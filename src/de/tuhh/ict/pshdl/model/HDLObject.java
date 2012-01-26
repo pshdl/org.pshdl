@@ -1,20 +1,35 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-
 import java.util.*;
 
 @SuppressWarnings("all")
 public abstract class HDLObject extends AbstractHDLObject {
-	public HDLObject(HDLObject container) {
-		super(container);
+	/**
+	 * Constructs a new instance of {@link HDLObject}
+	 * 
+	 * @param container
+	 *            the value for container. Can be <code>null</code>.
+	 * @param validate
+	 *			  if <code>true</code> the paramaters will be validated.
+	 */
+	public HDLObject(HDLObject container, boolean validate) {
+		super(container, validate);
 	}
-
+	/**
+	 * Constructs a new instance of {@link HDLObject}
+	 * 
+	 * @param container
+	 *            the value for container. Can be <code>null</code>.
+	 */
+	public HDLObject(HDLObject container) {
+		this(container, true);
+	}
 	public HDLObject() {
 		super();
 	}
-
-	// $CONTENT-BEGIN$
+//$CONTENT-BEGIN$
 
 	public static <T> ArrayList<T> asList(T... items) {
 		ArrayList<T> res = new ArrayList<T>();
@@ -39,5 +54,5 @@ public abstract class HDLObject extends AbstractHDLObject {
 			return false;
 		return true;
 	}
-	// $CONTENT-END$
-}
+//$CONTENT-END$
+}	

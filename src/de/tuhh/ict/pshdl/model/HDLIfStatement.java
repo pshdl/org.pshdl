@@ -1,20 +1,47 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-
 import java.util.*;
 
 @SuppressWarnings("all")
 public class HDLIfStatement extends AbstractHDLIfStatement {
-	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> ifDo, ArrayList<HDLStatement> thenDo) {
-		super(container, ifExp, ifDo, thenDo);
+	/**
+	 * Constructs a new instance of {@link HDLIfStatement}
+	 * 
+	 * @param container
+	 *            the value for container. Can be <code>null</code>.
+	 * @param ifExp
+	 *            the value for ifExp. Can <b>not</b> be <code>null</code>.
+	 * @param thenDo
+	 *            the value for thenDo. Can be <code>null</code>.
+	 * @param elseDo
+	 *            the value for elseDo. Can be <code>null</code>.
+	 * @param validate
+	 *			  if <code>true</code> the paramaters will be validated.
+	 */
+	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo, boolean validate) {
+		super(container, ifExp, thenDo, elseDo, validate);
 	}
-
+	/**
+	 * Constructs a new instance of {@link HDLIfStatement}
+	 * 
+	 * @param container
+	 *            the value for container. Can be <code>null</code>.
+	 * @param ifExp
+	 *            the value for ifExp. Can <b>not</b> be <code>null</code>.
+	 * @param thenDo
+	 *            the value for thenDo. Can be <code>null</code>.
+	 * @param elseDo
+	 *            the value for elseDo. Can be <code>null</code>.
+	 */
+	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo) {
+		this(container, ifExp, thenDo, elseDo, true);
+	}
 	public HDLIfStatement() {
 		super();
 	}
-
-	// $CONTENT-BEGIN$
+//$CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
@@ -38,5 +65,5 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		res.addAll(getallVariableDeclarations(elseDo));
 		return res;
 	}
-	// $CONTENT-END$
-}
+//$CONTENT-END$
+}	
