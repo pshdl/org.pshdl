@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLEnumDeclaration}
@@ -33,10 +33,12 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	public HDLEnumDeclaration() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		return Collections.singletonList(this);
 	}
 //$CONTENT-END$
+	
 }	

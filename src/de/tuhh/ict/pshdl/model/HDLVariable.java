@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
@@ -17,11 +17,13 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param dimensions
 	 *            the value for dimensions. Can be <code>null</code>.
+	 * @param defaultValue
+	 *            the value for defaultValue. Can be <code>null</code>.
 	 * @param validate
 	 *			  if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLAnnotation> annotations, ArrayList<HDLExpression> dimensions, boolean validate) {
-		super(container, name, annotations, dimensions, validate);
+	public HDLVariable(HDLObject container, String name, ArrayList<HDLAnnotation> annotations, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, boolean validate) {
+		super(container, name, annotations, dimensions, defaultValue, validate);
 	}
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
@@ -34,13 +36,18 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param dimensions
 	 *            the value for dimensions. Can be <code>null</code>.
+	 * @param defaultValue
+	 *            the value for defaultValue. Can be <code>null</code>.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLAnnotation> annotations, ArrayList<HDLExpression> dimensions) {
-		this(container, name, annotations, dimensions, true);
+	public HDLVariable(HDLObject container, String name, ArrayList<HDLAnnotation> annotations, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue) {
+		this(container, name, annotations, dimensions, defaultValue, true);
 	}
 	public HDLVariable() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
+
 //$CONTENT-END$
+	
 }	

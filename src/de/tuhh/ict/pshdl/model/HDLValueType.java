@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLValueType extends AbstractHDLValueType {
 	/**
 	 * Constructs a new instance of {@link HDLValueType}
@@ -37,9 +37,11 @@ public abstract class HDLValueType extends AbstractHDLValueType {
 	public HDLValueType() {
 		super();
 	}
-	 	public static enum HDLDirection {
-			IN,OUT,INOUT,PARAMETER,CONST,INTERNAL,HIDDEN,
+	 public static enum HDLDirection {
+	IN, OUT, INOUT, PARAMETER, CONST, INTERNAL, HIDDEN;
 		}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

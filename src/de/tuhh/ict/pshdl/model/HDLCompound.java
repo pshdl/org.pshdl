@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLCompound extends AbstractHDLCompound {
 	/**
 	 * Constructs a new instance of {@link HDLCompound}
@@ -29,6 +29,8 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	public HDLCompound() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
@@ -37,6 +37,8 @@ public class HDLFunction extends AbstractHDLFunction {
 	public HDLFunction() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLGeneratorArgument extends AbstractHDLGeneratorArgument {
 	/**
 	 * Constructs a new instance of {@link HDLGeneratorArgument}
@@ -41,6 +41,8 @@ public class HDLGeneratorArgument extends AbstractHDLGeneratorArgument {
 	public HDLGeneratorArgument() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

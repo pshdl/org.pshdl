@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLBitOp extends AbstractHDLBitOp {
 	/**
 	 * Constructs a new instance of {@link HDLBitOp}
@@ -41,9 +41,30 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	public HDLBitOp() {
 		super();
 	}
-	 	public static enum HDLBitOpType {
-			AND,OR,XOR,LOGI_AND,LOGI_OR,
+	 public static enum HDLBitOpType {
+	AND("&"), OR("|"), XOR("^"), LOGI_AND("&&"), LOGI_OR("||");	
+		String str;
+	
+		HDLBitOpType(String op) {
+			this.str = op;
 		}
+	
+		public static HDLBitOpType getOp(String op) {
+			for (HDLBitOpType ass : values()) {
+				if (ass.str.equals(op)) {
+					return ass;
+				}
+			}
+			return null;
+		}
+	
+		@Override
+		public String toString() {
+			return str;
+		}
+	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

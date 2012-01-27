@@ -1,39 +1,44 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
 public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param caseExp
+	 *            the value for caseExp. Can <b>not</b> be <code>null</code>.
 	 * @param cases
 	 *            the value for cases. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSwitchStatement(HDLObject container, ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
-		super(container, cases, validate);
+	public HDLSwitchStatement(HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
+		super(container, caseExp, cases, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param caseExp
+	 *            the value for caseExp. Can <b>not</b> be <code>null</code>.
 	 * @param cases
 	 *            the value for cases. Can be <code>null</code>.
 	 */
-	public HDLSwitchStatement(HDLObject container, ArrayList<HDLSwitchCaseStatement> cases) {
-		this(container, cases, true);
+	public HDLSwitchStatement(HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases) {
+		this(container, caseExp, cases, true);
 	}
+
 	public HDLSwitchStatement() {
 		super();
 	}
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
@@ -44,8 +49,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	}
 
 	@Override
-	protected List<HDLInterfaceDeclaration> doGetInterfaceDeclarations() {
-		List<HDLInterfaceDeclaration> res = new LinkedList<HDLInterfaceDeclaration>();
+	protected List<HDLInterface> doGetInterfaceDeclarations() {
+		List<HDLInterface> res = new LinkedList<HDLInterface>();
 		for (HDLSwitchCaseStatement c : cases) {
 			res.addAll(c.doGetInterfaceDeclarations());
 		}
@@ -60,5 +65,6 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 		}
 		return res;
 	}
-//$CONTENT-END$
-}	
+	// $CONTENT-END$
+
+}

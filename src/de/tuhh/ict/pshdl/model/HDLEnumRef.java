@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
 	 * Constructs a new instance of {@link HDLEnumRef}
@@ -37,6 +37,8 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	public HDLEnumRef() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

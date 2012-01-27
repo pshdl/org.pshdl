@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLConcat extends AbstractHDLConcat {
 	/**
 	 * Constructs a new instance of {@link HDLConcat}
@@ -33,6 +33,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	public HDLConcat() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

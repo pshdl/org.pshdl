@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * Constructs a new instance of {@link HDLPrimitive}
@@ -45,9 +45,11 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	public HDLPrimitive() {
 		super();
 	}
-	 	public static enum HDLPrimitiveType {
-			INT,UINT,INTEGER,NATURAL,BIT,BITVECTOR,BOOL,
+	 public static enum HDLPrimitiveType {
+	INT, UINT, INTEGER, NATURAL, BIT, BITVECTOR, BOOL;
 		}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

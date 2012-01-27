@@ -1,12 +1,11 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLValueType.HDLDirection;
-import de.tuhh.ict.pshdl.model.impl.*;
 
-@SuppressWarnings("all")
 public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * Constructs a new instance of {@link HDLForLoop}
@@ -51,13 +50,14 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	}
 
 	// $CONTENT-BEGIN$
+
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		return getallEnumDeclarations(dos);
 	}
 
 	@Override
-	protected List<HDLInterfaceDeclaration> doGetInterfaceDeclarations() {
+	protected List<HDLInterface> doGetInterfaceDeclarations() {
 		return getallInterfaceDeclarations(dos);
 	}
 
@@ -69,5 +69,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		res.add(new HDLVariableDeclaration(this, primitive, asList(param)));
 		return res;
 	}
+
 	// $CONTENT-END$
+
 }

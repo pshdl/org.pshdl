@@ -1,10 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
 public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchCaseStatement}
@@ -16,11 +14,12 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	 * @param dos
 	 *            the value for dos. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLSwitchCaseStatement(HDLObject container, HDLExpression label, ArrayList<HDLStatement> dos, boolean validate) {
 		super(container, label, dos, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLSwitchCaseStatement}
 	 * 
@@ -34,17 +33,19 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	public HDLSwitchCaseStatement(HDLObject container, HDLExpression label, ArrayList<HDLStatement> dos) {
 		this(container, label, dos, true);
 	}
+
 	public HDLSwitchCaseStatement() {
 		super();
 	}
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		return getallEnumDeclarations(dos);
 	}
 
 	@Override
-	protected List<HDLInterfaceDeclaration> doGetInterfaceDeclarations() {
+	protected List<HDLInterface> doGetInterfaceDeclarations() {
 		return getallInterfaceDeclarations(dos);
 	}
 
@@ -52,5 +53,6 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
 		return getallVariableDeclarations(dos);
 	}
-//$CONTENT-END$
-}	
+	// $CONTENT-END$
+
+}

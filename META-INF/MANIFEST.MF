@@ -4,7 +4,8 @@ Bundle-Name: V2
 Bundle-SymbolicName: de.tuhh.ict.pshdl.model.v2
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
- de.upb.hni.vmagic;bundle-version="1.0.0"
+ de.upb.hni.vmagic;bundle-version="1.0.0",
+ org.aspectj.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.tuhh.ict.pshdl.model,

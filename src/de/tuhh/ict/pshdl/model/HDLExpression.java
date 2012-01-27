@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLExpression extends AbstractHDLExpression {
 	/**
 	 * Constructs a new instance of {@link HDLExpression}
@@ -29,6 +29,8 @@ public abstract class HDLExpression extends AbstractHDLExpression {
 	public HDLExpression() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

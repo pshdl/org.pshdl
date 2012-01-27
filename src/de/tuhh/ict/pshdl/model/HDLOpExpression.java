@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * Constructs a new instance of {@link HDLOpExpression}
@@ -37,6 +37,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	public HDLOpExpression() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

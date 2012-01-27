@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
 	 * Constructs a new instance of {@link HDLEqualityOp}
@@ -41,9 +41,30 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	public HDLEqualityOp() {
 		super();
 	}
-	 	public static enum HDLEqualityOpType {
-			EQ,GREATER,GREATER_EQ,LESS,LESS_EQ,NOT_EQ,
+	 public static enum HDLEqualityOpType {
+	EQ("=="), NOT_EQ("!="), LESS("<"), LESS_EQ("<="), GREATER(">"), GREATER_EQ(">=");	
+		String str;
+	
+		HDLEqualityOpType(String op) {
+			this.str = op;
 		}
+	
+		public static HDLEqualityOpType getOp(String op) {
+			for (HDLEqualityOpType ass : values()) {
+				if (ass.str.equals(op)) {
+					return ass;
+				}
+			}
+			return null;
+		}
+	
+		@Override
+		public String toString() {
+			return str;
+		}
+	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

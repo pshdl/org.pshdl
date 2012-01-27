@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLShiftOp extends AbstractHDLShiftOp {
 	/**
 	 * Constructs a new instance of {@link HDLShiftOp}
@@ -41,9 +41,30 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	public HDLShiftOp() {
 		super();
 	}
-	 	public static enum HDLShiftOpType {
-			SLL,SRA,SRL,
+	 public static enum HDLShiftOpType {
+	SLL("<<"), SRA(">>"), SRL(">>>");	
+		String str;
+	
+		HDLShiftOpType(String op) {
+			this.str = op;
 		}
+	
+		public static HDLShiftOpType getOp(String op) {
+			for (HDLShiftOpType ass : values()) {
+				if (ass.str.equals(op)) {
+					return ass;
+				}
+			}
+			return null;
+		}
+	
+		@Override
+		public String toString() {
+			return str;
+		}
+	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

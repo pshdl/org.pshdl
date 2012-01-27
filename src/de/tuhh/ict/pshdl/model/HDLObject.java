@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLObject extends AbstractHDLObject {
 	/**
 	 * Constructs a new instance of {@link HDLObject}
@@ -29,6 +29,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	public HDLObject() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 
 	public static <T> ArrayList<T> asList(T... items) {
@@ -55,4 +56,5 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return true;
 	}
 //$CONTENT-END$
+	
 }	

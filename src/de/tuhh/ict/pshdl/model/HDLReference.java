@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLReference extends AbstractHDLReference {
 	/**
 	 * Constructs a new instance of {@link HDLReference}
@@ -29,6 +29,8 @@ public abstract class HDLReference extends AbstractHDLReference {
 	public HDLReference() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

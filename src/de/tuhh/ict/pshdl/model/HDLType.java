@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public abstract class HDLType extends AbstractHDLType {
 	/**
 	 * Constructs a new instance of {@link HDLType}
@@ -29,6 +29,8 @@ public abstract class HDLType extends AbstractHDLType {
 	public HDLType() {
 		super();
 	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLArithOp extends AbstractHDLArithOp {
 	/**
 	 * Constructs a new instance of {@link HDLArithOp}
@@ -41,9 +41,30 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	public HDLArithOp() {
 		super();
 	}
-	 	public static enum HDLArithOpType {
-			MUL,DIV,MINUS,PLUS,MOD,POW,
+	 public static enum HDLArithOpType {
+	MUL("*"), DIV("/"), MINUS("-"), PLUS("+"), MOD("%"), POW("**");	
+		String str;
+	
+		HDLArithOpType(String op) {
+			this.str = op;
 		}
+	
+		public static HDLArithOpType getOp(String op) {
+			for (HDLArithOpType ass : values()) {
+				if (ass.str.equals(op)) {
+					return ass;
+				}
+			}
+			return null;
+		}
+	
+		@Override
+		public String toString() {
+			return str;
+		}
+	}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	

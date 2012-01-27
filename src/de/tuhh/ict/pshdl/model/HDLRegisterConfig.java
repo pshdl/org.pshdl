@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
@@ -53,18 +53,20 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public HDLRegisterConfig() {
 		super();
 	}
-	 	public static enum HDLRegClockType {
-			RISING,FALLING,
+	 public static enum HDLRegClockType {
+	RISING, FALLING;
 		}
-	 	public static enum HDLRegResetType {
-			HIGH_ACTIVE,LOW_ACTIVE,
+	 public static enum HDLRegResetType {
+	HIGH_ACTIVE, LOW_ACTIVE;
 		}
-	 	public static enum HDLRegSyncType {
-			SYNC,ASYNC,
+	 public static enum HDLRegSyncType {
+	SYNC, ASYNC;
 		}
+	
 //$CONTENT-BEGIN$
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig(null, HDLQualifiedName.create("$clk"), HDLQualifiedName.create("$rst"), null, null, null, new HDLLiteral(null, "0"));
 	}
 //$CONTENT-END$
+	
 }	

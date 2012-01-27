@@ -4,7 +4,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
 public abstract class HDLStatement extends AbstractHDLStatement {
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
@@ -12,11 +11,12 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLStatement(HDLObject container, boolean validate) {
 		super(container, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
 	 * 
@@ -26,10 +26,12 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	public HDLStatement(HDLObject container) {
 		this(container, true);
 	}
+
 	public HDLStatement() {
 		super();
 	}
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 	private Map<String, HDLEnum> enumCache;
 
 	@Override
@@ -67,10 +69,10 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
 		if (ifCache == null) {
 			synchronized (this) {
-				List<HDLInterfaceDeclaration> ifDecl = doGetInterfaceDeclarations();
+				List<HDLInterface> ifDecl = doGetInterfaceDeclarations();
 				ifCache = new HashMap<String, HDLInterface>();
-				for (HDLInterfaceDeclaration hdlIfDeclaration : ifDecl) {
-					ifCache.put(hdlIfDeclaration.getHIf().getName(), hdlIfDeclaration.getHIf());
+				for (HDLInterface hdlIfDeclaration : ifDecl) {
+					ifCache.put(hdlIfDeclaration.getName(), hdlIfDeclaration);
 				}
 			}
 		}
@@ -79,18 +81,22 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 		return container.resolveInterface(hIf);
 	}
 
-	protected List<HDLInterfaceDeclaration> getallInterfaceDeclarations(List<HDLStatement> stmnts) {
-		List<HDLInterfaceDeclaration> res = new LinkedList<HDLInterfaceDeclaration>();
+	protected List<HDLInterface> getallInterfaceDeclarations(List<HDLStatement> stmnts) {
+		List<HDLInterface> res = new LinkedList<HDLInterface>();
 		for (HDLStatement hdlStatement : stmnts) {
 			if (hdlStatement instanceof HDLInterfaceDeclaration) {
 				HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) hdlStatement;
-				res.add(hid);
+				res.add(hid.getHIf());
+			}
+			if (hdlStatement instanceof HDLDirectGeneration) {
+				HDLDirectGeneration hid = (HDLDirectGeneration) hdlStatement;
+				res.add(hid.getHIf());
 			}
 		}
 		return res;
 	}
 
-	abstract protected List<HDLInterfaceDeclaration> doGetInterfaceDeclarations();
+	abstract protected List<HDLInterface> doGetInterfaceDeclarations();
 
 	@Override
 	public HDLType resolveType(HDLQualifiedName type) {
@@ -105,8 +111,8 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 		for (HDLVariableDeclaration varDecl : doGetVariableDeclarations()) {
 			types.add(varDecl.getType());
 		}
-		for (HDLInterfaceDeclaration ifDecl : doGetInterfaceDeclarations()) {
-			types.add(ifDecl.getHIf());
+		for (HDLInterface ifDecl : doGetInterfaceDeclarations()) {
+			types.add(ifDecl);
 		}
 		return types;
 	}
@@ -128,5 +134,6 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	}
 
 	abstract protected List<HDLVariableDeclaration> doGetVariableDeclarations();
-//$CONTENT-END$
-}	
+	// $CONTENT-END$
+
+}

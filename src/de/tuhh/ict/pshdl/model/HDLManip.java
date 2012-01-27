@@ -4,7 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-@SuppressWarnings("all")
+
 public class HDLManip extends AbstractHDLManip {
 	/**
 	 * Constructs a new instance of {@link HDLManip}
@@ -41,9 +41,11 @@ public class HDLManip extends AbstractHDLManip {
 	public HDLManip() {
 		super();
 	}
-	 	public static enum HDLManipType {
-			CAST,ARITH_NEG,BIT_NEG,LOGIC_NEG,
+	 public static enum HDLManipType {
+	CAST, ARITH_NEG, BIT_NEG, LOGIC_NEG;
 		}
+	
 //$CONTENT-BEGIN$
 //$CONTENT-END$
+	
 }	
