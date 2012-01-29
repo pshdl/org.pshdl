@@ -13,8 +13,6 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
 	 * @param dimensions
 	 *            the value for dimensions. Can be <code>null</code>.
 	 * @param defaultValue
@@ -22,8 +20,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *			  if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLAnnotation> annotations, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, boolean validate) {
-		super(container, name, annotations, dimensions, defaultValue, validate);
+	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, boolean validate) {
+		super(container, name, dimensions, defaultValue, validate);
 	}
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
@@ -32,21 +30,42 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
 	 * @param dimensions
 	 *            the value for dimensions. Can be <code>null</code>.
 	 * @param defaultValue
 	 *            the value for defaultValue. Can be <code>null</code>.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLAnnotation> annotations, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue) {
-		this(container, name, annotations, dimensions, defaultValue, true);
+	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue) {
+		this(container, name, dimensions, defaultValue, true);
 	}
 	public HDLVariable() {
 		super();
 	}
 	
 //$CONTENT-BEGIN$
+
+	/**
+	 * Attempt to determine the type of this HDLVariable. For this to work it
+	 * needs to have a valid container.
+	 * 
+	 * @return the HDLType if it could be determined, <code>null</code>
+	 *         otherwise.
+	 */
+	public HDLType determineType() {
+		if (getContainer() instanceof HDLVariableDeclaration) {
+			HDLVariableDeclaration hvd = (HDLVariableDeclaration) getContainer();
+			return hvd.resolveType();
+		}
+		if (getContainer() instanceof HDLDirectGeneration) {
+			HDLDirectGeneration hdg = (HDLDirectGeneration) getContainer();
+			return hdg.getHIf();
+		}
+		if (getContainer() instanceof HDLInterfaceInstantiation) {
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) getContainer();
+			return hii.resolveHIf();
+		}
+		return null;
+	}
 
 //$CONTENT-END$
 	

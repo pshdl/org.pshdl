@@ -18,7 +18,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *			  if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(HDLObject container, HDLType type, ArrayList<HDLVariable> variables, boolean validate) {
+	public HDLVariableDeclaration(HDLObject container, HDLQualifiedName type, ArrayList<HDLVariable> variables, boolean validate) {
 		super(container, type, variables, validate);
 	}
 	/**
@@ -31,7 +31,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param variables
 	 *            the value for variables. Can <b>not</b> be <code>null</code>, additionally the collection must contain at least one element.
 	 */
-	public HDLVariableDeclaration(HDLObject container, HDLType type, ArrayList<HDLVariable> variables) {
+	public HDLVariableDeclaration(HDLObject container, HDLQualifiedName type, ArrayList<HDLVariable> variables) {
 		this(container, type, variables, true);
 	}
 	public HDLVariableDeclaration() {
@@ -39,6 +39,43 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	}
 	
 //$CONTENT-BEGIN$
+	@Override
+	public String toConstructionString(String spacing) {
+		boolean first = true;
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n").append(spacing).append("new HDLVariableDeclaration(");
+		sb.append("null");
+		if (type == null)
+			sb.append(", null");
+		else {
+			// Fix for HDLPrimitives, do not just create reference!
+			if (type.getLastSegment().startsWith("#"))
+				sb.append(", ").append(resolveType().toConstructionString(spacing));
+			else
+				sb.append(", HDLQualifiedName.create(\"").append(type).append("\")");
+		}
+		if (variables == null)
+			sb.append(", null");
+		else {
+			if (variables.size() > 0) {
+				sb.append(",\n");
+				sb.append(spacing + "\t").append("HDLObject.asList(");
+				first = true;
+				for (HDLVariable o : variables) {
+					if (!first)
+						sb.append(", ");
+					first = false;
+					sb.append(o.toConstructionString(spacing + "\t\t"));
+				}
+				sb.append("\n" + spacing + "\t").append(")");
+			} else {
+				sb.append(", new ArrayList<HDLVariable>()");
+			}
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
 //$CONTENT-END$
 	
 }	

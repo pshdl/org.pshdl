@@ -37,14 +37,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	
 //$CONTENT-BEGIN$
 
-	@Override
-	protected String validateVal(String val) {
-		String validateVal = super.validateVal(val);
-		if (getValueAsBigInt() == null)
-			throw new IllegalArgumentException("Literal String is " + validateVal + " is not a valid literal.");
-		return validateVal;
-	}
-
 	public BigInteger getValueAsBigInt() {
 		String string = getVal();
 		char zeroChar = string.charAt(0);
@@ -62,6 +54,13 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			}
 		}
 		return new BigInteger(string.replaceAll("_", ""));
+	}
+
+	@Override
+	public void validateAllFields(boolean checkResolve) {
+		super.validateAllFields(checkResolve);
+		if (getValueAsBigInt() == null)
+			throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");
 	}
 
 //$CONTENT-END$

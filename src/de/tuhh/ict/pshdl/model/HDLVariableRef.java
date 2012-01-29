@@ -43,6 +43,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	}
 	
 //$CONTENT-BEGIN$
+
 //$CONTENT-END$
 	
 }	

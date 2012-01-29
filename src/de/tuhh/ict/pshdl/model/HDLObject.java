@@ -32,6 +32,29 @@ public abstract class HDLObject extends AbstractHDLObject {
 	
 //$CONTENT-BEGIN$
 
+	public interface MetaAccess<T> {
+		public String name();
+	}
+
+	public Map<String, Object> metaData = new HashMap<String, Object>();
+
+	public void addMeta(String key, Object value) {
+		metaData.put(key, value);
+	}
+
+	public Object getMeta(String key) {
+		return metaData.get(key);
+	}
+
+	public <K> void addMeta(MetaAccess<K> key, K value) {
+		metaData.put(key.name(), value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K> K getMeta(MetaAccess<K> key) {
+		return (K) metaData.get(key.name());
+	}
+
 	public static <T> ArrayList<T> asList(T... items) {
 		ArrayList<T> res = new ArrayList<T>();
 		for (T t : items) {
@@ -55,6 +78,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 			return false;
 		return true;
 	}
+
 //$CONTENT-END$
 	
 }	

@@ -39,6 +39,12 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	}
 	
 //$CONTENT-BEGIN$
+	@Override
+	public HDLVariable resolveVar() {
+		HDLEnum resolveHEnum = resolveHEnum();
+		return resolveHEnum.getVariable(getVarRefName().getLastSegment());
+	}
+
 //$CONTENT-END$
 	
 }	

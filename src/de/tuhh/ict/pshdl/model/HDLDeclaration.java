@@ -1,7 +1,9 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
 
 public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	/**
@@ -10,12 +12,11 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *			  if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLDeclaration(HDLObject container, boolean validate) {
 		super(container, validate);
 	}
-
 	/**
 	 * Constructs a new instance of {@link HDLDeclaration}
 	 * 
@@ -25,31 +26,30 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	public HDLDeclaration(HDLObject container) {
 		this(container, true);
 	}
-
 	public HDLDeclaration() {
 		super();
 	}
-
-	// $CONTENT-BEGIN$
+	
+//$CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected List<HDLInterface> doGetInterfaceDeclarations() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected List<HDLType> doGetTypeDeclarations() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
-	// $CONTENT-END$
-
-}
+//$CONTENT-END$
+	
+}	

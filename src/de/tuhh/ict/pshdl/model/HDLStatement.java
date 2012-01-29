@@ -4,6 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
+
 public abstract class HDLStatement extends AbstractHDLStatement {
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
@@ -11,12 +12,11 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *			  if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLStatement(HDLObject container, boolean validate) {
 		super(container, validate);
 	}
-
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
 	 * 
@@ -26,12 +26,11 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	public HDLStatement(HDLObject container) {
 		this(container, true);
 	}
-
 	public HDLStatement() {
 		super();
 	}
-
-	// $CONTENT-BEGIN$
+	
+//$CONTENT-BEGIN$
 	private Map<String, HDLEnum> enumCache;
 
 	@Override
@@ -45,20 +44,11 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 				}
 			}
 		}
-		if (enumCache.get(hEnum) != null)
+		// XXX Check if the qualifier does either match the pkg name, or is not
+		// existant
+		if (enumCache.get(hEnum.getLastSegment()) != null)
 			return enumCache.get(hEnum);
 		return container.resolveEnum(hEnum);
-	}
-
-	protected List<HDLEnumDeclaration> getallEnumDeclarations(List<HDLStatement> stmnts) {
-		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
-		for (HDLStatement hdlStatement : stmnts) {
-			if (hdlStatement instanceof HDLEnumDeclaration) {
-				HDLEnumDeclaration hed = (HDLEnumDeclaration) hdlStatement;
-				res.add(hed);
-			}
-		}
-		return res;
 	}
 
 	abstract protected List<HDLEnumDeclaration> doGetEnumDeclarations();
@@ -76,31 +66,40 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 				}
 			}
 		}
-		if (ifCache.get(hIf) != null)
-			return ifCache.get(hIf);
+		// XXX Check if the qualifier does either match the pkg name, or is not
+		// existant
+		if (ifCache.get(hIf.getLastSegment()) != null)
+			return ifCache.get(hIf.getLastSegment());
 		return container.resolveInterface(hIf);
-	}
-
-	protected List<HDLInterface> getallInterfaceDeclarations(List<HDLStatement> stmnts) {
-		List<HDLInterface> res = new LinkedList<HDLInterface>();
-		for (HDLStatement hdlStatement : stmnts) {
-			if (hdlStatement instanceof HDLInterfaceDeclaration) {
-				HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) hdlStatement;
-				res.add(hid.getHIf());
-			}
-			if (hdlStatement instanceof HDLDirectGeneration) {
-				HDLDirectGeneration hid = (HDLDirectGeneration) hdlStatement;
-				res.add(hid.getHIf());
-			}
-		}
-		return res;
 	}
 
 	abstract protected List<HDLInterface> doGetInterfaceDeclarations();
 
+	private Map<String, HDLType> typeCache;
+
 	@Override
-	public HDLType resolveType(HDLQualifiedName type) {
-		return super.resolveType(type);
+	public HDLType resolveType(HDLQualifiedName var) {
+		if (typeCache == null) {
+			synchronized (this) {
+				List<HDLType> typeDecl = doGetTypeDeclarations();
+				typeCache = new HashMap<String, HDLType>();
+				for (HDLType hdlTypeDeclaration : typeDecl) {
+					// Primitives do not have a name and can thus not be
+					// resolved..
+					if (hdlTypeDeclaration instanceof HDLEnum) {
+						HDLEnum hEnum = (HDLEnum) hdlTypeDeclaration;
+						typeCache.put(hEnum.getName(), hEnum);
+					}
+					if (hdlTypeDeclaration instanceof HDLInterface) {
+						HDLInterface hIf = (HDLInterface) hdlTypeDeclaration;
+						typeCache.put(hIf.getName(), hIf);
+					}
+				}
+			}
+		}
+		if (typeCache.get(var.getLastSegment()) != null)
+			return typeCache.get(var.getLastSegment());
+		return container.resolveType(var);
 	}
 
 	protected List<HDLType> doGetTypeDeclarations() {
@@ -109,7 +108,8 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 			types.add(hEnumDecl.getHEnum());
 		}
 		for (HDLVariableDeclaration varDecl : doGetVariableDeclarations()) {
-			types.add(varDecl.getType());
+			if (varDecl.getTypeRefName().getLastSegment().startsWith("#"))
+				types.add(HDLPrimitive.forName(varDecl.getTypeRefName()));
 		}
 		for (HDLInterface ifDecl : doGetInterfaceDeclarations()) {
 			types.add(ifDecl);
@@ -117,23 +117,27 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 		return types;
 	}
 
+	private Map<String, HDLVariable> variableCache;
+
 	@Override
 	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		return super.resolveVariable(var);
-	}
-
-	protected List<HDLVariableDeclaration> getallVariableDeclarations(List<HDLStatement> stmnts) {
-		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
-		for (HDLStatement hdlStatement : stmnts) {
-			if (hdlStatement instanceof HDLVariableDeclaration) {
-				HDLVariableDeclaration hid = (HDLVariableDeclaration) hdlStatement;
-				res.add(hid);
+		if (variableCache == null) {
+			synchronized (this) {
+				List<HDLVariableDeclaration> varDecl = doGetVariableDeclarations();
+				variableCache = new HashMap<String, HDLVariable>();
+				for (HDLVariableDeclaration hdlVarDeclaration : varDecl) {
+					for (HDLVariable declVars : hdlVarDeclaration.getVariables()) {
+						variableCache.put(declVars.getName(), declVars);
+					}
+				}
 			}
 		}
-		return res;
+		if (variableCache.get(var.getLastSegment()) != null)
+			return variableCache.get(var.getLastSegment());
+		return container.resolveVariable(var);
 	}
 
 	abstract protected List<HDLVariableDeclaration> doGetVariableDeclarations();
-	// $CONTENT-END$
-
-}
+//$CONTENT-END$
+	
+}	
