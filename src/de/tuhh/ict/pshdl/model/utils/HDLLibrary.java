@@ -6,35 +6,8 @@ import java.util.concurrent.*;
 import de.tuhh.ict.pshdl.model.*;
 
 public class HDLLibrary {
-	public Map<String, HDLPackage> pkgs = new ConcurrentHashMap<String, HDLPackage>();
-
-	public HDLPackage getOrCreatePackage(HDLQualifiedName qfn) {
-		if ((qfn == null) || (qfn.length == 0))
-			throw new IllegalArgumentException("Can not get null or empty String package");
-		String rootpkg = qfn.getSegment(0);
-		HDLPackage hdlPackage = pkgs.get(rootpkg);
-		if (hdlPackage == null) {
-			hdlPackage = new HDLPackage(rootpkg, null, this);
-			pkgs.put(rootpkg, hdlPackage);
-		}
-		return hdlPackage.getOrCreateSubPackages(1, qfn);
-	}
-
-	public HDLPackage getPackage(HDLQualifiedName qfn) {
-		if ((qfn == null) || (qfn.length == 0))
-			throw new IllegalArgumentException("Can not get null or empty String package");
-		String rootpkg = qfn.getSegment(0);
-		HDLPackage hdlPackage = pkgs.get(rootpkg);
-		if (hdlPackage == null) {
-			return null;
-		}
-		return hdlPackage.getSubPackages(1, qfn);
-	}
-
-	public HDLUnit getUnit(HDLQualifiedName name) {
-		HDLPackage pkg = getPackage(name.skipLast(1));
-		return pkg.getUnit(name.getLastSegment());
-	}
+	public Map<HDLQualifiedName, HDLPackage> pkgs = new ConcurrentHashMap<HDLQualifiedName, HDLPackage>();
+	public Map<HDLQualifiedName, HDLType> types = new ConcurrentHashMap<HDLQualifiedName, HDLType>();
 
 	private static Map<String, HDLLibrary> libs = new HashMap<String, HDLLibrary>();
 
@@ -46,8 +19,62 @@ public class HDLLibrary {
 		return libs.get(uri);
 	}
 
-	public void addUnit(HDLUnit unit) {
-		HDLQualifiedName fqn = new HDLQualifiedName(unit.getName());
-		getOrCreatePackage(fqn.skipLast(1)).units.put(fqn.getLastSegment(), unit);
+	public void addPkg(HDLPackage pkg) {
+		pkg.setLibrary(this);
+		HDLQualifiedName hdlPkg = new HDLQualifiedName(pkg.getPkg());
+		for (HDLUnit unit : pkg.getUnits()) {
+			HDLQualifiedName uq = hdlPkg.append(new HDLQualifiedName(unit.getName()));
+			System.out.println("HDLLibrary.addPkg()" + uq);
+			HDLQualifiedName skipLast = uq.skipLast(1);
+			HDLPackage hdlPackage = pkgs.get(skipLast);
+			if (hdlPackage == null) {
+				hdlPackage = new HDLPackage().setPkg(skipLast.toString());
+			}
+			ArrayList<HDLUnit> units = hdlPackage.getUnits();
+			Iterator<HDLUnit> it = units.iterator();
+			while (it.hasNext()) {
+				HDLUnit type = it.next();
+				HDLQualifiedName name = new HDLQualifiedName(type.getName());
+				if (name.equals(uq))
+					it.remove();
+			}
+			units.add(unit);
+			hdlPackage = hdlPackage.setUnits(units);
+			pkgs.put(skipLast, hdlPackage);
+			types.put(uq, unit.asInterface());
+			List<HDLInterface> list = unit.getAllObjectsOf(HDLInterface.class, true);
+			for (HDLInterface hdlInterface : list) {
+				HDLQualifiedName append = uq.append(hdlInterface.getName());
+				System.out.println("HDLLibrary.addPkg() Interface:" + append);
+				types.put(append, hdlInterface);
+			}
+			List<HDLEnum> elist = unit.getAllObjectsOf(HDLEnum.class, true);
+			for (HDLEnum hdlEnum : elist) {
+				HDLQualifiedName append = uq.append(hdlEnum.getName());
+				System.out.println("HDLLibrary.addPkg() Enum:" + append);
+				types.put(append, hdlEnum);
+			}
+		}
+	}
+
+	public HDLType resolve(String name, ArrayList<String> imports, HDLQualifiedName type) {
+		HDLType hdlType = types.get(type);
+		if (hdlType == null) {
+			for (String string : imports) {
+				if (string.endsWith(type.toString()))
+					return types.get(new HDLQualifiedName(string));
+			}
+			for (String string : imports) {
+				if (string.endsWith(".*")) {
+					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
+					System.out.println("HDLLibrary.resolve()" + newTypeName);
+					HDLType newType = types.get(newTypeName);
+					if (newType != null) {
+						return newType;
+					}
+				}
+			}
+		}
+		return hdlType;
 	}
 }

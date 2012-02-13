@@ -55,7 +55,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 
 	@Override
 	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		return Collections.singletonList(new HDLVariableDeclaration(this, hIf, asList(var)));
+		return Collections.emptyList();
 	}
 //$CONTENT-END$
 	

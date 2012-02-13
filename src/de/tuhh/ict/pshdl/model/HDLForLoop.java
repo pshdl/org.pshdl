@@ -4,6 +4,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 
 public class HDLForLoop extends AbstractHDLForLoop {
 	/**
@@ -58,7 +59,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
 		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
 		res.addAll(HDLUtils.getallVariableDeclarations(dos));
-		res.add(new HDLVariableDeclaration(this, HDLQualifiedName.create("#uint"), asList(param)));
+		res.add(new HDLVariableDeclaration(this, null, HDLDirection.HIDDEN, null, HDLQualifiedName.create("#uint"), asList(param)));
 		return res;
 	}
 

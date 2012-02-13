@@ -3,7 +3,7 @@ package de.tuhh.ict.pshdl.model.aspects;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLValueType.HDLDirection;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 
 public aspect StringWriterAspect {
@@ -14,6 +14,7 @@ public aspect StringWriterAspect {
 		sb.append(getRight()).append(")");
 		return sb.toString();
 	}
+
 	public String HDLEqualityOp.toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft());
@@ -21,6 +22,7 @@ public aspect StringWriterAspect {
 		sb.append(getRight()).append(")");
 		return sb.toString();
 	}
+
 	public String HDLArithOp.toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft());
@@ -28,6 +30,7 @@ public aspect StringWriterAspect {
 		sb.append(getRight()).append(")");
 		return sb.toString();
 	}
+
 	public String HDLBitOp.toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft());
@@ -66,7 +69,7 @@ public aspect StringWriterAspect {
 			sb.append('[').append(arr).append(']');
 		}
 		sb.append('.');
-		sb.append(super.toString());
+		sb.append(getVarRef(this));
 		return sb.toString();
 	}
 
@@ -146,23 +149,15 @@ public aspect StringWriterAspect {
 		return builder.toString();
 	}
 
-	public String HDLPrimitive.toString(){
-		StringBuilder sb=new StringBuilder();
-		switch (getDirection()){
-		case INTERNAL:break;
-		case HIDDEN:break;
-		default:
-			sb.append(getDirection()).append(' ');
-		}
-		if (getRegister()!=null)
-			sb.append(getRegister());
+	public String HDLPrimitive.toString() {
+		StringBuilder sb = new StringBuilder();
 		sb.append(getType().toString().toLowerCase());
-		if (getWidth()!=null){
+		if (getWidth() != null) {
 			sb.append('<').append(getWidth()).append('>');
 		}
 		return sb.toString();
 	}
-	
+
 	public String HDLForLoop.toString() {
 		StringBuilder space = getSpacing();
 		StringBuilder sb = new StringBuilder();
@@ -204,7 +199,7 @@ public aspect StringWriterAspect {
 	public String HDLSwitchCaseStatement.toString() {
 		StringBuilder sb = getSpacing();
 		Formatter f = new Formatter();
-		if (getLabel()==null)
+		if (getLabel() == null)
 			f.format("%sdefault : {\n", sb);
 		else
 			f.format("%scase %s: {\n", sb, getLabel());
@@ -232,7 +227,21 @@ public aspect StringWriterAspect {
 
 	public String HDLVariableDeclaration.toString() {
 		StringBuilder sb = getSpacing();
-		sb.append(resolveType());
+		HDLType resolveType = resolveType();
+		if (getAnnotations() != null) {
+			for (HDLAnnotation hdla : getAnnotations()) {
+				sb.append(hdla);
+			}
+		}
+		String dirString = getDirection().toString();
+		if (dirString.length() > 0)
+			sb.append(dirString).append(' ');
+		if (getRegister() != null)
+			sb.append(getRegister());
+		if (resolveType instanceof HDLEnum) {
+			sb.append("enum ").append(resolveType);
+		} else
+			sb.append(resolveType);
 		String spacing = " ";
 		for (HDLVariable var : getVariables()) {
 			sb.append(spacing);
@@ -250,10 +259,10 @@ public aspect StringWriterAspect {
 		incSpacing();
 		for (HDLVariableDeclaration var : getHIf().getPorts()) {
 			sb.append(getSpacing()).append(var.resolveType());
-			String spacing=" ";
+			String spacing = " ";
 			for (HDLVariable vars : var.getVariables()) {
 				sb.append(spacing).append(vars);
-				spacing=",";
+				spacing = ",";
 			}
 			sb.append(";\n");
 		}
@@ -275,60 +284,55 @@ public aspect StringWriterAspect {
 		sb.append("enum ");
 		sb.append(getHEnum().getName());
 		sb.append(" = {");
-		String spacer="";
+		String spacer = "";
 		for (HDLVariable henum : getHEnum().getEnums()) {
 			sb.append(spacer).append(henum);
-			spacer=", ";
+			spacer = ", ";
 		}
 		sb.append("};");
 		return sb.toString();
 	}
-	public static final String EDGE_PARAM = "clockEdge";
-	public static final String RESET_PARAM = "reset";
-	public static final String RESET_SYNC_PARAM = "resetSync";
-	public static final String CLOCK_PARAM = "clock";
-	public static final String RESET_TYPE_PARAM = "resetType";
-	public static final String RESET_VALUE_PARAM = "resetValue";
-	public String HDLRegisterConfig.toString(){
-		StringBuilder sb=new StringBuilder();
+
+	public String HDLRegisterConfig.toString() {
+		StringBuilder sb = new StringBuilder();
 		sb.append("register");
-		HDLRegisterConfig def=HDLRegisterConfig.defaultConfig();
-		StringBuilder params=new StringBuilder();
+		HDLRegisterConfig def = HDLRegisterConfig.defaultConfig();
+		StringBuilder params = new StringBuilder();
 		params.append('(');
-		boolean first=true;
-		if (!getClkRefName().equals(def.getClkRefName())){
-			params.append(CLOCK_PARAM).append('=').append(getClkRefName());
-			first=false;
+		boolean first = true;
+		if (!getClkRefName().equals(def.getClkRefName())) {
+			params.append(HDLRegisterConfig.CLOCK_PARAM).append('=').append(getClkRefName());
+			first = false;
 		}
-		if (!getRstRefName().equals(def.getRstRefName())){
+		if (!getRstRefName().equals(def.getRstRefName())) {
 			if (!first)
 				params.append(", ");
-			params.append(RESET_PARAM).append('=').append(getRstRefName());
-			first=false;
+			params.append(HDLRegisterConfig.RESET_PARAM).append('=').append(getRstRefName());
+			first = false;
 		}
-		if (!getClockType().equals(def.getClockType())){
+		if (!getClockType().equals(def.getClockType())) {
 			if (!first)
 				params.append(", ");
-			params.append(EDGE_PARAM).append('=').append(getClockType());
-			first=false;
+			params.append(HDLRegisterConfig.EDGE_PARAM).append('=').append(getClockType());
+			first = false;
 		}
-		if (!getSyncType().equals(def.getSyncType())){
+		if (!getSyncType().equals(def.getSyncType())) {
 			if (!first)
 				params.append(", ");
-			params.append(RESET_SYNC_PARAM).append('=').append(getSyncType());
-			first=false;
+			params.append(HDLRegisterConfig.RESET_SYNC_PARAM).append('=').append(getSyncType());
+			first = false;
 		}
-		if (!getResetType().equals(def.getResetType())){
+		if (!getResetType().equals(def.getResetType())) {
 			if (!first)
 				params.append(", ");
-			params.append(RESET_TYPE_PARAM).append('=').append(getResetType());
-			first=false;
+			params.append(HDLRegisterConfig.RESET_TYPE_PARAM).append('=').append(getResetType());
+			first = false;
 		}
-		if (!getResetValue().equals(def.getResetValue())){
+		if (!getResetValue().equals(def.getResetValue())) {
 			if (!first)
 				params.append(", ");
-			params.append(RESET_VALUE_PARAM).append('=').append(getResetValue());
-			first=false;
+			params.append(HDLRegisterConfig.RESET_VALUE_PARAM).append('=').append(getResetValue());
+			first = false;
 		}
 		params.append(')');
 		if (!first)
@@ -337,18 +341,29 @@ public aspect StringWriterAspect {
 		return sb.toString();
 	}
 
-	public String HDLUnit.toString(){
+	public String HDLPackage.toString(){
 		StringBuilder sb=new StringBuilder();
-		sb.append("module ").append(getName()).append(";\n");
-		for(String imports:getImports()){
-			sb.append("import ").append(imports).append(";\n");
-		}
-		for(HDLStatement stmnt:getStatements()){
-			sb.append(stmnt).append('\n');
+		if (getPkg()!=null)
+		sb.append("package ").append(getPkg()).append(";\n");
+		for (HDLUnit unit : getUnits()) {
+			sb.append(unit);
 		}
 		return sb.toString();
 	}
 	
+	public String HDLUnit.toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("module ").append(getName()).append(";\n");
+		for (String imports : getImports()) {
+			sb.append("import ").append(imports).append(";\n");
+		}
+		for (HDLStatement stmnt : getStatements()) {
+			sb.append(stmnt).append('\n');
+		}
+		return sb.toString();
+
+	}
+
 	public String HDLInterfaceInstantiation.toString() {
 		StringBuilder sb = getSpacing();
 		sb.append(getHIfRefName()).append(' ').append(getVar().getName());
@@ -366,7 +381,7 @@ public aspect StringWriterAspect {
 		return getTo().toString();
 	}
 
-	public String HDLVariable.toString(){
+	public String HDLVariable.toString() {
 		StringBuilder sb = new StringBuilder();
 		// sb.append(qfn);
 		sb.append(getName());
@@ -377,14 +392,14 @@ public aspect StringWriterAspect {
 			sb.append('=').append(getDefaultValue());
 		return sb.toString();
 	}
-	
+
 	public String HDLDirectGeneration.toString() {
 		StringBuilder sb = getSpacing();
 		sb.append(getHIf().getName()).append(' ').append(getVar().getName()).append("=").append(getGeneratorID());
 		sb.append('(');
 		for (HDLGeneratorArgument args : getArguments()) {
 			sb.append(args.getName()).append('=');
-			if (args.getValue()!=null) {
+			if (args.getValue() != null) {
 				sb.append('"').append(args.getValue()).append('"');
 			} else
 				sb.append(args.getExpression());

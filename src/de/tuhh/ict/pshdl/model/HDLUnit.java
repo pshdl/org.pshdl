@@ -44,61 +44,36 @@ public class HDLUnit extends AbstractHDLUnit {
 	}
 
 	// $CONTENT-BEGIN$
-	private Map<String, HDLEnum> enumCache;
 
 	@Override
 	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
-		if (enumCache == null) {
-			synchronized (this) {
-				List<HDLEnumDeclaration> enumDecl = HDLUtils.getallEnumDeclarations(getStatements());
-				enumCache = new HashMap<String, HDLEnum>();
-				for (HDLEnumDeclaration hdlEnumDeclaration : enumDecl) {
-					enumCache.put(hdlEnumDeclaration.getHEnum().getName(), hdlEnumDeclaration.getHEnum());
-				}
-			}
-		}
-		if (enumCache.get(hEnum.getLastSegment()) != null)
-			return enumCache.get(hEnum.getLastSegment());
-		return container.resolveEnum(hEnum);
+		return (HDLEnum) resolveType(hEnum);
 	}
-
-	private Map<String, HDLInterface> ifCache;
 
 	@Override
 	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
-		if (ifCache == null) {
-			synchronized (this) {
-				List<HDLInterface> ifDecl = HDLUtils.getallInterfaceDeclarations(getStatements());
-				ifCache = new HashMap<String, HDLInterface>();
-				for (HDLInterface hdlIfDeclaration : ifDecl) {
-					ifCache.put(hdlIfDeclaration.getName(), hdlIfDeclaration);
-				}
-			}
-		}
-		if (ifCache.get(hIf.getLastSegment()) != null)
-			return ifCache.get(hIf.getLastSegment());
-		return library.getUnit(hIf).asInterface();
+		return (HDLInterface) resolveType(hIf);
 	}
 
-	private HDLInterface asInterface() {
-		HDLInterface unitIF = new HDLInterface().setName(getName());
+	private HDLInterface unitIF = null;
+
+	public HDLInterface asInterface() {
+		if (unitIF != null)
+			return unitIF;
+		unitIF = new HDLInterface().setName(getName());
 		List<HDLVariableDeclaration> declarations = HDLUtils.getallVariableDeclarations(getStatements());
 		for (HDLVariableDeclaration hdlVariableDeclaration : declarations) {
-			HDLType type = hdlVariableDeclaration.resolveType();
-			if (type instanceof HDLValueType) {
-				HDLValueType valueType = (HDLValueType) type;
-				switch (valueType.getDirection()) {
-				case IN:
-				case INOUT:
-				case OUT:
-					unitIF = unitIF.addPorts(hdlVariableDeclaration.copy());
-					break;
-				default:
-					break;
-				}
-				// TODO Add annotations and deeper Declarations
-				// TODO add clk/rst;
+			switch (hdlVariableDeclaration.getDirection()) {
+			case IN:
+			case INOUT:
+			case OUT:
+				unitIF = unitIF.addPorts(hdlVariableDeclaration.copy());
+				break;
+			default:
+				break;
 			}
+			// TODO Add annotations and deeper Declarations
+			// TODO add clk/rst;
 		}
 		return unitIF;
 	}
@@ -118,7 +93,9 @@ public class HDLUnit extends AbstractHDLUnit {
 		}
 		if (typeCache.get(type.getLastSegment()) != null)
 			return typeCache.get(type.getLastSegment());
-		return library.getUnit(type).asInterface();
+		if (type.getLastSegment().startsWith("#"))
+			return HDLPrimitive.forName(type);
+		return library.resolve(getName(), getImports(), type);
 	}
 
 	protected List<HDLType> doGetTypeDeclarations() {
@@ -152,6 +129,10 @@ public class HDLUnit extends AbstractHDLUnit {
 		}
 		if (variableCache.get(var.getLastSegment()) != null)
 			return variableCache.get(var.getLastSegment());
+		if (var.getLastSegment().equals("$clk"))
+			return new HDLVariable(null, "$clk", null, null);
+		if (var.getLastSegment().equals("$rst"))
+			return new HDLVariable(null, "$rst", null, null);
 		return container.resolveVariable(var);
 	}
 

@@ -12,7 +12,7 @@ public class HDLQualifiedName {
 	}
 
 	public HDLQualifiedName(String qfn) {
-		this(qfn.split("\\."));
+		this(qfn == null ? new String[0] : qfn.split("\\."));
 	}
 
 	public String[] getQfn() {
@@ -100,5 +100,21 @@ public class HDLQualifiedName {
 
 	public static HDLQualifiedName create(List<String> segments) {
 		return new HDLQualifiedName(segments.toArray(new String[segments.size()]));
+	}
+
+	public HDLQualifiedName toSegment(int i) {
+		int len = i;
+		if ((len < 0) || (len >= qfn.length))
+			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
+		String[] newQfn = new String[len];
+		System.arraycopy(qfn, 0, newQfn, 0, len);
+		return new HDLQualifiedName(newQfn);
+	}
+
+	public HDLQualifiedName append(HDLQualifiedName hdlQualifiedName) {
+		LinkedList<String> ll = new LinkedList<String>();
+		ll.addAll(Arrays.asList(this.qfn));
+		ll.addAll(Arrays.asList(hdlQualifiedName.qfn));
+		return HDLQualifiedName.create(ll);
 	}
 }

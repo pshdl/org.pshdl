@@ -37,7 +37,7 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
 		if (enumCache == null) {
 			synchronized (this) {
-				List<HDLEnumDeclaration> enumDecl = doGetEnumDeclarations();
+				List<HDLEnumDeclaration> enumDecl = getAllObjectsOf(HDLEnumDeclaration.class, false);
 				enumCache = new HashMap<String, HDLEnum>();
 				for (HDLEnumDeclaration hdlEnumDeclaration : enumDecl) {
 					enumCache.put(hdlEnumDeclaration.getHEnum().getName(), hdlEnumDeclaration.getHEnum());
@@ -47,7 +47,7 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 		// XXX Check if the qualifier does either match the pkg name, or is not
 		// existant
 		if (enumCache.get(hEnum.getLastSegment()) != null)
-			return enumCache.get(hEnum);
+			return enumCache.get(hEnum.getLastSegment());
 		return container.resolveEnum(hEnum);
 	}
 

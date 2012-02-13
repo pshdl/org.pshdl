@@ -10,4 +10,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.tuhh.ict.pshdl.model,
  de.tuhh.ict.pshdl.model.impl,
- de.tuhh.ict.pshdl.model.utils
+ de.tuhh.ict.pshdl.model.utils,
+ de.tuhh.ict.pshdl.model.validation

@@ -64,8 +64,36 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	
 //$CONTENT-BEGIN$
+
+	public static final String EDGE_PARAM = "clockEdge";
+	public static final String RESET_PARAM = "reset";
+	public static final String RESET_SYNC_PARAM = "resetSync";
+	public static final String CLOCK_PARAM = "clock";
+	public static final String RESET_TYPE_PARAM = "resetType";
+	public static final String RESET_VALUE_PARAM = "resetValue";
+
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig(null, HDLQualifiedName.create("$clk"), HDLQualifiedName.create("$rst"), null, null, null, new HDLLiteral(null, "0"));
+	}
+
+	public static HDLRegisterConfig fromArgs(ArrayList<HDLGeneratorArgument> args) {
+		HDLRegisterConfig config = defaultConfig();
+		for (HDLGeneratorArgument genArgs : args) {
+			String name = genArgs.getName();
+			if (RESET_PARAM.equals(name))
+				config = config.setRst(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
+			if (CLOCK_PARAM.equals(name))
+				config = config.setClk(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
+			if (EDGE_PARAM.equals(name))
+				config = config.setClockType(HDLRegClockType.valueOf(genArgs.getValue().toUpperCase()));
+			if (RESET_SYNC_PARAM.equals(name))
+				config = config.setSyncType(HDLRegSyncType.valueOf(genArgs.getValue().toUpperCase()));
+			if (RESET_TYPE_PARAM.equals(name))
+				config = config.setResetType(HDLRegResetType.valueOf(genArgs.getValue().toUpperCase()));
+			if (RESET_VALUE_PARAM.equals(name))
+				config = config.setResetValue(genArgs.getExpression());
+		}
+		return config;
 	}
 //$CONTENT-END$
 	

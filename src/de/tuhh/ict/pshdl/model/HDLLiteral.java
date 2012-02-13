@@ -1,9 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
-
 import java.math.*;
 
 public class HDLLiteral extends AbstractHDLLiteral {
@@ -47,7 +44,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 				case 'x':
 					return new BigInteger(str, 16);
 				case 'b':
-					new BigInteger(str, 2);
+					return new BigInteger(str, 2);
 				}
 			} else {
 				return BigInteger.ZERO;

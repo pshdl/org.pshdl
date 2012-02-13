@@ -1,9 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
-
+import java.util.Map.Entry;
 
 public abstract class HDLObject extends AbstractHDLObject {
 	/**
@@ -12,11 +11,12 @@ public abstract class HDLObject extends AbstractHDLObject {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLObject(HDLObject container, boolean validate) {
 		super(container, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLObject}
 	 * 
@@ -26,11 +26,14 @@ public abstract class HDLObject extends AbstractHDLObject {
 	public HDLObject(HDLObject container) {
 		this(container, true);
 	}
+
 	public HDLObject() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
+
+	public abstract HDLObject copy();
 
 	public interface MetaAccess<T> {
 		public String name();
@@ -79,6 +82,58 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return true;
 	}
 
-//$CONTENT-END$
-	
-}	
+	private Map<Class<? extends HDLObject>, List<HDLObject>> clazzTypes;
+	private Map<Class<? extends HDLObject>, List<HDLObject>> deepClazzTypes;
+
+	public abstract Iterator<HDLObject> iterator();
+
+	@SuppressWarnings("unchecked")
+	public <T> List<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
+		if (clazzTypes == null) {
+			clazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
+			deepClazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
+			Iterator<HDLObject> iterator = iterator();
+			while (iterator.hasNext()) {
+				HDLObject c = iterator.next();
+				addClazz(c, clazzTypes);
+				addClazz(c, deepClazzTypes);
+				c.getAllObjectsOf(clazz, deep);
+				for (Entry<Class<? extends HDLObject>, List<HDLObject>> e : c.deepClazzTypes.entrySet()) {
+					List<HDLObject> list = deepClazzTypes.get(e.getKey());
+					if (list == null)
+						deepClazzTypes.put(e.getKey(), e.getValue());
+					else
+						list.addAll(e.getValue());
+				}
+			}
+		}
+		List<T> list;
+		if (deep) {
+			list = (List<T>) deepClazzTypes.get(clazz);
+		} else
+			list = (List<T>) clazzTypes.get(clazz);
+		if (list == null)
+			return new LinkedList<T>();
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, List<HDLObject>> ct) {
+		Class<? extends HDLObject> clazz = c.getClass();
+		do {
+			addClazz(c, ct, clazz);
+			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
+		} while ((clazz != null) && !clazz.equals(HDLObject.class));
+	}
+
+	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, List<HDLObject>> ct, Class<? extends HDLObject> clazz) {
+		List<HDLObject> list = ct.get(clazz);
+		if (list == null)
+			list = new LinkedList<HDLObject>();
+		list.add(c);
+		ct.put(clazz, list);
+	}
+
+	// $CONTENT-END$
+
+}
