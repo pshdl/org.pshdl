@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -34,6 +36,8 @@ public abstract class HDLObject extends AbstractHDLObject {
 	// $CONTENT-BEGIN$
 
 	public abstract HDLObject copy();
+
+	public abstract HDLObject copyFiltered(CopyFilter filter);
 
 	public interface MetaAccess<T> {
 		public String name();

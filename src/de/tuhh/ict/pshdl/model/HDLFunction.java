@@ -3,7 +3,6 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
@@ -15,11 +14,12 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param params
 	 *            the value for params. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLFunction(HDLObject container, String name, ArrayList<HDLExpression> params, boolean validate) {
 		super(container, name, params, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
 	 * 
@@ -33,11 +33,12 @@ public class HDLFunction extends AbstractHDLFunction {
 	public HDLFunction(HDLObject container, String name, ArrayList<HDLExpression> params) {
 		this(container, name, params, true);
 	}
+
 	public HDLFunction() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	// $CONTENT-BEGIN$
+	// $CONTENT-END$
+
+}

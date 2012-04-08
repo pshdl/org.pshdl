@@ -3,7 +3,6 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
@@ -15,11 +14,12 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 * @param cases
 	 *            the value for cases. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLSwitchStatement(HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
 		super(container, caseExp, cases, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
 	 * 
@@ -33,11 +33,12 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	public HDLSwitchStatement(HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases) {
 		this(container, caseExp, cases, true);
 	}
+
 	public HDLSwitchStatement() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
@@ -64,6 +65,6 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 		}
 		return res;
 	}
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

@@ -2,7 +2,6 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
-
 public class HDLShiftOp extends AbstractHDLShiftOp {
 	/**
 	 * Constructs a new instance of {@link HDLShiftOp}
@@ -16,11 +15,12 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLShiftOp(HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type, boolean validate) {
 		super(container, left, right, type, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLShiftOp}
 	 * 
@@ -36,17 +36,19 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	public HDLShiftOp(HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type) {
 		this(container, left, right, type, true);
 	}
+
 	public HDLShiftOp() {
 		super();
 	}
-	 public static enum HDLShiftOpType {
-	SLL("<<"), SRA(">>"), SRL(">>>");	
+
+	public static enum HDLShiftOpType {
+		SLL("<<"), SRA(">>"), SRL(">>>");
 		String str;
-	
+
 		HDLShiftOpType(String op) {
 			this.str = op;
 		}
-	
+
 		public static HDLShiftOpType getOp(String op) {
 			for (HDLShiftOpType ass : values()) {
 				if (ass.str.equals(op)) {
@@ -55,14 +57,14 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 			}
 			return null;
 		}
-	
+
 		@Override
 		public String toString() {
 			return str;
 		}
 	}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	// $CONTENT-BEGIN$
+	// $CONTENT-END$
+
+}

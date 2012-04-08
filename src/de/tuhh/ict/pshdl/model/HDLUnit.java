@@ -133,7 +133,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			return new HDLVariable(null, "$clk", null, null);
 		if (var.getLastSegment().equals("$rst"))
 			return new HDLVariable(null, "$rst", null, null);
-		return container.resolveVariable(var);
+		return null;
 	}
 
 	public void setLibrary(HDLLibrary library) {

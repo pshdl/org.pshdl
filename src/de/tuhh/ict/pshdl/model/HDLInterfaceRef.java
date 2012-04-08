@@ -4,7 +4,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
@@ -22,11 +21,13 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf, ArrayList<HDLExpression> ifArray, boolean validate) {
+	public HDLInterfaceRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
+			ArrayList<HDLExpression> ifArray, boolean validate) {
 		super(container, var, array, bits, hIf, ifArray, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
 	 * 
@@ -43,14 +44,16 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 */
-	public HDLInterfaceRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf, ArrayList<HDLExpression> ifArray) {
+	public HDLInterfaceRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
+			ArrayList<HDLExpression> ifArray) {
 		this(container, var, array, bits, hIf, ifArray, true);
 	}
+
 	public HDLInterfaceRef() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 
 	@Override
 	public HDLVariable resolveVar() {
@@ -69,6 +72,6 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 		throw new IllegalArgumentException("Could not resolve interface variable:" + getVarRefName());
 	}
 
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

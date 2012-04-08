@@ -4,7 +4,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public abstract class HDLStatement extends AbstractHDLStatement {
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
@@ -12,11 +11,12 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLStatement(HDLObject container, boolean validate) {
 		super(container, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
 	 * 
@@ -26,11 +26,12 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	public HDLStatement(HDLObject container) {
 		this(container, true);
 	}
+
 	public HDLStatement() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 	private Map<String, HDLEnum> enumCache;
 
 	@Override
@@ -138,6 +139,6 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	}
 
 	abstract protected List<HDLVariableDeclaration> doGetVariableDeclarations();
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

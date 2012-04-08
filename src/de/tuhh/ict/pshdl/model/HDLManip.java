@@ -2,7 +2,6 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
-
 public class HDLManip extends AbstractHDLManip {
 	/**
 	 * Constructs a new instance of {@link HDLManip}
@@ -16,11 +15,12 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param castTo
 	 *            the value for castTo. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLManip(HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo, boolean validate) {
 		super(container, type, target, castTo, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLManip}
 	 * 
@@ -36,14 +36,16 @@ public class HDLManip extends AbstractHDLManip {
 	public HDLManip(HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo) {
 		this(container, type, target, castTo, true);
 	}
+
 	public HDLManip() {
 		super();
 	}
-	 public static enum HDLManipType {
-	CAST, ARITH_NEG, BIT_NEG, LOGIC_NEG;
-		}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	public static enum HDLManipType {
+		CAST, ARITH_NEG, BIT_NEG, LOGIC_NEG;
+	}
+
+	// $CONTENT-BEGIN$
+	// $CONTENT-END$
+
+}

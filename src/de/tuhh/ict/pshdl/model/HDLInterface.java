@@ -3,7 +3,6 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLInterface extends AbstractHDLInterface {
 	/**
 	 * Constructs a new instance of {@link HDLInterface}
@@ -15,11 +14,12 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLInterface(HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports, boolean validate) {
 		super(container, name, ports, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLInterface}
 	 * 
@@ -33,11 +33,12 @@ public class HDLInterface extends AbstractHDLInterface {
 	public HDLInterface(HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports) {
 		this(container, name, ports, true);
 	}
+
 	public HDLInterface() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	// $CONTENT-BEGIN$
+	// $CONTENT-END$
+
+}

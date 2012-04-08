@@ -12,11 +12,12 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param val
 	 *            the value for val. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLLiteral(HDLObject container, String val, boolean validate) {
 		super(container, val, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
 	 * 
@@ -28,11 +29,12 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	public HDLLiteral(HDLObject container, String val) {
 		this(container, val, true);
 	}
+
 	public HDLLiteral() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 
 	public BigInteger getValueAsBigInt() {
 		String string = getVal();
@@ -60,6 +62,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");
 	}
 
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

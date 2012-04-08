@@ -4,7 +4,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLVariableRef extends AbstractHDLVariableRef {
 	/**
 	 * Constructs a new instance of {@link HDLVariableRef}
@@ -18,11 +17,12 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param bits
 	 *            the value for bits. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLVariableRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, boolean validate) {
 		super(container, var, array, bits, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLVariableRef}
 	 * 
@@ -38,12 +38,12 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public HDLVariableRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits) {
 		this(container, var, array, bits, true);
 	}
+
 	public HDLVariableRef() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+	// $CONTENT-BEGIN$
 
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

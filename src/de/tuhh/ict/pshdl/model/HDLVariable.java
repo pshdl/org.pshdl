@@ -3,7 +3,6 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
@@ -17,11 +16,12 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param defaultValue
 	 *            the value for defaultValue. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, boolean validate) {
 		super(container, name, dimensions, defaultValue, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
 	 * 
@@ -37,11 +37,12 @@ public class HDLVariable extends AbstractHDLVariable {
 	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue) {
 		this(container, name, dimensions, defaultValue, true);
 	}
+
 	public HDLVariable() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 
 	/**
 	 * Attempt to determine the type of this HDLVariable. For this to work it
@@ -66,6 +67,6 @@ public class HDLVariable extends AbstractHDLVariable {
 		return null;
 	}
 
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

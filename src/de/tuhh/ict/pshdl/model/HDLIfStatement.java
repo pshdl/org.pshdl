@@ -4,7 +4,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-
 public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}
@@ -18,11 +17,12 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param elseDo
 	 *            the value for elseDo. Can be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo, boolean validate) {
 		super(container, ifExp, thenDo, elseDo, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}
 	 * 
@@ -38,11 +38,12 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo) {
 		this(container, ifExp, thenDo, elseDo, true);
 	}
+
 	public HDLIfStatement() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
+
+	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
@@ -66,6 +67,6 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		res.addAll(HDLUtils.getallVariableDeclarations(elseDo));
 		return res;
 	}
-//$CONTENT-END$
-	
-}	
+	// $CONTENT-END$
+
+}

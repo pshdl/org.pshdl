@@ -1,7 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
-
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public abstract class HDLType extends AbstractHDLType {
 	/**
@@ -12,11 +12,12 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLType(HDLObject container, String name, boolean validate) {
 		super(container, name, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLType}
 	 * 
@@ -28,11 +29,15 @@ public abstract class HDLType extends AbstractHDLType {
 	public HDLType(HDLObject container, String name) {
 		this(container, name, true);
 	}
+
 	public HDLType() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	// $CONTENT-BEGIN$
+	public HDLQualifiedName asRef() {
+		return new HDLQualifiedName(getName());
+	}
+	// $CONTENT-END$
+
+}

@@ -2,7 +2,6 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
-
 public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * Constructs a new instance of {@link HDLAnnotation}
@@ -14,11 +13,12 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param value
 	 *            the value for value. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLAnnotation(HDLObject container, String name, String value, boolean validate) {
 		super(container, name, value, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLAnnotation}
 	 * 
@@ -32,11 +32,12 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	public HDLAnnotation(HDLObject container, String name, String value) {
 		this(container, name, value, true);
 	}
+
 	public HDLAnnotation() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	// $CONTENT-BEGIN$
+	// $CONTENT-END$
+
+}

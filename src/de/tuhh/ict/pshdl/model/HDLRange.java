@@ -1,7 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
-
 
 public class HDLRange extends AbstractHDLRange {
 	/**
@@ -14,11 +14,12 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *			  if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLRange(HDLObject container, HDLExpression from, HDLExpression to, boolean validate) {
 		super(container, from, to, validate);
 	}
+
 	/**
 	 * Constructs a new instance of {@link HDLRange}
 	 * 
@@ -32,11 +33,19 @@ public class HDLRange extends AbstractHDLRange {
 	public HDLRange(HDLObject container, HDLExpression from, HDLExpression to) {
 		this(container, from, to, true);
 	}
+
 	public HDLRange() {
 		super();
 	}
-	
-//$CONTENT-BEGIN$
-//$CONTENT-END$
-	
-}	
+
+	// $CONTENT-BEGIN$
+	public HDLExpression getWidth() {
+		if (getFrom() == null)
+			return new HDLLiteral().setVal("1");
+		HDLArithOp rangeDist = new HDLArithOp().setLeft(getTo()).setType(HDLArithOpType.MINUS).setRight(getFrom());
+		HDLFunction absRange = new HDLFunction().setName("abs").addParams(rangeDist);
+		return new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(new HDLLiteral(null, "1"));
+	}
+	// $CONTENT-END$
+
+}
