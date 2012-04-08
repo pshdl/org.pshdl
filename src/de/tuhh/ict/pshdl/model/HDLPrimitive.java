@@ -5,7 +5,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
 public class HDLPrimitive extends AbstractHDLPrimitive {
-
 	/**
 	 * Constructs a new instance of {@link HDLPrimitive}
 	 * 
@@ -42,6 +41,10 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	public HDLPrimitive() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLPrimitive;
 	}
 
 	public static enum HDLPrimitiveType {

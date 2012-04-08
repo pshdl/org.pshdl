@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
@@ -53,6 +54,10 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 
 	public HDLDirectGeneration() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLDirectGeneration;
 	}
 
 	// $CONTENT-BEGIN$

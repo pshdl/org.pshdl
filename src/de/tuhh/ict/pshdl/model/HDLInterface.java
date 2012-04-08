@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
@@ -36,6 +37,10 @@ public class HDLInterface extends AbstractHDLInterface {
 
 	public HDLInterface() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLInterface;
 	}
 
 	// $CONTENT-BEGIN$

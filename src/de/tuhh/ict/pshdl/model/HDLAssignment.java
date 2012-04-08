@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
@@ -42,6 +43,10 @@ public class HDLAssignment extends AbstractHDLAssignment {
 
 	public HDLAssignment() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLAssignment;
 	}
 
 	public static enum HDLAssignmentType {

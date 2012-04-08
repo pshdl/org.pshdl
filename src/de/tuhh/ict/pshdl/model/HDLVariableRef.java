@@ -42,6 +42,11 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public HDLVariableRef() {
 		super();
 	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLVariableRef;
+	}
+
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

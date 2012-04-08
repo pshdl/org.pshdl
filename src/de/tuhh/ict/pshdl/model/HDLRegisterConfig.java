@@ -63,6 +63,10 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLRegisterConfig;
+	}
+
 	public static enum HDLRegClockType {
 		RISING, FALLING;
 	}

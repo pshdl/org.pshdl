@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public abstract class HDLValueType extends AbstractHDLValueType {
 	/**
@@ -31,6 +33,10 @@ public abstract class HDLValueType extends AbstractHDLValueType {
 
 	public HDLValueType() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLValueType;
 	}
 
 	// $CONTENT-BEGIN$

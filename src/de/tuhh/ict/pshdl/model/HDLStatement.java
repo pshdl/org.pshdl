@@ -31,6 +31,10 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLStatement;
+	}
+
 	// $CONTENT-BEGIN$
 	private Map<String, HDLEnum> enumCache;
 

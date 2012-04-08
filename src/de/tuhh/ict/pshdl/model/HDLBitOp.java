@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLBitOp extends AbstractHDLBitOp {
 	/**
@@ -41,6 +43,10 @@ public class HDLBitOp extends AbstractHDLBitOp {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLBitOp;
+	}
+
 	public static enum HDLBitOpType {
 		AND("&"), OR("|"), XOR("^"), LOGI_AND("&&"), LOGI_OR("||");
 		String str;
@@ -62,7 +68,6 @@ public class HDLBitOp extends AbstractHDLBitOp {
 		public String toString() {
 			return str;
 		}
-
 	}
 
 	// $CONTENT-BEGIN$

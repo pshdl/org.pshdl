@@ -53,6 +53,10 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLInterfaceRef;
+	}
+
 	// $CONTENT-BEGIN$
 
 	@Override

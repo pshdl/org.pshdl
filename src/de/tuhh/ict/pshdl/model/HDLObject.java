@@ -1,9 +1,9 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-
+import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
 import java.util.Map.Entry;
 
 public abstract class HDLObject extends AbstractHDLObject {
@@ -31,6 +31,10 @@ public abstract class HDLObject extends AbstractHDLObject {
 
 	public HDLObject() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLObject;
 	}
 
 	// $CONTENT-BEGIN$

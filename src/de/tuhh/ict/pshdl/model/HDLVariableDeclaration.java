@@ -57,6 +57,10 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLVariableDeclaration;
+	}
+
 	public static enum HDLDirection {
 		IN("in"), OUT("out"), INOUT("inout"), PARAMETER("param"), CONSTANT("const"), INTERNAL(""), HIDDEN("<HIDDEN>");
 		String str;

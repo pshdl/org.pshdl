@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLGeneratorArgument extends AbstractHDLGeneratorArgument {
 	/**
@@ -39,6 +41,10 @@ public class HDLGeneratorArgument extends AbstractHDLGeneratorArgument {
 
 	public HDLGeneratorArgument() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLGeneratorArgument;
 	}
 
 	// $CONTENT-BEGIN$

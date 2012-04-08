@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
@@ -32,6 +33,10 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 
 	public HDLEnumDeclaration() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLEnumDeclaration;
 	}
 
 	// $CONTENT-BEGIN$

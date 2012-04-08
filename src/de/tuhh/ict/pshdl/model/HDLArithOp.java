@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLArithOp extends AbstractHDLArithOp {
 	/**
@@ -41,6 +43,10 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLArithOp;
+	}
+
 	public static enum HDLArithOpType {
 		MUL("*"), DIV("/"), MINUS("-"), PLUS("+"), MOD("%"), POW("**");
 		String str;
@@ -62,7 +68,6 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		public String toString() {
 			return str;
 		}
-
 	}
 
 	// $CONTENT-BEGIN$

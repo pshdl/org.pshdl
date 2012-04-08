@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
@@ -39,6 +41,10 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 
 	public HDLEqualityOp() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLEqualityOp;
 	}
 
 	public static enum HDLEqualityOpType {

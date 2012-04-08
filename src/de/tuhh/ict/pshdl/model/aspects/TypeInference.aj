@@ -1,9 +1,11 @@
 package de.tuhh.ict.pshdl.model.aspects;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLArithOp.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+
 import java.util.*;
 
 public aspect TypeInference {
@@ -21,6 +23,19 @@ public aspect TypeInference {
 	}
 	
 	public HDLPrimitive HDLManip.determineType() {
+		switch (getType()){
+		case LOGIC_NEG :
+			return new HDLPrimitive().setType(HDLPrimitiveType.BOOL);
+		case BIT_NEG :
+			return getTarget().determineType();
+		case ARITH_NEG :
+			return getTarget().determineType().setType(HDLPrimitiveType.INT);
+		case CAST :
+			HDLType castTo = getCastTo();
+			if (castTo instanceof HDLPrimitive) {
+				return (HDLPrimitive) castTo;
+			}
+		}
 		return null;
 	}
 

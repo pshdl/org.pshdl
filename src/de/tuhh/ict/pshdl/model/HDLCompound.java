@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public abstract class HDLCompound extends AbstractHDLCompound {
 	/**
@@ -27,6 +29,10 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 
 	public HDLCompound() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLCompound;
 	}
 
 	// $CONTENT-BEGIN$

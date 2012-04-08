@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public abstract class HDLExpression extends AbstractHDLExpression {
 	/**
@@ -27,6 +29,10 @@ public abstract class HDLExpression extends AbstractHDLExpression {
 
 	public HDLExpression() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLExpression;
 	}
 
 	// $CONTENT-BEGIN$

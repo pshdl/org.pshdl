@@ -5,7 +5,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
 public class HDLPackage extends AbstractHDLPackage {
-
 	/**
 	 * Constructs a new instance of {@link HDLPackage}
 	 * 
@@ -38,6 +37,10 @@ public class HDLPackage extends AbstractHDLPackage {
 
 	public HDLPackage() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLPackage;
 	}
 
 	// $CONTENT-BEGIN$

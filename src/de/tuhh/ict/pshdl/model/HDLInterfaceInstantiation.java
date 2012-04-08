@@ -43,6 +43,10 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLInterfaceInstantiation;
+	}
+
 	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {

@@ -43,6 +43,10 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLIfStatement;
+	}
+
 	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {

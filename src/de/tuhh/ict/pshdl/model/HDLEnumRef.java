@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
@@ -36,6 +37,10 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 
 	public HDLEnumRef() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLEnumRef;
 	}
 
 	// $CONTENT-BEGIN$

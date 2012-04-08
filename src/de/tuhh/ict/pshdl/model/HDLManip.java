@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLManip extends AbstractHDLManip {
 	/**
@@ -39,6 +41,10 @@ public class HDLManip extends AbstractHDLManip {
 
 	public HDLManip() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLManip;
 	}
 
 	public static enum HDLManipType {

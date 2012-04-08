@@ -43,6 +43,10 @@ public class HDLUnit extends AbstractHDLUnit {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLUnit;
+	}
+
 	// $CONTENT-BEGIN$
 
 	@Override

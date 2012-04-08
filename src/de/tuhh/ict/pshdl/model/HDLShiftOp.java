@@ -1,6 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
+import java.util.*;
 
 public class HDLShiftOp extends AbstractHDLShiftOp {
 	/**
@@ -39,6 +41,10 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 
 	public HDLShiftOp() {
 		super();
+	}
+
+	public HDLClass getClassType() {
+		return HDLClass.HDLShiftOp;
 	}
 
 	public static enum HDLShiftOpType {

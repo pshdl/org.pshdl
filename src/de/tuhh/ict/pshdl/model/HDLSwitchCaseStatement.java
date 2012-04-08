@@ -39,6 +39,10 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLSwitchCaseStatement;
+	}
+
 	// $CONTENT-BEGIN$
 	@Override
 	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {

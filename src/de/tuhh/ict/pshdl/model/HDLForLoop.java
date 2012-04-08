@@ -49,6 +49,10 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		super();
 	}
 
+	public HDLClass getClassType() {
+		return HDLClass.HDLForLoop;
+	}
+
 	// $CONTENT-BEGIN$
 
 	@Override
