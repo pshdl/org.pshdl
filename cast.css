@@ -1,0 +1,29 @@
+tr:nth-child(even) {
+	background: #EEE
+}
+
+tr:nth-child(odd) {
+	background: #FFF
+}
+
+table td {
+	white-space: nowrap;
+	font-family: sans-serif;
+	border-width: 1px;
+	padding: 3px;
+	border-style: inset;
+	border-color: #AAA;
+	min-width: 70px;
+	text-align: center;
+}
+
+table {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: solid;
+	border-collapse: collapse;
+}
+
+.cast {
+	color: green;
+}

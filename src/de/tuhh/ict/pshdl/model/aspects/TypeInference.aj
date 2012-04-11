@@ -1,12 +1,11 @@
 package de.tuhh.ict.pshdl.model.aspects;
 
-import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
-import de.tuhh.ict.pshdl.model.HDLArithOp.*;
-import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.*;
-
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect TypeInference {
 	public HDLPrimitive HDLConcat.determineType() {
@@ -15,7 +14,7 @@ public aspect TypeInference {
 		while (iter.hasNext()) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().determineType().getWidth());
 		}
-		return new HDLPrimitive().setType(HDLPrimitiveType.BITVECTOR).setWidth(width);
+		return HDLPrimitive.getBitvector().setWidth(width);
 	}
 
 	public HDLPrimitive HDLEnumRef.determineType() {
@@ -25,7 +24,7 @@ public aspect TypeInference {
 	public HDLPrimitive HDLManip.determineType() {
 		switch (getType()){
 		case LOGIC_NEG :
-			return new HDLPrimitive().setType(HDLPrimitiveType.BOOL);
+			return HDLPrimitive.getBool();
 		case BIT_NEG :
 			return getTarget().determineType();
 		case ARITH_NEG :
@@ -57,7 +56,7 @@ public aspect TypeInference {
 		while (iter.hasNext()) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth());
 		}
-		return new HDLPrimitive().setType(HDLPrimitiveType.BITVECTOR).setWidth(width);
+		return HDLPrimitive.getBitvector().setWidth(width);
 	}
 
 	public HDLPrimitive HDLArithOp.determineType() {

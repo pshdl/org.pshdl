@@ -50,7 +50,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	public static enum HDLPrimitiveType {
-		INT("int"), UINT("uint"), INTEGER("int"), NATURAL("uint"), BIT("bit"), BITVECTOR("bit"), BOOL("<BOOL>");
+		INT("int"), UINT("uint"), INTEGER("int"), NATURAL("uint"), BIT("bit"), BITVECTOR("bit"), BOOL("<bool>");
 		String str;
 
 		HDLPrimitiveType(String op) {
@@ -74,7 +74,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	// $CONTENT-BEGIN$
 
-	public static final HDLPrimitive TARGET = new HDLPrimitive().setType(HDLPrimitiveType.INTEGER);
+	public static final HDLPrimitive TARGET = getInteger();
 
 	private static WeakHashMap<String, HDLPrimitive> primCache = new WeakHashMap<String, HDLPrimitive>();
 
@@ -88,6 +88,57 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	public static HDLType forName(HDLQualifiedName typeRefName) {
 		return primCache.get(typeRefName.getLastSegment());
 	}
+
+	public static HDLPrimitive getInt() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.INT).setName("#int<?>");
+	}
+
+	public static HDLPrimitive getInteger() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.INTEGER).setName("#int");
+	}
+
+	public static HDLPrimitive getUint() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.UINT).setName("#uint<?>");
+	}
+
+	public static HDLPrimitive getNatural() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.NATURAL).setName("#uint");
+	}
+
+	public static HDLPrimitive getBool() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.BOOL).setName("#<bool>");
+	}
+
+	public static HDLPrimitive getBit() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.BIT).setName("#bit");
+	}
+
+	public static HDLPrimitive getBitvector() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.BITVECTOR).setName("#bit<?>");
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractHDLPrimitive))
+			return false;
+		AbstractHDLPrimitive other = (AbstractHDLPrimitive) obj;
+		if (type == null) {
+			if (other.getType() != null)
+				return false;
+		} else if (!type.equals(other.getType()))
+			return false;
+		if (width == null) {
+			if (other.getWidth() != null)
+				return false;
+		} else if (!width.equals(other.getWidth()))
+			return false;
+		return true;
+	}
+
 	// $CONTENT-END$
 
 }

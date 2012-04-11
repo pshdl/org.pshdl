@@ -3,8 +3,6 @@ package de.tuhh.ict.pshdl.model.aspects;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import de.tuhh.ict.pshdl.model.impl.*;
 
 public aspect StringWriterAspect {
 	public String HDLShiftOp.toString() {
@@ -57,6 +55,7 @@ public aspect StringWriterAspect {
 			if (!first)
 				sb.append(',');
 			sb.append(p);
+			first=false;
 		}
 		sb.append(')');
 		return sb.toString();
