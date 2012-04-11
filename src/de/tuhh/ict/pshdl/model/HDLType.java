@@ -1,8 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public abstract class HDLType extends AbstractHDLType {
 	/**
@@ -35,6 +34,7 @@ public abstract class HDLType extends AbstractHDLType {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLType;
 	}

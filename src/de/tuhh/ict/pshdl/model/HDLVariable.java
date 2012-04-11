@@ -1,8 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
 
 public class HDLVariable extends AbstractHDLVariable {
 	/**
@@ -43,6 +43,7 @@ public class HDLVariable extends AbstractHDLVariable {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariable;
 	}

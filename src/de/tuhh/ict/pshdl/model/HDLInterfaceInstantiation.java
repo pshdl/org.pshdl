@@ -1,8 +1,9 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation {
 	/**
@@ -43,6 +44,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceInstantiation;
 	}

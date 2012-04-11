@@ -1,8 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
 
 public class HDLArithOp extends AbstractHDLArithOp {
 	/**
@@ -43,6 +41,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLArithOp;
 	}

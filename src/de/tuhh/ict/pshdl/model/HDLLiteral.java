@@ -1,10 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
-
 import java.math.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
 
 public class HDLLiteral extends AbstractHDLLiteral {
 	/**
@@ -37,6 +35,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLLiteral;
 	}

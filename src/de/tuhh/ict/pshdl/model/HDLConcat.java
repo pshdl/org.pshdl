@@ -1,8 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
 
 public class HDLConcat extends AbstractHDLConcat {
 	/**
@@ -37,6 +37,7 @@ public class HDLConcat extends AbstractHDLConcat {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLConcat;
 	}

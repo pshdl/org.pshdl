@@ -1,10 +1,10 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
-
 import java.util.Map.Entry;
+
+import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public abstract class HDLObject extends AbstractHDLObject {
 	/**

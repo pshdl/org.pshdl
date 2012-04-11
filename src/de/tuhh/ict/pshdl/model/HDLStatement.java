@@ -1,8 +1,9 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public abstract class HDLStatement extends AbstractHDLStatement {
 	/**
@@ -31,6 +32,7 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLStatement;
 	}

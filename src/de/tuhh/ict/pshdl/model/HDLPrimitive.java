@@ -1,8 +1,9 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
@@ -43,6 +44,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLPrimitive;
 	}

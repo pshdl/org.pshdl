@@ -1,8 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
 
 public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	/**
@@ -31,6 +29,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInstantiation;
 	}

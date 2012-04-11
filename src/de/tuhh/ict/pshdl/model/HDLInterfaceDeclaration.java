@@ -1,8 +1,8 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
 
 public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	/**
@@ -35,6 +35,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceDeclaration;
 	}

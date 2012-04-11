@@ -1,10 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
-
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.impl.*;
 
 public class HDLRange extends AbstractHDLRange {
 	/**
@@ -41,6 +38,7 @@ public class HDLRange extends AbstractHDLRange {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRange;
 	}

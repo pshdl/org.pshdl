@@ -1,8 +1,9 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
+
+import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
@@ -63,6 +64,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRegisterConfig;
 	}

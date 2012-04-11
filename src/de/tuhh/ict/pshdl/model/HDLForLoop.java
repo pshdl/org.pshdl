@@ -1,10 +1,10 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.impl.*;
 import java.util.*;
 
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLForLoop extends AbstractHDLForLoop {
 	/**
@@ -49,6 +49,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLForLoop;
 	}

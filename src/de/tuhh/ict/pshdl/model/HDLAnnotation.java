@@ -1,8 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.impl.*;
-import java.util.*;
 
 public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
@@ -39,6 +37,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLAnnotation;
 	}
