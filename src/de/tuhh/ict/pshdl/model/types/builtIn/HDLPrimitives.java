@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 
@@ -377,5 +378,63 @@ public class HDLPrimitives {
 			width = rType.getWidth();
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(lType.setType(triple.left), lType.setType(triple.right), new HDLPrimitive().setType(triple.result).setWidth(width));
 		return normalize(info);
+	}
+
+	public HDLTypeInferenceInfo getManipOpType(HDLExpression target, HDLManipType type, HDLType castTo) {
+		HDLPrimitive determineType = target.determineType();
+		switch (type) {
+		case CAST:
+			// XXX If there ever happens to be another cast, this has to be
+			// updated
+			return new HDLTypeInferenceInfo(determineType, null, (HDLPrimitive) castTo);
+		case ARITH_NEG:
+			switch (determineType.getType()) {
+			case INT:
+			case INTEGER:
+				return new HDLTypeInferenceInfo(determineType, null, determineType);
+			case UINT:
+				return new HDLTypeInferenceInfo(determineType.setType(INT), null, determineType.setType(INT));
+			case NATURAL:
+				return new HDLTypeInferenceInfo(determineType.setType(INTEGER), null, determineType.setType(INTEGER));
+			case BIT:
+			case BITVECTOR:
+			case BOOL:
+				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(determineType, null, null);
+				hdi.error = "Arithmetic negation does not support bit/boolean operands";
+				return hdi;
+			}
+			break;
+		case BIT_NEG:
+			switch (determineType.getType()) {
+			case INT:
+			case INTEGER:
+			case UINT:
+			case NATURAL:
+			case BIT:
+			case BITVECTOR:
+				return new HDLTypeInferenceInfo(determineType, null, determineType);
+			case BOOL:
+				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(determineType, null, null);
+				hdi.error = "Bit negation does not support boolean operands";
+				return hdi;
+			}
+			break;
+		case LOGIC_NEG:
+			switch (determineType.getType()) {
+			case INT:
+			case INTEGER:
+			case UINT:
+			case NATURAL:
+			case BIT:
+			case BITVECTOR:
+				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(determineType, null, null);
+				hdi.error = "Logic negation does not support bit operands";
+				return hdi;
+			case BOOL:
+				return new HDLTypeInferenceInfo(determineType, null, determineType);
+			}
+			break;
+		}
+		return null;
 	}
 }

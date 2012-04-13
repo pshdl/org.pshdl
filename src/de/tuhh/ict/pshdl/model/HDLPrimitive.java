@@ -76,17 +76,30 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	public static final HDLPrimitive TARGET = getInteger();
 
-	private static WeakHashMap<String, HDLPrimitive> primCache = new WeakHashMap<String, HDLPrimitive>();
+	private static WeakHashMap<String, HDLPrimitive> primCache;
+
+	@Override
+	protected String validateName(String name) {
+		if (this.name == null)
+			return "#primitive";
+		return super.validateName(name);
+	}
 
 	@Override
 	public String getName() {
 		String strName = "#" + toString();
-		primCache.put(strName, this);
+		getPrimCache().put(strName, this);
 		return strName;
 	}
 
 	public static HDLType forName(HDLQualifiedName typeRefName) {
-		return primCache.get(typeRefName.getLastSegment());
+		return getPrimCache().get(typeRefName.getLastSegment());
+	}
+
+	private static WeakHashMap<String, HDLPrimitive> getPrimCache() {
+		if (primCache == null)
+			primCache = new WeakHashMap<String, HDLPrimitive>();
+		return primCache;
 	}
 
 	public static HDLPrimitive getInt() {

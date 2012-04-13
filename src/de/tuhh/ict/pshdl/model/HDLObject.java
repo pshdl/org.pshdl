@@ -39,8 +39,10 @@ public abstract class HDLObject extends AbstractHDLObject {
 
 	// $CONTENT-BEGIN$
 
+	@Override
 	public abstract HDLObject copy();
 
+	@Override
 	public abstract HDLObject copyFiltered(CopyFilter filter);
 
 	public interface MetaAccess<T> {

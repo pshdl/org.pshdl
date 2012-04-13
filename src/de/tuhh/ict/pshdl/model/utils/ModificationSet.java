@@ -19,7 +19,7 @@ public class ModificationSet {
 							throw new IllegalArgumentException("Can not replace with more than one object into a single node for feature:" + feature + " of "
 									+ container.getClass());
 						System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:" + modification);
-						return (T) modification.with.get(0);
+						return (T) modification.with.get(0).copyFiltered(this);
 					}
 					throw new IllegalArgumentException("Can not insert into a single node for feature:" + feature + " of " + container);
 				}

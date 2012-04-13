@@ -4,7 +4,6 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
-import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect TypeInference {
@@ -22,20 +21,7 @@ public aspect TypeInference {
 	}
 	
 	public HDLPrimitive HDLManip.determineType() {
-		switch (getType()){
-		case LOGIC_NEG :
-			return HDLPrimitive.getBool();
-		case BIT_NEG :
-			return getTarget().determineType();
-		case ARITH_NEG :
-			return getTarget().determineType().setType(HDLPrimitiveType.INT);
-		case CAST :
-			HDLType castTo = getCastTo();
-			if (castTo instanceof HDLPrimitive) {
-				return (HDLPrimitive) castTo;
-			}
-		}
-		return null;
+		return HDLPrimitives.getInstance().getManipOpType(getTarget(), getType(), getCastTo()).result;
 	}
 
 	public HDLPrimitive HDLFunction.determineType() {

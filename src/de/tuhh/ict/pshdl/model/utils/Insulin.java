@@ -23,11 +23,7 @@ public class Insulin {
 		apply = handleMultiBitAccess(apply);
 		apply = handleMultiForLoop(apply);
 		apply = handlePostfixOp(apply);
-		HDLPackage postResult = apply;
-		do {
-			apply = postResult;
-			postResult = fortifyType(apply);
-		} while (postResult != apply);
+		apply = fortifyType(apply);
 		return apply;
 	}
 
@@ -50,61 +46,76 @@ public class Insulin {
 				HDLShiftOp sop = (HDLShiftOp) opExpression;
 				left = sop.getLeft();
 				right = sop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getShiftOpType(sop.getLeft(), sop.getType(), sop.getRight());
+				inferenceInfo = HDLPrimitives.getInstance().getShiftOpType(left, sop.getType(), right);
 				break;
 			case HDLBitOp:
 				HDLBitOp bop = (HDLBitOp) opExpression;
 				left = bop.getLeft();
 				right = bop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getBitOpType(bop.getLeft(), bop.getType(), bop.getRight());
+				inferenceInfo = HDLPrimitives.getInstance().getBitOpType(left, bop.getType(), right);
 				break;
 			case HDLEqualityOp:
 				HDLEqualityOp eop = (HDLEqualityOp) opExpression;
 				left = eop.getLeft();
 				right = eop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getEqualityOpType(eop.getLeft(), eop.getType(), eop.getRight());
+				inferenceInfo = HDLPrimitives.getInstance().getEqualityOpType(left, eop.getType(), right);
 				break;
+			case HDLManip:
+				HDLManip manip = (HDLManip) opExpression;
+				left = manip.getTarget();
+				inferenceInfo = HDLPrimitives.getInstance().getManipOpType(left, manip.getType(), manip.getCastTo());
 			}
 			if (inferenceInfo != null) {
 				if (inferenceInfo.error != null) {
 					throw new IllegalArgumentException("Expression has error:" + inferenceInfo.error);
 				}
 				fortify(ms, inferenceInfo, left, inferenceInfo.left);
-				fortify(ms, inferenceInfo, right, inferenceInfo.right);
+				if (right != null)
+					fortify(ms, inferenceInfo, right, inferenceInfo.right);
 			}
 		}
 		List<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
 			HDLPrimitive leftType = assignment.getLeft().determineType();
-			HDLPrimitive rightType = assignment.getRight().determineType();
+			HDLExpression exp = assignment.getRight();
+			HDLPrimitive rightType = exp.determineType();
 			if (!leftType.equals(rightType)) {
 				// Compatibility is assumed
-				ms.replace(assignment.getRight(), new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget((HDLExpression) assignment.getRight().copy()));
+				cast(ms, leftType, exp);
 			}
 		}
 		List<HDLIfStatement> ifs = apply.getAllObjectsOf(HDLIfStatement.class, true);
 		for (HDLIfStatement assignment : ifs) {
-			HDLPrimitive ifExpType = assignment.getIfExp().determineType();
+			HDLExpression exp = assignment.getIfExp();
+			HDLPrimitive ifExpType = exp.determineType();
 			if (ifExpType.getType() != HDLPrimitiveType.BOOL) {
 				// Compatibility is assumed
-				ms.replace(assignment.getIfExp(),
-						new HDLEqualityOp().setLeft((HDLExpression) assignment.getIfExp().copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(new HDLLiteral().setVal("0")));
+				makeBool(ms, exp);
 			}
 		}
 		return ms.apply(apply);
 	}
 
-	private static void fortify(ModificationSet ms, HDLTypeInferenceInfo inferenceInfo, HDLExpression left, HDLPrimitive primitive) {
-		HDLPrimitive lt = left.determineType();
+	private static void cast(ModificationSet ms, HDLPrimitive leftType, HDLExpression exp) {
+		ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(exp.copy()));
+	}
+
+	private static void makeBool(ModificationSet ms, HDLExpression exp) {
+		ms.replace(exp, new HDLEqualityOp().setLeft(exp.copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(new HDLLiteral().setVal("0")));
+	}
+
+	private static void fortify(ModificationSet ms, HDLTypeInferenceInfo inferenceInfo, HDLExpression exp, HDLPrimitive primitive) {
+		HDLPrimitive lt = exp.determineType();
 		if (!primitive.equals(lt)) {
-			System.out.println("Insulin.fortifyType()" + lt + " to " + inferenceInfo);
-			if ((primitive.getType() == HDLPrimitiveType.BOOL)) {
-				ms.replace(left, new HDLEqualityOp().setLeft((HDLExpression) left.copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(new HDLLiteral().setVal("0")));
-			} else
-				ms.replace(left, new HDLManip().setType(HDLManipType.CAST).setCastTo(primitive).setTarget((HDLExpression) left.copy()));
+			System.out.println("Insulin.fortifyType()" + exp + " to " + inferenceInfo);
+			if (primitive.getType() == HDLPrimitiveType.BOOL)
+				makeBool(ms, exp);
+			else
+				cast(ms, primitive, exp);
 		}
 	}
 
+	@SuppressWarnings("null")
 	private static HDLPackage handlePostfixOp(HDLPackage apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLAssignment> loops = apply.getAllObjectsOf(HDLAssignment.class, true);
@@ -148,8 +159,8 @@ public class Insulin {
 			case ASSGN:
 				continue;
 			}
-			op = op.setLeft((HDLExpression) hdlAssignment.getLeft().copy()).setRight(hdlAssignment.getRight());
-			HDLAssignment newAss = new HDLAssignment().setLeft((HDLReference) hdlAssignment.getLeft().copy()).setType(HDLAssignmentType.ASSGN).setRight(op);
+			op = op.setLeft(hdlAssignment.getLeft().copy()).setRight(hdlAssignment.getRight());
+			HDLAssignment newAss = new HDLAssignment().setLeft(hdlAssignment.getLeft().copy()).setType(HDLAssignmentType.ASSGN).setRight(op);
 			ms.replace(hdlAssignment, newAss);
 		}
 		return ms.apply(apply);
