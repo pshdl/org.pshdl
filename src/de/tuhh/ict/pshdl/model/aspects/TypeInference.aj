@@ -26,12 +26,12 @@ public aspect TypeInference {
 
 	public HDLPrimitive HDLFunction.determineType() {
 		// XXX Really good question!
-		return HDLPrimitive.TARGET;
+		return HDLPrimitive.target(false);
 	}
 
 	public HDLPrimitive HDLLiteral.determineType() {
 		// Actually depends on context
-		return HDLPrimitive.TARGET;
+		return HDLPrimitive.target(getVal().charAt(0)!='-');
 	}
 
 	public HDLPrimitive HDLVariableRef.determineType() {

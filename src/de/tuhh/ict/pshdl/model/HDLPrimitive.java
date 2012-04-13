@@ -74,7 +74,25 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	// $CONTENT-BEGIN$
 
-	public static final HDLPrimitive TARGET = getInteger();
+	public static enum TargetMeta implements MetaAccess<Boolean> {
+		TARGET;
+	}
+
+	public static HDLPrimitive target(boolean positive) {
+		if (positive) {
+			HDLPrimitive natural = getNatural();
+			natural.addMeta(TargetMeta.TARGET, true);
+			return natural;
+		}
+		HDLPrimitive integer = getInteger();
+		integer.addMeta(TargetMeta.TARGET, true);
+		return integer;
+	}
+
+	public static boolean isTargetMatching(HDLPrimitive prim) {
+		Boolean meta = prim.getMeta(TargetMeta.TARGET);
+		return meta == null ? false : meta;
+	}
 
 	private static WeakHashMap<String, HDLPrimitive> primCache;
 

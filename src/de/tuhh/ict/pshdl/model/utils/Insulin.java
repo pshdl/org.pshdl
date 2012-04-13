@@ -12,7 +12,6 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives.HDLTypeInferenceInfo;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class Insulin {
@@ -27,9 +26,86 @@ public class Insulin {
 		return apply;
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	private static HDLPackage fortifyType(HDLPackage apply) {
 		ModificationSet ms = new ModificationSet();
+		fortifyOpExpressions(apply, ms);
+		fortifyAssignments(apply, ms);
+		fortifyIfExpressions(apply, ms);
+		fortifyRanges(apply, ms);
+		fortifyWidthExpressions(apply, ms);
+		foritfyArrays(apply, ms);
+		foritfyFunctions(apply, ms);
+		return ms.apply(apply);
+	}
+
+	private static void foritfyFunctions(HDLPackage apply, ModificationSet ms) {
+		List<HDLFunction> functions = apply.getAllObjectsOf(HDLFunction.class, true);
+		for (HDLFunction function : functions) {
+			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
+			if (info != null) {
+				ArrayList<HDLExpression> params = function.getParams();
+				for (int j = 0; j < params.size(); j++) {
+					HDLExpression exp = params.get(j);
+					fortify(ms, exp, info.args[j]);
+				}
+			}
+		}
+	}
+
+	private static void foritfyArrays(HDLPackage apply, ModificationSet ms) {
+		List<HDLVariableRef> varRefs = apply.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : varRefs) {
+			for (HDLExpression exp : ref.getArray()) {
+				fortify(ms, exp, HDLPrimitive.getNatural());
+			}
+			if (ref instanceof HDLInterfaceRef) {
+				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
+				for (HDLExpression exp : hir.getIfArray()) {
+					fortify(ms, exp, HDLPrimitive.getNatural());
+				}
+			}
+		}
+	}
+
+	private static void fortifyWidthExpressions(HDLPackage apply, ModificationSet ms) {
+		List<HDLPrimitive> primitives = apply.getAllObjectsOf(HDLPrimitive.class, true);
+		for (HDLPrimitive hdlPrimitive : primitives) {
+			HDLExpression width = hdlPrimitive.getWidth();
+			if (width != null) {
+				fortify(ms, width, HDLPrimitive.getNatural());
+			}
+		}
+	}
+
+	private static void fortifyRanges(HDLPackage apply, ModificationSet ms) {
+		List<HDLRange> ranges = apply.getAllObjectsOf(HDLRange.class, true);
+		for (HDLRange range : ranges) {
+			HDLExpression exp = range.getFrom();
+			if (exp != null) {
+				fortify(ms, exp, HDLPrimitive.getNatural());
+			}
+			fortify(ms, range.getTo(), HDLPrimitive.getNatural());
+		}
+	}
+
+	private static void fortifyIfExpressions(HDLPackage apply, ModificationSet ms) {
+		List<HDLIfStatement> ifs = apply.getAllObjectsOf(HDLIfStatement.class, true);
+		for (HDLIfStatement assignment : ifs) {
+			fortify(ms, assignment.getIfExp(), HDLPrimitive.getBool());
+		}
+	}
+
+	private static void fortifyAssignments(HDLPackage apply, ModificationSet ms) {
+		List<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
+		for (HDLAssignment assignment : assignments) {
+			HDLPrimitive leftType = assignment.getLeft().determineType();
+			HDLExpression exp = assignment.getRight();
+			fortify(ms, exp, leftType);
+		}
+	}
+
+	@SuppressWarnings("incomplete-switch")
+	private static void fortifyOpExpressions(HDLPackage apply, ModificationSet ms) {
 		List<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		for (HDLExpression opExpression : opEx) {
 			HDLTypeInferenceInfo inferenceInfo = null;
@@ -69,49 +145,28 @@ public class Insulin {
 				if (inferenceInfo.error != null) {
 					throw new IllegalArgumentException("Expression has error:" + inferenceInfo.error);
 				}
-				fortify(ms, inferenceInfo, left, inferenceInfo.left);
+				fortify(ms, left, inferenceInfo.args[0]);
 				if (right != null)
-					fortify(ms, inferenceInfo, right, inferenceInfo.right);
+					fortify(ms, right, inferenceInfo.args[1]);
 			}
 		}
-		List<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
-		for (HDLAssignment assignment : assignments) {
-			HDLPrimitive leftType = assignment.getLeft().determineType();
-			HDLExpression exp = assignment.getRight();
-			HDLPrimitive rightType = exp.determineType();
-			if (!leftType.equals(rightType)) {
-				// Compatibility is assumed
-				cast(ms, leftType, exp);
-			}
-		}
-		List<HDLIfStatement> ifs = apply.getAllObjectsOf(HDLIfStatement.class, true);
-		for (HDLIfStatement assignment : ifs) {
-			HDLExpression exp = assignment.getIfExp();
-			HDLPrimitive ifExpType = exp.determineType();
-			if (ifExpType.getType() != HDLPrimitiveType.BOOL) {
-				// Compatibility is assumed
-				makeBool(ms, exp);
-			}
-		}
-		return ms.apply(apply);
 	}
 
-	private static void cast(ModificationSet ms, HDLPrimitive leftType, HDLExpression exp) {
-		ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(exp.copy()));
+	private static void cast(ModificationSet ms, HDLPrimitive targetType, HDLExpression exp) {
+		ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(targetType.copy()).setTarget(exp.copy()));
 	}
 
 	private static void makeBool(ModificationSet ms, HDLExpression exp) {
 		ms.replace(exp, new HDLEqualityOp().setLeft(exp.copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(new HDLLiteral().setVal("0")));
 	}
 
-	private static void fortify(ModificationSet ms, HDLTypeInferenceInfo inferenceInfo, HDLExpression exp, HDLPrimitive primitive) {
+	private static void fortify(ModificationSet ms, HDLExpression exp, HDLPrimitive targetType) {
 		HDLPrimitive lt = exp.determineType();
-		if (!primitive.equals(lt)) {
-			System.out.println("Insulin.fortifyType()" + exp + " to " + inferenceInfo);
-			if (primitive.getType() == HDLPrimitiveType.BOOL)
+		if (!targetType.equals(lt)) {
+			if (targetType.getType() == HDLPrimitiveType.BOOL)
 				makeBool(ms, exp);
 			else
-				cast(ms, primitive, exp);
+				cast(ms, targetType, exp);
 		}
 	}
 
