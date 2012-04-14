@@ -15,13 +15,14 @@ import de.upb.hni.vmagic.type.*;
 
 public aspect VHDLExpressionTransformation {
 	public abstract Expression<?> HDLExpression.toVHDL();
+	public abstract Name<?> HDLReference.toVHDL();
 
 	public Name<?> HDLVariableRef.toVHDL() {
 		Name<?> result = new Signal(getVarRefName().getLastSegment(), UnresolvedType.NO_NAME);
 		result = getRef(result, this);
 		return result;
 	}
-
+	
 	private static Name<?> getRef(Name<?> result, HDLVariableRef ref) {
 		if (ref.getArray().size() != 0) {
 			@SuppressWarnings("rawtypes")

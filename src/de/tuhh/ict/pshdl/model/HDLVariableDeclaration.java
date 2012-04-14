@@ -91,6 +91,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	}
 
 	// $CONTENT-BEGIN$
+
 	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLPrimitive primitive,
 			ArrayList<HDLVariable> variables) {
 		this(container, register, direction, annotations, primitive.asRef(), primitive, variables, true);
@@ -101,43 +102,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		if (getPrimitive() != null)
 			return getPrimitive();
 		return super.resolveType();
-	}
-
-	@Override
-	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
-		sb.append("\n").append(spacing).append("new HDLVariableDeclaration(");
-		sb.append("null");
-		if (type == null)
-			sb.append(", null");
-		else {
-			// Fix for HDLPrimitives, do not just create reference!
-			if (type.getLastSegment().startsWith("#"))
-				sb.append(", ").append(resolveType().toConstructionString(spacing));
-			else
-				sb.append(", HDLQualifiedName.create(\"").append(type).append("\")");
-		}
-		if (variables == null)
-			sb.append(", null");
-		else {
-			if (variables.size() > 0) {
-				sb.append(",\n");
-				sb.append(spacing + "\t").append("HDLObject.asList(");
-				first = true;
-				for (HDLVariable o : variables) {
-					if (!first)
-						sb.append(", ");
-					first = false;
-					sb.append(o.toConstructionString(spacing + "\t\t"));
-				}
-				sb.append("\n" + spacing + "\t").append(")");
-			} else {
-				sb.append(", new ArrayList<HDLVariable>()");
-			}
-		}
-		sb.append(")");
-		return sb.toString();
 	}
 
 	// $CONTENT-END$

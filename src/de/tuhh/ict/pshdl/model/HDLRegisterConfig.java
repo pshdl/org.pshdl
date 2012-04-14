@@ -113,6 +113,57 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 		return config;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractHDLRegisterConfig))
+			return false;
+		if (!super.equals(obj))
+			return false;
+		AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
+		if (clk == null) {
+			if (other.getClkRefName() != null)
+				return false;
+		} else if (!clk.equals(other.getClkRefName()))
+			return false;
+		if (rst == null) {
+			if (other.getRstRefName() != null)
+				return false;
+		} else if (!rst.equals(other.getRstRefName()))
+			return false;
+		if (clockType == null) {
+			if (other.getClockType() != null)
+				return false;
+		} else if (!clockType.equals(other.getClockType()))
+			return false;
+		if (resetType == null) {
+			if (other.getResetType() != null)
+				return false;
+		} else if (!resetType.equals(other.getResetType()))
+			return false;
+		if (syncType == null) {
+			if (other.getSyncType() != null)
+				return false;
+		} else if (!syncType.equals(other.getSyncType()))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		final int prime = 31;
+		result = (prime * result) + ((clk == null) ? 0 : clk.hashCode());
+		result = (prime * result) + ((rst == null) ? 0 : rst.hashCode());
+		result = (prime * result) + ((clockType == null) ? 0 : clockType.hashCode());
+		result = (prime * result) + ((resetType == null) ? 0 : resetType.hashCode());
+		result = (prime * result) + ((syncType == null) ? 0 : syncType.hashCode());
+		return result;
+	}
 	// $CONTENT-END$
 
 }

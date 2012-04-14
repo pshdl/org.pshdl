@@ -50,6 +50,14 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	// $CONTENT-BEGIN$
 
+	public HDLRegisterConfig getRegisterConfig() {
+		if (container instanceof HDLVariableDeclaration) {
+			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
+			return vhd.getRegister();
+		}
+		return null;
+	}
+
 	// $CONTENT-END$
 
 }

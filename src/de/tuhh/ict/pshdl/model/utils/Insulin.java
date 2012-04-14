@@ -147,7 +147,7 @@ public class Insulin {
 			}
 			if (inferenceInfo != null) {
 				if (inferenceInfo.error != null) {
-					throw new IllegalArgumentException("Expression has error:" + inferenceInfo.error);
+					throw new IllegalArgumentException("The expression has an error:" + inferenceInfo.error);
 				}
 				fortify(ms, left, inferenceInfo.args[0]);
 				if (right != null)

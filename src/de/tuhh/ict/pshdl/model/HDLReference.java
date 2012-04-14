@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public abstract class HDLReference extends AbstractHDLReference {
 	/**
@@ -8,11 +9,13 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param var
+	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLReference(HDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLReference(HDLObject container, HDLQualifiedName var, boolean validate) {
+		super(container, var, validate);
 	}
 
 	/**
@@ -20,9 +23,11 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param var
+	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLReference(HDLObject container) {
-		this(container, true);
+	public HDLReference(HDLObject container, HDLQualifiedName var) {
+		this(container, var, true);
 	}
 
 	public HDLReference() {
