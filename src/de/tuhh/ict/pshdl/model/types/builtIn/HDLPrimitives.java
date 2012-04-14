@@ -9,10 +9,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
-import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
-import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
-import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 
 public class HDLPrimitives {
 
@@ -213,9 +210,10 @@ public class HDLPrimitives {
 		sb.append("\n</table>");
 	}
 
-	public HDLTypeInferenceInfo getArithOpType(HDLExpression left, HDLArithOpType type, HDLExpression right) {
-		HDLPrimitive lType = left.determineType();
-		HDLPrimitive rType = right.determineType();
+	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {
+		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
+		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
+		HDLArithOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType)) {
 			if (HDLPrimitive.isTargetMatching(rType))
 				lType = rType;
@@ -230,32 +228,34 @@ public class HDLPrimitives {
 		}
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, lType.setType(triple.left), rType.setType(triple.right));
 		info.result = new HDLPrimitive().setType(triple.result).setWidth(getWidth(type, info));
-		return normalize(info);
+		return normalize(info, op);
 	}
 
-	private HDLTypeInferenceInfo normalize(HDLTypeInferenceInfo info) {
-		HDLPrimitive result = info.result;
-		if (result.getWidth() != null) {
-			switch (result.getType()) {
-			case BIT:
-				result = result.setType(BITVECTOR);
-				break;
-			case INT:
-				result = result.setType(INTEGER);
-				break;
-			case UINT:
-				result = result.setType(NATURAL);
-				break;
-			default:
+	private HDLTypeInferenceInfo normalize(HDLTypeInferenceInfo info, HDLExpression op) {
+		if (info.result instanceof HDLPrimitive) {
+			HDLPrimitive result = (HDLPrimitive) info.result;
+			if (result.getWidth() != null) {
+				switch (result.getType()) {
+				case BIT:
+					result = result.setType(BITVECTOR);
+					break;
+				case INT:
+					result = result.setType(INTEGER);
+					break;
+				case UINT:
+					result = result.setType(NATURAL);
+					break;
+				default:
+				}
 			}
+			info.result = result.setContainer(op);
 		}
-		info.result = result;
 		return info;
 	}
 
 	private HDLExpression getWidth(HDLArithOpType type, HDLTypeInferenceInfo info) {
-		HDLExpression leftW = info.args[0].getWidth();
-		HDLExpression rightW = info.args[1].getWidth();
+		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
+		HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
 		switch (type) {
 		case POW:
 			// The result type of pow can only be natural
@@ -299,9 +299,9 @@ public class HDLPrimitives {
 		return null;
 	}
 
-	public HDLTypeInferenceInfo getShiftOpType(HDLExpression left, HDLShiftOpType type, HDLExpression right) {
-		HDLPrimitive lType = left.determineType();
-		HDLPrimitive rType = right.determineType();
+	public HDLTypeInferenceInfo getShiftOpType(HDLShiftOp op) {
+		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
+		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
 		if (HDLPrimitive.isTargetMatching(lType)) {
 			if (HDLPrimitive.isTargetMatching(rType))
 				lType = rType;
@@ -311,36 +311,42 @@ public class HDLPrimitives {
 		HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
 			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
-			hdi.error = "The operation " + type + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
+			hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 			return hdi;
 		}
 		HDLExpression width = lType.getWidth();
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType, new HDLPrimitive().setType(triple.right));
-		return normalize(info);
+		return normalize(info, op);
 	}
 
-	public HDLTypeInferenceInfo getEqualityOpType(HDLExpression left, HDLEqualityOpType type, HDLExpression right) {
-		HDLPrimitive lType = left.determineType();
-		HDLPrimitive rType = right.determineType();
-		if (HDLPrimitive.isTargetMatching(lType)) {
+	public HDLTypeInferenceInfo getEqualityOpType(HDLEqualityOp op) {
+		HDLType determineTypeL = op.getLeft().determineType();
+		HDLType determineTypeR = op.getRight().determineType();
+		if ((determineTypeL instanceof HDLPrimitive) && (determineTypeR instanceof HDLPrimitive)) {
+			HDLPrimitive lType = (HDLPrimitive) determineTypeL;
+			HDLPrimitive rType = (HDLPrimitive) determineTypeR;
+			if (HDLPrimitive.isTargetMatching(lType)) {
+				if (HDLPrimitive.isTargetMatching(rType))
+					lType = rType;
+			}
 			if (HDLPrimitive.isTargetMatching(rType))
-				lType = rType;
+				rType = lType;
+			HDLInferenceTriple triple = equalityResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
+			if (triple == null) {
+				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+				hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
+				return hdi;
+			}
+			HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result), lType.setType(triple.left), lType.setType(triple.right));
+			return normalize(info, op);
 		}
-		if (HDLPrimitive.isTargetMatching(rType))
-			rType = lType;
-		HDLInferenceTriple triple = equalityResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
-		if (triple == null) {
-			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
-			hdi.error = "The operation " + type + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
-			return hdi;
-		}
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result), lType.setType(triple.left), lType.setType(triple.right));
-		return normalize(info);
+		return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), determineTypeL, determineTypeR);
 	}
 
-	public HDLTypeInferenceInfo getBitOpType(HDLExpression left, HDLBitOpType type, HDLExpression right) {
-		HDLPrimitive lType = left.determineType();
-		HDLPrimitive rType = right.determineType();
+	public HDLTypeInferenceInfo getBitOpType(HDLBitOp op) {
+		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
+		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
+		HDLBitOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType)) {
 			if (HDLPrimitive.isTargetMatching(rType))
 				lType = rType;
@@ -359,12 +365,14 @@ public class HDLPrimitives {
 		if ((width == null) && (rType.getWidth() != null))
 			width = rType.getWidth();
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType.setType(triple.left), lType.setType(triple.right));
-		return normalize(info);
+		return normalize(info, op);
 	}
 
-	public HDLTypeInferenceInfo getManipOpType(HDLExpression target, HDLManipType type, HDLType castTo) {
-		HDLPrimitive determineType = target.determineType();
-		switch (type) {
+	public HDLTypeInferenceInfo getManipOpType(HDLManip manip) {
+		HDLExpression target = manip.getTarget();
+		HDLType castTo = manip.getCastTo();
+		HDLPrimitive determineType = (HDLPrimitive) target.determineType();
+		switch (manip.getType()) {
 		case CAST:
 			// XXX If there ever happens to be another cast, this has to be
 			// updated
@@ -407,13 +415,13 @@ public class HDLPrimitives {
 			case INTEGER:
 			case UINT:
 			case NATURAL:
-			case BIT:
 			case BITVECTOR:
 				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
 				hdi.error = "Logic negation does not support bit operands";
 				return hdi;
+			case BIT:
 			case BOOL:
-				return new HDLTypeInferenceInfo(determineType, determineType);
+				return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool());
 			}
 			break;
 		}

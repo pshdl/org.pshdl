@@ -43,7 +43,6 @@ public abstract class HDLExpression extends AbstractHDLExpression {
 		return (HDLStatement) parent;
 	}
 
-	public abstract HDLPrimitive determineType();
 	// $CONTENT-END$
 
 }

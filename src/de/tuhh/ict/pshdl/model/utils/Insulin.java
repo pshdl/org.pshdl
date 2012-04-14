@@ -23,6 +23,7 @@ public class Insulin {
 		apply = handleMultiForLoop(apply);
 		apply = handlePostfixOp(apply);
 		apply = fortifyType(apply);
+		apply.validateAllFields(null, true);
 		return apply;
 	}
 
@@ -35,9 +36,7 @@ public class Insulin {
 		fortifyWidthExpressions(apply, ms);
 		foritfyArrays(apply, ms);
 		foritfyFunctions(apply, ms);
-		HDLPackage result = ms.apply(apply);
-		result.validateAllFields(null, true);
-		return result;
+		return ms.apply(apply);
 	}
 
 	private static void foritfyFunctions(HDLPackage apply, ModificationSet ms) {
@@ -100,9 +99,12 @@ public class Insulin {
 	private static void fortifyAssignments(HDLPackage apply, ModificationSet ms) {
 		List<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
-			HDLPrimitive leftType = assignment.getLeft().determineType();
+			HDLType leftType = assignment.getLeft().determineType();
 			HDLExpression exp = assignment.getRight();
-			fortify(ms, exp, leftType);
+			if (leftType instanceof HDLPrimitive) {
+				HDLPrimitive pt = (HDLPrimitive) leftType;
+				fortify(ms, exp, pt);
+			}
 		}
 	}
 
@@ -118,30 +120,30 @@ public class Insulin {
 				HDLArithOp aop = (HDLArithOp) opExpression;
 				left = aop.getLeft();
 				right = aop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getArithOpType(left, aop.getType(), right);
+				inferenceInfo = HDLPrimitives.getInstance().getArithOpType(aop);
 				break;
 			case HDLShiftOp:
 				HDLShiftOp sop = (HDLShiftOp) opExpression;
 				left = sop.getLeft();
 				right = sop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getShiftOpType(left, sop.getType(), right);
+				inferenceInfo = HDLPrimitives.getInstance().getShiftOpType(sop);
 				break;
 			case HDLBitOp:
 				HDLBitOp bop = (HDLBitOp) opExpression;
 				left = bop.getLeft();
 				right = bop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getBitOpType(left, bop.getType(), right);
+				inferenceInfo = HDLPrimitives.getInstance().getBitOpType(bop);
 				break;
 			case HDLEqualityOp:
 				HDLEqualityOp eop = (HDLEqualityOp) opExpression;
 				left = eop.getLeft();
 				right = eop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getEqualityOpType(left, eop.getType(), right);
+				inferenceInfo = HDLPrimitives.getInstance().getEqualityOpType(eop);
 				break;
 			case HDLManip:
 				HDLManip manip = (HDLManip) opExpression;
 				left = manip.getTarget();
-				inferenceInfo = HDLPrimitives.getInstance().getManipOpType(left, manip.getType(), manip.getCastTo());
+				inferenceInfo = HDLPrimitives.getInstance().getManipOpType(manip);
 			}
 			if (inferenceInfo != null) {
 				if (inferenceInfo.error != null) {
@@ -162,13 +164,16 @@ public class Insulin {
 		ms.replace(exp, new HDLEqualityOp().setLeft(exp.copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(new HDLLiteral().setVal("0")));
 	}
 
-	private static void fortify(ModificationSet ms, HDLExpression exp, HDLPrimitive targetType) {
-		HDLPrimitive lt = exp.determineType();
-		if (!targetType.equals(lt)) {
-			if (targetType.getType() == HDLPrimitiveType.BOOL)
-				makeBool(ms, exp);
-			else
-				cast(ms, targetType, exp);
+	private static void fortify(ModificationSet ms, HDLExpression exp, HDLType targetType) {
+		if (targetType instanceof HDLPrimitive) {
+			HDLPrimitive pt = (HDLPrimitive) targetType;
+			HDLType lt = exp.determineType();
+			if (!targetType.equals(lt)) {
+				if (pt.getType() == HDLPrimitiveType.BOOL)
+					makeBool(ms, exp);
+				else
+					cast(ms, pt, exp);
+			}
 		}
 	}
 

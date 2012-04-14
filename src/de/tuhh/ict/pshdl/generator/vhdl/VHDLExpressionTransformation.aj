@@ -94,7 +94,8 @@ public aspect VHDLExpressionTransformation {
 //				
 //				}
 //			} else {
-				Expression<?> exp = VHDLCastsLibrary.cast(vhdl, getTarget().determineType().getType(), targetType.getType());
+				HDLPrimitive t=(HDLPrimitive)getTarget().determineType();
+				Expression<?> exp = VHDLCastsLibrary.cast(vhdl, t.getType(), targetType.getType());
 				if (targetType.getWidth() != null) {
 					Expression<?> width = targetType.getWidth().toVHDL();
 					FunctionCall resize = null;
@@ -135,7 +136,7 @@ public aspect VHDLExpressionTransformation {
 			return new DecimalLiteral(val);
 		switch (val.charAt(1)) {
 		case 'b':
-			return new StringLiteral(val.substring(2));
+			return new BinaryLiteral(val.substring(2));
 		case 'x':
 			return new HexLiteral(val.substring(2));
 		default:

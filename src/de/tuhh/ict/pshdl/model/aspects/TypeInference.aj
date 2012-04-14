@@ -8,6 +8,8 @@ import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect TypeInference {
 	
+	public abstract HDLType HDLExpression.determineType();
+	
 	/**
 	 * Attempt to determine the type of this HDLVariable. For this to work it
 	 * needs to have a valid container.
@@ -40,19 +42,21 @@ public aspect TypeInference {
 	
 	public HDLPrimitive HDLConcat.determineType() {
 		Iterator<HDLExpression> iter = getCats().iterator();
-		HDLExpression width = iter.next().determineType().getWidth();
+		HDLPrimitive type=(HDLPrimitive)iter.next().determineType();
+		HDLExpression width = type.getWidth();
 		while (iter.hasNext()) {
-			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().determineType().getWidth());
+			type=(HDLPrimitive)iter.next().determineType();
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(type.getWidth());
 		}
-		return HDLPrimitive.getBitvector().setWidth(width);
+		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}
 
 	public HDLPrimitive HDLEnumRef.determineType() {
 		return null;
 	}
 	
-	public HDLPrimitive HDLManip.determineType() {
-		return HDLPrimitives.getInstance().getManipOpType(getTarget(), getType(), getCastTo()).result;
+	public HDLType HDLManip.determineType() {
+		return HDLPrimitives.getInstance().getManipOpType(this).result;
 	}
 
 	public HDLPrimitive HDLFunction.determineType() {
@@ -65,30 +69,30 @@ public aspect TypeInference {
 		return HDLPrimitive.target(getVal().charAt(0)!='-');
 	}
 
-	public HDLPrimitive HDLVariableRef.determineType() {
+	public HDLType HDLVariableRef.determineType() {
 		if (getBits().size() == 0)
-			return (HDLPrimitive) resolveVar().determineType();
+			return resolveVar().determineType();
 		Iterator<HDLRange> iter = getBits().iterator();
 		HDLExpression width = iter.next().getWidth();
 		while (iter.hasNext()) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth());
 		}
-		return HDLPrimitive.getBitvector().setWidth(width);
+		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}
 
-	public HDLPrimitive HDLArithOp.determineType() {
-		return HDLPrimitives.getInstance().getArithOpType(getLeft(), getType(), getRight()).result;
+	public HDLType HDLArithOp.determineType() {
+		return HDLPrimitives.getInstance().getArithOpType(this).result;
 	}
 
-	public HDLPrimitive HDLBitOp.determineType() {
-		return HDLPrimitives.getInstance().getBitOpType(getLeft(), getType(), getRight()).result;
+	public HDLType HDLBitOp.determineType() {
+		return HDLPrimitives.getInstance().getBitOpType(this).result;
 	}
 
-	public HDLPrimitive HDLShiftOp.determineType() {
-		return HDLPrimitives.getInstance().getShiftOpType(getLeft(), getType(), getRight()).result;
+	public HDLType HDLShiftOp.determineType() {
+		return HDLPrimitives.getInstance().getShiftOpType(this).result;
 	}
 
-	public HDLPrimitive HDLEqualityOp.determineType() {
-		return HDLPrimitives.getInstance().getEqualityOpType(getLeft(), getType(), getRight()).result;
+	public HDLType HDLEqualityOp.determineType() {
+		return HDLPrimitives.getInstance().getEqualityOpType(this).result;
 	}
 }

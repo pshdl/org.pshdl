@@ -33,7 +33,7 @@ public class HDLFunctions implements IHDLFunctionResolver {
 		String name = function.getName();
 		ArrayList<HDLExpression> params = function.getParams();
 		for (HDLExpression exp : params) {
-			HDLPrimitive type = exp.determineType();
+			HDLPrimitive type = (HDLPrimitive) exp.determineType();
 			if (disallowedTypes.contains(type.getType())) {
 				HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(HDLPrimitive.getInteger());
 				info.error = "The parameter " + exp + " of type:" + type + " is not allowed for function:" + name;

@@ -5,11 +5,11 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 
 public class HDLTypeInferenceInfo {
-	public HDLPrimitive result;
+	public HDLType result;
 	public String error;
-	public HDLPrimitive[] args;
+	public HDLType[] args;
 
-	public HDLTypeInferenceInfo(HDLPrimitive result, HDLPrimitive... args) {
+	public HDLTypeInferenceInfo(HDLPrimitive result, HDLType... args) {
 		super();
 		this.args = args;
 		this.result = result;
