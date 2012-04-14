@@ -40,6 +40,11 @@ public abstract class HDLObject extends AbstractHDLObject {
 	// $CONTENT-BEGIN$
 
 	@Override
+	public void copyMetaData(HDLObject src, HDLObject target) {
+		target.metaData.putAll(src.metaData);
+	}
+
+	@Override
 	public abstract HDLObject copy();
 
 	@Override

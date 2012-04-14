@@ -5,6 +5,8 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 
 public interface CopyFilter {
+	CopyFilter DEEP = new DeepCloneFilter();
+
 	public <T extends Enum<T>> T copyObject(String feature, HDLObject container, T object);
 
 	public String copyObject(String feature, HDLObject container, String object);

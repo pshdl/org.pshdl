@@ -70,7 +70,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
 		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
 		res.addAll(HDLUtils.getallVariableDeclarations(dos));
-		res.add(new HDLVariableDeclaration(this, null, HDLDirection.HIDDEN, null, HDLQualifiedName.create("#uint"), asList(param)));
+		res.add(new HDLVariableDeclaration(this, null, HDLDirection.HIDDEN, null, HDLPrimitive.getNatural(), asList(param.copy())));
 		return res;
 	}
 

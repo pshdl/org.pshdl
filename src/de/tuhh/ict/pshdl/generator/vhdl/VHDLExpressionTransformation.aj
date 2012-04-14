@@ -1,20 +1,19 @@
-package de.tuhh.ict.pshdl.model.aspects;
+package de.tuhh.ict.pshdl.generator.vhdl;
 
 import java.util.*;
 
+import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
+import de.tuhh.ict.pshdl.model.*;
+import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
-import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.declaration.*;
+import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.type.*;
-import de.upb.hni.vmagic.*;
-import de.tuhh.ict.pshdl.generator.vhdl.*;
-import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
-import de.tuhh.ict.pshdl.model.*;
 
-public aspect VHDLOutput {
+public aspect VHDLExpressionTransformation {
 	public abstract Expression<?> HDLExpression.toVHDL();
 
 	public Name<?> HDLVariableRef.toVHDL() {
@@ -37,7 +36,7 @@ public aspect VHDLOutput {
 				throw new IllegalArgumentException("Multi bit access not supported");
 			HDLRange r = ref.getBits().get(0);
 			if (r.getFrom() == null) {
-				result = new ArrayElement<Name<?>>(result, r.getFrom().toVHDL());
+				result = new ArrayElement<Name<?>>(result, r.getTo().toVHDL());
 			} else {
 				result = new Slice<Name<?>>(result, r.toVHDL(Direction.DOWNTO));
 			}
@@ -57,17 +56,17 @@ public aspect VHDLOutput {
 		}
 		return getRef(result, this);
 	}
-	
-	public FunctionCall HDLFunction.toVHDL(){
+
+	public FunctionCall HDLFunction.toVHDL() {
 		FunctionDeclaration fd = new FunctionDeclaration(getName(), UnresolvedType.NO_NAME);
-		FunctionCall res=new FunctionCall(fd);
-		for(HDLExpression exp:getParams()){
+		FunctionCall res = new FunctionCall(fd);
+		for (HDLExpression exp : getParams()) {
 			res.getParameters().add(new AssociationElement(exp.toVHDL()));
 		}
 		return res;
 	}
-	
-	public Signal HDLEnumRef.toVHDL(){
+
+	public Signal HDLEnumRef.toVHDL() {
 		return new Signal(getVarRefName().getLastSegment(), UnresolvedType.NO_NAME);
 	}
 
@@ -90,29 +89,35 @@ public aspect VHDLOutput {
 			return new Not(vhdl);
 		case CAST:
 			HDLPrimitive targetType = (HDLPrimitive) getCastTo();
-			Expression<?> exp = VHDLCastsLibrary.cast(vhdl, getTarget().determineType().getType(), targetType.getType());
-			if (targetType.getWidth() != null) {
-				Expression<?> width = targetType.getWidth().toVHDL();
-				FunctionCall resize = null;
-				switch (targetType.getType()) {
-				case BOOL:
-				case BIT:
-				case INTEGER:
-				case NATURAL:
-					throw new IllegalArgumentException(targetType + " can't have a width.");
-				case INT:
-				case UINT:
-					resize = new FunctionCall(NumericStd.RESIZE);
-					break;
-				case BITVECTOR:
-					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-					break;
+//			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
+//				switch (targetType.getType()){
+//				
+//				}
+//			} else {
+				Expression<?> exp = VHDLCastsLibrary.cast(vhdl, getTarget().determineType().getType(), targetType.getType());
+				if (targetType.getWidth() != null) {
+					Expression<?> width = targetType.getWidth().toVHDL();
+					FunctionCall resize = null;
+					switch (targetType.getType()) {
+					case BOOL:
+					case BIT:
+					case INTEGER:
+					case NATURAL:
+						throw new IllegalArgumentException(targetType + " can't have a width.");
+					case INT:
+					case UINT:
+						resize = new FunctionCall(NumericStd.RESIZE);
+						break;
+					case BITVECTOR:
+						resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+						break;
+					}
+					resize.getParameters().add(new AssociationElement(exp));
+					resize.getParameters().add(new AssociationElement(width));
+					return resize;
 				}
-				resize.getParameters().add(new AssociationElement(exp));
-				resize.getParameters().add(new AssociationElement(width));
-				return resize;
-			}
-			return exp;
+				return exp;
+//			}
 		}
 		throw new IllegalArgumentException("Not supported:" + this);
 	}

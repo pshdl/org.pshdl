@@ -91,16 +91,7 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 				List<HDLType> typeDecl = doGetTypeDeclarations();
 				typeCache = new HashMap<String, HDLType>();
 				for (HDLType hdlTypeDeclaration : typeDecl) {
-					// Primitives do not have a name and can thus not be
-					// resolved..
-					if (hdlTypeDeclaration instanceof HDLEnum) {
-						HDLEnum hEnum = (HDLEnum) hdlTypeDeclaration;
-						typeCache.put(hEnum.getName(), hEnum);
-					}
-					if (hdlTypeDeclaration instanceof HDLInterface) {
-						HDLInterface hIf = (HDLInterface) hdlTypeDeclaration;
-						typeCache.put(hIf.getName(), hIf);
-					}
+					typeCache.put(hdlTypeDeclaration.getName(), hdlTypeDeclaration);
 				}
 			}
 		}
@@ -115,8 +106,8 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 			types.add(hEnumDecl.getHEnum());
 		}
 		for (HDLVariableDeclaration varDecl : doGetVariableDeclarations()) {
-			if (varDecl.getTypeRefName().getLastSegment().startsWith("#"))
-				types.add(HDLPrimitive.forName(varDecl.getTypeRefName()));
+			if (varDecl.getPrimitive() != null)
+				types.add(varDecl.getPrimitive());
 		}
 		for (HDLInterface ifDecl : doGetInterfaceDeclarations()) {
 			types.add(ifDecl);

@@ -35,7 +35,9 @@ public class Insulin {
 		fortifyWidthExpressions(apply, ms);
 		foritfyArrays(apply, ms);
 		foritfyFunctions(apply, ms);
-		return ms.apply(apply);
+		HDLPackage result = ms.apply(apply);
+		result.validateAllFields(null, true);
+		return result;
 	}
 
 	private static void foritfyFunctions(HDLPackage apply, ModificationSet ms) {
@@ -229,7 +231,7 @@ public class Insulin {
 				HDLForLoop[] newLoops = new HDLForLoop[loop.getRange().size()];
 				int i = 0;
 				for (HDLRange r : loop.getRange()) {
-					newLoops[i++] = loop.setRange(HDLObject.asList(r));
+					newLoops[i++] = loop.copyFiltered(CopyFilter.DEEP).setRange(HDLObject.asList(r));
 				}
 				ms.replace(loop, newLoops);
 			}

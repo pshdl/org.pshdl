@@ -7,6 +7,37 @@ import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect TypeInference {
+	
+	/**
+	 * Attempt to determine the type of this HDLVariable. For this to work it
+	 * needs to have a valid container.
+	 * 
+	 * @return the HDLType if it could be determined, <code>null</code>
+	 *         otherwise.
+	 */
+	public HDLType HDLVariable.determineType() {
+		HDLObject container = getContainer();
+		if (container instanceof HDLVariableDeclaration) {
+			HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
+			return hvd.determineType();
+		}
+		if (container instanceof HDLDirectGeneration) {
+			HDLDirectGeneration hdg = (HDLDirectGeneration) container;
+			return hdg.getHIf();
+		}
+		if (container instanceof HDLInterfaceInstantiation) {
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) container;
+			return hii.resolveHIf();
+		}
+		throw new IllegalArgumentException("Failed to resolve type of "+this+" caused by an unexpected container"+container);
+	}
+	
+	public HDLType HDLVariableDeclaration.determineType(){
+		if (getPrimitive()!=null)
+			return getPrimitive();
+		return resolveType();
+	}
+	
 	public HDLPrimitive HDLConcat.determineType() {
 		Iterator<HDLExpression> iter = getCats().iterator();
 		HDLExpression width = iter.next().determineType().getWidth();

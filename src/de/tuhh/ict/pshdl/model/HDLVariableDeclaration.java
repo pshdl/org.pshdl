@@ -20,6 +20,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
+	 * @param primitive
+	 *            the value for primitive. Can be <code>null</code>.
 	 * @param variables
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
@@ -27,8 +29,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLQualifiedName type,
-			ArrayList<HDLVariable> variables, boolean validate) {
-		super(container, register, direction, annotations, type, variables, validate);
+			HDLPrimitive primitive, ArrayList<HDLVariable> variables, boolean validate) {
+		super(container, register, direction, annotations, type, primitive, variables, validate);
 	}
 
 	/**
@@ -45,13 +47,15 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
+	 * @param primitive
+	 *            the value for primitive. Can be <code>null</code>.
 	 * @param variables
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
 	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLQualifiedName type,
-			ArrayList<HDLVariable> variables) {
-		this(container, register, direction, annotations, type, variables, true);
+			HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
+		this(container, register, direction, annotations, type, primitive, variables, true);
 	}
 
 	public HDLVariableDeclaration() {
@@ -87,6 +91,18 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	}
 
 	// $CONTENT-BEGIN$
+	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLPrimitive primitive,
+			ArrayList<HDLVariable> variables) {
+		this(container, register, direction, annotations, primitive.asRef(), primitive, variables, true);
+	}
+
+	@Override
+	public HDLType resolveType() {
+		if (getPrimitive() != null)
+			return getPrimitive();
+		return super.resolveType();
+	}
+
 	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;

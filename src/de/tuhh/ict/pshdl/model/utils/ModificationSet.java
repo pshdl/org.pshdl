@@ -18,7 +18,8 @@ public class ModificationSet {
 						if (modification.with.size() > 1)
 							throw new IllegalArgumentException("Can not replace with more than one object into a single node for feature:" + feature + " of "
 									+ container.getClass());
-						System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:" + modification);
+						// System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:"
+						// + modification);
 						return (T) modification.with.get(0).copyFiltered(this);
 					}
 					throw new IllegalArgumentException("Can not insert into a single node for feature:" + feature + " of " + container);
@@ -39,7 +40,8 @@ public class ModificationSet {
 						List<T> after = new LinkedList<T>();
 						List<T> replace = new LinkedList<T>();
 						for (Modification modification : mods) {
-							System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:" + modification);
+							// System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:"
+							// + modification);
 							switch (modification.type) {
 							case INSERT_AFTER:
 								after.addAll((Collection<? extends T>) modification.with);
@@ -128,19 +130,22 @@ public class ModificationSet {
 	}
 
 	public void replace(HDLObject subject, HDLObject... with) {
-		System.out.println("ModificationSet.replace()" + subject + " with " + Arrays.toString(with));
+		// System.out.println("ModificationSet.replace()" + subject + " with " +
+		// Arrays.toString(with));
 		Modification mod = new Modification(subject, ModificationType.REPLACE, with);
 		insert(subject, mod);
 	}
 
 	public void insertAfter(HDLObject subject, HDLObject... with) {
-		System.out.println("ModificationSet.insertAfter()" + subject + " with " + Arrays.toString(with));
+		// System.out.println("ModificationSet.insertAfter()" + subject +
+		// " with " + Arrays.toString(with));
 		Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, with);
 		insert(subject, mod);
 	}
 
 	public void insertBefore(HDLObject subject, HDLObject... with) {
-		System.out.println("ModificationSet.insertBefore()" + subject + " with " + Arrays.toString(with));
+		// System.out.println("ModificationSet.insertBefore()" + subject +
+		// " with " + Arrays.toString(with));
 		Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, with);
 		insert(subject, mod);
 	}

@@ -20,7 +20,6 @@ public class HDLLibrary {
 	}
 
 	public void addPkg(HDLPackage pkg) {
-		pkg.setLibrary(this);
 		HDLQualifiedName hdlPkg = new HDLQualifiedName(pkg.getPkg());
 		for (HDLUnit unit : pkg.getUnits()) {
 			HDLQualifiedName uq = hdlPkg.append(new HDLQualifiedName(unit.getName()));

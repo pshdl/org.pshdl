@@ -50,29 +50,6 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	// $CONTENT-BEGIN$
 
-	/**
-	 * Attempt to determine the type of this HDLVariable. For this to work it
-	 * needs to have a valid container.
-	 * 
-	 * @return the HDLType if it could be determined, <code>null</code>
-	 *         otherwise.
-	 */
-	public HDLType determineType() {
-		if (getContainer() instanceof HDLVariableDeclaration) {
-			HDLVariableDeclaration hvd = (HDLVariableDeclaration) getContainer();
-			return hvd.resolveType();
-		}
-		if (getContainer() instanceof HDLDirectGeneration) {
-			HDLDirectGeneration hdg = (HDLDirectGeneration) getContainer();
-			return hdg.getHIf();
-		}
-		if (getContainer() instanceof HDLInterfaceInstantiation) {
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) getContainer();
-			return hii.resolveHIf();
-		}
-		return null;
-	}
-
 	// $CONTENT-END$
 
 }

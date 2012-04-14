@@ -11,6 +11,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param libURI
+	 *            the value for libURI. Can <b>not</b> be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param imports
@@ -20,8 +22,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(HDLObject container, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements, boolean validate) {
-		super(container, name, imports, statements, validate);
+	public HDLUnit(HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements, boolean validate) {
+		super(container, libURI, name, imports, statements, validate);
 	}
 
 	/**
@@ -29,6 +31,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param libURI
+	 *            the value for libURI. Can <b>not</b> be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param imports
@@ -36,8 +40,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
 	 */
-	public HDLUnit(HDLObject container, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements) {
-		this(container, name, imports, statements, true);
+	public HDLUnit(HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements) {
+		this(container, libURI, name, imports, statements, true);
 	}
 
 	public HDLUnit() {
@@ -73,7 +77,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			case IN:
 			case INOUT:
 			case OUT:
-				unitIF = unitIF.addPorts(hdlVariableDeclaration.copy());
+				unitIF = unitIF.addPorts(hdlVariableDeclaration.copyFiltered(CopyFilter.DEEP));
 				break;
 			default:
 				break;
@@ -99,8 +103,8 @@ public class HDLUnit extends AbstractHDLUnit {
 		}
 		if (typeCache.get(type.getLastSegment()) != null)
 			return typeCache.get(type.getLastSegment());
-		if (type.getLastSegment().startsWith("#"))
-			return HDLPrimitive.forName(type);
+		if (library == null)
+			library = HDLLibrary.getLibrary(libURI);
 		return library.resolve(getName(), getImports(), type);
 	}
 
@@ -110,8 +114,8 @@ public class HDLUnit extends AbstractHDLUnit {
 			types.add(hEnumDecl.getHEnum());
 		}
 		for (HDLVariableDeclaration varDecl : HDLUtils.getallVariableDeclarations(getStatements())) {
-			if (varDecl.getTypeRefName().getLastSegment().startsWith("#"))
-				types.add(HDLPrimitive.forName(varDecl.getTypeRefName()));
+			if (varDecl.getPrimitive() != null)
+				types.add(varDecl.getPrimitive());
 		}
 		for (HDLInterface ifDecl : HDLUtils.getallInterfaceDeclarations(getStatements())) {
 			types.add(ifDecl);
@@ -133,17 +137,15 @@ public class HDLUnit extends AbstractHDLUnit {
 				}
 			}
 		}
-		if (variableCache.get(var.getLastSegment()) != null)
-			return variableCache.get(var.getLastSegment());
-		if (var.getLastSegment().equals("$clk"))
+		String varName = var.getLastSegment();
+		HDLVariable hdlVariable = variableCache.get(varName);
+		if (hdlVariable != null)
+			return hdlVariable;
+		if (varName.equals("$clk"))
 			return new HDLVariable(null, "$clk", null, null);
-		if (var.getLastSegment().equals("$rst"))
+		if (varName.equals("$rst"))
 			return new HDLVariable(null, "$rst", null, null);
 		return null;
-	}
-
-	public void setLibrary(HDLLibrary library) {
-		this.library = library;
 	}
 
 	// $CONTENT-END$
