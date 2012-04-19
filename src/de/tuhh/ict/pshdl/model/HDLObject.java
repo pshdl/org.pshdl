@@ -68,6 +68,14 @@ public abstract class HDLObject extends AbstractHDLObject {
 		metaData.put(key.name(), value);
 	}
 
+	public void setMeta(MetaAccess<Boolean> meta) {
+		addMeta(meta, true);
+	}
+
+	public boolean hasMeta(MetaAccess<?> key) {
+		return getMeta(key) != null;
+	}
+
 	@SuppressWarnings("unchecked")
 	public <K> K getMeta(MetaAccess<K> key) {
 		return (K) metaData.get(key.name());

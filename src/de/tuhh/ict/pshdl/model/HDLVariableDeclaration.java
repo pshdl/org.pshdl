@@ -104,6 +104,15 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		return super.resolveType();
 	}
 
+	public AbstractHDLVariableDeclaration setType(HDLType resolveType) {
+		HDLVariableDeclaration setType = super.setType(resolveType.asRef());
+		if (resolveType instanceof HDLPrimitive) {
+			HDLPrimitive prim = (HDLPrimitive) resolveType;
+			return setType.setPrimitive(prim);
+		}
+		return setType;
+	}
+
 	// $CONTENT-END$
 
 }

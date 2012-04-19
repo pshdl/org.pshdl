@@ -122,8 +122,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return false;
 		if (!(obj instanceof AbstractHDLRegisterConfig))
 			return false;
-		if (!super.equals(obj))
-			return false;
+		// if (!super.equals(obj))
+		// return false;
 		AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
 		if (clk == null) {
 			if (other.getClkRefName() != null)
@@ -155,7 +155,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 
 	@Override
 	public int hashCode() {
-		int result = super.hashCode();
+		int result = 1;
 		final int prime = 31;
 		result = (prime * result) + ((clk == null) ? 0 : clk.hashCode());
 		result = (prime * result) + ((rst == null) ? 0 : rst.hashCode());

@@ -8,7 +8,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.aspectj.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.tuhh.ict.pshdl.model,
+Export-Package: de.tuhh.ict.pshdl.generator.vhdl,
+ de.tuhh.ict.pshdl.model,
  de.tuhh.ict.pshdl.model.impl,
  de.tuhh.ict.pshdl.model.utils,
  de.tuhh.ict.pshdl.model.validation

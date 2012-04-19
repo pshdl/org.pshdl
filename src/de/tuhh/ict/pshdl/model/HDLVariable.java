@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLVariable extends AbstractHDLVariable {
 	/**
@@ -56,6 +57,10 @@ public class HDLVariable extends AbstractHDLVariable {
 			return vhd.getRegister();
 		}
 		return null;
+	}
+
+	public HDLQualifiedName asRef() {
+		return HDLQualifiedName.create(getName());
 	}
 
 	// $CONTENT-END$

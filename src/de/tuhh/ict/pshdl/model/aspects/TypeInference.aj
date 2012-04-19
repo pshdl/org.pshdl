@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect TypeInference {
@@ -43,16 +44,23 @@ public aspect TypeInference {
 	public HDLPrimitive HDLConcat.determineType() {
 		Iterator<HDLExpression> iter = getCats().iterator();
 		HDLPrimitive type=(HDLPrimitive)iter.next().determineType();
-		HDLExpression width = type.getWidth();
+		HDLExpression width = getWidth(type);
 		while (iter.hasNext()) {
 			type=(HDLPrimitive)iter.next().determineType();
-			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(type.getWidth());
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(getWidth(type));
 		}
 		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}
 
-	public HDLPrimitive HDLEnumRef.determineType() {
-		return null;
+	private static HDLExpression getWidth(HDLPrimitive type) {
+		HDLExpression width = type.getWidth();
+		if (type.getType()==HDLPrimitiveType.BIT)
+			width=new HDLLiteral().setVal("1");
+		return width;
+	}
+
+	public HDLType HDLEnumRef.determineType() {
+		return resolveHEnum();
 	}
 	
 	public HDLType HDLManip.determineType() {
@@ -70,9 +78,12 @@ public aspect TypeInference {
 	}
 
 	public HDLType HDLVariableRef.determineType() {
-		if (getBits().size() == 0)
+		List<HDLRange> bits=getBits();
+		if (bits.size() == 0)
 			return resolveVar().determineType();
-		Iterator<HDLRange> iter = getBits().iterator();
+		if (bits.size()==1 && bits.get(0).getFrom()==null)
+			return HDLPrimitive.getBit();
+		Iterator<HDLRange> iter = bits.iterator();
 		HDLExpression width = iter.next().getWidth();
 		while (iter.hasNext()) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth());

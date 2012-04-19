@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
@@ -15,6 +16,7 @@ import de.upb.hni.vmagic.type.*;
 
 public aspect VHDLExpressionTransformation {
 	public abstract Expression<?> HDLExpression.toVHDL();
+
 	public abstract Name<?> HDLReference.toVHDL();
 
 	public Name<?> HDLVariableRef.toVHDL() {
@@ -22,7 +24,7 @@ public aspect VHDLExpressionTransformation {
 		result = getRef(result, this);
 		return result;
 	}
-	
+
 	private static Name<?> getRef(Name<?> result, HDLVariableRef ref) {
 		if (ref.getArray().size() != 0) {
 			@SuppressWarnings("rawtypes")
@@ -90,36 +92,56 @@ public aspect VHDLExpressionTransformation {
 			return new Not(vhdl);
 		case CAST:
 			HDLPrimitive targetType = (HDLPrimitive) getCastTo();
-//			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
-//				switch (targetType.getType()){
-//				
-//				}
-//			} else {
-				HDLPrimitive t=(HDLPrimitive)getTarget().determineType();
-				Expression<?> exp = VHDLCastsLibrary.cast(vhdl, t.getType(), targetType.getType());
-				if (targetType.getWidth() != null) {
-					Expression<?> width = targetType.getWidth().toVHDL();
-					FunctionCall resize = null;
-					switch (targetType.getType()) {
-					case BOOL:
-					case BIT:
-					case INTEGER:
-					case NATURAL:
-						throw new IllegalArgumentException(targetType + " can't have a width.");
-					case INT:
-					case UINT:
-						resize = new FunctionCall(NumericStd.RESIZE);
-						break;
-					case BITVECTOR:
-						resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-						break;
-					}
-					resize.getParameters().add(new AssociationElement(exp));
-					resize.getParameters().add(new AssociationElement(width));
-					return resize;
+			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
+				HDLLiteral lit = (HDLLiteral) getTarget();
+				BigInteger val = lit.getValueAsBigInt();
+				FunctionCall resize = null;
+				switch (targetType.getType()) {
+				case BIT:
+					if (BigInteger.ZERO.equals(val))
+						return new CharacterLiteral('0');
+					return new CharacterLiteral('1');
+				case NATURAL:
+				case INTEGER:
+					return lit.toVHDL();
+				case INT:
+				case UINT:
+					resize = new FunctionCall(NumericStd.RESIZE);
+					break;
+				case BITVECTOR:
+					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+					break;
+				case BOOL:
+					throw new IllegalArgumentException("Bool is not a literal");
 				}
-				return exp;
-//			}
+				resize.getParameters().add(new AssociationElement(lit.toVHDL()));
+				resize.getParameters().add(new AssociationElement(targetType.getWidth().toVHDL()));
+				return resize;
+			}
+			HDLPrimitive t = (HDLPrimitive) getTarget().determineType();
+			Expression<?> exp = VHDLCastsLibrary.cast(vhdl, t.getType(), targetType.getType());
+			if (targetType.getWidth() != null) {
+				Expression<?> width = targetType.getWidth().toVHDL();
+				FunctionCall resize = null;
+				switch (targetType.getType()) {
+				case BOOL:
+				case BIT:
+				case INTEGER:
+				case NATURAL:
+					throw new IllegalArgumentException(targetType + " can't have a width.");
+				case INT:
+				case UINT:
+					resize = new FunctionCall(NumericStd.RESIZE);
+					break;
+				case BITVECTOR:
+					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+					break;
+				}
+				resize.getParameters().add(new AssociationElement(exp));
+				resize.getParameters().add(new AssociationElement(width));
+				return resize;
+			}
+			return exp;
 		}
 		throw new IllegalArgumentException("Not supported:" + this);
 	}
@@ -146,15 +168,8 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public Expression<?> HDLShiftOp.toVHDL() {
-		switch (getType()) {
-		case SLL:
-			return new Sll(getLeft().toVHDL(), getRight().toVHDL());
-		case SRA:
-			return new Sra(getLeft().toVHDL(), getRight().toVHDL());
-		case SRL:
-			return new Srl(getLeft().toVHDL(), getRight().toVHDL());
-		}
-		throw new IllegalArgumentException("Not supported:" + this);
+		HDLPrimitive type = (HDLPrimitive) getLeft().determineType();
+		return VHDLShiftLibrary.shift(getLeft().toVHDL(), getRight().toVHDL(), type.getType(), getType());
 	}
 
 	public Expression<?> HDLEqualityOp.toVHDL() {

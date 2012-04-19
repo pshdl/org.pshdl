@@ -54,14 +54,14 @@ public class ModificationSet {
 								break;
 							}
 						}
-						res.addAll(before);
+						multiAdd(res, before, container);
 						if (replace.size() != 0)
-							res.addAll(replace);
+							multiAdd(res, replace, container);
 						else
-							singleAdd(res, t);
-						res.addAll(after);
+							singleAdd(res, t, container);
+						multiAdd(res, after, container);
 					} else {
-						singleAdd(res, t);
+						singleAdd(res, t, container);
 					}
 				}
 				return res;
@@ -69,10 +69,17 @@ public class ModificationSet {
 			return null;
 		}
 
+		private <T> void multiAdd(ArrayList<T> res, List<T> before, HDLObject container) {
+			for (T element : before) {
+				singleAdd(res, element, container);
+			}
+		}
+
 		@SuppressWarnings("unchecked")
-		private <T> void singleAdd(ArrayList<T> res, T t) {
+		private <T> void singleAdd(ArrayList<T> res, T t, HDLObject container) {
 			if (t instanceof HDLObject) {
 				HDLObject newT = (HDLObject) t;
+				newT.setContainer(container);
 				res.add((T) newT.copyFiltered(this));
 			} else {
 				res.add(t);

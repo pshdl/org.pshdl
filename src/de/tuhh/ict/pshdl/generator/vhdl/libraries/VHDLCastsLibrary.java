@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.generator.vhdl.libraries;
 
 import java.util.*;
 
+import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.builtin.*;
@@ -81,6 +82,25 @@ public class VHDLCastsLibrary {
 			return NumericStd.SIGNED;
 		case UINT:
 			return NumericStd.UNSIGNED;
+		case INTEGER:
+			return Standard.INTEGER;
+		case NATURAL:
+			return Standard.NATURAL;
+		}
+		throw new IllegalArgumentException("Unexpected Type:" + left);
+	}
+
+	public static SubtypeIndication getType(HDLPrimitive left) {
+		switch (left.getType()) {
+		case BOOL:
+		case BIT:
+			return StdLogic1164.STD_LOGIC;
+		case BITVECTOR:
+			return StdLogic1164.STD_LOGIC_VECTOR(left.getWidth().toVHDL());
+		case INT:
+			return NumericStd.SIGNED(left.getWidth().toVHDL());
+		case UINT:
+			return NumericStd.UNSIGNED(left.getWidth().toVHDL());
 		case INTEGER:
 			return Standard.INTEGER;
 		case NATURAL:

@@ -39,7 +39,7 @@ public class VHDLShiftLibrary {
 		return name;
 	}
 
-	public static Expression<?> shift(Expression<?> vhdlExpr, Expression<?> amount, HDLPrimitiveType type, HDLShiftOpType op, Scope scope) {
+	public static Expression<?> shift(Expression<?> vhdlExpr, Expression<?> amount, HDLPrimitiveType type, HDLShiftOpType op) {
 		String name = getFunctionName(op, type);
 		Function resolve = PACKAGE.getScope().resolve(name, Function.class);
 		FunctionCall call = new FunctionCall(resolve);

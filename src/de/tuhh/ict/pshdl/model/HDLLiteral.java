@@ -68,6 +68,32 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");
 	}
 
+	public static HDLLiteral get(int i) {
+		return new HDLLiteral().setVal(Integer.toString(i));
+	}
+
+	public static enum HDLLiteralPresentation {
+		HEX, BIN, NUM;
+	}
+
+	public HDLLiteralPresentation getPresentation() {
+		String string = getVal();
+		char zeroChar = string.charAt(0);
+		if (zeroChar == '0') {
+			if (string.length() > 1) {
+				switch (string.charAt(1)) {
+				case 'x':
+					return HDLLiteralPresentation.HEX;
+				case 'b':
+					return HDLLiteralPresentation.BIN;
+				}
+			} else {
+				return HDLLiteralPresentation.NUM;
+			}
+		}
+		return HDLLiteralPresentation.NUM;
+	}
+
 	// $CONTENT-END$
 
 }
