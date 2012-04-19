@@ -73,6 +73,9 @@ public aspect VHDLStatementTransformation {
 					res.addResetValue(getRegister(), vhdl.getStatement());
 				}
 				Signal s = new Signal(var.getName(), type);
+				Constant constant = new Constant(var.getName(), type);
+				if (var.getDefaultValue() != null)
+					constant.setDefaultValue(var.getDefaultValue().toVHDL());
 				switch (getDirection()) {
 				case IN:
 					s.setMode(Mode.IN);
@@ -93,11 +96,11 @@ public aspect VHDLStatementTransformation {
 				case HIDDEN:
 					break;
 				case CONSTANT:
-					ConstantDeclaration cd = new ConstantDeclaration(new Constant(var.getName(), type));
-					res.addInternalDeclaration(cd);
+					ConstantDeclaration cd = new ConstantDeclaration(constant);
+					res.addConstantDeclaration(cd);
 					break;
 				case PARAMETER:
-					res.addGenericDeclaration(new Constant(var.getName(), type));
+					res.addGenericDeclaration(constant);
 					break;
 				}
 			}

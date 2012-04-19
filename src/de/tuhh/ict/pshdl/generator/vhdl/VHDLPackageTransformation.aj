@@ -7,6 +7,7 @@ import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.*;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -17,6 +18,7 @@ import de.upb.hni.vmagic.statement.IfStatement.*;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.concurrent.*;
 import de.upb.hni.vmagic.literal.*;
+import de.upb.hni.vmagic.type.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.libraryunit.*;
 
@@ -40,12 +42,14 @@ public aspect VHDLPackageTransformation {
 		res.add(VHDLShiftLibrary.USE_CLAUSE);
 		e.getPort().addAll((List) unit.ports);
 		e.getGeneric().addAll((List) unit.generics);
+		e.getDeclarations().addAll((List) unit.constants);
 		res.add(e);
 		Architecture a = new Architecture("pshdlGenerated", e);
 		a.getDeclarations().addAll((List) unit.internalTypes);
 		a.getDeclarations().addAll((List) unit.internals);
 		if (unit.unclockedStatements.size() > 0) {
 			ProcessStatement ps = new ProcessStatement();
+			ps.getSensitivityList().addAll(createSensitivyList(this));
 			ps.getStatements().addAll(unit.unclockedStatements);
 			a.getStatements().add(ps);
 		}
@@ -56,6 +60,36 @@ public aspect VHDLPackageTransformation {
 		}
 		res.add(a);
 		return res;
+	}
+
+	private static EnumSet<HDLDirection> notSensitive = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.PARAMETER, HDLDirection.CONSTANT);
+
+	private static Collection<? extends Signal> createSensitivyList(HDLUnit unit) {
+		List<Signal> sensitivity = new LinkedList<Signal>();
+		Set<String> vars = new TreeSet<String>();
+		List<HDLVariableRef> refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : refs) {
+			HDLVariable var = ref.resolveVar();
+			HDLObject container = var.getContainer();
+			if (container instanceof HDLVariableDeclaration) {
+				HDLVariableDeclaration hdv = (HDLVariableDeclaration) container;
+				if (!notSensitive.contains(hdv.getDirection())) {
+					HDLRegisterConfig config = var.getRegisterConfig();
+					if (config == null) {
+						if (ref.getContainer() instanceof HDLAssignment) {
+							HDLAssignment hAss = (HDLAssignment) ref.getContainer();
+							if (hAss.getLeft() != ref)
+								vars.add(var.getName());
+						} else
+							vars.add(var.getName());
+					}
+				}
+			}
+		}
+		for (String string : vars) {
+			sensitivity.add(new Signal(string, UnresolvedType.NO_NAME));
+		}
+		return sensitivity;
 	}
 
 	private static SequentialStatement createIfStatement(ProcessStatement ps, HDLRegisterConfig key, LinkedList<SequentialStatement> value, VHDLContext unit) {

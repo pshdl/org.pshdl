@@ -63,6 +63,10 @@ public class HDLVariable extends AbstractHDLVariable {
 		return HDLQualifiedName.create(getName());
 	}
 
+	public HDLVariableRef asHDLRef() {
+		return new HDLVariableRef().setVar(asRef());
+	}
+
 	// $CONTENT-END$
 
 }

@@ -239,6 +239,19 @@ public class HDLPrimitives {
 				case BIT:
 					result = result.setType(BITVECTOR);
 					break;
+				case INTEGER:
+					result = result.setType(INT);
+					break;
+				case NATURAL:
+					result = result.setType(UINT);
+					break;
+				default:
+				}
+			} else {
+				switch (result.getType()) {
+				case BITVECTOR:
+					result = result.setType(BIT);
+					break;
 				case INT:
 					result = result.setType(INTEGER);
 					break;

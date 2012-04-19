@@ -175,17 +175,17 @@ public aspect VHDLExpressionTransformation {
 	public Expression<?> HDLEqualityOp.toVHDL() {
 		switch (getType()) {
 		case EQ:
-			return new Equals(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Equals(getLeft().toVHDL(), getRight().toVHDL()));
 		case GREATER:
-			return new GreaterEquals(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new GreaterEquals(getLeft().toVHDL(), getRight().toVHDL()));
 		case GREATER_EQ:
-			return new GreaterThan(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new GreaterThan(getLeft().toVHDL(), getRight().toVHDL()));
 		case LESS:
-			return new LessEquals(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new LessEquals(getLeft().toVHDL(), getRight().toVHDL()));
 		case LESS_EQ:
-			return new LessThan(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new LessThan(getLeft().toVHDL(), getRight().toVHDL()));
 		case NOT_EQ:
-			return new NotEquals(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new NotEquals(getLeft().toVHDL(), getRight().toVHDL()));
 		}
 		throw new IllegalArgumentException("Not supported:" + this);
 	}
@@ -194,12 +194,12 @@ public aspect VHDLExpressionTransformation {
 		switch (getType()) {
 		case AND:
 		case LOGI_AND:
-			return new And(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new And(getLeft().toVHDL(), getRight().toVHDL()));
 		case OR:
 		case LOGI_OR:
-			return new Or(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Or(getLeft().toVHDL(), getRight().toVHDL()));
 		case XOR:
-			return new Xor(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Xor(getLeft().toVHDL(), getRight().toVHDL()));
 		}
 		throw new IllegalArgumentException("Not supported:" + this);
 	}
@@ -207,17 +207,17 @@ public aspect VHDLExpressionTransformation {
 	public Expression<?> HDLArithOp.toVHDL() {
 		switch (getType()) {
 		case PLUS:
-			return new Add(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Add(getLeft().toVHDL(), getRight().toVHDL()));
 		case MINUS:
-			return new Subtract(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Subtract(getLeft().toVHDL(), getRight().toVHDL()));
 		case DIV:
-			return new Divide(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Divide(getLeft().toVHDL(), getRight().toVHDL()));
 		case MUL:
-			return new Multiply(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Multiply(getLeft().toVHDL(), getRight().toVHDL()));
 		case MOD:
-			return new Mod(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Mod(getLeft().toVHDL(), getRight().toVHDL()));
 		case POW:
-			return new Pow(getLeft().toVHDL(), getRight().toVHDL());
+			return new Parentheses(new Pow(getLeft().toVHDL(), getRight().toVHDL()));
 		}
 		throw new IllegalArgumentException("Not supported:" + this);
 	}

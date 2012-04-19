@@ -13,7 +13,6 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.Insulin.SignalInserted;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class Insulin {
@@ -31,11 +30,13 @@ public class Insulin {
 		return apply;
 	}
 
+	private static EnumSet<HDLDirection> doNotInit = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.CONSTANT, HDLDirection.PARAMETER, HDLDirection.IN);
+
 	private static HDLPackage generateInitializations(HDLPackage apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableDeclaration> allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : allVarDecls) {
-			if (hvd.getDirection() != HDLDirection.IN) {
+			if (!doNotInit.contains(hvd.getDirection())) {
 				HDLRegisterConfig register = hvd.getRegister();
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLExpression defaultValue = var.getDefaultValue();
@@ -398,26 +399,40 @@ public class Insulin {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableDeclaration> list = orig.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hdv : list) {
+			HDLVariableDeclaration origHdv = hdv;
 			if (hdv.getDirection() == HDLDirection.OUT) {
 				for (HDLVariable var : hdv.getVariables()) {
 					Integer readCount = var.getMeta(IntegerMeta.READ_COUNT);
 					if (readCount != null) {
-						// out bit a, b=a;
-						HDLQualifiedName oldFQN = new HDLQualifiedName(var.getName());
-						HDLVariable newVar = var.copy().setName(var.getName() + "_OutRead");
-						HDLQualifiedName newFQN = new HDLQualifiedName(newVar.getName());
-						ms.replace(var, var.setDefaultValue(new HDLVariableRef().setVar(newFQN)));
-						HDLVariableDeclaration tempDecl = new HDLVariableDeclaration().setType(hdv.resolveType()).addVariables(newVar).setContainer(hdv.getContainer());
-						ms.insertAfter(hdv, tempDecl);
+						// Create new Declaration out uint<W> bar=bar_OutRead;
+						// Extract bar from declaration out uint<W> x,y,bar=5;
+						// Create a new Declaration uint<W> bar_outRead=5;
+						// Change all reference to bar_OutRead
+
+						HDLVariable outVar = var.setName(var.getName() + "_OutRead");
+						ms.insertAfter(origHdv, hdv.setRegister(null).setVariables(HDLObject.asList(var.setDefaultValue(outVar.asHDLRef()))));
+
+						if (hdv.getVariables().size() == 1) {
+							hdv = hdv.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(outVar));
+						} else {
+							ms.insertAfter(origHdv, new HDLVariableDeclaration().setType(origHdv.resolveType()).addVariables(outVar));
+							hdv = hdv.removeVariables(var);
+						}
+
+						// Replace all read occourances with the new bar_outRead
+						HDLQualifiedName originalFQN = var.asRef();
+						HDLQualifiedName newFQN = outVar.asRef();
 						List<HDLVariableRef> reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
 						for (HDLVariableRef varRef : reads) {
-							if (varRef.getVarRefName().equals(oldFQN)) {
+							if (varRef.getVarRefName().equals(originalFQN)) {
 								ms.replace(varRef, varRef.setVar(newFQN));
 							}
 						}
 					}
 				}
 			}
+			if (origHdv != hdv)
+				ms.replace(origHdv, hdv);
 		}
 		return ms.apply(orig);
 	}

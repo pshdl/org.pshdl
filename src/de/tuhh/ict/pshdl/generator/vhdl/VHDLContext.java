@@ -16,6 +16,7 @@ public class VHDLContext {
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> clockedStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
 	public LinkedList<SequentialStatement> unclockedStatements = new LinkedList<SequentialStatement>();
 	public LinkedList<Signal> ports = new LinkedList<Signal>();
+	public LinkedList<ConstantDeclaration> constants = new LinkedList<ConstantDeclaration>();
 	public LinkedList<Constant> generics = new LinkedList<Constant>();
 	public LinkedList<ObjectDeclaration<?>> internals = new LinkedList<ObjectDeclaration<?>>();
 	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
@@ -37,6 +38,7 @@ public class VHDLContext {
 		unclockedStatements.addAll(vhdl.unclockedStatements);
 		ports.addAll(vhdl.ports);
 		generics.addAll(vhdl.generics);
+		constants.addAll(vhdl.constants);
 		internals.addAll(vhdl.internals);
 		internalTypes.addAll(vhdl.internalTypes);
 		mergeListMap(vhdl, vhdl.clockedStatements, clockedStatements);
@@ -59,9 +61,13 @@ public class VHDLContext {
 		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : clockedStatements.entrySet()) {
 			printList(sb, e.getValue(), "For clock config " + e.getKey() + ":");
 		}
+		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : resetStatements.entrySet()) {
+			printList(sb, e.getValue(), "For clock config resets " + e.getKey() + ":");
+		}
 		printList(sb, unclockedStatements, "Unclocked Statements:");
 		printList(sb, ports, "Entity ports:");
 		printList(sb, generics, "Entity generics:");
+		printList(sb, constants, "Entity constants:");
 		printList(sb, internals, "Internal signals:");
 		// printList(sb, internalTypes, "Internal types:");
 		return sb.toString();
@@ -109,6 +115,10 @@ public class VHDLContext {
 			return clkd.getFirst();
 		}
 		return unclockedStatements.getFirst();
+	}
+
+	public void addConstantDeclaration(ConstantDeclaration cd) {
+		constants.add(cd);
 	}
 
 }
