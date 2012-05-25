@@ -20,6 +20,7 @@ public class VHDLContext {
 	public LinkedList<Constant> generics = new LinkedList<Constant>();
 	public LinkedList<ObjectDeclaration<?>> internals = new LinkedList<ObjectDeclaration<?>>();
 	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
+	public LinkedList<BlockDeclarativeItem> externalTypes = new LinkedList<BlockDeclarativeItem>();
 
 	public void addClockedStatement(HDLRegisterConfig config, SequentialStatement sa) {
 		LinkedList<SequentialStatement> list = clockedStatements.get(config);
@@ -41,6 +42,7 @@ public class VHDLContext {
 		constants.addAll(vhdl.constants);
 		internals.addAll(vhdl.internals);
 		internalTypes.addAll(vhdl.internalTypes);
+		externalTypes.addAll(vhdl.externalTypes);
 		mergeListMap(vhdl, vhdl.clockedStatements, clockedStatements);
 		mergeListMap(vhdl, vhdl.resetStatements, resetStatements);
 	}
@@ -86,7 +88,7 @@ public class VHDLContext {
 		ports.add(sd);
 	}
 
-	public void addInternalDeclaration(ObjectDeclaration<?> sd) {
+	public void addInternalSignalDeclaration(ObjectDeclaration<?> sd) {
 		internals.add(sd);
 	}
 
@@ -119,6 +121,17 @@ public class VHDLContext {
 
 	public void addConstantDeclaration(ConstantDeclaration cd) {
 		constants.add(cd);
+	}
+
+	public void addTypeDeclaration(BlockDeclarativeItem type, boolean isExternal) {
+		if (isExternal)
+			externalTypes.add(type);
+		else
+			internalTypes.add(type);
+	}
+
+	public boolean hasExternalTypes() {
+		return (externalTypes.size() != 0);
 	}
 
 }

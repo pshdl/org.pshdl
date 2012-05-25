@@ -1,11 +1,13 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
+import java.math.*;
 import java.util.*;
 import java.util.Map.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
@@ -65,6 +67,19 @@ public aspect VHDLStatementTransformation {
 		}
 		if (type != null) {
 			for (HDLVariable var : getVariables()) {
+				SubtypeIndication varType=type;
+				if (var.getDimensions().size()!=0){
+					@SuppressWarnings("rawtypes")
+					List<DiscreteRange> ranges = new LinkedList<DiscreteRange>();
+					for (HDLExpression arrayWidth : var.getDimensions()) {
+						HDLExpression newWidth = new HDLArithOp().setLeft(arrayWidth).setType(HDLArithOp.HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+						Range range = new Range(new DecimalLiteral(0), Direction.TO, newWidth.toVHDL());
+						ranges.add(range);
+					}
+					ConstrainedArray arrType=new ConstrainedArray(var.getName()+"_array",type, ranges);
+					res.addTypeDeclaration(arrType, isExternal());
+					varType=arrType;
+				}
 				if (resetValue != null) {
 					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()));
 					initLoop.setContainer(this);
@@ -72,8 +87,8 @@ public aspect VHDLStatementTransformation {
 					System.out.println("VHDLStatementTransformation.HDLVariableDeclaration.toVHDL()" + vhdl);
 					res.addResetValue(getRegister(), vhdl.getStatement());
 				}
-				Signal s = new Signal(var.getName(), type);
-				Constant constant = new Constant(var.getName(), type);
+				Signal s = new Signal(var.getName(), varType);
+				Constant constant = new Constant(var.getName(), varType);
 				if (var.getDefaultValue() != null)
 					constant.setDefaultValue(var.getDefaultValue().toVHDL());
 				switch (getDirection()) {
@@ -91,7 +106,7 @@ public aspect VHDLStatementTransformation {
 					break;
 				case INTERNAL:
 					SignalDeclaration sd = new SignalDeclaration(s);
-					res.addInternalDeclaration(sd);
+					res.addInternalSignalDeclaration(sd);
 					break;
 				case HIDDEN:
 					break;

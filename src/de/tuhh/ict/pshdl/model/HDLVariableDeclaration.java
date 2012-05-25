@@ -113,6 +113,12 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		return setType;
 	}
 
+	private static final EnumSet<HDLDirection> external = EnumSet.of(HDLDirection.IN, HDLDirection.OUT, HDLDirection.INOUT, HDLDirection.PARAMETER);
+
+	public boolean isExternal() {
+		return external.contains(getDirection());
+	}
+
 	// $CONTENT-END$
 
 }
