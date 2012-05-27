@@ -34,12 +34,12 @@ public aspect VHDLPackageTransformation {
 		for (HDLStatement stmnt : getStatements()) {
 			unit.merge(stmnt.toVHDL());
 		}
-		if (unit.hasExternalTypes()){
-			String libName=entityName.getLastSegment()+"Pkg";
-			PackageDeclaration pd=new PackageDeclaration(libName);
-			pd.getDeclarations().addAll((List)unit.externalTypes);
+		if (unit.hasExternalTypes()) {
+			String libName = entityName.getLastSegment() + "Pkg";
+			PackageDeclaration pd = new PackageDeclaration(libName);
+			pd.getDeclarations().addAll((List) unit.externalTypes);
 			res.add(pd);
-			res.add(new UseClause("work."+libName+".all"));
+			res.add(new UseClause("work." + libName + ".all"));
 			addDefaultLibs(res);
 		}
 		// System.out.println("VHDLPackageTransformation.HDLUnit.toVHDL()"+unit);
@@ -50,9 +50,10 @@ public aspect VHDLPackageTransformation {
 		Architecture a = new Architecture("pshdlGenerated", e);
 		e.getDeclarations().addAll((List) unit.internalTypes);
 		a.getDeclarations().addAll((List) unit.internals);
+		a.getStatements().addAll(unit.concurrentStatements);
 		if (unit.unclockedStatements.size() > 0) {
 			ProcessStatement ps = new ProcessStatement();
-			ps.getSensitivityList().addAll(createSensitivyList(this));
+			ps.getSensitivityList().addAll(createSensitivyList(unit));
 			ps.getStatements().addAll(unit.unclockedStatements);
 			a.getStatements().add(ps);
 		}
@@ -76,28 +77,30 @@ public aspect VHDLPackageTransformation {
 
 	private static EnumSet<HDLDirection> notSensitive = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.PARAMETER, HDLDirection.CONSTANT);
 
-	private static Collection<? extends Signal> createSensitivyList(HDLUnit unit) {
+	private static Collection<? extends Signal> createSensitivyList(VHDLContext ctx) {
 		List<Signal> sensitivity = new LinkedList<Signal>();
 		Set<String> vars = new TreeSet<String>();
-		List<HDLVariableRef> refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : refs) {
-			HDLVariable var = ref.resolveVar();
-			HDLObject container = var.getContainer();
-			if (container instanceof HDLVariableDeclaration) {
-				HDLVariableDeclaration hdv = (HDLVariableDeclaration) container;
-				if (!notSensitive.contains(hdv.getDirection())) {
-					HDLRegisterConfig config = var.getRegisterConfig();
-					if (config == null) {
+		for (HDLStatement stmnt : ctx.sensitiveStatements) {
+			List<HDLVariableRef> refs = stmnt.getAllObjectsOf(HDLVariableRef.class, true);
+			for (HDLVariableRef ref : refs) {
+				HDLVariable var = ref.resolveVar();
+				HDLObject container = var.getContainer();
+				if (container instanceof HDLVariableDeclaration) {
+					HDLVariableDeclaration hdv = (HDLVariableDeclaration) container;
+					if (!notSensitive.contains(hdv.getDirection())) {
 						if (ref.getContainer() instanceof HDLAssignment) {
 							HDLAssignment hAss = (HDLAssignment) ref.getContainer();
+							if (hAss.getLeft().resolveVar().getRegisterConfig()!=null)
+								continue;
 							if (hAss.getLeft() != ref)
-								vars.add(var.getName());
+								vars.add(ref.getVHDLName());
 						} else
-							vars.add(var.getName());
+							vars.add(ref.getVHDLName());
 					}
 				}
 			}
 		}
+
 		for (String string : vars) {
 			sensitivity.add(new Signal(string, UnresolvedType.NO_NAME));
 		}

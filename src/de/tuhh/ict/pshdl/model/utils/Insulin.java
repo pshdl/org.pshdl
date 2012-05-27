@@ -54,7 +54,12 @@ public class Insulin {
 					if (defaultValue != null) {
 						ArrayList<HDLExpression> dimensions = var.getDimensions();
 						HDLVariableRef setVar = new HDLVariableRef().setVar(var.asRef());
-						HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar);
+						boolean synchedArray = false;
+						if (defaultValue instanceof HDLVariableRef) {
+							HDLVariableRef ref = (HDLVariableRef) defaultValue;
+							synchedArray = ref.resolveVar().getDimensions().size() != 0;
+						}
+						HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
 						insertFirstStatement(ms, var, init);
 						ms.replace(var, var.setDefaultValue(null));
 					}
@@ -65,14 +70,19 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	public static HDLStatement createArrayForLoop(ArrayList<HDLExpression> dimensions, int i, HDLExpression defaultValue, HDLVariableRef ref) {
+	public static HDLStatement createArrayForLoop(ArrayList<HDLExpression> dimensions, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
 		if (i == dimensions.size()) {
 			return new HDLAssignment().setLeft(ref).setRight(defaultValue);
 		}
 		HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(dimensions.get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
 		HDLVariable param = new HDLVariable().setName(Character.toString((char) (i + 'I')));
 		HDLForLoop loop = new HDLForLoop().setRange(HDLObject.asList(range)).setParam(param);
-		return loop.addDos(createArrayForLoop(dimensions, i + 1, defaultValue, ref.addArray(new HDLVariableRef().setVar(param.asRef()))));
+		HDLVariableRef paramRef = new HDLVariableRef().setVar(param.asRef());
+		if (synchedArray) {
+			HDLVariableRef defRef = (HDLVariableRef) defaultValue;
+			defaultValue = defRef.addArray(paramRef.copy());
+		}
+		return loop.addDos(createArrayForLoop(dimensions, i + 1, defaultValue, ref.addArray(paramRef), synchedArray));
 	}
 
 	private static void insertFirstStatement(ModificationSet ms, HDLObject container, HDLStatement stmnt) {

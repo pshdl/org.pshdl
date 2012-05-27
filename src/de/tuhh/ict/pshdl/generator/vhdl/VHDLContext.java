@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.upb.hni.vmagic.*;
+import de.upb.hni.vmagic.concurrent.*;
 import de.upb.hni.vmagic.declaration.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.output.*;
@@ -14,7 +15,9 @@ public class VHDLContext {
 
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> resetStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> clockedStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
+	public LinkedList<ConcurrentStatement> concurrentStatements = new LinkedList<ConcurrentStatement>();
 	public LinkedList<SequentialStatement> unclockedStatements = new LinkedList<SequentialStatement>();
+	public LinkedList<HDLStatement> sensitiveStatements = new LinkedList<HDLStatement>();
 	public LinkedList<Signal> ports = new LinkedList<Signal>();
 	public LinkedList<ConstantDeclaration> constants = new LinkedList<ConstantDeclaration>();
 	public LinkedList<Constant> generics = new LinkedList<Constant>();
@@ -31,11 +34,14 @@ public class VHDLContext {
 		clockedStatements.put(config, list);
 	}
 
-	public void addUnclockedStatement(SequentialStatement sa) {
+	public void addUnclockedStatement(SequentialStatement sa, HDLStatement statement) {
 		unclockedStatements.add(sa);
+		sensitiveStatements.add(statement);
 	}
 
 	public void merge(VHDLContext vhdl) {
+		concurrentStatements.addAll(vhdl.concurrentStatements);
+		sensitiveStatements.addAll(vhdl.sensitiveStatements);
 		unclockedStatements.addAll(vhdl.unclockedStatements);
 		ports.addAll(vhdl.ports);
 		generics.addAll(vhdl.generics);
@@ -66,6 +72,7 @@ public class VHDLContext {
 		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : resetStatements.entrySet()) {
 			printList(sb, e.getValue(), "For clock config resets " + e.getKey() + ":");
 		}
+		printList(sb, concurrentStatements, "Concurrent Statements:");
 		printList(sb, unclockedStatements, "Unclocked Statements:");
 		printList(sb, ports, "Entity ports:");
 		printList(sb, generics, "Entity generics:");
@@ -132,6 +139,10 @@ public class VHDLContext {
 
 	public boolean hasExternalTypes() {
 		return (externalTypes.size() != 0);
+	}
+
+	public void addConcurrentStatement(ConcurrentStatement stmnt) {
+		concurrentStatements.add(stmnt);
 	}
 
 }

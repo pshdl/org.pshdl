@@ -6,16 +6,19 @@ import java.util.Map.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLArithOp.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
+import de.upb.hni.vmagic.concurrent.*;
 import de.upb.hni.vmagic.declaration.*;
 import de.upb.hni.vmagic.statement.*;
 import de.upb.hni.vmagic.statement.CaseStatement.*;
 import de.upb.hni.vmagic.expression.*;
+import de.upb.hni.vmagic.libraryunit.*;
 import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.object.VhdlObject.*;
@@ -43,8 +46,52 @@ public aspect VHDLStatementTransformation {
 		return new VHDLContext();
 	}
 
+	private static EnumSet<HDLDirection> inAndOut=EnumSet.of(HDLDirection.IN,HDLDirection.INOUT,HDLDirection.OUT);
+	
 	public VHDLContext HDLInterfaceInstantiation.toVHDL() {
-		return new VHDLContext();
+		VHDLContext res = new VHDLContext();
+		HDLInterface hIf = resolveHIf();
+		String ifName = getVar().getName();
+		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
+		Entity entity = new Entity("work." + hIf.asRef().getLastSegment());
+
+		EntityInstantiation instantiation = new EntityInstantiation(ifName, entity);
+		List<AssociationElement> portMap = instantiation.getPortMap();
+		for (HDLVariableDeclaration hvd : ports) {
+			if (inAndOut.contains(hvd.getDirection())){
+				for (HDLVariable var : hvd.getVariables()) {
+					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
+					HDLVariableRef ref=sigVar.asHDLRef();
+					for (int i=0;i<getDimensions().size();i++){
+						ref=ref.addArray(new HDLVariableRef().setVar(HDLQualifiedName.create(Character.toString((char)(i+'I')))));
+					}
+					for (HDLExpression exp : getDimensions()) {
+						sigVar = sigVar.addDimensions(exp.copy());
+					}
+					HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
+					res.merge(newHVD.toVHDL());
+					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
+				}
+			}
+		}
+		ForGenerateStatement forLoop=null;
+		if (getDimensions().size()==0)
+			res.addConcurrentStatement(instantiation);
+		else {
+			for (int i=0;i<getDimensions().size();i++){
+				HDLExpression to=new HDLArithOp().setLeft(getDimensions().get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				HDLRange range=new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to);
+				range.setContainer(this);
+				ForGenerateStatement newFor=new ForGenerateStatement("generate_"+ifName, Character.toString((char)(i+'I')), range.toVHDL(Range.Direction.TO));
+				if (forLoop!=null)
+					forLoop.getStatements().add(newFor);
+				else
+					res.addConcurrentStatement(newFor);
+				forLoop=newFor;
+			}
+			forLoop.getStatements().add(instantiation);
+		}
+		return res;
 	}
 
 	public VHDLContext HDLVariableDeclaration.toVHDL() {
@@ -62,13 +109,14 @@ public aspect VHDLStatementTransformation {
 			if (hType instanceof HDLEnum) {
 				HDLEnum hEnum = (HDLEnum) hType;
 				type = new EnumerationType(hEnum.getName());
-				resetValue = new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
+				resetValue = new HDLEnumRef().setHEnum(hEnum.asRef()).setVar(hEnum.getEnums().get(0).asRef());
+				resetValue.setContainer(this);
 			}
 		}
 		if (type != null) {
 			for (HDLVariable var : getVariables()) {
-				SubtypeIndication varType=type;
-				if (var.getDimensions().size()!=0){
+				SubtypeIndication varType = type;
+				if (var.getDimensions().size() != 0) {
 					@SuppressWarnings("rawtypes")
 					List<DiscreteRange> ranges = new LinkedList<DiscreteRange>();
 					for (HDLExpression arrayWidth : var.getDimensions()) {
@@ -76,12 +124,17 @@ public aspect VHDLStatementTransformation {
 						Range range = new Range(new DecimalLiteral(0), Direction.TO, newWidth.toVHDL());
 						ranges.add(range);
 					}
-					ConstrainedArray arrType=new ConstrainedArray(var.getName()+"_array",type, ranges);
+					ConstrainedArray arrType = new ConstrainedArray(var.getName() + "_array", type, ranges);
 					res.addTypeDeclaration(arrType, isExternal());
-					varType=arrType;
+					varType = arrType;
 				}
 				if (resetValue != null) {
-					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()));
+					boolean synchedArray = false;
+					if (resetValue instanceof HDLVariableRef) {
+						HDLVariableRef ref = (HDLVariableRef) resetValue;
+						synchedArray = ref.resolveVar().getDimensions().size() != 0;
+					}
+					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray);
 					initLoop.setContainer(this);
 					VHDLContext vhdl = initLoop.toVHDL();
 					System.out.println("VHDLStatementTransformation.HDLVariableDeclaration.toVHDL()" + vhdl);
@@ -153,7 +206,7 @@ public aspect VHDLStatementTransformation {
 				Alternative alt = createAlternative(cs, e);
 				alt.getStatements().addAll(e.getValue().unclockedStatements);
 			}
-			context.addUnclockedStatement(cs);
+			context.addUnclockedStatement(cs, this);
 		}
 		return context;
 	}
@@ -183,7 +236,7 @@ public aspect VHDLStatementTransformation {
 		if (config != null)
 			context.addClockedStatement(config, sa);
 		else
-			context.addUnclockedStatement(sa);
+			context.addUnclockedStatement(sa, this);
 		return context;
 	}
 
@@ -201,7 +254,7 @@ public aspect VHDLStatementTransformation {
 		if (context.unclockedStatements.size() > 0) {
 			ForStatement fStmnt = new ForStatement(getParam().getName(), getRange().get(0).toVHDL(Direction.TO));
 			fStmnt.getStatements().addAll(context.unclockedStatements);
-			res.addUnclockedStatement(fStmnt);
+			res.addUnclockedStatement(fStmnt, this);
 		}
 		return res;
 	}
@@ -232,7 +285,7 @@ public aspect VHDLStatementTransformation {
 			IfStatement ifs = new IfStatement(ifExp);
 			ifs.getStatements().addAll(thenCtx.unclockedStatements);
 			ifs.getElseStatements().addAll(elseCtx.unclockedStatements);
-			res.addUnclockedStatement(ifs);
+			res.addUnclockedStatement(ifs, this);
 		}
 		return res;
 	}

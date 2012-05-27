@@ -19,8 +19,16 @@ public aspect VHDLExpressionTransformation {
 
 	public abstract Name<?> HDLReference.toVHDL();
 
+	
+	public String HDLVariableRef.getVHDLName(){
+		return getVarRefName().getLastSegment();
+	}
+	public String HDLInterfaceRef.getVHDLName(){
+		return getHIfRefName().getLastSegment()+"_"+getVarRefName().getLastSegment();
+	}
+	
 	public Name<?> HDLVariableRef.toVHDL() {
-		Name<?> result = new Signal(getVarRefName().getLastSegment(), UnresolvedType.NO_NAME);
+		Name<?> result = new Signal(getVHDLName(), UnresolvedType.NO_NAME);
 		result = getRef(result, this);
 		return result;
 	}
@@ -48,7 +56,7 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public Name<?> HDLInterfaceRef.toVHDL() {
-		Name<?> result = new Signal(getHIfRefName().getLastSegment() + "_" + getVarRefName().getLastSegment(), UnresolvedType.NO_NAME);
+		Name<?> result = new Signal(getVHDLName(), UnresolvedType.NO_NAME);
 		if (getIfArray().size() != 0) {
 			@SuppressWarnings("rawtypes")
 			List<Expression> indices = new LinkedList<Expression>();
@@ -114,7 +122,7 @@ public aspect VHDLExpressionTransformation {
 				case BOOL:
 					throw new IllegalArgumentException("Bool is not a literal");
 				}
-				resize.getParameters().add(new AssociationElement(lit.toVHDL()));
+				resize.getParameters().add(new AssociationElement(new StringLiteral(val.toString(2))));
 				resize.getParameters().add(new AssociationElement(targetType.getWidth().toVHDL()));
 				return resize;
 			}
