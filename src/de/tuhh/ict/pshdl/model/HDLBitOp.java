@@ -2,6 +2,16 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLBitOp contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLExpression left. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLBitOpType type. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLBitOp extends AbstractHDLBitOp {
 	/**
 	 * Constructs a new instance of {@link HDLBitOp}

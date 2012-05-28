@@ -5,6 +5,16 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLVariable contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
+ * <li>HDLExpression defaultValue. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
@@ -55,6 +65,14 @@ public class HDLVariable extends AbstractHDLVariable {
 		if (container instanceof HDLVariableDeclaration) {
 			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
 			return vhd.getRegister();
+		}
+		return null;
+	}
+
+	public HDLVariableDeclaration.HDLDirection getDirection() {
+		if (container instanceof HDLVariableDeclaration) {
+			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
+			return vhd.getDirection();
 		}
 		return null;
 	}

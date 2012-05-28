@@ -4,6 +4,15 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLConcat contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> cats. Can <b>not</b> be <code>null</code>,
+ * additionally the collection must contain at least one element.</li>
+ * </ul>
+ */
+
 public class HDLConcat extends AbstractHDLConcat {
 	/**
 	 * Constructs a new instance of {@link HDLConcat}

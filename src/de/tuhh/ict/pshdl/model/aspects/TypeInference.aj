@@ -55,7 +55,7 @@ public aspect TypeInference {
 	private static HDLExpression getWidth(HDLPrimitive type) {
 		HDLExpression width = type.getWidth();
 		if (type.getType()==HDLPrimitiveType.BIT)
-			width=new HDLLiteral().setVal("1");
+			width=HDLLiteral.get(1);
 		return width;
 	}
 
@@ -67,9 +67,8 @@ public aspect TypeInference {
 		return HDLPrimitives.getInstance().getManipOpType(this).result;
 	}
 
-	public HDLPrimitive HDLFunction.determineType() {
-		// XXX Really good question!
-		return HDLPrimitive.target(false);
+	public HDLType HDLFunction.determineType() {
+		return HDLFunctions.getInferenceInfo(this).result;
 	}
 
 	public HDLPrimitive HDLLiteral.determineType() {

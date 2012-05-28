@@ -5,6 +5,21 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLVariableDeclaration contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLRegisterConfig register. Can be <code>null</code>.</li>
+ * <li>HDLDirection direction. If <code>null</code>,
+ * {@link HDLDirection#INTERNAL} is used as default.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
+ * <li>HDLQualifiedName type. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLPrimitive primitive. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLVariable> variables. Can <b>not</b> be <code>null</code>,
+ * additionally the collection must contain at least one element.</li>
+ * </ul>
+ */
+
 public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLVariableDeclaration}

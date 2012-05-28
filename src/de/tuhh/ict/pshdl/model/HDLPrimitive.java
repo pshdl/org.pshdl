@@ -5,6 +5,16 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLPrimitive contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLPrimitiveType type. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression width. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * Constructs a new instance of {@link HDLPrimitive}

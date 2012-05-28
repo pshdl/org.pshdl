@@ -3,6 +3,14 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLType contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public abstract class HDLType extends AbstractHDLType {
 	/**
 	 * Constructs a new instance of {@link HDLType}
@@ -42,6 +50,10 @@ public abstract class HDLType extends AbstractHDLType {
 	// $CONTENT-BEGIN$
 	public HDLQualifiedName asRef() {
 		return new HDLQualifiedName(getName());
+	}
+
+	public HDLExpression getWidth() {
+		throw new IllegalArgumentException("Not implemented for this type:" + this);
 	}
 	// $CONTENT-END$
 

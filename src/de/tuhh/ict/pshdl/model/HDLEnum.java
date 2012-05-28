@@ -4,6 +4,16 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLEnum contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLVariable> enums. Can <b>not</b> be <code>null</code>,
+ * additionally the collection must contain at least one element.</li>
+ * </ul>
+ */
+
 public class HDLEnum extends AbstractHDLEnum {
 	/**
 	 * Constructs a new instance of {@link HDLEnum}

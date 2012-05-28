@@ -2,6 +2,16 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLEqualityOp contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLExpression left. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLEqualityOpType type. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
 	 * Constructs a new instance of {@link HDLEqualityOp}

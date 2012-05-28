@@ -4,6 +4,17 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLAssignment contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLReference left. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLAssignmentType type. If <code>null</code>,
+ * {@link HDLAssignmentType#ASSGN} is used as default.</li>
+ * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * Constructs a new instance of {@link HDLAssignment}

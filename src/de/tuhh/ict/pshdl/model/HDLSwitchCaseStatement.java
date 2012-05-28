@@ -5,6 +5,15 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLSwitchCaseStatement contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLExpression label. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLStatement> dos. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchCaseStatement}

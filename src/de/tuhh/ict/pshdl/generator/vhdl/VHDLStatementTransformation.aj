@@ -46,8 +46,8 @@ public aspect VHDLStatementTransformation {
 		return new VHDLContext();
 	}
 
-	private static EnumSet<HDLDirection> inAndOut=EnumSet.of(HDLDirection.IN,HDLDirection.INOUT,HDLDirection.OUT);
-	
+	private static EnumSet<HDLDirection> inAndOut = EnumSet.of(HDLDirection.IN, HDLDirection.INOUT, HDLDirection.OUT);
+
 	public VHDLContext HDLInterfaceInstantiation.toVHDL() {
 		VHDLContext res = new VHDLContext();
 		HDLInterface hIf = resolveHIf();
@@ -58,12 +58,12 @@ public aspect VHDLStatementTransformation {
 		EntityInstantiation instantiation = new EntityInstantiation(ifName, entity);
 		List<AssociationElement> portMap = instantiation.getPortMap();
 		for (HDLVariableDeclaration hvd : ports) {
-			if (inAndOut.contains(hvd.getDirection())){
+			if (inAndOut.contains(hvd.getDirection())) {
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
-					HDLVariableRef ref=sigVar.asHDLRef();
-					for (int i=0;i<getDimensions().size();i++){
-						ref=ref.addArray(new HDLVariableRef().setVar(HDLQualifiedName.create(Character.toString((char)(i+'I')))));
+					HDLVariableRef ref = sigVar.asHDLRef();
+					for (int i = 0; i < getDimensions().size(); i++) {
+						ref = ref.addArray(new HDLVariableRef().setVar(HDLQualifiedName.create(Character.toString((char) (i + 'I')))));
 					}
 					for (HDLExpression exp : getDimensions()) {
 						sigVar = sigVar.addDimensions(exp.copy());
@@ -74,20 +74,20 @@ public aspect VHDLStatementTransformation {
 				}
 			}
 		}
-		ForGenerateStatement forLoop=null;
-		if (getDimensions().size()==0)
+		ForGenerateStatement forLoop = null;
+		if (getDimensions().size() == 0)
 			res.addConcurrentStatement(instantiation);
 		else {
-			for (int i=0;i<getDimensions().size();i++){
-				HDLExpression to=new HDLArithOp().setLeft(getDimensions().get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-				HDLRange range=new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to);
+			for (int i = 0; i < getDimensions().size(); i++) {
+				HDLExpression to = new HDLArithOp().setLeft(getDimensions().get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to);
 				range.setContainer(this);
-				ForGenerateStatement newFor=new ForGenerateStatement("generate_"+ifName, Character.toString((char)(i+'I')), range.toVHDL(Range.Direction.TO));
-				if (forLoop!=null)
+				ForGenerateStatement newFor = new ForGenerateStatement("generate_" + ifName, Character.toString((char) (i + 'I')), range.toVHDL(Range.Direction.TO));
+				if (forLoop != null)
 					forLoop.getStatements().add(newFor);
 				else
 					res.addConcurrentStatement(newFor);
-				forLoop=newFor;
+				forLoop = newFor;
 			}
 			forLoop.getStatements().add(instantiation);
 		}
@@ -213,10 +213,16 @@ public aspect VHDLStatementTransformation {
 
 	private static Alternative createAlternative(CaseStatement cs, Map.Entry<HDLSwitchCaseStatement, VHDLContext> e) {
 		Alternative alt;
-		if (e.getKey().getLabel() != null)
-			alt = cs.createAlternative(e.getKey().getLabel().toVHDL());
-		else
+		HDLExpression label = e.getKey().getLabel();
+		if (label != null) {
+			BigInteger eval = label.constantEvaluate(null);
+			if (eval != null)
+				alt = cs.createAlternative(new HDLLiteral().setVal("0b" + eval.toString(2)).toVHDL());
+			else
+				alt = cs.createAlternative(label.toVHDL());
+		} else {
 			alt = cs.createAlternative(Choices.OTHERS);
+		}
 		return alt;
 	}
 

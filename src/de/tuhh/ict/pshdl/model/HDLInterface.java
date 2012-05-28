@@ -4,6 +4,15 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLInterface contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLVariableDeclaration> ports. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLInterface extends AbstractHDLInterface {
 	/**
 	 * Constructs a new instance of {@link HDLInterface}

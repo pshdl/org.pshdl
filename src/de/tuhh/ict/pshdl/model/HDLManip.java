@@ -2,6 +2,16 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLManip contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLManipType type. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression target. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLType castTo. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLManip extends AbstractHDLManip {
 	/**
 	 * Constructs a new instance of {@link HDLManip}

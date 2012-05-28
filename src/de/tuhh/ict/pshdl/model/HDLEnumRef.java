@@ -3,6 +3,15 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLEnumRef contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLQualifiedName hEnum. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
 	 * Constructs a new instance of {@link HDLEnumRef}

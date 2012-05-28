@@ -4,6 +4,13 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLDeclaration contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLDeclaration}

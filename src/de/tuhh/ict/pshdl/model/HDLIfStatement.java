@@ -5,6 +5,16 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLIfStatement contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLExpression ifExp. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLStatement> thenDo. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLStatement> elseDo. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}

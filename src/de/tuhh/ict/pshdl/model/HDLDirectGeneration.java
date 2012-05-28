@@ -4,6 +4,18 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLDirectGeneration contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
+ * <li>String generatorID. Can <b>not</b> be <code>null</code>.</li>
+ * <li>String generatorContent. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLGeneratorArgument> arguments. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * Constructs a new instance of {@link HDLDirectGeneration}

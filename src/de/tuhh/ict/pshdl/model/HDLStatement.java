@@ -5,6 +5,13 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLStatement contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public abstract class HDLStatement extends AbstractHDLStatement {
 	/**
 	 * Constructs a new instance of {@link HDLStatement}

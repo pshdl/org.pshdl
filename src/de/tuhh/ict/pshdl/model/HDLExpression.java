@@ -2,6 +2,13 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLExpression contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public abstract class HDLExpression extends AbstractHDLExpression {
 	/**
 	 * Constructs a new instance of {@link HDLExpression}

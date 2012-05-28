@@ -4,6 +4,14 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLEnumDeclaration contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLEnum hEnum. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLEnumDeclaration}

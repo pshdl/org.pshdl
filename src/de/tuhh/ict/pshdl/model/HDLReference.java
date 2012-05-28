@@ -3,6 +3,14 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLReference contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public abstract class HDLReference extends AbstractHDLReference {
 	/**
 	 * Constructs a new instance of {@link HDLReference}

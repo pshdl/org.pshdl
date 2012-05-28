@@ -5,6 +5,16 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLInterfaceInstantiation contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLQualifiedName hIf. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceInstantiation}

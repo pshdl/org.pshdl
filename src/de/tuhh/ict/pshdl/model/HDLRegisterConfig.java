@@ -5,6 +5,22 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLRegisterConfig contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLQualifiedName clk. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLQualifiedName rst. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLRegClockType clockType. If <code>null</code>,
+ * {@link HDLRegClockType#RISING} is used as default.</li>
+ * <li>HDLRegResetType resetType. If <code>null</code>,
+ * {@link HDLRegResetType#HIGH_ACTIVE} is used as default.</li>
+ * <li>HDLRegSyncType syncType. If <code>null</code>,
+ * {@link HDLRegSyncType#SYNC} is used as default.</li>
+ * <li>HDLExpression resetValue. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}

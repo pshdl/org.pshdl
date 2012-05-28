@@ -5,6 +5,16 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLVariableRef contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> array. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
+ * </ul>
+ */
+
 public class HDLVariableRef extends AbstractHDLVariableRef {
 	/**
 	 * Constructs a new instance of {@link HDLVariableRef}

@@ -1,9 +1,11 @@
 package de.tuhh.ict.pshdl.model.types.builtIn;
 
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 
 public class HDLFunctions implements IHDLFunctionResolver {
 
@@ -22,6 +24,17 @@ public class HDLFunctions implements IHDLFunctionResolver {
 				HDLTypeInferenceInfo resolve = resolver.resolve(function);
 				if (resolve != null)
 					return resolve;
+			}
+		return null;
+	}
+
+	public static BigInteger constantEvaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+		if (list != null)
+			for (IHDLFunctionResolver resolver : list) {
+				BigInteger eval = resolver.evaluate(function, args, context);
+				if (eval != null)
+					return eval;
 			}
 		return null;
 	}
@@ -45,6 +58,21 @@ public class HDLFunctions implements IHDLFunctionResolver {
 		}
 		if ("abs".equals(name)) {
 			return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+		}
+		return null;
+	}
+
+	@Override
+	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
+		String name = function.getName();
+		if ("abs".equals(name)) {
+			return args.get(0).abs();
+		}
+		if ("min".equals(name)) {
+			return args.get(0).min(args.get(1));
+		}
+		if ("max".equals(name)) {
+			return args.get(0).max(args.get(1));
 		}
 		return null;
 	}

@@ -2,6 +2,14 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLValueType contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+
 public abstract class HDLValueType extends AbstractHDLValueType {
 	/**
 	 * Constructs a new instance of {@link HDLValueType}
