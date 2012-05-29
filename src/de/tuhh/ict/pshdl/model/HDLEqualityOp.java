@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLEqualityOpType type. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
 	 * Constructs a new instance of {@link HDLEqualityOp}
@@ -51,6 +50,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLEqualityOp;
 	}

@@ -17,7 +17,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * additionally the collection must contain at least one element.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * Constructs a new instance of {@link HDLForLoop}
@@ -61,6 +60,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLForLoop;
 	}

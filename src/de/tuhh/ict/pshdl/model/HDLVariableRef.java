@@ -14,7 +14,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLVariableRef extends AbstractHDLVariableRef {
 	/**
 	 * Constructs a new instance of {@link HDLVariableRef}
@@ -54,6 +53,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariableRef;
 	}

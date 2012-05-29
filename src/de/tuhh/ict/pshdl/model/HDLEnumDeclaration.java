@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLEnum hEnum. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLEnumDeclaration}
@@ -43,6 +42,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLEnumDeclaration;
 	}

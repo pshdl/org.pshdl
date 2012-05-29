@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLShiftOpType type. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLShiftOp extends AbstractHDLShiftOp {
 	/**
 	 * Constructs a new instance of {@link HDLShiftOp}
@@ -51,6 +50,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLShiftOp;
 	}

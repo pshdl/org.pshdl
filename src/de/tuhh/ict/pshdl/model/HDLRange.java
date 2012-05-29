@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLExpression to. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLRange extends AbstractHDLRange {
 	/**
 	 * Constructs a new instance of {@link HDLRange}
@@ -47,6 +46,7 @@ public class HDLRange extends AbstractHDLRange {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRange;
 	}

@@ -10,7 +10,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public abstract class HDLReference extends AbstractHDLReference {
 	/**
 	 * Constructs a new instance of {@link HDLReference}
@@ -42,6 +41,7 @@ public abstract class HDLReference extends AbstractHDLReference {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLReference;
 	}

@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLExpression expression. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLGeneratorArgument extends AbstractHDLGeneratorArgument {
 	/**
 	 * Constructs a new instance of {@link HDLGeneratorArgument}
@@ -51,6 +50,7 @@ public class HDLGeneratorArgument extends AbstractHDLGeneratorArgument {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLGeneratorArgument;
 	}

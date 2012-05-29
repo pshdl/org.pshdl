@@ -16,8 +16,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
-public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
+public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
 	 * 

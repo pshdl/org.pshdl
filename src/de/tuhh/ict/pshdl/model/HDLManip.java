@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLType castTo. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLManip extends AbstractHDLManip {
 	/**
 	 * Constructs a new instance of {@link HDLManip}
@@ -51,6 +50,7 @@ public class HDLManip extends AbstractHDLManip {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLManip;
 	}

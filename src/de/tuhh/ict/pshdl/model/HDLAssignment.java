@@ -14,7 +14,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * Constructs a new instance of {@link HDLAssignment}
@@ -56,6 +55,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLAssignment;
 	}

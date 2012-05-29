@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceDeclaration}
@@ -43,6 +42,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceDeclaration;
 	}

@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLArithOpType type. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLArithOp extends AbstractHDLArithOp {
 	/**
 	 * Constructs a new instance of {@link HDLArithOp}
@@ -51,6 +50,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLArithOp;
 	}

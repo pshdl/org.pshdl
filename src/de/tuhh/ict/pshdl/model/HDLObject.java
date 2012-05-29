@@ -12,7 +12,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLObject container. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public abstract class HDLObject extends AbstractHDLObject {
 	/**
 	 * Constructs a new instance of {@link HDLObject}

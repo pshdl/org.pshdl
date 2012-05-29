@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>String val. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
@@ -43,6 +42,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLLiteral;
 	}

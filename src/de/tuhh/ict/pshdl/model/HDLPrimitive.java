@@ -14,7 +14,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLExpression width. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * Constructs a new instance of {@link HDLPrimitive}
@@ -54,6 +53,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLPrimitive;
 	}

@@ -14,7 +14,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceInstantiation}
@@ -54,6 +53,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceInstantiation;
 	}

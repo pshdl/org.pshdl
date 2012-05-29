@@ -14,7 +14,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLStatement> elseDo. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}
@@ -54,6 +53,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLIfStatement;
 	}

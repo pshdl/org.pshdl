@@ -10,7 +10,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>String value. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * Constructs a new instance of {@link HDLAnnotation}
@@ -46,6 +45,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLAnnotation;
 	}

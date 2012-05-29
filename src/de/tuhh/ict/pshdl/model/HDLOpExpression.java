@@ -10,7 +10,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * Constructs a new instance of {@link HDLOpExpression}
@@ -46,6 +45,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLOpExpression;
 	}

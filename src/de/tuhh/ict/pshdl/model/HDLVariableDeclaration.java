@@ -19,7 +19,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * additionally the collection must contain at least one element.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLVariableDeclaration}
@@ -77,6 +76,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariableDeclaration;
 	}

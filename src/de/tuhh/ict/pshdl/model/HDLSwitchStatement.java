@@ -12,7 +12,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>ArrayList<HDLSwitchCaseStatement> cases. Can be <code>null</code>.</li>
  * </ul>
  */
-@SuppressWarnings("all")
 public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
@@ -48,6 +47,7 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 		super();
 	}
 
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLSwitchStatement;
 	}
