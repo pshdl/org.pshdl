@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>ArrayList<HDLUnit> units. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * Constructs a new instance of {@link HDLPackage}
@@ -53,7 +53,6 @@ public class HDLPackage extends AbstractHDLPackage {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLPackage;
 	}

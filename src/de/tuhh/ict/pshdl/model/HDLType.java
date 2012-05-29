@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public abstract class HDLType extends AbstractHDLType {
 	/**
 	 * Constructs a new instance of {@link HDLType}
@@ -42,7 +42,6 @@ public abstract class HDLType extends AbstractHDLType {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLType;
 	}

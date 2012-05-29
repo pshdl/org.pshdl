@@ -14,7 +14,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceInstantiation}
@@ -54,25 +54,26 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceInstantiation;
 	}
 
 	// $CONTENT-BEGIN$
 	@Override
-	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	protected List<HDLInterface> doGetInterfaceDeclarations() {
+	public List<HDLInterface> doGetInterfaceDeclarations() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		return Collections.emptyList();
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(getHIfRefName()).addVariables(getVar().copy());
+		hvd.setContainer(this);
+		return Collections.singletonList(hvd);
 	}
 	// $CONTENT-END$
 

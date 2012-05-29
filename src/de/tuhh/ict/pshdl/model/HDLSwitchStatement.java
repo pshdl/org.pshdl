@@ -12,7 +12,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>ArrayList<HDLSwitchCaseStatement> cases. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
@@ -48,14 +48,13 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLSwitchStatement;
 	}
 
 	// $CONTENT-BEGIN$
 	@Override
-	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
 		for (HDLSwitchCaseStatement c : cases) {
 			res.addAll(c.doGetEnumDeclarations());
@@ -64,7 +63,7 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	}
 
 	@Override
-	protected List<HDLInterface> doGetInterfaceDeclarations() {
+	public List<HDLInterface> doGetInterfaceDeclarations() {
 		List<HDLInterface> res = new LinkedList<HDLInterface>();
 		for (HDLSwitchCaseStatement c : cases) {
 			res.addAll(c.doGetInterfaceDeclarations());
@@ -73,7 +72,7 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	}
 
 	@Override
-	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
 		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
 		for (HDLSwitchCaseStatement c : cases) {
 			res.addAll(c.doGetVariableDeclarations());

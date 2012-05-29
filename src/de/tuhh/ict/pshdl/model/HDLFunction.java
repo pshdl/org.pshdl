@@ -12,7 +12,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>ArrayList<HDLExpression> params. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
@@ -48,7 +48,6 @@ public class HDLFunction extends AbstractHDLFunction {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLFunction;
 	}

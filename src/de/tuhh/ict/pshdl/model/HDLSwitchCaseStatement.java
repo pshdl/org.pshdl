@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLStatement> dos. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchCaseStatement}
@@ -49,25 +49,24 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLSwitchCaseStatement;
 	}
 
 	// $CONTENT-BEGIN$
 	@Override
-	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return HDLUtils.getallEnumDeclarations(dos);
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
+		return HDLResolver.getallEnumDeclarations(dos);
 	}
 
 	@Override
-	protected List<HDLInterface> doGetInterfaceDeclarations() {
-		return HDLUtils.getallInterfaceDeclarations(dos);
+	public List<HDLInterface> doGetInterfaceDeclarations() {
+		return HDLResolver.getallInterfaceDeclarations(dos);
 	}
 
 	@Override
-	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		return HDLUtils.getallVariableDeclarations(dos);
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+		return HDLResolver.getallVariableDeclarations(dos);
 	}
 	// $CONTENT-END$
 

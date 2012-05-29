@@ -14,7 +14,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLStatement> elseDo. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}
@@ -54,33 +54,32 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLIfStatement;
 	}
 
 	// $CONTENT-BEGIN$
 	@Override
-	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
-		res.addAll(HDLUtils.getallEnumDeclarations(thenDo));
-		res.addAll(HDLUtils.getallEnumDeclarations(elseDo));
+		res.addAll(HDLResolver.getallEnumDeclarations(thenDo));
+		res.addAll(HDLResolver.getallEnumDeclarations(elseDo));
 		return res;
 	}
 
 	@Override
-	protected List<HDLInterface> doGetInterfaceDeclarations() {
+	public List<HDLInterface> doGetInterfaceDeclarations() {
 		List<HDLInterface> res = new LinkedList<HDLInterface>();
-		res.addAll(HDLUtils.getallInterfaceDeclarations(thenDo));
-		res.addAll(HDLUtils.getallInterfaceDeclarations(elseDo));
+		res.addAll(HDLResolver.getallInterfaceDeclarations(thenDo));
+		res.addAll(HDLResolver.getallInterfaceDeclarations(elseDo));
 		return res;
 	}
 
 	@Override
-	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
 		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
-		res.addAll(HDLUtils.getallVariableDeclarations(thenDo));
-		res.addAll(HDLUtils.getallVariableDeclarations(elseDo));
+		res.addAll(HDLResolver.getallVariableDeclarations(thenDo));
+		res.addAll(HDLResolver.getallVariableDeclarations(elseDo));
 		return res;
 	}
 	// $CONTENT-END$

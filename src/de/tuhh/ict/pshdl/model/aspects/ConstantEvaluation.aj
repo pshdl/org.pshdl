@@ -50,7 +50,7 @@ public aspect ConstantEvaluation {
 		case BIT_NEG:
 			return eval.not();
 		case LOGIC_NEG:
-			return boolInt(getTarget().equals(BigInteger.ZERO));
+			return boolInt(getTarget().constantEvaluate(context).equals(BigInteger.ZERO));
 		case CAST:
 			HDLType type=getCastTo();
 			if (type instanceof HDLPrimitive){

@@ -14,7 +14,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLExpression defaultValue. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
@@ -54,7 +54,6 @@ public class HDLVariable extends AbstractHDLVariable {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariable;
 	}

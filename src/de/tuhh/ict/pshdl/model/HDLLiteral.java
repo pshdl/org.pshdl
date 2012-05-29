@@ -4,6 +4,14 @@ import java.math.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLLiteral contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>String val. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+@SuppressWarnings("all")
 public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
@@ -35,7 +43,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLLiteral;
 	}

@@ -3,6 +3,15 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
 
+/**
+ * The class HDLRange contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>HDLExpression from. Can be <code>null</code>.</li>
+ * <li>HDLExpression to. Can <b>not</b> be <code>null</code>.</li>
+ * </ul>
+ */
+@SuppressWarnings("all")
 public class HDLRange extends AbstractHDLRange {
 	/**
 	 * Constructs a new instance of {@link HDLRange}
@@ -38,7 +47,6 @@ public class HDLRange extends AbstractHDLRange {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRange;
 	}

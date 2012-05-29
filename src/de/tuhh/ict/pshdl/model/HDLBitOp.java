@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLBitOpType type. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLBitOp extends AbstractHDLBitOp {
 	/**
 	 * Constructs a new instance of {@link HDLBitOp}
@@ -51,7 +51,6 @@ public class HDLBitOp extends AbstractHDLBitOp {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLBitOp;
 	}

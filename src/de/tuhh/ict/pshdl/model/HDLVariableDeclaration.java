@@ -19,7 +19,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * additionally the collection must contain at least one element.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLVariableDeclaration}
@@ -77,7 +77,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariableDeclaration;
 	}
@@ -119,7 +118,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		return super.resolveType();
 	}
 
-	public AbstractHDLVariableDeclaration setType(HDLType resolveType) {
+	public HDLVariableDeclaration setType(HDLType resolveType) {
 		HDLVariableDeclaration setType = super.setType(resolveType.asRef());
 		if (resolveType instanceof HDLPrimitive) {
 			HDLPrimitive prim = (HDLPrimitive) resolveType;
@@ -132,6 +131,21 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 	public boolean isExternal() {
 		return external.contains(getDirection());
+	}
+
+	@Override
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+		return Collections.singletonList(this);
+	}
+
+	@Override
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<HDLInterface> doGetInterfaceDeclarations() {
+		return Collections.emptyList();
 	}
 
 	// $CONTENT-END$

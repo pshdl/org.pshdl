@@ -6,6 +6,13 @@ import java.util.Map.Entry;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLObject contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * </ul>
+ */
+@SuppressWarnings("all")
 public abstract class HDLObject extends AbstractHDLObject {
 	/**
 	 * Constructs a new instance of {@link HDLObject}

@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
@@ -15,8 +16,8 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * </ul>
  */
-
-public class HDLUnit extends AbstractHDLUnit {
+@SuppressWarnings("all")
+public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
 	 * 
@@ -65,24 +66,13 @@ public class HDLUnit extends AbstractHDLUnit {
 	}
 
 	// $CONTENT-BEGIN$
-
-	@Override
-	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
-		return (HDLEnum) resolveType(hEnum);
-	}
-
-	@Override
-	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
-		return (HDLInterface) resolveType(hIf);
-	}
-
 	private HDLInterface unitIF = null;
 
 	public HDLInterface asInterface() {
 		if (unitIF != null)
 			return unitIF;
 		unitIF = new HDLInterface().setName(getName());
-		List<HDLVariableDeclaration> declarations = HDLUtils.getallVariableDeclarations(getStatements());
+		List<HDLVariableDeclaration> declarations = HDLResolver.getallVariableDeclarations(getStatements());
 		for (HDLVariableDeclaration hdlVariableDeclaration : declarations) {
 			switch (hdlVariableDeclaration.getDirection()) {
 			case IN:
@@ -99,64 +89,67 @@ public class HDLUnit extends AbstractHDLUnit {
 		return unitIF;
 	}
 
-	private Map<String, HDLType> typeCache;
+	private HDLResolver resolver = new HDLResolver(this, false);
+
+	@Override
+	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
+		HDLEnum resolveEnum = resolver.resolveEnum(hEnum);
+		if (resolveEnum != null)
+			return resolveEnum;
+		return (HDLEnum) resolveType(hEnum);
+	}
+
+	@Override
+	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
+		HDLInterface resolveInterface = resolver.resolveInterface(hIf);
+		if (resolveInterface != null)
+			return resolveInterface;
+		return (HDLInterface) resolveType(hIf);
+	}
 
 	@Override
 	public HDLType resolveType(HDLQualifiedName type) {
-		if (typeCache == null) {
-			synchronized (this) {
-				List<HDLType> typeDecl = doGetTypeDeclarations();
-				typeCache = new HashMap<String, HDLType>();
-				for (HDLType hdlTypeDeclaration : typeDecl) {
-					typeCache.put(hdlTypeDeclaration.getName(), hdlTypeDeclaration);
-				}
-			}
-		}
-		if (typeCache.get(type.getLastSegment()) != null)
-			return typeCache.get(type.getLastSegment());
+		HDLType resolveType = resolver.resolveType(type);
+		if (resolveType != null)
+			return resolveType;
 		if (library == null)
 			library = HDLLibrary.getLibrary(libURI);
 		return library.resolve(getName(), getImports(), type);
 	}
 
-	protected List<HDLType> doGetTypeDeclarations() {
-		List<HDLType> types = new LinkedList<HDLType>();
-		for (HDLEnumDeclaration hEnumDecl : HDLUtils.getallEnumDeclarations(getStatements())) {
-			types.add(hEnumDecl.getHEnum());
-		}
-		for (HDLVariableDeclaration varDecl : HDLUtils.getallVariableDeclarations(getStatements())) {
-			if (varDecl.getPrimitive() != null)
-				types.add(varDecl.getPrimitive());
-		}
-		for (HDLInterface ifDecl : HDLUtils.getallInterfaceDeclarations(getStatements())) {
-			types.add(ifDecl);
-		}
-		return types;
-	}
-
-	private Map<String, HDLVariable> variableCache;
 	private HDLLibrary library;
 
 	@Override
 	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		if (variableCache == null) {
-			synchronized (this) {
-				List<HDLVariable> varDecl = HDLUtils.getallVariables(getStatements());
-				variableCache = new HashMap<String, HDLVariable>();
-				for (HDLVariable vars : varDecl) {
-					variableCache.put(vars.getName(), vars);
-				}
-			}
-		}
-		String varName = var.getLastSegment();
-		HDLVariable hdlVariable = variableCache.get(varName);
+		HDLVariable hdlVariable = resolver.resolveVariable(var);
 		if (hdlVariable != null)
 			return hdlVariable;
-		if (varName.equals("$clk"))
-			return new HDLVariable(null, "$clk", null, null);
-		if (varName.equals("$rst"))
-			return new HDLVariable(null, "$rst", null, null);
+		// String varName = var.getLastSegment();
+		// if (varName.equals("$clk"))
+		// return new HDLVariable(null, "$clk", null, null);
+		// if (varName.equals("$rst"))
+		// return new HDLVariable(null, "$rst", null, null);
 		return null;
+	}
+
+	@Override
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
+		return HDLResolver.getallEnumDeclarations(statements);
+	}
+
+	@Override
+	public List<HDLInterface> doGetInterfaceDeclarations() {
+		return HDLResolver.getallInterfaceDeclarations(statements);
+	}
+
+	@Override
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+		List<HDLVariableDeclaration> res = HDLResolver.getallVariableDeclarations(statements);
+		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).setDirection(HDLDirection.IN);
+		hvd.setContainer(this);
+		res.add(hvd.addVariables(new HDLVariable(null, "$clk", null, null)));
+		res.add(hvd.addVariables(new HDLVariable(null, "$rst", null, null)));
+		return res;
 	}
 
 	// $CONTENT-END$

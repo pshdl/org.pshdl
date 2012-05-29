@@ -6,6 +6,18 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * The class HDLForLoop contains the following fields
+ * <ul>
+ * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLRange> range. Can <b>not</b> be <code>null</code>,
+ * additionally the collection must contain at least one element.</li>
+ * <li>HDLVariable param. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLStatement> dos. Can <b>not</b> be <code>null</code>,
+ * additionally the collection must contain at least one element.</li>
+ * </ul>
+ */
+@SuppressWarnings("all")
 public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * Constructs a new instance of {@link HDLForLoop}
@@ -49,7 +61,6 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLForLoop;
 	}
@@ -57,19 +68,19 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	// $CONTENT-BEGIN$
 
 	@Override
-	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return HDLUtils.getallEnumDeclarations(dos);
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
+		return HDLResolver.getallEnumDeclarations(dos);
 	}
 
 	@Override
-	protected List<HDLInterface> doGetInterfaceDeclarations() {
-		return HDLUtils.getallInterfaceDeclarations(dos);
+	public List<HDLInterface> doGetInterfaceDeclarations() {
+		return HDLResolver.getallInterfaceDeclarations(dos);
 	}
 
 	@Override
-	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
 		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
-		res.addAll(HDLUtils.getallVariableDeclarations(dos));
+		res.addAll(HDLResolver.getallVariableDeclarations(dos));
 		res.add(new HDLVariableDeclaration(this, null, HDLDirection.HIDDEN, null, HDLPrimitive.getNatural(), asList(param.copy())));
 		return res;
 	}

@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
  * The class HDLDirectGeneration contains the following fields
@@ -15,7 +16,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>ArrayList<HDLGeneratorArgument> arguments. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * Constructs a new instance of {@link HDLDirectGeneration}
@@ -68,26 +69,36 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLDirectGeneration;
 	}
 
 	// $CONTENT-BEGIN$
+
 	@Override
-	protected List<HDLEnumDeclaration> doGetEnumDeclarations() {
+	public HDLInterface getHIf() {
+		return HDLGenerators.getInterface(this).setContainer(this);
+	}
+
+	public HDLQualifiedName getIfName() {
+		return super.getHIf().asRef();
+	}
+
+	@Override
+	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	protected List<HDLInterface> doGetInterfaceDeclarations() {
-		// XXX Implement the HDLInterfaceGeneration
+	public List<HDLInterface> doGetInterfaceDeclarations() {
 		return Collections.singletonList(getHIf());
 	}
 
 	@Override
-	protected List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		return Collections.emptyList();
+	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(getHIf().copy()).addVariables(getVar().copy());
+		hvd.setContainer(this);
+		return Collections.singletonList(hvd);
 	}
 	// $CONTENT-END$
 

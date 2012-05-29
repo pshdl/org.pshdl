@@ -251,19 +251,16 @@ public aspect StringWriterAspect {
 	}
 
 	public String HDLInterfaceDeclaration.toString() {
+		return getHIf().toString();
+	}
+	public String HDLInterface.toString() {
 		StringBuilder sb = getSpacing();
 		sb.append("interface ");
-		sb.append(getHIf().getName());
+		sb.append(getName());
 		sb.append("{\n");
 		incSpacing();
-		for (HDLVariableDeclaration var : getHIf().getPorts()) {
-			sb.append(getSpacing()).append(var.resolveType());
-			String spacing = " ";
-			for (HDLVariable vars : var.getVariables()) {
-				sb.append(spacing).append(vars);
-				spacing = ",";
-			}
-			sb.append(";\n");
+		for (HDLVariableDeclaration var : getPorts()) {
+			sb.append(var).append('\n');
 		}
 		decSpacing();
 		sb.append("};\n");

@@ -135,7 +135,7 @@ public class Insulin {
 			HDLStatement statement = unit.getStatements().get(0);
 			HDLPrimitive bit = HDLPrimitive.getBit();
 			container.setMeta(signalInserted);
-			ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit.asRef()).setPrimitive(bit).addVariables(defClkVar));
+			ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defClkVar));
 		}
 	}
 

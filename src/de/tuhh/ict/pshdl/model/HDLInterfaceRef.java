@@ -16,7 +16,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLExpression> ifArray. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
@@ -66,7 +66,6 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceRef;
 	}

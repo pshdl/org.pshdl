@@ -20,7 +20,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLExpression resetValue. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
@@ -80,7 +80,6 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRegisterConfig;
 	}

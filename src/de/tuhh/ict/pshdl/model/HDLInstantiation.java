@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>HDLObject container. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInstantiation}
@@ -36,7 +36,6 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInstantiation;
 	}

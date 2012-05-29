@@ -76,4 +76,9 @@ public class HDLLibrary {
 		}
 		return hdlType;
 	}
+
+	public void addInterface(HDLInterface hIf) {
+		System.out.println("HDLLibrary.addInterface()" + hIf.asRef());
+		types.put(hIf.asRef(), hIf);
+	}
 }

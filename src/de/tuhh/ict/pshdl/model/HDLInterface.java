@@ -12,7 +12,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <li>ArrayList<HDLVariableDeclaration> ports. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLInterface extends AbstractHDLInterface {
 	/**
 	 * Constructs a new instance of {@link HDLInterface}
@@ -48,7 +48,6 @@ public class HDLInterface extends AbstractHDLInterface {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterface;
 	}

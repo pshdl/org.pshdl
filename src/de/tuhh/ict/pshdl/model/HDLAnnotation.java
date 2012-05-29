@@ -7,10 +7,10 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <ul>
  * <li>HDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>String value. Can <b>not</b> be <code>null</code>.</li>
+ * <li>String value. Can be <code>null</code>.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * Constructs a new instance of {@link HDLAnnotation}
@@ -20,7 +20,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param value
-	 *            the value for value. Can <b>not</b> be <code>null</code>.
+	 *            the value for value. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
@@ -36,7 +36,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param value
-	 *            the value for value. Can <b>not</b> be <code>null</code>.
+	 *            the value for value. Can be <code>null</code>.
 	 */
 	public HDLAnnotation(HDLObject container, String name, String value) {
 		this(container, name, value, true);
@@ -46,7 +46,6 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLAnnotation;
 	}

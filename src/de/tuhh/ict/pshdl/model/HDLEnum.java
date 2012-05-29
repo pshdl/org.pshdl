@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * additionally the collection must contain at least one element.</li>
  * </ul>
  */
-
+@SuppressWarnings("all")
 public class HDLEnum extends AbstractHDLEnum {
 	/**
 	 * Constructs a new instance of {@link HDLEnum}
@@ -51,7 +51,6 @@ public class HDLEnum extends AbstractHDLEnum {
 		super();
 	}
 
-	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLEnum;
 	}
