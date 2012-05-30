@@ -3,8 +3,11 @@ package de.tuhh.ict.pshdl.generator.vhdl.libraries;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.upb.hni.vmagic.*;
+import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
 import de.upb.hni.vmagic.declaration.*;
 import de.upb.hni.vmagic.expression.*;
@@ -91,16 +94,22 @@ public class VHDLCastsLibrary {
 	}
 
 	public static SubtypeIndication getType(HDLPrimitive left) {
+		HDLExpression width = left.getWidth();
+		HDLRange range = null;
+		if (width != null) {
+			range = new HDLRange().setFrom(new HDLArithOp().setLeft(width).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1))).setTo(HDLLiteral.get(0));
+			range.setContainer(left);
+		}
 		switch (left.getType()) {
 		case BOOL:
 		case BIT:
 			return StdLogic1164.STD_LOGIC;
 		case BITVECTOR:
-			return StdLogic1164.STD_LOGIC_VECTOR(left.getWidth().toVHDL());
+			return StdLogic1164.STD_LOGIC_VECTOR(range.toVHDL(Direction.DOWNTO));
 		case INT:
-			return NumericStd.SIGNED(left.getWidth().toVHDL());
+			return NumericStd.SIGNED(range.toVHDL(Direction.DOWNTO));
 		case UINT:
-			return NumericStd.UNSIGNED(left.getWidth().toVHDL());
+			return NumericStd.UNSIGNED(range.toVHDL(Direction.DOWNTO));
 		case INTEGER:
 			return Standard.INTEGER;
 		case NATURAL:

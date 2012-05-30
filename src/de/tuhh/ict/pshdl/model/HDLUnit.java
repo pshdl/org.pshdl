@@ -16,7 +16,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * </ul>
  */
-public class HDLUnit extends AbstractHDLUnit {
+public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
 	 * 
@@ -85,6 +85,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			// TODO Add annotations and deeper Declarations
 			// TODO add clk/rst;
 		}
+		unitIF.setContainer(this);
 		return unitIF;
 	}
 
@@ -123,11 +124,6 @@ public class HDLUnit extends AbstractHDLUnit {
 		HDLVariable hdlVariable = resolver.resolveVariable(var);
 		if (hdlVariable != null)
 			return hdlVariable;
-		// String varName = var.getLastSegment();
-		// if (varName.equals("$clk"))
-		// return new HDLVariable(null, "$clk", null, null);
-		// if (varName.equals("$rst"))
-		// return new HDLVariable(null, "$rst", null, null);
 		return null;
 	}
 

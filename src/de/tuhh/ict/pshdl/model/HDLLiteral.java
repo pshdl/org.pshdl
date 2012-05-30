@@ -101,6 +101,10 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		return HDLLiteralPresentation.NUM;
 	}
 
+	public static HDLExpression get(BigInteger constant) {
+		return new HDLLiteral().setVal(constant.toString());
+	}
+
 	// $CONTENT-END$
 
 }

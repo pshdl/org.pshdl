@@ -5,6 +5,14 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 
 public aspect StringWriterAspect {
+	public String HDLAnnotation.toString(){
+		StringBuilder sb=new StringBuilder();
+		sb.append(getName());
+		if (getValue()!=null)
+			sb.append("(\"").append(getValue()).append("\")");
+		return sb.toString();
+	}
+	
 	public String HDLShiftOp.toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft());
@@ -229,7 +237,7 @@ public aspect StringWriterAspect {
 		HDLType resolveType = resolveType();
 		if (getAnnotations() != null) {
 			for (HDLAnnotation hdla : getAnnotations()) {
-				sb.append(hdla);
+				sb.append(hdla).append(' ');
 			}
 		}
 		String dirString = getDirection().toString();
@@ -393,7 +401,7 @@ public aspect StringWriterAspect {
 		StringBuilder sb = getSpacing();
 		sb.append(getHIf().getName()).append(' ').append(getVar().getName()).append("=").append(getGeneratorID());
 		sb.append('(');
-		for (HDLGeneratorArgument args : getArguments()) {
+		for (HDLArgument args : getArguments()) {
 			sb.append(args.getName()).append('=');
 			if (args.getValue() != null) {
 				sb.append('"').append(args.getValue()).append('"');

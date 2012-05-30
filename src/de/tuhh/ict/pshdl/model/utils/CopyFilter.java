@@ -11,6 +11,8 @@ public interface CopyFilter {
 
 	public String copyObject(String feature, HDLObject container, String object);
 
+	public boolean copyObject(String feature, HDLObject container, boolean object);
+
 	public HDLQualifiedName copyObject(String feature, HDLObject container, HDLQualifiedName object);
 
 	public <T extends HDLObject> T copyObject(String feature, HDLObject container, T object);
@@ -31,6 +33,11 @@ public interface CopyFilter {
 
 		@Override
 		public HDLQualifiedName copyObject(String feature, HDLObject container, HDLQualifiedName object) {
+			return object;
+		}
+
+		@Override
+		public boolean copyObject(String feature, HDLObject container, boolean object) {
 			return object;
 		}
 

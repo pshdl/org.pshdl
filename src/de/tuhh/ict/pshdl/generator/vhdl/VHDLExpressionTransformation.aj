@@ -5,6 +5,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -128,7 +129,17 @@ public aspect VHDLExpressionTransformation {
 			}
 			HDLPrimitive t = (HDLPrimitive) getTarget().determineType();
 			Expression<?> exp = VHDLCastsLibrary.cast(vhdl, t.getType(), targetType.getType());
-			if (targetType.getWidth() != null) {
+			HDLExpression tw=targetType.getWidth();
+			if (tw != null) {
+				if (t.getWidth()!=null){
+					BigInteger bt=t.getWidth().constantEvaluate(null);
+					if (bt!=null){
+						BigInteger btw=tw.constantEvaluate(null);
+						if (bt.equals(btw)){
+							return exp;
+						}
+					}
+				}
 				Expression<?> width = targetType.getWidth().toVHDL();
 				FunctionCall resize = null;
 				switch (targetType.getType()) {
@@ -155,10 +166,10 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public Range HDLRange.toVHDL(Direction dir) {
-		Expression<?> to = getTo().toVHDL();
+		Expression<?> to = HDLPrimitives.simplifyWidth(this, getTo()).toVHDL();
 		if (getFrom() == null)
 			return new Range(to, dir, to);
-		return new Range(getFrom().toVHDL(), dir, to);
+		return new Range(HDLPrimitives.simplifyWidth(this, getFrom()).toVHDL(), dir, to);
 	}
 
 	public Literal<?> HDLLiteral.toVHDL() {

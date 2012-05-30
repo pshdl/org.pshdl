@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.HDLArithOp.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -69,7 +70,7 @@ public aspect VHDLStatementTransformation {
 						sigVar = sigVar.addDimensions(exp.copy());
 					}
 					HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
-					res.merge(newHVD.toVHDL());
+					res.merge(newHVD.setContainer(this).toVHDL());
 					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
 				}
 			}
@@ -80,8 +81,7 @@ public aspect VHDLStatementTransformation {
 		else {
 			for (int i = 0; i < getDimensions().size(); i++) {
 				HDLExpression to = new HDLArithOp().setLeft(getDimensions().get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-				HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to);
-				range.setContainer(this);
+				HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to).setContainer(this);
 				ForGenerateStatement newFor = new ForGenerateStatement("generate_" + ifName, Character.toString((char) (i + 'I')), range.toVHDL(Range.Direction.TO));
 				if (forLoop != null)
 					forLoop.getStatements().add(newFor);
@@ -121,7 +121,7 @@ public aspect VHDLStatementTransformation {
 					List<DiscreteRange> ranges = new LinkedList<DiscreteRange>();
 					for (HDLExpression arrayWidth : var.getDimensions()) {
 						HDLExpression newWidth = new HDLArithOp().setLeft(arrayWidth).setType(HDLArithOp.HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-						Range range = new Range(new DecimalLiteral(0), Direction.TO, newWidth.toVHDL());
+						Range range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(newWidth).setContainer(this).toVHDL(Direction.TO);
 						ranges.add(range);
 					}
 					ConstrainedArray arrType = new ConstrainedArray(var.getName() + "_array", type, ranges);

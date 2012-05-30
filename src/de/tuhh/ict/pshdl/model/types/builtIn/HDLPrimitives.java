@@ -4,6 +4,7 @@ import static de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType.*;
 import static de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -227,8 +228,20 @@ public class HDLPrimitives {
 			return hdi;
 		}
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, lType.setType(triple.left), rType.setType(triple.right));
-		info.result = new HDLPrimitive().setType(triple.result).setWidth(getWidth(type, info));
+		HDLExpression width = simplifyWidth(op, getWidth(type, info));
+		info.result = new HDLPrimitive().setType(triple.result).setWidth(width);
 		return normalize(info, op);
+	}
+
+	public static HDLExpression simplifyWidth(HDLObject container, HDLExpression width) {
+		if (width == null)
+			return null;
+		if (width.getContainer() == null)
+			width.setContainer(container);
+		BigInteger newW = width.constantEvaluate(null);
+		if (newW != null)
+			width = new HDLLiteral().setVal(newW.toString());
+		return width;
 	}
 
 	private HDLTypeInferenceInfo normalize(HDLTypeInferenceInfo info, HDLExpression op) {

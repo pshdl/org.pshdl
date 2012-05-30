@@ -35,7 +35,7 @@ public class VHDLGenerator {
 
 	private static VhdlFile generateVHDL(HDLPackage unit, String library, HDLEvaluationContext context) {
 		unit = Insulin.transform(unit);
-		System.out.println(unit);
+		System.out.println("Generating VHDL code for:\n" + unit);
 		return unit.toVHDL();
 	}
 }

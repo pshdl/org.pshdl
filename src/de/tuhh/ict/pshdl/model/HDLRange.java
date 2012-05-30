@@ -1,7 +1,10 @@
 package de.tuhh.ict.pshdl.model;
 
+import java.math.*;
+
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 /**
  * The class HDLRange contains the following fields
@@ -52,12 +55,23 @@ public class HDLRange extends AbstractHDLRange {
 	}
 
 	// $CONTENT-BEGIN$
+	/**
+	 * Calculates the width of the Expression as if it used as a downto (the
+	 * most common case when the width is needed)
+	 * 
+	 * @return
+	 */
 	public HDLExpression getWidth() {
 		if (getFrom() == null)
 			return new HDLLiteral().setVal("1");
-		HDLArithOp rangeDist = new HDLArithOp().setLeft(getTo()).setType(HDLArithOpType.MINUS).setRight(getFrom());
+		if (getTo() != null) {
+			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null)))
+				return new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+		}
+		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.MINUS).setRight(getTo());
 		HDLFunction absRange = new HDLFunction().setName("abs").addParams(rangeDist);
-		return new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(new HDLLiteral(null, "1"));
+		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(new HDLLiteral(null, "1"));
+		return HDLPrimitives.simplifyWidth(this, width);
 	}
 	// $CONTENT-END$
 

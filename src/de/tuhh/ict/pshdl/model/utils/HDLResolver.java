@@ -108,9 +108,10 @@ public class HDLResolver {
 		}
 		if (variableCache.get(var.getLastSegment()) != null)
 			return variableCache.get(var.getLastSegment());
-		if ((resolveTo.getContainer() == null) || !descent)
+		HDLObject container = resolveTo.getContainer();
+		if ((container == null) || !descent)
 			return null;
-		return resolveTo.getContainer().resolveVariable(var);
+		return container.resolveVariable(var);
 	}
 
 	public static List<HDLEnumDeclaration> getallEnumDeclarations(List<HDLStatement> stmnts) {

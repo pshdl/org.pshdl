@@ -5,22 +5,21 @@ import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLArithOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.HDLObject.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
-import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect ConstantEvaluation {
 
-	/*pointcut evaluate(): execution(BigInteger constantEvaluate(HDLEvaluationContext));
-	BigInteger around():evaluate() {
-		BigInteger res=proceed();
-		System.out.println("Result of evaluating:"+thisJoinPoint.getTarget()+" was "+res);
-		return res;
-	}*/
-	
+	/*
+	 * pointcut evaluate(): execution(BigInteger
+	 * constantEvaluate(HDLEvaluationContext)); BigInteger around():evaluate() {
+	 * BigInteger res=proceed();
+	 * System.out.println("Result of evaluating:"+thisJoinPoint
+	 * .getTarget()+" was "+res); return res; }
+	 */
+
 	public enum ProblemSource implements MetaAccess<HDLObject> {
 		SOURCE;
 	}
@@ -29,10 +28,10 @@ public aspect ConstantEvaluation {
 		DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE, ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT, CAN_NOT_USE_PARAMETER, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS, NON_PRIMITVE_TYPE_NOT_EVALUATED, TYPE_NOT_SUPPORTED_FOR_CONSTANTS;
 	}
 
-	public BigInteger HDLExpression.constantEvaluate(HDLEvaluationContext context){
+	public BigInteger HDLExpression.constantEvaluate(HDLEvaluationContext context) {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!");
 	}
-	
+
 	public BigInteger HDLLiteral.constantEvaluate(HDLEvaluationContext context) {
 		return getValueAsBigInt();
 	}
@@ -52,11 +51,16 @@ public aspect ConstantEvaluation {
 		case LOGIC_NEG:
 			return boolInt(getTarget().constantEvaluate(context).equals(BigInteger.ZERO));
 		case CAST:
-			HDLType type=getCastTo();
-			if (type instanceof HDLPrimitive){
-				HDLPrimitive prim=(HDLPrimitive)type;
-				BigInteger width = prim.getWidth().constantEvaluate(context);
-				return eval.mod(BigInteger.ONE.shiftLeft(width.intValue()));
+			HDLType type = getCastTo();
+			if (type instanceof HDLPrimitive) {
+				HDLPrimitive prim = (HDLPrimitive) type;
+				if (prim.getWidth() != null) {
+					BigInteger width = prim.getWidth().constantEvaluate(context);
+					if (width!=null)
+						return eval.mod(BigInteger.ONE.shiftLeft(width.intValue()));
+					return null;
+				}
+				return eval;
 			}
 			this.addMeta(ProblemSource.SOURCE, getTarget());
 			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
@@ -86,8 +90,8 @@ public aspect ConstantEvaluation {
 		}
 		return sum;
 	}
-	
-	public static BigInteger subEvaluate(HDLExpression container, HDLExpression left, HDLEvaluationContext context){
+
+	public static BigInteger subEvaluate(HDLExpression container, HDLExpression left, HDLEvaluationContext context) {
 		BigInteger leftVal = left.constantEvaluate(context);
 		if (leftVal == null) {
 			container.addMeta(ProblemSource.SOURCE, left);
@@ -99,9 +103,11 @@ public aspect ConstantEvaluation {
 
 	public BigInteger HDLArithOp.constantEvaluate(HDLEvaluationContext context) {
 		BigInteger leftVal = subEvaluate(this, getLeft(), context);
-		if (leftVal==null) return null;
+		if (leftVal == null)
+			return null;
 		BigInteger rightVal = subEvaluate(this, getRight(), context);
-		if (rightVal==null) return null;
+		if (rightVal == null)
+			return null;
 		switch (getType()) {
 		case DIV:
 			return leftVal.divide(rightVal);
@@ -118,11 +124,14 @@ public aspect ConstantEvaluation {
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!");
 	}
+
 	public BigInteger HDLBitOp.constantEvaluate(HDLEvaluationContext context) {
 		BigInteger leftVal = subEvaluate(this, getLeft(), context);
-		if (leftVal==null) return null;
+		if (leftVal == null)
+			return null;
 		BigInteger rightVal = subEvaluate(this, getRight(), context);
-		if (rightVal==null) return null;
+		if (rightVal == null)
+			return null;
 		switch (getType()) {
 		case AND:
 			return leftVal.and(rightVal);
@@ -143,11 +152,14 @@ public aspect ConstantEvaluation {
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!");
 	}
+
 	public BigInteger HDLEqualityOp.constantEvaluate(HDLEvaluationContext context) {
 		BigInteger leftVal = subEvaluate(this, getLeft(), context);
-		if (leftVal==null) return null;
+		if (leftVal == null)
+			return null;
 		BigInteger rightVal = subEvaluate(this, getRight(), context);
-		if (rightVal==null) return null;
+		if (rightVal == null)
+			return null;
 		switch (getType()) {
 		case EQ:
 			return boolInt(leftVal.equals(rightVal));
@@ -164,30 +176,34 @@ public aspect ConstantEvaluation {
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!");
 	}
+
 	public BigInteger HDLShiftOp.constantEvaluate(HDLEvaluationContext context) {
 		BigInteger leftVal = subEvaluate(this, getLeft(), context);
-		if (leftVal==null) return null;
+		if (leftVal == null)
+			return null;
 		BigInteger rightVal = subEvaluate(this, getRight(), context);
-		if (rightVal==null) return null;
-			switch (getType()) {
-			case SLL:
-				return leftVal.shiftLeft(rightVal.intValue());
-			case SRA:
-				return leftVal.shiftRight(rightVal.intValue());
-			case SRL:
-				BigInteger shiftRight = leftVal.shiftRight(rightVal.intValue());
-				if (shiftRight.signum() < 0)
-					return shiftRight.negate();
-				return shiftRight;
-			}
-			throw new RuntimeException("Incorrectly implemented constant evaluation!");
+		if (rightVal == null)
+			return null;
+		switch (getType()) {
+		case SLL:
+			return leftVal.shiftLeft(rightVal.intValue());
+		case SRA:
+			return leftVal.shiftRight(rightVal.intValue());
+		case SRL:
+			BigInteger shiftRight = leftVal.shiftRight(rightVal.intValue());
+			if (shiftRight.signum() < 0)
+				return shiftRight.negate();
+			return shiftRight;
+		}
+		throw new RuntimeException("Incorrectly implemented constant evaluation!");
 	}
 
 	public BigInteger HDLFunction.constantEvaluate(HDLEvaluationContext context) {
-		List<BigInteger> args=new LinkedList<BigInteger>();
-		for (HDLExpression arg:getParams()){
-			BigInteger val=subEvaluate(this, arg, context);
-			if (val==null) return null;
+		List<BigInteger> args = new LinkedList<BigInteger>();
+		for (HDLExpression arg : getParams()) {
+			BigInteger val = subEvaluate(this, arg, context);
+			if (val == null)
+				return null;
 			args.add(val);
 		}
 		return HDLFunctions.constantEvaluate(this, args, context);
@@ -204,26 +220,26 @@ public aspect ConstantEvaluation {
 			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
 			return null;
 		}
-		HDLType type=determineType();
-		if (!(type instanceof HDLPrimitive)){
+		HDLType type = determineType();
+		if (!(type instanceof HDLPrimitive)) {
 			this.addMeta(ProblemSource.SOURCE, this);
 			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
 			return null;
 		}
-		HDLVariable var=resolveVar();
-		HDLDirection dir=resolveVar().getDirection();
-		if (dir==HDLDirection.CONSTANT) 
-			return subEvaluate(this, var.getDefaultValue(),context);
-		
-		if (dir==HDLDirection.PARAMETER) {
-			if (context==null){
+		HDLVariable var = resolveVar();
+		HDLDirection dir = resolveVar().getDirection();
+		if (dir == HDLDirection.CONSTANT)
+			return subEvaluate(this, var.getDefaultValue(), context);
+
+		if (dir == HDLDirection.PARAMETER) {
+			if (context == null) {
 				this.addMeta(ProblemSource.SOURCE, this);
 				this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
 				return null;
 			}
-			HDLExpression cRef=context.get(var);
+			HDLExpression cRef = context.get(var);
 			BigInteger cRefEval = cRef.constantEvaluate(context);
-			if (cRefEval==null){
+			if (cRefEval == null) {
 				this.addMeta(ProblemSource.SOURCE, cRef);
 				this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
 				return null;
@@ -235,12 +251,12 @@ public aspect ConstantEvaluation {
 		return null;
 	}
 
-	public BigInteger HDLEnumRef.constantEvaluate(HDLEvaluationContext context){
+	public BigInteger HDLEnumRef.constantEvaluate(HDLEvaluationContext context) {
 		this.addMeta(ProblemSource.SOURCE, this);
 		this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ENUMS_NOT_SUPPORTED_FOR_CONSTANTS);
 		return null;
 	}
-	
+
 	private static BigInteger boolInt(boolean b) {
 		return b ? BigInteger.ONE : BigInteger.ZERO;
 	}

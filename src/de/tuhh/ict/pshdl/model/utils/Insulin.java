@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model.utils;
 
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -13,6 +14,7 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.IHDLGenerator.HDLGenerationInfo;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class Insulin {
@@ -20,14 +22,46 @@ public class Insulin {
 		annotateReadCount(orig);
 		annotateWriteCount(orig);
 		HDLPackage apply = handleOutPortRead(orig);
+		apply = includeGenerators(apply);
+		// System.out.println("Insulin.transform()" + apply);
+		// apply.validateAllFields(null, true);
 		apply = generateClkAndReset(apply);
 		apply = handleMultiBitAccess(apply);
 		apply = handleMultiForLoop(apply);
 		apply = handlePostfixOp(apply);
 		apply = generateInitializations(apply);
 		apply = fortifyType(apply);
+		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(null, true);
 		return apply;
+	}
+
+	/**
+	 * Checks for HDLDirectGenerations and calls the generators. If the are
+	 * includes, it will be included and the references resolved
+	 * 
+	 * @param apply
+	 * @return
+	 */
+	private static HDLPackage includeGenerators(HDLPackage apply) {
+		ModificationSet ms = new ModificationSet();
+		List<HDLDirectGeneration> gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
+		for (HDLDirectGeneration generation : gens) {
+			HDLGenerationInfo generationInfo = HDLGenerators.getImplementation(generation);
+			if (generationInfo.include) {
+				HDLQualifiedName ifRef = generation.getHIf().asRef();
+				System.out.println("Insulin.includeGenerators()" + generationInfo.unit);
+				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
+				ms.replace(generation, stmnts);
+				List<HDLInterfaceRef> ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
+				for (HDLInterfaceRef hdI : ifRefs) {
+					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
+						ms.replace(hdI, new HDLVariableRef(null, hdI.getVarRefName(), hdI.getArray(), hdI.getBits()));
+					}
+				}
+			}
+		}
+		return ms.apply(apply);
 	}
 
 	private static EnumSet<HDLDirection> doNotInit = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.CONSTANT, HDLDirection.PARAMETER, HDLDirection.IN);
@@ -95,26 +129,64 @@ public class Insulin {
 		ms.insertBefore(statement, stmnt);
 	}
 
+	/**
+	 * Checks for the clock and reset annotation and replaces all $clk and $rst
+	 * references with it.
+	 * 
+	 * @param apply
+	 * @return
+	 */
 	private static HDLPackage generateClkAndReset(HDLPackage apply) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableDeclaration> decls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		// XXX Check annotations for default clock
 		HDLVariable defClkVar = new HDLVariable().setName("clk");
+		boolean customClk = false, customRst = false;
 		HDLVariable defRstVar = new HDLVariable().setName("rst");
+		List<HDLAnnotation> annotations = apply.getAllObjectsOf(HDLAnnotation.class, true);
+		for (HDLAnnotation hdlAnnotation : annotations) {
+			if ("@clock".equalsIgnoreCase(hdlAnnotation.getName())) {
+				HDLObject container = hdlAnnotation.getContainer();
+				if (container instanceof HDLVariableDeclaration) {
+					HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
+					defClkVar = hvd.getVariables().get(0);
+					customClk = true;
+				}
+			}
+			if ("@reset".equalsIgnoreCase(hdlAnnotation.getName())) {
+				HDLObject container = hdlAnnotation.getContainer();
+				if (container instanceof HDLVariableDeclaration) {
+					HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
+					defRstVar = hvd.getVariables().get(0);
+					customRst = true;
+				}
+			}
+		}
 
+		List<HDLVariableDeclaration> decls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration decl : decls) {
 			HDLRegisterConfig register = decl.getRegister();
 			if (register != null) {
 				if ("$clk".equals(register.getClkRefName().getLastSegment())) {
 					register = register.setClk(HDLQualifiedName.create(defClkVar.getName()));
-					insertClk(ms, register.getContainer(), defClkVar, SignalInserted.ClkInserted);
+					if (!customClk)
+						insertClk(ms, register.getContainer(), defClkVar, SignalInserted.ClkInserted);
 				}
 				if ("$rst".equals(register.getRstRefName().getLastSegment())) {
 					register = register.setRst(HDLQualifiedName.create(defRstVar.getName()));
-					insertClk(ms, register.getContainer(), defRstVar, SignalInserted.RstInserted);
+					if (!customRst)
+						insertClk(ms, register.getContainer(), defRstVar, SignalInserted.RstInserted);
 				}
 				if (register != decl.getRegister())
 					ms.replace(decl.getRegister(), register);
+			}
+		}
+
+		List<HDLVariableRef> varRefs = apply.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : varRefs) {
+			if ("$clk".equals(ref.getVarRefName().getLastSegment())) {
+				ms.replace(ref, defClkVar.asHDLRef());
+			}
+			if ("$rst".equals(ref.getVarRefName().getLastSegment())) {
+				ms.replace(ref, defRstVar.asHDLRef());
 			}
 		}
 		return ms.apply(apply);

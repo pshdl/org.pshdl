@@ -109,9 +109,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		return new HDLRegisterConfig(null, HDLQualifiedName.create("$clk"), HDLQualifiedName.create("$rst"), null, null, null, new HDLLiteral(null, "0"));
 	}
 
-	public static HDLRegisterConfig fromArgs(ArrayList<HDLGeneratorArgument> args) {
+	public static HDLRegisterConfig fromArgs(ArrayList<HDLArgument> args) {
 		HDLRegisterConfig config = defaultConfig();
-		for (HDLGeneratorArgument genArgs : args) {
+		for (HDLArgument genArgs : args) {
 			String name = genArgs.getName();
 			if (RESET_PARAM.equals(name))
 				config = config.setRst(((HDLVariableRef) genArgs.getExpression()).getVarRefName());

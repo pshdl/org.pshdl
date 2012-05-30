@@ -74,7 +74,10 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 
 	@Override
 	public HDLVariable resolveVar() {
-		HDLType type = resolveHIf().determineType();
+		HDLVariable resolveHIf = resolveHIf();
+		if (resolveHIf == null)
+			throw new IllegalArgumentException("Could not resolve interface:" + getHIfRefName());
+		HDLType type = resolveHIf.determineType();
 		if (type instanceof HDLInterface) {
 			HDLInterface hIf = (HDLInterface) type;
 			String lastSegment2 = getVarRefName().getLastSegment();

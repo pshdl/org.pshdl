@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model.aspects;
 
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -48,6 +49,7 @@ public aspect TypeInference {
 		while (iter.hasNext()) {
 			type=(HDLPrimitive)iter.next().determineType();
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(getWidth(type));
+			width = HDLPrimitives.simplifyWidth(this, width);
 		}
 		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}
@@ -83,9 +85,10 @@ public aspect TypeInference {
 		if (bits.size()==1 && bits.get(0).getFrom()==null)
 			return HDLPrimitive.getBit();
 		Iterator<HDLRange> iter = bits.iterator();
-		HDLExpression width = iter.next().getWidth();
+		HDLExpression width = HDLPrimitives.simplifyWidth(this, iter.next().getWidth());
 		while (iter.hasNext()) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth());
+			width = HDLPrimitives.simplifyWidth(this, width);
 		}
 		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}

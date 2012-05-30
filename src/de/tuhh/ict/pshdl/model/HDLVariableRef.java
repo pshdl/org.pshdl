@@ -60,6 +60,14 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 
 	// $CONTENT-BEGIN$
 
+	@Override
+	public HDLVariable resolveVar() {
+		HDLVariable var = super.resolveVar();
+		if (var == null)
+			throw new IllegalArgumentException("This variable can not be resolved:" + getVarRefName());
+		return var;
+	}
+
 	// $CONTENT-END$
 
 }

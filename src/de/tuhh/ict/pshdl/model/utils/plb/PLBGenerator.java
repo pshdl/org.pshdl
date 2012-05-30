@@ -11,9 +11,18 @@ public class PLBGenerator implements IHDLGenerator {
 	@Override
 	public HDLInterface getInterface(HDLDirectGeneration hdl) {
 		HDLInterface hIf = new HDLInterface().setName(hdl.getIfName().getLastSegment());
-		ArrayList<HDLGeneratorArgument> args = hdl.getArguments();
+		int regCount = getRegCount(hdl);
+		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(32)));
+		hvd = hvd.setDirection(HDLDirection.INOUT).addVariables(new HDLVariable().setName("regs").addDimensions(HDLLiteral.get(regCount)));
+		hIf = hIf.addPorts(hvd);
+		// System.out.println("PLBGenerator.getInterface()" + hIf);
+		return hIf;
+	}
+
+	private int getRegCount(HDLDirectGeneration hdl) {
+		ArrayList<HDLArgument> args = hdl.getArguments();
 		int regCount = -1;
-		for (HDLGeneratorArgument arg : args) {
+		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
 				if (arg.getExpression() != null) {
 					regCount = arg.getExpression().constantEvaluate(null).intValue();
@@ -24,11 +33,13 @@ public class PLBGenerator implements IHDLGenerator {
 		}
 		if (regCount == -1)
 			throw new IllegalArgumentException("The parameter regCount is not valid!");
-		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(32)));
-		hvd = hvd.setDirection(HDLDirection.INOUT).addVariables(new HDLVariable().setName("regs").addDimensions(HDLLiteral.get(regCount)));
-		hIf = hIf.addPorts(hvd);
-		// System.out.println("PLBGenerator.getInterface()" + hIf);
-		return hIf;
+		return regCount;
+	}
+
+	@Override
+	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
+		int regCount = getRegCount(hdl);
+		return new HDLGenerationInfo(true, PLBCodeGen.get(regCount));
 	}
 
 }
