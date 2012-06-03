@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLInstantiation contains the following fields
@@ -51,6 +52,23 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	public HDLClass getClassType() {
 		return HDLClass.HDLInstantiation;
 	}
+
+	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>() {
+		@Override
+		public HDLVariable getValue(HDLInstantiation obj) {
+			if (obj == null)
+				return null;
+			return obj.getVar();
+		}
+	};
+	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>() {
+		@Override
+		public ArrayList<HDLArgument> getValue(HDLInstantiation obj) {
+			if (obj == null)
+				return null;
+			return obj.getArguments();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

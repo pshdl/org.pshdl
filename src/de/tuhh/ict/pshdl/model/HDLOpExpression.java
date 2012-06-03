@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLOpExpression contains the following fields
@@ -49,6 +50,23 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	public HDLClass getClassType() {
 		return HDLClass.HDLOpExpression;
 	}
+
+	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLOpExpression obj) {
+			if (obj == null)
+				return null;
+			return obj.getLeft();
+		}
+	};
+	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLOpExpression obj) {
+			if (obj == null)
+				return null;
+			return obj.getRight();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

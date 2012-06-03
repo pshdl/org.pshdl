@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLInterface contains the following fields
@@ -51,6 +52,15 @@ public class HDLInterface extends AbstractHDLInterface {
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterface;
 	}
+
+	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>() {
+		@Override
+		public ArrayList<HDLVariableDeclaration> getValue(HDLInterface obj) {
+			if (obj == null)
+				return null;
+			return obj.getPorts();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

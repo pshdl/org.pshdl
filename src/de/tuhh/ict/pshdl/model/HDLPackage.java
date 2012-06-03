@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLPackage contains the following fields
@@ -56,6 +57,31 @@ public class HDLPackage extends AbstractHDLPackage {
 	public HDLClass getClassType() {
 		return HDLClass.HDLPackage;
 	}
+
+	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>() {
+		@Override
+		public String getValue(HDLPackage obj) {
+			if (obj == null)
+				return null;
+			return obj.getLibURI();
+		}
+	};
+	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>() {
+		@Override
+		public String getValue(HDLPackage obj) {
+			if (obj == null)
+				return null;
+			return obj.getPkg();
+		}
+	};
+	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>() {
+		@Override
+		public ArrayList<HDLUnit> getValue(HDLPackage obj) {
+			if (obj == null)
+				return null;
+			return obj.getUnits();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

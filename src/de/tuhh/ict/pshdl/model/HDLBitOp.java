@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLBitOp contains the following fields
@@ -77,6 +78,15 @@ public class HDLBitOp extends AbstractHDLBitOp {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>() {
+		@Override
+		public HDLBitOpType getValue(HDLBitOp obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLEnum contains the following fields
@@ -54,6 +55,15 @@ public class HDLEnum extends AbstractHDLEnum {
 	public HDLClass getClassType() {
 		return HDLClass.HDLEnum;
 	}
+
+	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>() {
+		@Override
+		public ArrayList<HDLVariable> getValue(HDLEnum obj) {
+			if (obj == null)
+				return null;
+			return obj.getEnums();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	public HDLVariable getVariable(String lastSegment) {

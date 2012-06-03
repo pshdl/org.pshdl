@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLShiftOp contains the following fields
@@ -77,6 +78,15 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>() {
+		@Override
+		public HDLShiftOpType getValue(HDLShiftOp obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

@@ -36,7 +36,7 @@ public class VHDLImporter {
 				if (unit instanceof Entity) {
 					Entity entity = (Entity) unit;
 					String id = entity.getIdentifier();
-					HDLInterface vInterface = new HDLInterface().setName("VHDL.work." + id);
+					HDLInterface vInterface = new HDLInterface().setName(id);
 					List<VhdlObjectProvider<Signal>> ports = entity.getPort();
 					for (VhdlObjectProvider<Signal> port : ports) {
 						List<Signal> signals = port.getVhdlObjects();
@@ -51,7 +51,7 @@ public class VHDLImporter {
 					// lib.addInterface(vInterface);
 				}
 				workScope.getFiles().add(file);
-				System.out.println("VHDLImporter.importFile()" + unit);
+				// System.out.println("VHDLImporter.importFile()" + unit);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

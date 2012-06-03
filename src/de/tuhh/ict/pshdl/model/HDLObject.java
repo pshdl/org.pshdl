@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLObject contains the following fields
@@ -42,6 +44,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 	public HDLClass getClassType() {
 		return HDLClass.HDLObject;
 	}
+
+	public static HDLFieldAccess<HDLObject, HDLObject> fContainer = new HDLFieldAccess<HDLObject, HDLObject>() {
+		@Override
+		public HDLObject getValue(HDLObject obj) {
+			if (obj == null)
+				return null;
+			return obj.getContainer();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 
@@ -143,6 +154,17 @@ public abstract class HDLObject extends AbstractHDLObject {
 			list = (List<T>) clazzTypes.get(clazz);
 		if (list == null)
 			return new LinkedList<T>();
+		return list;
+	}
+
+	public <T, K> List<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher matcher) {
+		List<T> list = getAllObjectsOf(clazz, true);
+		for (Iterator<T> iter = list.iterator(); iter.hasNext();) {
+			T t = iter.next();
+			K value = field.getValue(t);
+			if (!matcher.matches(value))
+				iter.remove();
+		}
 		return list;
 	}
 

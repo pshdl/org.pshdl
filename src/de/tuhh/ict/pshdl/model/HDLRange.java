@@ -5,6 +5,7 @@ import java.math.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLRange contains the following fields
@@ -53,6 +54,23 @@ public class HDLRange extends AbstractHDLRange {
 	public HDLClass getClassType() {
 		return HDLClass.HDLRange;
 	}
+
+	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLRange obj) {
+			if (obj == null)
+				return null;
+			return obj.getFrom();
+		}
+	};
+	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLRange obj) {
+			if (obj == null)
+				return null;
+			return obj.getTo();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	/**

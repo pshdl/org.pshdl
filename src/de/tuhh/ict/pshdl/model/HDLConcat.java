@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLConcat contains the following fields
@@ -49,6 +50,15 @@ public class HDLConcat extends AbstractHDLConcat {
 	public HDLClass getClassType() {
 		return HDLClass.HDLConcat;
 	}
+
+	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>() {
+		@Override
+		public ArrayList<HDLExpression> getValue(HDLConcat obj) {
+			if (obj == null)
+				return null;
+			return obj.getCats();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

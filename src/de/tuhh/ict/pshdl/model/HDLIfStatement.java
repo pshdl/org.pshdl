@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
@@ -57,6 +58,31 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	public HDLClass getClassType() {
 		return HDLClass.HDLIfStatement;
 	}
+
+	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLIfStatement obj) {
+			if (obj == null)
+				return null;
+			return obj.getIfExp();
+		}
+	};
+	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
+		@Override
+		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
+			if (obj == null)
+				return null;
+			return obj.getThenDo();
+		}
+	};
+	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
+		@Override
+		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
+			if (obj == null)
+				return null;
+			return obj.getElseDo();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	@Override

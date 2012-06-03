@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLEnumRef contains the following fields
@@ -50,6 +51,15 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	public HDLClass getClassType() {
 		return HDLClass.HDLEnumRef;
 	}
+
+	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLEnumRef obj) {
+			if (obj == null)
+				return null;
+			return obj.getHEnumRefName();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	@Override

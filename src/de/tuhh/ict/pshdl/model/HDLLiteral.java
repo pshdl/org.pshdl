@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.math.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLLiteral contains the following fields
@@ -46,6 +47,15 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	public HDLClass getClassType() {
 		return HDLClass.HDLLiteral;
 	}
+
+	public static HDLFieldAccess<HDLLiteral, String> fVal = new HDLFieldAccess<HDLLiteral, String>() {
+		@Override
+		public String getValue(HDLLiteral obj) {
+			if (obj == null)
+				return null;
+			return obj.getVal();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

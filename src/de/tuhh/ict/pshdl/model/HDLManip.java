@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLManip contains the following fields
@@ -58,6 +59,31 @@ public class HDLManip extends AbstractHDLManip {
 	public static enum HDLManipType {
 		CAST, ARITH_NEG, BIT_NEG, LOGIC_NEG;
 	}
+
+	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>() {
+		@Override
+		public HDLManipType getValue(HDLManip obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
+	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLManip obj) {
+			if (obj == null)
+				return null;
+			return obj.getTarget();
+		}
+	};
+	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>() {
+		@Override
+		public HDLType getValue(HDLManip obj) {
+			if (obj == null)
+				return null;
+			return obj.getCastTo();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

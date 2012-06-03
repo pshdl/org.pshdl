@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLAnnotation contains the following fields
@@ -49,6 +50,23 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	public HDLClass getClassType() {
 		return HDLClass.HDLAnnotation;
 	}
+
+	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>() {
+		@Override
+		public String getValue(HDLAnnotation obj) {
+			if (obj == null)
+				return null;
+			return obj.getName();
+		}
+	};
+	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>() {
+		@Override
+		public String getValue(HDLAnnotation obj) {
+			if (obj == null)
+				return null;
+			return obj.getValue();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

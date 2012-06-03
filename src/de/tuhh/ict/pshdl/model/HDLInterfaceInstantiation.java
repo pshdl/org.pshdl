@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLInterfaceInstantiation contains the following fields
@@ -63,6 +64,23 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceInstantiation;
 	}
+
+	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLInterfaceInstantiation obj) {
+			if (obj == null)
+				return null;
+			return obj.getHIfRefName();
+		}
+	};
+	public static HDLFieldAccess<HDLInterfaceInstantiation, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLInterfaceInstantiation, ArrayList<HDLExpression>>() {
+		@Override
+		public ArrayList<HDLExpression> getValue(HDLInterfaceInstantiation obj) {
+			if (obj == null)
+				return null;
+			return obj.getDimensions();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	@Override

@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLDirectGeneration contains the following fields
@@ -14,7 +15,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
  * <li>String generatorID. Can <b>not</b> be <code>null</code>.</li>
  * <li>String generatorContent. Can <b>not</b> be <code>null</code>.</li>
- * <li>boolean include. Can <b>not</b> be <code>null</code>.</li>
+ * <li>Boolean include. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
 public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
@@ -41,7 +42,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLDirectGeneration(HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLInterface hIf, String generatorID, String generatorContent,
-			boolean include, boolean validate) {
+			Boolean include, boolean validate) {
 		super(container, var, arguments, hIf, generatorID, generatorContent, include, validate);
 	}
 
@@ -66,7 +67,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 *            the value for include. Can <b>not</b> be <code>null</code>.
 	 */
 	public HDLDirectGeneration(HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLInterface hIf, String generatorID, String generatorContent,
-			boolean include) {
+			Boolean include) {
 		this(container, var, arguments, hIf, generatorID, generatorContent, include, true);
 	}
 
@@ -78,6 +79,39 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	public HDLClass getClassType() {
 		return HDLClass.HDLDirectGeneration;
 	}
+
+	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>() {
+		@Override
+		public HDLInterface getValue(HDLDirectGeneration obj) {
+			if (obj == null)
+				return null;
+			return obj.getHIf();
+		}
+	};
+	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>() {
+		@Override
+		public String getValue(HDLDirectGeneration obj) {
+			if (obj == null)
+				return null;
+			return obj.getGeneratorID();
+		}
+	};
+	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>() {
+		@Override
+		public String getValue(HDLDirectGeneration obj) {
+			if (obj == null)
+				return null;
+			return obj.getGeneratorContent();
+		}
+	};
+	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>() {
+		@Override
+		public Boolean getValue(HDLDirectGeneration obj) {
+			if (obj == null)
+				return null;
+			return obj.getInclude();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

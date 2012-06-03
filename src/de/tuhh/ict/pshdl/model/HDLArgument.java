@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLArgument contains the following fields
@@ -54,6 +55,31 @@ public class HDLArgument extends AbstractHDLArgument {
 	public HDLClass getClassType() {
 		return HDLClass.HDLArgument;
 	}
+
+	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>() {
+		@Override
+		public String getValue(HDLArgument obj) {
+			if (obj == null)
+				return null;
+			return obj.getName();
+		}
+	};
+	public static HDLFieldAccess<HDLArgument, String> fValue = new HDLFieldAccess<HDLArgument, String>() {
+		@Override
+		public String getValue(HDLArgument obj) {
+			if (obj == null)
+				return null;
+			return obj.getValue();
+		}
+	};
+	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLArgument obj) {
+			if (obj == null)
+				return null;
+			return obj.getExpression();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

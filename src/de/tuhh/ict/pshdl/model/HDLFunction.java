@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLFunction contains the following fields
@@ -51,6 +52,23 @@ public class HDLFunction extends AbstractHDLFunction {
 	public HDLClass getClassType() {
 		return HDLClass.HDLFunction;
 	}
+
+	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>() {
+		@Override
+		public String getValue(HDLFunction obj) {
+			if (obj == null)
+				return null;
+			return obj.getName();
+		}
+	};
+	public static HDLFieldAccess<HDLFunction, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunction, ArrayList<HDLExpression>>() {
+		@Override
+		public ArrayList<HDLExpression> getValue(HDLFunction obj) {
+			if (obj == null)
+				return null;
+			return obj.getParams();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

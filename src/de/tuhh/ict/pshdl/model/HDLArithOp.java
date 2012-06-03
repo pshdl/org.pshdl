@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLArithOp contains the following fields
@@ -77,6 +78,15 @@ public class HDLArithOp extends AbstractHDLArithOp {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>() {
+		@Override
+		public HDLArithOpType getValue(HDLArithOp obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

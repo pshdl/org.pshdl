@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLReference contains the following fields
@@ -45,6 +46,15 @@ public abstract class HDLReference extends AbstractHDLReference {
 	public HDLClass getClassType() {
 		return HDLClass.HDLReference;
 	}
+
+	public static HDLFieldAccess<HDLReference, HDLQualifiedName> fVar = new HDLFieldAccess<HDLReference, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLReference obj) {
+			if (obj == null)
+				return null;
+			return obj.getVarRefName();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

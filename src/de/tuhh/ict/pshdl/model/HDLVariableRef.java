@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLVariableRef contains the following fields
@@ -57,6 +58,23 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariableRef;
 	}
+
+	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>() {
+		@Override
+		public ArrayList<HDLExpression> getValue(HDLVariableRef obj) {
+			if (obj == null)
+				return null;
+			return obj.getArray();
+		}
+	};
+	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>() {
+		@Override
+		public ArrayList<HDLRange> getValue(HDLVariableRef obj) {
+			if (obj == null)
+				return null;
+			return obj.getBits();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

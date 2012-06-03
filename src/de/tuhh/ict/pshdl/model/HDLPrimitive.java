@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLPrimitive contains the following fields
@@ -80,6 +81,23 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLPrimitive, HDLPrimitiveType> fType = new HDLFieldAccess<HDLPrimitive, HDLPrimitiveType>() {
+		@Override
+		public HDLPrimitiveType getValue(HDLPrimitive obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
+	public static HDLFieldAccess<HDLPrimitive, HDLExpression> fWidth = new HDLFieldAccess<HDLPrimitive, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLPrimitive obj) {
+			if (obj == null)
+				return null;
+			return obj.getWidth();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

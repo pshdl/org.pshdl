@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLInterfaceRef contains the following fields
@@ -69,6 +70,23 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceRef;
 	}
+
+	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLInterfaceRef obj) {
+			if (obj == null)
+				return null;
+			return obj.getHIfRefName();
+		}
+	};
+	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>() {
+		@Override
+		public ArrayList<HDLExpression> getValue(HDLInterfaceRef obj) {
+			if (obj == null)
+				return null;
+			return obj.getIfArray();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

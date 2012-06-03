@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
@@ -52,6 +53,23 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	public HDLClass getClassType() {
 		return HDLClass.HDLSwitchCaseStatement;
 	}
+
+	public static HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression> fLabel = new HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLSwitchCaseStatement obj) {
+			if (obj == null)
+				return null;
+			return obj.getLabel();
+		}
+	};
+	public static HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>>() {
+		@Override
+		public ArrayList<HDLStatement> getValue(HDLSwitchCaseStatement obj) {
+			if (obj == null)
+				return null;
+			return obj.getDos();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	@Override

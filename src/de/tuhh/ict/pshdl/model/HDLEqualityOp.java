@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLEqualityOp contains the following fields
@@ -77,6 +78,15 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType> fType = new HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType>() {
+		@Override
+		public HDLEqualityOpType getValue(HDLEqualityOp obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

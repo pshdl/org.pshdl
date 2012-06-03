@@ -5,6 +5,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLUnit contains the following fields
@@ -63,6 +64,39 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 	public HDLClass getClassType() {
 		return HDLClass.HDLUnit;
 	}
+
+	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>() {
+		@Override
+		public String getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getLibURI();
+		}
+	};
+	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>() {
+		@Override
+		public String getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getName();
+		}
+	};
+	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>() {
+		@Override
+		public ArrayList<String> getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getImports();
+		}
+	};
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>() {
+		@Override
+		public ArrayList<HDLStatement> getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getStatements();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	private HDLInterface unitIF = null;

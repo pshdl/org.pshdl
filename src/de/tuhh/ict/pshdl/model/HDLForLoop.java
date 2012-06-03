@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
@@ -64,6 +65,31 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	public HDLClass getClassType() {
 		return HDLClass.HDLForLoop;
 	}
+
+	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>() {
+		@Override
+		public ArrayList<HDLRange> getValue(HDLForLoop obj) {
+			if (obj == null)
+				return null;
+			return obj.getRange();
+		}
+	};
+	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>() {
+		@Override
+		public HDLVariable getValue(HDLForLoop obj) {
+			if (obj == null)
+				return null;
+			return obj.getParam();
+		}
+	};
+	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>() {
+		@Override
+		public ArrayList<HDLStatement> getValue(HDLForLoop obj) {
+			if (obj == null)
+				return null;
+			return obj.getDos();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

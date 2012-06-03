@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLAssignment contains the following fields
@@ -83,6 +84,31 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>() {
+		@Override
+		public HDLReference getValue(HDLAssignment obj) {
+			if (obj == null)
+				return null;
+			return obj.getLeft();
+		}
+	};
+	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>() {
+		@Override
+		public HDLAssignmentType getValue(HDLAssignment obj) {
+			if (obj == null)
+				return null;
+			return obj.getType();
+		}
+	};
+	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLAssignment obj) {
+			if (obj == null)
+				return null;
+			return obj.getRight();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	@Override

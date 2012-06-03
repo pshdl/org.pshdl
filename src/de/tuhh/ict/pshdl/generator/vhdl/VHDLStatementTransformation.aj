@@ -137,7 +137,6 @@ public aspect VHDLStatementTransformation {
 					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray);
 					initLoop.setContainer(this);
 					VHDLContext vhdl = initLoop.toVHDL();
-					System.out.println("VHDLStatementTransformation.HDLVariableDeclaration.toVHDL()" + vhdl);
 					res.addResetValue(getRegister(), vhdl.getStatement());
 				}
 				Signal s = new Signal(var.getName(), varType);

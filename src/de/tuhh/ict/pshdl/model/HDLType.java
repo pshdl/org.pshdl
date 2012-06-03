@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLType contains the following fields
@@ -45,6 +46,15 @@ public abstract class HDLType extends AbstractHDLType {
 	public HDLClass getClassType() {
 		return HDLClass.HDLType;
 	}
+
+	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>() {
+		@Override
+		public String getValue(HDLType obj) {
+			if (obj == null)
+				return null;
+			return obj.getName();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 	public HDLQualifiedName asRef() {

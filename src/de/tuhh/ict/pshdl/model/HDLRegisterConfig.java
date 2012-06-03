@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLRegisterConfig contains the following fields
@@ -95,6 +96,55 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static enum HDLRegSyncType {
 		SYNC, ASYNC;
 	}
+
+	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getClkRefName();
+		}
+	};
+	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getRstRefName();
+		}
+	};
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegClockType> fClockType = new HDLFieldAccess<HDLRegisterConfig, HDLRegClockType>() {
+		@Override
+		public HDLRegClockType getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getClockType();
+		}
+	};
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetType>() {
+		@Override
+		public HDLRegResetType getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getResetType();
+		}
+	};
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType> fSyncType = new HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType>() {
+		@Override
+		public HDLRegSyncType getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getSyncType();
+		}
+	};
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fResetValue = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>() {
+		@Override
+		public HDLExpression getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getResetValue();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 

@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLVariableDeclaration contains the following fields
@@ -103,6 +104,55 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return str;
 		}
 	}
+
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig> fRegister = new HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig>() {
+		@Override
+		public HDLRegisterConfig getValue(HDLVariableDeclaration obj) {
+			if (obj == null)
+				return null;
+			return obj.getRegister();
+		}
+	};
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLDirection> fDirection = new HDLFieldAccess<HDLVariableDeclaration, HDLDirection>() {
+		@Override
+		public HDLDirection getValue(HDLVariableDeclaration obj) {
+			if (obj == null)
+				return null;
+			return obj.getDirection();
+		}
+	};
+	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>>() {
+		@Override
+		public ArrayList<HDLAnnotation> getValue(HDLVariableDeclaration obj) {
+			if (obj == null)
+				return null;
+			return obj.getAnnotations();
+		}
+	};
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName> fType = new HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName>() {
+		@Override
+		public HDLQualifiedName getValue(HDLVariableDeclaration obj) {
+			if (obj == null)
+				return null;
+			return obj.getTypeRefName();
+		}
+	};
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive> fPrimitive = new HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive>() {
+		@Override
+		public HDLPrimitive getValue(HDLVariableDeclaration obj) {
+			if (obj == null)
+				return null;
+			return obj.getPrimitive();
+		}
+	};
+	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>() {
+		@Override
+		public ArrayList<HDLVariable> getValue(HDLVariableDeclaration obj) {
+			if (obj == null)
+				return null;
+			return obj.getVariables();
+		}
+	};
 
 	// $CONTENT-BEGIN$
 
