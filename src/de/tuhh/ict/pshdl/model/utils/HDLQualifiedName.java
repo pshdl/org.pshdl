@@ -81,6 +81,13 @@ public class HDLQualifiedName {
 		return sb.toString();
 	}
 
+	/**
+	 * Generates a new HDLQualifiedName with the name appended
+	 * 
+	 * @param name
+	 *            the segment to append
+	 * @return a new HDLQualifiedName instance
+	 */
 	public HDLQualifiedName append(String name) {
 		int len = length + 1;
 		String[] newQfn = new String[len];

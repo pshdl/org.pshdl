@@ -54,6 +54,26 @@ public class HDLLibrary {
 				types.put(append, hdlEnum);
 			}
 		}
+		for (HDLDeclaration decl : pkg.getDeclarations()) {
+			switch (decl.getClassType()) {
+			case HDLEnumDeclaration:
+				HDLEnumDeclaration ed = (HDLEnumDeclaration) decl;
+				HDLEnum hdlEnum = ed.getHEnum();
+				HDLQualifiedName append = hdlPkg.append(hdlEnum.getName());
+				System.out.println("HDLLibrary.addPkg() Enum:" + append);
+				types.put(append, hdlEnum);
+				break;
+			case HDLInterfaceDeclaration:
+				HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) decl;
+				HDLInterface hdlInterface = hid.getHIf();
+				HDLQualifiedName newIFname = hdlPkg.append(hdlInterface.getName());
+				System.out.println("HDLLibrary.addPkg() Interface:" + newIFname);
+				types.put(newIFname, hdlInterface);
+				break;
+			default:
+				throw new IllegalArgumentException("Did not handle:" + decl);
+			}
+		}
 	}
 
 	public HDLType resolve(String name, ArrayList<String> imports, HDLQualifiedName type) {

@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String pkg. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLUnit> units. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLDeclaration> declarations. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLPackage extends AbstractHDLPackage {
@@ -26,11 +27,13 @@ public class HDLPackage extends AbstractHDLPackage {
 	 *            the value for pkg. Can be <code>null</code>.
 	 * @param units
 	 *            the value for units. Can be <code>null</code>.
+	 * @param declarations
+	 *            the value for declarations. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPackage(HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, boolean validate) {
-		super(container, libURI, pkg, units, validate);
+	public HDLPackage(HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations, boolean validate) {
+		super(container, libURI, pkg, units, declarations, validate);
 	}
 
 	/**
@@ -44,9 +47,11 @@ public class HDLPackage extends AbstractHDLPackage {
 	 *            the value for pkg. Can be <code>null</code>.
 	 * @param units
 	 *            the value for units. Can be <code>null</code>.
+	 * @param declarations
+	 *            the value for declarations. Can be <code>null</code>.
 	 */
-	public HDLPackage(HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units) {
-		this(container, libURI, pkg, units, true);
+	public HDLPackage(HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations) {
+		this(container, libURI, pkg, units, declarations, true);
 	}
 
 	public HDLPackage() {
@@ -80,6 +85,14 @@ public class HDLPackage extends AbstractHDLPackage {
 			if (obj == null)
 				return null;
 			return obj.getUnits();
+		}
+	};
+	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>() {
+		@Override
+		public ArrayList<HDLDeclaration> getValue(HDLPackage obj) {
+			if (obj == null)
+				return null;
+			return obj.getDeclarations();
 		}
 	};
 

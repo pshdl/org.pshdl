@@ -36,7 +36,7 @@ public class VHDLImporter {
 				if (unit instanceof Entity) {
 					Entity entity = (Entity) unit;
 					String id = entity.getIdentifier();
-					HDLInterface vInterface = new HDLInterface().setName(id);
+					HDLInterface vInterface = new HDLInterface().setName("VHDL.work." + id);
 					List<VhdlObjectProvider<Signal>> ports = entity.getPort();
 					for (VhdlObjectProvider<Signal> port : ports) {
 						List<Signal> signals = port.getVhdlObjects();
@@ -48,7 +48,7 @@ public class VHDLImporter {
 						}
 					}
 					res.add(vInterface);
-					// lib.addInterface(vInterface);
+					lib.addInterface(vInterface);
 				}
 				workScope.getFiles().add(file);
 				// System.out.println("VHDLImporter.importFile()" + unit);
@@ -76,17 +76,17 @@ public class VHDLImporter {
 			return getVariable(isi.getBaseType(), direction, qfn, convertRange(dr));
 		}
 		if (StdLogic1164.STD_LOGIC.equals(left))
-			return createVar(direction, HDLPrimitiveType.BIT, qfn, null);
+			return createVar(direction, HDLPrimitiveType.BIT, qfn, width);
 		if (StdLogic1164.STD_LOGIC_VECTOR.equals(left))
-			return createVar(direction, HDLPrimitiveType.BITVECTOR, qfn, null);
+			return createVar(direction, HDLPrimitiveType.BITVECTOR, qfn, width);
 		if (NumericStd.SIGNED.equals(left))
-			return createVar(direction, HDLPrimitiveType.INT, qfn, null);
+			return createVar(direction, HDLPrimitiveType.INT, qfn, width);
 		if (NumericStd.UNSIGNED.equals(left))
-			return createVar(direction, HDLPrimitiveType.UINT, qfn, null);
+			return createVar(direction, HDLPrimitiveType.UINT, qfn, width);
 		if (Standard.INTEGER.equals(left))
-			return createVar(direction, HDLPrimitiveType.INTEGER, qfn, null);
+			return createVar(direction, HDLPrimitiveType.INTEGER, qfn, width);
 		if (Standard.NATURAL.equals(left))
-			return createVar(direction, HDLPrimitiveType.NATURAL, qfn, null);
+			return createVar(direction, HDLPrimitiveType.NATURAL, qfn, width);
 		if (left instanceof ConstrainedArray) {
 			ConstrainedArray ca = (ConstrainedArray) left;
 			@SuppressWarnings("rawtypes")

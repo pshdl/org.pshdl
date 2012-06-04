@@ -76,7 +76,4 @@ public class HDLQuery {
 		return new Source<T>(clazz);
 	}
 
-	public void test(HDLObject obj) {
-		selectAll(HDLVariable.class).from(obj).where(HDLVariable.name).isEqualTo("Test");
-	}
 }
