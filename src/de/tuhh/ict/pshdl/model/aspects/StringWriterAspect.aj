@@ -271,7 +271,7 @@ public aspect StringWriterAspect {
 			sb.append(var).append('\n');
 		}
 		decSpacing();
-		sb.append("};\n");
+		sb.append("}\n");
 		return sb.toString();
 	}
 
@@ -293,7 +293,7 @@ public aspect StringWriterAspect {
 			sb.append(spacer).append(henum);
 			spacer = ", ";
 		}
-		sb.append("};");
+		sb.append("}");
 		return sb.toString();
 	}
 
@@ -349,6 +349,9 @@ public aspect StringWriterAspect {
 		StringBuilder sb=new StringBuilder();
 		if (getPkg()!=null)
 		sb.append("package ").append(getPkg()).append(";\n");
+		for (HDLDeclaration decl : getDeclarations()) {
+			sb.append(decl);
+		}
 		for (HDLUnit unit : getUnits()) {
 			sb.append(unit);
 		}
@@ -357,13 +360,16 @@ public aspect StringWriterAspect {
 	
 	public String HDLUnit.toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("module ").append(getName()).append(";\n");
+		sb.append("module ").append(getName()).append("{\n");
+		incSpacing();
 		for (String imports : getImports()) {
 			sb.append("import ").append(imports).append(";\n");
 		}
 		for (HDLStatement stmnt : getStatements()) {
 			sb.append(stmnt).append('\n');
 		}
+		decSpacing();
+		sb.append("}\n");
 		return sb.toString();
 
 	}

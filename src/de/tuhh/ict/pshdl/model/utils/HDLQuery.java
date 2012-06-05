@@ -9,11 +9,11 @@ public class HDLQuery {
 		public abstract K getValue(T obj);
 	}
 
-	public static interface FieldMatcher {
-		boolean matches(Object obj);
+	public static interface FieldMatcher<T> {
+		boolean matches(T obj);
 	}
 
-	private static class EqualsMatcher implements FieldMatcher {
+	private static class EqualsMatcher<T> implements FieldMatcher<T> {
 		private final Object equalsTo;
 
 		public EqualsMatcher(Object equalsTo) {
@@ -25,6 +25,37 @@ public class HDLQuery {
 			if (equalsTo == null)
 				return obj == null ? true : false;
 			return equalsTo.equals(obj);
+		}
+	}
+
+	private static class StartsWithMatcher<K> implements FieldMatcher<K> {
+		private final K equalsTo;
+
+		public StartsWithMatcher(K equalsTo) {
+			this.equalsTo = equalsTo;
+		}
+
+		@Override
+		public boolean matches(K obj) {
+			if (obj == null)
+				return false;
+			return obj.toString().startsWith(equalsTo.toString());
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static class LastSegmentMatcher implements FieldMatcher {
+		private final String equalsTo;
+
+		public LastSegmentMatcher(String equalsTo) {
+			this.equalsTo = equalsTo;
+		}
+
+		@Override
+		public boolean matches(Object obj) {
+			if (obj == null)
+				return false;
+			return new HDLQualifiedName(obj.toString()).getLastSegment().equals(equalsTo);
 		}
 	}
 
@@ -40,7 +71,16 @@ public class HDLQuery {
 		}
 
 		public List<T> isEqualTo(K value) {
-			return from.getAllObjectsOf(clazz, field, new EqualsMatcher(value));
+			return from.getAllObjectsOf(clazz, field, new EqualsMatcher<K>(value));
+		}
+
+		public List<T> startsWith(K ifRef) {
+			return from.getAllObjectsOf(clazz, field, new StartsWithMatcher<K>(ifRef));
+		}
+
+		@SuppressWarnings("unchecked")
+		public List<T> lastSegmentIs(String lastSegment) {
+			return from.getAllObjectsOf(clazz, field, new LastSegmentMatcher(lastSegment));
 		}
 
 	}
@@ -55,8 +95,9 @@ public class HDLQuery {
 			this.from = obj;
 		}
 
-		public <K> FieldSelector<T, K> where(HDLFieldAccess<T, K> field) {
-			return new FieldSelector<T, K>(clazz, from, field);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		public <K> FieldSelector<T, K> where(HDLFieldAccess<? super T, K> field) {
+			return new FieldSelector(clazz, from, field);
 		}
 	}
 

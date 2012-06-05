@@ -37,7 +37,7 @@ public class HDLLibrary {
 				if (name.equals(uq))
 					it.remove();
 			}
-			units.add(unit);
+			units.add(unit.setName(uq.getLastSegment()));
 			hdlPackage = hdlPackage.setUnits(units);
 			pkgs.put(skipLast, hdlPackage);
 			types.put(uq, unit.asInterface());

@@ -165,10 +165,11 @@ public class ModificationSet {
 		replacements.put(getHash(subject), list);
 	}
 
-	public HDLPackage apply(HDLPackage orig) {
+	@SuppressWarnings("unchecked")
+	public <T extends HDLObject> T apply(T orig) {
 		if (replacements.size() == 0)
 			return orig;
-		return orig.copyFiltered(new MSCopyFilter());
+		return (T) orig.copyFiltered(new MSCopyFilter());
 	}
 
 }

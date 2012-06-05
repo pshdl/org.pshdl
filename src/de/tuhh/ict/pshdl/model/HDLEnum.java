@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -66,12 +67,30 @@ public class HDLEnum extends AbstractHDLEnum {
 	};
 
 	// $CONTENT-BEGIN$
+
+	@Override
+	public HDLVariable resolveVariable(HDLQualifiedName var) {
+		if (var.length == 1) {
+			return getVariable(var.getLastSegment());
+		}
+		if (getFullName().equals(var.skipLast(1)))
+			return getVariable(var.getLastSegment());
+		return super.resolveVariable(var);
+	}
+
 	public HDLVariable getVariable(String lastSegment) {
 		for (HDLVariable var : getEnums()) {
 			if (var.getName().equals(lastSegment))
 				return var;
 		}
 		return null;
+	}
+
+	@Override
+	public HDLQualifiedName getFullName() {
+		if (container != null)
+			return container.getFullName().append(asRef());
+		return asRef();
 	}
 	// $CONTENT-END$
 

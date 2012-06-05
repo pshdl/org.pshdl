@@ -33,7 +33,7 @@ public aspect TypeInference {
 			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) container;
 			return hii.resolveHIf();
 		}
-		throw new IllegalArgumentException("Failed to resolve type of "+this+" caused by an unexpected container"+container);
+		throw new IllegalArgumentException("Failed to resolve type of "+this+" caused by an unexpected container: "+container);
 	}
 	
 	public HDLType HDLVariableDeclaration.determineType(){

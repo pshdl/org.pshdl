@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model.utils;
 import java.util.*;
 
 public class HDLQualifiedName {
+	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
 	private final String[] qfn;
 	public final int length;
 

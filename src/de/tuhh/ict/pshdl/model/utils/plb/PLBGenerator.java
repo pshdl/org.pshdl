@@ -10,11 +10,12 @@ public class PLBGenerator implements IHDLGenerator {
 
 	@Override
 	public HDLInterface getInterface(HDLDirectGeneration hdl) {
-		HDLInterface hIf = new HDLInterface().setName(hdl.getIfName().toString());
+		HDLInterface hIf = new HDLInterface().setName(hdl.getFullName().append(hdl.getIfName()).toString());
 		HDLExpression regCount = getRegCountLiteral(hdl);
 		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(32)));
 		hvd = hvd.setDirection(HDLDirection.INOUT).addVariables(new HDLVariable().setName("regs").addDimensions(regCount));
 		hIf = hIf.addPorts(hvd);
+		hIf.setContainer(hdl);
 		// System.out.println("PLBGenerator.getInterface()" + hIf);
 		return hIf;
 	}
@@ -24,7 +25,7 @@ public class PLBGenerator implements IHDLGenerator {
 		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
 				if (arg.getExpression() != null) {
-					return arg.getExpression();
+					return arg.getExpression().copyFiltered(CopyFilter.DEEP);
 				}
 				return HDLLiteral.get(Integer.parseInt(arg.getValue()));
 			}

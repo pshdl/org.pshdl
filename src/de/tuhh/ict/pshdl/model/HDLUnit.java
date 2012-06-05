@@ -104,23 +104,60 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 	public HDLInterface asInterface() {
 		if (unitIF != null)
 			return unitIF;
-		unitIF = new HDLInterface().setName(getName());
-		List<HDLVariableDeclaration> declarations = HDLResolver.getallVariableDeclarations(getStatements());
-		for (HDLVariableDeclaration hdlVariableDeclaration : declarations) {
-			switch (hdlVariableDeclaration.getDirection()) {
+		HDLQualifiedName fullName = getFullName();
+		unitIF = new HDLInterface().setName(fullName.toString());
+		List<HDLVariableDeclaration> declarations = getAllObjectsOf(HDLVariableDeclaration.class, true);
+		HDLVariable clk = null, rst = null;
+		boolean hasReg = false;
+		for (HDLVariableDeclaration hvd : declarations) {
+			switch (hvd.getDirection()) {
+			case PARAMETER:
+			case CONSTANT:
 			case IN:
 			case INOUT:
 			case OUT:
-				unitIF = unitIF.addPorts(hdlVariableDeclaration.copyFiltered(CopyFilter.DEEP));
+				unitIF = unitIF.addPorts(hvd.copyFiltered(new QualifiyingFilter(fullName)));
 				break;
 			default:
 				break;
 			}
-			// TODO Add annotations and deeper Declarations
-			// TODO add clk/rst;
+			for (HDLAnnotation hdla : hvd.getAnnotations()) {
+				if ("@clock".equalsIgnoreCase(hdla.getName())) {
+					clk = hvd.getVariables().get(0);
+				}
+				if ("@reset".equalsIgnoreCase(hdla.getName())) {
+					rst = hvd.getVariables().get(0);
+				}
+			}
+			if (hvd.getRegister() != null)
+				hasReg = true;
+		}
+		if (hasReg) {
+			if ((clk == null) && (rst == null)) {
+				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
+						.addVariables(new HDLVariable().setName("clk"))//
+						.addVariables(new HDLVariable().setName("rst")));
+			}
 		}
 		unitIF.setContainer(this);
-		return unitIF;
+		ModificationSet ms = new ModificationSet();
+		List<HDLVariableRef> refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : refs) {
+			ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
+		}
+		return ms.apply(unitIF);
+	}
+
+	@Override
+	public HDLQualifiedName getFullName() {
+		HDLQualifiedName unitName = new HDLQualifiedName(getName());
+		if (getContainer() != null) {
+			HDLPackage p = (HDLPackage) getContainer();
+			if (p.getPkg() != null) {
+				return new HDLQualifiedName(p.getPkg()).append(unitName);
+			}
+		}
+		return unitName;
 	}
 
 	private HDLResolver resolver = new HDLResolver(this, false);

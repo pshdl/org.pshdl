@@ -1,6 +1,5 @@
 package de.tuhh.ict.pshdl.model.utils;
 
-import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -37,7 +36,7 @@ public class Insulin {
 	}
 
 	/**
-	 * Checks for HDLDirectGenerations and calls the generators. If the are
+	 * Checks for HDLDirectGenerations and calls the generators. If they are
 	 * includes, it will be included and the references resolved
 	 * 
 	 * @param apply
@@ -50,13 +49,15 @@ public class Insulin {
 			HDLGenerationInfo generationInfo = HDLGenerators.getImplementation(generation);
 			if (generationInfo.include) {
 				HDLQualifiedName ifRef = generation.getHIf().asRef();
+				HDLQualifiedName fullName = generation.getFullName();
 				System.out.println("Insulin.includeGenerators()" + generationInfo.unit);
 				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
 				ms.replace(generation, stmnts);
 				List<HDLInterfaceRef> ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
 				for (HDLInterfaceRef hdI : ifRefs) {
 					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
-						ms.replace(hdI, new HDLVariableRef(null, hdI.getVarRefName(), hdI.getArray(), hdI.getBits()));
+						HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
+						ms.replace(hdI, new HDLVariableRef(null, newName, hdI.getArray(), hdI.getBits()));
 					}
 				}
 			}

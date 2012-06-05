@@ -147,17 +147,17 @@ public abstract class HDLObject extends AbstractHDLObject {
 				}
 			}
 		}
-		List<T> list;
+		LinkedList<T> list;
 		if (deep) {
-			list = (List<T>) deepClazzTypes.get(clazz);
+			list = (LinkedList<T>) deepClazzTypes.get(clazz);
 		} else
-			list = (List<T>) clazzTypes.get(clazz);
+			list = (LinkedList<T>) clazzTypes.get(clazz);
 		if (list == null)
 			return new LinkedList<T>();
-		return list;
+		return (List<T>) list.clone();
 	}
 
-	public <T, K> List<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher matcher) {
+	public <T, K> List<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
 		List<T> list = getAllObjectsOf(clazz, true);
 		for (Iterator<T> iter = list.iterator(); iter.hasNext();) {
 			T t = iter.next();
@@ -183,6 +183,12 @@ public abstract class HDLObject extends AbstractHDLObject {
 			list = new LinkedList<HDLObject>();
 		list.add(c);
 		ct.put(clazz, list);
+	}
+
+	public HDLQualifiedName getFullName() {
+		if (container != null)
+			return container.getFullName();
+		return HDLQualifiedName.EMPTY;
 	}
 
 	// $CONTENT-END$

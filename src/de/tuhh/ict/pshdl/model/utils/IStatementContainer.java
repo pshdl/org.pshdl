@@ -14,4 +14,6 @@ public interface IStatementContainer {
 	public HDLObject getContainer();
 
 	public <T> List<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep);
+
+	public HDLQualifiedName getFullName();
 }
