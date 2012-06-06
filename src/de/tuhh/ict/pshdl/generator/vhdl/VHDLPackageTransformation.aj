@@ -27,20 +27,20 @@ public aspect VHDLPackageTransformation {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<LibraryUnit> HDLUnit.toVHDL() {
 		List<LibraryUnit> res = new LinkedList<LibraryUnit>();
-		addDefaultLibs(res);
 		HDLQualifiedName entityName = new HDLQualifiedName(getName());
 		Entity e = new Entity(entityName.getLastSegment());
 		VHDLContext unit = new VHDLContext();
 		for (HDLStatement stmnt : getStatements()) {
 			unit.merge(stmnt.toVHDL());
 		}
+		addDefaultLibs(res, unit);
 		if (unit.hasExternalTypes()) {
 			String libName = entityName.getLastSegment() + "Pkg";
 			PackageDeclaration pd = new PackageDeclaration(libName);
 			pd.getDeclarations().addAll((List) unit.externalTypes);
 			res.add(pd);
 			res.add(new UseClause("work." + libName + ".all"));
-			addDefaultLibs(res);
+			addDefaultLibs(res, unit);
 		}
 		// System.out.println("VHDLPackageTransformation.HDLUnit.toVHDL()"+unit);
 		e.getPort().addAll((List) unit.ports);
@@ -66,13 +66,16 @@ public aspect VHDLPackageTransformation {
 		return res;
 	}
 
-	private static void addDefaultLibs(List<LibraryUnit> res) {
+	private static void addDefaultLibs(List<LibraryUnit> res, VHDLContext unit) {
 		res.add(new LibraryClause("ieee"));
 		res.add(StdLogic1164.USE_CLAUSE);
 		res.add(NumericStd.USE_CLAUSE);
 		res.add(new LibraryClause("pshdl"));
 		res.add(VHDLCastsLibrary.USE_CLAUSE);
 		res.add(VHDLShiftLibrary.USE_CLAUSE);
+		for (HDLQualifiedName i : unit.imports) {
+			res.add(new UseClause(i.append("all").toString()));
+		}
 	}
 
 	private static EnumSet<HDLDirection> notSensitive = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.PARAMETER, HDLDirection.CONSTANT);

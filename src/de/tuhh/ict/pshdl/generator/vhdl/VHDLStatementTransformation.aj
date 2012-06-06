@@ -54,12 +54,14 @@ public aspect VHDLStatementTransformation {
 		HDLInterface hIf = resolveHIf();
 		String ifName = getVar().getName();
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
-		Entity entity = new Entity("work." + hIf.asRef().getLastSegment());
+		HDLQualifiedName asRef = hIf.asRef();
+		Entity entity = new Entity("work." + asRef.getLastSegment());
 
 		EntityInstantiation instantiation = new EntityInstantiation(ifName, entity);
 		List<AssociationElement> portMap = instantiation.getPortMap();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
+				List<HDLAnnotation> typeAnno = HDLQuery.selectAll(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString());
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
 					HDLVariableRef ref = sigVar.asHDLRef();
@@ -69,8 +71,20 @@ public aspect VHDLStatementTransformation {
 					for (HDLExpression exp : getDimensions()) {
 						sigVar = sigVar.addDimensions(exp.copy());
 					}
-					HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
-					res.merge(newHVD.setContainer(this).toVHDL());
+					if (var.getDimensions().size() != 0) {
+						if (typeAnno.isEmpty()) {
+							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(var.getName()+"_array");
+							res.addImport(name);
+							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLAnnotations.VHDLType.create(name.toString()))));
+							res.merge(newHVD.setContainer(this).toVHDL());
+						} else {
+							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null)));
+							res.merge(newHVD.setContainer(this).toVHDL());
+						}
+					} else {
+						HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
+						res.merge(newHVD.setContainer(this).toVHDL());
+					}
 					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
 				}
 			}
@@ -99,18 +113,25 @@ public aspect VHDLStatementTransformation {
 		HDLPrimitive primitive = getPrimitive();
 		SubtypeIndication type = null;
 		HDLExpression resetValue = null;
-		if (primitive != null) {
-			type = VHDLCastsLibrary.getType(primitive);
-			if (getRegister() != null) {
-				resetValue = getRegister().getResetValue();
-			}
+		List<HDLAnnotation> typeAnno = HDLQuery.selectAll(HDLAnnotation.class).from(this).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString());
+		if (!typeAnno.isEmpty()) {
+			HDLQualifiedName value = new HDLQualifiedName(typeAnno.get(0).getValue());
+			res.addImport(value);
+			type = new EnumerationType(value.getLastSegment());
 		} else {
-			HDLType hType = resolveType();
-			if (hType instanceof HDLEnum) {
-				HDLEnum hEnum = (HDLEnum) hType;
-				type = new EnumerationType(hEnum.getName());
-				resetValue = new HDLEnumRef().setHEnum(hEnum.asRef()).setVar(hEnum.getEnums().get(0).asRef());
-				resetValue.setContainer(this);
+			if (primitive != null) {
+				type = VHDLCastsLibrary.getType(primitive);
+				if (getRegister() != null) {
+					resetValue = getRegister().getResetValue();
+				}
+			} else {
+				HDLType hType = resolveType();
+				if (hType instanceof HDLEnum) {
+					HDLEnum hEnum = (HDLEnum) hType;
+					type = new EnumerationType(hEnum.getName());
+					resetValue = new HDLEnumRef().setHEnum(hEnum.asRef()).setVar(hEnum.getEnums().get(0).asRef());
+					resetValue.setContainer(this);
+				}
 			}
 		}
 		if (type != null) {

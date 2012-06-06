@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.concurrent.*;
 import de.upb.hni.vmagic.declaration.*;
@@ -24,6 +25,7 @@ public class VHDLContext {
 	public LinkedList<ObjectDeclaration<?>> internals = new LinkedList<ObjectDeclaration<?>>();
 	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
 	public LinkedList<BlockDeclarativeItem> externalTypes = new LinkedList<BlockDeclarativeItem>();
+	public Set<HDLQualifiedName> imports = new HashSet<HDLQualifiedName>();
 
 	public void addClockedStatement(HDLRegisterConfig config, SequentialStatement sa) {
 		LinkedList<SequentialStatement> list = clockedStatements.get(config);
@@ -49,6 +51,7 @@ public class VHDLContext {
 		internals.addAll(vhdl.internals);
 		internalTypes.addAll(vhdl.internalTypes);
 		externalTypes.addAll(vhdl.externalTypes);
+		imports.addAll(vhdl.imports);
 		mergeListMap(vhdl, vhdl.clockedStatements, clockedStatements);
 		mergeListMap(vhdl, vhdl.resetStatements, resetStatements);
 	}
@@ -143,6 +146,10 @@ public class VHDLContext {
 
 	public void addConcurrentStatement(ConcurrentStatement stmnt) {
 		concurrentStatements.add(stmnt);
+	}
+
+	public void addImport(HDLQualifiedName value) {
+		imports.add(value.skipLast(1));
 	}
 
 }

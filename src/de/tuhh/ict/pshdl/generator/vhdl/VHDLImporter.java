@@ -93,7 +93,7 @@ public class VHDLImporter {
 			List<DiscreteRange> ranges = ca.getIndexRanges();
 			workScope.getScope().resolve(ca.getIdentifier());
 			HDLVariableDeclaration var = getVariable(ca.getElementType(), direction, qfn, convertRange((Range) ranges.get(0)));
-			var = var.addAnnotations(new HDLAnnotation().setName("@VHDLType").setValue(getFullName(ca.getIdentifier())));
+			var = var.addAnnotations(new HDLAnnotation().setName(HDLAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier())));
 			return var;
 		}
 		throw new IllegalArgumentException("Unexpected Type:" + left);

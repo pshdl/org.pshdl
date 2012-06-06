@@ -116,16 +116,16 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 			case IN:
 			case INOUT:
 			case OUT:
-				unitIF = unitIF.addPorts(hvd.copyFiltered(new QualifiyingFilter(fullName)));
+				unitIF = unitIF.addPorts(hvd.copyFiltered(CopyFilter.DEEP));
 				break;
 			default:
 				break;
 			}
 			for (HDLAnnotation hdla : hvd.getAnnotations()) {
-				if ("@clock".equalsIgnoreCase(hdla.getName())) {
+				if (HDLAnnotations.clock.is(hdla)) {
 					clk = hvd.getVariables().get(0);
 				}
-				if ("@reset".equalsIgnoreCase(hdla.getName())) {
+				if (HDLAnnotations.reset.is(hdla)) {
 					rst = hvd.getVariables().get(0);
 				}
 			}
@@ -213,8 +213,8 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 		List<HDLVariableDeclaration> res = HDLResolver.getallVariableDeclarations(statements);
 		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).setDirection(HDLDirection.IN);
 		hvd.setContainer(this);
-		res.add(hvd.addVariables(new HDLVariable(null, "$clk", null, null)));
-		res.add(hvd.addVariables(new HDLVariable(null, "$rst", null, null)));
+		res.add(hvd.addVariables(new HDLVariable(null, "$clk", null, null, null)));
+		res.add(hvd.addVariables(new HDLVariable(null, "$rst", null, null, null)));
 		return res;
 	}
 

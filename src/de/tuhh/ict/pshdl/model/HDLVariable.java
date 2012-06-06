@@ -13,6 +13,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
  * <li>HDLExpression defaultValue. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLVariable extends AbstractHDLVariable {
@@ -27,11 +28,13 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *            the value for dimensions. Can be <code>null</code>.
 	 * @param defaultValue
 	 *            the value for defaultValue. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, boolean validate) {
-		super(container, name, dimensions, defaultValue, validate);
+	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations, boolean validate) {
+		super(container, name, dimensions, defaultValue, annotations, validate);
 	}
 
 	/**
@@ -45,9 +48,11 @@ public class HDLVariable extends AbstractHDLVariable {
 	 *            the value for dimensions. Can be <code>null</code>.
 	 * @param defaultValue
 	 *            the value for defaultValue. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue) {
-		this(container, name, dimensions, defaultValue, true);
+	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations) {
+		this(container, name, dimensions, defaultValue, annotations, true);
 	}
 
 	public HDLVariable() {
@@ -81,6 +86,14 @@ public class HDLVariable extends AbstractHDLVariable {
 			if (obj == null)
 				return null;
 			return obj.getDefaultValue();
+		}
+	};
+	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>() {
+		@Override
+		public ArrayList<HDLAnnotation> getValue(HDLVariable obj) {
+			if (obj == null)
+				return null;
+			return obj.getAnnotations();
 		}
 	};
 
