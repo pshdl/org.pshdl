@@ -17,6 +17,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param caseExp
@@ -26,8 +28,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSwitchStatement(HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
-		super(container, caseExp, cases, validate);
+	public HDLSwitchStatement(int containerID, HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
+		super(containerID, container, caseExp, cases, validate);
 	}
 
 	/**
@@ -40,19 +42,25 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 * @param cases
 	 *            the value for cases. Can be <code>null</code>.
 	 */
-	public HDLSwitchStatement(HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases) {
-		this(container, caseExp, cases, true);
+	public HDLSwitchStatement(int containerID, HDLObject container, HDLExpression caseExp, ArrayList<HDLSwitchCaseStatement> cases) {
+		this(containerID, container, caseExp, cases, true);
 	}
 
 	public HDLSwitchStatement() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLSwitchStatement;
 	}
 
+	/**
+	 * The accessor for the field caseExp which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLSwitchStatement, HDLExpression> fCaseExp = new HDLFieldAccess<HDLSwitchStatement, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLSwitchStatement obj) {
@@ -61,6 +69,10 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 			return obj.getCaseExp();
 		}
 	};
+	/**
+	 * The accessor for the field cases which is of type
+	 * ArrayList<HDLSwitchCaseStatement>
+	 */
 	public static HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>> fCases = new HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>>() {
 		@Override
 		public ArrayList<HDLSwitchCaseStatement> getValue(HDLSwitchStatement obj) {

@@ -12,13 +12,15 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLDeclaration}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLDeclaration(HDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLDeclaration(int containerID, HDLObject container, boolean validate) {
+		super(containerID, container, validate);
 	}
 
 	/**
@@ -27,14 +29,17 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLDeclaration(HDLObject container) {
-		this(container, true);
+	public HDLDeclaration(int containerID, HDLObject container) {
+		this(containerID, container, true);
 	}
 
 	public HDLDeclaration() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLDeclaration;

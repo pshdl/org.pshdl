@@ -17,6 +17,8 @@ public class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -26,8 +28,8 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(HDLObject container, String name, ArrayList<HDLExpression> params, boolean validate) {
-		super(container, name, params, validate);
+	public HDLFunction(int containerID, HDLObject container, String name, ArrayList<HDLExpression> params, boolean validate) {
+		super(containerID, container, name, params, validate);
 	}
 
 	/**
@@ -40,19 +42,25 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param params
 	 *            the value for params. Can be <code>null</code>.
 	 */
-	public HDLFunction(HDLObject container, String name, ArrayList<HDLExpression> params) {
-		this(container, name, params, true);
+	public HDLFunction(int containerID, HDLObject container, String name, ArrayList<HDLExpression> params) {
+		this(containerID, container, name, params, true);
 	}
 
 	public HDLFunction() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLFunction;
 	}
 
+	/**
+	 * The accessor for the field name which is of type String
+	 */
 	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>() {
 		@Override
 		public String getValue(HDLFunction obj) {
@@ -61,6 +69,10 @@ public class HDLFunction extends AbstractHDLFunction {
 			return obj.getName();
 		}
 	};
+	/**
+	 * The accessor for the field params which is of type
+	 * ArrayList<HDLExpression>
+	 */
 	public static HDLFieldAccess<HDLFunction, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunction, ArrayList<HDLExpression>>() {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLFunction obj) {

@@ -21,6 +21,8 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -36,9 +38,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
+	public HDLInterfaceRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
 			ArrayList<HDLExpression> ifArray, boolean validate) {
-		super(container, var, array, bits, hIf, ifArray, validate);
+		super(containerID, container, var, array, bits, hIf, ifArray, validate);
 	}
 
 	/**
@@ -57,20 +59,26 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 */
-	public HDLInterfaceRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
+	public HDLInterfaceRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
 			ArrayList<HDLExpression> ifArray) {
-		this(container, var, array, bits, hIf, ifArray, true);
+		this(containerID, container, var, array, bits, hIf, ifArray, true);
 	}
 
 	public HDLInterfaceRef() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceRef;
 	}
 
+	/**
+	 * The accessor for the field hIf which is of type HDLQualifiedName
+	 */
 	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>() {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceRef obj) {
@@ -79,6 +87,10 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 			return obj.getHIfRefName();
 		}
 	};
+	/**
+	 * The accessor for the field ifArray which is of type
+	 * ArrayList<HDLExpression>
+	 */
 	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>() {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLInterfaceRef obj) {

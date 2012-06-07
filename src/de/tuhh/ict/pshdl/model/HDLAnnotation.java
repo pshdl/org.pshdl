@@ -15,6 +15,8 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * Constructs a new instance of {@link HDLAnnotation}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -24,8 +26,8 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAnnotation(HDLObject container, String name, String value, boolean validate) {
-		super(container, name, value, validate);
+	public HDLAnnotation(int containerID, HDLObject container, String name, String value, boolean validate) {
+		super(containerID, container, name, value, validate);
 	}
 
 	/**
@@ -38,19 +40,25 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param value
 	 *            the value for value. Can be <code>null</code>.
 	 */
-	public HDLAnnotation(HDLObject container, String name, String value) {
-		this(container, name, value, true);
+	public HDLAnnotation(int containerID, HDLObject container, String name, String value) {
+		this(containerID, container, name, value, true);
 	}
 
 	public HDLAnnotation() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLAnnotation;
 	}
 
+	/**
+	 * The accessor for the field name which is of type String
+	 */
 	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>() {
 		@Override
 		public String getValue(HDLAnnotation obj) {
@@ -59,6 +67,9 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 			return obj.getName();
 		}
 	};
+	/**
+	 * The accessor for the field value which is of type String
+	 */
 	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>() {
 		@Override
 		public String getValue(HDLAnnotation obj) {

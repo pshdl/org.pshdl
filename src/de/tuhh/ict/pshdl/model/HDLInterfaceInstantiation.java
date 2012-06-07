@@ -20,6 +20,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceInstantiation}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -33,9 +35,9 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf, ArrayList<HDLExpression> dimensions,
-			boolean validate) {
-		super(container, var, arguments, hIf, dimensions, validate);
+	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf,
+			ArrayList<HDLExpression> dimensions, boolean validate) {
+		super(containerID, container, var, arguments, hIf, dimensions, validate);
 	}
 
 	/**
@@ -52,19 +54,26 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param dimensions
 	 *            the value for dimensions. Can be <code>null</code>.
 	 */
-	public HDLInterfaceInstantiation(HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf, ArrayList<HDLExpression> dimensions) {
-		this(container, var, arguments, hIf, dimensions, true);
+	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf,
+			ArrayList<HDLExpression> dimensions) {
+		this(containerID, container, var, arguments, hIf, dimensions, true);
 	}
 
 	public HDLInterfaceInstantiation() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceInstantiation;
 	}
 
+	/**
+	 * The accessor for the field hIf which is of type HDLQualifiedName
+	 */
 	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>() {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceInstantiation obj) {
@@ -73,6 +82,10 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			return obj.getHIfRefName();
 		}
 	};
+	/**
+	 * The accessor for the field dimensions which is of type
+	 * ArrayList<HDLExpression>
+	 */
 	public static HDLFieldAccess<HDLInterfaceInstantiation, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLInterfaceInstantiation, ArrayList<HDLExpression>>() {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLInterfaceInstantiation obj) {

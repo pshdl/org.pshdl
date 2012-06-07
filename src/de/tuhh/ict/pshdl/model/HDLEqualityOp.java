@@ -16,6 +16,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
 	 * Constructs a new instance of {@link HDLEqualityOp}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -27,8 +29,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEqualityOp(HDLObject container, HDLExpression left, HDLExpression right, HDLEqualityOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLEqualityOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLEqualityOpType type, boolean validate) {
+		super(containerID, container, left, right, type, validate);
 	}
 
 	/**
@@ -43,14 +45,17 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEqualityOp(HDLObject container, HDLExpression left, HDLExpression right, HDLEqualityOpType type) {
-		this(container, left, right, type, true);
+	public HDLEqualityOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLEqualityOpType type) {
+		this(containerID, container, left, right, type, true);
 	}
 
 	public HDLEqualityOp() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLEqualityOp;
@@ -79,6 +84,9 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 		}
 	}
 
+	/**
+	 * The accessor for the field type which is of type HDLEqualityOpType
+	 */
 	public static HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType> fType = new HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType>() {
 		@Override
 		public HDLEqualityOpType getValue(HDLEqualityOp obj) {

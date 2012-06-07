@@ -20,6 +20,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -33,8 +35,9 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations, boolean validate) {
-		super(container, name, dimensions, defaultValue, annotations, validate);
+	public HDLVariable(int containerID, HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations,
+			boolean validate) {
+		super(containerID, container, name, dimensions, defaultValue, annotations, validate);
 	}
 
 	/**
@@ -51,19 +54,25 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param annotations
 	 *            the value for annotations. Can be <code>null</code>.
 	 */
-	public HDLVariable(HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations) {
-		this(container, name, dimensions, defaultValue, annotations, true);
+	public HDLVariable(int containerID, HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations) {
+		this(containerID, container, name, dimensions, defaultValue, annotations, true);
 	}
 
 	public HDLVariable() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariable;
 	}
 
+	/**
+	 * The accessor for the field name which is of type String
+	 */
 	public static HDLFieldAccess<HDLVariable, String> fName = new HDLFieldAccess<HDLVariable, String>() {
 		@Override
 		public String getValue(HDLVariable obj) {
@@ -72,6 +81,10 @@ public class HDLVariable extends AbstractHDLVariable {
 			return obj.getName();
 		}
 	};
+	/**
+	 * The accessor for the field dimensions which is of type
+	 * ArrayList<HDLExpression>
+	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>() {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariable obj) {
@@ -80,6 +93,9 @@ public class HDLVariable extends AbstractHDLVariable {
 			return obj.getDimensions();
 		}
 	};
+	/**
+	 * The accessor for the field defaultValue which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLVariable, HDLExpression> fDefaultValue = new HDLFieldAccess<HDLVariable, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLVariable obj) {
@@ -88,6 +104,10 @@ public class HDLVariable extends AbstractHDLVariable {
 			return obj.getDefaultValue();
 		}
 	};
+	/**
+	 * The accessor for the field annotations which is of type
+	 * ArrayList<HDLAnnotation>
+	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>() {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLVariable obj) {

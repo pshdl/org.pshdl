@@ -37,7 +37,7 @@ public class HDLLibrary {
 				if (name.equals(uq))
 					it.remove();
 			}
-			units.add(unit.setName(uq.getLastSegment()));
+			units.add(unit.setName(uq.getLastSegment()).copy());
 			hdlPackage = hdlPackage.setUnits(units);
 			pkgs.put(skipLast, hdlPackage);
 			types.put(uq, unit.asInterface());
@@ -100,5 +100,9 @@ public class HDLLibrary {
 	public void addInterface(HDLInterface hIf) {
 		System.out.println("HDLLibrary.addInterface()" + hIf.asRef());
 		types.put(hIf.asRef(), hIf);
+	}
+
+	public static void clear() {
+		libs.clear();
 	}
 }

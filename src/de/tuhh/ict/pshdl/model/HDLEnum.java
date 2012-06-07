@@ -19,6 +19,8 @@ public class HDLEnum extends AbstractHDLEnum {
 	/**
 	 * Constructs a new instance of {@link HDLEnum}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -29,8 +31,8 @@ public class HDLEnum extends AbstractHDLEnum {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnum(HDLObject container, String name, ArrayList<HDLVariable> enums, boolean validate) {
-		super(container, name, enums, validate);
+	public HDLEnum(int containerID, HDLObject container, String name, ArrayList<HDLVariable> enums, boolean validate) {
+		super(containerID, container, name, enums, validate);
 	}
 
 	/**
@@ -44,19 +46,25 @@ public class HDLEnum extends AbstractHDLEnum {
 	 *            the value for enums. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLEnum(HDLObject container, String name, ArrayList<HDLVariable> enums) {
-		this(container, name, enums, true);
+	public HDLEnum(int containerID, HDLObject container, String name, ArrayList<HDLVariable> enums) {
+		this(containerID, container, name, enums, true);
 	}
 
 	public HDLEnum() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLEnum;
 	}
 
+	/**
+	 * The accessor for the field enums which is of type ArrayList<HDLVariable>
+	 */
 	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>() {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLEnum obj) {

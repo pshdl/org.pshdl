@@ -16,6 +16,8 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceDeclaration}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param hIf
@@ -23,8 +25,8 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceDeclaration(HDLObject container, HDLInterface hIf, boolean validate) {
-		super(container, hIf, validate);
+	public HDLInterfaceDeclaration(int containerID, HDLObject container, HDLInterface hIf, boolean validate) {
+		super(containerID, container, hIf, validate);
 	}
 
 	/**
@@ -35,19 +37,25 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceDeclaration(HDLObject container, HDLInterface hIf) {
-		this(container, hIf, true);
+	public HDLInterfaceDeclaration(int containerID, HDLObject container, HDLInterface hIf) {
+		this(containerID, container, hIf, true);
 	}
 
 	public HDLInterfaceDeclaration() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterfaceDeclaration;
 	}
 
+	/**
+	 * The accessor for the field hIf which is of type HDLInterface
+	 */
 	public static HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface> fHIf = new HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface>() {
 		@Override
 		public HDLInterface getValue(HDLInterfaceDeclaration obj) {

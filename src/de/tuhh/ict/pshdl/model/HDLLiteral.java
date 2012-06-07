@@ -16,6 +16,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param val
@@ -23,8 +25,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLLiteral(HDLObject container, String val, boolean validate) {
-		super(container, val, validate);
+	public HDLLiteral(int containerID, HDLObject container, String val, boolean validate) {
+		super(containerID, container, val, validate);
 	}
 
 	/**
@@ -35,19 +37,25 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param val
 	 *            the value for val. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLLiteral(HDLObject container, String val) {
-		this(container, val, true);
+	public HDLLiteral(int containerID, HDLObject container, String val) {
+		this(containerID, container, val, true);
 	}
 
 	public HDLLiteral() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLLiteral;
 	}
 
+	/**
+	 * The accessor for the field val which is of type String
+	 */
 	public static HDLFieldAccess<HDLLiteral, String> fVal = new HDLFieldAccess<HDLLiteral, String>() {
 		@Override
 		public String getValue(HDLLiteral obj) {

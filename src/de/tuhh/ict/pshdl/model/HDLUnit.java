@@ -17,10 +17,12 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * </ul>
  */
-public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
+public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.utils.IStatementContainer {
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param libURI
@@ -34,8 +36,8 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements, boolean validate) {
-		super(container, libURI, name, imports, statements, validate);
+	public HDLUnit(int containerID, HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements, boolean validate) {
+		super(containerID, container, libURI, name, imports, statements, validate);
 	}
 
 	/**
@@ -52,19 +54,25 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
 	 */
-	public HDLUnit(HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements) {
-		this(container, libURI, name, imports, statements, true);
+	public HDLUnit(int containerID, HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements) {
+		this(containerID, container, libURI, name, imports, statements, true);
 	}
 
 	public HDLUnit() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLUnit;
 	}
 
+	/**
+	 * The accessor for the field libURI which is of type String
+	 */
 	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>() {
 		@Override
 		public String getValue(HDLUnit obj) {
@@ -73,6 +81,9 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 			return obj.getLibURI();
 		}
 	};
+	/**
+	 * The accessor for the field name which is of type String
+	 */
 	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>() {
 		@Override
 		public String getValue(HDLUnit obj) {
@@ -81,6 +92,9 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 			return obj.getName();
 		}
 	};
+	/**
+	 * The accessor for the field imports which is of type ArrayList<String>
+	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>() {
 		@Override
 		public ArrayList<String> getValue(HDLUnit obj) {
@@ -89,6 +103,10 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 			return obj.getImports();
 		}
 	};
+	/**
+	 * The accessor for the field statements which is of type
+	 * ArrayList<HDLStatement>
+	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>() {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLUnit obj) {
@@ -213,8 +231,8 @@ public class HDLUnit extends AbstractHDLUnit implements IStatementContainer {
 		List<HDLVariableDeclaration> res = HDLResolver.getallVariableDeclarations(statements);
 		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).setDirection(HDLDirection.IN);
 		hvd.setContainer(this);
-		res.add(hvd.addVariables(new HDLVariable(null, "$clk", null, null, null)));
-		res.add(hvd.addVariables(new HDLVariable(null, "$rst", null, null, null)));
+		res.add(hvd.addVariables(new HDLVariable().setName("$clk")));
+		res.add(hvd.addVariables(new HDLVariable().setName("$rst")));
 		return res;
 	}
 

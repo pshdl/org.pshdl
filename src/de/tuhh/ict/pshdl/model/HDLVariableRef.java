@@ -19,6 +19,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	/**
 	 * Constructs a new instance of {@link HDLVariableRef}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -30,8 +32,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, boolean validate) {
-		super(container, var, array, bits, validate);
+	public HDLVariableRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, boolean validate) {
+		super(containerID, container, var, array, bits, validate);
 	}
 
 	/**
@@ -46,19 +48,26 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param bits
 	 *            the value for bits. Can be <code>null</code>.
 	 */
-	public HDLVariableRef(HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits) {
-		this(container, var, array, bits, true);
+	public HDLVariableRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits) {
+		this(containerID, container, var, array, bits, true);
 	}
 
 	public HDLVariableRef() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariableRef;
 	}
 
+	/**
+	 * The accessor for the field array which is of type
+	 * ArrayList<HDLExpression>
+	 */
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>() {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariableRef obj) {
@@ -67,6 +76,9 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 			return obj.getArray();
 		}
 	};
+	/**
+	 * The accessor for the field bits which is of type ArrayList<HDLRange>
+	 */
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>() {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLVariableRef obj) {

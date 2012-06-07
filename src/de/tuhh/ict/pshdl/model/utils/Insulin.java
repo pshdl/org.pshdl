@@ -14,12 +14,16 @@ import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.IHDLGenerator.HDLGenerationInfo;
+import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class Insulin {
+	private static final String RST_NAME = HDLRegisterConfig.defaultConfig().getRstRefName().getLastSegment();
+	private static final String CLK_NAME = HDLRegisterConfig.defaultConfig().getClkRefName().getLastSegment();
+
 	public static HDLPackage transform(HDLPackage orig) {
-		annotateReadCount(orig);
-		annotateWriteCount(orig);
+		HDLValidator.annotateReadCount(orig);
+		HDLValidator.annotateWriteCount(orig);
 		HDLPackage apply = handleOutPortRead(orig);
 		apply = includeGenerators(apply);
 		// System.out.println("Insulin.transform()" + apply);
@@ -50,14 +54,16 @@ public class Insulin {
 			if (generationInfo.include) {
 				HDLQualifiedName ifRef = generation.getHIf().asRef();
 				HDLQualifiedName fullName = generation.getFullName();
-				System.out.println("Insulin.includeGenerators()" + generationInfo.unit);
+				// System.out.println("Insulin.includeGenerators()" +
+				// generationInfo.unit);
 				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
 				ms.replace(generation, stmnts);
 				List<HDLInterfaceRef> ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
 				for (HDLInterfaceRef hdI : ifRefs) {
 					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
 						HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
-						ms.replace(hdI, new HDLVariableRef(null, newName, hdI.getArray(), hdI.getBits()));
+						ms.replace(hdI,
+								new HDLVariableRef().setVar(newName).setArray(HDLObject.copyAll(hdI.getArray())).setBits(HDLObject.copyAll(hdI.getBits())).setContainer(generation));
 					}
 				}
 			}
@@ -107,9 +113,10 @@ public class Insulin {
 
 	public static HDLStatement createArrayForLoop(ArrayList<HDLExpression> dimensions, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
 		if (i == dimensions.size()) {
-			return new HDLAssignment().setLeft(ref).setRight(defaultValue);
+			return new HDLAssignment().setLeft(ref).setRight(defaultValue.copy());
 		}
-		HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(dimensions.get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
+		HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(
+				new HDLArithOp().setLeft(dimensions.get(i).copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
 		HDLVariable param = new HDLVariable().setName(Character.toString((char) (i + 'I')));
 		HDLForLoop loop = new HDLForLoop().setRange(HDLObject.asList(range)).setParam(param);
 		HDLVariableRef paramRef = new HDLVariableRef().setVar(param.asRef());
@@ -132,7 +139,8 @@ public class Insulin {
 
 	/**
 	 * Checks for the clock and reset annotation and replaces all $clk and $rst
-	 * references with it.
+	 * references with it. It also inserts the clk and rst signals into the
+	 * HDLUnit if needed.
 	 * 
 	 * @param apply
 	 * @return
@@ -140,66 +148,65 @@ public class Insulin {
 	private static HDLPackage generateClkAndReset(HDLPackage apply) {
 		ModificationSet ms = new ModificationSet();
 		HDLVariable defClkVar = new HDLVariable().setName("clk");
-		boolean customClk = false, customRst = false;
 		HDLVariable defRstVar = new HDLVariable().setName("rst");
-		List<HDLAnnotation> annotations = apply.getAllObjectsOf(HDLAnnotation.class, true);
-		for (HDLAnnotation hdlAnnotation : annotations) {
-			if ("@clock".equalsIgnoreCase(hdlAnnotation.getName())) {
-				HDLObject container = hdlAnnotation.getContainer();
-				if (container instanceof HDLVariableDeclaration) {
-					HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
-					defClkVar = hvd.getVariables().get(0);
-					customClk = true;
-				}
-			}
-			if ("@reset".equalsIgnoreCase(hdlAnnotation.getName())) {
-				HDLObject container = hdlAnnotation.getContainer();
-				if (container instanceof HDLVariableDeclaration) {
-					HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
-					defRstVar = hvd.getVariables().get(0);
-					customRst = true;
-				}
-			}
+		boolean customClk = false, customRst = false;
+		// Find all clock annotated Signals
+		HDLVariable newVar = extractVar(apply, HDLAnnotations.clock);
+		if (newVar != null) {
+			defClkVar = newVar;
+			customClk = true;
+		}
+		newVar = extractVar(apply, HDLAnnotations.reset);
+		if (newVar != null) {
+			defRstVar = newVar;
+			customRst = true;
+		}
+		// Replace all $clk and $rst with the clock in HDLRegisters
+		List<HDLRegisterConfig> clkRefs = HDLQuery.selectAll(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fClk).lastSegmentIs(CLK_NAME);
+		for (HDLRegisterConfig reg : clkRefs) {
+			ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
+			if (!customClk)
+				insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
+		}
+		List<HDLRegisterConfig> rstRefs = HDLQuery.selectAll(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fRst).lastSegmentIs(RST_NAME);
+		for (HDLRegisterConfig reg : rstRefs) {
+			HDLRegisterConfig orig = reg;
+			reg = ms.getReplacement(reg);
+			ms.replacePrune(orig, reg.setRst(HDLQualifiedName.create(defRstVar.getName())));
+			if (!customRst)
+				insertSig(ms, orig.getContainer(), defRstVar, SignalInserted.RstInserted);
 		}
 
-		List<HDLVariableDeclaration> decls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration decl : decls) {
-			HDLRegisterConfig register = decl.getRegister();
-			if (register != null) {
-				if ("$clk".equals(register.getClkRefName().getLastSegment())) {
-					register = register.setClk(HDLQualifiedName.create(defClkVar.getName()));
-					if (!customClk)
-						insertClk(ms, register.getContainer(), defClkVar, SignalInserted.ClkInserted);
-				}
-				if ("$rst".equals(register.getRstRefName().getLastSegment())) {
-					register = register.setRst(HDLQualifiedName.create(defRstVar.getName()));
-					if (!customRst)
-						insertClk(ms, register.getContainer(), defRstVar, SignalInserted.RstInserted);
-				}
-				if (register != decl.getRegister())
-					ms.replace(decl.getRegister(), register);
-			}
+		// Replace all $clk and $rst VariableRefs
+		List<HDLVariableRef> clkVarRefs = HDLQuery.selectAll(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(CLK_NAME);
+		for (HDLVariableRef clkRef : clkVarRefs) {
+			ms.replace(clkRef, defClkVar.asHDLRef());
 		}
-
-		List<HDLVariableRef> varRefs = apply.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : varRefs) {
-			if ("$clk".equals(ref.getVarRefName().getLastSegment())) {
-				ms.replace(ref, defClkVar.asHDLRef());
-			}
-			if ("$rst".equals(ref.getVarRefName().getLastSegment())) {
-				ms.replace(ref, defRstVar.asHDLRef());
-			}
+		List<HDLVariableRef> rstVarRefs = HDLQuery.selectAll(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(RST_NAME);
+		for (HDLVariableRef rstRef : rstVarRefs) {
+			ms.replace(rstRef, defRstVar.asHDLRef());
 		}
 		return ms.apply(apply);
+	}
+
+	private static HDLVariable extractVar(HDLPackage apply, HDLAnnotations annotation) {
+		List<HDLAnnotation> clocks = HDLQuery.selectAll(HDLAnnotation.class).from(apply).where(HDLAnnotation.fName).isEqualTo(annotation.toString());
+		if (!clocks.isEmpty()) {
+			if (clocks.get(0).getContainer() instanceof HDLVariableDeclaration) {
+				HDLVariableDeclaration hvd = (HDLVariableDeclaration) clocks.get(0).getContainer();
+				return hvd.getVariables().get(0);
+			}
+		}
+		return null;
 	}
 
 	public static enum SignalInserted implements MetaAccess<Boolean> {
 		ClkInserted, RstInserted;
 	}
 
-	private static void insertClk(ModificationSet ms, HDLObject container, HDLVariable defClkVar, SignalInserted signalInserted) {
+	private static void insertSig(ModificationSet ms, HDLObject container, HDLVariable defClkVar, SignalInserted signalInserted) {
 		if (container.getClassType() != HDLClass.HDLUnit) {
-			insertClk(ms, container.getContainer(), defClkVar, signalInserted);
+			insertSig(ms, container.getContainer(), defClkVar, signalInserted);
 			return;
 		}
 		boolean hasMeta = container.hasMeta(signalInserted);
@@ -363,7 +370,7 @@ public class Insulin {
 	}
 
 	private static void makeBool(ModificationSet ms, HDLExpression exp) {
-		HDLManip zero = new HDLManip().setType(HDLManipType.CAST).setCastTo(exp.determineType()).setTarget(HDLLiteral.get(0));
+		HDLManip zero = new HDLManip().setType(HDLManipType.CAST).setCastTo(exp.determineType().copy()).setTarget(HDLLiteral.get(0));
 		ms.replace(exp, new HDLEqualityOp().setLeft(exp.copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(zero));
 	}
 
@@ -424,7 +431,7 @@ public class Insulin {
 			case ASSGN:
 				continue;
 			}
-			op = op.setLeft(hdlAssignment.getLeft().copy()).setRight(hdlAssignment.getRight());
+			op = op.setLeft(hdlAssignment.getLeft().copy()).setRight(hdlAssignment.getRight().copy());
 			HDLAssignment newAss = new HDLAssignment().setLeft(hdlAssignment.getLeft().copy()).setType(HDLAssignmentType.ASSGN).setRight(op);
 			ms.replace(hdlAssignment, newAss);
 		}
@@ -480,36 +487,34 @@ public class Insulin {
 
 	private static HDLPackage handleOutPortRead(HDLPackage orig) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableDeclaration> list = orig.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		List<HDLVariableDeclaration> list = HDLQuery.selectAll(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT);
 		for (HDLVariableDeclaration hdv : list) {
 			HDLVariableDeclaration origHdv = hdv;
-			if (hdv.getDirection() == HDLDirection.OUT) {
-				for (HDLVariable var : hdv.getVariables()) {
-					Integer readCount = var.getMeta(IntegerMeta.READ_COUNT);
-					if (readCount != null) {
-						// Create new Declaration out uint<W> bar=bar_OutRead;
-						// Extract bar from declaration out uint<W> x,y,bar=5;
-						// Create a new Declaration uint<W> bar_outRead=5;
-						// Change all reference to bar_OutRead
+			for (HDLVariable var : hdv.getVariables()) {
+				Integer readCount = var.getMeta(IntegerMeta.READ_COUNT);
+				if (readCount != null) {
+					// Create new Declaration out uint<W> bar=bar_OutRead;
+					// Extract bar from declaration out uint<W> x,y,bar=5;
+					// Create a new Declaration uint<W> bar_outRead=5;
+					// Change all reference to bar_OutRead
 
-						HDLVariable outVar = var.setName(var.getName() + "_OutRead");
-						ms.insertAfter(origHdv, hdv.setRegister(null).setVariables(HDLObject.asList(var.setDefaultValue(outVar.asHDLRef()))));
+					HDLVariable outVar = var.setName(var.getName() + "_OutRead");
+					ms.insertAfter(origHdv, hdv.setRegister(null).setVariables(HDLObject.asList(var.setDefaultValue(outVar.asHDLRef()))));
 
-						if (hdv.getVariables().size() == 1) {
-							hdv = hdv.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(outVar));
-						} else {
-							ms.insertAfter(origHdv, new HDLVariableDeclaration().setType(origHdv.resolveType()).addVariables(outVar));
-							hdv = hdv.removeVariables(var);
-						}
+					if (hdv.getVariables().size() == 1) {
+						hdv = hdv.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(outVar));
+					} else {
+						ms.insertAfter(origHdv, new HDLVariableDeclaration().setType(origHdv.resolveType()).addVariables(outVar));
+						hdv = hdv.removeVariables(var);
+					}
 
-						// Replace all read occourances with the new bar_outRead
-						HDLQualifiedName originalFQN = var.asRef();
-						HDLQualifiedName newFQN = outVar.asRef();
-						List<HDLVariableRef> reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
-						for (HDLVariableRef varRef : reads) {
-							if (varRef.getVarRefName().equals(originalFQN)) {
-								ms.replace(varRef, varRef.setVar(newFQN));
-							}
+					// Replace all read occourances with the new bar_outRead
+					HDLQualifiedName originalFQN = var.asRef();
+					HDLQualifiedName newFQN = outVar.asRef();
+					List<HDLVariableRef> reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
+					for (HDLVariableRef varRef : reads) {
+						if (varRef.getVarRefName().equals(originalFQN)) {
+							ms.replace(varRef, varRef.setVar(newFQN));
 						}
 					}
 				}
@@ -518,41 +523,5 @@ public class Insulin {
 				ms.replace(origHdv, hdv);
 		}
 		return ms.apply(orig);
-	}
-
-	private static void annotateReadCount(HDLPackage orig) {
-		List<HDLVariableRef> list = orig.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : list) {
-			if (ref.getContainer() instanceof HDLAssignment) {
-				HDLAssignment ass = (HDLAssignment) ref.getContainer();
-				if ((ass.getLeft() == ref) && (ass.getType() == HDLAssignmentType.ASSGN))
-					// If it is a non-trivial assign, it contains a read
-					continue;
-			}
-			HDLVariable var = ref.resolveVar();
-			Integer meta = var.getMeta(IntegerMeta.READ_COUNT);
-			if (meta == null)
-				meta = 1;
-			else
-				meta++;
-			var.addMeta(IntegerMeta.READ_COUNT, meta);
-		}
-	}
-
-	private static void annotateWriteCount(HDLPackage orig) {
-		List<HDLAssignment> list = orig.getAllObjectsOf(HDLAssignment.class, true);
-		for (HDLAssignment ass : list) {
-			HDLReference left = ass.getLeft();
-			if (left instanceof HDLVariableRef) {
-				HDLVariableRef ref = (HDLVariableRef) left;
-				HDLVariable var = ref.resolveVar();
-				Integer meta = var.getMeta(IntegerMeta.WRITE_COUNT);
-				if (meta == null)
-					meta = 1;
-				else
-					meta++;
-				var.addMeta(IntegerMeta.WRITE_COUNT, meta);
-			}
-		}
 	}
 }

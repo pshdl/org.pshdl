@@ -17,6 +17,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	/**
 	 * Constructs a new instance of {@link HDLConcat}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param cats
@@ -25,8 +27,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLConcat(HDLObject container, ArrayList<HDLExpression> cats, boolean validate) {
-		super(container, cats, validate);
+	public HDLConcat(int containerID, HDLObject container, ArrayList<HDLExpression> cats, boolean validate) {
+		super(containerID, container, cats, validate);
 	}
 
 	/**
@@ -38,19 +40,25 @@ public class HDLConcat extends AbstractHDLConcat {
 	 *            the value for cats. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLConcat(HDLObject container, ArrayList<HDLExpression> cats) {
-		this(container, cats, true);
+	public HDLConcat(int containerID, HDLObject container, ArrayList<HDLExpression> cats) {
+		this(containerID, container, cats, true);
 	}
 
 	public HDLConcat() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLConcat;
 	}
 
+	/**
+	 * The accessor for the field cats which is of type ArrayList<HDLExpression>
+	 */
 	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>() {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLConcat obj) {

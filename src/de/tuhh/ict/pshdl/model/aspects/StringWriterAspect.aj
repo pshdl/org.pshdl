@@ -363,7 +363,7 @@ public aspect StringWriterAspect {
 		sb.append("module ").append(getName()).append("{\n");
 		incSpacing();
 		for (String imports : getImports()) {
-			sb.append("import ").append(imports).append(";\n");
+			sb.append(getSpacing()).append("import ").append(imports).append(";\n");
 		}
 		for (HDLStatement stmnt : getStatements()) {
 			sb.append(stmnt).append('\n');

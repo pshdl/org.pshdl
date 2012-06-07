@@ -19,6 +19,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param ifExp
@@ -30,8 +32,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo, boolean validate) {
-		super(container, ifExp, thenDo, elseDo, validate);
+	public HDLIfStatement(int containerID, HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo, boolean validate) {
+		super(containerID, container, ifExp, thenDo, elseDo, validate);
 	}
 
 	/**
@@ -46,19 +48,25 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param elseDo
 	 *            the value for elseDo. Can be <code>null</code>.
 	 */
-	public HDLIfStatement(HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo) {
-		this(container, ifExp, thenDo, elseDo, true);
+	public HDLIfStatement(int containerID, HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo) {
+		this(containerID, container, ifExp, thenDo, elseDo, true);
 	}
 
 	public HDLIfStatement() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLIfStatement;
 	}
 
+	/**
+	 * The accessor for the field ifExp which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLIfStatement obj) {
@@ -67,6 +75,10 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			return obj.getIfExp();
 		}
 	};
+	/**
+	 * The accessor for the field thenDo which is of type
+	 * ArrayList<HDLStatement>
+	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
@@ -75,6 +87,10 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			return obj.getThenDo();
 		}
 	};
+	/**
+	 * The accessor for the field elseDo which is of type
+	 * ArrayList<HDLStatement>
+	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {

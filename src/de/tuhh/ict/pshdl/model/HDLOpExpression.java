@@ -15,6 +15,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * Constructs a new instance of {@link HDLOpExpression}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -24,8 +26,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLOpExpression(HDLObject container, HDLExpression left, HDLExpression right, boolean validate) {
-		super(container, left, right, validate);
+	public HDLOpExpression(int containerID, HDLObject container, HDLExpression left, HDLExpression right, boolean validate) {
+		super(containerID, container, left, right, validate);
 	}
 
 	/**
@@ -38,19 +40,25 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLOpExpression(HDLObject container, HDLExpression left, HDLExpression right) {
-		this(container, left, right, true);
+	public HDLOpExpression(int containerID, HDLObject container, HDLExpression left, HDLExpression right) {
+		this(containerID, container, left, right, true);
 	}
 
 	public HDLOpExpression() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLOpExpression;
 	}
 
+	/**
+	 * The accessor for the field left which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
@@ -59,6 +67,9 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 			return obj.getLeft();
 		}
 	};
+	/**
+	 * The accessor for the field right which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {

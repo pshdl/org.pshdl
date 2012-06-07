@@ -281,7 +281,11 @@ public class HDLPrimitives {
 
 	private HDLExpression getWidth(HDLArithOpType type, HDLTypeInferenceInfo info) {
 		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
+		if (leftW != null)
+			leftW = leftW.copy();
 		HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
+		if (rightW != null)
+			rightW = rightW.copy();
 		switch (type) {
 		case POW:
 			// The result type of pow can only be natural
@@ -341,7 +345,7 @@ public class HDLPrimitives {
 			return hdi;
 		}
 		HDLExpression width = lType.getWidth();
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType, new HDLPrimitive().setType(triple.right));
+		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width.copy()), lType, new HDLPrimitive().setType(triple.right));
 		return normalize(info, op);
 	}
 

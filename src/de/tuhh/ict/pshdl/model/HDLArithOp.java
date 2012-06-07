@@ -16,6 +16,8 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	/**
 	 * Constructs a new instance of {@link HDLArithOp}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -27,8 +29,8 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArithOp(HDLObject container, HDLExpression left, HDLExpression right, HDLArithOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLArithOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLArithOpType type, boolean validate) {
+		super(containerID, container, left, right, type, validate);
 	}
 
 	/**
@@ -43,14 +45,17 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLArithOp(HDLObject container, HDLExpression left, HDLExpression right, HDLArithOpType type) {
-		this(container, left, right, type, true);
+	public HDLArithOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLArithOpType type) {
+		this(containerID, container, left, right, type, true);
 	}
 
 	public HDLArithOp() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLArithOp;
@@ -79,6 +84,9 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		}
 	}
 
+	/**
+	 * The accessor for the field type which is of type HDLArithOpType
+	 */
 	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>() {
 		@Override
 		public HDLArithOpType getValue(HDLArithOp obj) {

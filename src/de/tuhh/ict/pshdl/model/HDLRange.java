@@ -19,6 +19,8 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * Constructs a new instance of {@link HDLRange}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param from
@@ -28,8 +30,8 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRange(HDLObject container, HDLExpression from, HDLExpression to, boolean validate) {
-		super(container, from, to, validate);
+	public HDLRange(int containerID, HDLObject container, HDLExpression from, HDLExpression to, boolean validate) {
+		super(containerID, container, from, to, validate);
 	}
 
 	/**
@@ -42,19 +44,25 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRange(HDLObject container, HDLExpression from, HDLExpression to) {
-		this(container, from, to, true);
+	public HDLRange(int containerID, HDLObject container, HDLExpression from, HDLExpression to) {
+		this(containerID, container, from, to, true);
 	}
 
 	public HDLRange() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRange;
 	}
 
+	/**
+	 * The accessor for the field from which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
@@ -63,6 +71,9 @@ public class HDLRange extends AbstractHDLRange {
 			return obj.getFrom();
 		}
 	};
+	/**
+	 * The accessor for the field to which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
@@ -84,11 +95,11 @@ public class HDLRange extends AbstractHDLRange {
 			return new HDLLiteral().setVal("1");
 		if (getTo() != null) {
 			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null)))
-				return new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+				return new HDLArithOp().setLeft(getFrom().copy()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		}
-		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.MINUS).setRight(getTo());
+		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom().copy()).setType(HDLArithOpType.MINUS).setRight(getTo().copy());
 		HDLFunction absRange = new HDLFunction().setName("abs").addParams(rangeDist);
-		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(new HDLLiteral(null, "1"));
+		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);
 	}
 	// $CONTENT-END$

@@ -15,7 +15,7 @@ public class VHDLGenerator {
 	public static CharSequence generate(HDLPackage unit, String library, HDLEvaluationContext context) {
 		VhdlFile visitor = generateVHDL(unit, library, context);
 		String vhdlString = VhdlOutput.toVhdlString(visitor);
-		System.out.println(vhdlString);
+		// System.out.println(vhdlString);
 		return vhdlString;
 	}
 
@@ -35,7 +35,7 @@ public class VHDLGenerator {
 
 	private static VhdlFile generateVHDL(HDLPackage unit, String library, HDLEvaluationContext context) {
 		unit = Insulin.transform(unit);
-		System.out.println("Generating VHDL code for:\n" + unit);
+		// System.out.println("Generating VHDL code for:\n" + unit);
 		return unit.toVHDL();
 	}
 }

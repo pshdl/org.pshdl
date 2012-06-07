@@ -12,13 +12,15 @@ public abstract class HDLExpression extends AbstractHDLExpression {
 	/**
 	 * Constructs a new instance of {@link HDLExpression}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLExpression(HDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLExpression(int containerID, HDLObject container, boolean validate) {
+		super(containerID, container, validate);
 	}
 
 	/**
@@ -27,14 +29,17 @@ public abstract class HDLExpression extends AbstractHDLExpression {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLExpression(HDLObject container) {
-		this(container, true);
+	public HDLExpression(int containerID, HDLObject container) {
+		this(containerID, container, true);
 	}
 
 	public HDLExpression() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLExpression;

@@ -113,8 +113,10 @@ public class ModificationSet {
 		public Modification(HDLObject subject, List<HDLObject> with, ModificationType type) {
 			super();
 			this.subject = subject;
-			for (HDLObject hdlObject : with) {
-				hdlObject.setContainer(subject.getContainer());
+			HDLObject container = subject.getContainer();
+			for (int i = 0; i < with.size(); i++) {
+				HDLObject obj = with.get(i);
+				with.set(i, obj.copy().setContainer(container));
 			}
 			this.with = with;
 			this.type = type;
@@ -137,22 +139,16 @@ public class ModificationSet {
 	}
 
 	public void replace(HDLObject subject, HDLObject... with) {
-		// System.out.println("ModificationSet.replace()" + subject + " with " +
-		// Arrays.toString(with));
 		Modification mod = new Modification(subject, ModificationType.REPLACE, with);
 		insert(subject, mod);
 	}
 
 	public void insertAfter(HDLObject subject, HDLObject... with) {
-		// System.out.println("ModificationSet.insertAfter()" + subject +
-		// " with " + Arrays.toString(with));
 		Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, with);
 		insert(subject, mod);
 	}
 
 	public void insertBefore(HDLObject subject, HDLObject... with) {
-		// System.out.println("ModificationSet.insertBefore()" + subject +
-		// " with " + Arrays.toString(with));
 		Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, with);
 		insert(subject, mod);
 	}
@@ -165,11 +161,57 @@ public class ModificationSet {
 		replacements.put(getHash(subject), list);
 	}
 
+	/**
+	 * Executes all outstanding modifications or returns the orignal object if
+	 * nothing needs to be done
+	 * 
+	 * @param orig
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public <T extends HDLObject> T apply(T orig) {
 		if (replacements.size() == 0)
 			return orig;
 		return (T) orig.copyFiltered(new MSCopyFilter());
+	}
+
+	/**
+	 * Checks whether any replacements are planned and returns the first object
+	 * that should replace the subject
+	 * 
+	 * @param reg
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends HDLObject> T getReplacement(T reg) {
+		List<Modification> mods = getModifications(reg);
+		if ((mods == null) || mods.isEmpty())
+			return reg;
+		return (T) mods.get(0).with.get(0);
+	}
+
+	/**
+	 * Replace the subject HDLObject with the subjects, but discard all other
+	 * planned modifications
+	 * 
+	 * @param subject
+	 * @param with
+	 */
+	public void replacePrune(HDLObject subject, HDLObject... with) {
+		prune(subject);
+		replace(subject, with);
+	}
+
+	private void prune(HDLObject subject) {
+		List<Modification> list = replacements.get(getHash(subject));
+		if (list != null) {
+			Iterator<Modification> iter = list.iterator();
+			while (iter.hasNext()) {
+				ModificationSet.Modification mod = iter.next();
+				if (mod.subject == subject)
+					iter.remove();
+			}
+		}
 	}
 
 }

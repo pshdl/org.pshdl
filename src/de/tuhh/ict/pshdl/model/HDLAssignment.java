@@ -19,6 +19,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * Constructs a new instance of {@link HDLAssignment}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -31,8 +33,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAssignment(HDLObject container, HDLReference left, HDLAssignmentType type, HDLExpression right, boolean validate) {
-		super(container, left, type, right, validate);
+	public HDLAssignment(int containerID, HDLObject container, HDLReference left, HDLAssignmentType type, HDLExpression right, boolean validate) {
+		super(containerID, container, left, type, right, validate);
 	}
 
 	/**
@@ -48,14 +50,17 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLAssignment(HDLObject container, HDLReference left, HDLAssignmentType type, HDLExpression right) {
-		this(container, left, type, right, true);
+	public HDLAssignment(int containerID, HDLObject container, HDLReference left, HDLAssignmentType type, HDLExpression right) {
+		this(containerID, container, left, type, right, true);
 	}
 
 	public HDLAssignment() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLAssignment;
@@ -85,6 +90,9 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		}
 	}
 
+	/**
+	 * The accessor for the field left which is of type HDLReference
+	 */
 	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>() {
 		@Override
 		public HDLReference getValue(HDLAssignment obj) {
@@ -93,6 +101,9 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			return obj.getLeft();
 		}
 	};
+	/**
+	 * The accessor for the field type which is of type HDLAssignmentType
+	 */
 	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>() {
 		@Override
 		public HDLAssignmentType getValue(HDLAssignment obj) {
@@ -101,6 +112,9 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			return obj.getType();
 		}
 	};
+	/**
+	 * The accessor for the field right which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLAssignment obj) {

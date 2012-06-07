@@ -25,6 +25,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param clk
@@ -45,9 +47,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRegisterConfig(HDLObject container, HDLQualifiedName clk, HDLQualifiedName rst, HDLRegClockType clockType, HDLRegResetType resetType, HDLRegSyncType syncType,
-			HDLExpression resetValue, boolean validate) {
-		super(container, clk, rst, clockType, resetType, syncType, resetValue, validate);
+	public HDLRegisterConfig(int containerID, HDLObject container, HDLQualifiedName clk, HDLQualifiedName rst, HDLRegClockType clockType, HDLRegResetType resetType,
+			HDLRegSyncType syncType, HDLExpression resetValue, boolean validate) {
+		super(containerID, container, clk, rst, clockType, resetType, syncType, resetValue, validate);
 	}
 
 	/**
@@ -71,15 +73,18 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRegisterConfig(HDLObject container, HDLQualifiedName clk, HDLQualifiedName rst, HDLRegClockType clockType, HDLRegResetType resetType, HDLRegSyncType syncType,
-			HDLExpression resetValue) {
-		this(container, clk, rst, clockType, resetType, syncType, resetValue, true);
+	public HDLRegisterConfig(int containerID, HDLObject container, HDLQualifiedName clk, HDLQualifiedName rst, HDLRegClockType clockType, HDLRegResetType resetType,
+			HDLRegSyncType syncType, HDLExpression resetValue) {
+		this(containerID, container, clk, rst, clockType, resetType, syncType, resetValue, true);
 	}
 
 	public HDLRegisterConfig() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLRegisterConfig;
@@ -97,6 +102,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		SYNC, ASYNC;
 	}
 
+	/**
+	 * The accessor for the field clk which is of type HDLQualifiedName
+	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>() {
 		@Override
 		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
@@ -105,6 +113,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.getClkRefName();
 		}
 	};
+	/**
+	 * The accessor for the field rst which is of type HDLQualifiedName
+	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>() {
 		@Override
 		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
@@ -113,6 +124,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.getRstRefName();
 		}
 	};
+	/**
+	 * The accessor for the field clockType which is of type HDLRegClockType
+	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLRegClockType> fClockType = new HDLFieldAccess<HDLRegisterConfig, HDLRegClockType>() {
 		@Override
 		public HDLRegClockType getValue(HDLRegisterConfig obj) {
@@ -121,6 +135,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.getClockType();
 		}
 	};
+	/**
+	 * The accessor for the field resetType which is of type HDLRegResetType
+	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetType>() {
 		@Override
 		public HDLRegResetType getValue(HDLRegisterConfig obj) {
@@ -129,6 +146,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.getResetType();
 		}
 	};
+	/**
+	 * The accessor for the field syncType which is of type HDLRegSyncType
+	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType> fSyncType = new HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType>() {
 		@Override
 		public HDLRegSyncType getValue(HDLRegisterConfig obj) {
@@ -137,6 +157,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.getSyncType();
 		}
 	};
+	/**
+	 * The accessor for the field resetValue which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fResetValue = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLRegisterConfig obj) {
@@ -156,7 +179,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String RESET_VALUE_PARAM = "resetValue";
 
 	public static HDLRegisterConfig defaultConfig() {
-		return new HDLRegisterConfig(null, HDLQualifiedName.create("$clk"), HDLQualifiedName.create("$rst"), null, null, null, new HDLLiteral(null, "0"));
+		return new HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setResetValue(HDLLiteral.get(0));
 	}
 
 	public static HDLRegisterConfig fromArgs(ArrayList<HDLArgument> args) {
@@ -174,7 +197,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (RESET_TYPE_PARAM.equals(name))
 				config = config.setResetType(HDLRegResetType.valueOf(genArgs.getValue().toUpperCase()));
 			if (RESET_VALUE_PARAM.equals(name))
-				config = config.setResetValue(genArgs.getExpression());
+				config = config.setResetValue(genArgs.getExpression().copy());
 		}
 		return config;
 	}

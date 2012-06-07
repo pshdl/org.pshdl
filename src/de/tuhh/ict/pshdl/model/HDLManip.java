@@ -16,6 +16,8 @@ public class HDLManip extends AbstractHDLManip {
 	/**
 	 * Constructs a new instance of {@link HDLManip}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param type
@@ -27,8 +29,8 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLManip(HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo, boolean validate) {
-		super(container, type, target, castTo, validate);
+	public HDLManip(int containerID, HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo, boolean validate) {
+		super(containerID, container, type, target, castTo, validate);
 	}
 
 	/**
@@ -43,14 +45,17 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param castTo
 	 *            the value for castTo. Can be <code>null</code>.
 	 */
-	public HDLManip(HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo) {
-		this(container, type, target, castTo, true);
+	public HDLManip(int containerID, HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo) {
+		this(containerID, container, type, target, castTo, true);
 	}
 
 	public HDLManip() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLManip;
@@ -60,6 +65,9 @@ public class HDLManip extends AbstractHDLManip {
 		CAST, ARITH_NEG, BIT_NEG, LOGIC_NEG;
 	}
 
+	/**
+	 * The accessor for the field type which is of type HDLManipType
+	 */
 	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>() {
 		@Override
 		public HDLManipType getValue(HDLManip obj) {
@@ -68,6 +76,9 @@ public class HDLManip extends AbstractHDLManip {
 			return obj.getType();
 		}
 	};
+	/**
+	 * The accessor for the field target which is of type HDLExpression
+	 */
 	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>() {
 		@Override
 		public HDLExpression getValue(HDLManip obj) {
@@ -76,6 +87,9 @@ public class HDLManip extends AbstractHDLManip {
 			return obj.getTarget();
 		}
 	};
+	/**
+	 * The accessor for the field castTo which is of type HDLType
+	 */
 	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>() {
 		@Override
 		public HDLType getValue(HDLManip obj) {

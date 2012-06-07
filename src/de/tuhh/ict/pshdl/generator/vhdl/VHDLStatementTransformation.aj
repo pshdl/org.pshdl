@@ -76,14 +76,14 @@ public aspect VHDLStatementTransformation {
 							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(var.getName()+"_array");
 							res.addImport(name);
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLAnnotations.VHDLType.create(name.toString()))));
-							res.merge(newHVD.setContainer(this).toVHDL());
+							res.merge(newHVD.copy().setContainer(this).toVHDL());
 						} else {
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null)));
-							res.merge(newHVD.setContainer(this).toVHDL());
+							res.merge(newHVD.copy().setContainer(this).toVHDL());
 						}
 					} else {
 						HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
-						res.merge(newHVD.setContainer(this).toVHDL());
+						res.merge(newHVD.copy().setContainer(this).toVHDL());
 					}
 					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
 				}
@@ -94,7 +94,7 @@ public aspect VHDLStatementTransformation {
 			res.addConcurrentStatement(instantiation);
 		else {
 			for (int i = 0; i < getDimensions().size(); i++) {
-				HDLExpression to = new HDLArithOp().setLeft(getDimensions().get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				HDLExpression to = new HDLArithOp().setLeft(getDimensions().get(i).copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
 				HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to).setContainer(this);
 				ForGenerateStatement newFor = new ForGenerateStatement("generate_" + ifName, Character.toString((char) (i + 'I')), range.toVHDL(Range.Direction.TO));
 				if (forLoop != null)
@@ -141,7 +141,7 @@ public aspect VHDLStatementTransformation {
 					@SuppressWarnings("rawtypes")
 					List<DiscreteRange> ranges = new LinkedList<DiscreteRange>();
 					for (HDLExpression arrayWidth : var.getDimensions()) {
-						HDLExpression newWidth = new HDLArithOp().setLeft(arrayWidth).setType(HDLArithOp.HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+						HDLExpression newWidth = new HDLArithOp().setLeft(arrayWidth.copy()).setType(HDLArithOp.HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
 						Range range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(newWidth).setContainer(this).toVHDL(Direction.TO);
 						ranges.add(range);
 					}

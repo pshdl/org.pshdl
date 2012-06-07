@@ -17,6 +17,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInstantiation}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -26,8 +28,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInstantiation(HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, boolean validate) {
-		super(container, var, arguments, validate);
+	public HDLInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, boolean validate) {
+		super(containerID, container, var, arguments, validate);
 	}
 
 	/**
@@ -40,19 +42,25 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param arguments
 	 *            the value for arguments. Can be <code>null</code>.
 	 */
-	public HDLInstantiation(HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments) {
-		this(container, var, arguments, true);
+	public HDLInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments) {
+		this(containerID, container, var, arguments, true);
 	}
 
 	public HDLInstantiation() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInstantiation;
 	}
 
+	/**
+	 * The accessor for the field var which is of type HDLVariable
+	 */
 	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>() {
 		@Override
 		public HDLVariable getValue(HDLInstantiation obj) {
@@ -61,6 +69,10 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 			return obj.getVar();
 		}
 	};
+	/**
+	 * The accessor for the field arguments which is of type
+	 * ArrayList<HDLArgument>
+	 */
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>() {
 		@Override
 		public ArrayList<HDLArgument> getValue(HDLInstantiation obj) {

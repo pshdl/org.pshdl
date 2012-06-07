@@ -9,17 +9,19 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <li>HDLObject container. Can be <code>null</code>.</li>
  * </ul>
  */
-public abstract class HDLStatement extends AbstractHDLStatement {
+public abstract class HDLStatement extends AbstractHDLStatement implements de.tuhh.ict.pshdl.model.utils.IStatementContainer {
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLStatement(HDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLStatement(int containerID, HDLObject container, boolean validate) {
+		super(containerID, container, validate);
 	}
 
 	/**
@@ -28,14 +30,17 @@ public abstract class HDLStatement extends AbstractHDLStatement {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLStatement(HDLObject container) {
-		this(container, true);
+	public HDLStatement(int containerID, HDLObject container) {
+		this(containerID, container, true);
 	}
 
 	public HDLStatement() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLStatement;

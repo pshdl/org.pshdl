@@ -97,7 +97,7 @@ public class VHDLCastsLibrary {
 		HDLExpression width = left.getWidth();
 		HDLRange range = null;
 		if (width != null) {
-			range = new HDLRange().setFrom(new HDLArithOp().setLeft(width).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1))).setTo(HDLLiteral.get(0));
+			range = new HDLRange().setFrom(new HDLArithOp().setLeft(width.copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1))).setTo(HDLLiteral.get(0));
 			range.setContainer(left);
 		}
 		switch (left.getType()) {

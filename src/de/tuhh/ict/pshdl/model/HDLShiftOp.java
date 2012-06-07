@@ -16,6 +16,8 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	/**
 	 * Constructs a new instance of {@link HDLShiftOp}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -27,8 +29,8 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLShiftOp(HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLShiftOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type, boolean validate) {
+		super(containerID, container, left, right, type, validate);
 	}
 
 	/**
@@ -43,14 +45,17 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLShiftOp(HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type) {
-		this(container, left, right, type, true);
+	public HDLShiftOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type) {
+		this(containerID, container, left, right, type, true);
 	}
 
 	public HDLShiftOp() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLShiftOp;
@@ -79,6 +84,9 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 		}
 	}
 
+	/**
+	 * The accessor for the field type which is of type HDLShiftOpType
+	 */
 	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>() {
 		@Override
 		public HDLShiftOpType getValue(HDLShiftOp obj) {

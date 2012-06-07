@@ -24,6 +24,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLVariableDeclaration}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param register
@@ -43,9 +45,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLQualifiedName type,
-			HDLPrimitive primitive, ArrayList<HDLVariable> variables, boolean validate) {
-		super(container, register, direction, annotations, type, primitive, variables, validate);
+	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
+			HDLQualifiedName type, HDLPrimitive primitive, ArrayList<HDLVariable> variables, boolean validate) {
+		super(containerID, container, register, direction, annotations, type, primitive, variables, validate);
 	}
 
 	/**
@@ -68,15 +70,18 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLQualifiedName type,
-			HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
-		this(container, register, direction, annotations, type, primitive, variables, true);
+	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
+			HDLQualifiedName type, HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
+		this(containerID, container, register, direction, annotations, type, primitive, variables, true);
 	}
 
 	public HDLVariableDeclaration() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLVariableDeclaration;
@@ -105,6 +110,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 	}
 
+	/**
+	 * The accessor for the field register which is of type HDLRegisterConfig
+	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig> fRegister = new HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig>() {
 		@Override
 		public HDLRegisterConfig getValue(HDLVariableDeclaration obj) {
@@ -113,6 +121,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return obj.getRegister();
 		}
 	};
+	/**
+	 * The accessor for the field direction which is of type HDLDirection
+	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLDirection> fDirection = new HDLFieldAccess<HDLVariableDeclaration, HDLDirection>() {
 		@Override
 		public HDLDirection getValue(HDLVariableDeclaration obj) {
@@ -121,6 +132,10 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return obj.getDirection();
 		}
 	};
+	/**
+	 * The accessor for the field annotations which is of type
+	 * ArrayList<HDLAnnotation>
+	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>>() {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLVariableDeclaration obj) {
@@ -129,6 +144,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return obj.getAnnotations();
 		}
 	};
+	/**
+	 * The accessor for the field type which is of type HDLQualifiedName
+	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName> fType = new HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName>() {
 		@Override
 		public HDLQualifiedName getValue(HDLVariableDeclaration obj) {
@@ -137,6 +155,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return obj.getTypeRefName();
 		}
 	};
+	/**
+	 * The accessor for the field primitive which is of type HDLPrimitive
+	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive> fPrimitive = new HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive>() {
 		@Override
 		public HDLPrimitive getValue(HDLVariableDeclaration obj) {
@@ -145,6 +166,10 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return obj.getPrimitive();
 		}
 	};
+	/**
+	 * The accessor for the field variables which is of type
+	 * ArrayList<HDLVariable>
+	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>() {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLVariableDeclaration obj) {
@@ -156,9 +181,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 	// $CONTENT-BEGIN$
 
-	public HDLVariableDeclaration(HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations, HDLPrimitive primitive,
-			ArrayList<HDLVariable> variables) {
-		this(container, register, direction, annotations, primitive.asRef(), primitive, variables, true);
+	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
+			HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
+		this(containerID, container, register, direction, annotations, primitive.asRef(), primitive, variables, true);
 	}
 
 	@Override

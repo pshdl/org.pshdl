@@ -16,6 +16,8 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	/**
 	 * Constructs a new instance of {@link HDLBitOp}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -27,8 +29,8 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBitOp(HDLObject container, HDLExpression left, HDLExpression right, HDLBitOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLBitOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLBitOpType type, boolean validate) {
+		super(containerID, container, left, right, type, validate);
 	}
 
 	/**
@@ -43,14 +45,17 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLBitOp(HDLObject container, HDLExpression left, HDLExpression right, HDLBitOpType type) {
-		this(container, left, right, type, true);
+	public HDLBitOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLBitOpType type) {
+		this(containerID, container, left, right, type, true);
 	}
 
 	public HDLBitOp() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLBitOp;
@@ -79,6 +84,9 @@ public class HDLBitOp extends AbstractHDLBitOp {
 		}
 	}
 
+	/**
+	 * The accessor for the field type which is of type HDLBitOpType
+	 */
 	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>() {
 		@Override
 		public HDLBitOpType getValue(HDLBitOp obj) {

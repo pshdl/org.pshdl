@@ -18,13 +18,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 	/**
 	 * Constructs a new instance of {@link HDLObject}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLObject(HDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLObject(int containerID, HDLObject container, boolean validate) {
+		super(containerID, container, validate);
 	}
 
 	/**
@@ -33,18 +35,24 @@ public abstract class HDLObject extends AbstractHDLObject {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLObject(HDLObject container) {
-		this(container, true);
+	public HDLObject(int containerID, HDLObject container) {
+		this(containerID, container, true);
 	}
 
 	public HDLObject() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	public HDLClass getClassType() {
 		return HDLClass.HDLObject;
 	}
 
+	/**
+	 * The accessor for the field container which is of type HDLObject
+	 */
 	public static HDLFieldAccess<HDLObject, HDLObject> fContainer = new HDLFieldAccess<HDLObject, HDLObject>() {
 		@Override
 		public HDLObject getValue(HDLObject obj) {
@@ -189,6 +197,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 		if (container != null)
 			return container.getFullName();
 		return HDLQualifiedName.EMPTY;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends HDLObject> ArrayList<T> copyAll(ArrayList<T> array) {
+		ArrayList<T> res = new ArrayList<T>(array.size());
+		for (T hdlExpression : array) {
+			res.add((T) hdlExpression.copy());
+		}
+		return res;
 	}
 
 	// $CONTENT-END$

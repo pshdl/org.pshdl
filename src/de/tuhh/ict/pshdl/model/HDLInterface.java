@@ -18,6 +18,8 @@ public class HDLInterface extends AbstractHDLInterface {
 	/**
 	 * Constructs a new instance of {@link HDLInterface}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -27,8 +29,8 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports, boolean validate) {
-		super(container, name, ports, validate);
+	public HDLInterface(int containerID, HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports, boolean validate) {
+		super(containerID, container, name, ports, validate);
 	}
 
 	/**
@@ -41,19 +43,26 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 */
-	public HDLInterface(HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports) {
-		this(container, name, ports, true);
+	public HDLInterface(int containerID, HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports) {
+		this(containerID, container, name, ports, true);
 	}
 
 	public HDLInterface() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLInterface;
 	}
 
+	/**
+	 * The accessor for the field ports which is of type
+	 * ArrayList<HDLVariableDeclaration>
+	 */
 	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>() {
 		@Override
 		public ArrayList<HDLVariableDeclaration> getValue(HDLInterface obj) {

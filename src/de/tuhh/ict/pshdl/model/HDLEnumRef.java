@@ -16,6 +16,8 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
 	 * Constructs a new instance of {@link HDLEnumRef}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -25,8 +27,8 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumRef(HDLObject container, HDLQualifiedName var, HDLQualifiedName hEnum, boolean validate) {
-		super(container, var, hEnum, validate);
+	public HDLEnumRef(int containerID, HDLObject container, HDLQualifiedName var, HDLQualifiedName hEnum, boolean validate) {
+		super(containerID, container, var, hEnum, validate);
 	}
 
 	/**
@@ -39,19 +41,25 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEnumRef(HDLObject container, HDLQualifiedName var, HDLQualifiedName hEnum) {
-		this(container, var, hEnum, true);
+	public HDLEnumRef(int containerID, HDLObject container, HDLQualifiedName var, HDLQualifiedName hEnum) {
+		this(containerID, container, var, hEnum, true);
 	}
 
 	public HDLEnumRef() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLEnumRef;
 	}
 
+	/**
+	 * The accessor for the field hEnum which is of type HDLQualifiedName
+	 */
 	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>() {
 		@Override
 		public HDLQualifiedName getValue(HDLEnumRef obj) {

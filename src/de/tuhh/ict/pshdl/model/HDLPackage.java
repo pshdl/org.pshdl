@@ -19,6 +19,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * Constructs a new instance of {@link HDLPackage}
 	 * 
+	 * @param containerID
+	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param libURI
@@ -32,8 +34,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPackage(HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations, boolean validate) {
-		super(container, libURI, pkg, units, declarations, validate);
+	public HDLPackage(int containerID, HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations, boolean validate) {
+		super(containerID, container, libURI, pkg, units, declarations, validate);
 	}
 
 	/**
@@ -50,19 +52,25 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param declarations
 	 *            the value for declarations. Can be <code>null</code>.
 	 */
-	public HDLPackage(HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations) {
-		this(container, libURI, pkg, units, declarations, true);
+	public HDLPackage(int containerID, HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations) {
+		this(containerID, container, libURI, pkg, units, declarations, true);
 	}
 
 	public HDLPackage() {
 		super();
 	}
 
+	/**
+	 * Returns the ClassType of this instance
+	 */
 	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLPackage;
 	}
 
+	/**
+	 * The accessor for the field libURI which is of type String
+	 */
 	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>() {
 		@Override
 		public String getValue(HDLPackage obj) {
@@ -71,6 +79,9 @@ public class HDLPackage extends AbstractHDLPackage {
 			return obj.getLibURI();
 		}
 	};
+	/**
+	 * The accessor for the field pkg which is of type String
+	 */
 	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>() {
 		@Override
 		public String getValue(HDLPackage obj) {
@@ -79,6 +90,9 @@ public class HDLPackage extends AbstractHDLPackage {
 			return obj.getPkg();
 		}
 	};
+	/**
+	 * The accessor for the field units which is of type ArrayList<HDLUnit>
+	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>() {
 		@Override
 		public ArrayList<HDLUnit> getValue(HDLPackage obj) {
@@ -87,6 +101,10 @@ public class HDLPackage extends AbstractHDLPackage {
 			return obj.getUnits();
 		}
 	};
+	/**
+	 * The accessor for the field declarations which is of type
+	 * ArrayList<HDLDeclaration>
+	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>() {
 		@Override
 		public ArrayList<HDLDeclaration> getValue(HDLPackage obj) {
