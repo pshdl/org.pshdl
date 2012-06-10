@@ -22,6 +22,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * </ul>
  */
 public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
+
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
 	 * 
@@ -177,9 +178,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String CLOCK_PARAM = "clock";
 	public static final String RESET_TYPE_PARAM = "resetType";
 	public static final String RESET_VALUE_PARAM = "resetValue";
+	public static final String DEF_RST = "$rst";
+	public static final String DEF_CLK = "$clk";
 
 	public static HDLRegisterConfig defaultConfig() {
-		return new HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setResetValue(HDLLiteral.get(0));
+		return new HDLRegisterConfig().setClk(HDLQualifiedName.create(DEF_CLK)).setRst(HDLQualifiedName.create(DEF_RST)).setResetValue(HDLLiteral.get(0));
 	}
 
 	public static HDLRegisterConfig fromArgs(ArrayList<HDLArgument> args) {
@@ -251,6 +254,14 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		result = (prime * result) + ((resetType == null) ? 0 : resetType.hashCode());
 		result = (prime * result) + ((syncType == null) ? 0 : syncType.hashCode());
 		return result;
+	}
+
+	public static HDLVariable defaultClk() {
+		return new HDLVariable().setName(DEF_CLK);
+	}
+
+	public static HDLVariable defaultRst() {
+		return new HDLVariable().setName(DEF_RST);
 	}
 	// $CONTENT-END$
 

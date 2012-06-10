@@ -18,12 +18,9 @@ import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class Insulin {
-	private static final String RST_NAME = HDLRegisterConfig.defaultConfig().getRstRefName().getLastSegment();
-	private static final String CLK_NAME = HDLRegisterConfig.defaultConfig().getClkRefName().getLastSegment();
-
 	public static HDLPackage transform(HDLPackage orig) {
-		HDLValidator.annotateReadCount(orig);
-		HDLValidator.annotateWriteCount(orig);
+		RWValidation.annotateReadCount(orig);
+		RWValidation.annotateWriteCount(orig);
 		HDLPackage apply = handleOutPortRead(orig);
 		apply = includeGenerators(apply);
 		// System.out.println("Insulin.transform()" + apply);
@@ -162,13 +159,13 @@ public class Insulin {
 			customRst = true;
 		}
 		// Replace all $clk and $rst with the clock in HDLRegisters
-		List<HDLRegisterConfig> clkRefs = HDLQuery.selectAll(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fClk).lastSegmentIs(CLK_NAME);
+		List<HDLRegisterConfig> clkRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fClk).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
 		for (HDLRegisterConfig reg : clkRefs) {
 			ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
 			if (!customClk)
 				insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
 		}
-		List<HDLRegisterConfig> rstRefs = HDLQuery.selectAll(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fRst).lastSegmentIs(RST_NAME);
+		List<HDLRegisterConfig> rstRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fRst).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
 		for (HDLRegisterConfig reg : rstRefs) {
 			HDLRegisterConfig orig = reg;
 			reg = ms.getReplacement(reg);
@@ -178,11 +175,11 @@ public class Insulin {
 		}
 
 		// Replace all $clk and $rst VariableRefs
-		List<HDLVariableRef> clkVarRefs = HDLQuery.selectAll(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(CLK_NAME);
+		List<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
 		for (HDLVariableRef clkRef : clkVarRefs) {
 			ms.replace(clkRef, defClkVar.asHDLRef());
 		}
-		List<HDLVariableRef> rstVarRefs = HDLQuery.selectAll(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(RST_NAME);
+		List<HDLVariableRef> rstVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
 		for (HDLVariableRef rstRef : rstVarRefs) {
 			ms.replace(rstRef, defRstVar.asHDLRef());
 		}
@@ -190,12 +187,14 @@ public class Insulin {
 	}
 
 	private static HDLVariable extractVar(HDLPackage apply, HDLAnnotations annotation) {
-		List<HDLAnnotation> clocks = HDLQuery.selectAll(HDLAnnotation.class).from(apply).where(HDLAnnotation.fName).isEqualTo(annotation.toString());
-		if (!clocks.isEmpty()) {
-			if (clocks.get(0).getContainer() instanceof HDLVariableDeclaration) {
-				HDLVariableDeclaration hvd = (HDLVariableDeclaration) clocks.get(0).getContainer();
+		HDLAnnotation clock = HDLQuery.select(HDLAnnotation.class).from(apply).where(HDLAnnotation.fName).isEqualTo(annotation.toString()).getFirst();
+		if (clock != null) {
+			if (clock.getContainer() instanceof HDLVariableDeclaration) {
+				HDLVariableDeclaration hvd = (HDLVariableDeclaration) clock.getContainer();
 				return hvd.getVariables().get(0);
 			}
+			if (clock.getContainer() instanceof HDLVariable)
+				return (HDLVariable) clock.getContainer();
 		}
 		return null;
 	}
@@ -477,7 +476,7 @@ public class Insulin {
 				// b{1,4:5} == b{1}#b{4:5}
 				HDLConcat concat = new HDLConcat();
 				for (HDLRange r : ref.getBits()) {
-					concat = concat.addCats(ref.setBits(HDLObject.asList(r)));
+					concat = concat.addCats(ref.copy().setBits(HDLObject.asList(r.copy())));
 				}
 				ms.replace(ref, concat);
 			}
@@ -487,7 +486,7 @@ public class Insulin {
 
 	private static HDLPackage handleOutPortRead(HDLPackage orig) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableDeclaration> list = HDLQuery.selectAll(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT);
+		List<HDLVariableDeclaration> list = HDLQuery.select(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT).getAll();
 		for (HDLVariableDeclaration hdv : list) {
 			HDLVariableDeclaration origHdv = hdv;
 			for (HDLVariable var : hdv.getVariables()) {
@@ -504,7 +503,7 @@ public class Insulin {
 					if (hdv.getVariables().size() == 1) {
 						hdv = hdv.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(outVar));
 					} else {
-						ms.insertAfter(origHdv, new HDLVariableDeclaration().setType(origHdv.resolveType()).addVariables(outVar));
+						ms.insertAfter(origHdv, new HDLVariableDeclaration().setType(origHdv.resolveType().copy()).addVariables(outVar.copy()));
 						hdv = hdv.removeVariables(var);
 					}
 

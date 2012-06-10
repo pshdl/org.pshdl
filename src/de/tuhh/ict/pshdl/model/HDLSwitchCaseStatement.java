@@ -94,7 +94,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+	public List<HDLVariable> doGetVariables() {
 		return HDLResolver.getallVariableDeclarations(dos);
 	}
 	// $CONTENT-END$

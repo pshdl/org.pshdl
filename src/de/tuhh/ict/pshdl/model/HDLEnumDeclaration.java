@@ -77,7 +77,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+	public List<HDLVariable> doGetVariables() {
 		return Collections.emptyList();
 	}
 	// $CONTENT-END$

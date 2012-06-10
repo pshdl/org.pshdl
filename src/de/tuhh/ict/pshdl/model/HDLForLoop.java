@@ -2,7 +2,6 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -118,10 +117,10 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+	public List<HDLVariable> doGetVariables() {
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		res.addAll(HDLResolver.getallVariableDeclarations(dos));
-		res.add(new HDLVariableDeclaration(new Random().nextInt(), this, null, HDLDirection.HIDDEN, null, HDLPrimitive.getNatural(), asList(param.copy())));
+		res.add(param);
 		return res;
 	}
 

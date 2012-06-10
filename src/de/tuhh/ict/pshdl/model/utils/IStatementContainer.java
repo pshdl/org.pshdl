@@ -9,7 +9,7 @@ public interface IStatementContainer {
 
 	public List<HDLInterface> doGetInterfaceDeclarations();
 
-	public List<HDLVariableDeclaration> doGetVariableDeclarations();
+	public List<HDLVariable> doGetVariables();
 
 	public HDLObject getContainer();
 

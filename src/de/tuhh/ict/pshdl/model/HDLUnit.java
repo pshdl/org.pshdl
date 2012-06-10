@@ -203,7 +203,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 			return resolveType;
 		if (library == null)
 			library = HDLLibrary.getLibrary(libURI);
-		return library.resolve(getName(), getImports(), type);
+		return library.resolve(getImports(), type);
 	}
 
 	private HDLLibrary library;
@@ -227,13 +227,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		List<HDLVariableDeclaration> res = HDLResolver.getallVariableDeclarations(statements);
-		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).setDirection(HDLDirection.IN);
-		hvd.setContainer(this);
-		res.add(hvd.addVariables(new HDLVariable().setName("$clk")));
-		res.add(hvd.addVariables(new HDLVariable().setName("$rst")));
-		return res;
+	public List<HDLVariable> doGetVariables() {
+		return HDLResolver.getallVariableDeclarations(statements);
 	}
 
 	// $CONTENT-END$

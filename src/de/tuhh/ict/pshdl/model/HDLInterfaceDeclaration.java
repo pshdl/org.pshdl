@@ -77,7 +77,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
+	public List<HDLVariable> doGetVariables() {
 		return Collections.emptyList();
 	}
 	// $CONTENT-END$

@@ -33,17 +33,9 @@ public class PLBCodeGen {
 				.setPrimitive(
 						new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))
 				.addVariables(new HDLVariable().setName("Bus2IP_WrCE"));
-		// HDLAssignment Bus2IP_ClkTOClk = new HDLAssignment().setLeft(new
-		// HDLVariableRef().setVar(HDLQualifiedName.create("$clk"))).setType(HDLAssignmentType.ASSGN)
-		// .setRight(new
-		// HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_Clk")));
 		HDLVariableDeclaration Bus2IP_Clk = new HDLVariableDeclaration().setDirection(HDLDirection.IN).addAnnotations(new HDLAnnotation().setName("@clock"))
 				.addAnnotations(new HDLAnnotation().setName("@VHDLAttribute").setValue("SIGIS=CLK")).setType(HDLQualifiedName.create("#bit"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("Bus2IP_Clk"));
-		// HDLAssignment Bus2IP_ResetTORst = new HDLAssignment().setLeft(new
-		// HDLVariableRef().setVar(HDLQualifiedName.create("$rst"))).setType(HDLAssignmentType.ASSGN)
-		// .setRight(new
-		// HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_Reset")));
 		HDLVariableDeclaration Bus2IP_Reset = new HDLVariableDeclaration().setDirection(HDLDirection.IN).addAnnotations(new HDLAnnotation().setName("@reset"))
 				.addAnnotations(new HDLAnnotation().setName("@VHDLAttribute").setValue("SIGIS=RST")).setType(HDLQualifiedName.create("#bit"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("Bus2IP_Reset"));

@@ -61,7 +61,7 @@ public aspect VHDLStatementTransformation {
 		List<AssociationElement> portMap = instantiation.getPortMap();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
-				List<HDLAnnotation> typeAnno = HDLQuery.selectAll(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString());
+				List<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString()).getAll();
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
 					HDLVariableRef ref = sigVar.asHDLRef();
@@ -113,9 +113,9 @@ public aspect VHDLStatementTransformation {
 		HDLPrimitive primitive = getPrimitive();
 		SubtypeIndication type = null;
 		HDLExpression resetValue = null;
-		List<HDLAnnotation> typeAnno = HDLQuery.selectAll(HDLAnnotation.class).from(this).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString());
-		if (!typeAnno.isEmpty()) {
-			HDLQualifiedName value = new HDLQualifiedName(typeAnno.get(0).getValue());
+		HDLAnnotation typeAnno = HDLQuery.select(HDLAnnotation.class).from(this).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString()).getFirst();
+		if (typeAnno!=null) {
+			HDLQualifiedName value = new HDLQualifiedName(typeAnno.getValue());
 			res.addImport(value);
 			type = new EnumerationType(value.getLastSegment());
 		} else {

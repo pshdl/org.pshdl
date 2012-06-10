@@ -152,10 +152,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(getHIf().copy()).addVariables(getVar().copy());
-		hvd.setContainer(this);
-		return Collections.singletonList(hvd);
+	public List<HDLVariable> doGetVariables() {
+		return Collections.singletonList(getVar());
 	}
 	// $CONTENT-END$
 

@@ -15,16 +15,25 @@ public class HDLQuery {
 
 	private static class EqualsMatcher<T> implements FieldMatcher<T> {
 		private final Object equalsTo;
+		private boolean invert;
 
-		public EqualsMatcher(Object equalsTo) {
+		public EqualsMatcher(Object equalsTo, boolean invert) {
 			this.equalsTo = equalsTo;
+			this.invert = invert;
 		}
 
 		@Override
 		public boolean matches(Object obj) {
-			if (equalsTo == null)
-				return obj == null ? true : false;
-			return equalsTo.equals(obj);
+			if (equalsTo == null) {
+				boolean b = obj == null ? true : false;
+				if (invert)
+					return !b;
+				return b;
+			}
+			boolean equals = equalsTo.equals(obj);
+			if (invert)
+				return !equals;
+			return equals;
 		}
 	}
 
@@ -59,6 +68,24 @@ public class HDLQuery {
 		}
 	}
 
+	public static class Result<T> {
+		private List<T> res;
+
+		public Result(List<T> res) {
+			this.res = res;
+		}
+
+		public List<T> getAll() {
+			return res;
+		}
+
+		public T getFirst() {
+			if (res.size() == 0)
+				return null;
+			return res.get(0);
+		}
+	}
+
 	public static class FieldSelector<T, K> {
 		private HDLFieldAccess<T, K> field;
 		private HDLObject from;
@@ -70,17 +97,21 @@ public class HDLQuery {
 			this.field = field;
 		}
 
-		public List<T> isEqualTo(K value) {
-			return from.getAllObjectsOf(clazz, field, new EqualsMatcher<K>(value));
+		public Result<T> isEqualTo(K value) {
+			return new Result<T>(from.getAllObjectsOf(clazz, field, new EqualsMatcher<K>(value, false)));
 		}
 
-		public List<T> startsWith(K ifRef) {
-			return from.getAllObjectsOf(clazz, field, new StartsWithMatcher<K>(ifRef));
+		public Result<T> startsWith(K ifRef) {
+			return new Result<T>(from.getAllObjectsOf(clazz, field, new StartsWithMatcher<K>(ifRef)));
 		}
 
 		@SuppressWarnings("unchecked")
-		public List<T> lastSegmentIs(String lastSegment) {
-			return from.getAllObjectsOf(clazz, field, new LastSegmentMatcher(lastSegment));
+		public Result<T> lastSegmentIs(String lastSegment) {
+			return new Result<T>(from.getAllObjectsOf(clazz, field, new LastSegmentMatcher(lastSegment)));
+		}
+
+		public Result<T> isNotEqualTo(T value) {
+			return new Result<T>(from.getAllObjectsOf(clazz, field, new EqualsMatcher<K>(value, true)));
 		}
 
 	}
@@ -113,7 +144,7 @@ public class HDLQuery {
 		}
 	}
 
-	public static <T extends HDLObject> Source<T> selectAll(Class<T> clazz) {
+	public static <T extends HDLObject> Source<T> select(Class<T> clazz) {
 		return new Source<T>(clazz);
 	}
 

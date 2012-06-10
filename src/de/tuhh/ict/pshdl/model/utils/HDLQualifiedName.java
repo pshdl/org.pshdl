@@ -10,6 +10,11 @@ public class HDLQualifiedName {
 	public HDLQualifiedName(String[] qfn) {
 		this.qfn = qfn;
 		this.length = qfn.length;
+		for (String string : qfn) {
+			if (string.contains(".")) {
+				throw new IllegalArgumentException("Segments may not contain dots");
+			}
+		}
 	}
 
 	public HDLQualifiedName(String qfn) {

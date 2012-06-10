@@ -102,10 +102,10 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+	public List<HDLVariable> doGetVariables() {
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		for (HDLSwitchCaseStatement c : cases) {
-			res.addAll(c.doGetVariableDeclarations());
+			res.addAll(c.doGetVariables());
 		}
 		return res;
 	}

@@ -118,8 +118,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+	public List<HDLVariable> doGetVariables() {
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		res.addAll(HDLResolver.getallVariableDeclarations(thenDo));
 		res.addAll(HDLResolver.getallVariableDeclarations(elseDo));
 		return res;

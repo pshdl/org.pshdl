@@ -209,8 +209,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		return Collections.singletonList(this);
+	public List<HDLVariable> doGetVariables() {
+		return this.getVariables();
 	}
 
 	@Override

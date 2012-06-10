@@ -208,6 +208,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return res;
 	}
 
+	public boolean hasContainer(Class<?> clazz) {
+		if (container != null) {
+			if (container.getClass().equals(clazz))
+				return true;
+			return container.hasContainer(clazz);
+		}
+		return false;
+	}
+
 	// $CONTENT-END$
 
 }

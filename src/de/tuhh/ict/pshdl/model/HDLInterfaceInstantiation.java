@@ -107,10 +107,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	}
 
 	@Override
-	public List<HDLVariableDeclaration> doGetVariableDeclarations() {
-		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(getHIfRefName()).addVariables(getVar().copy());
-		hvd.setContainer(this);
-		return Collections.singletonList(hvd);
+	public List<HDLVariable> doGetVariables() {
+		return Collections.singletonList(getVar());
 	}
 	// $CONTENT-END$
 

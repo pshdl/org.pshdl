@@ -85,10 +85,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	}
 
 	private HDLVariable getVariable(String lastSegment) {
-		List<HDLVariable> vars = HDLQuery.selectAll(HDLVariable.class).from(this).where(HDLVariable.fName).lastSegmentIs(lastSegment);
-		if (vars.isEmpty())
-			return null;
-		return vars.get(0);
+		return HDLQuery.select(HDLVariable.class).from(this).where(HDLVariable.fName).lastSegmentIs(lastSegment).getFirst();
 	}
 
 	@Override

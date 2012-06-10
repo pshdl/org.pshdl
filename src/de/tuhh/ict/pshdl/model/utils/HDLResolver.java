@@ -29,9 +29,13 @@ public class HDLResolver {
 		for (HDLEnumDeclaration hEnumDecl : resolveTo.doGetEnumDeclarations()) {
 			types.add(hEnumDecl.getHEnum());
 		}
-		for (HDLVariableDeclaration varDecl : resolveTo.doGetVariableDeclarations()) {
-			if (varDecl.getPrimitive() != null)
-				types.add(varDecl.getPrimitive());
+		for (HDLVariable varDecl : resolveTo.doGetVariables()) {
+			HDLObject container = varDecl.getContainer();
+			if (container instanceof HDLVariableDeclaration) {
+				HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
+				if (hvd.getPrimitive() != null)
+					types.add(hvd.getPrimitive());
+			}
 		}
 		for (HDLInterface ifDecl : resolveTo.doGetInterfaceDeclarations()) {
 			types.add(ifDecl);
@@ -100,12 +104,10 @@ public class HDLResolver {
 	public HDLVariable resolveVariable(HDLQualifiedName var) {
 		if (variableCache == null) {
 			synchronized (this) {
-				List<HDLVariableDeclaration> varDecl = resolveTo.doGetVariableDeclarations();
+				List<HDLVariable> varDecl = resolveTo.doGetVariables();
 				variableCache = new HashMap<HDLQualifiedName, HDLVariable>();
-				for (HDLVariableDeclaration hdlVarDeclaration : varDecl) {
-					for (HDLVariable declVars : hdlVarDeclaration.getVariables()) {
-						variableCache.put(declVars.getFullName(), declVars);
-					}
+				for (HDLVariable declVars : varDecl) {
+					variableCache.put(declVars.getFullName(), declVars);
 				}
 			}
 		}
@@ -123,6 +125,10 @@ public class HDLResolver {
 				}
 			}
 		}
+		if (HDLRegisterConfig.DEF_CLK.equals(var.getLastSegment()))
+			return HDLRegisterConfig.defaultClk();
+		if (HDLRegisterConfig.DEF_RST.equals(var.getLastSegment()))
+			return HDLRegisterConfig.defaultRst();
 		HDLObject container = resolveTo.getContainer();
 		if ((container == null) || !descent)
 			return null;
@@ -156,10 +162,10 @@ public class HDLResolver {
 		return res;
 	}
 
-	public static List<HDLVariableDeclaration> getallVariableDeclarations(List<HDLStatement> stmnts) {
-		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+	public static List<HDLVariable> getallVariableDeclarations(List<HDLStatement> stmnts) {
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		for (HDLStatement hdlStatement : stmnts) {
-			res.addAll(hdlStatement.doGetVariableDeclarations());
+			res.addAll(hdlStatement.doGetVariables());
 		}
 		return res;
 	}
