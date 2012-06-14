@@ -74,6 +74,13 @@ public class HDLQualifiedName {
 		return qfn[qfn.length - 1];
 	}
 
+	/**
+	 * Prints the Qualified name using c as separator
+	 * 
+	 * @param c
+	 *            the separator
+	 * @return
+	 */
 	public String toString(char c) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();

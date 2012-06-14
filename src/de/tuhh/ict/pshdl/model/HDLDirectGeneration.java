@@ -132,9 +132,14 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 
 	// $CONTENT-BEGIN$
 
+	private HDLInterface hif = null;
+
 	@Override
 	public HDLInterface getHIf() {
-		return HDLGenerators.getInterface(this).setContainer(this);
+		if (hif != null)
+			return hif;
+		hif = HDLGenerators.getInterface(this).setContainer(this);
+		return hif;
 	}
 
 	public HDLQualifiedName getIfName() {

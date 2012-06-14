@@ -78,7 +78,6 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 			return obj.getValue();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

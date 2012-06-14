@@ -113,7 +113,6 @@ public class HDLPackage extends AbstractHDLPackage {
 			return obj.getDeclarations();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

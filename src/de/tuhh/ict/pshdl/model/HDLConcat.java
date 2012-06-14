@@ -67,7 +67,6 @@ public class HDLConcat extends AbstractHDLConcat {
 			return obj.getCats();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

@@ -44,7 +44,6 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	public HDLClass getClassType() {
 		return HDLClass.HDLCompound;
 	}
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

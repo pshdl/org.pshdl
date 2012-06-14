@@ -95,7 +95,6 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 			return obj.getType();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

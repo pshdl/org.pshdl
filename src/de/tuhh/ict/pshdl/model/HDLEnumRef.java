@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 /**
  * The class HDLEnumRef contains the following fields
@@ -73,7 +74,10 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	@Override
 	public HDLVariable resolveVar() {
 		HDLEnum resolveHEnum = resolveHEnum();
-		return resolveHEnum.getVariable(getVarRefName().getLastSegment());
+		HDLVariable var = resolveHEnum.getVariable(getVarRefName().getLastSegment());
+		if (var == null)
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
+		return var;
 	}
 
 	// $CONTENT-END$

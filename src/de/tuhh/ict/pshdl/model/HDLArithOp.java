@@ -95,7 +95,6 @@ public class HDLArithOp extends AbstractHDLArithOp {
 			return obj.getType();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

@@ -11,10 +11,12 @@ public class HDLQuery {
 
 	public static interface FieldMatcher<T> {
 		boolean matches(T obj);
+
+		FieldMatcher<T> setParameter(T param);
 	}
 
 	private static class EqualsMatcher<T> implements FieldMatcher<T> {
-		private final Object equalsTo;
+		private Object equalsTo;
 		private boolean invert;
 
 		public EqualsMatcher(Object equalsTo, boolean invert) {
@@ -23,7 +25,7 @@ public class HDLQuery {
 		}
 
 		@Override
-		public boolean matches(Object obj) {
+		public boolean matches(T obj) {
 			if (equalsTo == null) {
 				boolean b = obj == null ? true : false;
 				if (invert)
@@ -35,26 +37,36 @@ public class HDLQuery {
 				return !equals;
 			return equals;
 		}
+
+		@Override
+		public EqualsMatcher<T> setParameter(T param) {
+			return new EqualsMatcher<T>(param, invert);
+		}
 	}
 
-	private static class StartsWithMatcher<K> implements FieldMatcher<K> {
-		private final K equalsTo;
+	private static class StartsWithMatcher<T> implements FieldMatcher<T> {
+		private T equalsTo;
 
-		public StartsWithMatcher(K equalsTo) {
+		public StartsWithMatcher(T equalsTo) {
 			this.equalsTo = equalsTo;
 		}
 
 		@Override
-		public boolean matches(K obj) {
+		public boolean matches(T obj) {
 			if (obj == null)
 				return false;
 			return obj.toString().startsWith(equalsTo.toString());
+		}
+
+		@Override
+		public StartsWithMatcher<T> setParameter(T param) {
+			return new StartsWithMatcher<T>(param);
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	private static class LastSegmentMatcher implements FieldMatcher {
-		private final String equalsTo;
+		private String equalsTo;
 
 		public LastSegmentMatcher(String equalsTo) {
 			this.equalsTo = equalsTo;
@@ -66,23 +78,41 @@ public class HDLQuery {
 				return false;
 			return new HDLQualifiedName(obj.toString()).getLastSegment().equals(equalsTo);
 		}
+
+		@Override
+		public LastSegmentMatcher setParameter(Object param) {
+			return new LastSegmentMatcher(param.toString());
+		}
 	}
 
-	public static class Result<T> {
-		private List<T> res;
+	public static class Result<T, K> {
+		private HDLFieldAccess<T, K> field;
+		private HDLObject from;
+		private Class<T> clazz;
+		private FieldMatcher<K> matcher;
 
-		public Result(List<T> res) {
-			this.res = res;
+		public Result(HDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
+			this.from = from;
+			this.clazz = clazz;
+			this.field = field;
+			this.matcher = matcher;
 		}
 
 		public List<T> getAll() {
-			return res;
+			return from.getAllObjectsOf(clazz, field, matcher);
 		}
 
 		public T getFirst() {
+			List<T> res = from.getAllObjectsOf(clazz, field, matcher);
 			if (res.size() == 0)
 				return null;
 			return res.get(0);
+		}
+
+		public List<T> or(K parameter) {
+			List<T> res = from.getAllObjectsOf(clazz, field, matcher);
+			res.addAll(from.getAllObjectsOf(clazz, field, matcher.setParameter(parameter)));
+			return res;
 		}
 	}
 
@@ -97,21 +127,21 @@ public class HDLQuery {
 			this.field = field;
 		}
 
-		public Result<T> isEqualTo(K value) {
-			return new Result<T>(from.getAllObjectsOf(clazz, field, new EqualsMatcher<K>(value, false)));
+		public Result<T, K> isEqualTo(K value) {
+			return new Result<T, K>(from, clazz, field, new EqualsMatcher<K>(value, false));
 		}
 
-		public Result<T> startsWith(K ifRef) {
-			return new Result<T>(from.getAllObjectsOf(clazz, field, new StartsWithMatcher<K>(ifRef)));
+		public Result<T, K> startsWith(K ifRef) {
+			return new Result<T, K>(from, clazz, field, new StartsWithMatcher<K>(ifRef));
 		}
 
 		@SuppressWarnings("unchecked")
-		public Result<T> lastSegmentIs(String lastSegment) {
-			return new Result<T>(from.getAllObjectsOf(clazz, field, new LastSegmentMatcher(lastSegment)));
+		public Result<T, K> lastSegmentIs(String lastSegment) {
+			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(lastSegment));
 		}
 
-		public Result<T> isNotEqualTo(T value) {
-			return new Result<T>(from.getAllObjectsOf(clazz, field, new EqualsMatcher<K>(value, true)));
+		public Result<T, K> isNotEqualTo(T value) {
+			return new Result<T, K>(from, clazz, field, new EqualsMatcher<K>(value, true));
 		}
 
 	}

@@ -7,6 +7,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 /**
  * The class HDLObject contains the following fields
@@ -62,6 +63,30 @@ public abstract class HDLObject extends AbstractHDLObject {
 		}
 	};
 
+	public HDLVariable resolveVariable(HDLQualifiedName var) {
+		if (container == null)
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for variable:" + var));
+		return container.resolveVariable(var);
+	}
+
+	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
+		if (container == null)
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, this, "for enum:" + hEnum));
+		return container.resolveEnum(hEnum);
+	}
+
+	public HDLType resolveType(HDLQualifiedName type) {
+		if (container == null)
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, this, "for type:" + type));
+		return container.resolveType(type);
+	}
+
+	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
+		if (container == null)
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_INTERFACE, this, "for interface:" + hIf));
+		return container.resolveInterface(hIf);
+	}
+
 	// $CONTENT-BEGIN$
 
 	@Override
@@ -74,10 +99,6 @@ public abstract class HDLObject extends AbstractHDLObject {
 
 	@Override
 	public abstract HDLObject copyFiltered(CopyFilter filter);
-
-	public interface MetaAccess<T> {
-		public String name();
-	}
 
 	public Map<String, Object> metaData = new HashMap<String, Object>();
 
@@ -208,13 +229,14 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return res;
 	}
 
-	public boolean hasContainer(Class<?> clazz) {
+	@SuppressWarnings("unchecked")
+	public <T extends HDLObject> T getContainer(Class<T> clazz) {
 		if (container != null) {
 			if (container.getClass().equals(clazz))
-				return true;
-			return container.hasContainer(clazz);
+				return (T) container;
+			return container.getContainer(clazz);
 		}
-		return false;
+		return null;
 	}
 
 	// $CONTENT-END$

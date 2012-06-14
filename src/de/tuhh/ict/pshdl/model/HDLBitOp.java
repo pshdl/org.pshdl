@@ -95,7 +95,6 @@ public class HDLBitOp extends AbstractHDLBitOp {
 			return obj.getType();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

@@ -80,6 +80,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	};
 
 	// $CONTENT-BEGIN$
+	public abstract Enum<?> getType();
 	// $CONTENT-END$
 
 }

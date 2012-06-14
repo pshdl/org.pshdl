@@ -5,6 +5,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 /**
  * The class HDLInterfaceRef contains the following fields
@@ -106,7 +107,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	public HDLVariable resolveVar() {
 		HDLVariable resolveHIf = resolveHIf();
 		if (resolveHIf == null)
-			throw new IllegalArgumentException("Could not resolve interface:" + getHIfRefName());
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
 		HDLType type = resolveHIf.determineType();
 		if (type instanceof HDLInterface) {
 			HDLInterface hIf = (HDLInterface) type;
@@ -119,7 +120,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 				}
 			}
 		}
-		throw new IllegalArgumentException("Could not resolve interface variable:" + getVarRefName());
+		throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
 	}
 
 	// $CONTENT-END$

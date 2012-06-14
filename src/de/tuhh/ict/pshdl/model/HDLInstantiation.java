@@ -81,7 +81,6 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 			return obj.getArguments();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

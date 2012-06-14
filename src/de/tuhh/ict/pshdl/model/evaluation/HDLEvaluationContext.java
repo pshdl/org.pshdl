@@ -1,8 +1,11 @@
 package de.tuhh.ict.pshdl.model.evaluation;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLEvaluationContext {
 
@@ -14,6 +17,40 @@ public class HDLEvaluationContext {
 
 	public HDLExpression get(HDLVariable ref) {
 		return context.get(ref.getName());
+	}
+
+	public static Map<HDLQualifiedName, HDLEvaluationContext> createDefault(HDLPackage pkg) {
+		Map<HDLQualifiedName, HDLEvaluationContext> res = new HashMap<HDLQualifiedName, HDLEvaluationContext>();
+		for (HDLUnit unit : pkg.getUnits()) {
+			HDLEvaluationContext hec = createDefault(unit);
+			HDLQualifiedName fullName = unit.getFullName();
+			res.put(fullName, hec);
+		}
+		return res;
+	}
+
+	public static HDLEvaluationContext createDefault(HDLUnit unit) {
+		Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
+		List<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.CONSTANT)
+				.or(HDLDirection.PARAMETER);
+		for (HDLVariableDeclaration hvd : constants) {
+			for (HDLVariable var : hvd.getVariables()) {
+				c.put(var.getName(), var.getDefaultValue());
+			}
+		}
+		HDLEvaluationContext hec = new HDLEvaluationContext(c);
+		return hec;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String spacer = "";
+		for (Entry<String, HDLExpression> unit : context.entrySet()) {
+			sb.append(spacer).append(unit.getKey()).append(':').append(unit.getValue());
+			spacer = ",";
+		}
+		return sb.toString();
 	}
 
 }

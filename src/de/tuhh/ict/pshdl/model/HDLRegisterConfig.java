@@ -22,7 +22,6 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * </ul>
  */
 public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
-
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
 	 * 
@@ -169,7 +168,6 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.getResetValue();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 
 	public static final String EDGE_PARAM = "clockEdge";

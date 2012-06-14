@@ -76,11 +76,14 @@ public class HDLInterface extends AbstractHDLInterface {
 
 	@Override
 	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		if (var.length == 1) {
-			return getVariable(var.getLastSegment());
+		HDLVariable resolved = getVariable(var.getLastSegment());
+		if (resolved != null) {
+			if (var.length == 1) {
+				return resolved;
+			}
+			if (getFullName().equals(var.skipLast(1)))
+				return resolved;
 		}
-		if (getFullName().equals(var.skipLast(1)))
-			return getVariable(var.getLastSegment());
 		return super.resolveVariable(var);
 	}
 

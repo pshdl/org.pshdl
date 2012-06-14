@@ -11,6 +11,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 
 public class HDLPrimitives {
 
@@ -157,6 +158,17 @@ public class HDLPrimitives {
 	}
 
 	public static void main(String[] args) {
+		System.out.println(intRange(BigInteger.valueOf(0)));
+		System.out.println(intRange(BigInteger.valueOf(1)));
+		System.out.println(intRange(BigInteger.valueOf(16)));
+		System.out.println(intRange(BigInteger.valueOf(9)));
+		System.out.println(intRange(BigInteger.valueOf(32)));
+		System.out.println("IntMin:" + Integer.MIN_VALUE + " IntMax:" + Integer.MAX_VALUE);
+		System.out.println(uintRange(BigInteger.valueOf(0)));
+		System.out.println(uintRange(BigInteger.valueOf(1)));
+		System.out.println(uintRange(BigInteger.valueOf(16)));
+		System.out.println(uintRange(BigInteger.valueOf(9)));
+		System.out.println(uintRange(BigInteger.valueOf(32)));
 		try {
 			StringBuilder sb = new StringBuilder("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"cast.css\" /></head><body>\n");
 			sb.append("<p>Arithmetic operation conversion/result table</p>");
@@ -458,4 +470,82 @@ public class HDLPrimitives {
 		}
 		return null;
 	}
+
+	public static class ValueRange {
+		public final BigInteger from, to;
+
+		public ValueRange(BigInteger from, BigInteger to) {
+			super();
+			this.from = from;
+			this.to = to;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((from == null) ? 0 : from.hashCode());
+			result = (prime * result) + ((to == null) ? 0 : to.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ValueRange other = (ValueRange) obj;
+			if (from == null) {
+				if (other.from != null)
+					return false;
+			} else if (!from.equals(other.from))
+				return false;
+			if (to == null) {
+				if (other.to != null)
+					return false;
+			} else if (!to.equals(other.to))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "ValueRange [from=" + from + ", to=" + to + "]";
+		}
+	}
+
+	public ValueRange getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {
+		switch (pt.getType()) {
+		case BOOL:
+		case BIT:
+		case BITVECTOR:
+			throw new IllegalArgumentException(pt.getType() + " is not numerical!");
+		case INT:
+			BigInteger bitWidth = pt.getWidth().constantEvaluate(context);
+			return intRange(bitWidth);
+		case INTEGER:
+			return intRange(BigInteger.valueOf(32));
+		case UINT:
+			return uintRange(pt.getWidth().constantEvaluate(context));
+		case NATURAL:
+			return uintRange(BigInteger.valueOf(32));
+		}
+		throw new IllegalArgumentException("Did not expect type:" + pt.getType());
+	}
+
+	private static ValueRange intRange(BigInteger bitWidth) {
+		BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
+		BigInteger min = max.negate().subtract(BigInteger.ONE);
+		return new ValueRange(min, max);
+	}
+
+	private static ValueRange uintRange(BigInteger bitWidth) {
+		BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
+		BigInteger min = BigInteger.ZERO;
+		return new ValueRange(min, max);
+	}
+
 }

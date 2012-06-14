@@ -8,7 +8,6 @@ import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
-import de.tuhh.ict.pshdl.model.HDLObject.MetaAccess;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -18,10 +17,10 @@ import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class Insulin {
-	public static HDLPackage transform(HDLPackage orig) {
+	public static <T extends HDLObject> T transform(T orig) {
 		RWValidation.annotateReadCount(orig);
 		RWValidation.annotateWriteCount(orig);
-		HDLPackage apply = handleOutPortRead(orig);
+		HDLObject apply = handleOutPortRead(orig);
 		apply = includeGenerators(apply);
 		// System.out.println("Insulin.transform()" + apply);
 		// apply.validateAllFields(null, true);
@@ -33,7 +32,7 @@ public class Insulin {
 		apply = fortifyType(apply);
 		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(null, true);
-		return apply;
+		return (T) apply;
 	}
 
 	/**
@@ -43,7 +42,7 @@ public class Insulin {
 	 * @param apply
 	 * @return
 	 */
-	private static HDLPackage includeGenerators(HDLPackage apply) {
+	private static HDLObject includeGenerators(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLDirectGeneration> gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration generation : gens) {
@@ -70,7 +69,7 @@ public class Insulin {
 
 	private static EnumSet<HDLDirection> doNotInit = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.CONSTANT, HDLDirection.PARAMETER, HDLDirection.IN);
 
-	private static HDLPackage generateInitializations(HDLPackage apply) {
+	private static HDLObject generateInitializations(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableDeclaration> allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : allVarDecls) {
@@ -142,7 +141,7 @@ public class Insulin {
 	 * @param apply
 	 * @return
 	 */
-	private static HDLPackage generateClkAndReset(HDLPackage apply) {
+	private static HDLObject generateClkAndReset(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		HDLVariable defClkVar = new HDLVariable().setName("clk");
 		HDLVariable defRstVar = new HDLVariable().setName("rst");
@@ -186,7 +185,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLVariable extractVar(HDLPackage apply, HDLAnnotations annotation) {
+	private static HDLVariable extractVar(HDLObject apply, HDLAnnotations annotation) {
 		HDLAnnotation clock = HDLQuery.select(HDLAnnotation.class).from(apply).where(HDLAnnotation.fName).isEqualTo(annotation.toString()).getFirst();
 		if (clock != null) {
 			if (clock.getContainer() instanceof HDLVariableDeclaration) {
@@ -218,7 +217,7 @@ public class Insulin {
 		}
 	}
 
-	private static HDLPackage fortifyType(HDLPackage apply) {
+	private static HDLObject fortifyType(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		fortifyOpExpressions(apply, ms);
 		fortifyAssignments(apply, ms);
@@ -231,7 +230,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static void foritfyFunctions(HDLPackage apply, ModificationSet ms) {
+	private static void foritfyFunctions(HDLObject apply, ModificationSet ms) {
 		List<HDLFunction> functions = apply.getAllObjectsOf(HDLFunction.class, true);
 		for (HDLFunction function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
@@ -245,7 +244,7 @@ public class Insulin {
 		}
 	}
 
-	private static void foritfyArrays(HDLPackage apply, ModificationSet ms) {
+	private static void foritfyArrays(HDLObject apply, ModificationSet ms) {
 		List<HDLVariableRef> varRefs = apply.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : varRefs) {
 			for (HDLExpression exp : ref.getArray()) {
@@ -260,7 +259,7 @@ public class Insulin {
 		}
 	}
 
-	private static void fortifyWidthExpressions(HDLPackage apply, ModificationSet ms) {
+	private static void fortifyWidthExpressions(HDLObject apply, ModificationSet ms) {
 		List<HDLPrimitive> primitives = apply.getAllObjectsOf(HDLPrimitive.class, true);
 		for (HDLPrimitive hdlPrimitive : primitives) {
 			HDLExpression width = hdlPrimitive.getWidth();
@@ -270,7 +269,7 @@ public class Insulin {
 		}
 	}
 
-	private static void fortifyDefaultAndResetExpressions(HDLPackage apply, ModificationSet ms) {
+	private static void fortifyDefaultAndResetExpressions(HDLObject apply, ModificationSet ms) {
 		List<HDLVariableDeclaration> primitives = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : primitives) {
 			HDLRegisterConfig reg = hvd.getRegister();
@@ -286,7 +285,7 @@ public class Insulin {
 		}
 	}
 
-	private static void fortifyRanges(HDLPackage apply, ModificationSet ms) {
+	private static void fortifyRanges(HDLObject apply, ModificationSet ms) {
 		List<HDLRange> ranges = apply.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange range : ranges) {
 			HDLExpression exp = range.getFrom();
@@ -297,14 +296,14 @@ public class Insulin {
 		}
 	}
 
-	private static void fortifyIfExpressions(HDLPackage apply, ModificationSet ms) {
+	private static void fortifyIfExpressions(HDLObject apply, ModificationSet ms) {
 		List<HDLIfStatement> ifs = apply.getAllObjectsOf(HDLIfStatement.class, true);
 		for (HDLIfStatement assignment : ifs) {
 			fortify(ms, assignment.getIfExp(), HDLPrimitive.getBool());
 		}
 	}
 
-	private static void fortifyAssignments(HDLPackage apply, ModificationSet ms) {
+	private static void fortifyAssignments(HDLObject apply, ModificationSet ms) {
 		List<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
 			HDLType leftType = assignment.getLeft().determineType();
@@ -317,7 +316,7 @@ public class Insulin {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	private static void fortifyOpExpressions(HDLPackage apply, ModificationSet ms) {
+	private static void fortifyOpExpressions(HDLObject apply, ModificationSet ms) {
 		List<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		for (HDLExpression opExpression : opEx) {
 			HDLTypeInferenceInfo inferenceInfo = null;
@@ -387,7 +386,7 @@ public class Insulin {
 	}
 
 	@SuppressWarnings("null")
-	private static HDLPackage handlePostfixOp(HDLPackage apply) {
+	private static HDLObject handlePostfixOp(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLAssignment> loops = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment hdlAssignment : loops) {
@@ -437,7 +436,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLPackage handleMultiForLoop(HDLPackage apply) {
+	private static HDLObject handleMultiForLoop(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLForLoop> loops = apply.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop loop : loops) {
@@ -453,7 +452,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLPackage handleMultiBitAccess(HDLPackage apply) {
+	private static HDLObject handleMultiBitAccess(HDLObject apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableRef> refs = apply.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
@@ -484,7 +483,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLPackage handleOutPortRead(HDLPackage orig) {
+	private static HDLObject handleOutPortRead(HDLObject orig) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableDeclaration> list = HDLQuery.select(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT).getAll();
 		for (HDLVariableDeclaration hdv : list) {

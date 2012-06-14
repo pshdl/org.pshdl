@@ -5,6 +5,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 /**
  * The class HDLVariableRef contains the following fields
@@ -94,7 +95,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public HDLVariable resolveVar() {
 		HDLVariable var = super.resolveVar();
 		if (var == null)
-			throw new IllegalArgumentException("This variable can not be resolved:" + getVarRefName());
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
 		return var;
 	}
 

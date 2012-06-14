@@ -81,7 +81,6 @@ public class HDLFunction extends AbstractHDLFunction {
 			return obj.getParams();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

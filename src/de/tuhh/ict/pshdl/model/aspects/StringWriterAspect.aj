@@ -72,7 +72,7 @@ public aspect StringWriterAspect {
 	public String HDLInterfaceRef.toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getHIfRefName().getLastSegment());
-		for (HDLExpression arr : getArray()) {
+		for (HDLExpression arr : getIfArray()) {
 			sb.append('[').append(arr).append(']');
 		}
 		sb.append('.');
@@ -377,9 +377,6 @@ public aspect StringWriterAspect {
 	public String HDLInterfaceInstantiation.toString() {
 		StringBuilder sb = getSpacing();
 		sb.append(getHIfRefName()).append(' ').append(getVar().getName());
-		for (HDLExpression a : getDimensions()) {
-			sb.append('[').append(a).append(']');
-		}
 		sb.append(';');
 		return sb.toString();
 	}

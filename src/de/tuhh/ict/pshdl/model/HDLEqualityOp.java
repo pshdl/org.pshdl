@@ -95,7 +95,6 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 			return obj.getType();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

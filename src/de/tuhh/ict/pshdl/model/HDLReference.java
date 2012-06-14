@@ -63,7 +63,6 @@ public abstract class HDLReference extends AbstractHDLReference {
 			return obj.getVarRefName();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

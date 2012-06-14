@@ -13,7 +13,6 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName hIf. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation {
@@ -30,14 +29,11 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 *            the value for arguments. Can be <code>null</code>.
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
-	 * @param dimensions
-	 *            the value for dimensions. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf,
-			ArrayList<HDLExpression> dimensions, boolean validate) {
-		super(containerID, container, var, arguments, hIf, dimensions, validate);
+	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf, boolean validate) {
+		super(containerID, container, var, arguments, hIf, validate);
 	}
 
 	/**
@@ -51,12 +47,9 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 *            the value for arguments. Can be <code>null</code>.
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
-	 * @param dimensions
-	 *            the value for dimensions. Can be <code>null</code>.
 	 */
-	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf,
-			ArrayList<HDLExpression> dimensions) {
-		this(containerID, container, var, arguments, hIf, dimensions, true);
+	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf) {
+		this(containerID, container, var, arguments, hIf, true);
 	}
 
 	public HDLInterfaceInstantiation() {
@@ -80,18 +73,6 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			if (obj == null)
 				return null;
 			return obj.getHIfRefName();
-		}
-	};
-	/**
-	 * The accessor for the field dimensions which is of type
-	 * ArrayList<HDLExpression>
-	 */
-	public static HDLFieldAccess<HDLInterfaceInstantiation, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLInterfaceInstantiation, ArrayList<HDLExpression>>() {
-		@Override
-		public ArrayList<HDLExpression> getValue(HDLInterfaceInstantiation obj) {
-			if (obj == null)
-				return null;
-			return obj.getDimensions();
 		}
 	};
 

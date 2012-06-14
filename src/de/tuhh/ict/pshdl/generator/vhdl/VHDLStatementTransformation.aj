@@ -52,6 +52,7 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLInterfaceInstantiation.toVHDL() {
 		VHDLContext res = new VHDLContext();
 		HDLInterface hIf = resolveHIf();
+		HDLVariable hVar=getVar();
 		String ifName = getVar().getName();
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		HDLQualifiedName asRef = hIf.asRef();
@@ -65,10 +66,10 @@ public aspect VHDLStatementTransformation {
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
 					HDLVariableRef ref = sigVar.asHDLRef();
-					for (int i = 0; i < getDimensions().size(); i++) {
+					for (int i = 0; i < hVar.getDimensions().size(); i++) {
 						ref = ref.addArray(new HDLVariableRef().setVar(HDLQualifiedName.create(Character.toString((char) (i + 'I')))));
 					}
-					for (HDLExpression exp : getDimensions()) {
+					for (HDLExpression exp : hVar.getDimensions()) {
 						sigVar = sigVar.addDimensions(exp.copy());
 					}
 					if (var.getDimensions().size() != 0) {
@@ -90,11 +91,11 @@ public aspect VHDLStatementTransformation {
 			}
 		}
 		ForGenerateStatement forLoop = null;
-		if (getDimensions().size() == 0)
+		if (hVar.getDimensions().size() == 0)
 			res.addConcurrentStatement(instantiation);
 		else {
-			for (int i = 0; i < getDimensions().size(); i++) {
-				HDLExpression to = new HDLArithOp().setLeft(getDimensions().get(i).copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+			for (int i = 0; i < hVar.getDimensions().size(); i++) {
+				HDLExpression to = new HDLArithOp().setLeft(hVar.getDimensions().get(i).copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
 				HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to).setContainer(this);
 				ForGenerateStatement newFor = new ForGenerateStatement("generate_" + ifName, Character.toString((char) (i + 'I')), range.toVHDL(Range.Direction.TO));
 				if (forLoop != null)

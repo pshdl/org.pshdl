@@ -1,16 +1,15 @@
 package de.tuhh.ict.pshdl.model.validation;
 
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection.*;
-import static de.tuhh.ict.pshdl.model.validation.HDLValidator.ErrorCode.*;
+import static de.tuhh.ict.pshdl.model.validation.ErrorCode.*;
 
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLAssignment.*;
-import de.tuhh.ict.pshdl.model.HDLObject.*;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
+import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.validation.HDLValidator.*;
+import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
 public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {
@@ -18,7 +17,7 @@ public class RWValidation {
 		annotateWriteCount(unit);
 		List<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
-			if (hdlVariable.hasContainer(HDLInterfaceDeclaration.class))
+			if (hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null)
 				continue;
 			Integer readCount = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
 			readCount = readCount == null ? 0 : readCount;
@@ -27,26 +26,26 @@ public class RWValidation {
 			Integer accessCount = hdlVariable.getMeta(IntegerMeta.ACCESS);
 			accessCount = accessCount == null ? 0 : accessCount;
 			if ((readCount == 0) && (writeCount == 0) && (accessCount == 0)) {
-				problems.add(new Problem(ProblemSeverity.WARNING, UNUSED_VARIABLE, hdlVariable));
+				problems.add(new Problem(UNUSED_VARIABLE, hdlVariable));
 			} else {
 				HDLDirection dir = hdlVariable.getDirection();
 				if ((readCount == 0) && (dir == IN)) {
-					problems.add(new Problem(ProblemSeverity.WARNING, IN_PORT_NEVER_READ, hdlVariable));
+					problems.add(new Problem(IN_PORT_NEVER_READ, hdlVariable));
 				}
 				if ((writeCount > 0) && (dir == IN)) {
-					problems.add(new Problem(ProblemSeverity.ERROR, WRITE_ACCESS_TO_IN_PORT, hdlVariable));
+					problems.add(new Problem(WRITE_ACCESS_TO_IN_PORT, hdlVariable));
 				}
 				if ((writeCount == 0) && (dir == OUT)) {
-					problems.add(new Problem(ProblemSeverity.WARNING, OUT_PORT_NEVER_WRITTEN, hdlVariable));
+					problems.add(new Problem(OUT_PORT_NEVER_WRITTEN, hdlVariable));
 				}
 				if ((writeCount == 0) && (dir == INTERNAL)) {
-					problems.add(new Problem(ProblemSeverity.WARNING, INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN, hdlVariable));
+					problems.add(new Problem(INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN, hdlVariable));
 				}
 				if ((readCount == 0) && (dir == INTERNAL)) {
-					problems.add(new Problem(ProblemSeverity.WARNING, INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ, hdlVariable));
+					problems.add(new Problem(INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ, hdlVariable));
 				}
 				if ((readCount == 0) && ((dir == PARAMETER) || (dir == CONSTANT))) {
-					problems.add(new Problem(ProblemSeverity.WARNING, PARAMETER_OR_CONSTANT_NEVER_READ, hdlVariable));
+					problems.add(new Problem(PARAMETER_OR_CONSTANT_NEVER_READ, hdlVariable));
 				}
 			}
 		}
@@ -62,16 +61,16 @@ public class RWValidation {
 					writeCount = writeCount == null ? 0 : writeCount;
 					HDLDirection dir = hdlVariable.getDirection();
 					if ((readCount == 0) && (writeCount == 0) && !((dir == PARAMETER) || (dir == CONSTANT))) {
-						problems.add(new Problem(ProblemSeverity.WARNING, ErrorCode.INTERFACE_UNUSED_PORT, hdlVariable, hii));
+						problems.add(new Problem(ErrorCode.INTERFACE_UNUSED_PORT, hdlVariable, hii, null));
 					} else {
 						if ((readCount == 0) && (dir == OUT)) {
-							problems.add(new Problem(ProblemSeverity.WARNING, ErrorCode.INTERFACE_OUT_PORT_NEVER_READ, hdlVariable, hii));
+							problems.add(new Problem(ErrorCode.INTERFACE_OUT_PORT_NEVER_READ, hdlVariable, hii, null));
 						}
 						if ((writeCount > 0) && (dir == OUT)) {
-							problems.add(new Problem(ProblemSeverity.ERROR, ErrorCode.INTERFACE_OUT_WRITTEN, hdlVariable, hii));
+							problems.add(new Problem(ErrorCode.INTERFACE_OUT_WRITTEN, hdlVariable, hii, null));
 						}
 						if ((writeCount == 0) && (dir == IN)) {
-							problems.add(new Problem(ProblemSeverity.WARNING, ErrorCode.INTERFACE_IN_PORT_NEVER_WRITTEN, hdlVariable, hii));
+							problems.add(new Problem(ErrorCode.INTERFACE_IN_PORT_NEVER_WRITTEN, hdlVariable, hii, null));
 						}
 					}
 				}
@@ -79,7 +78,7 @@ public class RWValidation {
 		}
 	}
 
-	public static void annotateReadCount(HDLPackage orig) {
+	public static void annotateReadCount(HDLObject orig) {
 		List<HDLReference> list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
 			if (ref.getContainer() instanceof HDLAssignment) {
@@ -99,7 +98,7 @@ public class RWValidation {
 		}
 	}
 
-	public static void annotateWriteCount(HDLPackage orig) {
+	public static void annotateWriteCount(HDLObject orig) {
 		List<HDLAssignment> list = orig.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : list) {
 			HDLReference left = ass.getLeft();

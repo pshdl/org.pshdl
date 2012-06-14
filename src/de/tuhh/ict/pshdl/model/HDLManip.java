@@ -98,7 +98,6 @@ public class HDLManip extends AbstractHDLManip {
 			return obj.getCastTo();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

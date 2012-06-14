@@ -44,7 +44,6 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	public HDLClass getClassType() {
 		return HDLClass.HDLDeclaration;
 	}
-
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

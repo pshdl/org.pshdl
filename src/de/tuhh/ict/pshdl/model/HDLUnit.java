@@ -115,7 +115,6 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 			return obj.getStatements();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	private HDLInterface unitIF = null;
 

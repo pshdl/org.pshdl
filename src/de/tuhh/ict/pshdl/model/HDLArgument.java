@@ -94,7 +94,6 @@ public class HDLArgument extends AbstractHDLArgument {
 			return obj.getExpression();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

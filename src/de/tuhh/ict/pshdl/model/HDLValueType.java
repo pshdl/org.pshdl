@@ -49,7 +49,6 @@ public abstract class HDLValueType extends AbstractHDLValueType {
 	public HDLClass getClassType() {
 		return HDLClass.HDLValueType;
 	}
-
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 
