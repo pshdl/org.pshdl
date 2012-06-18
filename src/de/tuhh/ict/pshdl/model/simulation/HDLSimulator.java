@@ -5,10 +5,11 @@ import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives.ValueRange;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 public class HDLSimulator {
 	public static void createDottyGraph(HDLUnit unit, HDLEvaluationContext context, File f) throws FileNotFoundException {
@@ -71,6 +72,8 @@ public class HDLSimulator {
 							out.println(href.getVarRefName().getLastSegment() + "->" + Math.abs(exp.containerID));
 						}
 					}
+					break;
+				default:
 				}
 				System.out.println("HDLSimulator.createDottyGraph()" + container);
 				continue;
@@ -107,8 +110,8 @@ public class HDLSimulator {
 		HDLUnit insulin = Insulin.transform(unit);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createMultiplexArrayWrite(context, insulin);
+		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
-		// Create a signal for each Array Element
 		// Find all bit access
 		// Determine value ranges for array and bit accesses
 		// Create non overlapping ranges
@@ -118,49 +121,66 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {
+		ModificationSet ms = new ModificationSet();
 		List<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
 			if (ass.getLeft() instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) ass.getLeft();
+				// XXX check for multi-dimensional arrays and create appropriate
+				// code
 				for (HDLExpression arr : ref.getArray()) {
-					BigInteger index = arr.constantEvaluate(context);
-					if (index == null) {
-						HDLType type = arr.determineType();
-						HDLPrimitive pt = (HDLPrimitive) type;
-						ValueRange range = HDLPrimitives.getInstance().getValueRange(pt, context);
-
-					}
+					// The range that potentially could be accessed
+					ValueRange accessRange = arr.determineRange(context);
+					// The range that the array could be sized
+					ValueRange dimensionRange = ref.resolveVar().getDimensions().get(0).determineRange(context);
+					// Take the maximum range as the upper boundary and 0 as
+					// lower
+					dimensionRange = new ValueRange(BigInteger.ZERO, dimensionRange.to.subtract(BigInteger.ONE));
+					accessRange = accessRange.and(dimensionRange);
+					if (accessRange == null)
+						throw new HDLProblemException(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr));
+					BigInteger counter = accessRange.from;
+					List<HDLStatement> replacements = new ArrayList<HDLStatement>();
+					do {
+						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr.copy()).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
+						BigInteger evaluate = ifExp.constantEvaluate(context);
+						if (evaluate == null) {
+							HDLVariableRef writeRef = ref.copy().setArray(HDLObject.asList(HDLLiteral.get(counter)));
+							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp.copy()).addThenDo(ass.copy().setLeft(writeRef));
+							replacements.add(ifStmnt);
+						} else {
+							replacements.add(ass.copy());
+						}
+						counter = counter.add(BigInteger.ONE);
+					} while (counter.compareTo(accessRange.to) <= 0);
+					ms.replace(ass, replacements.toArray(new HDLStatement[0]));
 				}
 			}
 		}
-		return null;
+		return ms.apply(unit);
 	}
 
+	/**
+	 * Unrolls a loop and creates the statements with an accordingly replaced
+	 * loop parameter
+	 * 
+	 * @param context
+	 * @param insulin
+	 * @return
+	 */
 	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit insulin) {
 		List<HDLForLoop> loops = insulin.getAllObjectsOf(HDLForLoop.class, true);
 		ModificationSet ms = new ModificationSet();
 		for (HDLForLoop loop : loops) {
 			HDLVariable param = loop.getParam();
-			HDLRange range = loop.getRange().get(0); // Only one range expected
-														// here because of
-														// Insulin
-			BigInteger to = range.getTo().constantEvaluate(context);
-			BigInteger from = to;
-			if (range.getFrom() != null)
-				from = range.getFrom().constantEvaluate(context);
-			if (to.compareTo(from) < 1) {
-				BigInteger tmp = from;
-				from = to;
-				to = tmp;
-			}
-			System.out.println("HDLSimulator.createSimulationModel()From:" + from + " to:" + to);
+			ValueRange r = loop.getRange().get(0).determineRange(context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
 				List<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).isEqualTo(param.asRef()).getAll();
 				if (refs.size() == 0)
 					newStmnts.add(stmnt.copy());
 				else {
-					BigInteger counter = from;
+					BigInteger counter = r.from;
 					do {
 						ModificationSet stmntMs = new ModificationSet();
 						for (HDLVariableRef ref : refs) {
@@ -168,7 +188,7 @@ public class HDLSimulator {
 						}
 						newStmnts.add(stmntMs.apply(stmnt));
 						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(to) <= 0);
+					} while (counter.compareTo(r.to) <= 0);
 				}
 			}
 			ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));

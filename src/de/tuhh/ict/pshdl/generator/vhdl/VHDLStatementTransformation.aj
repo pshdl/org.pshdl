@@ -104,6 +104,8 @@ public aspect VHDLStatementTransformation {
 					res.addConcurrentStatement(newFor);
 				forLoop = newFor;
 			}
+			if (forLoop==null)
+				throw new IllegalArgumentException("Should not get here");
 			forLoop.getStatements().add(instantiation);
 		}
 		return res;

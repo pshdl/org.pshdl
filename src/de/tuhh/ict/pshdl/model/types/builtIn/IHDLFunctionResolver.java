@@ -10,4 +10,6 @@ public interface IHDLFunctionResolver {
 	public HDLTypeInferenceInfo resolve(HDLFunction function);
 
 	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context);
+
+	public ValueRange range(HDLFunction function, HDLEvaluationContext context);
 }

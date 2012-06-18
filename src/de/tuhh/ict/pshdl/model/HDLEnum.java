@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -31,7 +33,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnum(int containerID, HDLObject container, String name, ArrayList<HDLVariable> enums, boolean validate) {
+	public HDLEnum(int containerID, @Nullable HDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums, boolean validate) {
 		super(containerID, container, name, enums, validate);
 	}
 
@@ -46,7 +48,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	 *            the value for enums. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLEnum(int containerID, HDLObject container, String name, ArrayList<HDLVariable> enums) {
+	public HDLEnum(int containerID, @Nullable HDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums) {
 		this(containerID, container, name, enums, true);
 	}
 
@@ -63,7 +65,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	}
 
 	/**
-	 * The accessor for the field enums which is of type ArrayList<HDLVariable>
+	 * The accessor for the field enums which is of type ArrayList<HDLVariable>.
 	 */
 	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>() {
 		@Override

@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -29,7 +31,7 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLManip(int containerID, HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo, boolean validate) {
+	public HDLManip(int containerID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
 		super(containerID, container, type, target, castTo, validate);
 	}
 
@@ -45,7 +47,7 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param castTo
 	 *            the value for castTo. Can be <code>null</code>.
 	 */
-	public HDLManip(int containerID, HDLObject container, HDLManipType type, HDLExpression target, HDLType castTo) {
+	public HDLManip(int containerID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo) {
 		this(containerID, container, type, target, castTo, true);
 	}
 
@@ -66,7 +68,7 @@ public class HDLManip extends AbstractHDLManip {
 	}
 
 	/**
-	 * The accessor for the field type which is of type HDLManipType
+	 * The accessor for the field type which is of type HDLManipType.
 	 */
 	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>() {
 		@Override
@@ -77,7 +79,7 @@ public class HDLManip extends AbstractHDLManip {
 		}
 	};
 	/**
-	 * The accessor for the field target which is of type HDLExpression
+	 * The accessor for the field target which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>() {
 		@Override
@@ -88,7 +90,7 @@ public class HDLManip extends AbstractHDLManip {
 		}
 	};
 	/**
-	 * The accessor for the field castTo which is of type HDLType
+	 * The accessor for the field castTo which is of type HDLType.
 	 */
 	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>() {
 		@Override

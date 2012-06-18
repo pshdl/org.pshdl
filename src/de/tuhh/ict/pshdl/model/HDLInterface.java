@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -29,7 +31,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(int containerID, HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports, boolean validate) {
+	public HDLInterface(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate) {
 		super(containerID, container, name, ports, validate);
 	}
 
@@ -43,7 +45,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 */
-	public HDLInterface(int containerID, HDLObject container, String name, ArrayList<HDLVariableDeclaration> ports) {
+	public HDLInterface(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports) {
 		this(containerID, container, name, ports, true);
 	}
 
@@ -61,7 +63,7 @@ public class HDLInterface extends AbstractHDLInterface {
 
 	/**
 	 * The accessor for the field ports which is of type
-	 * ArrayList<HDLVariableDeclaration>
+	 * ArrayList<HDLVariableDeclaration>.
 	 */
 	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>() {
 		@Override

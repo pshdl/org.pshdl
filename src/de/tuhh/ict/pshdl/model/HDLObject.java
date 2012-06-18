@@ -3,6 +3,8 @@ package de.tuhh.ict.pshdl.model;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
@@ -26,7 +28,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLObject(int containerID, HDLObject container, boolean validate) {
+	public HDLObject(int containerID, @Nullable HDLObject container, boolean validate) {
 		super(containerID, container, validate);
 	}
 
@@ -36,7 +38,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLObject(int containerID, HDLObject container) {
+	public HDLObject(int containerID, @Nullable HDLObject container) {
 		this(containerID, container, true);
 	}
 
@@ -52,7 +54,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	}
 
 	/**
-	 * The accessor for the field container which is of type HDLObject
+	 * The accessor for the field container which is of type HDLObject.
 	 */
 	public static HDLFieldAccess<HDLObject, HDLObject> fContainer = new HDLFieldAccess<HDLObject, HDLObject>() {
 		@Override

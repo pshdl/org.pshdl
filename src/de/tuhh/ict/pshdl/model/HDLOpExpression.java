@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -26,7 +28,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLOpExpression(int containerID, HDLObject container, HDLExpression left, HDLExpression right, boolean validate) {
+	public HDLOpExpression(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, boolean validate) {
 		super(containerID, container, left, right, validate);
 	}
 
@@ -40,7 +42,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLOpExpression(int containerID, HDLObject container, HDLExpression left, HDLExpression right) {
+	public HDLOpExpression(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right) {
 		this(containerID, container, left, right, true);
 	}
 
@@ -57,7 +59,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	}
 
 	/**
-	 * The accessor for the field left which is of type HDLExpression
+	 * The accessor for the field left which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
 		@Override
@@ -68,7 +70,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 		}
 	};
 	/**
-	 * The accessor for the field right which is of type HDLExpression
+	 * The accessor for the field right which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
 		@Override

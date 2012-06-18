@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -28,7 +30,7 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumRef(int containerID, HDLObject container, HDLQualifiedName var, HDLQualifiedName hEnum, boolean validate) {
+	public HDLEnumRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum, boolean validate) {
 		super(containerID, container, var, hEnum, validate);
 	}
 
@@ -42,7 +44,7 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEnumRef(int containerID, HDLObject container, HDLQualifiedName var, HDLQualifiedName hEnum) {
+	public HDLEnumRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum) {
 		this(containerID, container, var, hEnum, true);
 	}
 
@@ -59,7 +61,7 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	}
 
 	/**
-	 * The accessor for the field hEnum which is of type HDLQualifiedName
+	 * The accessor for the field hEnum which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>() {
 		@Override

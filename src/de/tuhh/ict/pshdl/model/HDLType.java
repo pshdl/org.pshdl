@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -24,7 +26,7 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLType(int containerID, HDLObject container, String name, boolean validate) {
+	public HDLType(int containerID, @Nullable HDLObject container, @NonNull String name, boolean validate) {
 		super(containerID, container, name, validate);
 	}
 
@@ -36,7 +38,7 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLType(int containerID, HDLObject container, String name) {
+	public HDLType(int containerID, @Nullable HDLObject container, @NonNull String name) {
 		this(containerID, container, name, true);
 	}
 
@@ -53,7 +55,7 @@ public abstract class HDLType extends AbstractHDLType {
 	}
 
 	/**
-	 * The accessor for the field name which is of type String
+	 * The accessor for the field name which is of type String.
 	 */
 	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>() {
 		@Override

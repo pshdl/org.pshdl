@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -33,7 +35,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, boolean validate) {
+	public HDLVariableRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+			@Nullable ArrayList<HDLRange> bits, boolean validate) {
 		super(containerID, container, var, array, bits, validate);
 	}
 
@@ -49,7 +52,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param bits
 	 *            the value for bits. Can be <code>null</code>.
 	 */
-	public HDLVariableRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits) {
+	public HDLVariableRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+			@Nullable ArrayList<HDLRange> bits) {
 		this(containerID, container, var, array, bits, true);
 	}
 
@@ -67,7 +71,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 
 	/**
 	 * The accessor for the field array which is of type
-	 * ArrayList<HDLExpression>
+	 * ArrayList<HDLExpression>.
 	 */
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>() {
 		@Override
@@ -78,7 +82,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 		}
 	};
 	/**
-	 * The accessor for the field bits which is of type ArrayList<HDLRange>
+	 * The accessor for the field bits which is of type ArrayList<HDLRange>.
 	 */
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>() {
 		@Override

@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -47,8 +49,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRegisterConfig(int containerID, HDLObject container, HDLQualifiedName clk, HDLQualifiedName rst, HDLRegClockType clockType, HDLRegResetType resetType,
-			HDLRegSyncType syncType, HDLExpression resetValue, boolean validate) {
+	public HDLRegisterConfig(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate) {
 		super(containerID, container, clk, rst, clockType, resetType, syncType, resetValue, validate);
 	}
 
@@ -73,8 +75,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRegisterConfig(int containerID, HDLObject container, HDLQualifiedName clk, HDLQualifiedName rst, HDLRegClockType clockType, HDLRegResetType resetType,
-			HDLRegSyncType syncType, HDLExpression resetValue) {
+	public HDLRegisterConfig(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue) {
 		this(containerID, container, clk, rst, clockType, resetType, syncType, resetValue, true);
 	}
 
@@ -103,7 +105,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	}
 
 	/**
-	 * The accessor for the field clk which is of type HDLQualifiedName
+	 * The accessor for the field clk which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>() {
 		@Override
@@ -114,7 +116,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
-	 * The accessor for the field rst which is of type HDLQualifiedName
+	 * The accessor for the field rst which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>() {
 		@Override
@@ -125,7 +127,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
-	 * The accessor for the field clockType which is of type HDLRegClockType
+	 * The accessor for the field clockType which is of type HDLRegClockType.
 	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLRegClockType> fClockType = new HDLFieldAccess<HDLRegisterConfig, HDLRegClockType>() {
 		@Override
@@ -136,7 +138,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
-	 * The accessor for the field resetType which is of type HDLRegResetType
+	 * The accessor for the field resetType which is of type HDLRegResetType.
 	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetType>() {
 		@Override
@@ -147,7 +149,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
-	 * The accessor for the field syncType which is of type HDLRegSyncType
+	 * The accessor for the field syncType which is of type HDLRegSyncType.
 	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType> fSyncType = new HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType>() {
 		@Override
@@ -158,7 +160,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
-	 * The accessor for the field resetValue which is of type HDLExpression
+	 * The accessor for the field resetValue which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fResetValue = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>() {
 		@Override

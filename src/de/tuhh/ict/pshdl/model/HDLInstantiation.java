@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -28,7 +30,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, boolean validate) {
+	public HDLInstantiation(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate) {
 		super(containerID, container, var, arguments, validate);
 	}
 
@@ -42,7 +44,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param arguments
 	 *            the value for arguments. Can be <code>null</code>.
 	 */
-	public HDLInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments) {
+	public HDLInstantiation(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments) {
 		this(containerID, container, var, arguments, true);
 	}
 
@@ -59,7 +61,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	}
 
 	/**
-	 * The accessor for the field var which is of type HDLVariable
+	 * The accessor for the field var which is of type HDLVariable.
 	 */
 	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>() {
 		@Override
@@ -71,7 +73,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	};
 	/**
 	 * The accessor for the field arguments which is of type
-	 * ArrayList<HDLArgument>
+	 * ArrayList<HDLArgument>.
 	 */
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>() {
 		@Override

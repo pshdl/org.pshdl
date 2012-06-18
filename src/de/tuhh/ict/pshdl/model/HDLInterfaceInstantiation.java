@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -32,7 +34,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf, boolean validate) {
+	public HDLInterfaceInstantiation(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
+			@NonNull HDLQualifiedName hIf, boolean validate) {
 		super(containerID, container, var, arguments, hIf, validate);
 	}
 
@@ -48,7 +51,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceInstantiation(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLQualifiedName hIf) {
+	public HDLInterfaceInstantiation(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
+			@NonNull HDLQualifiedName hIf) {
 		this(containerID, container, var, arguments, hIf, true);
 	}
 
@@ -65,7 +69,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	}
 
 	/**
-	 * The accessor for the field hIf which is of type HDLQualifiedName
+	 * The accessor for the field hIf which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>() {
 		@Override

@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -29,7 +31,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEqualityOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLEqualityOpType type, boolean validate) {
+	public HDLEqualityOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type,
+			boolean validate) {
 		super(containerID, container, left, right, type, validate);
 	}
 
@@ -45,7 +48,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEqualityOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLEqualityOpType type) {
+	public HDLEqualityOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type) {
 		this(containerID, container, left, right, type, true);
 	}
 
@@ -85,7 +88,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	}
 
 	/**
-	 * The accessor for the field type which is of type HDLEqualityOpType
+	 * The accessor for the field type which is of type HDLEqualityOpType.
 	 */
 	public static HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType> fType = new HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType>() {
 		@Override

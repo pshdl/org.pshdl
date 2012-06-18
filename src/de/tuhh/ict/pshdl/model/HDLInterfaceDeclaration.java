@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -25,7 +27,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceDeclaration(int containerID, HDLObject container, HDLInterface hIf, boolean validate) {
+	public HDLInterfaceDeclaration(int containerID, @Nullable HDLObject container, @NonNull HDLInterface hIf, boolean validate) {
 		super(containerID, container, hIf, validate);
 	}
 
@@ -37,7 +39,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceDeclaration(int containerID, HDLObject container, HDLInterface hIf) {
+	public HDLInterfaceDeclaration(int containerID, @Nullable HDLObject container, @NonNull HDLInterface hIf) {
 		this(containerID, container, hIf, true);
 	}
 
@@ -54,7 +56,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	}
 
 	/**
-	 * The accessor for the field hIf which is of type HDLInterface
+	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
 	public static HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface> fHIf = new HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface>() {
 		@Override

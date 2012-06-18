@@ -123,6 +123,8 @@ public aspect VHDLExpressionTransformation {
 				case BOOL:
 					throw new IllegalArgumentException("Bool is not a literal");
 				}
+				if (resize==null)
+					throw new IllegalArgumentException("Should not get here");
 				resize.getParameters().add(new AssociationElement(new StringLiteral(val.toString(2))));
 				resize.getParameters().add(new AssociationElement(targetType.getWidth().toVHDL()));
 				return resize;
@@ -156,6 +158,8 @@ public aspect VHDLExpressionTransformation {
 					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
 					break;
 				}
+				if (resize==null)
+					throw new IllegalArgumentException("Should not happen");
 				resize.getParameters().add(new AssociationElement(exp));
 				resize.getParameters().add(new AssociationElement(width));
 				return resize;
@@ -234,7 +238,7 @@ public aspect VHDLExpressionTransformation {
 		case MUL:
 			return new Parentheses(new Multiply(getLeft().toVHDL(), getRight().toVHDL()));
 		case MOD:
-			return new Parentheses(new Mod(getLeft().toVHDL(), getRight().toVHDL()));
+			return new Parentheses(new Rem(getLeft().toVHDL(), getRight().toVHDL()));
 		case POW:
 			return new Parentheses(new Pow(getLeft().toVHDL(), getRight().toVHDL()));
 		}

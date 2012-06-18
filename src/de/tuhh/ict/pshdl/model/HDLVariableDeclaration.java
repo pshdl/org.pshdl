@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -45,8 +47,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
-			HDLQualifiedName type, HDLPrimitive primitive, ArrayList<HDLVariable> variables, boolean validate) {
+	public HDLVariableDeclaration(int containerID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
+			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables,
+			boolean validate) {
 		super(containerID, container, register, direction, annotations, type, primitive, variables, validate);
 	}
 
@@ -70,8 +73,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
-			HDLQualifiedName type, HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
+	public HDLVariableDeclaration(int containerID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
+			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables) {
 		this(containerID, container, register, direction, annotations, type, primitive, variables, true);
 	}
 
@@ -111,7 +114,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	}
 
 	/**
-	 * The accessor for the field register which is of type HDLRegisterConfig
+	 * The accessor for the field register which is of type HDLRegisterConfig.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig> fRegister = new HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig>() {
 		@Override
@@ -122,7 +125,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 	};
 	/**
-	 * The accessor for the field direction which is of type HDLDirection
+	 * The accessor for the field direction which is of type HDLDirection.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLDirection> fDirection = new HDLFieldAccess<HDLVariableDeclaration, HDLDirection>() {
 		@Override
@@ -134,7 +137,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	};
 	/**
 	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>
+	 * ArrayList<HDLAnnotation>.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>>() {
 		@Override
@@ -145,7 +148,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 	};
 	/**
-	 * The accessor for the field type which is of type HDLQualifiedName
+	 * The accessor for the field type which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName> fType = new HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName>() {
 		@Override
@@ -156,7 +159,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 	};
 	/**
-	 * The accessor for the field primitive which is of type HDLPrimitive
+	 * The accessor for the field primitive which is of type HDLPrimitive.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive> fPrimitive = new HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive>() {
 		@Override
@@ -168,7 +171,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	};
 	/**
 	 * The accessor for the field variables which is of type
-	 * ArrayList<HDLVariable>
+	 * ArrayList<HDLVariable>.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>() {
 		@Override
@@ -221,6 +224,14 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	@Override
 	public List<HDLInterface> doGetInterfaceDeclarations() {
 		return Collections.emptyList();
+	}
+
+	public HDLAnnotation getAnnotation(Enum<?> range) {
+		for (HDLAnnotation anno : getAnnotations()) {
+			if (anno.getName().equals(range.toString()))
+				return anno;
+		}
+		return null;
 	}
 
 	// $CONTENT-END$

@@ -105,10 +105,16 @@ public class VHDLCastsLibrary {
 		case BIT:
 			return StdLogic1164.STD_LOGIC;
 		case BITVECTOR:
+			if (range == null)
+				throw new IllegalArgumentException("Can not have null width");
 			return StdLogic1164.STD_LOGIC_VECTOR(range.toVHDL(Direction.DOWNTO));
 		case INT:
+			if (range == null)
+				throw new IllegalArgumentException("Can not have null width");
 			return NumericStd.SIGNED(range.toVHDL(Direction.DOWNTO));
 		case UINT:
+			if (range == null)
+				throw new IllegalArgumentException("Can not have null width");
 			return NumericStd.UNSIGNED(range.toVHDL(Direction.DOWNTO));
 		case INTEGER:
 			return Standard.INTEGER;

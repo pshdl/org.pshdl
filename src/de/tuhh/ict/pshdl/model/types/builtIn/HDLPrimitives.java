@@ -68,7 +68,7 @@ public class HDLPrimitives {
 		return hdlPrimitives;
 	}
 
-	public static Map<HDLInferenceTriple, HDLInferenceTriple> initEqualityResolution() {
+	private static Map<HDLInferenceTriple, HDLInferenceTriple> initEqualityResolution() {
 		Map<HDLInferenceTriple, HDLInferenceTriple> res = initArithResolution();
 		for (HDLInferenceTriple result : res.values()) {
 			result.result = BOOL;
@@ -84,7 +84,7 @@ public class HDLPrimitives {
 		return res;
 	}
 
-	public static Map<HDLInferenceTriple, HDLInferenceTriple> initBitResolution() {
+	private static Map<HDLInferenceTriple, HDLInferenceTriple> initBitResolution() {
 		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
 		for (HDLPrimitiveType left : HDLPrimitiveType.values()) {
 			if (left == BOOL)
@@ -99,7 +99,7 @@ public class HDLPrimitives {
 		return res;
 	}
 
-	public static Map<HDLInferenceTriple, HDLInferenceTriple> initArithResolution() {
+	private static Map<HDLInferenceTriple, HDLInferenceTriple> initArithResolution() {
 		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, INT, INT));
@@ -123,7 +123,7 @@ public class HDLPrimitives {
 		return res;
 	}
 
-	public static Map<HDLInferenceTriple, HDLInferenceTriple> initShiftResolution() {
+	private static Map<HDLInferenceTriple, HDLInferenceTriple> initShiftResolution() {
 		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
@@ -469,52 +469,6 @@ public class HDLPrimitives {
 			break;
 		}
 		return null;
-	}
-
-	public static class ValueRange {
-		public final BigInteger from, to;
-
-		public ValueRange(BigInteger from, BigInteger to) {
-			super();
-			this.from = from;
-			this.to = to;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = (prime * result) + ((from == null) ? 0 : from.hashCode());
-			result = (prime * result) + ((to == null) ? 0 : to.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ValueRange other = (ValueRange) obj;
-			if (from == null) {
-				if (other.from != null)
-					return false;
-			} else if (!from.equals(other.from))
-				return false;
-			if (to == null) {
-				if (other.to != null)
-					return false;
-			} else if (!to.equals(other.to))
-				return false;
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			return "ValueRange [from=" + from + ", to=" + to + "]";
-		}
 	}
 
 	public ValueRange getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {

@@ -38,10 +38,8 @@ public aspect ConstantEvaluation {
 	}
 
 	public BigInteger HDLManip.constantEvaluate(HDLEvaluationContext context) {
-		BigInteger eval = getTarget().constantEvaluate(context);
+		BigInteger eval = subEvaluate(this, getTarget(),context);
 		if (eval == null) {
-			this.addMeta(ProblemSource.SOURCE, getTarget());
-			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE);
 			return null;
 		}
 		switch (getType()) {
@@ -74,10 +72,8 @@ public aspect ConstantEvaluation {
 	public BigInteger HDLConcat.constantEvaluate(HDLEvaluationContext context) {
 		BigInteger sum = BigInteger.ZERO;
 		for (HDLExpression cat : getCats()) {
-			BigInteger im = cat.constantEvaluate(context);
+			BigInteger im = subEvaluate(this, cat, context);
 			if (im == null) {
-				this.addMeta(ProblemSource.SOURCE, cat);
-				this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE);
 				return null;
 			}
 			BigInteger width = cat.determineType().getWidth().constantEvaluate(context);

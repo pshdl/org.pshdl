@@ -4,7 +4,6 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 
-//XXX It is a bad idea to rely on the idea that System.identityHashCode is returning a unique ID.
 public class ModificationSet {
 
 	private class MSCopyFilter extends CopyFilter.DeepCloneFilter {

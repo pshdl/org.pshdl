@@ -92,7 +92,7 @@ public class VHDLImporter {
 			@SuppressWarnings("rawtypes")
 			List<DiscreteRange> ranges = ca.getIndexRanges();
 			workScope.getScope().resolve(ca.getIdentifier());
-			for (DiscreteRange discreteRange : ranges) {
+			for (DiscreteRange<?> discreteRange : ranges) {
 				dimensions.add(convertRange((Range) discreteRange));
 			}
 			HDLVariableDeclaration var = getVariable(ca.getElementType(), direction, qfn, null, dimensions);
@@ -117,11 +117,6 @@ public class VHDLImporter {
 								if (t.getIdentifier().equalsIgnoreCase(identifier))
 									return "work." + pkg + "." + identifier;
 							}
-						}
-					}
-					if (libraryUnit instanceof NamedEntity) {
-						NamedEntity ie = (NamedEntity) libraryUnit;
-						if (ie.getIdentifier().equalsIgnoreCase(identifier)) {
 						}
 					}
 				}

@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -29,7 +31,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArgument(int containerID, HDLObject container, String name, String value, HDLExpression expression, boolean validate) {
+	public HDLArgument(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression, boolean validate) {
 		super(containerID, container, name, value, expression, validate);
 	}
 
@@ -45,7 +47,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param expression
 	 *            the value for expression. Can be <code>null</code>.
 	 */
-	public HDLArgument(int containerID, HDLObject container, String name, String value, HDLExpression expression) {
+	public HDLArgument(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression) {
 		this(containerID, container, name, value, expression, true);
 	}
 
@@ -62,7 +64,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	}
 
 	/**
-	 * The accessor for the field name which is of type String
+	 * The accessor for the field name which is of type String.
 	 */
 	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>() {
 		@Override
@@ -73,7 +75,7 @@ public class HDLArgument extends AbstractHDLArgument {
 		}
 	};
 	/**
-	 * The accessor for the field value which is of type String
+	 * The accessor for the field value which is of type String.
 	 */
 	public static HDLFieldAccess<HDLArgument, String> fValue = new HDLFieldAccess<HDLArgument, String>() {
 		@Override
@@ -84,7 +86,7 @@ public class HDLArgument extends AbstractHDLArgument {
 		}
 	};
 	/**
-	 * The accessor for the field expression which is of type HDLExpression
+	 * The accessor for the field expression which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>() {
 		@Override

@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -28,7 +30,7 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(int containerID, HDLObject container, String name, ArrayList<HDLExpression> params, boolean validate) {
+	public HDLFunction(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> params, boolean validate) {
 		super(containerID, container, name, params, validate);
 	}
 
@@ -42,7 +44,7 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param params
 	 *            the value for params. Can be <code>null</code>.
 	 */
-	public HDLFunction(int containerID, HDLObject container, String name, ArrayList<HDLExpression> params) {
+	public HDLFunction(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> params) {
 		this(containerID, container, name, params, true);
 	}
 
@@ -59,7 +61,7 @@ public class HDLFunction extends AbstractHDLFunction {
 	}
 
 	/**
-	 * The accessor for the field name which is of type String
+	 * The accessor for the field name which is of type String.
 	 */
 	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>() {
 		@Override
@@ -71,7 +73,7 @@ public class HDLFunction extends AbstractHDLFunction {
 	};
 	/**
 	 * The accessor for the field params which is of type
-	 * ArrayList<HDLExpression>
+	 * ArrayList<HDLExpression>.
 	 */
 	public static HDLFieldAccess<HDLFunction, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunction, ArrayList<HDLExpression>>() {
 		@Override

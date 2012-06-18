@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
@@ -20,7 +22,7 @@ public abstract class HDLStatement extends AbstractHDLStatement implements de.tu
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLStatement(int containerID, HDLObject container, boolean validate) {
+	public HDLStatement(int containerID, @Nullable HDLObject container, boolean validate) {
 		super(containerID, container, validate);
 	}
 
@@ -30,7 +32,7 @@ public abstract class HDLStatement extends AbstractHDLStatement implements de.tu
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLStatement(int containerID, HDLObject container) {
+	public HDLStatement(int containerID, @Nullable HDLObject container) {
 		this(containerID, container, true);
 	}
 

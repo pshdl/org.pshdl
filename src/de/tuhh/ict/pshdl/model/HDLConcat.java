@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -27,7 +29,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLConcat(int containerID, HDLObject container, ArrayList<HDLExpression> cats, boolean validate) {
+	public HDLConcat(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats, boolean validate) {
 		super(containerID, container, cats, validate);
 	}
 
@@ -40,7 +42,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	 *            the value for cats. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLConcat(int containerID, HDLObject container, ArrayList<HDLExpression> cats) {
+	public HDLConcat(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats) {
 		this(containerID, container, cats, true);
 	}
 
@@ -57,7 +59,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	}
 
 	/**
-	 * The accessor for the field cats which is of type ArrayList<HDLExpression>
+	 * The accessor for the field cats which is of type
+	 * ArrayList<HDLExpression>.
 	 */
 	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>() {
 		@Override

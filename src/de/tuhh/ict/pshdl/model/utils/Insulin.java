@@ -20,7 +20,7 @@ public class Insulin {
 	public static <T extends HDLObject> T transform(T orig) {
 		RWValidation.annotateReadCount(orig);
 		RWValidation.annotateWriteCount(orig);
-		HDLObject apply = handleOutPortRead(orig);
+		T apply = handleOutPortRead(orig);
 		apply = includeGenerators(apply);
 		// System.out.println("Insulin.transform()" + apply);
 		// apply.validateAllFields(null, true);
@@ -32,7 +32,7 @@ public class Insulin {
 		apply = fortifyType(apply);
 		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(null, true);
-		return (T) apply;
+		return apply;
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class Insulin {
 	 * @param apply
 	 * @return
 	 */
-	private static HDLObject includeGenerators(HDLObject apply) {
+	private static <T extends HDLObject> T includeGenerators(T apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLDirectGeneration> gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration generation : gens) {
@@ -58,8 +58,7 @@ public class Insulin {
 				for (HDLInterfaceRef hdI : ifRefs) {
 					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
 						HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
-						ms.replace(hdI,
-								new HDLVariableRef().setVar(newName).setArray(HDLObject.copyAll(hdI.getArray())).setBits(HDLObject.copyAll(hdI.getBits())).setContainer(generation));
+						ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(HDLObject.copyAll(hdI.getArray())).setBits(HDLObject.copyAll(hdI.getBits())));
 					}
 				}
 			}
@@ -69,7 +68,14 @@ public class Insulin {
 
 	private static EnumSet<HDLDirection> doNotInit = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.CONSTANT, HDLDirection.PARAMETER, HDLDirection.IN);
 
-	private static HDLObject generateInitializations(HDLObject apply) {
+	/**
+	 * Generate the default initialization code for Arrays, Enums and Non
+	 * registers
+	 * 
+	 * @param apply
+	 * @return
+	 */
+	private static <T extends HDLObject> T generateInitializations(T apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableDeclaration> allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : allVarDecls) {
@@ -78,9 +84,10 @@ public class Insulin {
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLExpression defaultValue = var.getDefaultValue();
 					if ((defaultValue == null) && (register == null)) {
-						if ((hvd.getPrimitive() != null))
-							defaultValue = HDLLiteral.get(0);
-						else {
+						if ((hvd.getPrimitive() != null)) {
+							if ((var.getAnnotation(HDLAnnotations.VHDLLatchable) == null) || (hvd.getAnnotation(HDLAnnotations.VHDLLatchable) == null))
+								defaultValue = HDLLiteral.get(0);
+						} else {
 							HDLType resolveType = hvd.resolveType();
 							if (resolveType instanceof HDLEnum) {
 								HDLEnum hEnum = (HDLEnum) resolveType;
@@ -107,6 +114,16 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
+	/**
+	 * Generate the code to initialize an array with the given default value.
+	 * 
+	 * @param dimensions
+	 * @param i
+	 * @param defaultValue
+	 * @param ref
+	 * @param synchedArray
+	 * @return
+	 */
 	public static HDLStatement createArrayForLoop(ArrayList<HDLExpression> dimensions, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
 		if (i == dimensions.size()) {
 			return new HDLAssignment().setLeft(ref).setRight(defaultValue.copy());
@@ -141,7 +158,7 @@ public class Insulin {
 	 * @param apply
 	 * @return
 	 */
-	private static HDLObject generateClkAndReset(HDLObject apply) {
+	private static <T extends HDLObject> T generateClkAndReset(T apply) {
 		ModificationSet ms = new ModificationSet();
 		HDLVariable defClkVar = new HDLVariable().setName("clk");
 		HDLVariable defRstVar = new HDLVariable().setName("rst");
@@ -217,7 +234,7 @@ public class Insulin {
 		}
 	}
 
-	private static HDLObject fortifyType(HDLObject apply) {
+	private static <T extends HDLObject> T fortifyType(T apply) {
 		ModificationSet ms = new ModificationSet();
 		fortifyOpExpressions(apply, ms);
 		fortifyAssignments(apply, ms);
@@ -386,7 +403,7 @@ public class Insulin {
 	}
 
 	@SuppressWarnings("null")
-	private static HDLObject handlePostfixOp(HDLObject apply) {
+	private static <T extends HDLObject> T handlePostfixOp(T apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLAssignment> loops = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment hdlAssignment : loops) {
@@ -436,7 +453,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLObject handleMultiForLoop(HDLObject apply) {
+	private static <T extends HDLObject> T handleMultiForLoop(T apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLForLoop> loops = apply.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop loop : loops) {
@@ -452,7 +469,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLObject handleMultiBitAccess(HDLObject apply) {
+	private static <T extends HDLObject> T handleMultiBitAccess(T apply) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableRef> refs = apply.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
@@ -483,7 +500,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLObject handleOutPortRead(HDLObject orig) {
+	private static <T extends HDLObject> T handleOutPortRead(T orig) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableDeclaration> list = HDLQuery.select(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT).getAll();
 		for (HDLVariableDeclaration hdv : list) {

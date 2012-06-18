@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -25,7 +27,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumDeclaration(int containerID, HDLObject container, HDLEnum hEnum, boolean validate) {
+	public HDLEnumDeclaration(int containerID, @Nullable HDLObject container, @NonNull HDLEnum hEnum, boolean validate) {
 		super(containerID, container, hEnum, validate);
 	}
 
@@ -37,7 +39,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEnumDeclaration(int containerID, HDLObject container, HDLEnum hEnum) {
+	public HDLEnumDeclaration(int containerID, @Nullable HDLObject container, @NonNull HDLEnum hEnum) {
 		this(containerID, container, hEnum, true);
 	}
 
@@ -54,7 +56,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	}
 
 	/**
-	 * The accessor for the field hEnum which is of type HDLEnum
+	 * The accessor for the field hEnum which is of type HDLEnum.
 	 */
 	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>() {
 		@Override

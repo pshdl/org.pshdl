@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.math.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -25,7 +27,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLLiteral(int containerID, HDLObject container, String val, boolean validate) {
+	public HDLLiteral(int containerID, @Nullable HDLObject container, @NonNull String val, boolean validate) {
 		super(containerID, container, val, validate);
 	}
 
@@ -37,7 +39,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param val
 	 *            the value for val. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLLiteral(int containerID, HDLObject container, String val) {
+	public HDLLiteral(int containerID, @Nullable HDLObject container, @NonNull String val) {
 		this(containerID, container, val, true);
 	}
 
@@ -54,7 +56,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	}
 
 	/**
-	 * The accessor for the field val which is of type String
+	 * The accessor for the field val which is of type String.
 	 */
 	public static HDLFieldAccess<HDLLiteral, String> fVal = new HDLFieldAccess<HDLLiteral, String>() {
 		@Override
@@ -67,7 +69,11 @@ public class HDLLiteral extends AbstractHDLLiteral {
 
 	// $CONTENT-BEGIN$
 
+	private BigInteger bigIntegerVal = null;
+
 	public BigInteger getValueAsBigInt() {
+		if (bigIntegerVal != null)
+			return bigIntegerVal;
 		String string = getVal();
 		char zeroChar = string.charAt(0);
 		if (zeroChar == '0') {
@@ -75,15 +81,19 @@ public class HDLLiteral extends AbstractHDLLiteral {
 				String str = string.substring(2).replaceAll("_", "");
 				switch (string.charAt(1)) {
 				case 'x':
-					return new BigInteger(str, 16);
+					bigIntegerVal = new BigInteger(str, 16);
+					break;
 				case 'b':
-					return new BigInteger(str, 2);
+					bigIntegerVal = new BigInteger(str, 2);
+					break;
 				}
-			} else {
-				return BigInteger.ZERO;
+				return bigIntegerVal;
 			}
+			bigIntegerVal = BigInteger.ZERO;
+			return bigIntegerVal;
 		}
-		return new BigInteger(string.replaceAll("_", ""));
+		bigIntegerVal = new BigInteger(string.replaceAll("_", ""));
+		return bigIntegerVal;
 	}
 
 	@Override

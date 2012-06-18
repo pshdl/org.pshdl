@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.math.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -30,7 +32,7 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRange(int containerID, HDLObject container, HDLExpression from, HDLExpression to, boolean validate) {
+	public HDLRange(int containerID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate) {
 		super(containerID, container, from, to, validate);
 	}
 
@@ -44,7 +46,7 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRange(int containerID, HDLObject container, HDLExpression from, HDLExpression to) {
+	public HDLRange(int containerID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to) {
 		this(containerID, container, from, to, true);
 	}
 
@@ -61,7 +63,7 @@ public class HDLRange extends AbstractHDLRange {
 	}
 
 	/**
-	 * The accessor for the field from which is of type HDLExpression
+	 * The accessor for the field from which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>() {
 		@Override
@@ -72,7 +74,7 @@ public class HDLRange extends AbstractHDLRange {
 		}
 	};
 	/**
-	 * The accessor for the field to which is of type HDLExpression
+	 * The accessor for the field to which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>() {
 		@Override

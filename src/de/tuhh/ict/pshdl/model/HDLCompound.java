@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 
 /**
@@ -19,7 +21,7 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLCompound(int containerID, HDLObject container, boolean validate) {
+	public HDLCompound(int containerID, @Nullable HDLObject container, boolean validate) {
 		super(containerID, container, validate);
 	}
 
@@ -29,7 +31,7 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLCompound(int containerID, HDLObject container) {
+	public HDLCompound(int containerID, @Nullable HDLObject container) {
 		this(containerID, container, true);
 	}
 

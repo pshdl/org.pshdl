@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -33,7 +35,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAssignment(int containerID, HDLObject container, HDLReference left, HDLAssignmentType type, HDLExpression right, boolean validate) {
+	public HDLAssignment(int containerID, @Nullable HDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right,
+			boolean validate) {
 		super(containerID, container, left, type, right, validate);
 	}
 
@@ -50,7 +53,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLAssignment(int containerID, HDLObject container, HDLReference left, HDLAssignmentType type, HDLExpression right) {
+	public HDLAssignment(int containerID, @Nullable HDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right) {
 		this(containerID, container, left, type, right, true);
 	}
 
@@ -91,7 +94,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	}
 
 	/**
-	 * The accessor for the field left which is of type HDLReference
+	 * The accessor for the field left which is of type HDLReference.
 	 */
 	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>() {
 		@Override
@@ -102,7 +105,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		}
 	};
 	/**
-	 * The accessor for the field type which is of type HDLAssignmentType
+	 * The accessor for the field type which is of type HDLAssignmentType.
 	 */
 	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>() {
 		@Override
@@ -113,7 +116,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		}
 	};
 	/**
-	 * The accessor for the field right which is of type HDLExpression
+	 * The accessor for the field right which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>() {
 		@Override

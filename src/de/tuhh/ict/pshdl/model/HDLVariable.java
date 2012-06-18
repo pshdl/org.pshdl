@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -35,8 +37,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(int containerID, HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations,
-			boolean validate) {
+	public HDLVariable(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
 		super(containerID, container, name, dimensions, defaultValue, annotations, validate);
 	}
 
@@ -54,7 +56,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param annotations
 	 *            the value for annotations. Can be <code>null</code>.
 	 */
-	public HDLVariable(int containerID, HDLObject container, String name, ArrayList<HDLExpression> dimensions, HDLExpression defaultValue, ArrayList<HDLAnnotation> annotations) {
+	public HDLVariable(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+			@Nullable ArrayList<HDLAnnotation> annotations) {
 		this(containerID, container, name, dimensions, defaultValue, annotations, true);
 	}
 
@@ -71,7 +74,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	/**
-	 * The accessor for the field name which is of type String
+	 * The accessor for the field name which is of type String.
 	 */
 	public static HDLFieldAccess<HDLVariable, String> fName = new HDLFieldAccess<HDLVariable, String>() {
 		@Override
@@ -83,7 +86,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	};
 	/**
 	 * The accessor for the field dimensions which is of type
-	 * ArrayList<HDLExpression>
+	 * ArrayList<HDLExpression>.
 	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>() {
 		@Override
@@ -94,7 +97,7 @@ public class HDLVariable extends AbstractHDLVariable {
 		}
 	};
 	/**
-	 * The accessor for the field defaultValue which is of type HDLExpression
+	 * The accessor for the field defaultValue which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLVariable, HDLExpression> fDefaultValue = new HDLFieldAccess<HDLVariable, HDLExpression>() {
 		@Override
@@ -106,7 +109,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	};
 	/**
 	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>
+	 * ArrayList<HDLAnnotation>.
 	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>() {
 		@Override
@@ -146,6 +149,14 @@ public class HDLVariable extends AbstractHDLVariable {
 	@Override
 	public HDLQualifiedName getFullName() {
 		return container.getFullName().append(asRef());
+	}
+
+	public HDLAnnotation getAnnotation(Enum<?> range) {
+		for (HDLAnnotation anno : getAnnotations()) {
+			if (anno.getName().equals(range.toString()))
+				return anno;
+		}
+		return null;
 	}
 
 	// $CONTENT-END$

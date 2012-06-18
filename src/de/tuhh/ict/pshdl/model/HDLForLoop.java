@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -36,7 +38,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLForLoop(int containerID, HDLObject container, ArrayList<HDLRange> range, HDLVariable param, ArrayList<HDLStatement> dos, boolean validate) {
+	public HDLForLoop(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos,
+			boolean validate) {
 		super(containerID, container, range, param, dos, validate);
 	}
 
@@ -54,7 +57,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 *            the value for dos. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLForLoop(int containerID, HDLObject container, ArrayList<HDLRange> range, HDLVariable param, ArrayList<HDLStatement> dos) {
+	public HDLForLoop(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos) {
 		this(containerID, container, range, param, dos, true);
 	}
 
@@ -71,7 +74,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	}
 
 	/**
-	 * The accessor for the field range which is of type ArrayList<HDLRange>
+	 * The accessor for the field range which is of type ArrayList<HDLRange>.
 	 */
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>() {
 		@Override
@@ -82,7 +85,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		}
 	};
 	/**
-	 * The accessor for the field param which is of type HDLVariable
+	 * The accessor for the field param which is of type HDLVariable.
 	 */
 	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>() {
 		@Override
@@ -93,7 +96,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		}
 	};
 	/**
-	 * The accessor for the field dos which is of type ArrayList<HDLStatement>
+	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
 	 */
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>() {
 		@Override

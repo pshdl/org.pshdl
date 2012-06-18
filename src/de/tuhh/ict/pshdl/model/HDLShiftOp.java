@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -29,7 +31,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLShiftOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type, boolean validate) {
+	public HDLShiftOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLShiftOpType type, boolean validate) {
 		super(containerID, container, left, right, type, validate);
 	}
 
@@ -45,7 +47,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLShiftOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLShiftOpType type) {
+	public HDLShiftOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLShiftOpType type) {
 		this(containerID, container, left, right, type, true);
 	}
 
@@ -85,7 +87,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	}
 
 	/**
-	 * The accessor for the field type which is of type HDLShiftOpType
+	 * The accessor for the field type which is of type HDLShiftOpType.
 	 */
 	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>() {
 		@Override

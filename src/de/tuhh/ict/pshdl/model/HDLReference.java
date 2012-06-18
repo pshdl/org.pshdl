@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -24,7 +26,7 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLReference(int containerID, HDLObject container, HDLQualifiedName var, boolean validate) {
+	public HDLReference(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, boolean validate) {
 		super(containerID, container, var, validate);
 	}
 
@@ -36,7 +38,7 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLReference(int containerID, HDLObject container, HDLQualifiedName var) {
+	public HDLReference(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var) {
 		this(containerID, container, var, true);
 	}
 
@@ -53,7 +55,7 @@ public abstract class HDLReference extends AbstractHDLReference {
 	}
 
 	/**
-	 * The accessor for the field var which is of type HDLQualifiedName
+	 * The accessor for the field var which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLReference, HDLQualifiedName> fVar = new HDLFieldAccess<HDLReference, HDLQualifiedName>() {
 		@Override

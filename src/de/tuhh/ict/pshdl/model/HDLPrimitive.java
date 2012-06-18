@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -32,7 +34,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPrimitive(int containerID, HDLObject container, String name, HDLPrimitiveType type, HDLExpression width, boolean validate) {
+	public HDLPrimitive(int containerID, @Nullable HDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate) {
 		super(containerID, container, name, type, width, validate);
 	}
 
@@ -48,7 +50,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param width
 	 *            the value for width. Can be <code>null</code>.
 	 */
-	public HDLPrimitive(int containerID, HDLObject container, String name, HDLPrimitiveType type, HDLExpression width) {
+	public HDLPrimitive(int containerID, @Nullable HDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width) {
 		this(containerID, container, name, type, width, true);
 	}
 
@@ -88,7 +90,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	/**
-	 * The accessor for the field type which is of type HDLPrimitiveType
+	 * The accessor for the field type which is of type HDLPrimitiveType.
 	 */
 	public static HDLFieldAccess<HDLPrimitive, HDLPrimitiveType> fType = new HDLFieldAccess<HDLPrimitive, HDLPrimitiveType>() {
 		@Override
@@ -99,7 +101,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		}
 	};
 	/**
-	 * The accessor for the field width which is of type HDLExpression
+	 * The accessor for the field width which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLPrimitive, HDLExpression> fWidth = new HDLFieldAccess<HDLPrimitive, HDLExpression>() {
 		@Override

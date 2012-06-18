@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -32,7 +34,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLIfStatement(int containerID, HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo, boolean validate) {
+	public HDLIfStatement(int containerID, @Nullable HDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
+			@Nullable ArrayList<HDLStatement> elseDo, boolean validate) {
 		super(containerID, container, ifExp, thenDo, elseDo, validate);
 	}
 
@@ -48,7 +51,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param elseDo
 	 *            the value for elseDo. Can be <code>null</code>.
 	 */
-	public HDLIfStatement(int containerID, HDLObject container, HDLExpression ifExp, ArrayList<HDLStatement> thenDo, ArrayList<HDLStatement> elseDo) {
+	public HDLIfStatement(int containerID, @Nullable HDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
+			@Nullable ArrayList<HDLStatement> elseDo) {
 		this(containerID, container, ifExp, thenDo, elseDo, true);
 	}
 
@@ -65,7 +69,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	}
 
 	/**
-	 * The accessor for the field ifExp which is of type HDLExpression
+	 * The accessor for the field ifExp which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>() {
 		@Override
@@ -77,7 +81,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	};
 	/**
 	 * The accessor for the field thenDo which is of type
-	 * ArrayList<HDLStatement>
+	 * ArrayList<HDLStatement>.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
 		@Override
@@ -89,7 +93,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	};
 	/**
 	 * The accessor for the field elseDo which is of type
-	 * ArrayList<HDLStatement>
+	 * ArrayList<HDLStatement>.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
 		@Override

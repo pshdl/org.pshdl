@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -29,7 +31,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArithOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLArithOpType type, boolean validate) {
+	public HDLArithOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLArithOpType type, boolean validate) {
 		super(containerID, container, left, right, type, validate);
 	}
 
@@ -45,7 +47,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLArithOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLArithOpType type) {
+	public HDLArithOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLArithOpType type) {
 		this(containerID, container, left, right, type, true);
 	}
 
@@ -85,7 +87,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	}
 
 	/**
-	 * The accessor for the field type which is of type HDLArithOpType
+	 * The accessor for the field type which is of type HDLArithOpType.
 	 */
 	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>() {
 		@Override

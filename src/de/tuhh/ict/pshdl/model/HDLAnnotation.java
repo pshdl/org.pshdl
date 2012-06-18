@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -26,7 +28,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAnnotation(int containerID, HDLObject container, String name, String value, boolean validate) {
+	public HDLAnnotation(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, boolean validate) {
 		super(containerID, container, name, value, validate);
 	}
 
@@ -40,7 +42,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param value
 	 *            the value for value. Can be <code>null</code>.
 	 */
-	public HDLAnnotation(int containerID, HDLObject container, String name, String value) {
+	public HDLAnnotation(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable String value) {
 		this(containerID, container, name, value, true);
 	}
 
@@ -57,7 +59,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	}
 
 	/**
-	 * The accessor for the field name which is of type String
+	 * The accessor for the field name which is of type String.
 	 */
 	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>() {
 		@Override
@@ -68,7 +70,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 		}
 	};
 	/**
-	 * The accessor for the field value which is of type String
+	 * The accessor for the field value which is of type String.
 	 */
 	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>() {
 		@Override

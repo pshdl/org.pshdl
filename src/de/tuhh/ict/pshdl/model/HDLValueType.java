@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 
 /**
@@ -22,7 +24,7 @@ public abstract class HDLValueType extends AbstractHDLValueType {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLValueType(int containerID, HDLObject container, String name, boolean validate) {
+	public HDLValueType(int containerID, @Nullable HDLObject container, @NonNull String name, boolean validate) {
 		super(containerID, container, name, validate);
 	}
 
@@ -34,7 +36,7 @@ public abstract class HDLValueType extends AbstractHDLValueType {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLValueType(int containerID, HDLObject container, String name) {
+	public HDLValueType(int containerID, @Nullable HDLObject container, @NonNull String name) {
 		this(containerID, container, name, true);
 	}
 

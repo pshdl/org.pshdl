@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -34,7 +36,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPackage(int containerID, HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations, boolean validate) {
+	public HDLPackage(int containerID, @Nullable HDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
+			@Nullable ArrayList<HDLDeclaration> declarations, boolean validate) {
 		super(containerID, container, libURI, pkg, units, declarations, validate);
 	}
 
@@ -52,7 +55,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param declarations
 	 *            the value for declarations. Can be <code>null</code>.
 	 */
-	public HDLPackage(int containerID, HDLObject container, String libURI, String pkg, ArrayList<HDLUnit> units, ArrayList<HDLDeclaration> declarations) {
+	public HDLPackage(int containerID, @Nullable HDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
+			@Nullable ArrayList<HDLDeclaration> declarations) {
 		this(containerID, container, libURI, pkg, units, declarations, true);
 	}
 
@@ -69,7 +73,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	}
 
 	/**
-	 * The accessor for the field libURI which is of type String
+	 * The accessor for the field libURI which is of type String.
 	 */
 	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>() {
 		@Override
@@ -80,7 +84,7 @@ public class HDLPackage extends AbstractHDLPackage {
 		}
 	};
 	/**
-	 * The accessor for the field pkg which is of type String
+	 * The accessor for the field pkg which is of type String.
 	 */
 	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>() {
 		@Override
@@ -91,7 +95,7 @@ public class HDLPackage extends AbstractHDLPackage {
 		}
 	};
 	/**
-	 * The accessor for the field units which is of type ArrayList<HDLUnit>
+	 * The accessor for the field units which is of type ArrayList<HDLUnit>.
 	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>() {
 		@Override
@@ -103,7 +107,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	};
 	/**
 	 * The accessor for the field declarations which is of type
-	 * ArrayList<HDLDeclaration>
+	 * ArrayList<HDLDeclaration>.
 	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>() {
 		@Override

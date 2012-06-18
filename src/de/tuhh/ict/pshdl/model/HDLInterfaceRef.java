@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -39,8 +41,8 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
-			ArrayList<HDLExpression> ifArray, boolean validate) {
+	public HDLInterfaceRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate) {
 		super(containerID, container, var, array, bits, hIf, ifArray, validate);
 	}
 
@@ -60,8 +62,8 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 */
-	public HDLInterfaceRef(int containerID, HDLObject container, HDLQualifiedName var, ArrayList<HDLExpression> array, ArrayList<HDLRange> bits, HDLQualifiedName hIf,
-			ArrayList<HDLExpression> ifArray) {
+	public HDLInterfaceRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray) {
 		this(containerID, container, var, array, bits, hIf, ifArray, true);
 	}
 
@@ -78,7 +80,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	}
 
 	/**
-	 * The accessor for the field hIf which is of type HDLQualifiedName
+	 * The accessor for the field hIf which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>() {
 		@Override
@@ -90,7 +92,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	};
 	/**
 	 * The accessor for the field ifArray which is of type
-	 * ArrayList<HDLExpression>
+	 * ArrayList<HDLExpression>.
 	 */
 	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>() {
 		@Override

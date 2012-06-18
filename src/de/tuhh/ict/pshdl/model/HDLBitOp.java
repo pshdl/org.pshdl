@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -29,7 +31,7 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBitOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLBitOpType type, boolean validate) {
+	public HDLBitOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLBitOpType type, boolean validate) {
 		super(containerID, container, left, right, type, validate);
 	}
 
@@ -45,7 +47,7 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLBitOp(int containerID, HDLObject container, HDLExpression left, HDLExpression right, HDLBitOpType type) {
+	public HDLBitOp(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLBitOpType type) {
 		this(containerID, container, left, right, type, true);
 	}
 
@@ -85,7 +87,7 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	}
 
 	/**
-	 * The accessor for the field type which is of type HDLBitOpType
+	 * The accessor for the field type which is of type HDLBitOpType.
 	 */
 	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>() {
 		@Override

@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -43,8 +45,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLDirectGeneration(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLInterface hIf, String generatorID,
-			String generatorContent, Boolean include, boolean validate) {
+	public HDLDirectGeneration(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
+			@NonNull String generatorID, @NonNull String generatorContent, @NonNull Boolean include, boolean validate) {
 		super(containerID, container, var, arguments, hIf, generatorID, generatorContent, include, validate);
 	}
 
@@ -68,8 +70,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param include
 	 *            the value for include. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLDirectGeneration(int containerID, HDLObject container, HDLVariable var, ArrayList<HDLArgument> arguments, HDLInterface hIf, String generatorID,
-			String generatorContent, Boolean include) {
+	public HDLDirectGeneration(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
+			@NonNull String generatorID, @NonNull String generatorContent, @NonNull Boolean include) {
 		this(containerID, container, var, arguments, hIf, generatorID, generatorContent, include, true);
 	}
 
@@ -86,7 +88,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	}
 
 	/**
-	 * The accessor for the field hIf which is of type HDLInterface
+	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
 	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>() {
 		@Override
@@ -97,7 +99,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 		}
 	};
 	/**
-	 * The accessor for the field generatorID which is of type String
+	 * The accessor for the field generatorID which is of type String.
 	 */
 	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>() {
 		@Override
@@ -108,7 +110,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 		}
 	};
 	/**
-	 * The accessor for the field generatorContent which is of type String
+	 * The accessor for the field generatorContent which is of type String.
 	 */
 	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>() {
 		@Override
@@ -119,7 +121,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 		}
 	};
 	/**
-	 * The accessor for the field include which is of type Boolean
+	 * The accessor for the field include which is of type Boolean.
 	 */
 	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>() {
 		@Override
@@ -129,7 +131,6 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			return obj.getInclude();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 
 	private HDLInterface hif = null;

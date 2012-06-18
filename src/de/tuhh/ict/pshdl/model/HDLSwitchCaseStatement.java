@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -29,7 +31,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSwitchCaseStatement(int containerID, HDLObject container, HDLExpression label, ArrayList<HDLStatement> dos, boolean validate) {
+	public HDLSwitchCaseStatement(int containerID, @Nullable HDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos, boolean validate) {
 		super(containerID, container, label, dos, validate);
 	}
 
@@ -43,7 +45,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	 * @param dos
 	 *            the value for dos. Can be <code>null</code>.
 	 */
-	public HDLSwitchCaseStatement(int containerID, HDLObject container, HDLExpression label, ArrayList<HDLStatement> dos) {
+	public HDLSwitchCaseStatement(int containerID, @Nullable HDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos) {
 		this(containerID, container, label, dos, true);
 	}
 
@@ -60,7 +62,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	}
 
 	/**
-	 * The accessor for the field label which is of type HDLExpression
+	 * The accessor for the field label which is of type HDLExpression.
 	 */
 	public static HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression> fLabel = new HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression>() {
 		@Override
@@ -71,7 +73,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 		}
 	};
 	/**
-	 * The accessor for the field dos which is of type ArrayList<HDLStatement>
+	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
 	 */
 	public static HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>>() {
 		@Override

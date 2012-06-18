@@ -76,4 +76,32 @@ public class HDLFunctions implements IHDLFunctionResolver {
 		}
 		return null;
 	}
+
+	public static ValueRange determineRange(HDLFunction function, HDLEvaluationContext context) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+		if (list != null)
+			for (IHDLFunctionResolver resolver : list) {
+				ValueRange eval = resolver.range(function, context);
+				if (eval != null)
+					return eval;
+			}
+		return null;
+	}
+
+	@Override
+	public ValueRange range(HDLFunction function, HDLEvaluationContext context) {
+		String name = function.getName();
+		ValueRange zeroArg = function.getParams().get(0).determineRange(context);
+		if ("abs".equals(name)) {
+			return new ValueRange(zeroArg.from.abs(), zeroArg.to.abs());
+		}
+		ValueRange oneArg = function.getParams().get(1).determineRange(context);
+		if ("min".equals(name)) {
+			return new ValueRange(zeroArg.from.min(oneArg.from), zeroArg.to.min(oneArg.to));
+		}
+		if ("max".equals(name)) {
+			return new ValueRange(zeroArg.from.max(oneArg.from), zeroArg.to.max(oneArg.to));
+		}
+		return null;
+	}
 }

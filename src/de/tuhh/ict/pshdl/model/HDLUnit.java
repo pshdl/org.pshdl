@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -36,7 +38,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(int containerID, HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements, boolean validate) {
+	public HDLUnit(int containerID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
+			@Nullable ArrayList<HDLStatement> statements, boolean validate) {
 		super(containerID, container, libURI, name, imports, statements, validate);
 	}
 
@@ -54,7 +57,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
 	 */
-	public HDLUnit(int containerID, HDLObject container, String libURI, String name, ArrayList<String> imports, ArrayList<HDLStatement> statements) {
+	public HDLUnit(int containerID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
+			@Nullable ArrayList<HDLStatement> statements) {
 		this(containerID, container, libURI, name, imports, statements, true);
 	}
 
@@ -71,7 +75,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	}
 
 	/**
-	 * The accessor for the field libURI which is of type String
+	 * The accessor for the field libURI which is of type String.
 	 */
 	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>() {
 		@Override
@@ -82,7 +86,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		}
 	};
 	/**
-	 * The accessor for the field name which is of type String
+	 * The accessor for the field name which is of type String.
 	 */
 	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>() {
 		@Override
@@ -93,7 +97,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		}
 	};
 	/**
-	 * The accessor for the field imports which is of type ArrayList<String>
+	 * The accessor for the field imports which is of type ArrayList<String>.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>() {
 		@Override
@@ -105,7 +109,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	};
 	/**
 	 * The accessor for the field statements which is of type
-	 * ArrayList<HDLStatement>
+	 * ArrayList<HDLStatement>.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>() {
 		@Override
