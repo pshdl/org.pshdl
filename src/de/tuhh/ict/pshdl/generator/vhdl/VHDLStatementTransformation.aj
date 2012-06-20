@@ -201,7 +201,15 @@ public aspect VHDLStatementTransformation {
 
 	public VHDLContext HDLSwitchStatement.toVHDL() {
 		VHDLContext context = new VHDLContext();
-		Expression<?> caseExp = getCaseExp().toVHDL();
+		HDLExpression hCaseExp=getCaseExp();
+		BigInteger width=null;
+		HDLType type=hCaseExp.determineType();
+		if (type instanceof HDLPrimitive){
+			width=((HDLPrimitive)type).getWidth().constantEvaluate(null);
+			if (width==null)
+				throw new IllegalArgumentException("HDLPrimitive switch case needs to have constant width");
+		}
+		Expression<?> caseExp = hCaseExp.toVHDL();
 		Map<HDLSwitchCaseStatement, VHDLContext> ctxs = new LinkedHashMap<HDLSwitchCaseStatement, VHDLContext>();
 		Set<HDLRegisterConfig> configs = new HashSet<HDLRegisterConfig>();
 		boolean hasUnclocked = false;
@@ -215,7 +223,7 @@ public aspect VHDLStatementTransformation {
 		for (HDLRegisterConfig hdlRegisterConfig : configs) {
 			CaseStatement cs = new CaseStatement(caseExp);
 			for (Map.Entry<HDLSwitchCaseStatement, VHDLContext> e : ctxs.entrySet()) {
-				Alternative alt = createAlternative(cs, e);
+				Alternative alt = createAlternative(cs, e, width);
 				LinkedList<SequentialStatement> clockCase = e.getValue().clockedStatements.get(hdlRegisterConfig);
 				if (clockCase != null) {
 					alt.getStatements().addAll(clockCase);
@@ -226,7 +234,7 @@ public aspect VHDLStatementTransformation {
 		if (hasUnclocked) {
 			CaseStatement cs = new CaseStatement(caseExp);
 			for (Map.Entry<HDLSwitchCaseStatement, VHDLContext> e : ctxs.entrySet()) {
-				Alternative alt = createAlternative(cs, e);
+				Alternative alt = createAlternative(cs, e, width);
 				alt.getStatements().addAll(e.getValue().unclockedStatements);
 			}
 			context.addUnclockedStatement(cs, this);
@@ -234,15 +242,15 @@ public aspect VHDLStatementTransformation {
 		return context;
 	}
 
-	private static Alternative createAlternative(CaseStatement cs, Map.Entry<HDLSwitchCaseStatement, VHDLContext> e) {
+	private static Alternative createAlternative(CaseStatement cs, Map.Entry<HDLSwitchCaseStatement, VHDLContext> e, BigInteger bits) {
 		Alternative alt;
 		HDLExpression label = e.getKey().getLabel();
 		if (label != null) {
 			BigInteger eval = label.constantEvaluate(null);
 			if (eval != null)
-				alt = cs.createAlternative(new HDLLiteral().setVal("0b" + eval.toString(2)).toVHDL());
+				alt = cs.createAlternative(VHDLUtils.toBinaryLiteral(bits.intValue(), eval));
 			else
-				alt = cs.createAlternative(label.toVHDL());
+				alt = cs.createAlternative(label.toVHDL());//The only valid reason here is an Enum
 		} else {
 			alt = cs.createAlternative(Choices.OTHERS);
 		}

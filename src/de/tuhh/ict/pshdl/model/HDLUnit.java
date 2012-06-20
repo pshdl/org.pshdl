@@ -150,6 +150,12 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 					rst = hvd.getVariables().get(0);
 				}
 			}
+			for (HDLVariable var : hvd.getVariables()) {
+				if (var.getAnnotation(HDLAnnotations.clock) != null)
+					clk = var;
+				if (var.getAnnotation(HDLAnnotations.reset) != null)
+					rst = var;
+			}
 			if (hvd.getRegister() != null)
 				hasReg = true;
 		}
@@ -166,6 +172,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		for (HDLVariableRef ref : refs) {
 			ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
 		}
+		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		return ms.apply(unitIF);
 	}
 

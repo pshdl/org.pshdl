@@ -110,14 +110,148 @@ public class HDLSimulator {
 		HDLUnit insulin = Insulin.transform(unit);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createMultiplexArrayWrite(context, insulin);
+		insulin = createBitRanges(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 		// Find all bit access
-		// Determine value ranges for array and bit accesses
+		// Determine value ranges for bit accesses
 		// Create non overlapping ranges
 		// generate cat statement for ranges
 		// Starting from the end, generate multiplexer for each switch/if
 		// statement
+	}
+
+	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
+		List<HDLVariableRef> refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
+		Map<HDLQualifiedName, List<RangeVal>> ranges = new TreeMap<HDLQualifiedName, List<RangeVal>>();
+		for (HDLVariableRef ref : refs) {
+			if (ref.getBits().size() > 0) {
+				List<RangeVal> set = ranges.get(ref.getVarRefName());
+				if (set == null) {
+					set = new LinkedList<RangeVal>();
+				}
+				for (HDLRange r : ref.getBits()) {
+					ValueRange determineRange = r.determineRange(context);
+					set.add(new RangeVal(determineRange.from, 1));
+					set.add(new RangeVal(determineRange.to, -1));
+				}
+			}
+		}
+		Map<HDLQualifiedName, SortedSet<ValueRange>> splitRanges = new TreeMap<HDLQualifiedName, SortedSet<ValueRange>>();
+		for (Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
+			splitRanges.put(entry.getKey(), split(entry.getValue()));
+		}
+
+		ModificationSet ms = new ModificationSet();
+		return ms.apply(insulin);
+	}
+
+	private static class RangeVal implements Comparable<RangeVal> {
+		public final BigInteger value;
+		public int count;
+
+		public RangeVal(BigInteger value, int count) {
+			super();
+			this.value = value;
+			this.count = count;
+		}
+
+		@Override
+		public String toString() {
+			return value + (isStart() ? "S" : "E") + count;
+		}
+
+		@Override
+		public int compareTo(RangeVal o) {
+			// Sort by value first
+			int v = value.compareTo(o.value);
+			if (v != 0)
+				return v;
+			// Then sort Starts before ends
+			return -count;
+		}
+
+		public boolean isStart() {
+			return count > 0;
+		}
+
+	}
+
+	/**
+	 * Sort a List of ranges by their number, then start/end and merge multiple
+	 * start/ends
+	 * 
+	 * @param temp
+	 *            a list of RangeVal which can be unsorted
+	 */
+	private static void preSort(List<RangeVal> temp) {
+		Collections.sort(temp);
+		RangeVal last = null;
+		for (Iterator<RangeVal> iterator = temp.iterator(); iterator.hasNext();) {
+			RangeVal rangeVal = iterator.next();
+			if ((last != null) && last.value.equals(rangeVal.value) && (last.isStart() == rangeVal.isStart())) {
+				iterator.remove();
+				last.count += rangeVal.count;
+			} else
+				last = rangeVal;
+		}
+	}
+
+	/**
+	 * Splits a list into ValueRange Objects that do not overlap each other, but
+	 * fully represent the ranges given by value
+	 * 
+	 * @param value
+	 *            a list of RangeVal Objects that need to be split
+	 * @return
+	 */
+	private static SortedSet<ValueRange> split(List<RangeVal> value) {
+		preSort(value);
+		SortedSet<ValueRange> res = new TreeSet<ValueRange>();
+		int count = 0;
+		BigInteger start = null;
+		for (RangeVal rangeVal : value) {
+			count += rangeVal.count;
+			if (rangeVal.isStart()) {
+				if (start != null) {
+					// If there was an unended start, then we have to end it
+					// just one before the new start
+					res.add(new ValueRange(start, rangeVal.value.subtract(BigInteger.ONE)));
+				}
+				// Set the start to the current Element
+				start = rangeVal.value;
+			} else {
+				// End the current range at this Element
+				res.add(new ValueRange(start, rangeVal.value));
+				if (count > 0) {
+					// If we expect another end later, the element following
+					// this will have to start one after
+					start = rangeVal.value.add(BigInteger.ONE);
+				} else
+					// No new range anymore
+					start = null;
+			}
+		}
+		return res;
+	}
+
+	public static void main(String[] args) {
+		// 5->8 9->10 11
+		System.out.println(split(createRanges(5, 8, 9, 10, 11, 11)));
+		// 5, 6->7, 8, 9, 10
+		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9)));
+		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9)));
+		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9)));
+		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9, 14, 18)));
+	}
+
+	private static List<RangeVal> createRanges(int... r) {
+		List<RangeVal> temp = new LinkedList<RangeVal>();
+		for (int i = 0; i < r.length; i++) {
+			temp.add(new RangeVal(BigInteger.valueOf(r[i]), (i % 2) == 0 ? 1 : -1));
+		}
+		System.out.println("HDLSimulator.createRanges()" + temp);
+		return temp;
 	}
 
 	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {

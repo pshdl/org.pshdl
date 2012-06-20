@@ -391,6 +391,9 @@ public aspect StringWriterAspect {
 	public String HDLVariable.toString() {
 		StringBuilder sb = new StringBuilder();
 		// sb.append(qfn);
+		for (HDLAnnotation anno : getAnnotations()) {
+			sb.append(anno.toString()).append(' ');
+		}
 		sb.append(getName());
 		for (HDLExpression arr : getDimensions()) {
 			sb.append('[').append(arr).append(']');

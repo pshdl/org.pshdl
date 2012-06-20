@@ -160,8 +160,8 @@ public class Insulin {
 	 */
 	private static <T extends HDLObject> T generateClkAndReset(T apply) {
 		ModificationSet ms = new ModificationSet();
-		HDLVariable defClkVar = new HDLVariable().setName("clk");
-		HDLVariable defRstVar = new HDLVariable().setName("rst");
+		HDLVariable defClkVar = new HDLVariable().setName("clk").addAnnotations(HDLAnnotations.clock.create(null));
+		HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLAnnotations.clock.create(null));
 		boolean customClk = false, customRst = false;
 		// Find all clock annotated Signals
 		HDLVariable newVar = extractVar(apply, HDLAnnotations.clock);

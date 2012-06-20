@@ -4,7 +4,7 @@ import java.math.*;
 
 import org.eclipse.jdt.annotation.*;
 
-public class ValueRange {
+public class ValueRange implements Comparable<ValueRange> {
 	public final BigInteger from, to;
 
 	public ValueRange(@NonNull BigInteger from, @NonNull BigInteger to) {
@@ -51,7 +51,9 @@ public class ValueRange {
 
 	@Override
 	public String toString() {
-		return "ValueRange [from=" + from + ", to=" + to + "]";
+		if (from.equals(to))
+			return "[" + from + "]";
+		return "[" + from + "->" + to + "]";
 	}
 
 	public ValueRange and(ValueRange other) {
@@ -69,5 +71,13 @@ public class ValueRange {
 
 	public ValueRange or(ValueRange other) {
 		return new ValueRange(from.min(other.from), to.max(other.to));
+	}
+
+	@Override
+	public int compareTo(ValueRange arg0) {
+		int first = this.from.compareTo(arg0.from);
+		if (first != 0)
+			return first;
+		return this.to.compareTo(arg0.to);
 	}
 }

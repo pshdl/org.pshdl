@@ -104,6 +104,9 @@ public aspect VHDLExpressionTransformation {
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
 				HDLLiteral lit = (HDLLiteral) getTarget();
 				BigInteger val = lit.getValueAsBigInt();
+				BigInteger width=null;
+				if (targetType.getWidth()!=null)
+					width=targetType.getWidth().constantEvaluate(null);
 				FunctionCall resize = null;
 				switch (targetType.getType()) {
 				case BIT:
@@ -118,6 +121,8 @@ public aspect VHDLExpressionTransformation {
 					resize = new FunctionCall(NumericStd.RESIZE);
 					break;
 				case BITVECTOR:
+					if (width!=null)
+						return VHDLUtils.toBinaryLiteral(width.intValue(), val);
 					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
 					break;
 				case BOOL:
