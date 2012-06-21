@@ -80,4 +80,10 @@ public class ValueRange implements Comparable<ValueRange> {
 			return first;
 		return this.to.compareTo(arg0.to);
 	}
+
+	public boolean contains(ValueRange other) {
+		if ((from.compareTo(other.from) <= 0) && (to.compareTo(other.to) >= 0))
+			return true;
+		return false;
+	}
 }

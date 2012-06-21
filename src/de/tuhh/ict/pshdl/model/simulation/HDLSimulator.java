@@ -123,12 +123,13 @@ public class HDLSimulator {
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
 		List<HDLVariableRef> refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
-		Map<HDLQualifiedName, List<RangeVal>> ranges = new TreeMap<HDLQualifiedName, List<RangeVal>>();
+		Map<HDLQualifiedName, List<RangeVal>> ranges = new HashMap<HDLQualifiedName, List<RangeVal>>();
 		for (HDLVariableRef ref : refs) {
 			if (ref.getBits().size() > 0) {
 				List<RangeVal> set = ranges.get(ref.getVarRefName());
 				if (set == null) {
 					set = new LinkedList<RangeVal>();
+					ranges.put(ref.getVarRefName(), set);
 				}
 				for (HDLRange r : ref.getBits()) {
 					ValueRange determineRange = r.determineRange(context);
@@ -137,13 +138,36 @@ public class HDLSimulator {
 				}
 			}
 		}
-		Map<HDLQualifiedName, SortedSet<ValueRange>> splitRanges = new TreeMap<HDLQualifiedName, SortedSet<ValueRange>>();
+		Map<HDLQualifiedName, SortedSet<ValueRange>> splitRanges = new HashMap<HDLQualifiedName, SortedSet<ValueRange>>();
 		for (Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
 			splitRanges.put(entry.getKey(), split(entry.getValue()));
 		}
-
+		// Change bit access to broken down ranges
 		ModificationSet ms = new ModificationSet();
-		return ms.apply(insulin);
+		for (HDLVariableRef ref : refs) {
+			ArrayList<HDLRange> newRanges = new ArrayList<HDLRange>();
+			SortedSet<ValueRange> list = splitRanges.get(ref.getVarRefName());
+			for (HDLRange bit : ref.getBits()) {
+				if (bit.getFrom() != null) { // Singular ranges don't do
+												// anything
+					ValueRange range = bit.determineRange(context);
+					for (ValueRange newRange : list) {
+						if (range.contains(newRange)) {
+							if (newRange.from.equals(newRange.to))
+								newRanges.add(new HDLRange().setTo(HDLLiteral.get(newRange.to)));
+							else
+								newRanges.add(new HDLRange().setFrom(HDLLiteral.get(newRange.from)).setTo(HDLLiteral.get(newRange.to)));
+						}
+					}
+				} else {
+					newRanges.add(bit.copy());
+				}
+			}
+			if (newRanges.size() != 0)
+				ms.replace(ref, ref.setBits(newRanges));
+		}
+		HDLUnit apply = ms.apply(insulin);
+		return Insulin.handleMultiBitAccess(apply, context);
 	}
 
 	private static class RangeVal implements Comparable<RangeVal> {
@@ -215,8 +239,12 @@ public class HDLSimulator {
 			if (rangeVal.isStart()) {
 				if (start != null) {
 					// If there was an unended start, then we have to end it
-					// just one before the new start
-					res.add(new ValueRange(start, rangeVal.value.subtract(BigInteger.ONE)));
+					if (start.equals(rangeVal.value))
+						// Or at the same location
+						res.add(new ValueRange(start, rangeVal.value));
+					else
+						// just one before the new start
+						res.add(new ValueRange(start, rangeVal.value.subtract(BigInteger.ONE)));
 				}
 				// Set the start to the current Element
 				start = rangeVal.value;
@@ -243,6 +271,10 @@ public class HDLSimulator {
 		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9)));
 		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9)));
 		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9, 14, 18)));
+		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7)));
+		System.out.println(split(createRanges(2, 2, 7, 13, 7, 10, 5, 5, 6, 6, 7, 7, 5, 8, 10, 10)));
+		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 8)));
+		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 7)));
 	}
 
 	private static List<RangeVal> createRanges(int... r) {

@@ -34,6 +34,12 @@ public class HDLValidator {
 			// TODO check for constant booleans
 			// TODO combined Assignment is register
 			// TODO Validation Scheme for validating HDLAnnotation Values
+			// TODO Validate bitWidth mismatch
+			// TODO Check bit access direction
+			// TODO Multi-bit Write only for Constants
+			// TODO check for signals named clk or rst and warn about the
+			// collision
+			// TODO check for proper variable naming
 
 		} catch (Exception e) {
 			e.printStackTrace();

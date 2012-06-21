@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model.utils;
 
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -11,6 +12,7 @@ import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.IHDLGenerator.HDLGenerationInfo;
 import de.tuhh.ict.pshdl.model.validation.*;
@@ -25,7 +27,7 @@ public class Insulin {
 		// System.out.println("Insulin.transform()" + apply);
 		// apply.validateAllFields(null, true);
 		apply = generateClkAndReset(apply);
-		apply = handleMultiBitAccess(apply);
+		apply = handleMultiBitAccess(apply, null);
 		apply = handleMultiForLoop(apply);
 		apply = handlePostfixOp(apply);
 		apply = generateInitializations(apply);
@@ -469,11 +471,12 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static <T extends HDLObject> T handleMultiBitAccess(T apply) {
+	public static <T extends HDLObject> T handleMultiBitAccess(T apply, HDLEvaluationContext context) {
 		ModificationSet ms = new ModificationSet();
 		List<HDLVariableRef> refs = apply.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			if (ref.getBits().size() > 1) {
+			ArrayList<HDLRange> bits = ref.getBits();
+			if (bits.size() > 1) {
 				if (ref.getContainer() instanceof HDLAssignment) {
 					HDLAssignment ass = (HDLAssignment) ref.getContainer();
 					if (ass.getLeft() == ref) {
@@ -485,19 +488,41 @@ public class Insulin {
 						// bit<widthOfResult> b_bitAcces=8;
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
-						throw new IllegalArgumentException("Multi bit write access not implemented");
+						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
+						String varName = ref.getVarRefName() + "_" + ref.containerID + "_bitAccess";
+						HDLQualifiedName hVarName = HDLQualifiedName.create(varName);
+						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType().copy()).addVariables(
+								new HDLVariable().setName(varName).setDefaultValue(ass.getRight().copy()));
+						replacements.add(hvd);
+						BigInteger shift = BigInteger.ZERO;
+						for (int j = bits.size() - 1; j >= 0; j--) {
+							HDLRange r = bits.get(j);
+							ValueRange vr = r.determineRange(context);
+							BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
+							HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add));
+							HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
+							HDLVariableRef newRef = ref.setBits(HDLObject.asList(r.copy())).copy();
+							HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);
+							replacements.add(newAss);
+							shift = add.add(BigInteger.ONE);
+						}
+						ms.replace(ass, replacements.toArray(new HDLStatement[0]));
+
 					}
 				}
 				// Multi bit read access
 				// b{1,4:5} == b{1}#b{4:5}
 				HDLConcat concat = new HDLConcat();
-				for (HDLRange r : ref.getBits()) {
+				for (HDLRange r : bits) {
 					concat = concat.addCats(ref.copy().setBits(HDLObject.asList(r.copy())));
 				}
 				ms.replace(ref, concat);
 			}
 		}
-		return ms.apply(apply);
+		T tmp = ms.apply(apply);
+		if (tmp != apply)
+			tmp = handleMultiBitAccess(tmp, context);
+		return tmp;
 	}
 
 	private static <T extends HDLObject> T handleOutPortRead(T orig) {

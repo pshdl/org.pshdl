@@ -163,7 +163,9 @@ public abstract class HDLObject extends AbstractHDLObject {
 		if (clazzTypes == null) {
 			clazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
 			deepClazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
-			Iterator<HDLObject> iterator = iterator();
+			Iterator<HDLObject> iterator = iterator(false);
+			// addClazz(this, clazzTypes);
+			// addClazz(this, deepClazzTypes);
 			while (iterator.hasNext()) {
 				HDLObject c = iterator.next();
 				addClazz(c, clazzTypes);
@@ -237,6 +239,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 			if (container.getClass().equals(clazz))
 				return (T) container;
 			return container.getContainer(clazz);
+		}
+		return null;
+	}
+
+	public HDLIterator iterator(boolean deep) {
+		try {
+			return new HDLIterator(this, deep);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}

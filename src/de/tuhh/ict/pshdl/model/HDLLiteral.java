@@ -66,7 +66,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return obj.getVal();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 
 	private BigInteger bigIntegerVal = null;
