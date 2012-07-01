@@ -44,6 +44,7 @@ public aspect VHDLExpressionTransformation {
 			result = new ArrayElement<Name<?>>(result, indices);
 		}
 		if (ref.getBits().size() > 0) {
+			//TODO Make any directional access work (5:0, 0:5)
 			if (ref.getBits().size() > 1)
 				throw new IllegalArgumentException("Multi bit access not supported");
 			HDLRange r = ref.getBits().get(0);
@@ -103,11 +104,14 @@ public aspect VHDLExpressionTransformation {
 			HDLPrimitive targetType = (HDLPrimitive) getCastTo();
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
 				HDLLiteral lit = (HDLLiteral) getTarget();
+				if (this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLArithOp)
+					return lit.toVHDL();
 				BigInteger val = lit.getValueAsBigInt();
 				BigInteger width=null;
 				if (targetType.getWidth()!=null)
 					width=targetType.getWidth().constantEvaluate(null);
 				FunctionCall resize = null;
+				Expression<?> actual = new StringLiteral(val.toString(2));
 				switch (targetType.getType()) {
 				case BIT:
 					if (BigInteger.ZERO.equals(val))
@@ -116,21 +120,27 @@ public aspect VHDLExpressionTransformation {
 				case NATURAL:
 				case INTEGER:
 					return lit.toVHDL();
-				case INT:
-				case UINT:
-					resize = new FunctionCall(NumericStd.RESIZE);
+				case INT:{
+					resize = new FunctionCall(NumericStd.TO_SIGNED);
+					resize.getParameters().add(new AssociationElement(lit.toVHDL()));
 					break;
+				}
+				case UINT:{
+					resize = new FunctionCall(NumericStd.TO_UNSIGNED);
+					resize.getParameters().add(new AssociationElement(lit.toVHDL()));
+					break;
+				}
 				case BITVECTOR:
 					if (width!=null)
 						return VHDLUtils.toBinaryLiteral(width.intValue(), val);
 					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+					resize.getParameters().add(new AssociationElement(actual));
 					break;
 				case BOOL:
 					throw new IllegalArgumentException("Bool is not a literal");
 				}
 				if (resize==null)
 					throw new IllegalArgumentException("Should not get here");
-				resize.getParameters().add(new AssociationElement(new StringLiteral(val.toString(2))));
 				resize.getParameters().add(new AssociationElement(targetType.getWidth().toVHDL()));
 				return resize;
 			}
@@ -247,6 +257,10 @@ public aspect VHDLExpressionTransformation {
 		case POW:
 			return new Parentheses(new Pow(getLeft().toVHDL(), getRight().toVHDL()));
 		}
+		throw new IllegalArgumentException("Not supported:" + this);
+	}
+	
+	public Expression<?> HDLTernary.toVHDL(){
 		throw new IllegalArgumentException("Not supported:" + this);
 	}
 }

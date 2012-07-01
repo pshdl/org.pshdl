@@ -1,7 +1,5 @@
 package de.tuhh.ict.pshdl.model;
 
-import java.util.*;
-
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -134,8 +132,6 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		return meta == null ? false : meta;
 	}
 
-	private static WeakHashMap<String, HDLPrimitive> primCache;
-
 	@Override
 	protected String validateName(String name) {
 		if (this.name == null)
@@ -145,19 +141,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	@Override
 	public String getName() {
-		String strName = "#" + toString();
-		getPrimCache().put(strName, this);
-		return strName;
-	}
-
-	public static HDLType forName(HDLQualifiedName typeRefName) {
-		return getPrimCache().get(typeRefName.getLastSegment());
-	}
-
-	private static WeakHashMap<String, HDLPrimitive> getPrimCache() {
-		if (primCache == null)
-			primCache = new WeakHashMap<String, HDLPrimitive>();
-		return primCache;
+		return "#" + toString();
 	}
 
 	public static HDLPrimitive getInt() {

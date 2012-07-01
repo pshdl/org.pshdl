@@ -29,8 +29,19 @@ public aspect ConstantEvaluation {
 		DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE, ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT, CAN_NOT_USE_PARAMETER, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS, NON_PRIMITVE_TYPE_NOT_EVALUATED, TYPE_NOT_SUPPORTED_FOR_CONSTANTS;
 	}
 
-	public BigInteger HDLExpression.constantEvaluate(HDLEvaluationContext context) {
-		throw new RuntimeException("Incorrectly implemented constant evaluation!");
+	public abstract BigInteger HDLExpression.constantEvaluate(HDLEvaluationContext context);
+	
+	public BigInteger HDLTernary.constantEvaluate(HDLEvaluationContext context){
+		BigInteger res=getIfExpr().constantEvaluate(context);
+		if (res!=null){
+			if (BigInteger.ZERO.equals(res)){
+				return getElseExpr().constantEvaluate(context);
+			}
+			return getThenExpr().constantEvaluate(context);
+		}
+		this.addMeta(ProblemSource.SOURCE, getIfExpr());
+		this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
+		return null;
 	}
 
 	public BigInteger HDLLiteral.constantEvaluate(HDLEvaluationContext context) {

@@ -26,7 +26,7 @@ public class HDLLibrary {
 		HDLQualifiedName hdlPkg = new HDLQualifiedName(pkg.getPkg());
 		for (HDLUnit unit : pkg.getUnits()) {
 			HDLQualifiedName uq = hdlPkg.append(new HDLQualifiedName(unit.getName()));
-			System.out.println("HDLLibrary.addPkg()" + uq + " to " + this);
+			// System.out.println("HDLLibrary.addPkg()" + uq + " to " + this);
 			HDLQualifiedName skipLast = uq.skipLast(1);
 			HDLPackage hdlPackage = pkgs.get(skipLast);
 			if (hdlPackage == null) {
@@ -47,13 +47,15 @@ public class HDLLibrary {
 			List<HDLInterface> list = unit.getAllObjectsOf(HDLInterface.class, true);
 			for (HDLInterface hdlInterface : list) {
 				HDLQualifiedName append = uq.append(hdlInterface.getName());
-				System.out.println("HDLLibrary.addPkg() Interface:" + append);
+				// System.out.println("HDLLibrary.addPkg() Interface:" +
+				// append);
 				types.put(append, hdlInterface);
 			}
 			List<HDLEnum> elist = unit.getAllObjectsOf(HDLEnum.class, true);
 			for (HDLEnum hdlEnum : elist) {
 				HDLQualifiedName append = uq.append(hdlEnum.getName());
-				System.out.println("HDLLibrary.addPkg() Enum:" + append + " to " + this);
+				// System.out.println("HDLLibrary.addPkg() Enum:" + append +
+				// " to " + this);
 				types.put(append, hdlEnum);
 			}
 		}
@@ -63,14 +65,15 @@ public class HDLLibrary {
 				HDLEnumDeclaration ed = (HDLEnumDeclaration) decl;
 				HDLEnum hdlEnum = ed.getHEnum();
 				HDLQualifiedName append = hdlPkg.append(new HDLQualifiedName(hdlEnum.getName()));
-				System.out.println("HDLLibrary.addPkg() Enum:" + append);
+				// System.out.println("HDLLibrary.addPkg() Enum:" + append);
 				types.put(append, hdlEnum);
 				break;
 			case HDLInterfaceDeclaration:
 				HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) decl;
 				HDLInterface hdlInterface = hid.getHIf();
 				HDLQualifiedName newIFname = hdlPkg.append(new HDLQualifiedName(hdlInterface.getName()));
-				System.out.println("HDLLibrary.addPkg() Interface:" + newIFname + " to " + this);
+				// System.out.println("HDLLibrary.addPkg() Interface:" +
+				// newIFname + " to " + this);
 				types.put(newIFname, hdlInterface);
 				break;
 			default:
@@ -93,7 +96,8 @@ public class HDLLibrary {
 	public HDLType resolve(ArrayList<String> imports, HDLQualifiedName type) {
 		HDLType hdlType = types.get(type);
 		if (hdlType == null) {
-			System.out.println("HDLLibrary.resolve() Checking imports for:" + type + " @" + this);
+			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
+			// type + " @" + this);
 			for (String string : imports) {
 				if (string.endsWith(type.toString()))
 					return types.get(new HDLQualifiedName(string));
@@ -113,7 +117,8 @@ public class HDLLibrary {
 	}
 
 	public void addInterface(HDLInterface hIf) {
-		System.out.println("HDLLibrary.addInterface()" + hIf.asRef() + " to:" + this);
+		// System.out.println("HDLLibrary.addInterface()" + hIf.asRef() + " to:"
+		// + this);
 		types.put(hIf.asRef(), hIf);
 	}
 

@@ -53,4 +53,8 @@ public class HDLEvaluationContext {
 		return sb.toString();
 	}
 
+	public int getPrevious(String string) {
+		throw new RuntimeException("Not implemented");
+	}
+
 }

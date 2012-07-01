@@ -44,6 +44,10 @@ public class HDLIterator implements Iterator<HDLObject> {
 	private Iterator<Iterator<HDLObject>> delegate;
 	private Iterator<HDLObject> current;
 
+	public HDLIterator(HDLObject obj) throws IllegalArgumentException, IllegalAccessException {
+		this(obj, false);
+	}
+
 	public HDLIterator(HDLObject obj, boolean deep) throws IllegalArgumentException, IllegalAccessException {
 		Class<? extends HDLObject> clazz = obj.getClass();
 		addAllFields(obj, clazz, deep);

@@ -87,7 +87,7 @@ public class Insulin {
 					HDLExpression defaultValue = var.getDefaultValue();
 					if ((defaultValue == null) && (register == null)) {
 						if ((hvd.getPrimitive() != null)) {
-							if ((var.getAnnotation(HDLAnnotations.VHDLLatchable) == null) || (hvd.getAnnotation(HDLAnnotations.VHDLLatchable) == null))
+							if ((var.getAnnotation(HDLAnnotations.VHDLLatchable) == null) && (hvd.getAnnotation(HDLAnnotations.VHDLLatchable) == null))
 								defaultValue = HDLLiteral.get(0);
 						} else {
 							HDLType resolveType = hvd.resolveType();

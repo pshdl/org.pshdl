@@ -110,4 +110,8 @@ public aspect TypeInference {
 	public HDLType HDLEqualityOp.determineType() {
 		return HDLPrimitives.getInstance().getEqualityOpType(this).result;
 	}
+	
+	public HDLType HDLTernary.determineType(){
+		return getThenExpr().determineType();
+	}
 }

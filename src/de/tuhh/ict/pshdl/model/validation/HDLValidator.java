@@ -40,6 +40,13 @@ public class HDLValidator {
 			// TODO check for signals named clk or rst and warn about the
 			// collision
 			// TODO check for proper variable naming
+			// TODO check for valid parameter
+			// TODO Check for unconstrained arrays in switch case
+			// TODO Check for covered cases in switch clause
+			// TODO Check for only one default clause
+			// TODO Check for Range direction
+			// TODO Type checking!
+			// TODO HDLConcat need known width
 
 		} catch (Exception e) {
 			e.printStackTrace();

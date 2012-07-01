@@ -357,7 +357,9 @@ public class HDLPrimitives {
 			return hdi;
 		}
 		HDLExpression width = lType.getWidth();
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width.copy()), lType, new HDLPrimitive().setType(triple.right));
+		if (width != null)
+			width = width.copy();
+		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType, new HDLPrimitive().setType(triple.right));
 		return normalize(info, op);
 	}
 

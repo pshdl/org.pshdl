@@ -13,6 +13,10 @@ public aspect StringWriterAspect {
 		return sb.toString();
 	}
 	
+	public String HDLTernary.toString() {
+		return "("+getIfExpr().toString()+"?"+getThenExpr().toString()+":"+getElseExpr().toString()+")";
+	}
+	
 	public String HDLShiftOp.toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft());
