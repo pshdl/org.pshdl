@@ -3,8 +3,8 @@ package de.tuhh.ict.pshdl.model;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
  * The class HDLPrimitive contains the following fields

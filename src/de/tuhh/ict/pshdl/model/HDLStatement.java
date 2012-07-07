@@ -3,7 +3,6 @@ package de.tuhh.ict.pshdl.model;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
  * The class HDLStatement contains the following fields
@@ -47,29 +46,8 @@ public abstract class HDLStatement extends AbstractHDLStatement implements de.tu
 	public HDLClass getClassType() {
 		return HDLClass.HDLStatement;
 	}
-
 	// $CONTENT-BEGIN$
-	private HDLResolver resolver = new HDLResolver(this, true);
 
-	@Override
-	public HDLType resolveType(HDLQualifiedName var) {
-		return resolver.resolveType(var);
-	}
-
-	@Override
-	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		return resolver.resolveVariable(var);
-	}
-
-	@Override
-	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
-		return resolver.resolveInterface(hIf);
-	}
-
-	@Override
-	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
-		return resolver.resolveEnum(hEnum);
-	}
 	// $CONTENT-END$
 
 }

@@ -162,8 +162,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		if (hasReg) {
 			if ((clk == null) && (rst == null)) {
 				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
-						.addVariables(new HDLVariable().setName("clk"))//
-						.addVariables(new HDLVariable().setName("rst")));
+						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
+						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
 			}
 		}
 		unitIF.setContainer(this);
@@ -174,71 +174,6 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		return ms.apply(unitIF);
-	}
-
-	@Override
-	public HDLQualifiedName getFullName() {
-		HDLQualifiedName unitName = new HDLQualifiedName(getName());
-		if (getContainer() != null) {
-			HDLPackage p = (HDLPackage) getContainer();
-			if (p.getPkg() != null) {
-				return new HDLQualifiedName(p.getPkg()).append(unitName);
-			}
-		}
-		return unitName;
-	}
-
-	private HDLResolver resolver = new HDLResolver(this, false);
-
-	@Override
-	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
-		HDLEnum resolveEnum = resolver.resolveEnum(hEnum);
-		if (resolveEnum != null)
-			return resolveEnum;
-		return (HDLEnum) resolveType(hEnum);
-	}
-
-	@Override
-	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
-		HDLInterface resolveInterface = resolver.resolveInterface(hIf);
-		if (resolveInterface != null)
-			return resolveInterface;
-		return (HDLInterface) resolveType(hIf);
-	}
-
-	@Override
-	public HDLType resolveType(HDLQualifiedName type) {
-		HDLType resolveType = resolver.resolveType(type);
-		if (resolveType != null)
-			return resolveType;
-		if (library == null)
-			library = HDLLibrary.getLibrary(libURI);
-		return library.resolve(getImports(), type);
-	}
-
-	private HDLLibrary library;
-
-	@Override
-	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		HDLVariable hdlVariable = resolver.resolveVariable(var);
-		if (hdlVariable != null)
-			return hdlVariable;
-		return null;
-	}
-
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return HDLResolver.getallEnumDeclarations(statements);
-	}
-
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return HDLResolver.getallInterfaceDeclarations(statements);
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		return HDLResolver.getallVariableDeclarations(statements);
 	}
 
 	// $CONTENT-END$

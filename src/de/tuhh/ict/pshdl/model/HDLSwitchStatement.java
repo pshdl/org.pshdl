@@ -83,34 +83,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 			return obj.getCases();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
-		for (HDLSwitchCaseStatement c : cases) {
-			res.addAll(c.doGetEnumDeclarations());
-		}
-		return res;
-	}
 
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		List<HDLInterface> res = new LinkedList<HDLInterface>();
-		for (HDLSwitchCaseStatement c : cases) {
-			res.addAll(c.doGetInterfaceDeclarations());
-		}
-		return res;
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		List<HDLVariable> res = new LinkedList<HDLVariable>();
-		for (HDLSwitchCaseStatement c : cases) {
-			res.addAll(c.doGetVariables());
-		}
-		return res;
-	}
 	// $CONTENT-END$
 
 }

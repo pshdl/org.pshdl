@@ -66,17 +66,25 @@ public class HDLQuery {
 
 	@SuppressWarnings("rawtypes")
 	private static class LastSegmentMatcher implements FieldMatcher {
-		private String equalsTo;
+		private HDLQualifiedName equalsTo;
+		private boolean matchLocally = false;
 
 		public LastSegmentMatcher(String equalsTo) {
-			this.equalsTo = equalsTo;
+			this.equalsTo = new HDLQualifiedName(equalsTo);
+		}
+
+		public LastSegmentMatcher(HDLQualifiedName fullName, boolean matchLocally) {
+			this.equalsTo = fullName.getLocalPart();
+			this.matchLocally = matchLocally;
 		}
 
 		@Override
 		public boolean matches(Object obj) {
 			if (obj == null)
 				return false;
-			return new HDLQualifiedName(obj.toString()).getLastSegment().equals(equalsTo);
+			if (matchLocally)
+				return new HDLQualifiedName(obj.toString()).getLocalPart().equals(equalsTo);
+			return new HDLQualifiedName(obj.toString()).getLastSegment().equals(equalsTo.getLastSegment());
 		}
 
 		@Override
@@ -142,6 +150,10 @@ public class HDLQuery {
 
 		public Result<T, K> isNotEqualTo(T value) {
 			return new Result<T, K>(from, clazz, field, new EqualsMatcher<K>(value, true));
+		}
+
+		public Result<T, K> matchesLocally(HDLQualifiedName fullName) {
+			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(fullName, true));
 		}
 
 	}

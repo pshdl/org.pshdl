@@ -221,9 +221,9 @@ public class Insulin {
 		ClkInserted, RstInserted;
 	}
 
-	private static void insertSig(ModificationSet ms, HDLObject container, HDLVariable defClkVar, SignalInserted signalInserted) {
+	private static void insertSig(ModificationSet ms, HDLObject container, HDLVariable defVar, SignalInserted signalInserted) {
 		if (container.getClassType() != HDLClass.HDLUnit) {
-			insertSig(ms, container.getContainer(), defClkVar, signalInserted);
+			insertSig(ms, container.getContainer(), defVar, signalInserted);
 			return;
 		}
 		boolean hasMeta = container.hasMeta(signalInserted);
@@ -232,7 +232,7 @@ public class Insulin {
 			HDLStatement statement = unit.getStatements().get(0);
 			HDLPrimitive bit = HDLPrimitive.getBit();
 			container.setMeta(signalInserted);
-			ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defClkVar));
+			ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defVar.copy()));
 		}
 	}
 
@@ -489,8 +489,8 @@ public class Insulin {
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
-						String varName = ref.getVarRefName() + "_" + ref.containerID + "_bitAccess";
-						HDLQualifiedName hVarName = HDLQualifiedName.create(varName);
+						String varName = ref.getVarRefName().getLastSegment() + "_" + ref.containerID + "_bitAccess";
+						HDLQualifiedName hVarName = new HDLQualifiedName(varName);
 						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType().copy()).addVariables(
 								new HDLVariable().setName(varName).setDefaultValue(ass.getRight().copy()));
 						replacements.add(hvd);

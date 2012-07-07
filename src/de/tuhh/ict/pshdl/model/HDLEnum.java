@@ -96,12 +96,6 @@ public class HDLEnum extends AbstractHDLEnum {
 		return null;
 	}
 
-	@Override
-	public HDLQualifiedName getFullName() {
-		if (container != null)
-			return container.getFullName().append(asRef());
-		return asRef();
-	}
 	// $CONTENT-END$
 
 }

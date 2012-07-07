@@ -91,6 +91,37 @@ public abstract class HDLObject extends AbstractHDLObject {
 
 	// $CONTENT-BEGIN$
 
+	public static void printInfo(HDLObject obj) {
+		if (obj.getMeta("CONSTRUCTOR") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " constructed at:" + obj.getMeta("CONSTRUCTOR"));
+		}
+		Object meta = obj.getMeta("CONSTRUCTION_SRC");
+		if (meta != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " constructed in:" + meta.getClass());
+			if (meta instanceof HDLObject)
+				printInfo((HDLObject) meta);
+		}
+		if (obj.getMeta("SETTER") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " setter called at:" + obj.getMeta("SETTER"));
+		}
+		if (obj.getMeta("SETTER_CONTAINER") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " setContainer called at:" + obj.getMeta("SETTER_CONTAINER"));
+		}
+		if (obj.getMeta("ADDER") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " add called at:" + obj.getMeta("ADDER"));
+		}
+		if (obj.getMeta("COPY") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copy called at:" + obj.getMeta("COPY"));
+		}
+		if (obj.getMeta("COPY_FILTERED") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copyFiltered called at:" + obj.getMeta("COPY_FILTERED"));
+		}
+		if (obj.getMeta("COPY_SOURCE") != null) {
+			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copied from:" + obj.getMeta("COPY_SOURCE"));
+			printInfo((HDLObject) obj.getMeta("COPY_SOURCE"));
+		}
+	}
+
 	@Override
 	public void copyMetaData(HDLObject src, HDLObject target) {
 		target.metaData.putAll(src.metaData);
@@ -159,7 +190,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	public abstract Iterator<HDLObject> iterator();
 
 	@SuppressWarnings("unchecked")
-	public <T> List<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
+	public <T> LinkedList<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
 		if (clazzTypes == null) {
 			clazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
 			deepClazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
@@ -187,11 +218,11 @@ public abstract class HDLObject extends AbstractHDLObject {
 			list = (LinkedList<T>) clazzTypes.get(clazz);
 		if (list == null)
 			return new LinkedList<T>();
-		return (List<T>) list.clone();
+		return (LinkedList<T>) list.clone();
 	}
 
-	public <T, K> List<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
-		List<T> list = getAllObjectsOf(clazz, true);
+	public <T, K> LinkedList<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
+		LinkedList<T> list = getAllObjectsOf(clazz, true);
 		for (Iterator<T> iter = list.iterator(); iter.hasNext();) {
 			T t = iter.next();
 			K value = field.getValue(t);
@@ -216,12 +247,6 @@ public abstract class HDLObject extends AbstractHDLObject {
 			list = new LinkedList<HDLObject>();
 		list.add(c);
 		ct.put(clazz, list);
-	}
-
-	public HDLQualifiedName getFullName() {
-		if (container != null)
-			return container.getFullName();
-		return HDLQualifiedName.EMPTY;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -250,6 +275,19 @@ public abstract class HDLObject extends AbstractHDLObject {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public HDLObject setContainer(HDLObject container) {
+		if (container == this)
+			throw new IllegalArgumentException("Object can not contain itself");
+		if (this.container != null) {
+			if (this.container.containerID != container.containerID) {
+				throw new IllegalArgumentException("The parents container ID does not match the new container ID!");
+			}
+		}
+		this.container = container;
+		return this;
 	}
 
 	// $CONTENT-END$

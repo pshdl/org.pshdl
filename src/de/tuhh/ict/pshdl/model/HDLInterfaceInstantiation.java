@@ -79,22 +79,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			return obj.getHIfRefName();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return Collections.emptyList();
-	}
 
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		return Collections.singletonList(getVar());
-	}
 	// $CONTENT-END$
 
 }

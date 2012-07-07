@@ -93,13 +93,6 @@ public class HDLInterface extends AbstractHDLInterface {
 		return HDLQuery.select(HDLVariable.class).from(this).where(HDLVariable.fName).lastSegmentIs(lastSegment).getFirst();
 	}
 
-	@Override
-	public de.tuhh.ict.pshdl.model.utils.HDLQualifiedName getFullName() {
-		HDLQualifiedName asRef = asRef();
-		if ((container != null) && (asRef.length != 1))
-			container.getFullName().append(asRef);
-		return asRef;
-	}
 	// $CONTENT-END$
 
 }

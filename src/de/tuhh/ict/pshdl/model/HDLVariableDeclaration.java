@@ -211,21 +211,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		return external.contains(getDirection());
 	}
 
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		return this.getVariables();
-	}
-
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return Collections.emptyList();
-	}
-
 	public HDLAnnotation getAnnotation(Enum<?> range) {
 		for (HDLAnnotation anno : getAnnotations()) {
 			if (anno.getName().equals(range.toString()))

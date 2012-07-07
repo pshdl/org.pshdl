@@ -139,7 +139,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	public HDLQualifiedName asRef() {
-		return HDLQualifiedName.create(getName());
+		return getFullName();
 	}
 
 	public HDLVariableRef asHDLRef() {
@@ -147,8 +147,10 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	@Override
-	public HDLQualifiedName getFullName() {
-		return container.getFullName().append(asRef());
+	protected String validateName(String name) {
+		if ((name != null) && name.contains("."))
+			throw new IllegalArgumentException("Variable names may not contain a dot");
+		return super.validateName(name);
 	}
 
 	public HDLAnnotation getAnnotation(Enum<?> range) {

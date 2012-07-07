@@ -6,7 +6,6 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
  * The class HDLIfStatement contains the following fields
@@ -103,31 +102,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			return obj.getElseDo();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
-		res.addAll(HDLResolver.getallEnumDeclarations(thenDo));
-		res.addAll(HDLResolver.getallEnumDeclarations(elseDo));
-		return res;
-	}
 
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		List<HDLInterface> res = new LinkedList<HDLInterface>();
-		res.addAll(HDLResolver.getallInterfaceDeclarations(thenDo));
-		res.addAll(HDLResolver.getallInterfaceDeclarations(elseDo));
-		return res;
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		List<HDLVariable> res = new LinkedList<HDLVariable>();
-		res.addAll(HDLResolver.getallVariableDeclarations(thenDo));
-		res.addAll(HDLResolver.getallVariableDeclarations(elseDo));
-		return res;
-	}
 	// $CONTENT-END$
 
 }

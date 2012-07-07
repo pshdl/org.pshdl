@@ -6,7 +6,6 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
  * The class HDLForLoop contains the following fields
@@ -106,26 +105,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 			return obj.getDos();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return HDLResolver.getallEnumDeclarations(dos);
-	}
-
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return HDLResolver.getallInterfaceDeclarations(dos);
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		List<HDLVariable> res = new LinkedList<HDLVariable>();
-		res.addAll(HDLResolver.getallVariableDeclarations(dos));
-		res.add(param);
-		return res;
-	}
 
 	// $CONTENT-END$
 

@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
 
@@ -115,10 +116,18 @@ public class HDLResolver {
 		if (checkCache != null)
 			return checkCache;
 		if (var.length > 1) {
+			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(resolveTo.getFullName().getTypePart())) {
+				String string = var.getLastSegment();
+				for (Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {
+					if (entry.getKey().getLastSegment().equals(string)) {
+						return entry.getValue();
+					}
+				}
+			}
 			HDLQualifiedName skipLast = var.skipLast(1);
 			if (!resolveTo.getFullName().equals(skipLast)) {
 				HDLType type = resolveType(skipLast);
-				if (type != null) {
+				if ((type != null) && (type.getClassType() != HDLClass.HDLPrimitive)) {
 					HDLVariable variable = type.resolveVariable(var);
 					if (variable != null)
 						return variable;

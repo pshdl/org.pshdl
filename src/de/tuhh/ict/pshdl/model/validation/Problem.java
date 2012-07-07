@@ -55,6 +55,8 @@ public class Problem {
 		String string = code.name().toLowerCase() + " for: " + node;
 		if (context != null)
 			string += " @ " + context;
+		if (info != null)
+			string += " info:" + info;
 		return string;
 	}
 

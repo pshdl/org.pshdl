@@ -74,6 +74,22 @@ public aspect RangeApsect {
 				return res;
 			}
 		}
+		if (getBits().size()>0){
+			BigInteger bitWidth=BigInteger.ZERO;
+			for (HDLRange r : getBits()) {
+				HDLExpression width=r.getWidth();
+				width.setContainer(r);
+				BigInteger cw=width.constantEvaluate(context);
+				if (cw==null) {
+					bitWidth=null;
+					break;
+				}
+				bitWidth=bitWidth.add(cw);
+			}
+			if (bitWidth!=null){
+				return new ValueRange(BigInteger.ZERO, BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE));
+			}
+		}
 		HDLType type = var.determineType();
 		if (type instanceof HDLPrimitive) {
 			return HDLPrimitives.getInstance().getValueRange((HDLPrimitive) type, context);

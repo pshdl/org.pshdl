@@ -123,17 +123,18 @@ public class HDLValidator {
 			for (HDLExpression arr : array) {
 				HDLEvaluationContext context = getContext(hContext, arr);
 				ValueRange accessRange = arr.determineRange(context);
+				String info = "Expected value range:" + accessRange;
 				if (accessRange.to.signum() < 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref));
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info));
 				else if (accessRange.from.signum() < 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref));
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info));
 				ValueRange arrayRange = dimensions.get(dim).determineRange(context);
 				arrayRange = new ValueRange(BigInteger.ZERO, arrayRange.to);
 				ValueRange commonRange = arrayRange.and(accessRange);
 				if (commonRange == null)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref));
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info));
 				else if (accessRange.to.compareTo(arrayRange.to) >= 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref));
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info));
 
 				dim++;
 			}

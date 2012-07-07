@@ -11,9 +11,12 @@ public class HDLQualifiedName {
 		this.qfn = qfn;
 		this.length = qfn.length;
 		for (String string : qfn) {
-			if (string.contains(".")) {
+			if (string == null)
+				throw new IllegalArgumentException("Segments may not be null");
+			if (string.contains("."))
 				throw new IllegalArgumentException("Segments may not contain dots");
-			}
+			if (string.isEmpty())
+				throw new IllegalArgumentException("Segments may not be empty");
 		}
 	}
 
@@ -136,5 +139,28 @@ public class HDLQualifiedName {
 		ll.addAll(Arrays.asList(this.qfn));
 		ll.addAll(Arrays.asList(hdlQualifiedName.qfn));
 		return HDLQualifiedName.create(ll);
+	}
+
+	public HDLQualifiedName getTypePart() {
+		List<String> res = new LinkedList<String>();
+		for (String segment : qfn) {
+			if (segment.charAt(0) != '$')
+				res.add(segment);
+			else
+				break;
+		}
+		return create(res);
+	}
+
+	public HDLQualifiedName getLocalPart() {
+		List<String> res = new LinkedList<String>();
+		if (qfn.length <= 1)
+			return this;
+		for (String segment : qfn) {
+			if (segment.charAt(0) == '$')
+				res.add(segment);
+		}
+		res.add(getLastSegment());
+		return create(res);
 	}
 }

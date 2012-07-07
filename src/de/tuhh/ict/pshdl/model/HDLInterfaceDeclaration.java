@@ -1,7 +1,5 @@
 package de.tuhh.ict.pshdl.model;
 
-import java.util.*;
-
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -66,22 +64,8 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 			return obj.getHIf();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return Collections.singletonList(getHIf());
-	}
 
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		return Collections.emptyList();
-	}
 	// $CONTENT-END$
 
 }

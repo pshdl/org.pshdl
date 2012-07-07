@@ -98,8 +98,10 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	@Override
 	public HDLVariable resolveVar() {
 		HDLVariable var = super.resolveVar();
-		if (var == null)
+		if (var == null) {
+			HDLObject.printInfo(this);
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
+		}
 		return var;
 	}
 

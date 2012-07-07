@@ -33,8 +33,8 @@ public class VHDLGenerator {
 		return visitor;
 	}
 
-	private static VhdlFile generateVHDL(HDLPackage unit, HDLEvaluationContext context) {
-		unit = Insulin.transform(unit);
-		return unit.toVHDL();
+	private static VhdlFile generateVHDL(HDLPackage pkg, HDLEvaluationContext context) {
+		pkg = Insulin.transform(pkg);
+		return pkg.toVHDL();
 	}
 }

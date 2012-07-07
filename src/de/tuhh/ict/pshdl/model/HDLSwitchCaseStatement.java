@@ -6,7 +6,6 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.utils.*;
 
 /**
  * The class HDLSwitchCaseStatement contains the following fields
@@ -83,22 +82,8 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 			return obj.getDos();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return HDLResolver.getallEnumDeclarations(dos);
-	}
 
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return HDLResolver.getallInterfaceDeclarations(dos);
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		return HDLResolver.getallVariableDeclarations(dos);
-	}
 	// $CONTENT-END$
 
 }
