@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class HDLPrimitives {
 
@@ -296,10 +297,10 @@ public class HDLPrimitives {
 	private HDLExpression getWidth(HDLArithOpType type, HDLTypeInferenceInfo info) {
 		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
 		if (leftW != null)
-			leftW = leftW.copy();
+			leftW = leftW.copyFiltered(CopyFilter.DEEP);
 		HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
 		if (rightW != null)
-			rightW = rightW.copy();
+			rightW = rightW.copyFiltered(CopyFilter.DEEP);
 		switch (type) {
 		case POW:
 			// The result type of pow can only be natural

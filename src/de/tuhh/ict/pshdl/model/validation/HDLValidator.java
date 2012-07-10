@@ -47,6 +47,8 @@ public class HDLValidator {
 			// TODO Check for Range direction
 			// TODO Type checking!
 			// TODO HDLConcat need known width
+			// TODO Check for combinatorical loop. Especially += on non register
+			// TODO Check for multiple assignment in same Scope
 
 		} catch (Exception e) {
 			e.printStackTrace();

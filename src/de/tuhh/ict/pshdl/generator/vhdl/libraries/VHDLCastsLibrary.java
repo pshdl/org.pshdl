@@ -6,6 +6,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -97,7 +98,8 @@ public class VHDLCastsLibrary {
 		HDLExpression width = left.getWidth();
 		HDLRange range = null;
 		if (width != null) {
-			range = new HDLRange().setFrom(new HDLArithOp().setLeft(width.copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1))).setTo(HDLLiteral.get(0));
+			range = new HDLRange().setFrom(new HDLArithOp().setLeft(width.copyFiltered(CopyFilter.DEEP)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1))).setTo(
+					HDLLiteral.get(0));
 			range.setContainer(left);
 		}
 		switch (left.getType()) {

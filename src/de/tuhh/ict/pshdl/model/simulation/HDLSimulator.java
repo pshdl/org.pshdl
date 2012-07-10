@@ -246,7 +246,7 @@ public class HDLSimulator {
 			ValueRange r = loop.getRange().get(0).determineRange(context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
-				List<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).isEqualTo(param.asRef()).getAll();
+				List<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();
 				if (refs.size() == 0)
 					newStmnts.add(stmnt.copy());
 				else {

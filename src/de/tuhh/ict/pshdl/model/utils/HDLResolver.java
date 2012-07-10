@@ -116,6 +116,7 @@ public class HDLResolver {
 		if (checkCache != null)
 			return checkCache;
 		if (var.length > 1) {
+			// Using lastSgement if $for0.I or ThisObject.I
 			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(resolveTo.getFullName().getTypePart())) {
 				String string = var.getLastSegment();
 				for (Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {

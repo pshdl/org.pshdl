@@ -91,37 +91,6 @@ public abstract class HDLObject extends AbstractHDLObject {
 
 	// $CONTENT-BEGIN$
 
-	public static void printInfo(HDLObject obj) {
-		if (obj.getMeta("CONSTRUCTOR") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " constructed at:" + obj.getMeta("CONSTRUCTOR"));
-		}
-		Object meta = obj.getMeta("CONSTRUCTION_SRC");
-		if (meta != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " constructed in:" + meta.getClass());
-			if (meta instanceof HDLObject)
-				printInfo((HDLObject) meta);
-		}
-		if (obj.getMeta("SETTER") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " setter called at:" + obj.getMeta("SETTER"));
-		}
-		if (obj.getMeta("SETTER_CONTAINER") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " setContainer called at:" + obj.getMeta("SETTER_CONTAINER"));
-		}
-		if (obj.getMeta("ADDER") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " add called at:" + obj.getMeta("ADDER"));
-		}
-		if (obj.getMeta("COPY") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copy called at:" + obj.getMeta("COPY"));
-		}
-		if (obj.getMeta("COPY_FILTERED") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copyFiltered called at:" + obj.getMeta("COPY_FILTERED"));
-		}
-		if (obj.getMeta("COPY_SOURCE") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copied from:" + obj.getMeta("COPY_SOURCE"));
-			printInfo((HDLObject) obj.getMeta("COPY_SOURCE"));
-		}
-	}
-
 	@Override
 	public void copyMetaData(HDLObject src, HDLObject target) {
 		target.metaData.putAll(src.metaData);

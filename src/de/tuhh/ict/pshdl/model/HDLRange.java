@@ -7,6 +7,7 @@ import org.eclipse.jdt.annotation.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -96,10 +97,12 @@ public class HDLRange extends AbstractHDLRange {
 		if (getFrom() == null)
 			return new HDLLiteral().setVal("1");
 		if (getTo() != null) {
-			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null)))
-				return new HDLArithOp().setLeft(getFrom().copy()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null))) {
+				HDLArithOp simpleWith = new HDLArithOp().setLeft(getFrom().copyFiltered(CopyFilter.DEEP)).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+				return HDLPrimitives.simplifyWidth(this, simpleWith);
+			}
 		}
-		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom().copy()).setType(HDLArithOpType.MINUS).setRight(getTo().copy());
+		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom().copyFiltered(CopyFilter.DEEP)).setType(HDLArithOpType.MINUS).setRight(getTo().copyFiltered(CopyFilter.DEEP));
 		HDLFunction absRange = new HDLFunction().setName("abs").addParams(rangeDist);
 		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);

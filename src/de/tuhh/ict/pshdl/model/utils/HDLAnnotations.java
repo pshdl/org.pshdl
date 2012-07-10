@@ -28,7 +28,13 @@ public enum HDLAnnotations {
 	 * This annotation causes the default initialization to 0 to be omitted.
 	 * This MAY cause a latch to be created.
 	 */
-	VHDLLatchable;
+	VHDLLatchable,
+	/**
+	 * This annotation causes the reset value of a register to be assigned as
+	 * default in the value in the declaration, instead of describing a reset
+	 * behaviour.
+	 */
+	VHDLNoExplicitReset;
 	@Override
 	public String toString() {
 		return "@" + name();
