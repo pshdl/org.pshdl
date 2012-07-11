@@ -151,7 +151,7 @@ public class HDLQuery {
 			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(lastSegment));
 		}
 
-		public Result<T, K> isNotEqualTo(T value) {
+		public Result<T, K> isNotEqualTo(K value) {
 			return new Result<T, K>(from, clazz, field, new EqualsMatcher<K>(value, true));
 		}
 

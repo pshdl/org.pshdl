@@ -6,6 +6,7 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -143,17 +144,17 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 				break;
 			}
 			for (HDLAnnotation hdla : hvd.getAnnotations()) {
-				if (HDLAnnotations.clock.is(hdla)) {
+				if (HDLBuiltInAnnotations.clock.is(hdla)) {
 					clk = hvd.getVariables().get(0);
 				}
-				if (HDLAnnotations.reset.is(hdla)) {
+				if (HDLBuiltInAnnotations.reset.is(hdla)) {
 					rst = hvd.getVariables().get(0);
 				}
 			}
 			for (HDLVariable var : hvd.getVariables()) {
-				if (var.getAnnotation(HDLAnnotations.clock) != null)
+				if (var.getAnnotation(HDLBuiltInAnnotations.clock) != null)
 					clk = var;
-				if (var.getAnnotation(HDLAnnotations.reset) != null)
+				if (var.getAnnotation(HDLBuiltInAnnotations.reset) != null)
 					rst = var;
 			}
 			if (hvd.getRegister() != null)

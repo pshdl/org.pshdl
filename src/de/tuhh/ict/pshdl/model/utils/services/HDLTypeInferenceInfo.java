@@ -1,4 +1,4 @@
-package de.tuhh.ict.pshdl.model.types.builtIn;
+package de.tuhh.ict.pshdl.model.utils.services;
 
 import java.util.*;
 

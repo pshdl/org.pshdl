@@ -14,7 +14,9 @@ import de.tuhh.ict.pshdl.model.HDLBitOp.*;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public aspect RangeApsect {
 
@@ -49,7 +51,7 @@ public aspect RangeApsect {
 		if (val != null)
 			return new ValueRange(val, val);
 		HDLVariable var=resolveVar();
-		HDLAnnotation range=var.getAnnotation(HDLAnnotations.range);
+		HDLAnnotation range=var.getAnnotation(HDLBuiltInAnnotations.range);
 		if (range!=null){
 			String value[]=range.getValue().split(";");
 			//TODO Allow simple references
@@ -58,7 +60,7 @@ public aspect RangeApsect {
 		if (var.getContainer()!=null) {
 			if (var.getContainer() instanceof HDLVariableDeclaration) {
 				HDLVariableDeclaration hvd=(HDLVariableDeclaration)var.getContainer();
-				range=hvd.getAnnotation(HDLAnnotations.range);
+				range=hvd.getAnnotation(HDLBuiltInAnnotations.range);
 				if (range!=null){
 					String value[]=range.getValue().split(";");
 					//TODO Allow simple references

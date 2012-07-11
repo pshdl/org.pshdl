@@ -14,7 +14,9 @@ import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.IHDLGenerator.HDLGenerationInfo;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
+import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
@@ -24,6 +26,7 @@ public class Insulin {
 		RWValidation.annotateWriteCount(orig);
 		T apply = handleOutPortRead(orig);
 		apply = includeGenerators(apply);
+		apply = setParameterOnInstance(apply);
 		// System.out.println("Insulin.transform()" + apply);
 		// apply.validateAllFields(null, true);
 		apply = generateClkAndReset(apply);
@@ -35,6 +38,32 @@ public class Insulin {
 		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(null, true);
 		return apply;
+	}
+
+	private static <T extends HDLObject> T setParameterOnInstance(T apply) {
+		ModificationSet ms = new ModificationSet();
+		Set<HDLInterfaceInstantiation> hiis = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
+		Map<String, HDLExpression> argMap = new HashMap<String, HDLExpression>();
+		for (HDLInterfaceInstantiation hdi : hiis) {
+			ArrayList<HDLArgument> arguments = hdi.getArguments();
+			for (HDLArgument hdlArgument : arguments) {
+				argMap.put(hdlArgument.getName(), hdlArgument.getExpression());
+			}
+			HDLInterface hIf = hdi.resolveHIf();
+			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
+				if (hvd.getDirection() == HDLDirection.PARAMETER) {
+					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType().copy()).setDirection(HDLDirection.CONSTANT);
+					for (HDLVariable var : hvd.getVariables()) {
+						HDLVariable newVar = var.copy().setName(hdi.getVar().getName() + "_" + var.getName());
+						if (argMap.get(var.getName()) != null)
+							newVar = newVar.setDefaultValue(argMap.get(var.getName()).copy());
+						newHVD = newHVD.addVariables(newVar);
+					}
+					ms.insertBefore(hdi, newHVD);
+				}
+			}
+		}
+		return ms.apply(apply);
 	}
 
 	/**
@@ -87,7 +116,7 @@ public class Insulin {
 					HDLExpression defaultValue = var.getDefaultValue();
 					if ((defaultValue == null) && (register == null)) {
 						if ((hvd.getPrimitive() != null)) {
-							if ((var.getAnnotation(HDLAnnotations.VHDLLatchable) == null) && (hvd.getAnnotation(HDLAnnotations.VHDLLatchable) == null))
+							if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null)
 								defaultValue = HDLLiteral.get(0);
 						} else {
 							HDLType resolveType = hvd.resolveType();
@@ -162,16 +191,16 @@ public class Insulin {
 	 */
 	private static <T extends HDLObject> T generateClkAndReset(T apply) {
 		ModificationSet ms = new ModificationSet();
-		HDLVariable defClkVar = new HDLVariable().setName("clk").addAnnotations(HDLAnnotations.clock.create(null));
-		HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLAnnotations.clock.create(null));
+		HDLVariable defClkVar = new HDLVariable().setName("clk").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
+		HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
 		boolean customClk = false, customRst = false;
 		// Find all clock annotated Signals
-		HDLVariable newVar = extractVar(apply, HDLAnnotations.clock);
+		HDLVariable newVar = extractVar(apply, HDLBuiltInAnnotations.clock);
 		if (newVar != null) {
 			defClkVar = newVar;
 			customClk = true;
 		}
-		newVar = extractVar(apply, HDLAnnotations.reset);
+		newVar = extractVar(apply, HDLBuiltInAnnotations.reset);
 		if (newVar != null) {
 			defRstVar = newVar;
 			customRst = true;
@@ -206,7 +235,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static HDLVariable extractVar(HDLObject apply, HDLAnnotations annotation) {
+	private static HDLVariable extractVar(HDLObject apply, HDLBuiltInAnnotations annotation) {
 		HDLAnnotation clock = HDLQuery.select(HDLAnnotation.class).from(apply).where(HDLAnnotation.fName).isEqualTo(annotation.toString()).getFirst();
 		if (clock != null) {
 			if (clock.getContainer() instanceof HDLVariableDeclaration) {

@@ -9,6 +9,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
@@ -96,7 +97,7 @@ public class VHDLImporter {
 				dimensions.add(convertRange((Range) discreteRange));
 			}
 			HDLVariableDeclaration var = getVariable(ca.getElementType(), direction, qfn, null, dimensions);
-			var = var.addAnnotations(new HDLAnnotation().setName(HDLAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier())));
+			var = var.addAnnotations(new HDLAnnotation().setName(HDLBuiltInAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier())));
 			return var;
 		}
 		throw new IllegalArgumentException("Unexpected Type:" + left);

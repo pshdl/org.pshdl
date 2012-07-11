@@ -1,10 +1,11 @@
-package de.tuhh.ict.pshdl.model.utils;
+package de.tuhh.ict.pshdl.model.types.builtIn;
 
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.utils.IHDLGenerator.HDLGenerationInfo;
 import de.tuhh.ict.pshdl.model.utils.plb.*;
+import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
 
 public class HDLGenerators {
 	// XXX Use service loaders (java.util.ServiceLoader) for non-OSGI contexts

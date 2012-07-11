@@ -8,7 +8,9 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.simulation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public class HDLValidator {
 
@@ -31,9 +33,8 @@ public class HDLValidator {
 			checkConstantEquals(unit, problems, hContext);
 			// TODO Validate value ranges, check for 0 divide
 			// TODO Check for POW only power of 2
-			// TODO check for constant booleans
-			// TODO combined Assignment is register
-			// TODO Validation Scheme for validating HDLAnnotation Values
+			checkCombinedAssignment(unit, problems, hContext);
+			checkAnnotations(unit, problems, hContext);
 			// TODO Validate bitWidth mismatch
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
@@ -47,13 +48,32 @@ public class HDLValidator {
 			// TODO Check for Range direction
 			// TODO Type checking!
 			// TODO HDLConcat need known width
-			// TODO Check for combinatorical loop. Especially += on non register
+			// TODO Check for combinatorical loop.
 			// TODO Check for multiple assignment in same Scope
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return problems;
+	}
+
+	private static void checkAnnotations(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLAnnotation> annos = unit.getAllObjectsOf(HDLAnnotation.class, true);
+		for (HDLAnnotation hdlAnnotation : annos) {
+			Problem[] p = HDLAnnotations.validate(hdlAnnotation);
+			for (Problem problem : p) {
+				problems.add(problem);
+			}
+		}
+	}
+
+	private static void checkCombinedAssignment(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Collection<HDLAssignment> all = HDLQuery.select(HDLAssignment.class).from(unit).where(HDLAssignment.fType).isNotEqualTo(HDLAssignment.HDLAssignmentType.ASSGN).getAll();
+		for (HDLAssignment ass : all) {
+			if (ass.getLeft().resolveVar().getRegisterConfig() == null) {
+				problems.add(new Problem(ErrorCode.COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
+			}
+		}
 	}
 
 	private static void checkConstantEquals(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
@@ -150,12 +170,12 @@ public class HDLValidator {
 	}
 
 	private static void checkClockAndResetAnnotation(HDLPackage unit, Set<Problem> problems) {
-		Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.clock.toString()).getAll();
+		Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.clock.toString()).getAll();
 		if (clocks.size() > 1)
 			for (HDLAnnotation anno : clocks) {
 				problems.add(new Problem(ErrorCode.ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
 			}
-		Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.reset.toString()).getAll();
+		Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.reset.toString()).getAll();
 		if (resets.size() > 1)
 			for (HDLAnnotation anno : resets) {
 				problems.add(new Problem(ErrorCode.ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));

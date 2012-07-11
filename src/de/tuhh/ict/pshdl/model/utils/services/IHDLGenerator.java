@@ -1,4 +1,4 @@
-package de.tuhh.ict.pshdl.model.utils;
+package de.tuhh.ict.pshdl.model.utils.services;
 
 import de.tuhh.ict.pshdl.model.*;
 

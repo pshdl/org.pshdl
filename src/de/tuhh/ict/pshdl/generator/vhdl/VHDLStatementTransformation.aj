@@ -11,6 +11,7 @@ import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -58,15 +59,22 @@ public aspect VHDLStatementTransformation {
 		HDLInterface hIf = resolveHIf();
 		HDLVariable hVar=getVar();
 		String ifName = getVar().getName();
-		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		HDLQualifiedName asRef = hIf.asRef();
 		Entity entity = new Entity("work." + asRef.getLastSegment());
 
 		EntityInstantiation instantiation = new EntityInstantiation(ifName, entity);
 		List<AssociationElement> portMap = instantiation.getPortMap();
+		List<AssociationElement> genericMap = instantiation.getGenericMap();
+		ModificationSet ms=new ModificationSet();
+		Collection<HDLVariableRef> refs=hIf.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : refs) {
+			ms.replace(ref, ref.setVar(new HDLQualifiedName(hVar.getName()+"_"+ ref.getVarRefName().getLastSegment())));
+		}
+		hIf=ms.apply(hIf);
+		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
-				Collection<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString()).getAll();
+				Collection<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.VHDLType.toString()).getAll();
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
 					HDLVariableRef ref = sigVar.asHDLRef();
@@ -80,7 +88,7 @@ public aspect VHDLStatementTransformation {
 						if (typeAnno.isEmpty()) {
 							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(var.getName()+"_array");
 							res.addImport(name);
-							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLAnnotations.VHDLType.create(name.toString()))));
+							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))));
 							res.merge(newHVD.copy().setContainer(this).toVHDL());
 						} else {
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null)));
@@ -91,6 +99,12 @@ public aspect VHDLStatementTransformation {
 						res.merge(newHVD.copy().setContainer(this).toVHDL());
 					}
 					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
+				}
+			} else if (hvd.getDirection()==HDLDirection.PARAMETER){
+				for (HDLVariable var : hvd.getVariables()) {
+					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
+					HDLVariableRef ref = sigVar.asHDLRef();
+					genericMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
 				}
 			}
 		}
@@ -120,7 +134,7 @@ public aspect VHDLStatementTransformation {
 		HDLPrimitive primitive = getPrimitive();
 		SubtypeIndication type = null;
 		HDLExpression resetValue = null;
-		HDLAnnotation typeAnno = HDLQuery.select(HDLAnnotation.class).from(this).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString()).getFirst();
+		HDLAnnotation typeAnno = HDLQuery.select(HDLAnnotation.class).from(this).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.VHDLType.toString()).getFirst();
 		if (typeAnno!=null) {
 			HDLQualifiedName value = new HDLQualifiedName(typeAnno.getValue());
 			res.addImport(value);
@@ -143,7 +157,7 @@ public aspect VHDLStatementTransformation {
 		}
 		if (type != null) {
 			for (HDLVariable var : getVariables()) {
-				boolean noExplicitResetVar=var.getAnnotation(HDLAnnotations.VHDLNoExplicitReset)!=null;
+				boolean noExplicitResetVar=var.getAnnotation(HDLBuiltInAnnotations.VHDLNoExplicitReset)!=null;
 				SubtypeIndication varType = type;
 				if (var.getDimensions().size() != 0) {
 					@SuppressWarnings("rawtypes")
