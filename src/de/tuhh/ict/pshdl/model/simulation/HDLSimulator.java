@@ -26,7 +26,7 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
-		List<HDLVariableRef> refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
+		Collection<HDLVariableRef> refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
 		Map<HDLQualifiedName, List<RangeVal>> ranges = new HashMap<HDLQualifiedName, List<RangeVal>>();
 		for (HDLVariableRef ref : refs) {
 			if (ref.getBits().size() > 0) {
@@ -192,7 +192,7 @@ public class HDLSimulator {
 
 	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
+		Collection<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
 			if (ass.getLeft() instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) ass.getLeft();
@@ -239,14 +239,14 @@ public class HDLSimulator {
 	 * @return
 	 */
 	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit insulin) {
-		List<HDLForLoop> loops = insulin.getAllObjectsOf(HDLForLoop.class, true);
+		Collection<HDLForLoop> loops = insulin.getAllObjectsOf(HDLForLoop.class, true);
 		ModificationSet ms = new ModificationSet();
 		for (HDLForLoop loop : loops) {
 			HDLVariable param = loop.getParam();
 			ValueRange r = loop.getRange().get(0).determineRange(context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
-				List<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();
+				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();
 				if (refs.size() == 0)
 					newStmnts.add(stmnt.copy());
 				else {

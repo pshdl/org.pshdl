@@ -158,6 +158,10 @@ public class HDLVariable extends AbstractHDLVariable {
 			if (anno.getName().equals(range.toString()))
 				return anno;
 		}
+		if (container instanceof HDLVariableDeclaration) {
+			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
+			return vhd.getAnnotation(range);
+		}
 		return null;
 	}
 

@@ -330,7 +330,9 @@ public class HDLPrimitives {
 			if ((leftW == null) && (rightW != null))
 				return rightW;
 			HDLFunction max = new HDLFunction().setName("max").addParams(leftW).addParams(rightW);
-			return new HDLArithOp().setLeft(max).setType(PLUS).setRight(new HDLLiteral().setVal("1"));
+			return max;
+			// return new HDLArithOp().setLeft(max).setType(PLUS).setRight(new
+			// HDLLiteral().setVal("1"));
 		case MUL:
 			if ((leftW == null) && (rightW == null))
 				return null;

@@ -57,7 +57,7 @@ public class HDLValidator {
 	}
 
 	private static void checkConstantEquals(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		List<HDLEqualityOp> equalities = unit.getAllObjectsOf(HDLEqualityOp.class, true);
+		Collection<HDLEqualityOp> equalities = unit.getAllObjectsOf(HDLEqualityOp.class, true);
 		for (HDLEqualityOp op : equalities) {
 			BigInteger res = op.constantEvaluate(getContext(hContext, op));
 			if (res != null) {
@@ -70,8 +70,8 @@ public class HDLValidator {
 	}
 
 	private static void checkConstantBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		List<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.CONSTANT)
-				.or(HDLDirection.PARAMETER);
+		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection)
+				.isEqualTo(HDLDirection.CONSTANT).or(HDLDirection.PARAMETER);
 		for (HDLVariableDeclaration hvd : constants) {
 			for (HDLVariable var : hvd.getVariables()) {
 				if (var.getDefaultValue() == null) {
@@ -84,7 +84,7 @@ public class HDLValidator {
 				}
 			}
 		}
-		List<HDLForLoop> forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
+		Collection<HDLForLoop> forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop hdlForLoop : forLoops) {
 			for (HDLRange r : hdlForLoop.getRange()) {
 				BigInteger evalTo = r.getTo().constantEvaluate(getContext(hContext, r));
@@ -102,7 +102,7 @@ public class HDLValidator {
 	}
 
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		List<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
+		Collection<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
 			if (ass.getLeft() instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) ass.getLeft();
@@ -150,12 +150,12 @@ public class HDLValidator {
 	}
 
 	private static void checkClockAndResetAnnotation(HDLPackage unit, Set<Problem> problems) {
-		List<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.clock.toString()).getAll();
+		Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.clock.toString()).getAll();
 		if (clocks.size() > 1)
 			for (HDLAnnotation anno : clocks) {
 				problems.add(new Problem(ErrorCode.ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
 			}
-		List<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.reset.toString()).getAll();
+		Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.reset.toString()).getAll();
 		if (resets.size() > 1)
 			for (HDLAnnotation anno : resets) {
 				problems.add(new Problem(ErrorCode.ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));

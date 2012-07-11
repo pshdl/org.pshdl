@@ -153,16 +153,16 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return true;
 	}
 
-	private Map<Class<? extends HDLObject>, List<HDLObject>> clazzTypes;
-	private Map<Class<? extends HDLObject>, List<HDLObject>> deepClazzTypes;
+	private Map<Class<? extends HDLObject>, Set<HDLObject>> clazzTypes;
+	private Map<Class<? extends HDLObject>, Set<HDLObject>> deepClazzTypes;
 
 	public abstract Iterator<HDLObject> iterator();
 
 	@SuppressWarnings("unchecked")
-	public <T> LinkedList<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
+	public <T> Set<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
 		if (clazzTypes == null) {
-			clazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
-			deepClazzTypes = new HashMap<Class<? extends HDLObject>, List<HDLObject>>();
+			clazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
+			deepClazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
 			Iterator<HDLObject> iterator = iterator(false);
 			// addClazz(this, clazzTypes);
 			// addClazz(this, deepClazzTypes);
@@ -171,27 +171,27 @@ public abstract class HDLObject extends AbstractHDLObject {
 				addClazz(c, clazzTypes);
 				addClazz(c, deepClazzTypes);
 				c.getAllObjectsOf(clazz, deep);
-				for (Entry<Class<? extends HDLObject>, List<HDLObject>> e : c.deepClazzTypes.entrySet()) {
-					List<HDLObject> list = deepClazzTypes.get(e.getKey());
+				for (Entry<Class<? extends HDLObject>, Set<HDLObject>> e : c.deepClazzTypes.entrySet()) {
+					Set<HDLObject> list = deepClazzTypes.get(e.getKey());
 					if (list == null)
-						deepClazzTypes.put(e.getKey(), e.getValue());
+						deepClazzTypes.put(e.getKey(), new NonSameList<HDLObject>(e.getValue()));
 					else
 						list.addAll(e.getValue());
 				}
 			}
 		}
-		LinkedList<T> list;
+		NonSameList<T> list;
 		if (deep) {
-			list = (LinkedList<T>) deepClazzTypes.get(clazz);
+			list = (NonSameList<T>) deepClazzTypes.get(clazz);
 		} else
-			list = (LinkedList<T>) clazzTypes.get(clazz);
+			list = (NonSameList<T>) clazzTypes.get(clazz);
 		if (list == null)
-			return new LinkedList<T>();
-		return (LinkedList<T>) list.clone();
+			return new NonSameList<T>();
+		return (NonSameList<T>) list.clone();
 	}
 
-	public <T, K> LinkedList<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
-		LinkedList<T> list = getAllObjectsOf(clazz, true);
+	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
+		Set<T> list = getAllObjectsOf(clazz, true);
 		for (Iterator<T> iter = list.iterator(); iter.hasNext();) {
 			T t = iter.next();
 			K value = field.getValue(t);
@@ -202,7 +202,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, List<HDLObject>> ct) {
+	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct) {
 		Class<? extends HDLObject> clazz = c.getClass();
 		do {
 			addClazz(c, ct, clazz);
@@ -210,10 +210,10 @@ public abstract class HDLObject extends AbstractHDLObject {
 		} while ((clazz != null) && !clazz.equals(HDLObject.class));
 	}
 
-	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, List<HDLObject>> ct, Class<? extends HDLObject> clazz) {
-		List<HDLObject> list = ct.get(clazz);
+	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct, Class<? extends HDLObject> clazz) {
+		Set<HDLObject> list = ct.get(clazz);
 		if (list == null)
-			list = new LinkedList<HDLObject>();
+			list = new NonSameList<HDLObject>();
 		list.add(c);
 		ct.put(clazz, list);
 	}

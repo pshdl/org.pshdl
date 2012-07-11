@@ -26,6 +26,10 @@ import de.upb.hni.vmagic.object.VhdlObject.*;
 import de.upb.hni.vmagic.type.*;
 
 public aspect VHDLStatementTransformation {
+	
+	public enum Exportable implements MetaAccess<Boolean> {
+		EXPORT
+	}
 	public abstract VHDLContext HDLStatement.toVHDL();
 
 	public VHDLContext HDLDirectGeneration.toVHDL() {
@@ -62,7 +66,7 @@ public aspect VHDLStatementTransformation {
 		List<AssociationElement> portMap = instantiation.getPortMap();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
-				List<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString()).getAll();
+				Collection<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLAnnotations.VHDLType.toString()).getAll();
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
 					HDLVariableRef ref = sigVar.asHDLRef();
@@ -139,6 +143,7 @@ public aspect VHDLStatementTransformation {
 		}
 		if (type != null) {
 			for (HDLVariable var : getVariables()) {
+				boolean noExplicitResetVar=var.getAnnotation(HDLAnnotations.VHDLNoExplicitReset)!=null;
 				SubtypeIndication varType = type;
 				if (var.getDimensions().size() != 0) {
 					@SuppressWarnings("rawtypes")
@@ -152,7 +157,7 @@ public aspect VHDLStatementTransformation {
 					res.addTypeDeclaration(arrType, isExternal());
 					varType = arrType;
 				}
-				if (resetValue != null) {
+				if (resetValue != null && !noExplicitResetVar) {
 					boolean synchedArray = false;
 					if (resetValue instanceof HDLVariableRef) {
 						HDLVariableRef ref = (HDLVariableRef) resetValue;
@@ -167,6 +172,12 @@ public aspect VHDLStatementTransformation {
 				Constant constant = new Constant(var.getName(), varType);
 				if (var.getDefaultValue() != null)
 					constant.setDefaultValue(var.getDefaultValue().toVHDL());
+				if (noExplicitResetVar){
+					Aggregate assign=Aggregate.OTHERS(new CharacterLiteral('0'));
+					for (int i=0;i<var.getDimensions().size();i++)
+						assign=Aggregate.OTHERS(assign);
+					s.setDefaultValue(assign);
+				}
 				switch (getDirection()) {
 				case IN:
 					s.setMode(Mode.IN);
@@ -188,7 +199,10 @@ public aspect VHDLStatementTransformation {
 					break;
 				case CONSTANT:
 					ConstantDeclaration cd = new ConstantDeclaration(constant);
-					res.addConstantDeclaration(cd);
+					if (var.hasMeta(Exportable.EXPORT))
+						res.addConstantDeclarationPkg(cd);
+					else
+						res.addConstantDeclaration(cd);
 					break;
 				case PARAMETER:
 					res.addGenericDeclaration(constant);

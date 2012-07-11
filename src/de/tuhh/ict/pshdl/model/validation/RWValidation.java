@@ -15,7 +15,7 @@ public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {
 		annotateReadCount(unit);
 		annotateWriteCount(unit);
-		List<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		Collection<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
 			if (hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null)
 				continue;
@@ -49,7 +49,7 @@ public class RWValidation {
 				}
 			}
 		}
-		List<HDLInterfaceInstantiation> his = unit.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
+		Collection<HDLInterfaceInstantiation> his = unit.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hii : his) {
 			ArrayList<HDLVariableDeclaration> ports = hii.resolveHIf().getPorts();
 			for (HDLVariableDeclaration hvd : ports) {
@@ -79,7 +79,7 @@ public class RWValidation {
 	}
 
 	public static void annotateReadCount(HDLObject orig) {
-		List<HDLReference> list = orig.getAllObjectsOf(HDLReference.class, true);
+		Collection<HDLReference> list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
 			if (ref.getContainer() instanceof HDLAssignment) {
 				HDLAssignment ass = (HDLAssignment) ref.getContainer();
@@ -99,7 +99,7 @@ public class RWValidation {
 	}
 
 	public static void annotateWriteCount(HDLObject orig) {
-		List<HDLAssignment> list = orig.getAllObjectsOf(HDLAssignment.class, true);
+		Collection<HDLAssignment> list = orig.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : list) {
 			HDLReference left = ass.getLeft();
 			if (left instanceof HDLReference) {
@@ -113,7 +113,7 @@ public class RWValidation {
 				}
 			}
 		}
-		List<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();
+		Collection<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();
 		for (HDLVariable var : defVal) {
 			incMeta(var, IntegerMeta.WRITE_COUNT);
 		}

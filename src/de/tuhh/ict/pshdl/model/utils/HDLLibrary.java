@@ -24,11 +24,11 @@ public class HDLLibrary {
 			HDLQualifiedName uq = unit.getFullName();
 			units.put(uq, unit);
 			types.put(uq, unit.asInterface());
-			List<HDLInterface> list = unit.getAllObjectsOf(HDLInterface.class, true);
+			Collection<HDLInterface> list = unit.getAllObjectsOf(HDLInterface.class, true);
 			for (HDLInterface hdlInterface : list) {
 				addInterface(hdlInterface);
 			}
-			List<HDLEnum> elist = unit.getAllObjectsOf(HDLEnum.class, true);
+			Collection<HDLEnum> elist = unit.getAllObjectsOf(HDLEnum.class, true);
 			for (HDLEnum hdlEnum : elist) {
 				addEnum(hdlEnum);
 			}

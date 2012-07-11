@@ -127,7 +127,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 			return unitIF;
 		HDLQualifiedName fullName = getFullName();
 		unitIF = new HDLInterface().setName(fullName.toString());
-		List<HDLVariableDeclaration> declarations = getAllObjectsOf(HDLVariableDeclaration.class, true);
+		Collection<HDLVariableDeclaration> declarations = getAllObjectsOf(HDLVariableDeclaration.class, true);
 		HDLVariable clk = null, rst = null;
 		boolean hasReg = false;
 		for (HDLVariableDeclaration hvd : declarations) {
@@ -168,7 +168,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		}
 		unitIF.setContainer(this);
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableRef> refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
+		Collection<HDLVariableRef> refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
 			ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
 		}

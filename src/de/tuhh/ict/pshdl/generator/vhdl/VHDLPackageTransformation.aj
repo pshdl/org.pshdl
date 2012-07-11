@@ -26,6 +26,15 @@ public aspect VHDLPackageTransformation {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<LibraryUnit> HDLUnit.toVHDL() {
+		Collection<HDLVariableDeclaration> hvds=getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (HDLVariableDeclaration hvd : hvds) {
+			for (HDLVariable var : hvd.getVariables()) {
+				Collection<HDLVariableRef> refs=var.getAllObjectsOf(HDLVariableRef.class, true);
+				for (HDLVariableRef ref : refs) {
+					ref.resolveVar().setMeta(VHDLStatementTransformation.Exportable.EXPORT);
+				}
+			}
+		}
 		List<LibraryUnit> res = new LinkedList<LibraryUnit>();
 		HDLQualifiedName entityName = new HDLQualifiedName(getName());
 		Entity e = new Entity(entityName.getLastSegment());
@@ -34,10 +43,11 @@ public aspect VHDLPackageTransformation {
 			unit.merge(stmnt.toVHDL());
 		}
 		addDefaultLibs(res, unit);
-		if (unit.hasExternalTypes()) {
+		if (unit.hasPkgDeclarations()) {
 			String libName = entityName.getLastSegment() + "Pkg";
 			PackageDeclaration pd = new PackageDeclaration(libName);
 			pd.getDeclarations().addAll((List) unit.externalTypes);
+			pd.getDeclarations().addAll((List) unit.constantsPkg);
 			res.add(pd);
 			res.add(new UseClause("work." + libName + ".all"));
 			addDefaultLibs(res, unit);
@@ -84,7 +94,7 @@ public aspect VHDLPackageTransformation {
 		List<Signal> sensitivity = new LinkedList<Signal>();
 		Set<String> vars = new TreeSet<String>();
 		for (HDLStatement stmnt : ctx.sensitiveStatements) {
-			List<HDLVariableRef> refs = stmnt.getAllObjectsOf(HDLVariableRef.class, true);
+			Collection<HDLVariableRef> refs = stmnt.getAllObjectsOf(HDLVariableRef.class, true);
 			for (HDLVariableRef ref : refs) {
 				HDLVariable var = ref.resolveVar();
 				HDLObject container = var.getContainer();

@@ -46,7 +46,7 @@ public class Insulin {
 	 */
 	private static <T extends HDLObject> T includeGenerators(T apply) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLDirectGeneration> gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
+		Collection<HDLDirectGeneration> gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration generation : gens) {
 			HDLGenerationInfo generationInfo = HDLGenerators.getImplementation(generation);
 			if (generationInfo.include) {
@@ -56,7 +56,7 @@ public class Insulin {
 				// generationInfo.unit);
 				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
 				ms.replace(generation, stmnts);
-				List<HDLInterfaceRef> ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
+				Collection<HDLInterfaceRef> ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
 				for (HDLInterfaceRef hdI : ifRefs) {
 					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
 						HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
@@ -79,7 +79,7 @@ public class Insulin {
 	 */
 	private static <T extends HDLObject> T generateInitializations(T apply) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableDeclaration> allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		Collection<HDLVariableDeclaration> allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : allVarDecls) {
 			if (!doNotInit.contains(hvd.getDirection())) {
 				HDLRegisterConfig register = hvd.getRegister();
@@ -177,13 +177,15 @@ public class Insulin {
 			customRst = true;
 		}
 		// Replace all $clk and $rst with the clock in HDLRegisters
-		List<HDLRegisterConfig> clkRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fClk).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
+		Collection<HDLRegisterConfig> clkRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fClk).lastSegmentIs(HDLRegisterConfig.DEF_CLK)
+				.getAll();
 		for (HDLRegisterConfig reg : clkRefs) {
 			ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
 			if (!customClk)
 				insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
 		}
-		List<HDLRegisterConfig> rstRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fRst).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
+		Collection<HDLRegisterConfig> rstRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fRst).lastSegmentIs(HDLRegisterConfig.DEF_RST)
+				.getAll();
 		for (HDLRegisterConfig reg : rstRefs) {
 			HDLRegisterConfig orig = reg;
 			reg = ms.getReplacement(reg);
@@ -193,11 +195,11 @@ public class Insulin {
 		}
 
 		// Replace all $clk and $rst VariableRefs
-		List<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
+		Collection<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
 		for (HDLVariableRef clkRef : clkVarRefs) {
 			ms.replace(clkRef, defClkVar.asHDLRef());
 		}
-		List<HDLVariableRef> rstVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
+		Collection<HDLVariableRef> rstVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
 		for (HDLVariableRef rstRef : rstVarRefs) {
 			ms.replace(rstRef, defRstVar.asHDLRef());
 		}
@@ -250,7 +252,7 @@ public class Insulin {
 	}
 
 	private static void foritfyFunctions(HDLObject apply, ModificationSet ms) {
-		List<HDLFunction> functions = apply.getAllObjectsOf(HDLFunction.class, true);
+		Collection<HDLFunction> functions = apply.getAllObjectsOf(HDLFunction.class, true);
 		for (HDLFunction function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
 			if (info != null) {
@@ -264,7 +266,7 @@ public class Insulin {
 	}
 
 	private static void foritfyArrays(HDLObject apply, ModificationSet ms) {
-		List<HDLVariableRef> varRefs = apply.getAllObjectsOf(HDLVariableRef.class, true);
+		Collection<HDLVariableRef> varRefs = apply.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : varRefs) {
 			for (HDLExpression exp : ref.getArray()) {
 				fortify(ms, exp, HDLPrimitive.getNatural());
@@ -279,7 +281,7 @@ public class Insulin {
 	}
 
 	private static void fortifyWidthExpressions(HDLObject apply, ModificationSet ms) {
-		List<HDLPrimitive> primitives = apply.getAllObjectsOf(HDLPrimitive.class, true);
+		Collection<HDLPrimitive> primitives = apply.getAllObjectsOf(HDLPrimitive.class, true);
 		for (HDLPrimitive hdlPrimitive : primitives) {
 			HDLExpression width = hdlPrimitive.getWidth();
 			if (width != null) {
@@ -289,7 +291,7 @@ public class Insulin {
 	}
 
 	private static void fortifyDefaultAndResetExpressions(HDLObject apply, ModificationSet ms) {
-		List<HDLVariableDeclaration> primitives = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		Collection<HDLVariableDeclaration> primitives = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : primitives) {
 			HDLRegisterConfig reg = hvd.getRegister();
 			HDLType determineType = hvd.determineType();
@@ -305,7 +307,7 @@ public class Insulin {
 	}
 
 	private static void fortifyRanges(HDLObject apply, ModificationSet ms) {
-		List<HDLRange> ranges = apply.getAllObjectsOf(HDLRange.class, true);
+		Collection<HDLRange> ranges = apply.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange range : ranges) {
 			HDLExpression exp = range.getFrom();
 			if (exp != null) {
@@ -316,14 +318,14 @@ public class Insulin {
 	}
 
 	private static void fortifyIfExpressions(HDLObject apply, ModificationSet ms) {
-		List<HDLIfStatement> ifs = apply.getAllObjectsOf(HDLIfStatement.class, true);
+		Collection<HDLIfStatement> ifs = apply.getAllObjectsOf(HDLIfStatement.class, true);
 		for (HDLIfStatement assignment : ifs) {
 			fortify(ms, assignment.getIfExp(), HDLPrimitive.getBool());
 		}
 	}
 
 	private static void fortifyAssignments(HDLObject apply, ModificationSet ms) {
-		List<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
+		Collection<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
 			HDLType leftType = assignment.getLeft().determineType();
 			HDLExpression exp = assignment.getRight();
@@ -336,7 +338,7 @@ public class Insulin {
 
 	@SuppressWarnings("incomplete-switch")
 	private static void fortifyOpExpressions(HDLObject apply, ModificationSet ms) {
-		List<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
+		Collection<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		for (HDLExpression opExpression : opEx) {
 			HDLTypeInferenceInfo inferenceInfo = null;
 			HDLExpression left = null;
@@ -407,7 +409,7 @@ public class Insulin {
 	@SuppressWarnings("null")
 	private static <T extends HDLObject> T handlePostfixOp(T apply) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLAssignment> loops = apply.getAllObjectsOf(HDLAssignment.class, true);
+		Collection<HDLAssignment> loops = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment hdlAssignment : loops) {
 			HDLAssignmentType type = hdlAssignment.getType();
 			HDLOpExpression op = null;
@@ -457,7 +459,7 @@ public class Insulin {
 
 	private static <T extends HDLObject> T handleMultiForLoop(T apply) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLForLoop> loops = apply.getAllObjectsOf(HDLForLoop.class, true);
+		Collection<HDLForLoop> loops = apply.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop loop : loops) {
 			if (loop.getRange().size() > 1) {
 				HDLForLoop[] newLoops = new HDLForLoop[loop.getRange().size()];
@@ -473,7 +475,7 @@ public class Insulin {
 
 	public static <T extends HDLObject> T handleMultiBitAccess(T apply, HDLEvaluationContext context) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableRef> refs = apply.getAllObjectsOf(HDLVariableRef.class, true);
+		Collection<HDLVariableRef> refs = apply.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
 			ArrayList<HDLRange> bits = ref.getBits();
 			if (bits.size() > 1) {
@@ -527,7 +529,8 @@ public class Insulin {
 
 	private static <T extends HDLObject> T handleOutPortRead(T orig) {
 		ModificationSet ms = new ModificationSet();
-		List<HDLVariableDeclaration> list = HDLQuery.select(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT).getAll();
+		Collection<HDLVariableDeclaration> list = HDLQuery.select(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT)
+				.getAll();
 		for (HDLVariableDeclaration hdv : list) {
 			HDLVariableDeclaration origHdv = hdv;
 			for (HDLVariable var : hdv.getVariables()) {
@@ -551,7 +554,7 @@ public class Insulin {
 					// Replace all read occourances with the new bar_outRead
 					HDLQualifiedName originalFQN = var.asRef();
 					HDLQualifiedName newFQN = outVar.asRef();
-					List<HDLVariableRef> reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
+					Collection<HDLVariableRef> reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
 					for (HDLVariableRef varRef : reads) {
 						if (varRef.getVarRefName().equals(originalFQN)) {
 							ms.replace(varRef, varRef.setVar(newFQN));

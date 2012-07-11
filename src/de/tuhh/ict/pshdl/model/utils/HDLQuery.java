@@ -106,19 +106,22 @@ public class HDLQuery {
 			this.matcher = matcher;
 		}
 
-		public List<T> getAll() {
+		public Collection<T> getAll() {
 			return from.getAllObjectsOf(clazz, field, matcher);
 		}
 
 		public T getFirst() {
-			List<T> res = from.getAllObjectsOf(clazz, field, matcher);
-			if (res.size() == 0)
+			Collection<T> res = from.getAllObjectsOf(clazz, field, matcher);
+			if (res.isEmpty())
 				return null;
-			return res.get(0);
+			Iterator<T> iterator = res.iterator();
+			if (iterator.hasNext())
+				return iterator.next();
+			return null;
 		}
 
-		public List<T> or(K parameter) {
-			List<T> res = from.getAllObjectsOf(clazz, field, matcher);
+		public Collection<T> or(K parameter) {
+			Collection<T> res = from.getAllObjectsOf(clazz, field, matcher);
 			res.addAll(from.getAllObjectsOf(clazz, field, matcher.setParameter(parameter)));
 			return res;
 		}

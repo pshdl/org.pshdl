@@ -21,6 +21,7 @@ public class VHDLContext {
 	public LinkedList<HDLStatement> sensitiveStatements = new LinkedList<HDLStatement>();
 	public LinkedList<Signal> ports = new LinkedList<Signal>();
 	public LinkedList<ConstantDeclaration> constants = new LinkedList<ConstantDeclaration>();
+	public LinkedList<ConstantDeclaration> constantsPkg = new LinkedList<ConstantDeclaration>();
 	public LinkedList<Constant> generics = new LinkedList<Constant>();
 	public LinkedList<ObjectDeclaration<?>> internals = new LinkedList<ObjectDeclaration<?>>();
 	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
@@ -48,6 +49,7 @@ public class VHDLContext {
 		ports.addAll(vhdl.ports);
 		generics.addAll(vhdl.generics);
 		constants.addAll(vhdl.constants);
+		constantsPkg.addAll(vhdl.constantsPkg);
 		internals.addAll(vhdl.internals);
 		internalTypes.addAll(vhdl.internalTypes);
 		externalTypes.addAll(vhdl.externalTypes);
@@ -80,6 +82,7 @@ public class VHDLContext {
 		printList(sb, ports, "Entity ports:");
 		printList(sb, generics, "Entity generics:");
 		printList(sb, constants, "Entity constants:");
+		printList(sb, constantsPkg, "Pkg constants:");
 		printList(sb, internals, "Internal signals:");
 		// printList(sb, internalTypes, "Internal types:");
 		return sb.toString();
@@ -140,8 +143,8 @@ public class VHDLContext {
 			internalTypes.add(type);
 	}
 
-	public boolean hasExternalTypes() {
-		return (externalTypes.size() != 0);
+	public boolean hasPkgDeclarations() {
+		return (externalTypes.size() != 0) || (constantsPkg.size() != 0);
 	}
 
 	public void addConcurrentStatement(ConcurrentStatement stmnt) {
@@ -150,6 +153,10 @@ public class VHDLContext {
 
 	public void addImport(HDLQualifiedName value) {
 		imports.add(value.skipLast(1));
+	}
+
+	public void addConstantDeclarationPkg(ConstantDeclaration cd) {
+		constantsPkg.add(cd);
 	}
 
 }

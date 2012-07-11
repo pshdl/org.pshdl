@@ -31,8 +31,8 @@ public class HDLEvaluationContext {
 
 	public static HDLEvaluationContext createDefault(HDLUnit unit) {
 		Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
-		List<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.CONSTANT)
-				.or(HDLDirection.PARAMETER);
+		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection)
+				.isEqualTo(HDLDirection.CONSTANT).or(HDLDirection.PARAMETER);
 		for (HDLVariableDeclaration hvd : constants) {
 			for (HDLVariable var : hvd.getVariables()) {
 				c.put(var.getName(), var.getDefaultValue());
