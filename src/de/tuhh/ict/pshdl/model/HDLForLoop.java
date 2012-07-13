@@ -22,7 +22,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * Constructs a new instance of {@link HDLForLoop}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -37,9 +37,9 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLForLoop(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos,
-			boolean validate) {
-		super(containerID, container, range, param, dos, validate);
+	public HDLForLoop(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos,
+			boolean validate, boolean updateContainer) {
+		super(objectID, container, range, param, dos, validate, updateContainer);
 	}
 
 	/**
@@ -56,8 +56,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 *            the value for dos. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLForLoop(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos) {
-		this(containerID, container, range, param, dos, true);
+	public HDLForLoop(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos) {
+		this(objectID, container, range, param, dos, true, true);
 	}
 
 	public HDLForLoop() {

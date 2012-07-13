@@ -9,7 +9,6 @@ import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.validation.*;
 
 /**
  * The class HDLObject contains the following fields
@@ -21,15 +20,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 	/**
 	 * Constructs a new instance of {@link HDLObject}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLObject(int containerID, @Nullable HDLObject container, boolean validate) {
-		super(containerID, container, validate);
+	public HDLObject(int objectID, @Nullable HDLObject container, boolean validate, boolean updateContainer) {
+		super(objectID, container, validate, updateContainer);
 	}
 
 	/**
@@ -38,8 +37,8 @@ public abstract class HDLObject extends AbstractHDLObject {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLObject(int containerID, @Nullable HDLObject container) {
-		this(containerID, container, true);
+	public HDLObject(int objectID, @Nullable HDLObject container) {
+		this(objectID, container, true, true);
 	}
 
 	public HDLObject() {
@@ -64,30 +63,6 @@ public abstract class HDLObject extends AbstractHDLObject {
 			return obj.getContainer();
 		}
 	};
-
-	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		if (container == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for variable:" + var));
-		return container.resolveVariable(var);
-	}
-
-	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
-		if (container == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, this, "for enum:" + hEnum));
-		return container.resolveEnum(hEnum);
-	}
-
-	public HDLType resolveType(HDLQualifiedName type) {
-		if (container == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, this, "for type:" + type));
-		return container.resolveType(type);
-	}
-
-	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
-		if (container == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_INTERFACE, this, "for interface:" + hIf));
-		return container.resolveInterface(hIf);
-	}
 
 	// $CONTENT-BEGIN$
 
@@ -156,8 +131,6 @@ public abstract class HDLObject extends AbstractHDLObject {
 	private Map<Class<? extends HDLObject>, Set<HDLObject>> clazzTypes;
 	private Map<Class<? extends HDLObject>, Set<HDLObject>> deepClazzTypes;
 
-	public abstract Iterator<HDLObject> iterator();
-
 	@SuppressWarnings("unchecked")
 	public <T> Set<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
 		if (clazzTypes == null) {
@@ -187,7 +160,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 			list = (NonSameList<T>) clazzTypes.get(clazz);
 		if (list == null)
 			return new NonSameList<T>();
-		return (NonSameList<T>) list.clone();
+		return list.clone();
 	}
 
 	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
@@ -237,7 +210,12 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return null;
 	}
 
-	public HDLIterator iterator(boolean deep) {
+	@Override
+	public Iterator<HDLObject> iterator() {
+		return iterator(false);
+	}
+
+	public Iterator<HDLObject> iterator(boolean deep) {
 		try {
 			return new HDLIterator(this, deep);
 		} catch (IllegalAccessException e) {
@@ -251,7 +229,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (this.container != null) {
-			if (this.container.containerID != container.containerID) {
+			if (this.container.objectID != container.objectID) {
 				throw new IllegalArgumentException("The parents container ID does not match the new container ID!");
 			}
 		}

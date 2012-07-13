@@ -35,6 +35,7 @@ public class HDLValidator {
 			// TODO Check for POW only power of 2
 			checkCombinedAssignment(unit, problems, hContext);
 			checkAnnotations(unit, problems, hContext);
+			checkType(unit, problems, hContext);
 			// TODO Validate bitWidth mismatch
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
@@ -55,6 +56,33 @@ public class HDLValidator {
 			e.printStackTrace();
 		}
 		return problems;
+	}
+
+	private static void checkType(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLOpExpression> ops = unit.getAllObjectsOf(HDLOpExpression.class, true);
+		for (HDLOpExpression ope : ops) {
+			HDLTypeInferenceInfo info = null;
+			switch (ope.getClassType()) {
+			case HDLArithOp:
+				info = HDLPrimitives.getInstance().getArithOpType((HDLArithOp) ope);
+				break;
+			case HDLBitOp:
+				info = HDLPrimitives.getInstance().getBitOpType((HDLBitOp) ope);
+				break;
+			case HDLShiftOp:
+				info = HDLPrimitives.getInstance().getShiftOpType((HDLShiftOp) ope);
+				break;
+			case HDLEqualityOp:
+				info = HDLPrimitives.getInstance().getEqualityOpType((HDLEqualityOp) ope);
+				break;
+			default:
+				throw new IllegalArgumentException("Did not expect class:" + ope.getClassType());
+			}
+			if (info == null)
+				throw new IllegalArgumentException("Info should not be null");
+			if (info.error != null)
+				problems.add(new Problem(ErrorCode.UNSUPPORTED_TYPE_FOR_OP, ope, info.error));
+		}
 	}
 
 	private static void checkAnnotations(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

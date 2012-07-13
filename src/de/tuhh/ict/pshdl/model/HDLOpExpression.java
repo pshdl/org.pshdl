@@ -17,7 +17,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * Constructs a new instance of {@link HDLOpExpression}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -28,8 +28,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLOpExpression(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, boolean validate) {
-		super(containerID, container, left, right, validate);
+	public HDLOpExpression(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, boolean validate, boolean updateContainer) {
+		super(objectID, container, left, right, validate, updateContainer);
 	}
 
 	/**
@@ -42,8 +42,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLOpExpression(int containerID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right) {
-		this(containerID, container, left, right, true);
+	public HDLOpExpression(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right) {
+		this(objectID, container, left, right, true, true);
 	}
 
 	public HDLOpExpression() {

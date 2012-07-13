@@ -68,7 +68,8 @@ public aspect VHDLStatementTransformation {
 		ModificationSet ms=new ModificationSet();
 		Collection<HDLVariableRef> refs=hIf.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			ms.replace(ref, ref.setVar(new HDLQualifiedName(hVar.getName()+"_"+ ref.getVarRefName().getLastSegment())));
+			if (ref.resolveVar().getDirection()==HDLDirection.PARAMETER)
+				ms.replace(ref, ref.setVar(new HDLQualifiedName(hVar.getName()+"_"+ ref.getVarRefName().getLastSegment())));
 		}
 		hIf=ms.apply(hIf);
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();

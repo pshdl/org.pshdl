@@ -24,7 +24,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -41,9 +41,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
-			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate) {
-		super(containerID, container, var, array, bits, hIf, ifArray, validate);
+	public HDLInterfaceRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate, boolean updateContainer) {
+		super(objectID, container, var, array, bits, hIf, ifArray, validate, updateContainer);
 	}
 
 	/**
@@ -62,9 +62,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 */
-	public HDLInterfaceRef(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+	public HDLInterfaceRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
 			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray) {
-		this(containerID, container, var, array, bits, hIf, ifArray, true);
+		this(objectID, container, var, array, bits, hIf, ifArray, true, true);
 	}
 
 	public HDLInterfaceRef() {

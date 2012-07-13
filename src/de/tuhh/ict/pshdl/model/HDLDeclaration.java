@@ -14,15 +14,15 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLDeclaration}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLDeclaration(int containerID, @Nullable HDLObject container, boolean validate) {
-		super(containerID, container, validate);
+	public HDLDeclaration(int objectID, @Nullable HDLObject container, boolean validate, boolean updateContainer) {
+		super(objectID, container, validate, updateContainer);
 	}
 
 	/**
@@ -31,8 +31,8 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLDeclaration(int containerID, @Nullable HDLObject container) {
-		this(containerID, container, true);
+	public HDLDeclaration(int objectID, @Nullable HDLObject container) {
+		this(objectID, container, true, true);
 	}
 
 	public HDLDeclaration() {

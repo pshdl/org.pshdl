@@ -18,7 +18,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -27,8 +27,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLLiteral(int containerID, @Nullable HDLObject container, @NonNull String val, boolean validate) {
-		super(containerID, container, val, validate);
+	public HDLLiteral(int objectID, @Nullable HDLObject container, @NonNull String val, boolean validate, boolean updateContainer) {
+		super(objectID, container, val, validate, updateContainer);
 	}
 
 	/**
@@ -39,8 +39,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param val
 	 *            the value for val. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLLiteral(int containerID, @Nullable HDLObject container, @NonNull String val) {
-		this(containerID, container, val, true);
+	public HDLLiteral(int objectID, @Nullable HDLObject container, @NonNull String val) {
+		this(objectID, container, val, true, true);
 	}
 
 	public HDLLiteral() {

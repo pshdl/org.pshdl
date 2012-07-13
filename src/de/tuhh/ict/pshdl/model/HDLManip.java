@@ -18,7 +18,7 @@ public class HDLManip extends AbstractHDLManip {
 	/**
 	 * Constructs a new instance of {@link HDLManip}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -31,8 +31,9 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLManip(int containerID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
-		super(containerID, container, type, target, castTo, validate);
+	public HDLManip(int objectID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo, boolean validate,
+			boolean updateContainer) {
+		super(objectID, container, type, target, castTo, validate, updateContainer);
 	}
 
 	/**
@@ -47,8 +48,8 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param castTo
 	 *            the value for castTo. Can be <code>null</code>.
 	 */
-	public HDLManip(int containerID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo) {
-		this(containerID, container, type, target, castTo, true);
+	public HDLManip(int objectID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo) {
+		this(objectID, container, type, target, castTo, true, true);
 	}
 
 	public HDLManip() {

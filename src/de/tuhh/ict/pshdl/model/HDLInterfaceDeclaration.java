@@ -16,7 +16,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceDeclaration}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -25,8 +25,8 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceDeclaration(int containerID, @Nullable HDLObject container, @NonNull HDLInterface hIf, boolean validate) {
-		super(containerID, container, hIf, validate);
+	public HDLInterfaceDeclaration(int objectID, @Nullable HDLObject container, @NonNull HDLInterface hIf, boolean validate, boolean updateContainer) {
+		super(objectID, container, hIf, validate, updateContainer);
 	}
 
 	/**
@@ -37,8 +37,8 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceDeclaration(int containerID, @Nullable HDLObject container, @NonNull HDLInterface hIf) {
-		this(containerID, container, hIf, true);
+	public HDLInterfaceDeclaration(int objectID, @Nullable HDLObject container, @NonNull HDLInterface hIf) {
+		this(objectID, container, hIf, true, true);
 	}
 
 	public HDLInterfaceDeclaration() {

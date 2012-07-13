@@ -26,7 +26,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLVariableDeclaration}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -47,10 +47,10 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(int containerID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
+	public HDLVariableDeclaration(int objectID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
 			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables,
-			boolean validate) {
-		super(containerID, container, register, direction, annotations, type, primitive, variables, validate);
+			boolean validate, boolean updateContainer) {
+		super(objectID, container, register, direction, annotations, type, primitive, variables, validate, updateContainer);
 	}
 
 	/**
@@ -73,9 +73,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLVariableDeclaration(int containerID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
+	public HDLVariableDeclaration(int objectID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
 			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables) {
-		this(containerID, container, register, direction, annotations, type, primitive, variables, true);
+		this(objectID, container, register, direction, annotations, type, primitive, variables, true, true);
 	}
 
 	public HDLVariableDeclaration() {
@@ -186,7 +186,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
 			HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
-		this(containerID, container, register, direction, annotations, primitive.asRef(), primitive, variables, true);
+		this(containerID, container, register, direction, annotations, primitive.asRef(), primitive, variables);
 	}
 
 	@Override

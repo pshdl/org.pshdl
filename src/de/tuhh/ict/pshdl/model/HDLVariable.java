@@ -22,7 +22,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -37,9 +37,9 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
-			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
-		super(containerID, container, name, dimensions, defaultValue, annotations, validate);
+	public HDLVariable(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate, boolean updateContainer) {
+		super(objectID, container, name, dimensions, defaultValue, annotations, validate, updateContainer);
 	}
 
 	/**
@@ -56,9 +56,9 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param annotations
 	 *            the value for annotations. Can be <code>null</code>.
 	 */
-	public HDLVariable(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+	public HDLVariable(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
 			@Nullable ArrayList<HDLAnnotation> annotations) {
-		this(containerID, container, name, dimensions, defaultValue, annotations, true);
+		this(objectID, container, name, dimensions, defaultValue, annotations, true, true);
 	}
 
 	public HDLVariable() {

@@ -45,10 +45,7 @@ public class Problem {
 
 	@Override
 	public String toString() {
-		String string = severity + ":" + code.name().toLowerCase() + " for: " + node;
-		if (context != null)
-			string += " @ " + context;
-		return string;
+		return severity + ": " + toStringWithoutSeverity();
 	}
 
 	public String toStringWithoutSeverity() {

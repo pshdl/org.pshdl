@@ -19,7 +19,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	/**
 	 * Constructs a new instance of {@link HDLConcat}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -29,8 +29,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLConcat(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats, boolean validate) {
-		super(containerID, container, cats, validate);
+	public HDLConcat(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats, boolean validate, boolean updateContainer) {
+		super(objectID, container, cats, validate, updateContainer);
 	}
 
 	/**
@@ -42,8 +42,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	 *            the value for cats. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLConcat(int containerID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats) {
-		this(containerID, container, cats, true);
+	public HDLConcat(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats) {
+		this(objectID, container, cats, true, true);
 	}
 
 	public HDLConcat() {

@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model.aspects;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import java.util.*;
 
 public aspect FullNameAspect {
 	public HDLQualifiedName HDLForLoop.getFullName() {
@@ -61,7 +62,7 @@ public aspect FullNameAspect {
 	private static int countInstance(HDLObject obj) {
 		int count = 0;
 		if (obj.getContainer() != null) {
-			HDLIterator iterator = obj.getContainer().iterator(false);
+			Iterator<HDLObject> iterator = obj.getContainer().iterator(false);
 			while (iterator.hasNext()) {
 				HDLObject hdlObject = iterator.next();
 				if (hdlObject == obj)

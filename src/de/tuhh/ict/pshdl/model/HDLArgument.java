@@ -18,7 +18,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	/**
 	 * Constructs a new instance of {@link HDLArgument}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -31,8 +31,9 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArgument(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression, boolean validate) {
-		super(containerID, container, name, value, expression, validate);
+	public HDLArgument(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression, boolean validate,
+			boolean updateContainer) {
+		super(objectID, container, name, value, expression, validate, updateContainer);
 	}
 
 	/**
@@ -47,8 +48,8 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param expression
 	 *            the value for expression. Can be <code>null</code>.
 	 */
-	public HDLArgument(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression) {
-		this(containerID, container, name, value, expression, true);
+	public HDLArgument(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression) {
+		this(objectID, container, name, value, expression, true, true);
 	}
 
 	public HDLArgument() {

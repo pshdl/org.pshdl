@@ -27,7 +27,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -49,9 +49,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRegisterConfig(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate) {
-		super(containerID, container, clk, rst, clockType, resetType, syncType, resetValue, validate);
+	public HDLRegisterConfig(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate, boolean updateContainer) {
+		super(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, validate, updateContainer);
 	}
 
 	/**
@@ -75,9 +75,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRegisterConfig(int containerID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+	public HDLRegisterConfig(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
 			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue) {
-		this(containerID, container, clk, rst, clockType, resetType, syncType, resetValue, true);
+		this(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, true, true);
 	}
 
 	public HDLRegisterConfig() {

@@ -14,15 +14,15 @@ public abstract class HDLStatement extends AbstractHDLStatement implements de.tu
 	/**
 	 * Constructs a new instance of {@link HDLStatement}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLStatement(int containerID, @Nullable HDLObject container, boolean validate) {
-		super(containerID, container, validate);
+	public HDLStatement(int objectID, @Nullable HDLObject container, boolean validate, boolean updateContainer) {
+		super(objectID, container, validate, updateContainer);
 	}
 
 	/**
@@ -31,8 +31,8 @@ public abstract class HDLStatement extends AbstractHDLStatement implements de.tu
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLStatement(int containerID, @Nullable HDLObject container) {
-		this(containerID, container, true);
+	public HDLStatement(int objectID, @Nullable HDLObject container) {
+		this(objectID, container, true, true);
 	}
 
 	public HDLStatement() {

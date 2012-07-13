@@ -22,7 +22,7 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * Constructs a new instance of {@link HDLRange}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -33,8 +33,8 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRange(int containerID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate) {
-		super(containerID, container, from, to, validate);
+	public HDLRange(int objectID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate, boolean updateContainer) {
+		super(objectID, container, from, to, validate, updateContainer);
 	}
 
 	/**
@@ -47,8 +47,8 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRange(int containerID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to) {
-		this(containerID, container, from, to, true);
+	public HDLRange(int objectID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to) {
+		this(objectID, container, from, to, true, true);
 	}
 
 	public HDLRange() {

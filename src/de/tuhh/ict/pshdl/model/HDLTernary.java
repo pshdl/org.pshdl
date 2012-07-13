@@ -18,7 +18,7 @@ public class HDLTernary extends AbstractHDLTernary {
 	/**
 	 * Constructs a new instance of {@link HDLTernary}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -31,9 +31,9 @@ public class HDLTernary extends AbstractHDLTernary {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLTernary(int containerID, @Nullable HDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr,
-			boolean validate) {
-		super(containerID, container, ifExpr, thenExpr, elseExpr, validate);
+	public HDLTernary(int objectID, @Nullable HDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr,
+			boolean validate, boolean updateContainer) {
+		super(objectID, container, ifExpr, thenExpr, elseExpr, validate, updateContainer);
 	}
 
 	/**
@@ -48,8 +48,8 @@ public class HDLTernary extends AbstractHDLTernary {
 	 * @param elseExpr
 	 *            the value for elseExpr. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLTernary(int containerID, @Nullable HDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr) {
-		this(containerID, container, ifExpr, thenExpr, elseExpr, true);
+	public HDLTernary(int objectID, @Nullable HDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr) {
+		this(objectID, container, ifExpr, thenExpr, elseExpr, true, true);
 	}
 
 	public HDLTernary() {

@@ -6,7 +6,7 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -24,7 +24,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -39,9 +39,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(int containerID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
-			@Nullable ArrayList<HDLStatement> statements, boolean validate) {
-		super(containerID, container, libURI, name, imports, statements, validate);
+	public HDLUnit(int objectID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
+			@Nullable ArrayList<HDLStatement> statements, boolean validate, boolean updateContainer) {
+		super(objectID, container, libURI, name, imports, statements, validate, updateContainer);
 	}
 
 	/**
@@ -58,9 +58,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
 	 */
-	public HDLUnit(int containerID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
+	public HDLUnit(int objectID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
 			@Nullable ArrayList<HDLStatement> statements) {
-		this(containerID, container, libURI, name, imports, statements, true);
+		this(objectID, container, libURI, name, imports, statements, true, true);
 	}
 
 	public HDLUnit() {
@@ -167,14 +167,15 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
 			}
 		}
-		unitIF.setContainer(this);
 		ModificationSet ms = new ModificationSet();
 		Collection<HDLVariableRef> refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
 			ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
 		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
-		return ms.apply(unitIF);
+		unitIF = ms.apply(unitIF);
+		unitIF.setContainer(this);
+		return unitIF;
 	}
 
 	// $CONTENT-END$

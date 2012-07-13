@@ -21,7 +21,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	/**
 	 * Constructs a new instance of {@link HDLEnum}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -33,8 +33,8 @@ public class HDLEnum extends AbstractHDLEnum {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnum(int containerID, @Nullable HDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums, boolean validate) {
-		super(containerID, container, name, enums, validate);
+	public HDLEnum(int objectID, @Nullable HDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums, boolean validate, boolean updateContainer) {
+		super(objectID, container, name, enums, validate, updateContainer);
 	}
 
 	/**
@@ -48,8 +48,8 @@ public class HDLEnum extends AbstractHDLEnum {
 	 *            the value for enums. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLEnum(int containerID, @Nullable HDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums) {
-		this(containerID, container, name, enums, true);
+	public HDLEnum(int objectID, @Nullable HDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums) {
+		this(objectID, container, name, enums, true, true);
 	}
 
 	public HDLEnum() {

@@ -25,7 +25,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * Constructs a new instance of {@link HDLDirectGeneration}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -46,9 +46,9 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLDirectGeneration(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
-			@NonNull String generatorID, @NonNull String generatorContent, @NonNull Boolean include, boolean validate) {
-		super(containerID, container, var, arguments, hIf, generatorID, generatorContent, include, validate);
+	public HDLDirectGeneration(int objectID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
+			@NonNull String generatorID, @NonNull String generatorContent, @NonNull Boolean include, boolean validate, boolean updateContainer) {
+		super(objectID, container, var, arguments, hIf, generatorID, generatorContent, include, validate, updateContainer);
 	}
 
 	/**
@@ -71,9 +71,9 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param include
 	 *            the value for include. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLDirectGeneration(int containerID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
+	public HDLDirectGeneration(int objectID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
 			@NonNull String generatorID, @NonNull String generatorContent, @NonNull Boolean include) {
-		this(containerID, container, var, arguments, hIf, generatorID, generatorContent, include, true);
+		this(objectID, container, var, arguments, hIf, generatorID, generatorContent, include, true, true);
 	}
 
 	public HDLDirectGeneration() {

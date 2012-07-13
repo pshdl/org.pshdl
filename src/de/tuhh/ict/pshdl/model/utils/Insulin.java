@@ -520,7 +520,7 @@ public class Insulin {
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
-						String varName = ref.getVarRefName().getLastSegment() + "_" + ref.containerID + "_bitAccess";
+						String varName = ref.getVarRefName().getLastSegment() + "_" + ref.objectID + "_bitAccess";
 						HDLQualifiedName hVarName = new HDLQualifiedName(varName);
 						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType().copy()).addVariables(
 								new HDLVariable().setName(varName).setDefaultValue(ass.getRight().copy()));

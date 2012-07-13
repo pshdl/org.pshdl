@@ -20,7 +20,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	/**
 	 * Constructs a new instance of {@link HDLInterface}
 	 * 
-	 * @param containerID
+	 * @param objectID
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -31,8 +31,9 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate) {
-		super(containerID, container, name, ports, validate);
+	public HDLInterface(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate,
+			boolean updateContainer) {
+		super(objectID, container, name, ports, validate, updateContainer);
 	}
 
 	/**
@@ -45,8 +46,8 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 */
-	public HDLInterface(int containerID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports) {
-		this(containerID, container, name, ports, true);
+	public HDLInterface(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports) {
+		this(objectID, container, name, ports, true, true);
 	}
 
 	public HDLInterface() {

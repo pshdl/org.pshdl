@@ -30,20 +30,20 @@ public abstract aspect LogginAspect {
 	
 	public static void HDLObject.printInfo(HDLObject obj) {
 		if (obj.getMeta("CONSTRUCTOR") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " constructed at:" + obj.getMeta("CONSTRUCTOR"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " constructed at:" + obj.getMeta("CONSTRUCTOR"));
 		}
 		Object meta = obj.getMeta("CONSTRUCTION_SRC");
 		if (meta != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " constructed in:" + meta.getClass());
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " constructed in:" + meta.getClass());
 			if (meta instanceof HDLObject)
 				printInfo((HDLObject) meta);
 		}
 		if (obj.getMeta("SETTER") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " setter called at:" + obj.getMeta("SETTER"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " setter called at:" + obj.getMeta("SETTER"));
 		}
 		HDLObject[] replaceWith = (HDLObject[])obj.getMeta("REPLACED_WITH");
 		if (replaceWith != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " replaced with:" + replaceWith);
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " replaced with:" + replaceWith);
 			System.out.println(">>>>");
 			for (HDLObject hdlObject : replaceWith) {
 				HDLObject.printInfo(hdlObject);
@@ -51,22 +51,22 @@ public abstract aspect LogginAspect {
 			System.out.println("<<<<");
 		}
 		if (obj.getMeta("REPLACED_AT") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " replaced at:" + obj.getMeta("REPLACED_AT"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " replaced at:" + obj.getMeta("REPLACED_AT"));
 		}
 		if (obj.getMeta("SETTER_CONTAINER") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " setContainer called at:" + obj.getMeta("SETTER_CONTAINER"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " setContainer called at:" + obj.getMeta("SETTER_CONTAINER"));
 		}
 		if (obj.getMeta("ADDER") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " add called at:" + obj.getMeta("ADDER"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " add called at:" + obj.getMeta("ADDER"));
 		}
 		if (obj.getMeta("COPY") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copy called at:" + obj.getMeta("COPY"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " copy called at:" + obj.getMeta("COPY"));
 		}
 		if (obj.getMeta("COPY_FILTERED") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copyFiltered called at:" + obj.getMeta("COPY_FILTERED"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " copyFiltered called at:" + obj.getMeta("COPY_FILTERED"));
 		}
 		if (obj.getMeta("COPY_SOURCE") != null) {
-			System.out.println("HDLObject.resolveVariable()" + obj.containerID + " copied from:" + obj.getMeta("COPY_SOURCE"));
+			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " copied from:" + obj.getMeta("COPY_SOURCE"));
 			printInfo((HDLObject) obj.getMeta("COPY_SOURCE"));
 		}
 	}
