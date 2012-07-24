@@ -94,7 +94,7 @@ public class HDLPrimitives {
 			for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
 				if (right == BOOL)
 					continue;
-				res.put(new HDLInferenceTriple(left, right, null), new HDLInferenceTriple(left, BITVECTOR, left));
+				res.put(new HDLInferenceTriple(left, right, null), new HDLInferenceTriple(left, left, left));
 			}
 		}
 		res.put(new HDLInferenceTriple(BIT, BIT, null), new HDLInferenceTriple(BIT, BIT, BIT));

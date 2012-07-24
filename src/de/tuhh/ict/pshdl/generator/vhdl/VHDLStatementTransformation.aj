@@ -338,6 +338,10 @@ public aspect VHDLStatementTransformation {
 		configs.addAll(thenCtx.clockedStatements.keySet());
 		configs.addAll(elseCtx.clockedStatements.keySet());
 		VHDLContext res = new VHDLContext();
+		res.merge(thenCtx);
+		res.merge(elseCtx);
+		res.clockedStatements.clear();
+		res.unclockedStatements.clear();
 		Expression<?> ifExp = getIfExp().toVHDL();
 		for (HDLRegisterConfig config : configs) {
 			IfStatement ifs = new IfStatement(ifExp);

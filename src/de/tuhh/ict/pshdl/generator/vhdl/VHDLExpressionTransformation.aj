@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.generator.vhdl;
 import java.math.*;
 import java.util.*;
 
+import de.tuhh.ict.pshdl.generator.vhdl.VHDLPackageTransformation.*;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -197,9 +198,9 @@ public aspect VHDLExpressionTransformation {
 			return new DecimalLiteral(val);
 		switch (val.charAt(1)) {
 		case 'b':
-			return new BinaryLiteral(val.substring(2));
+			return new BasedLiteral("2#"+val.substring(2)+"#");
 		case 'x':
-			return new HexLiteral(val.substring(2));
+			return new BasedLiteral("16#"+val.substring(2)+"#");
 		default:
 			return new DecimalLiteral(val);
 		}

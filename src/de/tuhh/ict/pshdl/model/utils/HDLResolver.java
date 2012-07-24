@@ -19,10 +19,19 @@ public class HDLResolver {
 
 	private Map<HDLQualifiedName, HDLVariable> variableCache;
 
+	private String libURI;
+
 	public HDLResolver(IStatementContainer resolveTo, boolean descent) {
 		super();
 		this.resolveTo = resolveTo;
 		this.descent = descent;
+	}
+
+	public HDLResolver(IStatementContainer resolveTo, boolean descent, String libURI) {
+		super();
+		this.resolveTo = resolveTo;
+		this.descent = descent;
+		this.libURI = libURI;
 	}
 
 	protected List<HDLType> doGetTypeDeclarations() {
@@ -97,8 +106,18 @@ public class HDLResolver {
 		HDLType checkCache = checkCache(var, typeCache);
 		if (checkCache != null)
 			return checkCache;
-		if ((resolveTo.getContainer() == null) || !descent)
+		if ((resolveTo.getContainer() == null) || !descent) {
+			if (resolveTo instanceof HDLUnit) {
+				HDLUnit unit = (HDLUnit) resolveTo;
+				String uri = unit.getLibURI();
+				if (uri != null) {
+					HDLLibrary library = HDLLibrary.getLibrary(uri);
+					if (library != null)
+						return library.resolve(unit.getImports(), var);
+				}
+			}
 			return null;
+		}
 		return resolveTo.getContainer().resolveType(var);
 	}
 
