@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLFunction contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> params. Can be <code>null</code>.</li>
  * </ul>
@@ -30,7 +30,7 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> params, boolean validate, boolean updateContainer) {
+	public HDLFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> params, boolean validate, boolean updateContainer) {
 		super(objectID, container, name, params, validate, updateContainer);
 	}
 
@@ -44,7 +44,7 @@ public class HDLFunction extends AbstractHDLFunction {
 	 * @param params
 	 *            the value for params. Can be <code>null</code>.
 	 */
-	public HDLFunction(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> params) {
+	public HDLFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> params) {
 		this(objectID, container, name, params, true, true);
 	}
 

@@ -8,4 +8,5 @@ public interface HDLStatement extends de.tuhh.ict.pshdl.model.utils.IStatementCo
 
 	@Override
 	public HDLStatement copyFiltered(CopyFilter filter);
+
 }

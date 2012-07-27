@@ -7,7 +7,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
 /**
  * The class HDLCompound contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * </ul>
  */
 public abstract class HDLCompound extends AbstractHDLCompound {
@@ -21,7 +21,7 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLCompound(int objectID, @Nullable HDLObject container, boolean validate, boolean updateContainer) {
+	public HDLCompound(int objectID, @Nullable IHDLObject container, boolean validate, boolean updateContainer) {
 		super(objectID, container, validate, updateContainer);
 	}
 
@@ -31,7 +31,7 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLCompound(int objectID, @Nullable HDLObject container) {
+	public HDLCompound(int objectID, @Nullable IHDLObject container) {
 		this(objectID, container, true, true);
 	}
 

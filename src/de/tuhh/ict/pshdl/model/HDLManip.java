@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLManip contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLManipType type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression target. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLType castTo. Can be <code>null</code>.</li>
@@ -31,7 +31,7 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLManip(int objectID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo, boolean validate,
+	public HDLManip(int objectID, @Nullable IHDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, type, target, castTo, validate, updateContainer);
 	}
@@ -48,7 +48,7 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param castTo
 	 *            the value for castTo. Can be <code>null</code>.
 	 */
-	public HDLManip(int objectID, @Nullable HDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo) {
+	public HDLManip(int objectID, @Nullable IHDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo) {
 		this(objectID, container, type, target, castTo, true, true);
 	}
 

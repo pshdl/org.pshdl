@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLIfStatement contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression ifExp. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> thenDo. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> elseDo. Can be <code>null</code>.</li>
@@ -33,7 +33,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLIfStatement(int objectID, @Nullable HDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
+	public HDLIfStatement(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
 			@Nullable ArrayList<HDLStatement> elseDo, boolean validate, boolean updateContainer) {
 		super(objectID, container, ifExp, thenDo, elseDo, validate, updateContainer);
 	}
@@ -50,7 +50,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param elseDo
 	 *            the value for elseDo. Can be <code>null</code>.
 	 */
-	public HDLIfStatement(int objectID, @Nullable HDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
+	public HDLIfStatement(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
 			@Nullable ArrayList<HDLStatement> elseDo) {
 		this(objectID, container, ifExp, thenDo, elseDo, true, true);
 	}

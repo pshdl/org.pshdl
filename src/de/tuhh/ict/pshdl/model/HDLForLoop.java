@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLForLoop contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLRange> range. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * <li>HDLVariable param. Can <b>not</b> be <code>null</code>.</li>
@@ -37,7 +37,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLForLoop(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos,
+	public HDLForLoop(int objectID, @Nullable IHDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos,
 			boolean validate, boolean updateContainer) {
 		super(objectID, container, range, param, dos, validate, updateContainer);
 	}
@@ -56,7 +56,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 *            the value for dos. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLForLoop(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos) {
+	public HDLForLoop(int objectID, @Nullable IHDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos) {
 		this(objectID, container, range, param, dos, true, true);
 	}
 

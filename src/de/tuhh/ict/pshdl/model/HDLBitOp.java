@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLBitOp contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression left. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLBitOpType type. Can <b>not</b> be <code>null</code>.</li>
@@ -31,7 +31,7 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBitOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLBitOpType type, boolean validate,
+	public HDLBitOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLBitOpType type, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, left, right, type, validate, updateContainer);
 	}
@@ -48,7 +48,7 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLBitOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLBitOpType type) {
+	public HDLBitOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLBitOpType type) {
 		this(objectID, container, left, right, type, true, true);
 	}
 

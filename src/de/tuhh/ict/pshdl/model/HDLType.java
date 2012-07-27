@@ -9,7 +9,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLType contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -26,7 +26,7 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLType(int objectID, @Nullable HDLObject container, @NonNull String name, boolean validate, boolean updateContainer) {
+	public HDLType(int objectID, @Nullable IHDLObject container, @NonNull String name, boolean validate, boolean updateContainer) {
 		super(objectID, container, name, validate, updateContainer);
 	}
 
@@ -38,7 +38,7 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLType(int objectID, @Nullable HDLObject container, @NonNull String name) {
+	public HDLType(int objectID, @Nullable IHDLObject container, @NonNull String name) {
 		this(objectID, container, name, true, true);
 	}
 

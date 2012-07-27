@@ -20,7 +20,7 @@ public aspect TypeInference {
 	 *         otherwise.
 	 */
 	public HDLType HDLVariable.determineType() {
-		HDLObject container = getContainer();
+		IHDLObject container = getContainer();
 		switch (container.getClassType()) {
 		case HDLVariableDeclaration:
 			HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;

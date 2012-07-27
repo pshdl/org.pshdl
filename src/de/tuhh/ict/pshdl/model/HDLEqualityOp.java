@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLEqualityOp contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression left. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLEqualityOpType type. Can <b>not</b> be <code>null</code>.</li>
@@ -31,8 +31,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEqualityOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type, boolean validate,
-			boolean updateContainer) {
+	public HDLEqualityOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type,
+			boolean validate, boolean updateContainer) {
 		super(objectID, container, left, right, type, validate, updateContainer);
 	}
 
@@ -48,7 +48,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEqualityOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type) {
+	public HDLEqualityOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type) {
 		this(objectID, container, left, right, type, true, true);
 	}
 

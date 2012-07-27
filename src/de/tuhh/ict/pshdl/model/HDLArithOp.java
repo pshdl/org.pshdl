@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLArithOp contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression left. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLArithOpType type. Can <b>not</b> be <code>null</code>.</li>
@@ -31,7 +31,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArithOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLArithOpType type, boolean validate,
+	public HDLArithOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLArithOpType type, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, left, right, type, validate, updateContainer);
 	}
@@ -48,7 +48,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLArithOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLArithOpType type) {
+	public HDLArithOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLArithOpType type) {
 		this(objectID, container, left, right, type, true, true);
 	}
 

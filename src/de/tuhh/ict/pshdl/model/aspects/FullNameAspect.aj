@@ -53,6 +53,7 @@ public aspect FullNameAspect {
 		return super.getFullName().append(getName());
 	}
 
+	
 	public HDLQualifiedName HDLObject.getFullName() {
 		if (getContainer() != null)
 			return getContainer().getFullName();

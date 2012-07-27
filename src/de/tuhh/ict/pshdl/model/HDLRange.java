@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLRange contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression from. Can be <code>null</code>.</li>
  * <li>HDLExpression to. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
@@ -33,7 +33,7 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRange(int objectID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate, boolean updateContainer) {
+	public HDLRange(int objectID, @Nullable IHDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate, boolean updateContainer) {
 		super(objectID, container, from, to, validate, updateContainer);
 	}
 
@@ -47,7 +47,7 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRange(int objectID, @Nullable HDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to) {
+	public HDLRange(int objectID, @Nullable IHDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to) {
 		this(objectID, container, from, to, true, true);
 	}
 

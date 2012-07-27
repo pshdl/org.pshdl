@@ -171,7 +171,7 @@ public class Insulin {
 		return loop.addDos(createArrayForLoop(dimensions, i + 1, defaultValue, ref.addArray(paramRef), synchedArray));
 	}
 
-	private static void insertFirstStatement(ModificationSet ms, HDLObject container, HDLStatement stmnt) {
+	private static void insertFirstStatement(ModificationSet ms, IHDLObject container, HDLStatement stmnt) {
 		if (container.getClassType() != HDLClass.HDLUnit) {
 			insertFirstStatement(ms, container.getContainer(), stmnt);
 			return;
@@ -252,7 +252,7 @@ public class Insulin {
 		ClkInserted, RstInserted;
 	}
 
-	private static void insertSig(ModificationSet ms, HDLObject container, HDLVariable defVar, SignalInserted signalInserted) {
+	private static void insertSig(ModificationSet ms, IHDLObject container, HDLVariable defVar, SignalInserted signalInserted) {
 		if (container.getClassType() != HDLClass.HDLUnit) {
 			insertSig(ms, container.getContainer(), defVar, signalInserted);
 			return;

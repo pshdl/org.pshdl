@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLUnit contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<String> imports. Can be <code>null</code>.</li>
@@ -42,7 +42,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(int objectID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
+	public HDLUnit(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
 			@Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate, boolean updateContainer) {
 		super(objectID, container, libURI, name, imports, statements, simulation, validate, updateContainer);
 	}
@@ -63,7 +63,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param simulation
 	 *            the value for simulation. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLUnit(int objectID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
+	public HDLUnit(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
 			@Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation) {
 		this(objectID, container, libURI, name, imports, statements, simulation, true, true);
 	}

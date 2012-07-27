@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLShiftOp contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression left. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression right. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLShiftOpType type. Can <b>not</b> be <code>null</code>.</li>
@@ -31,7 +31,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLShiftOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLShiftOpType type, boolean validate,
+	public HDLShiftOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLShiftOpType type, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, left, right, type, validate, updateContainer);
 	}
@@ -48,7 +48,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLShiftOp(int objectID, @Nullable HDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLShiftOpType type) {
+	public HDLShiftOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLShiftOpType type) {
 		this(objectID, container, left, right, type, true, true);
 	}
 

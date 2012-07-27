@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLBlock contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>Boolean process. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * </ul>
@@ -30,7 +30,7 @@ public class HDLBlock extends AbstractHDLBlock {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBlock(int objectID, @Nullable HDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate, boolean updateContainer) {
+	public HDLBlock(int objectID, @Nullable IHDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate, boolean updateContainer) {
 		super(objectID, container, process, statements, validate, updateContainer);
 	}
 
@@ -44,7 +44,7 @@ public class HDLBlock extends AbstractHDLBlock {
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
 	 */
-	public HDLBlock(int objectID, @Nullable HDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements) {
+	public HDLBlock(int objectID, @Nullable IHDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements) {
 		this(objectID, container, process, statements, true, true);
 	}
 

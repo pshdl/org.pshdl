@@ -12,7 +12,7 @@ import de.tuhh.ict.pshdl.model.validation.*;
 /**
  * The class HDLVariableRef contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> array. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
@@ -35,8 +35,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
-			boolean validate, boolean updateContainer) {
+	public HDLVariableRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+			@Nullable ArrayList<HDLRange> bits, boolean validate, boolean updateContainer) {
 		super(objectID, container, var, array, bits, validate, updateContainer);
 	}
 
@@ -52,7 +52,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param bits
 	 *            the value for bits. Can be <code>null</code>.
 	 */
-	public HDLVariableRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits) {
+	public HDLVariableRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits) {
 		this(objectID, container, var, array, bits, true, true);
 	}
 

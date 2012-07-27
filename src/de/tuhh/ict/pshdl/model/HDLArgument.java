@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLArgument contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>String value. Can be <code>null</code>.</li>
  * <li>HDLExpression expression. Can be <code>null</code>.</li>
@@ -31,7 +31,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArgument(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression, boolean validate,
+	public HDLArgument(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, name, value, expression, validate, updateContainer);
 	}
@@ -48,7 +48,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param expression
 	 *            the value for expression. Can be <code>null</code>.
 	 */
-	public HDLArgument(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression) {
+	public HDLArgument(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression) {
 		this(objectID, container, name, value, expression, true, true);
 	}
 

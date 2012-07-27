@@ -12,7 +12,7 @@ import de.tuhh.ict.pshdl.model.validation.*;
 /**
  * The class HDLInterfaceRef contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> array. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
@@ -41,7 +41,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+	public HDLInterfaceRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
 			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate, boolean updateContainer) {
 		super(objectID, container, var, array, bits, hIf, ifArray, validate, updateContainer);
 	}
@@ -62,7 +62,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 */
-	public HDLInterfaceRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
+	public HDLInterfaceRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
 			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray) {
 		this(objectID, container, var, array, bits, hIf, ifArray, true, true);
 	}

@@ -37,7 +37,7 @@ public class HDLResolver {
 			types.add(hEnumDecl.getHEnum());
 		}
 		for (HDLVariable varDecl : resolveTo.doGetVariables()) {
-			HDLObject container = varDecl.getContainer();
+			IHDLObject container = varDecl.getContainer();
 			if (container instanceof HDLVariableDeclaration) {
 				HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
 				if (hvd.getPrimitive() != null)
@@ -155,7 +155,7 @@ public class HDLResolver {
 			return HDLRegisterConfig.defaultClk();
 		if (HDLRegisterConfig.DEF_RST.equals(var.getLastSegment()))
 			return HDLRegisterConfig.defaultRst();
-		HDLObject container = resolveTo.getContainer();
+		IHDLObject container = resolveTo.getContainer();
 		if ((container == null) || !descent)
 			return null;
 		return container.resolveVariable(var);

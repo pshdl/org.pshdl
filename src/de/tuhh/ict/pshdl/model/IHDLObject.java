@@ -44,4 +44,8 @@ public interface IHDLObject {
 
 	public String toConstructionString(String spacing);
 
+	public void freeze();
+
+	public HDLQualifiedName getFullName();
+
 }

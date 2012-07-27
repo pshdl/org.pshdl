@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLVariableDeclaration contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLRegisterConfig register. Can be <code>null</code>.</li>
  * <li>HDLDirection direction. If <code>null</code>,
  * {@link HDLDirection#INTERNAL} is used as default.</li>
@@ -47,7 +47,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(int objectID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
+	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
 			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables,
 			boolean validate, boolean updateContainer) {
 		super(objectID, container, register, direction, annotations, type, primitive, variables, validate, updateContainer);
@@ -73,7 +73,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLVariableDeclaration(int objectID, @Nullable HDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
+	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
 			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables) {
 		this(objectID, container, register, direction, annotations, type, primitive, variables, true, true);
 	}

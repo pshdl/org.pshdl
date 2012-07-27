@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLObject contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * </ul>
  */
 public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict.pshdl.model.IHDLObject {
@@ -27,7 +27,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLObject(int objectID, @Nullable HDLObject container, boolean validate, boolean updateContainer) {
+	public HDLObject(int objectID, @Nullable IHDLObject container, boolean validate, boolean updateContainer) {
 		super(objectID, container, validate, updateContainer);
 	}
 
@@ -37,7 +37,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 */
-	public HDLObject(int objectID, @Nullable HDLObject container) {
+	public HDLObject(int objectID, @Nullable IHDLObject container) {
 		this(objectID, container, true, true);
 	}
 
@@ -54,11 +54,11 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	/**
-	 * The accessor for the field container which is of type HDLObject.
+	 * The accessor for the field container which is of type IHDLObject.
 	 */
-	public static HDLFieldAccess<HDLObject, HDLObject> fContainer = new HDLFieldAccess<HDLObject, HDLObject>() {
+	public static HDLFieldAccess<HDLObject, IHDLObject> fContainer = new HDLFieldAccess<HDLObject, IHDLObject>() {
 		@Override
-		public HDLObject getValue(HDLObject obj) {
+		public IHDLObject getValue(HDLObject obj) {
 			if (obj == null)
 				return null;
 			return obj.getContainer();
@@ -240,15 +240,15 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
-	public IHDLObject setContainer(IHDLObject container) {
+	public HDLObject setContainer(IHDLObject container) {
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (this.container != null) {
-			if (this.container.objectID != ((HDLObject) container).objectID) {
+			if (((HDLObject) this.container).objectID != ((HDLObject) container).objectID) {
 				throw new IllegalArgumentException("The parents container ID does not match the new container ID!");
 			}
 		}
-		this.container = (HDLObject) container;
+		this.container = container;
 		return this;
 	}
 

@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLInterface contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLVariableDeclaration> ports. Can be <code>null</code>.</li>
  * </ul>
@@ -31,7 +31,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate,
+	public HDLInterface(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, name, ports, validate, updateContainer);
 	}
@@ -46,7 +46,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 */
-	public HDLInterface(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports) {
+	public HDLInterface(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports) {
 		this(objectID, container, name, ports, true, true);
 	}
 

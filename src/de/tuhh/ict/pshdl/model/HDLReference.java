@@ -9,7 +9,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLReference contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -26,7 +26,7 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLReference(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, boolean validate, boolean updateContainer) {
+	public HDLReference(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, boolean validate, boolean updateContainer) {
 		super(objectID, container, var, validate, updateContainer);
 	}
 
@@ -38,7 +38,7 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLReference(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var) {
+	public HDLReference(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var) {
 		this(objectID, container, var, true, true);
 	}
 

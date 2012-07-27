@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLInterfaceDeclaration contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -25,7 +25,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceDeclaration(int objectID, @Nullable HDLObject container, @NonNull HDLInterface hIf, boolean validate, boolean updateContainer) {
+	public HDLInterfaceDeclaration(int objectID, @Nullable IHDLObject container, @NonNull HDLInterface hIf, boolean validate, boolean updateContainer) {
 		super(objectID, container, hIf, validate, updateContainer);
 	}
 
@@ -37,7 +37,7 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceDeclaration(int objectID, @Nullable HDLObject container, @NonNull HDLInterface hIf) {
+	public HDLInterfaceDeclaration(int objectID, @Nullable IHDLObject container, @NonNull HDLInterface hIf) {
 		this(objectID, container, hIf, true, true);
 	}
 

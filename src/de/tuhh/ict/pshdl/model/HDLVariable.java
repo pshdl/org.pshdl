@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLVariable contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> dimensions. Can be <code>null</code>.</li>
  * <li>HDLExpression defaultValue. Can be <code>null</code>.</li>
@@ -37,7 +37,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+	public HDLVariable(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
 			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate, boolean updateContainer) {
 		super(objectID, container, name, dimensions, defaultValue, annotations, validate, updateContainer);
 	}
@@ -56,7 +56,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param annotations
 	 *            the value for annotations. Can be <code>null</code>.
 	 */
-	public HDLVariable(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+	public HDLVariable(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
 			@Nullable ArrayList<HDLAnnotation> annotations) {
 		this(objectID, container, name, dimensions, defaultValue, annotations, true, true);
 	}

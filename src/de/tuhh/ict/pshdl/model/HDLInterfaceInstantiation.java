@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLInterfaceInstantiation contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName hIf. Can <b>not</b> be <code>null</code>.</li>
@@ -34,7 +34,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(int objectID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
+	public HDLInterfaceInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
 			@NonNull HDLQualifiedName hIf, boolean validate, boolean updateContainer) {
 		super(objectID, container, var, arguments, hIf, validate, updateContainer);
 	}
@@ -51,7 +51,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceInstantiation(int objectID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
+	public HDLInterfaceInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
 			@NonNull HDLQualifiedName hIf) {
 		this(objectID, container, var, arguments, hIf, true, true);
 	}

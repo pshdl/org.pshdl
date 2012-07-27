@@ -9,7 +9,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 /**
  * The class HDLPrimitive contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLPrimitiveType type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression width. Can be <code>null</code>.</li>
@@ -32,7 +32,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPrimitive(int objectID, @Nullable HDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate,
+	public HDLPrimitive(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, name, type, width, validate, updateContainer);
 	}
@@ -49,7 +49,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param width
 	 *            the value for width. Can be <code>null</code>.
 	 */
-	public HDLPrimitive(int objectID, @Nullable HDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width) {
+	public HDLPrimitive(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width) {
 		this(objectID, container, name, type, width, true, true);
 	}
 

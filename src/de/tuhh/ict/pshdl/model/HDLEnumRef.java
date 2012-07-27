@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.validation.*;
 /**
  * The class HDLEnumRef contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName var. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName hEnum. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
@@ -30,7 +30,7 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum, boolean validate, boolean updateContainer) {
+	public HDLEnumRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum, boolean validate, boolean updateContainer) {
 		super(objectID, container, var, hEnum, validate, updateContainer);
 	}
 
@@ -44,7 +44,7 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEnumRef(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum) {
+	public HDLEnumRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum) {
 		this(objectID, container, var, hEnum, true, true);
 	}
 

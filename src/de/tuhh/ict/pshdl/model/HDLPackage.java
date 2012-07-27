@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLPackage contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String pkg. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLUnit> units. Can be <code>null</code>.</li>
@@ -36,7 +36,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPackage(int objectID, @Nullable HDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
+	public HDLPackage(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
 			@Nullable ArrayList<HDLDeclaration> declarations, boolean validate, boolean updateContainer) {
 		super(objectID, container, libURI, pkg, units, declarations, validate, updateContainer);
 	}
@@ -55,7 +55,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param declarations
 	 *            the value for declarations. Can be <code>null</code>.
 	 */
-	public HDLPackage(int objectID, @Nullable HDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
+	public HDLPackage(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
 			@Nullable ArrayList<HDLDeclaration> declarations) {
 		this(objectID, container, libURI, pkg, units, declarations, true, true);
 	}

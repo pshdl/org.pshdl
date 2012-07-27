@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLSwitchCaseStatement contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression label. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> dos. Can be <code>null</code>.</li>
  * </ul>
@@ -30,7 +30,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSwitchCaseStatement(int objectID, @Nullable HDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos, boolean validate,
+	public HDLSwitchCaseStatement(int objectID, @Nullable IHDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, label, dos, validate, updateContainer);
 	}
@@ -45,7 +45,7 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	 * @param dos
 	 *            the value for dos. Can be <code>null</code>.
 	 */
-	public HDLSwitchCaseStatement(int objectID, @Nullable HDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos) {
+	public HDLSwitchCaseStatement(int objectID, @Nullable IHDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos) {
 		this(objectID, container, label, dos, true, true);
 	}
 

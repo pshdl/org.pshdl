@@ -9,25 +9,25 @@ import de.tuhh.ict.pshdl.model.validation.*;
 public aspect ScopingAspect {
 	private HDLResolver HDLStatement.resolver = new HDLResolver(this, true);
 	
-	public HDLVariable HDLObject.resolveVariable(HDLQualifiedName var) {
+	public HDLVariable IHDLObject.resolveVariable(HDLQualifiedName var) {
 		if (getContainer() == null)
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for variable:"+var));
 		return getContainer().resolveVariable(var);
 	}
 
-	public HDLEnum HDLObject.resolveEnum(HDLQualifiedName hEnum) {
+	public HDLEnum IHDLObject.resolveEnum(HDLQualifiedName hEnum) {
 		if (getContainer() == null)
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, this, "for enum:"+hEnum));
 		return getContainer().resolveEnum(hEnum);
 	}
 
-	public HDLType HDLObject.resolveType(HDLQualifiedName type) {
+	public HDLType IHDLObject.resolveType(HDLQualifiedName type) {
 		if (getContainer() == null)
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, this, "for type:"+type));
 		return getContainer().resolveType(type);
 	}
 
-	public HDLInterface HDLObject.resolveInterface(HDLQualifiedName hIf) {
+	public HDLInterface IHDLObject.resolveInterface(HDLQualifiedName hIf) {
 		if (getContainer() == null)
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_INTERFACE, this, "for interface:"+hIf));
 		return getContainer().resolveInterface(hIf);

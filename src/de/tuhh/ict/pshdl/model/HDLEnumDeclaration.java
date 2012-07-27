@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLEnumDeclaration contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLEnum hEnum. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -25,7 +25,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumDeclaration(int objectID, @Nullable HDLObject container, @NonNull HDLEnum hEnum, boolean validate, boolean updateContainer) {
+	public HDLEnumDeclaration(int objectID, @Nullable IHDLObject container, @NonNull HDLEnum hEnum, boolean validate, boolean updateContainer) {
 		super(objectID, container, hEnum, validate, updateContainer);
 	}
 
@@ -37,7 +37,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLEnumDeclaration(int objectID, @Nullable HDLObject container, @NonNull HDLEnum hEnum) {
+	public HDLEnumDeclaration(int objectID, @Nullable IHDLObject container, @NonNull HDLEnum hEnum) {
 		this(objectID, container, hEnum, true, true);
 	}
 

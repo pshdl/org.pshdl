@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLAnnotation contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>String value. Can be <code>null</code>.</li>
  * </ul>
@@ -28,7 +28,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAnnotation(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable String value, boolean validate, boolean updateContainer) {
+	public HDLAnnotation(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value, boolean validate, boolean updateContainer) {
 		super(objectID, container, name, value, validate, updateContainer);
 	}
 
@@ -42,7 +42,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param value
 	 *            the value for value. Can be <code>null</code>.
 	 */
-	public HDLAnnotation(int objectID, @Nullable HDLObject container, @NonNull String name, @Nullable String value) {
+	public HDLAnnotation(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value) {
 		this(objectID, container, name, value, true, true);
 	}
 

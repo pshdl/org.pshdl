@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLConcat contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> cats. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * </ul>
@@ -29,7 +29,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLConcat(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats, boolean validate, boolean updateContainer) {
+	public HDLConcat(int objectID, @Nullable IHDLObject container, @NonNull ArrayList<HDLExpression> cats, boolean validate, boolean updateContainer) {
 		super(objectID, container, cats, validate, updateContainer);
 	}
 
@@ -42,7 +42,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	 *            the value for cats. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLConcat(int objectID, @Nullable HDLObject container, @NonNull ArrayList<HDLExpression> cats) {
+	public HDLConcat(int objectID, @Nullable IHDLObject container, @NonNull ArrayList<HDLExpression> cats) {
 		this(objectID, container, cats, true, true);
 	}
 

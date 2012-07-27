@@ -10,7 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLInstantiation contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
  * </ul>
@@ -30,7 +30,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInstantiation(int objectID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate,
+	public HDLInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate,
 			boolean updateContainer) {
 		super(objectID, container, var, arguments, validate, updateContainer);
 	}
@@ -45,7 +45,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param arguments
 	 *            the value for arguments. Can be <code>null</code>.
 	 */
-	public HDLInstantiation(int objectID, @Nullable HDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments) {
+	public HDLInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments) {
 		this(objectID, container, var, arguments, true, true);
 	}
 

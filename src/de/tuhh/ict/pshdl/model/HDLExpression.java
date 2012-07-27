@@ -8,4 +8,5 @@ public interface HDLExpression extends de.tuhh.ict.pshdl.model.IHDLObject {
 
 	@Override
 	public HDLExpression copyFiltered(CopyFilter filter);
+
 }

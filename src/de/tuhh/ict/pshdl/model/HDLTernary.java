@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLTernary contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression ifExpr. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression thenExpr. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression elseExpr. Can <b>not</b> be <code>null</code>.</li>
@@ -31,7 +31,7 @@ public class HDLTernary extends AbstractHDLTernary {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLTernary(int objectID, @Nullable HDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr,
+	public HDLTernary(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr,
 			boolean validate, boolean updateContainer) {
 		super(objectID, container, ifExpr, thenExpr, elseExpr, validate, updateContainer);
 	}
@@ -48,7 +48,7 @@ public class HDLTernary extends AbstractHDLTernary {
 	 * @param elseExpr
 	 *            the value for elseExpr. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLTernary(int objectID, @Nullable HDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr) {
+	public HDLTernary(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr) {
 		this(objectID, container, ifExpr, thenExpr, elseExpr, true, true);
 	}
 

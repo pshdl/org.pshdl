@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLAssignment contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLReference left. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLAssignmentType type. If <code>null</code>,
  * {@link HDLAssignmentType#ASSGN} is used as default.</li>
@@ -33,8 +33,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAssignment(int objectID, @Nullable HDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right, boolean validate,
-			boolean updateContainer) {
+	public HDLAssignment(int objectID, @Nullable IHDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right,
+			boolean validate, boolean updateContainer) {
 		super(objectID, container, left, type, right, validate, updateContainer);
 	}
 
@@ -51,7 +51,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLAssignment(int objectID, @Nullable HDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right) {
+	public HDLAssignment(int objectID, @Nullable IHDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right) {
 		this(objectID, container, left, type, right, true, true);
 	}
 

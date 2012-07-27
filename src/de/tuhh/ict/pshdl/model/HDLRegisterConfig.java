@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 /**
  * The class HDLRegisterConfig contains the following fields
  * <ul>
- * <li>HDLObject container. Can be <code>null</code>.</li>
+ * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName clk. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName rst. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLRegClockType clockType. If <code>null</code>,
@@ -49,7 +49,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRegisterConfig(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+	public HDLRegisterConfig(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
 			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate, boolean updateContainer) {
 		super(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, validate, updateContainer);
 	}
@@ -75,7 +75,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLRegisterConfig(int objectID, @Nullable HDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+	public HDLRegisterConfig(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
 			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue) {
 		this(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, true, true);
 	}
