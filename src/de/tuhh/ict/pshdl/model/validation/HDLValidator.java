@@ -36,6 +36,7 @@ public class HDLValidator {
 			checkCombinedAssignment(unit, problems, hContext);
 			checkAnnotations(unit, problems, hContext);
 			checkType(unit, problems, hContext);
+			checkProessWrite(unit, problems, hContext);
 			// TODO Validate bitWidth mismatch
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
@@ -51,11 +52,23 @@ public class HDLValidator {
 			// TODO HDLConcat need known width
 			// TODO Check for combinatorical loop.
 			// TODO Check for multiple assignment in same Scope
+			// TODO No processes in Module
+			// TODO no I/O variables in block
+			// TODO Switch expression needs to have width (no natural etc..)
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return problems;
+	}
+
+	private static void checkProessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		for (HDLVariable var : vars) {
+			if (var.hasMeta(RWValidation.BlockMetaClash.clash)) {
+				problems.add(new Problem(ErrorCode.MULTI_PROCESS_WRITE, var));
+			}
+		}
 	}
 
 	private static void checkType(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

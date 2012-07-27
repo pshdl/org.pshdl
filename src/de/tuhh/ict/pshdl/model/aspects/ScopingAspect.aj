@@ -85,6 +85,17 @@ public aspect ScopingAspect {
 		res.add(getParam());
 		return res;
 	}
+	public List<HDLEnumDeclaration> HDLBlock.doGetEnumDeclarations() {
+		return HDLResolver.getallEnumDeclarations(getStatements());
+	}
+	
+	public List<HDLInterface> HDLBlock.doGetInterfaceDeclarations() {
+		return HDLResolver.getallInterfaceDeclarations(getStatements());
+	}
+	
+	public List<HDLVariable> HDLBlock.doGetVariables() {
+		return HDLResolver.getallVariableDeclarations(getStatements());
+	}
 	
 	public List<HDLEnumDeclaration> IStatementContainer.doGetEnumDeclarations() {
 		return Collections.emptyList();

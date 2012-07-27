@@ -152,6 +152,20 @@ public aspect StringWriterAspect {
 		spacing.set(current - 1);
 	}
 
+	public String HDLBlock.toString() {
+		StringBuilder sb=new StringBuilder(getSpacing());
+		if (getProcess()!=null && getProcess()){
+			sb.append("process {");
+		}
+		incSpacing();
+		for (HDLStatement string : getStatements()) {
+			sb.append(string).append('\n');
+		}
+		decSpacing();
+		sb.append(getSpacing()).append("}");
+		return sb.toString();
+	}
+	
 	public String HDLAssignment.toString() {
 		StringBuilder builder = getSpacing();
 		builder.append(getLeft());

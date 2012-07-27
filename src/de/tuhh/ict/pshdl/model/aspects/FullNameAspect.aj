@@ -10,6 +10,12 @@ public aspect FullNameAspect {
 		int count = countInstance(this);
 		return fullName.append("$for" + count);
 	}
+	
+	public HDLQualifiedName HDLBlock.getFullName() {
+		HDLQualifiedName fullName = super.getFullName();
+		int count = countInstance(this);
+		return fullName.append("$block" + count);
+	}
 
 	public HDLQualifiedName HDLIfStatement.getFullName() {
 		HDLQualifiedName fullName = super.getFullName();

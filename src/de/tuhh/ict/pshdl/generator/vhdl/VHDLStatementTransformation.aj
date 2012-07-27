@@ -31,13 +31,27 @@ public aspect VHDLStatementTransformation {
 	public enum Exportable implements MetaAccess<Boolean> {
 		EXPORT
 	}
-	public abstract VHDLContext HDLStatement.toVHDL();
+	public abstract VHDLContext HDLStatement.toVHDL(int pid);
 
-	public VHDLContext HDLDirectGeneration.toVHDL() {
+	public VHDLContext HDLDirectGeneration.toVHDL(int pid) {
 		return new VHDLContext();
 	}
 
-	public VHDLContext HDLEnumDeclaration.toVHDL() {
+	public VHDLContext HDLBlock.toVHDL(int pid){
+		VHDLContext res = new VHDLContext();
+		boolean process=false;
+		if (getProcess()!=null && getProcess()){
+			process=true;
+		}
+		if (process)
+			pid=res.newProcessID();
+		for(HDLStatement stmnt:getStatements()){
+			res.merge(stmnt.toVHDL(pid));
+		}
+		return res;
+	}
+	
+	public VHDLContext HDLEnumDeclaration.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		HDLEnum hEnum = getHEnum();
 		List<String> enums = new LinkedList<String>();
@@ -48,13 +62,13 @@ public aspect VHDLStatementTransformation {
 		return res;
 	}
 
-	public VHDLContext HDLInterfaceDeclaration.toVHDL() {
+	public VHDLContext HDLInterfaceDeclaration.toVHDL(int pid) {
 		return new VHDLContext();
 	}
 
 	private static EnumSet<HDLDirection> inAndOut = EnumSet.of(HDLDirection.IN, HDLDirection.INOUT, HDLDirection.OUT);
 
-	public VHDLContext HDLInterfaceInstantiation.toVHDL() {
+	public VHDLContext HDLInterfaceInstantiation.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		HDLInterface hIf = resolveHIf();
 		HDLVariable hVar=getVar();
@@ -90,14 +104,14 @@ public aspect VHDLStatementTransformation {
 							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(var.getName()+"_array");
 							res.addImport(name);
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))));
-							res.merge(newHVD.toVHDL());
+							res.merge(newHVD.toVHDL(pid));
 						} else {
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null)));
-							res.merge(newHVD.toVHDL());
+							res.merge(newHVD.toVHDL(pid));
 						}
 					} else {
 						HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
-						res.merge(newHVD.toVHDL());
+						res.merge(newHVD.toVHDL(pid));
 					}
 					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
 				}
@@ -130,7 +144,7 @@ public aspect VHDLStatementTransformation {
 		return res;
 	}
 
-	public VHDLContext HDLVariableDeclaration.toVHDL() {
+	public VHDLContext HDLVariableDeclaration.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		HDLPrimitive primitive = getPrimitive();
 		SubtypeIndication type = null;
@@ -180,7 +194,7 @@ public aspect VHDLStatementTransformation {
 					}
 					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray);
 					initLoop.setContainer(this);
-					VHDLContext vhdl = initLoop.toVHDL();
+					VHDLContext vhdl = initLoop.toVHDL(pid);
 					res.addResetValue(getRegister(), vhdl.getStatement());
 				}
 				Signal s = new Signal(var.getName(), varType);
@@ -228,7 +242,7 @@ public aspect VHDLStatementTransformation {
 		return res;
 	}
 
-	public VHDLContext HDLSwitchStatement.toVHDL() {
+	public VHDLContext HDLSwitchStatement.toVHDL(int pid) {
 		VHDLContext context = new VHDLContext();
 		HDLExpression hCaseExp=getCaseExp();
 		BigInteger width=null;
@@ -243,7 +257,7 @@ public aspect VHDLStatementTransformation {
 		Set<HDLRegisterConfig> configs = new HashSet<HDLRegisterConfig>();
 		boolean hasUnclocked = false;
 		for (HDLSwitchCaseStatement cs : getCases()) {
-			VHDLContext vhdl = cs.toVHDL();
+			VHDLContext vhdl = cs.toVHDL(pid);
 			ctxs.put(cs, vhdl);
 			if (vhdl.unclockedStatements.size() > 0)
 				hasUnclocked = true;
@@ -264,9 +278,10 @@ public aspect VHDLStatementTransformation {
 			CaseStatement cs = new CaseStatement(caseExp);
 			for (Map.Entry<HDLSwitchCaseStatement, VHDLContext> e : ctxs.entrySet()) {
 				Alternative alt = createAlternative(cs, e, width);
-				alt.getStatements().addAll(e.getValue().unclockedStatements);
+				if (e.getValue().unclockedStatements.get(pid)!=null)
+					alt.getStatements().addAll(e.getValue().unclockedStatements.get(pid));
 			}
-			context.addUnclockedStatement(cs, this);
+			context.addUnclockedStatement(pid, cs, this);
 		}
 		return context;
 	}
@@ -286,15 +301,15 @@ public aspect VHDLStatementTransformation {
 		return alt;
 	}
 
-	public VHDLContext HDLSwitchCaseStatement.toVHDL() {
+	public VHDLContext HDLSwitchCaseStatement.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		for (HDLStatement stmnt : getDos()) {
-			res.merge(stmnt.toVHDL());
+			res.merge(stmnt.toVHDL(pid));
 		}
 		return res;
 	}
 
-	public VHDLContext HDLAssignment.toVHDL() {
+	public VHDLContext HDLAssignment.toVHDL(int pid) {
 		VHDLContext context = new VHDLContext();
 		SignalAssignment sa = new SignalAssignment((SignalAssignmentTarget) getLeft().toVHDL(), getRight().toVHDL());
 		HDLReference ref = getLeft();
@@ -302,14 +317,14 @@ public aspect VHDLStatementTransformation {
 		if (config != null)
 			context.addClockedStatement(config, sa);
 		else
-			context.addUnclockedStatement(sa, this);
+			context.addUnclockedStatement(pid, sa, this);
 		return context;
 	}
 
-	public VHDLContext HDLForLoop.toVHDL() {
+	public VHDLContext HDLForLoop.toVHDL(int pid) {
 		VHDLContext context = new VHDLContext();
 		for (HDLStatement stmnt : getDos()) {
-			context.merge(stmnt.toVHDL());
+			context.merge(stmnt.toVHDL(pid));
 		}
 		VHDLContext res = new VHDLContext();
 		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : context.clockedStatements.entrySet()) {
@@ -317,22 +332,22 @@ public aspect VHDLStatementTransformation {
 			fStmnt.getStatements().addAll(e.getValue());
 			res.addClockedStatement(e.getKey(), fStmnt);
 		}
-		if (context.unclockedStatements.size() > 0) {
+		if (context.unclockedStatements.get(pid) != null) {
 			ForStatement fStmnt = new ForStatement(getParam().getName(), getRange().get(0).toVHDL(Direction.TO));
-			fStmnt.getStatements().addAll(context.unclockedStatements);
-			res.addUnclockedStatement(fStmnt, this);
+			fStmnt.getStatements().addAll(context.unclockedStatements.get(pid));
+			res.addUnclockedStatement(pid, fStmnt, this);
 		}
 		return res;
 	}
 
-	public VHDLContext HDLIfStatement.toVHDL() {
+	public VHDLContext HDLIfStatement.toVHDL(int pid) {
 		VHDLContext thenCtx = new VHDLContext();
 		for (HDLStatement stmnt : getThenDo()) {
-			thenCtx.merge(stmnt.toVHDL());
+			thenCtx.merge(stmnt.toVHDL(pid));
 		}
 		VHDLContext elseCtx = new VHDLContext();
 		for (HDLStatement stmnt : getElseDo()) {
-			elseCtx.merge(stmnt.toVHDL());
+			elseCtx.merge(stmnt.toVHDL(pid));
 		}
 		Set<HDLRegisterConfig> configs = new HashSet<HDLRegisterConfig>();
 		configs.addAll(thenCtx.clockedStatements.keySet());
@@ -353,9 +368,11 @@ public aspect VHDLStatementTransformation {
 		}
 		if (thenCtx.unclockedStatements.size() != 0 || elseCtx.unclockedStatements.size() != 0) {
 			IfStatement ifs = new IfStatement(ifExp);
-			ifs.getStatements().addAll(thenCtx.unclockedStatements);
-			ifs.getElseStatements().addAll(elseCtx.unclockedStatements);
-			res.addUnclockedStatement(ifs, this);
+			if (thenCtx.unclockedStatements.get(pid)!=null)
+				ifs.getStatements().addAll(thenCtx.unclockedStatements.get(pid));
+			if (elseCtx.unclockedStatements.get(pid)!=null)
+				ifs.getElseStatements().addAll(elseCtx.unclockedStatements.get(pid));
+			res.addUnclockedStatement(pid, ifs, this);
 		}
 		return res;
 	}

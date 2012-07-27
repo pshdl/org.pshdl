@@ -135,7 +135,11 @@ public class Insulin {
 							synchedArray = ref.resolveVar().getDimensions().size() != 0;
 						}
 						HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
-						insertFirstStatement(ms, var, init);
+						HDLBlock obj = var.getMeta(RWValidation.BlockMeta.block);
+						if ((obj != null) && (obj != RWValidation.UNIT_BLOCK))
+							insertFirstStatement(ms, obj, init);
+						else
+							insertFirstStatement(ms, var, init);
 						ms.replace(var, var.setDefaultValue(null));
 					}
 
@@ -172,13 +176,20 @@ public class Insulin {
 	}
 
 	private static void insertFirstStatement(ModificationSet ms, IHDLObject container, HDLStatement stmnt) {
-		if (container.getClassType() != HDLClass.HDLUnit) {
+		if ((container.getClassType() != HDLClass.HDLUnit) && (container.getClassType() != HDLClass.HDLBlock)) {
 			insertFirstStatement(ms, container.getContainer(), stmnt);
 			return;
 		}
-		HDLUnit unit = (HDLUnit) container;
-		HDLStatement statement = unit.getStatements().get(0);
-		ms.insertBefore(statement, stmnt);
+		if (container instanceof HDLUnit) {
+			HDLUnit unit = (HDLUnit) container;
+			HDLStatement statement = unit.getStatements().get(0);
+			ms.insertBefore(statement, stmnt);
+		}
+		if (container instanceof HDLBlock) {
+			HDLBlock block = (HDLBlock) container;
+			HDLStatement statement = block.getStatements().get(0);
+			ms.insertBefore(statement, stmnt);
+		}
 	}
 
 	/**

@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.generator.vhdl;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -17,8 +18,8 @@ public class VHDLContext {
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> resetStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> clockedStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
 	public LinkedList<ConcurrentStatement> concurrentStatements = new LinkedList<ConcurrentStatement>();
-	public LinkedList<SequentialStatement> unclockedStatements = new LinkedList<SequentialStatement>();
-	public LinkedList<HDLStatement> sensitiveStatements = new LinkedList<HDLStatement>();
+	public Map<Integer, LinkedList<SequentialStatement>> unclockedStatements = new LinkedHashMap<Integer, LinkedList<SequentialStatement>>();
+	public Map<Integer, LinkedList<HDLStatement>> sensitiveStatements = new LinkedHashMap<Integer, LinkedList<HDLStatement>>();
 	public LinkedList<Signal> ports = new LinkedList<Signal>();
 	public LinkedList<ConstantDeclaration> constants = new LinkedList<ConstantDeclaration>();
 	public LinkedList<ConstantDeclaration> constantsPkg = new LinkedList<ConstantDeclaration>();
@@ -37,15 +38,27 @@ public class VHDLContext {
 		clockedStatements.put(config, list);
 	}
 
-	public void addUnclockedStatement(SequentialStatement sa, HDLStatement statement) {
-		unclockedStatements.add(sa);
-		sensitiveStatements.add(statement);
+	public void addUnclockedStatement(int pid, SequentialStatement sa, HDLStatement stmnt) {
+		LinkedList<SequentialStatement> list = unclockedStatements.get(pid);
+		if (list == null) {
+			list = new LinkedList<SequentialStatement>();
+		}
+		list.add(sa);
+		unclockedStatements.put(pid, list);
+		LinkedList<HDLStatement> hlist = sensitiveStatements.get(pid);
+		if (hlist == null) {
+			hlist = new LinkedList<HDLStatement>();
+		}
+		hlist.add(stmnt);
+		sensitiveStatements.put(pid, hlist);
 	}
+
+	public static int DEFAULT_CTX = -1;
 
 	public void merge(VHDLContext vhdl) {
 		concurrentStatements.addAll(vhdl.concurrentStatements);
-		sensitiveStatements.addAll(vhdl.sensitiveStatements);
-		unclockedStatements.addAll(vhdl.unclockedStatements);
+		mergeListMap(vhdl, vhdl.sensitiveStatements, sensitiveStatements);
+		mergeListMap(vhdl, vhdl.unclockedStatements, unclockedStatements);
 		ports.addAll(vhdl.ports);
 		generics.addAll(vhdl.generics);
 		constants.addAll(vhdl.constants);
@@ -58,11 +71,11 @@ public class VHDLContext {
 		mergeListMap(vhdl, vhdl.resetStatements, resetStatements);
 	}
 
-	private void mergeListMap(VHDLContext vhdl, Map<HDLRegisterConfig, LinkedList<SequentialStatement>> map, Map<HDLRegisterConfig, LinkedList<SequentialStatement>> local) {
-		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : map.entrySet()) {
-			LinkedList<SequentialStatement> list = local.get(e.getKey());
+	private <K, T> void mergeListMap(VHDLContext vhdl, Map<K, LinkedList<T>> map, Map<K, LinkedList<T>> local) {
+		for (Entry<K, LinkedList<T>> e : map.entrySet()) {
+			LinkedList<T> list = local.get(e.getKey());
 			if (list == null)
-				list = new LinkedList<SequentialStatement>();
+				list = new LinkedList<T>();
 			list.addAll(e.getValue());
 			local.put(e.getKey(), list);
 		}
@@ -78,7 +91,9 @@ public class VHDLContext {
 			printList(sb, e.getValue(), "For clock config resets " + e.getKey() + ":");
 		}
 		printList(sb, concurrentStatements, "Concurrent Statements:");
-		printList(sb, unclockedStatements, "Unclocked Statements:");
+		for (Entry<Integer, LinkedList<SequentialStatement>> e : unclockedStatements.entrySet()) {
+			printList(sb, e.getValue(), "For unclocked process " + e.getKey() + ":");
+		}
 		printList(sb, ports, "Entity ports:");
 		printList(sb, generics, "Entity generics:");
 		printList(sb, constants, "Entity constants:");
@@ -123,13 +138,21 @@ public class VHDLContext {
 	}
 
 	public SequentialStatement getStatement() {
+		if ((clockedStatements.size() > 1) || (unclockedStatements.size() > 1))
+			throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
 		for (LinkedList<SequentialStatement> clkd : clockedStatements.values()) {
 			if (clkd.size() > 1) {
 				throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
 			}
 			return clkd.getFirst();
 		}
-		return unclockedStatements.getFirst();
+		for (LinkedList<SequentialStatement> clkd : unclockedStatements.values()) {
+			if (clkd.size() > 1) {
+				throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
+			}
+			return clkd.getFirst();
+		}
+		throw new NoSuchElementException("No Statement found");
 	}
 
 	public void addConstantDeclaration(ConstantDeclaration cd) {
@@ -157,6 +180,12 @@ public class VHDLContext {
 
 	public void addConstantDeclarationPkg(ConstantDeclaration cd) {
 		constantsPkg.add(cd);
+	}
+
+	private static AtomicInteger ai = new AtomicInteger();
+
+	public int newProcessID() {
+		return ai.incrementAndGet();
 	}
 
 }

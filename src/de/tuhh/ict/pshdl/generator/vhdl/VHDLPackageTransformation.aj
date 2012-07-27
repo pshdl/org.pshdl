@@ -23,15 +23,50 @@ import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.libraryunit.*;
 
 public aspect VHDLPackageTransformation {
+	public static class ContextInformation implements MetaAccess<Collection<ContextInformation>> {
+		public static final ContextInformation INFO = new ContextInformation(null, null);
+		public final HDLObject context;
+		public final String newName;
+
+		public ContextInformation(HDLObject context, String newName) {
+			super();
+			this.context = context;
+			this.newName = newName;
+		}
+
+		@Override
+		public String name() {
+			return "CONTEXT_INFO";
+		}
+
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<LibraryUnit> HDLUnit.toVHDL() {
-		Collection<HDLVariableDeclaration> hvds=getAllObjectsOf(HDLVariableDeclaration.class, true);
+		Collection<HDLVariableDeclaration> hvds = getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : hvds) {
 			for (HDLVariable var : hvd.getVariables()) {
-				Collection<HDLVariableRef> refs=var.getAllObjectsOf(HDLVariableRef.class, true);
+				Collection<HDLVariableRef> refs = var.getAllObjectsOf(HDLVariableRef.class, true);
 				for (HDLVariableRef ref : refs) {
 					ref.resolveVar().setMeta(VHDLStatementTransformation.Exportable.EXPORT);
+				}
+			}
+		}
+		Collection<HDLInterfaceInstantiation> hii = getAllObjectsOf(HDLInterfaceInstantiation.class, true);
+		for (HDLInterfaceInstantiation hdi : hii) {
+			HDLInterface hIf = hdi.resolveHIf();
+			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
+				if (hvd.getDirection() == HDLDirection.PARAMETER) {
+					Collection<HDLVariable> vars = hvd.getAllObjectsOf(HDLVariable.class, true);
+					for (HDLVariable hdlVariable : vars) {
+						ContextInformation ci = new ContextInformation(hIf, hdi.getVar().getName() + "_" + hdlVariable.getName());
+						Collection<ContextInformation> meta = hdlVariable.getMeta(ContextInformation.INFO);
+						if (meta == null) {
+							meta = new LinkedList<ContextInformation>();
+							hdlVariable.addMeta(ContextInformation.INFO, meta);
+						}
+						meta.add(ci);
+					}
 				}
 			}
 		}
@@ -40,7 +75,7 @@ public aspect VHDLPackageTransformation {
 		Entity e = new Entity(entityName.getLastSegment());
 		VHDLContext unit = new VHDLContext();
 		for (HDLStatement stmnt : getStatements()) {
-			unit.merge(stmnt.toVHDL());
+			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX));
 		}
 		addDefaultLibs(res, unit);
 		if (unit.hasPkgDeclarations()) {
@@ -61,10 +96,10 @@ public aspect VHDLPackageTransformation {
 		e.getDeclarations().addAll((List) unit.internalTypes);
 		a.getDeclarations().addAll((List) unit.internals);
 		a.getStatements().addAll(unit.concurrentStatements);
-		if (unit.unclockedStatements.size() > 0) {
+		for (Map.Entry<Integer,LinkedList<SequentialStatement>> uc: unit.unclockedStatements.entrySet()){
 			ProcessStatement ps = new ProcessStatement();
-			ps.getSensitivityList().addAll(createSensitivyList(unit));
-			ps.getStatements().addAll(unit.unclockedStatements);
+			ps.getSensitivityList().addAll(createSensitivyList(unit, uc.getKey()));
+			ps.getStatements().addAll(uc.getValue());
 			a.getStatements().add(ps);
 		}
 		for (Map.Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> pc : unit.clockedStatements.entrySet()) {
@@ -90,20 +125,20 @@ public aspect VHDLPackageTransformation {
 
 	private static EnumSet<HDLDirection> notSensitive = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.PARAMETER, HDLDirection.CONSTANT);
 
-	private static Collection<? extends Signal> createSensitivyList(VHDLContext ctx) {
+	private static Collection<? extends Signal> createSensitivyList(VHDLContext ctx, int pid) {
 		List<Signal> sensitivity = new LinkedList<Signal>();
 		Set<String> vars = new TreeSet<String>();
-		for (HDLStatement stmnt : ctx.sensitiveStatements) {
+		for (HDLStatement stmnt : ctx.sensitiveStatements.get(pid)) {
 			Collection<HDLVariableRef> refs = stmnt.getAllObjectsOf(HDLVariableRef.class, true);
 			for (HDLVariableRef ref : refs) {
 				HDLVariable var = ref.resolveVar();
-				HDLObject container = var.getContainer();
+				IHDLObject container = var.getContainer();
 				if (container instanceof HDLVariableDeclaration) {
 					HDLVariableDeclaration hdv = (HDLVariableDeclaration) container;
 					if (!notSensitive.contains(hdv.getDirection())) {
 						if (ref.getContainer() instanceof HDLAssignment) {
 							HDLAssignment hAss = (HDLAssignment) ref.getContainer();
-							if (hAss.getLeft().resolveVar().getRegisterConfig()!=null)
+							if (hAss.getLeft().resolveVar().getRegisterConfig() != null)
 								continue;
 							if (hAss.getLeft() != ref)
 								vars.add(ref.getVHDLName());

@@ -98,11 +98,21 @@ public class RWValidation {
 		}
 	}
 
+	public static enum BlockMeta implements MetaAccess<HDLBlock> {
+		block
+	}
+
+	public static enum BlockMetaClash implements MetaAccess<Set<HDLBlock>> {
+		clash
+	}
+
+	public static HDLBlock UNIT_BLOCK = new HDLBlock();
+
 	public static void annotateWriteCount(HDLObject orig) {
 		Collection<HDLAssignment> list = orig.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : list) {
 			HDLReference left = ass.getLeft();
-			if (left instanceof HDLReference) {
+			if (left instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) left;
 				HDLVariable var = ref.resolveVar();
 				incMeta(var, IntegerMeta.WRITE_COUNT);
@@ -111,6 +121,20 @@ public class RWValidation {
 					HDLVariable hVar = hir.resolveHIf();
 					incMeta(hVar, IntegerMeta.ACCESS);
 				}
+				HDLBlock block = ass.getContainer(HDLBlock.class);
+				if (block == null)
+					block = UNIT_BLOCK;
+				if ((var.getMeta(BlockMeta.block) != null) && (var.getMeta(BlockMeta.block) != block)) {
+					Set<HDLBlock> meta = var.getMeta(BlockMetaClash.clash);
+					if (meta == null)
+						meta = new HashSet<HDLBlock>();
+					if (block == null)
+						meta.add(UNIT_BLOCK);
+					else
+						meta.add(block);
+					var.addMeta(BlockMetaClash.clash, meta);
+				}
+				var.addMeta(BlockMeta.block, block);
 			}
 		}
 		Collection<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();
