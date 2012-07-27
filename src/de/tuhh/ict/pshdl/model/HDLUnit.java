@@ -18,6 +18,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<String> imports. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
+ * <li>Boolean simulation. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
 public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.utils.IStatementContainer {
@@ -36,12 +37,14 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 *            the value for imports. Can be <code>null</code>.
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
+	 * @param simulation
+	 *            the value for simulation. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLUnit(int objectID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
-			@Nullable ArrayList<HDLStatement> statements, boolean validate, boolean updateContainer) {
-		super(objectID, container, libURI, name, imports, statements, validate, updateContainer);
+			@Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate, boolean updateContainer) {
+		super(objectID, container, libURI, name, imports, statements, simulation, validate, updateContainer);
 	}
 
 	/**
@@ -57,10 +60,12 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 *            the value for imports. Can be <code>null</code>.
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
+	 * @param simulation
+	 *            the value for simulation. Can <b>not</b> be <code>null</code>.
 	 */
 	public HDLUnit(int objectID, @Nullable HDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
-			@Nullable ArrayList<HDLStatement> statements) {
-		this(objectID, container, libURI, name, imports, statements, true, true);
+			@Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation) {
+		this(objectID, container, libURI, name, imports, statements, simulation, true, true);
 	}
 
 	public HDLUnit() {
@@ -118,6 +123,17 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 			if (obj == null)
 				return null;
 			return obj.getStatements();
+		}
+	};
+	/**
+	 * The accessor for the field simulation which is of type Boolean.
+	 */
+	public static HDLFieldAccess<HDLUnit, Boolean> fSimulation = new HDLFieldAccess<HDLUnit, Boolean>() {
+		@Override
+		public Boolean getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getSimulation();
 		}
 	};
 	// $CONTENT-BEGIN$

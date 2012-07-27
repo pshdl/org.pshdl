@@ -95,11 +95,11 @@ public class HDLQuery {
 
 	public static class Result<T, K> {
 		private HDLFieldAccess<T, K> field;
-		private HDLObject from;
+		private IHDLObject from;
 		private Class<T> clazz;
 		private FieldMatcher<K> matcher;
 
-		public Result(HDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
+		public Result(IHDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
 			this.from = from;
 			this.clazz = clazz;
 			this.field = field;
@@ -129,10 +129,10 @@ public class HDLQuery {
 
 	public static class FieldSelector<T, K> {
 		private HDLFieldAccess<T, K> field;
-		private HDLObject from;
+		private IHDLObject from;
 		private Class<T> clazz;
 
-		public FieldSelector(Class<T> clazz, HDLObject from, HDLFieldAccess<T, K> field) {
+		public FieldSelector(Class<T> clazz, IHDLObject from, HDLFieldAccess<T, K> field) {
 			this.clazz = clazz;
 			this.from = from;
 			this.field = field;
@@ -161,12 +161,12 @@ public class HDLQuery {
 
 	}
 
-	public static class Selector<T extends HDLObject> {
+	public static class Selector<T extends IHDLObject> {
 
-		private HDLObject from;
+		private IHDLObject from;
 		private Class<T> clazz;
 
-		public Selector(Class<T> clazz, HDLObject obj) {
+		public Selector(Class<T> clazz, IHDLObject obj) {
 			this.clazz = clazz;
 			this.from = obj;
 		}
@@ -177,19 +177,19 @@ public class HDLQuery {
 		}
 	}
 
-	public static class Source<T extends HDLObject> {
+	public static class Source<T extends IHDLObject> {
 		private Class<T> clazz;
 
 		public Source(Class<T> clazz) {
 			this.clazz = clazz;
 		}
 
-		public Selector<T> from(HDLObject obj) {
+		public Selector<T> from(IHDLObject obj) {
 			return new Selector<T>(clazz, obj);
 		}
 	}
 
-	public static <T extends HDLObject> Source<T> select(Class<T> clazz) {
+	public static <T extends IHDLObject> Source<T> select(Class<T> clazz) {
 		return new Source<T>(clazz);
 	}
 

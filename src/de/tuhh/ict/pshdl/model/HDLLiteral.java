@@ -96,7 +96,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	}
 
 	@Override
-	public void validateAllFields(HDLObject expectedParent, boolean checkResolve) {
+	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		if (getValueAsBigInt() == null)
 			throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");

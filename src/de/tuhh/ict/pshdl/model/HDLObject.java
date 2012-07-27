@@ -16,7 +16,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>HDLObject container. Can be <code>null</code>.</li>
  * </ul>
  */
-public abstract class HDLObject extends AbstractHDLObject {
+public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict.pshdl.model.IHDLObject {
 	/**
 	 * Constructs a new instance of {@link HDLObject}
 	 * 
@@ -48,6 +48,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	/**
 	 * Returns the ClassType of this instance
 	 */
+	@Override
 	public HDLClass getClassType() {
 		return HDLClass.HDLObject;
 	}
@@ -67,8 +68,8 @@ public abstract class HDLObject extends AbstractHDLObject {
 	// $CONTENT-BEGIN$
 
 	@Override
-	public void copyMetaData(HDLObject src, HDLObject target) {
-		target.metaData.putAll(src.metaData);
+	public void copyMetaData(IHDLObject src, IHDLObject target) {
+		((HDLObject) target).metaData.putAll(((HDLObject) src).metaData);
 	}
 
 	@Override
@@ -79,26 +80,32 @@ public abstract class HDLObject extends AbstractHDLObject {
 
 	public Map<String, Object> metaData = new HashMap<String, Object>();
 
+	@Override
 	public void addMeta(String key, Object value) {
 		metaData.put(key, value);
 	}
 
+	@Override
 	public Object getMeta(String key) {
 		return metaData.get(key);
 	}
 
+	@Override
 	public <K> void addMeta(MetaAccess<K> key, K value) {
 		metaData.put(key.name(), value);
 	}
 
+	@Override
 	public void setMeta(MetaAccess<Boolean> meta) {
 		addMeta(meta, true);
 	}
 
+	@Override
 	public boolean hasMeta(MetaAccess<?> key) {
 		return getMeta(key) != null;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <K> K getMeta(MetaAccess<K> key) {
 		return (K) metaData.get(key.name());
@@ -131,16 +138,17 @@ public abstract class HDLObject extends AbstractHDLObject {
 	private Map<Class<? extends HDLObject>, Set<HDLObject>> clazzTypes;
 	private Map<Class<? extends HDLObject>, Set<HDLObject>> deepClazzTypes;
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> Set<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
 		if (clazzTypes == null) {
 			clazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
 			deepClazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
-			Iterator<HDLObject> iterator = iterator(false);
+			Iterator<IHDLObject> iterator = iterator(false);
 			// addClazz(this, clazzTypes);
 			// addClazz(this, deepClazzTypes);
 			while (iterator.hasNext()) {
-				HDLObject c = iterator.next();
+				HDLObject c = (HDLObject) iterator.next();
 				addClazz(c, clazzTypes);
 				addClazz(c, deepClazzTypes);
 				c.getAllObjectsOf(clazz, deep);
@@ -163,6 +171,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return list.clone();
 	}
 
+	@Override
 	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
 		Set<T> list = getAllObjectsOf(clazz, true);
 		for (Iterator<T> iter = list.iterator(); iter.hasNext();) {
@@ -178,6 +187,10 @@ public abstract class HDLObject extends AbstractHDLObject {
 	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct) {
 		Class<? extends HDLObject> clazz = c.getClass();
 		do {
+			Class<?>[] interfaces = clazz.getInterfaces();
+			for (Class<?> cIf : interfaces) {
+				addClazz(c, ct, (Class<? extends HDLObject>) cIf);
+			}
 			addClazz(c, ct, clazz);
 			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
 		} while ((clazz != null) && !clazz.equals(HDLObject.class));
@@ -192,7 +205,7 @@ public abstract class HDLObject extends AbstractHDLObject {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends HDLObject> ArrayList<T> copyAll(ArrayList<T> array) {
+	public static <T extends IHDLObject> ArrayList<T> copyAll(ArrayList<T> array) {
 		ArrayList<T> res = new ArrayList<T>(array.size());
 		for (T hdlExpression : array) {
 			res.add((T) hdlExpression.copy());
@@ -200,8 +213,9 @@ public abstract class HDLObject extends AbstractHDLObject {
 		return res;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends HDLObject> T getContainer(Class<T> clazz) {
+	public <T extends IHDLObject> T getContainer(Class<T> clazz) {
 		if (container != null) {
 			if (container.getClass().equals(clazz))
 				return (T) container;
@@ -211,11 +225,12 @@ public abstract class HDLObject extends AbstractHDLObject {
 	}
 
 	@Override
-	public Iterator<HDLObject> iterator() {
+	public Iterator<IHDLObject> iterator() {
 		return iterator(false);
 	}
 
-	public Iterator<HDLObject> iterator(boolean deep) {
+	@Override
+	public Iterator<IHDLObject> iterator(boolean deep) {
 		try {
 			return new HDLIterator(this, deep);
 		} catch (IllegalAccessException e) {
@@ -225,15 +240,15 @@ public abstract class HDLObject extends AbstractHDLObject {
 	}
 
 	@Override
-	public HDLObject setContainer(HDLObject container) {
+	public IHDLObject setContainer(IHDLObject container) {
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (this.container != null) {
-			if (this.container.objectID != container.objectID) {
+			if (this.container.objectID != ((HDLObject) container).objectID) {
 				throw new IllegalArgumentException("The parents container ID does not match the new container ID!");
 			}
 		}
-		this.container = container;
+		this.container = (HDLObject) container;
 		return this;
 	}
 

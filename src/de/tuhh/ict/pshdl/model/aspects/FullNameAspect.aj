@@ -62,9 +62,9 @@ public aspect FullNameAspect {
 	private static int countInstance(HDLObject obj) {
 		int count = 0;
 		if (obj.getContainer() != null) {
-			Iterator<HDLObject> iterator = obj.getContainer().iterator(false);
+			Iterator<IHDLObject> iterator = obj.getContainer().iterator(false);
 			while (iterator.hasNext()) {
-				HDLObject hdlObject = iterator.next();
+				IHDLObject hdlObject = iterator.next();
 				if (hdlObject == obj)
 					break;
 				if (hdlObject.getClassType() == obj.getClassType())

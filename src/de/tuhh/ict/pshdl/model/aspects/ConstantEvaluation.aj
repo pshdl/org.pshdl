@@ -21,7 +21,7 @@ public aspect ConstantEvaluation {
 	 * .getTarget()+" was "+res); return res; }
 	 */
 
-	public enum ProblemSource implements MetaAccess<HDLObject> {
+	public enum ProblemSource implements MetaAccess<IHDLObject> {
 		SOURCE;
 	}
 

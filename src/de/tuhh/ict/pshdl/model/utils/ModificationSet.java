@@ -9,7 +9,7 @@ public class ModificationSet {
 	private class MSCopyFilter extends CopyFilter.DeepCloneFilter {
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T extends HDLObject> T copyObject(String feature, HDLObject container, T object) {
+		public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T object) {
 			List<Modification> mods = getModifications(object);
 			if (mods != null) {
 				for (Modification modification : mods) {
@@ -68,16 +68,16 @@ public class ModificationSet {
 			return null;
 		}
 
-		private <T> void multiAdd(ArrayList<T> res, List<T> before, HDLObject container) {
+		private <T> void multiAdd(ArrayList<T> res, List<T> before, IHDLObject container) {
 			for (T element : before) {
 				singleAdd(res, element, container);
 			}
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T> void singleAdd(ArrayList<T> res, T t, HDLObject container) {
-			if (t instanceof HDLObject) {
-				HDLObject newT = (HDLObject) t;
+		private <T> void singleAdd(ArrayList<T> res, T t, IHDLObject container) {
+			if (t instanceof IHDLObject) {
+				IHDLObject newT = (IHDLObject) t;
 				newT.copy().setContainer(container);
 				res.add((T) newT.copyFiltered(this));
 			} else {
@@ -96,8 +96,8 @@ public class ModificationSet {
 	}
 
 	private static class Modification {
-		public final HDLObject subject;
-		public final List<HDLObject> with;
+		public final IHDLObject subject;
+		public final List<IHDLObject> with;
 		public final ModificationType type;
 
 		@Override
@@ -105,16 +105,16 @@ public class ModificationSet {
 			return "Modification [subject=" + subject + ", with=" + with + ", type=" + type + "]";
 		}
 
-		public Modification(HDLObject subject, ModificationType type, HDLObject... with) {
+		public Modification(IHDLObject subject, ModificationType type, IHDLObject... with) {
 			this(subject, Arrays.asList(with), type);
 		}
 
-		public Modification(HDLObject subject, List<HDLObject> with, ModificationType type) {
+		public Modification(IHDLObject subject, List<IHDLObject> with, ModificationType type) {
 			super();
 			this.subject = subject;
-			HDLObject container = subject.getContainer();
+			IHDLObject container = subject.getContainer();
 			for (int i = 0; i < with.size(); i++) {
-				HDLObject obj = with.get(i);
+				IHDLObject obj = with.get(i);
 				with.set(i, obj.copy().setContainer(container));
 			}
 			this.with = with;
@@ -137,22 +137,22 @@ public class ModificationSet {
 		return null;
 	}
 
-	public void replace(HDLObject subject, HDLObject... with) {
+	public void replace(IHDLObject subject, IHDLObject... with) {
 		Modification mod = new Modification(subject, ModificationType.REPLACE, with);
 		insert(subject, mod);
 	}
 
-	public void insertAfter(HDLObject subject, HDLObject... with) {
+	public void insertAfter(IHDLObject subject, IHDLObject... with) {
 		Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, with);
 		insert(subject, mod);
 	}
 
-	public void insertBefore(HDLObject subject, HDLObject... with) {
+	public void insertBefore(IHDLObject subject, IHDLObject... with) {
 		Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, with);
 		insert(subject, mod);
 	}
 
-	private void insert(HDLObject subject, Modification mod) {
+	private void insert(IHDLObject subject, Modification mod) {
 		List<Modification> list = replacements.get(getHash(subject));
 		if (list == null)
 			list = new LinkedList<ModificationSet.Modification>();
@@ -168,7 +168,7 @@ public class ModificationSet {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends HDLObject> T apply(T orig) {
+	public <T extends IHDLObject> T apply(T orig) {
 		if (replacements.size() == 0)
 			return orig;
 		return (T) orig.copyFiltered(new MSCopyFilter());
@@ -182,7 +182,7 @@ public class ModificationSet {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends HDLObject> T getReplacement(T reg) {
+	public <T extends IHDLObject> T getReplacement(T reg) {
 		List<Modification> mods = getModifications(reg);
 		if ((mods == null) || mods.isEmpty())
 			return reg;
@@ -190,18 +190,18 @@ public class ModificationSet {
 	}
 
 	/**
-	 * Replace the subject HDLObject with the subjects, but discard all other
+	 * Replace the subject IHDLObject with the subjects, but discard all other
 	 * planned modifications
 	 * 
 	 * @param subject
 	 * @param with
 	 */
-	public void replacePrune(HDLObject subject, HDLObject... with) {
+	public void replacePrune(IHDLObject subject, IHDLObject... with) {
 		prune(subject);
 		replace(subject, with);
 	}
 
-	private void prune(HDLObject subject) {
+	private void prune(IHDLObject subject) {
 		List<Modification> list = replacements.get(getHash(subject));
 		if (list != null) {
 			Iterator<Modification> iter = list.iterator();

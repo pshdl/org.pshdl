@@ -191,7 +191,7 @@ public class HDLValidator {
 		}
 	}
 
-	private static HDLEvaluationContext getContext(Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLObject var) {
+	private static HDLEvaluationContext getContext(Map<HDLQualifiedName, HDLEvaluationContext> hContext, IHDLObject var) {
 		HDLUnit container = var.getContainer(HDLUnit.class);
 		HDLEvaluationContext hdlEvaluationContext = hContext.get(container.getFullName());
 		return hdlEvaluationContext;

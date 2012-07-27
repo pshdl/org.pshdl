@@ -14,23 +14,23 @@ public class Problem {
 
 	public final ProblemSeverity severity;
 	public final ErrorCode code;
-	public final HDLObject node;
-	public final HDLObject context;
+	public final IHDLObject node;
+	public final IHDLObject context;
 	public final String info;
 
-	public Problem(ErrorCode code, HDLObject node) {
+	public Problem(ErrorCode code, IHDLObject node) {
 		this(code, node, null, null);
 	}
 
-	public Problem(ErrorCode code, HDLObject node, HDLObject context) {
+	public Problem(ErrorCode code, IHDLObject node, IHDLObject context) {
 		this(code, node, context, null);
 	}
 
-	public Problem(ErrorCode code, HDLObject node, String info) {
+	public Problem(ErrorCode code, IHDLObject node, String info) {
 		this(code, node, null, info);
 	}
 
-	public Problem(ErrorCode code, HDLObject node, HDLObject context, String info) {
+	public Problem(ErrorCode code, IHDLObject node, IHDLObject context, String info) {
 		if (node == null)
 			throw new IllegalArgumentException("Node can not be null!");
 		this.context = context;

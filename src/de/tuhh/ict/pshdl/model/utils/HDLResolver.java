@@ -19,8 +19,6 @@ public class HDLResolver {
 
 	private Map<HDLQualifiedName, HDLVariable> variableCache;
 
-	private String libURI;
-
 	public HDLResolver(IStatementContainer resolveTo, boolean descent) {
 		super();
 		this.resolveTo = resolveTo;
@@ -31,7 +29,6 @@ public class HDLResolver {
 		super();
 		this.resolveTo = resolveTo;
 		this.descent = descent;
-		this.libURI = libURI;
 	}
 
 	protected List<HDLType> doGetTypeDeclarations() {

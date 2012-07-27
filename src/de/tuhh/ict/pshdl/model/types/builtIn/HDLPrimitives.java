@@ -290,7 +290,7 @@ public class HDLPrimitives {
 				default:
 				}
 			}
-			info.result = result.setContainer(op);
+			info.result = (HDLType) result.setContainer(op);
 		}
 		return info;
 	}

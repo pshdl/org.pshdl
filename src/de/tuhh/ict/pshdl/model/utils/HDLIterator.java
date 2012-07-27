@@ -6,7 +6,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 
-public class HDLIterator implements Iterator<HDLObject> {
+public class HDLIterator implements Iterator<IHDLObject> {
 	private final class SingleObjectIterator implements Iterator<HDLObject> {
 		private HDLObject hdo;
 
