@@ -3,16 +3,18 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.utils.plb.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
 
 public class HDLGenerators {
-	// XXX Use service loaders (java.util.ServiceLoader) for non-OSGI contexts
-	private static Map<String, IHDLGenerator> generators = new HashMap<String, IHDLGenerator>();
+	private static Map<String, IHDLGenerator> generators;
 
-	static {
-		generators.put("plb", new PLBGenerator());
+	public static void init(IServiceProvider sp) {
+		generators = new HashMap<String, IHDLGenerator>();
+		for (IHDLGenerator gen : sp.getAllGenerators()) {
+			for (String name : gen.getNames())
+				generators.put(name, gen);
+		}
 	}
 
 	public static HDLInterface getInterface(HDLDirectGeneration hdl) {

@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.simulation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 
@@ -37,6 +37,7 @@ public class HDLValidator {
 			checkAnnotations(unit, problems, hContext);
 			checkType(unit, problems, hContext);
 			checkProessWrite(unit, problems, hContext);
+			checkFunctionCalls(unit, problems, hContext);
 			// TODO Validate bitWidth mismatch
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
@@ -60,6 +61,16 @@ public class HDLValidator {
 			e.printStackTrace();
 		}
 		return problems;
+	}
+
+	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLFunction> functions = unit.getAllObjectsOf(HDLFunction.class, true);
+		for (HDLFunction function : functions) {
+			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
+			if (info == null) {
+				problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+			}
+		}
 	}
 
 	private static void checkProessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

@@ -6,7 +6,8 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.HDLBuiltInAnnotations;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 

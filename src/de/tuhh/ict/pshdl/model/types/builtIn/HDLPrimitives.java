@@ -15,9 +15,9 @@ import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 
-public class HDLPrimitives {
+public class HDLPrimitives implements IHDLPrimitive {
 
-	private static HDLPrimitives hdlPrimitives;
+	private static IHDLPrimitive hdlPrimitives;
 
 	public static class HDLInferenceTriple {
 		public HDLPrimitiveType left, right, result;
@@ -64,7 +64,7 @@ public class HDLPrimitives {
 
 	}
 
-	public static HDLPrimitives getInstance() {
+	public static IHDLPrimitive getInstance() {
 		if (hdlPrimitives == null)
 			hdlPrimitives = new HDLPrimitives();
 		return hdlPrimitives;
@@ -225,6 +225,14 @@ public class HDLPrimitives {
 		sb.append("\n</table>");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
+	 * .tuhh.ict.pshdl.model.HDLArithOp)
+	 */
+	@Override
 	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {
 		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
 		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
@@ -290,7 +298,7 @@ public class HDLPrimitives {
 				default:
 				}
 			}
-			info.result = (HDLType) result.setContainer(op);
+			info.result = result.setContainer(op);
 		}
 		return info;
 	}
@@ -347,6 +355,14 @@ public class HDLPrimitives {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getShiftOpType(de
+	 * .tuhh.ict.pshdl.model.HDLShiftOp)
+	 */
+	@Override
 	public HDLTypeInferenceInfo getShiftOpType(HDLShiftOp op) {
 		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
 		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
@@ -369,6 +385,14 @@ public class HDLPrimitives {
 		return normalize(info, op);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getEqualityOpType
+	 * (de.tuhh.ict.pshdl.model.HDLEqualityOp)
+	 */
+	@Override
 	public HDLTypeInferenceInfo getEqualityOpType(HDLEqualityOp op) {
 		HDLType determineTypeL = op.getLeft().determineType();
 		HDLType determineTypeR = op.getRight().determineType();
@@ -393,6 +417,14 @@ public class HDLPrimitives {
 		return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), determineTypeL, determineTypeR);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getBitOpType(de.tuhh
+	 * .ict.pshdl.model.HDLBitOp)
+	 */
+	@Override
 	public HDLTypeInferenceInfo getBitOpType(HDLBitOp op) {
 		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
 		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
@@ -419,6 +451,14 @@ public class HDLPrimitives {
 		return normalize(info, op);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getManipOpType(de
+	 * .tuhh.ict.pshdl.model.HDLManip)
+	 */
+	@Override
 	public HDLTypeInferenceInfo getManipOpType(HDLManip manip) {
 		HDLExpression target = manip.getTarget();
 		HDLType castTo = manip.getCastTo();
@@ -479,6 +519,15 @@ public class HDLPrimitives {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getValueRange(de.
+	 * tuhh.ict.pshdl.model.HDLPrimitive,
+	 * de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext)
+	 */
+	@Override
 	public ValueRange getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {
 		switch (pt.getType()) {
 		case BOOL:

@@ -19,4 +19,6 @@ public interface IHDLGenerator {
 
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl);
 
+	public String[] getNames();
+
 }

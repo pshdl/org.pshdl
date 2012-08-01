@@ -14,4 +14,5 @@ Export-Package: de.tuhh.ict.pshdl.generator.vhdl,
  de.tuhh.ict.pshdl.model.impl,
  de.tuhh.ict.pshdl.model.simulation,
  de.tuhh.ict.pshdl.model.utils,
+ de.tuhh.ict.pshdl.model.utils.services,
  de.tuhh.ict.pshdl.model.validation

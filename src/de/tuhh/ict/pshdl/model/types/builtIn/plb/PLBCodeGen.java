@@ -1,4 +1,4 @@
-package de.tuhh.ict.pshdl.model.utils.plb;
+package de.tuhh.ict.pshdl.model.types.builtIn.plb;
 
 import java.math.*;
 

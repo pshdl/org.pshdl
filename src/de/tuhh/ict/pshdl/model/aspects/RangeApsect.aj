@@ -14,7 +14,7 @@ import de.tuhh.ict.pshdl.model.HDLBitOp.*;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 

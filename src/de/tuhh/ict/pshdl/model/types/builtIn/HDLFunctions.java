@@ -10,12 +10,25 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public class HDLFunctions implements IHDLFunctionResolver {
 
-	private static Map<String, List<IHDLFunctionResolver>> resolvers = new HashMap<String, List<IHDLFunctionResolver>>();
-	static {
-		IHDLFunctionResolver builtIn = new HDLFunctions();
-		resolvers.put("max", Arrays.asList(builtIn));
-		resolvers.put("min", Arrays.asList(builtIn));
-		resolvers.put("abs", Arrays.asList(builtIn));
+	public HDLFunctions() {
+
+	}
+
+	private static Map<String, List<IHDLFunctionResolver>> resolvers;
+
+	public static void init(IServiceProvider sp) {
+		resolvers = new HashMap<String, List<IHDLFunctionResolver>>();
+		for (IHDLFunctionResolver resolver : sp.getAllFunctions()) {
+			String[] names = resolver.getFunctionNames();
+			for (String funcName : names) {
+				List<IHDLFunctionResolver> list = resolvers.get(funcName);
+				if (list == null) {
+					list = new LinkedList<IHDLFunctionResolver>();
+					resolvers.put(funcName, list);
+				}
+				list.add(resolver);
+			}
+		}
 	}
 
 	public static HDLTypeInferenceInfo getInferenceInfo(HDLFunction function) {
@@ -40,7 +53,22 @@ public class HDLFunctions implements IHDLFunctionResolver {
 		return null;
 	}
 
+	public static ValueRange determineRange(HDLFunction function, HDLEvaluationContext context) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+		if (list != null)
+			for (IHDLFunctionResolver resolver : list) {
+				ValueRange eval = resolver.range(function, context);
+				if (eval != null)
+					return eval;
+			}
+		return null;
+	}
+
 	private static EnumSet<HDLPrimitiveType> disallowedTypes = EnumSet.of(HDLPrimitiveType.BIT, HDLPrimitiveType.BITVECTOR, HDLPrimitiveType.BOOL);
+
+	public static enum BuiltInFunctions {
+		max, min, abs
+	}
 
 	@Override
 	public HDLTypeInferenceInfo resolve(HDLFunction function) {
@@ -54,11 +82,16 @@ public class HDLFunctions implements IHDLFunctionResolver {
 				return info;
 			}
 		}
-		if ("max".equals(name) || "min".equals(name)) {
-			return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
-		}
-		if ("abs".equals(name)) {
-			return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+		try {
+			BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+			switch (func) {
+			case min:
+			case max:
+				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+			case abs:
+				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+			}
+		} catch (Exception e) {
 		}
 		return null;
 	}
@@ -66,26 +99,15 @@ public class HDLFunctions implements IHDLFunctionResolver {
 	@Override
 	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
 		String name = function.getName();
-		if ("abs".equals(name)) {
+		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+		switch (func) {
+		case abs:
 			return args.get(0).abs();
-		}
-		if ("min".equals(name)) {
+		case min:
 			return args.get(0).min(args.get(1));
-		}
-		if ("max".equals(name)) {
+		case max:
 			return args.get(0).max(args.get(1));
 		}
-		return null;
-	}
-
-	public static ValueRange determineRange(HDLFunction function, HDLEvaluationContext context) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
-		if (list != null)
-			for (IHDLFunctionResolver resolver : list) {
-				ValueRange eval = resolver.range(function, context);
-				if (eval != null)
-					return eval;
-			}
 		return null;
 	}
 
@@ -93,16 +115,28 @@ public class HDLFunctions implements IHDLFunctionResolver {
 	public ValueRange range(HDLFunction function, HDLEvaluationContext context) {
 		String name = function.getName();
 		ValueRange zeroArg = function.getParams().get(0).determineRange(context);
-		if ("abs".equals(name)) {
+		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+		switch (func) {
+		case abs:
 			return new ValueRange(zeroArg.from.abs(), zeroArg.to.abs());
-		}
-		ValueRange oneArg = function.getParams().get(1).determineRange(context);
-		if ("min".equals(name)) {
-			return new ValueRange(zeroArg.from.min(oneArg.from), zeroArg.to.min(oneArg.to));
-		}
-		if ("max".equals(name)) {
-			return new ValueRange(zeroArg.from.max(oneArg.from), zeroArg.to.max(oneArg.to));
+		case min:
+			ValueRange oneArgMin = function.getParams().get(1).determineRange(context);
+			return new ValueRange(zeroArg.from.min(oneArgMin.from), zeroArg.to.min(oneArgMin.to));
+		case max:
+			ValueRange oneArgMax = function.getParams().get(1).determineRange(context);
+			return new ValueRange(zeroArg.from.max(oneArgMax.from), zeroArg.to.max(oneArgMax.to));
 		}
 		return null;
+	}
+
+	@Override
+	public String[] getFunctionNames() {
+		String[] res = new String[BuiltInFunctions.values().length];
+		BuiltInFunctions[] values = BuiltInFunctions.values();
+		for (int i = 0; i < values.length; i++) {
+			BuiltInFunctions bif = values[i];
+			res[i] = bif.name();
+		}
+		return res;
 	}
 }

@@ -1,4 +1,4 @@
-package de.tuhh.ict.pshdl.model.utils.plb;
+package de.tuhh.ict.pshdl.model.types.builtIn.plb;
 
 import java.util.*;
 
@@ -55,6 +55,11 @@ public class PLBGenerator implements IHDLGenerator {
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
 		int regCount = getRegCount(hdl);
 		return new HDLGenerationInfo(true, PLBCodeGen.get(regCount));
+	}
+
+	@Override
+	public String[] getNames() {
+		return new String[] { "plb" };
 	}
 
 }

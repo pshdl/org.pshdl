@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLAnnotations.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
