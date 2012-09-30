@@ -93,6 +93,20 @@ public class Insulin {
 					}
 				}
 			}
+			String libURI = null;
+			switch (apply.getClassType()) {
+			case HDLPackage:
+				libURI = ((HDLPackage) apply).getLibURI();
+				break;
+			case HDLUnit:
+				libURI = ((HDLUnit) apply).getLibURI();
+				break;
+			default:
+				libURI = apply.getContainer(HDLUnit.class).getLibURI();
+				break;
+			}
+			HDLLibrary library = HDLLibrary.getLibrary(libURI);
+			library.addSideFiles(generationInfo.files);
 		}
 		return ms.apply(apply);
 	}

@@ -1,4 +1,4 @@
-package de.tuhh.ict.pshdl.model.types.builtIn.plb;
+package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 
 import java.util.*;
 
@@ -7,7 +7,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 
-public class PLBGenerator implements IHDLGenerator {
+public class BusGenerator implements IHDLGenerator {
 
 	@Override
 	public HDLInterface getInterface(HDLDirectGeneration hdl) {
@@ -54,12 +54,21 @@ public class PLBGenerator implements IHDLGenerator {
 	@Override
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
 		int regCount = getRegCount(hdl);
-		return new HDLGenerationInfo(true, PLBCodeGen.get(regCount));
+		HDLGenerationInfo hdgi = new HDLGenerationInfo(true, UserLogicCodeGen.get(regCount));
+		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
+			List<SideFile> sideFiles = PLBSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount);
+			hdgi.files.addAll(sideFiles);
+			return hdgi;
+		}
+		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
+			return hdgi;
+		}
+		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
 	}
 
 	@Override
 	public String[] getNames() {
-		return new String[] { "plb" };
+		return new String[] { "plb", "axi" };
 	}
 
 }

@@ -1,4 +1,4 @@
-package de.tuhh.ict.pshdl.model.types.builtIn.plb;
+package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 
 import java.math.*;
 
@@ -13,7 +13,7 @@ import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
 
-public class PLBCodeGen {
+public class UserLogicCodeGen {
 	public static HDLUnit get(int regCount) {
 		HDLVariableDeclaration C_SLV_WIDTH = new HDLVariableDeclaration().setDirection(HDLDirection.PARAMETER).setType(HDLQualifiedName.create("#uint"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.NATURAL))

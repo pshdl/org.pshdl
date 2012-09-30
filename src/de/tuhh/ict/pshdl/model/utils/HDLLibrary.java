@@ -4,10 +4,12 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class HDLLibrary {
 	public Map<HDLQualifiedName, HDLUnit> units = new ConcurrentHashMap<HDLQualifiedName, HDLUnit>();
 	public Map<HDLQualifiedName, HDLType> types = new ConcurrentHashMap<HDLQualifiedName, HDLType>();
+	public List<SideFile> sideFiles = new LinkedList<SideFile>();
 
 	private static Map<String, HDLLibrary> libs = new HashMap<String, HDLLibrary>();
 
@@ -95,5 +97,9 @@ public class HDLLibrary {
 
 	public static void clear() {
 		libs.clear();
+	}
+
+	public void addSideFiles(List<SideFile> files) {
+		sideFiles.addAll(files);
 	}
 }

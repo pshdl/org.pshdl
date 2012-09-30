@@ -200,6 +200,7 @@ public aspect ConstantEvaluation {
 		case SRL:
 			BigInteger shiftRight = leftVal.shiftRight(rightVal.intValue());
 			if (shiftRight.signum() < 0)
+				//XXX This is incorrect. We have to know the width of the
 				return shiftRight.negate();
 			return shiftRight;
 		}
