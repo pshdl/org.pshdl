@@ -54,9 +54,10 @@ public class BusGenerator implements IHDLGenerator {
 	@Override
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
 		int regCount = getRegCount(hdl);
+		String version = getVersion(hdl);
 		HDLGenerationInfo hdgi = new HDLGenerationInfo(true, UserLogicCodeGen.get(regCount));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			List<SideFile> sideFiles = PLBSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount);
+			List<SideFile> sideFiles = PLBSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version);
 			hdgi.files.addAll(sideFiles);
 			return hdgi;
 		}
@@ -64,6 +65,15 @@ public class BusGenerator implements IHDLGenerator {
 			return hdgi;
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
+	}
+
+	private String getVersion(HDLDirectGeneration hdl) {
+		for (HDLArgument arg : hdl.getArguments()) {
+			if ("version".equals(arg.getName())) {
+				return arg.getValue();
+			}
+		}
+		return "v1_00_a";
 	}
 
 	@Override

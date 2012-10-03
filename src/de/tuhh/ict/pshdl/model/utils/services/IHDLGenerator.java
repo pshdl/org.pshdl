@@ -6,6 +6,7 @@ import de.tuhh.ict.pshdl.model.*;
 
 public interface IHDLGenerator {
 	public static class SideFile {
+		public static final byte[] THIS = new byte[] { 'T', 'H', 'I', 'S' };
 		public final String relPath;
 		public final byte[] contents;
 
