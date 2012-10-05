@@ -78,7 +78,7 @@ public class Insulin {
 		Collection<HDLDirectGeneration> gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration generation : gens) {
 			HDLGenerationInfo generationInfo = HDLGenerators.getImplementation(generation);
-			if (generationInfo.include) {
+			if (generation.getInclude()) {
 				HDLQualifiedName ifRef = generation.getHIf().asRef();
 				HDLQualifiedName fullName = generation.getFullName();
 				// System.out.println("Insulin.includeGenerators()" +
@@ -383,7 +383,12 @@ public class Insulin {
 		for (HDLAssignment assignment : assignments) {
 			HDLType leftType = assignment.getLeft().determineType();
 			HDLExpression exp = assignment.getRight();
-			if (leftType instanceof HDLPrimitive) {
+			if (exp.getClassType() == HDLClass.HDLEqualityOp) {
+				HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp.copy())
+						.addThenDo(assignment.copy().setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(HDLLiteral.get(1))))
+						.addElseDo(assignment.copy().setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(HDLLiteral.get(0))));
+				ms.replace(assignment, newIf);
+			} else if (leftType instanceof HDLPrimitive) {
 				HDLPrimitive pt = (HDLPrimitive) leftType;
 				fortify(ms, exp, pt);
 			}

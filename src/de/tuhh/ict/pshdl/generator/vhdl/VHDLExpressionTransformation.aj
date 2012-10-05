@@ -215,13 +215,13 @@ public aspect VHDLExpressionTransformation {
 		switch (getType()) {
 		case EQ:
 			return new Parentheses(new Equals(getLeft().toVHDL(), getRight().toVHDL()));
-		case GREATER:
-			return new Parentheses(new GreaterEquals(getLeft().toVHDL(), getRight().toVHDL()));
 		case GREATER_EQ:
+			return new Parentheses(new GreaterEquals(getLeft().toVHDL(), getRight().toVHDL()));
+		case GREATER:
 			return new Parentheses(new GreaterThan(getLeft().toVHDL(), getRight().toVHDL()));
-		case LESS:
-			return new Parentheses(new LessEquals(getLeft().toVHDL(), getRight().toVHDL()));
 		case LESS_EQ:
+			return new Parentheses(new LessEquals(getLeft().toVHDL(), getRight().toVHDL()));
+		case LESS:
 			return new Parentheses(new LessThan(getLeft().toVHDL(), getRight().toVHDL()));
 		case NOT_EQ:
 			return new Parentheses(new NotEquals(getLeft().toVHDL(), getRight().toVHDL()));

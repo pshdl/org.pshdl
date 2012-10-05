@@ -3,6 +3,8 @@ package de.tuhh.ict.pshdl.model.utils.services;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 public interface IHDLGenerator {
 	public static class SideFile {
@@ -20,12 +22,10 @@ public interface IHDLGenerator {
 
 	public static class HDLGenerationInfo {
 		public List<SideFile> files = new LinkedList<SideFile>();
-		public final boolean include;
 		public final HDLUnit unit;
 
-		public HDLGenerationInfo(boolean include, HDLUnit unit) {
+		public HDLGenerationInfo(HDLUnit unit) {
 			super();
-			this.include = include;
 			this.unit = unit;
 		}
 	}
@@ -35,5 +35,9 @@ public interface IHDLGenerator {
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl);
 
 	public String[] getNames();
+
+	public void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context);
+
+	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl);
 
 }

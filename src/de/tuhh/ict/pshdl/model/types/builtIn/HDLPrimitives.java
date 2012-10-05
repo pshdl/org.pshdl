@@ -10,6 +10,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
+import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -385,13 +386,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 		return normalize(info, op);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.tuhh.ict.pshdl.model.types.builtIn.IHDLPrimitive#getEqualityOpType
-	 * (de.tuhh.ict.pshdl.model.HDLEqualityOp)
-	 */
+	EnumSet<HDLPrimitiveType> nonOrderType = EnumSet.of(HDLPrimitiveType.BIT, HDLPrimitiveType.BITVECTOR, HDLPrimitiveType.BOOL);
+	EnumSet<HDLEqualityOpType> nonOrderCompType = EnumSet.of(HDLEqualityOpType.EQ, HDLEqualityOpType.NOT_EQ);
+
 	@Override
 	public HDLTypeInferenceInfo getEqualityOpType(HDLEqualityOp op) {
 		HDLType determineTypeL = op.getLeft().determineType();
@@ -405,6 +402,12 @@ public class HDLPrimitives implements IHDLPrimitive {
 			}
 			if (HDLPrimitive.isTargetMatching(rType))
 				rType = lType;
+			if (nonOrderType.contains(lType.getType()) || nonOrderCompType.contains(rType.getType()))
+				if (!nonOrderCompType.contains(op)) {
+					HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+					hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
+					return hdi;
+				}
 			HDLInferenceTriple triple = equalityResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 			if (triple == null) {
 				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);

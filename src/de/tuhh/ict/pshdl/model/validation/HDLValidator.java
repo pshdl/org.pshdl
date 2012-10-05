@@ -38,6 +38,7 @@ public class HDLValidator {
 			checkType(unit, problems, hContext);
 			checkProessWrite(unit, problems, hContext);
 			checkFunctionCalls(unit, problems, hContext);
+			checkGenerators(unit, problems, hContext);
 			// TODO Validate bitWidth mismatch
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
@@ -61,6 +62,13 @@ public class HDLValidator {
 			e.printStackTrace();
 		}
 		return problems;
+	}
+
+	private static void checkGenerators(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLDirectGeneration> generators = unit.getAllObjectsOf(HDLDirectGeneration.class, true);
+		for (HDLDirectGeneration hdg : generators) {
+			HDLGenerators.validate(hdg, problems, getContext(hContext, hdg));
+		}
 	}
 
 	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

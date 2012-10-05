@@ -3,8 +3,10 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 public class HDLGenerators {
 	private static Map<String, IHDLGenerator> generators;
@@ -15,6 +17,14 @@ public class HDLGenerators {
 			for (String name : gen.getNames())
 				generators.put(name, gen);
 		}
+	}
+
+	public static List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
+		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
+		if (generator != null) {
+			return generator.getPortAdditions(hdl);
+		}
+		return null;
 	}
 
 	public static HDLInterface getInterface(HDLDirectGeneration hdl) {
@@ -31,6 +41,15 @@ public class HDLGenerators {
 			return generator.getImplementation(hdl);
 		}
 		return null;
+	}
+
+	public static void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
+		IHDLGenerator generator = generators.get(hdg.getGeneratorID());
+		if (generator != null) {
+			generator.validate(hdg, problems, context);
+		} else {
+			problems.add(new Problem(ErrorCode.GENERATOR_NOT_KNOWN, hdg));
+		}
 	}
 
 }

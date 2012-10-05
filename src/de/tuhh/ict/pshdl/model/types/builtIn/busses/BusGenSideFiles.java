@@ -6,26 +6,31 @@ import java.util.regex.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
-public class PLBSideFiles {
+public class BusGenSideFiles {
 
-	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, String version) {
+	private static final String WRAPPER_APPENDIX = "core";
+
+	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, String version, boolean axi) {
 		List<SideFile> res = new LinkedList<SideFile>();
 		String unitName = unit.getFullName().getLastSegment().toLowerCase();
-		String dirName = unitName + "_" + version;
-		res.add(mpdFile(unit, unitName, dirName));
-		res.add(paoFile(unitName, dirName));
-		res.add(wrapperFile(unit, unitName, dirName, version, regCount));
+		String ipcorename = unitName + WRAPPER_APPENDIX;
+		String dirName = ipcorename + "_" + version;
+		String type = axi ? "axi" : "plb";
+		res.add(mpdFile(unit, ipcorename, dirName, type));
+		res.add(paoFile(unitName, dirName, type));
+		res.add(wrapperFile(unit, unitName, dirName, version, regCount, type));
 		res.add(new SideFile(dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS));
 		return res;
 	}
 
-	private static SideFile wrapperFile(HDLUnit unit, String ipcoreName, String dirName, String version, int regCount) {
-		String wrapperName = ipcoreName + "_wrapper";
+	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, String type) {
+		String wrapperName = unitName + WRAPPER_APPENDIX;
 		String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
 		Map<String, String> options = new HashMap<String, String>();
-		options.put("{NAME}", ipcoreName);
+		options.put("{NAME}", unitName);
 		options.put("{DIRNAME}", dirName);
 		options.put("{WRAPPERNAME}", wrapperName);
 		options.put("{VERSION}", version.replaceAll("_", "."));
@@ -37,12 +42,17 @@ public class PLBSideFiles {
 		StringBuilder ports = new StringBuilder();
 		StringBuilder portMap = new StringBuilder();
 		for (HDLVariableDeclaration vhd : asInterface.getPorts()) {
+			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null)
+				continue;
 			StringBuilder targetMap = null;
 			StringBuilder target = null;
-			switch (vhd.getDirection()) {
+			HDLDirection direction = vhd.getDirection();
+			String dir = direction.toString();
+			switch (direction) {
 			case PARAMETER:
 				targetMap = genericsMap;
 				target = generics;
+				dir = "";
 				break;
 			case IN:
 			case OUT:
@@ -53,22 +63,22 @@ public class PLBSideFiles {
 				continue;
 			}
 			for (HDLVariable v : vhd.getVariables()) {
-				target.append('\t').append(v.getName()).append("\t:\t").append(vhd.getDirection()).append(" ");
+				target.append('\t').append(v.getName()).append("\t:\t").append(dir).append(" ");
 				switch (vhd.getPrimitive().getType()) {
 				case BIT:
 					target.append("std_logic");
 					break;
 				case BITVECTOR:
 					target.append("std_logic_vector");
-					target.append("(").append(vhd.getPrimitive().getWidth()).append(" downto 0)");
+					target.append("(").append(vhd.getPrimitive().getWidth()).append("-1 downto 0)");
 					break;
 				case UINT:
 					target.append("unsigned");
-					target.append("(").append(vhd.getPrimitive().getWidth()).append(" downto 0)");
+					target.append("(").append(vhd.getPrimitive().getWidth()).append("-1 downto 0)");
 					break;
 				case INT:
 					target.append("signed");
-					target.append("(").append(vhd.getPrimitive().getWidth()).append(" downto 0)");
+					target.append("(").append(vhd.getPrimitive().getWidth()).append("-1 downto 0)");
 					break;
 				case NATURAL:
 					target.append("NATURAL");
@@ -76,6 +86,7 @@ public class PLBSideFiles {
 				case INTEGER:
 					target.append("INTEGER");
 					break;
+				default:
 				}
 				if ((vhd.getDirection() == HDLDirection.PARAMETER) && (v.getDefaultValue() != null)) {
 					target.append(":=").append(v.getDefaultValue());
@@ -89,34 +100,36 @@ public class PLBSideFiles {
 		options.put("{GENERICS}", generics.toString());
 		options.put("{GENERICSMAP}", genericsMap.toString());
 		try {
-			return new SideFile(relPath, processFile("plb_wrapper.vhd", options));
+			return new SideFile(relPath, processFile(type + "_wrapper.vhd", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static SideFile paoFile(String ipcoreName, String dirName) {
-		String relPath = dirName + "/data/" + ipcoreName + "_v2_1_0.pao";
+	private static SideFile paoFile(String ipcoreName, String dirName, String type) {
+		String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
 		options.put("{TARGETFILE}", relPath);
 		options.put("{DIRNAME}", dirName);
-		options.put("{WRAPPERNAME}", ipcoreName + "_wrapper");
+		options.put("{WRAPPERNAME}", ipcoreName + WRAPPER_APPENDIX);
 		options.put("{DATE}", new Date().toString());
 		try {
-			return new SideFile(relPath, processFile("plb_v2_1_0.pao", options));
+			return new SideFile(relPath, processFile(type + "_v2_1_0.pao", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName) {
+	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type) {
 		HDLInterface asInterface = unit.asInterface();
 		StringBuilder generics = new StringBuilder();
 		StringBuilder ports = new StringBuilder();
 		for (HDLVariableDeclaration vhd : asInterface.getPorts()) {
+			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null)
+				continue;
 			if (vhd.getPrimitive() == null)
 				throw new IllegalArgumentException("Only primitive types are supported as in/out pins in a bus based unit");
 			StringBuilder type = new StringBuilder();
@@ -124,15 +137,16 @@ public class PLBSideFiles {
 			case IN:
 				type.append(" = \"\", DIR= I");
 				if (vhd.getPrimitive().getWidth() != null) {
-					type.append(", VEC = [" + vhd.getPrimitive().getWidth() + ":0]");
+					type.append(", VEC = [" + vhd.getPrimitive().getWidth() + "-1:0]");
 				}
 				break;
 			case OUT:
 				type.append(" = \"\", DIR= O");
 				if (vhd.getPrimitive().getWidth() != null) {
-					type.append(", VEC = [" + vhd.getPrimitive().getWidth() + ":0]");
+					type.append(", VEC = [" + vhd.getPrimitive().getWidth() + "-1:0]");
 				}
 				break;
+			case CONSTANT:
 			case PARAMETER:
 				type.append(", DT = ");
 				switch (vhd.getPrimitive().getType()) {
@@ -149,11 +163,14 @@ public class PLBSideFiles {
 					type.append("INTEGER");
 					break;
 				default:
-					throw new IllegalArgumentException("Not supported");
+					throw new IllegalArgumentException("Parameter type:+" + vhd.getPrimitive().getType() + " not supported");
 				}
 				break;
+			case INTERNAL:
+			case HIDDEN:
+				break;
 			default:
-				throw new IllegalArgumentException("Not supported");
+				throw new IllegalArgumentException("Direction:" + vhd.getDirection() + " not supported");
 			}
 			for (HDLVariable var : vhd.getVariables()) {
 				if (vhd.getDirection() == HDLDirection.PARAMETER) {
@@ -174,7 +191,7 @@ public class PLBSideFiles {
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
-			return new SideFile(dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", processFile("plb_v2_1_0.mpd", options));
+			return new SideFile(dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", processFile(bus_type + "_v2_1_0.mpd", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -182,7 +199,7 @@ public class PLBSideFiles {
 	}
 
 	private static byte[] processFile(String string, Map<String, String> options) throws IOException {
-		InputStream stream = PLBSideFiles.class.getResourceAsStream(string);
+		InputStream stream = BusGenSideFiles.class.getResourceAsStream(string);
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		boolean first = true;

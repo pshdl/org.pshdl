@@ -1,11 +1,16 @@
 package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 
+import java.math.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 public class BusGenerator implements IHDLGenerator {
 
@@ -15,6 +20,7 @@ public class BusGenerator implements IHDLGenerator {
 		HDLExpression regCount = getRegCountLiteral(hdl);
 		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(32)));
 		hvd = hvd.setDirection(HDLDirection.INOUT).addVariables(new HDLVariable().setName("regs").addDimensions(regCount));
+		hvd = hvd.addAnnotations(HDLBuiltInAnnotations.genSignal.create(null));
 		hIf = hIf.addPorts(hvd);
 		hIf.setContainer(hdl);
 		// System.out.println("PLBGenerator.getInterface()" + hIf);
@@ -40,14 +46,22 @@ public class BusGenerator implements IHDLGenerator {
 		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
 				if (arg.getExpression() != null) {
-					regCount = arg.getExpression().constantEvaluate(null).intValue();
+					BigInteger regVal = arg.getExpression().constantEvaluate(null);
+					if (regVal != null)
+						regCount = regVal.intValue();
+					else
+						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
 				} else {
-					regCount = Integer.parseInt(arg.getValue());
+					try {
+						regCount = Integer.parseInt(arg.getValue());
+					} catch (NumberFormatException e) {
+						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
+					}
 				}
 			}
 		}
 		if (regCount == -1)
-			throw new IllegalArgumentException("The parameter regCount is not valid!");
+			throw new IllegalArgumentException("The parameter regCount is not present!");
 		return regCount;
 	}
 
@@ -55,13 +69,16 @@ public class BusGenerator implements IHDLGenerator {
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
 		int regCount = getRegCount(hdl);
 		String version = getVersion(hdl);
-		HDLGenerationInfo hdgi = new HDLGenerationInfo(true, UserLogicCodeGen.get(regCount));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			List<SideFile> sideFiles = PLBSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version);
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get(regCount, false));
+			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version, false);
 			hdgi.files.addAll(sideFiles);
 			return hdgi;
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get(regCount, true));
+			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version, true);
+			hdgi.files.addAll(sideFiles);
 			return hdgi;
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
@@ -79,6 +96,45 @@ public class BusGenerator implements IHDLGenerator {
 	@Override
 	public String[] getNames() {
 		return new String[] { "plb", "axi" };
+	}
+
+	@Override
+	public void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
+		if (!hdg.getInclude()) {
+			problems.add(new Problem(ErrorCode.GENERATOR_WARNING, hdg, "The " + hdg.getGeneratorID()
+					+ " generator assumes to be included. Not including it means that all ports need to be exported manually."));
+		}
+		try {
+			getRegCount(hdg);
+		} catch (Exception e) {
+			problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+		}
+		String version = getVersion(hdg);
+		if (!version.matches("v\\d_\\d\\d_[a-z]")) {
+			problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "The version string:" + version + " is not valid. It has to be of the format v[0-9]_[0-9][0-9]_[a-z]"));
+		}
+	}
+
+	@Override
+	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
+		HDLGenerationInfo info = getImplementation(hdl);
+		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+		Set<HDLVariableDeclaration> hvd = info.unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (HDLVariableDeclaration hdlVariableDeclaration : hvd) {
+			switch (hdlVariableDeclaration.getDirection()) {
+			case CONSTANT:
+			case PARAMETER:
+			case IN:
+			case INOUT:
+			case OUT:
+				res.add(hdlVariableDeclaration.addAnnotations(HDLBuiltInAnnotations.genSignal.create(null)));
+				break;
+			case HIDDEN:
+			case INTERNAL:
+				break;
+			}
+		}
+		return res;
 	}
 
 }

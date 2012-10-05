@@ -8,6 +8,10 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 	public enum HDLBuiltInAnnotations implements IHDLAnnotation {
 		/**
+		 * Generated signal
+		 */
+		genSignal,
+		/**
 		 * Designates a bit signal as clock
 		 */
 		clock,
@@ -55,6 +59,7 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		@Override
 		public String validate(String value) {
 			switch (this) {
+			case genSignal:
 			case VHDLLatchable:
 			case VHDLNoExplicitReset:
 			case reset:
@@ -87,7 +92,6 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			}
 			return null;
 		}
-
 	}
 
 	@Override
