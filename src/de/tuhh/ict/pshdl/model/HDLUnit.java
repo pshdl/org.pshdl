@@ -6,8 +6,8 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
@@ -199,6 +199,12 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		unitIF = ms.apply(unitIF);
 		unitIF.setContainer(this);
 		return unitIF;
+	}
+
+	@Override
+	public HDLLibrary getLibrary() {
+		return HDLLibrary.getLibrary(libURI);
+
 	}
 	// $CONTENT-END$
 

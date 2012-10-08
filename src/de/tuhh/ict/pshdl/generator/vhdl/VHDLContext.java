@@ -15,11 +15,14 @@ import de.upb.hni.vmagic.statement.*;
 
 public class VHDLContext {
 
+	public HDLConfig config = new HDLConfig();
+
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> resetStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
 	public Map<HDLRegisterConfig, LinkedList<SequentialStatement>> clockedStatements = new LinkedHashMap<HDLRegisterConfig, LinkedList<SequentialStatement>>();
 	public LinkedList<ConcurrentStatement> concurrentStatements = new LinkedList<ConcurrentStatement>();
 	public Map<Integer, LinkedList<SequentialStatement>> unclockedStatements = new LinkedHashMap<Integer, LinkedList<SequentialStatement>>();
 	public Map<Integer, LinkedList<HDLStatement>> sensitiveStatements = new LinkedHashMap<Integer, LinkedList<HDLStatement>>();
+	public Map<Integer, Boolean> noSensitivity = new LinkedHashMap<Integer, Boolean>();
 	public LinkedList<Signal> ports = new LinkedList<Signal>();
 	public LinkedList<ConstantDeclaration> constants = new LinkedList<ConstantDeclaration>();
 	public LinkedList<ConstantDeclaration> constantsPkg = new LinkedList<ConstantDeclaration>();
@@ -30,6 +33,7 @@ public class VHDLContext {
 	public Set<HDLQualifiedName> imports = new HashSet<HDLQualifiedName>();
 
 	public void addClockedStatement(HDLRegisterConfig config, SequentialStatement sa) {
+		config = config.normalize();
 		LinkedList<SequentialStatement> list = clockedStatements.get(config);
 		if (list == null) {
 			list = new LinkedList<SequentialStatement>();
@@ -67,6 +71,9 @@ public class VHDLContext {
 		internalTypes.addAll(vhdl.internalTypes);
 		externalTypes.addAll(vhdl.externalTypes);
 		imports.addAll(vhdl.imports);
+		for (Map.Entry<Integer, Boolean> entry : vhdl.noSensitivity.entrySet()) {
+			noSensitivity.put(entry.getKey(), entry.getValue());
+		}
 		mergeListMap(vhdl, vhdl.clockedStatements, clockedStatements);
 		mergeListMap(vhdl, vhdl.resetStatements, resetStatements);
 	}
@@ -129,6 +136,7 @@ public class VHDLContext {
 	}
 
 	public void addResetValue(HDLRegisterConfig config, SequentialStatement sa) {
+		config = config.normalize();
 		LinkedList<SequentialStatement> list = resetStatements.get(config);
 		if (list == null) {
 			list = new LinkedList<SequentialStatement>();
@@ -186,6 +194,10 @@ public class VHDLContext {
 
 	public int newProcessID() {
 		return ai.incrementAndGet();
+	}
+
+	public void setNoSensitivity(int pid) {
+		noSensitivity.put(pid, true);
 	}
 
 }

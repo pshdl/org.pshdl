@@ -22,6 +22,7 @@ public class HDLSimulator {
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 		// generate cat statement for ranges
+		// generate reset condition
 		// Starting from the end, generate ternary op for each switch/if
 		// statement
 	}

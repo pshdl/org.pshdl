@@ -71,7 +71,7 @@ public aspect VHDLPackageTransformation {
 			}
 		}
 		List<LibraryUnit> res = new LinkedList<LibraryUnit>();
-		HDLQualifiedName entityName = new HDLQualifiedName(getName());
+		HDLQualifiedName entityName = getFullName();
 		Entity e = new Entity(entityName.getLastSegment());
 		VHDLContext unit = new VHDLContext();
 		for (HDLStatement stmnt : getStatements()) {
@@ -104,7 +104,7 @@ public aspect VHDLPackageTransformation {
 		}
 		for (Map.Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> pc : unit.clockedStatements.entrySet()) {
 			ProcessStatement ps = new ProcessStatement();
-			ps.getStatements().add(createIfStatement(ps, pc.getKey(), pc.getValue(), unit));
+			ps.getStatements().add(createIfStatement(this, ps, pc.getKey(), pc.getValue(), unit));
 			a.getStatements().add(ps);
 		}
 		res.add(a);
@@ -118,6 +118,7 @@ public aspect VHDLPackageTransformation {
 		res.add(new LibraryClause("pshdl"));
 		res.add(VHDLCastsLibrary.USE_CLAUSE);
 		res.add(VHDLShiftLibrary.USE_CLAUSE);
+		res.add(new UseClause("pshdl.types.all"));
 		for (HDLQualifiedName i : unit.imports) {
 			res.add(new UseClause(i.append("all").toString()));
 		}
@@ -126,6 +127,8 @@ public aspect VHDLPackageTransformation {
 	private static EnumSet<HDLDirection> notSensitive = EnumSet.of(HDLDirection.HIDDEN, HDLDirection.PARAMETER, HDLDirection.CONSTANT);
 
 	private static Collection<? extends Signal> createSensitivyList(VHDLContext ctx, int pid) {
+		if (ctx.noSensitivity.containsKey(pid))
+			return Collections.emptyList();
 		List<Signal> sensitivity = new LinkedList<Signal>();
 		Set<String> vars = new TreeSet<String>();
 		for (HDLStatement stmnt : ctx.sensitiveStatements.get(pid)) {
@@ -155,12 +158,13 @@ public aspect VHDLPackageTransformation {
 		return sensitivity;
 	}
 
-	private static SequentialStatement createIfStatement(ProcessStatement ps, HDLRegisterConfig key, LinkedList<SequentialStatement> value, VHDLContext unit) {
+	private static SequentialStatement createIfStatement(HDLUnit hUnit, ProcessStatement ps, HDLRegisterConfig key, LinkedList<SequentialStatement> value, VHDLContext unit) {
 		Signal clk = (Signal) new HDLVariableRef().setVar(key.getClkRefName()).toVHDL();
 		Signal rst = (Signal) new HDLVariableRef().setVar(key.getRstRefName()).toVHDL();
+		HDLConfig config = HDLLibrary.getLibrary(hUnit.getLibURI()).getConfig();
 		ps.getSensitivityList().add((Signal) clk);
 		EnumerationLiteral activeRst;
-		if (key.getResetType() == HDLRegResetType.HIGH_ACTIVE)
+		if (config.getRegResetType(hUnit.getFullName(), key.getResetType()) == HDLRegResetType.HIGH_ACTIVE)
 			activeRst = StdLogic1164.STD_LOGIC_1;
 		else
 			activeRst = StdLogic1164.STD_LOGIC_0;
@@ -170,11 +174,11 @@ public aspect VHDLPackageTransformation {
 		if (resets != null)
 			rstIfStmnt.getStatements().addAll(resets);
 		Expression<?> clkEdge;
-		if (key.getClockType() == HDLRegClockType.RISING)
+		if (config.getRegClockType(hUnit.getFullName(), key.getClockType()) == HDLRegClockType.RISING)
 			clkEdge = Expressions.risingEdge(clk);
 		else
 			clkEdge = Expressions.fallingEdge(clk);
-		if (key.getSyncType() == HDLRegSyncType.ASYNC) {
+		if (config.getRegSyncType(hUnit.getFullName(), key.getSyncType()) == HDLRegSyncType.ASYNC) {
 			ps.getSensitivityList().add(rst);
 			ElsifPart elsifPart = rstIfStmnt.createElsifPart(clkEdge);
 			elsifPart.getStatements().addAll(value);

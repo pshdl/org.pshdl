@@ -36,6 +36,9 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLDirectGeneration.toVHDL(int pid) {
 		return new VHDLContext();
 	}
+	public VHDLContext HDLFunction.toVHDL(int pid) {
+		return HDLFunctions.toVHDL(this, pid);
+	}
 
 	public VHDLContext HDLBlock.toVHDL(int pid){
 		VHDLContext res = new VHDLContext();

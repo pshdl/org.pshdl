@@ -332,19 +332,19 @@ public aspect StringWriterAspect {
 			params.append(HDLRegisterConfig.RESET_PARAM).append('=').append(getRstRefName());
 			first = false;
 		}
-		if (!getClockType().equals(def.getClockType())) {
+		if (getClockType()!=null && !getClockType().equals(def.getClockType())) {
 			if (!first)
 				params.append(", ");
 			params.append(HDLRegisterConfig.EDGE_PARAM).append('=').append(getClockType());
 			first = false;
 		}
-		if (!getSyncType().equals(def.getSyncType())) {
+		if (getSyncType()!=null && !getSyncType().equals(def.getSyncType())) {
 			if (!first)
 				params.append(", ");
 			params.append(HDLRegisterConfig.RESET_SYNC_PARAM).append('=').append(getSyncType());
 			first = false;
 		}
-		if (!getResetType().equals(def.getResetType())) {
+		if (getResetType()!=null && !getResetType().equals(def.getResetType())) {
 			if (!first)
 				params.append(", ");
 			params.append(HDLRegisterConfig.RESET_TYPE_PARAM).append('=').append(getResetType());

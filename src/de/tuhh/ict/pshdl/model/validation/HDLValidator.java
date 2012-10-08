@@ -57,6 +57,8 @@ public class HDLValidator {
 			// TODO No processes in Module
 			// TODO no I/O variables in block
 			// TODO Switch expression needs to have width (no natural etc..)
+			// TODO no Registers in Testbench
+			// TODO warn for name collision in generators
 
 		} catch (Exception e) {
 			e.printStackTrace();

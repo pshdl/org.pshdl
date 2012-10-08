@@ -5,6 +5,7 @@ import java.util.*;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -117,8 +118,13 @@ public class HDLPackage extends AbstractHDLPackage {
 			return obj.getDeclarations();
 		}
 	};
-	// $CONTENT-BEGIN$
 
+	// $CONTENT-BEGIN$
+	@Override
+	public HDLLibrary getLibrary() {
+		return HDLLibrary.getLibrary(libURI);
+
+	}
 	// $CONTENT-END$
 
 }

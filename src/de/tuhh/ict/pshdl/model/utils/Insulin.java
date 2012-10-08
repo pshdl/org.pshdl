@@ -387,6 +387,7 @@ public class Insulin {
 				HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp.copy())
 						.addThenDo(assignment.copy().setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(HDLLiteral.get(1))))
 						.addElseDo(assignment.copy().setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(HDLLiteral.get(0))));
+				newIf.setContainer(assignment.getContainer());
 				ms.replace(assignment, newIf);
 			} else if (leftType instanceof HDLPrimitive) {
 				HDLPrimitive pt = (HDLPrimitive) leftType;

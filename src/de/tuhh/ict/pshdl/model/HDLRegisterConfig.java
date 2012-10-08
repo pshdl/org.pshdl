@@ -14,12 +14,9 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName clk. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName rst. Can <b>not</b> be <code>null</code>.</li>
- * <li>HDLRegClockType clockType. If <code>null</code>,
- * {@link HDLRegClockType#RISING} is used as default.</li>
- * <li>HDLRegResetType resetType. If <code>null</code>,
- * {@link HDLRegResetType#HIGH_ACTIVE} is used as default.</li>
- * <li>HDLRegSyncType syncType. If <code>null</code>,
- * {@link HDLRegSyncType#SYNC} is used as default.</li>
+ * <li>HDLRegClockType clockType. Can be <code>null</code>.</li>
+ * <li>HDLRegResetType resetType. Can be <code>null</code>.</li>
+ * <li>HDLRegSyncType syncType. Can be <code>null</code>.</li>
  * <li>HDLExpression resetValue. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -36,14 +33,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param rst
 	 *            the value for rst. Can <b>not</b> be <code>null</code>.
 	 * @param clockType
-	 *            the value for clockType. If <code>null</code>,
-	 *            {@link HDLRegClockType#RISING} is used as default.
+	 *            the value for clockType. Can be <code>null</code>.
 	 * @param resetType
-	 *            the value for resetType. If <code>null</code>,
-	 *            {@link HDLRegResetType#HIGH_ACTIVE} is used as default.
+	 *            the value for resetType. Can be <code>null</code>.
 	 * @param syncType
-	 *            the value for syncType. If <code>null</code>,
-	 *            {@link HDLRegSyncType#SYNC} is used as default.
+	 *            the value for syncType. Can be <code>null</code>.
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 * @param validate
@@ -64,14 +58,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param rst
 	 *            the value for rst. Can <b>not</b> be <code>null</code>.
 	 * @param clockType
-	 *            the value for clockType. If <code>null</code>,
-	 *            {@link HDLRegClockType#RISING} is used as default.
+	 *            the value for clockType. Can be <code>null</code>.
 	 * @param resetType
-	 *            the value for resetType. If <code>null</code>,
-	 *            {@link HDLRegResetType#HIGH_ACTIVE} is used as default.
+	 *            the value for resetType. Can be <code>null</code>.
 	 * @param syncType
-	 *            the value for syncType. If <code>null</code>,
-	 *            {@link HDLRegSyncType#SYNC} is used as default.
+	 *            the value for syncType. Can be <code>null</code>.
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 */
@@ -193,12 +184,27 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				config = config.setRst(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
 			if (CLOCK_PARAM.equals(name))
 				config = config.setClk(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
-			if (EDGE_PARAM.equals(name))
-				config = config.setClockType(HDLRegClockType.valueOf(genArgs.getValue().toUpperCase()));
-			if (RESET_SYNC_PARAM.equals(name))
-				config = config.setSyncType(HDLRegSyncType.valueOf(genArgs.getValue().toUpperCase()));
-			if (RESET_TYPE_PARAM.equals(name))
-				config = config.setResetType(HDLRegResetType.valueOf(genArgs.getValue().toUpperCase()));
+			if (EDGE_PARAM.equals(name)) {
+				String value = genArgs.getValue();
+				if (value != null)
+					config = config.setClockType(HDLRegClockType.valueOf(value.toUpperCase()));
+				else
+					config = config.setClockType(HDLRegClockType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+			}
+			if (RESET_SYNC_PARAM.equals(name)) {
+				String value = genArgs.getValue();
+				if (value != null)
+					config = config.setSyncType(HDLRegSyncType.valueOf(value.toUpperCase()));
+				else
+					config = config.setSyncType(HDLRegSyncType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+			}
+			if (RESET_TYPE_PARAM.equals(name)) {
+				String value = genArgs.getValue();
+				if (value != null)
+					config = config.setResetType(HDLRegResetType.valueOf(value.toUpperCase()));
+				else
+					config = config.setResetType(HDLRegResetType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+			}
 			if (RESET_VALUE_PARAM.equals(name))
 				config = config.setResetValue(genArgs.getExpression().copy());
 		}
@@ -262,6 +268,25 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 
 	public static HDLVariable defaultRst() {
 		return new HDLVariable().setName(DEF_RST);
+	}
+
+	public HDLRegisterConfig normalize() {
+		HDLRegisterConfig res = this;
+		HDLUnit unit = getContainer(HDLUnit.class);
+		if (unit != null) {
+			HDLQualifiedName fullName = unit.getFullName();
+			HDLLibrary library = unit.getLibrary();
+			if (library != null) {
+				HDLConfig config = library.getConfig();
+				if (getResetType() == null)
+					res = res.setResetType(config.getRegResetType(fullName, null));
+				if (getSyncType() == null)
+					res = res.setSyncType(config.getRegSyncType(fullName, null));
+				if (getClockType() == null)
+					res = res.setClockType(config.getRegClockType(fullName, null));
+			}
+		}
+		return res;
 	}
 	// $CONTENT-END$
 

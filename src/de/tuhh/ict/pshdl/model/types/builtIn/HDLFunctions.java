@@ -3,14 +3,15 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 import java.math.*;
 import java.util.*;
 
+import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.upb.hni.vmagic.expression.*;
 
-public class HDLFunctions implements IHDLFunctionResolver {
+public class HDLFunctions {
 
-	public HDLFunctions() {
+	private HDLFunctions() {
 
 	}
 
@@ -64,79 +65,25 @@ public class HDLFunctions implements IHDLFunctionResolver {
 		return null;
 	}
 
-	private static EnumSet<HDLPrimitiveType> disallowedTypes = EnumSet.of(HDLPrimitiveType.BIT, HDLPrimitiveType.BITVECTOR, HDLPrimitiveType.BOOL);
-
-	public static enum BuiltInFunctions {
-		max, min, abs
-	}
-
-	@Override
-	public HDLTypeInferenceInfo resolve(HDLFunction function) {
-		String name = function.getName();
-		ArrayList<HDLExpression> params = function.getParams();
-		for (HDLExpression exp : params) {
-			HDLPrimitive type = (HDLPrimitive) exp.determineType();
-			if (disallowedTypes.contains(type.getType())) {
-				HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(HDLPrimitive.getInteger());
-				info.error = "The parameter " + exp + " of type:" + type + " is not allowed for function:" + name;
-				return info;
+	public static VHDLContext toVHDL(HDLFunction function, int pid) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+		if (list != null)
+			for (IHDLFunctionResolver resolver : list) {
+				VHDLContext eval = resolver.toVHDL(function, pid);
+				if (eval != null)
+					return eval;
 			}
-		}
-		try {
-			BuiltInFunctions func = BuiltInFunctions.valueOf(name);
-			switch (func) {
-			case min:
-			case max:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
-			case abs:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+		return null;
+	}
+
+	public static FunctionCall toVHDLExpression(HDLFunction function) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+		if (list != null)
+			for (IHDLFunctionResolver resolver : list) {
+				FunctionCall eval = resolver.toVHDLExpression(function);
+				if (eval != null)
+					return eval;
 			}
-		} catch (Exception e) {
-		}
 		return null;
-	}
-
-	@Override
-	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
-		String name = function.getName();
-		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
-		switch (func) {
-		case abs:
-			return args.get(0).abs();
-		case min:
-			return args.get(0).min(args.get(1));
-		case max:
-			return args.get(0).max(args.get(1));
-		}
-		return null;
-	}
-
-	@Override
-	public ValueRange range(HDLFunction function, HDLEvaluationContext context) {
-		String name = function.getName();
-		ValueRange zeroArg = function.getParams().get(0).determineRange(context);
-		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
-		switch (func) {
-		case abs:
-			return new ValueRange(zeroArg.from.abs(), zeroArg.to.abs());
-		case min:
-			ValueRange oneArgMin = function.getParams().get(1).determineRange(context);
-			return new ValueRange(zeroArg.from.min(oneArgMin.from), zeroArg.to.min(oneArgMin.to));
-		case max:
-			ValueRange oneArgMax = function.getParams().get(1).determineRange(context);
-			return new ValueRange(zeroArg.from.max(oneArgMax.from), zeroArg.to.max(oneArgMax.to));
-		}
-		return null;
-	}
-
-	@Override
-	public String[] getFunctionNames() {
-		String[] res = new String[BuiltInFunctions.values().length];
-		BuiltInFunctions[] values = BuiltInFunctions.values();
-		for (int i = 0; i < values.length; i++) {
-			BuiltInFunctions bif = values[i];
-			res[i] = bif.name();
-		}
-		return res;
 	}
 }

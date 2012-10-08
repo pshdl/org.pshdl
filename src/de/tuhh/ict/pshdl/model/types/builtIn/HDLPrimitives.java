@@ -403,7 +403,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 			if (HDLPrimitive.isTargetMatching(rType))
 				rType = lType;
 			if (nonOrderType.contains(lType.getType()) || nonOrderCompType.contains(rType.getType()))
-				if (!nonOrderCompType.contains(op)) {
+				if (!nonOrderCompType.contains(op.getType())) {
 					HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 					hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 					return hdi;

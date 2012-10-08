@@ -73,10 +73,10 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
-	public abstract HDLObject copy();
+	public abstract IHDLObject copy();
 
 	@Override
-	public abstract HDLObject copyFiltered(CopyFilter filter);
+	public abstract IHDLObject copyFiltered(CopyFilter filter);
 
 	public Map<String, Object> metaData = new HashMap<String, Object>();
 
@@ -250,6 +250,17 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		}
 		this.container = container;
 		return this;
+	}
+
+	public HDLLibrary getLibrary() {
+		HDLUnit hdlUnit = getContainer(HDLUnit.class);
+		if (hdlUnit != null) {
+			return hdlUnit.getLibrary();
+		}
+		HDLPackage hdlPackage = getContainer(HDLPackage.class);
+		if (hdlPackage != null)
+			return hdlPackage.getLibrary();
+		return null;
 	}
 
 	// $CONTENT-END$

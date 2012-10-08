@@ -72,12 +72,7 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public FunctionCall HDLFunction.toVHDL() {
-		FunctionDeclaration fd = new FunctionDeclaration(getName(), UnresolvedType.NO_NAME);
-		FunctionCall res = new FunctionCall(fd);
-		for (HDLExpression exp : getParams()) {
-			res.getParameters().add(new AssociationElement(exp.toVHDL()));
-		}
-		return res;
+		return HDLFunctions.toVHDLExpression(this);
 	}
 
 	public Signal HDLEnumRef.toVHDL() {
