@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.simulation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.Result;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public class HDLValidator {
@@ -18,27 +19,28 @@ public class HDLValidator {
 		READ_COUNT, WRITE_COUNT, ACCESS
 	}
 
-	public static Set<Problem> validate(HDLPackage unit, Map<HDLQualifiedName, HDLEvaluationContext> context) {
+	public static Set<Problem> validate(HDLPackage pkg, Map<HDLQualifiedName, HDLEvaluationContext> context) {
 		Set<Problem> problems = new HashSet<Problem>();
 		Map<HDLQualifiedName, HDLEvaluationContext> hContext = context;
 		if (context == null)
-			hContext = HDLEvaluationContext.createDefault(unit);
+			hContext = HDLEvaluationContext.createDefault(pkg);
 		// TODO find a way to distinguish between context dependent problems and
 		// others
 		try {
-			RWValidation.checkVariableUsage(unit, problems);
-			checkClockAndResetAnnotation(unit, problems);
-			checkConstantBoundaries(unit, problems, hContext);
-			checkArrayBoundaries(unit, problems, hContext);
-			checkConstantEquals(unit, problems, hContext);
+			RWValidation.checkVariableUsage(pkg, problems);
+			checkClockAndResetAnnotation(pkg, problems);
+			checkConstantBoundaries(pkg, problems, hContext);
+			checkArrayBoundaries(pkg, problems, hContext);
+			checkConstantEquals(pkg, problems, hContext);
 			// TODO Validate value ranges, check for 0 divide
 			// TODO Check for POW only power of 2
-			checkCombinedAssignment(unit, problems, hContext);
-			checkAnnotations(unit, problems, hContext);
-			checkType(unit, problems, hContext);
-			checkProessWrite(unit, problems, hContext);
-			checkFunctionCalls(unit, problems, hContext);
-			checkGenerators(unit, problems, hContext);
+			checkCombinedAssignment(pkg, problems, hContext);
+			checkAnnotations(pkg, problems, hContext);
+			checkType(pkg, problems, hContext);
+			checkProessWrite(pkg, problems, hContext);
+			checkFunctionCalls(pkg, problems, hContext);
+			checkGenerators(pkg, problems, hContext);
+			checkInputReg(pkg, problems, hContext);
 			// TODO Validate bitWidth mismatch
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
@@ -64,6 +66,16 @@ public class HDLValidator {
 			e.printStackTrace();
 		}
 		return problems;
+	}
+
+	private static void checkInputReg(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Collection<HDLVariableDeclaration> allIns = HDLQuery.select(HDLVariableDeclaration.class).from(pkg).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.IN)
+				.getAll();
+		for (HDLVariableDeclaration inPort : allIns) {
+			if (inPort.getRegister() != null)
+				problems.add(new Problem(ErrorCode.IN_PORT_CANT_REGISTER, inPort));
+		}
+
 	}
 
 	private static void checkGenerators(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

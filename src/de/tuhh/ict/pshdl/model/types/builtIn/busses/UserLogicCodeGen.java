@@ -14,7 +14,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 public class UserLogicCodeGen {
-	public static HDLUnit get(int regCount, boolean axi) {
+	public static HDLUnit get(int regCount) {
 		HDLVariableDeclaration C_SLV_WIDTH = new HDLVariableDeclaration().setDirection(HDLDirection.PARAMETER).setType(HDLQualifiedName.create("#uint"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.NATURAL))
 				.addVariables(new HDLVariable().setName("C_SLV_DWIDTH").setDefaultValue(new HDLLiteral().setVal("32")));
@@ -38,8 +38,7 @@ public class UserLogicCodeGen {
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("Bus2IP_Clk"));
 		HDLVariableDeclaration Bus2IP_Reset = new HDLVariableDeclaration().setDirection(HDLDirection.IN).addAnnotations(new HDLAnnotation().setName("@reset"))
 				.addAnnotations(new HDLAnnotation().setName("@VHDLAttribute").setValue("SIGIS=RST")).setType(HDLQualifiedName.create("#bit"))
-				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
-				.addVariables(new HDLVariable().setName(axi ? "Bus2IP_Resetn" : "Bus2IP_Reset"));
+				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("Bus2IP_Reset"));
 		HDLVariableDeclaration IP2Bus_RdAck = new HDLVariableDeclaration()
 				.setDirection(HDLDirection.OUT)
 				.setType(HDLQualifiedName.create("#bit"))
@@ -70,8 +69,7 @@ public class UserLogicCodeGen {
 		HDLVariableDeclaration regs = new HDLVariableDeclaration()
 				.setRegister(
 						new HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setClockType(HDLRegClockType.RISING)
-								.setResetType(axi ? HDLRegResetType.LOW_ACTIVE : HDLRegResetType.HIGH_ACTIVE).setSyncType(HDLRegSyncType.SYNC)
-								.setResetValue(new HDLLiteral().setVal("0")))
+								.setResetType(HDLRegResetType.HIGH_ACTIVE).setSyncType(HDLRegSyncType.SYNC).setResetValue(new HDLLiteral().setVal("0")))
 				.setDirection(HDLDirection.INTERNAL)
 				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
 				.setPrimitive(
@@ -174,7 +172,7 @@ public class UserLogicCodeGen {
 	}
 
 	public static void main(String[] args) {
-		HDLUnit hdlPackage = get(5, true);
+		HDLUnit hdlPackage = get(5);
 		System.out.println(hdlPackage);
 		hdlPackage.validateAllFields(null, true);
 	}

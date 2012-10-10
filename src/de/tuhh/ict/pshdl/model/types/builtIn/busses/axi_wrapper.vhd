@@ -231,7 +231,7 @@ architecture IMP of {WRAPPERNAME} is
   signal user_IP2Bus_RdAck              : std_logic;
   signal user_IP2Bus_WrAck              : std_logic;
   signal user_IP2Bus_Error              : std_logic;
-
+  signal inv_reset						: std_logic;
 begin
 
   ------------------------------------------
@@ -304,7 +304,7 @@ begin
       -- MAP USER PORTS ABOVE THIS LINE ------------------
 
       Bus2IP_Clk                     => ipif_Bus2IP_Clk,
-      Bus2IP_Resetn                  => ipif_Bus2IP_Resetn,
+      Bus2IP_Reset                   => inv_reset,
       Bus2IP_Data                    => ipif_Bus2IP_Data,
       Bus2IP_BE                      => ipif_Bus2IP_BE,
       Bus2IP_RdCE                    => user_Bus2IP_RdCE,
@@ -318,6 +318,7 @@ begin
   ------------------------------------------
   -- connect internal signals
   ------------------------------------------
+  inv_reset <= not ipif_Bus2IP_Resetn;
   ipif_IP2Bus_Data <= user_IP2Bus_Data;
   ipif_IP2Bus_WrAck <= user_IP2Bus_WrAck;
   ipif_IP2Bus_RdAck <= user_IP2Bus_RdAck;

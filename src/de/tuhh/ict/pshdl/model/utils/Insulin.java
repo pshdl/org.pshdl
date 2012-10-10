@@ -211,51 +211,66 @@ public class Insulin {
 	 * references with it. It also inserts the clk and rst signals into the
 	 * HDLUnit if needed.
 	 * 
-	 * @param apply
+	 * @param unit
 	 * @return
 	 */
 	private static <T extends HDLObject> T generateClkAndReset(T apply) {
 		ModificationSet ms = new ModificationSet();
-		HDLVariable defClkVar = new HDLVariable().setName("clk").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
-		HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
-		boolean customClk = false, customRst = false;
-		// Find all clock annotated Signals
-		HDLVariable newVar = extractVar(apply, HDLBuiltInAnnotations.clock);
-		if (newVar != null) {
-			defClkVar = newVar;
-			customClk = true;
-		}
-		newVar = extractVar(apply, HDLBuiltInAnnotations.reset);
-		if (newVar != null) {
-			defRstVar = newVar;
-			customRst = true;
-		}
-		// Replace all $clk and $rst with the clock in HDLRegisters
-		Collection<HDLRegisterConfig> clkRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fClk).lastSegmentIs(HDLRegisterConfig.DEF_CLK)
-				.getAll();
-		for (HDLRegisterConfig reg : clkRefs) {
-			ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
-			if (!customClk)
-				insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
-		}
-		Collection<HDLRegisterConfig> rstRefs = HDLQuery.select(HDLRegisterConfig.class).from(apply).where(HDLRegisterConfig.fRst).lastSegmentIs(HDLRegisterConfig.DEF_RST)
-				.getAll();
-		for (HDLRegisterConfig reg : rstRefs) {
-			HDLRegisterConfig orig = reg;
-			reg = ms.getReplacement(reg);
-			ms.replacePrune(orig, reg.setRst(HDLQualifiedName.create(defRstVar.getName())));
-			if (!customRst)
-				insertSig(ms, orig.getContainer(), defRstVar, SignalInserted.RstInserted);
-		}
+		Set<HDLUnit> units = apply.getAllObjectsOf(HDLUnit.class, true);
+		for (HDLUnit unit : units) {
+			HDLVariable defClkVar = new HDLVariable().setName("clk").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
+			HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
+			boolean customClk = false, customRst = false;
+			// Find all clock annotated Signals
+			HDLVariable newVar = extractVar(unit, HDLBuiltInAnnotations.clock);
+			if (newVar != null) {
+				defClkVar = newVar;
+				customClk = true;
+			}
+			newVar = extractVar(unit, HDLBuiltInAnnotations.reset);
+			if (newVar != null) {
+				defRstVar = newVar;
+				customRst = true;
+			}
+			boolean hasRegister = false;
+			// Replace all $clk and $rst with the clock in HDLRegisters
+			Collection<HDLRegisterConfig> clkRefs = HDLQuery.select(HDLRegisterConfig.class).from(unit).where(HDLRegisterConfig.fClk).lastSegmentIs(HDLRegisterConfig.DEF_CLK)
+					.getAll();
+			for (HDLRegisterConfig reg : clkRefs) {
+				hasRegister = true;
+				ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
+				if (!customClk)
+					insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
+			}
+			Collection<HDLRegisterConfig> rstRefs = HDLQuery.select(HDLRegisterConfig.class).from(unit).where(HDLRegisterConfig.fRst).lastSegmentIs(HDLRegisterConfig.DEF_RST)
+					.getAll();
+			for (HDLRegisterConfig reg : rstRefs) {
+				hasRegister = true;
+				HDLRegisterConfig orig = reg;
+				reg = ms.getReplacement(reg);
+				ms.replacePrune(orig, reg.setRst(HDLQualifiedName.create(defRstVar.getName())));
+				if (!customRst)
+					insertSig(ms, orig.getContainer(), defRstVar, SignalInserted.RstInserted);
+			}
 
-		// Replace all $clk and $rst VariableRefs
-		Collection<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
-		for (HDLVariableRef clkRef : clkVarRefs) {
-			ms.replace(clkRef, defClkVar.asHDLRef());
-		}
-		Collection<HDLVariableRef> rstVarRefs = HDLQuery.select(HDLVariableRef.class).from(apply).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
-		for (HDLVariableRef rstRef : rstVarRefs) {
-			ms.replace(rstRef, defRstVar.asHDLRef());
+			boolean hasClkRef = false, hasRstRef = false;
+			// Replace all $clk and $rst VariableRefs
+			Collection<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(unit).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
+			for (HDLVariableRef clkRef : clkVarRefs) {
+				ms.replace(clkRef, defClkVar.asHDLRef());
+				hasClkRef = true;
+			}
+			Collection<HDLVariableRef> rstVarRefs = HDLQuery.select(HDLVariableRef.class).from(unit).where(HDLVariableRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
+			for (HDLVariableRef rstRef : rstVarRefs) {
+				ms.replace(rstRef, defRstVar.asHDLRef());
+				hasRstRef = true;
+			}
+			if (hasClkRef && !hasRegister) {
+				insertSig(ms, unit, defClkVar, SignalInserted.ClkInserted);
+			}
+			if (hasRstRef && !hasRegister) {
+				insertSig(ms, unit, defRstVar, SignalInserted.RstInserted);
+			}
 		}
 		return ms.apply(apply);
 	}
@@ -285,10 +300,12 @@ public class Insulin {
 		boolean hasMeta = container.hasMeta(signalInserted);
 		if (!hasMeta) {
 			HDLUnit unit = (HDLUnit) container;
-			HDLStatement statement = unit.getStatements().get(0);
-			HDLPrimitive bit = HDLPrimitive.getBit();
 			container.setMeta(signalInserted);
-			ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defVar.copy()));
+			if (HDLQuery.select(HDLVariable.class).from(unit).where(HDLVariable.fName).isEqualTo(defVar.getName()).getFirst() == null) {
+				HDLStatement statement = unit.getStatements().get(0);
+				HDLPrimitive bit = HDLPrimitive.getBit();
+				ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defVar.copy()));
+			}
 		}
 	}
 

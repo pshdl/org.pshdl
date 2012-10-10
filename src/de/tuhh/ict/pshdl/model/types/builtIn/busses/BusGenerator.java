@@ -69,14 +69,13 @@ public class BusGenerator implements IHDLGenerator {
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
 		int regCount = getRegCount(hdl);
 		String version = getVersion(hdl);
+		HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get(regCount));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get(regCount, false));
 			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version, false);
 			hdgi.files.addAll(sideFiles);
 			return hdgi;
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get(regCount, true));
 			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version, true);
 			hdgi.files.addAll(sideFiles);
 			return hdgi;
