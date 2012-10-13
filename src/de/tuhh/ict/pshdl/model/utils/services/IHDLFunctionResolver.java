@@ -6,6 +6,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.upb.hni.vmagic.expression.*;
 
 public interface IHDLFunctionResolver {
@@ -20,4 +21,6 @@ public interface IHDLFunctionResolver {
 	public VHDLContext toVHDL(HDLFunction function, int pid);
 
 	public FunctionCall toVHDLExpression(HDLFunction function);
+
+	public FunctionInformation getFunctionInfo(String funcName);
 }

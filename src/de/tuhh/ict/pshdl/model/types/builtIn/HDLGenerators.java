@@ -11,11 +11,13 @@ import de.tuhh.ict.pshdl.model.validation.*;
 public class HDLGenerators {
 	private static Map<String, IHDLGenerator> generators;
 
-	public static void init(IServiceProvider sp) {
+	public static void init(CompilerInformation info, IServiceProvider sp) {
 		generators = new HashMap<String, IHDLGenerator>();
 		for (IHDLGenerator gen : sp.getAllGenerators()) {
-			for (String name : gen.getNames())
+			for (String name : gen.getNames()) {
 				generators.put(name, gen);
+				info.registeredGenerators.put(name, gen.getGeneratorInfo(name));
+			}
 		}
 	}
 

@@ -9,6 +9,7 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.declaration.*;
 import de.upb.hni.vmagic.expression.*;
@@ -40,7 +41,7 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 			case max:
 				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
 			case abs:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+				return new HDLTypeInferenceInfo(HDLPrimitive.getNatural(), HDLPrimitive.getInteger());
 			}
 		} catch (Exception e) {
 		}
@@ -104,5 +105,32 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 			res.getParameters().add(new AssociationElement(exp.toVHDL()));
 		}
 		return res;
+	}
+
+	@Override
+	public FunctionInformation getFunctionInfo(String funcName) {
+		switch (BuiltInFunctions.valueOf(funcName)) {
+		case abs: {
+			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the absolute value of a number (makes it positive)",
+					"uint - the absolute (positive) value of a number", false);
+			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
+			return fi;
+		}
+		case max: {
+			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the bigger value of two numbers",
+					"int - the bigger value of two numbers", false);
+			fi.arguments.put("int numberA", "The first number");
+			fi.arguments.put("int numberB", "The second number");
+			return fi;
+		}
+		case min: {
+			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the smaller value of two numbers",
+					"int - the smaller value of two numbers", false);
+			fi.arguments.put("int numberA", "The first number");
+			fi.arguments.put("int numberB", "The second number");
+			return fi;
+		}
+		}
+		return null;
 	}
 }

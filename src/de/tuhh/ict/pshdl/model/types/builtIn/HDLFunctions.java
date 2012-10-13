@@ -17,7 +17,7 @@ public class HDLFunctions {
 
 	private static Map<String, List<IHDLFunctionResolver>> resolvers;
 
-	public static void init(IServiceProvider sp) {
+	public static void init(CompilerInformation info, IServiceProvider sp) {
 		resolvers = new HashMap<String, List<IHDLFunctionResolver>>();
 		for (IHDLFunctionResolver resolver : sp.getAllFunctions()) {
 			String[] names = resolver.getFunctionNames();
@@ -27,6 +27,7 @@ public class HDLFunctions {
 					list = new LinkedList<IHDLFunctionResolver>();
 					resolvers.put(funcName, list);
 				}
+				info.registeredFunctions.put(funcName, resolver.getFunctionInfo(funcName));
 				list.add(resolver);
 			}
 		}

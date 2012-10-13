@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
 import de.tuhh.ict.pshdl.model.validation.*;
 
 public interface IHDLGenerator {
@@ -39,5 +40,7 @@ public interface IHDLGenerator {
 	public void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context);
 
 	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl);
+
+	public GeneratorInformation getGeneratorInfo(String name);
 
 }

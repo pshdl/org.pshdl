@@ -196,16 +196,13 @@ public class HDLValidator {
 	}
 
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Collection<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
-		for (HDLAssignment ass : asss) {
-			if (ass.getLeft() instanceof HDLVariableRef) {
-				HDLVariableRef ref = (HDLVariableRef) ass.getLeft();
-				compareBoundaries(problems, hContext, ref, ref.resolveVar().getDimensions(), ref.getArray());
-				if (ref instanceof HDLInterfaceRef) {
-					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-					HDLVariable var = hir.resolveHIf();
-					compareBoundaries(problems, hContext, ref, var.getDimensions(), hir.getIfArray());
-				}
+		Collection<HDLVariableRef> asss = unit.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : asss) {
+			compareBoundaries(problems, hContext, ref, ref.resolveVar().getDimensions(), ref.getArray());
+			if (ref instanceof HDLInterfaceRef) {
+				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
+				HDLVariable var = hir.resolveHIf();
+				compareBoundaries(problems, hContext, ref, var.getDimensions(), hir.getIfArray());
 			}
 		}
 	}
@@ -219,18 +216,18 @@ public class HDLValidator {
 			for (HDLExpression arr : array) {
 				HDLEvaluationContext context = getContext(hContext, arr);
 				ValueRange accessRange = arr.determineRange(context);
+				ValueRange arrayRange = dimensions.get(dim).determineRange(context);
+				arrayRange = new ValueRange(BigInteger.ZERO, arrayRange.to.subtract(BigInteger.ONE));
 				String info = "Expected value range:" + accessRange;
 				if (accessRange.to.signum() < 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info));
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
 				else if (accessRange.from.signum() < 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info));
-				ValueRange arrayRange = dimensions.get(dim).determineRange(context);
-				arrayRange = new ValueRange(BigInteger.ZERO, arrayRange.to);
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
 				ValueRange commonRange = arrayRange.and(accessRange);
 				if (commonRange == null)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info));
-				else if (accessRange.to.compareTo(arrayRange.to) >= 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info));
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+				else if (accessRange.to.compareTo(arrayRange.to) > 0)
+					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
 
 				dim++;
 			}

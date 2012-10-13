@@ -226,7 +226,7 @@ public aspect RangeApsect {
 			HDLType type = getCastTo();
 			if (type instanceof HDLPrimitive) {
 				ValueRange castRange = HDLPrimitives.getInstance().getValueRange((HDLPrimitive) type, context);
-				return new ValueRange(right.from, right.to.min(castRange.to));
+				return castRange.and(right);
 			}
 			this.addMeta(ProblemSource.SOURCE, this);
 			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITIVE_TYPE);

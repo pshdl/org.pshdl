@@ -4,9 +4,18 @@ import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public class HDLCore {
+	private static final CompilerInformation info = new CompilerInformation("0.1a");
+
 	public static void init(IServiceProvider sp) {
-		HDLFunctions.init(sp);
-		HDLAnnotations.init(sp);
-		HDLGenerators.init(sp);
+		info.registeredAnnotations.clear();
+		info.registeredFunctions.clear();
+		info.registeredGenerators.clear();
+		HDLFunctions.init(info, sp);
+		HDLAnnotations.init(info, sp);
+		HDLGenerators.init(info, sp);
+	}
+
+	public static CompilerInformation getCompilerInformation() {
+		return info;
 	}
 }

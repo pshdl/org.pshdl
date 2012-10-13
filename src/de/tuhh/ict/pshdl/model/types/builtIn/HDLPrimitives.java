@@ -376,7 +376,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
 			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
-			hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
+			hdi.error = "The operation " + op.getType() + " is not defined for the type of the right-handside: " + rType;
 			return hdi;
 		}
 		HDLExpression width = lType.getWidth();
@@ -429,17 +429,17 @@ public class HDLPrimitives implements IHDLPrimitive {
 	 */
 	@Override
 	public HDLTypeInferenceInfo getBitOpType(HDLBitOp op) {
+		HDLBitOpType type = op.getType();
+		if ((type == HDLBitOpType.LOGI_AND) || (type == HDLBitOpType.LOGI_OR))
+			return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool(), HDLPrimitive.getBool());
 		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
 		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
-		HDLBitOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType)) {
 			if (HDLPrimitive.isTargetMatching(rType))
 				lType = rType;
 		}
 		if (HDLPrimitive.isTargetMatching(rType))
 			rType = lType;
-		if ((type == HDLBitOpType.LOGI_AND) || (type == HDLBitOpType.LOGI_OR))
-			return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool(), HDLPrimitive.getBool());
 		HDLInferenceTriple triple = bitResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
 			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);

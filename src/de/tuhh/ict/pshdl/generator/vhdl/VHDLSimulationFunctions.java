@@ -8,6 +8,7 @@ import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.statement.*;
@@ -130,6 +131,11 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	@Override
 	public FunctionCall toVHDLExpression(HDLFunction function) {
 		return null;
+	}
+
+	@Override
+	public FunctionInformation getFunctionInfo(String funcName) {
+		return new FunctionInformation(funcName, VHDLSimulationFunctions.class.getSimpleName(), "", "does not return", true);
 	}
 
 }

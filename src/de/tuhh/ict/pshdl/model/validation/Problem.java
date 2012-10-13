@@ -1,7 +1,11 @@
 package de.tuhh.ict.pshdl.model.validation;
 
+import java.util.*;
+import java.util.concurrent.atomic.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.validation.HDLAdvisor.HDLAdvise;
 
 public class Problem {
 	public enum ProblemAccess implements MetaAccess<Problem> {
@@ -17,6 +21,9 @@ public class Problem {
 	public final IHDLObject node;
 	public final IHDLObject context;
 	public final String info;
+	public final int pid;
+	public final Map<String, Object> meta = new HashMap<String, Object>();
+	private static AtomicInteger uid = new AtomicInteger();
 
 	public Problem(ErrorCode code, IHDLObject node) {
 		this(code, node, null, null);
@@ -38,9 +45,15 @@ public class Problem {
 		this.code = code;
 		this.node = node;
 		this.info = info;
+		this.pid = uid.incrementAndGet();
 		node.addMeta(ProblemAccess.PROBLEM, this);
 		if (context != null)
 			context.addMeta(ProblemAccess.PROBLEM, this);
+	}
+
+	public Problem addMeta(String key, Object value) {
+		meta.put(key, value);
+		return this;
 	}
 
 	@Override
@@ -49,6 +62,9 @@ public class Problem {
 	}
 
 	public String toStringWithoutSeverity() {
+		HDLAdvise advise = HDLAdvisor.getAdvise(this);
+		if (advise != null)
+			return advise.message;
 		String string = code.name().toLowerCase() + " for: " + node;
 		if (context != null)
 			string += " @ " + context;

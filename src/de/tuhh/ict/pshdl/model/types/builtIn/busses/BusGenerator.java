@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
 import de.tuhh.ict.pshdl.model.validation.*;
 
 public class BusGenerator implements IHDLGenerator {
@@ -134,6 +135,16 @@ public class BusGenerator implements IHDLGenerator {
 			}
 		}
 		return res;
+	}
+
+	@Override
+	public GeneratorInformation getGeneratorInfo(String name) {
+		GeneratorInformation gi = new GeneratorInformation(BusGenerator.class.getSimpleName(), name, "Generate the infrastructure to create a pcore for the " + name
+				+ " bus. This generator should always be included.");
+		gi.arguments.put("regCount",
+				"This parameter is mandatory. It indicates how many sw registers should be accessible in the ip core. The number can be a constant or a string");
+		gi.arguments.put("version", "The version ID to use for the generated pcore");
+		return gi;
 	}
 
 }

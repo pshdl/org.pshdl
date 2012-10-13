@@ -82,7 +82,7 @@ public class HDLSampleSimulation {
 		commitAllNonRegisters(input.cycle);
 		updateAllNonRegisters(input);
 		// Rising Edge condition
-		if ((clk.current == BigInteger.ONE) && (clk.last == BigInteger.ZERO)) {
+		if ((clk.current == BigInteger.ONE) && (clk.previous == BigInteger.ZERO)) {
 			// Bypass if reset is active and it is async
 			commitRegisterValuesForClk(input.cycle);
 			updateRegisterValuesForClk(input);
@@ -143,7 +143,7 @@ public class HDLSampleSimulation {
 	}
 
 	private BigInteger c(HDLSampleSimulationInput input) {
-		return c.last;
+		return c.previous;
 	}
 
 }

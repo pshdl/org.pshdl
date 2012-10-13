@@ -5,19 +5,19 @@ import java.math.*;
 public class HDLInfo {
 	public Enum<?> var;
 	public int lastCycle;
-	public BigInteger current = BigInteger.ZERO, last = BigInteger.ZERO;
+	public BigInteger current = BigInteger.ZERO, previous = BigInteger.ZERO;
 
 	public HDLInfo(Enum<?> var) {
 		this.var = var;
 	}
 
 	public void commit(int cycle) {
-		last = current;
+		previous = current;
 		lastCycle = cycle;
 	}
 
 	@Override
 	public String toString() {
-		return "[" + last + "," + current + "]";
+		return "[" + previous + "," + current + "]";
 	}
 }
