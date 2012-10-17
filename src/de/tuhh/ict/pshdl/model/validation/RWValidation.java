@@ -60,6 +60,7 @@ public class RWValidation {
 					Integer writeCount = hdlVariable.getMeta(IntegerMeta.WRITE_COUNT);
 					writeCount = writeCount == null ? 0 : writeCount;
 					HDLDirection dir = hdlVariable.getDirection();
+					// XXX Take care of inout
 					if ((readCount == 0) && (writeCount == 0) && !((dir == PARAMETER) || (dir == CONSTANT))) {
 						problems.add(new Problem(ErrorCode.INTERFACE_UNUSED_PORT, hdlVariable, hii, null));
 					} else {

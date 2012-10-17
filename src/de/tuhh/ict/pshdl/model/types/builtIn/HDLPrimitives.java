@@ -250,7 +250,18 @@ public class HDLPrimitives implements IHDLPrimitive {
 			hdi.error = "The operation " + type + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 			return hdi;
 		}
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, lType.setType(triple.left), rType.setType(triple.right));
+
+		// Extend uint by 1 to have not lose information when interpreting uint
+		// as int
+		HDLPrimitive newLType = lType.setType(triple.left);
+		HDLPrimitive newRType = rType.setType(triple.right);
+		if ((triple.left == INT) && (triple.right == UINT)) {
+			newRType = newRType.setWidth(new HDLArithOp().setLeft(newRType.getWidth().copy()).setType(PLUS).setRight(HDLLiteral.get(1)));
+		}
+		if ((triple.left == UINT) && (triple.right == INT)) {
+			newLType = newLType.setWidth(new HDLArithOp().setLeft(newLType.getWidth().copy()).setType(PLUS).setRight(HDLLiteral.get(1)));
+		}
+		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
 		HDLExpression width = simplifyWidth(op, getWidth(type, info));
 		if (width != null)
 			width = width.copy();

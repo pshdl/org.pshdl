@@ -45,7 +45,18 @@ public class VHDLImporter {
 						for (Signal signal : signals) {
 							HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
 							HDLQualifiedName qfn = HDLQualifiedName.create("VHDL", "work", id, signal.getIdentifier());
-							HDLVariableDeclaration var = getVariable(signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>());
+							HDLVariableDeclaration var = getVariable(null, signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>());
+							vInterface = vInterface.addPorts(var);
+						}
+					}
+					List<VhdlObjectProvider<Constant>> param = entity.getGeneric();
+					for (VhdlObjectProvider<Constant> port : param) {
+						List<Constant> signals = port.getVhdlObjects();
+						for (Constant signal : signals) {
+							HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
+							HDLQualifiedName qfn = HDLQualifiedName.create("VHDL", "work", id, signal.getIdentifier());
+							HDLVariableDeclaration var = getVariable(signal.getDefaultValue(), signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>());
+							var = var.setDirection(HDLDirection.PARAMETER);
 							vInterface = vInterface.addPorts(var);
 						}
 					}
@@ -71,24 +82,25 @@ public class VHDLImporter {
 		rootScope.getLibraries().add(workScope);
 	}
 
-	public static HDLVariableDeclaration getVariable(SubtypeIndication left, HDLDirection direction, HDLQualifiedName qfn, HDLExpression width, ArrayList<HDLExpression> dimensions) {
+	public static HDLVariableDeclaration getVariable(Expression<?> defaultValue, SubtypeIndication left, HDLDirection direction, HDLQualifiedName qfn, HDLExpression width,
+			ArrayList<HDLExpression> dimensions) {
 		if (left instanceof IndexSubtypeIndication) {
 			IndexSubtypeIndication isi = (IndexSubtypeIndication) left;
 			Range dr = (Range) isi.getRanges().get(0);
-			return getVariable(isi.getBaseType(), direction, qfn, convertRange(dr), dimensions);
+			return getVariable(defaultValue, isi.getBaseType(), direction, qfn, convertRange(dr), dimensions);
 		}
 		if (StdLogic1164.STD_LOGIC.equals(left))
-			return createVar(direction, HDLPrimitiveType.BIT, qfn, width, dimensions);
+			return createVar(defaultValue, direction, HDLPrimitiveType.BIT, qfn, width, dimensions);
 		if (StdLogic1164.STD_LOGIC_VECTOR.equals(left))
-			return createVar(direction, HDLPrimitiveType.BITVECTOR, qfn, width, dimensions);
+			return createVar(defaultValue, direction, HDLPrimitiveType.BITVECTOR, qfn, width, dimensions);
 		if (NumericStd.SIGNED.equals(left))
-			return createVar(direction, HDLPrimitiveType.INT, qfn, width, dimensions);
+			return createVar(defaultValue, direction, HDLPrimitiveType.INT, qfn, width, dimensions);
 		if (NumericStd.UNSIGNED.equals(left))
-			return createVar(direction, HDLPrimitiveType.UINT, qfn, width, dimensions);
+			return createVar(defaultValue, direction, HDLPrimitiveType.UINT, qfn, width, dimensions);
 		if (Standard.INTEGER.equals(left))
-			return createVar(direction, HDLPrimitiveType.INTEGER, qfn, width, dimensions);
+			return createVar(defaultValue, direction, HDLPrimitiveType.INTEGER, qfn, width, dimensions);
 		if (Standard.NATURAL.equals(left))
-			return createVar(direction, HDLPrimitiveType.NATURAL, qfn, width, dimensions);
+			return createVar(defaultValue, direction, HDLPrimitiveType.NATURAL, qfn, width, dimensions);
 		if (left instanceof ConstrainedArray) {
 			ConstrainedArray ca = (ConstrainedArray) left;
 			@SuppressWarnings("rawtypes")
@@ -97,7 +109,7 @@ public class VHDLImporter {
 			for (DiscreteRange<?> discreteRange : ranges) {
 				dimensions.add(convertRange((Range) discreteRange));
 			}
-			HDLVariableDeclaration var = getVariable(ca.getElementType(), direction, qfn, null, dimensions);
+			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions);
 			var = var.addAnnotations(new HDLAnnotation().setName(HDLBuiltInAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier())));
 			return var;
 		}
@@ -138,9 +150,14 @@ public class VHDLImporter {
 		return width;
 	}
 
-	private static HDLVariableDeclaration createVar(HDLDirection direction, HDLPrimitiveType pt, HDLQualifiedName name, HDLExpression width, ArrayList<HDLExpression> dimensions) {
+	private static HDLVariableDeclaration createVar(Expression<?> defaultValue, HDLDirection direction, HDLPrimitiveType pt, HDLQualifiedName name, HDLExpression width,
+			ArrayList<HDLExpression> dimensions) {
 		HDLPrimitive p = new HDLPrimitive().setType(pt).setWidth(width);
-		return new HDLVariableDeclaration().setDirection(direction).setType(p).addVariables(new HDLVariable().setName(name.getLastSegment()).setDimensions(dimensions));
+		HDLExpression hDefault = null;
+		if (defaultValue != null)
+			hDefault = getExpression(defaultValue);
+		return new HDLVariableDeclaration().setDirection(direction).setType(p)
+				.addVariables(new HDLVariable().setName(name.getLastSegment()).setDimensions(dimensions).setDefaultValue(hDefault));
 	}
 
 	private static HDLExpression subThenPlus1(HDLExpression from, HDLExpression to) {

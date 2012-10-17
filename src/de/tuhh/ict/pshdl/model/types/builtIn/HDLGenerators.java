@@ -54,4 +54,12 @@ public class HDLGenerators {
 		}
 	}
 
+	public static Collection<IHDLGenerator> getAllGenerators() {
+		return generators.values();
+	}
+
+	public static Set<String> getAllGeneratorIDs() {
+		return generators.keySet();
+	}
+
 }

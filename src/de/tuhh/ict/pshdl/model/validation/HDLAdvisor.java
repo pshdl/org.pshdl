@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.validation;
 
+import java.util.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -31,7 +33,7 @@ public class HDLAdvisor {
 					"The String you provided is incorrect for this annotation: " + problem.info,
 					"Some annotations can have additional information. Those are stated as a String in double quotes. The interpretation of this String is depending on the Annotation. The String you provided however was not correct.",
 					"Check the message for information what might be incorrect", "Check the documentation for the " + annoName + " Annotation");
-		case ANNOTATION_UNKNOWN:
+		case ANNOTATION_UNKNOWN: {
 			String lastName = ((HDLAnnotation) problem.node).getName();
 			Score[] topMatches = LevenshteinDistance.getTopMatches(lastName, true, HDLAnnotations.knownAnnotations());
 			StringBuilder matchSolution = new StringBuilder();
@@ -45,6 +47,7 @@ public class HDLAdvisor {
 			return new HDLAdvise(problem, "The annotation: " + lastName + " is not known",
 					"The annotation you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", matchSolution.toString(),
 					"Check the installed libraries of the compiler");
+		}
 		case ARRAY_INDEX_NEGATIVE:
 			return new HDLAdvise(problem, "The index of the array can only be negative",
 					"When an array is accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
@@ -93,21 +96,54 @@ public class HDLAdvisor {
 		case FOR_LOOP_RANGE_NOT_CONSTANT:
 			break;
 		case GENERATOR_ERROR:
-			break;
-		case GENERATOR_INFO:
-			break;
-		case GENERATOR_NOT_KNOWN:
-			break;
+			return new HDLAdvise(problem, "The generator contains an error", problem.info, "Read the documentation for the specific generator");
 		case GENERATOR_WARNING:
-			break;
-		case INTERFACE_IN_PORT_NEVER_WRITTEN:
-			break;
-		case INTERFACE_OUT_PORT_NEVER_READ:
-			break;
-		case INTERFACE_OUT_WRITTEN:
-			break;
-		case INTERFACE_UNUSED_PORT:
-			break;
+			return new HDLAdvise(problem, "The generator produced a warning", problem.info, "Read the documentation for the specific generator");
+		case GENERATOR_INFO:
+			return new HDLAdvise(problem, "The generator contains an information", problem.info);
+		case GENERATOR_NOT_KNOWN: {
+			String genName = ((HDLDirectGeneration) problem.node).getGeneratorID();
+			Set<String> genIDs = HDLGenerators.getAllGeneratorIDs();
+			Score[] topMatches = LevenshteinDistance.getTopMatches(genName, true, genIDs.toArray(new String[genIDs.size()]));
+			StringBuilder matchSolution = new StringBuilder();
+			matchSolution.append("Generators that you might have meant: ");
+			for (int i = 0; i < Math.min(3, topMatches.length); i++) {
+				Score score = topMatches[i];
+				if (i != 0)
+					matchSolution.append(", ");
+				matchSolution.append('@').append(score.string);
+			}
+			return new HDLAdvise(problem, "The generator with the id: " + genName + " is not known",
+					"The generator you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", matchSolution.toString(),
+					"Check the installed generators of the compiler");
+		}
+		case INTERFACE_IN_PORT_NEVER_WRITTEN: {
+			HDLVariable var = (HDLVariable) problem.node;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
+					"It appears that the port " + var.getName()
+							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
+					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
+		}
+		case INTERFACE_OUT_PORT_NEVER_READ: {
+			HDLVariable var = (HDLVariable) problem.node;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			return new HDLAdvise(problem, "No read access to the out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
+					"It appears that the port " + var.getName() + " is never read, altough it is marked as out port", "Do something with the port");
+		}
+		case INTERFACE_OUT_WRITTEN: {
+			HDLVariable var = (HDLVariable) problem.node;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			return new HDLAdvise(problem, "The out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is written", "It appears that the port "
+					+ var.getName() + " is written to, altough it is marked as out port", "Remove the write access");
+		}
+		case INTERFACE_UNUSED_PORT: {
+			HDLVariable var = (HDLVariable) problem.node;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			return new HDLAdvise(problem, "The port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is never read or written", "It appears that the port "
+					+ var.getName() + " is neither read, nor written to. You might want to check wether this is intentional", "Remove the port if it is not necessary",
+					"Do something useful with it");
+		}
 		case INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN:
 			break;
 		case INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ:
