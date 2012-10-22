@@ -80,6 +80,12 @@ public aspect ScopingAspect {
 		return res;
 	}
 	
+	public List<HDLVariable> HDLInlineFunction.doGetVariables(){
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
+		res.addAll(getArgs());
+		return res;
+	}
+	
 	public List<HDLEnumDeclaration> HDLForLoop.doGetEnumDeclarations() {
 		return HDLResolver.getallEnumDeclarations(getDos());
 	}

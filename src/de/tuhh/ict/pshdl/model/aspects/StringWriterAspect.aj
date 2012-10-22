@@ -77,8 +77,22 @@ public aspect StringWriterAspect {
 		StringBuilder sb = new StringBuilder();
 		if (getSimOnly()!= null && getSimOnly())
 			sb.append("simulation ");
-		sb.append("native ");
+		sb.append("native function ");
 		sb.append(getName()).append(";\n");
+		return sb.toString();
+	}
+	public String HDLInlineFunction.toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("inline function ");
+		sb.append(getName());
+		sb.append('(');
+		for (Iterator<HDLVariable> iter = getArgs().iterator(); iter.hasNext();) {
+			HDLVariable var = (HDLVariable) iter.next();
+			sb.append(var.getName());
+			if (iter.hasNext())
+				sb.append(',');
+		}
+		sb.append(") -> (").append(getExpr()).append(")\n");
 		return sb.toString();
 	}
 

@@ -12,7 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>String args. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLVariable> args. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> stmnts. Can be <code>null</code>.</li>
  * </ul>
  */
@@ -27,14 +27,14 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param args
-	 *            the value for args. Can <b>not</b> be <code>null</code>.
+	 *            the value for args. Can be <code>null</code>.
 	 * @param stmnts
 	 *            the value for stmnts. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSubstituteFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull String args, @Nullable ArrayList<HDLStatement> stmnts,
-			boolean validate, boolean updateContainer) {
+	public HDLSubstituteFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariable> args,
+			@Nullable ArrayList<HDLStatement> stmnts, boolean validate, boolean updateContainer) {
 		super(objectID, container, name, args, stmnts, validate, updateContainer);
 	}
 
@@ -46,11 +46,11 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param args
-	 *            the value for args. Can <b>not</b> be <code>null</code>.
+	 *            the value for args. Can be <code>null</code>.
 	 * @param stmnts
 	 *            the value for stmnts. Can be <code>null</code>.
 	 */
-	public HDLSubstituteFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull String args, @Nullable ArrayList<HDLStatement> stmnts) {
+	public HDLSubstituteFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariable> args, @Nullable ArrayList<HDLStatement> stmnts) {
 		this(objectID, container, name, args, stmnts, true, true);
 	}
 
@@ -67,11 +67,11 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	}
 
 	/**
-	 * The accessor for the field args which is of type String.
+	 * The accessor for the field args which is of type ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLSubstituteFunction, String> fArgs = new HDLFieldAccess<HDLSubstituteFunction, String>() {
+	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>>() {
 		@Override
-		public String getValue(HDLSubstituteFunction obj) {
+		public ArrayList<HDLVariable> getValue(HDLSubstituteFunction obj) {
 			if (obj == null)
 				return null;
 			return obj.getArgs();

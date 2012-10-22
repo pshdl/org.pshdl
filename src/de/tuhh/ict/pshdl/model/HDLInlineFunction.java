@@ -1,8 +1,11 @@
 package de.tuhh.ict.pshdl.model;
 
+import java.util.*;
+
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -10,7 +13,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>String args. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLVariable> args. Can be <code>null</code>.</li>
  * <li>HDLExpression expr. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -25,14 +28,14 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param args
-	 *            the value for args. Can <b>not</b> be <code>null</code>.
+	 *            the value for args. Can be <code>null</code>.
 	 * @param expr
 	 *            the value for expr. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInlineFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull String args, @NonNull HDLExpression expr, boolean validate,
-			boolean updateContainer) {
+	public HDLInlineFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariable> args, @NonNull HDLExpression expr,
+			boolean validate, boolean updateContainer) {
 		super(objectID, container, name, args, expr, validate, updateContainer);
 	}
 
@@ -44,11 +47,11 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param args
-	 *            the value for args. Can <b>not</b> be <code>null</code>.
+	 *            the value for args. Can be <code>null</code>.
 	 * @param expr
 	 *            the value for expr. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInlineFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull String args, @NonNull HDLExpression expr) {
+	public HDLInlineFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariable> args, @NonNull HDLExpression expr) {
 		this(objectID, container, name, args, expr, true, true);
 	}
 
@@ -65,11 +68,11 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	}
 
 	/**
-	 * The accessor for the field args which is of type String.
+	 * The accessor for the field args which is of type ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLInlineFunction, String> fArgs = new HDLFieldAccess<HDLInlineFunction, String>() {
+	public static HDLFieldAccess<HDLInlineFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLInlineFunction, ArrayList<HDLVariable>>() {
 		@Override
-		public String getValue(HDLInlineFunction obj) {
+		public ArrayList<HDLVariable> getValue(HDLInlineFunction obj) {
 			if (obj == null)
 				return null;
 			return obj.getArgs();
@@ -86,7 +89,31 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 			return obj.getExpr();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+
+	public HDLExpression getReplacementExpression(HDLFunctionCall hdi) {
+		ArrayList<HDLVariable> args = getArgs();
+		ArrayList<HDLExpression> params = hdi.getParams();
+		return createExpression(args, params);
+	}
+
+	private HDLExpression createExpression(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params) {
+		ModificationSet msExp = new ModificationSet();
+		HDLExpression orig = getExpr();
+		for (int i = 0; i < args.size(); i++) {
+			HDLVariable arg = args.get(i);
+			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(this).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
+			for (HDLVariableRef argRef : allArgRefs) {
+				msExp.replace(argRef, params.get(i).copyFiltered(CopyFilter.DEEP));
+			}
+		}
+		return msExp.apply(orig).copy();
+	}
+
+	public HDLExpression getReplacementExpressionArgs(HDLExpression... args) {
+		return createExpression(getArgs(), asList(args));
+	}
 	// $CONTENT-END$
 
 }

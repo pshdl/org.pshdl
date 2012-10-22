@@ -350,8 +350,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 				return leftW;
 			if ((leftW == null) && (rightW != null))
 				return rightW;
-			HDLFunctionCall max = new HDLFunctionCall().setName(HDLQualifiedName.create("pshdl", "max")).addParams(leftW).addParams(rightW);
-			return max;
+			return PSHDLLib.MAX.getReplacementExpressionArgs(leftW, rightW);
 			// return new HDLArithOp().setLeft(max).setType(PLUS).setRight(new
 			// HDLLiteral().setVal("1"));
 		case MUL:

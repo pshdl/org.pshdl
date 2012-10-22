@@ -41,6 +41,25 @@ public class HDLFunctions {
 				if (resolve != null)
 					return resolve;
 			}
+		HDLFunction rFunc = function.resolveName();
+		if (rFunc != null) {
+			if (rFunc instanceof HDLInlineFunction) {
+				HDLInlineFunction hif = (HDLInlineFunction) rFunc;
+				HDLExpression expression = hif.getReplacementExpression(function);
+				if (expression != null) {
+					HDLType type = expression.determineType();
+					if (type instanceof HDLPrimitive) {
+						HDLPrimitive result = (HDLPrimitive) type;
+						HDLType args[] = new HDLType[function.getParams().size()];
+						int i = 0;
+						for (HDLExpression exp : function.getParams()) {
+							args[i++] = exp.determineType();
+						}
+						return new HDLTypeInferenceInfo(result, args);
+					}
+				}
+			}
+		}
 		return null;
 	}
 

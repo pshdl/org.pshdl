@@ -28,6 +28,8 @@ public class HDLValidator {
 		// others
 		try {
 			RWValidation.checkVariableUsage(pkg, problems);
+			checkFunctionCalls(pkg, problems, hContext);
+			pkg = Insulin.inlineFunctions(pkg);
 			checkClockAndResetAnnotation(pkg, problems);
 			checkConstantBoundaries(pkg, problems, hContext);
 			checkArrayBoundaries(pkg, problems, hContext);
@@ -38,7 +40,6 @@ public class HDLValidator {
 			checkAnnotations(pkg, problems, hContext);
 			checkType(pkg, problems, hContext);
 			checkProessWrite(pkg, problems, hContext);
-			checkFunctionCalls(pkg, problems, hContext);
 			checkGenerators(pkg, problems, hContext);
 			checkInputReg(pkg, problems, hContext);
 			// TODO Validate bitWidth mismatch
@@ -90,7 +91,13 @@ public class HDLValidator {
 		for (HDLFunctionCall function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
 			if (info == null) {
-				problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+				try {
+					HDLFunction f = function.resolveName();
+					if (f == null)
+						problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+				} catch (Exception e) {
+					problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+				}
 			}
 		}
 	}

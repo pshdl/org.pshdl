@@ -26,6 +26,7 @@ public class Insulin {
 		RWValidation.annotateWriteCount(orig);
 		T apply = handleOutPortRead(orig);
 		apply = includeGenerators(apply);
+		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
 		// System.out.println("Insulin.transform()" + apply);
 		// apply.validateAllFields(null, true);
@@ -38,6 +39,24 @@ public class Insulin {
 		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(null, true);
 		return apply;
+	}
+
+	public static <T extends HDLObject> T inlineFunctions(T pkg) {
+		ModificationSet ms = new ModificationSet();
+		Set<HDLFunctionCall> functions = pkg.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (HDLFunctionCall hdi : functions) {
+			HDLFunction function = hdi.resolveName();
+			switch (function.getClassType()) {
+			case HDLInlineFunction:
+				HDLInlineFunction hif = (HDLInlineFunction) function;
+				HDLExpression equivalenExpression = hif.getReplacementExpression(hdi);
+				ms.replace(hdi, equivalenExpression);
+				break;
+			case HDLSubstituteFunction:
+			default:
+			}
+		}
+		return ms.apply(pkg);
 	}
 
 	private static <T extends HDLObject> T setParameterOnInstance(T apply) {
@@ -417,6 +436,10 @@ public class Insulin {
 	private static void fortifyOpExpressions(HDLObject apply, ModificationSet ms) {
 		Collection<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		for (HDLExpression opExpression : opEx) {
+			if (opExpression.getContainer(HDLInlineFunction.class) != null)
+				continue;
+			if (opExpression.getContainer(HDLSubstituteFunction.class) != null)
+				continue;
 			HDLTypeInferenceInfo inferenceInfo = null;
 			HDLExpression left = null;
 			HDLExpression right = null;

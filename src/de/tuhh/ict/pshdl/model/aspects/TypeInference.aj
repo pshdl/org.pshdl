@@ -7,6 +7,8 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 public aspect TypeInference {
 
@@ -33,6 +35,8 @@ public aspect TypeInference {
 			return hii.resolveHIf();
 		case HDLForLoop:
 			return HDLPrimitive.getNatural();
+		case HDLInlineFunction:
+			throw new HDLProblemException(new Problem(ErrorCode.INLINE_FUNCTION_NO_TYPE, this));
 		default:
 			throw new IllegalArgumentException("Failed to resolve type of " + this + " caused by an unexpected container: " + container);
 		}
@@ -51,7 +55,7 @@ public aspect TypeInference {
 		while (iter.hasNext()) {
 			type = (HDLPrimitive) iter.next().determineType();
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(getWidth(type));
-			width = HDLPrimitives.simplifyWidth(this, width);
+			width = HDLPrimitives.simplifyWidth(this, width).copy();
 		}
 		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}
@@ -87,10 +91,10 @@ public aspect TypeInference {
 		if (bits.size() == 1 && bits.get(0).getFrom() == null)
 			return HDLPrimitive.getBit();
 		Iterator<HDLRange> iter = bits.iterator();
-		HDLExpression width = HDLPrimitives.simplifyWidth(this, iter.next().getWidth().copy());
+		HDLExpression width = HDLPrimitives.simplifyWidth(this, iter.next().getWidth().copy()).copy();
 		while (iter.hasNext()) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth().copy());
-			width = HDLPrimitives.simplifyWidth(this, width);
+			width = HDLPrimitives.simplifyWidth(this, width).copy();
 		}
 		return HDLPrimitive.getBitvector().setWidth(width.copy()).setContainer(this);
 	}
@@ -113,5 +117,9 @@ public aspect TypeInference {
 	
 	public HDLType HDLTernary.determineType(){
 		return getThenExpr().determineType();
+	}
+	
+	public HDLType HDLInlineFunction.determineType() {
+		throw new HDLProblemException(new Problem(ErrorCode.INLINE_FUNCTION_NO_TYPE, this));
 	}
 }
