@@ -164,7 +164,7 @@ public aspect VHDLPackageTransformation {
 		HDLConfig config = HDLLibrary.getLibrary(hUnit.getLibURI()).getConfig();
 		ps.getSensitivityList().add((Signal) clk);
 		EnumerationLiteral activeRst;
-		if (config.getRegResetType(hUnit.getFullName(), key.getResetType()) == HDLRegResetType.HIGH_ACTIVE)
+		if (config.getRegResetType(hUnit.getFullName(), key.getResetType()) == HDLRegResetActiveType.HIGH)
 			activeRst = StdLogic1164.STD_LOGIC_1;
 		else
 			activeRst = StdLogic1164.STD_LOGIC_0;

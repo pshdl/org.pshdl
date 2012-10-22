@@ -47,6 +47,10 @@ public aspect FullNameAspect {
 		HDLQualifiedName fullName = super.getFullName();
 		return fullName.append(new HDLQualifiedName(getName()));
 	}
+	public HDLQualifiedName HDLFunction.getFullName() {
+		HDLQualifiedName fullName = super.getFullName();
+		return fullName.append(new HDLQualifiedName(getName()));
+	}
 
 	public HDLQualifiedName HDLPackage.getFullName() {
 		HDLQualifiedName fullName = super.getFullName();

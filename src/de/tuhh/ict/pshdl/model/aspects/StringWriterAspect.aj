@@ -59,9 +59,9 @@ public aspect StringWriterAspect {
 		return sb.toString();
 	}
 
-	public String HDLFunction.toString() {
+	public String HDLFunctionCall.toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getName().toLowerCase()).append('(');
+		sb.append(getNameRefName()).append('(');
 		boolean first = true;
 		for (HDLExpression p : getParams()) {
 			if (!first)
@@ -70,6 +70,15 @@ public aspect StringWriterAspect {
 			first=false;
 		}
 		sb.append(')');
+		return sb.toString();
+	}
+	
+	public String HDLNativeFunction.toString() {
+		StringBuilder sb = new StringBuilder();
+		if (getSimOnly()!= null && getSimOnly())
+			sb.append("simulation ");
+		sb.append("native ");
+		sb.append(getName()).append(";\n");
 		return sb.toString();
 	}
 
@@ -311,7 +320,7 @@ public aspect StringWriterAspect {
 			sb.append(spacer).append(henum);
 			spacer = ", ";
 		}
-		sb.append("}");
+		sb.append("}\n");
 		return sb.toString();
 	}
 

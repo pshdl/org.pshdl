@@ -323,8 +323,8 @@ public class Insulin {
 	}
 
 	private static void foritfyFunctions(HDLObject apply, ModificationSet ms) {
-		Collection<HDLFunction> functions = apply.getAllObjectsOf(HDLFunction.class, true);
-		for (HDLFunction function : functions) {
+		Collection<HDLFunctionCall> functions = apply.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (HDLFunctionCall function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
 			if (info != null) {
 				ArrayList<HDLExpression> params = function.getParams();
@@ -624,7 +624,10 @@ public class Insulin {
 					if (hdv.getVariables().size() == 1) {
 						hdv = hdv.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(outVar));
 					} else {
-						ms.insertAfter(origHdv, new HDLVariableDeclaration().setType(origHdv.resolveType().copy()).addVariables(outVar.copy()));
+						HDLRegisterConfig register = null;
+						if (hdv.getRegister() != null)
+							register = hdv.getRegister().copy();
+						ms.insertAfter(origHdv, new HDLVariableDeclaration().setRegister(register).setType(origHdv.resolveType().copy()).addVariables(outVar.copy()));
 						hdv = hdv.removeVariables(var);
 					}
 

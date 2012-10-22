@@ -36,7 +36,7 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLDirectGeneration.toVHDL(int pid) {
 		return new VHDLContext();
 	}
-	public VHDLContext HDLFunction.toVHDL(int pid) {
+	public VHDLContext HDLFunctionCall.toVHDL(int pid) {
 		return HDLFunctions.toVHDL(this, pid);
 	}
 
@@ -378,5 +378,9 @@ public aspect VHDLStatementTransformation {
 			res.addUnclockedStatement(pid, ifs, this);
 		}
 		return res;
+	}
+	
+	public VHDLContext HDLFunction.toVHDL(int pid){
+		throw new IllegalArgumentException("Not supported");
 	}
 }

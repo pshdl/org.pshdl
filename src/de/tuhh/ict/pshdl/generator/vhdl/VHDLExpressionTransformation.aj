@@ -71,7 +71,7 @@ public aspect VHDLExpressionTransformation {
 		return getRef(result, this);
 	}
 
-	public FunctionCall HDLFunction.toVHDL() {
+	public FunctionCall HDLFunctionCall.toVHDL() {
 		return HDLFunctions.toVHDLExpression(this);
 	}
 
@@ -257,6 +257,9 @@ public aspect VHDLExpressionTransformation {
 	}
 	
 	public Expression<?> HDLTernary.toVHDL(){
+		throw new IllegalArgumentException("Not supported:" + this);
+	}
+	public Expression<?> HDLFunction.toVHDL(){
 		throw new IllegalArgumentException("Not supported:" + this);
 	}
 }

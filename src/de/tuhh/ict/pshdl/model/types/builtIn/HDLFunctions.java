@@ -33,8 +33,8 @@ public class HDLFunctions {
 		}
 	}
 
-	public static HDLTypeInferenceInfo getInferenceInfo(HDLFunction function) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+	public static HDLTypeInferenceInfo getInferenceInfo(HDLFunctionCall function) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null)
 			for (IHDLFunctionResolver resolver : list) {
 				HDLTypeInferenceInfo resolve = resolver.resolve(function);
@@ -44,8 +44,8 @@ public class HDLFunctions {
 		return null;
 	}
 
-	public static BigInteger constantEvaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+	public static BigInteger constantEvaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null)
 			for (IHDLFunctionResolver resolver : list) {
 				BigInteger eval = resolver.evaluate(function, args, context);
@@ -55,8 +55,8 @@ public class HDLFunctions {
 		return null;
 	}
 
-	public static ValueRange determineRange(HDLFunction function, HDLEvaluationContext context) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+	public static ValueRange determineRange(HDLFunctionCall function, HDLEvaluationContext context) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null)
 			for (IHDLFunctionResolver resolver : list) {
 				ValueRange eval = resolver.range(function, context);
@@ -66,8 +66,8 @@ public class HDLFunctions {
 		return null;
 	}
 
-	public static VHDLContext toVHDL(HDLFunction function, int pid) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+	public static VHDLContext toVHDL(HDLFunctionCall function, int pid) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null)
 			for (IHDLFunctionResolver resolver : list) {
 				VHDLContext eval = resolver.toVHDL(function, pid);
@@ -77,8 +77,8 @@ public class HDLFunctions {
 		return null;
 	}
 
-	public static FunctionCall toVHDLExpression(HDLFunction function) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getName());
+	public static FunctionCall toVHDLExpression(HDLFunctionCall function) {
+		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null)
 			for (IHDLFunctionResolver resolver : list) {
 				FunctionCall eval = resolver.toVHDLExpression(function);

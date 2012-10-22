@@ -48,4 +48,6 @@ public interface IHDLObject {
 
 	public HDLQualifiedName getFullName();
 
+	public HDLFunction resolveFunction(HDLQualifiedName name);
+
 }

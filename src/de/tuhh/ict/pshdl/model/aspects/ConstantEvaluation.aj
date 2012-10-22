@@ -207,7 +207,7 @@ public aspect ConstantEvaluation {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!");
 	}
 
-	public BigInteger HDLFunction.constantEvaluate(HDLEvaluationContext context) {
+	public BigInteger HDLFunctionCall.constantEvaluate(HDLEvaluationContext context) {
 		List<BigInteger> args = new LinkedList<BigInteger>();
 		for (HDLExpression arg : getParams()) {
 			BigInteger val = subEvaluate(this, arg, context);

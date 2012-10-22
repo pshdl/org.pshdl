@@ -23,8 +23,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public HDLTypeInferenceInfo resolve(HDLFunction function) {
-		String name = function.getName();
+	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
+		String name = function.getNameRefName().getLastSegment();
 		ArrayList<HDLExpression> params = function.getParams();
 		for (HDLExpression exp : params) {
 			HDLPrimitive type = (HDLPrimitive) exp.determineType();
@@ -49,8 +49,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
-		String name = function.getName();
+	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
+		String name = function.getNameRefName().getLastSegment();
 		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
 		switch (func) {
 		case abs:
@@ -64,8 +64,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public ValueRange range(HDLFunction function, HDLEvaluationContext context) {
-		String name = function.getName();
+	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
+		String name = function.getNameRefName().getLastSegment();
 		ValueRange zeroArg = function.getParams().get(0).determineRange(context);
 		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
 		switch (func) {
@@ -93,13 +93,13 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public VHDLContext toVHDL(HDLFunction function, int pid) {
+	public VHDLContext toVHDL(HDLFunctionCall function, int pid) {
 		return null;
 	}
 
 	@Override
-	public FunctionCall toVHDLExpression(HDLFunction function) {
-		FunctionDeclaration fd = new FunctionDeclaration(function.getName(), UnresolvedType.NO_NAME);
+	public FunctionCall toVHDLExpression(HDLFunctionCall function) {
+		FunctionDeclaration fd = new FunctionDeclaration(function.getNameRefName().getLastSegment(), UnresolvedType.NO_NAME);
 		FunctionCall res = new FunctionCall(fd);
 		for (HDLExpression exp : function.getParams()) {
 			res.getParameters().add(new AssociationElement(exp.toVHDL()));

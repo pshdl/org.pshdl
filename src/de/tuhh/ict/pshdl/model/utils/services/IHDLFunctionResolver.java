@@ -10,17 +10,17 @@ import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInform
 import de.upb.hni.vmagic.expression.*;
 
 public interface IHDLFunctionResolver {
-	public HDLTypeInferenceInfo resolve(HDLFunction function);
+	public HDLTypeInferenceInfo resolve(HDLFunctionCall function);
 
-	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context);
+	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context);
 
-	public ValueRange range(HDLFunction function, HDLEvaluationContext context);
+	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context);
 
 	public String[] getFunctionNames();
 
-	public VHDLContext toVHDL(HDLFunction function, int pid);
+	public VHDLContext toVHDL(HDLFunctionCall function, int pid);
 
-	public FunctionCall toVHDLExpression(HDLFunction function);
+	public FunctionCall toVHDLExpression(HDLFunctionCall function);
 
 	public FunctionInformation getFunctionInfo(String funcName);
 }

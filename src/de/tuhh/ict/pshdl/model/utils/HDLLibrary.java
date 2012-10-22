@@ -10,13 +10,14 @@ import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 public class HDLLibrary {
 	public Map<HDLQualifiedName, HDLUnit> units = new ConcurrentHashMap<HDLQualifiedName, HDLUnit>();
 	public Map<HDLQualifiedName, HDLType> types = new ConcurrentHashMap<HDLQualifiedName, HDLType>();
+	public Map<HDLQualifiedName, HDLFunction> functions = new ConcurrentHashMap<HDLQualifiedName, HDLFunction>();
 	public List<SideFile> sideFiles = new LinkedList<SideFile>();
 	private HDLConfig config = new HDLConfig();
 
 	private static Map<String, HDLLibrary> libs = new HashMap<String, HDLLibrary>();
 
 	public HDLLibrary() {
-		addPkg(PSHDLLib.LIB);
+		addPkg(PSHDLLib.getLib());
 	}
 
 	public static void registerLibrary(String uri, HDLLibrary library) {
@@ -40,6 +41,10 @@ public class HDLLibrary {
 			for (HDLEnum hdlEnum : elist) {
 				addEnum(hdlEnum);
 			}
+			Set<HDLFunction> functions = unit.getAllObjectsOf(HDLFunction.class, true);
+			for (HDLFunction hdlFunction : functions) {
+				addFunction(hdlFunction);
+			}
 		}
 		for (HDLDeclaration decl : pkg.getDeclarations()) {
 			switch (decl.getClassType()) {
@@ -52,9 +57,51 @@ public class HDLLibrary {
 				addInterface(hid.getHIf());
 				break;
 			default:
-				throw new IllegalArgumentException("Did not handle:" + decl);
+				if (decl instanceof HDLFunction) {
+					HDLFunction func = (HDLFunction) decl;
+					addFunction(func);
+				} else
+					throw new IllegalArgumentException("Did not handle:" + decl);
 			}
 		}
+	}
+
+	public void addFunction(HDLFunction func) {
+		functions.put(func.getFullName(), func);
+	}
+
+	/**
+	 * Resolves a type by firstly checking if it already exists given the
+	 * qualified name. If not the specific imports are tried first, then the
+	 * wild card ones in order of declaration.
+	 * 
+	 * @param imports
+	 *            a list of specific and wild card imports
+	 * @param type
+	 *            the fqn or local name of the type to look for
+	 * @return the type if found
+	 */
+	public HDLFunction resolveFunction(ArrayList<String> imports, HDLQualifiedName type) {
+		HDLFunction hdlType = functions.get(type);
+		if (hdlType == null) {
+			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
+			// type + " @" + this);
+			for (String string : imports) {
+				if (string.endsWith(type.toString()))
+					return functions.get(new HDLQualifiedName(string));
+			}
+			for (String string : imports) {
+				if (string.endsWith(".*")) {
+					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
+					// System.out.println("HDLLibrary.resolve()" + newTypeName);
+					HDLFunction newType = functions.get(newTypeName);
+					if (newType != null) {
+						return newType;
+					}
+				}
+			}
+		}
+		return hdlType;
 	}
 
 	/**

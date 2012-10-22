@@ -86,8 +86,8 @@ public class HDLValidator {
 	}
 
 	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLFunction> functions = unit.getAllObjectsOf(HDLFunction.class, true);
-		for (HDLFunction function : functions) {
+		Set<HDLFunctionCall> functions = unit.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (HDLFunctionCall function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
 			if (info == null) {
 				problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));

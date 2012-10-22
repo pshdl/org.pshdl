@@ -7,6 +7,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.upb.hni.vmagic.expression.*;
@@ -16,13 +17,16 @@ import de.upb.hni.vmagic.statement.*;
 public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	private static enum SimulationFunctions {
-		waitFor, waitUntil, wait, toggle, pulse
+		waitFor, waitUntil, wait, toggle, pulse;
+		public HDLQualifiedName getName() {
+			return HDLQualifiedName.create("pshdl", name());
+		}
 	}
 
 	@Override
-	public HDLTypeInferenceInfo resolve(HDLFunction function) {
+	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
 		try {
-			SimulationFunctions func = SimulationFunctions.valueOf(function.getName());
+			SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
 			switch (func) {
 			case wait:
 				return new HDLTypeInferenceInfo(HDLPrimitive.getBool());
@@ -41,12 +45,12 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public BigInteger evaluate(HDLFunction function, List<BigInteger> args, HDLEvaluationContext context) {
+	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
 		return null;
 	}
 
 	@Override
-	public ValueRange range(HDLFunction function, HDLEvaluationContext context) {
+	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
 		return null;
 	}
 
@@ -62,8 +66,8 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public VHDLContext toVHDL(HDLFunction function, int pid) {
-		SimulationFunctions func = SimulationFunctions.valueOf(function.getName());
+	public VHDLContext toVHDL(HDLFunctionCall function, int pid) {
+		SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
 		switch (func) {
 		case wait: {
 			VHDLContext res = new VHDLContext();
@@ -89,11 +93,12 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			IHDLObject container = function.getContainer();
 			HDLAssignment ass = setValue(ref, 0, container);
 			res.addUnclockedStatement(pid, ass.toVHDL(pid).getStatement(), ass);
-			HDLFunction wait = new HDLFunction().setName("waitFor").addParams(params.get(1).copy()).addParams(params.get(2).copy()).setContainer(container);
+			HDLFunctionCall wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1).copy()).addParams(params.get(2).copy())
+					.setContainer(container);
 			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
 			ass = setValue(ref, 1, container);
 			res.addUnclockedStatement(pid, ass.toVHDL(pid).getStatement(), ass);
-			wait = new HDLFunction().setName("waitFor").addParams(params.get(1).copy()).addParams(params.get(2).copy()).setContainer(container);
+			wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1).copy()).addParams(params.get(2).copy()).setContainer(container);
 			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
 			return res;
 		}
@@ -129,7 +134,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public FunctionCall toVHDLExpression(HDLFunction function) {
+	public FunctionCall toVHDLExpression(HDLFunctionCall function) {
 		return null;
 	}
 

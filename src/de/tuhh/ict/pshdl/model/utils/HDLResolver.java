@@ -13,6 +13,8 @@ public class HDLResolver {
 
 	private Map<HDLQualifiedName, HDLInterface> ifCache;
 
+	private Map<HDLQualifiedName, HDLFunction> funcCache;
+
 	private final IStatementContainer resolveTo;
 
 	private Map<HDLQualifiedName, HDLType> typeCache;
@@ -68,6 +70,26 @@ public class HDLResolver {
 		if ((resolveTo.getContainer() == null) || !descent)
 			return null;
 		return resolveTo.getContainer().resolveEnum(hEnum);
+	}
+
+	public HDLFunction resolveFunction(HDLQualifiedName hEnum) {
+		if (funcCache == null) {
+			synchronized (this) {
+				Collection<HDLFunction> enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
+				funcCache = new HashMap<HDLQualifiedName, HDLFunction>();
+				for (HDLFunction hdlEnumDeclaration : enumDecl) {
+					funcCache.put(hdlEnumDeclaration.getFullName(), hdlEnumDeclaration);
+				}
+			}
+		}
+		// XXX Check if the qualifier does either match the pkg name, or is not
+		// existant
+		HDLFunction checkCache = checkCache(hEnum, funcCache);
+		if (checkCache != null)
+			return checkCache;
+		if ((resolveTo.getContainer() == null) || !descent)
+			return null;
+		return resolveTo.getContainer().resolveFunction(hEnum);
 	}
 
 	public HDLInterface resolveInterface(HDLQualifiedName hIf) {

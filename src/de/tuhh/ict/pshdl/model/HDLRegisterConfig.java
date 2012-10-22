@@ -15,7 +15,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>HDLQualifiedName clk. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName rst. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLRegClockType clockType. Can be <code>null</code>.</li>
- * <li>HDLRegResetType resetType. Can be <code>null</code>.</li>
+ * <li>HDLRegResetActiveType resetType. Can be <code>null</code>.</li>
  * <li>HDLRegSyncType syncType. Can be <code>null</code>.</li>
  * <li>HDLExpression resetValue. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
@@ -44,7 +44,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLRegisterConfig(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate, boolean updateContainer) {
+			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate, boolean updateContainer) {
 		super(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, validate, updateContainer);
 	}
 
@@ -67,7 +67,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 */
 	public HDLRegisterConfig(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue) {
+			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue) {
 		this(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, true, true);
 	}
 
@@ -87,8 +87,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		RISING, FALLING;
 	}
 
-	public static enum HDLRegResetType {
-		HIGH_ACTIVE, LOW_ACTIVE;
+	public static enum HDLRegResetActiveType {
+		HIGH, LOW;
 	}
 
 	public static enum HDLRegSyncType {
@@ -129,11 +129,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
-	 * The accessor for the field resetType which is of type HDLRegResetType.
+	 * The accessor for the field resetType which is of type
+	 * HDLRegResetActiveType.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetType>() {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetActiveType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetActiveType>() {
 		@Override
-		public HDLRegResetType getValue(HDLRegisterConfig obj) {
+		public HDLRegResetActiveType getValue(HDLRegisterConfig obj) {
 			if (obj == null)
 				return null;
 			return obj.getResetType();
@@ -164,9 +165,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	// $CONTENT-BEGIN$
 
 	public static final String EDGE_PARAM = "clockEdge";
+	public static final String CLOCK_PARAM = "clock";
 	public static final String RESET_PARAM = "reset";
 	public static final String RESET_SYNC_PARAM = "resetSync";
-	public static final String CLOCK_PARAM = "clock";
 	public static final String RESET_TYPE_PARAM = "resetType";
 	public static final String RESET_VALUE_PARAM = "resetValue";
 	public static final String DEF_RST = "$rst";
@@ -201,9 +202,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (RESET_TYPE_PARAM.equals(name)) {
 				String value = genArgs.getValue();
 				if (value != null)
-					config = config.setResetType(HDLRegResetType.valueOf(value.toUpperCase()));
+					config = config.setResetType(HDLRegResetActiveType.valueOf(value.toUpperCase()));
 				else
-					config = config.setResetType(HDLRegResetType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+					config = config.setResetType(HDLRegResetActiveType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
 			}
 			if (RESET_VALUE_PARAM.equals(name))
 				config = config.setResetValue(genArgs.getExpression().copy());

@@ -243,7 +243,7 @@ public aspect RangeApsect {
 		throw new RuntimeException("Incorrectly implemented this op");
 	}
 
-	public ValueRange HDLFunction.determineRange(HDLEvaluationContext context) {
+	public ValueRange HDLFunctionCall.determineRange(HDLEvaluationContext context) {
 		return HDLFunctions.determineRange(this, context);
 	}
 

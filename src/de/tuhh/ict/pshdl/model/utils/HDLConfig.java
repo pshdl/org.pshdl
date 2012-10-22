@@ -4,14 +4,14 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
-import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetType;
+import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 
 public class HDLConfig {
 	private HDLRegClockType defaultClockType = HDLRegClockType.RISING;
 	private Map<HDLQualifiedName, HDLRegClockType> unitClockType = new HashMap<HDLQualifiedName, HDLRegClockType>();
-	private HDLRegResetType defaultResetType = HDLRegResetType.HIGH_ACTIVE;
-	private Map<HDLQualifiedName, HDLRegResetType> unitResetType = new HashMap<HDLQualifiedName, HDLRegResetType>();
+	private HDLRegResetActiveType defaultResetType = HDLRegResetActiveType.HIGH;
+	private Map<HDLQualifiedName, HDLRegResetActiveType> unitResetType = new HashMap<HDLQualifiedName, HDLRegResetActiveType>();
 	private HDLRegSyncType defaultSyncType = HDLRegSyncType.SYNC;
 	private Map<HDLQualifiedName, HDLRegSyncType> unitSyncType = new HashMap<HDLQualifiedName, HDLRegSyncType>();
 
@@ -30,7 +30,7 @@ public class HDLConfig {
 			unitClockType.put(name, type);
 	}
 
-	public HDLRegResetType getRegResetType(HDLQualifiedName name, HDLRegResetType actual) {
+	public HDLRegResetActiveType getRegResetType(HDLQualifiedName name, HDLRegResetActiveType actual) {
 		if (actual != null)
 			return actual;
 		if (unitResetType.containsKey(name))
@@ -38,7 +38,7 @@ public class HDLConfig {
 		return defaultResetType;
 	}
 
-	public void setRegResetType(HDLQualifiedName name, HDLRegResetType type) {
+	public void setRegResetType(HDLQualifiedName name, HDLRegResetActiveType type) {
 		if (name == null)
 			defaultResetType = type;
 		else

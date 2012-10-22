@@ -71,7 +71,7 @@ public aspect TypeInference {
 		return HDLPrimitives.getInstance().getManipOpType(this).result;
 	}
 
-	public HDLType HDLFunction.determineType() {
+	public HDLType HDLFunctionCall.determineType() {
 		return HDLFunctions.getInferenceInfo(this).result;
 	}
 

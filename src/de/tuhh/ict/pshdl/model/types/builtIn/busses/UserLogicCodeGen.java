@@ -8,7 +8,7 @@ import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
-import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetType;
+import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -69,7 +69,7 @@ public class UserLogicCodeGen {
 		HDLVariableDeclaration regs = new HDLVariableDeclaration()
 				.setRegister(
 						new HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setClockType(HDLRegClockType.RISING)
-								.setResetType(HDLRegResetType.HIGH_ACTIVE).setSyncType(HDLRegSyncType.SYNC).setResetValue(new HDLLiteral().setVal("0")))
+								.setResetType(HDLRegResetActiveType.HIGH).setSyncType(HDLRegSyncType.SYNC).setResetValue(new HDLLiteral().setVal("0")))
 				.setDirection(HDLDirection.INTERNAL)
 				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
 				.setPrimitive(
