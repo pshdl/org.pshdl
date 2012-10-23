@@ -14,7 +14,7 @@ public aspect StringWriterAspect {
 	}
 	
 	public String HDLTernary.toString() {
-		return "("+getIfExpr().toString()+"?"+getThenExpr().toString()+":"+getElseExpr().toString()+")";
+		return getIfExpr().toString()+"?"+getThenExpr().toString()+":"+getElseExpr().toString();
 	}
 	
 	public String HDLShiftOp.toString() {

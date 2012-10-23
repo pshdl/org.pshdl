@@ -5,30 +5,31 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import org.aspectj.lang.reflect.*;
 
 public abstract aspect LogginAspect {
-	pointcut addClazz() : call (* HDLObject.addClazz(..));
-	pointcut addMeta() : call (* HDLObject.addMeta(..));
-	pointcut setContainer() : call (* HDLObject.setContainer(..));
+	pointcut addClazz() : call (* IHDLObject.addClazz(..));
+	pointcut addMeta() : call (* IHDLObject.addMeta(..));
+	pointcut setContainer() : call (* IHDLObject.setContainer(..));
 
-	pointcut copy(HDLObject tar) : target(tar) &&call (* HDLObject+.copy(..));
-	pointcut copyFiltered(HDLObject tar) : target(tar) && call (* HDLObject+.copyFiltered(..));
-	pointcut setters(HDLObject tar):target(tar) && (call(* HDLObject+.set*(..)) && !setContainer());
-	pointcut adder(HDLObject tar):target(tar) && (call(* HDLObject+.add*(..)) && !addClazz() && !addMeta());
-	pointcut constructors(): call(HDLObject+.new(..));
-	pointcut replaced(HDLObject src, HDLObject[] with): call(* ModificationSet.replace(..))&& args(src, with);
+	pointcut copy(IHDLObject tar) : target(tar) &&call (* IHDLObject+.copy(..));
+	pointcut copyFiltered(IHDLObject tar) : target(tar) && call (* IHDLObject+.copyFiltered(..));
+	pointcut setters(IHDLObject tar):target(tar) && (call(* IHDLObject+.set*(..)) && !setContainer());
+	pointcut adder(IHDLObject tar):target(tar) && (call(* IHDLObject+.add*(..)) && !addClazz() && !addMeta());
+	pointcut constructors(): call(IHDLObject+.new(..));
+	pointcut replaced(IHDLObject src, IHDLObject[] with): call(* ModificationSet.replace(..))&& args(src, with);
 
 	public enum Infos implements MetaAccess<SourceLocation> {
 		SETTER, SETTER_CONTAINER, ADDER, CONSTRUCTOR, COPY, COPY_FILTERED;
 	}
 	
-	before(HDLObject src, HDLObject[] with) : replaced(src, with){
+	before(IHDLObject src, IHDLObject[] with) : replaced(src, with){
 		src.addMeta("REPLACED_AT", thisJoinPointStaticPart.getSourceLocation());
 		src.addMeta("REPLACED_WITH", with);
-		for (HDLObject hdo : with) {
+		for (IHDLObject hdo : with) {
 			hdo.addMeta("REPLACED", src);
 		}
 	}
 	
-	public static void HDLObject.printInfo(HDLObject obj) {
+	public static void HDLObject.printInfo(IHDLObject iobj) {
+		HDLObject obj=(HDLObject) iobj;
 		if (obj.getMeta("CONSTRUCTOR") != null) {
 			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " constructed at:" + obj.getMeta("CONSTRUCTOR"));
 		}
@@ -41,11 +42,11 @@ public abstract aspect LogginAspect {
 		if (obj.getMeta("SETTER") != null) {
 			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " setter called at:" + obj.getMeta("SETTER"));
 		}
-		HDLObject[] replaceWith = (HDLObject[])obj.getMeta("REPLACED_WITH");
+		IHDLObject[] replaceWith = (IHDLObject[])obj.getMeta("REPLACED_WITH");
 		if (replaceWith != null) {
 			System.out.println("HDLObject.resolveVariable()" + obj.objectID + " replaced with:" + replaceWith);
 			System.out.println(">>>>");
-			for (HDLObject hdlObject : replaceWith) {
+			for (IHDLObject hdlObject : replaceWith) {
 				HDLObject.printInfo(hdlObject);
 			}
 			System.out.println("<<<<");
@@ -71,28 +72,28 @@ public abstract aspect LogginAspect {
 		}
 	}
 
-	before(HDLObject tar) : copy(tar){
+	before(IHDLObject tar) : copy(tar){
 		tar.addMeta(Infos.COPY, thisJoinPointStaticPart.getSourceLocation());
 	}
-	before(HDLObject tar) : copyFiltered(tar){
+	before(IHDLObject tar) : copyFiltered(tar){
 		tar.addMeta(Infos.COPY_FILTERED, thisJoinPointStaticPart.getSourceLocation());
 	}
-	after(HDLObject src) returning(HDLObject res) :  this(src) && execution (* HDLObject.copyFiltered(..)){
+	after(IHDLObject src) returning(IHDLObject res) :  this(src) && execution (* IHDLObject.copyFiltered(..)){
 		res.addMeta("COPY_SOURCE", src);
 	}
-	after(HDLObject src) returning(HDLObject res) : this(src) && execution (* HDLObject.copy(..)){
+	after(IHDLObject src) returning(IHDLObject res) : this(src) && execution (* IHDLObject.copy(..)){
 		res.addMeta("COPY_SOURCE", src);
 	}
-	before(HDLObject tar) : setters(tar){
+	before(IHDLObject tar) : setters(tar){
 		tar.addMeta(Infos.SETTER, thisJoinPointStaticPart.getSourceLocation());
 	}
-	before(HDLObject tar) : target(tar) && setContainer(){
+	before(IHDLObject tar) : target(tar) && setContainer(){
 		tar.addMeta(Infos.SETTER_CONTAINER, thisJoinPointStaticPart.getSourceLocation());
 	}
-	before(HDLObject tar) : adder(tar){
+	before(IHDLObject tar) : adder(tar){
 		tar.addMeta(Infos.ADDER, thisJoinPointStaticPart.getSourceLocation());
 	}
-	after(HDLObject src) returning(HDLObject tar): this(src) && constructors(){
+	after(IHDLObject src) returning(IHDLObject tar): this(src) && constructors(){
 		tar.addMeta(Infos.CONSTRUCTOR, thisJoinPointStaticPart.getSourceLocation());
 		tar.addMeta("CONSTRUCTION_SRC", src);
 	}

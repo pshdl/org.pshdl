@@ -72,6 +72,9 @@ public class PSHDLLib {
 	}
 
 	private static HDLPackage addMinMaxAbs(HDLPackage pkg) {
+		MAX.freeze();
+		MIN.freeze();
+		ABS.freeze();
 		pkg = pkg.addDeclarations(MAX);
 		pkg = pkg.addDeclarations(MIN);
 		pkg = pkg.addDeclarations(ABS);

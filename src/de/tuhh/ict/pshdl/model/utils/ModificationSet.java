@@ -78,7 +78,7 @@ public class ModificationSet {
 		private <T> void singleAdd(ArrayList<T> res, T t, IHDLObject container) {
 			if (t instanceof IHDLObject) {
 				IHDLObject newT = (IHDLObject) t;
-				newT.copy().setContainer(container);
+				// newT = newT.copy().setContainer(container);
 				res.add((T) newT.copyFiltered(this));
 			} else {
 				res.add(t);

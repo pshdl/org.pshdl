@@ -114,6 +114,8 @@ public class HDLValidator {
 	private static void checkType(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		Set<HDLOpExpression> ops = unit.getAllObjectsOf(HDLOpExpression.class, true);
 		for (HDLOpExpression ope : ops) {
+			if (skipExp(ope))
+				continue;
 			HDLTypeInferenceInfo info = null;
 			switch (ope.getClassType()) {
 			case HDLArithOp:
@@ -160,6 +162,8 @@ public class HDLValidator {
 	private static void checkConstantEquals(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		Collection<HDLEqualityOp> equalities = unit.getAllObjectsOf(HDLEqualityOp.class, true);
 		for (HDLEqualityOp op : equalities) {
+			if (skipExp(op))
+				continue;
 			BigInteger res = op.constantEvaluate(getContext(hContext, op));
 			if (res != null) {
 				if (res.equals(BigInteger.ONE))
@@ -168,6 +172,10 @@ public class HDLValidator {
 					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_FALSE, op));
 			}
 		}
+	}
+
+	private static boolean skipExp(HDLExpression op) {
+		return op.getContainer(HDLInlineFunction.class) != null;
 	}
 
 	private static void checkConstantBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

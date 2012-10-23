@@ -100,15 +100,16 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 
 	private HDLExpression createExpression(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params) {
 		ModificationSet msExp = new ModificationSet();
-		HDLExpression orig = getExpr();
+		HDLExpression orig = getExpr().copyFiltered(CopyFilter.DEEP);
 		for (int i = 0; i < args.size(); i++) {
 			HDLVariable arg = args.get(i);
-			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(this).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
+			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
 				msExp.replace(argRef, params.get(i).copyFiltered(CopyFilter.DEEP));
 			}
 		}
-		return msExp.apply(orig).copy();
+		HDLExpression newExp = msExp.apply(orig);
+		return newExp;
 	}
 
 	public HDLExpression getReplacementExpressionArgs(HDLExpression... args) {

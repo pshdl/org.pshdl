@@ -10,13 +10,15 @@ public aspect ScopingAspect {
 	private HDLResolver HDLStatement.resolver = new HDLResolver(this, true);
 	
 	public HDLVariable IHDLObject.resolveVariable(HDLQualifiedName var) {
-		if (getContainer() == null)
+		if (getContainer() == null) {
+			HDLObject.printInfo(this);
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for variable:"+var));
+		}
 		return getContainer().resolveVariable(var);
 	}
 	public HDLFunction IHDLObject.resolveFunction(HDLQualifiedName var) {
 		if (getContainer() == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for function:"+var));
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_FUNCTION, this, "for function:"+var));
 		return getContainer().resolveFunction(var);
 	}
 

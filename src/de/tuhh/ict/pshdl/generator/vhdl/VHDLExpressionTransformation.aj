@@ -257,7 +257,12 @@ public aspect VHDLExpressionTransformation {
 	}
 	
 	public Expression<?> HDLTernary.toVHDL(){
-		throw new IllegalArgumentException("Not supported:" + this);
+		FunctionCall fc = new FunctionCall(VHDLTypesLibrary.TERNARY_SLV);
+		List<AssociationElement> parameters = fc.getParameters();
+		parameters.add(new AssociationElement(getIfExpr().toVHDL()));
+		parameters.add(new AssociationElement(getThenExpr().toVHDL()));
+		parameters.add(new AssociationElement(getElseExpr().toVHDL()));
+		return fc;
 	}
 	public Expression<?> HDLFunction.toVHDL(){
 		throw new IllegalArgumentException("Not supported:" + this);
