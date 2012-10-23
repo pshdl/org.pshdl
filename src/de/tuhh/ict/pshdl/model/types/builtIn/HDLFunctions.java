@@ -7,6 +7,7 @@ import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.upb.hni.vmagic.expression.*;
 
 public class HDLFunctions {
@@ -30,6 +31,10 @@ public class HDLFunctions {
 				info.registeredFunctions.put(funcName, resolver.getFunctionInfo(funcName));
 				list.add(resolver);
 			}
+		}
+		for (HDLFunction func : PSHDLLib.FUNCTIONS) {
+			FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false);
+			info.registeredFunctions.put(func.getName(), fi);
 		}
 	}
 

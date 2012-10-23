@@ -52,6 +52,8 @@ public class PSHDLLib {
 							.setThenExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.a")))
 							.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.b"))));
 
+	public static final HDLFunction[] FUNCTIONS = new HDLFunction[] { MIN, MAX, ABS };
+
 	private static HDLPackage LIB = null;
 
 	public static HDLPackage getLib() {
@@ -61,7 +63,9 @@ public class PSHDLLib {
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(EDGE));
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(SYNC));
-			pkg = addMinMaxAbs(pkg);
+			for (HDLFunction func : FUNCTIONS) {
+				pkg = pkg.addDeclarations(func);
+			}
 			CompilerInformation info = HDLCore.getCompilerInformation();
 			for (Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet()) {
 				pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
@@ -69,16 +73,6 @@ public class PSHDLLib {
 			LIB = pkg;
 		}
 		return LIB;
-	}
-
-	private static HDLPackage addMinMaxAbs(HDLPackage pkg) {
-		MAX.freeze();
-		MIN.freeze();
-		ABS.freeze();
-		pkg = pkg.addDeclarations(MAX);
-		pkg = pkg.addDeclarations(MIN);
-		pkg = pkg.addDeclarations(ABS);
-		return pkg;
 	}
 
 	public static void main(String[] args) {
