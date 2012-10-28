@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.declaration.*;
 import de.upb.hni.vmagic.expression.*;
@@ -112,20 +113,20 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 		switch (BuiltInFunctions.valueOf(funcName)) {
 		case abs: {
 			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the absolute value of a number (makes it positive)",
-					"uint - the absolute (positive) value of a number", false);
+					"uint - the absolute (positive) value of a number", false, FunctionType.NATIVE);
 			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
 			return fi;
 		}
 		case max: {
 			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the bigger value of two numbers",
-					"int - the bigger value of two numbers", false);
+					"int - the bigger value of two numbers", false, FunctionType.NATIVE);
 			fi.arguments.put("int numberA", "The first number");
 			fi.arguments.put("int numberB", "The second number");
 			return fi;
 		}
 		case min: {
 			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the smaller value of two numbers",
-					"int - the smaller value of two numbers", false);
+					"int - the smaller value of two numbers", false, FunctionType.NATIVE);
 			fi.arguments.put("int numberA", "The first number");
 			fi.arguments.put("int numberB", "The second number");
 			return fi;

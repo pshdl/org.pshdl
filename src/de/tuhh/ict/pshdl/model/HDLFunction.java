@@ -1,8 +1,11 @@
 package de.tuhh.ict.pshdl.model;
 
+import java.util.*;
+
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -64,7 +67,44 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			return obj.getName();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+
+	public static final String META = "INLINED_FROM";
+
+	public <T extends IHDLObject> T substitute(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, T stmnt, IHDLObject origin) {
+		ModificationSet msExp = new ModificationSet();
+		@SuppressWarnings("unchecked")
+		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP);
+		for (int i = 0; i < args.size(); i++) {
+			HDLVariable arg = args.get(i);
+			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
+			for (HDLVariableRef argRef : allArgRefs) {
+				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP);
+				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
+					if (exp instanceof HDLVariableRef) {
+						HDLVariableRef ref = (HDLVariableRef) exp;
+						HDLVariableRef nref = ref.copy();
+						for (HDLRange bit : argRef.getBits())
+							nref = nref.addBits(substitute(args, params, bit, origin));
+						for (HDLExpression aExp : argRef.getArray())
+							nref = nref.addArray(substitute(args, params, aExp, origin));
+						msExp.replace(argRef, nref);
+					} else
+						msExp.replace(argRef, exp);
+				} else
+					msExp.replace(argRef, exp);
+			}
+		}
+		T newExp = msExp.apply(orig);
+		Iterator<IHDLObject> iterator = newExp.iterator(true);
+		while (iterator.hasNext()) {
+			IHDLObject obj = iterator.next();
+			obj.addMeta(META, origin);
+		}
+		newExp.addMeta(META, origin);
+		return newExp;
+	}
 	// $CONTENT-END$
 
 }

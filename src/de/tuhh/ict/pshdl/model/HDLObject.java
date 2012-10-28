@@ -67,8 +67,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 
 	// $CONTENT-BEGIN$
 
-	@Override
-	public void copyMetaData(IHDLObject src, IHDLObject target) {
+	public static void copyMetaData(IHDLObject src, IHDLObject target) {
 		((HDLObject) target).metaData.putAll(((HDLObject) src).metaData);
 	}
 
@@ -145,8 +144,8 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			clazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
 			deepClazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
 			Iterator<IHDLObject> iterator = iterator(false);
-			// addClazz(this, clazzTypes);
-			// addClazz(this, deepClazzTypes);
+			addClazz(this, clazzTypes);
+			addClazz(this, deepClazzTypes);
 			while (iterator.hasNext()) {
 				HDLObject c = (HDLObject) iterator.next();
 				addClazz(c, clazzTypes);

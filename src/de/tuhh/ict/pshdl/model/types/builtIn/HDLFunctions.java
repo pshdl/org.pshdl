@@ -8,6 +8,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
 import de.upb.hni.vmagic.expression.*;
 
 public class HDLFunctions {
@@ -33,7 +34,21 @@ public class HDLFunctions {
 			}
 		}
 		for (HDLFunction func : PSHDLLib.FUNCTIONS) {
-			FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false);
+			FunctionType type;
+			switch (func.getClassType()) {
+			case HDLNativeFunction:
+				type = FunctionType.NATIVE;
+				break;
+			case HDLInlineFunction:
+				type = FunctionType.INLINE;
+				break;
+			case HDLSubstituteFunction:
+				type = FunctionType.SUBSTITUTION;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown type:" + func);
+			}
+			FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false, type);
 			info.registeredFunctions.put(func.getName(), fi);
 		}
 	}

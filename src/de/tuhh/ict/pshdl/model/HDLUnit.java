@@ -5,6 +5,7 @@ import java.util.*;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.aspects.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -197,6 +198,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);
+		unitIF.addMeta(FullNameAspect.FULLNAME, fullName);
 		unitIF.setContainer(this);
 		return unitIF;
 	}

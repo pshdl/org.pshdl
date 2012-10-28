@@ -95,6 +95,26 @@ public aspect StringWriterAspect {
 		sb.append(") -> (").append(getExpr()).append(")\n");
 		return sb.toString();
 	}
+	public String HDLSubstituteFunction.toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("substitute function ");
+		sb.append(getName());
+		sb.append('(');
+		for (Iterator<HDLVariable> iter = getArgs().iterator(); iter.hasNext();) {
+			HDLVariable var = (HDLVariable) iter.next();
+			sb.append(var.getName());
+			if (iter.hasNext())
+				sb.append(',');
+		}
+		sb.append(") {\n");
+		incSpacing();
+		for (HDLStatement string : getStmnts()) {
+			sb.append(string).append('\n');
+		}
+		decSpacing();
+		sb.append("}\n");
+		return sb.toString();
+	}
 
 	public String HDLInterfaceRef.toString() {
 		StringBuilder sb = new StringBuilder();

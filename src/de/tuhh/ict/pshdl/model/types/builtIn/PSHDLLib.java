@@ -8,6 +8,7 @@ import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 
 public class PSHDLLib {
 
@@ -68,7 +69,8 @@ public class PSHDLLib {
 			}
 			CompilerInformation info = HDLCore.getCompilerInformation();
 			for (Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet()) {
-				pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
+				if (e.getValue().type == FunctionType.NATIVE)
+					pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
 			}
 			LIB = pkg;
 		}

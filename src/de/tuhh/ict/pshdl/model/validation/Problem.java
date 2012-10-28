@@ -62,15 +62,30 @@ public class Problem {
 	}
 
 	public String toStringWithoutSeverity() {
+		String preText = "";
+		IHDLObject inlineType = checkInlineType(node);
+		if (inlineType != null) {
+			preText = "The inline function: " + inlineType + " caused the following issue: ";
+		}
 		HDLAdvise advise = HDLAdvisor.getAdvise(this);
 		if (advise != null)
-			return advise.message;
-		String string = code.name().toLowerCase() + " for: " + node;
+			return preText + advise.message;
+		String string = preText + code.name().toLowerCase() + " for: " + node;
 		if (context != null)
 			string += " @ " + context;
 		if (info != null)
 			string += " info:" + info;
 		return string;
+	}
+
+	private IHDLObject checkInlineType(IHDLObject node) {
+		if (node == null)
+			return null;
+		Object meta = node.getMeta(HDLInlineFunction.META);
+		if (meta != null) {
+			return (IHDLObject) meta;
+		}
+		return checkInlineType(node.getContainer());
 	}
 
 	@Override

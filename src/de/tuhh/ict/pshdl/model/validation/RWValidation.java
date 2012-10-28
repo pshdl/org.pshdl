@@ -17,7 +17,7 @@ public class RWValidation {
 		annotateWriteCount(unit);
 		Collection<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
-			if (hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null)
+			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || HDLValidator.skipExp(hdlVariable))
 				continue;
 			Integer readCount = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
 			readCount = readCount == null ? 0 : readCount;
@@ -82,6 +82,8 @@ public class RWValidation {
 	public static void annotateReadCount(HDLObject orig) {
 		Collection<HDLReference> list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
+			if (HDLValidator.skipExp(ref))
+				continue;
 			if (ref.getContainer() instanceof HDLAssignment) {
 				HDLAssignment ass = (HDLAssignment) ref.getContainer();
 				if ((ass.getLeft() == ref) && (ass.getType() == HDLAssignmentType.ASSGN))
@@ -115,6 +117,8 @@ public class RWValidation {
 			HDLReference left = ass.getLeft();
 			if (left instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) left;
+				if (HDLValidator.skipExp(ref))
+					continue;
 				HDLVariable var = ref.resolveVar();
 				incMeta(var, IntegerMeta.WRITE_COUNT);
 				if (ref instanceof HDLInterfaceRef) {

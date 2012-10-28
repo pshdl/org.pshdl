@@ -5,7 +5,8 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 
 public interface CopyFilter {
-	CopyFilter DEEP = new DeepCloneFilter();
+	CopyFilter DEEP = new DeepCloneFilter(false);
+	CopyFilter DEEP_META = new DeepCloneFilter(true);
 
 	public <T extends Enum<T>> T copyObject(String feature, IHDLObject container, T object);
 
@@ -20,6 +21,13 @@ public interface CopyFilter {
 	public <T> ArrayList<T> copyContainer(String feature, HDLObject container, ArrayList<T> object);
 
 	public static class DeepCloneFilter implements CopyFilter {
+
+		private boolean copyMeta = false;
+
+		public DeepCloneFilter(boolean copyMeta) {
+			super();
+			this.copyMeta = copyMeta;
+		}
 
 		@Override
 		public <T extends Enum<T>> T copyObject(String feature, IHDLObject container, T object) {
@@ -46,7 +54,10 @@ public interface CopyFilter {
 		public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T object) {
 			if (object == null)
 				return null;
-			return (T) object.copyFiltered(this);
+			T copyFiltered = (T) object.copyFiltered(this);
+			if (copyMeta)
+				HDLObject.copyMetaData(object, copyFiltered);
+			return copyFiltered;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -58,7 +69,10 @@ public interface CopyFilter {
 			for (T t : object) {
 				if (t instanceof HDLObject) {
 					IHDLObject obj = (IHDLObject) t;
-					res.add((T) obj.copyFiltered(this));
+					T copyFiltered = (T) obj.copyFiltered(this);
+					if (copyMeta)
+						HDLObject.copyMetaData(obj, (IHDLObject) copyFiltered);
+					res.add(copyFiltered);
 				} else
 					res.add(t);
 			}

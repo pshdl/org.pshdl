@@ -262,7 +262,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 			newLType = newLType.setWidth(new HDLArithOp().setLeft(newLType.getWidth().copy()).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
-		HDLExpression width = simplifyWidth(op, getWidth(type, info));
+		HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
 		if (width != null)
 			width = width.copy();
 		info.result = new HDLPrimitive().setType(triple.result).setWidth(width);
@@ -315,7 +315,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 		return info;
 	}
 
-	private HDLExpression getWidth(HDLArithOpType type, HDLTypeInferenceInfo info) {
+	private HDLExpression getWidth(IHDLObject exp, HDLArithOpType type, HDLTypeInferenceInfo info) {
 		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
 		if (leftW != null)
 			leftW = leftW.copyFiltered(CopyFilter.DEEP);
@@ -350,7 +350,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 				return leftW;
 			if ((leftW == null) && (rightW != null))
 				return rightW;
-			return PSHDLLib.MAX.getReplacementExpressionArgs(leftW, rightW);
+			return PSHDLLib.MAX.getReplacementExpressionArgs(exp, leftW, rightW);
 			// return new HDLArithOp().setLeft(max).setType(PLUS).setRight(new
 			// HDLLiteral().setVal("1"));
 		case MUL:

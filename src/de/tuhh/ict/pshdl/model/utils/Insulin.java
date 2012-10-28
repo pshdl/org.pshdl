@@ -36,9 +36,27 @@ public class Insulin {
 		apply = handlePostfixOp(apply);
 		apply = generateInitializations(apply);
 		apply = fortifyType(apply);
+		apply = fixDoubleNegate(apply);
 		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(null, true);
 		return apply;
+	}
+
+	public static <T extends HDLObject> T fixDoubleNegate(T pkg) {
+		ModificationSet ms = new ModificationSet();
+		Set<HDLManip> manips = pkg.getAllObjectsOf(HDLManip.class, true);
+		for (HDLManip manip : manips) {
+			if (manip.getType() == HDLManipType.ARITH_NEG) {
+				HDLExpression target = manip.getTarget();
+				if (target instanceof HDLManip) {
+					HDLManip innerManip = (HDLManip) target;
+					if (innerManip.getType() == HDLManipType.ARITH_NEG) {
+						ms.replace(manip, innerManip.getTarget());
+					}
+				}
+			}
+		}
+		return ms.apply(pkg);
 	}
 
 	public static <T extends HDLObject> T inlineFunctions(T pkg) {
@@ -53,6 +71,10 @@ public class Insulin {
 				ms.replace(hdi, equivalenExpression);
 				break;
 			case HDLSubstituteFunction:
+				HDLSubstituteFunction hsf = (HDLSubstituteFunction) function;
+				HDLStatement[] statements = hsf.getReplacementStatements(hdi);
+				ms.replace(hdi, statements);
+				break;
 			default:
 			}
 		}
@@ -399,6 +421,8 @@ public class Insulin {
 	private static void fortifyRanges(HDLObject apply, ModificationSet ms) {
 		Collection<HDLRange> ranges = apply.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange range : ranges) {
+			if (HDLValidator.skipExp(range))
+				continue;
 			HDLExpression exp = range.getFrom();
 			if (exp != null) {
 				fortify(ms, exp, HDLPrimitive.getNatural());
@@ -417,6 +441,8 @@ public class Insulin {
 	private static void fortifyAssignments(HDLObject apply, ModificationSet ms) {
 		Collection<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
+			if (HDLValidator.skipExp(assignment))
+				continue;
 			HDLType leftType = assignment.getLeft().determineType();
 			HDLExpression exp = assignment.getRight();
 			if (exp.getClassType() == HDLClass.HDLEqualityOp) {
@@ -436,9 +462,7 @@ public class Insulin {
 	private static void fortifyOpExpressions(HDLObject apply, ModificationSet ms) {
 		Collection<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		for (HDLExpression opExpression : opEx) {
-			if (opExpression.getContainer(HDLInlineFunction.class) != null)
-				continue;
-			if (opExpression.getContainer(HDLSubstituteFunction.class) != null)
+			if (HDLValidator.skipExp(opExpression))
 				continue;
 			HDLTypeInferenceInfo inferenceInfo = null;
 			HDLExpression left = null;
@@ -496,6 +520,8 @@ public class Insulin {
 	private static void fortify(ModificationSet ms, HDLExpression exp, HDLType targetType) {
 		if (targetType instanceof HDLPrimitive) {
 			HDLPrimitive pt = (HDLPrimitive) targetType;
+			if (HDLValidator.skipExp(exp))
+				return;
 			HDLType lt = exp.determineType();
 			if (!targetType.equals(lt)) {
 				if (pt.getType() == HDLPrimitiveType.BOOL)

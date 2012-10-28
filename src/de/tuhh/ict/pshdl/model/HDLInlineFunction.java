@@ -18,6 +18,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * </ul>
  */
 public class HDLInlineFunction extends AbstractHDLInlineFunction {
+
 	/**
 	 * Constructs a new instance of {@link HDLInlineFunction}
 	 * 
@@ -95,25 +96,15 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	public HDLExpression getReplacementExpression(HDLFunctionCall hdi) {
 		ArrayList<HDLVariable> args = getArgs();
 		ArrayList<HDLExpression> params = hdi.getParams();
-		return createExpression(args, params);
+		return createExpression(args, params, hdi);
 	}
 
-	private HDLExpression createExpression(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params) {
-		ModificationSet msExp = new ModificationSet();
-		HDLExpression orig = getExpr().copyFiltered(CopyFilter.DEEP);
-		for (int i = 0; i < args.size(); i++) {
-			HDLVariable arg = args.get(i);
-			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
-			for (HDLVariableRef argRef : allArgRefs) {
-				msExp.replace(argRef, params.get(i).copyFiltered(CopyFilter.DEEP));
-			}
-		}
-		HDLExpression newExp = msExp.apply(orig);
-		return newExp;
+	private HDLExpression createExpression(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, IHDLObject origin) {
+		return substitute(args, params, getExpr(), origin);
 	}
 
-	public HDLExpression getReplacementExpressionArgs(HDLExpression... args) {
-		return createExpression(getArgs(), asList(args));
+	public HDLExpression getReplacementExpressionArgs(IHDLObject origin, HDLExpression... args) {
+		return createExpression(getArgs(), asList(args), origin);
 	}
 	// $CONTENT-END$
 

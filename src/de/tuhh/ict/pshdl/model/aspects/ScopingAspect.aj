@@ -12,31 +12,36 @@ public aspect ScopingAspect {
 	public HDLVariable IHDLObject.resolveVariable(HDLQualifiedName var) {
 		if (getContainer() == null) {
 			HDLObject.printInfo(this);
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for variable:"+var));
+			return null;
+//			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, this, "for variable:"+var));
 		}
 		return getContainer().resolveVariable(var);
 	}
 	public HDLFunction IHDLObject.resolveFunction(HDLQualifiedName var) {
 		if (getContainer() == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_FUNCTION, this, "for function:"+var));
+//			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_FUNCTION, this, "for function:"+var));
+			return null;
 		return getContainer().resolveFunction(var);
 	}
 
 	public HDLEnum IHDLObject.resolveEnum(HDLQualifiedName hEnum) {
 		if (getContainer() == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, this, "for enum:"+hEnum));
+//			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, this, "for enum:"+hEnum));
+			return null;
 		return getContainer().resolveEnum(hEnum);
 	}
 
 	public HDLType IHDLObject.resolveType(HDLQualifiedName type) {
 		if (getContainer() == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, this, "for type:"+type));
+//			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, this, "for type:"+type));
+			return null;
 		return getContainer().resolveType(type);
 	}
 
 	public HDLInterface IHDLObject.resolveInterface(HDLQualifiedName hIf) {
 		if (getContainer() == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_INTERFACE, this, "for interface:"+hIf));
+//			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_INTERFACE, this, "for interface:"+hIf));
+			return null;
 		return getContainer().resolveInterface(hIf);
 	}
 
@@ -83,6 +88,11 @@ public aspect ScopingAspect {
 	}
 	
 	public List<HDLVariable> HDLInlineFunction.doGetVariables(){
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
+		res.addAll(getArgs());
+		return res;
+	}
+	public List<HDLVariable> HDLSubstituteFunction.doGetVariables(){
 		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		res.addAll(getArgs());
 		return res;
@@ -216,13 +226,13 @@ public aspect ScopingAspect {
 			return resolveEnum;
 		return (HDLEnum) resolveType(hEnum);
 	}
-	public HDLFunction HDLUnit.resolveFunction(HDLQualifiedName hEnum) {
-		HDLFunction resolveEnum = resolver.resolveFunction(hEnum);
+	public HDLFunction HDLUnit.resolveFunction(HDLQualifiedName hFunc) {
+		HDLFunction resolveEnum = resolver.resolveFunction(hFunc);
 		if (resolveEnum != null)
 			return resolveEnum;
 		if (library == null)
 			library = HDLLibrary.getLibrary(getLibURI());
-		return library.resolveFunction(getImports(), hEnum);
+		return library.resolveFunction(getImports(), hFunc);
 	}
 
 	public HDLInterface HDLUnit.resolveInterface(HDLQualifiedName hIf) {

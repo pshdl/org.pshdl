@@ -28,6 +28,8 @@ import de.upb.hni.vmagic.type.*;
 
 public aspect VHDLStatementTransformation {
 	
+	private static final String ORIGINAL_FULLNAME = "ORIGINAL_FULLNAME";
+
 	public enum Exportable implements MetaAccess<Boolean> {
 		EXPORT
 	}
@@ -83,12 +85,18 @@ public aspect VHDLStatementTransformation {
 		List<AssociationElement> portMap = instantiation.getPortMap();
 		List<AssociationElement> genericMap = instantiation.getGenericMap();
 		ModificationSet ms=new ModificationSet();
+		Collection<HDLVariable> vars=hIf.getAllObjectsOf(HDLVariable.class, true);
+		for (HDLVariable var : vars) {
+			if(var.getMeta(ORIGINAL_FULLNAME)==null)
+				var.addMeta(ORIGINAL_FULLNAME,var.getFullName());
+		}
 		Collection<HDLVariableRef> refs=hIf.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			if (ref.resolveVar().getDirection()==HDLDirection.PARAMETER)
+			HDLVariable var = ref.resolveVar();
+			if (var.getDirection()==HDLDirection.PARAMETER)
 				ms.replace(ref, ref.setVar(new HDLQualifiedName(hVar.getName()+"_"+ ref.getVarRefName().getLastSegment())));
 		}
-		hIf=ms.apply(hIf).copyFiltered(CopyFilter.DEEP).setContainer(getContainer());
+		hIf=ms.apply(hIf).copyFiltered(CopyFilter.DEEP_META).setContainer(getContainer());
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
@@ -104,7 +112,7 @@ public aspect VHDLStatementTransformation {
 					}
 					if (var.getDimensions().size() != 0) {
 						if (typeAnno.isEmpty()) {
-							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(var.getName()+"_array");
+							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(getArrayRefName(var, true));
 							res.addImport(name);
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))));
 							res.merge(newHVD.toVHDL(pid));
@@ -147,6 +155,18 @@ public aspect VHDLStatementTransformation {
 		return res;
 	}
 
+	private static String getArrayRefName(HDLVariable var, boolean external) {
+		if (external) {
+			HDLQualifiedName fullName;
+			if (var.getMeta(ORIGINAL_FULLNAME)!=null)
+				fullName=(HDLQualifiedName) var.getMeta(ORIGINAL_FULLNAME);
+			else
+				fullName= var.getFullName();
+			return fullName.toString('_') + "_array";
+		}
+		return var.getName() + "_array";
+	}
+
 	public VHDLContext HDLVariableDeclaration.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		HDLPrimitive primitive = getPrimitive();
@@ -185,8 +205,9 @@ public aspect VHDLStatementTransformation {
 						Range range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(newWidth).setContainer(this).toVHDL(Direction.TO);
 						ranges.add(range);
 					}
-					ConstrainedArray arrType = new ConstrainedArray(var.getName() + "_array", type, ranges);
-					res.addTypeDeclaration(arrType, isExternal());
+					boolean external = isExternal();
+					ConstrainedArray arrType = new ConstrainedArray(getArrayRefName(var, external), type, ranges);
+					res.addTypeDeclaration(arrType, external);
 					varType = arrType;
 				}
 				if (resetValue != null && !noExplicitResetVar) {

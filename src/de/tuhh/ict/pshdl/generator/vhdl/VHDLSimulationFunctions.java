@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.statement.*;
@@ -140,7 +141,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public FunctionInformation getFunctionInfo(String funcName) {
-		return new FunctionInformation(funcName, VHDLSimulationFunctions.class.getSimpleName(), "", "does not return", true);
+		return new FunctionInformation(funcName, VHDLSimulationFunctions.class.getSimpleName(), "", "does not return", true, FunctionType.NATIVE);
 	}
 
 }

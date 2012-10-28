@@ -62,6 +62,10 @@ public class HDLValidator {
 			// TODO Switch expression needs to have width (no natural etc..)
 			// TODO no Registers in Testbench
 			// TODO warn for name collision in generators
+			// TODO check for same name with different case
+			// TODO Out port array need to be constant
+			// TODO Check for bit access on left assignment side when right is
+			// matching
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -174,8 +178,8 @@ public class HDLValidator {
 		}
 	}
 
-	private static boolean skipExp(HDLExpression op) {
-		return op.getContainer(HDLInlineFunction.class) != null;
+	public static boolean skipExp(IHDLObject op) {
+		return (op.getContainer(HDLInlineFunction.class) != null) || (op.getContainer(HDLSubstituteFunction.class) != null);
 	}
 
 	private static void checkConstantBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
@@ -213,6 +217,8 @@ public class HDLValidator {
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		Collection<HDLVariableRef> asss = unit.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : asss) {
+			if (skipExp(ref))
+				continue;
 			compareBoundaries(problems, hContext, ref, ref.resolveVar().getDimensions(), ref.getArray());
 			if (ref instanceof HDLInterfaceRef) {
 				HDLInterfaceRef hir = (HDLInterfaceRef) ref;

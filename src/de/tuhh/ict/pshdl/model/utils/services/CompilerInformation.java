@@ -9,20 +9,27 @@ public class CompilerInformation implements Serializable {
 		 * 
 		 */
 		private static final long serialVersionUID = -731752567686038980L;
+
+		public static enum FunctionType {
+			NATIVE, INLINE, SUBSTITUTION
+		}
+
 		public final String name;
 		public final String provider;
 		public final String description;
 		public final Map<String, String> arguments = new LinkedHashMap<String, String>();
 		public final String returnInfo;
 		public final boolean simulationOnly;
+		public final FunctionType type;
 
-		public FunctionInformation(String name, String provider, String description, String returnInfo, boolean simulationOnly) {
+		public FunctionInformation(String name, String provider, String description, String returnInfo, boolean simulationOnly, FunctionType type) {
 			super();
 			this.name = name;
 			this.returnInfo = returnInfo;
 			this.simulationOnly = simulationOnly;
 			this.provider = provider;
 			this.description = description;
+			this.type = type;
 		}
 	}
 

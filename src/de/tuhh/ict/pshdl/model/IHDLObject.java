@@ -8,8 +8,6 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
 public interface IHDLObject {
 	public HDLClass getClassType();
 
-	public void copyMetaData(IHDLObject src, IHDLObject target);
-
 	public abstract IHDLObject copy();
 
 	public abstract IHDLObject copyFiltered(CopyFilter filter);

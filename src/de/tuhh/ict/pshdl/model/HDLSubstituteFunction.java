@@ -5,6 +5,7 @@ import java.util.*;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -89,7 +90,28 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 			return obj.getStmnts();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+	public HDLStatement[] getReplacementStatements(HDLFunctionCall hdi) {
+		ArrayList<HDLVariable> args = getArgs();
+		ArrayList<HDLExpression> params = hdi.getParams();
+		return createStatements(args, params, hdi);
+	}
+
+	public static final String META = "INLINED_FROM";
+
+	private HDLStatement[] createStatements(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, IHDLObject origin) {
+		HDLStatement[] res = new HDLStatement[getStmnts().size()];
+		int pos = 0;
+		for (HDLStatement stmnt : getStmnts()) {
+			res[pos++] = substitute(args, params, stmnt, origin);
+		}
+		return res;
+	}
+
+	public HDLStatement[] getReplacementExpressionArgs(IHDLObject origin, HDLExpression... args) {
+		return createStatements(getArgs(), asList(args), origin);
+	}
 	// $CONTENT-END$
 
 }
