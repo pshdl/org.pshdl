@@ -8,6 +8,7 @@ import org.antlr.runtime.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 public class MemoryModel {
 
@@ -16,8 +17,9 @@ public class MemoryModel {
 		Unit unit = parseUnit(new FileInputStream(file));
 		System.out.println(unit);
 		List<Row> rows = buildRows(unit);
-		PrintStream ps = new PrintStream(args[0] + "Map.html");
-		builtHTML(unit, rows, ps);
+		byte[] builtHTML = builtHTML(unit, rows);
+		FileOutputStream ps = new FileOutputStream(args[0] + "Map.html");
+		ps.write(builtHTML);
 		ps.close();
 		HDLInterface hdi = buildHDLInterface(unit, rows);
 		System.out.println(hdi);
@@ -99,38 +101,47 @@ public class MemoryModel {
 		return hdi;
 	}
 
-	public static void builtHTML(Unit unit, List<Row> rows, PrintStream ps) {
-		ps.print("<!DOCTYPE html SYSTEM \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" + "    <head>\n"
-				+ "        <title>Register overview</title>\n" + "        <style>\n" + "    table {\n" + "    	border: 1px solid gray;\n" + "    	border-collapse: collapse;\n"
-				+ "    }\n" + "    tr:nth-child(even) {\n" + "        background-color: rgba(193, 226, 253, 0.48);\n" + "    }\n" + "    td {\n" + "    	border: 1px solid gray;\n"
-				+ "    	padding: 4px;\n" + "    	text-align: center;\n" + "    }\n" + "    .wStyle {\n" + "    	color: blue;\n" + "    }\n" + "    .rStyle {\n"
-				+ "    	color: orange;\n" + "    }\n" + "    .rwStyle{\n" + "    	color: green;\n" + "    }\n" + "    .nullStyle {\n" + "    	color: silver;\n" + "    }\n"
-				+ "    .register {\n" + "    	font-style: italic;\n" + "    }\n" + "    thead {\n" + "    	font-weight: bold;\n" + "    	text-align: center;\n"
-				+ "    	background-color: #b2d4ed;\n" + "    }\n" + "    td.offset {\n" + "    	text-align: right;\n" + "    }\n" + "    </style></head>\n" + "    <body>\n"
-				+ "        <table>\n" + "            <thead>\n" + "                <tr>");
-		ps.print("<td>Offset</td>");
+	public static byte[] builtHTML(Unit unit, List<Row> rows) throws IOException {
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("{TITLE}", "Register Overview");
+		options.put("{DATE}", new Date().toString());
+		Formatter ps = new Formatter();
+		ps.format("<tr><td>Offset</td>");
 		for (int i = 0; i < unit.rowWidth; i++) {
-			ps.printf("<td>%d</td>", unit.rowWidth - i - 1);
+			ps.format("<td>%d</td>", unit.rowWidth - i - 1);
 		}
-		ps.println("</tr>\n" + "            </thead>");
+		ps.format("<td>Row</td></tr>");
+		options.put("{HEADER}", ps.toString());
+		ps.close();
+		ps = new Formatter();
 		int mul = unit.rowWidth / 8;
 		int pos = 0;
+		Column current = null;
+		int colIndex = -1;
 		for (Row row : rows) {
-			ps.print("                <tr>");
-			ps.printf("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
+			if ((row.column != current) || (row.colIndex != colIndex)) {
+				if (row.column == null) {
+					current = null;
+					colIndex = -1;
+					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>\n", unit.rowWidth + 2, "Without Column");
+				} else {
+					current = row.column;
+					colIndex = row.colIndex;
+					ps.format("<tr><td colspan='%d' class='columnHeader'>%s[%d]</td></tr>\n", unit.rowWidth + 2, row.column.name, row.colIndex);
+				}
+			}
+			ps.format("<tr>");
+			ps.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
 			for (NamedElement dec : row.definitions) {
 				Definition def = (Definition) dec;
-				ps.printf("<td colspan='%d' class='field %s %s'>%s</td>", getSize(def), def.rw + "Style", def.register ? "register" : "", def.name);
+				ps.format("<td colspan='%d' class='field %s %s'>%s</td>", getSize(def), def.rw + "Style", def.register ? "register" : "", def.name);
 			}
-			ps.println("</tr>");
+			ps.format("<td>%s</td></tr>\n", row.name);
 			pos++;
 		}
-		ps.println("        </table>\n            <p>The various formatting styles have the following meaning:</p>\n" + "        <table>\n"
-				+ "        <tr><td class=\"register\">register</td><td>A register has been created for this variable</td></tr>\n"
-				+ "		<tr><td class=\"rStyle\">readable</td><td>The variable can be read</td></tr>\n"
-				+ "        <tr><td class=\"wStyle\">writeable</td><td>The variable can be written</td></tr>\n"
-				+ "        <tr><td class=\"rwStyle\">read-writeable</td><td>The variable can be read and written</td></tr>\n"
-				+ "        <tr><td class=\"nullStyle\">unused</td><td>This range is not backed by any variable</td></tr>\n" + "        </table></body>\n" + "</html>");
+		options.put("{TABLE}", ps.toString());
+		ps.close();
+		return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);
 	}
 
 	public static List<Row> buildRows(Unit unit) {
@@ -140,33 +151,36 @@ public class MemoryModel {
 			if (ref.dimensions.size() != 0) {
 				for (Integer num : ref.dimensions) {
 					for (int i = 0; i < num; i++) {
-						addDeclarations(unit, rows, declaration);
+						addDeclarations(unit, rows, declaration, null, i);
 					}
 				}
 			} else {
-				addDeclarations(unit, rows, declaration);
+				addDeclarations(unit, rows, declaration, null, 0);
 			}
 		}
 		return rows;
 	}
 
-	private static void addDeclarations(Unit unit, List<Row> rows, NamedElement declaration) {
+	private static void addDeclarations(Unit unit, List<Row> rows, NamedElement declaration, Column parent, int colIndex) {
 		if (declaration instanceof Column) {
 			Column col = (Column) declaration;
 			for (NamedElement row : col.rows) {
-				addDeclarations(unit, rows, row);
+				addDeclarations(unit, rows, row, col, colIndex);
 			}
 			return;
 		}
 		if (declaration instanceof Row) {
 			Row row = (Row) declaration;
-			rows.add(normalize(unit, row));
+			Row normalize = normalize(unit, row);
+			normalize.column = parent;
+			normalize.colIndex = colIndex;
+			rows.add(normalize);
 			return;
 		}
 		if (declaration instanceof Reference) {
 			Reference ref = (Reference) declaration;
 			NamedElement decl = unit.resolve(ref);
-			addDeclarations(unit, rows, decl);
+			addDeclarations(unit, rows, decl, parent, colIndex);
 			return;
 		}
 		throw new IllegalArgumentException("Reference not a row, column or reference:" + declaration);

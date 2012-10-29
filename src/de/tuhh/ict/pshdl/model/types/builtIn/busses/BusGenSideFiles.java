@@ -2,11 +2,10 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.*;
-
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class BusGenSideFiles {
@@ -100,7 +99,7 @@ public class BusGenSideFiles {
 		options.put("{GENERICS}", generics.toString());
 		options.put("{GENERICSMAP}", genericsMap.toString());
 		try {
-			return new SideFile(relPath, processFile(type + "_wrapper.vhd", options));
+			return new SideFile(relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -116,7 +115,7 @@ public class BusGenSideFiles {
 		options.put("{WRAPPERNAME}", ipcoreName + WRAPPER_APPENDIX);
 		options.put("{DATE}", new Date().toString());
 		try {
-			return new SideFile(relPath, processFile(type + "_v2_1_0.pao", options));
+			return new SideFile(relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -191,55 +190,11 @@ public class BusGenSideFiles {
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
-			return new SideFile(dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", processFile(bus_type + "_v2_1_0.mpd", options));
+			return new SideFile(dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static byte[] processFile(String string, Map<String, String> options) throws IOException {
-		InputStream stream = BusGenSideFiles.class.getResourceAsStream(string);
-		StringBuilder sb = new StringBuilder();
-		sb.append("(");
-		boolean first = true;
-		for (String key : options.keySet()) {
-			if (!first)
-				sb.append('|');
-			sb.append(Pattern.quote(key));
-			first = false;
-		}
-		sb.append(")");
-		Pattern p = Pattern.compile(sb.toString());
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		String line = null;
-		StringBuilder res = new StringBuilder();
-		while ((line = reader.readLine()) != null) {
-			Matcher matcher = p.matcher(line);
-			int offset = 0;
-			while (matcher.find()) {
-				res.append(line.substring(offset, matcher.start()));
-				String group = matcher.group(1);
-				String replacement = options.get(group);
-				res.append(replacement);
-				offset = matcher.end();
-			}
-			res.append(line.substring(offset));
-			res.append("\n");
-		}
-		return res.toString().getBytes();
-	}
-
-	public static void main(String[] args) {
-		Map<String, String> options = new HashMap<String, String>();
-		options.put("{WRAPPERNAME}", "Hallo");
-		String ports = "Meine Ports";
-		options.put("{PORTS}", ports);
-		options.put("{DATE}", new Date().toString());
-		try {
-			System.out.println(new String(processFile("plbMPD.txt", options)));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }

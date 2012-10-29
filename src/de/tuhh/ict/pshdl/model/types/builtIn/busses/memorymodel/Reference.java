@@ -3,14 +3,21 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.*;
 
 public class Reference implements NamedElement {
+	public String name;
+	public List<Integer> dimensions = new LinkedList<Integer>();
+
+	public Reference(String name, Integer... dimensions) {
+		super();
+		this.name = name;
+		for (Integer integer : dimensions) {
+			this.dimensions.add(integer);
+		}
+	}
 
 	public Reference(String name) {
 		super();
 		this.name = name;
 	}
-
-	public String name;
-	public List<Integer> dimensions = new LinkedList<Integer>();
 
 	@Override
 	public String getName() {

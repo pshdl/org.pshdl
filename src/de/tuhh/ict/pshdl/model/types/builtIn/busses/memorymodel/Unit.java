@@ -7,6 +7,16 @@ public class Unit {
 	public Map<String, NamedElement> declarations = new LinkedHashMap<String, NamedElement>();
 	public Memory memory;
 
+	public Unit(int rowWidth, Map<String, NamedElement> declarations, Memory memory) {
+		super();
+		this.rowWidth = rowWidth;
+		this.declarations = declarations;
+		this.memory = memory;
+	}
+
+	public Unit() {
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

@@ -218,6 +218,36 @@ public aspect ScopingAspect {
 		return res;
 	}
 	
+	public HDLFunction HDLPackage.resolveFunction(HDLQualifiedName hFunc) {
+		HDLLibrary library=getLibrary();
+		if (getLibrary() == null)
+			library = HDLLibrary.getLibrary(getLibURI());
+		return library.resolveFunction(asList(getPkg()+".*"), hFunc);
+	}
+
+	public HDLEnum HDLPackage.resolveEnum(HDLQualifiedName hEnum) {
+		return (HDLEnum) resolveType(hEnum);
+	}
+
+	public HDLInterface HDLPackage.resolveInterface(HDLQualifiedName hIf) {
+		return (HDLInterface) resolveType(hIf);
+	}
+
+	public HDLType HDLPackage.resolveType(HDLQualifiedName type) {
+		HDLLibrary library=getLibrary();
+		if (getLibrary() == null)
+			library = HDLLibrary.getLibrary(getLibURI());
+		return library.resolve(asList(getPkg()+".*"), type);
+	}
+
+	public HDLVariable HDLPackage.resolveVariable(HDLQualifiedName var) {
+		HDLLibrary library=getLibrary();
+		if (getLibrary() == null)
+			library = HDLLibrary.getLibrary(getLibURI());
+		return library.resolveVariable(asList(getPkg()+".*"), var);
+	}
+	
+	//HDLUnit begin
 	private HDLResolver HDLUnit.resolver = new HDLResolver(this, false);
 
 	public HDLEnum HDLUnit.resolveEnum(HDLQualifiedName hEnum) {
@@ -257,7 +287,9 @@ public aspect ScopingAspect {
 		HDLVariable hdlVariable = resolver.resolveVariable(var);
 		if (hdlVariable != null)
 			return hdlVariable;
-		return null;
+		if (library == null)
+			library = HDLLibrary.getLibrary(getLibURI());
+		return library.resolveVariable(getImports(), var);
 	}
 
 	public List<HDLEnumDeclaration> HDLUnit.doGetEnumDeclarations() {

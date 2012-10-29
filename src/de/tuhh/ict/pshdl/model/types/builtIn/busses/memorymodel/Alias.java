@@ -4,10 +4,14 @@ import java.util.*;
 
 public class Alias implements NamedElement {
 	public String name;
+	public LinkedList<NamedElement> definitions = new LinkedList<NamedElement>();
 
-	@Override
-	public String getName() {
-		return name;
+	public Alias(String name, NamedElement... definitions) {
+		super();
+		this.name = name;
+		for (NamedElement namedElement : definitions) {
+			this.definitions.add(namedElement);
+		}
 	}
 
 	public Alias(String name) {
@@ -15,7 +19,10 @@ public class Alias implements NamedElement {
 		this.name = name;
 	}
 
-	public LinkedList<NamedElement> definitions = new LinkedList<NamedElement>();
+	@Override
+	public String getName() {
+		return name;
+	}
 
 	@Override
 	public String toString() {

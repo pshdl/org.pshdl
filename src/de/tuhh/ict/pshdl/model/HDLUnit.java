@@ -194,7 +194,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		ModificationSet ms = new ModificationSet();
 		Collection<HDLVariableRef> refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
+			if (ref.getVarRefName().length == 1)
+				ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
 		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);

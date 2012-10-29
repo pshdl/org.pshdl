@@ -4,13 +4,20 @@ import java.util.*;
 
 public class Column implements NamedElement {
 	public String name;
+	public List<NamedElement> rows = new LinkedList<NamedElement>();
 
 	public Column(String name) {
 		super();
 		this.name = name;
 	}
 
-	public List<NamedElement> rows = new LinkedList<NamedElement>();
+	public Column(String name, NamedElement... rows) {
+		super();
+		this.name = name;
+		for (NamedElement namedElement : rows) {
+			this.rows.add(namedElement);
+		}
+	}
 
 	@Override
 	public String getName() {

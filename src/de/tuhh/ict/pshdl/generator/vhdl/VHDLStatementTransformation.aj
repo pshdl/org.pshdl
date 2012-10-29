@@ -79,7 +79,7 @@ public aspect VHDLStatementTransformation {
 		HDLVariable hVar=getVar();
 		String ifName = getVar().getName();
 		HDLQualifiedName asRef = hIf.asRef();
-		Entity entity = new Entity("work." + asRef.getLastSegment());
+		Entity entity = new Entity("work." + asRef.toString('_'));
 
 		EntityInstantiation instantiation = new EntityInstantiation(ifName, entity);
 		List<AssociationElement> portMap = instantiation.getPortMap();
@@ -112,7 +112,7 @@ public aspect VHDLStatementTransformation {
 					}
 					if (var.getDimensions().size() != 0) {
 						if (typeAnno.isEmpty()) {
-							HDLQualifiedName name = HDLQualifiedName.create("work").append(asRef.getLastSegment() + "Pkg").append(getArrayRefName(var, true));
+							HDLQualifiedName name = HDLQualifiedName.create("work").append(VHDLPackageTransformation.getPackageName(asRef)).append(getArrayRefName(var, true));
 							res.addImport(name);
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))));
 							res.merge(newHVD.toVHDL(pid));

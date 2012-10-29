@@ -72,14 +72,24 @@ public aspect VHDLPackageTransformation {
 		}
 		List<LibraryUnit> res = new LinkedList<LibraryUnit>();
 		HDLQualifiedName entityName = getFullName();
-		Entity e = new Entity(entityName.getLastSegment());
+		Entity e = new Entity(entityName.toString('_'));
 		VHDLContext unit = new VHDLContext();
+		for (String imp : getImports()) {
+			HDLQualifiedName fqn = new HDLQualifiedName(imp);
+			if (fqn.getLastSegment().equals("*")) {
+				unit.addImport(HDLQualifiedName.create("work",getPackageName(fqn.skipLast(1)), "all"));
+				unit.addImport(HDLQualifiedName.create("work",fqn.skipLast(1).toString('_'), "all"));
+			} else {
+				unit.addImport(HDLQualifiedName.create("work",getPackageName(fqn)));
+				unit.addImport(HDLQualifiedName.create("work",fqn.toString('_')));
+			}
+		}
 		for (HDLStatement stmnt : getStatements()) {
 			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX));
 		}
 		addDefaultLibs(res, unit);
 		if (unit.hasPkgDeclarations()) {
-			String libName = entityName.getLastSegment() + "Pkg";
+			String libName = getPackageName(entityName);
 			PackageDeclaration pd = new PackageDeclaration(libName);
 			pd.getDeclarations().addAll((List) unit.externalTypes);
 			pd.getDeclarations().addAll((List) unit.constantsPkg);
@@ -109,6 +119,10 @@ public aspect VHDLPackageTransformation {
 		}
 		res.add(a);
 		return res;
+	}
+
+	public static String getPackageName(HDLQualifiedName entityName) {
+		return entityName.toString('_') + "Pkg";
 	}
 
 	private static void addDefaultLibs(List<LibraryUnit> res, VHDLContext unit) {
@@ -194,6 +208,24 @@ public aspect VHDLPackageTransformation {
 		VhdlFile res = new VhdlFile();
 		for (HDLUnit unit : getUnits()) {
 			res.getElements().addAll(unit.toVHDL());
+		}
+		PackageDeclaration pd=null;
+		for (HDLDeclaration decl:getDeclarations()){
+			if (decl.getClassType()==HDLClass.HDLVariableDeclaration){
+				HDLVariableDeclaration hvd=(HDLVariableDeclaration) decl;
+				if (pd==null){
+					pd=new PackageDeclaration(getPackageName(new HDLQualifiedName(getPkg())));
+					res.getElements().add(pd);
+				}
+				VHDLContext vhdl = hvd.toVHDL(VHDLContext.DEFAULT_CTX);
+				ConstantDeclaration first = vhdl.constants.getFirst();
+				if (first==null) {
+					first=vhdl.constantsPkg.getFirst();
+					if (first==null)
+						throw new IllegalArgumentException("Expected constant declaration but found none!");
+				}
+				pd.getDeclarations().add(first);
+			}
 		}
 		return res;
 	}

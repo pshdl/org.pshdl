@@ -1,0 +1,74 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>{TITLE}</title>
+        <style type="text/css">
+            table{
+                border:1px solid gray;
+                border-collapse:collapse;
+            }
+            tr:nth-child(even){
+                background-color:rgba(193, 226, 253, 0.48);
+            }
+            td{
+                border:1px solid gray;
+                padding:4px;
+                text-align:center;
+            }
+            .wStyle{
+                color:blue;
+            }
+            .rStyle{
+                color:orange;
+            }
+            .rwStyle{
+                color:green;
+            }
+            .nullStyle{
+                color:silver;
+            }
+            .register{
+                font-style:italic;
+            }
+            thead{
+                font-weight:bold;
+                text-align:center;
+                background-color:#b2d4ed;
+            }
+            td.offset{
+                text-align:right;
+            }</style>
+    </head>
+    <body>
+        <table>
+            <thead>
+                {HEADER}
+            </thead>
+            {TABLE} 
+        </table>
+        <p>The various formatting styles have the following meaning:</p>
+        <table>
+            <tr>
+                <td class="register">register</td>
+                <td>A register has been created for this variable</td>
+            </tr>
+            <tr>
+                <td class="rStyle">readable</td>
+                <td>The variable can be read</td>
+            </tr>
+            <tr>
+                <td class="wStyle">writeable</td>
+                <td>The variable can be written</td>
+            </tr>
+            <tr>
+                <td class="rwStyle">read-writeable</td>
+                <td>The variable can be read and written</td>
+            </tr>
+            <tr>
+                <td class="nullStyle">unused</td>
+                <td>This range is not backed by any variable</td>
+            </tr>
+        </table>
+        <p>This file has been generated on:{DATE}</p>
+    </body>
+</html>

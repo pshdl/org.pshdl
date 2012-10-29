@@ -5,6 +5,16 @@ import java.util.*;
 public class Memory {
 	public List<Reference> references = new LinkedList<Reference>();
 
+	public Memory() {
+	}
+
+	public Memory(Reference... references) {
+		super();
+		for (Reference reference : references) {
+			this.references.add(reference);
+		}
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

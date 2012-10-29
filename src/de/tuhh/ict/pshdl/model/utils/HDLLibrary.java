@@ -11,6 +11,7 @@ public class HDLLibrary {
 	public Map<HDLQualifiedName, HDLUnit> units = new ConcurrentHashMap<HDLQualifiedName, HDLUnit>();
 	public Map<HDLQualifiedName, HDLType> types = new ConcurrentHashMap<HDLQualifiedName, HDLType>();
 	public Map<HDLQualifiedName, HDLFunction> functions = new ConcurrentHashMap<HDLQualifiedName, HDLFunction>();
+	public Map<HDLQualifiedName, HDLVariable> variables = new ConcurrentHashMap<HDLQualifiedName, HDLVariable>();
 	public List<SideFile> sideFiles = new LinkedList<SideFile>();
 	private HDLConfig config = new HDLConfig();
 
@@ -56,6 +57,12 @@ public class HDLLibrary {
 				HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) decl;
 				addInterface(hid.getHIf());
 				break;
+			case HDLVariableDeclaration:
+				HDLVariableDeclaration hvd = (HDLVariableDeclaration) decl;
+				for (HDLVariable var : hvd.getVariables()) {
+					addVariable(var);
+				}
+				break;
 			default:
 				if (decl instanceof HDLFunction) {
 					HDLFunction func = (HDLFunction) decl;
@@ -66,8 +73,46 @@ public class HDLLibrary {
 		}
 	}
 
+	public void addVariable(HDLVariable var) {
+		variables.put(var.getFullName(), var);
+	}
+
 	public void addFunction(HDLFunction func) {
 		functions.put(func.getFullName(), func);
+	}
+
+	/**
+	 * Resolves a type by firstly checking if it already exists given the
+	 * qualified name. If not the specific imports are tried first, then the
+	 * wild card ones in order of declaration.
+	 * 
+	 * @param imports
+	 *            a list of specific and wild card imports
+	 * @param type
+	 *            the fqn or local name of the type to look for
+	 * @return the type if found
+	 */
+	public HDLVariable resolveVariable(ArrayList<String> imports, HDLQualifiedName type) {
+		HDLVariable hdlType = variables.get(type);
+		if (hdlType == null) {
+			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
+			// type + " @" + this);
+			for (String string : imports) {
+				if (string.endsWith(type.toString()))
+					return variables.get(new HDLQualifiedName(string));
+			}
+			for (String string : imports) {
+				if (string.endsWith(".*")) {
+					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
+					// System.out.println("HDLLibrary.resolve()" + newTypeName);
+					HDLVariable newType = variables.get(newTypeName);
+					if (newType != null) {
+						return newType;
+					}
+				}
+			}
+		}
+		return hdlType;
 	}
 
 	/**
