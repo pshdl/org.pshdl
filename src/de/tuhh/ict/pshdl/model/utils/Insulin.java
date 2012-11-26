@@ -168,40 +168,66 @@ public class Insulin {
 			if (!doNotInit.contains(hvd.getDirection())) {
 				HDLRegisterConfig register = hvd.getRegister();
 				for (HDLVariable var : hvd.getVariables()) {
-					HDLExpression defaultValue = var.getDefaultValue();
-					if ((defaultValue == null) && (register == null)) {
-						if ((hvd.getPrimitive() != null)) {
-							if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null)
-								defaultValue = HDLLiteral.get(0);
-						} else {
-							HDLType resolveType = hvd.resolveType();
-							if (resolveType instanceof HDLEnum) {
-								HDLEnum hEnum = (HDLEnum) resolveType;
-								defaultValue = new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
-							}
-						}
-					}
-					if (defaultValue != null) {
-						ArrayList<HDLExpression> dimensions = var.getDimensions();
+					HDLExpression defaultValue = getDefaultValue(hvd, register, var);
+					if ((defaultValue != null) && (hvd.getContainer(HDLInterface.class) == null)) {
 						HDLVariableRef setVar = new HDLVariableRef().setVar(var.asRef());
-						boolean synchedArray = false;
-						if (defaultValue instanceof HDLVariableRef) {
-							HDLVariableRef ref = (HDLVariableRef) defaultValue;
-							synchedArray = ref.resolveVar().getDimensions().size() != 0;
-						}
-						HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
-						HDLBlock obj = var.getMeta(RWValidation.BlockMeta.block);
-						if ((obj != null) && (obj != RWValidation.UNIT_BLOCK))
-							insertFirstStatement(ms, obj, init);
-						else
-							insertFirstStatement(ms, var, init);
-						ms.replace(var, var.setDefaultValue(null));
+						generateInit(ms, var, var, defaultValue, setVar);
 					}
 
 				}
 			}
 		}
+		Set<HDLInterfaceInstantiation> hii = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
+		for (HDLInterfaceInstantiation hi : hii) {
+			HDLInterface hIf = hi.resolveHIf();
+			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
+				HDLDirection direction = hvd.getDirection();
+				if ((direction == HDLDirection.IN) || (direction == HDLDirection.INOUT)) {
+					for (HDLVariable var : hvd.getVariables()) {
+						HDLExpression defaultValue = getDefaultValue(hvd, null, var);
+						if (defaultValue != null) {
+							HDLVariableRef setVar = new HDLInterfaceRef().setHIf(hi.getVar().asRef()).setVar(var.asRef());
+							generateInit(ms, var, hi.getContainer(HDLUnit.class), defaultValue, setVar);
+						}
+					}
+				}
+			}
+		}
 		return ms.apply(apply);
+	}
+
+	private static void generateInit(ModificationSet ms, HDLVariable var, IHDLObject container, HDLExpression defaultValue, HDLVariableRef setVar) {
+		ArrayList<HDLExpression> dimensions = var.getDimensions();
+		boolean synchedArray = false;
+		if (defaultValue instanceof HDLVariableRef) {
+			HDLVariableRef ref = (HDLVariableRef) defaultValue;
+			synchedArray = ref.resolveVar().getDimensions().size() != 0;
+		}
+		HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
+		HDLBlock obj = var.getMeta(RWValidation.BlockMeta.block);
+		if ((obj != null) && (obj != RWValidation.UNIT_BLOCK))
+			insertFirstStatement(ms, obj, init);
+		else
+			insertFirstStatement(ms, container, init);
+		if (!(setVar instanceof HDLInterfaceRef))
+			ms.replace(var, var.setDefaultValue(null));
+	}
+
+	private static HDLExpression getDefaultValue(HDLVariableDeclaration hvd, HDLRegisterConfig register, HDLVariable var) {
+		HDLExpression defaultValue = var.getDefaultValue();
+		if ((defaultValue == null) && (register == null)) {
+			if ((hvd.getPrimitive() != null)) {
+				if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null)
+					defaultValue = HDLLiteral.get(0);
+			} else {
+				HDLType resolveType = hvd.resolveType();
+				if (resolveType instanceof HDLEnum) {
+					HDLEnum hEnum = (HDLEnum) resolveType;
+					defaultValue = new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
+				}
+			}
+		}
+		return defaultValue;
 	}
 
 	/**
@@ -233,6 +259,9 @@ public class Insulin {
 	private static void insertFirstStatement(ModificationSet ms, IHDLObject container, HDLStatement stmnt) {
 		if ((container.getClassType() != HDLClass.HDLUnit) && (container.getClassType() != HDLClass.HDLBlock)) {
 			insertFirstStatement(ms, container.getContainer(), stmnt);
+			return;
+		}
+		if (container instanceof HDLInterface) {
 			return;
 		}
 		if (container instanceof HDLUnit) {
@@ -658,6 +687,8 @@ public class Insulin {
 		Collection<HDLVariableDeclaration> list = HDLQuery.select(HDLVariableDeclaration.class).from(orig).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.OUT)
 				.getAll();
 		for (HDLVariableDeclaration hdv : list) {
+			if (hdv.getContainer(HDLInterface.class) != null)
+				continue;
 			HDLVariableDeclaration origHdv = hdv;
 			for (HDLVariable var : hdv.getVariables()) {
 				Integer readCount = var.getMeta(IntegerMeta.READ_COUNT);

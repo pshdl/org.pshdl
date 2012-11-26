@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String val. Can <b>not</b> be <code>null</code>.</li>
+ * <li>Boolean str. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLLiteral extends AbstractHDLLiteral {
@@ -24,11 +25,13 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param val
 	 *            the value for val. Can <b>not</b> be <code>null</code>.
+	 * @param str
+	 *            the value for str. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLLiteral(int objectID, @Nullable IHDLObject container, @NonNull String val, boolean validate, boolean updateContainer) {
-		super(objectID, container, val, validate, updateContainer);
+	public HDLLiteral(int objectID, @Nullable IHDLObject container, @NonNull String val, @Nullable Boolean str, boolean validate, boolean updateContainer) {
+		super(objectID, container, val, str, validate, updateContainer);
 	}
 
 	/**
@@ -38,9 +41,11 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param val
 	 *            the value for val. Can <b>not</b> be <code>null</code>.
+	 * @param str
+	 *            the value for str. Can be <code>null</code>.
 	 */
-	public HDLLiteral(int objectID, @Nullable IHDLObject container, @NonNull String val) {
-		this(objectID, container, val, true, true);
+	public HDLLiteral(int objectID, @Nullable IHDLObject container, @NonNull String val, @Nullable Boolean str) {
+		this(objectID, container, val, str, true, true);
 	}
 
 	public HDLLiteral() {
@@ -64,6 +69,17 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			if (obj == null)
 				return null;
 			return obj.getVal();
+		}
+	};
+	/**
+	 * The accessor for the field str which is of type Boolean.
+	 */
+	public static HDLFieldAccess<HDLLiteral, Boolean> fStr = new HDLFieldAccess<HDLLiteral, Boolean>() {
+		@Override
+		public Boolean getValue(HDLLiteral obj) {
+			if (obj == null)
+				return null;
+			return obj.getStr();
 		}
 	};
 	// $CONTENT-BEGIN$
@@ -98,20 +114,39 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
-		if (getValueAsBigInt() == null)
-			throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");
+		switch (getPresentation()) {
+		case STR:
+		case BOOL:
+			break;
+		default:
+			if (getValueAsBigInt() == null)
+				throw new IllegalArgumentException("The value:" + val + " is not a valid Literal!");
+		}
 	}
 
 	public static HDLLiteral get(int i) {
-		return new HDLLiteral().setVal(Integer.toString(i));
+		return new HDLLiteral().setStr(false).setVal(Integer.toString(i));
 	}
 
 	public static enum HDLLiteralPresentation {
-		HEX, BIN, NUM;
+		HEX, BIN, NUM, STR, BOOL;
+	}
+
+	@Override
+	public Boolean getStr() {
+		if (super.str == null)
+			return false;
+		return super.str;
 	}
 
 	public HDLLiteralPresentation getPresentation() {
+		if (getStr())
+			return HDLLiteralPresentation.STR;
 		String string = getVal();
+		if ("true".equals(string))
+			return HDLLiteralPresentation.BOOL;
+		if ("false".equals(string))
+			return HDLLiteralPresentation.BOOL;
 		char zeroChar = string.charAt(0);
 		if (zeroChar == '0') {
 			if (string.length() > 1) {
@@ -129,7 +164,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	}
 
 	public static HDLExpression get(BigInteger constant) {
-		return new HDLLiteral().setVal(constant.toString());
+		return new HDLLiteral().setStr(false).setVal(constant.toString());
 	}
 
 	// $CONTENT-END$

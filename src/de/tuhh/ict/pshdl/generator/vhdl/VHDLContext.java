@@ -30,7 +30,7 @@ public class VHDLContext {
 	public LinkedList<ObjectDeclaration<?>> internals = new LinkedList<ObjectDeclaration<?>>();
 	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
 	public LinkedList<BlockDeclarativeItem> externalTypes = new LinkedList<BlockDeclarativeItem>();
-	public Set<HDLQualifiedName> imports = new HashSet<HDLQualifiedName>();
+	public Set<HDLQualifiedName> imports = new TreeSet<HDLQualifiedName>();
 
 	public void addClockedStatement(HDLRegisterConfig config, SequentialStatement sa) {
 		config = config.normalize();

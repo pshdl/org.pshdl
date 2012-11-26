@@ -79,11 +79,24 @@ public aspect VHDLStatementTransformation {
 		HDLVariable hVar=getVar();
 		String ifName = getVar().getName();
 		HDLQualifiedName asRef = hIf.asRef();
-		Entity entity = new Entity("work." + asRef.toString('_'));
-
-		EntityInstantiation instantiation = new EntityInstantiation(ifName, entity);
-		List<AssociationElement> portMap = instantiation.getPortMap();
-		List<AssociationElement> genericMap = instantiation.getGenericMap();
+		HDLInterfaceDeclaration hid=hIf.getContainer(HDLInterfaceDeclaration.class);
+		List<AssociationElement> portMap;
+		List<AssociationElement> genericMap;
+		ConcurrentStatement instantiation;
+		if (hid!=null && hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent)!=null){
+			res.addImport(VHDLPackageTransformation.getNameRef(asRef));
+			Component entity = new Component(asRef.getLastSegment().toString());
+			ComponentInstantiation inst = new ComponentInstantiation(ifName, entity);
+			portMap = inst.getPortMap();
+			genericMap = inst.getGenericMap();
+			instantiation=inst;
+		}else{
+			Entity entity = new Entity(VHDLPackageTransformation.getNameRef(asRef).toString());
+			EntityInstantiation inst = new EntityInstantiation(ifName, entity);
+			portMap = inst.getPortMap();
+			genericMap = inst.getGenericMap();
+			instantiation=inst;
+		}
 		ModificationSet ms=new ModificationSet();
 		Collection<HDLVariable> vars=hIf.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable var : vars) {
@@ -112,7 +125,7 @@ public aspect VHDLStatementTransformation {
 					}
 					if (var.getDimensions().size() != 0) {
 						if (typeAnno.isEmpty()) {
-							HDLQualifiedName name = HDLQualifiedName.create("work").append(VHDLPackageTransformation.getPackageName(asRef)).append(getArrayRefName(var, true));
+							HDLQualifiedName name = VHDLPackageTransformation.getPackageNameRef(asRef).append(getArrayRefName(var, true));
 							res.addImport(name);
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))));
 							res.merge(newHVD.toVHDL(pid));

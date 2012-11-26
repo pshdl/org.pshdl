@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLFunction contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -23,13 +24,15 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(int objectID, @Nullable IHDLObject container, @NonNull String name, boolean validate, boolean updateContainer) {
-		super(objectID, container, name, validate, updateContainer);
+	public HDLFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, boolean validate, boolean updateContainer) {
+		super(objectID, container, annotations, name, validate, updateContainer);
 	}
 
 	/**
@@ -37,11 +40,13 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLFunction(int objectID, @Nullable IHDLObject container, @NonNull String name) {
-		this(objectID, container, name, true, true);
+	public HDLFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name) {
+		this(objectID, container, annotations, name, true, true);
 	}
 
 	public HDLFunction() {
@@ -67,7 +72,6 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			return obj.getName();
 		}
 	};
-
 	// $CONTENT-BEGIN$
 
 	public static final String META = "INLINED_FROM";
@@ -81,7 +85,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
 				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP);
-				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
+				if (argRef.getBits().size() != 0 || argRef.getArray().size() != 0) {
 					if (exp instanceof HDLVariableRef) {
 						HDLVariableRef ref = (HDLVariableRef) exp;
 						HDLVariableRef nref = ref.copy();

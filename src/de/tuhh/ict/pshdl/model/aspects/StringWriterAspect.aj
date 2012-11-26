@@ -75,6 +75,9 @@ public aspect StringWriterAspect {
 	
 	public String HDLNativeFunction.toString() {
 		StringBuilder sb = new StringBuilder();
+		for (HDLAnnotation anno : getAnnotations()) {
+			sb.append(anno).append(' ');
+		}
 		if (getSimOnly()!= null && getSimOnly())
 			sb.append("simulation ");
 		sb.append("native function ");
@@ -83,6 +86,9 @@ public aspect StringWriterAspect {
 	}
 	public String HDLInlineFunction.toString() {
 		StringBuilder sb = new StringBuilder();
+		for (HDLAnnotation anno : getAnnotations()) {
+			sb.append(anno).append(' ');
+		}
 		sb.append("inline function ");
 		sb.append(getName());
 		sb.append('(');
@@ -97,6 +103,9 @@ public aspect StringWriterAspect {
 	}
 	public String HDLSubstituteFunction.toString() {
 		StringBuilder sb = new StringBuilder();
+		for (HDLAnnotation anno : getAnnotations()) {
+			sb.append(anno).append(' ');
+		}
 		sb.append("substitute function ");
 		sb.append(getName());
 		sb.append('(');
@@ -150,6 +159,8 @@ public aspect StringWriterAspect {
 	}
 
 	public String HDLLiteral.toString() {
+		if (getStr())
+			return '"'+getVal()+'"';
 		return getVal();
 	}
 
@@ -320,7 +331,11 @@ public aspect StringWriterAspect {
 	}
 
 	public String HDLInterfaceDeclaration.toString() {
-		return getHIf().toString();
+		StringBuilder annos=getSpacing();
+		for (HDLAnnotation anno : getAnnotations()) {
+			annos.append(anno).append(' ');
+		}
+		return annos.append(getHIf()).toString();
 	}
 	public String HDLInterface.toString() {
 		StringBuilder sb = getSpacing();
@@ -346,6 +361,9 @@ public aspect StringWriterAspect {
 
 	public String HDLEnumDeclaration.toString() {
 		StringBuilder sb = getSpacing();
+		for (HDLAnnotation anno : getAnnotations()) {
+			sb.append(anno).append(' ');
+		}
 		sb.append("enum ");
 		sb.append(getHEnum().getName());
 		sb.append(" = {");

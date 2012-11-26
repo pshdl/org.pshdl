@@ -192,8 +192,11 @@ public class HDLValidator {
 				} else {
 					HDLExpression def = var.getDefaultValue();
 					BigInteger constant = def.constantEvaluate(getContext(hContext, var));
-					if (constant == null)
-						problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
+					if (constant == null) {
+						if (!(def instanceof HDLLiteral))
+							problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
+
+					}
 				}
 			}
 		}
@@ -231,7 +234,8 @@ public class HDLValidator {
 	private static void compareBoundaries(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, ArrayList<HDLExpression> dimensions,
 			ArrayList<HDLExpression> array) {
 		if (dimensions.size() != array.size()) {
-			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ref));
+			// problems.add(new
+			// Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ref));
 		} else {
 			int dim = 0;
 			for (HDLExpression arr : array) {

@@ -45,7 +45,13 @@ public aspect ConstantEvaluation {
 	}
 
 	public BigInteger HDLLiteral.constantEvaluate(HDLEvaluationContext context) {
-		return getValueAsBigInt();
+		switch (getPresentation()){
+		case STR:
+		case BOOL:
+			return null;
+		default:
+			return getValueAsBigInt();
+		}
 	}
 
 	public BigInteger HDLManip.constantEvaluate(HDLEvaluationContext context) {

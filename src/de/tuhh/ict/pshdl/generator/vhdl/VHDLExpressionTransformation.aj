@@ -6,6 +6,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLPackageTransformation.*;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
@@ -98,6 +99,8 @@ public aspect VHDLExpressionTransformation {
 			return new Not(vhdl);
 		case CAST:
 			HDLPrimitive targetType = (HDLPrimitive) getCastTo();
+			if (targetType.getType()==HDLPrimitiveType.STRING)
+				return vhdl;
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
 				HDLLiteral lit = (HDLLiteral) getTarget();
 				if (this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLArithOp)
@@ -132,6 +135,8 @@ public aspect VHDLExpressionTransformation {
 					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
 					resize.getParameters().add(new AssociationElement(actual));
 					break;
+				case STRING:
+					throw new IllegalArgumentException("String is not castable");
 				case BOOL:
 					throw new IllegalArgumentException("Bool is not a literal");
 				}
@@ -160,6 +165,7 @@ public aspect VHDLExpressionTransformation {
 				case BIT:
 				case INTEGER:
 				case NATURAL:
+				case STRING:
 					throw new IllegalArgumentException(targetType + " can't have a width.");
 				case INT:
 				case UINT:
@@ -189,15 +195,24 @@ public aspect VHDLExpressionTransformation {
 
 	public Literal<?> HDLLiteral.toVHDL() {
 		String val = getVal();
-		if (val.length() == 1)
-			return new DecimalLiteral(val);
-		switch (val.charAt(1)) {
-		case 'b':
-			return new BasedLiteral("2#"+val.substring(2)+"#");
-		case 'x':
-			return new BasedLiteral("16#"+val.substring(2)+"#");
+		switch (getPresentation()){
+		case STR:
+			return new StringLiteral(val);
+		case BOOL:
+			if ("true".equals(val))
+				return Standard.BOOLEAN_TRUE;
+			return Standard.BOOLEAN_FALSE;
 		default:
-			return new DecimalLiteral(val);
+			if (val.length() == 1)
+				return new DecimalLiteral(val);
+			switch (val.charAt(1)) {
+			case 'b':
+				return new BasedLiteral("2#"+val.substring(2)+"#");
+			case 'x':
+				return new BasedLiteral("16#"+val.substring(2)+"#");
+			default:
+				return new DecimalLiteral(val);
+			}
 		}
 	}
 

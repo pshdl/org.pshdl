@@ -148,7 +148,7 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	@Override
 	protected String validateName(String name) {
-		if ((name != null) && name.contains("."))
+		if (name != null && name.contains("."))
 			throw new IllegalArgumentException("Variable names may not contain a dot");
 		return super.validateName(name);
 	}

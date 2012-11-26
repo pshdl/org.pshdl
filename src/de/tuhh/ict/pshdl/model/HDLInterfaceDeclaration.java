@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import java.util.*;
+
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -9,6 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLInterfaceDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -20,13 +23,16 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceDeclaration(int objectID, @Nullable IHDLObject container, @NonNull HDLInterface hIf, boolean validate, boolean updateContainer) {
-		super(objectID, container, hIf, validate, updateContainer);
+	public HDLInterfaceDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLInterface hIf, boolean validate,
+			boolean updateContainer) {
+		super(objectID, container, annotations, hIf, validate, updateContainer);
 	}
 
 	/**
@@ -34,11 +40,13 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLInterfaceDeclaration(int objectID, @Nullable IHDLObject container, @NonNull HDLInterface hIf) {
-		this(objectID, container, hIf, true, true);
+	public HDLInterfaceDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLInterface hIf) {
+		this(objectID, container, annotations, hIf, true, true);
 	}
 
 	public HDLInterfaceDeclaration() {

@@ -12,8 +12,8 @@ import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInform
 
 public class PSHDLLib {
 
-	public static final HDLEnum TIMEUNIT = new HDLEnum().setName("TimeUnit").addEnums(new HDLVariable().setName("NS")).addEnums(new HDLVariable().setName("US"))
-			.addEnums(new HDLVariable().setName("MS")).addEnums(new HDLVariable().setName("S")).addEnums(new HDLVariable().setName("KS"));
+	public static final HDLEnum TIMEUNIT = new HDLEnum().setName("TimeUnit").addEnums(new HDLVariable().setName("FS")).addEnums(new HDLVariable().setName("PS")).addEnums(new HDLVariable().setName("NS"))
+			.addEnums(new HDLVariable().setName("US")).addEnums(new HDLVariable().setName("MS")).addEnums(new HDLVariable().setName("S")).addEnums(new HDLVariable().setName("KS"));
 	public static final HDLEnum EDGE = new HDLEnum().setName("Edge").addEnums(new HDLVariable().setName("RISING")).addEnums(new HDLVariable().setName("FALLING"));
 	public static final HDLEnum ACTIVE = new HDLEnum().setName("Active").addEnums(new HDLVariable().setName("LOW")).addEnums(new HDLVariable().setName("HIGH"));
 	public static final HDLEnum SYNC = new HDLEnum().setName("Sync").addEnums(new HDLVariable().setName("ASYNC")).addEnums(new HDLVariable().setName("SYNC"));

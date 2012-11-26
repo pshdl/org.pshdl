@@ -5,7 +5,6 @@ import java.util.*;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import de.tuhh.ict.pshdl.model.aspects.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -16,6 +15,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLUnit contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<String> imports. Can be <code>null</code>.</li>
@@ -31,6 +31,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param libURI
 	 *            the value for libURI. Can <b>not</b> be <code>null</code>.
 	 * @param name
@@ -44,9 +46,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
-			@Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate, boolean updateContainer) {
-		super(objectID, container, libURI, name, imports, statements, simulation, validate, updateContainer);
+	public HDLUnit(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
+			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate, boolean updateContainer) {
+		super(objectID, container, annotations, libURI, name, imports, statements, simulation, validate, updateContainer);
 	}
 
 	/**
@@ -54,6 +56,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param libURI
 	 *            the value for libURI. Can <b>not</b> be <code>null</code>.
 	 * @param name
@@ -65,9 +69,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param simulation
 	 *            the value for simulation. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLUnit(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @NonNull String name, @Nullable ArrayList<String> imports,
-			@Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation) {
-		this(objectID, container, libURI, name, imports, statements, simulation, true, true);
+	public HDLUnit(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
+			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation) {
+		this(objectID, container, annotations, libURI, name, imports, statements, simulation, true, true);
 	}
 
 	public HDLUnit() {
@@ -82,6 +86,18 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		return HDLClass.HDLUnit;
 	}
 
+	/**
+	 * The accessor for the field annotations which is of type
+	 * ArrayList<HDLAnnotation>.
+	 */
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>>() {
+		@Override
+		public ArrayList<HDLAnnotation> getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getAnnotations();
+		}
+	};
 	/**
 	 * The accessor for the field libURI which is of type String.
 	 */
@@ -185,7 +201,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 				hasReg = true;
 		}
 		if (hasReg) {
-			if ((clk == null) && (rst == null)) {
+			if (clk == null && rst == null) {
 				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));

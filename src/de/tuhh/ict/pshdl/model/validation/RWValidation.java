@@ -8,6 +8,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 
@@ -25,6 +26,8 @@ public class RWValidation {
 			writeCount = writeCount == null ? 0 : writeCount;
 			Integer accessCount = hdlVariable.getMeta(IntegerMeta.ACCESS);
 			accessCount = accessCount == null ? 0 : accessCount;
+			if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null))
+				continue;
 			if ((readCount == 0) && (writeCount == 0) && (accessCount == 0)) {
 				problems.add(new Problem(UNUSED_VARIABLE, hdlVariable));
 			} else {
@@ -59,6 +62,8 @@ public class RWValidation {
 					readCount = readCount == null ? 0 : readCount;
 					Integer writeCount = hdlVariable.getMeta(IntegerMeta.WRITE_COUNT);
 					writeCount = writeCount == null ? 0 : writeCount;
+					if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null))
+						continue;
 					HDLDirection dir = hdlVariable.getDirection();
 					// XXX Take care of inout
 					if ((readCount == 0) && (writeCount == 0) && !((dir == PARAMETER) || (dir == CONSTANT))) {

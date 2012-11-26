@@ -13,7 +13,7 @@ public class HDLProblemException extends RuntimeException {
 	public final Problem[] problems;
 
 	public HDLProblemException(String message, Problem... problems) {
-		super();
+		super(message);
 		this.problems = problems;
 	}
 

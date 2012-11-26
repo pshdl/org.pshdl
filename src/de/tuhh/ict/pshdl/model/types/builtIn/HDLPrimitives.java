@@ -493,8 +493,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			case BIT:
 			case BITVECTOR:
 			case BOOL:
+			case STRING:
 				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
-				hdi.error = "Arithmetic negation does not support bit/boolean operands";
+				hdi.error = "Arithmetic negation does not support bit/boolean/string operands";
 				return hdi;
 			}
 			break;
@@ -508,8 +509,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			case BITVECTOR:
 				return new HDLTypeInferenceInfo(determineType, determineType);
 			case BOOL:
+			case STRING:
 				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
-				hdi.error = "Bit negation does not support boolean operands";
+				hdi.error = "Bit negation does not support boolean/string operands";
 				return hdi;
 			}
 			break;
@@ -520,8 +522,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			case UINT:
 			case NATURAL:
 			case BITVECTOR:
+			case STRING:
 				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
-				hdi.error = "Logic negation does not support bit operands";
+				hdi.error = "Logic negation does not support bit/string operands";
 				return hdi;
 			case BIT:
 			case BOOL:
@@ -546,6 +549,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 		case BOOL:
 		case BIT:
 		case BITVECTOR:
+		case STRING:
 			throw new IllegalArgumentException(pt.getType() + " is not numerical!");
 		case INT:
 			BigInteger bitWidth = pt.getWidth().constantEvaluate(context);

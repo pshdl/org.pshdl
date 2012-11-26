@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
 
-public class HDLQualifiedName {
+public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
 	private final String[] qfn;
 	public final int length;
@@ -162,5 +162,10 @@ public class HDLQualifiedName {
 		}
 		res.add(getLastSegment());
 		return create(res);
+	}
+
+	@Override
+	public int compareTo(HDLQualifiedName arg0) {
+		return toString().compareTo(arg0.toString());
 	}
 }

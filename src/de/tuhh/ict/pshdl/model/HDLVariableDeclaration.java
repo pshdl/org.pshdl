@@ -12,10 +12,10 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLVariableDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLRegisterConfig register. Can be <code>null</code>.</li>
  * <li>HDLDirection direction. If <code>null</code>,
  * {@link HDLDirection#INTERNAL} is used as default.</li>
- * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLPrimitive primitive. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLVariable> variables. Can <b>not</b> be <code>null</code>,
@@ -30,13 +30,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param register
 	 *            the value for register. Can be <code>null</code>.
 	 * @param direction
 	 *            the value for direction. If <code>null</code>,
 	 *            {@link HDLDirection#INTERNAL} is used as default.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param primitive
@@ -47,10 +47,10 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
-			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables,
-			boolean validate, boolean updateContainer) {
-		super(objectID, container, register, direction, annotations, type, primitive, variables, validate, updateContainer);
+	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+			@Nullable HDLDirection direction, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables, boolean validate,
+			boolean updateContainer) {
+		super(objectID, container, annotations, register, direction, type, primitive, variables, validate, updateContainer);
 	}
 
 	/**
@@ -58,13 +58,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param register
 	 *            the value for register. Can be <code>null</code>.
 	 * @param direction
 	 *            the value for direction. If <code>null</code>,
 	 *            {@link HDLDirection#INTERNAL} is used as default.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param primitive
@@ -73,9 +73,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 */
-	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable HDLRegisterConfig register, @Nullable HDLDirection direction,
-			@Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables) {
-		this(objectID, container, register, direction, annotations, type, primitive, variables, true, true);
+	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+			@Nullable HDLDirection direction, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables) {
+		this(objectID, container, annotations, register, direction, type, primitive, variables, true, true);
 	}
 
 	public HDLVariableDeclaration() {
@@ -136,18 +136,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 	};
 	/**
-	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>.
-	 */
-	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLAnnotation>>() {
-		@Override
-		public ArrayList<HDLAnnotation> getValue(HDLVariableDeclaration obj) {
-			if (obj == null)
-				return null;
-			return obj.getAnnotations();
-		}
-	};
-	/**
 	 * The accessor for the field type which is of type HDLQualifiedName.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName> fType = new HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName>() {
@@ -184,11 +172,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 	// $CONTENT-BEGIN$
 
-	public HDLVariableDeclaration(int containerID, HDLObject container, HDLRegisterConfig register, HDLDirection direction, ArrayList<HDLAnnotation> annotations,
-			HDLPrimitive primitive, ArrayList<HDLVariable> variables) {
-		this(containerID, container, register, direction, annotations, primitive.asRef(), primitive, variables);
-	}
-
 	@Override
 	public HDLType resolveType() {
 		if (getPrimitive() != null)
@@ -209,14 +192,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 	public boolean isExternal() {
 		return external.contains(getDirection());
-	}
-
-	public HDLAnnotation getAnnotation(Enum<?> range) {
-		for (HDLAnnotation anno : getAnnotations()) {
-			if (anno.getName().equals(range.toString()))
-				return anno;
-		}
-		return null;
 	}
 
 	// $CONTENT-END$

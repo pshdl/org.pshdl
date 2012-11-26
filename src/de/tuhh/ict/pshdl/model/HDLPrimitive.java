@@ -66,7 +66,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	public static enum HDLPrimitiveType {
-		INT("int"), UINT("uint"), INTEGER("int"), NATURAL("uint"), BIT("bit"), BITVECTOR("bit"), BOOL("<bool>");
+		INT("int"), UINT("uint"), INTEGER("int"), NATURAL("uint"), BIT("bit"), BITVECTOR("bit"), BOOL("bool"), STRING("string");
 		String str;
 
 		HDLPrimitiveType(String op) {

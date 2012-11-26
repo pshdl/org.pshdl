@@ -90,6 +90,8 @@ public class VHDLCastsLibrary {
 			return Standard.INTEGER;
 		case NATURAL:
 			return Standard.NATURAL;
+		case STRING:
+			return Standard.STRING;
 		}
 		throw new IllegalArgumentException("Unexpected Type:" + left);
 	}
@@ -122,6 +124,8 @@ public class VHDLCastsLibrary {
 			return Standard.INTEGER;
 		case NATURAL:
 			return Standard.NATURAL;
+		case STRING:
+			return Standard.STRING;
 		}
 		throw new IllegalArgumentException("Unexpected Type:" + left);
 	}

@@ -18,7 +18,7 @@ import de.upb.hni.vmagic.statement.*;
 public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	private static enum SimulationFunctions {
-		waitFor, waitUntil, wait, toggle, pulse;
+		waitFor, waitUntil, wait, pulse;
 		public HDLQualifiedName getName() {
 			return HDLQualifiedName.create("pshdl", name());
 		}
@@ -30,15 +30,21 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
 			switch (func) {
 			case wait:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getBool());
+				if (function.getParams().size() == 0)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool());
+				break;
 			case waitFor:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+				if (function.getParams().size() == 2)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+				break;
 			case waitUntil:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool());
+				if (function.getParams().size() == 1)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool());
+				break;
 			case pulse:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
-			case toggle:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit());
+				if (function.getParams().size() == 3)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+				break;
 			}
 		} catch (Exception e) {
 		}
@@ -102,9 +108,6 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1).copy()).addParams(params.get(2).copy()).setContainer(container);
 			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
 			return res;
-		}
-		case toggle: {
-			return new VHDLContext();
 		}
 		case waitUntil: {
 			VHDLContext res = new VHDLContext();

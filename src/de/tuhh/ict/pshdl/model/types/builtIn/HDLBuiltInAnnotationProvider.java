@@ -34,6 +34,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 */
 		VHDLType,
 		/**
+		 * Indicates that this interface should be instantiated as component
+		 * rather entity.
+		 */
+		VHDLComponent,
+		/**
 		 * This annotation causes the default initialization to 0 to be omitted.
 		 * This MAY cause a latch to be created.
 		 */

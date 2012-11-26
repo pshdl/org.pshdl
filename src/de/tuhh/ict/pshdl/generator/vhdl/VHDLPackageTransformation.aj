@@ -74,7 +74,17 @@ public aspect VHDLPackageTransformation {
 		HDLQualifiedName entityName = getFullName();
 		Entity e = new Entity(entityName.toString('_'));
 		VHDLContext unit = new VHDLContext();
-		for (String imp : getImports()) {
+		
+		Collection<HDLEnumRef> hRefs=getAllObjectsOf(HDLEnumRef.class, true);
+		for (HDLEnumRef hdlEnumRef : hRefs) {
+			HDLUnit enumContainer=hdlEnumRef.resolveHEnum().getContainer(HDLUnit.class);
+			if (enumContainer!=null && !enumContainer.equals(hdlEnumRef.getContainer(HDLUnit.class))){
+				HDLQualifiedName type=hdlEnumRef.getFullName();
+				if (!type.getSegment(0).equals("pshdl"))
+					unit.addImport(HDLQualifiedName.create("work",getPackageName(type.skipLast(1)), "all"));
+			}
+		}
+		/*for (String imp : getImports()) {
 			HDLQualifiedName fqn = new HDLQualifiedName(imp);
 			if (fqn.getLastSegment().equals("*")) {
 				unit.addImport(HDLQualifiedName.create("work",getPackageName(fqn.skipLast(1)), "all"));
@@ -83,7 +93,7 @@ public aspect VHDLPackageTransformation {
 				unit.addImport(HDLQualifiedName.create("work",getPackageName(fqn)));
 				unit.addImport(HDLQualifiedName.create("work",fqn.toString('_')));
 			}
-		}
+		}*/
 		for (HDLStatement stmnt : getStatements()) {
 			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX));
 		}
@@ -124,6 +134,16 @@ public aspect VHDLPackageTransformation {
 	public static String getPackageName(HDLQualifiedName entityName) {
 		return entityName.toString('_') + "Pkg";
 	}
+	public static HDLQualifiedName getPackageNameRef(HDLQualifiedName entityName) {
+		if (entityName.getSegment(0).equals("VHDL"))
+			return entityName.skipFirst(1);
+		return HDLQualifiedName.create("work",entityName.toString('_')+"Pkg");
+	}
+	public static HDLQualifiedName getNameRef(HDLQualifiedName entityName) {
+		if (entityName.getSegment(0).equals("VHDL"))
+			return entityName.skipFirst(1);
+		return HDLQualifiedName.create("work",entityName.toString('_'));
+	}
 
 	private static void addDefaultLibs(List<LibraryUnit> res, VHDLContext unit) {
 		res.add(new LibraryClause("ieee"));
@@ -133,7 +153,16 @@ public aspect VHDLPackageTransformation {
 		res.add(VHDLCastsLibrary.USE_CLAUSE);
 		res.add(VHDLShiftLibrary.USE_CLAUSE);
 		res.add(new UseClause("pshdl.types.all"));
+		Set<String> usedLibs=new HashSet<String>();
+		usedLibs.add("pshdl");
+		usedLibs.add("ieee");
+		usedLibs.add("work");
 		for (HDLQualifiedName i : unit.imports) {
+			String lib=i.getSegment(0);
+			if (!usedLibs.contains(lib)) {
+				res.add(new LibraryClause(lib));
+				usedLibs.add(lib);
+			}
 			res.add(new UseClause(i.append("all").toString()));
 		}
 	}
@@ -225,6 +254,16 @@ public aspect VHDLPackageTransformation {
 						throw new IllegalArgumentException("Expected constant declaration but found none!");
 				}
 				pd.getDeclarations().add(first);
+			}
+			if (decl.getClassType()==HDLClass.HDLEnumDeclaration){
+				HDLEnumDeclaration hvd=(HDLEnumDeclaration) decl;
+				PackageDeclaration	enumPd=new PackageDeclaration(getPackageName(hvd.getHEnum().getFullName()));
+				res.getElements().add(enumPd);
+				VHDLContext vhdl = hvd.toVHDL(VHDLContext.DEFAULT_CTX);
+				Type first = (Type)vhdl.internalTypes.getFirst();
+				if (first==null)
+					throw new IllegalArgumentException("Expected enum type declaration but found none!");
+				enumPd.getDeclarations().add(first);
 			}
 		}
 		return res;
