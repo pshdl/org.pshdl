@@ -186,21 +186,21 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (CLOCK_PARAM.equals(name))
 				config = config.setClk(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
 			if (EDGE_PARAM.equals(name)) {
-				String value = genArgs.getValue();
+				String value = getString(genArgs);
 				if (value != null)
 					config = config.setClockType(HDLRegClockType.valueOf(value.toUpperCase()));
 				else
 					config = config.setClockType(HDLRegClockType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
 			}
 			if (RESET_SYNC_PARAM.equals(name)) {
-				String value = genArgs.getValue();
+				String value = getString(genArgs);
 				if (value != null)
 					config = config.setSyncType(HDLRegSyncType.valueOf(value.toUpperCase()));
 				else
 					config = config.setSyncType(HDLRegSyncType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
 			}
 			if (RESET_TYPE_PARAM.equals(name)) {
-				String value = genArgs.getValue();
+				String value = getString(genArgs);
 				if (value != null)
 					config = config.setResetType(HDLRegResetActiveType.valueOf(value.toUpperCase()));
 				else
@@ -210,6 +210,15 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				config = config.setResetValue(genArgs.getExpression().copy());
 		}
 		return config;
+	}
+
+	private static String getString(HDLArgument genArgs) {
+		if (genArgs.getExpression() instanceof HDLLiteral) {
+			HDLLiteral lit = (HDLLiteral) genArgs.getExpression();
+			if (lit.getStr())
+				return lit.getVal();
+		}
+		return null;
 	}
 
 	@Override

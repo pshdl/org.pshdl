@@ -10,8 +10,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>String value. Can be <code>null</code>.</li>
- * <li>HDLExpression expression. Can be <code>null</code>.</li>
+ * <li>HDLExpression expression. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
 public class HDLArgument extends AbstractHDLArgument {
@@ -24,16 +23,13 @@ public class HDLArgument extends AbstractHDLArgument {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param value
-	 *            the value for value. Can be <code>null</code>.
 	 * @param expression
-	 *            the value for expression. Can be <code>null</code>.
+	 *            the value for expression. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArgument(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, name, value, expression, validate, updateContainer);
+	public HDLArgument(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull HDLExpression expression, boolean validate, boolean updateContainer) {
+		super(objectID, container, name, expression, validate, updateContainer);
 	}
 
 	/**
@@ -43,13 +39,11 @@ public class HDLArgument extends AbstractHDLArgument {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param value
-	 *            the value for value. Can be <code>null</code>.
 	 * @param expression
-	 *            the value for expression. Can be <code>null</code>.
+	 *            the value for expression. Can <b>not</b> be <code>null</code>.
 	 */
-	public HDLArgument(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value, @Nullable HDLExpression expression) {
-		this(objectID, container, name, value, expression, true, true);
+	public HDLArgument(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull HDLExpression expression) {
+		this(objectID, container, name, expression, true, true);
 	}
 
 	public HDLArgument() {
@@ -73,17 +67,6 @@ public class HDLArgument extends AbstractHDLArgument {
 			if (obj == null)
 				return null;
 			return obj.getName();
-		}
-	};
-	/**
-	 * The accessor for the field value which is of type String.
-	 */
-	public static HDLFieldAccess<HDLArgument, String> fValue = new HDLFieldAccess<HDLArgument, String>() {
-		@Override
-		public String getValue(HDLArgument obj) {
-			if (obj == null)
-				return null;
-			return obj.getValue();
 		}
 	};
 	/**

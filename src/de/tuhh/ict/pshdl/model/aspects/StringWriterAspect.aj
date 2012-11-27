@@ -488,10 +488,7 @@ public aspect StringWriterAspect {
 		sb.append('(');
 		for (HDLArgument args : getArguments()) {
 			sb.append(args.getName()).append('=');
-			if (args.getValue() != null) {
-				sb.append('"').append(args.getValue()).append('"');
-			} else
-				sb.append(args.getExpression());
+			sb.append(args.getExpression());
 
 		}
 		sb.append(')');
