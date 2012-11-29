@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.antlr.runtime.*;
 
+import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -16,21 +17,20 @@ import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWTyp
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.upb.hni.vmagic.expression.*;
 
-public class BusGenerator implements IHDLGenerator {
+public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDLFunctionResolver {
 
 	@Override
 	public HDLInterface getInterface(HDLDirectGeneration hdl) {
 		String name = hdl.getFullName().append(hdl.getIfName()).toString();
 		if (hdl.getGeneratorContent().length() != 0) {
-			Unit unit = null;
 			try {
-				unit = MemoryModel.parseUnit(getContentStream(hdl));
-				List<Row> rows = MemoryModel.buildRows(unit);
-				HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
-				return bId;
+				return createInterface(hdl, name);
 			} catch (Exception e) {
 				throw new HDLProblemException("An unexpected exception occured while parsing the generator content:" + e, new Problem(ErrorCode.GENERATOR_ERROR, hdl));
 			}
@@ -46,6 +46,13 @@ public class BusGenerator implements IHDLGenerator {
 		return hIf;
 	}
 
+	private HDLInterface createInterface(HDLDirectGeneration hdl, String name) throws FileNotFoundException, IOException, RecognitionException {
+		Unit unit = MemoryModel.parseUnit(getContentStream(hdl));
+		List<Row> rows = MemoryModel.buildRows(unit);
+		HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
+		return bId;
+	}
+
 	private InputStream getContentStream(HDLDirectGeneration hdl) {
 		String generatorContent = hdl.getGeneratorContent();
 		String substring = generatorContent.substring(2, generatorContent.length() - 2);
@@ -56,10 +63,7 @@ public class BusGenerator implements IHDLGenerator {
 		ArrayList<HDLArgument> args = hdl.getArguments();
 		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
-				if (arg.getExpression() != null) {
-					return arg.getExpression().copyFiltered(CopyFilter.DEEP);
-				}
-				return HDLLiteral.get(Integer.parseInt(arg.getValue()));
+				return arg.getExpression().copyFiltered(CopyFilter.DEEP);
 			}
 		}
 		throw new IllegalArgumentException("The parameter regCount is not valid!");
@@ -70,18 +74,22 @@ public class BusGenerator implements IHDLGenerator {
 		int regCount = -1;
 		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
-				if (arg.getExpression() != null) {
-					BigInteger regVal = arg.getExpression().constantEvaluate(null);
-					if (regVal != null)
-						regCount = regVal.intValue();
-					else
-						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
+				HDLExpression expression = arg.getExpression();
+				BigInteger regVal = expression.constantEvaluate(null);
+				if (regVal != null) {
+					regCount = regVal.intValue();
 				} else {
-					try {
-						regCount = Integer.parseInt(arg.getValue());
-					} catch (NumberFormatException e) {
-						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
-					}
+					if (expression instanceof HDLLiteral) {
+						HDLLiteral lit = (HDLLiteral) expression;
+						if (lit.getStr()) {
+							try {
+								regCount = Integer.parseInt(lit.getVal());
+							} catch (NumberFormatException e) {
+								throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
+							}
+						}
+					} else
+						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
 				}
 			}
 		}
@@ -113,6 +121,12 @@ public class BusGenerator implements IHDLGenerator {
 				Unit unit = null;
 				try {
 					unit = MemoryModel.parseUnit(getContentStream(hdl));
+					List<Row> rows = MemoryModel.buildRows(unit);
+					HDLUnit hdlUnit = ABP3BusCodeGen.get("de.tuhh.ict.apb", unit, rows);
+					HDLGenerationInfo hdgi = new HDLGenerationInfo(hdlUnit);
+					byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
+					hdgi.files.add(new SideFile(hdl.getVar().getName() + "Map.html", html));
+					return hdgi;
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -120,29 +134,19 @@ public class BusGenerator implements IHDLGenerator {
 				} catch (RecognitionException e) {
 					e.printStackTrace();
 				}
-				return new HDLGenerationInfo(ABP3BusCodeGen.get("de.tuhh.ict.apb", unit));
 			}
 			Unit unit = createDefaultUnit(regCount);
-			return new HDLGenerationInfo(ABP3BusCodeGen.get("de.tuhh.ict.apb", unit));
+			return new HDLGenerationInfo(ABP3BusCodeGen.get("de.tuhh.ict.apb", unit, MemoryModel.buildRows(unit)));
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
 	}
 
 	private Unit createDefaultUnit(int regCount) {
+		Definition def = new Definition("regs", true, RWType.rw, Type.BIT, 32);
+		Row row = new Row("reg", null, def);
+		Memory mem = new Memory(new Reference("reg", regCount));
 		Unit unit = new Unit();
-		Row row = new Row("reg");
-		Definition def = new Definition();
-		def.name = "regs";
-		def.register = true;
-		def.type = Type.BIT;
-		def.rw = RWType.rw;
-		def.width = 32;
-		row.definitions.add(def);
 		unit.declarations.put("reg", row);
-		Memory mem = new Memory();
-		Reference regRow = new Reference("reg");
-		regRow.dimensions.add(regCount);
-		mem.references.add(regRow);
 		unit.memory = mem;
 		return unit;
 	}
@@ -150,7 +154,7 @@ public class BusGenerator implements IHDLGenerator {
 	private String getVersion(HDLDirectGeneration hdl) {
 		for (HDLArgument arg : hdl.getArguments()) {
 			if ("version".equals(arg.getName())) {
-				return arg.getValue();
+				return ((HDLLiteral) arg.getExpression()).getVal();
 			}
 		}
 		return "v1_00_a";
@@ -170,6 +174,13 @@ public class BusGenerator implements IHDLGenerator {
 		if (hdg.getGeneratorContent().length() == 0) {
 			try {
 				getRegCount(hdg);
+			} catch (Exception e) {
+				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+			}
+		} else {
+			String name = hdg.getFullName().append(hdg.getIfName()).toString();
+			try {
+				createInterface(hdg, name);
 			} catch (Exception e) {
 				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
 			}
@@ -210,6 +221,67 @@ public class BusGenerator implements IHDLGenerator {
 				"This parameter is mandatory. It indicates how many sw registers should be accessible in the ip core. The number can be a constant or a string");
 		gi.arguments.put("version", "The version ID to use for the generated pcore");
 		return gi;
+	}
+
+	@Override
+	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getFunctionNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public VHDLContext toVHDL(HDLFunctionCall function, int pid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FunctionCall toVHDLExpression(HDLFunctionCall function) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FunctionInformation getFunctionInfo(String funcName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static enum BusMarker implements IHDLAnnotation {
+		BusInterface;
+
+		@Override
+		public String validate(String value) {
+			return null;
+		}
+
+		@Override
+		public AnnotationInformation getAnnotationInformation() {
+			return new AnnotationInformation(BusMarker.class.getSimpleName(), name(), "Tags a Unit as a generated bus", "the interface that it implements");
+		}
+	}
+
+	@Override
+	public IHDLAnnotation[] getAnnotations() {
+		return BusMarker.values();
 	}
 
 }

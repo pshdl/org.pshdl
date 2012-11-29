@@ -192,7 +192,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 			addClazz(c, ct, clazz);
 			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
-		} while (clazz != null && !clazz.equals(HDLObject.class));
+		} while ((clazz != null) && !clazz.equals(HDLObject.class));
 	}
 
 	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct, Class<? extends HDLObject> clazz) {

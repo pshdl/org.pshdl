@@ -19,8 +19,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
 
 public class ABP3BusCodeGen {
 
-	public static HDLUnit get(String name, Unit unit) {
-		List<Row> rows = MemoryModel.buildRows(unit);
+	public static HDLUnit get(String name, Unit unit, List<Row> rows) {
 		HDLInterface hdi = MemoryModel.buildHDLInterface(unit, rows);
 		String UNIT_NAME = "";
 		int addrWidth = ((int) Math.ceil(Math.log10(rows.size() * 4) / Math.log10(2)));
@@ -198,6 +197,6 @@ public class ABP3BusCodeGen {
 	public static void main(String[] args) throws FileNotFoundException, IOException, RecognitionException {
 		Unit unit = MemoryModel.parseUnit(new FileInputStream(args[0]));
 		System.out.println(unit);
-		System.out.println(get("Bla", unit));
+		System.out.println(get("Bla", unit, MemoryModel.buildRows(unit)));
 	}
 }

@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g 2012-10-27 22:50:26
+// $ANTLR 3.4 /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g 2012-11-02 14:07:34
 
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
@@ -11,15 +11,15 @@ import java.util.ArrayList;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class MemoryModelLexer extends Lexer {
     public static final int EOF=-1;
-    public static final int T__19=19;
-    public static final int T__20=20;
-    public static final int T__21=21;
     public static final int T__22=22;
     public static final int T__23=23;
     public static final int T__24=24;
     public static final int T__25=25;
     public static final int T__26=26;
     public static final int T__27=27;
+    public static final int T__28=28;
+    public static final int T__29=29;
+    public static final int T__30=30;
     public static final int ALIAS=4;
     public static final int BITTYPE=5;
     public static final int COLUMN=6;
@@ -27,14 +27,17 @@ public class MemoryModelLexer extends Lexer {
     public static final int ID=8;
     public static final int INT=9;
     public static final int INTTYPE=10;
-    public static final int MEMORY=11;
-    public static final int READ=12;
-    public static final int READWRITE=13;
-    public static final int ROMWIDTH=14;
-    public static final int ROW=15;
-    public static final int UINTTYPE=16;
-    public static final int WRITE=17;
-    public static final int WS=18;
+    public static final int LIMIT=11;
+    public static final int MASK=12;
+    public static final int MEMORY=13;
+    public static final int READ=14;
+    public static final int READWRITE=15;
+    public static final int ROMWIDTH=16;
+    public static final int ROW=17;
+    public static final int SILENT=18;
+    public static final int UINTTYPE=19;
+    public static final int WRITE=20;
+    public static final int WS=21;
 
     // delegates
     // delegators
@@ -49,15 +52,15 @@ public class MemoryModelLexer extends Lexer {
     public MemoryModelLexer(CharStream input, RecognizerSharedState state) {
         super(input,state);
     }
-    public String getGrammarFileName() { return "/Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g"; }
+    public String getGrammarFileName() { return "/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g"; }
 
     // $ANTLR start "ALIAS"
     public final void mALIAS() throws RecognitionException {
         try {
             int _type = ALIAS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:6:7: ( 'alias' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:6:9: 'alias'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:6:7: ( 'alias' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:6:9: 'alias'
             {
             match("alias"); 
 
@@ -79,8 +82,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = BITTYPE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:7:9: ( 'bit' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:7:11: 'bit'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:7:9: ( 'bit' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:7:11: 'bit'
             {
             match("bit"); 
 
@@ -102,8 +105,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = COLUMN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:8:8: ( 'column' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:8:10: 'column'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:8:8: ( 'column' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:8:10: 'column'
             {
             match("column"); 
 
@@ -125,8 +128,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = INTTYPE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:9:9: ( 'int' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:9:11: 'int'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:9:9: ( 'int' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:9:11: 'int'
             {
             match("int"); 
 
@@ -143,13 +146,59 @@ public class MemoryModelLexer extends Lexer {
     }
     // $ANTLR end "INTTYPE"
 
+    // $ANTLR start "LIMIT"
+    public final void mLIMIT() throws RecognitionException {
+        try {
+            int _type = LIMIT;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:10:7: ( 'limit' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:10:9: 'limit'
+            {
+            match("limit"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "LIMIT"
+
+    // $ANTLR start "MASK"
+    public final void mMASK() throws RecognitionException {
+        try {
+            int _type = MASK;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:11:6: ( 'mask' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:11:8: 'mask'
+            {
+            match("mask"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "MASK"
+
     // $ANTLR start "MEMORY"
     public final void mMEMORY() throws RecognitionException {
         try {
             int _type = MEMORY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:10:8: ( 'memory' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:10:10: 'memory'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:12:8: ( 'memory' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:12:10: 'memory'
             {
             match("memory"); 
 
@@ -171,8 +220,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = READ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:11:6: ( 'r' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:11:8: 'r'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:13:6: ( 'r' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:13:8: 'r'
             {
             match('r'); 
 
@@ -192,8 +241,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = READWRITE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:12:11: ( 'rw' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:12:13: 'rw'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:14:11: ( 'rw' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:14:13: 'rw'
             {
             match("rw"); 
 
@@ -215,8 +264,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = ROMWIDTH;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:13:10: ( 'rowWidth' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:13:12: 'rowWidth'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:15:10: ( 'rowWidth' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:15:12: 'rowWidth'
             {
             match("rowWidth"); 
 
@@ -238,8 +287,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = ROW;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:14:5: ( 'row' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:14:7: 'row'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:16:5: ( 'row' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:16:7: 'row'
             {
             match("row"); 
 
@@ -256,13 +305,36 @@ public class MemoryModelLexer extends Lexer {
     }
     // $ANTLR end "ROW"
 
+    // $ANTLR start "SILENT"
+    public final void mSILENT() throws RecognitionException {
+        try {
+            int _type = SILENT;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:17:8: ( 'silent' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:17:10: 'silent'
+            {
+            match("silent"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "SILENT"
+
     // $ANTLR start "UINTTYPE"
     public final void mUINTTYPE() throws RecognitionException {
         try {
             int _type = UINTTYPE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:15:10: ( 'uint' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:15:12: 'uint'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:18:10: ( 'uint' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:18:12: 'uint'
             {
             match("uint"); 
 
@@ -284,8 +356,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = WRITE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:16:7: ( 'w' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:16:9: 'w'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:19:7: ( 'w' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:19:9: 'w'
             {
             match('w'); 
 
@@ -300,78 +372,15 @@ public class MemoryModelLexer extends Lexer {
     }
     // $ANTLR end "WRITE"
 
-    // $ANTLR start "T__19"
-    public final void mT__19() throws RecognitionException {
-        try {
-            int _type = T__19;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:17:7: ( ';' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:17:9: ';'
-            {
-            match(';'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        	// do for sure before leaving
-        }
-    }
-    // $ANTLR end "T__19"
-
-    // $ANTLR start "T__20"
-    public final void mT__20() throws RecognitionException {
-        try {
-            int _type = T__20;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:18:7: ( '<' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:18:9: '<'
-            {
-            match('<'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        	// do for sure before leaving
-        }
-    }
-    // $ANTLR end "T__20"
-
-    // $ANTLR start "T__21"
-    public final void mT__21() throws RecognitionException {
-        try {
-            int _type = T__21;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:19:7: ( '=' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:19:9: '='
-            {
-            match('='); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        	// do for sure before leaving
-        }
-    }
-    // $ANTLR end "T__21"
-
     // $ANTLR start "T__22"
     public final void mT__22() throws RecognitionException {
         try {
             int _type = T__22;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:20:7: ( '>' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:20:9: '>'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:20:7: ( ';' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:20:9: ';'
             {
-            match('>'); 
+            match(';'); 
 
             }
 
@@ -389,10 +398,10 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = T__23;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:21:7: ( '[' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:21:9: '['
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:21:7: ( '<' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:21:9: '<'
             {
-            match('['); 
+            match('<'); 
 
             }
 
@@ -410,10 +419,10 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = T__24;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:22:7: ( ']' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:22:9: ']'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:22:7: ( '=' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:22:9: '='
             {
-            match(']'); 
+            match('='); 
 
             }
 
@@ -431,12 +440,10 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = T__25;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:23:7: ( 'register' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:23:9: 'register'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:23:7: ( '>' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:23:9: '>'
             {
-            match("register"); 
-
-
+            match('>'); 
 
             }
 
@@ -454,10 +461,10 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = T__26;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:24:7: ( '{' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:24:9: '{'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:24:7: ( '[' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:24:9: '['
             {
-            match('{'); 
+            match('['); 
 
             }
 
@@ -475,10 +482,10 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = T__27;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:25:7: ( '}' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:25:9: '}'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:25:7: ( ']' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:25:9: ']'
             {
-            match('}'); 
+            match(']'); 
 
             }
 
@@ -491,13 +498,78 @@ public class MemoryModelLexer extends Lexer {
     }
     // $ANTLR end "T__27"
 
+    // $ANTLR start "T__28"
+    public final void mT__28() throws RecognitionException {
+        try {
+            int _type = T__28;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:26:7: ( 'register' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:26:9: 'register'
+            {
+            match("register"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__28"
+
+    // $ANTLR start "T__29"
+    public final void mT__29() throws RecognitionException {
+        try {
+            int _type = T__29;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:27:7: ( '{' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:27:9: '{'
+            {
+            match('{'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__29"
+
+    // $ANTLR start "T__30"
+    public final void mT__30() throws RecognitionException {
+        try {
+            int _type = T__30;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:28:7: ( '}' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:28:9: '}'
+            {
+            match('}'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__30"
+
     // $ANTLR start "ID"
     public final void mID() throws RecognitionException {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:83:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:83:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:93:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:93:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             {
             if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
                 input.consume();
@@ -509,7 +581,7 @@ public class MemoryModelLexer extends Lexer {
             }
 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:83:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:93:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
             loop1:
             do {
                 int alt1=2;
@@ -522,7 +594,7 @@ public class MemoryModelLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
             	        input.consume();
@@ -559,10 +631,10 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:86:5: ( ( '0' .. '9' )+ )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:86:7: ( '0' .. '9' )+
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:96:5: ( ( '0' .. '9' )+ )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:96:7: ( '0' .. '9' )+
             {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:86:7: ( '0' .. '9' )+
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:96:7: ( '0' .. '9' )+
             int cnt2=0;
             loop2:
             do {
@@ -576,7 +648,7 @@ public class MemoryModelLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
             	        input.consume();
@@ -617,7 +689,7 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:90:5: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' | '/*' ( options {greedy=false; } : . )* '*/' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:100:5: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' | '/*' ( options {greedy=false; } : . )* '*/' )
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -647,13 +719,13 @@ public class MemoryModelLexer extends Lexer {
             }
             switch (alt6) {
                 case 1 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:90:9: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:100:9: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
                     {
                     match("//"); 
 
 
 
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:90:14: (~ ( '\\n' | '\\r' ) )*
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:100:14: (~ ( '\\n' | '\\r' ) )*
                     loop3:
                     do {
                         int alt3=2;
@@ -666,7 +738,7 @@ public class MemoryModelLexer extends Lexer {
 
                         switch (alt3) {
                     	case 1 :
-                    	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
+                    	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
                     	    {
                     	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '\uFFFF') ) {
                     	        input.consume();
@@ -687,7 +759,7 @@ public class MemoryModelLexer extends Lexer {
                     } while (true);
 
 
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:90:28: ( '\\r' )?
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:100:28: ( '\\r' )?
                     int alt4=2;
                     int LA4_0 = input.LA(1);
 
@@ -696,7 +768,7 @@ public class MemoryModelLexer extends Lexer {
                     }
                     switch (alt4) {
                         case 1 :
-                            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:90:28: '\\r'
+                            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:100:28: '\\r'
                             {
                             match('\r'); 
 
@@ -713,13 +785,13 @@ public class MemoryModelLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:91:9: '/*' ( options {greedy=false; } : . )* '*/'
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:101:9: '/*' ( options {greedy=false; } : . )* '*/'
                     {
                     match("/*"); 
 
 
 
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:91:14: ( options {greedy=false; } : . )*
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:101:14: ( options {greedy=false; } : . )*
                     loop5:
                     do {
                         int alt5=2;
@@ -744,7 +816,7 @@ public class MemoryModelLexer extends Lexer {
 
                         switch (alt5) {
                     	case 1 :
-                    	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:91:42: .
+                    	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:101:42: .
                     	    {
                     	    matchAny(); 
 
@@ -781,8 +853,8 @@ public class MemoryModelLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:94:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:94:9: ( ' ' | '\\t' | '\\r' | '\\n' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:104:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:104:9: ( ' ' | '\\t' | '\\r' | '\\n' )
             {
             if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
                 input.consume();
@@ -808,12 +880,12 @@ public class MemoryModelLexer extends Lexer {
     // $ANTLR end "WS"
 
     public void mTokens() throws RecognitionException {
-        // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:8: ( ALIAS | BITTYPE | COLUMN | INTTYPE | MEMORY | READ | READWRITE | ROMWIDTH | ROW | UINTTYPE | WRITE | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | ID | INT | COMMENT | WS )
-        int alt7=24;
+        // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:8: ( ALIAS | BITTYPE | COLUMN | INTTYPE | LIMIT | MASK | MEMORY | READ | READWRITE | ROMWIDTH | ROW | SILENT | UINTTYPE | WRITE | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | ID | INT | COMMENT | WS )
+        int alt7=27;
         alt7 = dfa7.predict(input);
         switch (alt7) {
             case 1 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:10: ALIAS
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:10: ALIAS
                 {
                 mALIAS(); 
 
@@ -821,7 +893,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 2 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:16: BITTYPE
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:16: BITTYPE
                 {
                 mBITTYPE(); 
 
@@ -829,7 +901,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 3 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:24: COLUMN
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:24: COLUMN
                 {
                 mCOLUMN(); 
 
@@ -837,7 +909,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 4 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:31: INTTYPE
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:31: INTTYPE
                 {
                 mINTTYPE(); 
 
@@ -845,87 +917,87 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 5 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:39: MEMORY
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:39: LIMIT
+                {
+                mLIMIT(); 
+
+
+                }
+                break;
+            case 6 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:45: MASK
+                {
+                mMASK(); 
+
+
+                }
+                break;
+            case 7 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:50: MEMORY
                 {
                 mMEMORY(); 
 
 
                 }
                 break;
-            case 6 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:46: READ
+            case 8 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:57: READ
                 {
                 mREAD(); 
 
 
                 }
                 break;
-            case 7 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:51: READWRITE
+            case 9 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:62: READWRITE
                 {
                 mREADWRITE(); 
 
 
                 }
                 break;
-            case 8 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:61: ROMWIDTH
+            case 10 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:72: ROMWIDTH
                 {
                 mROMWIDTH(); 
 
 
                 }
                 break;
-            case 9 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:70: ROW
+            case 11 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:81: ROW
                 {
                 mROW(); 
 
 
                 }
                 break;
-            case 10 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:74: UINTTYPE
+            case 12 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:85: SILENT
+                {
+                mSILENT(); 
+
+
+                }
+                break;
+            case 13 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:92: UINTTYPE
                 {
                 mUINTTYPE(); 
 
 
                 }
                 break;
-            case 11 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:83: WRITE
+            case 14 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:101: WRITE
                 {
                 mWRITE(); 
 
 
                 }
                 break;
-            case 12 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:89: T__19
-                {
-                mT__19(); 
-
-
-                }
-                break;
-            case 13 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:95: T__20
-                {
-                mT__20(); 
-
-
-                }
-                break;
-            case 14 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:101: T__21
-                {
-                mT__21(); 
-
-
-                }
-                break;
             case 15 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:107: T__22
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:107: T__22
                 {
                 mT__22(); 
 
@@ -933,7 +1005,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 16 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:113: T__23
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:113: T__23
                 {
                 mT__23(); 
 
@@ -941,7 +1013,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 17 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:119: T__24
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:119: T__24
                 {
                 mT__24(); 
 
@@ -949,7 +1021,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 18 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:125: T__25
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:125: T__25
                 {
                 mT__25(); 
 
@@ -957,7 +1029,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 19 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:131: T__26
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:131: T__26
                 {
                 mT__26(); 
 
@@ -965,7 +1037,7 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 20 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:137: T__27
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:137: T__27
                 {
                 mT__27(); 
 
@@ -973,31 +1045,55 @@ public class MemoryModelLexer extends Lexer {
                 }
                 break;
             case 21 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:143: ID
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:143: T__28
+                {
+                mT__28(); 
+
+
+                }
+                break;
+            case 22 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:149: T__29
+                {
+                mT__29(); 
+
+
+                }
+                break;
+            case 23 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:155: T__30
+                {
+                mT__30(); 
+
+
+                }
+                break;
+            case 24 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:161: ID
                 {
                 mID(); 
 
 
                 }
                 break;
-            case 22 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:146: INT
+            case 25 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:164: INT
                 {
                 mINT(); 
 
 
                 }
                 break;
-            case 23 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:150: COMMENT
+            case 26 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:168: COMMENT
                 {
                 mCOMMENT(); 
 
 
                 }
                 break;
-            case 24 :
-                // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:158: WS
+            case 27 :
+                // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:1:176: WS
                 {
                 mWS(); 
 
@@ -1012,104 +1108,125 @@ public class MemoryModelLexer extends Lexer {
 
     protected DFA7 dfa7 = new DFA7(this);
     static final String DFA7_eotS =
-        "\1\uffff\5\21\1\35\1\21\1\37\14\uffff\5\21\1\45\2\21\1\uffff\1\21"+
-        "\1\uffff\1\21\1\52\1\21\1\54\1\21\1\uffff\1\57\3\21\1\uffff\1\21"+
-        "\1\uffff\2\21\1\uffff\1\21\1\67\1\70\4\21\2\uffff\1\75\1\76\2\21"+
-        "\2\uffff\2\21\1\103\1\104\2\uffff";
+        "\1\uffff\6\23\1\41\2\23\1\44\14\uffff\7\23\1\54\2\23\1\uffff\2\23"+
+        "\1\uffff\1\23\1\62\1\23\1\64\3\23\1\uffff\1\71\4\23\1\uffff\1\23"+
+        "\1\uffff\1\23\1\100\2\23\1\uffff\2\23\1\105\1\106\1\23\1\110\1\uffff"+
+        "\4\23\2\uffff\1\115\1\uffff\1\116\2\23\1\121\2\uffff\2\23\1\uffff"+
+        "\1\124\1\125\2\uffff";
     static final String DFA7_eofS =
-        "\105\uffff";
+        "\126\uffff";
     static final String DFA7_minS =
-        "\1\11\1\154\1\151\1\157\1\156\1\145\1\60\1\151\1\60\14\uffff\1\151"+
-        "\1\164\1\154\1\164\1\155\1\60\1\167\1\147\1\uffff\1\156\1\uffff"+
-        "\1\141\1\60\1\165\1\60\1\157\1\uffff\1\60\1\151\1\164\1\163\1\uffff"+
-        "\1\155\1\uffff\1\162\1\151\1\uffff\1\163\2\60\1\156\1\171\1\144"+
-        "\1\164\2\uffff\2\60\1\164\1\145\2\uffff\1\150\1\162\2\60\2\uffff";
+        "\1\11\1\154\1\151\1\157\1\156\1\151\1\141\1\60\2\151\1\60\14\uffff"+
+        "\1\151\1\164\1\154\1\164\1\155\1\163\1\155\1\60\1\167\1\147\1\uffff"+
+        "\1\154\1\156\1\uffff\1\141\1\60\1\165\1\60\1\151\1\153\1\157\1\uffff"+
+        "\1\60\1\151\1\145\1\164\1\163\1\uffff\1\155\1\uffff\1\164\1\60\1"+
+        "\162\1\151\1\uffff\1\163\1\156\2\60\1\156\1\60\1\uffff\1\171\1\144"+
+        "\2\164\2\uffff\1\60\1\uffff\1\60\1\164\1\145\1\60\2\uffff\1\150"+
+        "\1\162\1\uffff\2\60\2\uffff";
     static final String DFA7_maxS =
-        "\1\175\1\154\1\151\1\157\1\156\1\145\1\172\1\151\1\172\14\uffff"+
-        "\1\151\1\164\1\154\1\164\1\155\1\172\1\167\1\147\1\uffff\1\156\1"+
-        "\uffff\1\141\1\172\1\165\1\172\1\157\1\uffff\1\172\1\151\1\164\1"+
-        "\163\1\uffff\1\155\1\uffff\1\162\1\151\1\uffff\1\163\2\172\1\156"+
-        "\1\171\1\144\1\164\2\uffff\2\172\1\164\1\145\2\uffff\1\150\1\162"+
-        "\2\172\2\uffff";
+        "\1\175\1\154\1\151\1\157\1\156\1\151\1\145\1\172\2\151\1\172\14"+
+        "\uffff\1\151\1\164\1\154\1\164\1\155\1\163\1\155\1\172\1\167\1\147"+
+        "\1\uffff\1\154\1\156\1\uffff\1\141\1\172\1\165\1\172\1\151\1\153"+
+        "\1\157\1\uffff\1\172\1\151\1\145\1\164\1\163\1\uffff\1\155\1\uffff"+
+        "\1\164\1\172\1\162\1\151\1\uffff\1\163\1\156\2\172\1\156\1\172\1"+
+        "\uffff\1\171\1\144\2\164\2\uffff\1\172\1\uffff\1\172\1\164\1\145"+
+        "\1\172\2\uffff\1\150\1\162\1\uffff\2\172\2\uffff";
     static final String DFA7_acceptS =
-        "\11\uffff\1\14\1\15\1\16\1\17\1\20\1\21\1\23\1\24\1\25\1\26\1\27"+
-        "\1\30\10\uffff\1\6\1\uffff\1\13\5\uffff\1\7\4\uffff\1\2\1\uffff"+
-        "\1\4\2\uffff\1\11\7\uffff\1\12\1\1\4\uffff\1\3\1\5\4\uffff\1\10"+
-        "\1\22";
+        "\13\uffff\1\17\1\20\1\21\1\22\1\23\1\24\1\26\1\27\1\30\1\31\1\32"+
+        "\1\33\12\uffff\1\10\2\uffff\1\16\7\uffff\1\11\5\uffff\1\2\1\uffff"+
+        "\1\4\4\uffff\1\13\6\uffff\1\6\4\uffff\1\15\1\1\1\uffff\1\5\4\uffff"+
+        "\1\3\1\7\2\uffff\1\14\2\uffff\1\12\1\25";
     static final String DFA7_specialS =
-        "\105\uffff}>";
+        "\126\uffff}>";
     static final String[] DFA7_transitionS = {
-            "\2\24\2\uffff\1\24\22\uffff\1\24\16\uffff\1\23\12\22\1\uffff"+
-            "\1\11\1\12\1\13\1\14\2\uffff\32\21\1\15\1\uffff\1\16\1\uffff"+
-            "\1\21\1\uffff\1\1\1\2\1\3\5\21\1\4\3\21\1\5\4\21\1\6\2\21\1"+
-            "\7\1\21\1\10\3\21\1\17\1\uffff\1\20",
-            "\1\25",
-            "\1\26",
+            "\2\26\2\uffff\1\26\22\uffff\1\26\16\uffff\1\25\12\24\1\uffff"+
+            "\1\13\1\14\1\15\1\16\2\uffff\32\23\1\17\1\uffff\1\20\1\uffff"+
+            "\1\23\1\uffff\1\1\1\2\1\3\5\23\1\4\2\23\1\5\1\6\4\23\1\7\1\10"+
+            "\1\23\1\11\1\23\1\12\3\23\1\21\1\uffff\1\22",
             "\1\27",
             "\1\30",
             "\1\31",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\4\21\1\34\11\21\1"+
-            "\33\7\21\1\32\3\21",
-            "\1\36",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\40",
-            "\1\41",
+            "\1\32",
+            "\1\33",
+            "\1\34\3\uffff\1\35",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\4\23\1\40\11\23\1"+
+            "\37\7\23\1\36\3\23",
             "\1\42",
             "\1\43",
-            "\1\44",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\1\45",
             "\1\46",
             "\1\47",
-            "",
             "\1\50",
-            "",
             "\1\51",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
+            "\1\52",
             "\1\53",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
             "\1\55",
+            "\1\56",
             "",
-            "\12\21\7\uffff\26\21\1\56\3\21\4\uffff\1\21\1\uffff\32\21",
+            "\1\57",
             "\1\60",
+            "",
             "\1\61",
-            "\1\62",
-            "",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
             "\1\63",
-            "",
-            "\1\64",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
             "\1\65",
-            "",
             "\1\66",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
-            "\1\71",
+            "\1\67",
+            "",
+            "\12\23\7\uffff\26\23\1\70\3\23\4\uffff\1\23\1\uffff\32\23",
             "\1\72",
             "\1\73",
             "\1\74",
+            "\1\75",
             "",
+            "\1\76",
             "",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
             "\1\77",
-            "\1\100",
-            "",
-            "",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
             "\1\101",
             "\1\102",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
-            "\12\21\7\uffff\32\21\4\uffff\1\21\1\uffff\32\21",
+            "",
+            "\1\103",
+            "\1\104",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "\1\107",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "",
+            "\1\111",
+            "\1\112",
+            "\1\113",
+            "\1\114",
+            "",
+            "",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "\1\117",
+            "\1\120",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "",
+            "",
+            "\1\122",
+            "\1\123",
+            "",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
+            "\12\23\7\uffff\32\23\4\uffff\1\23\1\uffff\32\23",
             "",
             ""
     };
@@ -1144,7 +1261,7 @@ public class MemoryModelLexer extends Lexer {
             this.transition = DFA7_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( ALIAS | BITTYPE | COLUMN | INTTYPE | MEMORY | READ | READWRITE | ROMWIDTH | ROW | UINTTYPE | WRITE | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | ID | INT | COMMENT | WS );";
+            return "1:1: Tokens : ( ALIAS | BITTYPE | COLUMN | INTTYPE | LIMIT | MASK | MEMORY | READ | READWRITE | ROMWIDTH | ROW | SILENT | UINTTYPE | WRITE | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | ID | INT | COMMENT | WS );";
         }
     }
  

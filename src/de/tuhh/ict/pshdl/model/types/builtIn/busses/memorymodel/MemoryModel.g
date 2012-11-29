@@ -12,6 +12,9 @@ tokens {
 	READ='r';
 	WRITE='w';
 	READWRITE='rw';
+	MASK='mask';
+	LIMIT='limit';
+	SILENT='silent';
 }
 @header {
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
@@ -19,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 }
 
@@ -69,7 +73,13 @@ definition returns [Definition res]
 		type {$res.type=Type.valueOf($type.text.toUpperCase());} 
 		('<' width {$res.width=Integer.parseInt($width.text);} '>')? 
 		ID {$res.name=$ID.text;} 
-		('[' INT ']' {$res.dimensions.add(Integer.parseInt($INT.text));})* ';';
+		('[' INT ']' {$res.dimensions.add(Integer.parseInt($INT.text));})* 
+		(warnType{$res.warn=$warnType.warn;})?
+		';';
+warnType returns [WarnType warn]
+	:	{boolean silent=false;} (SILENT {silent=true;})? 
+		(MASK{$warn=silent?WarnType.silentMask:WarnType.mask;}|
+		LIMIT{$warn=silent?WarnType.silentLimit:WarnType.limit;});
 rwStatus:	(READ | WRITE | READWRITE);
 width	:	INT;
 type	

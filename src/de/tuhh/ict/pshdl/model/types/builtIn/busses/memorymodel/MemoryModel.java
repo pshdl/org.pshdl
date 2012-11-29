@@ -8,7 +8,7 @@ import org.antlr.runtime.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
-import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class MemoryModel {
 
@@ -17,7 +17,12 @@ public class MemoryModel {
 		Unit unit = parseUnit(new FileInputStream(file));
 		System.out.println(unit);
 		List<Row> rows = buildRows(unit);
-		byte[] builtHTML = builtHTML(unit, rows);
+		byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
+		SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
+		for (SideFile sideFile : cFiles) {
+			System.out.println(sideFile.relPath);
+			System.out.println(new String(sideFile.contents));
+		}
 		FileOutputStream ps = new FileOutputStream(args[0] + "Map.html");
 		ps.write(builtHTML);
 		ps.close();
@@ -99,49 +104,6 @@ public class MemoryModel {
 			hdi = hdi.addPorts(hdv);
 		}
 		return hdi;
-	}
-
-	public static byte[] builtHTML(Unit unit, List<Row> rows) throws IOException {
-		Map<String, String> options = new HashMap<String, String>();
-		options.put("{TITLE}", "Register Overview");
-		options.put("{DATE}", new Date().toString());
-		Formatter ps = new Formatter();
-		ps.format("<tr><td>Offset</td>");
-		for (int i = 0; i < unit.rowWidth; i++) {
-			ps.format("<td>%d</td>", unit.rowWidth - i - 1);
-		}
-		ps.format("<td>Row</td></tr>");
-		options.put("{HEADER}", ps.toString());
-		ps.close();
-		ps = new Formatter();
-		int mul = unit.rowWidth / 8;
-		int pos = 0;
-		Column current = null;
-		int colIndex = -1;
-		for (Row row : rows) {
-			if ((row.column != current) || (row.colIndex != colIndex)) {
-				if (row.column == null) {
-					current = null;
-					colIndex = -1;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>\n", unit.rowWidth + 2, "Without Column");
-				} else {
-					current = row.column;
-					colIndex = row.colIndex;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s[%d]</td></tr>\n", unit.rowWidth + 2, row.column.name, row.colIndex);
-				}
-			}
-			ps.format("<tr>");
-			ps.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
-			for (NamedElement dec : row.definitions) {
-				Definition def = (Definition) dec;
-				ps.format("<td colspan='%d' class='field %s %s'>%s</td>", getSize(def), def.rw + "Style", def.register ? "register" : "", def.name);
-			}
-			ps.format("<td>%s</td></tr>\n", row.name);
-			pos++;
-		}
-		options.put("{TABLE}", ps.toString());
-		ps.close();
-		return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);
 	}
 
 	public static List<Row> buildRows(Unit unit) {
@@ -254,7 +216,8 @@ public class MemoryModel {
 			for (Integer dim : def.dimensions) {
 				for (int i = 0; i < dim; i++) {
 					usedSize += getSize(def);
-					definitions.add(def.withoutDim());
+					Definition withoutDim = def.withoutDim();
+					definitions.add(withoutDim);
 				}
 			}
 		} else {

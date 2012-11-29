@@ -1,0 +1,184 @@
+package de.tuhh.ict.pshdl.model.aspects;
+
+import java.math.*;
+import java.util.*;
+
+import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.validation.*;
+
+public aspect TypeInference {
+
+	public static enum Dimension implements MetaAccess<ArrayList<HDLExpression>>{
+		dim
+	}
+	
+	public abstract HDLType HDLExpression.determineType();
+
+	/**
+	 * Attempt to determine the type of this HDLVariable. For this to work it
+	 * needs to have a valid container.
+	 * 
+	 * @return the HDLType if it could be determined, <code>null</code>
+	 *         otherwise.
+	 */
+	public HDLType HDLVariable.determineType() {
+		IHDLObject container = getContainer();
+		switch (container.getClassType()) {
+		case HDLVariableDeclaration:
+			HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
+			HDLType determineType = hvd.determineType();
+			determineType.addMeta(Dimension.dim, getDimensions());
+			return determineType;
+		case HDLDirectGeneration:
+			HDLDirectGeneration hdg = (HDLDirectGeneration) container;
+			HDLInterface hIf = hdg.getHIf();
+			hIf.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+			return hIf;
+		case HDLInterfaceInstantiation:
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) container;
+			HDLInterface resolveHIf = hii.resolveHIf();
+			resolveHIf.addMeta(Dimension.dim, getDimensions());
+			return resolveHIf;
+		case HDLForLoop:
+			HDLPrimitive natural = HDLPrimitive.getNatural();
+			natural.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+			return natural;
+		case HDLInlineFunction:
+			throw new HDLProblemException(new Problem(ErrorCode.INLINE_FUNCTION_NO_TYPE, this));
+		default:
+			throw new IllegalArgumentException("Failed to resolve type of " + this + " caused by an unexpected container: " + container);
+		}
+	}
+
+	public HDLType HDLVariableDeclaration.determineType() {
+		HDLType primitive = getPrimitive();
+		if (primitive != null) {
+			primitive.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+			return primitive;
+		}
+		HDLType type = resolveType();
+		type.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return type;
+	}
+
+	public HDLPrimitive HDLConcat.determineType() {
+		Iterator<HDLExpression> iter = getCats().iterator();
+		HDLPrimitive type = (HDLPrimitive) iter.next().determineType();
+		HDLExpression width = getWidth(type);
+		while (iter.hasNext()) {
+			type = (HDLPrimitive) iter.next().determineType();
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(getWidth(type));
+			width = HDLPrimitives.simplifyWidth(this, width).copy();
+		}
+		HDLPrimitive res = HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
+		res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	private static HDLExpression getWidth(HDLPrimitive type) {
+		HDLExpression width = type.getWidth();
+		if (type.getType() == HDLPrimitiveType.BIT)
+			width = HDLLiteral.get(1);
+		return width.copy();
+	}
+
+	public HDLType HDLEnumRef.determineType() {
+		HDLType res = resolveHEnum();
+		res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLManip.determineType() {
+		HDLType res = HDLPrimitives.getInstance().getManipOpType(this).result;
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLFunctionCall.determineType() {
+		HDLType res = HDLFunctions.getInferenceInfo(this).result;
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLPrimitive HDLLiteral.determineType() {
+		// Actually depends on context
+		HDLPrimitive res = HDLPrimitive.target(getVal().charAt(0) != '-');
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLVariableRef.determineType() {
+		List<HDLRange> bits = getBits();
+		if (bits.size() == 0) {
+			HDLType type = resolveVar().determineType();
+			int array=getArray().size();
+			if (array!=0){
+				ArrayList<HDLExpression> dim = type.getMeta(Dimension.dim);
+				for (int i=0;i<array;i++){
+					dim.remove(0);
+				}
+				HDLType res = type.copy();
+				res.addMeta(Dimension.dim, dim);
+				return res;
+			}
+			return type;
+		}
+		if (bits.size() == 1 && bits.get(0).getFrom() == null) {
+			HDLPrimitive res = HDLPrimitive.getBit();
+			res.addMeta(TypeInference.Dimension.dim, new ArrayList<HDLExpression>());
+			return res;
+		}
+		Iterator<HDLRange> iter = bits.iterator();
+		HDLExpression width = HDLPrimitives.simplifyWidth(this, iter.next().getWidth().copy()).copy();
+		while (iter.hasNext()) {
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth().copy());
+			width = HDLPrimitives.simplifyWidth(this, width).copy();
+		}
+		HDLType res = HDLPrimitive.getBitvector().setWidth(width.copy()).setContainer(this);
+		res.addMeta(TypeInference.Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLArithOp.determineType() {
+		HDLType res = HDLPrimitives.getInstance().getArithOpType(this).result;
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLBitOp.determineType() {
+		HDLType res = HDLPrimitives.getInstance().getBitOpType(this).result;
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLShiftOp.determineType() {
+		HDLType res = HDLPrimitives.getInstance().getShiftOpType(this).result;
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+
+	public HDLType HDLEqualityOp.determineType() {
+		HDLType res = HDLPrimitives.getInstance().getEqualityOpType(this).result;
+		if (!res.hasMeta(Dimension.dim))
+			res.addMeta(Dimension.dim, new ArrayList<HDLExpression>());
+		return res;
+	}
+	
+	public HDLType HDLTernary.determineType(){
+		return getThenExpr().determineType();
+	}
+	
+	public HDLType HDLInlineFunction.determineType() {
+		throw new HDLProblemException(new Problem(ErrorCode.INLINE_FUNCTION_NO_TYPE, this));
+	}
+}

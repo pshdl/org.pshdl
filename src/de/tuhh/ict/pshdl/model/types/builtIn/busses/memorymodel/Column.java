@@ -5,6 +5,7 @@ import java.util.*;
 public class Column implements NamedElement {
 	public String name;
 	public List<NamedElement> rows = new LinkedList<NamedElement>();
+	public int index = -1;
 
 	public Column(String name) {
 		super();

@@ -77,11 +77,12 @@ public aspect VHDLPackageTransformation {
 		
 		Collection<HDLEnumRef> hRefs=getAllObjectsOf(HDLEnumRef.class, true);
 		for (HDLEnumRef hdlEnumRef : hRefs) {
-			HDLUnit enumContainer=hdlEnumRef.resolveHEnum().getContainer(HDLUnit.class);
-			if (enumContainer!=null && !enumContainer.equals(hdlEnumRef.getContainer(HDLUnit.class))){
-				HDLQualifiedName type=hdlEnumRef.getFullName();
+			HDLEnum resolveHEnum = hdlEnumRef.resolveHEnum();
+			HDLUnit enumContainer=resolveHEnum.getContainer(HDLUnit.class);
+			if (enumContainer==null || !enumContainer.equals(hdlEnumRef.getContainer(HDLUnit.class))){
+				HDLQualifiedName type=resolveHEnum.getFullName();
 				if (!type.getSegment(0).equals("pshdl"))
-					unit.addImport(HDLQualifiedName.create("work",getPackageName(type.skipLast(1)), "all"));
+					unit.addImport(HDLQualifiedName.create("work",getPackageName(type), "all"));
 			}
 		}
 		/*for (String imp : getImports()) {

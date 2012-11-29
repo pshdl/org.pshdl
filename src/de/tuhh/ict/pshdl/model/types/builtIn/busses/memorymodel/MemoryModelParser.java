@@ -1,10 +1,11 @@
-// $ANTLR 3.4 /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g 2012-10-27 22:50:26
+// $ANTLR 3.4 /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g 2012-11-02 14:07:34
 
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 
 
@@ -16,19 +17,19 @@ import java.util.ArrayList;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class MemoryModelParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ALIAS", "BITTYPE", "COLUMN", "COMMENT", "ID", "INT", "INTTYPE", "MEMORY", "READ", "READWRITE", "ROMWIDTH", "ROW", "UINTTYPE", "WRITE", "WS", "';'", "'<'", "'='", "'>'", "'['", "']'", "'register'", "'{'", "'}'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ALIAS", "BITTYPE", "COLUMN", "COMMENT", "ID", "INT", "INTTYPE", "LIMIT", "MASK", "MEMORY", "READ", "READWRITE", "ROMWIDTH", "ROW", "SILENT", "UINTTYPE", "WRITE", "WS", "';'", "'<'", "'='", "'>'", "'['", "']'", "'register'", "'{'", "'}'"
     };
 
     public static final int EOF=-1;
-    public static final int T__19=19;
-    public static final int T__20=20;
-    public static final int T__21=21;
     public static final int T__22=22;
     public static final int T__23=23;
     public static final int T__24=24;
     public static final int T__25=25;
     public static final int T__26=26;
     public static final int T__27=27;
+    public static final int T__28=28;
+    public static final int T__29=29;
+    public static final int T__30=30;
     public static final int ALIAS=4;
     public static final int BITTYPE=5;
     public static final int COLUMN=6;
@@ -36,14 +37,17 @@ public class MemoryModelParser extends Parser {
     public static final int ID=8;
     public static final int INT=9;
     public static final int INTTYPE=10;
-    public static final int MEMORY=11;
-    public static final int READ=12;
-    public static final int READWRITE=13;
-    public static final int ROMWIDTH=14;
-    public static final int ROW=15;
-    public static final int UINTTYPE=16;
-    public static final int WRITE=17;
-    public static final int WS=18;
+    public static final int LIMIT=11;
+    public static final int MASK=12;
+    public static final int MEMORY=13;
+    public static final int READ=14;
+    public static final int READWRITE=15;
+    public static final int ROMWIDTH=16;
+    public static final int ROW=17;
+    public static final int SILENT=18;
+    public static final int UINTTYPE=19;
+    public static final int WRITE=20;
+    public static final int WS=21;
 
     // delegates
     public Parser[] getDelegates() {
@@ -61,7 +65,7 @@ public class MemoryModelParser extends Parser {
     }
 
     public String[] getTokenNames() { return MemoryModelParser.tokenNames; }
-    public String getGrammarFileName() { return "/Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g"; }
+    public String getGrammarFileName() { return "/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g"; }
 
 
     	
@@ -69,7 +73,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "unit"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:33:1: unit returns [Unit res] : ( ROMWIDTH '=' INT ';' )? ( declaration )* ( memory ) ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:37:1: unit returns [Unit res] : ( ROMWIDTH '=' INT ';' )? ( declaration )* ( memory ) ;
     public final Unit unit() throws RecognitionException {
         Unit res = null;
 
@@ -81,12 +85,12 @@ public class MemoryModelParser extends Parser {
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:34:2: ( ( ROMWIDTH '=' INT ';' )? ( declaration )* ( memory ) )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:34:4: ( ROMWIDTH '=' INT ';' )? ( declaration )* ( memory )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:38:2: ( ( ROMWIDTH '=' INT ';' )? ( declaration )* ( memory ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:38:4: ( ROMWIDTH '=' INT ';' )? ( declaration )* ( memory )
             {
             res =new Unit();
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:35:3: ( ROMWIDTH '=' INT ';' )?
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:39:3: ( ROMWIDTH '=' INT ';' )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -95,17 +99,17 @@ public class MemoryModelParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:35:4: ROMWIDTH '=' INT ';'
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:39:4: ROMWIDTH '=' INT ';'
                     {
-                    match(input,ROMWIDTH,FOLLOW_ROMWIDTH_in_unit127); 
+                    match(input,ROMWIDTH,FOLLOW_ROMWIDTH_in_unit145); 
 
-                    match(input,21,FOLLOW_21_in_unit129); 
+                    match(input,24,FOLLOW_24_in_unit147); 
 
-                    INT1=(Token)match(input,INT,FOLLOW_INT_in_unit131); 
+                    INT1=(Token)match(input,INT,FOLLOW_INT_in_unit149); 
 
                     res.rowWidth=Integer.parseInt((INT1!=null?INT1.getText():null));
 
-                    match(input,19,FOLLOW_19_in_unit135); 
+                    match(input,22,FOLLOW_22_in_unit153); 
 
                     }
                     break;
@@ -113,7 +117,7 @@ public class MemoryModelParser extends Parser {
             }
 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:36:3: ( declaration )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:40:3: ( declaration )*
             loop2:
             do {
                 int alt2=2;
@@ -126,9 +130,9 @@ public class MemoryModelParser extends Parser {
 
                 switch (alt2) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:36:4: declaration
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:40:4: declaration
             	    {
-            	    pushFollow(FOLLOW_declaration_in_unit143);
+            	    pushFollow(FOLLOW_declaration_in_unit161);
             	    declaration2=declaration();
 
             	    state._fsp--;
@@ -145,10 +149,10 @@ public class MemoryModelParser extends Parser {
             } while (true);
 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:37:3: ( memory )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:37:4: memory
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:41:3: ( memory )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:41:4: memory
             {
-            pushFollow(FOLLOW_memory_in_unit152);
+            pushFollow(FOLLOW_memory_in_unit170);
             memory3=memory();
 
             state._fsp--;
@@ -177,7 +181,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "declaration"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:38:1: declaration returns [NamedElement decl] : ( ( row ) | ( column ) | ( alias ) ) ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:42:1: declaration returns [NamedElement decl] : ( ( row ) | ( column ) | ( alias ) ) ;
     public final NamedElement declaration() throws RecognitionException {
         NamedElement decl = null;
 
@@ -190,10 +194,10 @@ public class MemoryModelParser extends Parser {
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:39:2: ( ( ( row ) | ( column ) | ( alias ) ) )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:39:4: ( ( row ) | ( column ) | ( alias ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:43:2: ( ( ( row ) | ( column ) | ( alias ) ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:43:4: ( ( row ) | ( column ) | ( alias ) )
             {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:39:4: ( ( row ) | ( column ) | ( alias ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:43:4: ( ( row ) | ( column ) | ( alias ) )
             int alt3=3;
             switch ( input.LA(1) ) {
             case ROW:
@@ -221,12 +225,12 @@ public class MemoryModelParser extends Parser {
 
             switch (alt3) {
                 case 1 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:40:4: ( row )
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:44:4: ( row )
                     {
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:40:4: ( row )
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:40:5: row
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:44:4: ( row )
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:44:5: row
                     {
-                    pushFollow(FOLLOW_row_in_declaration173);
+                    pushFollow(FOLLOW_row_in_declaration191);
                     row4=row();
 
                     state._fsp--;
@@ -240,12 +244,12 @@ public class MemoryModelParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:41:4: ( column )
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:45:4: ( column )
                     {
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:41:4: ( column )
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:41:5: column
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:45:4: ( column )
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:45:5: column
                     {
-                    pushFollow(FOLLOW_column_in_declaration185);
+                    pushFollow(FOLLOW_column_in_declaration203);
                     column5=column();
 
                     state._fsp--;
@@ -259,12 +263,12 @@ public class MemoryModelParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:42:4: ( alias )
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:46:4: ( alias )
                     {
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:42:4: ( alias )
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:42:5: alias
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:46:4: ( alias )
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:46:5: alias
                     {
-                    pushFollow(FOLLOW_alias_in_declaration197);
+                    pushFollow(FOLLOW_alias_in_declaration215);
                     alias6=alias();
 
                     state._fsp--;
@@ -299,7 +303,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "row"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:45:1: row returns [Row res] : ROW ID '{' ( ( definition ) | ( reference ) )* '}' ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:49:1: row returns [Row res] : ROW ID '{' ( ( definition ) | ( reference ) )* '}' ;
     public final Row row() throws RecognitionException {
         Row res = null;
 
@@ -311,18 +315,18 @@ public class MemoryModelParser extends Parser {
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:46:2: ( ROW ID '{' ( ( definition ) | ( reference ) )* '}' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:47:3: ROW ID '{' ( ( definition ) | ( reference ) )* '}'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:50:2: ( ROW ID '{' ( ( definition ) | ( reference ) )* '}' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:51:3: ROW ID '{' ( ( definition ) | ( reference ) )* '}'
             {
-            match(input,ROW,FOLLOW_ROW_in_row221); 
+            match(input,ROW,FOLLOW_ROW_in_row239); 
 
-            ID7=(Token)match(input,ID,FOLLOW_ID_in_row223); 
+            ID7=(Token)match(input,ID,FOLLOW_ID_in_row241); 
 
             res =new Row((ID7!=null?ID7.getText():null));
 
-            match(input,26,FOLLOW_26_in_row227); 
+            match(input,29,FOLLOW_29_in_row245); 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:48:3: ( ( definition ) | ( reference ) )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:52:3: ( ( definition ) | ( reference ) )*
             loop4:
             do {
                 int alt4=3;
@@ -338,12 +342,12 @@ public class MemoryModelParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:49:4: ( definition )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:53:4: ( definition )
             	    {
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:49:4: ( definition )
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:49:5: definition
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:53:4: ( definition )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:53:5: definition
             	    {
-            	    pushFollow(FOLLOW_definition_in_row238);
+            	    pushFollow(FOLLOW_definition_in_row256);
             	    definition8=definition();
 
             	    state._fsp--;
@@ -357,12 +361,12 @@ public class MemoryModelParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:50:4: ( reference )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:54:4: ( reference )
             	    {
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:50:4: ( reference )
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:50:5: reference
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:54:4: ( reference )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:54:5: reference
             	    {
-            	    pushFollow(FOLLOW_reference_in_row250);
+            	    pushFollow(FOLLOW_reference_in_row268);
             	    reference9=reference();
 
             	    state._fsp--;
@@ -382,7 +386,7 @@ public class MemoryModelParser extends Parser {
             } while (true);
 
 
-            match(input,27,FOLLOW_27_in_row260); 
+            match(input,30,FOLLOW_30_in_row278); 
 
             }
 
@@ -402,7 +406,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "column"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:52:1: column returns [Column res] : COLUMN ID '{' ( reference )* '}' ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:56:1: column returns [Column res] : COLUMN ID '{' ( reference )* '}' ;
     public final Column column() throws RecognitionException {
         Column res = null;
 
@@ -412,18 +416,18 @@ public class MemoryModelParser extends Parser {
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:53:2: ( COLUMN ID '{' ( reference )* '}' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:54:3: COLUMN ID '{' ( reference )* '}'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:57:2: ( COLUMN ID '{' ( reference )* '}' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:58:3: COLUMN ID '{' ( reference )* '}'
             {
-            match(input,COLUMN,FOLLOW_COLUMN_in_column275); 
+            match(input,COLUMN,FOLLOW_COLUMN_in_column293); 
 
-            ID10=(Token)match(input,ID,FOLLOW_ID_in_column277); 
+            ID10=(Token)match(input,ID,FOLLOW_ID_in_column295); 
 
             res =new Column((ID10!=null?ID10.getText():null));
 
-            match(input,26,FOLLOW_26_in_column281); 
+            match(input,29,FOLLOW_29_in_column299); 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:54:46: ( reference )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:58:46: ( reference )*
             loop5:
             do {
                 int alt5=2;
@@ -436,9 +440,9 @@ public class MemoryModelParser extends Parser {
 
                 switch (alt5) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:54:47: reference
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:58:47: reference
             	    {
-            	    pushFollow(FOLLOW_reference_in_column284);
+            	    pushFollow(FOLLOW_reference_in_column302);
             	    reference11=reference();
 
             	    state._fsp--;
@@ -455,7 +459,7 @@ public class MemoryModelParser extends Parser {
             } while (true);
 
 
-            match(input,27,FOLLOW_27_in_column290); 
+            match(input,30,FOLLOW_30_in_column308); 
 
             }
 
@@ -475,7 +479,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "alias"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:55:1: alias returns [Alias res] : ALIAS ID '{' ( ( definition ) | ( reference ) )* '}' ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:59:1: alias returns [Alias res] : ALIAS ID '{' ( ( definition ) | ( reference ) )* '}' ;
     public final Alias alias() throws RecognitionException {
         Alias res = null;
 
@@ -487,18 +491,18 @@ public class MemoryModelParser extends Parser {
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:56:2: ( ALIAS ID '{' ( ( definition ) | ( reference ) )* '}' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:57:3: ALIAS ID '{' ( ( definition ) | ( reference ) )* '}'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:60:2: ( ALIAS ID '{' ( ( definition ) | ( reference ) )* '}' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:61:3: ALIAS ID '{' ( ( definition ) | ( reference ) )* '}'
             {
-            match(input,ALIAS,FOLLOW_ALIAS_in_alias306); 
+            match(input,ALIAS,FOLLOW_ALIAS_in_alias324); 
 
-            ID12=(Token)match(input,ID,FOLLOW_ID_in_alias308); 
+            ID12=(Token)match(input,ID,FOLLOW_ID_in_alias326); 
 
             res =new Alias((ID12!=null?ID12.getText():null));
 
-            match(input,26,FOLLOW_26_in_alias312); 
+            match(input,29,FOLLOW_29_in_alias330); 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:58:3: ( ( definition ) | ( reference ) )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:62:3: ( ( definition ) | ( reference ) )*
             loop6:
             do {
                 int alt6=3;
@@ -514,12 +518,12 @@ public class MemoryModelParser extends Parser {
 
                 switch (alt6) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:59:4: ( definition )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:63:4: ( definition )
             	    {
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:59:4: ( definition )
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:59:5: definition
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:63:4: ( definition )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:63:5: definition
             	    {
-            	    pushFollow(FOLLOW_definition_in_alias323);
+            	    pushFollow(FOLLOW_definition_in_alias341);
             	    definition13=definition();
 
             	    state._fsp--;
@@ -533,12 +537,12 @@ public class MemoryModelParser extends Parser {
             	    }
             	    break;
             	case 2 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:60:4: ( reference )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:64:4: ( reference )
             	    {
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:60:4: ( reference )
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:60:5: reference
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:64:4: ( reference )
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:64:5: reference
             	    {
-            	    pushFollow(FOLLOW_reference_in_alias335);
+            	    pushFollow(FOLLOW_reference_in_alias353);
             	    reference14=reference();
 
             	    state._fsp--;
@@ -558,7 +562,7 @@ public class MemoryModelParser extends Parser {
             } while (true);
 
 
-            match(input,27,FOLLOW_27_in_alias345); 
+            match(input,30,FOLLOW_30_in_alias363); 
 
             }
 
@@ -578,7 +582,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "memory"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:62:1: memory returns [Memory res] : MEMORY '{' ( reference )* '}' ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:66:1: memory returns [Memory res] : MEMORY '{' ( reference )* '}' ;
     public final Memory memory() throws RecognitionException {
         Memory res = null;
 
@@ -587,16 +591,16 @@ public class MemoryModelParser extends Parser {
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:63:2: ( MEMORY '{' ( reference )* '}' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:63:4: MEMORY '{' ( reference )* '}'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:67:2: ( MEMORY '{' ( reference )* '}' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:67:4: MEMORY '{' ( reference )* '}'
             {
             res =new Memory();
 
-            match(input,MEMORY,FOLLOW_MEMORY_in_memory361); 
+            match(input,MEMORY,FOLLOW_MEMORY_in_memory379); 
 
-            match(input,26,FOLLOW_26_in_memory363); 
+            match(input,29,FOLLOW_29_in_memory381); 
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:64:14: ( reference )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:68:14: ( reference )*
             loop7:
             do {
                 int alt7=2;
@@ -609,9 +613,9 @@ public class MemoryModelParser extends Parser {
 
                 switch (alt7) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:64:15: reference
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:68:15: reference
             	    {
-            	    pushFollow(FOLLOW_reference_in_memory366);
+            	    pushFollow(FOLLOW_reference_in_memory384);
             	    reference15=reference();
 
             	    state._fsp--;
@@ -628,7 +632,7 @@ public class MemoryModelParser extends Parser {
             } while (true);
 
 
-            match(input,27,FOLLOW_27_in_memory372); 
+            match(input,30,FOLLOW_30_in_memory390); 
 
             }
 
@@ -648,7 +652,7 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "definition"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:65:1: definition returns [Definition res] : rwStatus ( 'register' )? type ( '<' width '>' )? ID ( '[' INT ']' )* ';' ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:69:1: definition returns [Definition res] : rwStatus ( 'register' )? type ( '<' width '>' )? ID ( '[' INT ']' )* ( warnType )? ';' ;
     public final Definition definition() throws RecognitionException {
         Definition res = null;
 
@@ -661,14 +665,16 @@ public class MemoryModelParser extends Parser {
 
         MemoryModelParser.width_return width18 =null;
 
+        WarnType warnType21 =null;
+
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:66:2: ( rwStatus ( 'register' )? type ( '<' width '>' )? ID ( '[' INT ']' )* ';' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:66:4: rwStatus ( 'register' )? type ( '<' width '>' )? ID ( '[' INT ']' )* ';'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:70:2: ( rwStatus ( 'register' )? type ( '<' width '>' )? ID ( '[' INT ']' )* ( warnType )? ';' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:70:4: rwStatus ( 'register' )? type ( '<' width '>' )? ID ( '[' INT ']' )* ( warnType )? ';'
             {
             res =new Definition();
 
-            pushFollow(FOLLOW_rwStatus_in_definition388);
+            pushFollow(FOLLOW_rwStatus_in_definition406);
             rwStatus16=rwStatus();
 
             state._fsp--;
@@ -676,18 +682,18 @@ public class MemoryModelParser extends Parser {
 
             res.rw=RWType.valueOf((rwStatus16!=null?input.toString(rwStatus16.start,rwStatus16.stop):null));
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:68:3: ( 'register' )?
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:72:3: ( 'register' )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
-            if ( (LA8_0==25) ) {
+            if ( (LA8_0==28) ) {
                 alt8=1;
             }
             switch (alt8) {
                 case 1 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:68:4: 'register'
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:72:4: 'register'
                     {
-                    match(input,25,FOLLOW_25_in_definition395); 
+                    match(input,28,FOLLOW_28_in_definition413); 
 
                     res.register=true;
 
@@ -697,7 +703,7 @@ public class MemoryModelParser extends Parser {
             }
 
 
-            pushFollow(FOLLOW_type_in_definition403);
+            pushFollow(FOLLOW_type_in_definition421);
             type17=type();
 
             state._fsp--;
@@ -705,20 +711,20 @@ public class MemoryModelParser extends Parser {
 
             res.type=Type.valueOf((type17!=null?input.toString(type17.start,type17.stop):null).toUpperCase());
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:70:3: ( '<' width '>' )?
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:74:3: ( '<' width '>' )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
-            if ( (LA9_0==20) ) {
+            if ( (LA9_0==23) ) {
                 alt9=1;
             }
             switch (alt9) {
                 case 1 :
-                    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:70:4: '<' width '>'
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:74:4: '<' width '>'
                     {
-                    match(input,20,FOLLOW_20_in_definition411); 
+                    match(input,23,FOLLOW_23_in_definition429); 
 
-                    pushFollow(FOLLOW_width_in_definition413);
+                    pushFollow(FOLLOW_width_in_definition431);
                     width18=width();
 
                     state._fsp--;
@@ -726,7 +732,7 @@ public class MemoryModelParser extends Parser {
 
                     res.width=Integer.parseInt((width18!=null?input.toString(width18.start,width18.stop):null));
 
-                    match(input,22,FOLLOW_22_in_definition417); 
+                    match(input,25,FOLLOW_25_in_definition435); 
 
                     }
                     break;
@@ -734,30 +740,30 @@ public class MemoryModelParser extends Parser {
             }
 
 
-            ID19=(Token)match(input,ID,FOLLOW_ID_in_definition424); 
+            ID19=(Token)match(input,ID,FOLLOW_ID_in_definition442); 
 
             res.name=(ID19!=null?ID19.getText():null);
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:72:3: ( '[' INT ']' )*
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:76:3: ( '[' INT ']' )*
             loop10:
             do {
                 int alt10=2;
                 int LA10_0 = input.LA(1);
 
-                if ( (LA10_0==23) ) {
+                if ( (LA10_0==26) ) {
                     alt10=1;
                 }
 
 
                 switch (alt10) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:72:4: '[' INT ']'
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:76:4: '[' INT ']'
             	    {
-            	    match(input,23,FOLLOW_23_in_definition432); 
+            	    match(input,26,FOLLOW_26_in_definition450); 
 
-            	    INT20=(Token)match(input,INT,FOLLOW_INT_in_definition434); 
+            	    INT20=(Token)match(input,INT,FOLLOW_INT_in_definition452); 
 
-            	    match(input,24,FOLLOW_24_in_definition436); 
+            	    match(input,27,FOLLOW_27_in_definition454); 
 
             	    res.dimensions.add(Integer.parseInt((INT20!=null?INT20.getText():null)));
 
@@ -770,7 +776,32 @@ public class MemoryModelParser extends Parser {
             } while (true);
 
 
-            match(input,19,FOLLOW_19_in_definition442); 
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:77:3: ( warnType )?
+            int alt11=2;
+            int LA11_0 = input.LA(1);
+
+            if ( ((LA11_0 >= LIMIT && LA11_0 <= MASK)||LA11_0==SILENT) ) {
+                alt11=1;
+            }
+            switch (alt11) {
+                case 1 :
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:77:4: warnType
+                    {
+                    pushFollow(FOLLOW_warnType_in_definition464);
+                    warnType21=warnType();
+
+                    state._fsp--;
+
+
+                    res.warn=warnType21;
+
+                    }
+                    break;
+
+            }
+
+
+            match(input,22,FOLLOW_22_in_definition471); 
 
             }
 
@@ -788,20 +819,110 @@ public class MemoryModelParser extends Parser {
     // $ANTLR end "definition"
 
 
+
+    // $ANTLR start "warnType"
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:79:1: warnType returns [WarnType warn] : ( SILENT )? ( MASK | LIMIT ) ;
+    public final WarnType warnType() throws RecognitionException {
+        WarnType warn = null;
+
+
+        try {
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:80:2: ( ( SILENT )? ( MASK | LIMIT ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:80:4: ( SILENT )? ( MASK | LIMIT )
+            {
+            boolean silent=false;
+
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:80:28: ( SILENT )?
+            int alt12=2;
+            int LA12_0 = input.LA(1);
+
+            if ( (LA12_0==SILENT) ) {
+                alt12=1;
+            }
+            switch (alt12) {
+                case 1 :
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:80:29: SILENT
+                    {
+                    match(input,SILENT,FOLLOW_SILENT_in_warnType486); 
+
+                    silent=true;
+
+                    }
+                    break;
+
+            }
+
+
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:81:3: ( MASK | LIMIT )
+            int alt13=2;
+            int LA13_0 = input.LA(1);
+
+            if ( (LA13_0==MASK) ) {
+                alt13=1;
+            }
+            else if ( (LA13_0==LIMIT) ) {
+                alt13=2;
+            }
+            else {
+                NoViableAltException nvae =
+                    new NoViableAltException("", 13, 0, input);
+
+                throw nvae;
+
+            }
+            switch (alt13) {
+                case 1 :
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:81:4: MASK
+                    {
+                    match(input,MASK,FOLLOW_MASK_in_warnType496); 
+
+                    warn =silent?WarnType.silentMask:WarnType.mask;
+
+                    }
+                    break;
+                case 2 :
+                    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:82:3: LIMIT
+                    {
+                    match(input,LIMIT,FOLLOW_LIMIT_in_warnType502); 
+
+                    warn =silent?WarnType.silentLimit:WarnType.limit;
+
+                    }
+                    break;
+
+            }
+
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+
+        finally {
+        	// do for sure before leaving
+        }
+        return warn;
+    }
+    // $ANTLR end "warnType"
+
+
     public static class rwStatus_return extends ParserRuleReturnScope {
     };
 
 
     // $ANTLR start "rwStatus"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:73:1: rwStatus : ( READ | WRITE | READWRITE ) ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:83:1: rwStatus : ( READ | WRITE | READWRITE ) ;
     public final MemoryModelParser.rwStatus_return rwStatus() throws RecognitionException {
         MemoryModelParser.rwStatus_return retval = new MemoryModelParser.rwStatus_return();
         retval.start = input.LT(1);
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:73:9: ( ( READ | WRITE | READWRITE ) )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:83:9: ( ( READ | WRITE | READWRITE ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
             {
             if ( (input.LA(1) >= READ && input.LA(1) <= READWRITE)||input.LA(1)==WRITE ) {
                 input.consume();
@@ -837,17 +958,17 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "width"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:74:1: width : INT ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:84:1: width : INT ;
     public final MemoryModelParser.width_return width() throws RecognitionException {
         MemoryModelParser.width_return retval = new MemoryModelParser.width_return();
         retval.start = input.LT(1);
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:74:7: ( INT )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:74:9: INT
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:84:7: ( INT )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:84:9: INT
             {
-            match(input,INT,FOLLOW_INT_in_width465); 
+            match(input,INT,FOLLOW_INT_in_width527); 
 
             }
 
@@ -873,15 +994,15 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "type"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:75:1: type : ( INTTYPE | UINTTYPE | BITTYPE ) ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:85:1: type : ( INTTYPE | UINTTYPE | BITTYPE ) ;
     public final MemoryModelParser.type_return type() throws RecognitionException {
         MemoryModelParser.type_return retval = new MemoryModelParser.type_return();
         retval.start = input.LT(1);
 
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:76:2: ( ( INTTYPE | UINTTYPE | BITTYPE ) )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:86:2: ( ( INTTYPE | UINTTYPE | BITTYPE ) )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:
             {
             if ( input.LA(1)==BITTYPE||input.LA(1)==INTTYPE||input.LA(1)==UINTTYPE ) {
                 input.consume();
@@ -914,55 +1035,55 @@ public class MemoryModelParser extends Parser {
 
 
     // $ANTLR start "reference"
-    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:78:1: reference returns [Reference res] : ID ( '[' INT ']' )* ';' ;
+    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:88:1: reference returns [Reference res] : ID ( '[' INT ']' )* ';' ;
     public final Reference reference() throws RecognitionException {
         Reference res = null;
 
 
-        Token ID21=null;
-        Token INT22=null;
+        Token ID22=null;
+        Token INT23=null;
 
         try {
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:79:2: ( ID ( '[' INT ']' )* ';' )
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:80:3: ID ( '[' INT ']' )* ';'
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:89:2: ( ID ( '[' INT ']' )* ';' )
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:90:3: ID ( '[' INT ']' )* ';'
             {
-            ID21=(Token)match(input,ID,FOLLOW_ID_in_reference501); 
+            ID22=(Token)match(input,ID,FOLLOW_ID_in_reference563); 
 
-            res =new Reference((ID21!=null?ID21.getText():null));
+            res =new Reference((ID22!=null?ID22.getText():null));
 
-            // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:81:3: ( '[' INT ']' )*
-            loop11:
+            // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:91:3: ( '[' INT ']' )*
+            loop14:
             do {
-                int alt11=2;
-                int LA11_0 = input.LA(1);
+                int alt14=2;
+                int LA14_0 = input.LA(1);
 
-                if ( (LA11_0==23) ) {
-                    alt11=1;
+                if ( (LA14_0==26) ) {
+                    alt14=1;
                 }
 
 
-                switch (alt11) {
+                switch (alt14) {
             	case 1 :
-            	    // /Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:81:4: '[' INT ']'
+            	    // /Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/src/de/tuhh/ict/pshdl/model/types/builtIn/busses/memorymodel/MemoryModel.g:91:4: '[' INT ']'
             	    {
-            	    match(input,23,FOLLOW_23_in_reference509); 
+            	    match(input,26,FOLLOW_26_in_reference571); 
 
-            	    INT22=(Token)match(input,INT,FOLLOW_INT_in_reference511); 
+            	    INT23=(Token)match(input,INT,FOLLOW_INT_in_reference573); 
 
-            	    match(input,24,FOLLOW_24_in_reference513); 
+            	    match(input,27,FOLLOW_27_in_reference575); 
 
-            	    res.dimensions.add(Integer.parseInt((INT22!=null?INT22.getText():null)));
+            	    res.dimensions.add(Integer.parseInt((INT23!=null?INT23.getText():null)));
 
             	    }
             	    break;
 
             	default :
-            	    break loop11;
+            	    break loop14;
                 }
             } while (true);
 
 
-            match(input,19,FOLLOW_19_in_reference519); 
+            match(input,22,FOLLOW_22_in_reference581); 
 
             }
 
@@ -984,52 +1105,56 @@ public class MemoryModelParser extends Parser {
 
  
 
-    public static final BitSet FOLLOW_ROMWIDTH_in_unit127 = new BitSet(new long[]{0x0000000000200000L});
-    public static final BitSet FOLLOW_21_in_unit129 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_INT_in_unit131 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_unit135 = new BitSet(new long[]{0x0000000000008850L});
-    public static final BitSet FOLLOW_declaration_in_unit143 = new BitSet(new long[]{0x0000000000008850L});
-    public static final BitSet FOLLOW_memory_in_unit152 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_row_in_declaration173 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_column_in_declaration185 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_alias_in_declaration197 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ROW_in_row221 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_ID_in_row223 = new BitSet(new long[]{0x0000000004000000L});
-    public static final BitSet FOLLOW_26_in_row227 = new BitSet(new long[]{0x0000000008023100L});
-    public static final BitSet FOLLOW_definition_in_row238 = new BitSet(new long[]{0x0000000008023100L});
-    public static final BitSet FOLLOW_reference_in_row250 = new BitSet(new long[]{0x0000000008023100L});
-    public static final BitSet FOLLOW_27_in_row260 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COLUMN_in_column275 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_ID_in_column277 = new BitSet(new long[]{0x0000000004000000L});
-    public static final BitSet FOLLOW_26_in_column281 = new BitSet(new long[]{0x0000000008000100L});
-    public static final BitSet FOLLOW_reference_in_column284 = new BitSet(new long[]{0x0000000008000100L});
-    public static final BitSet FOLLOW_27_in_column290 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ALIAS_in_alias306 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_ID_in_alias308 = new BitSet(new long[]{0x0000000004000000L});
-    public static final BitSet FOLLOW_26_in_alias312 = new BitSet(new long[]{0x0000000008023100L});
-    public static final BitSet FOLLOW_definition_in_alias323 = new BitSet(new long[]{0x0000000008023100L});
-    public static final BitSet FOLLOW_reference_in_alias335 = new BitSet(new long[]{0x0000000008023100L});
-    public static final BitSet FOLLOW_27_in_alias345 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MEMORY_in_memory361 = new BitSet(new long[]{0x0000000004000000L});
-    public static final BitSet FOLLOW_26_in_memory363 = new BitSet(new long[]{0x0000000008000100L});
-    public static final BitSet FOLLOW_reference_in_memory366 = new BitSet(new long[]{0x0000000008000100L});
-    public static final BitSet FOLLOW_27_in_memory372 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rwStatus_in_definition388 = new BitSet(new long[]{0x0000000002010420L});
-    public static final BitSet FOLLOW_25_in_definition395 = new BitSet(new long[]{0x0000000000010420L});
-    public static final BitSet FOLLOW_type_in_definition403 = new BitSet(new long[]{0x0000000000100100L});
-    public static final BitSet FOLLOW_20_in_definition411 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_width_in_definition413 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_22_in_definition417 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_ID_in_definition424 = new BitSet(new long[]{0x0000000000880000L});
-    public static final BitSet FOLLOW_23_in_definition432 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_INT_in_definition434 = new BitSet(new long[]{0x0000000001000000L});
-    public static final BitSet FOLLOW_24_in_definition436 = new BitSet(new long[]{0x0000000000880000L});
-    public static final BitSet FOLLOW_19_in_definition442 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INT_in_width465 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_reference501 = new BitSet(new long[]{0x0000000000880000L});
-    public static final BitSet FOLLOW_23_in_reference509 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_INT_in_reference511 = new BitSet(new long[]{0x0000000001000000L});
-    public static final BitSet FOLLOW_24_in_reference513 = new BitSet(new long[]{0x0000000000880000L});
-    public static final BitSet FOLLOW_19_in_reference519 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROMWIDTH_in_unit145 = new BitSet(new long[]{0x0000000001000000L});
+    public static final BitSet FOLLOW_24_in_unit147 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_INT_in_unit149 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_22_in_unit153 = new BitSet(new long[]{0x0000000000022050L});
+    public static final BitSet FOLLOW_declaration_in_unit161 = new BitSet(new long[]{0x0000000000022050L});
+    public static final BitSet FOLLOW_memory_in_unit170 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_row_in_declaration191 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_column_in_declaration203 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_alias_in_declaration215 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ROW_in_row239 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_ID_in_row241 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_29_in_row245 = new BitSet(new long[]{0x000000004010C100L});
+    public static final BitSet FOLLOW_definition_in_row256 = new BitSet(new long[]{0x000000004010C100L});
+    public static final BitSet FOLLOW_reference_in_row268 = new BitSet(new long[]{0x000000004010C100L});
+    public static final BitSet FOLLOW_30_in_row278 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COLUMN_in_column293 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_ID_in_column295 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_29_in_column299 = new BitSet(new long[]{0x0000000040000100L});
+    public static final BitSet FOLLOW_reference_in_column302 = new BitSet(new long[]{0x0000000040000100L});
+    public static final BitSet FOLLOW_30_in_column308 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ALIAS_in_alias324 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_ID_in_alias326 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_29_in_alias330 = new BitSet(new long[]{0x000000004010C100L});
+    public static final BitSet FOLLOW_definition_in_alias341 = new BitSet(new long[]{0x000000004010C100L});
+    public static final BitSet FOLLOW_reference_in_alias353 = new BitSet(new long[]{0x000000004010C100L});
+    public static final BitSet FOLLOW_30_in_alias363 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MEMORY_in_memory379 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_29_in_memory381 = new BitSet(new long[]{0x0000000040000100L});
+    public static final BitSet FOLLOW_reference_in_memory384 = new BitSet(new long[]{0x0000000040000100L});
+    public static final BitSet FOLLOW_30_in_memory390 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_rwStatus_in_definition406 = new BitSet(new long[]{0x0000000010080420L});
+    public static final BitSet FOLLOW_28_in_definition413 = new BitSet(new long[]{0x0000000000080420L});
+    public static final BitSet FOLLOW_type_in_definition421 = new BitSet(new long[]{0x0000000000800100L});
+    public static final BitSet FOLLOW_23_in_definition429 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_width_in_definition431 = new BitSet(new long[]{0x0000000002000000L});
+    public static final BitSet FOLLOW_25_in_definition435 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_ID_in_definition442 = new BitSet(new long[]{0x0000000004441800L});
+    public static final BitSet FOLLOW_26_in_definition450 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_INT_in_definition452 = new BitSet(new long[]{0x0000000008000000L});
+    public static final BitSet FOLLOW_27_in_definition454 = new BitSet(new long[]{0x0000000004441800L});
+    public static final BitSet FOLLOW_warnType_in_definition464 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_22_in_definition471 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SILENT_in_warnType486 = new BitSet(new long[]{0x0000000000001800L});
+    public static final BitSet FOLLOW_MASK_in_warnType496 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LIMIT_in_warnType502 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INT_in_width527 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_reference563 = new BitSet(new long[]{0x0000000004400000L});
+    public static final BitSet FOLLOW_26_in_reference571 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_INT_in_reference573 = new BitSet(new long[]{0x0000000008000000L});
+    public static final BitSet FOLLOW_27_in_reference575 = new BitSet(new long[]{0x0000000004400000L});
+    public static final BitSet FOLLOW_22_in_reference581 = new BitSet(new long[]{0x0000000000000002L});
 
 }

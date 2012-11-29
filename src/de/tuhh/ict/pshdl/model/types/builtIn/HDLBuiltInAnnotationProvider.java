@@ -68,6 +68,7 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case genSignal:
 			case VHDLLatchable:
 			case VHDLNoExplicitReset:
+			case VHDLComponent:
 			case reset:
 			case clock:
 				if (value != null)
@@ -126,6 +127,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case reset:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
 						"Designates a bit signal to be used for $rst, which also is used by registers", null);
+			case VHDLComponent:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
+						"Designates an interface that should be instantiated as component rather than as entity", null);
+			default:
+				break;
 			}
 			return null;
 		}

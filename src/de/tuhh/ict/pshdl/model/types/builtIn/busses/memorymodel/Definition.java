@@ -3,16 +3,62 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.*;
 
 public class Definition implements NamedElement {
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
-		result = (prime * result) + (register ? 1231 : 1237);
-		result = (prime * result) + ((rw == null) ? 0 : rw.hashCode());
-		result = (prime * result) + ((type == null) ? 0 : type.hashCode());
-		result = (prime * result) + width;
-		return result;
+
+	public static enum RWType {
+		r, rw, w;
+	}
+
+	public static enum Type {
+		BIT, INT, UINT, UNUSED
+	}
+
+	public static enum WarnType {
+		mask, silentMask, limit, silentLimit;
+
+		@Override
+		public String toString() {
+			switch (this) {
+			case limit:
+				return "limit";
+			case mask:
+				return "mask";
+			case silentLimit:
+				return "silent limit";
+			case silentMask:
+				return "silent mask";
+			}
+			return null;
+		}
+	}
+
+	public List<Integer> dimensions = new LinkedList<Integer>();
+
+	public String name;
+
+	public boolean register;
+
+	public RWType rw = null;
+
+	public Type type = Type.UNUSED;
+	public int width = -1;
+
+	public Integer arrayIndex;
+
+	public WarnType warn = WarnType.limit;
+
+	public Definition() {
+	}
+
+	public Definition(String name, boolean register, RWType rw, Type type, int width, int... dimensions) {
+		super();
+		for (int dim : dimensions) {
+			this.dimensions.add(dim);
+		}
+		this.name = name;
+		this.register = register;
+		this.rw = rw;
+		this.type = type;
+		this.width = width;
 	}
 
 	@Override
@@ -43,24 +89,21 @@ public class Definition implements NamedElement {
 		return true;
 	}
 
-	public static enum Type {
-		INT, UINT, BIT, UNUSED
-	}
-
-	public static enum RWType {
-		r, w, rw;
-	}
-
-	public Type type = Type.UNUSED;
-	public int width = -1;
-	public String name;
-	public RWType rw = null;
-	public boolean register;
-	public List<Integer> dimensions = new LinkedList<Integer>();
-
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+		result = (prime * result) + (register ? 1231 : 1237);
+		result = (prime * result) + ((rw == null) ? 0 : rw.hashCode());
+		result = (prime * result) + ((type == null) ? 0 : type.hashCode());
+		result = (prime * result) + width;
+		return result;
 	}
 
 	@Override
@@ -73,7 +116,7 @@ public class Definition implements NamedElement {
 		String w = width != -1 ? "<" + width + ">" : "";
 		String lowerCase = type.name().toLowerCase();
 		String rwString = rw != null ? rw + " " : "";
-		return rwString + reg + lowerCase + w + " " + name + sb;
+		return rwString + reg + lowerCase + w + " " + name + sb + " " + warn + ";";
 	}
 
 	public Definition withoutDim() {
@@ -83,6 +126,7 @@ public class Definition implements NamedElement {
 		res.name = name;
 		res.rw = rw;
 		res.register = register;
+		res.warn = warn;
 		return res;
 	}
 }

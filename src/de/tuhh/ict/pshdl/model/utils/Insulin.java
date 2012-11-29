@@ -19,6 +19,7 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
+import de.tuhh.ict.pshdl.model.validation.RWValidation.Init;
 
 public class Insulin {
 	public static <T extends HDLObject> T transform(T orig) {
@@ -179,11 +180,16 @@ public class Insulin {
 		}
 		Set<HDLInterfaceInstantiation> hii = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hi : hii) {
+			HDLUnit unit = hi.getContainer(HDLUnit.class);
+			if (unit.getSimulation())
+				continue;
 			HDLInterface hIf = hi.resolveHIf();
 			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
 				HDLDirection direction = hvd.getDirection();
 				if ((direction == HDLDirection.IN) || (direction == HDLDirection.INOUT)) {
 					for (HDLVariable var : hvd.getVariables()) {
+						if (var.hasMeta(Init.full))
+							continue;
 						HDLExpression defaultValue = getDefaultValue(hvd, null, var);
 						if (defaultValue != null) {
 							HDLVariableRef setVar = new HDLInterfaceRef().setHIf(hi.getVar().asRef()).setVar(var.asRef());

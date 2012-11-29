@@ -233,9 +233,8 @@ public class HDLValidator {
 
 	private static void compareBoundaries(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, ArrayList<HDLExpression> dimensions,
 			ArrayList<HDLExpression> array) {
-		if (dimensions.size() != array.size()) {
-			// problems.add(new
-			// Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ref));
+		if (dimensions.size() < array.size()) {
+			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
 		} else {
 			int dim = 0;
 			for (HDLExpression arr : array) {
