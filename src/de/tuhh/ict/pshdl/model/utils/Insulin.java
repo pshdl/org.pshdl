@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.math.*;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -39,7 +40,7 @@ public class Insulin {
 		apply = fortifyType(apply);
 		apply = fixDoubleNegate(apply);
 		// apply = simplifyExpressions(apply);
-		apply.validateAllFields(null, true);
+		apply.validateAllFields(orig.getContainer(), true);
 		return apply;
 	}
 
@@ -248,16 +249,15 @@ public class Insulin {
 	 */
 	public static HDLStatement createArrayForLoop(ArrayList<HDLExpression> dimensions, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
 		if (i == dimensions.size()) {
-			return new HDLAssignment().setLeft(ref).setRight(defaultValue.copy());
+			return new HDLAssignment().setLeft(ref).setRight(defaultValue);
 		}
-		HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(
-				new HDLArithOp().setLeft(dimensions.get(i).copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
+		HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(dimensions.get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
 		HDLVariable param = new HDLVariable().setName(Character.toString((char) (i + 'I')));
 		HDLForLoop loop = new HDLForLoop().setRange(HDLObject.asList(range)).setParam(param);
 		HDLVariableRef paramRef = new HDLVariableRef().setVar(param.asRef());
 		if (synchedArray) {
 			HDLVariableRef defRef = (HDLVariableRef) defaultValue;
-			defaultValue = defRef.addArray(paramRef.copy());
+			defaultValue = defRef.addArray(paramRef);
 		}
 		return loop.addDos(createArrayForLoop(dimensions, i + 1, defaultValue, ref.addArray(paramRef), synchedArray));
 	}
@@ -481,9 +481,9 @@ public class Insulin {
 			HDLType leftType = assignment.getLeft().determineType();
 			HDLExpression exp = assignment.getRight();
 			if (exp.getClassType() == HDLClass.HDLEqualityOp) {
-				HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp.copy())
-						.addThenDo(assignment.copy().setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(HDLLiteral.get(1))))
-						.addElseDo(assignment.copy().setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType.copy()).setTarget(HDLLiteral.get(0))));
+				HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp)
+						.addThenDo(assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(HDLLiteral.get(1))))
+						.addElseDo(assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(HDLLiteral.get(0))));
 				newIf.setContainer(assignment.getContainer());
 				ms.replace(assignment, newIf);
 			} else if (leftType instanceof HDLPrimitive) {
@@ -544,12 +544,12 @@ public class Insulin {
 	}
 
 	private static void cast(ModificationSet ms, HDLPrimitive targetType, HDLExpression exp) {
-		ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(targetType.copy()).setTarget(exp.copy()));
+		ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(targetType).setTarget(exp));
 	}
 
 	private static void makeBool(ModificationSet ms, HDLExpression exp) {
-		HDLManip zero = new HDLManip().setType(HDLManipType.CAST).setCastTo(exp.determineType().copy()).setTarget(HDLLiteral.get(0));
-		ms.replace(exp, new HDLEqualityOp().setLeft(exp.copy()).setType(HDLEqualityOpType.NOT_EQ).setRight(zero));
+		HDLManip zero = new HDLManip().setType(HDLManipType.CAST).setCastTo(exp.determineType()).setTarget(HDLLiteral.get(0));
+		ms.replace(exp, new HDLEqualityOp().setLeft(exp).setType(HDLEqualityOpType.NOT_EQ).setRight(zero));
 	}
 
 	private static void fortify(ModificationSet ms, HDLExpression exp, HDLType targetType) {
@@ -634,6 +634,12 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
+	private static AtomicInteger objectID = new AtomicInteger();
+
+	public static void resetID() {
+		objectID.set(0);
+	}
+
 	public static <T extends HDLObject> T handleMultiBitAccess(T apply, HDLEvaluationContext context) {
 		ModificationSet ms = new ModificationSet();
 		Collection<HDLVariableRef> refs = apply.getAllObjectsOf(HDLVariableRef.class, true);
@@ -652,7 +658,7 @@ public class Insulin {
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
-						String varName = ref.getVarRefName().getLastSegment() + "_" + ref.objectID + "_bitAccess";
+						String varName = ref.getVarRefName().getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
 						HDLQualifiedName hVarName = new HDLQualifiedName(varName);
 						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType().copy()).addVariables(
 								new HDLVariable().setName(varName).setDefaultValue(ass.getRight().copy()));

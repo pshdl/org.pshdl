@@ -19,8 +19,6 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * Constructs a new instance of {@link HDLSwitchStatement}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param caseExp
@@ -30,23 +28,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSwitchStatement(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression caseExp, @Nullable ArrayList<HDLSwitchCaseStatement> cases, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, caseExp, cases, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLSwitchStatement}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param caseExp
-	 *            the value for caseExp. Can <b>not</b> be <code>null</code>.
-	 * @param cases
-	 *            the value for cases. Can be <code>null</code>.
-	 */
-	public HDLSwitchStatement(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression caseExp, @Nullable ArrayList<HDLSwitchCaseStatement> cases) {
-		this(objectID, container, caseExp, cases, true, true);
+	public HDLSwitchStatement(@Nullable IHDLObject container, @NonNull HDLExpression caseExp, @Nullable ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
+		super(container, caseExp, cases, validate);
 	}
 
 	public HDLSwitchStatement() {

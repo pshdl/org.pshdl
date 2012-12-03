@@ -27,8 +27,6 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -46,32 +44,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
-			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate, boolean updateContainer) {
-		super(objectID, container, annotations, libURI, name, imports, statements, simulation, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLUnit}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param libURI
-	 *            the value for libURI. Can <b>not</b> be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param imports
-	 *            the value for imports. Can be <code>null</code>.
-	 * @param statements
-	 *            the value for statements. Can be <code>null</code>.
-	 * @param simulation
-	 *            the value for simulation. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLUnit(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
-			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation) {
-		this(objectID, container, annotations, libURI, name, imports, statements, simulation, true, true);
+	public HDLUnit(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
+			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate) {
+		super(container, annotations, libURI, name, imports, statements, simulation, validate);
 	}
 
 	public HDLUnit() {
@@ -178,7 +153,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 			case IN:
 			case INOUT:
 			case OUT:
-				unitIF = unitIF.addPorts(hvd.copyFiltered(CopyFilter.DEEP));
+				unitIF = unitIF.addPorts(hvd.copyFiltered(CopyFilter.DEEP_META));
 				break;
 			default:
 				break;
@@ -201,7 +176,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 				hasReg = true;
 		}
 		if (hasReg) {
-			if ((clk == null) && (rst == null)) {
+			if (clk == null && rst == null) {
 				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
@@ -215,8 +190,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);
+		if (!unitIF.isFrozen())
+			unitIF.freeze(this);
 		unitIF.addMeta("FULLNAME", fullName);
-		unitIF.setContainer(this);
 		return unitIF;
 	}
 

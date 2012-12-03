@@ -22,8 +22,6 @@ public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * Constructs a new instance of {@link HDLVariable}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -37,28 +35,9 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
-			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate, boolean updateContainer) {
-		super(objectID, container, name, dimensions, defaultValue, annotations, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLVariable}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param dimensions
-	 *            the value for dimensions. Can be <code>null</code>.
-	 * @param defaultValue
-	 *            the value for defaultValue. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 */
-	public HDLVariable(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
-			@Nullable ArrayList<HDLAnnotation> annotations) {
-		this(objectID, container, name, dimensions, defaultValue, annotations, true, true);
+	public HDLVariable(@Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
+		super(container, name, dimensions, defaultValue, annotations, validate);
 	}
 
 	public HDLVariable() {

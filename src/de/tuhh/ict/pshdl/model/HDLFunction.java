@@ -20,8 +20,6 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -31,22 +29,8 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, boolean validate, boolean updateContainer) {
-		super(objectID, container, annotations, name, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLFunction}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name) {
-		this(objectID, container, annotations, name, true, true);
+	public HDLFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, boolean validate) {
+		super(container, annotations, name, validate);
 	}
 
 	public HDLFunction() {

@@ -21,8 +21,6 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	/**
 	 * Constructs a new instance of {@link HDLSubstituteFunction}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -36,28 +34,9 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSubstituteFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name,
-			@Nullable ArrayList<HDLVariable> args, @Nullable ArrayList<HDLStatement> stmnts, boolean validate, boolean updateContainer) {
-		super(objectID, container, annotations, name, args, stmnts, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLSubstituteFunction}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param args
-	 *            the value for args. Can be <code>null</code>.
-	 * @param stmnts
-	 *            the value for stmnts. Can be <code>null</code>.
-	 */
-	public HDLSubstituteFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name,
-			@Nullable ArrayList<HDLVariable> args, @Nullable ArrayList<HDLStatement> stmnts) {
-		this(objectID, container, annotations, name, args, stmnts, true, true);
+	public HDLSubstituteFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @Nullable ArrayList<HDLVariable> args,
+			@Nullable ArrayList<HDLStatement> stmnts, boolean validate) {
+		super(container, annotations, name, args, stmnts, validate);
 	}
 
 	public HDLSubstituteFunction() {

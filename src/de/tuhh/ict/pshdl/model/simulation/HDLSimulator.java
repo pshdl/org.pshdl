@@ -66,7 +66,7 @@ public class HDLSimulator {
 						}
 					}
 				} else {
-					newRanges.add(bit.copy());
+					newRanges.add(bit);
 				}
 			}
 			if (newRanges.size() != 0)
@@ -214,14 +214,15 @@ public class HDLSimulator {
 					BigInteger counter = accessRange.from;
 					List<HDLStatement> replacements = new ArrayList<HDLStatement>();
 					do {
-						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr.copy()).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
+						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
+						ifExp = ifExp.copyDeepFrozen(ass);
 						BigInteger evaluate = ifExp.constantEvaluate(context);
 						if (evaluate == null) {
-							HDLVariableRef writeRef = ref.copy().setArray(HDLObject.asList(HDLLiteral.get(counter)));
-							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp.copy()).addThenDo(ass.copy().setLeft(writeRef));
+							HDLVariableRef writeRef = ref.setArray(HDLObject.asList(HDLLiteral.get(counter)));
+							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp).addThenDo(ass.setLeft(writeRef));
 							replacements.add(ifStmnt);
 						} else {
-							replacements.add(ass.copy());
+							replacements.add(ass);
 						}
 						counter = counter.add(BigInteger.ONE);
 					} while (counter.compareTo(accessRange.to) <= 0);

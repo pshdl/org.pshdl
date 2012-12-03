@@ -18,8 +18,6 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLDeclaration}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -27,20 +25,8 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, boolean validate, boolean updateContainer) {
-		super(objectID, container, annotations, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLDeclaration}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 */
-	public HDLDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations) {
-		this(objectID, container, annotations, true, true);
+	public HDLDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
+		super(container, annotations, validate);
 	}
 
 	public HDLDeclaration() {

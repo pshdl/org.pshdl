@@ -79,6 +79,14 @@ public interface CopyFilter {
 			return res;
 		}
 
+		@Override
+		public <T extends IHDLObject> T postFilter(T src, T target) {
+			if (copyMeta)
+				HDLObject.copyMetaData(src, target);
+			return target;
+		}
+
 	}
 
+	public <T extends IHDLObject> T postFilter(T src, T target);
 }

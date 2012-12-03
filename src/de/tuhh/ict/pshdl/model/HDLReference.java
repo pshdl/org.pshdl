@@ -17,8 +17,6 @@ public abstract class HDLReference extends AbstractHDLReference {
 	/**
 	 * Constructs a new instance of {@link HDLReference}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -26,20 +24,8 @@ public abstract class HDLReference extends AbstractHDLReference {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLReference(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, boolean validate, boolean updateContainer) {
-		super(objectID, container, var, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLReference}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param var
-	 *            the value for var. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLReference(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var) {
-		this(objectID, container, var, true, true);
+	public HDLReference(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, boolean validate) {
+		super(container, var, validate);
 	}
 
 	public HDLReference() {

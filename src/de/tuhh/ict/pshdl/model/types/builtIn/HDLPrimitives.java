@@ -272,8 +272,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 	public static HDLExpression simplifyWidth(HDLObject container, HDLExpression width) {
 		if (width == null)
 			return null;
-		if (width.getContainer() == null)
-			width.setContainer(container);
+		width = width.copyDeepFrozen(container);
 		BigInteger newW = width.constantEvaluate(null);
 		if (newW != null)
 			width = new HDLLiteral().setVal(newW.toString());

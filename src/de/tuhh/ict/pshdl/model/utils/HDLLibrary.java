@@ -30,6 +30,7 @@ public class HDLLibrary {
 	}
 
 	public void addPkg(HDLPackage pkg) {
+		checkFrozen(pkg);
 		for (HDLUnit unit : pkg.getUnits()) {
 			HDLQualifiedName uq = unit.getFullName();
 			units.put(uq, unit);
@@ -73,11 +74,25 @@ public class HDLLibrary {
 		}
 	}
 
+	/**
+	 * Adds the given variable to the library so that it can be resolved by
+	 * resolveVariable
+	 * 
+	 * @param var
+	 */
 	public void addVariable(HDLVariable var) {
+		checkFrozen(var);
 		variables.put(var.getFullName(), var);
 	}
 
+	/**
+	 * Adds the given function to the library so that it can be resolved by
+	 * resolveFunction
+	 * 
+	 * @param func
+	 */
 	public void addFunction(HDLFunction func) {
+		checkFrozen(func);
 		functions.put(func.getFullName(), func);
 	}
 
@@ -183,18 +198,33 @@ public class HDLLibrary {
 		return hdlType;
 	}
 
+	/**
+	 * Adds the given interface to the library so that it can be resolved by
+	 * resolveType
+	 * 
+	 * @param hIf
+	 */
 	public void addInterface(HDLInterface hIf) {
+		checkFrozen(hIf);
 		HDLQualifiedName fullName = hIf.getFullName();
 		types.put(fullName, hIf);
 	}
 
-	public void addEnum(HDLEnum hEnum) {
-		HDLQualifiedName fullName = hEnum.getFullName();
-		types.put(fullName, hEnum);
+	private void checkFrozen(IHDLObject hObject) {
+		if (!hObject.isFrozen())
+			throw new IllegalArgumentException("Objects need to be frozen to be added");
 	}
 
-	public static void clear() {
-		libs.clear();
+	/**
+	 * Adds the given enum to the library so that it can be resolved by
+	 * resolveType
+	 * 
+	 * @param hEnum
+	 */
+	public void addEnum(HDLEnum hEnum) {
+		checkFrozen(hEnum);
+		HDLQualifiedName fullName = hEnum.getFullName();
+		types.put(fullName, hEnum);
 	}
 
 	public void addSideFiles(List<SideFile> files) {

@@ -101,14 +101,15 @@ public aspect VHDLExpressionTransformation {
 			HDLPrimitive targetType = (HDLPrimitive) getCastTo();
 			if (targetType.getType()==HDLPrimitiveType.STRING)
 				return vhdl;
+			HDLExpression tWidth = targetType.getWidth();
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
 				HDLLiteral lit = (HDLLiteral) getTarget();
 				if (this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLArithOp)
 					return lit.toVHDL();
 				BigInteger val = lit.getValueAsBigInt();
 				BigInteger width=null;
-				if (targetType.getWidth()!=null)
-					width=targetType.getWidth().constantEvaluate(null);
+				if (tWidth!=null)
+					width=tWidth.constantEvaluate(null);
 				FunctionCall resize = null;
 				Expression<?> actual = new StringLiteral(val.toString(2));
 				switch (targetType.getType()) {
@@ -142,12 +143,12 @@ public aspect VHDLExpressionTransformation {
 				}
 				if (resize==null)
 					throw new IllegalArgumentException("Should not get here");
-				resize.getParameters().add(new AssociationElement(targetType.getWidth().toVHDL()));
+				resize.getParameters().add(new AssociationElement(tWidth.toVHDL()));
 				return resize;
 			}
 			HDLPrimitive t = (HDLPrimitive) getTarget().determineType();
 			Expression<?> exp = VHDLCastsLibrary.cast(vhdl, t.getType(), targetType.getType());
-			HDLExpression tw=targetType.getWidth();
+			HDLExpression tw=tWidth;
 			if (tw != null) {
 				if (t.getWidth()!=null){
 					BigInteger bt=t.getWidth().constantEvaluate(null);
@@ -158,7 +159,7 @@ public aspect VHDLExpressionTransformation {
 						}
 					}
 				}
-				Expression<?> width = targetType.getWidth().toVHDL();
+				Expression<?> width = tWidth.toVHDL();
 				FunctionCall resize = null;
 				switch (targetType.getType()) {
 				case BOOL:

@@ -7,7 +7,6 @@ import org.eclipse.jdt.annotation.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -22,8 +21,6 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * Constructs a new instance of {@link HDLRange}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param from
@@ -33,22 +30,8 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRange(int objectID, @Nullable IHDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate, boolean updateContainer) {
-		super(objectID, container, from, to, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLRange}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param from
-	 *            the value for from. Can be <code>null</code>.
-	 * @param to
-	 *            the value for to. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLRange(int objectID, @Nullable IHDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to) {
-		this(objectID, container, from, to, true, true);
+	public HDLRange(@Nullable IHDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate) {
+		super(container, from, to, validate);
 	}
 
 	public HDLRange() {
@@ -98,11 +81,11 @@ public class HDLRange extends AbstractHDLRange {
 			return new HDLLiteral().setVal("1");
 		if (getTo() != null) {
 			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null))) {
-				HDLArithOp simpleWith = new HDLArithOp().setLeft(getFrom().copyFiltered(CopyFilter.DEEP)).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+				HDLArithOp simpleWith = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 				return HDLPrimitives.simplifyWidth(this, simpleWith);
 			}
 		}
-		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom().copyFiltered(CopyFilter.DEEP)).setType(HDLArithOpType.MINUS).setRight(getTo().copyFiltered(CopyFilter.DEEP));
+		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.MINUS).setRight(getTo());
 		HDLExpression absRange = PSHDLLib.ABS.getReplacementExpressionArgs(this, rangeDist);
 		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);

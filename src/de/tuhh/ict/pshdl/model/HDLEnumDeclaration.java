@@ -19,8 +19,6 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLEnumDeclaration}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -30,23 +28,8 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLEnum hEnum, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, annotations, hEnum, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLEnumDeclaration}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param hEnum
-	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLEnumDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLEnum hEnum) {
-		this(objectID, container, annotations, hEnum, true, true);
+	public HDLEnumDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull HDLEnum hEnum, boolean validate) {
+		super(container, annotations, hEnum, validate);
 	}
 
 	public HDLEnumDeclaration() {

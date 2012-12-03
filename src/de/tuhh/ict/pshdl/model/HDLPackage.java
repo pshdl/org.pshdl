@@ -22,8 +22,6 @@ public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * Constructs a new instance of {@link HDLPackage}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param libURI
@@ -37,28 +35,9 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPackage(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
-			@Nullable ArrayList<HDLDeclaration> declarations, boolean validate, boolean updateContainer) {
-		super(objectID, container, libURI, pkg, units, declarations, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLPackage}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param libURI
-	 *            the value for libURI. Can <b>not</b> be <code>null</code>.
-	 * @param pkg
-	 *            the value for pkg. Can be <code>null</code>.
-	 * @param units
-	 *            the value for units. Can be <code>null</code>.
-	 * @param declarations
-	 *            the value for declarations. Can be <code>null</code>.
-	 */
-	public HDLPackage(int objectID, @Nullable IHDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
-			@Nullable ArrayList<HDLDeclaration> declarations) {
-		this(objectID, container, libURI, pkg, units, declarations, true, true);
+	public HDLPackage(@Nullable IHDLObject container, @NonNull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
+			@Nullable ArrayList<HDLDeclaration> declarations, boolean validate) {
+		super(container, libURI, pkg, units, declarations, validate);
 	}
 
 	public HDLPackage() {

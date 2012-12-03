@@ -60,6 +60,7 @@ public class VHDLImporter {
 							vInterface = vInterface.addPorts(var);
 						}
 					}
+					vInterface.freeze(null);
 					res.add(vInterface);
 					lib.addInterface(vInterface);
 				}
@@ -178,7 +179,7 @@ public class VHDLImporter {
 
 	private static HDLExpression subThenPlus1(HDLExpression from, HDLExpression to) {
 		HDLArithOp left = new HDLArithOp().setLeft(from).setType(HDLArithOpType.MINUS).setRight(to);
-		HDLArithOp op = new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+		HDLArithOp op = new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1)).copyDeepFrozen(null);
 		BigInteger constant = op.constantEvaluate(null);
 		if (constant != null)
 			return HDLLiteral.get(constant);

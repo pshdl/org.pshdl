@@ -124,8 +124,7 @@ public class ModificationSet {
 			IHDLObject container = subject.getContainer();
 			for (int i = 0; i < with.size(); i++) {
 				IHDLObject obj = with.get(i);
-				IHDLObject newObj = obj.copy().setContainer(container);
-				HDLObject.copyMetaData(obj, newObj);
+				IHDLObject newObj = obj.copyDeepFrozen(container);
 				with.set(i, newObj);
 			}
 			this.with = with;
@@ -183,7 +182,9 @@ public class ModificationSet {
 		if (replacements.size() == 0)
 			return orig;
 		T newR = getReplacement(orig);
-		return (T) newR.copyFiltered(new MSCopyFilter());
+		T res = (T) newR.copyFiltered(new MSCopyFilter());
+		res.freeze(orig.getContainer());
+		return res;
 	}
 
 	/**

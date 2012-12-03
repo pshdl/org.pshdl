@@ -26,8 +26,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * Constructs a new instance of {@link HDLVariableDeclaration}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -47,35 +45,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
-			@Nullable HDLDirection direction, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, annotations, register, direction, type, primitive, variables, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLVariableDeclaration}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param register
-	 *            the value for register. Can be <code>null</code>.
-	 * @param direction
-	 *            the value for direction. If <code>null</code>,
-	 *            {@link HDLDirection#INTERNAL} is used as default.
-	 * @param type
-	 *            the value for type. Can <b>not</b> be <code>null</code>.
-	 * @param primitive
-	 *            the value for primitive. Can be <code>null</code>.
-	 * @param variables
-	 *            the value for variables. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
-	 */
-	public HDLVariableDeclaration(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
-			@Nullable HDLDirection direction, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables) {
-		this(objectID, container, annotations, register, direction, type, primitive, variables, true, true);
+	public HDLVariableDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+			@Nullable HDLDirection direction, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables, boolean validate) {
+		super(container, annotations, register, direction, type, primitive, variables, validate);
 	}
 
 	public HDLVariableDeclaration() {

@@ -111,7 +111,7 @@ public class ABP3BusCodeGen {
 										new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create(UNIT_NAME + "PRDATA"))).setType(HDLAssignmentType.ASSGN)
 												.setRight(new HDLLiteral().setVal("0")))).setSimulation(false);
 		for (HDLVariableDeclaration port : hdi.getPorts()) {
-			res = res.addStatements(port.copy().setDirection(HDLDirection.INTERNAL));
+			res = res.addStatements(port.setDirection(HDLDirection.INTERNAL));
 		}
 		return res;
 	}

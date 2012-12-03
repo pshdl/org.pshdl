@@ -32,7 +32,7 @@ public class HDLGenerators {
 	public static HDLInterface getInterface(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
 		if (generator != null) {
-			return generator.getInterface(hdl);
+			return generator.getInterface(hdl).copyDeepFrozen(hdl);
 		}
 		return null;
 	}

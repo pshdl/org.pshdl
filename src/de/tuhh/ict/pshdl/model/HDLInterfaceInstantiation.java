@@ -21,8 +21,6 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceInstantiation}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -34,26 +32,9 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
-			@NonNull HDLQualifiedName hIf, boolean validate, boolean updateContainer) {
-		super(objectID, container, var, arguments, hIf, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLInterfaceInstantiation}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param var
-	 *            the value for var. Can <b>not</b> be <code>null</code>.
-	 * @param arguments
-	 *            the value for arguments. Can be <code>null</code>.
-	 * @param hIf
-	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLInterfaceInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments,
-			@NonNull HDLQualifiedName hIf) {
-		this(objectID, container, var, arguments, hIf, true, true);
+	public HDLInterfaceInstantiation(@Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLQualifiedName hIf,
+			boolean validate) {
+		super(container, var, arguments, hIf, validate);
 	}
 
 	public HDLInterfaceInstantiation() {

@@ -20,25 +20,13 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	/**
 	 * Constructs a new instance of {@link HDLObject}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLObject(int objectID, @Nullable IHDLObject container, boolean validate, boolean updateContainer) {
-		super(objectID, container, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLObject}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 */
-	public HDLObject(int objectID, @Nullable IHDLObject container) {
-		this(objectID, container, true, true);
+	public HDLObject(@Nullable IHDLObject container, boolean validate) {
+		super(container, validate);
 	}
 
 	public HDLObject() {
@@ -76,6 +64,13 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 
 	@Override
 	public abstract IHDLObject copyFiltered(CopyFilter filter);
+
+	@Override
+	public IHDLObject copyDeepFrozen(IHDLObject container) {
+		IHDLObject copy = copyFiltered(CopyFilter.DEEP_META);
+		copy.freeze(container);
+		return copy;
+	}
 
 	public Map<String, Object> metaData = new HashMap<String, Object>();
 
@@ -192,7 +187,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 			addClazz(c, ct, clazz);
 			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
-		} while ((clazz != null) && !clazz.equals(HDLObject.class));
+		} while (clazz != null && !clazz.equals(HDLObject.class));
 	}
 
 	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct, Class<? extends HDLObject> clazz) {
@@ -243,10 +238,10 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (this.container != null) {
-			if (((HDLObject) this.container).objectID != ((HDLObject) container).objectID) {
-				throw new IllegalArgumentException("The parents container ID does not match the new container ID!");
-			}
+			throw new IllegalArgumentException("Container already set");
 		}
+		if (frozen)
+			throw new IllegalArgumentException("Frozen");
 		this.container = container;
 		return this;
 	}
@@ -260,6 +255,23 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		if (hdlPackage != null)
 			return hdlPackage.getLibrary();
 		return null;
+	}
+
+	@Override
+	public IHDLObject freeze(IHDLObject container) {
+		setContainer(container);
+		frozen = true;
+		Iterator<IHDLObject> iterator = iterator();
+		while (iterator.hasNext()) {
+			IHDLObject hdlObject = iterator.next();
+			hdlObject.freeze(this);
+		}
+		return this;
+	}
+
+	@Override
+	public boolean isFrozen() {
+		return frozen;
 	}
 
 	// $CONTENT-END$

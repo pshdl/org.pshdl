@@ -19,8 +19,6 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * Constructs a new instance of {@link HDLAssignment}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -33,26 +31,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAssignment(int objectID, @Nullable IHDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right,
-			boolean validate, boolean updateContainer) {
-		super(objectID, container, left, type, right, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLAssignment}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param left
-	 *            the value for left. Can <b>not</b> be <code>null</code>.
-	 * @param type
-	 *            the value for type. If <code>null</code>,
-	 *            {@link HDLAssignmentType#ASSGN} is used as default.
-	 * @param right
-	 *            the value for right. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLAssignment(int objectID, @Nullable IHDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right) {
-		this(objectID, container, left, type, right, true, true);
+	public HDLAssignment(@Nullable IHDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right, boolean validate) {
+		super(container, left, type, right, validate);
 	}
 
 	public HDLAssignment() {

@@ -19,8 +19,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param val
@@ -30,22 +28,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLLiteral(int objectID, @Nullable IHDLObject container, @NonNull String val, @Nullable Boolean str, boolean validate, boolean updateContainer) {
-		super(objectID, container, val, str, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLLiteral}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param val
-	 *            the value for val. Can <b>not</b> be <code>null</code>.
-	 * @param str
-	 *            the value for str. Can be <code>null</code>.
-	 */
-	public HDLLiteral(int objectID, @Nullable IHDLObject container, @NonNull String val, @Nullable Boolean str) {
-		this(objectID, container, val, str, true, true);
+	public HDLLiteral(@Nullable IHDLObject container, @NonNull String val, @Nullable Boolean str, boolean validate) {
+		super(container, val, str, validate);
 	}
 
 	public HDLLiteral() {
@@ -165,6 +149,30 @@ public class HDLLiteral extends AbstractHDLLiteral {
 
 	public static HDLExpression get(BigInteger constant) {
 		return new HDLLiteral().setStr(false).setVal(constant.toString());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractHDLLiteral))
+			return false;
+		if (!super.equals(obj))
+			return false;
+		AbstractHDLLiteral other = (AbstractHDLLiteral) obj;
+		if (val == null) {
+			if (other.getVal() != null)
+				return false;
+		} else if (val.equals(other.getVal()))
+			return true;
+		BigInteger bigVal = getValueAsBigInt();
+		BigInteger otherbigVal = getValueAsBigInt();
+		if (bigVal != null) {
+			return bigVal.equals(otherbigVal);
+		}
+		return true;
 	}
 
 	// $CONTENT-END$

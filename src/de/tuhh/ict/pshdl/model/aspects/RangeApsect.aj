@@ -80,7 +80,7 @@ public aspect RangeApsect {
 			BigInteger bitWidth=BigInteger.ZERO;
 			for (HDLRange r : getBits()) {
 				HDLExpression width=r.getWidth();
-				width.setContainer(r);
+				width=width.copyDeepFrozen(r);
 				BigInteger cw=width.constantEvaluate(context);
 				if (cw==null) {
 					bitWidth=null;
@@ -248,6 +248,6 @@ public aspect RangeApsect {
 	}
 
 	public ValueRange HDLConcat.determineRange(HDLEvaluationContext context) {
-		return HDLPrimitives.getInstance().getValueRange(this.determineType(), context);
+		return HDLPrimitives.getInstance().getValueRange((HDLPrimitive)this.determineType(), context);
 	}
 }

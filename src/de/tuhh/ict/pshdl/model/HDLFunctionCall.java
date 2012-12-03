@@ -20,8 +20,6 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements de.tuhh.
 	/**
 	 * Constructs a new instance of {@link HDLFunctionCall}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -31,23 +29,8 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements de.tuhh.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunctionCall(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, name, params, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLFunctionCall}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param params
-	 *            the value for params. Can be <code>null</code>.
-	 */
-	public HDLFunctionCall(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params) {
-		this(objectID, container, name, params, true, true);
+	public HDLFunctionCall(@Nullable IHDLObject container, @NonNull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params, boolean validate) {
+		super(container, name, params, validate);
 	}
 
 	public HDLFunctionCall() {

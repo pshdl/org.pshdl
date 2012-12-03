@@ -12,6 +12,18 @@ import de.tuhh.ict.pshdl.model.validation.*;
 
 public aspect TypeInference {
 
+	
+	pointcut type(IHDLObject obj): target(obj) && execution(HDLType determineType());
+	
+	HDLType around(IHDLObject obj): type(obj) {
+		if (!obj.isFrozen())
+			throw new IllegalArgumentException("Target needs to be frozen");
+		HDLType res = proceed(obj);
+		if (res!=null)
+			return res.copyDeepFrozen(obj);
+		return res;
+	}
+	
 	public abstract HDLType HDLExpression.determineType();
 
 	/**
@@ -48,7 +60,7 @@ public aspect TypeInference {
 		return resolveType();
 	}
 
-	public HDLPrimitive HDLConcat.determineType() {
+	public HDLType HDLConcat.determineType() {
 		Iterator<HDLExpression> iter = getCats().iterator();
 		HDLPrimitive type = (HDLPrimitive) iter.next().determineType();
 		HDLExpression width = getWidth(type);
@@ -79,7 +91,7 @@ public aspect TypeInference {
 		return HDLFunctions.getInferenceInfo(this).result;
 	}
 
-	public HDLPrimitive HDLLiteral.determineType() {
+	public HDLType HDLLiteral.determineType() {
 		// Actually depends on context
 		return HDLPrimitive.target(getVal().charAt(0) != '-');
 	}

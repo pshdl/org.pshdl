@@ -22,8 +22,6 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	/**
 	 * Constructs a new instance of {@link HDLVariableRef}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -35,25 +33,9 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
-			@Nullable ArrayList<HDLRange> bits, boolean validate, boolean updateContainer) {
-		super(objectID, container, var, array, bits, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLVariableRef}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param var
-	 *            the value for var. Can <b>not</b> be <code>null</code>.
-	 * @param array
-	 *            the value for array. Can be <code>null</code>.
-	 * @param bits
-	 *            the value for bits. Can be <code>null</code>.
-	 */
-	public HDLVariableRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits) {
-		this(objectID, container, var, array, bits, true, true);
+	public HDLVariableRef(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+			boolean validate) {
+		super(container, var, array, bits, validate);
 	}
 
 	public HDLVariableRef() {

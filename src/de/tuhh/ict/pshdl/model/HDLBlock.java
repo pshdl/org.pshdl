@@ -19,8 +19,6 @@ public class HDLBlock extends AbstractHDLBlock {
 	/**
 	 * Constructs a new instance of {@link HDLBlock}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param process
@@ -30,22 +28,8 @@ public class HDLBlock extends AbstractHDLBlock {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBlock(int objectID, @Nullable IHDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate, boolean updateContainer) {
-		super(objectID, container, process, statements, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLBlock}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param process
-	 *            the value for process. Can <b>not</b> be <code>null</code>.
-	 * @param statements
-	 *            the value for statements. Can be <code>null</code>.
-	 */
-	public HDLBlock(int objectID, @Nullable IHDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements) {
-		this(objectID, container, process, statements, true, true);
+	public HDLBlock(@Nullable IHDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate) {
+		super(container, process, statements, validate);
 	}
 
 	public HDLBlock() {

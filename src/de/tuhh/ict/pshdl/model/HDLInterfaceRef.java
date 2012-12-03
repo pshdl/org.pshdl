@@ -24,8 +24,6 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -41,30 +39,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
-			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate, boolean updateContainer) {
-		super(objectID, container, var, array, bits, hIf, ifArray, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLInterfaceRef}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param var
-	 *            the value for var. Can <b>not</b> be <code>null</code>.
-	 * @param array
-	 *            the value for array. Can be <code>null</code>.
-	 * @param bits
-	 *            the value for bits. Can be <code>null</code>.
-	 * @param hIf
-	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
-	 * @param ifArray
-	 *            the value for ifArray. Can be <code>null</code>.
-	 */
-	public HDLInterfaceRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array,
-			@Nullable ArrayList<HDLRange> bits, @NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray) {
-		this(objectID, container, var, array, bits, hIf, ifArray, true, true);
+	public HDLInterfaceRef(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+			@NonNull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate) {
+		super(container, var, array, bits, hIf, ifArray, validate);
 	}
 
 	public HDLInterfaceRef() {

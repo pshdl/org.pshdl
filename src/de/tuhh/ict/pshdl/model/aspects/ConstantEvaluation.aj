@@ -13,13 +13,23 @@ import de.tuhh.ict.pshdl.model.utils.*;
 
 public aspect ConstantEvaluation {
 
-	/*
-	 * pointcut evaluate(): execution(BigInteger
-	 * constantEvaluate(HDLEvaluationContext)); BigInteger around():evaluate() {
-	 * BigInteger res=proceed();
-	 * System.out.println("Result of evaluating:"+thisJoinPoint
-	 * .getTarget()+" was "+res); return res; }
-	 */
+	
+	pointcut evaluate(IHDLObject obj): target(obj) && execution(BigInteger constantEvaluate(HDLEvaluationContext));
+	
+	private static enum EvalResult implements MetaAccess<BigInteger>{
+		result
+	}
+
+	BigInteger around(IHDLObject obj):evaluate(obj) {
+		if (!obj.isFrozen())
+			throw new IllegalArgumentException("Only frozen objects can be evaluated");
+		if (obj.getMeta(EvalResult.result)!=null)
+			return obj.getMeta(EvalResult.result);
+		BigInteger res=proceed(obj);
+		obj.addMeta(EvalResult.result, res);
+		return res; 
+	}
+	
 
 	public enum ProblemSource implements MetaAccess<IHDLObject> {
 		SOURCE;

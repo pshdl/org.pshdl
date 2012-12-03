@@ -10,6 +10,8 @@ public aspect ScopingAspect {
 	private HDLResolver HDLStatement.resolver = new HDLResolver(this, true);
 	
 	public HDLVariable IHDLObject.resolveVariable(HDLQualifiedName var) {
+//		if (!isFrozen())
+//			throw new IllegalArgumentException("Resolution only works when frozen");
 		if (getContainer() == null) {
 			HDLObject.printInfo(this);
 			return null;
@@ -18,6 +20,8 @@ public aspect ScopingAspect {
 		return getContainer().resolveVariable(var);
 	}
 	public HDLFunction IHDLObject.resolveFunction(HDLQualifiedName var) {
+//		if (!isFrozen())
+//			throw new IllegalArgumentException("Resolution only works when frozen");
 		if (getContainer() == null)
 //			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_FUNCTION, this, "for function:"+var));
 			return null;
@@ -25,6 +29,8 @@ public aspect ScopingAspect {
 	}
 
 	public HDLEnum IHDLObject.resolveEnum(HDLQualifiedName hEnum) {
+//		if (!isFrozen())
+//			throw new IllegalArgumentException("Resolution only works when frozen");
 		if (getContainer() == null)
 //			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, this, "for enum:"+hEnum));
 			return null;
@@ -32,6 +38,8 @@ public aspect ScopingAspect {
 	}
 
 	public HDLType IHDLObject.resolveType(HDLQualifiedName type) {
+//		if (!isFrozen())
+//			throw new IllegalArgumentException("Resolution only works when frozen");
 		if (getContainer() == null)
 //			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, this, "for type:"+type));
 			return null;

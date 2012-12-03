@@ -19,8 +19,6 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
 	 * Constructs a new instance of {@link HDLEnumRef}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -30,22 +28,8 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum, boolean validate, boolean updateContainer) {
-		super(objectID, container, var, hEnum, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLEnumRef}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param var
-	 *            the value for var. Can <b>not</b> be <code>null</code>.
-	 * @param hEnum
-	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLEnumRef(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum) {
-		this(objectID, container, var, hEnum, true, true);
+	public HDLEnumRef(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum, boolean validate) {
+		super(container, var, hEnum, validate);
 	}
 
 	public HDLEnumRef() {

@@ -19,8 +19,6 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInstantiation}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -30,23 +28,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, var, arguments, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLInstantiation}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param var
-	 *            the value for var. Can <b>not</b> be <code>null</code>.
-	 * @param arguments
-	 *            the value for arguments. Can be <code>null</code>.
-	 */
-	public HDLInstantiation(int objectID, @Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments) {
-		this(objectID, container, var, arguments, true, true);
+	public HDLInstantiation(@Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate) {
+		super(container, var, arguments, validate);
 	}
 
 	public HDLInstantiation() {

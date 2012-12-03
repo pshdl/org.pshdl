@@ -20,8 +20,6 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * Constructs a new instance of {@link HDLIfStatement}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param ifExp
@@ -33,26 +31,9 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLIfStatement(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
-			@Nullable ArrayList<HDLStatement> elseDo, boolean validate, boolean updateContainer) {
-		super(objectID, container, ifExp, thenDo, elseDo, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLIfStatement}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param ifExp
-	 *            the value for ifExp. Can <b>not</b> be <code>null</code>.
-	 * @param thenDo
-	 *            the value for thenDo. Can be <code>null</code>.
-	 * @param elseDo
-	 *            the value for elseDo. Can be <code>null</code>.
-	 */
-	public HDLIfStatement(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo,
-			@Nullable ArrayList<HDLStatement> elseDo) {
-		this(objectID, container, ifExp, thenDo, elseDo, true, true);
+	public HDLIfStatement(@Nullable IHDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo, @Nullable ArrayList<HDLStatement> elseDo,
+			boolean validate) {
+		super(container, ifExp, thenDo, elseDo, validate);
 	}
 
 	public HDLIfStatement() {

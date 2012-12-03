@@ -20,8 +20,6 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	/**
 	 * Constructs a new instance of {@link HDLNativeFunction}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -33,25 +31,8 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLNativeFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @NonNull Boolean simOnly,
-			boolean validate, boolean updateContainer) {
-		super(objectID, container, annotations, name, simOnly, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLNativeFunction}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param simOnly
-	 *            the value for simOnly. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLNativeFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @NonNull Boolean simOnly) {
-		this(objectID, container, annotations, name, simOnly, true, true);
+	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @NonNull Boolean simOnly, boolean validate) {
+		super(container, annotations, name, simOnly, validate);
 	}
 
 	public HDLNativeFunction() {

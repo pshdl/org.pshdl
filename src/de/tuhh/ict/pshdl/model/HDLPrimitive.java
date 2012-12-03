@@ -19,8 +19,6 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * Constructs a new instance of {@link HDLPrimitive}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -32,25 +30,8 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPrimitive(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate,
-			boolean updateContainer) {
-		super(objectID, container, name, type, width, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLPrimitive}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param type
-	 *            the value for type. Can <b>not</b> be <code>null</code>.
-	 * @param width
-	 *            the value for width. Can be <code>null</code>.
-	 */
-	public HDLPrimitive(int objectID, @Nullable IHDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width) {
-		this(objectID, container, name, type, width, true, true);
+	public HDLPrimitive(@Nullable IHDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate) {
+		super(container, name, type, width, validate);
 	}
 
 	public HDLPrimitive() {

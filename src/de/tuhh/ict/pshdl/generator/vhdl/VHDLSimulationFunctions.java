@@ -100,12 +100,11 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			IHDLObject container = function.getContainer();
 			HDLAssignment ass = setValue(ref, 0, container);
 			res.addUnclockedStatement(pid, ass.toVHDL(pid).getStatement(), ass);
-			HDLFunctionCall wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1).copy()).addParams(params.get(2).copy())
-					.setContainer(container);
+			HDLFunctionCall wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1)).addParams(params.get(2)).copyDeepFrozen(container);
 			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
 			ass = setValue(ref, 1, container);
 			res.addUnclockedStatement(pid, ass.toVHDL(pid).getStatement(), ass);
-			wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1).copy()).addParams(params.get(2).copy()).setContainer(container);
+			wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1)).addParams(params.get(2)).copyDeepFrozen(container);
 			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
 			return res;
 		}
@@ -122,7 +121,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	private HDLAssignment setValue(HDLVariableRef ref, int value, IHDLObject container) {
 		HDLManip val = new HDLManip().setCastTo(HDLPrimitive.getBit()).setType(HDLManipType.CAST).setTarget(HDLLiteral.get(value));
-		return new HDLAssignment().setLeft(ref.copy()).setRight(val).setContainer(container);
+		return new HDLAssignment().setLeft(ref.copy()).setRight(val).copyDeepFrozen(container);
 	}
 
 	private HDLVariableRef getVarRef(HDLExpression hdlExpression) {

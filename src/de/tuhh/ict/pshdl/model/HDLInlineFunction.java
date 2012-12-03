@@ -21,8 +21,6 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	/**
 	 * Constructs a new instance of {@link HDLInlineFunction}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -36,28 +34,9 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInlineFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name,
-			@Nullable ArrayList<HDLVariable> args, @NonNull HDLExpression expr, boolean validate, boolean updateContainer) {
-		super(objectID, container, annotations, name, args, expr, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLInlineFunction}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param annotations
-	 *            the value for annotations. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param args
-	 *            the value for args. Can be <code>null</code>.
-	 * @param expr
-	 *            the value for expr. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLInlineFunction(int objectID, @Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name,
-			@Nullable ArrayList<HDLVariable> args, @NonNull HDLExpression expr) {
-		this(objectID, container, annotations, name, args, expr, true, true);
+	public HDLInlineFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @Nullable ArrayList<HDLVariable> args,
+			@NonNull HDLExpression expr, boolean validate) {
+		super(container, annotations, name, args, expr, validate);
 	}
 
 	public HDLInlineFunction() {

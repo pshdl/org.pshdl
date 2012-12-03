@@ -17,8 +17,6 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * Constructs a new instance of {@link HDLAnnotation}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -28,22 +26,8 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAnnotation(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value, boolean validate, boolean updateContainer) {
-		super(objectID, container, name, value, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLAnnotation}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
-	 * @param value
-	 *            the value for value. Can be <code>null</code>.
-	 */
-	public HDLAnnotation(int objectID, @Nullable IHDLObject container, @NonNull String name, @Nullable String value) {
-		this(objectID, container, name, value, true, true);
+	public HDLAnnotation(@Nullable IHDLObject container, @NonNull String name, @Nullable String value, boolean validate) {
+		super(container, name, value, validate);
 	}
 
 	public HDLAnnotation() {

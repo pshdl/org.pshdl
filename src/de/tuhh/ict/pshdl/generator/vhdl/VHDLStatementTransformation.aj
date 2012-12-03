@@ -109,7 +109,7 @@ public aspect VHDLStatementTransformation {
 			if (var.getDirection()==HDLDirection.PARAMETER)
 				ms.replace(ref, ref.setVar(new HDLQualifiedName(hVar.getName()+"_"+ ref.getVarRefName().getLastSegment())));
 		}
-		hIf=ms.apply(hIf).copyFiltered(CopyFilter.DEEP_META).setContainer(getContainer());
+		hIf=ms.apply(hIf);
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
@@ -127,14 +127,14 @@ public aspect VHDLStatementTransformation {
 						if (typeAnno.isEmpty()) {
 							HDLQualifiedName name = VHDLPackageTransformation.getPackageNameRef(asRef).append(getArrayRefName(var, true));
 							res.addImport(name);
-							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))));
+							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString())))).copyDeepFrozen(this);
 							res.merge(newHVD.toVHDL(pid));
 						} else {
-							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null)));
+							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null))).copyDeepFrozen(this);
 							res.merge(newHVD.toVHDL(pid));
 						}
 					} else {
-						HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar));
+						HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar)).copyDeepFrozen(this);
 						res.merge(newHVD.toVHDL(pid));
 					}
 					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
@@ -142,7 +142,7 @@ public aspect VHDLStatementTransformation {
 			} else if (hvd.getDirection()==HDLDirection.PARAMETER){
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
-					HDLVariableRef ref = sigVar.asHDLRef();
+					HDLVariableRef ref = sigVar.asHDLRef().copyDeepFrozen(this);
 					genericMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
 				}
 			}
@@ -214,8 +214,8 @@ public aspect VHDLStatementTransformation {
 					@SuppressWarnings("rawtypes")
 					List<DiscreteRange> ranges = new LinkedList<DiscreteRange>();
 					for (HDLExpression arrayWidth : var.getDimensions()) {
-						HDLExpression newWidth = new HDLArithOp().setLeft(arrayWidth.copy()).setType(HDLArithOp.HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-						Range range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(newWidth).setContainer(this).toVHDL(Direction.TO);
+						HDLExpression newWidth = new HDLArithOp().setLeft(arrayWidth).setType(HDLArithOp.HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+						Range range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(newWidth).copyDeepFrozen(this).toVHDL(Direction.TO);
 						ranges.add(range);
 					}
 					boolean external = isExternal();
@@ -229,8 +229,7 @@ public aspect VHDLStatementTransformation {
 						HDLVariableRef ref = (HDLVariableRef) resetValue;
 						synchedArray = ref.resolveVar().getDimensions().size() != 0;
 					}
-					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray);
-					initLoop.setContainer(this);
+					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray).copyDeepFrozen(this);
 					VHDLContext vhdl = initLoop.toVHDL(pid);
 					res.addResetValue(getRegister(), vhdl.getStatement());
 				}

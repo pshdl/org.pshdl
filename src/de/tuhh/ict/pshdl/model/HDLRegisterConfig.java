@@ -24,8 +24,6 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * Constructs a new instance of {@link HDLRegisterConfig}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param clk
@@ -43,32 +41,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRegisterConfig(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate, boolean updateContainer) {
-		super(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLRegisterConfig}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param clk
-	 *            the value for clk. Can <b>not</b> be <code>null</code>.
-	 * @param rst
-	 *            the value for rst. Can <b>not</b> be <code>null</code>.
-	 * @param clockType
-	 *            the value for clockType. Can be <code>null</code>.
-	 * @param resetType
-	 *            the value for resetType. Can be <code>null</code>.
-	 * @param syncType
-	 *            the value for syncType. Can be <code>null</code>.
-	 * @param resetValue
-	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLRegisterConfig(int objectID, @Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue) {
-		this(objectID, container, clk, rst, clockType, resetType, syncType, resetValue, true, true);
+	public HDLRegisterConfig(@Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate) {
+		super(container, clk, rst, clockType, resetType, syncType, resetValue, validate);
 	}
 
 	public HDLRegisterConfig() {
@@ -207,7 +182,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 					config = config.setResetType(HDLRegResetActiveType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
 			}
 			if (RESET_VALUE_PARAM.equals(name))
-				config = config.setResetValue(genArgs.getExpression().copy());
+				config = config.setResetValue(genArgs.getExpression());
 		}
 		return config;
 	}
@@ -264,11 +239,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public int hashCode() {
 		int result = 1;
 		final int prime = 31;
-		result = prime * result + (clk == null ? 0 : clk.hashCode());
-		result = prime * result + (rst == null ? 0 : rst.hashCode());
-		result = prime * result + (clockType == null ? 0 : clockType.hashCode());
-		result = prime * result + (resetType == null ? 0 : resetType.hashCode());
-		result = prime * result + (syncType == null ? 0 : syncType.hashCode());
+		result = (prime * result) + (clk == null ? 0 : clk.hashCode());
+		result = (prime * result) + (rst == null ? 0 : rst.hashCode());
+		result = (prime * result) + (clockType == null ? 0 : clockType.hashCode());
+		result = (prime * result) + (resetType == null ? 0 : resetType.hashCode());
+		result = (prime * result) + (syncType == null ? 0 : syncType.hashCode());
 		return result;
 	}
 

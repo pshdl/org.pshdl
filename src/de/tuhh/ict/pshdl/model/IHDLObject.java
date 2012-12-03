@@ -12,6 +12,8 @@ public interface IHDLObject {
 
 	public abstract IHDLObject copyFiltered(CopyFilter filter);
 
+	public abstract IHDLObject copyDeepFrozen(IHDLObject container);
+
 	public void addMeta(String key, Object value);
 
 	public Object getMeta(String key);
@@ -42,7 +44,9 @@ public interface IHDLObject {
 
 	public String toConstructionString(String spacing);
 
-	public void freeze();
+	public IHDLObject freeze(IHDLObject container);
+
+	public boolean isFrozen();
 
 	public HDLQualifiedName getFullName();
 

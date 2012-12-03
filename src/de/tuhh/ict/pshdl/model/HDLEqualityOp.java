@@ -18,8 +18,6 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
 	 * Constructs a new instance of {@link HDLEqualityOp}
 	 * 
-	 * @param objectID
-	 *            a unique ID that identifies this instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left
@@ -31,25 +29,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEqualityOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type,
-			boolean validate, boolean updateContainer) {
-		super(objectID, container, left, right, type, validate, updateContainer);
-	}
-
-	/**
-	 * Constructs a new instance of {@link HDLEqualityOp}
-	 * 
-	 * @param container
-	 *            the value for container. Can be <code>null</code>.
-	 * @param left
-	 *            the value for left. Can <b>not</b> be <code>null</code>.
-	 * @param right
-	 *            the value for right. Can <b>not</b> be <code>null</code>.
-	 * @param type
-	 *            the value for type. Can <b>not</b> be <code>null</code>.
-	 */
-	public HDLEqualityOp(int objectID, @Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type) {
-		this(objectID, container, left, right, type, true, true);
+	public HDLEqualityOp(@Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type, boolean validate) {
+		super(container, left, right, type, validate);
 	}
 
 	public HDLEqualityOp() {
