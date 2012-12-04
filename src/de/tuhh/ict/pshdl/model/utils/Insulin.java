@@ -366,6 +366,11 @@ public class Insulin {
 
 	public static enum SignalInserted implements MetaAccess<Boolean> {
 		ClkInserted, RstInserted;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	private static void insertSig(ModificationSet ms, IHDLObject container, HDLVariable defVar, SignalInserted signalInserted) {

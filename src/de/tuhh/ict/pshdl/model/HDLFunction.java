@@ -63,12 +63,12 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	public <T extends IHDLObject> T substitute(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, T stmnt, IHDLObject origin) {
 		ModificationSet msExp = new ModificationSet();
 		@SuppressWarnings("unchecked")
-		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP);
+		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
 		for (int i = 0; i < args.size(); i++) {
 			HDLVariable arg = args.get(i);
 			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
-				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP);
+				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP_META);
 				if (argRef.getBits().size() != 0 || argRef.getArray().size() != 0) {
 					if (exp instanceof HDLVariableRef) {
 						HDLVariableRef ref = (HDLVariableRef) exp;

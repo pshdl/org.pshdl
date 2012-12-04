@@ -317,10 +317,10 @@ public class HDLPrimitives implements IHDLPrimitive {
 	private HDLExpression getWidth(IHDLObject exp, HDLArithOpType type, HDLTypeInferenceInfo info) {
 		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
 		if (leftW != null)
-			leftW = leftW.copyFiltered(CopyFilter.DEEP);
+			leftW = leftW.copyFiltered(CopyFilter.DEEP_META); // XXX Remove
 		HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
 		if (rightW != null)
-			rightW = rightW.copyFiltered(CopyFilter.DEEP);
+			rightW = rightW.copyFiltered(CopyFilter.DEEP_META); // XXX Remove
 		switch (type) {
 		case POW:
 			// The result type of pow can only be natural

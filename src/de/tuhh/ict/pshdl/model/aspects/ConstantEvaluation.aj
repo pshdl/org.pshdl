@@ -17,26 +17,46 @@ public aspect ConstantEvaluation {
 	pointcut evaluate(IHDLObject obj): target(obj) && execution(BigInteger constantEvaluate(HDLEvaluationContext));
 	
 	private static enum EvalResult implements MetaAccess<BigInteger>{
-		result
+		result;
+
+		@Override
+		public boolean inherit() {
+			return false;
+		}
+	}
+	private static enum EvalResultContainer implements MetaAccess<IHDLObject>{
+		container;
+
+		@Override
+		public boolean inherit() {
+			return false;
+		}
 	}
 
 	BigInteger around(IHDLObject obj):evaluate(obj) {
 		if (!obj.isFrozen())
 			throw new IllegalArgumentException("Only frozen objects can be evaluated");
-		if (obj.getMeta(EvalResult.result)!=null)
-			return obj.getMeta(EvalResult.result);
 		BigInteger res=proceed(obj);
-		obj.addMeta(EvalResult.result, res);
 		return res; 
 	}
 	
 
 	public enum ProblemSource implements MetaAccess<IHDLObject> {
 		SOURCE;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 		DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE, ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT, CAN_NOT_USE_PARAMETER, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS, NON_PRIMITVE_TYPE_NOT_EVALUATED, TYPE_NOT_SUPPORTED_FOR_CONSTANTS;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public abstract BigInteger HDLExpression.constantEvaluate(HDLEvaluationContext context);

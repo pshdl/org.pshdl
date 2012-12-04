@@ -107,15 +107,30 @@ public class RWValidation {
 	}
 
 	public static enum BlockMeta implements MetaAccess<HDLBlock> {
-		block
+		block;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public static enum BlockMetaClash implements MetaAccess<Set<HDLBlock>> {
-		clash
+		clash;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public static enum Init implements MetaAccess<Boolean> {
-		full
+		full;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public static HDLBlock UNIT_BLOCK = new HDLBlock();

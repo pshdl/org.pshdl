@@ -56,7 +56,17 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	// $CONTENT-BEGIN$
 
 	public static void copyMetaData(IHDLObject src, IHDLObject target) {
-		((HDLObject) target).metaData.putAll(((HDLObject) src).metaData);
+		copyMetaData(src, target, false);
+	}
+
+	public static void copyMetaData(IHDLObject src, IHDLObject target, boolean all) {
+		Map<MetaAccess<?>, Object> srcMeta = ((HDLObject) src).metaData;
+		Map<MetaAccess<?>, Object> targetMeta = ((HDLObject) target).metaData;
+		for (Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet()) {
+			if (all || entry.getKey().inherit()) {
+				targetMeta.put(entry.getKey(), entry.getValue());
+			}
+		}
 	}
 
 	@Override
@@ -72,21 +82,76 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		return copy;
 	}
 
-	public Map<String, Object> metaData = new HashMap<String, Object>();
+	public Map<MetaAccess<?>, Object> metaData = new HashMap<MetaAccess<?>, Object>();
+
+	public static class GenericMeta<T> implements MetaAccess<T> {
+
+		private boolean inherit;
+		private String name;
+
+		public GenericMeta(String name, boolean inherit) {
+			this.name = name;
+			this.inherit = inherit;
+		}
+
+		@Override
+		public String toString() {
+			return "GenericMeta [inherit=" + inherit + ", name=" + name + "]";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + (inherit ? 1231 : 1237);
+			result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			GenericMeta other = (GenericMeta) obj;
+			if (inherit != other.inherit)
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String name() {
+			return name;
+		}
+
+		@Override
+		public boolean inherit() {
+			return inherit;
+		}
+
+	}
 
 	@Override
 	public void addMeta(String key, Object value) {
-		metaData.put(key, value);
+		metaData.put(new GenericMeta<Object>(key, true), value);
 	}
 
 	@Override
 	public Object getMeta(String key) {
-		return metaData.get(key);
+		return metaData.get(new GenericMeta<Object>(key, true));
 	}
 
 	@Override
 	public <K> void addMeta(MetaAccess<K> key, K value) {
-		metaData.put(key.name(), value);
+		metaData.put(key, value);
 	}
 
 	@Override
@@ -102,7 +167,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	@Override
 	@SuppressWarnings("unchecked")
 	public <K> K getMeta(MetaAccess<K> key) {
-		return (K) metaData.get(key.name());
+		return (K) metaData.get(key);
 	}
 
 	public static <T> ArrayList<T> asList(T... items) {
@@ -187,7 +252,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 			addClazz(c, ct, clazz);
 			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
-		} while (clazz != null && !clazz.equals(HDLObject.class));
+		} while ((clazz != null) && !clazz.equals(HDLObject.class));
 	}
 
 	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct, Class<? extends HDLObject> clazz) {

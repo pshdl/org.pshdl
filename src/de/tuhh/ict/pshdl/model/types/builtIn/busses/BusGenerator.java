@@ -63,7 +63,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 		ArrayList<HDLArgument> args = hdl.getArguments();
 		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
-				return arg.getExpression().copyFiltered(CopyFilter.DEEP);
+				return arg.getExpression().copyFiltered(CopyFilter.DEEP_META);
 			}
 		}
 		throw new IllegalArgumentException("The parameter regCount is not valid!");

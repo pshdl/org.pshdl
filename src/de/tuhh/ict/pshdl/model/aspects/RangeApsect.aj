@@ -22,10 +22,20 @@ public aspect RangeApsect {
 
 	public enum ProblemSource implements MetaAccess<HDLObject> {
 		SOURCE;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 		DESCRIPTION, NON_PRIMITIVE_TYPE, POSSIBLY_ZERO_DIVIDE, BOOL_TYPE, ZERO_DIVIDE, BIT_TYPE;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	//First we check whether this Expression might be Constant. If so, we do exactly know the range

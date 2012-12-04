@@ -10,6 +10,11 @@ import de.tuhh.ict.pshdl.model.validation.HDLAdvisor.HDLAdvise;
 public class Problem {
 	public enum ProblemAccess implements MetaAccess<Problem> {
 		PROBLEM;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public static enum ProblemSeverity {

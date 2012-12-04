@@ -18,6 +18,11 @@ public abstract aspect LogginAspect {
 
 	public enum Infos implements MetaAccess<SourceLocation> {
 		SETTER, SETTER_CONTAINER, ADDER, CONSTRUCTOR, COPY, COPY_FILTERED;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 	
 	before(IHDLObject src, IHDLObject[] with) : replaced(src, with){

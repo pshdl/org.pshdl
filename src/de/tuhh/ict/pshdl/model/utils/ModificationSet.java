@@ -1,37 +1,55 @@
 package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import de.tuhh.ict.pshdl.model.*;
 
 public class ModificationSet {
 
+	private static enum ModID implements MetaAccess<Integer> {
+		id;
+
+		@Override
+		public boolean inherit() {
+			return false;
+		}
+	}
+
 	private class MSCopyFilter extends CopyFilter.DeepCloneFilter {
+		public AtomicInteger gid = new AtomicInteger();
+		private int id;
+
 		public MSCopyFilter() {
-			super(true);
+			id = gid.incrementAndGet();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T object) {
-			List<Modification> mods = getModifications(object);
+		public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T original) {
+			if (original == null)
+				return null;
+			Integer modID = original.getMeta(ModID.id);
+			if (modID != null) {
+				if (modID == id)
+					return super.copyObject(feature, container, original);
+			}
+			List<Modification> mods = getModifications(original);
 			if (mods != null) {
 				for (Modification modification : mods) {
 					if (modification.type == ModificationType.REPLACE) {
 						if (modification.with.size() > 1)
 							throw new IllegalArgumentException("Can not replace with more than one object into a single node for feature:" + feature + " of "
 									+ container.getClass());
-						// System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:"
-						// + modification);
-						IHDLObject orig = modification.with.get(0);
-						IHDLObject res = orig.copyFiltered(this);
-						HDLObject.copyMetaData(orig, res);
-						return (T) res;
+						IHDLObject replacement = modification.with.get(0);
+						original.addMeta(ModID.id, id);
+						T copyFiltered = (T) replacement.copyFiltered(this);
+						return copyFiltered;
 					}
 					throw new IllegalArgumentException("Can not insert into a single node for feature:" + feature + " of " + container);
 				}
 			}
-			return super.copyObject(feature, container, object);
+			return super.copyObject(feature, container, original);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -85,9 +103,7 @@ public class ModificationSet {
 		private <T> void singleAdd(ArrayList<T> res, T t, IHDLObject container) {
 			if (t instanceof IHDLObject) {
 				IHDLObject newT = (IHDLObject) t;
-				// newT = newT.copy().setContainer(container);
 				T copyFiltered = (T) newT.copyFiltered(this);
-				HDLObject.copyMetaData(newT, (IHDLObject) copyFiltered);
 				res.add(copyFiltered);
 			} else {
 				res.add(t);
@@ -121,11 +137,8 @@ public class ModificationSet {
 		public Modification(IHDLObject subject, List<IHDLObject> with, ModificationType type) {
 			super();
 			this.subject = subject;
-			IHDLObject container = subject.getContainer();
 			for (int i = 0; i < with.size(); i++) {
-				IHDLObject obj = with.get(i);
-				IHDLObject newObj = obj.copyDeepFrozen(container);
-				with.set(i, newObj);
+				with.set(i, with.get(i));
 			}
 			this.with = with;
 			this.type = type;

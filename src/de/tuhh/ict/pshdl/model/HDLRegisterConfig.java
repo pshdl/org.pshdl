@@ -239,11 +239,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public int hashCode() {
 		int result = 1;
 		final int prime = 31;
-		result = (prime * result) + (clk == null ? 0 : clk.hashCode());
-		result = (prime * result) + (rst == null ? 0 : rst.hashCode());
-		result = (prime * result) + (clockType == null ? 0 : clockType.hashCode());
-		result = (prime * result) + (resetType == null ? 0 : resetType.hashCode());
-		result = (prime * result) + (syncType == null ? 0 : syncType.hashCode());
+		result = prime * result + (clk == null ? 0 : clk.hashCode());
+		result = prime * result + (rst == null ? 0 : rst.hashCode());
+		result = prime * result + (clockType == null ? 0 : clockType.hashCode());
+		result = prime * result + (resetType == null ? 0 : resetType.hashCode());
+		result = prime * result + (syncType == null ? 0 : syncType.hashCode());
 		return result;
 	}
 

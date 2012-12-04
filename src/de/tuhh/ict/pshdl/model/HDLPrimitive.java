@@ -96,6 +96,11 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	public static enum TargetMeta implements MetaAccess<Boolean> {
 		TARGET;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public static HDLPrimitive target(boolean positive) {

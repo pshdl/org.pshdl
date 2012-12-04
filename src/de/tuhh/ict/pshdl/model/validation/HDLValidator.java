@@ -16,7 +16,12 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 public class HDLValidator {
 
 	public static enum IntegerMeta implements MetaAccess<Integer> {
-		READ_COUNT, WRITE_COUNT, ACCESS
+		READ_COUNT, WRITE_COUNT, ACCESS;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 
 	public static Set<Problem> validate(HDLPackage pkg, Map<HDLQualifiedName, HDLEvaluationContext> context) {

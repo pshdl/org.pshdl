@@ -31,7 +31,12 @@ public aspect VHDLStatementTransformation {
 	private static final String ORIGINAL_FULLNAME = "ORIGINAL_FULLNAME";
 
 	public enum Exportable implements MetaAccess<Boolean> {
-		EXPORT
+		EXPORT;
+
+		@Override
+		public boolean inherit() {
+			return true;
+		}
 	}
 	public abstract VHDLContext HDLStatement.toVHDL(int pid);
 

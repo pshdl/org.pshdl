@@ -159,8 +159,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return false;
 		if (!(obj instanceof AbstractHDLLiteral))
 			return false;
-		if (!super.equals(obj))
-			return false;
 		AbstractHDLLiteral other = (AbstractHDLLiteral) obj;
 		if (val == null) {
 			if (other.getVal() != null)

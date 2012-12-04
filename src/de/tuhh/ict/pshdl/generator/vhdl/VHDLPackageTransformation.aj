@@ -39,6 +39,11 @@ public aspect VHDLPackageTransformation {
 			return "CONTEXT_INFO";
 		}
 
+		@Override
+		public boolean inherit() {
+			return true;
+		}
+
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
