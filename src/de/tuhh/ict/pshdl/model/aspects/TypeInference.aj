@@ -76,7 +76,7 @@ public aspect TypeInference {
 		HDLExpression width = type.getWidth();
 		if (type.getType() == HDLPrimitiveType.BIT)
 			width = HDLLiteral.get(1);
-		return width.copy();
+		return width;
 	}
 
 	public HDLType HDLEnumRef.determineType() {

@@ -173,7 +173,7 @@ public class Insulin {
 					HDLExpression defaultValue = getDefaultValue(hvd, register, var);
 					if ((defaultValue != null) && (hvd.getContainer(HDLInterface.class) == null)) {
 						HDLVariableRef setVar = new HDLVariableRef().setVar(var.asRef());
-						generateInit(ms, var, var, defaultValue, setVar);
+						generateInit(var.getDimensions(), ms, var, var, defaultValue, setVar);
 					}
 
 				}
@@ -184,17 +184,24 @@ public class Insulin {
 			HDLUnit unit = hi.getContainer(HDLUnit.class);
 			if (unit.getSimulation())
 				continue;
+			Set<String> meta = hi.getVar().getMeta(Init.full);
+			ArrayList<HDLExpression> dimensions = hi.getVar().getDimensions();
+			if ((meta == null) || (dimensions.size() != 0))
+				meta = new HashSet<String>();
 			HDLInterface hIf = hi.resolveHIf();
 			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
 				HDLDirection direction = hvd.getDirection();
 				if ((direction == HDLDirection.IN) || (direction == HDLDirection.INOUT)) {
 					for (HDLVariable var : hvd.getVariables()) {
-						if (var.hasMeta(Init.full))
+						if (meta.contains(var.getName()))
 							continue;
+						ArrayList<HDLExpression> varDim = var.getDimensions();
+						ArrayList<HDLExpression> cloneDim = (ArrayList<HDLExpression>) dimensions.clone();
+						cloneDim.addAll(varDim);
 						HDLExpression defaultValue = getDefaultValue(hvd, null, var);
 						if (defaultValue != null) {
 							HDLVariableRef setVar = new HDLInterfaceRef().setHIf(hi.getVar().asRef()).setVar(var.asRef());
-							generateInit(ms, var, hi.getContainer(HDLUnit.class), defaultValue, setVar);
+							generateInit(cloneDim, ms, var, hi.getContainer(HDLUnit.class), defaultValue, setVar);
 						}
 					}
 				}
@@ -203,8 +210,8 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static void generateInit(ModificationSet ms, HDLVariable var, IHDLObject container, HDLExpression defaultValue, HDLVariableRef setVar) {
-		ArrayList<HDLExpression> dimensions = var.getDimensions();
+	private static void generateInit(ArrayList<HDLExpression> dimensions, ModificationSet ms, HDLVariable var, IHDLObject container, HDLExpression defaultValue,
+			HDLVariableRef setVar) {
 		boolean synchedArray = false;
 		if (defaultValue instanceof HDLVariableRef) {
 			HDLVariableRef ref = (HDLVariableRef) defaultValue;

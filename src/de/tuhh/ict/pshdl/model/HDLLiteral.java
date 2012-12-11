@@ -159,14 +159,14 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return false;
 		if (!(obj instanceof AbstractHDLLiteral))
 			return false;
-		AbstractHDLLiteral other = (AbstractHDLLiteral) obj;
+		HDLLiteral other = (HDLLiteral) obj;
 		if (val == null) {
 			if (other.getVal() != null)
 				return false;
 		} else if (val.equals(other.getVal()))
 			return true;
 		BigInteger bigVal = getValueAsBigInt();
-		BigInteger otherbigVal = getValueAsBigInt();
+		BigInteger otherbigVal = other.getValueAsBigInt();
 		if (bigVal != null) {
 			return bigVal.equals(otherbigVal);
 		}

@@ -124,7 +124,7 @@ public class RWValidation {
 		}
 	}
 
-	public static enum Init implements MetaAccess<Boolean> {
+	public static enum Init implements MetaAccess<Set<String>> {
 		full;
 
 		@Override
@@ -149,12 +149,18 @@ public class RWValidation {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
 					HDLVariable hVar = hir.resolveHIf();
 					incMeta(hVar, IntegerMeta.ACCESS);
-				}
+					if ((ass.getContainer().getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
+						Set<String> meta = hVar.getMeta(Init.full);
+						if (meta == null)
+							meta = new HashSet<String>();
+						meta.add(hir.getVarRefName().getLastSegment());
+						hVar.addMeta(Init.full, meta);
+					}
+				} else if ((ass.getContainer().getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0))
+					var.addMeta(Init.full, Collections.singleton(var.getName()));
 				HDLBlock block = ass.getContainer(HDLBlock.class);
 				if (block == null) {
 					block = UNIT_BLOCK;
-					if ((ass.getContainer().getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0))
-						var.setMeta(Init.full);
 				}
 				if ((var.getMeta(BlockMeta.block) != null) && (var.getMeta(BlockMeta.block) != block)) {
 					Set<HDLBlock> meta = var.getMeta(BlockMetaClash.clash);

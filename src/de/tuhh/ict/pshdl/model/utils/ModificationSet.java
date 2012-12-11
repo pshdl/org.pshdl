@@ -7,6 +7,9 @@ import de.tuhh.ict.pshdl.model.*;
 
 public class ModificationSet {
 
+	public AtomicInteger gid = new AtomicInteger();
+	private int id = gid.incrementAndGet();
+
 	private static enum ModID implements MetaAccess<Integer> {
 		id;
 
@@ -17,23 +20,12 @@ public class ModificationSet {
 	}
 
 	private class MSCopyFilter extends CopyFilter.DeepCloneFilter {
-		public AtomicInteger gid = new AtomicInteger();
-		private int id;
-
-		public MSCopyFilter() {
-			id = gid.incrementAndGet();
-		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T original) {
 			if (original == null)
 				return null;
-			Integer modID = original.getMeta(ModID.id);
-			if (modID != null) {
-				if (modID == id)
-					return super.copyObject(feature, container, original);
-			}
 			List<Modification> mods = getModifications(original);
 			if (mods != null) {
 				for (Modification modification : mods) {
@@ -64,8 +56,6 @@ public class ModificationSet {
 						List<T> after = new LinkedList<T>();
 						List<T> replace = new LinkedList<T>();
 						for (Modification modification : mods) {
-							// System.out.println("ModificationSet.MSCopyFilter.copyContainer() Applying modification:"
-							// + modification);
 							switch (modification.type) {
 							case INSERT_AFTER:
 								after.addAll((Collection<? extends T>) modification.with);
@@ -93,8 +83,8 @@ public class ModificationSet {
 			return null;
 		}
 
-		private <T> void multiAdd(ArrayList<T> res, List<T> before, IHDLObject container) {
-			for (T element : before) {
+		private <T> void multiAdd(ArrayList<T> res, List<T> list, IHDLObject container) {
+			for (T element : list) {
 				singleAdd(res, element, container);
 			}
 		}
@@ -103,6 +93,7 @@ public class ModificationSet {
 		private <T> void singleAdd(ArrayList<T> res, T t, IHDLObject container) {
 			if (t instanceof IHDLObject) {
 				IHDLObject newT = (IHDLObject) t;
+				newT.addMeta(ModID.id, id);
 				T copyFiltered = (T) newT.copyFiltered(this);
 				res.add(copyFiltered);
 			} else {
@@ -148,6 +139,14 @@ public class ModificationSet {
 	private Map<Integer, List<Modification>> replacements = new HashMap<Integer, List<Modification>>();
 
 	private <T> List<Modification> getModifications(T object) {
+		if (object instanceof IHDLObject) {
+			IHDLObject original = (IHDLObject) object;
+			Integer modID = original.getMeta(ModID.id);
+			if (modID != null) {
+				if (modID == id)
+					return null;
+			}
+		}
 		List<Modification> list = replacements.get(getHash(object));
 		if (list != null) {
 			List<Modification> res = new LinkedList<ModificationSet.Modification>();
@@ -237,6 +236,11 @@ public class ModificationSet {
 					iter.remove();
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return replacements.toString();
 	}
 
 }
