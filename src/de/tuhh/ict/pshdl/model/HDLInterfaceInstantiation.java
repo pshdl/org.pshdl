@@ -4,9 +4,11 @@ import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
 
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.Result;
 
 /**
  * The class HDLInterfaceInstantiation contains the following fields
@@ -60,7 +62,36 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			return obj.getHIfRefName();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+
+	public static GenericMeta<String> ORIG_NAME = new GenericMeta<String>("ORIG_NAME", true);
+
+	@Override
+	public HDLInterface resolveHIf() {
+		HDLInterface resolveHIf = super.resolveHIf();
+		ModificationSet ms = new ModificationSet();
+		ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
+		String prefix = getVar().getName();
+		for (HDLVariableDeclaration hvd : ports) {
+			if (hvd.getDirection() == HDLDirection.PARAMETER) {
+				ArrayList<HDLVariable> variables = hvd.getVariables();
+				for (HDLVariable hdlVariable : variables) {
+					String newName = prefix + "_" + hdlVariable.getName();
+					HDLVariable newVar = hdlVariable.setName(newName);
+					newVar.addMeta(ORIG_NAME, hdlVariable.getName());
+					ms.replace(hdlVariable, newVar);
+					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(resolveHIf).where(HDLVariableRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
+					for (HDLVariableRef ref : refs) {
+						// Make local only so that it is resolved locally first
+						ms.replace(ref, ref.setVar(HDLQualifiedName.create(newName)));
+					}
+				}
+			}
+		}
+		HDLInterface newIF = ms.apply(resolveHIf);
+		return newIF;
+	}
 
 	// $CONTENT-END$
 

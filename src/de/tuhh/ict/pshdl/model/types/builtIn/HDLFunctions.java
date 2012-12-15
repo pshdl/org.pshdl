@@ -116,11 +116,11 @@ public class HDLFunctions {
 		return null;
 	}
 
-	public static FunctionCall toVHDLExpression(HDLFunctionCall function) {
+	public static Expression<?> toVHDLExpression(HDLFunctionCall function) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null)
 			for (IHDLFunctionResolver resolver : list) {
-				FunctionCall eval = resolver.toVHDLExpression(function);
+				Expression<?> eval = resolver.toVHDLExpression(function);
 				if (eval != null)
 					return eval;
 			}

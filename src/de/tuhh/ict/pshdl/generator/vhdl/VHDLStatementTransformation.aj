@@ -102,19 +102,6 @@ public aspect VHDLStatementTransformation {
 			genericMap = inst.getGenericMap();
 			instantiation=inst;
 		}
-		ModificationSet ms=new ModificationSet();
-		Collection<HDLVariable> vars=hIf.getAllObjectsOf(HDLVariable.class, true);
-		for (HDLVariable var : vars) {
-			if(var.getMeta(ORIGINAL_FULLNAME)==null)
-				var.addMeta(ORIGINAL_FULLNAME,var.getFullName());
-		}
-		Collection<HDLVariableRef> refs=hIf.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : refs) {
-			HDLVariable var = ref.resolveVar();
-			if (var.getDirection()==HDLDirection.PARAMETER)
-				ms.replace(ref, ref.setVar(new HDLQualifiedName(hVar.getName()+"_"+ ref.getVarRefName().getLastSegment())));
-		}
-		hIf=ms.apply(hIf);
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
@@ -146,9 +133,12 @@ public aspect VHDLStatementTransformation {
 				}
 			} else if (hvd.getDirection()==HDLDirection.PARAMETER){
 				for (HDLVariable var : hvd.getVariables()) {
-					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
-					HDLVariableRef ref = sigVar.asHDLRef().copyDeepFrozen(this);
-					genericMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
+					HDLVariable sigVar=var;
+					if (var.getMeta(HDLInterfaceInstantiation.ORIG_NAME)!=null)
+						 sigVar = var.setName(var.getMeta(HDLInterfaceInstantiation.ORIG_NAME));
+					
+					HDLVariableRef ref = var.asHDLRef().copyDeepFrozen(this);
+					genericMap.add(new AssociationElement(sigVar.getName(), ref.toVHDL()));
 				}
 			}
 		}

@@ -376,12 +376,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 	public HDLTypeInferenceInfo getShiftOpType(HDLShiftOp op) {
 		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
 		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
-		if (HDLPrimitive.isTargetMatching(lType)) {
-			if (HDLPrimitive.isTargetMatching(rType))
-				lType = rType;
-		}
-		if (HDLPrimitive.isTargetMatching(rType))
-			rType = lType;
+
 		HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
 			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);

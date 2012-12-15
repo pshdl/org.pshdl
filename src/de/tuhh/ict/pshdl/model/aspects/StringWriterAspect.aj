@@ -60,7 +60,14 @@ public aspect StringWriterAspect {
 	}
 
 	public String HDLFunctionCall.toString() {
-		StringBuilder sb = new StringBuilder();
+		boolean isStatement=false;
+		if (getContainer() instanceof HDLStatement)
+			isStatement=true;
+		StringBuilder sb;
+		if (isStatement)
+			sb=getSpacing();
+		else
+			sb= new StringBuilder();
 		sb.append(getNameRefName()).append('(');
 		boolean first = true;
 		for (HDLExpression p : getParams()) {
@@ -70,6 +77,8 @@ public aspect StringWriterAspect {
 			first=false;
 		}
 		sb.append(')');
+		if (isStatement)
+			sb.append(';');
 		return sb.toString();
 	}
 	

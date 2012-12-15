@@ -7,7 +7,7 @@ import de.tuhh.ict.pshdl.model.*;
 
 public class ModificationSet {
 
-	public AtomicInteger gid = new AtomicInteger();
+	private static final AtomicInteger gid = new AtomicInteger();
 	private int id = gid.incrementAndGet();
 
 	private static enum ModID implements MetaAccess<Integer> {
@@ -93,7 +93,9 @@ public class ModificationSet {
 		private <T> void singleAdd(ArrayList<T> res, T t, IHDLObject container) {
 			if (t instanceof IHDLObject) {
 				IHDLObject newT = (IHDLObject) t;
-				newT.addMeta(ModID.id, id);
+				// newT.addMeta(ModID.id, id);
+				// Marking not needed here as it will be taken care of in
+				// copyObject
 				T copyFiltered = (T) newT.copyFiltered(this);
 				res.add(copyFiltered);
 			} else {
@@ -193,6 +195,7 @@ public class ModificationSet {
 	public <T extends IHDLObject> T apply(T orig) {
 		if (replacements.size() == 0)
 			return orig;
+		id = gid.incrementAndGet();
 		T newR = getReplacement(orig);
 		T res = (T) newR.copyFiltered(new MSCopyFilter());
 		res.freeze(orig.getContainer());

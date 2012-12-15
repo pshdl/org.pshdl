@@ -72,7 +72,7 @@ public aspect VHDLExpressionTransformation {
 		return getRef(result, this);
 	}
 
-	public FunctionCall HDLFunctionCall.toVHDL() {
+	public Expression<?> HDLFunctionCall.toVHDL() {
 		return HDLFunctions.toVHDLExpression(this);
 	}
 
@@ -121,11 +121,17 @@ public aspect VHDLExpressionTransformation {
 				case INTEGER:
 					return lit.toVHDL();
 				case INT:{
+					if (val.bitLength()>31){
+						return lit.toVHDL(true); 
+					}
 					resize = new FunctionCall(NumericStd.TO_SIGNED);
 					resize.getParameters().add(new AssociationElement(lit.toVHDL()));
 					break;
 				}
 				case UINT:{
+					if (val.bitLength()>31){
+						return lit.toVHDL(true); 
+					}
 					resize = new FunctionCall(NumericStd.TO_UNSIGNED);
 					resize.getParameters().add(new AssociationElement(lit.toVHDL()));
 					break;
@@ -195,6 +201,9 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public Literal<?> HDLLiteral.toVHDL() {
+		return toVHDL(false);
+	}
+	public Literal<?> HDLLiteral.toVHDL(boolean asString) {
 		String val = getVal();
 		switch (getPresentation()){
 		case STR:
@@ -203,17 +212,20 @@ public aspect VHDLExpressionTransformation {
 			if ("true".equals(val))
 				return Standard.BOOLEAN_TRUE;
 			return Standard.BOOLEAN_FALSE;
+		case HEX:
+			if (asString)
+				return new HexLiteral(val.substring(2));
+			return new BasedLiteral("16#"+val.substring(2)+"#");
+		case BIN:
+			if (asString)
+				return new BinaryLiteral(val.substring(2));
+			return new BasedLiteral("2#"+val.substring(2)+"#");
 		default:
-			if (val.length() == 1)
-				return new DecimalLiteral(val);
-			switch (val.charAt(1)) {
-			case 'b':
-				return new BasedLiteral("2#"+val.substring(2)+"#");
-			case 'x':
-				return new BasedLiteral("16#"+val.substring(2)+"#");
-			default:
-				return new DecimalLiteral(val);
-			}
+			BigInteger dec=getValueAsBigInt();
+			//VHDL isn't smart enough to allow uints with 32 bit
+			if (dec.bitLength()>31)
+				return new BinaryLiteral(dec.toString(2));
+			return new DecimalLiteral(val);
 		}
 	}
 

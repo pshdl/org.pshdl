@@ -20,7 +20,7 @@ public interface IHDLFunctionResolver {
 
 	public VHDLContext toVHDL(HDLFunctionCall function, int pid);
 
-	public FunctionCall toVHDLExpression(HDLFunctionCall function);
+	public Expression<?> toVHDLExpression(HDLFunctionCall function);
 
 	public FunctionInformation getFunctionInfo(String funcName);
 }

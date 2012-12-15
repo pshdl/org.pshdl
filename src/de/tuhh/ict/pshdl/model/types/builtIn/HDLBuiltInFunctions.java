@@ -5,44 +5,31 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
 import de.upb.hni.vmagic.*;
-import de.upb.hni.vmagic.declaration.*;
+import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.expression.*;
-import de.upb.hni.vmagic.type.*;
+import de.upb.hni.vmagic.literal.*;
 
 public class HDLBuiltInFunctions implements IHDLFunctionResolver {
-	private static EnumSet<HDLPrimitiveType> disallowedTypes = EnumSet.of(HDLPrimitiveType.BIT, HDLPrimitiveType.BITVECTOR, HDLPrimitiveType.BOOL);
 
 	public static enum BuiltInFunctions {
-		max, min, abs
+		highZ
 	}
 
 	@Override
 	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
 		String name = function.getNameRefName().getLastSegment();
-		ArrayList<HDLExpression> params = function.getParams();
-		for (HDLExpression exp : params) {
-			HDLPrimitive type = (HDLPrimitive) exp.determineType();
-			if (disallowedTypes.contains(type.getType())) {
-				HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(HDLPrimitive.getInteger());
-				info.error = "The parameter " + exp + " of type:" + type + " is not allowed for function:" + name;
-				return info;
-			}
-		}
 		try {
 			BuiltInFunctions func = BuiltInFunctions.valueOf(name);
 			switch (func) {
-			case min:
-			case max:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
-			case abs:
-				return new HDLTypeInferenceInfo(HDLPrimitive.getNatural(), HDLPrimitive.getInteger());
+			case highZ:
+				if (function.getParams().size() == 1)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBit(), HDLPrimitive.getNatural());
+				return new HDLTypeInferenceInfo(HDLPrimitive.getBit());
 			}
 		} catch (Exception e) {
 		}
@@ -51,33 +38,24 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
-		String name = function.getNameRefName().getLastSegment();
-		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
-		switch (func) {
-		case abs:
-			return args.get(0).abs();
-		case min:
-			return args.get(0).min(args.get(1));
-		case max:
-			return args.get(0).max(args.get(1));
+		switch (getFuncEnum(function)) {
+		case highZ:
+			return null;
 		}
 		return null;
 	}
 
+	private BuiltInFunctions getFuncEnum(HDLFunctionCall function) {
+		String name = function.getNameRefName().getLastSegment();
+		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+		return func;
+	}
+
 	@Override
 	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
-		String name = function.getNameRefName().getLastSegment();
-		ValueRange zeroArg = function.getParams().get(0).determineRange(context);
-		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
-		switch (func) {
-		case abs:
-			return new ValueRange(zeroArg.from.abs(), zeroArg.to.abs());
-		case min:
-			ValueRange oneArgMin = function.getParams().get(1).determineRange(context);
-			return new ValueRange(zeroArg.from.min(oneArgMin.from), zeroArg.to.min(oneArgMin.to));
-		case max:
-			ValueRange oneArgMax = function.getParams().get(1).determineRange(context);
-			return new ValueRange(zeroArg.from.max(oneArgMax.from), zeroArg.to.max(oneArgMax.to));
+		switch (getFuncEnum(function)) {
+		case highZ:
+			return null;
 		}
 		return null;
 	}
@@ -99,36 +77,26 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public FunctionCall toVHDLExpression(HDLFunctionCall function) {
-		FunctionDeclaration fd = new FunctionDeclaration(function.getNameRefName().getLastSegment(), UnresolvedType.NO_NAME);
-		FunctionCall res = new FunctionCall(fd);
-		for (HDLExpression exp : function.getParams()) {
-			res.getParameters().add(new AssociationElement(exp.toVHDL()));
+	public Expression<?> toVHDLExpression(HDLFunctionCall function) {
+		switch (getFuncEnum(function)) {
+		case highZ:
+			if (function.getParams().size() == 0)
+				return new CharacterLiteral('Z');
+
+			Aggregate aggregate = new Aggregate();
+			HDLRange range = new HDLRange().setFrom(HDLLiteral.get(1)).setTo(function.getParams().get(0));
+			aggregate.createAssociation(new CharacterLiteral('Z'), range.toVHDL(Direction.TO));
+			return aggregate;
 		}
-		return res;
+		return null;
 	}
 
 	@Override
 	public FunctionInformation getFunctionInfo(String funcName) {
 		switch (BuiltInFunctions.valueOf(funcName)) {
-		case abs: {
-			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the absolute value of a number (makes it positive)",
-					"uint - the absolute (positive) value of a number", false, FunctionType.NATIVE);
-			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
-			return fi;
-		}
-		case max: {
-			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the bigger value of two numbers",
-					"int - the bigger value of two numbers", false, FunctionType.NATIVE);
-			fi.arguments.put("int numberA", "The first number");
-			fi.arguments.put("int numberB", "The second number");
-			return fi;
-		}
-		case min: {
-			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the smaller value of two numbers",
-					"int - the smaller value of two numbers", false, FunctionType.NATIVE);
-			fi.arguments.put("int numberA", "The first number");
-			fi.arguments.put("int numberB", "The second number");
+		case highZ: {
+			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
+					"Returns a high Z. This is useful for tri-state busses, high z however is not supported in PSHDL as computational value.", "highZ", false, FunctionType.NATIVE);
 			return fi;
 		}
 		}
