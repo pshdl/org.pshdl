@@ -21,6 +21,7 @@ import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInfo
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 import de.upb.hni.vmagic.expression.*;
 
 public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDLFunctionResolver {

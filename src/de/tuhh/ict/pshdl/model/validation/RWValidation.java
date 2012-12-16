@@ -1,7 +1,7 @@
 package de.tuhh.ict.pshdl.model.validation;
 
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection.*;
-import static de.tuhh.ict.pshdl.model.validation.ErrorCode.*;
+import static de.tuhh.ict.pshdl.model.validation.builtin.ErrorCode.*;
 
 import java.util.*;
 
@@ -10,7 +10,8 @@ import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
+import de.tuhh.ict.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {
@@ -18,7 +19,7 @@ public class RWValidation {
 		annotateWriteCount(unit);
 		Collection<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
-			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || HDLValidator.skipExp(hdlVariable))
+			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || BuiltInValidator.skipExp(hdlVariable))
 				continue;
 			Integer readCount = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
 			readCount = readCount == null ? 0 : readCount;
@@ -91,7 +92,7 @@ public class RWValidation {
 	public static void annotateReadCount(HDLObject orig) {
 		Collection<HDLReference> list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
-			if (HDLValidator.skipExp(ref))
+			if (BuiltInValidator.skipExp(ref))
 				continue;
 			if (ref.getContainer() instanceof HDLAssignment) {
 				HDLAssignment ass = (HDLAssignment) ref.getContainer();
@@ -146,7 +147,7 @@ public class RWValidation {
 			HDLReference left = ass.getLeft();
 			if (left instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) left;
-				if (HDLValidator.skipExp(ref))
+				if (BuiltInValidator.skipExp(ref))
 					continue;
 				HDLVariable var = ref.resolveVar();
 				if (ref instanceof HDLInterfaceRef) {

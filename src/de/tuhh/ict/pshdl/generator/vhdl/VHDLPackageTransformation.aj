@@ -23,58 +23,9 @@ import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.libraryunit.*;
 
 public aspect VHDLPackageTransformation {
-	public static class ContextInformation implements MetaAccess<Collection<ContextInformation>> {
-		public static final ContextInformation INFO = new ContextInformation(null, null);
-		public final HDLObject context;
-		public final String newName;
-
-		public ContextInformation(HDLObject context, String newName) {
-			super();
-			this.context = context;
-			this.newName = newName;
-		}
-
-		@Override
-		public String name() {
-			return "CONTEXT_INFO";
-		}
-
-		@Override
-		public boolean inherit() {
-			return true;
-		}
-
-	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<LibraryUnit> HDLUnit.toVHDL() {
-		Collection<HDLVariableDeclaration> hvds = getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hvd : hvds) {
-			for (HDLVariable var : hvd.getVariables()) {
-				Collection<HDLVariableRef> refs = var.getAllObjectsOf(HDLVariableRef.class, true);
-				for (HDLVariableRef ref : refs) {
-					ref.resolveVar().setMeta(VHDLStatementTransformation.Exportable.EXPORT);
-				}
-			}
-		}
-		Collection<HDLInterfaceInstantiation> hii = getAllObjectsOf(HDLInterfaceInstantiation.class, true);
-		for (HDLInterfaceInstantiation hdi : hii) {
-			HDLInterface hIf = hdi.resolveHIf();
-			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
-				if (hvd.getDirection() == HDLDirection.PARAMETER) {
-					Collection<HDLVariable> vars = hvd.getAllObjectsOf(HDLVariable.class, true);
-					for (HDLVariable hdlVariable : vars) {
-						ContextInformation ci = new ContextInformation(hIf, hdi.getVar().getName() + "_" + hdlVariable.getName());
-						Collection<ContextInformation> meta = hdlVariable.getMeta(ContextInformation.INFO);
-						if (meta == null) {
-							meta = new LinkedList<ContextInformation>();
-							hdlVariable.addMeta(ContextInformation.INFO, meta);
-						}
-						meta.add(ci);
-					}
-				}
-			}
-		}
 		List<LibraryUnit> res = new LinkedList<LibraryUnit>();
 		HDLQualifiedName entityName = getFullName();
 		Entity e = new Entity(entityName.toString('_'));
@@ -90,18 +41,9 @@ public aspect VHDLPackageTransformation {
 					unit.addImport(HDLQualifiedName.create("work",getPackageName(type), "all"));
 			}
 		}
-		/*for (String imp : getImports()) {
-			HDLQualifiedName fqn = new HDLQualifiedName(imp);
-			if (fqn.getLastSegment().equals("*")) {
-				unit.addImport(HDLQualifiedName.create("work",getPackageName(fqn.skipLast(1)), "all"));
-				unit.addImport(HDLQualifiedName.create("work",fqn.skipLast(1).toString('_'), "all"));
-			} else {
-				unit.addImport(HDLQualifiedName.create("work",getPackageName(fqn)));
-				unit.addImport(HDLQualifiedName.create("work",fqn.toString('_')));
-			}
-		}*/
+
 		for (HDLStatement stmnt : getStatements()) {
-			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX));
+			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX), false);
 		}
 		addDefaultLibs(res, unit);
 		if (unit.hasPkgDeclarations()) {
@@ -113,7 +55,6 @@ public aspect VHDLPackageTransformation {
 			res.add(new UseClause("work." + libName + ".all"));
 			addDefaultLibs(res, unit);
 		}
-		// System.out.println("VHDLPackageTransformation.HDLUnit.toVHDL()"+unit);
 		e.getPort().addAll((List) unit.ports);
 		e.getGeneric().addAll((List) unit.generics);
 		e.getDeclarations().addAll((List) unit.constants);
@@ -242,7 +183,30 @@ public aspect VHDLPackageTransformation {
 	public VhdlFile HDLPackage.toVHDL() {
 		VhdlFile res = new VhdlFile();
 		for (HDLUnit unit : getUnits()) {
-			res.getElements().addAll(unit.toVHDL());
+			ModificationSet ms=new ModificationSet();
+			Collection<HDLVariableDeclaration> hvds = unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+			for (HDLVariableDeclaration hvd : hvds) {
+				for (HDLVariable var : hvd.getVariables()) {
+					Collection<HDLVariableRef> refs = var.getAllObjectsOf(HDLVariableRef.class, true);
+					for (HDLVariableRef ref : refs) {
+						//Check which variable declaration contains references and mark those references as the ones that should be declared in a package
+						ref.resolveVar().setMeta(VHDLStatementTransformation.EXPORT);
+					}
+					String origName = var.getName();
+					String name=VHDLOutputValidator.getVHDLName(origName);
+					if (!origName.equals(name)){
+						HDLVariable newVar=var.setName(name);
+						ms.replace(var, newVar);
+						Collection<HDLVariableRef> varRefs=HDLQuery.select(HDLVariableRef.class).from(this).where(HDLVariableRef.fVar).isEqualTo(var.asRef()).getAll();
+						HDLQualifiedName newVarRef=newVar.asRef();
+						for (HDLVariableRef ref : varRefs) {
+							ms.replace(ref, ref.setVar(newVarRef));
+						}
+					}
+				}
+			}
+			HDLUnit newUnit=ms.apply(unit);
+			res.getElements().addAll(newUnit.toVHDL());
 		}
 		PackageDeclaration pd=null;
 		for (HDLDeclaration decl:getDeclarations()){

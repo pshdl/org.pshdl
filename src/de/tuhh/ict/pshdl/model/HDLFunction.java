@@ -69,10 +69,10 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
 				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP_META);
-				if (argRef.getBits().size() != 0 || argRef.getArray().size() != 0) {
+				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
 					if (exp instanceof HDLVariableRef) {
 						HDLVariableRef ref = (HDLVariableRef) exp;
-						HDLVariableRef nref = ref.copy();
+						HDLVariableRef nref = ref;
 						for (HDLRange bit : argRef.getBits())
 							nref = nref.addBits(substitute(args, params, bit, origin));
 						for (HDLExpression aExp : argRef.getArray())

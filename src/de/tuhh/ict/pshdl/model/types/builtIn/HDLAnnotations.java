@@ -5,6 +5,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 public class HDLAnnotations {
 	private static Map<String, IHDLAnnotation> annotations;

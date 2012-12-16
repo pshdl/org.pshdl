@@ -7,6 +7,7 @@ import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 public class HDLGenerators {
 	private static Map<String, IHDLGenerator> generators;

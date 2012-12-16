@@ -1,9 +1,10 @@
-package de.tuhh.ict.pshdl.model.validation;
+package de.tuhh.ict.pshdl.model.validation.builtin;
 
 import static de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity;
 
-public enum ErrorCode {
+public enum ErrorCode implements IErrorCode {
 	// RWValidation
 	WRITE_ACCESS_TO_IN_PORT(ERROR), IN_PORT_NEVER_READ(WARNING), OUT_PORT_NEVER_WRITTEN(WARNING), UNUSED_VARIABLE(WARNING), INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ(WARNING), PARAMETER_OR_CONSTANT_NEVER_READ(
 			WARNING), INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN(WARNING),
@@ -23,11 +24,19 @@ public enum ErrorCode {
 	// Various
 	COMBINED_ASSIGNMENT_NOT_ALLOWED(ERROR), UNSUPPORTED_TYPE_FOR_OP(ERROR), MULTI_PROCESS_WRITE(ERROR), NO_SUCH_FUNCTION(ERROR), IN_PORT_CANT_REGISTER(ERROR),
 	// Generator
-	GENERATOR_NOT_KNOWN(ERROR), GENERATOR_ERROR(ERROR), GENERATOR_WARNING(WARNING), GENERATOR_INFO(INFO), INLINE_FUNCTION_NO_TYPE(ERROR), UNRESOLVED_FUNCTION(ERROR);
+	GENERATOR_NOT_KNOWN(ERROR), GENERATOR_ERROR(ERROR), GENERATOR_WARNING(WARNING), GENERATOR_INFO(INFO), INLINE_FUNCTION_NO_TYPE(ERROR), UNRESOLVED_FUNCTION(ERROR),
+	// Variable naming
+	VARIABLE_SAME_NAME(ERROR), VARIABLE_KEYWORD_NAME(ERROR), VARIABLE_SAME_NAME_DIFFERENT_CASE(ERROR), VARIABLE_SCOPE_SAME_NAME(ERROR), VARIABLE_SCOPE_SAME_NAME_DIFFERENT_CASE(
+			ERROR);
 
 	public final ProblemSeverity severity;
 
 	ErrorCode(ProblemSeverity severity) {
 		this.severity = severity;
+	}
+
+	@Override
+	public ProblemSeverity getSeverity() {
+		return severity;
 	}
 }

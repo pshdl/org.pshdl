@@ -11,6 +11,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 public class HDLSimulator {
 
@@ -251,7 +252,7 @@ public class HDLSimulator {
 			for (HDLStatement stmnt : loop.getDos()) {
 				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();
 				if (refs.size() == 0)
-					newStmnts.add(stmnt.copy());
+					newStmnts.add(stmnt);
 				else {
 					BigInteger counter = r.from;
 					do {

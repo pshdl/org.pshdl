@@ -256,15 +256,13 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLPrimitive newLType = lType.setType(triple.left);
 		HDLPrimitive newRType = rType.setType(triple.right);
 		if ((triple.left == INT) && (triple.right == UINT)) {
-			newRType = newRType.setWidth(new HDLArithOp().setLeft(newRType.getWidth().copy()).setType(PLUS).setRight(HDLLiteral.get(1)));
+			newRType = newRType.setWidth(new HDLArithOp().setLeft(newRType.getWidth()).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
 		if ((triple.left == UINT) && (triple.right == INT)) {
-			newLType = newLType.setWidth(new HDLArithOp().setLeft(newLType.getWidth().copy()).setType(PLUS).setRight(HDLLiteral.get(1)));
+			newLType = newLType.setWidth(new HDLArithOp().setLeft(newLType.getWidth()).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
 		HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
-		if (width != null)
-			width = width.copy();
 		info.result = new HDLPrimitive().setType(triple.result).setWidth(width);
 		return normalize(info, op);
 	}
@@ -384,8 +382,6 @@ public class HDLPrimitives implements IHDLPrimitive {
 			return hdi;
 		}
 		HDLExpression width = lType.getWidth();
-		if (width != null)
-			width = width.copy();
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType, new HDLPrimitive().setType(triple.right));
 		return normalize(info, op);
 	}
@@ -453,7 +449,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLExpression width = lType.getWidth();
 		if ((width == null) && (rType.getWidth() != null))
 			width = rType.getWidth();
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width == null ? null : width.copy()), lType.setType(triple.left),
+		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width == null ? null : width), lType.setType(triple.left),
 				lType.setType(triple.right));
 		return normalize(info, op);
 	}

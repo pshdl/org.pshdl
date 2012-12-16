@@ -5,7 +5,8 @@ import java.util.concurrent.atomic.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.validation.HDLAdvisor.HDLAdvise;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.IErrorCode;
+import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
 
 public class Problem {
 	public enum ProblemAccess implements MetaAccess<Problem> {
@@ -22,7 +23,7 @@ public class Problem {
 	}
 
 	public final ProblemSeverity severity;
-	public final ErrorCode code;
+	public final IErrorCode code;
 	public final IHDLObject node;
 	public final IHDLObject context;
 	public final String info;
@@ -30,23 +31,23 @@ public class Problem {
 	public final Map<String, Object> meta = new HashMap<String, Object>();
 	private static AtomicInteger uid = new AtomicInteger();
 
-	public Problem(ErrorCode code, IHDLObject node) {
+	public Problem(IErrorCode code, IHDLObject node) {
 		this(code, node, null, null);
 	}
 
-	public Problem(ErrorCode code, IHDLObject node, IHDLObject context) {
+	public Problem(IErrorCode code, IHDLObject node, IHDLObject context) {
 		this(code, node, context, null);
 	}
 
-	public Problem(ErrorCode code, IHDLObject node, String info) {
+	public Problem(IErrorCode code, IHDLObject node, String info) {
 		this(code, node, null, info);
 	}
 
-	public Problem(ErrorCode code, IHDLObject node, IHDLObject context, String info) {
+	public Problem(IErrorCode code, IHDLObject node, IHDLObject context, String info) {
 		if (node == null)
 			throw new IllegalArgumentException("Node can not be null!");
 		this.context = context;
-		this.severity = code.severity;
+		this.severity = code.getSeverity();
 		this.code = code;
 		this.node = node;
 		this.info = info;
@@ -72,7 +73,7 @@ public class Problem {
 		if (inlineType != null) {
 			preText = "The inline function: " + inlineType + " caused the following issue: ";
 		}
-		HDLAdvise advise = HDLAdvisor.getAdvise(this);
+		HDLAdvise advise = HDLValidator.advise(this);
 		if (advise != null)
 			return preText + advise.message;
 		String string = preText + code.name().toLowerCase() + " for: " + node;

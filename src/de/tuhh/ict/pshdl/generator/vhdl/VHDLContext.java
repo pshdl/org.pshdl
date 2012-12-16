@@ -59,10 +59,14 @@ public class VHDLContext {
 
 	public static int DEFAULT_CTX = -1;
 
-	public void merge(VHDLContext vhdl) {
-		concurrentStatements.addAll(vhdl.concurrentStatements);
-		mergeListMap(vhdl, vhdl.sensitiveStatements, sensitiveStatements);
-		mergeListMap(vhdl, vhdl.unclockedStatements, unclockedStatements);
+	public void merge(VHDLContext vhdl, boolean excludeStatements) {
+		if (!excludeStatements) {
+			concurrentStatements.addAll(vhdl.concurrentStatements);
+			mergeListMap(vhdl, vhdl.sensitiveStatements, sensitiveStatements);
+			mergeListMap(vhdl, vhdl.unclockedStatements, unclockedStatements);
+			mergeListMap(vhdl, vhdl.clockedStatements, clockedStatements);
+			mergeListMap(vhdl, vhdl.resetStatements, resetStatements);
+		}
 		ports.addAll(vhdl.ports);
 		generics.addAll(vhdl.generics);
 		constants.addAll(vhdl.constants);
@@ -74,8 +78,6 @@ public class VHDLContext {
 		for (Map.Entry<Integer, Boolean> entry : vhdl.noSensitivity.entrySet()) {
 			noSensitivity.put(entry.getKey(), entry.getValue());
 		}
-		mergeListMap(vhdl, vhdl.clockedStatements, clockedStatements);
-		mergeListMap(vhdl, vhdl.resetStatements, resetStatements);
 	}
 
 	private <K, T> void mergeListMap(VHDLContext vhdl, Map<K, LinkedList<T>> map, Map<K, LinkedList<T>> local) {
@@ -192,10 +194,22 @@ public class VHDLContext {
 
 	private static AtomicInteger ai = new AtomicInteger();
 
+	/**
+	 * Generates a new process id
+	 * 
+	 * @return an unused process id
+	 */
 	public int newProcessID() {
 		return ai.incrementAndGet();
 	}
 
+	/**
+	 * Marks a process as containing no sensitivity. This is useful for
+	 * simulation purposes where wait functions are used
+	 * 
+	 * @param pid
+	 *            the process id
+	 */
 	public void setNoSensitivity(int pid) {
 		noSensitivity.put(pid, true);
 	}

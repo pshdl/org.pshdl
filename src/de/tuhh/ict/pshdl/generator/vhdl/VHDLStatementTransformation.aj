@@ -25,42 +25,38 @@ import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.object.VhdlObject.*;
 import de.upb.hni.vmagic.type.*;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 
 public aspect VHDLStatementTransformation {
-	
+
 	private static final String ORIGINAL_FULLNAME = "ORIGINAL_FULLNAME";
 
-	public enum Exportable implements MetaAccess<Boolean> {
-		EXPORT;
+	public static GenericMeta<Boolean> EXPORT = new GenericMeta<Boolean>("EXPORT", true);
 
-		@Override
-		public boolean inherit() {
-			return true;
-		}
-	}
 	public abstract VHDLContext HDLStatement.toVHDL(int pid);
 
 	public VHDLContext HDLDirectGeneration.toVHDL(int pid) {
 		return new VHDLContext();
 	}
+
 	public VHDLContext HDLFunctionCall.toVHDL(int pid) {
 		return HDLFunctions.toVHDL(this, pid);
 	}
 
-	public VHDLContext HDLBlock.toVHDL(int pid){
+	public VHDLContext HDLBlock.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
-		boolean process=false;
-		if (getProcess()!=null && getProcess()){
-			process=true;
+		boolean process = false;
+		if (getProcess() != null && getProcess()) {
+			process = true;
 		}
 		if (process)
-			pid=res.newProcessID();
-		for(HDLStatement stmnt:getStatements()){
-			res.merge(stmnt.toVHDL(pid));
+			pid = res.newProcessID();
+		for (HDLStatement stmnt : getStatements()) {
+			res.merge(stmnt.toVHDL(pid), false);
 		}
 		return res;
 	}
-	
+
 	public VHDLContext HDLEnumDeclaration.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		HDLEnum hEnum = getHEnum();
@@ -81,31 +77,34 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLInterfaceInstantiation.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		HDLInterface hIf = resolveHIf();
-		HDLVariable hVar=getVar();
+		HDLVariable hVar = getVar();
 		String ifName = getVar().getName();
 		HDLQualifiedName asRef = hIf.asRef();
-		HDLInterfaceDeclaration hid=hIf.getContainer(HDLInterfaceDeclaration.class);
+		HDLInterfaceDeclaration hid = hIf.getContainer(HDLInterfaceDeclaration.class);
 		List<AssociationElement> portMap;
 		List<AssociationElement> genericMap;
 		ConcurrentStatement instantiation;
-		if (hid!=null && hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent)!=null){
+		// Perform instantiation as Component rather than Entity if
+		// VHDLComponent Annotation is present
+		if (hid != null && hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent) != null) {
 			res.addImport(VHDLPackageTransformation.getNameRef(asRef));
 			Component entity = new Component(asRef.getLastSegment().toString());
 			ComponentInstantiation inst = new ComponentInstantiation(ifName, entity);
 			portMap = inst.getPortMap();
 			genericMap = inst.getGenericMap();
-			instantiation=inst;
-		}else{
+			instantiation = inst;
+		} else {
 			Entity entity = new Entity(VHDLPackageTransformation.getNameRef(asRef).toString());
 			EntityInstantiation inst = new EntityInstantiation(ifName, entity);
 			portMap = inst.getPortMap();
 			genericMap = inst.getGenericMap();
-			instantiation=inst;
+			instantiation = inst;
 		}
 		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
-				Collection<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.VHDLType.toString()).getAll();
+				Collection<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.VHDLType.toString())
+						.getAll();
 				for (HDLVariable var : hvd.getVariables()) {
 					HDLVariable sigVar = var.setName(ifName + "_" + var.getName());
 					HDLVariableRef ref = sigVar.asHDLRef();
@@ -113,32 +112,38 @@ public aspect VHDLStatementTransformation {
 						ref = ref.addArray(new HDLVariableRef().setVar(HDLQualifiedName.create(Character.toString((char) (i + 'I')))));
 					}
 					for (HDLExpression exp : hVar.getDimensions()) {
-						sigVar = sigVar.addDimensions(exp.copy());
+						sigVar = sigVar.addDimensions(exp);
 					}
 					if (var.getDimensions().size() != 0) {
+						//Arrays are always named in VHDL, so the type annotation should be present
 						if (typeAnno.isEmpty()) {
 							HDLQualifiedName name = VHDLPackageTransformation.getPackageNameRef(asRef).append(getArrayRefName(var, true));
 							res.addImport(name);
-							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString())))).copyDeepFrozen(this);
-							res.merge(newHVD.toVHDL(pid));
+							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL)
+									.setVariables(HDLObject.asList(sigVar.setDimensions(null).addAnnotations(HDLBuiltInAnnotations.VHDLType.create(name.toString()))))
+									.copyDeepFrozen(this);
+							res.merge(newHVD.toVHDL(pid), false);
 						} else {
 							HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar.setDimensions(null))).copyDeepFrozen(this);
-							res.merge(newHVD.toVHDL(pid));
+							res.merge(newHVD.toVHDL(pid), false);
 						}
 					} else {
 						HDLVariableDeclaration newHVD = hvd.setDirection(HDLDirection.INTERNAL).setVariables(HDLObject.asList(sigVar)).copyDeepFrozen(this);
-						res.merge(newHVD.toVHDL(pid));
+						res.merge(newHVD.toVHDL(pid), false);
 					}
-					portMap.add(new AssociationElement(var.getName(), ref.toVHDL()));
+					portMap.add(new AssociationElement(VHDLOutputValidator.getVHDLName(var.getName()), ref.toVHDL()));
 				}
-			} else if (hvd.getDirection()==HDLDirection.PARAMETER){
-				for (HDLVariable var : hvd.getVariables()) {
-					HDLVariable sigVar=var;
-					if (var.getMeta(HDLInterfaceInstantiation.ORIG_NAME)!=null)
-						 sigVar = var.setName(var.getMeta(HDLInterfaceInstantiation.ORIG_NAME));
-					
-					HDLVariableRef ref = var.asHDLRef().copyDeepFrozen(this);
-					genericMap.add(new AssociationElement(sigVar.getName(), ref.toVHDL()));
+			} else {
+				//Parameter get a special treatment because they have been renamed by HDLInterfaceInstantiation resolveIF
+				if (hvd.getDirection() == HDLDirection.PARAMETER) {
+					for (HDLVariable var : hvd.getVariables()) {
+						HDLVariable sigVar = var;
+						if (var.getMeta(HDLInterfaceInstantiation.ORIG_NAME) != null)
+							sigVar = var.setName(var.getMeta(HDLInterfaceInstantiation.ORIG_NAME));
+
+						HDLVariableRef ref = var.asHDLRef();
+						genericMap.add(new AssociationElement(sigVar.getName(), ref.toVHDL()));
+					}
 				}
 			}
 		}
@@ -147,7 +152,7 @@ public aspect VHDLStatementTransformation {
 			res.addConcurrentStatement(instantiation);
 		else {
 			for (int i = 0; i < hVar.getDimensions().size(); i++) {
-				HDLExpression to = new HDLArithOp().setLeft(hVar.getDimensions().get(i).copy()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				HDLExpression to = new HDLArithOp().setLeft(hVar.getDimensions().get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
 				HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(to).setContainer(this);
 				ForGenerateStatement newFor = new ForGenerateStatement("generate_" + ifName, Character.toString((char) (i + 'I')), range.toVHDL(Range.Direction.TO));
 				if (forLoop != null)
@@ -156,7 +161,7 @@ public aspect VHDLStatementTransformation {
 					res.addConcurrentStatement(newFor);
 				forLoop = newFor;
 			}
-			if (forLoop==null)
+			if (forLoop == null)
 				throw new IllegalArgumentException("Should not get here");
 			forLoop.getStatements().add(instantiation);
 		}
@@ -166,10 +171,10 @@ public aspect VHDLStatementTransformation {
 	private static String getArrayRefName(HDLVariable var, boolean external) {
 		if (external) {
 			HDLQualifiedName fullName;
-			if (var.getMeta(ORIGINAL_FULLNAME)!=null)
-				fullName=(HDLQualifiedName) var.getMeta(ORIGINAL_FULLNAME);
+			if (var.getMeta(ORIGINAL_FULLNAME) != null)
+				fullName = (HDLQualifiedName) var.getMeta(ORIGINAL_FULLNAME);
 			else
-				fullName= var.getFullName();
+				fullName = var.getFullName();
 			return fullName.toString('_') + "_array";
 		}
 		return var.getName() + "_array";
@@ -181,7 +186,7 @@ public aspect VHDLStatementTransformation {
 		SubtypeIndication type = null;
 		HDLExpression resetValue = null;
 		HDLAnnotation typeAnno = HDLQuery.select(HDLAnnotation.class).from(this).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.VHDLType.toString()).getFirst();
-		if (typeAnno!=null) {
+		if (typeAnno != null) {
 			HDLQualifiedName value = new HDLQualifiedName(typeAnno.getValue());
 			res.addImport(value);
 			type = new EnumerationType(value.getLastSegment());
@@ -203,7 +208,7 @@ public aspect VHDLStatementTransformation {
 		}
 		if (type != null) {
 			for (HDLVariable var : getVariables()) {
-				boolean noExplicitResetVar=var.getAnnotation(HDLBuiltInAnnotations.VHDLNoExplicitReset)!=null;
+				boolean noExplicitResetVar = var.getAnnotation(HDLBuiltInAnnotations.VHDLNoExplicitReset) != null;
 				SubtypeIndication varType = type;
 				if (var.getDimensions().size() != 0) {
 					@SuppressWarnings("rawtypes")
@@ -224,7 +229,8 @@ public aspect VHDLStatementTransformation {
 						HDLVariableRef ref = (HDLVariableRef) resetValue;
 						synchedArray = ref.resolveVar().getDimensions().size() != 0;
 					}
-					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray).copyDeepFrozen(this);
+					HDLStatement initLoop = Insulin.createArrayForLoop(var.getDimensions(), 0, resetValue, new HDLVariableRef().setVar(var.asRef()), synchedArray).copyDeepFrozen(
+							this);
 					VHDLContext vhdl = initLoop.toVHDL(pid);
 					res.addResetValue(getRegister(), vhdl.getStatement());
 				}
@@ -232,10 +238,10 @@ public aspect VHDLStatementTransformation {
 				Constant constant = new Constant(var.getName(), varType);
 				if (var.getDefaultValue() != null)
 					constant.setDefaultValue(var.getDefaultValue().toVHDL());
-				if (noExplicitResetVar){
-					Aggregate assign=Aggregate.OTHERS(new CharacterLiteral('0'));
-					for (int i=0;i<var.getDimensions().size();i++)
-						assign=Aggregate.OTHERS(assign);
+				if (noExplicitResetVar) {
+					Aggregate assign = Aggregate.OTHERS(new CharacterLiteral('0'));
+					for (int i = 0; i < var.getDimensions().size(); i++)
+						assign = Aggregate.OTHERS(assign);
 					s.setDefaultValue(assign);
 				}
 				switch (getDirection()) {
@@ -259,7 +265,7 @@ public aspect VHDLStatementTransformation {
 					break;
 				case CONSTANT:
 					ConstantDeclaration cd = new ConstantDeclaration(constant);
-					if (var.hasMeta(Exportable.EXPORT))
+					if (var.hasMeta(EXPORT))
 						res.addConstantDeclarationPkg(cd);
 					else
 						res.addConstantDeclaration(cd);
@@ -275,12 +281,12 @@ public aspect VHDLStatementTransformation {
 
 	public VHDLContext HDLSwitchStatement.toVHDL(int pid) {
 		VHDLContext context = new VHDLContext();
-		HDLExpression hCaseExp=getCaseExp();
-		BigInteger width=null;
-		HDLType type=hCaseExp.determineType();
-		if (type instanceof HDLPrimitive){
-			width=((HDLPrimitive)type).getWidth().constantEvaluate(null);
-			if (width==null)
+		HDLExpression hCaseExp = getCaseExp();
+		BigInteger width = null;
+		HDLType type = hCaseExp.determineType();
+		if (type instanceof HDLPrimitive) {
+			width = ((HDLPrimitive) type).getWidth().constantEvaluate(null);
+			if (width == null)
 				throw new IllegalArgumentException("HDLPrimitive switch case needs to have constant width");
 		}
 		Expression<?> caseExp = hCaseExp.toVHDL();
@@ -309,7 +315,7 @@ public aspect VHDLStatementTransformation {
 			CaseStatement cs = new CaseStatement(caseExp);
 			for (Map.Entry<HDLSwitchCaseStatement, VHDLContext> e : ctxs.entrySet()) {
 				Alternative alt = createAlternative(cs, e, width);
-				if (e.getValue().unclockedStatements.get(pid)!=null)
+				if (e.getValue().unclockedStatements.get(pid) != null)
 					alt.getStatements().addAll(e.getValue().unclockedStatements.get(pid));
 			}
 			context.addUnclockedStatement(pid, cs, this);
@@ -325,7 +331,9 @@ public aspect VHDLStatementTransformation {
 			if (eval != null)
 				alt = cs.createAlternative(VHDLUtils.toBinaryLiteral(bits.intValue(), eval));
 			else
-				alt = cs.createAlternative(label.toVHDL());//The only valid reason here is an Enum
+				alt = cs.createAlternative(label.toVHDL());// The only valid
+															// reason here is an
+															// Enum
 		} else {
 			alt = cs.createAlternative(Choices.OTHERS);
 		}
@@ -335,7 +343,7 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLSwitchCaseStatement.toVHDL(int pid) {
 		VHDLContext res = new VHDLContext();
 		for (HDLStatement stmnt : getDos()) {
-			res.merge(stmnt.toVHDL(pid));
+			res.merge(stmnt.toVHDL(pid), false);
 		}
 		return res;
 	}
@@ -355,9 +363,10 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLForLoop.toVHDL(int pid) {
 		VHDLContext context = new VHDLContext();
 		for (HDLStatement stmnt : getDos()) {
-			context.merge(stmnt.toVHDL(pid));
+			context.merge(stmnt.toVHDL(pid), false);
 		}
 		VHDLContext res = new VHDLContext();
+		res.merge(context, true);
 		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : context.clockedStatements.entrySet()) {
 			ForStatement fStmnt = new ForStatement(getParam().getName(), getRange().get(0).toVHDL(Direction.TO));
 			fStmnt.getStatements().addAll(e.getValue());
@@ -374,20 +383,18 @@ public aspect VHDLStatementTransformation {
 	public VHDLContext HDLIfStatement.toVHDL(int pid) {
 		VHDLContext thenCtx = new VHDLContext();
 		for (HDLStatement stmnt : getThenDo()) {
-			thenCtx.merge(stmnt.toVHDL(pid));
+			thenCtx.merge(stmnt.toVHDL(pid), false);
 		}
 		VHDLContext elseCtx = new VHDLContext();
 		for (HDLStatement stmnt : getElseDo()) {
-			elseCtx.merge(stmnt.toVHDL(pid));
+			elseCtx.merge(stmnt.toVHDL(pid), false);
 		}
 		Set<HDLRegisterConfig> configs = new HashSet<HDLRegisterConfig>();
 		configs.addAll(thenCtx.clockedStatements.keySet());
 		configs.addAll(elseCtx.clockedStatements.keySet());
 		VHDLContext res = new VHDLContext();
-		res.merge(thenCtx);
-		res.merge(elseCtx);
-		res.clockedStatements.clear();
-		res.unclockedStatements.clear();
+		res.merge(thenCtx, true);
+		res.merge(elseCtx, true);
 		Expression<?> ifExp = getIfExp().toVHDL();
 		for (HDLRegisterConfig config : configs) {
 			IfStatement ifs = new IfStatement(ifExp);
@@ -399,16 +406,16 @@ public aspect VHDLStatementTransformation {
 		}
 		if (thenCtx.unclockedStatements.size() != 0 || elseCtx.unclockedStatements.size() != 0) {
 			IfStatement ifs = new IfStatement(ifExp);
-			if (thenCtx.unclockedStatements.get(pid)!=null)
+			if (thenCtx.unclockedStatements.get(pid) != null)
 				ifs.getStatements().addAll(thenCtx.unclockedStatements.get(pid));
-			if (elseCtx.unclockedStatements.get(pid)!=null)
+			if (elseCtx.unclockedStatements.get(pid) != null)
 				ifs.getElseStatements().addAll(elseCtx.unclockedStatements.get(pid));
 			res.addUnclockedStatement(pid, ifs, this);
 		}
 		return res;
 	}
-	
-	public VHDLContext HDLFunction.toVHDL(int pid){
+
+	public VHDLContext HDLFunction.toVHDL(int pid) {
 		throw new IllegalArgumentException("Not supported");
 	}
 }

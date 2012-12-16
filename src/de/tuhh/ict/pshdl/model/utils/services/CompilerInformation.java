@@ -78,6 +78,7 @@ public class CompilerInformation implements Serializable {
 	public final Map<String, AnnotationInformation> registeredAnnotations = new LinkedHashMap<String, AnnotationInformation>();
 	public final Map<String, GeneratorInformation> registeredGenerators = new LinkedHashMap<String, GeneratorInformation>();
 	public final Map<String, FunctionInformation> registeredFunctions = new LinkedHashMap<String, FunctionInformation>();
+	public final Map<String, IHDLValidator> registeredValidators = new LinkedHashMap<String, IHDLValidator>();
 
 	public CompilerInformation(String version) {
 		super();

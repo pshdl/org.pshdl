@@ -9,6 +9,8 @@ public interface IServiceProvider {
 
 	public Collection<IHDLGenerator> getAllGenerators();
 
+	public Collection<IHDLValidator> getAllValidators();
+
 	public static class ServiceLoaderProvider implements IServiceProvider {
 
 		@Override
@@ -38,6 +40,16 @@ public interface IServiceProvider {
 			ServiceLoader<IHDLGenerator> generators = ServiceLoader.load(IHDLGenerator.class);
 			List<IHDLGenerator> res = new LinkedList<IHDLGenerator>();
 			for (IHDLGenerator gen : generators) {
+				res.add(gen);
+			}
+			return res;
+		}
+
+		@Override
+		public Collection<IHDLValidator> getAllValidators() {
+			ServiceLoader<IHDLValidator> generators = ServiceLoader.load(IHDLValidator.class);
+			List<IHDLValidator> res = new LinkedList<IHDLValidator>();
+			for (IHDLValidator gen : generators) {
 				res.add(gen);
 			}
 			return res;

@@ -14,15 +14,17 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
 import de.tuhh.ict.pshdl.model.validation.*;
-import de.tuhh.ict.pshdl.model.validation.HDLValidator.IntegerMeta;
 import de.tuhh.ict.pshdl.model.validation.RWValidation.Init;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
 public class Insulin {
+
 	public static <T extends HDLObject> T transform(T orig) {
 		RWValidation.annotateReadCount(orig);
 		RWValidation.annotateWriteCount(orig);
@@ -83,7 +85,7 @@ public class Insulin {
 		return ms.apply(pkg);
 	}
 
-	private static <T extends HDLObject> T setParameterOnInstance(T apply) {
+	public static <T extends HDLObject> T setParameterOnInstance(T apply) {
 		ModificationSet ms = new ModificationSet();
 		Set<HDLInterfaceInstantiation> hiis = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		Map<String, HDLExpression> argMap = new HashMap<String, HDLExpression>();
@@ -95,7 +97,7 @@ public class Insulin {
 			HDLInterface hIf = hdi.resolveHIf();
 			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
 				if (hvd.getDirection() == HDLDirection.PARAMETER) {
-					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType().copy()).setDirection(HDLDirection.CONSTANT);
+					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType()).setDirection(HDLDirection.CONSTANT);
 					for (HDLVariable var : hvd.getVariables()) {
 						String argName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
 						if (argName == null)
@@ -394,7 +396,7 @@ public class Insulin {
 			if (HDLQuery.select(HDLVariable.class).from(unit).where(HDLVariable.fName).isEqualTo(defVar.getName()).getFirst() == null) {
 				HDLStatement statement = unit.getStatements().get(0);
 				HDLPrimitive bit = HDLPrimitive.getBit();
-				ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defVar.copy()));
+				ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defVar));
 			}
 		}
 	}
@@ -470,7 +472,7 @@ public class Insulin {
 	private static void fortifyRanges(HDLObject apply, ModificationSet ms) {
 		Collection<HDLRange> ranges = apply.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange range : ranges) {
-			if (HDLValidator.skipExp(range))
+			if (BuiltInValidator.skipExp(range))
 				continue;
 			HDLExpression exp = range.getFrom();
 			if (exp != null) {
@@ -494,7 +496,7 @@ public class Insulin {
 	private static void fortifyAssignments(HDLObject apply, ModificationSet ms) {
 		Collection<HDLAssignment> assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
-			if (HDLValidator.skipExp(assignment))
+			if (BuiltInValidator.skipExp(assignment))
 				continue;
 			HDLType leftType = assignment.getLeft().determineType();
 			HDLExpression exp = assignment.getRight();
@@ -515,7 +517,7 @@ public class Insulin {
 	private static void fortifyOpExpressions(HDLObject apply, ModificationSet ms) {
 		Collection<HDLExpression> opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		for (HDLExpression opExpression : opEx) {
-			if (HDLValidator.skipExp(opExpression))
+			if (BuiltInValidator.skipExp(opExpression))
 				continue;
 			HDLTypeInferenceInfo inferenceInfo = null;
 			HDLExpression left = null;
@@ -573,7 +575,7 @@ public class Insulin {
 	private static void fortify(ModificationSet ms, HDLExpression exp, HDLType targetType) {
 		if (targetType instanceof HDLPrimitive) {
 			HDLPrimitive pt = (HDLPrimitive) targetType;
-			if (HDLValidator.skipExp(exp))
+			if (BuiltInValidator.skipExp(exp))
 				return;
 			HDLType lt = exp.determineType();
 			if (!targetType.equals(lt)) {
@@ -629,8 +631,8 @@ public class Insulin {
 			case ASSGN:
 				continue;
 			}
-			op = op.setLeft(hdlAssignment.getLeft().copy()).setRight(hdlAssignment.getRight().copy());
-			HDLAssignment newAss = new HDLAssignment().setLeft(hdlAssignment.getLeft().copy()).setType(HDLAssignmentType.ASSGN).setRight(op);
+			op = op.setLeft(hdlAssignment.getLeft()).setRight(hdlAssignment.getRight());
+			HDLAssignment newAss = new HDLAssignment().setLeft(hdlAssignment.getLeft()).setType(HDLAssignmentType.ASSGN).setRight(op);
 			ms.replace(hdlAssignment, newAss);
 		}
 		return ms.apply(apply);
@@ -678,8 +680,8 @@ public class Insulin {
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
 						String varName = ref.getVarRefName().getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
 						HDLQualifiedName hVarName = new HDLQualifiedName(varName);
-						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType().copy()).addVariables(
-								new HDLVariable().setName(varName).setDefaultValue(ass.getRight().copy()));
+						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType()).addVariables(
+								new HDLVariable().setName(varName).setDefaultValue(ass.getRight()));
 						replacements.add(hvd);
 						BigInteger shift = BigInteger.ZERO;
 						for (int j = bits.size() - 1; j >= 0; j--) {
@@ -688,7 +690,7 @@ public class Insulin {
 							BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
 							HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add));
 							HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
-							HDLVariableRef newRef = ref.setBits(HDLObject.asList(r.copy())).copy();
+							HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
 							HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);
 							replacements.add(newAss);
 							shift = add.add(BigInteger.ONE);
@@ -701,7 +703,7 @@ public class Insulin {
 				// b{1,4:5} == b{1}#b{4:5}
 				HDLConcat concat = new HDLConcat();
 				for (HDLRange r : bits) {
-					concat = concat.addCats(ref.copy().setBits(HDLObject.asList(r.copy())));
+					concat = concat.addCats(ref.setBits(HDLObject.asList(r)));
 				}
 				ms.replace(ref, concat);
 			}
@@ -736,8 +738,8 @@ public class Insulin {
 					} else {
 						HDLRegisterConfig register = null;
 						if (hdv.getRegister() != null)
-							register = hdv.getRegister().copy();
-						ms.insertAfter(origHdv, new HDLVariableDeclaration().setRegister(register).setType(origHdv.resolveType().copy()).addVariables(outVar.copy()));
+							register = hdv.getRegister();
+						ms.insertAfter(origHdv, new HDLVariableDeclaration().setRegister(register).setType(origHdv.resolveType()).addVariables(outVar));
 						hdv = hdv.removeVariables(var);
 					}
 

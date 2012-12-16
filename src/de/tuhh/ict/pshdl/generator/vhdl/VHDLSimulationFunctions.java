@@ -121,7 +121,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	private HDLAssignment setValue(HDLVariableRef ref, int value, IHDLObject container) {
 		HDLManip val = new HDLManip().setCastTo(HDLPrimitive.getBit()).setType(HDLManipType.CAST).setTarget(HDLLiteral.get(value));
-		return new HDLAssignment().setLeft(ref.copy()).setRight(val).copyDeepFrozen(container);
+		return new HDLAssignment().setLeft(ref).setRight(val).copyDeepFrozen(container);
 	}
 
 	private HDLVariableRef getVarRef(HDLExpression hdlExpression) {

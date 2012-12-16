@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
+import java.math.*;
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -74,7 +75,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
 		String prefix = getVar().getName();
 		for (HDLVariableDeclaration hvd : ports) {
-			if (hvd.getDirection() == HDLDirection.PARAMETER) {
+			switch (hvd.getDirection()) {
+			case PARAMETER: {
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
 					String newName = prefix + "_" + hdlVariable.getName();
@@ -87,6 +89,22 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 						ms.replace(ref, ref.setVar(HDLQualifiedName.create(newName)));
 					}
 				}
+				break;
+			}
+			case CONSTANT: {
+				ArrayList<HDLVariable> variables = hvd.getVariables();
+				for (HDLVariable hdlVariable : variables) {
+					BigInteger constant = hdlVariable.getDefaultValue().constantEvaluate(null);
+					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(resolveHIf).where(HDLVariableRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
+					for (HDLVariableRef ref : refs) {
+						ms.replace(ref, HDLLiteral.get(constant));
+					}
+				}
+				break;
+			}
+			default:
+				break;
+
 			}
 		}
 		HDLInterface newIF = ms.apply(resolveHIf);

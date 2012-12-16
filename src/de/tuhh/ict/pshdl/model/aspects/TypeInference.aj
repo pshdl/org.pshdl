@@ -9,6 +9,7 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 public aspect TypeInference {
 
@@ -103,12 +104,12 @@ public aspect TypeInference {
 		if (bits.size() == 1 && bits.get(0).getFrom() == null)
 			return HDLPrimitive.getBit();
 		Iterator<HDLRange> iter = bits.iterator();
-		HDLExpression width = HDLPrimitives.simplifyWidth(this, iter.next().getWidth().copy()).copy();
+		HDLExpression width = HDLPrimitives.simplifyWidth(this, iter.next().getWidth());
 		while (iter.hasNext()) {
-			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth().copy());
-			width = HDLPrimitives.simplifyWidth(this, width).copy();
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth());
+			width = HDLPrimitives.simplifyWidth(this, width);
 		}
-		return HDLPrimitive.getBitvector().setWidth(width.copy()).setContainer(this);
+		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
 	}
 
 	public HDLType HDLArithOp.determineType() {

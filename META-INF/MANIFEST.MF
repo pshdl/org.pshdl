@@ -36,5 +36,6 @@ Export-Package: de.tuhh.ict.pshdl.generator.vhdl;
    de.tuhh.ict.pshdl.generator.vhdl,
    de.tuhh.ict.pshdl.model.evaluation,
    de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.validation;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model"
+ de.tuhh.ict.pshdl.model.validation;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model",
+ de.tuhh.ict.pshdl.model.validation.builtin
 
