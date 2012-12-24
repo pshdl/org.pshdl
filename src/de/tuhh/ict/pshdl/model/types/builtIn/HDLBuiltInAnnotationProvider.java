@@ -68,11 +68,15 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case genSignal:
 			case VHDLLatchable:
 			case VHDLNoExplicitReset:
-			case VHDLComponent:
 			case reset:
 			case clock:
 				if (value != null)
 					return this + " does not expect any arguments";
+				break;
+			case VHDLComponent:
+				if (!((value == null) || "declare".equals(value) || "import".equals(value))) {
+					return this + " only accepts 'declare' or 'import' as parameter. If no parameter is supplied import is assumed.";
+				}
 				break;
 			case range:
 				if (value == null)

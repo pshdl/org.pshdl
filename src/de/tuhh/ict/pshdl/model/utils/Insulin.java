@@ -174,6 +174,9 @@ public class Insulin {
 			if (!doNotInit.contains(hvd.getDirection())) {
 				HDLRegisterConfig register = hvd.getRegister();
 				for (HDLVariable var : hvd.getVariables()) {
+					Set<String> meta = var.getMeta(Init.full);
+					if ((meta != null) && (hvd.getRegister() == null) && (var.getDimensions().size() == 0))
+						continue;
 					HDLExpression defaultValue = getDefaultValue(hvd, register, var);
 					if ((defaultValue != null) && (hvd.getContainer(HDLInterface.class) == null)) {
 						HDLVariableRef setVar = new HDLVariableRef().setVar(var.asRef());

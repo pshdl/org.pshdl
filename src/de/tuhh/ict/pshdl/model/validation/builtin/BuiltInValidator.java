@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -59,24 +60,22 @@ public class BuiltInValidator implements IHDLValidator {
 			checkProessWrite(pkg, problems, hContext);
 			checkGenerators(pkg, problems, hContext);
 			checkInputReg(pkg, problems, hContext);
+			checkLiteralConcat(pkg, problems);
 			// TODO Validate bitWidth mismatch
+			// checkBitWidthAssignments(pkg, problems, hContext);
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
 			// collision
 			// TODO check for proper variable naming
 			// TODO check for valid parameter
-			// TODO Check for unconstrained arrays in switch case
-			// TODO Check for covered cases in switch clause
-			// TODO Check for only one default clause
+			checkSwitchStatements(pkg, problems, hContext);
 			// TODO Check for Range direction
 			// TODO Type checking!
-			// TODO HDLConcat need known width
 			// TODO Check for combinatorical loop.
 			// TODO Check for multiple assignment in same Scope
 			// TODO No processes in Module
 			// TODO no I/O variables in block
-			// TODO Switch expression needs to have width (no natural etc..)
 			// TODO no Registers in Testbench
 			// TODO warn for name collision in generators
 			// TODO check for same name with different case
@@ -86,6 +85,128 @@ public class BuiltInValidator implements IHDLValidator {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void checkBitWidthAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLAssignment> asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
+		for (HDLAssignment ass : asss) {
+			HDLEvaluationContext context = getContext(hContext, ass);
+			HDLType lType = ass.getLeft().determineType();
+			HDLType rType = ass.getRight().determineType();
+			switch (lType.getClassType()) {
+			case HDLEnum:
+				if (rType.getClassType() != HDLClass.HDLEnum)
+					problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_ENUM, ass));
+				break;
+			case HDLPrimitive:
+				if (rType.getClassType() != HDLClass.HDLPrimitive) {
+					problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_PRIMITIVE, ass));
+				} else {
+					HDLPrimitive left = (HDLPrimitive) lType;
+					HDLPrimitive right = (HDLPrimitive) rType;
+					switch (left.getType()) {
+					case BIT:
+						if (right.getType() != HDLPrimitiveType.BIT) {
+							if (right.getWidth() != null) {
+								BigInteger w = right.getWidth().constantEvaluate(context);
+								if (!w.equals(BigInteger.ONE))
+									problems.add(new Problem(ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR, ass.getRight(), ass));
+							}
+						}
+						break;
+					case BITVECTOR:
+						break;
+					case BOOL:
+						break;
+					case INT:
+						break;
+					case INTEGER:
+						break;
+					case NATURAL:
+						break;
+					case STRING:
+						break;
+					case UINT:
+						break;
+					default:
+						break;
+
+					}
+				}
+				break;
+			case HDLInterface:
+			default:
+				problems.add(new Problem(ErrorCode.ASSIGNEMENT_NOT_SUPPORTED, ass));
+			}
+		}
+	}
+
+	private void checkLiteralConcat(HDLPackage pkg, Set<Problem> problems) {
+		Set<HDLConcat> concats = pkg.getAllObjectsOf(HDLConcat.class, true);
+		for (HDLConcat hdlConcat : concats) {
+			ArrayList<HDLExpression> cats = hdlConcat.getCats();
+			for (HDLExpression exp : cats) {
+				HDLType type = exp.determineType();
+				if (type instanceof HDLPrimitive) {
+					HDLPrimitive prim = (HDLPrimitive) type;
+					switch (prim.getType()) {
+					case BIT:
+					case BITVECTOR:
+					case INT:
+					case UINT:
+						break;
+					case BOOL:
+					case INTEGER:
+					case NATURAL:
+					case STRING:
+						problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, prim));
+						break;
+					}
+				} else
+					problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, type));
+
+			}
+		}
+	}
+
+	private void checkSwitchStatements(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		Set<HDLSwitchStatement> switches = pkg.getAllObjectsOf(HDLSwitchStatement.class, true);
+		for (HDLSwitchStatement switchStatement : switches) {
+			boolean defaultFound = false;
+			ArrayList<HDLSwitchCaseStatement> cases = switchStatement.getCases();
+			Set<BigInteger> values = new HashSet<BigInteger>();
+			Set<HDLQualifiedName> enums = new HashSet<HDLQualifiedName>();
+			HDLType type = switchStatement.getCaseExp().determineType();
+			if (type instanceof HDLPrimitive) {
+				HDLPrimitive primitive = (HDLPrimitive) type;
+				if (primitive.getWidth() == null)
+					problems.add(new Problem(ErrorCode.SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
+			}
+			boolean isEnum = type instanceof HDLEnum;
+			for (HDLSwitchCaseStatement caseStatement : cases) {
+				HDLExpression label = caseStatement.getLabel();
+				if (label == null) {
+					if (defaultFound)
+						problems.add(new Problem(ErrorCode.SWITCH_MULTIPLE_DEFAULT, caseStatement));
+					defaultFound = true;
+				} else {
+					if (!isEnum) {
+						BigInteger constant = label.constantEvaluate(null);
+						if (constant == null) {
+							problems.add(new Problem(ErrorCode.SWITCH_LABEL_NOT_CONSTANT, caseStatement));
+						} else {
+							if (!values.add(constant))
+								problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
+						}
+					} else {
+						if (!enums.add(((HDLEnumRef) label).getVarRefName()))
+							problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
+					}
+				}
+			}
+			if (!defaultFound)
+				problems.add(new Problem(ErrorCode.SWITCH_NO_DEFAULT, switchStatement));
 		}
 	}
 
@@ -433,28 +554,28 @@ public class BuiltInValidator implements IHDLValidator {
 					"Check the installed generators of the compiler");
 		}
 		case INTERFACE_IN_PORT_NEVER_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.node;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			HDLVariable var = (HDLVariable) problem.context;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName()
 							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
 					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
 		}
 		case INTERFACE_OUT_PORT_NEVER_READ: {
-			HDLVariable var = (HDLVariable) problem.node;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			HDLVariable var = (HDLVariable) problem.context;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No read access to the out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName() + " is never read, altough it is marked as out port", "Do something with the port");
 		}
 		case INTERFACE_OUT_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.node;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			HDLVariable var = (HDLVariable) problem.context;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "The out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is written", "It appears that the port "
 					+ var.getName() + " is written to, altough it is marked as out port", "Remove the write access");
 		}
 		case INTERFACE_UNUSED_PORT: {
-			HDLVariable var = (HDLVariable) problem.node;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.context;
+			HDLVariable var = (HDLVariable) problem.context;
+			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "The port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is never read or written", "It appears that the port "
 					+ var.getName() + " is neither read, nor written to. You might want to check wether this is intentional", "Remove the port if it is not necessary",
 					"Do something useful with it");

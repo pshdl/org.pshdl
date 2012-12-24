@@ -72,16 +72,16 @@ public class RWValidation {
 					HDLDirection dir = hdlVariable.getDirection();
 					// XXX Take care of inout
 					if (!read && !written && !((dir == PARAMETER) || (dir == CONSTANT))) {
-						problems.add(new Problem(ErrorCode.INTERFACE_UNUSED_PORT, hdlVariable, hii, null));
+						problems.add(new Problem(ErrorCode.INTERFACE_UNUSED_PORT, hii, hdlVariable, null));
 					} else {
 						if (!read && (dir == OUT)) {
-							problems.add(new Problem(ErrorCode.INTERFACE_OUT_PORT_NEVER_READ, hdlVariable, hii, null));
+							problems.add(new Problem(ErrorCode.INTERFACE_OUT_PORT_NEVER_READ, hii, hdlVariable, null));
 						}
 						if (written && (dir == OUT)) {
-							problems.add(new Problem(ErrorCode.INTERFACE_OUT_WRITTEN, hdlVariable, hii, null));
+							problems.add(new Problem(ErrorCode.INTERFACE_OUT_WRITTEN, hii, hdlVariable, null));
 						}
 						if (!written && (dir == IN)) {
-							problems.add(new Problem(ErrorCode.INTERFACE_IN_PORT_NEVER_WRITTEN, hdlVariable, hii, null));
+							problems.add(new Problem(ErrorCode.INTERFACE_IN_PORT_NEVER_WRITTEN, hii, hdlVariable, null));
 						}
 					}
 				}

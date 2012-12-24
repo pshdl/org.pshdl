@@ -86,8 +86,28 @@ public aspect VHDLStatementTransformation {
 		ConcurrentStatement instantiation;
 		// Perform instantiation as Component rather than Entity if
 		// VHDLComponent Annotation is present
+		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		if (hid != null && hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent) != null) {
-			res.addImport(VHDLPackageTransformation.getNameRef(asRef));
+			HDLAnnotation anno = hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent);
+			if ("declare".equals(anno.getValue())){
+				Component c=new Component(asRef.getLastSegment().toString());
+				VHDLContext cContext=new VHDLContext();
+				for (HDLVariableDeclaration port : ports) {
+					cContext.merge(port.toVHDL(-1), true);
+				}
+				for (Signal signal : cContext.ports) {
+					c.getPort().add(signal);
+				}
+				for (ConstantDeclaration cd : cContext.constants) {
+					for (Object obj:cd.getObjects())
+						c.getGeneric().add((Constant)obj);
+				}
+				for (Constant constant : cContext.generics) {
+					c.getGeneric().add(constant);
+				}
+				res.addTypeDeclaration(c, false);
+			} else
+				res.addImport(VHDLPackageTransformation.getNameRef(asRef));
 			Component entity = new Component(asRef.getLastSegment().toString());
 			ComponentInstantiation inst = new ComponentInstantiation(ifName, entity);
 			portMap = inst.getPortMap();
@@ -100,7 +120,6 @@ public aspect VHDLStatementTransformation {
 			genericMap = inst.getGenericMap();
 			instantiation = inst;
 		}
-		ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
 		for (HDLVariableDeclaration hvd : ports) {
 			if (inAndOut.contains(hvd.getDirection())) {
 				Collection<HDLAnnotation> typeAnno = HDLQuery.select(HDLAnnotation.class).from(hvd).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.VHDLType.toString())

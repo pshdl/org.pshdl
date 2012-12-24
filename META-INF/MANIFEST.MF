@@ -8,7 +8,8 @@ Require-Bundle: de.upb.hni.vmagic;bundle-version="1.0.0",
  org.antlr.runtime;bundle-version="3.2.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.tuhh.ict.pshdl.generator.vhdl;
+Export-Package: de.tuhh.ict.pshdl,
+ de.tuhh.ict.pshdl.generator.vhdl;
   uses:="de.upb.hni.vmagic.declaration,
    de.upb.hni.vmagic.expression,
    de.tuhh.ict.pshdl.model.utils.services,
@@ -30,6 +31,7 @@ Export-Package: de.tuhh.ict.pshdl.generator.vhdl;
    de.tuhh.ict.pshdl.generator.vhdl,
    de.tuhh.ict.pshdl.model.evaluation,
    de.tuhh.ict.pshdl.model",
+ de.tuhh.ict.pshdl.model.types.builtIn.busses,
  de.tuhh.ict.pshdl.model.utils;uses:="de.tuhh.ict.pshdl.model.utils.services,de.tuhh.ict.pshdl.model.evaluation,de.tuhh.ict.pshdl.model",
  de.tuhh.ict.pshdl.model.utils.services;
   uses:="de.upb.hni.vmagic.expression,
