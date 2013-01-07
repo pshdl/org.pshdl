@@ -108,6 +108,7 @@ public class HDLLibrary {
 	 * @return the type if found
 	 */
 	public HDLVariable resolveVariable(ArrayList<String> imports, HDLQualifiedName type) {
+		imports.add("pshdl.*");
 		HDLVariable hdlType = variables.get(type);
 		if (hdlType == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
@@ -142,6 +143,7 @@ public class HDLLibrary {
 	 * @return the type if found
 	 */
 	public HDLFunction resolveFunction(ArrayList<String> imports, HDLQualifiedName type) {
+		imports.add("pshdl.*");
 		HDLFunction hdlType = functions.get(type);
 		if (hdlType == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
@@ -176,6 +178,7 @@ public class HDLLibrary {
 	 * @return the type if found
 	 */
 	public HDLType resolve(ArrayList<String> imports, HDLQualifiedName type) {
+		imports.add("pshdl.*");
 		HDLType hdlType = types.get(type);
 		if (hdlType == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +

@@ -189,6 +189,8 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			return true;
 		if (obj == null)
 			return false;
+		if (hashCode() != obj.hashCode())
+			return false;
 		if (!(obj instanceof HDLObject))
 			return false;
 		return true;

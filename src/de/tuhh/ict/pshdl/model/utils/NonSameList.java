@@ -3,7 +3,7 @@ package de.tuhh.ict.pshdl.model.utils;
 import java.util.*;
 
 public class NonSameList<T> extends AbstractSet<T> implements Set<T> {
-	private Map<T, List<T>> map = new LinkedHashMap<T, List<T>>();
+	private Map<Integer, List<T>> map = new LinkedHashMap<Integer, List<T>>();
 
 	public NonSameList(Collection<T> value) {
 		super();
@@ -15,11 +15,11 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T> {
 
 	@Override
 	public boolean add(T arg0) {
-		List<T> list = map.get(arg0);
+		List<T> list = map.get(System.identityHashCode(arg0));
 		if (list == null) {
 			list = new LinkedList<T>();
 			list.add(arg0);
-			map.put(arg0, list);
+			map.put(System.identityHashCode(arg0), list);
 		} else {
 			for (T t : list) {
 				if (t == arg0)
@@ -37,7 +37,7 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T> {
 
 	@Override
 	public boolean contains(Object arg0) {
-		List<T> list = map.get(arg0);
+		List<T> list = map.get(System.identityHashCode(arg0));
 		if (list == null)
 			return false;
 		for (T t : list) {
@@ -105,7 +105,7 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T> {
 
 	@Override
 	public boolean remove(Object arg0) {
-		List<T> list = map.get(arg0);
+		List<T> list = map.get(System.identityHashCode(arg0));
 		if (list == null)
 			return false;
 		return list.remove(arg0);

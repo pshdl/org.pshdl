@@ -27,7 +27,7 @@ public class VHDLContext {
 	public LinkedList<ConstantDeclaration> constants = new LinkedList<ConstantDeclaration>();
 	public LinkedList<ConstantDeclaration> constantsPkg = new LinkedList<ConstantDeclaration>();
 	public LinkedList<Constant> generics = new LinkedList<Constant>();
-	public LinkedList<ObjectDeclaration<?>> internals = new LinkedList<ObjectDeclaration<?>>();
+	public LinkedList<DeclarativeItem> internals = new LinkedList<DeclarativeItem>();
 	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
 	public LinkedList<BlockDeclarativeItem> externalTypes = new LinkedList<BlockDeclarativeItem>();
 	public Set<HDLQualifiedName> imports = new TreeSet<HDLQualifiedName>();
@@ -212,6 +212,10 @@ public class VHDLContext {
 	 */
 	public void setNoSensitivity(int pid) {
 		noSensitivity.put(pid, true);
+	}
+
+	public void addComponent(Component c) {
+		internals.add(c);
 	}
 
 }

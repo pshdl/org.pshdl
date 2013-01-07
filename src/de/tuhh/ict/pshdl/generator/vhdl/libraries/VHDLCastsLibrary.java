@@ -40,7 +40,11 @@ public class VHDLCastsLibrary {
 	public static final PackageDeclaration PACKAGE;
 	public static final FunctionDeclaration RESIZE_SLV = new FunctionDeclaration("resizeSLV", StdLogic1164.STD_LOGIC_VECTOR, new Constant("s", StdLogic1164.STD_LOGIC_VECTOR),
 			new Constant("newSize", Standard.NATURAL));
-
+	public static final FunctionDeclaration RESIZE_BIT = new FunctionDeclaration("resizeBit", StdLogic1164.STD_LOGIC, new Constant("s", StdLogic1164.STD_LOGIC), new Constant(
+			"newSize", Standard.NATURAL));
+	public static final FunctionDeclaration RESIZE_INT = new FunctionDeclaration("resizeInt", NumericStd.SIGNED, new Constant("s", StdLogic1164.STD_LOGIC), new Constant("newSize",
+			Standard.NATURAL));
+	private static final Map<FunctionCallMap, FunctionCallMap> castMap = new HashMap<VHDLCastsLibrary.FunctionCallMap, VHDLCastsLibrary.FunctionCallMap>();
 	static {
 		PACKAGE = new PackageDeclaration("pshdl.Casts");
 		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
@@ -61,6 +65,12 @@ public class VHDLCastsLibrary {
 				}
 			}
 		}
+		putCastMap(HDLPrimitiveType.INT, HDLPrimitiveType.UINT, null);
+		putCastMap(HDLPrimitiveType.INT, HDLPrimitiveType.BITVECTOR, null);
+		putCastMap(HDLPrimitiveType.INT, HDLPrimitiveType.INTEGER, NumericStd.TO_INTEGER);
+		putCastMap(HDLPrimitiveType.UINT, HDLPrimitiveType.INT, null);
+		putCastMap(HDLPrimitiveType.UINT, HDLPrimitiveType.BITVECTOR, null);
+
 		declarations.add(STR_TO_UNSIGNED);
 		// declarations.add(STR_TO_SIGNED);
 		declarations.add(ACCESS_BITS_SLV);
@@ -73,6 +83,11 @@ public class VHDLCastsLibrary {
 		declarations.add(MAX);
 		declarations.add(MIN);
 		declarations.add(ABS);
+	}
+
+	private static void putCastMap(HDLPrimitiveType left, HDLPrimitiveType right, FunctionDeclaration call) {
+		FunctionCallMap callMap = new FunctionCallMap(left, right, call);
+		castMap.put(callMap, callMap);
 	}
 
 	public static SubtypeIndication getType(HDLPrimitiveType left) {
@@ -129,12 +144,57 @@ public class VHDLCastsLibrary {
 		throw new IllegalArgumentException("Unexpected Type:" + left);
 	}
 
+	private static class FunctionCallMap {
+		public final HDLPrimitiveType from;
+		public final HDLPrimitiveType to;
+		public final FunctionDeclaration call;
+
+		public FunctionCallMap(HDLPrimitiveType from, HDLPrimitiveType to, FunctionDeclaration call) {
+			super();
+			this.from = from;
+			this.to = to;
+			this.call = call;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((from == null) ? 0 : from.hashCode());
+			result = (prime * result) + ((to == null) ? 0 : to.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			FunctionCallMap other = (FunctionCallMap) obj;
+			if (from != other.from)
+				return false;
+			if (to != other.to)
+				return false;
+			return true;
+		}
+	}
+
 	public static Expression<?> cast(Expression<?> vhdlExpr, HDLPrimitiveType from, HDLPrimitiveType to) {
 		if (from.equals(to))
 			return vhdlExpr;
+		FunctionCallMap callMap = castMap.get(new FunctionCallMap(from, to, null));
 		String name = getCastName(from, to);
 		Function resolve = PACKAGE.getScope().resolve(name, Function.class);
 		FunctionCall call = new FunctionCall(resolve);
+		if (callMap != null) {
+			if (callMap.call == null) {
+				return new TypeConversion(getType(to), vhdlExpr);
+			}
+			call = new FunctionCall(callMap.call);
+		}
 		call.getParameters().add(new AssociationElement(vhdlExpr));
 		return call;
 	}

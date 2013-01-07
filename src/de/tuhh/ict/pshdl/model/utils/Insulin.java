@@ -32,6 +32,7 @@ public class Insulin {
 		apply = includeGenerators(apply);
 		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
+		apply = pushSignIntoLiteral(apply);
 		// System.out.println("Insulin.transform()" + apply);
 		// apply.validateAllFields(null, true);
 		apply = generateClkAndReset(apply);
@@ -46,6 +47,24 @@ public class Insulin {
 		return apply;
 	}
 
+	private static <T extends HDLObject> T pushSignIntoLiteral(T pkg) {
+		Set<HDLLiteral> literals = pkg.getAllObjectsOf(HDLLiteral.class, true);
+		ModificationSet ms = new ModificationSet();
+		for (HDLLiteral hdlLiteral : literals) {
+			if (hdlLiteral.getContainer() instanceof HDLManip) {
+				HDLManip manip = (HDLManip) hdlLiteral.getContainer();
+				if (manip.getType() == HDLManipType.ARITH_NEG) {
+					if (hdlLiteral.getVal().charAt(0) == '-') {
+						ms.replace(manip, hdlLiteral.setVal(hdlLiteral.getVal().substring(1)));
+					} else {
+						ms.replace(manip, hdlLiteral.setVal("-" + hdlLiteral.getVal()));
+					}
+				}
+			}
+		}
+		return ms.apply(pkg);
+	}
+
 	public static <T extends HDLObject> T fixDoubleNegate(T pkg) {
 		ModificationSet ms = new ModificationSet();
 		Set<HDLManip> manips = pkg.getAllObjectsOf(HDLManip.class, true);
@@ -56,6 +75,13 @@ public class Insulin {
 					HDLManip innerManip = (HDLManip) target;
 					if (innerManip.getType() == HDLManipType.ARITH_NEG) {
 						ms.replace(manip, innerManip.getTarget());
+					}
+				}
+				if (target instanceof HDLLiteral) {
+					HDLLiteral lit = (HDLLiteral) target;
+					BigInteger valueAsBigInt = lit.getValueAsBigInt();
+					if (valueAsBigInt.signum() <= 0) {
+						ms.replace(manip, HDLLiteral.get(valueAsBigInt.negate()));
 					}
 				}
 			}
@@ -683,9 +709,8 @@ public class Insulin {
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
 						String varName = ref.getVarRefName().getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
 						HDLQualifiedName hVarName = new HDLQualifiedName(varName);
-						HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(ref.determineType()).addVariables(
-								new HDLVariable().setName(varName).setDefaultValue(ass.getRight()));
-						replacements.add(hvd);
+						replacements
+								.add(new HDLVariableDeclaration().setType(ref.determineType()).addVariables(new HDLVariable().setName(varName).setDefaultValue(ass.getRight())));
 						BigInteger shift = BigInteger.ZERO;
 						for (int j = bits.size() - 1; j >= 0; j--) {
 							HDLRange r = bits.get(j);

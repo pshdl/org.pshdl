@@ -94,7 +94,11 @@ public aspect TypeInference {
 
 	public HDLType HDLLiteral.determineType() {
 		// Actually depends on context
-		return HDLPrimitive.target(getVal().charAt(0) != '-');
+		boolean isSigned=getVal().charAt(0) != '-';
+		BigInteger val=getValueAsBigInt();
+		if (val.bitLength()>31)
+			return HDLPrimitive.getUint().setWidth(HDLLiteral.get(val.bitLength()));
+		return HDLPrimitive.target(isSigned);
 	}
 
 	public HDLType HDLVariableRef.determineType() {

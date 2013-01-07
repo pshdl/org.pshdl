@@ -358,6 +358,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkConstantBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		// XXX Check Array Dimensions
 		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection)
 				.isEqualTo(HDLDirection.CONSTANT).or(HDLDirection.PARAMETER);
 		for (HDLVariableDeclaration hvd : constants) {
@@ -393,11 +394,12 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Collection<HDLVariableRef> asss = unit.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : asss) {
+		Collection<HDLVariableRef> refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : refs) {
 			if (skipExp(ref))
 				continue;
-			compareBoundaries(problems, hContext, ref, ref.resolveVar().getDimensions(), ref.getArray());
+			ArrayList<HDLExpression> dimensions = ref.resolveVar().getDimensions();
+			compareBoundaries(problems, hContext, ref, dimensions, ref.getArray());
 			if (ref instanceof HDLInterfaceRef) {
 				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
 				HDLVariable var = hir.resolveHIf();
@@ -406,29 +408,117 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
+	/**
+	 * Compares whether the actual access array fits within the declared array
+	 * dimensions
+	 * 
+	 * @param problems
+	 * @param hContext
+	 * @param ref
+	 *            the subject upon which the error will be declared
+	 * @param dimensions
+	 *            the declared dimensions of the variable
+	 * @param array
+	 *            the accessed dimensions of the variable
+	 */
 	private static void compareBoundaries(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, ArrayList<HDLExpression> dimensions,
 			ArrayList<HDLExpression> array) {
 		if (dimensions.size() < array.size()) {
 			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
-		} else {
-			int dim = 0;
-			for (HDLExpression arr : array) {
-				HDLEvaluationContext context = getContext(hContext, arr);
-				ValueRange accessRange = arr.determineRange(context);
-				ValueRange arrayRange = dimensions.get(dim).determineRange(context);
-				arrayRange = new ValueRange(BigInteger.ZERO, arrayRange.to.subtract(BigInteger.ONE));
-				String info = "Expected value range:" + accessRange;
-				if (accessRange.to.signum() < 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
-				else if (accessRange.from.signum() < 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
-				ValueRange commonRange = arrayRange.and(accessRange);
-				if (commonRange == null)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
-				else if (accessRange.to.compareTo(arrayRange.to) > 0)
-					problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+			return;
+		} else if ((dimensions.size() > array.size())) {
+			// Check whether dimensions have been left out. This is only ok when
+			// it is an assignment and the other dimension is the same
+			HDLClass containerType = ref.getContainer().getClassType();
+			if (containerType == HDLClass.HDLAssignment) {
+				HDLAssignment ass = (HDLAssignment) ref.getContainer();
+				HDLReference left = ass.getLeft();
+				if (left.getClassType() == HDLClass.HDLEnumRef) {
+					problems.add(new Problem(ErrorCode.ASSIGNMENT_ENUM_NOT_WRITABLE, left));
+				} else {
+					HDLVariableRef varRef = (HDLVariableRef) left;
+					ArrayList<HDLExpression> targetDim = varRef.resolveVar().getDimensions();
+					for (int i = 0; i < varRef.getArray().size(); i++) {
+						if (targetDim.size() == 0) {
+							problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, varRef));
+							return;
+						}
+						targetDim.remove(0);
+					}
+					if (left != ref) {
+						validateArrayAssignment(problems, hContext, ref, ass, left, targetDim);
+					} else {
+						if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
+							problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
+						}
+					}
+				}
+			} else if (containerType == HDLClass.HDLVariable) {
+				HDLVariable var = (HDLVariable) ref.getContainer();
+				validateArrayAssignment(problems, hContext, ref, var, var, var.getDimensions());
+			} else
+				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION, ref));
+		}
+		int dim = 0;
+		for (HDLExpression arr : array) {
+			HDLEvaluationContext context = getContext(hContext, arr);
+			ValueRange accessRange = arr.determineRange(context);
+			if (accessRange == null) {
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, arr));
+				break;
+			}
+			ValueRange arrayRange = dimensions.get(dim).determineRange(context);
+			if (arrayRange == null) {
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
+				break;
+			}
+			arrayRange = new ValueRange(BigInteger.ZERO, arrayRange.to.subtract(BigInteger.ONE));
+			String info = "Expected value range:" + accessRange;
+			if (accessRange.to.signum() < 0)
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+			else if (accessRange.from.signum() < 0)
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+			ValueRange commonRange = arrayRange.and(accessRange);
+			if (commonRange == null)
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+			else if (accessRange.to.compareTo(arrayRange.to) > 0)
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
 
-				dim++;
+			dim++;
+		}
+	}
+
+	private static void validateArrayAssignment(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, IHDLObject ass, IHDLObject left,
+			ArrayList<HDLExpression> targetDim) {
+		HDLVariable right = ref.resolveVar();
+		ArrayList<HDLExpression> sourceDim = right.getDimensions();
+		for (int i = 0; i < ref.getArray().size(); i++) {
+			if (sourceDim.size() == 0) {
+				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
+				return;
+			}
+			sourceDim.remove(0);
+		}
+		if (targetDim.size() != sourceDim.size())
+			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ass));
+		else {
+			HDLEvaluationContext context = getContext(hContext, ass);
+			for (int i = 0; i < targetDim.size(); i++) {
+				HDLExpression target = targetDim.get(i);
+				HDLExpression source = sourceDim.get(i);
+				BigInteger t = target.constantEvaluate(context);
+				BigInteger s = source.constantEvaluate(context);
+				if (s == null) {
+					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, right));
+				}
+				if (t == null) {
+					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, left));
+				}
+				if ((t != null) && (s != null)) {
+					if (!s.equals(t)) {
+						problems.add(new Problem(ErrorCode.ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS, ass));
+					}
+				}
 			}
 		}
 	}
@@ -461,190 +551,7 @@ public class BuiltInValidator implements IHDLValidator {
 
 	@Override
 	public HDLAdvise advise(Problem problem) {
-		switch ((ErrorCode) problem.code) {
-		case ANNOTATION_INVALID:
-			String annoName = ((HDLAnnotation) problem.node).getName();
-			return new HDLAdvise(
-					problem,
-					"The String you provided is incorrect for this annotation: " + problem.info,
-					"Some annotations can have additional information. Those are stated as a String in double quotes. The interpretation of this String is depending on the Annotation. The String you provided however was not correct.",
-					"Check the message for information what might be incorrect", "Check the documentation for the " + annoName + " Annotation");
-		case ANNOTATION_UNKNOWN: {
-			String lastName = ((HDLAnnotation) problem.node).getName();
-			Score[] topMatches = LevenshteinDistance.getTopMatches(lastName, true, HDLAnnotations.knownAnnotations());
-			StringBuilder matchSolution = new StringBuilder();
-			matchSolution.append("Annotations that you might have meant: ");
-			for (int i = 0; i < Math.min(3, topMatches.length); i++) {
-				Score score = topMatches[i];
-				if (i != 0)
-					matchSolution.append(", ");
-				matchSolution.append('@').append(score.string);
-			}
-			return new HDLAdvise(problem, "The annotation: " + lastName + " is not known",
-					"The annotation you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", matchSolution.toString(),
-					"Check the installed libraries of the compiler");
-		}
-		case ARRAY_INDEX_NEGATIVE:
-			return new HDLAdvise(problem, "The index of the array can only be negative",
-					"When an array is accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
-		case ARRAY_INDEX_NOT_PRIMITIVE:
-			return new HDLAdvise(problem, "Only primitives like uint and int are allowed as index index",
-					"Enums or interface references do not have a numerical value, they thus can't be used as array index", "Use another variable or constant as index");
-		case ARRAY_INDEX_OUT_OF_BOUNDS: {
-			ValueRange accessRange = (ValueRange) problem.meta.get("accessRange");
-			ValueRange arrayRange = (ValueRange) problem.meta.get("arrayRange");
-			return new HDLAdvise(problem, "The array index exceeds its capacity", "Valid access index for the array are: " + arrayRange + " while the index has a range of: "
-					+ accessRange + ". These don't overlap which means that the index will never be valid");
-		}
-		case ARRAY_INDEX_POSSIBLY_NEGATIVE: {
-			ValueRange accessRange = (ValueRange) problem.meta.get("accessRange");
-			ValueRange arrayRange = (ValueRange) problem.meta.get("arrayRange");
-			ValueRange commonRange = arrayRange.and(accessRange);
-			String[] solutions;
-			if (commonRange == null)
-				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
-			else
-				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node,
-						"Manually declare a range for the index with the @range(\"" + arrayRange.from + ";" + arrayRange.to + "\") annotation to define a range" };
-			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.from
-					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
-		}
-		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
-			ValueRange accessRange = (ValueRange) problem.meta.get("accessRange");
-			ValueRange arrayRange = (ValueRange) problem.meta.get("arrayRange");
-			ValueRange commonRange = arrayRange.and(accessRange);
-			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
-					+ " while the highest index of the array is " + arrayRange.to, "Limit the possible range by masking with &", "Downcast the index to a suitable size",
-					"Use the @range(\"" + commonRange.from + ";" + commonRange.to + "\") Annotation to indicate the expected range");
-		}
-		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
-			break;
-		case COMBINED_ASSIGNMENT_NOT_ALLOWED:
-			break;
-		case CONSTANT_DEFAULT_VALUE_NOT_CONSTANT:
-			break;
-		case CONSTANT_NEED_DEFAULTVALUE:
-			break;
-		case EQUALITY_ALWAYS_FALSE:
-			break;
-		case EQUALITY_ALWAYS_TRUE:
-			break;
-		case FOR_LOOP_RANGE_NOT_CONSTANT:
-			break;
-		case GENERATOR_ERROR:
-			return new HDLAdvise(problem, "The generator contains an error", problem.info, "Read the documentation for the specific generator");
-		case GENERATOR_WARNING:
-			return new HDLAdvise(problem, "The generator produced a warning", problem.info, "Read the documentation for the specific generator");
-		case GENERATOR_INFO:
-			return new HDLAdvise(problem, "The generator contains an information", problem.info);
-		case GENERATOR_NOT_KNOWN: {
-			String genName = ((HDLDirectGeneration) problem.node).getGeneratorID();
-			Set<String> genIDs = HDLGenerators.getAllGeneratorIDs();
-			Score[] topMatches = LevenshteinDistance.getTopMatches(genName, true, genIDs.toArray(new String[genIDs.size()]));
-			StringBuilder matchSolution = new StringBuilder();
-			matchSolution.append("Generators that you might have meant: ");
-			for (int i = 0; i < Math.min(3, topMatches.length); i++) {
-				Score score = topMatches[i];
-				if (i != 0)
-					matchSolution.append(", ");
-				matchSolution.append('@').append(score.string);
-			}
-			return new HDLAdvise(problem, "The generator with the id: " + genName + " is not known",
-					"The generator you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", matchSolution.toString(),
-					"Check the installed generators of the compiler");
-		}
-		case INTERFACE_IN_PORT_NEVER_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
-			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
-					"It appears that the port " + var.getName()
-							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
-					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
-		}
-		case INTERFACE_OUT_PORT_NEVER_READ: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
-			return new HDLAdvise(problem, "No read access to the out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
-					"It appears that the port " + var.getName() + " is never read, altough it is marked as out port", "Do something with the port");
-		}
-		case INTERFACE_OUT_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
-			return new HDLAdvise(problem, "The out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is written", "It appears that the port "
-					+ var.getName() + " is written to, altough it is marked as out port", "Remove the write access");
-		}
-		case INTERFACE_UNUSED_PORT: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
-			return new HDLAdvise(problem, "The port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is never read or written", "It appears that the port "
-					+ var.getName() + " is neither read, nor written to. You might want to check wether this is intentional", "Remove the port if it is not necessary",
-					"Do something useful with it");
-		}
-		case INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN:
-			break;
-		case INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ:
-			break;
-		case IN_PORT_CANT_REGISTER:
-			break;
-		case IN_PORT_NEVER_READ:
-			break;
-		case MULTI_PROCESS_WRITE:
-			break;
-		case NO_SUCH_FUNCTION:
-			break;
-		case ONLY_ONE_CLOCK_ANNOTATION_ALLOWED:
-			break;
-		case ONLY_ONE_RESET_ANNOTATION_ALLOWED:
-			break;
-		case OUT_PORT_NEVER_WRITTEN:
-			break;
-		case PARAMETER_OR_CONSTANT_NEVER_READ:
-			break;
-		case UNRESOLVED_ENUM:
-			break;
-		case UNRESOLVED_INTERFACE:
-			break;
-		case UNRESOLVED_REFERENCE:
-			break;
-		case UNRESOLVED_TYPE:
-			break;
-		case UNRESOLVED_VARIABLE:
-			break;
-		case UNSUPPORTED_TYPE_FOR_OP:
-			switch (problem.node.getClassType()) {
-			case HDLArithOp:
-				return new HDLAdvise(problem, problem.info, "Arithmetic operations require an interpretable value, they can not work on bit types",
-						"Cast either side to uint<?>/int<?>");
-			case HDLShiftOp:
-				return new HDLAdvise(problem, problem.info, "Shift operations require an interpretable value on the right hand side, they can not work on bit types",
-						"Cast the right hand-side to uint<?>/int<?>");
-			case HDLEqualityOp:
-				return new HDLAdvise(problem, problem.info,
-						"Equality operations require an interpretable value when a greater/less than compare is used, they can not work on bit types",
-						"Cast the either side to uint<?>/int<?>");
-			case HDLBitOp:
-				return new HDLAdvise(problem, problem.info, "Bit operations generally work on any primitive type, see the message for more information");
-			default:
-
-			}
-			break;
-		case UNUSED_VARIABLE:
-			return new HDLAdvise(problem, "The variable: " + problem.node + " is not used", "This variable is never read or written. You can safely remove it", "Remove it",
-					"Use it");
-		case WRITE_ACCESS_TO_IN_PORT:
-			return new HDLAdvise(problem, "The variable: " + problem.node + " is defined as in port and written",
-					"A variable that is declared as in can only be read. Writing to it is not supported", "Remove the in keyword in the declaration",
-					"Assign it to a new internal variable", "Change the direction to inout");
-		case ARRAY_REFERENCE_TOO_MANY_DIMENSIONS:
-			break;
-		case INLINE_FUNCTION_NO_TYPE:
-			break;
-		case UNRESOLVED_FUNCTION:
-			break;
-		default:
-			break;
-		}
-		return null;
+		return BuiltInAdvisor.advise(problem);
 	}
 
 	@Override

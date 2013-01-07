@@ -540,7 +540,8 @@ public class HDLPrimitives implements IHDLPrimitive {
 		case BIT:
 		case BITVECTOR:
 		case STRING:
-			throw new IllegalArgumentException(pt.getType() + " is not numerical!");
+
+			return null;
 		case INT:
 			BigInteger bitWidth = pt.getWidth().constantEvaluate(context);
 			return intRange(bitWidth);

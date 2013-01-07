@@ -63,6 +63,10 @@ public aspect StringWriterAspect {
 		boolean isStatement=false;
 		if (getContainer() instanceof HDLStatement)
 			isStatement=true;
+		if (getContainer() instanceof HDLBlock)
+			isStatement=true;
+		if (getContainer() instanceof HDLUnit)
+			isStatement=true;
 		StringBuilder sb;
 		if (isStatement)
 			sb=getSpacing();
@@ -218,7 +222,7 @@ public aspect StringWriterAspect {
 	public String HDLBlock.toString() {
 		StringBuilder sb=new StringBuilder(getSpacing());
 		if (getProcess()!=null && getProcess()){
-			sb.append("process {");
+			sb.append("process \n{");
 		}
 		incSpacing();
 		for (HDLStatement string : getStatements()) {
@@ -448,7 +452,11 @@ public aspect StringWriterAspect {
 	
 	public String HDLUnit.toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("module ").append(getName()).append("{\n");
+		if (!getSimulation())
+			sb.append("module ");
+		else
+			sb.append("testbench ");
+		sb.append(getName()).append("{\n");
 		incSpacing();
 		for (String imports : getImports()) {
 			sb.append(getSpacing()).append("import ").append(imports).append(";\n");
@@ -464,7 +472,19 @@ public aspect StringWriterAspect {
 
 	public String HDLInterfaceInstantiation.toString() {
 		StringBuilder sb = getSpacing();
-		sb.append(getHIfRefName()).append(' ').append(getVar().getName());
+		String name=getVar().getName();
+		sb.append(getHIfRefName()).append(' ').append(name);
+		if (getArguments().size()!=0){
+			boolean first=true;
+			sb.append('(');
+			for (HDLArgument arg : getArguments()) {
+				if (!first)
+					sb.append(',');
+				first=false;
+				sb.append(arg.getName()).append('=').append(arg.getExpression());
+			}
+			sb.append(')');
+		}
 		sb.append(';');
 		return sb.toString();
 	}

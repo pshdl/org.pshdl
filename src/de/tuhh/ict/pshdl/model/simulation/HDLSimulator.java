@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model.simulation;
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
@@ -20,12 +21,48 @@ public class HDLSimulator {
 		insulin = unrollForLoops(context, insulin);
 		insulin = createMultiplexArrayWrite(context, insulin);
 		insulin = createBitRanges(context, insulin);
+		insulin = createTernary(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 		// generate cat statement for ranges
 		// generate reset condition
 		// Starting from the end, generate ternary op for each switch/if
 		// statement
+	}
+
+	private static HDLUnit createTernary(HDLEvaluationContext context, HDLUnit insulin) {
+		Set<HDLAssignment> asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
+		Map<String, LinkedList<HDLAssignment>> writeOps = new HashMap<String, LinkedList<HDLAssignment>>();
+		Map<String, HDLReference> references = new HashMap<String, HDLReference>();
+		for (HDLAssignment ass : asss) {
+			String key = ass.getLeft().toString();
+			LinkedList<HDLAssignment> list = writeOps.get(key);
+			if (list == null) {
+				list = new LinkedList<HDLAssignment>();
+				writeOps.put(key, list);
+			}
+			references.put(key, ass.getLeft());
+			list.add(ass);
+		}
+		Set<HDLVariableDeclaration> hvds = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		ArrayList<HDLStatement> finalStatements = new ArrayList<HDLStatement>();
+		finalStatements.addAll(hvds);
+		for (Entry<String, LinkedList<HDLAssignment>> entry : writeOps.entrySet()) {
+			LinkedList<HDLAssignment> list = entry.getValue();
+			Iterator<HDLAssignment> reverseIter = list.descendingIterator();
+			HDLExpression current = null;
+			while (reverseIter.hasNext()) {
+				HDLAssignment next = reverseIter.next();
+				if (current == null)
+					current = next.getRight();
+				// XXX Add if cases
+				if (next.getContainer().getClassType() == HDLClass.HDLUnit) {
+					break;
+				}
+			}
+			finalStatements.add(new HDLAssignment().setLeft(references.get(entry.getKey())).setRight(current));
+		}
+		return insulin.setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
@@ -219,7 +256,7 @@ public class HDLSimulator {
 						ifExp = ifExp.copyDeepFrozen(ass);
 						BigInteger evaluate = ifExp.constantEvaluate(context);
 						if (evaluate == null) {
-							HDLVariableRef writeRef = ref.setArray(HDLObject.asList(HDLLiteral.get(counter)));
+							HDLVariableRef writeRef = ref.setArray(HDLObject.asList((HDLExpression) HDLLiteral.get(counter)));
 							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp).addThenDo(ass.setLeft(writeRef));
 							replacements.add(ifStmnt);
 						} else {

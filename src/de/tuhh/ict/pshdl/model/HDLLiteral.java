@@ -108,8 +108,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		}
 	}
 
-	public static HDLLiteral get(int i) {
-		return new HDLLiteral().setStr(false).setVal(Integer.toString(i));
+	public static HDLLiteral get(long i) {
+		return new HDLLiteral().setStr(false).setVal(Long.toString(i));
 	}
 
 	public static enum HDLLiteralPresentation {
@@ -147,7 +147,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		return HDLLiteralPresentation.NUM;
 	}
 
-	public static HDLExpression get(BigInteger constant) {
+	public static HDLLiteral get(BigInteger constant) {
 		return new HDLLiteral().setStr(false).setVal(constant.toString());
 	}
 
@@ -160,17 +160,31 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		if (!(obj instanceof AbstractHDLLiteral))
 			return false;
 		HDLLiteral other = (HDLLiteral) obj;
-		if (val == null) {
-			if (other.getVal() != null)
-				return false;
-		} else if (val.equals(other.getVal()))
-			return true;
 		BigInteger bigVal = getValueAsBigInt();
 		BigInteger otherbigVal = other.getValueAsBigInt();
 		if (bigVal != null) {
 			return bigVal.equals(otherbigVal);
 		}
+		if (val == null) {
+			if (other.getVal() != null)
+				return false;
+		} else if (val.equals(other.getVal()))
+			return true;
 		return true;
+	}
+
+	private Integer hashCache = null;
+
+	@Override
+	public int hashCode() {
+		if (hashCache != null)
+			return hashCache;
+		BigInteger valueAsBigInt = getValueAsBigInt();
+		if (valueAsBigInt != null) {
+			hashCache = valueAsBigInt.hashCode();
+			return hashCache;
+		}
+		return super.hashCode();
 	}
 
 	// $CONTENT-END$

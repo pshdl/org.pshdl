@@ -105,7 +105,7 @@ public aspect VHDLStatementTransformation {
 				for (Constant constant : cContext.generics) {
 					c.getGeneric().add(constant);
 				}
-				res.addTypeDeclaration(c, false);
+				res.addComponent(c);
 			} else
 				res.addImport(VHDLPackageTransformation.getNameRef(asRef));
 			Component entity = new Component(asRef.getLastSegment().toString());
@@ -369,9 +369,30 @@ public aspect VHDLStatementTransformation {
 
 	public VHDLContext HDLAssignment.toVHDL(int pid) {
 		VHDLContext context = new VHDLContext();
-		SignalAssignment sa = new SignalAssignment((SignalAssignmentTarget) getLeft().toVHDL(), getRight().toVHDL());
+		SignalAssignment sa=null;
 		HDLReference ref = getLeft();
-		HDLRegisterConfig config = ref.resolveVar().getRegisterConfig();
+		HDLVariable var = ref.resolveVar();
+		ArrayList<HDLExpression> dim = var.getDimensions();
+		if (dim.size()!=0 && ref.getClassType()==HDLClass.HDLVariableRef){
+			HDLVariableRef varRef=(HDLVariableRef) ref;
+			for (int i=0;i<varRef.getArray().size();i++){
+				dim.remove(0);
+			}
+			if (dim.size()!=0){
+				//XXX Implement correct array assignment for non full assignments
+				HDLAnnotation typeAnno = var.getAnnotation(HDLBuiltInAnnotations.VHDLType);
+				if (typeAnno!=null){
+					sa = new SignalAssignment((SignalAssignmentTarget) ref.toVHDL(), new TypeConversion(new UnresolvedType(typeAnno.getValue()), getRight().toVHDL()));
+				} else {
+					HDLVariableDeclaration hvd=var.getContainer(HDLVariableDeclaration.class);
+					sa = new SignalAssignment((SignalAssignmentTarget) ref.toVHDL(), new TypeConversion(new UnresolvedType(getArrayRefName(var, hvd.isExternal())), getRight().toVHDL()));
+				}
+			} else {
+				sa = new SignalAssignment((SignalAssignmentTarget) ref.toVHDL(), getRight().toVHDL());
+			}
+		} else
+			sa = new SignalAssignment((SignalAssignmentTarget) ref.toVHDL(), getRight().toVHDL());
+		HDLRegisterConfig config = var.getRegisterConfig();
 		if (config != null)
 			context.addClockedStatement(config, sa);
 		else

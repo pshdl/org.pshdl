@@ -6,6 +6,8 @@ import java.util.*;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLPackageTransformation.*;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
+import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.upb.hni.vmagic.*;
@@ -103,94 +105,133 @@ public aspect VHDLExpressionTransformation {
 				return vhdl;
 			HDLExpression tWidth = targetType.getWidth();
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
-				HDLLiteral lit = (HDLLiteral) getTarget();
-				if (this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLArithOp)
-					return lit.toVHDL();
-				BigInteger val = lit.getValueAsBigInt();
-				BigInteger width=null;
-				if (tWidth!=null)
-					width=tWidth.constantEvaluate(null);
-				FunctionCall resize = null;
-				Expression<?> actual = new StringLiteral(val.toString(2));
-				switch (targetType.getType()) {
-				case BIT:
-					if (BigInteger.ZERO.equals(val))
-						return new CharacterLiteral('0');
-					return new CharacterLiteral('1');
-				case NATURAL:
-				case INTEGER:
-					return lit.toVHDL();
-				case INT:{
-					if (val.bitLength()>31){
-						return lit.toVHDL(true); 
-					}
-					resize = new FunctionCall(NumericStd.TO_SIGNED);
-					resize.getParameters().add(new AssociationElement(lit.toVHDL()));
-					break;
-				}
-				case UINT:{
-					if (val.bitLength()>31){
-						return lit.toVHDL(true); 
-					}
-					resize = new FunctionCall(NumericStd.TO_UNSIGNED);
-					resize.getParameters().add(new AssociationElement(lit.toVHDL()));
-					break;
-				}
-				case BITVECTOR:
-					if (width!=null)
-						return VHDLUtils.toBinaryLiteral(width.intValue(), val);
-					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-					resize.getParameters().add(new AssociationElement(actual));
-					break;
-				case STRING:
-					throw new IllegalArgumentException("String is not castable");
-				case BOOL:
-					throw new IllegalArgumentException("Bool is not a literal");
-				}
-				if (resize==null)
-					throw new IllegalArgumentException("Should not get here");
-				resize.getParameters().add(new AssociationElement(tWidth.toVHDL()));
-				return resize;
+				return handleLiteral(targetType, tWidth);
 			}
 			HDLPrimitive t = (HDLPrimitive) getTarget().determineType();
-			Expression<?> exp = VHDLCastsLibrary.cast(vhdl, t.getType(), targetType.getType());
-			HDLExpression tw=tWidth;
-			if (tw != null) {
-				if (t.getWidth()!=null){
-					BigInteger bt=t.getWidth().constantEvaluate(null);
-					if (bt!=null){
-						BigInteger btw=tw.constantEvaluate(null);
-						if (bt.equals(btw)){
-							return exp;
-						}
-					}
-				}
-				Expression<?> width = tWidth.toVHDL();
-				FunctionCall resize = null;
-				switch (targetType.getType()) {
-				case BOOL:
-				case BIT:
-				case INTEGER:
-				case NATURAL:
-				case STRING:
-					throw new IllegalArgumentException(targetType + " can't have a width.");
-				case INT:
-				case UINT:
-					resize = new FunctionCall(NumericStd.RESIZE);
-					break;
-				case BITVECTOR:
-					resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-					break;
-				}
-				if (resize==null)
-					throw new IllegalArgumentException("Should not happen");
-				resize.getParameters().add(new AssociationElement(exp));
-				resize.getParameters().add(new AssociationElement(width));
-				return resize;
+			Expression<?> exp = vhdl;
+			HDLPrimitiveType actualType=t.getType();
+			if (tWidth != null) {
+				TargetType resized=getResize(exp, t, tWidth);
+				exp=resized.resized;
+				actualType=resized.newType;
 			}
-			return exp;
+			return VHDLCastsLibrary.cast(exp, actualType, targetType.getType());
 		}
 		throw new IllegalArgumentException("Not supported:" + this);
+	}
+	
+	private static class TargetType {
+		public final Expression<?> resized;
+		public final HDLPrimitiveType newType;
+		public TargetType(Expression<?> resized, HDLPrimitiveType newType) {
+			super();
+			this.resized = resized;
+			this.newType = newType;
+		}
+	}
+
+	private TargetType  HDLManip.getResize(Expression<?> exp, HDLPrimitive actualType, HDLExpression tWidth) {
+		if (actualType.getWidth()!=null){
+			BigInteger bt=actualType.getWidth().constantEvaluate(null);
+			if (bt!=null){
+				BigInteger btw=tWidth.constantEvaluate(null);
+				if (bt.equals(btw)){
+					return new TargetType(exp, actualType.getType());
+				}
+			}
+		}
+		Expression<?> width = tWidth.toVHDL();
+		FunctionCall resize = null;
+		HDLPrimitiveType resType=actualType.getType();
+		switch (actualType.getType()) {
+		case BOOL:
+		case STRING:
+			throw new IllegalArgumentException(actualType + " can't have a width.");
+		case BIT:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_BIT);
+			resType=HDLPrimitiveType.BITVECTOR;
+			break;
+		case INTEGER:
+		case NATURAL:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_INT);
+			resType=HDLPrimitiveType.INT;
+			break;
+		case INT:
+		case UINT:
+			resize = new FunctionCall(NumericStd.RESIZE);
+			break;
+		case BITVECTOR:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+			break;
+		}
+		if (resize==null)
+			throw new IllegalArgumentException("Should not happen");
+		resize.getParameters().add(new AssociationElement(exp));
+		resize.getParameters().add(new AssociationElement(width));
+		return new TargetType(resize, resType);
+	}
+	
+	private Expression<?> HDLManip.handleLiteral(HDLPrimitive targetType, HDLExpression tWidth) {
+		HDLLiteral lit = (HDLLiteral) getTarget();
+		if (this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLArithOp)
+			return lit.toVHDL();
+		BigInteger val = lit.getValueAsBigInt();
+		BigInteger width=null;
+		if (tWidth!=null)
+			width=tWidth.constantEvaluate(null);
+		switch (targetType.getType()) {
+		case BIT:
+			if (BigInteger.ZERO.equals(val))
+				return new CharacterLiteral('0');
+			return new CharacterLiteral('1');
+		case NATURAL:
+		case INTEGER:
+			return lit.toVHDL();
+		case INT: {
+			if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
+				return Aggregate.OTHERS(new CharacterLiteral('0'));
+			if(width!=null && lit.getPresentation()!=HDLLiteralPresentation.NUM)
+				return new TypeConversion(NumericStd.SIGNED,  lit.toVHDL(width.intValue(), true));
+			if (val.bitLength()>31){
+				FunctionCall functionCall = new FunctionCall(NumericStd.RESIZE);
+				functionCall.getParameters().add(new AssociationElement(new TypeConversion(NumericStd.SIGNED,  lit.toVHDL())));
+				return functionCall;
+			}
+			FunctionCall functionCall = new FunctionCall(NumericStd.TO_SIGNED);
+			functionCall.getParameters().add(new AssociationElement(lit.toVHDL()));
+			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			return functionCall;
+		}
+		case UINT:{
+			if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
+				return Aggregate.OTHERS(new CharacterLiteral('0'));
+			if(width!=null && lit.getPresentation()!=HDLLiteralPresentation.NUM)
+				return new TypeConversion(NumericStd.UNSIGNED,  lit.toVHDL(width.intValue(), true));
+			if (val.bitLength()>31){
+				FunctionCall functionCall = new FunctionCall(NumericStd.RESIZE);
+				functionCall.getParameters().add(new AssociationElement(new TypeConversion(NumericStd.UNSIGNED,  lit.toVHDL())));
+				return functionCall;
+			}
+			FunctionCall functionCall = new FunctionCall(NumericStd.TO_UNSIGNED);
+			functionCall.getParameters().add(new AssociationElement(lit.toVHDL()));
+			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			return functionCall;
+		}
+		case BITVECTOR:
+			if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
+				return Aggregate.OTHERS(new CharacterLiteral('0'));
+			if(width!=null && lit.getPresentation()!=HDLLiteralPresentation.NUM)	
+				return lit.toVHDL(width.intValue(), true);
+			FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+			functionCall.getParameters().add(new AssociationElement(lit.toVHDL(val.bitLength(), true)));
+			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			return functionCall;
+		case STRING:
+			throw new IllegalArgumentException("String is not castable");
+		case BOOL:
+			throw new IllegalArgumentException("Bool is not a literal");
+		}
+		throw new IllegalArgumentException("Should not get here");
 	}
 
 	public Range HDLRange.toVHDL(Direction dir) {
@@ -201,10 +242,16 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public Literal<?> HDLLiteral.toVHDL() {
-		return toVHDL(false);
+		int length=-1;
+		if(getValueAsBigInt()!=null)
+			length=getValueAsBigInt().bitLength();
+		return toVHDL(length, false);
 	}
-	public Literal<?> HDLLiteral.toVHDL(boolean asString) {
+	public Literal<?> HDLLiteral.toVHDL(int length, boolean asString) {
 		String val = getVal();
+		if (length==0)
+			length=1;
+		BigInteger dec=getValueAsBigInt();
 		switch (getPresentation()){
 		case STR:
 			return new StringLiteral(val);
@@ -214,17 +261,16 @@ public aspect VHDLExpressionTransformation {
 			return Standard.BOOLEAN_FALSE;
 		case HEX:
 			if (asString)
-				return new HexLiteral(val.substring(2));
+				return VHDLUtils.toHexLiteral(length, dec);
 			return new BasedLiteral("16#"+val.substring(2)+"#");
 		case BIN:
 			if (asString)
-				return new BinaryLiteral(val.substring(2));
+				return VHDLUtils.toBinaryLiteral(length, dec);
 			return new BasedLiteral("2#"+val.substring(2)+"#");
 		default:
-			BigInteger dec=getValueAsBigInt();
 			//VHDL isn't smart enough to allow uints with 32 bit
-			if (dec.bitLength()>31)
-				return new BinaryLiteral(dec.toString(2));
+			if (dec.bitLength()>31 || asString)
+				return VHDLUtils.toBinaryLiteral(length, dec);
 			return new DecimalLiteral(val);
 		}
 	}

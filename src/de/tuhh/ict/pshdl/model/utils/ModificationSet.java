@@ -51,6 +51,10 @@ public class ModificationSet {
 				ArrayList<T> res = new ArrayList<T>();
 				for (T t : object) {
 					List<Modification> mods = getModifications(t);
+					if (t instanceof IHDLObject) {
+						IHDLObject newT = (IHDLObject) t;
+						newT.addMeta(ModID.id, id);
+					}
 					if (mods != null) {
 						List<T> before = new LinkedList<T>();
 						List<T> after = new LinkedList<T>();
