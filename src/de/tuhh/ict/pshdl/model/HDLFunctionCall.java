@@ -16,7 +16,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>ArrayList<HDLExpression> params. Can be <code>null</code>.</li>
  * </ul>
  */
-public class HDLFunctionCall extends AbstractHDLFunctionCall implements de.tuhh.ict.pshdl.model.HDLStatement {
+public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLStatement {
 	/**
 	 * Constructs a new instance of {@link HDLFunctionCall}
 	 * 

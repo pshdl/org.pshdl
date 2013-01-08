@@ -103,8 +103,8 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = (prime * result) + (inherit ? 1231 : 1237);
-			result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + (inherit ? 1231 : 1237);
+			result = prime * result + (name == null ? 0 : name.hashCode());
 			return result;
 		}
 
@@ -254,7 +254,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 			addClazz(c, ct, clazz);
 			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
-		} while ((clazz != null) && !clazz.equals(HDLObject.class));
+		} while (clazz != null && !clazz.equals(HDLObject.class));
 	}
 
 	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct, Class<? extends HDLObject> clazz) {

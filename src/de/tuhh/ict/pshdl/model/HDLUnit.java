@@ -178,7 +178,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 				hasReg = true;
 		}
 		if (hasReg) {
-			if ((clk == null) && (rst == null)) {
+			if (clk == null && rst == null) {
 				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
