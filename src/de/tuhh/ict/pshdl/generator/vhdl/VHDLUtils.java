@@ -17,7 +17,6 @@ public class VHDLUtils {
 		}
 		// System.out.println("VHDLUtils.toBinaryLiteral()" + sb);
 		String string = sb.toString();
-		System.out.println(string.length());
 		return new BinaryLiteral(string);
 	}
 
@@ -50,6 +49,8 @@ public class VHDLUtils {
 	public static void main(String[] args) {
 		long a = -4373652435859253850L;
 		BigInteger lit = BigInteger.valueOf(a);
+		BigInteger litB = new BigInteger("-4373652435859253850");
+		System.out.println("VHDLUtils.main()" + lit.equals(litB));
 		BigInteger mask = BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
 		System.out.println("Long.toBinaryString(a)                             " + Long.toBinaryString(a));
 		System.out.println("Long.toBinaryString(lit.longValue())               " + Long.toBinaryString(lit.longValue()));

@@ -5,6 +5,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
@@ -19,11 +20,30 @@ public aspect SimulationTransformation {
 	}
 
 	public FluidFrame HDLAssignment.toSimulationModel() {
-		FluidFrame res = new FluidFrame(getLeft().toString());
+		HDLReference left = getLeft();
+		HDLVariable var = left.resolveVar();
+		FluidFrame res = new FluidFrame(getVarName(getLeft(), true));
 		res.append(getRight().toSimulationModel());
+		HDLDirection dir = var.getDirection();
+		res.setInternal(dir==HDLDirection.INTERNAL);
 		return res;
 	}
 
+	public static String getVarName(HDLReference var, boolean withBits){
+		HDLVariableRef varRef=(HDLVariableRef) var;
+		StringBuilder sb=new StringBuilder();
+		sb.append(var.resolveVar().getFullName());
+		for (HDLExpression exp : varRef.getArray()) {
+			sb.append('[').append(exp).append(']');
+		}
+		if (withBits){
+			for (HDLRange exp : varRef.getBits()) {
+				sb.append('{').append(exp).append('}');
+			}
+		}
+		return sb.toString();
+	}
+	
 	public FluidFrame HDLUnit.toSimulationModel() {
 		FluidFrame res = new FluidFrame();
 		for (HDLStatement stmnt : getStatements()) {
@@ -58,6 +78,9 @@ public aspect SimulationTransformation {
 				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, prim.getWidth().toString()));break;
 			case NATURAL:	
 				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, "32"));break;
+			case BIT:
+			case BITVECTOR:
+				break;
 			default:
 				throw new IllegalArgumentException("Cast to type:"+prim.getType()+" not supported");
 			}
@@ -69,16 +92,20 @@ public aspect SimulationTransformation {
 	public FluidFrame HDLVariableRef.toSimulationModel(){
 		FluidFrame res=new FluidFrame();
 		String refName=getVarRefName().toString();
-		res.addInput(refName);
 		String[] bits=new String[getBits().size()+1];
 		bits[0]=refName;
 		if (getBits().size()!=0){
 			for (int i = 0; i < bits.length-1; i++) {
 				bits[i+1]=getBits().get(i).toString();
 			}
-//			res.instructions.add(new ArgumentedInstruction(Instruction.bitAccess, bits));
 		}
-		res.instructions.add(new ArgumentedInstruction(Instruction.loadInput, bits));
+		HDLDirection dir=resolveVar().getDirection();
+		if (dir!=HDLDirection.INTERNAL) {
+			res.addInput(refName);
+			res.instructions.add(new ArgumentedInstruction(Instruction.loadInput, bits));
+		} else {
+			res.instructions.add(new ArgumentedInstruction(Instruction.loadInternal, bits));
+		}
 		return res;
 	}
 	
@@ -97,8 +124,8 @@ public aspect SimulationTransformation {
 		BigInteger value = getValueAsBigInt();
 		FluidFrame res = new FluidFrame();
 		String key = value.toString();
-		res.store.put(key, value);
-		res.instructions.add(new ArgumentedInstruction(Instruction.loadStore, key));
+		res.constants.put(key, value);
+		res.instructions.add(new ArgumentedInstruction(Instruction.loadConstant, key));
 		return res;
 	}
 
