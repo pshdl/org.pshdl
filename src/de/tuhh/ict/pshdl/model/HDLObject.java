@@ -213,7 +213,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			HDLClass[] clazzes = HDLClass.values();
 			arrayClazzTypes = new IHDLObject[clazzes.length][];
 			Iterator<IHDLObject> iterator = iterator(false);
-			EnumMap<HDLClass, Set<IHDLObject>> map = new EnumMap<HDLClass, Set<IHDLObject>>(HDLClass.class);
+			EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<HDLClass, List<IHDLObject[]>>(HDLClass.class);
 			addClazzArray(this, map);
 			while (iterator.hasNext()) {
 				HDLObject c = (HDLObject) iterator.next();
@@ -223,19 +223,25 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 					IHDLObject[] array = c.arrayClazzTypes[i];
 					if (array != null) {
 						HDLClass hdlClass = clazzes[i];
-						Set<IHDLObject> list = map.get(hdlClass);
+						List<IHDLObject[]> list = map.get(hdlClass);
 						if (list == null) {
-							map.put(hdlClass, new NonSameList<IHDLObject>(Arrays.asList(array)));
+							map.put(hdlClass, new LinkedList<IHDLObject[]>(Collections.singleton(array)));
 						} else {
-							list.addAll(Arrays.asList(array));
+							list.add(array);
 						}
 					}
 				}
 			}
 			for (HDLClass hClass : clazzes) {
-				Set<IHDLObject> set = map.get(hClass);
+				List<IHDLObject[]> set = map.get(hClass);
 				if (set != null) {
-					arrayClazzTypes[hClass.ordinal()] = set.toArray((IHDLObject[]) Array.newInstance(hClass.clazz, set.size()));
+					NonSameList<IHDLObject> list = new NonSameList<IHDLObject>();
+					for (IHDLObject[] ihdlObjects : set) {
+						for (IHDLObject ihdlObject : ihdlObjects) {
+							list.add(ihdlObject);
+						}
+					}
+					arrayClazzTypes[hClass.ordinal()] = list.toArray((IHDLObject[]) Array.newInstance(hClass.clazz, list.size()));
 				}
 			}
 		}
@@ -255,15 +261,15 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		return (T[]) list.clone();
 	}
 
-	private void addClazzArray(IHDLObject hdlObject, EnumMap<HDLClass, Set<IHDLObject>> map) {
+	private void addClazzArray(IHDLObject hdlObject, EnumMap<HDLClass, List<IHDLObject[]>> map) {
 		EnumSet<HDLClass> set = hdlObject.getClassSet();
 		for (HDLClass hdlClass : set) {
-			Set<IHDLObject> list = map.get(hdlClass);
+			List<IHDLObject[]> list = map.get(hdlClass);
 			if (list == null) {
-				list = new NonSameList<IHDLObject>();
+				list = new LinkedList<IHDLObject[]>();
 				map.put(hdlClass, list);
 			}
-			list.add(hdlObject);
+			list.add(new IHDLObject[] { hdlObject });
 		}
 	}
 
