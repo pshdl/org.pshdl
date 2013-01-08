@@ -31,7 +31,7 @@ public aspect VHDLPackageTransformation {
 		Entity e = new Entity(entityName.toString('_'));
 		VHDLContext unit = new VHDLContext();
 		
-		Collection<HDLEnumRef> hRefs=getAllObjectsOf(HDLEnumRef.class, true);
+		HDLEnumRef[] hRefs=getAllObjectsOf(HDLEnumRef.class, true);
 		for (HDLEnumRef hdlEnumRef : hRefs) {
 			HDLEnum resolveHEnum = hdlEnumRef.resolveHEnum();
 			HDLUnit enumContainer=resolveHEnum.getContainer(HDLUnit.class);
@@ -122,7 +122,7 @@ public aspect VHDLPackageTransformation {
 		List<Signal> sensitivity = new LinkedList<Signal>();
 		Set<String> vars = new TreeSet<String>();
 		for (HDLStatement stmnt : ctx.sensitiveStatements.get(pid)) {
-			Collection<HDLVariableRef> refs = stmnt.getAllObjectsOf(HDLVariableRef.class, true);
+			HDLVariableRef[] refs = stmnt.getAllObjectsOf(HDLVariableRef.class, true);
 			for (HDLVariableRef ref : refs) {
 				HDLVariable var = ref.resolveVar();
 				IHDLObject container = var.getContainer();
@@ -184,10 +184,10 @@ public aspect VHDLPackageTransformation {
 		VhdlFile res = new VhdlFile();
 		for (HDLUnit unit : getUnits()) {
 			ModificationSet ms=new ModificationSet();
-			Collection<HDLVariableDeclaration> hvds = unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+			HDLVariableDeclaration[] hvds = unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
 			for (HDLVariableDeclaration hvd : hvds) {
 				for (HDLVariable var : hvd.getVariables()) {
-					Collection<HDLVariableRef> refs = var.getAllObjectsOf(HDLVariableRef.class, true);
+					HDLVariableRef[] refs = var.getAllObjectsOf(HDLVariableRef.class, true);
 					for (HDLVariableRef ref : refs) {
 						//Check which variable declaration contains references and mark those references as the ones that should be declared in a package
 						ref.resolveVar().setMeta(VHDLStatementTransformation.EXPORT);

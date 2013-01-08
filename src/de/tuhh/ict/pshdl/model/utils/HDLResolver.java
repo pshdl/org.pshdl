@@ -55,7 +55,7 @@ public class HDLResolver {
 	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
 		if (enumCache == null) {
 			synchronized (this) {
-				Collection<HDLEnumDeclaration> enumDecl = resolveTo.getAllObjectsOf(HDLEnumDeclaration.class, false);
+				HDLEnumDeclaration[] enumDecl = resolveTo.getAllObjectsOf(HDLEnumDeclaration.class, false);
 				enumCache = new HashMap<HDLQualifiedName, HDLEnum>();
 				for (HDLEnumDeclaration hdlEnumDeclaration : enumDecl) {
 					enumCache.put(hdlEnumDeclaration.getHEnum().getFullName(), hdlEnumDeclaration.getHEnum());
@@ -75,7 +75,7 @@ public class HDLResolver {
 	public HDLFunction resolveFunction(HDLQualifiedName hEnum) {
 		if (funcCache == null) {
 			synchronized (this) {
-				Collection<HDLFunction> enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
+				HDLFunction[] enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
 				funcCache = new HashMap<HDLQualifiedName, HDLFunction>();
 				for (HDLFunction hdlEnumDeclaration : enumDecl) {
 					funcCache.put(hdlEnumDeclaration.getFullName(), hdlEnumDeclaration);

@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -103,8 +104,8 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + (inherit ? 1231 : 1237);
-			result = prime * result + (name == null ? 0 : name.hashCode());
+			result = (prime * result) + (inherit ? 1231 : 1237);
+			result = (prime * result) + (name == null ? 0 : name.hashCode());
 			return result;
 		}
 
@@ -196,73 +197,86 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		return true;
 	}
 
-	private Map<Class<? extends HDLObject>, Set<HDLObject>> clazzTypes;
-	private Map<Class<? extends HDLObject>, Set<HDLObject>> deepClazzTypes;
-
 	@Override
+	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
+		HDLClass classFor = HDLClass.getClassFor(clazz);
+		if (classFor == null)
+			throw new IllegalArgumentException("Unkown class:" + clazz);
+		return getAllObjectsOf(classFor, clazz, deep);
+	}
+
+	private IHDLObject[][] arrayClazzTypes;
+
 	@SuppressWarnings("unchecked")
-	public <T> Set<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
-		if (clazzTypes == null) {
-			clazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
-			deepClazzTypes = new HashMap<Class<? extends HDLObject>, Set<HDLObject>>();
+	public <T> T[] getAllObjectsOf(HDLClass clazz, Class<? extends T> type, boolean deep) {
+		if (arrayClazzTypes == null) {
+			HDLClass[] clazzes = HDLClass.values();
+			arrayClazzTypes = new IHDLObject[clazzes.length][];
 			Iterator<IHDLObject> iterator = iterator(false);
-			addClazz(this, clazzTypes);
-			addClazz(this, deepClazzTypes);
+			EnumMap<HDLClass, Set<IHDLObject>> map = new EnumMap<HDLClass, Set<IHDLObject>>(HDLClass.class);
+			addClazzArray(this, map);
 			while (iterator.hasNext()) {
 				HDLObject c = (HDLObject) iterator.next();
-				addClazz(c, clazzTypes);
-				addClazz(c, deepClazzTypes);
-				c.getAllObjectsOf(clazz, deep);
-				for (Entry<Class<? extends HDLObject>, Set<HDLObject>> e : c.deepClazzTypes.entrySet()) {
-					Set<HDLObject> list = deepClazzTypes.get(e.getKey());
-					if (list == null)
-						deepClazzTypes.put(e.getKey(), new NonSameList<HDLObject>(e.getValue()));
-					else
-						list.addAll(e.getValue());
+				addClazzArray(c, map);
+				c.getAllObjectsOf(clazz, type, deep);
+				for (int i = 0; i < c.arrayClazzTypes.length; i++) {
+					IHDLObject[] array = c.arrayClazzTypes[i];
+					if (array != null) {
+						HDLClass hdlClass = clazzes[i];
+						Set<IHDLObject> list = map.get(hdlClass);
+						if (list == null) {
+							map.put(hdlClass, new NonSameList<IHDLObject>(Arrays.asList(array)));
+						} else {
+							list.addAll(Arrays.asList(array));
+						}
+					}
+				}
+			}
+			for (HDLClass hClass : clazzes) {
+				Set<IHDLObject> set = map.get(hClass);
+				if (set != null) {
+					arrayClazzTypes[hClass.ordinal()] = set.toArray((IHDLObject[]) Array.newInstance(hClass.clazz, set.size()));
 				}
 			}
 		}
-		NonSameList<T> list;
-		if (deep) {
-			list = (NonSameList<T>) deepClazzTypes.get(clazz);
-		} else
-			list = (NonSameList<T>) clazzTypes.get(clazz);
+		IHDLObject[] list = arrayClazzTypes[clazz.ordinal()];
 		if (list == null)
-			return new NonSameList<T>();
-		return list.clone();
+			return (T[]) Array.newInstance(clazz.clazz, 0);
+		if (deep == false) {
+			LinkedList<IHDLObject> res = new LinkedList<IHDLObject>();
+			for (IHDLObject ihdlObject : list) {
+				if (ihdlObject.getContainer() == this)
+					res.add(ihdlObject);
+			}
+			return res.toArray((T[]) Array.newInstance(clazz.clazz, res.size()));
+		}
+		// T[] res = (T[]) Array.newInstance(clazz.clazz, list.length);
+		// System.arraycopy(list, 0, res, 0, res.length);
+		return (T[]) list.clone();
+	}
+
+	private void addClazzArray(IHDLObject hdlObject, EnumMap<HDLClass, Set<IHDLObject>> map) {
+		EnumSet<HDLClass> set = hdlObject.getClassSet();
+		for (HDLClass hdlClass : set) {
+			Set<IHDLObject> list = map.get(hdlClass);
+			if (list == null) {
+				list = new NonSameList<IHDLObject>();
+				map.put(hdlClass, list);
+			}
+			list.add(hdlObject);
+		}
 	}
 
 	@Override
 	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
-		Set<T> list = getAllObjectsOf(clazz, true);
-		for (Iterator<T> iter = list.iterator(); iter.hasNext();) {
-			T t = iter.next();
+		T[] allObjectsOf = getAllObjectsOf(clazz, true);
+		Set<T> list = new NonSameList<T>();
+		for (T t : allObjectsOf) {
 			K value = field.getValue(t);
-			if (!matcher.matches(value))
-				iter.remove();
+			if (matcher.matches(value))
+				list.add(t);
 		}
 		return list;
-	}
-
-	@SuppressWarnings("unchecked")
-	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct) {
-		Class<? extends HDLObject> clazz = c.getClass();
-		do {
-			Class<?>[] interfaces = clazz.getInterfaces();
-			for (Class<?> cIf : interfaces) {
-				addClazz(c, ct, (Class<? extends HDLObject>) cIf);
-			}
-			addClazz(c, ct, clazz);
-			clazz = (Class<? extends HDLObject>) clazz.getSuperclass();
-		} while (clazz != null && !clazz.equals(HDLObject.class));
-	}
-
-	private void addClazz(HDLObject c, Map<Class<? extends HDLObject>, Set<HDLObject>> ct, Class<? extends HDLObject> clazz) {
-		Set<HDLObject> list = ct.get(clazz);
-		if (list == null)
-			list = new NonSameList<HDLObject>();
-		list.add(c);
-		ct.put(clazz, list);
 	}
 
 	@SuppressWarnings("unchecked")

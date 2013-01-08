@@ -26,7 +26,7 @@ public interface IHDLObject {
 
 	public <K> K getMeta(MetaAccess<K> key);
 
-	public <T> Set<T> getAllObjectsOf(Class<? extends T> clazz, boolean deep);
+	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep);
 
 	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher);
 
@@ -51,5 +51,7 @@ public interface IHDLObject {
 	public HDLQualifiedName getFullName();
 
 	public HDLFunction resolveFunction(HDLQualifiedName name);
+
+	public EnumSet<HDLClass> getClassSet();
 
 }

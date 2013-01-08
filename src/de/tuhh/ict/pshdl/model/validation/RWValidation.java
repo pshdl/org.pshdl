@@ -17,7 +17,7 @@ public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {
 		annotateReadCount(unit);
 		annotateWriteCount(unit);
-		Collection<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
 			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || BuiltInValidator.skipExp(hdlVariable))
 				continue;
@@ -53,7 +53,7 @@ public class RWValidation {
 				}
 			}
 		}
-		Collection<HDLInterfaceInstantiation> his = unit.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
+		HDLInterfaceInstantiation[] his = unit.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hii : his) {
 			Set<String> readList = hii.getVar().getMeta(Init.read);
 			if (readList == null)
@@ -90,7 +90,7 @@ public class RWValidation {
 	}
 
 	public static void annotateReadCount(HDLObject orig) {
-		Collection<HDLReference> list = orig.getAllObjectsOf(HDLReference.class, true);
+		HDLReference[] list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
 			if (BuiltInValidator.skipExp(ref))
 				continue;
@@ -142,7 +142,7 @@ public class RWValidation {
 	public static HDLBlock UNIT_BLOCK = new HDLBlock();
 
 	public static void annotateWriteCount(HDLObject orig) {
-		Collection<HDLAssignment> list = orig.getAllObjectsOf(HDLAssignment.class, true);
+		HDLAssignment[] list = orig.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : list) {
 			HDLReference left = ass.getLeft();
 			if (left instanceof HDLVariableRef) {

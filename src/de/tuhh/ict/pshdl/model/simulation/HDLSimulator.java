@@ -31,7 +31,7 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit createTernary(HDLEvaluationContext context, HDLUnit insulin) {
-		Set<HDLAssignment> asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
+		HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
 		Map<String, LinkedList<HDLAssignment>> writeOps = new HashMap<String, LinkedList<HDLAssignment>>();
 		Map<String, HDLReference> references = new HashMap<String, HDLReference>();
 		for (HDLAssignment ass : asss) {
@@ -44,9 +44,9 @@ public class HDLSimulator {
 			references.put(key, ass.getLeft());
 			list.add(ass);
 		}
-		Set<HDLVariableDeclaration> hvds = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		HDLVariableDeclaration[] hvds = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		ArrayList<HDLStatement> finalStatements = new ArrayList<HDLStatement>();
-		finalStatements.addAll(hvds);
+		finalStatements.addAll(Arrays.asList(hvds));
 		for (Entry<String, LinkedList<HDLAssignment>> entry : writeOps.entrySet()) {
 			LinkedList<HDLAssignment> list = entry.getValue();
 			Iterator<HDLAssignment> reverseIter = list.descendingIterator();
@@ -66,7 +66,7 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
-		Collection<HDLVariableRef> refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
+		HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
 		Map<HDLQualifiedName, List<RangeVal>> ranges = new HashMap<HDLQualifiedName, List<RangeVal>>();
 		for (HDLVariableRef ref : refs) {
 			if (ref.getBits().size() > 0) {
@@ -232,7 +232,7 @@ public class HDLSimulator {
 
 	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {
 		ModificationSet ms = new ModificationSet();
-		Collection<HDLAssignment> asss = unit.getAllObjectsOf(HDLAssignment.class, true);
+		HDLAssignment[] asss = unit.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
 			if (ass.getLeft() instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) ass.getLeft();
@@ -280,7 +280,7 @@ public class HDLSimulator {
 	 * @return
 	 */
 	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit insulin) {
-		Collection<HDLForLoop> loops = insulin.getAllObjectsOf(HDLForLoop.class, true);
+		HDLForLoop[] loops = insulin.getAllObjectsOf(HDLForLoop.class, true);
 		ModificationSet ms = new ModificationSet();
 		for (HDLForLoop loop : loops) {
 			HDLVariable param = loop.getParam();

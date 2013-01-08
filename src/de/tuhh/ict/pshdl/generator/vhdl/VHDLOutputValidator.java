@@ -60,28 +60,28 @@ public class VHDLOutputValidator implements IHDLValidator {
 	}
 
 	private void checkNames(HDLPackage unit, Set<Problem> problems) {
-		Set<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
 			String varName = hdlVariable.getName();
 			if (!getVHDLName(varName).equals(varName)) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_NAME, hdlVariable));
 			}
 		}
-		Set<HDLUnit> units = unit.getAllObjectsOf(HDLUnit.class, true);
+		HDLUnit[] units = unit.getAllObjectsOf(HDLUnit.class, true);
 		for (HDLUnit hdlUnit : units) {
 			String name = hdlUnit.getFullName().toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
-		Set<HDLInterface> ifs = unit.getAllObjectsOf(HDLInterface.class, true);
+		HDLInterface[] ifs = unit.getAllObjectsOf(HDLInterface.class, true);
 		for (HDLInterface hdlUnit : ifs) {
 			String name = hdlUnit.getFullName().toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
-		Set<HDLEnum> enums = unit.getAllObjectsOf(HDLEnum.class, true);
+		HDLEnum[] enums = unit.getAllObjectsOf(HDLEnum.class, true);
 		for (HDLEnum hdlUnit : enums) {
 			String name = hdlUnit.getFullName().toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {

@@ -35,15 +35,15 @@ public class HDLLibrary {
 			HDLQualifiedName uq = unit.getFullName();
 			units.put(uq, unit);
 			types.put(uq, unit.asInterface());
-			Collection<HDLInterface> list = unit.getAllObjectsOf(HDLInterface.class, true);
+			HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
 			for (HDLInterface hdlInterface : list) {
 				addInterface(hdlInterface);
 			}
-			Collection<HDLEnum> elist = unit.getAllObjectsOf(HDLEnum.class, true);
+			HDLEnum[] elist = unit.getAllObjectsOf(HDLEnum.class, true);
 			for (HDLEnum hdlEnum : elist) {
 				addEnum(hdlEnum);
 			}
-			Set<HDLFunction> functions = unit.getAllObjectsOf(HDLFunction.class, true);
+			HDLFunction[] functions = unit.getAllObjectsOf(HDLFunction.class, true);
 			for (HDLFunction hdlFunction : functions) {
 				addFunction(hdlFunction);
 			}

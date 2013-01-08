@@ -198,7 +198,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
 		HDLGenerationInfo info = getImplementation(hdl);
 		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
-		Set<HDLVariableDeclaration> hvd = info.unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		HDLVariableDeclaration[] hvd = info.unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hdlVariableDeclaration : hvd) {
 			switch (hdlVariableDeclaration.getDirection()) {
 			case CONSTANT:

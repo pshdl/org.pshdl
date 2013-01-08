@@ -89,7 +89,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private void checkBitWidthAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLAssignment> asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
+		HDLAssignment[] asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
 			HDLEvaluationContext context = getContext(hContext, ass);
 			HDLType lType = ass.getLeft().determineType();
@@ -143,7 +143,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private void checkLiteralConcat(HDLPackage pkg, Set<Problem> problems) {
-		Set<HDLConcat> concats = pkg.getAllObjectsOf(HDLConcat.class, true);
+		HDLConcat[] concats = pkg.getAllObjectsOf(HDLConcat.class, true);
 		for (HDLConcat hdlConcat : concats) {
 			ArrayList<HDLExpression> cats = hdlConcat.getCats();
 			for (HDLExpression exp : cats) {
@@ -171,7 +171,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private void checkSwitchStatements(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLSwitchStatement> switches = pkg.getAllObjectsOf(HDLSwitchStatement.class, true);
+		HDLSwitchStatement[] switches = pkg.getAllObjectsOf(HDLSwitchStatement.class, true);
 		for (HDLSwitchStatement switchStatement : switches) {
 			boolean defaultFound = false;
 			ArrayList<HDLSwitchCaseStatement> cases = switchStatement.getCases();
@@ -211,7 +211,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private void checkVariableNaming(HDLPackage pkg, Set<Problem> problems) {
-		Set<HDLVariable> vars = pkg.getAllObjectsOf(HDLVariable.class, true);
+		HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
 		Map<String, HDLVariable> nameMap = new HashMap<String, HDLVariable>();
 		for (HDLVariable hdlVariable : vars) {
 			HDLQualifiedName fullName = hdlVariable.getFullName();
@@ -259,14 +259,14 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkGenerators(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLDirectGeneration> generators = unit.getAllObjectsOf(HDLDirectGeneration.class, true);
+		HDLDirectGeneration[] generators = unit.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration hdg : generators) {
 			HDLGenerators.validate(hdg, problems, getContext(hContext, hdg));
 		}
 	}
 
 	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLFunctionCall> functions = unit.getAllObjectsOf(HDLFunctionCall.class, true);
+		HDLFunctionCall[] functions = unit.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (HDLFunctionCall function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
 			if (info == null) {
@@ -282,7 +282,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkProessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLVariable> vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable var : vars) {
 			if (var.hasMeta(RWValidation.BlockMetaClash.clash)) {
 				problems.add(new Problem(ErrorCode.MULTI_PROCESS_WRITE, var));
@@ -291,7 +291,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkType(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLOpExpression> ops = unit.getAllObjectsOf(HDLOpExpression.class, true);
+		HDLOpExpression[] ops = unit.getAllObjectsOf(HDLOpExpression.class, true);
 		for (HDLOpExpression ope : ops) {
 			if (skipExp(ope))
 				continue;
@@ -320,7 +320,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkAnnotations(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Set<HDLAnnotation> annos = unit.getAllObjectsOf(HDLAnnotation.class, true);
+		HDLAnnotation[] annos = unit.getAllObjectsOf(HDLAnnotation.class, true);
 		for (HDLAnnotation hdlAnnotation : annos) {
 			Problem[] p = HDLAnnotations.validate(hdlAnnotation);
 			for (Problem problem : p) {
@@ -339,7 +339,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkConstantEquals(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Collection<HDLEqualityOp> equalities = unit.getAllObjectsOf(HDLEqualityOp.class, true);
+		HDLEqualityOp[] equalities = unit.getAllObjectsOf(HDLEqualityOp.class, true);
 		for (HDLEqualityOp op : equalities) {
 			if (skipExp(op))
 				continue;
@@ -376,7 +376,7 @@ public class BuiltInValidator implements IHDLValidator {
 				}
 			}
 		}
-		Collection<HDLForLoop> forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
+		HDLForLoop[] forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop hdlForLoop : forLoops) {
 			for (HDLRange r : hdlForLoop.getRange()) {
 				BigInteger evalTo = r.getTo().constantEvaluate(getContext(hContext, r));
@@ -394,7 +394,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Collection<HDLVariableRef> refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
+		HDLVariableRef[] refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
 			if (skipExp(ref))
 				continue;
