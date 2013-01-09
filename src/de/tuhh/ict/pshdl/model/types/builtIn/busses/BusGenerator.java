@@ -36,6 +36,13 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 				throw new HDLProblemException("An unexpected exception occured while parsing the generator content:" + e, new Problem(ErrorCode.GENERATOR_ERROR, hdl));
 			}
 		}
+		try {
+			Unit unit = createDefaultUnit(getRegCount(hdl));
+			List<Row> rows = MemoryModel.buildRows(unit);
+			HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
+			return bId;
+		} catch (Exception e) {
+		}
 		HDLInterface hIf = new HDLInterface().setName(name);
 		HDLExpression regCount = getRegCountLiteral(hdl);
 		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(32)));
@@ -45,6 +52,16 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 		hIf.setContainer(hdl);
 		// System.out.println("PLBGenerator.getInterface()" + hIf);
 		return hIf;
+	}
+
+	private HDLExpression getRegCountLiteral(HDLDirectGeneration hdl) {
+		ArrayList<HDLArgument> args = hdl.getArguments();
+		for (HDLArgument arg : args) {
+			if ("regCount".equals(arg.getName())) {
+				return arg.getExpression().copyFiltered(CopyFilter.DEEP_META);
+			}
+		}
+		throw new IllegalArgumentException("The parameter regCount is not valid!");
 	}
 
 	private HDLInterface createInterface(HDLDirectGeneration hdl, String name) throws FileNotFoundException, IOException, RecognitionException {
@@ -60,28 +77,20 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 		return new ByteArrayInputStream(substring.getBytes());
 	}
 
-	private HDLExpression getRegCountLiteral(HDLDirectGeneration hdl) {
-		ArrayList<HDLArgument> args = hdl.getArguments();
-		for (HDLArgument arg : args) {
-			if ("regCount".equals(arg.getName())) {
-				return arg.getExpression().copyFiltered(CopyFilter.DEEP_META);
-			}
-		}
-		throw new IllegalArgumentException("The parameter regCount is not valid!");
-	}
-
 	private int getRegCount(HDLDirectGeneration hdl) {
 		ArrayList<HDLArgument> args = hdl.getArguments();
 		int regCount = -1;
 		for (HDLArgument arg : args) {
 			if ("regCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
+				expression = expression.copyDeepFrozen(expression.getContainer());
 				BigInteger regVal = expression.constantEvaluate(null);
 				if (regVal != null) {
 					regCount = regVal.intValue();
 				} else {
 					if (expression instanceof HDLLiteral) {
 						HDLLiteral lit = (HDLLiteral) expression;
+						// String literals are allowed as well...
 						if (lit.getStr()) {
 							try {
 								regCount = Integer.parseInt(lit.getVal());
@@ -101,50 +110,45 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 
 	@Override
 	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
-		int regCount = 0;
-		if (hdl.getGeneratorContent().length() == 0)
-			regCount = getRegCount(hdl);
+		Unit unit;
+		if (hdl.getGeneratorContent().length() == 0) {
+			unit = createDefaultUnit(getRegCount(hdl));
+		} else {
+			try {
+				unit = MemoryModel.parseUnit(getContentStream(hdl));
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
+			}
+		}
 		String version = getVersion(hdl);
+		List<Row> rows = MemoryModel.buildRows(unit);
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			Unit unit = createDefaultUnit(regCount);
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("de.tuhh.ict.plb", unit, MemoryModel.buildRows(unit)));
-			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version, false);
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("de.tuhh.ict.plb", unit, rows));
+			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), rows.size(), version, false);
+			byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
+			hdgi.files.add(new SideFile(hdl.getVar().getName() + "Map.html", html));
 			hdgi.files.addAll(sideFiles);
 			return hdgi;
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
-			Unit unit = createDefaultUnit(regCount);
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("de.tuhh.ict.axi", unit, MemoryModel.buildRows(unit)));
-			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), regCount, version, true);
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("de.tuhh.ict.axi", unit, rows));
+			List<SideFile> sideFiles = BusGenSideFiles.getSideFiles(hdl.getContainer(HDLUnit.class), rows.size(), version, true);
+			byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
+			hdgi.files.add(new SideFile(hdl.getVar().getName() + "Map.html", html));
 			hdgi.files.addAll(sideFiles);
 			return hdgi;
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
-			if (hdl.getGeneratorContent().length() != 0) {
-				Unit unit = null;
-				try {
-					unit = MemoryModel.parseUnit(getContentStream(hdl));
-					List<Row> rows = MemoryModel.buildRows(unit);
-					HDLUnit hdlUnit = ABP3BusCodeGen.get("de.tuhh.ict.apb", unit, rows);
-					HDLGenerationInfo hdgi = new HDLGenerationInfo(hdlUnit);
-					byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
-					hdgi.files.add(new SideFile(hdl.getVar().getName() + "Map.html", html));
-					return hdgi;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (RecognitionException e) {
-					e.printStackTrace();
-				}
-			}
-			Unit unit = createDefaultUnit(regCount);
-			return new HDLGenerationInfo(ABP3BusCodeGen.get("de.tuhh.ict.apb", unit, MemoryModel.buildRows(unit)));
+			HDLUnit hdlUnit = ABP3BusCodeGen.get("de.tuhh.ict.apb", unit, rows);
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(hdlUnit);
+			byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
+			hdgi.files.add(new SideFile(hdl.getVar().getName() + "Map.html", html));
+			return hdgi;
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
 	}
 
-	private Unit createDefaultUnit(int regCount) {
+	public static Unit createDefaultUnit(int regCount) {
 		Definition def = new Definition("regs", true, RWType.rw, Type.BIT, 32);
 		Row row = new Row("reg", null, def);
 		Memory mem = new Memory(new Reference("reg", regCount));

@@ -164,7 +164,7 @@ public class MemoryModelSideFiles {
 		return name;
 	}
 
-	public static byte[] builtHTML(Unit unit, List<Row> rows) throws IOException {
+	public static byte[] builtHTML(Unit unit, List<Row> rows) {
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("{TITLE}", "Register Overview");
 		options.put("{DATE}", new Date().toString());
@@ -213,7 +213,12 @@ public class MemoryModelSideFiles {
 		options.put("{TABLE}", ps.toString());
 		options.put("{HDLINTERFACE}", MemoryModel.buildHDLInterface(unit, rows).setName("Bus").toString());
 		ps.close();
-		return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);
+		try {
+			return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private static Integer getAndInc(Map<String, Integer> defIndex, String name) {
