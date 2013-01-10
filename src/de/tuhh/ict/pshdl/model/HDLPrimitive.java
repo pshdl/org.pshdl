@@ -128,7 +128,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	@Override
 	public String getName() {
-		return "#" + toString();
+		return "#" + toString(SyntaxHighlighter.none());
 	}
 
 	public static HDLPrimitive getInt() {

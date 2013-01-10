@@ -8,9 +8,6 @@ import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
-import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
-import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
-import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
@@ -20,10 +17,10 @@ public class UserLogicCodeGen extends CommonBusCode {
 	public static HDLUnit get(String name, Unit unit, List<Row> rows) {
 		HDLInterface hdi = MemoryModel.buildHDLInterface(unit, rows);
 		Map<String, Boolean> isArray = buildArrayMap(hdi);
+		int regCount = rows.size();
 		HDLVariableDeclaration C_SLV_WIDTH = new HDLVariableDeclaration().setDirection(HDLDirection.PARAMETER).setType(HDLQualifiedName.create("#uint"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.NATURAL))
 				.addVariables(new HDLVariable().setName("C_SLV_DWIDTH").setDefaultValue(new HDLLiteral().setVal("32")));
-		int regCount = rows.size();
 		HDLVariableDeclaration C_NUM_REG = new HDLVariableDeclaration().setDirection(HDLDirection.CONSTANT).setType(HDLQualifiedName.create("#uint"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.NATURAL))
 				.addVariables(new HDLVariable().setName("C_NUM_REG").setDefaultValue(HDLLiteral.get(regCount)));
@@ -72,15 +69,20 @@ public class UserLogicCodeGen extends CommonBusCode {
 		HDLVariableDeclaration IP2Bus_Error = new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
 				.addVariables(new HDLVariable().setName("IP2Bus_Error").setDefaultValue(new HDLLiteral().setVal("0")));
-		HDLVariableDeclaration regs = new HDLVariableDeclaration()
-				.setRegister(
-						new HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setClockType(HDLRegClockType.RISING)
-								.setResetType(HDLRegResetActiveType.HIGH).setSyncType(HDLRegSyncType.SYNC).setResetValue(new HDLLiteral().setVal("0")))
-				.setDirection(HDLDirection.INTERNAL)
-				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
-				.setPrimitive(
-						new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
-				.addVariables(new HDLVariable().setName("regs").addDimensions(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))));
+		// HDLVariableDeclaration regs = new HDLVariableDeclaration()
+		// .setRegister(
+		// new
+		// HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setClockType(HDLRegClockType.RISING)
+		// .setResetType(HDLRegResetActiveType.HIGH).setSyncType(HDLRegSyncType.SYNC).setResetValue(new
+		// HDLLiteral().setVal("0")))
+		// .setDirection(HDLDirection.INTERNAL)
+		// .setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
+		// .setPrimitive(
+		// new
+		// HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new
+		// HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
+		// .addVariables(new HDLVariable().setName("regs").addDimensions(new
+		// HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))));
 		HDLVariableDeclaration IP2Bus_Data = new HDLVariableDeclaration()
 				.setDirection(HDLDirection.OUT)
 				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
@@ -111,10 +113,14 @@ public class UserLogicCodeGen extends CommonBusCode {
 												.setType(HDLArithOpType.DIV))).addVariables(new HDLVariable().setName("Bus2IP_BE"));
 		HDLSwitchStatement writeSwitch = createWriteSwitch(rows, isArray);
 		HDLSwitchStatement readSwitch = createReadSwitch(rows, isArray);
-		return new HDLUnit().setSimulation(false).setName(name).addStatements(C_SLV_WIDTH).addStatements(C_NUM_REG).addStatements(Bus2IP_RdCE).addStatements(Bus2IP_WrCE)
-				.addStatements(Bus2IP_Clk).addStatements(Bus2IP_Reset).addStatements(IP2Bus_RdAck).addStatements(IP2Bus_WrAck).addStatements(IP2Bus_Error).addStatements(regs)
+		HDLUnit hUnit = new HDLUnit().setSimulation(false).setName(name).addStatements(C_SLV_WIDTH).addStatements(C_NUM_REG).addStatements(Bus2IP_RdCE).addStatements(Bus2IP_WrCE)
+				.addStatements(Bus2IP_Clk).addStatements(Bus2IP_Reset).addStatements(IP2Bus_RdAck).addStatements(IP2Bus_WrAck).addStatements(IP2Bus_Error)
 				.addStatements(IP2Bus_Data).addStatements(slv_reg_read_sel).addStatements(readSwitch).addStatements(Bus2IP_Data).addStatements(slv_reg_write_sel)
 				.addStatements(Bus2IP_BE).addStatements(writeSwitch);
+		for (HDLVariableDeclaration port : hdi.getPorts()) {
+			hUnit = hUnit.addStatements(port.setDirection(HDLDirection.INTERNAL));
+		}
+		return hUnit;
 	}
 
 	private static HDLSwitchStatement createWriteSwitch(List<Row> rows, Map<String, Boolean> isArray) {
@@ -174,7 +180,8 @@ public class UserLogicCodeGen extends CommonBusCode {
 				}
 			}
 		}
-		label = label.addDos(ifStatement);
+		if (!ifStatement.getThenDo().isEmpty())
+			label = label.addDos(ifStatement);
 		return label;
 	}
 
