@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter.Context;
 
 public aspect StringWriterAspect {
 
@@ -44,7 +45,7 @@ public aspect StringWriterAspect {
 	public String HDLEqualityOp.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft().toString(highlight));
-		sb.append(highlight.operator(getType().toString()));
+		sb.append(highlight.simpleSpace()).append(highlight.operator(getType().toString())).append(highlight.simpleSpace());
 		sb.append(getRight().toString(highlight)).append(")");
 		return sb.toString();
 	}
@@ -60,7 +61,14 @@ public aspect StringWriterAspect {
 	public String HDLBitOp.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(getLeft().toString(highlight));
-		sb.append(highlight.operator(getType().toString()));
+		switch (getType()){
+		case LOGI_AND:
+		case LOGI_OR:
+			sb.append(highlight.simpleSpace()).append(highlight.operator(getType().toString())).append(highlight.simpleSpace());
+			break;
+		default:
+			sb.append(highlight.operator(getType().toString()));
+		}
 		sb.append(getRight().toString(highlight)).append(")");
 		return sb.toString();
 	}
@@ -216,8 +224,9 @@ public aspect StringWriterAspect {
 	public String HDLBlock.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb=new StringBuilder(highlight.getSpacing());
 		if (getProcess()!=null && getProcess()){
-			sb.append("process").append("\n{");
+			sb.append("process").append(highlight.simpleSpace());
 		}
+		sb.append('{').append(highlight.newLine());
 		highlight.incSpacing();
 		for (HDLStatement string : getStatements()) {
 			sb.append(string.toString(highlight)).append(highlight.newLine());
@@ -265,26 +274,27 @@ public aspect StringWriterAspect {
 
 	public String HDLIfStatement.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = highlight.getSpacing();
+		String origSpacing=sb.toString();
 		sb.append(highlight.keyword("if")).append(highlight.simpleSpace()).append('(').append(getIfExp().toString(highlight)).append(')').append(highlight.simpleSpace()).append('{').append(highlight.newLine());
 		highlight.incSpacing();
 		for (HDLStatement stmt : getThenDo()) {
 			sb.append(stmt.toString(highlight)).append(highlight.newLine());
 		}
 		if (getElseDo().size() != 0) {
-			sb.append(highlight.getSpacing()).append('}').append(highlight.simpleSpace()).append(highlight.keyword("else")).append(highlight.simpleSpace()).append('{').append(highlight.newLine());
+			sb.append(origSpacing).append('}').append(highlight.simpleSpace()).append(highlight.keyword("else")).append(highlight.simpleSpace()).append('{').append(highlight.newLine());
 			for (HDLStatement stmt : getElseDo()) {
 				sb.append(stmt.toString(highlight)).append(highlight.newLine());
 			}
 		}
 		highlight.decSpacing();
-		sb.append(highlight.getSpacing()).append('}');
+		sb.append(origSpacing).append('}');
 		return sb.toString();
 	}
 
 	public String HDLSwitchCaseStatement.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = highlight.getSpacing();
 		if (getLabel() == null)
-			sb.append(highlight.keyword("default")).append(highlight.simpleSpace()).append(':').append(highlight.simpleSpace()).append('{').append(highlight.newLine());
+			sb.append(highlight.keyword("default")).append(':').append(highlight.simpleSpace()).append('{').append(highlight.newLine());
 		else
 			sb.append(highlight.keyword("case")).append(highlight.simpleSpace()).append(getLabel().toString(highlight)).append(':').append(highlight.simpleSpace()).append('{').append(highlight.newLine());
 		highlight.incSpacing();
@@ -331,15 +341,22 @@ public aspect StringWriterAspect {
 			sb.append(var.toString(highlight));
 			spacing = ",";
 		}
-		return sb.append(';').toString();
+		if (highlight.getContext()==Context.HDLPackage)
+			sb.append(";").append(highlight.newLine());
+		else
+			sb.append(";");
+		return sb.toString();
 	}
 
 	public String HDLInterfaceDeclaration.toString(SyntaxHighlighter highlight) {
+		highlight.pushContext(Context.HDLInterface);
 		StringBuilder annos=highlight.getSpacing();
 		for (HDLAnnotation anno : getAnnotations()) {
 			annos.append(anno.toString(highlight)).append(highlight.simpleSpace());
 		}
-		return annos.append(getHIf().toString(highlight)).toString();
+		annos.append(getHIf().toString(highlight));
+		highlight.popContext();
+		return annos.toString();
 	}
 	public String HDLInterface.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = highlight.getSpacing();
@@ -357,7 +374,7 @@ public aspect StringWriterAspect {
 
 	public String HDLEnumRef.toString(SyntaxHighlighter highlight) {
 		//XXX Just using the last segment might not be correct as it might be non local
-		return highlight.enumRefType(getHEnumRefName().getLastSegment()) + "." + highlight.enumRefVar(getVarRefName().getLastSegment());
+		return highlight.enumRefType(getHEnumRefName().toString()) + "." + highlight.enumRefVar(getVarRefName().getLastSegment());
 	}
 
 	public String HDLEnum.toString(SyntaxHighlighter highlight) {
@@ -431,6 +448,7 @@ public aspect StringWriterAspect {
 
 	public String HDLPackage.toString(SyntaxHighlighter highlight){
 		StringBuilder sb=new StringBuilder();
+		highlight.pushContext(SyntaxHighlighter.Context.HDLPackage);
 		if (getPkg()!=null)
 			sb.append(highlight.keyword("package")).append(highlight.simpleSpace()).append(highlight.packageName(getPkg())).append(";").append(highlight.newLine());
 		for (HDLDeclaration decl : getDeclarations()) {
@@ -439,11 +457,13 @@ public aspect StringWriterAspect {
 		for (HDLUnit unit : getUnits()) {
 			sb.append(unit.toString(highlight));
 		}
+		highlight.popContext();
 		return sb.toString();
 	}
 	
 	public String HDLUnit.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = new StringBuilder();
+		highlight.pushContext(SyntaxHighlighter.Context.HDLUnit);
 		if (!getSimulation())
 			sb.append(highlight.keyword("module")).append(highlight.simpleSpace());
 		else
@@ -458,6 +478,7 @@ public aspect StringWriterAspect {
 		}
 		highlight.decSpacing();
 		sb.append("}").append(highlight.newLine());
+		highlight.popContext();
 		return sb.toString();
 
 	}
@@ -518,7 +539,7 @@ public aspect StringWriterAspect {
 		}
 		sb.append(')');
 		if (getGeneratorContent() != null) {
-			sb.append("<[").append(highlight.generatorContent(getGeneratorID(), getGeneratorContent())).append("]>");
+			sb.append(highlight.generatorContent(getGeneratorID(), getGeneratorContent()));
 		}
 		sb.append(";");
 		return sb.toString();

@@ -1,8 +1,16 @@
 package de.tuhh.ict.pshdl.model.utils;
 
+import java.util.*;
+
 import de.tuhh.ict.pshdl.model.*;
 
 public class SyntaxHighlighter {
+
+	public static enum Context {
+		HDLPackage, HDLUnit, HDLStatement, HDLExpression, HDLInterface;
+	}
+
+	private Stack<Context> context = new Stack<SyntaxHighlighter.Context>();
 
 	private int spacing = 0;
 
@@ -124,5 +132,19 @@ public class SyntaxHighlighter {
 
 	public String generatorContent(String generatorID, String generatorContent) {
 		return generatorContent;
+	}
+
+	public void pushContext(Context context) {
+		this.context.push(context);
+	}
+
+	public Context getContext() {
+		if (context.isEmpty())
+			return null;
+		return context.peek();
+	}
+
+	public Context popContext() {
+		return context.pop();
 	}
 }

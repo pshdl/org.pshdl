@@ -131,8 +131,11 @@ public class HDLResolver {
 				String uri = unit.getLibURI();
 				if (uri != null) {
 					HDLLibrary library = HDLLibrary.getLibrary(uri);
-					if (library != null)
-						return library.resolve(unit.getImports(), var);
+					if (library != null) {
+						ArrayList<String> imports = unit.getImports();
+						imports.add(unit.getFullName().skipLast(1).append("*").toString());
+						return library.resolve(imports, var);
+					}
 				}
 			}
 			return null;
