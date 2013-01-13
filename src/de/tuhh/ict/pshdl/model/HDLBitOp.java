@@ -71,11 +71,12 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	/**
 	 * The accessor for the field type which is of type HDLBitOpType.
 	 */
-	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>() {
+	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>("type") {
 		@Override
 		public HDLBitOpType getValue(HDLBitOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 	};

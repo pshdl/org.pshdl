@@ -8,7 +8,6 @@ import org.eclipse.jdt.annotation.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 /**
  * The class HDLInterfaceInstantiation contains the following fields
@@ -54,11 +53,12 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	/**
 	 * The accessor for the field hIf which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>() {
+	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>("hIf") {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIfRefName();
 		}
 	};
@@ -69,8 +69,9 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	@Override
 	public HDLInterface resolveHIf() {
 		HDLInterface resolveHIf = super.resolveHIf();
-		if (resolveHIf == null)
+		if (resolveHIf == null) {
 			return null;
+		}
 		ModificationSet ms = new ModificationSet();
 		ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
 		String prefix = getVar().getName();

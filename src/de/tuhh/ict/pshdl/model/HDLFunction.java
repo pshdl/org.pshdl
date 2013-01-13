@@ -48,11 +48,12 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>() {
+	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>("name") {
 		@Override
 		public String getValue(HDLFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 	};
@@ -69,19 +70,23 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
 				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP_META);
-				if (argRef.getBits().size() != 0 || argRef.getArray().size() != 0) {
+				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
 					if (exp instanceof HDLVariableRef) {
 						HDLVariableRef ref = (HDLVariableRef) exp;
 						HDLVariableRef nref = ref;
-						for (HDLRange bit : argRef.getBits())
+						for (HDLRange bit : argRef.getBits()) {
 							nref = nref.addBits(substitute(args, params, bit, origin));
-						for (HDLExpression aExp : argRef.getArray())
+						}
+						for (HDLExpression aExp : argRef.getArray()) {
 							nref = nref.addArray(substitute(args, params, aExp, origin));
+						}
 						msExp.replace(argRef, nref);
-					} else
+					} else {
 						msExp.replace(argRef, exp);
-				} else
+					}
+				} else {
 					msExp.replace(argRef, exp);
+				}
 			}
 		}
 		T newExp = msExp.apply(orig);

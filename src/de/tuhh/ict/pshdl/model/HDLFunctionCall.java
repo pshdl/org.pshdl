@@ -48,11 +48,12 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	/**
 	 * The accessor for the field name which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLFunctionCall, HDLQualifiedName> fName = new HDLFieldAccess<HDLFunctionCall, HDLQualifiedName>() {
+	public static HDLFieldAccess<HDLFunctionCall, HDLQualifiedName> fName = new HDLFieldAccess<HDLFunctionCall, HDLQualifiedName>("name") {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionCall obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getNameRefName();
 		}
 	};
@@ -60,11 +61,12 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	 * The accessor for the field params which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>>() {
+	public static HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>>("params") {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLFunctionCall obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getParams();
 		}
 	};

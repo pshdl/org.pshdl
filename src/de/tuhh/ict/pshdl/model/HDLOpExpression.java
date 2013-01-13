@@ -45,22 +45,24 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * The accessor for the field left which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
+	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>("left") {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLeft();
 		}
 	};
 	/**
 	 * The accessor for the field right which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>() {
+	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>("right") {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRight();
 		}
 	};

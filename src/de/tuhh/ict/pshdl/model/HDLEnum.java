@@ -50,11 +50,12 @@ public class HDLEnum extends AbstractHDLEnum {
 	/**
 	 * The accessor for the field enums which is of type ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>() {
+	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>("enums") {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLEnum obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getEnums();
 		}
 	};
@@ -66,15 +67,17 @@ public class HDLEnum extends AbstractHDLEnum {
 		if (var.length == 1) {
 			return getVariable(var.getLastSegment());
 		}
-		if (getFullName().equals(var.skipLast(1)))
+		if (getFullName().equals(var.skipLast(1))) {
 			return getVariable(var.getLastSegment());
+		}
 		return super.resolveVariable(var);
 	}
 
 	public HDLVariable getVariable(String lastSegment) {
 		for (HDLVariable var : getEnums()) {
-			if (var.getName().equals(lastSegment))
+			if (var.getName().equals(lastSegment)) {
 				return var;
+			}
 		}
 		return null;
 	}

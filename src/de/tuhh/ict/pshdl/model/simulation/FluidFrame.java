@@ -323,4 +323,8 @@ public class FluidFrame {
 	public void setInternal(boolean isInternal) {
 		this.isInternal = isInternal;
 	}
+
+	public void add(ArgumentedInstruction argumentedInstruction) {
+		instructions.add(argumentedInstruction);
+	}
 }

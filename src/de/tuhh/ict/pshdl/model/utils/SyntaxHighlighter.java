@@ -12,7 +12,7 @@ public class SyntaxHighlighter {
 
 	private Stack<Context> context = new Stack<SyntaxHighlighter.Context>();
 
-	private int spacing = 0;
+	protected int spacing = 0;
 
 	public StringBuilder getSpacing() {
 		StringBuilder sb = new StringBuilder();
@@ -87,7 +87,7 @@ public class SyntaxHighlighter {
 	}
 
 	public String direction(String dir) {
-		return dir;
+		return keyword(dir);
 	}
 
 	public String interfaceName(String name) {
@@ -146,5 +146,9 @@ public class SyntaxHighlighter {
 
 	public Context popContext() {
 		return context.pop();
+	}
+
+	public String primitiveType(String prim) {
+		return keyword(prim);
 	}
 }

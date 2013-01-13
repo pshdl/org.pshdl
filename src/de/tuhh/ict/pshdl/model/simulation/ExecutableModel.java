@@ -1,8 +1,16 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
+import java.io.*;
 import java.util.*;
 
-public class ExecutableModel {
+import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.Graph.Node;
+
+public class ExecutableModel implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7515137334641792104L;
 	public final int maxDataWidth;
 	public final int maxStackDepth;
 	public final Frame[] frames;
@@ -32,6 +40,29 @@ public class ExecutableModel {
 			builder.append("outputs=").append(Arrays.toString(outputs));
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public ExecutableModel sortTopological() {
+		Graph<Frame> graph = new Graph<Frame>();
+		ArrayList<Node<Frame>> nodes = new ArrayList<Graph.Node<Frame>>();
+		Map<String, Node<Frame>> intProvider = new HashMap<String, Graph.Node<Frame>>();
+		for (Frame f : frames) {
+			Node<Frame> node = new Node<Frame>(f);
+			nodes.add(node);
+			if (f.isInternal)
+				intProvider.put(internals[f.outputId & 0xff], node);
+		}
+		for (Node<Frame> node : nodes) {
+			for (Byte intDep : node.object.internalDependencies) {
+				node.reverseAddEdge(intProvider.get(internals[intDep & 0xff]));
+			}
+		}
+		ArrayList<Node<Frame>> sortNodes = graph.sortNodes(nodes);
+		int pos = 0;
+		for (Node<Frame> node : sortNodes) {
+			frames[pos++] = node.object;
+		}
+		return this;
 	}
 
 	public String toDotFile() {

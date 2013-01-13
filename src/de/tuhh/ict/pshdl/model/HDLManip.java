@@ -52,33 +52,36 @@ public class HDLManip extends AbstractHDLManip {
 	/**
 	 * The accessor for the field type which is of type HDLManipType.
 	 */
-	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>() {
+	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>("type") {
 		@Override
 		public HDLManipType getValue(HDLManip obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 	};
 	/**
 	 * The accessor for the field target which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>() {
+	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>("target") {
 		@Override
 		public HDLExpression getValue(HDLManip obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getTarget();
 		}
 	};
 	/**
 	 * The accessor for the field castTo which is of type HDLType.
 	 */
-	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>() {
+	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>("castTo") {
 		@Override
 		public HDLType getValue(HDLManip obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getCastTo();
 		}
 	};

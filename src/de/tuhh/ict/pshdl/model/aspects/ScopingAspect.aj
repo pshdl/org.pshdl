@@ -302,14 +302,20 @@ public aspect ScopingAspect {
 	}
 
 	public List<HDLEnumDeclaration> HDLUnit.doGetEnumDeclarations() {
-		return HDLResolver.getallEnumDeclarations(getStatements());
+		List<HDLEnumDeclaration> res = HDLResolver.getallEnumDeclarations(getInits());
+		res.addAll(HDLResolver.getallEnumDeclarations(getStatements()));
+		return res;
 	}
 
 	public List<HDLInterface> HDLUnit.doGetInterfaceDeclarations() {
-		return HDLResolver.getallInterfaceDeclarations(getStatements());
+		List<HDLInterface> res = HDLResolver.getallInterfaceDeclarations(getInits());
+		res.addAll(HDLResolver.getallInterfaceDeclarations(getStatements()));
+		return res;
 	}
 
 	public List<HDLVariable> HDLUnit.doGetVariables() {
-		return HDLResolver.getallVariableDeclarations(getStatements());
+		List<HDLVariable> res = HDLResolver.getallVariableDeclarations(getInits());
+		res.addAll(HDLResolver.getallVariableDeclarations(getStatements()));
+		return res;
 	}
 }

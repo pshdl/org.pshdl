@@ -47,22 +47,24 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	/**
 	 * The accessor for the field label which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression> fLabel = new HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression>() {
+	public static HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression> fLabel = new HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression>("label") {
 		@Override
 		public HDLExpression getValue(HDLSwitchCaseStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLabel();
 		}
 	};
 	/**
 	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>>("dos") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLSwitchCaseStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDos();
 		}
 	};

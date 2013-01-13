@@ -49,22 +49,24 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * The accessor for the field from which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>() {
+	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>("from") {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getFrom();
 		}
 	};
 	/**
 	 * The accessor for the field to which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>() {
+	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>("to") {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getTo();
 		}
 	};
@@ -77,8 +79,9 @@ public class HDLRange extends AbstractHDLRange {
 	 * @return
 	 */
 	public HDLExpression getWidth() {
-		if (getFrom() == null)
+		if (getFrom() == null) {
 			return new HDLLiteral().setVal("1");
+		}
 		if (getTo() != null) {
 			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null))) {
 				HDLArithOp simpleWith = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));

@@ -43,11 +43,12 @@ public abstract class HDLType extends AbstractHDLType {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>() {
+	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>("name") {
 		@Override
 		public String getValue(HDLType obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 	};

@@ -54,11 +54,12 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	/**
 	 * The accessor for the field args which is of type ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>>() {
+	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>>("args") {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLSubstituteFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArgs();
 		}
 	};
@@ -66,11 +67,12 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * The accessor for the field stmnts which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>> fStmnts = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>> fStmnts = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>>("stmnts") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLSubstituteFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getStmnts();
 		}
 	};

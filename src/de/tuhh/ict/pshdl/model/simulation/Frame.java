@@ -1,24 +1,29 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
+import java.io.*;
 import java.math.*;
 import java.util.*;
 
-public class Frame {
+public class Frame implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1690021519637432408L;
 	public final byte[] instructions;
 	public final byte[] inputDependencies;
 	public final byte[] internalDependencies;
-	public final BigInteger[] store;
+	public final BigInteger[] constants;
 	public final int outputId;
 	public final int maxDataWidth;
 	public final int maxStackDepth;
 	public final String id;
 	public final boolean isInternal;
 
-	public Frame(byte[] instructions, byte[] inputDependencies, byte[] internalDependencies, int outputId, int maxDataWidth, int maxStackDepth, BigInteger[] store, String id,
+	public Frame(byte[] instructions, byte[] inputDependencies, byte[] internalDependencies, int outputId, int maxDataWidth, int maxStackDepth, BigInteger[] constants, String id,
 			boolean isInternal) {
 		super();
-		this.store = store;
+		this.constants = constants;
 		this.instructions = instructions;
 		this.inputDependencies = inputDependencies;
 		this.internalDependencies = internalDependencies;
@@ -39,8 +44,8 @@ public class Frame {
 			builder.append("inputDependencies=").append(Arrays.toString(inputDependencies)).append(", ");
 		if (internalDependencies != null)
 			builder.append("internalDependencies=").append(Arrays.toString(internalDependencies)).append(", ");
-		if (store != null)
-			builder.append("constants=").append(Arrays.toString(store)).append(", ");
+		if (constants != null)
+			builder.append("constants=").append(Arrays.toString(constants)).append(", ");
 		if (isInternal)
 			builder.append("internal");
 		builder.append("outputId=").append(outputId).append(", maxDataWidth=").append(maxDataWidth).append(", maxStackDepth=").append(maxStackDepth).append(", ");

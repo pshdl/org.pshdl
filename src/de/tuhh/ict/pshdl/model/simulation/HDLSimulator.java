@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -20,7 +21,9 @@ public class HDLSimulator {
 		HDLUnit insulin = Insulin.transform(unit);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createMultiplexArrayWrite(context, insulin);
+		insulin = renameArrayAccess(context, insulin);
 		insulin = createBitRanges(context, insulin);
+		insulin = literalBitRanges(context, insulin);
 		insulin = createTernary(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
@@ -30,10 +33,67 @@ public class HDLSimulator {
 		// statement
 	}
 
+	private static HDLUnit renameArrayAccess(HDLEvaluationContext context, HDLUnit insulin) {
+		ModificationSet ms = new ModificationSet();
+		HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef variableRef : refs) {
+			if (!variableRef.getArray().isEmpty()) {
+				HDLQualifiedName newName = variableRef.getVarRefName();
+				String lastSegment = newName.getLastSegment();
+				for (HDLExpression arr : variableRef.getArray()) {
+					lastSegment += "[" + arr.constantEvaluate(context) + "]";
+				}
+				newName = newName.skipLast(1).append(lastSegment);
+				ms.replace(variableRef, variableRef.setVar(newName).setArray(null));
+			}
+		}
+		HDLVariableDeclaration[] varDecls = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (HDLVariableDeclaration hvd : varDecls) {
+			for (HDLVariable var : hvd.getVariables()) {
+				ArrayList<HDLExpression> dim = var.getDimensions();
+				if (!dim.isEmpty()) {
+					List<HDLVariable> newVariables = new LinkedList<HDLVariable>();
+					newVariables = (createArrayVar(dim, 0, var.getName(), context));
+					ms.replace(var, newVariables.toArray(new HDLVariable[newVariables.size()]));
+				}
+			}
+		}
+		return ms.apply(insulin);
+	}
+
+	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, String name, HDLEvaluationContext context) {
+		if (idx >= dim.size()) {
+			return Collections.singletonList(new HDLVariable().setName(name));
+		}
+		BigInteger size = dim.get(idx).constantEvaluate(context);
+		List<HDLVariable> res = new LinkedList<HDLVariable>();
+		for (int i = 0; i < size.intValue(); i++) {
+			res.addAll(createArrayVar(dim, i + 1, name + "[" + i + "]", context));
+		}
+		return res;
+	}
+
+	private static HDLUnit literalBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
+		ModificationSet ms = new ModificationSet();
+		HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
+		for (HDLRange hdlRange : ranges) {
+			BigInteger toBig = hdlRange.getTo().constantEvaluate(context);
+			BigInteger fromBig = null;
+			HDLExpression from = hdlRange.getFrom();
+			if (from != null) {
+				fromBig = from.constantEvaluate(context);
+				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig)).setTo(HDLLiteral.get(toBig)));
+			} else {
+				ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig)));
+			}
+		}
+		return ms.apply(insulin);
+	}
+
 	private static HDLUnit createTernary(HDLEvaluationContext context, HDLUnit insulin) {
 		HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
-		Map<String, LinkedList<HDLAssignment>> writeOps = new HashMap<String, LinkedList<HDLAssignment>>();
-		Map<String, HDLReference> references = new HashMap<String, HDLReference>();
+		Map<String, LinkedList<HDLAssignment>> writeOps = new LinkedHashMap<String, LinkedList<HDLAssignment>>();
+		Map<String, HDLReference> references = new LinkedHashMap<String, HDLReference>();
 		for (HDLAssignment ass : asss) {
 			String key = ass.getLeft().toString();
 			LinkedList<HDLAssignment> list = writeOps.get(key);
@@ -67,51 +127,74 @@ public class HDLSimulator {
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
 		HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
-		Map<HDLQualifiedName, List<RangeVal>> ranges = new HashMap<HDLQualifiedName, List<RangeVal>>();
+		Map<HDLQualifiedName, List<RangeVal>> ranges = new LinkedHashMap<HDLQualifiedName, List<RangeVal>>();
 		for (HDLVariableRef ref : refs) {
-			if (ref.getBits().size() > 0) {
-				List<RangeVal> set = ranges.get(ref.getVarRefName());
-				if (set == null) {
-					set = new LinkedList<RangeVal>();
-					ranges.put(ref.getVarRefName(), set);
-				}
-				for (HDLRange r : ref.getBits()) {
-					ValueRange determineRange = r.determineRange(context);
-					set.add(new RangeVal(determineRange.from, 1));
-					set.add(new RangeVal(determineRange.to, -1));
+			if (ref.resolveVar().getDirection() != HDLDirection.IN) {
+				if (ref.getBits().size() > 0) {
+					List<RangeVal> set = ranges.get(ref.getVarRefName());
+					if (set == null) {
+						set = new LinkedList<RangeVal>();
+						ranges.put(ref.getVarRefName(), set);
+					}
+					for (HDLRange r : ref.getBits()) {
+						ValueRange determineRange = r.determineRange(context);
+						set.add(new RangeVal(determineRange.from, 1));
+						set.add(new RangeVal(determineRange.to, -1));
+					}
 				}
 			}
 		}
-		Map<HDLQualifiedName, SortedSet<ValueRange>> splitRanges = new HashMap<HDLQualifiedName, SortedSet<ValueRange>>();
+		ModificationSet ms = new ModificationSet();
+		Map<HDLQualifiedName, SortedSet<ValueRange>> splitRanges = new LinkedHashMap<HDLQualifiedName, SortedSet<ValueRange>>();
 		for (Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
-			splitRanges.put(entry.getKey(), split(entry.getValue()));
+			SortedSet<ValueRange> split = split(entry.getValue());
+			splitRanges.put(entry.getKey(), split);
+			// HDLConcat cat = new HDLConcat();
+			// for (ValueRange range : split) {
+			// cat = cat.addCats(new
+			// HDLVariableRef().setVar(entry.getKey()).addBits(createRange(range)));
+			// }
+			// HDLAssignment ass = new HDLAssignment().setLeft(new
+			// HDLVariableRef().setVar(entry.getKey())).setRight(cat);
+			// ms.addTo(insulin, HDLUnit.fStatements, ass);
 		}
 		// Change bit access to broken down ranges
-		ModificationSet ms = new ModificationSet();
 		for (HDLVariableRef ref : refs) {
-			ArrayList<HDLRange> newRanges = new ArrayList<HDLRange>();
 			SortedSet<ValueRange> list = splitRanges.get(ref.getVarRefName());
-			for (HDLRange bit : ref.getBits()) {
-				if (bit.getFrom() != null) { // Singular ranges don't do
-												// anything
-					ValueRange range = bit.determineRange(context);
-					for (ValueRange newRange : list) {
-						if (range.contains(newRange)) {
-							if (newRange.from.equals(newRange.to))
-								newRanges.add(new HDLRange().setTo(HDLLiteral.get(newRange.to)));
-							else
-								newRanges.add(new HDLRange().setFrom(HDLLiteral.get(newRange.from)).setTo(HDLLiteral.get(newRange.to)));
+			if (list != null) {
+				ArrayList<HDLRange> newRanges = new ArrayList<HDLRange>();
+				if (!ref.getBits().isEmpty()) {
+					for (HDLRange bit : ref.getBits()) {
+						if (bit.getFrom() != null) { // Singular ranges don't do
+														// anything
+							ValueRange range = bit.determineRange(context);
+							for (ValueRange newRange : list) {
+								if (range.contains(newRange)) {
+									newRanges.add(createRange(newRange));
+								}
+							}
+						} else {
+							newRanges.add(bit);
 						}
 					}
 				} else {
-					newRanges.add(bit);
+					for (ValueRange vRange : list) {
+						newRanges.add(createRange(vRange));
+					}
+				}
+				if (newRanges.size() != 0) {
+					ms.replace(ref, ref.setBits(newRanges));
 				}
 			}
-			if (newRanges.size() != 0)
-				ms.replace(ref, ref.setBits(newRanges));
 		}
 		HDLUnit apply = ms.apply(insulin);
 		return Insulin.handleMultiBitAccess(apply, context);
+	}
+
+	private static HDLRange createRange(ValueRange newRange) {
+		if (newRange.from.equals(newRange.to))
+			return new HDLRange().setTo(HDLLiteral.get(newRange.to));
+		return new HDLRange().setFrom(HDLLiteral.get(newRange.from)).setTo(HDLLiteral.get(newRange.to));
 	}
 
 	private static class RangeVal implements Comparable<RangeVal> {

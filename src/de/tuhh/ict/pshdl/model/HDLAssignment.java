@@ -74,33 +74,36 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * The accessor for the field left which is of type HDLReference.
 	 */
-	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>() {
+	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>("left") {
 		@Override
 		public HDLReference getValue(HDLAssignment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLeft();
 		}
 	};
 	/**
 	 * The accessor for the field type which is of type HDLAssignmentType.
 	 */
-	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>() {
+	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>("type") {
 		@Override
 		public HDLAssignmentType getValue(HDLAssignment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 	};
 	/**
 	 * The accessor for the field right which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>() {
+	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>("right") {
 		@Override
 		public HDLExpression getValue(HDLAssignment obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRight();
 		}
 	};

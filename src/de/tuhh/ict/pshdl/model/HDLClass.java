@@ -62,8 +62,8 @@ public enum HDLClass {
 	public static HDLClass getClassFor(Class<?> clazz) {
 		if (classMap == null) {
 			classMap = new HashMap<Class<?>, HDLClass>();
-			for (HDLClass hdlClass : values()) {
-				classMap.put(hdlClass.clazz, hdlClass);
+			for (HDLClass cl : values()) {
+				classMap.put(cl.clazz, cl);
 			}
 		}
 		return classMap.get(clazz);

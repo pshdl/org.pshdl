@@ -60,11 +60,12 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * The accessor for the field hIf which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>() {
+	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>("hIf") {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIfRefName();
 		}
 	};
@@ -72,11 +73,12 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * The accessor for the field ifArray which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>() {
+	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>("ifArray") {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLInterfaceRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfArray();
 		}
 	};
@@ -86,8 +88,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	@Override
 	public HDLVariable resolveVar() {
 		HDLVariable resolveHIf = resolveHIf();
-		if (resolveHIf == null)
+		if (resolveHIf == null) {
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
+		}
 		HDLType type = resolveHIf.determineType();
 		if (type instanceof HDLInterface) {
 			HDLInterface hIf = (HDLInterface) type;
@@ -95,8 +98,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 			for (HDLVariableDeclaration vd : hIf.getPorts()) {
 				for (HDLVariable hv : vd.getVariables()) {
 					String lastSegment = hv.getName();
-					if (lastSegment.equals(lastSegment2))
+					if (lastSegment.equals(lastSegment2)) {
 						return hv;
+					}
 				}
 			}
 		}

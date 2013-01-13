@@ -43,11 +43,12 @@ public abstract class HDLReference extends AbstractHDLReference {
 	/**
 	 * The accessor for the field var which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLReference, HDLQualifiedName> fVar = new HDLFieldAccess<HDLReference, HDLQualifiedName>() {
+	public static HDLFieldAccess<HDLReference, HDLQualifiedName> fVar = new HDLFieldAccess<HDLReference, HDLQualifiedName>("var") {
 		@Override
 		public HDLQualifiedName getValue(HDLReference obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVarRefName();
 		}
 	};

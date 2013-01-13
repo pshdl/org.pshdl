@@ -72,22 +72,24 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * The accessor for the field type which is of type HDLPrimitiveType.
 	 */
-	public static HDLFieldAccess<HDLPrimitive, HDLPrimitiveType> fType = new HDLFieldAccess<HDLPrimitive, HDLPrimitiveType>() {
+	public static HDLFieldAccess<HDLPrimitive, HDLPrimitiveType> fType = new HDLFieldAccess<HDLPrimitive, HDLPrimitiveType>("type") {
 		@Override
 		public HDLPrimitiveType getValue(HDLPrimitive obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 	};
 	/**
 	 * The accessor for the field width which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLPrimitive, HDLExpression> fWidth = new HDLFieldAccess<HDLPrimitive, HDLExpression>() {
+	public static HDLFieldAccess<HDLPrimitive, HDLExpression> fWidth = new HDLFieldAccess<HDLPrimitive, HDLExpression>("width") {
 		@Override
 		public HDLExpression getValue(HDLPrimitive obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getWidth();
 		}
 	};
@@ -121,8 +123,9 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	@Override
 	protected String validateName(String name) {
-		if (this.name == null)
+		if (this.name == null) {
 			return "#primitive";
+		}
 		return super.validateName(name);
 	}
 
@@ -161,23 +164,30 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof AbstractHDLPrimitive))
+		}
+		if (!(obj instanceof AbstractHDLPrimitive)) {
 			return false;
+		}
 		AbstractHDLPrimitive other = (AbstractHDLPrimitive) obj;
 		if (type == null) {
-			if (other.getType() != null)
+			if (other.getType() != null) {
 				return false;
-		} else if (!type.equals(other.getType()))
+			}
+		} else if (!type.equals(other.getType())) {
 			return false;
+		}
 		if (width == null) {
-			if (other.getWidth() != null)
+			if (other.getWidth() != null) {
 				return false;
-		} else if (!width.equals(other.getWidth()))
+			}
+		} else if (!width.equals(other.getWidth())) {
 			return false;
+		}
 		return true;
 	}
 

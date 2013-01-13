@@ -54,33 +54,36 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * The accessor for the field range which is of type ArrayList<HDLRange>.
 	 */
-	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>() {
+	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>("range") {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLForLoop obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getRange();
 		}
 	};
 	/**
 	 * The accessor for the field param which is of type HDLVariable.
 	 */
-	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>() {
+	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>("param") {
 		@Override
 		public HDLVariable getValue(HDLForLoop obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getParam();
 		}
 	};
 	/**
 	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>("dos") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLForLoop obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDos();
 		}
 	};

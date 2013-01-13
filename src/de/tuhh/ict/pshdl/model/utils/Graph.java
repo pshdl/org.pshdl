@@ -22,6 +22,13 @@ public class Graph<T> {
 			return this;
 		}
 
+		public Node<T> reverseAddEdge(Node<T> node) {
+			Edge<T> e = new Edge<T>(node, this);
+			node.outEdges.add(e);
+			inEdges.add(e);
+			return this;
+		}
+
 		@Override
 		public String toString() {
 			return object.toString();
@@ -38,9 +45,34 @@ public class Graph<T> {
 		}
 
 		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((from == null) ? 0 : from.hashCode());
+			result = (prime * result) + ((to == null) ? 0 : to.hashCode());
+			return result;
+		}
+
+		@Override
 		public boolean equals(Object obj) {
-			Edge<?> e = (Edge<?>) obj;
-			return (e.from == from) && (e.to == to);
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Edge other = (Edge) obj;
+			if (from == null) {
+				if (other.from != null)
+					return false;
+			} else if (!from.equals(other.from))
+				return false;
+			if (to == null) {
+				if (other.to != null)
+					return false;
+			} else if (!to.equals(other.to))
+				return false;
+			return true;
 		}
 	}
 
@@ -65,12 +97,16 @@ public class Graph<T> {
 		eight.addEdge(nine).addEdge(ten);
 
 		List<Node<String>> allNodes = Arrays.asList(seven, five, three, eleven, eight, two, nine, ten);
+		graph.sortNodes(allNodes);
+	}
+
+	public ArrayList<Node<T>> sortNodes(List<Node<T>> allNodes) {
 		// L <- Empty list that will contain the sorted elements
-		ArrayList<Node<String>> L = new ArrayList<Node<String>>();
+		ArrayList<Node<T>> L = new ArrayList<Node<T>>();
 
 		// S <- Set of all nodes with no incoming edges
-		HashSet<Node<String>> S = new HashSet<Node<String>>();
-		for (Node<String> n : allNodes) {
+		HashSet<Node<T>> S = new HashSet<Node<T>>();
+		for (Node<T> n : allNodes) {
 			if (n.inEdges.size() == 0) {
 				S.add(n);
 			}
@@ -79,17 +115,17 @@ public class Graph<T> {
 		// while S is non-empty do
 		while (!S.isEmpty()) {
 			// remove a node n from S
-			Node<String> n = S.iterator().next();
+			Node<T> n = S.iterator().next();
 			S.remove(n);
 
 			// insert n into L
 			L.add(n);
 
 			// for each node m with an edge e from n to m do
-			for (Iterator<Edge<String>> it = n.outEdges.iterator(); it.hasNext();) {
+			for (Iterator<Edge<T>> it = n.outEdges.iterator(); it.hasNext();) {
 				// remove edge e from the graph
-				Edge<String> e = it.next();
-				Node<String> m = e.to;
+				Edge<T> e = it.next();
+				Node<T> m = e.to;
 				it.remove();// Remove edge from n
 				m.inEdges.remove(e);// Remove edge from m
 
@@ -101,7 +137,7 @@ public class Graph<T> {
 		}
 		// Check to see if all edges are removed
 		boolean cycle = false;
-		for (Node<String> n : allNodes) {
+		for (Node<T> n : allNodes) {
 			if (!n.inEdges.isEmpty()) {
 				cycle = true;
 				break;
@@ -112,5 +148,6 @@ public class Graph<T> {
 		} else {
 			System.out.println("Topological Sort: " + Arrays.toString(L.toArray()));
 		}
+		return L;
 	}
 }

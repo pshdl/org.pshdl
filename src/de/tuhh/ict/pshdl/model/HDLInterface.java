@@ -49,11 +49,12 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * The accessor for the field ports which is of type
 	 * ArrayList<HDLVariableDeclaration>.
 	 */
-	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>() {
+	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>("ports") {
 		@Override
 		public ArrayList<HDLVariableDeclaration> getValue(HDLInterface obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getPorts();
 		}
 	};
@@ -67,8 +68,9 @@ public class HDLInterface extends AbstractHDLInterface {
 			if (var.length == 1) {
 				return resolved;
 			}
-			if (getFullName().equals(var.skipLast(1)))
+			if (getFullName().equals(var.skipLast(1))) {
 				return resolved;
+			}
 		}
 		return super.resolveVariable(var);
 	}

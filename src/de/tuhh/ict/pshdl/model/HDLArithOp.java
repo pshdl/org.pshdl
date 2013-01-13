@@ -71,11 +71,12 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	/**
 	 * The accessor for the field type which is of type HDLArithOpType.
 	 */
-	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>() {
+	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>("type") {
 		@Override
 		public HDLArithOpType getValue(HDLArithOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 	};

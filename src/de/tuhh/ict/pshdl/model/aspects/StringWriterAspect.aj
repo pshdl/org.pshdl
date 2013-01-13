@@ -246,7 +246,7 @@ public aspect StringWriterAspect {
 
 	public String HDLPrimitive.toString(SyntaxHighlighter highlight) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getType().toString().toLowerCase());
+		sb.append(highlight.primitiveType(getType().toString().toLowerCase()));
 		if (getWidth() != null) {
 			sb.append(highlight.width('<'+getWidth().toString(highlight)+'>'));
 		}
@@ -472,6 +472,9 @@ public aspect StringWriterAspect {
 		highlight.incSpacing();
 		for (String imports : getImports()) {
 			sb.append(highlight.getSpacing()).append(highlight.keyword("import")).append(highlight.simpleSpace()).append(highlight.importName(imports)).append(";").append(highlight.newLine());
+		}
+		for (HDLStatement stmnt : getInits()) {
+			sb.append(stmnt.toString(highlight)).append(highlight.newLine());
 		}
 		for (HDLStatement stmnt : getStatements()) {
 			sb.append(stmnt.toString(highlight)).append(highlight.newLine());

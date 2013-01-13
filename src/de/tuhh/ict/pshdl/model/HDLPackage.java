@@ -55,33 +55,36 @@ public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * The accessor for the field libURI which is of type String.
 	 */
-	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>() {
+	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>("libURI") {
 		@Override
 		public String getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLibURI();
 		}
 	};
 	/**
 	 * The accessor for the field pkg which is of type String.
 	 */
-	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>() {
+	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>("pkg") {
 		@Override
 		public String getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getPkg();
 		}
 	};
 	/**
 	 * The accessor for the field units which is of type ArrayList<HDLUnit>.
 	 */
-	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>() {
+	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>("units") {
 		@Override
 		public ArrayList<HDLUnit> getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getUnits();
 		}
 	};
@@ -89,11 +92,12 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * The accessor for the field declarations which is of type
 	 * ArrayList<HDLDeclaration>.
 	 */
-	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>() {
+	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>("declarations") {
 		@Override
 		public ArrayList<HDLDeclaration> getValue(HDLPackage obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getDeclarations();
 		}
 	};

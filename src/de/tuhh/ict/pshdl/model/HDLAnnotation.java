@@ -45,22 +45,24 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>() {
+	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>("name") {
 		@Override
 		public String getValue(HDLAnnotation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 	};
 	/**
 	 * The accessor for the field value which is of type String.
 	 */
-	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>() {
+	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>("value") {
 		@Override
 		public String getValue(HDLAnnotation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getValue();
 		}
 	};

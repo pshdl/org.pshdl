@@ -51,11 +51,12 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * The accessor for the field ifExp which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>() {
+	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>("ifExp") {
 		@Override
 		public HDLExpression getValue(HDLIfStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfExp();
 		}
 	};
@@ -63,11 +64,12 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * The accessor for the field thenDo which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("thenDo") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getThenDo();
 		}
 	};
@@ -75,11 +77,12 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * The accessor for the field elseDo which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("elseDo") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getElseDo();
 		}
 	};

@@ -54,22 +54,24 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	/**
 	 * The accessor for the field args which is of type ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLInlineFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLInlineFunction, ArrayList<HDLVariable>>() {
+	public static HDLFieldAccess<HDLInlineFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLInlineFunction, ArrayList<HDLVariable>>("args") {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLInlineFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArgs();
 		}
 	};
 	/**
 	 * The accessor for the field expr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLInlineFunction, HDLExpression> fExpr = new HDLFieldAccess<HDLInlineFunction, HDLExpression>() {
+	public static HDLFieldAccess<HDLInlineFunction, HDLExpression> fExpr = new HDLFieldAccess<HDLInlineFunction, HDLExpression>("expr") {
 		@Override
 		public HDLExpression getValue(HDLInlineFunction obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getExpr();
 		}
 	};

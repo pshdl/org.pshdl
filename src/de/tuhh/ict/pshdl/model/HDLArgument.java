@@ -45,22 +45,24 @@ public class HDLArgument extends AbstractHDLArgument {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>() {
+	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>("name") {
 		@Override
 		public String getValue(HDLArgument obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 	};
 	/**
 	 * The accessor for the field expression which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>() {
+	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>("expression") {
 		@Override
 		public HDLExpression getValue(HDLArgument obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getExpression();
 		}
 	};

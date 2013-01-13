@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 public class ModificationSet {
 
@@ -70,6 +71,8 @@ public class ModificationSet {
 							case REPLACE:
 								replace.addAll((Collection<? extends T>) modification.with);
 								break;
+							case ADD:
+								break;
 							}
 						}
 						multiAdd(res, before, container);
@@ -82,7 +85,26 @@ public class ModificationSet {
 						singleAdd(res, t, container);
 					}
 				}
+				List<Modification> mods = getModWithoutCheck(container);
+				if (mods != null) {
+					for (Modification mod : mods) {
+						if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
+							multiAdd(res, (List<T>) mod.with, container);
+						}
+					}
+				}
 				return res;
+			}
+			List<Modification> mods = getModWithoutCheck(container);
+			if (mods != null) {
+				ArrayList<T> res = new ArrayList<T>();
+				for (Modification mod : mods) {
+					if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
+						multiAdd(res, (List<T>) mod.with, container);
+					}
+				}
+				if (res.size() != 0)
+					return res;
 			}
 			return null;
 		}
@@ -114,11 +136,12 @@ public class ModificationSet {
 	}
 
 	private static enum ModificationType {
-		REPLACE, INSERT_BEFORE, INSERT_AFTER;
+		REPLACE, INSERT_BEFORE, INSERT_AFTER, ADD;
 	}
 
 	private static class Modification {
 		public final IHDLObject subject;
+		public final String feature;
 		public final List<IHDLObject> with;
 		public final ModificationType type;
 
@@ -127,18 +150,16 @@ public class ModificationSet {
 			return "Modification [subject=" + subject + ", with=" + with + ", type=" + type + "]";
 		}
 
-		public Modification(IHDLObject subject, ModificationType type, IHDLObject... with) {
-			this(subject, Arrays.asList(with), type);
-		}
-
-		public Modification(IHDLObject subject, List<IHDLObject> with, ModificationType type) {
+		public Modification(IHDLObject subject, ModificationType type, String feature, IHDLObject... with) {
 			super();
+			List<IHDLObject> with1 = Arrays.asList(with);
 			this.subject = subject;
-			for (int i = 0; i < with.size(); i++) {
-				with.set(i, with.get(i));
+			for (int i = 0; i < with1.size(); i++) {
+				with1.set(i, with1.get(i));
 			}
-			this.with = with;
+			this.with = with1;
 			this.type = type;
+			this.feature = feature;
 		}
 	}
 
@@ -153,6 +174,10 @@ public class ModificationSet {
 					return null;
 			}
 		}
+		return getModWithoutCheck(object);
+	}
+
+	private <T> List<Modification> getModWithoutCheck(T object) {
 		List<Modification> list = replacements.get(getHash(object));
 		if (list != null) {
 			List<Modification> res = new LinkedList<ModificationSet.Modification>();
@@ -166,17 +191,17 @@ public class ModificationSet {
 	}
 
 	public void replace(IHDLObject subject, IHDLObject... with) {
-		Modification mod = new Modification(subject, ModificationType.REPLACE, with);
+		Modification mod = new Modification(subject, ModificationType.REPLACE, null, with);
 		insert(subject, mod);
 	}
 
 	public void insertAfter(IHDLObject subject, IHDLObject... with) {
-		Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, with);
+		Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, null, with);
 		insert(subject, mod);
 	}
 
 	public void insertBefore(IHDLObject subject, IHDLObject... with) {
-		Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, with);
+		Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, null, with);
 		insert(subject, mod);
 	}
 
@@ -186,6 +211,11 @@ public class ModificationSet {
 			list = new LinkedList<ModificationSet.Modification>();
 		list.add(mod);
 		replacements.put(getHash(subject), list);
+	}
+
+	public void addTo(IHDLObject subject, HDLFieldAccess<?, ?> field, IHDLObject... add) {
+		Modification mod = new Modification(subject, ModificationType.ADD, field.fieldName, add);
+		insert(subject, mod);
 	}
 
 	/**
@@ -218,7 +248,10 @@ public class ModificationSet {
 		List<Modification> mods = getModifications(reg);
 		if ((mods == null) || mods.isEmpty())
 			return reg;
-		return (T) mods.get(0).with.get(0);
+		Modification mod = mods.get(0);
+		if (mod.type != ModificationType.ADD)
+			return (T) mod.with.get(0);
+		return reg;
 	}
 
 	/**

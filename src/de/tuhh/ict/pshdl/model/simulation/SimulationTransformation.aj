@@ -11,116 +11,187 @@ import de.tuhh.ict.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
 
 public aspect SimulationTransformation {
-	public FluidFrame HDLExpression.toSimulationModel() {
+	public FluidFrame HDLExpression.toSimulationModel(HDLEvaluationContext context) {
 		throw new RuntimeException("Not implemented!");
 	}
 
-	public FluidFrame HDLStatement.toSimulationModel() {
+	public FluidFrame HDLStatement.toSimulationModel(HDLEvaluationContext context) {
 		throw new RuntimeException("Not implemented!");
 	}
 
-	public FluidFrame HDLAssignment.toSimulationModel() {
+	public FluidFrame HDLAssignment.toSimulationModel(HDLEvaluationContext context) {
 		HDLReference left = getLeft();
 		HDLVariable var = left.resolveVar();
 		FluidFrame res = new FluidFrame(getVarName(getLeft(), true));
-		res.append(getRight().toSimulationModel());
+		res.append(getRight().toSimulationModel(context));
 		HDLDirection dir = var.getDirection();
-		res.setInternal(dir==HDLDirection.INTERNAL);
+		boolean hasBits = false;
+		if (left instanceof HDLVariableRef) {
+			HDLVariableRef variableRef = (HDLVariableRef) left;
+			if (!variableRef.getBits().isEmpty())
+				hasBits = true;
+		}
+		res.setInternal(dir == HDLDirection.INTERNAL || hasBits);
 		return res;
 	}
 
-	public static String getVarName(HDLReference var, boolean withBits){
-		HDLVariableRef varRef=(HDLVariableRef) var;
-		StringBuilder sb=new StringBuilder();
+	public static String getVarName(HDLReference var, boolean withBits) {
+		HDLVariableRef varRef = (HDLVariableRef) var;
+		StringBuilder sb = new StringBuilder();
 		sb.append(var.resolveVar().getFullName());
 		for (HDLExpression exp : varRef.getArray()) {
 			sb.append('[').append(exp).append(']');
 		}
-		if (withBits){
+		if (withBits) {
 			for (HDLRange exp : varRef.getBits()) {
 				sb.append('{').append(exp).append('}');
 			}
 		}
 		return sb.toString();
 	}
-	
-	public FluidFrame HDLUnit.toSimulationModel() {
+
+	public FluidFrame HDLConcat.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
-		for (HDLStatement stmnt : getStatements()) {
+		Iterator<HDLExpression> iter = getCats().iterator();
+		res.append(iter.next().toSimulationModel(context));
+		while (iter.hasNext()) {
+			HDLExpression exp = iter.next();
+			res.append(exp.toSimulationModel(context));
+			HDLPrimitive determineType = (HDLPrimitive) exp.determineType();
+			BigInteger width = null;
+			switch (determineType.getType()) {
+			case BIT:
+				width = BigInteger.ONE;
+				break;
+			case INTEGER:
+			case NATURAL:
+				width = BigInteger.valueOf(32);
+				break;
+			case UINT:
+			case INT:
+			case BITVECTOR:
+				width = determineType.getWidth().constantEvaluate(context);
+				break;
+			default:
+				throw new IllegalArgumentException("Can not concatenate " + determineType);
+			}
+			res.add(new ArgumentedInstruction(Instruction.concat, width.toString()));
+		}
+		return res;
+	}
+
+	public FluidFrame HDLUnit.toSimulationModel(HDLEvaluationContext context) {
+		FluidFrame res = new FluidFrame();
+		for (HDLStatement stmnt : getInits()) {
 			switch (stmnt.getClassType()) {
 			case HDLAssignment:
-				FluidFrame sFrame = stmnt.toSimulationModel();
+				FluidFrame sFrame = stmnt.toSimulationModel(context);
 				res.addReferencedFrame(sFrame);
 				res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
 				break;
-			case HDLVariableDeclaration:
+			default:
+				break;
+			}
+		}
+
+		for (HDLStatement stmnt : getStatements()) {
+			switch (stmnt.getClassType()) {
+			case HDLAssignment:
+				FluidFrame sFrame = stmnt.toSimulationModel(context);
+				res.addReferencedFrame(sFrame);
+				res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
+				break;
+			default:
 				break;
 			}
 		}
 		return res;
 	}
-	
-	
-	public FluidFrame HDLManip.toSimulationModel(){
-		FluidFrame res=getTarget().toSimulationModel();
-		switch (getType()){
-		case ARITH_NEG: res.add(Instruction.arith_neg);break; 
-		case BIT_NEG: res.add(Instruction.bit_neg);break; 
-		case LOGIC_NEG: res.add(Instruction.logic_neg);break; 
+
+	public FluidFrame HDLManip.toSimulationModel(HDLEvaluationContext context) {
+		FluidFrame res = getTarget().toSimulationModel(context);
+		switch (getType()) {
+		case ARITH_NEG:
+			res.add(Instruction.arith_neg);
+			break;
+		case BIT_NEG:
+			res.add(Instruction.bit_neg);
+			break;
+		case LOGIC_NEG:
+			res.add(Instruction.logic_neg);
+			break;
 		case CAST:
-			HDLPrimitive prim=(HDLPrimitive)getCastTo();
-			switch (prim.getType()){
+			HDLPrimitive prim = (HDLPrimitive) getCastTo();
+			switch (prim.getType()) {
 			case INT:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, prim.getWidth().toString()));break;
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, prim.getWidth().toString()));
+				break;
 			case INTEGER:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, "32"));break;
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, "32"));
+				break;
 			case UINT:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, prim.getWidth().toString()));break;
-			case NATURAL:	
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, "32"));break;
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, prim.getWidth().toString()));
+				break;
+			case NATURAL:
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, "32"));
+				break;
 			case BIT:
 			case BITVECTOR:
 				break;
 			default:
-				throw new IllegalArgumentException("Cast to type:"+prim.getType()+" not supported");
+				throw new IllegalArgumentException("Cast to type:" + prim.getType() + " not supported");
 			}
 			break;
 		}
 		return res;
 	}
 
-	public FluidFrame HDLVariableRef.toSimulationModel(){
-		FluidFrame res=new FluidFrame();
-		String refName=getVarRefName().toString();
-		String[] bits=new String[getBits().size()+1];
-		bits[0]=refName;
-		if (getBits().size()!=0){
-			for (int i = 0; i < bits.length-1; i++) {
-				bits[i+1]=getBits().get(i).toString();
+	public FluidFrame HDLVariableRef.toSimulationModel(HDLEvaluationContext context) {
+		FluidFrame res = new FluidFrame();
+		String refName = getVarRefName().toString();
+		String[] bits = new String[getBits().size() + 1];
+		bits[0] = refName;
+		if (!getBits().isEmpty()) {
+			for (int i = 0; i < bits.length - 1; i++) {
+				bits[i + 1] = getBits().get(i).toString();
 			}
 		}
-		HDLDirection dir=resolveVar().getDirection();
-		if (dir!=HDLDirection.INTERNAL) {
+		HDLDirection dir = resolveVar().getDirection();
+		switch (dir) {
+		case INTERNAL:
+			res.instructions.add(new ArgumentedInstruction(Instruction.loadInternal, bits));
+			break;
+		case PARAMETER:
+		case CONSTANT:
+		case IN:
 			res.addInput(refName);
 			res.instructions.add(new ArgumentedInstruction(Instruction.loadInput, bits));
-		} else {
-			res.instructions.add(new ArgumentedInstruction(Instruction.loadInternal, bits));
+			break;
+		case OUT:
+		case INOUT:
+			if (bits.length > 1) {
+				res.instructions.add(new ArgumentedInstruction(Instruction.loadInternal, bits));
+			} else {
+				res.addInput(refName);
+				res.instructions.add(new ArgumentedInstruction(Instruction.loadInput, bits));
+			}
+			break;
 		}
 		return res;
 	}
-	
-	public FluidFrame HDLTernary.toSimulationModel() {
+
+	public FluidFrame HDLTernary.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
-		res.append(getIfExpr().toSimulationModel());
-		FluidFrame thenFrame = getThenExpr().toSimulationModel();
+		res.append(getIfExpr().toSimulationModel(context));
+		FluidFrame thenFrame = getThenExpr().toSimulationModel(context);
 		res.addReferencedFrame(thenFrame);
-		FluidFrame elseFrame = getThenExpr().toSimulationModel();
+		FluidFrame elseFrame = getThenExpr().toSimulationModel(context);
 		res.addReferencedFrame(elseFrame);
 		res.instructions.add(new ArgumentedInstruction(Instruction.ifCall, Integer.toString(thenFrame.id), Integer.toString(elseFrame.id)));
 		return res;
 	}
 
-	public FluidFrame HDLLiteral.toSimulationModel() {
+	public FluidFrame HDLLiteral.toSimulationModel(HDLEvaluationContext context) {
 		BigInteger value = getValueAsBigInt();
 		FluidFrame res = new FluidFrame();
 		String key = value.toString();
@@ -129,34 +200,34 @@ public aspect SimulationTransformation {
 		return res;
 	}
 
-	public FluidFrame HDLBitOp.toSimulationModel() {
+	public FluidFrame HDLBitOp.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
-		res.append(getLeft().toSimulationModel());
-		res.append(getRight().toSimulationModel());
+		res.append(getLeft().toSimulationModel(context));
+		res.append(getRight().toSimulationModel(context));
 		switch (getType()) {
 		case AND:
 			res.add(Instruction.and);
 			break;
 		case LOGI_AND:
-			res.add(Instruction.and);
+			res.add(Instruction.logiAnd);
 			break;
 		case OR:
-			res.add(Instruction.and);
+			res.add(Instruction.or);
 			break;
 		case LOGI_OR:
-			res.add(Instruction.and);
+			res.add(Instruction.logiOr);
 			break;
 		case XOR:
-			res.add(Instruction.and);
+			res.add(Instruction.xor);
 			break;
 		}
 		return res;
 	}
 
-	public FluidFrame HDLArithOp.toSimulationModel() {
+	public FluidFrame HDLArithOp.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
-		res.append(getLeft().toSimulationModel());
-		res.append(getRight().toSimulationModel());
+		res.append(getLeft().toSimulationModel(context));
+		res.append(getRight().toSimulationModel(context));
 		switch (getType()) {
 		case DIV:
 			res.add(Instruction.div);
@@ -180,10 +251,10 @@ public aspect SimulationTransformation {
 		return res;
 	}
 
-	public FluidFrame HDLShiftOp.toSimulationModel() {
+	public FluidFrame HDLShiftOp.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
-		res.append(getLeft().toSimulationModel());
-		res.append(getRight().toSimulationModel());
+		res.append(getLeft().toSimulationModel(context));
+		res.append(getRight().toSimulationModel(context));
 		switch (getType()) {
 		case SLL:
 			res.add(Instruction.sll);

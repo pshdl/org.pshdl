@@ -8,7 +8,6 @@ import org.antlr.runtime.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class MemoryModel {
 
@@ -18,11 +17,11 @@ public class MemoryModel {
 		System.out.println(unit);
 		List<Row> rows = buildRows(unit);
 		byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
-		SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
-		for (SideFile sideFile : cFiles) {
-			System.out.println(sideFile.relPath);
-			System.out.println(new String(sideFile.contents));
-		}
+		// SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
+		// for (SideFile sideFile : cFiles) {
+		// System.out.println(sideFile.relPath);
+		// System.out.println(new String(sideFile.contents));
+		// }
 		FileOutputStream ps = new FileOutputStream(args[0] + "Map.html");
 		ps.write(builtHTML);
 		ps.close();

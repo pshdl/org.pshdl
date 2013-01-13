@@ -47,11 +47,12 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	/**
 	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
-	public static HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface> fHIf = new HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface>() {
+	public static HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface> fHIf = new HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface>("hIf") {
 		@Override
 		public HDLInterface getValue(HDLInterfaceDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIf();
 		}
 	};

@@ -157,7 +157,11 @@ public class Insulin {
 				// System.out.println("Insulin.includeGenerators()" +
 				// generationInfo.unit);
 				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
-				ms.replace(generation, stmnts);
+				HDLStatement[] inits = generationInfo.unit.getInits().toArray(new HDLStatement[0]);
+				ArrayList<HDLStatement> allStmnt = new ArrayList<HDLStatement>();
+				allStmnt.addAll(Arrays.asList(stmnts));
+				allStmnt.addAll(Arrays.asList(inits));
+				ms.replace(generation, allStmnt.toArray(new HDLStatement[allStmnt.size()]));
 				HDLInterfaceRef[] ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
 				for (HDLInterfaceRef hdI : ifRefs) {
 					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
@@ -312,8 +316,7 @@ public class Insulin {
 		}
 		if (container instanceof HDLUnit) {
 			HDLUnit unit = (HDLUnit) container;
-			HDLStatement statement = unit.getStatements().get(0);
-			ms.insertBefore(statement, stmnt);
+			ms.addTo(unit, HDLUnit.fInits, stmnt);
 		}
 		if (container instanceof HDLBlock) {
 			HDLBlock block = (HDLBlock) container;
@@ -707,24 +710,38 @@ public class Insulin {
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
-						String varName = ref.getVarRefName().getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
-						HDLQualifiedName hVarName = new HDLQualifiedName(varName);
-						replacements
-								.add(new HDLVariableDeclaration().setType(ref.determineType()).addVariables(new HDLVariable().setName(varName).setDefaultValue(ass.getRight())));
-						BigInteger shift = BigInteger.ZERO;
-						for (int j = bits.size() - 1; j >= 0; j--) {
-							HDLRange r = bits.get(j);
-							ValueRange vr = r.determineRange(context);
-							BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
-							HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add));
-							HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
-							HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
-							HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);
-							replacements.add(newAss);
-							shift = add.add(BigInteger.ONE);
+						BigInteger constant = ass.getRight().constantEvaluate(context);
+						if (constant != null) {
+							BigInteger shift = BigInteger.ZERO;
+							for (int j = bits.size() - 1; j >= 0; j--) {
+								HDLRange r = bits.get(j);
+								ValueRange vr = r.determineRange(context);
+								BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
+								BigInteger res = constant.shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
+								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
+								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(HDLLiteral.get(res));
+								replacements.add(newAss);
+								shift = add.add(BigInteger.ONE);
+							}
+						} else {
+							String varName = ref.getVarRefName().getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
+							HDLQualifiedName hVarName = new HDLQualifiedName(varName);
+							replacements.add(new HDLVariableDeclaration().setType(ref.determineType()).addVariables(
+									new HDLVariable().setName(varName).setDefaultValue(ass.getRight())));
+							BigInteger shift = BigInteger.ZERO;
+							for (int j = bits.size() - 1; j >= 0; j--) {
+								HDLRange r = bits.get(j);
+								ValueRange vr = r.determineRange(context);
+								BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
+								HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add));
+								HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
+								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
+								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);
+								replacements.add(newAss);
+								shift = add.add(BigInteger.ONE);
+							}
 						}
 						ms.replace(ass, replacements.toArray(new HDLStatement[0]));
-
 					}
 				}
 				// Multi bit read access

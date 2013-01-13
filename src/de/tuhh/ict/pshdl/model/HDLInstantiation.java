@@ -47,11 +47,12 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	/**
 	 * The accessor for the field var which is of type HDLVariable.
 	 */
-	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>() {
+	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>("var") {
 		@Override
 		public HDLVariable getValue(HDLInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getVar();
 		}
 	};
@@ -59,11 +60,12 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * The accessor for the field arguments which is of type
 	 * ArrayList<HDLArgument>.
 	 */
-	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>() {
+	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>("arguments") {
 		@Override
 		public ArrayList<HDLArgument> getValue(HDLInstantiation obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getArguments();
 		}
 	};

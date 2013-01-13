@@ -64,44 +64,48 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>() {
+	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>("hIf") {
 		@Override
 		public HDLInterface getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHIf();
 		}
 	};
 	/**
 	 * The accessor for the field generatorID which is of type String.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>() {
+	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>("generatorID") {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getGeneratorID();
 		}
 	};
 	/**
 	 * The accessor for the field generatorContent which is of type String.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>() {
+	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>("generatorContent") {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getGeneratorContent();
 		}
 	};
 	/**
 	 * The accessor for the field include which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>() {
+	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>("include") {
 		@Override
 		public Boolean getValue(HDLDirectGeneration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getInclude();
 		}
 	};
@@ -111,8 +115,9 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 
 	@Override
 	public HDLInterface getHIf() {
-		if (hif != null)
+		if (hif != null) {
 			return hif;
+		}
 		hif = HDLGenerators.getInterface(this);
 		return hif;
 	}

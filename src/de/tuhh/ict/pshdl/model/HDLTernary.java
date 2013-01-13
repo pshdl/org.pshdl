@@ -48,33 +48,36 @@ public class HDLTernary extends AbstractHDLTernary {
 	/**
 	 * The accessor for the field ifExpr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLTernary, HDLExpression> fIfExpr = new HDLFieldAccess<HDLTernary, HDLExpression>() {
+	public static HDLFieldAccess<HDLTernary, HDLExpression> fIfExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("ifExpr") {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getIfExpr();
 		}
 	};
 	/**
 	 * The accessor for the field thenExpr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLTernary, HDLExpression> fThenExpr = new HDLFieldAccess<HDLTernary, HDLExpression>() {
+	public static HDLFieldAccess<HDLTernary, HDLExpression> fThenExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("thenExpr") {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getThenExpr();
 		}
 	};
 	/**
 	 * The accessor for the field elseExpr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLTernary, HDLExpression> fElseExpr = new HDLFieldAccess<HDLTernary, HDLExpression>() {
+	public static HDLFieldAccess<HDLTernary, HDLExpression> fElseExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("elseExpr") {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getElseExpr();
 		}
 	};

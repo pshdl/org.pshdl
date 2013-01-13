@@ -45,11 +45,12 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	/**
 	 * The accessor for the field container which is of type IHDLObject.
 	 */
-	public static HDLFieldAccess<HDLObject, IHDLObject> fContainer = new HDLFieldAccess<HDLObject, IHDLObject>() {
+	public static HDLFieldAccess<HDLObject, IHDLObject> fContainer = new HDLFieldAccess<HDLObject, IHDLObject>("container") {
 		@Override
 		public IHDLObject getValue(HDLObject obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getContainer();
 		}
 	};
@@ -111,20 +112,26 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			GenericMeta other = (GenericMeta) obj;
-			if (inherit != other.inherit)
+			if (inherit != other.inherit) {
 				return false;
+			}
 			if (name == null) {
-				if (other.name != null)
+				if (other.name != null) {
 					return false;
-			} else if (!name.equals(other.name))
+				}
+			} else if (!name.equals(other.name)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -186,22 +193,27 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (hashCode() != obj.hashCode())
+		}
+		if (hashCode() != obj.hashCode()) {
 			return false;
-		if (!(obj instanceof HDLObject))
+		}
+		if (!(obj instanceof HDLObject)) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
 		HDLClass classFor = HDLClass.getClassFor(clazz);
-		if (classFor == null)
+		if (classFor == null) {
 			throw new IllegalArgumentException("Unkown class:" + clazz);
+		}
 		return getAllObjectsOf(classFor, clazz, deep);
 	}
 
@@ -246,13 +258,15 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 		}
 		IHDLObject[] list = arrayClazzTypes[clazz.ordinal()];
-		if (list == null)
+		if (list == null) {
 			return (T[]) Array.newInstance(clazz.clazz, 0);
+		}
 		if (deep == false) {
 			LinkedList<IHDLObject> res = new LinkedList<IHDLObject>();
 			for (IHDLObject ihdlObject : list) {
-				if (ihdlObject.getContainer() == this)
+				if (ihdlObject.getContainer() == this) {
 					res.add(ihdlObject);
+				}
 			}
 			return res.toArray((T[]) Array.newInstance(clazz.clazz, res.size()));
 		}
@@ -279,8 +293,9 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		Set<T> list = new NonSameList<T>();
 		for (T t : allObjectsOf) {
 			K value = field.getValue(t);
-			if (matcher.matches(value))
+			if (matcher.matches(value)) {
 				list.add(t);
+			}
 		}
 		return list;
 	}
@@ -298,8 +313,9 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	@SuppressWarnings("unchecked")
 	public <T extends IHDLObject> T getContainer(Class<T> clazz) {
 		if (container != null) {
-			if (container.getClass().equals(clazz))
+			if (container.getClass().equals(clazz)) {
 				return (T) container;
+			}
 			return container.getContainer(clazz);
 		}
 		return null;
@@ -322,13 +338,15 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 
 	@Override
 	public HDLObject setContainer(IHDLObject container) {
-		if (container == this)
+		if (container == this) {
 			throw new IllegalArgumentException("Object can not contain itself");
+		}
 		if (this.container != null) {
 			throw new IllegalArgumentException("Container already set");
 		}
-		if (frozen)
+		if (frozen) {
 			throw new IllegalArgumentException("Frozen");
+		}
 		this.container = container;
 		return this;
 	}
@@ -339,8 +357,9 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			return hdlUnit.getLibrary();
 		}
 		HDLPackage hdlPackage = getContainer(HDLPackage.class);
-		if (hdlPackage != null)
+		if (hdlPackage != null) {
 			return hdlPackage.getLibrary();
+		}
 		return null;
 	}
 

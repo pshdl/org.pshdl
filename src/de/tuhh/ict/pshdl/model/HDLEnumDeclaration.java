@@ -47,11 +47,12 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	/**
 	 * The accessor for the field hEnum which is of type HDLEnum.
 	 */
-	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>() {
+	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>("hEnum") {
 		@Override
 		public HDLEnum getValue(HDLEnumDeclaration obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHEnum();
 		}
 	};

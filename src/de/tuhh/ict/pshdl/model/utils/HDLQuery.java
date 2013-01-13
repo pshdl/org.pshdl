@@ -6,6 +6,12 @@ import de.tuhh.ict.pshdl.model.*;
 
 public class HDLQuery {
 	public static abstract class HDLFieldAccess<T, K> {
+		public final String fieldName;
+
+		protected HDLFieldAccess(String fieldName) {
+			this.fieldName = fieldName;
+		}
+
 		public abstract K getValue(T obj);
 	}
 

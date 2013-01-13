@@ -42,6 +42,9 @@ public aspect VHDLPackageTransformation {
 			}
 		}
 
+		for (HDLStatement stmnt : getInits()) {
+			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX), false);
+		}
 		for (HDLStatement stmnt : getStatements()) {
 			unit.merge(stmnt.toVHDL(VHDLContext.DEFAULT_CTX), false);
 		}

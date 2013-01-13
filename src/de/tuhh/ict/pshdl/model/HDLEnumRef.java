@@ -48,11 +48,12 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
 	 * The accessor for the field hEnum which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>() {
+	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>("hEnum") {
 		@Override
 		public HDLQualifiedName getValue(HDLEnumRef obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getHEnumRefName();
 		}
 	};
@@ -62,8 +63,9 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	public HDLVariable resolveVar() {
 		HDLEnum resolveHEnum = resolveHEnum();
 		HDLVariable var = resolveHEnum.getVariable(getVarRefName().getLastSegment());
-		if (var == null)
+		if (var == null) {
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
+		}
 		return var;
 	}
 

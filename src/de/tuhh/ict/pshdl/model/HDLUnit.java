@@ -19,6 +19,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<String> imports. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLStatement> inits. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * <li>Boolean simulation. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
@@ -37,6 +38,8 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param imports
 	 *            the value for imports. Can be <code>null</code>.
+	 * @param inits
+	 *            the value for inits. Can be <code>null</code>.
 	 * @param statements
 	 *            the value for statements. Can be <code>null</code>.
 	 * @param simulation
@@ -45,8 +48,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLUnit(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
-			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation, boolean validate) {
-		super(container, annotations, libURI, name, imports, statements, simulation, validate);
+			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> inits, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation,
+			boolean validate) {
+		super(container, annotations, libURI, name, imports, inits, statements, simulation, validate);
 	}
 
 	public HDLUnit() {
@@ -65,67 +69,86 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	 * The accessor for the field annotations which is of type
 	 * ArrayList<HDLAnnotation>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>>() {
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>>("annotations") {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLUnit obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getAnnotations();
 		}
 	};
 	/**
 	 * The accessor for the field libURI which is of type String.
 	 */
-	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>() {
+	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>("libURI") {
 		@Override
 		public String getValue(HDLUnit obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getLibURI();
 		}
 	};
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>() {
+	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>("name") {
 		@Override
 		public String getValue(HDLUnit obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getName();
 		}
 	};
 	/**
 	 * The accessor for the field imports which is of type ArrayList<String>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>() {
+	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>("imports") {
 		@Override
 		public ArrayList<String> getValue(HDLUnit obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getImports();
+		}
+	};
+	/**
+	 * The accessor for the field inits which is of type
+	 * ArrayList<HDLStatement>.
+	 */
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fInits = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("inits") {
+		@Override
+		public ArrayList<HDLStatement> getValue(HDLUnit obj) {
+			if (obj == null) {
+				return null;
+			}
+			return obj.getInits();
 		}
 	};
 	/**
 	 * The accessor for the field statements which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("statements") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLUnit obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getStatements();
 		}
 	};
 	/**
 	 * The accessor for the field simulation which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLUnit, Boolean> fSimulation = new HDLFieldAccess<HDLUnit, Boolean>() {
+	public static HDLFieldAccess<HDLUnit, Boolean> fSimulation = new HDLFieldAccess<HDLUnit, Boolean>("simulation") {
 		@Override
 		public Boolean getValue(HDLUnit obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getSimulation();
 		}
 	};
@@ -133,8 +156,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 	private HDLInterface unitIF = null;
 
 	public HDLInterface asInterface() {
-		if (unitIF != null)
+		if (unitIF != null) {
 			return unitIF;
+		}
 		HDLQualifiedName fullName = getFullName();
 		unitIF = new HDLInterface().setName(fullName.toString());
 		HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
@@ -145,8 +169,9 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		for (HDLDirectGeneration hdgi : generators) {
 			if (hdgi.getInclude()) {
 				List<HDLVariableDeclaration> portAdditions = HDLGenerators.getPortAdditions(hdgi);
-				if (portAdditions != null)
+				if (portAdditions != null) {
 					declarations.addAll(portAdditions);
+				}
 			}
 		}
 		HDLVariable clk = null, rst = null;
@@ -172,13 +197,16 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 				}
 			}
 			for (HDLVariable var : hvd.getVariables()) {
-				if (var.getAnnotation(HDLBuiltInAnnotations.clock) != null)
+				if (var.getAnnotation(HDLBuiltInAnnotations.clock) != null) {
 					clk = var;
-				if (var.getAnnotation(HDLBuiltInAnnotations.reset) != null)
+				}
+				if (var.getAnnotation(HDLBuiltInAnnotations.reset) != null) {
 					rst = var;
+				}
 			}
-			if (hvd.getRegister() != null)
+			if (hvd.getRegister() != null) {
 				hasReg = true;
+			}
 		}
 		if (hasReg) {
 			if ((clk == null) && (rst == null)) {
@@ -190,13 +218,15 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		ModificationSet ms = new ModificationSet();
 		HDLVariableRef[] refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			if (ref.getVarRefName().length == 1)
+			if (ref.getVarRefName().length == 1) {
 				ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
+			}
 		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);
-		if (!unitIF.isFrozen())
+		if (!unitIF.isFrozen()) {
 			unitIF.freeze(this);
+		}
 		unitIF.addMeta("FULLNAME", fullName);
 		return unitIF;
 	}

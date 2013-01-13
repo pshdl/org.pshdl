@@ -47,11 +47,12 @@ public class HDLBlock extends AbstractHDLBlock {
 	/**
 	 * The accessor for the field process which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLBlock, Boolean> fProcess = new HDLFieldAccess<HDLBlock, Boolean>() {
+	public static HDLFieldAccess<HDLBlock, Boolean> fProcess = new HDLFieldAccess<HDLBlock, Boolean>("process") {
 		@Override
 		public Boolean getValue(HDLBlock obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getProcess();
 		}
 	};
@@ -59,11 +60,12 @@ public class HDLBlock extends AbstractHDLBlock {
 	 * The accessor for the field statements which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>>() {
+	public static HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>>("statements") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLBlock obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getStatements();
 		}
 	};

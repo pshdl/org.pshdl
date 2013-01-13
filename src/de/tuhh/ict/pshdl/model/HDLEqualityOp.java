@@ -71,11 +71,12 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	/**
 	 * The accessor for the field type which is of type HDLEqualityOpType.
 	 */
-	public static HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType> fType = new HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType>() {
+	public static HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType> fType = new HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType>("type") {
 		@Override
 		public HDLEqualityOpType getValue(HDLEqualityOp obj) {
-			if (obj == null)
+			if (obj == null) {
 				return null;
+			}
 			return obj.getType();
 		}
 	};
