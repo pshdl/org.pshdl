@@ -5,6 +5,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
+import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
@@ -22,7 +23,27 @@ public aspect SimulationTransformation {
 	public FluidFrame HDLAssignment.toSimulationModel(HDLEvaluationContext context) {
 		HDLReference left = getLeft();
 		HDLVariable var = left.resolveVar();
-		FluidFrame res = new FluidFrame(getVarName(getLeft(), true));
+		HDLRegisterConfig config = var.getRegisterConfig();
+		FluidFrame res;
+		if (config!=null)
+			res= new FluidFrame(getVarName(getLeft(), true)+"$reg");
+		else
+			res= new FluidFrame(getVarName(getLeft(), true));
+		if (config!=null){
+			config=config.normalize();
+			HDLVariable clk = config.resolveClk();
+			if (clk.getDirection()==HDLDirection.IN){
+				if (config.getClockType()==HDLRegClockType.RISING)
+					res.add(new ArgumentedInstruction(Instruction.isRisingEdgeInput, clk.getFullName().toString()));
+				else
+					res.add(new ArgumentedInstruction(Instruction.isFallingEdgeInput, clk.getFullName().toString()));
+			} else {
+				if (config.getClockType()==HDLRegClockType.RISING)
+					res.add(new ArgumentedInstruction(Instruction.isRisingEdgeInternal, clk.getFullName().toString()));
+				else
+					res.add(new ArgumentedInstruction(Instruction.isFallingEdgeInternal, clk.getFullName().toString()));
+			}
+		}
 		res.append(getRight().toSimulationModel(context));
 		HDLDirection dir = var.getDirection();
 		boolean hasBits = false;
@@ -193,7 +214,12 @@ public aspect SimulationTransformation {
 
 	public FluidFrame HDLLiteral.toSimulationModel(HDLEvaluationContext context) {
 		BigInteger value = getValueAsBigInt();
+			
 		FluidFrame res = new FluidFrame();
+		if (BigInteger.ZERO.equals(value)) {
+			res.add(Instruction.const0);
+			return res;
+		}
 		String key = value.toString();
 		res.constants.put(key, value);
 		res.instructions.add(new ArgumentedInstruction(Instruction.loadConstant, key));

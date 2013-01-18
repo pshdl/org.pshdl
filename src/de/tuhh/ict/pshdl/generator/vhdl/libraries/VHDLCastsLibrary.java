@@ -120,6 +120,7 @@ public class VHDLCastsLibrary {
 		}
 		switch (left.getType()) {
 		case BOOL:
+			return Standard.BOOLEAN;
 		case BIT:
 			return StdLogic1164.STD_LOGIC;
 		case BITVECTOR:

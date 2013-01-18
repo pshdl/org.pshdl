@@ -300,7 +300,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				}
 			}
 		}
-		return res;
+		return res.copyDeepFrozen(getContainer());
 	}
 	// $CONTENT-END$
 

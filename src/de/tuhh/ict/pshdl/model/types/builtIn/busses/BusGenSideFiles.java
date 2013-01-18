@@ -14,7 +14,7 @@ public class BusGenSideFiles {
 
 	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, String version, boolean axi) {
 		List<SideFile> res = new LinkedList<SideFile>();
-		String unitName = unit.getFullName().getLastSegment().toLowerCase();
+		String unitName = unit.getFullName().toString('_').toLowerCase();
 		String ipcorename = unitName + WRAPPER_APPENDIX;
 		String dirName = ipcorename + "_" + version;
 		String type = axi ? "axi" : "plb";

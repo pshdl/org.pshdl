@@ -83,6 +83,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 			res.put(new HDLInferenceTriple(BITVECTOR, right, null), new HDLInferenceTriple(BITVECTOR, BITVECTOR, BOOL));
 		}
 		res.put(new HDLInferenceTriple(BOOL, BOOL, null), new HDLInferenceTriple(BOOL, BOOL, BOOL));
+		res.put(new HDLInferenceTriple(STRING, STRING, null), new HDLInferenceTriple(STRING, STRING, BOOL));
 		res.put(new HDLInferenceTriple(BIT, BIT, null), new HDLInferenceTriple(BIT, BIT, BOOL));
 		return res;
 	}

@@ -200,9 +200,15 @@ public aspect VHDLExpressionTransformation {
 			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
 			return functionCall;
 		case STRING:
+			if (lit.getPresentation()==HDLLiteralPresentation.STR)
+				return lit.toVHDL();
 			throw new IllegalArgumentException("String is not castable");
 		case BOOL:
-			throw new IllegalArgumentException("Bool is not a literal");
+			if (lit.getPresentation()==HDLLiteralPresentation.BOOL)
+				return lit.toVHDL();
+			if (BigInteger.ZERO.equals(val))
+				return HDLLiteral.getFalse().toVHDL();
+			return HDLLiteral.getTrue().toVHDL();
 		}
 		throw new IllegalArgumentException("Should not get here");
 	}

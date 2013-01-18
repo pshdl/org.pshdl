@@ -7,9 +7,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.Graph.Node;
 
 public class ExecutableModel implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7515137334641792104L;
 	public final int maxDataWidth;
 	public final int maxStackDepth;
@@ -17,6 +14,7 @@ public class ExecutableModel implements Serializable {
 	public final String[] inputs;
 	public final String[] outputs;
 	public final String[] internals;
+	public final int[] registerOutputs;
 
 	public ExecutableModel(Frame[] frames, String[] inputs, String[] outputs, String[] internals, int maxDataWidth, int maxStackDepth) {
 		super();
@@ -26,6 +24,18 @@ public class ExecutableModel implements Serializable {
 		this.internals = internals;
 		this.maxDataWidth = maxDataWidth;
 		this.maxStackDepth = maxStackDepth;
+		List<Integer> regOuts = new ArrayList<Integer>();
+		for (int i = 0; i < frames.length; i++) {
+			Frame frame = frames[i];
+			if (frame.isReg) {
+				regOuts.add(frame.outputId);
+			}
+		}
+		int pos = 0;
+		this.registerOutputs = new int[regOuts.size()];
+		for (Integer integer : regOuts) {
+			registerOutputs[pos++] = integer;
+		}
 	}
 
 	@Override
@@ -49,12 +59,20 @@ public class ExecutableModel implements Serializable {
 		for (Frame f : frames) {
 			Node<Frame> node = new Node<Frame>(f);
 			nodes.add(node);
-			if (f.isInternal)
+			if (f.isInternal) {
+				// if (f.isReg)
+				// intProvider.put(stripReg(internals[f.outputId & 0xff]),
+				// node);
+				// else
 				intProvider.put(internals[f.outputId & 0xff], node);
+			}
 		}
 		for (Node<Frame> node : nodes) {
 			for (Byte intDep : node.object.internalDependencies) {
-				node.reverseAddEdge(intProvider.get(internals[intDep & 0xff]));
+				String string = internals[intDep & 0xff];
+				Node<Frame> node2 = intProvider.get(string);
+				if (node2 != null)
+					node.reverseAddEdge(node2);
 			}
 		}
 		ArrayList<Node<Frame>> sortNodes = graph.sortNodes(nodes);
@@ -65,40 +83,46 @@ public class ExecutableModel implements Serializable {
 		return this;
 	}
 
+	public static String stripReg(String string) {
+		if (string.endsWith("$reg"))
+			return string.substring(0, string.length() - 4);
+		return string;
+	}
+
 	public String toDotFile() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("digraph ExecutableModel {\n");
 		for (int i = 0; i < inputs.length; i++) {
 			String input = inputs[i];
 			sb.append("node [shape = box, color=green, label=\"").append(input).append("\"]");
-			sb.append(" in").append(i);
+			sb.append(" in").append(i & 0xFF);
 			sb.append(";\n");
 		}
 		for (int i = 0; i < outputs.length; i++) {
 			String input = outputs[i];
 			sb.append("node [shape = box, color=red, label=\"").append(input).append("\"]");
-			sb.append(" out").append(i);
+			sb.append(" out").append(i & 0xFF);
 			sb.append(";\n");
 		}
 		for (int i = 0; i < internals.length; i++) {
 			String input = internals[i];
 			sb.append("node [shape = box, color=orange, label=\"").append(input).append("\"]");
-			sb.append(" int").append(i);
+			sb.append(" int").append(i & 0xFF);
 			sb.append(";\n");
 		}
 		for (int i = 0; i < frames.length; i++) {
 			sb.append("node [shape = circle, color=black, label=\"").append(i).append("\"]");
-			sb.append(" frame").append(i);
+			sb.append(" frame").append(i & 0xFF);
 			sb.append(";\n");
 		}
 		for (int i = 0; i < frames.length; i++) {
 			Frame input = frames[i];
 			String frameId = "frame" + i;
 			for (byte in : input.inputDependencies) {
-				sb.append("in").append(in).append(" -> ").append(frameId).append(";\n");
+				sb.append("in").append(in & 0xFF).append(" -> ").append(frameId).append(";\n");
 			}
 			for (byte in : input.internalDependencies) {
-				sb.append("int").append(in).append(" -> ").append(frameId).append(";\n");
+				sb.append("int").append(in & 0xff).append(" -> ").append(frameId).append(";\n");
 			}
 			sb.append(frameId).append(" -> ");
 			if (input.isInternal)

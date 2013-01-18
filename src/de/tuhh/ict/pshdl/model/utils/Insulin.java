@@ -166,7 +166,7 @@ public class Insulin {
 				for (HDLInterfaceRef hdI : ifRefs) {
 					if (hdI.resolveHIf().determineType().asRef().equals(ifRef)) {
 						HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
-						ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(HDLObject.copyAll(hdI.getArray())).setBits(HDLObject.copyAll(hdI.getBits())));
+						ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(hdI.getArray()).setBits(hdI.getBits()));
 					}
 				}
 			}
@@ -268,13 +268,26 @@ public class Insulin {
 		HDLExpression defaultValue = var.getDefaultValue();
 		if ((defaultValue == null) && (register == null)) {
 			if ((hvd.getPrimitive() != null)) {
-				if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null)
-					defaultValue = HDLLiteral.get(0);
+				if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null) {
+					switch (hvd.getPrimitive().getType()) {
+					case STRING:
+						return null;
+					case BOOL:
+						return HDLLiteral.getFalse();
+					case BIT:
+					case BITVECTOR:
+					case INT:
+					case INTEGER:
+					case NATURAL:
+					case UINT:
+						return HDLLiteral.get(0);
+					}
+				}
 			} else {
 				HDLType resolveType = hvd.resolveType();
 				if (resolveType instanceof HDLEnum) {
 					HDLEnum hEnum = (HDLEnum) resolveType;
-					defaultValue = new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
+					return new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
 				}
 			}
 		}

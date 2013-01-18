@@ -94,6 +94,13 @@ public aspect TypeInference {
 
 	public HDLType HDLLiteral.determineType() {
 		// Actually depends on context
+		switch (getPresentation()){
+		case STR:
+			return new HDLPrimitive().setType(HDLPrimitiveType.STRING);
+		case BOOL:
+			return new HDLPrimitive().setType(HDLPrimitiveType.BOOL);
+		default:
+		}
 		boolean isSigned=getVal().charAt(0) != '-';
 		BigInteger val=getValueAsBigInt();
 		if (val.bitLength()>31)
@@ -113,7 +120,7 @@ public aspect TypeInference {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOpType.PLUS).setRight(iter.next().getWidth());
 			width = HDLPrimitives.simplifyWidth(this, width);
 		}
-		return HDLPrimitive.getBitvector().setWidth(width).setContainer(this);
+		return ((HDLPrimitive)resolveVar().determineType()).setWidth(width);
 	}
 
 	public HDLType HDLArithOp.determineType() {

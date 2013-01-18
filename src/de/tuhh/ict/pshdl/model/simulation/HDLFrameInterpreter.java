@@ -1,13 +1,14 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
 
-public class HDLFrameInterpreter {
-	private ExecutableModel model;
+public final class HDLFrameInterpreter {
+	private final ExecutableModel model;
 
-	protected long storage[];
+	protected final long storage[], storage_prev[];
 
 	private final class EncapsulatedAccess {
 		public final int shift;
@@ -15,10 +16,12 @@ public class HDLFrameInterpreter {
 		public final long writeMask;
 		public final String name;
 		public final int accessIndex;
+		public final boolean prev;
 
-		public EncapsulatedAccess(String name, int accessIndex) {
+		public EncapsulatedAccess(String name, int accessIndex, boolean prev) {
 			super();
 			this.accessIndex = accessIndex;
+			this.prev = prev;
 			int openBrace = name.indexOf('{');
 			if (openBrace == -1) {
 				this.shift = 0;
@@ -43,31 +46,33 @@ public class HDLFrameInterpreter {
 		}
 
 		public void setData(long data) {
-			long current = storage[accessIndex];
-			current &= writeMask;
-			current |= (data & mask) << shift;
-			// System.out.println("HDLFrameInterpreter.EncapsulatedAccess.setData()"
-			// + name + " to:" + current + " input was:" + data);
-			storage[accessIndex] = current;
+			long initial;
+			initial = storage[accessIndex];
+			long current = initial & writeMask;
+			storage[accessIndex] = current | ((data & mask) << shift);
+			// System.out.println("HDLFrameInterpreter.EncapsulatedAccess.setData()Setting:"
+			// + name + " from:" + initial + " to:" + storage[accessIndex]);
 		}
 
 		public long getData() {
-			long current = storage[accessIndex];
-			current >>= shift;
-			current &= mask;
-			return current;
+			if (prev)
+				return (storage_prev[accessIndex] >> shift) & mask;
+			return (storage[accessIndex] >> shift) & mask;
 		}
 	}
 
-	private EncapsulatedAccess[] internals;
-	private EncapsulatedAccess[] input;
-	private long[] outputs;
-	protected Map<String, Integer> idx = new HashMap<String, Integer>();
+	private final EncapsulatedAccess[] internals, internals_prev;
+	private final EncapsulatedAccess[] input, input_prev;
+	private final EncapsulatedAccess[] outputs;
+	private final int[] regIndex, regIndexTarget;
+	private final Map<String, Integer> idx = new HashMap<String, Integer>();
+	private int deltaCycle = 0;
 
 	public HDLFrameInterpreter(ExecutableModel model) {
 		this.model = model;
 		int currentIdx = 0;
 		this.internals = new EncapsulatedAccess[model.internals.length];
+		this.internals_prev = new EncapsulatedAccess[model.internals.length];
 		for (int i = 0; i < model.internals.length; i++) {
 			String in = model.internals[i];
 			String basicName = getBasicName(in);
@@ -76,9 +81,11 @@ public class HDLFrameInterpreter {
 				accessIndex = currentIdx++;
 				idx.put(basicName, accessIndex);
 			}
-			internals[i] = new EncapsulatedAccess(in, accessIndex);
+			internals[i] = new EncapsulatedAccess(in, accessIndex, false);
+			internals_prev[i] = new EncapsulatedAccess(in, accessIndex, true);
 		}
 		this.input = new EncapsulatedAccess[model.inputs.length];
+		this.input_prev = new EncapsulatedAccess[model.inputs.length];
 		for (int i = 0; i < model.inputs.length; i++) {
 			String in = model.inputs[i];
 			String basicName = getBasicName(in);
@@ -87,10 +94,30 @@ public class HDLFrameInterpreter {
 				accessIndex = currentIdx++;
 				idx.put(basicName, accessIndex);
 			}
-			input[i] = new EncapsulatedAccess(in, accessIndex);
+			input[i] = new EncapsulatedAccess(in, accessIndex, false);
+			input_prev[i] = new EncapsulatedAccess(in, accessIndex, true);
 		}
-		this.outputs = new long[model.outputs.length];
+		this.outputs = new EncapsulatedAccess[model.outputs.length];
+		for (int i = 0; i < model.outputs.length; i++) {
+			String in = model.outputs[i];
+			String basicName = getBasicName(in);
+			Integer accessIndex = idx.get(basicName);
+			if (accessIndex == null) {
+				accessIndex = currentIdx++;
+				idx.put(basicName, accessIndex);
+			}
+			outputs[i] = new EncapsulatedAccess(in, accessIndex, false);
+		}
+		regIndex = new int[model.registerOutputs.length];
+		regIndexTarget = new int[model.registerOutputs.length];
+		for (int i = 0; i < model.registerOutputs.length; i++) {
+			int ridx = model.registerOutputs[i];
+			String name = model.internals[ridx];
+			regIndex[i] = idx.get(name);
+			regIndexTarget[i] = idx.get(ExecutableModel.stripReg(name));
+		}
 		storage = new long[currentIdx];
+		storage_prev = new long[currentIdx];
 	}
 
 	private String getBasicName(String name) {
@@ -101,145 +128,229 @@ public class HDLFrameInterpreter {
 		return name;
 	}
 
-	public long[] run(long... args) {
-		storage[idx.get("de.tuhh.ict.bitAdder.a")] = args[0];
-		storage[idx.get("de.tuhh.ict.bitAdder.b")] = args[1];
-		long stack[] = new long[model.maxStackDepth];
-		Instruction[] values = Instruction.values();
-		for (Frame f : model.frames) {
-			int stackPos = -1;
-			int execPos = 0;
-			byte[] inst = f.instructions;
-			do {
-				Instruction instruction = values[inst[execPos] & 0xff];
-				// System.out.println("HDLFrameInterpreter.run()" +
-				// instruction);
-				switch (instruction) {
-				case and: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a & b;
-					break;
+	public void setInput(String name, long value) {
+		Integer integer = idx.get(name);
+		if (integer == null)
+			throw new IllegalArgumentException("Could not find an input named:" + name);
+		storage[integer] = value;
+	}
+
+	public long getOutput(String name) {
+		Integer integer = idx.get(name);
+		if (integer == null)
+			throw new IllegalArgumentException("Could not find an input named:" + name);
+		return storage[integer];
+	}
+
+	private static final Instruction[] values = Instruction.values();
+
+	public void run() {
+		boolean regUpdated = false;
+		deltaCycle++;
+		do {
+			regUpdated = false;
+			long stack[] = new long[model.maxStackDepth];
+			for (Frame f : model.frames) {
+				int stackPos = -1;
+				int execPos = 0;
+				byte[] inst = f.instructions;
+				do {
+					Instruction instruction = values[inst[execPos] & 0xff];
+					switch (instruction) {
+					case and: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a & b;
+						break;
+					}
+					case arith_neg: {
+						stack[stackPos] = -stack[stackPos];
+						break;
+					}
+					case bitAccess:
+						break;
+					case bit_neg: {
+						stack[stackPos] = ~stack[stackPos];
+						break;
+					}
+					case callFrame:
+						break;
+					case cast_int:
+						break;
+					case cast_uint:
+						break;
+					case concat:
+						break;
+					case const0:
+						stack[++stackPos] = 0;
+						break;
+					case div: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a / b;
+						break;
+					}
+					case eq:
+						break;
+					case greater:
+						break;
+					case greater_eq:
+						break;
+					case ifCall:
+						break;
+					case less:
+						break;
+					case less_eq:
+						break;
+					case loadConstant:
+						stack[++stackPos] = f.constants[inst[++execPos] & 0xff].longValue();
+						break;
+					case loadInput:
+						stack[++stackPos] = input[inst[++execPos] & 0xff].getData();
+						break;
+					case loadInternal:
+						stack[++stackPos] = internals[inst[++execPos] & 0xff].getData();
+						break;
+					case logiAnd:
+						break;
+					case logiOr:
+						break;
+					case logic_neg:
+						break;
+					case minus: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a - b;
+						break;
+					}
+					case mod: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a % b;
+						break;
+					}
+					case mul: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a * b;
+						break;
+					}
+					case not_eq:
+						break;
+					case or: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a | b;
+						break;
+					}
+					case plus: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a + b;
+						break;
+					}
+					case pow:
+						break;
+					case sll: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a << b;
+						break;
+					}
+					case sra: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a >> b;
+						break;
+					}
+					case srl: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a >>> b;
+						break;
+					}
+					case xor: {
+						long b = stack[stackPos--];
+						long a = stack[stackPos];
+						stack[stackPos] = a ^ b;
+						break;
+					}
+					case isFallingEdgeInput: {
+						int off = inst[++execPos] & 0xFF;
+						long curr = input[off].getData();
+						long prev = input_prev[off].getData();
+						if ((f.lastUpdate == deltaCycle) || !((prev == 1) && (curr == 0)))
+							execPos = Integer.MAX_VALUE - 1;
+						else {
+							f.lastUpdate = deltaCycle;
+							regUpdated = true;
+						}
+						break;
+					}
+					case isFallingEdgeInternal: {
+						int off = inst[++execPos] & 0xFF;
+						long curr = internals[off].getData();
+						long prev = internals_prev[off].getData();
+						if ((f.lastUpdate == deltaCycle) || !((prev == 1) && (curr == 0))) {
+							execPos = Integer.MAX_VALUE - 1;
+						} else {
+							f.lastUpdate = deltaCycle;
+							regUpdated = true;
+						}
+						break;
+					}
+					case isRisingEdgeInput: {
+						int off = inst[++execPos] & 0xFF;
+						long curr = input[off].getData();
+						long prev = input_prev[off].getData();
+						if ((f.lastUpdate == deltaCycle) || !((prev == 0) && (curr == 1)))
+							execPos = Integer.MAX_VALUE - 1;
+						else {
+							f.lastUpdate = deltaCycle;
+							regUpdated = true;
+						}
+						break;
+					}
+					case isRisingEdgeInternal: {
+						int off = inst[++execPos] & 0xFF;
+						long curr = internals[off].getData();
+						long prev = internals_prev[off].getData();
+						if ((f.lastUpdate == deltaCycle) || !((prev == 0) && (curr == 1)))
+							execPos = Integer.MAX_VALUE - 1;
+						else {
+							f.lastUpdate = deltaCycle;
+							regUpdated = true;
+						}
+						break;
+					}
+					default:
+						break;
+					}
+					execPos++;
+				} while (execPos < inst.length);
+				if (f.isInternal)
+					internals[f.outputId & 0xff].setData(stack[0]);
+				else
+					outputs[f.outputId & 0xff].setData(stack[0]);
+			}
+			if (regUpdated) {
+				for (int i = 0; i < regIndex.length; i++) {
+					long oldValue = storage[regIndex[i]];
+					storage[regIndexTarget[i]] = oldValue;
 				}
-				case arith_neg: {
-					long a = stack[stackPos];
-					stack[stackPos] = -a;
-					break;
-				}
-				case bitAccess:
-					break;
-				case bit_neg: {
-					long a = stack[stackPos];
-					stack[stackPos] = ~a;
-					break;
-				}
-				case callFrame:
-					break;
-				case cast_int:
-					break;
-				case cast_uint:
-					break;
-				case concat:
-					break;
-				case div: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a / b;
-					break;
-				}
-				case eq:
-					break;
-				case greater:
-					break;
-				case greater_eq:
-					break;
-				case ifCall:
-					break;
-				case less:
-					break;
-				case less_eq:
-					break;
-				case loadConstant:
-					stack[++stackPos] = f.constants[inst[++execPos] & 0xff].longValue();
-					break;
-				case loadInput:
-					stack[++stackPos] = input[inst[++execPos] & 0xff].getData();
-					break;
-				case loadInternal:
-					stack[++stackPos] = internals[inst[++execPos] & 0xff].getData();
-					break;
-				case logiAnd:
-					break;
-				case logiOr:
-					break;
-				case logic_neg:
-					break;
-				case minus: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a - b;
-					break;
-				}
-				case mod: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a % b;
-					break;
-				}
-				case mul: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a * b;
-					break;
-				}
-				case not_eq:
-					break;
-				case or: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a | b;
-					break;
-				}
-				case plus: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a + b;
-					break;
-				}
-				case pow:
-					break;
-				case sll: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a << b;
-					break;
-				}
-				case sra: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a >> b;
-					break;
-				}
-				case srl: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a >>> b;
-					break;
-				}
-				case xor: {
-					long b = stack[stackPos--];
-					long a = stack[stackPos];
-					stack[stackPos] = a ^ b;
-					break;
-				}
-				}
-				execPos++;
-			} while (execPos < inst.length);
-			if (f.isInternal)
-				internals[f.outputId & 0xff].setData(stack[0]);
-			else
-				outputs[f.outputId & 0xff] = stack[0];
+			}
+			System.out.println("HDLFrameInterpreter.run()" + this);
+		} while (regUpdated);
+		System.arraycopy(storage, 0, storage_prev, 0, storage.length);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Current Cycle:" + deltaCycle + "\n");
+		for (Entry<String, Integer> e : idx.entrySet()) {
+			sb.append('\t').append(e.getKey()).append("=").append(storage[e.getValue()]).append('\n');
 		}
-		return new long[] { outputs[0], storage[idx.get("de.tuhh.ict.bitAdder.sum")] };
+		return sb.toString();
 	}
 }

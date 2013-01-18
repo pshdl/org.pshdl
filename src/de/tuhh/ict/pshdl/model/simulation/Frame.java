@@ -19,9 +19,11 @@ public class Frame implements Serializable {
 	public final int maxStackDepth;
 	public final String id;
 	public final boolean isInternal;
+	public final boolean isReg;
+	transient public int lastUpdate;
 
 	public Frame(byte[] instructions, byte[] inputDependencies, byte[] internalDependencies, int outputId, int maxDataWidth, int maxStackDepth, BigInteger[] constants, String id,
-			boolean isInternal) {
+			boolean isInternal, boolean isReg) {
 		super();
 		this.constants = constants;
 		this.instructions = instructions;
@@ -32,6 +34,7 @@ public class Frame implements Serializable {
 		this.maxStackDepth = maxStackDepth;
 		this.id = id;
 		this.isInternal = isInternal;
+		this.isReg = isReg;
 	}
 
 	@Override

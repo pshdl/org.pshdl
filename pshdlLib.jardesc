@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/pshdlLib.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/de.tuhh.ict.pshdl.model.v2/pshdlLib.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/de.tuhh.ict.pshdl.model.v2/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/de.tuhh.ict.pshdl.model.v2/.classpath"/>
+        <folder path="/de.tuhh.ict.pshdl.model.v2/META-INF"/>
+        <file path="/de.tuhh.ict.pshdl.model.v2/castTable.html"/>
+        <file path="/de.tuhh.ict.pshdl.model.v2/cast.css"/>
+        <file path="/de.tuhh.ict.pshdl.model.v2/.project"/>
+        <javaElement handleIdentifier="=de.tuhh.ict.pshdl.model.v2/src"/>
+        <file path="/de.tuhh.ict.pshdl.model.v2/build.properties"/>
+    </selectedElements>
+</jardesc>

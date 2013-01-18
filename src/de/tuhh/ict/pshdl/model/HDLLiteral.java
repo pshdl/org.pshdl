@@ -6,6 +6,7 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.upb.hni.vmagic.expression.*;
 
 /**
  * The class HDLLiteral contains the following fields
@@ -16,6 +17,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * </ul>
  */
 public class HDLLiteral extends AbstractHDLLiteral {
+
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
 	 * 
@@ -69,14 +71,28 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		}
 	};
 	// $CONTENT-BEGIN$
-
+	public static final String TRUE = "true";
+	public static final String FALSE = "false";
 	private BigInteger bigIntegerVal = null;
 
 	public BigInteger getValueAsBigInt() {
 		if (bigIntegerVal != null) {
 			return bigIntegerVal;
 		}
+		if (getStr()) {
+			return null;
+		}
 		String string = getVal();
+		if (TRUE.equals(string)) {
+			return null;
+			// bigIntegerVal = BigInteger.ONE;
+			// return bigIntegerVal;
+		}
+		if (FALSE.equals(string)) {
+			return null;
+			// bigIntegerVal = BigInteger.ZERO;
+			// return bigIntegerVal;
+		}
 		char zeroChar = string.charAt(0);
 		if (zeroChar == '0') {
 			if (string.length() > 1) {
@@ -112,8 +128,14 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		}
 	}
 
-	public static HDLLiteral get(long i) {
-		return new HDLLiteral().setStr(false).setVal(Long.toString(i));
+	/**
+	 * Generate a literal with the given Value as decimal
+	 * 
+	 * @param val
+	 * @return
+	 */
+	public static HDLLiteral get(long val) {
+		return new HDLLiteral().setStr(false).setVal(Long.toString(val));
 	}
 
 	public static enum HDLLiteralPresentation {
@@ -133,10 +155,10 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return HDLLiteralPresentation.STR;
 		}
 		String string = getVal();
-		if ("true".equals(string)) {
+		if (TRUE.equals(string)) {
 			return HDLLiteralPresentation.BOOL;
 		}
-		if ("false".equals(string)) {
+		if (FALSE.equals(string)) {
 			return HDLLiteralPresentation.BOOL;
 		}
 		char zeroChar = string.charAt(0);
@@ -199,6 +221,14 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return hashCache;
 		}
 		return super.hashCode();
+	}
+
+	public static HDLLiteral getFalse() {
+		return new HDLLiteral().setVal(FALSE);
+	}
+
+	public static HDLLiteral getTrue() {
+		return new HDLLiteral().setVal(TRUE);
 	}
 
 	// $CONTENT-END$

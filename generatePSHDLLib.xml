@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project de.tuhh.ict.pshdl.v2 with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="/Users/karstenbecker/Dropbox/PSHDL/pshdlLib.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="de.tuhh.ict.pshdl.generator.Main"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ org.eclipse.xtext_2.3.1.v201208210947.jar org.eclipse.emf.ecore.xmi_2.8.0.v20120911-0500.jar org.eclipse.emf.ecore_2.8.1.v20120911-0500.jar org.eclipse.emf.common_2.8.0.v20120911-0500.jar org.antlr.runtime_3.2.0.v201101311130.jar com.google.inject_3.0.0.v201203062045.jar com.google.inject.assistedinject_3.0.0.201207101151.jar com.google.inject.multibindings_3.0.0.201207101151.jar org.eclipse.emf.mwe.core_1.2.1.v201206110920.jar org.apache.commons.cli_1.2.0.v201105210650.jar org.eclipse.emf.mwe2.runtime_2.3.0.v201206110920.jar org.eclipse.emf.mwe.utils_1.2.1.v201206110920.jar org.eclipse.xtext.util_2.3.1.v201208210947.jar com.google.guava_10.0.1.v201203051515.jar javax.inject_1.0.0.v20091030.jar org.apache.log4j_1.2.15.v201012070815.jar org.apache.commons.logging_1.0.4.v201101211617.jar org.eclipse.xtext.generator_2.3.1.v201208210947.jar org.eclipse.xtend_1.2.0.v201206110941.jar com.ibm.icu_4.4.2.v20110823.jar org.eclipse.xpand_1.2.0.v201206110941.jar org.eclipse.xtend.typesystem.emf_1.2.0.v201206110941.jar org.eclipse.emf.codegen.ecore_2.8.1.v20120917-0436.jar org.eclipse.emf.codegen_2.8.0.v20120917-0436.jar org.eclipse.emf.mwe2.lib_2.3.0.v201206110920.jar org.eclipse.xtext.xbase.lib_2.3.1.v201208210947.jar org.eclipse.emf.mwe2.launch_2.3.0.v201206120758.jar org.eclipse.emf.mwe2.language_2.3.0.v201206120758.jar org.eclipse.xtext.common.types_2.3.1.v201208210947.jar aspectjrt.jar org.eclipse.xtext.builder_2.3.1.v201208210947.jar org.eclipse.debug.ui_3.8.1.v20120718-192144.jar org.eclipse.debug.core_3.7.100.v20120521-2012.jar org.eclipse.core.resources_3.8.1.v20120802-154922.jar org.eclipse.core.runtime_3.8.0.v20120521-2346.jar org.eclipse.osgi_3.8.1.v20120830-144521.jar org.eclipse.equinox.weaving.hook_1.0.200.v20120524-1707.jar org.eclipse.equinox.common_3.6.100.v20120522-1841.jar org.eclipse.core.jobs_3.5.300.v20120622-204750.jar runtime_registry_compatibility.jar org.eclipse.equinox.registry_3.5.200.v20120522-1841.jar org.eclipse.equinox.preferences_3.5.0.v20120522-1841.jar org.eclipse.core.contenttype_3.4.200.v20120523-2004.jar org.eclipse.equinox.app_1.3.100.v20120522-1841.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtext_2.3.1.v201208210947.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.ecore.xmi_2.8.0.v20120911-0500.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.ecore_2.8.1.v20120911-0500.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.common_2.8.0.v20120911-0500.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.antlr.runtime_3.2.0.v201101311130.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="com.google.inject_3.0.0.v201203062045.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="com.google.inject.assistedinject_3.0.0.201207101151.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="com.google.inject.multibindings_3.0.0.201207101151.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.mwe.core_1.2.1.v201206110920.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.apache.commons.cli_1.2.0.v201105210650.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.mwe2.runtime_2.3.0.v201206110920.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.mwe.utils_1.2.1.v201206110920.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtext.util_2.3.1.v201208210947.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="com.google.guava_10.0.1.v201203051515.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="javax.inject_1.0.0.v20091030.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.apache.log4j_1.2.15.v201012070815.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.apache.commons.logging_1.0.4.v201101211617.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtext.generator_2.3.1.v201208210947.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtend_1.2.0.v201206110941.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="com.ibm.icu_4.4.2.v20110823.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xpand_1.2.0.v201206110941.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtend.typesystem.emf_1.2.0.v201206110941.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.codegen.ecore_2.8.1.v20120917-0436.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.codegen_2.8.0.v20120917-0436.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.mwe2.lib_2.3.0.v201206110920.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtext.xbase.lib_2.3.1.v201208210947.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.mwe2.launch_2.3.0.v201206120758.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.emf.mwe2.language_2.3.0.v201206120758.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtext.common.types_2.3.1.v201208210947.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins/org.aspectj.runtime_1.7.2.20120920133900" includes="aspectjrt.jar"/>
+            <fileset dir="/Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.upb.hni.vmagic"/>
+            <fileset dir="/Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/bin"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.xtext.builder_2.3.1.v201208210947.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.debug.ui_3.8.1.v20120718-192144.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.debug.core_3.7.100.v20120521-2012.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.core.resources_3.8.1.v20120802-154922.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.core.runtime_3.8.0.v20120521-2346.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.osgi_3.8.1.v20120830-144521.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.equinox.weaving.hook_1.0.200.v20120524-1707.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.equinox.common_3.6.100.v20120522-1841.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.core.jobs_3.5.300.v20120622-204750.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins/org.eclipse.core.runtime.compatibility.registry_3.5.100.v20120521-2346" includes="runtime_registry_compatibility.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.equinox.registry_3.5.200.v20120522-1841.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.equinox.preferences_3.5.0.v20120522-1841.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.core.contenttype_3.4.200.v20120523-2004.jar"/>
+            <zipfileset dir="/Applications/eclipse4.2/plugins" includes="org.eclipse.equinox.app_1.3.100.v20120522-1841.jar"/>
+            <fileset dir="/Volumes/Macintosh HD/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.v2/bin"/>
+        </jar>
+    </target>
+</project>
