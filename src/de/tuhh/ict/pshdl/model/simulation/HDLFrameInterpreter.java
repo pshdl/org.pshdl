@@ -50,13 +50,12 @@ public final class HDLFrameInterpreter {
 			initial = storage[accessIndex];
 			long current = initial & writeMask;
 			storage[accessIndex] = current | ((data & mask) << shift);
-			// System.out.println("HDLFrameInterpreter.EncapsulatedAccess.setData()Setting:"
-			// + name + " from:" + initial + " to:" + storage[accessIndex]);
 		}
 
 		public long getData() {
-			if (prev)
+			if (prev) {
 				return (storage_prev[accessIndex] >> shift) & mask;
+			}
 			return (storage[accessIndex] >> shift) & mask;
 		}
 	}
@@ -65,7 +64,7 @@ public final class HDLFrameInterpreter {
 	private final EncapsulatedAccess[] input, input_prev;
 	private final EncapsulatedAccess[] outputs;
 	private final int[] regIndex, regIndexTarget;
-	private final Map<String, Integer> idx = new HashMap<String, Integer>();
+	private final Map<String, Integer> idx = new TreeMap<String, Integer>();
 	private int deltaCycle = 0;
 
 	public HDLFrameInterpreter(ExecutableModel model) {
@@ -150,7 +149,7 @@ public final class HDLFrameInterpreter {
 		do {
 			regUpdated = false;
 			long stack[] = new long[model.maxStackDepth];
-			for (Frame f : model.frames) {
+			nextFrame: for (Frame f : model.frames) {
 				int stackPos = -1;
 				int execPos = 0;
 				byte[] inst = f.instructions;
@@ -279,52 +278,54 @@ public final class HDLFrameInterpreter {
 						int off = inst[++execPos] & 0xFF;
 						long curr = input[off].getData();
 						long prev = input_prev[off].getData();
-						if ((f.lastUpdate == deltaCycle) || !((prev == 1) && (curr == 0)))
-							execPos = Integer.MAX_VALUE - 1;
-						else {
+						if (f.lastUpdate == deltaCycle)
+							continue nextFrame;
+						else if ((prev == 1) && (curr == 0)) {
 							f.lastUpdate = deltaCycle;
 							regUpdated = true;
-						}
+						} else
+							continue nextFrame;
 						break;
 					}
 					case isFallingEdgeInternal: {
 						int off = inst[++execPos] & 0xFF;
-						long curr = internals[off].getData();
-						long prev = internals_prev[off].getData();
-						if ((f.lastUpdate == deltaCycle) || !((prev == 1) && (curr == 0))) {
-							execPos = Integer.MAX_VALUE - 1;
-						} else {
+						long curr = internals[off].getData() & 1;
+						long prev = internals_prev[off].getData() & 1;
+						if (f.lastUpdate == deltaCycle)
+							continue nextFrame;
+						else if ((prev == 1) && (curr == 0)) {
 							f.lastUpdate = deltaCycle;
 							regUpdated = true;
-						}
+						} else
+							continue nextFrame;
 						break;
 					}
 					case isRisingEdgeInput: {
 						int off = inst[++execPos] & 0xFF;
-						long curr = input[off].getData();
-						long prev = input_prev[off].getData();
-						if ((f.lastUpdate == deltaCycle) || !((prev == 0) && (curr == 1)))
-							execPos = Integer.MAX_VALUE - 1;
-						else {
+						long curr = input[off].getData() & 1;
+						long prev = input_prev[off].getData() & 1;
+						if (f.lastUpdate == deltaCycle)
+							continue nextFrame;
+						else if ((prev == 0) && (curr == 1)) {
 							f.lastUpdate = deltaCycle;
 							regUpdated = true;
-						}
+						} else
+							continue nextFrame;
 						break;
 					}
 					case isRisingEdgeInternal: {
 						int off = inst[++execPos] & 0xFF;
-						long curr = internals[off].getData();
-						long prev = internals_prev[off].getData();
-						if ((f.lastUpdate == deltaCycle) || !((prev == 0) && (curr == 1)))
-							execPos = Integer.MAX_VALUE - 1;
-						else {
+						long curr = internals[off].getData() & 1;
+						long prev = internals_prev[off].getData() & 1;
+						if (f.lastUpdate == deltaCycle)
+							continue nextFrame;
+						else if ((prev == 0) && (curr == 1)) {
 							f.lastUpdate = deltaCycle;
 							regUpdated = true;
-						}
+						} else
+							continue nextFrame;
 						break;
 					}
-					default:
-						break;
 					}
 					execPos++;
 				} while (execPos < inst.length);
@@ -339,7 +340,6 @@ public final class HDLFrameInterpreter {
 					storage[regIndexTarget[i]] = oldValue;
 				}
 			}
-			System.out.println("HDLFrameInterpreter.run()" + this);
 		} while (regUpdated);
 		System.arraycopy(storage, 0, storage_prev, 0, storage.length);
 	}

@@ -60,10 +60,6 @@ public class ExecutableModel implements Serializable {
 			Node<Frame> node = new Node<Frame>(f);
 			nodes.add(node);
 			if (f.isInternal) {
-				// if (f.isReg)
-				// intProvider.put(stripReg(internals[f.outputId & 0xff]),
-				// node);
-				// else
 				intProvider.put(internals[f.outputId & 0xff], node);
 			}
 		}
