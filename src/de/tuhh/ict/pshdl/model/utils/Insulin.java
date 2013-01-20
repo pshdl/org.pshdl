@@ -746,7 +746,7 @@ public class Insulin {
 								HDLRange r = bits.get(j);
 								ValueRange vr = r.determineRange(context);
 								BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
-								HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add));
+								HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add)).normalize();
 								HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
 								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
 								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);

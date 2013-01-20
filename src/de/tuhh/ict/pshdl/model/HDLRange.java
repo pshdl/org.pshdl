@@ -93,6 +93,12 @@ public class HDLRange extends AbstractHDLRange {
 		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);
 	}
+
+	public HDLRange normalize() {
+		if (getTo().equals(getFrom()))
+			return setFrom(null);
+		return this;
+	}
 	// $CONTENT-END$
 
 }

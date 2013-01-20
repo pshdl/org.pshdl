@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
 public aspect SimulationTransformation {
 	public FluidFrame HDLExpression.toSimulationModel(HDLEvaluationContext context) {
@@ -25,23 +26,25 @@ public aspect SimulationTransformation {
 		HDLVariable var = left.resolveVar();
 		HDLRegisterConfig config = var.getRegisterConfig();
 		FluidFrame res;
-		if (config!=null)
-			res= new FluidFrame(getVarName(getLeft(), true)+"$reg");
+		if (config != null)
+			res = new FluidFrame(getVarName(getLeft(), true) + "$reg");
 		else
-			res= new FluidFrame(getVarName(getLeft(), true));
-		if (config!=null){
-			config=config.normalize();
+			res = new FluidFrame(getVarName(getLeft(), true));
+		if (config != null) {
+			config = config.normalize();
 			HDLVariable clk = config.resolveClk();
-			if (clk.getDirection()==HDLDirection.IN){
-				if (config.getClockType()==HDLRegClockType.RISING)
-					res.add(new ArgumentedInstruction(Instruction.isRisingEdgeInput, clk.getFullName().toString()));
+			String name = clk.getFullName().toString();
+			if (clk.getDirection() == HDLDirection.IN) {
+				res.addInput(name);
+				if (config.getClockType() == HDLRegClockType.RISING)
+					res.add(new ArgumentedInstruction(Instruction.isRisingEdgeInput, name));
 				else
-					res.add(new ArgumentedInstruction(Instruction.isFallingEdgeInput, clk.getFullName().toString()));
+					res.add(new ArgumentedInstruction(Instruction.isFallingEdgeInput, name));
 			} else {
-				if (config.getClockType()==HDLRegClockType.RISING)
-					res.add(new ArgumentedInstruction(Instruction.isRisingEdgeInternal, clk.getFullName().toString()));
+				if (config.getClockType() == HDLRegClockType.RISING)
+					res.add(new ArgumentedInstruction(Instruction.isRisingEdgeInternal, name));
 				else
-					res.add(new ArgumentedInstruction(Instruction.isFallingEdgeInternal, clk.getFullName().toString()));
+					res.add(new ArgumentedInstruction(Instruction.isFallingEdgeInternal, name));
 			}
 		}
 		res.append(getRight().toSimulationModel(context));
@@ -78,24 +81,7 @@ public aspect SimulationTransformation {
 		while (iter.hasNext()) {
 			HDLExpression exp = iter.next();
 			res.append(exp.toSimulationModel(context));
-			HDLPrimitive determineType = (HDLPrimitive) exp.determineType();
-			BigInteger width = null;
-			switch (determineType.getType()) {
-			case BIT:
-				width = BigInteger.ONE;
-				break;
-			case INTEGER:
-			case NATURAL:
-				width = BigInteger.valueOf(32);
-				break;
-			case UINT:
-			case INT:
-			case BITVECTOR:
-				width = determineType.getWidth().constantEvaluate(context);
-				break;
-			default:
-				throw new IllegalArgumentException("Can not concatenate " + determineType);
-			}
+			Integer width=HDLPrimitives.getWidth(exp.determineType(), context);
 			res.add(new ArgumentedInstruction(Instruction.concat, width.toString()));
 		}
 		return res;
@@ -110,6 +96,12 @@ public aspect SimulationTransformation {
 				res.addReferencedFrame(sFrame);
 				res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
 				break;
+			case HDLVariableDeclaration:
+				HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
+				for(HDLVariable var: hvd.getVariables()){
+					res.addWith(var.getFullName().toString(),HDLPrimitives.getWidth(var.determineType(), context));
+				}
+				break;
 			default:
 				break;
 			}
@@ -121,6 +113,12 @@ public aspect SimulationTransformation {
 				FluidFrame sFrame = stmnt.toSimulationModel(context);
 				res.addReferencedFrame(sFrame);
 				res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
+				break;
+			case HDLVariableDeclaration:
+				HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
+				for(HDLVariable var: hvd.getVariables()){
+					res.addWith(var.getFullName().toString(),HDLPrimitives.getWidth(var.determineType(), context));
+				}
 				break;
 			default:
 				break;
@@ -145,13 +143,13 @@ public aspect SimulationTransformation {
 			HDLPrimitive prim = (HDLPrimitive) getCastTo();
 			switch (prim.getType()) {
 			case INT:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, prim.getWidth().toString()));
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, prim.getWidth().constantEvaluate(context).toString()));
 				break;
 			case INTEGER:
 				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, "32"));
 				break;
 			case UINT:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, prim.getWidth().toString()));
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, prim.getWidth().constantEvaluate(context).toString()));
 				break;
 			case NATURAL:
 				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, "32"));
@@ -177,7 +175,8 @@ public aspect SimulationTransformation {
 				bits[i + 1] = getBits().get(i).toString();
 			}
 		}
-		HDLDirection dir = resolveVar().getDirection();
+		HDLVariable var = resolveVar();
+		HDLDirection dir = var.getDirection();
 		switch (dir) {
 		case INTERNAL:
 			res.instructions.add(new ArgumentedInstruction(Instruction.loadInternal, bits));
@@ -197,6 +196,8 @@ public aspect SimulationTransformation {
 				res.instructions.add(new ArgumentedInstruction(Instruction.loadInput, bits));
 			}
 			break;
+		default:
+			throw new IllegalArgumentException("Did not expect this here" + dir);
 		}
 		return res;
 	}
@@ -214,7 +215,7 @@ public aspect SimulationTransformation {
 
 	public FluidFrame HDLLiteral.toSimulationModel(HDLEvaluationContext context) {
 		BigInteger value = getValueAsBigInt();
-			
+
 		FluidFrame res = new FluidFrame();
 		if (BigInteger.ZERO.equals(value)) {
 			res.add(Instruction.const0);

@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model.simulation;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.*;
 
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
 
@@ -9,6 +10,8 @@ public final class HDLFrameInterpreter {
 	private final ExecutableModel model;
 
 	protected final long storage[], storage_prev[];
+
+	protected static final Pattern aiFormatName = Pattern.compile("(.*?)(?:\\{(?:(\\d+)(?:\\:(\\d+))?)\\})?");
 
 	private final class EncapsulatedAccess {
 		public final int shift;
@@ -22,19 +25,31 @@ public final class HDLFrameInterpreter {
 			super();
 			this.accessIndex = accessIndex;
 			this.prev = prev;
-			int openBrace = name.indexOf('{');
-			if (openBrace == -1) {
-				this.shift = 0;
-				this.mask = 0xFFFFFFFFFFFFFFFFL;
-				this.writeMask = 0;
-				this.name = name;
-			} else {
-				this.name = name.substring(0, openBrace);
-				String range = name.substring(openBrace + 1, name.length() - 1);
-				this.shift = Integer.parseInt(range);
-				this.mask = 1;
-				this.writeMask = ~(mask << shift);
-			}
+			Matcher matcher = aiFormatName.matcher(name);
+			if (matcher.matches()) {
+				this.name = matcher.group(1);
+				if (matcher.group(2) == null) {
+					int width = model.getWidth(name);
+					this.shift = 0;
+					if (width == 64)
+						this.mask = 0xFFFFFFFFFFFFFFFFL;
+					else
+						this.mask = (1l << width) - 1;
+					this.writeMask = 0;
+				} else if (matcher.group(3) != null) {
+					int start = Integer.parseInt(matcher.group(2));
+					int end = Integer.parseInt(matcher.group(3));
+					int actualWidth = (start - end) + 1;
+					this.shift = end;
+					this.mask = (1l << actualWidth) - 1;
+					this.writeMask = ~(mask << shift);
+				} else {
+					this.shift = Integer.parseInt(matcher.group(2));
+					this.mask = 1;
+					this.writeMask = ~(mask << shift);
+				}
+			} else
+				throw new IllegalArgumentException("Name:" + name + " is not valid!");
 		}
 
 		@Override

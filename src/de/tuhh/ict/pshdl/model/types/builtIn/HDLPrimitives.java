@@ -568,4 +568,30 @@ public class HDLPrimitives implements IHDLPrimitive {
 		return new ValueRange(min, max);
 	}
 
+	public static Integer getWidth(HDLType type, HDLEvaluationContext context) {
+		if (type.getClassType() == HDLClass.HDLPrimitive) {
+			HDLPrimitive determineType = (HDLPrimitive) type;
+			BigInteger width = null;
+			switch (determineType.getType()) {
+			case BIT:
+				width = BigInteger.ONE;
+				break;
+			case INTEGER:
+			case NATURAL:
+				width = BigInteger.valueOf(32);
+				break;
+			case UINT:
+			case INT:
+			case BITVECTOR:
+				width = determineType.getWidth().constantEvaluate(context);
+				break;
+			default:
+				throw new IllegalArgumentException("Can not concatenate " + determineType);
+			}
+			if (width != null)
+				return width.intValue();
+		}
+		return null;
+	}
+
 }

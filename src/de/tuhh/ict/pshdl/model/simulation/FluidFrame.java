@@ -96,8 +96,9 @@ public class FluidFrame {
 		}
 	}
 
-	public final Map<String, FluidFrame> references = new HashMap<String, FluidFrame>();
-	public final Map<String, BigInteger> constants = new HashMap<String, BigInteger>();
+	public final Map<String, FluidFrame> references = new TreeMap<String, FluidFrame>();
+	public final Map<String, BigInteger> constants = new TreeMap<String, BigInteger>();
+	public final Map<String, Integer> widths = new TreeMap<String, Integer>();
 	public final Set<String> inputs = new LinkedHashSet<String>();
 	public final String outputName;
 
@@ -106,6 +107,7 @@ public class FluidFrame {
 
 	public FluidFrame append(FluidFrame frame) {
 		// Don't copy references
+		widths.putAll(frame.widths);
 		inputs.addAll(frame.inputs);
 		constants.putAll(frame.constants);
 		instructions.addAll(frame.instructions);
@@ -157,7 +159,6 @@ public class FluidFrame {
 	private static class FrameRegister {
 		public final Map<String, Byte> inputIds = new LinkedHashMap<String, Byte>();
 		private int inIdCounter = 0;
-		public final Map<String, Byte> regIds = new LinkedHashMap<String, Byte>();
 		public final Map<String, Byte> outputIds = new LinkedHashMap<String, Byte>();
 		private int outIdCounter = 0;
 		public final Map<String, Byte> internalIds = new LinkedHashMap<String, Byte>();
@@ -218,17 +219,16 @@ public class FluidFrame {
 			entry.registerFrame(register);
 		}
 		List<Frame> res = new LinkedList<Frame>();
-		int maxStack = -1, maxData = -1;
+		int maxStack = -1;
 		for (FluidFrame entry : references.values()) {
 			Frame frame = entry.toFrame(register);
 			maxStack = Math.max(maxStack, frame.maxStackDepth);
-			maxData = Math.max(maxData, frame.maxDataWidth);
 			res.add(frame);
 		}
 		String[] inputs = register.inputIds.keySet().toArray(new String[0]);
 		String[] outputs = register.outputIds.keySet().toArray(new String[0]);
 		String[] internals = register.internalIds.keySet().toArray(new String[0]);
-		return new ExecutableModel(res.toArray(new Frame[res.size()]), inputs, outputs, internals, maxData, maxStack);
+		return new ExecutableModel(res.toArray(new Frame[res.size()]), inputs, outputs, internals, widths, maxStack);
 	}
 
 	private void registerFrame(FrameRegister register) {
@@ -316,7 +316,7 @@ public class FluidFrame {
 		Byte outputId;
 		boolean isReg = outputName.endsWith("$reg");
 		if (isInternal || isReg)
-			outputId = register.getInternal(outputName);
+			outputId = register.registerInternal(outputName);
 		else
 			outputId = register.registerOutput(outputName);
 		byte[] instrRes = toByteArray(instr);
@@ -356,5 +356,9 @@ public class FluidFrame {
 
 	public void add(ArgumentedInstruction argumentedInstruction) {
 		instructions.add(argumentedInstruction);
+	}
+
+	public void addWith(String var, Integer width) {
+		widths.put(var, width);
 	}
 }

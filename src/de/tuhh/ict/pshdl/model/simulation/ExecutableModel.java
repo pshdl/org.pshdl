@@ -15,15 +15,21 @@ public class ExecutableModel implements Serializable {
 	public final String[] outputs;
 	public final String[] internals;
 	public final int[] registerOutputs;
+	public final Map<String, Integer> widths;
 
-	public ExecutableModel(Frame[] frames, String[] inputs, String[] outputs, String[] internals, int maxDataWidth, int maxStackDepth) {
+	public ExecutableModel(Frame[] frames, String[] inputs, String[] outputs, String[] internals, Map<String, Integer> widths, int maxStackDepth) {
 		super();
 		this.frames = frames;
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.internals = internals;
-		this.maxDataWidth = maxDataWidth;
 		this.maxStackDepth = maxStackDepth;
+		this.widths = widths;
+		int maxWidth = -1;
+		for (Integer width : widths.values()) {
+			maxWidth = Math.max(width, maxWidth);
+		}
+		this.maxDataWidth = maxWidth;
 		List<Integer> regOuts = new ArrayList<Integer>();
 		for (int i = 0; i < frames.length; i++) {
 			Frame frame = frames[i];
@@ -129,5 +135,9 @@ public class ExecutableModel implements Serializable {
 		}
 		sb.append("}");
 		return sb.toString();
+	}
+
+	public int getWidth(String name) {
+		return widths.get(stripReg(name));
 	}
 }
