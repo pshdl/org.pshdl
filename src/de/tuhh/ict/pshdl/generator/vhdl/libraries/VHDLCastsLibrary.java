@@ -44,7 +44,6 @@ public class VHDLCastsLibrary {
 			"newSize", Standard.NATURAL));
 	public static final FunctionDeclaration RESIZE_INT = new FunctionDeclaration("resizeInt", NumericStd.SIGNED, new Constant("s", StdLogic1164.STD_LOGIC), new Constant("newSize",
 			Standard.NATURAL));
-	private static final Map<FunctionCallMap, FunctionCallMap> castMap = new HashMap<VHDLCastsLibrary.FunctionCallMap, VHDLCastsLibrary.FunctionCallMap>();
 	static {
 		PACKAGE = new PackageDeclaration("pshdl.Casts");
 		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
@@ -65,11 +64,6 @@ public class VHDLCastsLibrary {
 				}
 			}
 		}
-		putCastMap(HDLPrimitiveType.INT, HDLPrimitiveType.UINT, null);
-		putCastMap(HDLPrimitiveType.INT, HDLPrimitiveType.BITVECTOR, null);
-		putCastMap(HDLPrimitiveType.INT, HDLPrimitiveType.INTEGER, NumericStd.TO_INTEGER);
-		putCastMap(HDLPrimitiveType.UINT, HDLPrimitiveType.INT, null);
-		putCastMap(HDLPrimitiveType.UINT, HDLPrimitiveType.BITVECTOR, null);
 
 		declarations.add(STR_TO_UNSIGNED);
 		// declarations.add(STR_TO_SIGNED);
@@ -83,11 +77,6 @@ public class VHDLCastsLibrary {
 		declarations.add(MAX);
 		declarations.add(MIN);
 		declarations.add(ABS);
-	}
-
-	private static void putCastMap(HDLPrimitiveType left, HDLPrimitiveType right, FunctionDeclaration call) {
-		FunctionCallMap callMap = new FunctionCallMap(left, right, call);
-		castMap.put(callMap, callMap);
 	}
 
 	public static SubtypeIndication getType(HDLPrimitiveType left) {
@@ -186,16 +175,9 @@ public class VHDLCastsLibrary {
 	public static Expression<?> cast(Expression<?> vhdlExpr, HDLPrimitiveType from, HDLPrimitiveType to) {
 		if (from.equals(to))
 			return vhdlExpr;
-		FunctionCallMap callMap = castMap.get(new FunctionCallMap(from, to, null));
 		String name = getCastName(from, to);
 		Function resolve = PACKAGE.getScope().resolve(name, Function.class);
 		FunctionCall call = new FunctionCall(resolve);
-		if (callMap != null) {
-			if (callMap.call == null) {
-				return new TypeConversion(getType(to), vhdlExpr);
-			}
-			call = new FunctionCall(callMap.call);
-		}
 		call.getParameters().add(new AssociationElement(vhdlExpr));
 		return call;
 	}

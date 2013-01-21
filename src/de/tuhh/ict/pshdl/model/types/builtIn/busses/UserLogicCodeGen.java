@@ -138,9 +138,8 @@ public class UserLogicCodeGen extends CommonBusCode {
 		HDLSwitchCaseStatement label = new HDLSwitchCaseStatement().setLabel(HDLLiteral.get(BigInteger.ONE.shiftLeft((rowCount - 1) - pos)));
 		HDLVariableRef busData = new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_Data"));
 		int bitPos = 31;
-		int bitEnable = 3;
 		HDLVariableRef be = new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_BE"));
-		HDLIfStatement ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitEnable, 1)));
+		HDLIfStatement ifStatement = null;
 		int ifBitPos = 31;
 		for (NamedElement ne : row.definitions) {
 			Definition def = (Definition) ne;
@@ -160,27 +159,37 @@ public class UserLogicCodeGen extends CommonBusCode {
 				while (!done) {
 					int remainingBits = bitPos % 8;
 					if (targetIdx > remainingBits) {
-						HDLReference temp = target.addBits(getRange(targetIdx, remainingBits + 1));
+						HDLReference temp;
+						if (def.width == -1)
+							temp = target;
+						else
+							temp = target.addBits(getRange(targetIdx, remainingBits + 1));
 						HDLRange busRange = getRange(bitPos, remainingBits + 1);
+						if (ifStatement == null)
+							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
 						ifStatement = ifStatement.addThenDo(new HDLAssignment().setLeft(temp).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(busRange)));
 						bitPos -= remainingBits + 1;
 						targetIdx -= remainingBits + 1;
 						if ((bitPos / 8) != (ifBitPos / 8)) {
 							label = label.addDos(ifStatement);
-							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(--bitEnable, 1)));
+							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
 							ifBitPos = bitPos;
 						}
 					} else {
 						HDLReference temp = target.addBits(getRange(targetIdx, targetIdx + 1));
 						HDLRange busRange = getRange(bitPos, targetIdx + 1);
+						if (ifStatement == null)
+							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
 						ifStatement = ifStatement.addThenDo(new HDLAssignment().setLeft(temp).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(busRange)));
 						bitPos -= targetIdx + 1;
 						done = true;
 					}
 				}
+			} else {
+				bitPos -= MemoryModel.getSize(def);
 			}
 		}
-		if (!ifStatement.getThenDo().isEmpty())
+		if ((ifStatement != null) && !ifStatement.getThenDo().isEmpty())
 			label = label.addDos(ifStatement);
 		return label;
 	}

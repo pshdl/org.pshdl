@@ -5,11 +5,6 @@ import java.math.*;
 import java.util.*;
 
 public class Frame implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1690021519637432408L;
 	public final byte[] instructions;
 	public final byte[] inputDependencies;
 	public final byte[] internalDependencies;
@@ -21,6 +16,7 @@ public class Frame implements Serializable {
 	public final boolean isInternal;
 	public final boolean isReg;
 	transient public int lastUpdate;
+	private static final long serialVersionUID = -1690021519637432408L;
 
 	public Frame(byte[] instructions, byte[] inputDependencies, byte[] internalDependencies, int outputId, int maxDataWidth, int maxStackDepth, BigInteger[] constants, String id,
 			boolean isInternal, boolean isReg) {

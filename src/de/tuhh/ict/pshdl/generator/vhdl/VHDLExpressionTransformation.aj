@@ -187,9 +187,9 @@ public aspect VHDLExpressionTransformation {
 		case INTEGER:
 			return lit.toVHDL();
 		case INT: 
-			return handleIntUint(tWidth, lit, val, width, NumericStd.SIGNED, NumericStd.TO_SIGNED);
+			return handleIntUint(tWidth, lit, val, width, HDLPrimitiveType.INT, NumericStd.TO_SIGNED);
 		case UINT:
-			return handleIntUint(tWidth, lit, val, width, NumericStd.UNSIGNED, NumericStd.TO_UNSIGNED);
+			return handleIntUint(tWidth, lit, val, width, HDLPrimitiveType.UINT, NumericStd.TO_UNSIGNED);
 		case BITVECTOR:
 			if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
 				return Aggregate.OTHERS(new CharacterLiteral('0'));
@@ -213,18 +213,18 @@ public aspect VHDLExpressionTransformation {
 		throw new IllegalArgumentException("Should not get here");
 	}
 
-	private Expression<?> HDLManip.handleIntUint(HDLExpression tWidth, HDLLiteral lit, BigInteger val, BigInteger width, SubtypeIndication type, Function f) {
+	private Expression<?> HDLManip.handleIntUint(HDLExpression tWidth, HDLLiteral lit, BigInteger val, BigInteger width, HDLPrimitiveType to, Function f) {
 		if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
 			return Aggregate.OTHERS(new CharacterLiteral('0'));
 		if(width!=null && lit.getPresentation()!=HDLLiteralPresentation.NUM)
-			return new TypeConversion(type,  lit.toVHDL(width.intValue(), true));
+			return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
 		if (val.bitLength()>31){
 			if (width!=null)
-				return new TypeConversion(type,  lit.toVHDL(width.intValue(), true));
+				return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
 			FunctionCall functionCall = new FunctionCall(NumericStd.RESIZE);
-			functionCall.getParameters().add(new AssociationElement(lit.toVHDL(val.bitLength(), true)));
+			functionCall.getParameters().add(new AssociationElement(VHDLCastsLibrary.cast(lit.toVHDL(val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));
 			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
-			return new TypeConversion(type,  functionCall);
+			return functionCall;
 		}
 		FunctionCall functionCall = new FunctionCall(f);
 		functionCall.getParameters().add(new AssociationElement(lit.toVHDL()));

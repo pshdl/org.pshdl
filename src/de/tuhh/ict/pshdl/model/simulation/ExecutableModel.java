@@ -7,7 +7,6 @@ import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.Graph.Node;
 
 public class ExecutableModel implements Serializable {
-	private static final long serialVersionUID = 7515137334641792104L;
 	public final int maxDataWidth;
 	public final int maxStackDepth;
 	public final Frame[] frames;
@@ -16,6 +15,7 @@ public class ExecutableModel implements Serializable {
 	public final String[] internals;
 	public final int[] registerOutputs;
 	public final Map<String, Integer> widths;
+	private static final long serialVersionUID = 7515137334641792104L;
 
 	public ExecutableModel(Frame[] frames, String[] inputs, String[] outputs, String[] internals, Map<String, Integer> widths, int maxStackDepth) {
 		super();

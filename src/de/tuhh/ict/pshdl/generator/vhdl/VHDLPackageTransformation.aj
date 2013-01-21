@@ -166,18 +166,19 @@ public aspect VHDLPackageTransformation {
 		LinkedList<SequentialStatement> resets = unit.resetStatements.get(key);
 		if (resets != null)
 			rstIfStmnt.getStatements().addAll(resets);
-		Expression<?> clkEdge;
+		FunctionCall edge;
 		if (config.getRegClockType(hUnit.getFullName(), key.getClockType()) == HDLRegClockType.RISING)
-			clkEdge = Expressions.risingEdge(clk);
+			edge = new FunctionCall(StdLogic1164.RISING_EDGE);
 		else
-			clkEdge = Expressions.fallingEdge(clk);
+			edge = new FunctionCall(StdLogic1164.FALLING_EDGE);
+		edge.getParameters().add(new AssociationElement(clk));
 		if (config.getRegSyncType(hUnit.getFullName(), key.getSyncType()) == HDLRegSyncType.ASYNC) {
 			ps.getSensitivityList().add(rst);
-			ElsifPart elsifPart = rstIfStmnt.createElsifPart(clkEdge);
+			ElsifPart elsifPart = rstIfStmnt.createElsifPart(edge);
 			elsifPart.getStatements().addAll(value);
 			return rstIfStmnt;
 		}
-		IfStatement clkIf = new IfStatement(clkEdge);
+		IfStatement clkIf = new IfStatement(edge);
 		clkIf.getStatements().add(rstIfStmnt);
 		rstIfStmnt.getElseStatements().addAll(value);
 		return clkIf;

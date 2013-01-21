@@ -110,6 +110,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			return result;
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) {
