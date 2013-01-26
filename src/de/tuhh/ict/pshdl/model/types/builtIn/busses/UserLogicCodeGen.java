@@ -176,7 +176,11 @@ public class UserLogicCodeGen extends CommonBusCode {
 							ifBitPos = bitPos;
 						}
 					} else {
-						HDLReference temp = target.addBits(getRange(targetIdx, targetIdx + 1));
+						HDLReference temp;
+						if (def.width == -1)
+							temp = target;
+						else
+							temp = target.addBits(getRange(targetIdx, targetIdx + 1));
 						HDLRange busRange = getRange(bitPos, targetIdx + 1);
 						if (ifStatement == null)
 							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));

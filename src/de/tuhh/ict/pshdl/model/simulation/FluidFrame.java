@@ -6,79 +6,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
 
 public class FluidFrame {
-	private static AtomicInteger gid = new AtomicInteger();
-	public final int id;
-
-	public FluidFrame() {
-		this(null);
-	}
-
-	public FluidFrame(String outputName) {
-		this.id = gid.incrementAndGet();
-		if (outputName != null)
-			this.outputName = outputName;
-		else
-			this.outputName = Integer.toString(id);
-	}
-
-	public static enum Instruction {
-		loadInput(false, -1, "Loads a value from an input. The first value is the input name, then followed by bit access indexes"), //
-		loadInternal(false, -1, "Loads a value from an internal. The first value is the input name, then followed by bit access indexes"), //
-		loadConstant(false, 1, "Loads a value from the internal storage"), //
-		// constants(false, 1, "Stores a value to the internal storage"), //
-		callFrame(false, 1, "Calls a frame"), //
-		// switchCall(false, -1,
-		// "Calls a frame depending on the value. The value format is: value, frame id"),
-		// //
-		isRisingEdgeInput(false, 1, "Checks for an rising edge on from an input signal"), //
-		isFallingEdgeInput(false, 1, "Checks for an rising edge on from an input signal"), //
-		isRisingEdgeInternal(false, 1, "Checks for an rising edge on from an internal signal"), //
-		isFallingEdgeInternal(false, 1, "Checks for an rising edge on from an internal signal"), //
-		bitAccess(false, -1, "Use the bits given as operands"), //
-		ifCall(false, 2, "Calls a frame depending on the value. The value format is: true frame, false frame id"), //
-		concat(false, 0, "Concatenate bits"), //
-		and(false, 0, "A binary & operation"), //
-		logiAnd(false, 0, "A logical && operation"), //
-		or(false, 0, "A binary | operation"), //
-		logiOr(false, 0, "A logical || operation"), //
-		xor(false, 0, "A binary ^ operation"), //
-		div(false, 0, "An arithmetic / operation"), //
-		minus(false, 0, "An arithmetic - operation"), //
-		mod(false, 0, "An arithmetic % operation"), //
-		mul(false, 0, "An arithmetic * operation"), //
-		plus(false, 0, "An arithmetic + operation"), //
-		pow(false, 0, "An arithmetic ** operation"), //
-		sll(false, 0, "A shift << operation"), //
-		sra(false, 0, "A shift >> operation"), //
-		srl(false, 0, "A shift >>> operation"), //
-		eq(false, 0, "An equality == operation"), //
-		greater(false, 0, "An equality > operation"), //
-		greater_eq(false, 0, "An equality >= operation"), //
-		not_eq(false, 0, "An equality != operation"), //
-		less(false, 0, "An equality < operation"), //
-		less_eq(false, 0, "An equality <= operation"), //
-		arith_neg(false, 0, "Arithmetically negates"), //
-		bit_neg(false, 0, "Bit inverts"), //
-		logic_neg(false, 0, "Logically negates"), //
-		cast_int(false, 1, "Re-interprets the operand as int and resizes it"), //
-		cast_uint(false, 1, "Re-interprets the operand as uint and resizes it"), //
-		const0(true, 0, "Loads a zero to the stack"), //
-
-		;
-		final int argCount;
-		final boolean immediate;
-		final String description;
-
-		Instruction(boolean immediate, int argCount, String desc) {
-			this.argCount = argCount;
-			this.immediate = immediate;
-			this.description = desc;
-		}
-	}
-
 	public static class ArgumentedInstruction {
-		public final Instruction instruction;
 		public final String args[];
+		public final Instruction instruction;
 
 		public ArgumentedInstruction(Instruction instruction, String... args) {
 			super();
@@ -96,98 +26,16 @@ public class FluidFrame {
 		}
 	}
 
-	public final Map<String, FluidFrame> references = new TreeMap<String, FluidFrame>();
-	public final Map<String, BigInteger> constants = new TreeMap<String, BigInteger>();
-	public final Map<String, Integer> widths = new TreeMap<String, Integer>();
-	public final Set<String> inputs = new LinkedHashSet<String>();
-	public final String outputName;
-
-	public final LinkedList<ArgumentedInstruction> instructions = new LinkedList<ArgumentedInstruction>();
-	private boolean isInternal;
-
-	public FluidFrame append(FluidFrame frame) {
-		// Don't copy references
-		widths.putAll(frame.widths);
-		inputs.addAll(frame.inputs);
-		constants.putAll(frame.constants);
-		instructions.addAll(frame.instructions);
-		return this;
-	}
-
-	public void add(Instruction inst) {
-		instructions.add(new ArgumentedInstruction(inst));
-	}
-
-	public void addReferencedFrame(FluidFrame frame) {
-		references.put(frame.outputName, frame);
-	}
-
-	public void addInput(String string) {
-		inputs.add(string);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("\nFrame: ").append(outputName).append('[').append(id).append("]\n");
-		if (constants.size() != 0) {
-			sb.append("Constants:\n");
-			for (Entry<String, BigInteger> entry : constants.entrySet()) {
-				sb.append("\t").append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
-			}
-		}
-		if (inputs.size() != 0) {
-			sb.append("Inputs:\t");
-			boolean first = true;
-			for (String input : inputs) {
-				if (!first)
-					sb.append(", ");
-				first = false;
-				sb.append(input);
-			}
-			sb.append('\n');
-		}
-		for (ArgumentedInstruction ai : instructions) {
-			sb.append(ai).append('\n');
-		}
-		for (FluidFrame refs : references.values()) {
-			sb.append(refs);
-		}
-		return sb.toString();
-	}
-
 	private static class FrameRegister {
-		public final Map<String, Byte> inputIds = new LinkedHashMap<String, Byte>();
-		private int inIdCounter = 0;
-		public final Map<String, Byte> outputIds = new LinkedHashMap<String, Byte>();
-		private int outIdCounter = 0;
-		public final Map<String, Byte> internalIds = new LinkedHashMap<String, Byte>();
-		private int internalIdCounter = 0;
-		public final Map<String, Byte> frameIds = new LinkedHashMap<String, Byte>();
 		private int frameIdCounter = 0;
+		public final Map<String, Byte> frameIds = new LinkedHashMap<String, Byte>();
 		public final List<Frame> frames = new ArrayList<Frame>();
-
-		public Byte registerInput(String in) {
-			if (inputIds.get(in) == null) {
-				inputIds.put(in, (byte) inIdCounter++);
-
-			}
-			return inputIds.get(in);
-		}
-
-		public Byte registerOutput(String in) {
-			if (outputIds.get(in) == null) {
-				outputIds.put(in, (byte) outIdCounter++);
-			}
-			return outputIds.get(in);
-		}
-
-		public Byte registerFrame(String in) {
-			if (frameIds.get(in) == null) {
-				frameIds.put(in, (byte) frameIdCounter++);
-			}
-			return frameIds.get(in);
-		}
+		private int inIdCounter = 0;
+		public final Map<String, Byte> inputIds = new LinkedHashMap<String, Byte>();
+		private int internalIdCounter = 0;
+		public final Map<String, Byte> internalIds = new LinkedHashMap<String, Byte>();
+		private int outIdCounter = 0;
+		public final Map<String, Byte> outputIds = new LinkedHashMap<String, Byte>();
 
 		public void addFrame(Frame frame) {
 			frames.add(frame);
@@ -197,8 +45,22 @@ public class FluidFrame {
 			return frameIds.get(string);
 		}
 
-		public Byte getInput(String fullRef) {
-			return inputIds.get(fullRef);
+		public Byte getInternal(String in) {
+			return internalIds.get(in);
+		}
+
+		public Byte registerFrame(String in) {
+			if (frameIds.get(in) == null) {
+				frameIds.put(in, (byte) frameIdCounter++);
+			}
+			return frameIds.get(in);
+		}
+
+		public Byte registerInput(String in) {
+			if (inputIds.get(in) == null) {
+				inputIds.put(in, (byte) inIdCounter++);
+			}
+			return inputIds.get(in);
 		}
 
 		public Byte registerInternal(String in) {
@@ -208,9 +70,168 @@ public class FluidFrame {
 			return internalIds.get(in);
 		}
 
-		public Byte getInternal(String in) {
-			return internalIds.get(in);
+		public Byte registerOutput(String in) {
+			if (outputIds.get(in) == null) {
+				outputIds.put(in, (byte) outIdCounter++);
+			}
+			return outputIds.get(in);
 		}
+	}
+
+	public static enum Instruction {
+		noop(true, 0, "Does nothing"), //
+		and(false, 0, "A binary & operation"), //
+		arith_neg(false, 0, "Arithmetically negates"), //
+		bit_neg(false, 0, "Bit inverts"), //
+		bitAccess(false, -1, "Use the bits given as operands"), //
+		callFrame(false, 1, "Calls a frame"), //
+		cast_int(false, 1, "Re-interprets the operand as int and resizes it"), //
+		cast_uint(false, 1, "Re-interprets the operand as uint and resizes it"), //
+		concat(false, 0, "Concatenate bits"), //
+		const0(true, 0, "Loads a zero to the stack"), //
+		div(false, 0, "An arithmetic / operation"), //
+		eq(false, 0, "An equality == operation"), //
+		greater(false, 0, "An equality > operation"), //
+		greater_eq(false, 0, "An equality >= operation"), //
+		isFallingEdgeInput(false, 1, "Checks for an rising edge on from an input signal"), //
+		isFallingEdgeInternal(false, 1, "Checks for an rising edge on from an internal signal"), //
+		isRisingEdgeInput(false, 1, "Checks for an rising edge on from an input signal"), //
+		isRisingEdgeInternal(false, 1, "Checks for an rising edge on from an internal signal"), //
+		less(false, 0, "An equality < operation"), //
+		less_eq(false, 0, "An equality <= operation"), //
+		loadConstant(false, 1, "Loads a value from the internal storage"), //
+		loadInput(false, -1, "Loads a value from an input. The first value is the input name, then followed by bit access indexes"), //
+		loadInternal(false, -1, "Loads a value from an internal. The first value is the input name, then followed by bit access indexes"), //
+		logiAnd(false, 0, "A logical && operation"), //
+		logic_neg(false, 0, "Logically negates"), //
+		logiOr(false, 0, "A logical || operation"), //
+		minus(false, 0, "An arithmetic - operation"), //
+		mul(false, 0, "An arithmetic * operation"), //
+		not_eq(false, 0, "An equality != operation"), //
+		or(false, 0, "A binary | operation"), //
+		plus(false, 0, "An arithmetic + operation"), //
+		sll(false, 0, "A shift << operation"), //
+		sra(false, 0, "A shift >> operation"), //
+		srl(false, 0, "A shift >>> operation"), //
+		xor(false, 0, "A binary ^ operation"), //
+
+		;
+		final int argCount;
+		final String description;
+		final boolean immediate;
+
+		Instruction(boolean immediate, int argCount, String desc) {
+			this.argCount = argCount;
+			this.immediate = immediate;
+			this.description = desc;
+		}
+	}
+
+	public static class Predicate {
+		public final int predcateID;
+		public final boolean predicateCondition;
+
+		public Predicate(boolean predicateCondition, int predcateID) {
+			super();
+			this.predicateCondition = predicateCondition;
+			this.predcateID = predcateID;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Predicate other = (Predicate) obj;
+			if (predcateID != other.predcateID)
+				return false;
+			if (predicateCondition != other.predicateCondition)
+				return false;
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + predcateID;
+			result = (prime * result) + (predicateCondition ? 1231 : 1237);
+			return result;
+		}
+	}
+
+	/**
+	 * A global counter for frame ids
+	 */
+	private static AtomicInteger gid = new AtomicInteger();
+
+	/**
+	 * The local id of this frame
+	 */
+	public final int id;
+
+	/**
+	 * All constants by name
+	 */
+	public final Map<String, BigInteger> constants = new TreeMap<String, BigInteger>();
+
+	public final Set<String> inputs = new LinkedHashSet<String>();
+	public final LinkedList<ArgumentedInstruction> instructions = new LinkedList<ArgumentedInstruction>();
+	private boolean isInternal;
+	public boolean isPredicate;
+	public final String outputName;
+
+	public Set<Predicate> predicates = new HashSet<Predicate>();
+	public final Map<String, FluidFrame> references = new TreeMap<String, FluidFrame>();
+
+	public final Map<String, Integer> widths = new TreeMap<String, Integer>();
+
+	public FluidFrame() {
+		this(null);
+	}
+
+	public FluidFrame(String outputName) {
+		this.id = gid.incrementAndGet();
+		if (outputName != null)
+			this.outputName = outputName;
+		else
+			this.outputName = Integer.toString(id);
+	}
+
+	public void add(ArgumentedInstruction argumentedInstruction) {
+		instructions.add(argumentedInstruction);
+	}
+
+	public void add(Instruction inst) {
+		instructions.add(new ArgumentedInstruction(inst));
+	}
+
+	public void addInput(String string) {
+		inputs.add(string);
+	}
+
+	public void addPredicate(int predicateID, boolean condition) {
+		predicates.add(new Predicate(condition, predicateID));
+	}
+
+	public void addReferencedFrame(FluidFrame frame) {
+		references.put(frame.outputName, frame);
+	}
+
+	public void addWith(String var, Integer width) {
+		widths.put(var, width);
+	}
+
+	public FluidFrame append(FluidFrame frame) {
+		// Don't copy references
+		widths.putAll(frame.widths);
+		inputs.addAll(frame.inputs);
+		constants.putAll(frame.constants);
+		instructions.addAll(frame.instructions);
+		return this;
 	}
 
 	public ExecutableModel getExecutable() {
@@ -244,6 +265,23 @@ public class FluidFrame {
 		for (FluidFrame entry : references.values()) {
 			entry.registerFrame(register);
 		}
+	}
+
+	public void setInternal(boolean isInternal) {
+		this.isInternal = isInternal;
+	}
+
+	public void setPredicate(boolean predicate) {
+		this.isPredicate = predicate;
+	}
+
+	private byte[] toByteArray(Collection<Byte> instr) {
+		byte[] instrRes = new byte[instr.size()];
+		int pos = 0;
+		for (Byte i : instr) {
+			instrRes[pos++] = i;
+		}
+		return instrRes;
 	}
 
 	private Frame toFrame(FrameRegister register) {
@@ -341,24 +379,33 @@ public class FluidFrame {
 		return sb.toString();
 	}
 
-	private byte[] toByteArray(Collection<Byte> instr) {
-		byte[] instrRes = new byte[instr.size()];
-		int pos = 0;
-		for (Byte i : instr) {
-			instrRes[pos++] = i;
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\nFrame: ").append(outputName).append('[').append(id).append("]\n");
+		if (constants.size() != 0) {
+			sb.append("Constants:\n");
+			for (Entry<String, BigInteger> entry : constants.entrySet()) {
+				sb.append("\t").append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+			}
 		}
-		return instrRes;
-	}
-
-	public void setInternal(boolean isInternal) {
-		this.isInternal = isInternal;
-	}
-
-	public void add(ArgumentedInstruction argumentedInstruction) {
-		instructions.add(argumentedInstruction);
-	}
-
-	public void addWith(String var, Integer width) {
-		widths.put(var, width);
+		if (inputs.size() != 0) {
+			sb.append("Inputs:\t");
+			boolean first = true;
+			for (String input : inputs) {
+				if (!first)
+					sb.append(", ");
+				first = false;
+				sb.append(input);
+			}
+			sb.append('\n');
+		}
+		for (ArgumentedInstruction ai : instructions) {
+			sb.append(ai).append('\n');
+		}
+		for (FluidFrame refs : references.values()) {
+			sb.append(refs);
+		}
+		return sb.toString();
 	}
 }

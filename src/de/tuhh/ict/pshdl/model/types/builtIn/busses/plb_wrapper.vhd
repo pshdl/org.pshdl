@@ -156,7 +156,8 @@ entity {WRAPPERNAME} is
     C_SPLB_SMALLEST_MASTER         : integer              := 32;
     C_SPLB_CLK_PERIOD_PS           : integer              := 10000;
     C_INCLUDE_DPHASE_TIMER         : integer              := 1;
-    C_FAMILY                       : string               := "virtex6"
+    C_FAMILY                       : string               := "virtex5"
+    {MEM_GENERICS}
     -- DO NOT EDIT ABOVE THIS LINE ---------------------
   );
   port
@@ -237,6 +238,7 @@ architecture IMP of {WRAPPERNAME} is
     (
       ZERO_ADDR_PAD & USER_SLV_BASEADDR,  -- user logic slave space base address
       ZERO_ADDR_PAD & USER_SLV_HIGHADDR   -- user logic slave space high address
+	  {MEM_ARRAY}	
     );
 
   ------------------------------------------
@@ -248,6 +250,7 @@ architecture IMP of {WRAPPERNAME} is
   constant IPIF_ARD_NUM_CE_ARRAY          : INTEGER_ARRAY_TYPE   := 
     (
       0  => pad_power2(USER_SLV_NUM_REG)  -- number of ce for user logic slave space
+	  {MEM_CES}
     );
 
   ------------------------------------------
@@ -394,6 +397,7 @@ begin
 
       Bus2IP_Clk                     => ipif_Bus2IP_Clk,
       Bus2IP_Reset                   => ipif_Bus2IP_Reset,
+      {MEM_PORTMAP}
       Bus2IP_Data                    => ipif_Bus2IP_Data,
       Bus2IP_BE                      => ipif_Bus2IP_BE,
       Bus2IP_RdCE                    => user_Bus2IP_RdCE,

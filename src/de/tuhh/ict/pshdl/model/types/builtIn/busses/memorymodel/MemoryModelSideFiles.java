@@ -3,165 +3,27 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.io.*;
 import java.util.*;
 
+import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.cfiles.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class MemoryModelSideFiles {
 
-	public static SideFile[] getCFiles(Unit unit, List<Row> rows) {
-		StringBuilder structDefinitions = new StringBuilder();
-		StringBuilder setDirectFunctions = new StringBuilder();
-		StringBuilder setFunctions = new StringBuilder();
-		StringBuilder updateFunctions = new StringBuilder();
-		StringBuilder setDirectFunctionsDeclarations = new StringBuilder();
-		StringBuilder setFunctionsDeclarations = new StringBuilder();
-		StringBuilder updateFunctionsDeclarations = new StringBuilder();
-		Set<String> handledRows = new HashSet<String>();
-		for (Row row : rows) {
-			if (handledRows.contains(row.name))
-				continue;
-			handledRows.add(row.name);
-			structDefinitions.append("typedef struct ").append(row.name).append("{\n");
-			Map<String, Integer> defCount = new HashMap<String, Integer>();
-			boolean readOnly = true;
-			boolean writeOnly = true;
-			for (NamedElement ne : row.definitions) {
-				Definition def = (Definition) ne;
-				Integer integer = defCount.get(def.name);
-				if (integer == null)
-					integer = 0;
-				def.arrayIndex = integer;
-				defCount.put(def.name, ++integer);
-				if ((def.rw == RWType.rw) || (def.rw == RWType.w))
-					readOnly = false;
-				if ((def.rw == RWType.rw) || (def.rw == RWType.r))
-					writeOnly = false;
-			}
-			if (!readOnly) {
-				StringBuilder set = new StringBuilder();
-				set.append("int set").append(firstUpper(row.name)).append("(uint32_t *base, int index, ").append(row.name).append("_t *res)");
-				setFunctionsDeclarations.append(set).append(";\n");
-				setFunctions.append(set).append("{\n\tset").append(firstUpper(row.name)).append("Direct(base, index");
-			}
-			StringBuilder setDirectFunction = new StringBuilder();
-			StringBuilder setDirectFunctionsDeclaration = new StringBuilder();
-			setDirectFunctionsDeclaration.append("int set").append(firstUpper(row.name)).append("Direct(uint32_t *base, int index");
-			for (NamedElement ne : row.definitions) {
-				Definition def = (Definition) ne;
-				if (def.type == Type.UNUSED)
-					continue;
-				int size = MemoryModel.getSize(def);
-				String type = "bus_" + def.type.toString().toLowerCase() + size + "_t";
-				String name = def.name;
-				Integer dim = defCount.get(name);
-				if (def.arrayIndex == 0) {
-					if (dim == 1)
-						structDefinitions.append("\t").append(type).append("\t").append(name).append(";\n");
-					else
-						structDefinitions.append("\t").append(type).append("\t").append(name).append('[').append(dim).append(']').append(";\n");
-				}
-				if (def.rw != RWType.r) {
-					long maskValue = (1 << size) - 1;
-					long maxValue;
-					if (def.type != Type.INT)
-						maxValue = (1 << size) - 1;
-					else
-						maxValue = (1 << (size - 1)) - 1;
-					String varName;
-					String varNameIndex;
-					if (dim == 1) {
-						setDirectFunctionsDeclaration.append(", ").append(type).append(' ').append(name);
-						varName = name;
-						varNameIndex = name;
-					} else {
-						setDirectFunctionsDeclaration.append(", ").append(type).append(' ').append(name).append(def.arrayIndex);
-						varName = name + def.arrayIndex;
-						varNameIndex = name + "[" + def.arrayIndex + "]";
-					}
-					setFunctions.append(", res->").append(varNameIndex);
-					directFunctionMasking(row, setDirectFunction, def, maskValue, maxValue, varName, varNameIndex);
-				}
-			}
-			structDefinitions.append("} ").append(row.name).append("_t;\n\n");
-			if (!readOnly) {
-				setDirectFunctions.append(setDirectFunctionsDeclaration).append("){\n");
-				setDirectFunctions.append(setDirectFunction);
-				setDirectFunctions.append("}\n");
-				setDirectFunctionsDeclaration.append(");\n");
-				setDirectFunctionsDeclarations.append(setDirectFunctionsDeclaration);
-				setFunctions.append(");\n}\n");
-			}
-		}
-		System.out.println(structDefinitions);
-		System.out.println(setDirectFunctionsDeclarations);
-		System.out.println(setDirectFunctions);
-		System.out.println(setFunctionsDeclarations);
-		System.out.println(setFunctions);
-		return null;
-	}
-
-	private static void directFunctionMasking(Row row, StringBuilder setDirectFunction, Definition def, long maskValue, long maxValue, String varName, String varNameIndex) {
-		switch (def.warn) {
-		case limit:
-			setDirectFunction.append("\tif (").append(varName).append(">").append(maxValue).append(") {\n");
-			setDirectFunction.append("\t\twarn(limit, ").append(varName).append(",\"").append(varNameIndex).append("\",\"").append(row.name).append("\",\" using ")
-					.append(maxValue).append("\");\n");
-			setDirectFunction.append("\t\t").append(varName).append("=").append(maxValue).append(";\n");
-			setDirectFunction.append("\t}\n");
-			if (def.type == Type.INT) {
-				long negMax = -maxValue - 1;
-				setDirectFunction.append("\telse if (").append(varName).append("<").append(negMax).append(") {\n");
-				setDirectFunction.append("\t\twarn(limit, ").append(varName).append(",\"").append(varNameIndex).append("\",\"").append(row.name).append("\",\" using ")
-						.append(negMax).append("\");\n");
-				setDirectFunction.append("\t\t").append(varName).append("=").append(negMax).append(";\n");
-				setDirectFunction.append("\t}\n");
-			}
-			break;
-		case silentLimit:
-			setDirectFunction.append("\tif (").append(varName).append(">").append(maxValue).append(") {\n");
-			setDirectFunction.append("\t\t").append(varName).append("=").append(maxValue).append(";\n");
-			setDirectFunction.append("\t}\n");
-			if (def.type == Type.INT) {
-				long negMax = -maxValue - 1;
-				setDirectFunction.append("\telse if (").append(varName).append("<").append(negMax).append(") {\n");
-				setDirectFunction.append("\t\t").append(varName).append("=").append(negMax).append(";\n");
-				setDirectFunction.append("\t}\n");
-			}
-			break;
-		case mask:
-			setDirectFunction.append("\tif (").append(varName).append(">").append(maxValue).append(") {\n");
-			setDirectFunction.append("\t\twarn(mask, ").append(varName).append(",\"").append(varNameIndex).append("\",\"").append(row.name).append("\",\" masking with ")
-					.append(maskValue).append("\");\n");
-			setDirectFunction.append("\t\t").append(varName).append("&=").append(maskValue).append(";\n");
-			setDirectFunction.append("\t}\n");
-			if (def.type == Type.INT) {
-				long negMax = -maxValue - 1;
-				setDirectFunction.append("\telse if (").append(varName).append("<").append(negMax).append(") {\n");
-				setDirectFunction.append("\t\twarn(mask, ").append(varName).append(",\"").append(varNameIndex).append("\",\"").append(row.name).append("\",\" masking with ")
-						.append(maskValue).append("\");\n");
-				setDirectFunction.append("\t\t").append(varName).append("&=").append(maskValue).append(";\n");
-				setDirectFunction.append("\t}\n");
-			}
-			break;
-		case silentMask:
-			setDirectFunction.append("\tif (").append(varName).append(">").append(maxValue).append(") {\n");
-			setDirectFunction.append("\t\t").append(varName).append("&=").append(maskValue).append(";\n");
-			setDirectFunction.append("\t}\n");
-			if (def.type == Type.INT) {
-				long negMax = -maxValue - 1;
-				setDirectFunction.append("\telse if (").append(varName).append("<").append(negMax).append(") {\n");
-				setDirectFunction.append("\t\t").append(varName).append("&=").append(maskValue).append(";\n");
-				setDirectFunction.append("\t}\n");
-			}
-			break;
-		}
-	}
-
-	private static String firstUpper(String name) {
-		if (name.length() > 1)
-			return Character.toUpperCase(name.charAt(0)) + name.substring(1);
-		return name;
+	public static List<SideFile> getSideFiles(HDLUnit unit, Unit memUnit, List<Row> rows, String version) {
+		List<SideFile> res = new LinkedList<SideFile>();
+		String unitName = unit.getFullName().toString('_').toLowerCase();
+		String ipcorename = unitName + BusGenSideFiles.WRAPPER_APPENDIX;
+		String dirName = ipcorename + "_" + version;
+		String rootDir = "drivers/";
+		BusAccess ba = new BusAccess();
+		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.html", builtHTML(memUnit, rows)));
+		res.add(new SideFile(rootDir + dirName + "/" + unitName + "BusAccess.c", ba.generateAccessC(rows).toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/" + unitName + "BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/" + "BusStdDefinitions.h", ba.generateStdDef().toString().getBytes()));
+		return res;
 	}
 
 	public static byte[] builtHTML(Unit unit, List<Row> rows) {

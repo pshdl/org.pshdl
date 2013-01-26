@@ -10,22 +10,23 @@ import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class BusGenSideFiles {
 
-	private static final String WRAPPER_APPENDIX = "core";
+	public static final String WRAPPER_APPENDIX = "core";
 
-	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, String version, boolean axi) {
+	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi) {
 		List<SideFile> res = new LinkedList<SideFile>();
 		String unitName = unit.getFullName().toString('_').toLowerCase();
 		String ipcorename = unitName + WRAPPER_APPENDIX;
 		String dirName = ipcorename + "_" + version;
 		String type = axi ? "axi" : "plb";
-		res.add(mpdFile(unit, ipcorename, dirName, type));
-		res.add(paoFile(unitName, dirName, type));
-		res.add(wrapperFile(unit, unitName, dirName, version, regCount, type));
-		res.add(new SideFile(dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS));
+		String pCore = "pcores/";
+		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount));
+		res.add(paoFile(unitName, dirName, type, pCore));
+		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore));
+		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS));
 		return res;
 	}
 
-	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, String type) {
+	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir) {
 		String wrapperName = unitName + WRAPPER_APPENDIX;
 		String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
 		Map<String, String> options = new HashMap<String, String>();
@@ -35,6 +36,28 @@ public class BusGenSideFiles {
 		options.put("{VERSION}", version.replaceAll("_", "."));
 		options.put("{DATE}", new Date().toString());
 		options.put("{REGCOUNT}", Integer.toString(regCount));
+		StringBuilder memGenerics = new StringBuilder(); // {MEM_GENERICS}
+		StringBuilder memArray = new StringBuilder(); // {MEM_ARRAY}
+		StringBuilder memCes = new StringBuilder(); // {MEM_CES}
+		for (int i = 0; i < memCount; i++) {
+			memGenerics.append("    C_MEM" + i + "_BASEADDR                : std_logic_vector     := X\"FFFFFFFF\";\n");
+			memGenerics.append("    C_MEM" + i + "_HIGHADDR                : std_logic_vector     := X\"00000000\";");
+			memArray.append("      ,ZERO_ADDR_PAD & C_MEM" + i + "_BASEADDR    -- user logic memory space " + i + " base address\n");
+			memArray.append("      ,ZERO_ADDR_PAD & C_MEM" + i + "_HIGHADDR    -- user logic memory space " + i + " high address\n");
+			memCes.append(",").append(i + 1).append(" => 1\n");
+		}
+		options.put("{MEM_GENERICS}", memGenerics.toString());
+		options.put("{MEM_ARRAY}", memArray.toString());
+		options.put("{MEM_CES}", memCes.toString());
+		String memPortMap;
+		if (memCount > 0) {
+			memPortMap = "      Bus2IP_Addr                    => ipif_Bus2IP_Addr,\n" + //
+					"Bus2IP_CS                      => ipif_Bus2IP_CS(1 to " + memCount + "),\n" + //
+					"Bus2IP_RNW                     => ipif_Bus2IP_RNW,";
+		} else {
+			memPortMap = "";
+		}
+		options.put("{MEM_PORTMAP}", memPortMap);
 		HDLInterface asInterface = unit.asInterface();
 		StringBuilder generics = new StringBuilder();
 		StringBuilder genericsMap = new StringBuilder();
@@ -99,14 +122,14 @@ public class BusGenSideFiles {
 		options.put("{GENERICS}", generics.toString());
 		options.put("{GENERICSMAP}", genericsMap.toString());
 		try {
-			return new SideFile(relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options));
+			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static SideFile paoFile(String ipcoreName, String dirName, String type) {
+	private static SideFile paoFile(String ipcoreName, String dirName, String type, String rootDir) {
 		String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
@@ -115,14 +138,14 @@ public class BusGenSideFiles {
 		options.put("{WRAPPERNAME}", ipcoreName + WRAPPER_APPENDIX);
 		options.put("{DATE}", new Date().toString());
 		try {
-			return new SideFile(relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options));
+			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type) {
+	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type, String rootDir, int memCount) {
 		HDLInterface asInterface = unit.asInterface();
 		StringBuilder generics = new StringBuilder();
 		StringBuilder ports = new StringBuilder();
@@ -184,13 +207,17 @@ public class BusGenSideFiles {
 				}
 			}
 		}
+		for (int i = 0; i < memCount; i++) {
+			generics.append("PARAMETER C_MEM" + i + "_BASEADDR = 0xffffffff, DT = std_logic_vector, PAIR = C_MEM" + i + "_HIGHADDR, ADDRESS = BASE, BUS = SPLB");
+			generics.append("PARAMETER C_MEM" + i + "_HIGHADDR = 0x00000000, DT = std_logic_vector, PAIR = C_MEM" + i + "_BASEADDR, ADDRESS = HIGH, BUS = SPLB");
+		}
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
 		options.put("{DATE}", new Date().toString());
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
-			return new SideFile(dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options));
+			return new SideFile(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

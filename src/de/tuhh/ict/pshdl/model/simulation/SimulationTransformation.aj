@@ -204,12 +204,14 @@ public aspect SimulationTransformation {
 
 	public FluidFrame HDLTernary.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
+		res.setPredicate(true);
 		res.append(getIfExpr().toSimulationModel(context));
 		FluidFrame thenFrame = getThenExpr().toSimulationModel(context);
+		thenFrame.addPredicate(res.id, true);
 		res.addReferencedFrame(thenFrame);
 		FluidFrame elseFrame = getThenExpr().toSimulationModel(context);
+		elseFrame.addPredicate(res.id, false);
 		res.addReferencedFrame(elseFrame);
-		res.instructions.add(new ArgumentedInstruction(Instruction.ifCall, Integer.toString(thenFrame.id), Integer.toString(elseFrame.id)));
 		return res;
 	}
 
@@ -263,8 +265,7 @@ public aspect SimulationTransformation {
 			res.add(Instruction.minus);
 			break;
 		case MOD:
-			res.add(Instruction.mod);
-			break;
+			throw new IllegalArgumentException("Mod is not supported as Instruction");
 		case MUL:
 			res.add(Instruction.mul);
 			break;
@@ -272,8 +273,7 @@ public aspect SimulationTransformation {
 			res.add(Instruction.plus);
 			break;
 		case POW:
-			res.add(Instruction.pow);
-			break;
+			throw new IllegalArgumentException("Pow is not supported as Instruction");
 		}
 		return res;
 	}

@@ -3,17 +3,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.*;
 
 public class Definition implements NamedElement {
-
-	public static enum RWType {
-		r, rw, w;
-	}
-
-	public static enum Type {
-		BIT, INT, UINT, UNUSED
-	}
-
-	public static enum WarnType {
-		mask, silentMask, limit, silentLimit;
+	public enum WarnType {
+		mask, silentMask, limit, silentLimit, error, silentError;
 
 		@Override
 		public String toString() {
@@ -26,9 +17,21 @@ public class Definition implements NamedElement {
 				return "silent limit";
 			case silentMask:
 				return "silent mask";
+			case error:
+				return "error";
+			case silentError:
+				return "silent error";
 			}
 			return null;
 		}
+	}
+
+	public enum Type {
+		BIT, INT, UINT, UNUSED
+	}
+
+	public enum RWType {
+		r, rw, w;
 	}
 
 	public List<Integer> dimensions = new LinkedList<Integer>();
@@ -45,6 +48,8 @@ public class Definition implements NamedElement {
 	public Integer arrayIndex;
 
 	public WarnType warn = WarnType.limit;
+
+	public int bitPos;
 
 	public Definition() {
 	}

@@ -171,6 +171,8 @@ public final class HDLFrameInterpreter {
 				do {
 					Instruction instruction = values[inst[execPos] & 0xff];
 					switch (instruction) {
+					case noop:
+						break;
 					case and: {
 						long b = stack[stackPos--];
 						long a = stack[stackPos];
@@ -210,8 +212,6 @@ public final class HDLFrameInterpreter {
 						break;
 					case greater_eq:
 						break;
-					case ifCall:
-						break;
 					case less:
 						break;
 					case less_eq:
@@ -237,12 +237,6 @@ public final class HDLFrameInterpreter {
 						stack[stackPos] = a - b;
 						break;
 					}
-					case mod: {
-						long b = stack[stackPos--];
-						long a = stack[stackPos];
-						stack[stackPos] = a % b;
-						break;
-					}
 					case mul: {
 						long b = stack[stackPos--];
 						long a = stack[stackPos];
@@ -263,8 +257,6 @@ public final class HDLFrameInterpreter {
 						stack[stackPos] = a + b;
 						break;
 					}
-					case pow:
-						break;
 					case sll: {
 						long b = stack[stackPos--];
 						long a = stack[stackPos];

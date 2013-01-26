@@ -125,14 +125,17 @@ public class Insulin {
 				if (hvd.getDirection() == HDLDirection.PARAMETER) {
 					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType()).setDirection(HDLDirection.CONSTANT);
 					for (HDLVariable var : hvd.getVariables()) {
-						String argName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
-						if (argName == null)
-							argName = var.getName();
-						if (argMap.get(argName) != null)
-							var = var.setDefaultValue(argMap.get(argName));
-						newHVD = newHVD.addVariables(var);
+						if (hdi.resolveVariable(HDLQualifiedName.create(var.getName())) == null) {
+							String argName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
+							if (argName == null)
+								argName = var.getName();
+							if (argMap.get(argName) != null)
+								var = var.setDefaultValue(argMap.get(argName));
+							newHVD = newHVD.addVariables(var);
+						}
 					}
-					ms.insertBefore(hdi, newHVD);
+					if (!newHVD.getVariables().isEmpty())
+						ms.insertBefore(hdi, newHVD);
 				}
 			}
 		}

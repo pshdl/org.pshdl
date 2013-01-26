@@ -12,15 +12,15 @@ public class VHDLGenerator {
 
 	private final static String FS = System.getProperty("file.separator");
 
-	public static CharSequence generate(HDLPackage unit, HDLEvaluationContext context) {
-		VhdlFile visitor = generateVHDL(unit, context);
+	public static CharSequence generate(HDLPackage unit) {
+		VhdlFile visitor = generateVHDL(unit);
 		String vhdlString = VhdlOutput.toVhdlString(visitor);
 		// System.out.println(vhdlString);
 		return vhdlString;
 	}
 
-	public static VhdlFile generate(HDLPackage unit, String targetDir, HDLEvaluationContext context) {
-		VhdlFile visitor = generateVHDL(unit, context);
+	public static VhdlFile generate(HDLPackage unit, String targetDir) {
+		VhdlFile visitor = generateVHDL(unit);
 		try {
 			VhdlOutput.print(visitor);
 			String name = unit.getPkg();
@@ -33,7 +33,7 @@ public class VHDLGenerator {
 		return visitor;
 	}
 
-	private static VhdlFile generateVHDL(HDLPackage pkg, HDLEvaluationContext context) {
+	private static VhdlFile generateVHDL(HDLPackage pkg) {
 		pkg = Insulin.transform(pkg);
 		return pkg.toVHDL();
 	}

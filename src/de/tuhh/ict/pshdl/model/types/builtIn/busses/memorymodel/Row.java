@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.util.*;
 
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+
 public class Row implements NamedElement {
 	public String name;
 	public Column column;
@@ -20,6 +22,28 @@ public class Row implements NamedElement {
 	public Row(String name) {
 		super();
 		this.name = name;
+	}
+
+	public final Map<String, Integer> defCount = new HashMap<String, Integer>();
+	public boolean readOnly = true;
+	public boolean writeOnly = true;
+
+	public void updateInfo() {
+		int bitPos = 31;
+		for (NamedElement ne : definitions) {
+			Definition def = (Definition) ne;
+			def.bitPos = bitPos;
+			bitPos -= MemoryModel.getSize(def);
+			Integer integer = defCount.get(def.name);
+			if (integer == null)
+				integer = 0;
+			def.arrayIndex = integer;
+			defCount.put(def.name, ++integer);
+			if ((def.rw == RWType.rw) || (def.rw == RWType.w))
+				readOnly = false;
+			if ((def.rw == RWType.rw) || (def.rw == RWType.r))
+				writeOnly = false;
+		}
 	}
 
 	@Override

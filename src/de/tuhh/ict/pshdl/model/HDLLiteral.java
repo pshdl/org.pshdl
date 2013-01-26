@@ -6,7 +6,6 @@ import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.upb.hni.vmagic.expression.*;
 
 /**
  * The class HDLLiteral contains the following fields
@@ -17,7 +16,6 @@ import de.upb.hni.vmagic.expression.*;
  * </ul>
  */
 public class HDLLiteral extends AbstractHDLLiteral {
-
 	/**
 	 * Constructs a new instance of {@link HDLLiteral}
 	 * 

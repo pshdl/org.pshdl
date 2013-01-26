@@ -14,16 +14,15 @@ tokens {
 	READWRITE='rw';
 	MASK='mask';
 	LIMIT='limit';
+	ERROR='error';
 	SILENT='silent';
 }
 @header {
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
 }
 
 @lexer::header {
@@ -79,6 +78,7 @@ definition returns [Definition res]
 warnType returns [WarnType warn]
 	:	{boolean silent=false;} (SILENT {silent=true;})? 
 		(MASK{$warn=silent?WarnType.silentMask:WarnType.mask;}|
+		ERROR{$warn=silent?WarnType.silentError:WarnType.error;}|
 		LIMIT{$warn=silent?WarnType.silentLimit:WarnType.limit;});
 rwStatus:	(READ | WRITE | READWRITE);
 width	:	INT;

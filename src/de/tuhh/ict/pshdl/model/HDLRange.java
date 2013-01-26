@@ -95,8 +95,9 @@ public class HDLRange extends AbstractHDLRange {
 	}
 
 	public HDLRange normalize() {
-		if (getTo().equals(getFrom()))
+		if (getTo().equals(getFrom())) {
 			return setFrom(null);
+		}
 		return this;
 	}
 	// $CONTENT-END$
