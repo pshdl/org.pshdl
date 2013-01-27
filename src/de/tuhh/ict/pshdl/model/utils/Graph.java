@@ -61,7 +61,7 @@ public class Graph<T> {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			Edge other = (Edge) obj;
+			Edge<?> other = (Edge<?>) obj;
 			if (from == null) {
 				if (other.from != null)
 					return false;

@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -68,7 +70,7 @@ public class HDLInterface extends AbstractHDLInterface {
 			if (var.length == 1) {
 				return resolved;
 			}
-			if (getFullName().equals(var.skipLast(1))) {
+			if (fullNameOf(this).equals(var.skipLast(1))) {
 				return resolved;
 			}
 		}

@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -14,15 +16,17 @@ public class MemoryModelSideFiles {
 
 	public static List<SideFile> getSideFiles(HDLUnit unit, Unit memUnit, List<Row> rows, String version) {
 		List<SideFile> res = new LinkedList<SideFile>();
-		String unitName = unit.getFullName().toString('_').toLowerCase();
+		String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		String ipcorename = unitName + BusGenSideFiles.WRAPPER_APPENDIX;
 		String dirName = ipcorename + "_" + version;
 		String rootDir = "drivers/";
 		BusAccess ba = new BusAccess();
 		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.html", builtHTML(memUnit, rows)));
-		res.add(new SideFile(rootDir + dirName + "/" + unitName + "BusAccess.c", ba.generateAccessC(rows).toString().getBytes()));
-		res.add(new SideFile(rootDir + dirName + "/" + unitName + "BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes()));
-		res.add(new SideFile(rootDir + dirName + "/" + "BusStdDefinitions.h", ba.generateStdDef().toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows).toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef().toString().getBytes()));
 		return res;
 	}
 
@@ -62,10 +66,14 @@ public class MemoryModelSideFiles {
 			for (NamedElement dec : row.definitions) {
 				Definition def = (Definition) dec;
 				Integer integer = getAndInc(defIndex, def.name);
-				if (def.type != Type.UNUSED)
-					ps.format("<td colspan='%d' class='field %s %s'>%s [%d]</td>", MemoryModel.getSize(def), def.rw + "Style", def.register ? "register" : "", def.name, integer);
-				else
-					ps.format("<td colspan='%d' class='field %s %s'>%s</td>", MemoryModel.getSize(def), def.rw + "Style", "", def.name);
+				int size = MemoryModel.getSize(def);
+				if (def.type != Type.UNUSED) {
+					String toolTip = String.format("Width:%d Shift:%d Mask:%08X \nread: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X\nwrite: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d",
+							size, (def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
+					ps.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name, integer);
+				} else {
+					ps.format("<td colspan='%d' class='field %s %s'>%s</td>", size, def.rw + "Style", "", def.name);
+				}
 
 			}
 			Integer integer = getAndInc(rowIndex, row.name);

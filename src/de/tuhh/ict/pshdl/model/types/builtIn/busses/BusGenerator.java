@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.io.*;
 import java.math.*;
 import java.util.*;
@@ -27,7 +29,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 
 	@Override
 	public HDLInterface getInterface(HDLDirectGeneration hdl) {
-		String name = hdl.getFullName().append(hdl.getIfName()).toString();
+		String name = fullNameOf(hdl).append(hdl.getIfName()).toString();
 		if (hdl.getGeneratorContent().length() != 0) {
 			try {
 				return createInterface(hdl, name);
@@ -213,7 +215,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
 			}
 		} else {
-			String name = hdg.getFullName().append(hdg.getIfName()).toString();
+			String name = fullNameOf(hdg).append(hdg.getIfName()).toString();
 			try {
 				createInterface(hdg, name);
 			} catch (Exception e) {

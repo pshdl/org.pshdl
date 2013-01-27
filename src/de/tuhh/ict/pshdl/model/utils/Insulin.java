@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.utils;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.math.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
@@ -10,6 +12,7 @@ import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -24,8 +27,11 @@ import de.tuhh.ict.pshdl.model.validation.builtin.*;
 import de.tuhh.ict.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
 public class Insulin {
+	public static final GenericMeta<Boolean> insulated = new GenericMeta<Boolean>("insulated", true);
 
 	public static <T extends HDLObject> T transform(T orig) {
+		if (orig.hasMeta(insulated))
+			return orig;
 		RWValidation.annotateReadCount(orig);
 		RWValidation.annotateWriteCount(orig);
 		T apply = handleOutPortRead(orig);
@@ -33,8 +39,6 @@ public class Insulin {
 		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
 		apply = pushSignIntoLiteral(apply);
-		// System.out.println("Insulin.transform()" + apply);
-		// apply.validateAllFields(null, true);
 		apply = generateClkAndReset(apply);
 		apply = handleMultiBitAccess(apply, null);
 		apply = handleMultiForLoop(apply);
@@ -44,6 +48,7 @@ public class Insulin {
 		apply = fixDoubleNegate(apply);
 		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(orig.getContainer(), true);
+		apply.setMeta(insulated);
 		return apply;
 	}
 
@@ -156,7 +161,7 @@ public class Insulin {
 			HDLGenerationInfo generationInfo = HDLGenerators.getImplementation(generation);
 			if (generation.getInclude()) {
 				HDLQualifiedName ifRef = generation.getHIf().asRef();
-				HDLQualifiedName fullName = generation.getFullName();
+				HDLQualifiedName fullName = fullNameOf(generation);
 				// System.out.println("Insulin.includeGenerators()" +
 				// generationInfo.unit);
 				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);

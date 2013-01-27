@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -67,7 +69,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
 		for (int i = 0; i < args.size(); i++) {
 			HDLVariable arg = args.get(i);
-			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(arg.getFullName()).getAll();
+			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLReference.fVar).isEqualTo(fullNameOf(arg)).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
 				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP_META);
 				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {

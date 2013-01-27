@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.utils;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -58,7 +60,7 @@ public class HDLResolver {
 				HDLEnumDeclaration[] enumDecl = resolveTo.getAllObjectsOf(HDLEnumDeclaration.class, false);
 				enumCache = new HashMap<HDLQualifiedName, HDLEnum>();
 				for (HDLEnumDeclaration hdlEnumDeclaration : enumDecl) {
-					enumCache.put(hdlEnumDeclaration.getHEnum().getFullName(), hdlEnumDeclaration.getHEnum());
+					enumCache.put(fullNameOf(hdlEnumDeclaration.getHEnum()), hdlEnumDeclaration.getHEnum());
 				}
 			}
 		}
@@ -78,7 +80,7 @@ public class HDLResolver {
 				HDLFunction[] enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
 				funcCache = new HashMap<HDLQualifiedName, HDLFunction>();
 				for (HDLFunction hdlEnumDeclaration : enumDecl) {
-					funcCache.put(hdlEnumDeclaration.getFullName(), hdlEnumDeclaration);
+					funcCache.put(fullNameOf(hdlEnumDeclaration), hdlEnumDeclaration);
 				}
 			}
 		}
@@ -98,7 +100,7 @@ public class HDLResolver {
 				List<HDLInterface> ifDecl = resolveTo.doGetInterfaceDeclarations();
 				ifCache = new HashMap<HDLQualifiedName, HDLInterface>();
 				for (HDLInterface hdlIfDeclaration : ifDecl) {
-					ifCache.put(hdlIfDeclaration.getFullName(), hdlIfDeclaration);
+					ifCache.put(fullNameOf(hdlIfDeclaration), hdlIfDeclaration);
 				}
 			}
 		}
@@ -118,7 +120,7 @@ public class HDLResolver {
 				List<HDLType> typeDecl = doGetTypeDeclarations();
 				typeCache = new HashMap<HDLQualifiedName, HDLType>();
 				for (HDLType hdlTypeDeclaration : typeDecl) {
-					typeCache.put(hdlTypeDeclaration.getFullName(), hdlTypeDeclaration);
+					typeCache.put(fullNameOf(hdlTypeDeclaration), hdlTypeDeclaration);
 				}
 			}
 		}
@@ -133,7 +135,7 @@ public class HDLResolver {
 					HDLLibrary library = HDLLibrary.getLibrary(uri);
 					if (library != null) {
 						ArrayList<String> imports = unit.getImports();
-						imports.add(unit.getFullName().skipLast(1).append("*").toString());
+						imports.add(fullNameOf(unit).skipLast(1).append("*").toString());
 						return library.resolve(imports, var);
 					}
 				}
@@ -149,7 +151,7 @@ public class HDLResolver {
 				List<HDLVariable> varDecl = resolveTo.doGetVariables();
 				variableCache = new HashMap<HDLQualifiedName, HDLVariable>();
 				for (HDLVariable declVars : varDecl) {
-					variableCache.put(declVars.getFullName(), declVars);
+					variableCache.put(fullNameOf(declVars), declVars);
 				}
 			}
 		}
@@ -158,7 +160,7 @@ public class HDLResolver {
 			return checkCache;
 		if (var.length > 1) {
 			// Using lastSgement if $for0.I or ThisObject.I
-			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(resolveTo.getFullName().getTypePart())) {
+			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(fullNameOf(resolveTo).getTypePart())) {
 				String string = var.getLastSegment();
 				for (Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {
 					if (entry.getKey().getLastSegment().equals(string)) {
@@ -167,7 +169,7 @@ public class HDLResolver {
 				}
 			}
 			HDLQualifiedName skipLast = var.skipLast(1);
-			if (!resolveTo.getFullName().equals(skipLast)) {
+			if (!fullNameOf(resolveTo).equals(skipLast)) {
 				HDLType type = resolveType(skipLast);
 				if ((type != null) && (type.getClassType() != HDLClass.HDLPrimitive)) {
 					HDLVariable variable = type.resolveVariable(var);
@@ -190,7 +192,7 @@ public class HDLResolver {
 		if (map.get(var) != null)
 			return map.get(var);
 		if (var.length == 1) {
-			HDLQualifiedName fqn = resolveTo.getFullName().append(var);
+			HDLQualifiedName fqn = fullNameOf(resolveTo).append(var);
 			if (map.get(fqn) != null)
 				return map.get(fqn);
 		}

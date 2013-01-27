@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.io.*;
 import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
@@ -14,7 +16,7 @@ public class BusGenSideFiles {
 
 	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi) {
 		List<SideFile> res = new LinkedList<SideFile>();
-		String unitName = unit.getFullName().toString('_').toLowerCase();
+		String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		String ipcorename = unitName + WRAPPER_APPENDIX;
 		String dirName = ipcorename + "_" + version;
 		String type = axi ? "axi" : "plb";

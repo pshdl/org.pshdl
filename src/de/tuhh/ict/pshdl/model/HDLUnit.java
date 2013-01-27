@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -159,7 +161,7 @@ public class HDLUnit extends AbstractHDLUnit implements de.tuhh.ict.pshdl.model.
 		if (unitIF != null) {
 			return unitIF;
 		}
-		HDLQualifiedName fullName = getFullName();
+		HDLQualifiedName fullName = fullNameOf(this);
 		unitIF = new HDLInterface().setName(fullName.toString());
 		HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
 

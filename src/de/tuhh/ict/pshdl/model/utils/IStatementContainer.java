@@ -11,5 +11,4 @@ public interface IStatementContainer extends IHDLObject {
 
 	public List<HDLVariable> doGetVariables();
 
-	public HDLQualifiedName getFullName();
 }

@@ -26,6 +26,7 @@ import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.object.VhdlObject.*;
 import de.upb.hni.vmagic.type.*;
 import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 public aspect VHDLStatementTransformation {
 
@@ -193,7 +194,7 @@ public aspect VHDLStatementTransformation {
 			if (var.getMeta(ORIGINAL_FULLNAME) != null)
 				fullName = (HDLQualifiedName) var.getMeta(ORIGINAL_FULLNAME);
 			else
-				fullName = var.getFullName();
+				fullName = fullNameOf(var);
 			return fullName.toString('_') + "_array";
 		}
 		return var.getName() + "_array";

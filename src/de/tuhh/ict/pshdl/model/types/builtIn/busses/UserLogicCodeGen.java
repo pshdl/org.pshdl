@@ -69,20 +69,6 @@ public class UserLogicCodeGen extends CommonBusCode {
 		HDLVariableDeclaration IP2Bus_Error = new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
 				.addVariables(new HDLVariable().setName("IP2Bus_Error").setDefaultValue(new HDLLiteral().setVal("0")));
-		// HDLVariableDeclaration regs = new HDLVariableDeclaration()
-		// .setRegister(
-		// new
-		// HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst")).setClockType(HDLRegClockType.RISING)
-		// .setResetType(HDLRegResetActiveType.HIGH).setSyncType(HDLRegSyncType.SYNC).setResetValue(new
-		// HDLLiteral().setVal("0")))
-		// .setDirection(HDLDirection.INTERNAL)
-		// .setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
-		// .setPrimitive(
-		// new
-		// HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new
-		// HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
-		// .addVariables(new HDLVariable().setName("regs").addDimensions(new
-		// HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))));
 		HDLVariableDeclaration IP2Bus_Data = new HDLVariableDeclaration()
 				.setDirection(HDLDirection.OUT)
 				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
@@ -156,6 +142,11 @@ public class UserLogicCodeGen extends CommonBusCode {
 				// c[i]{7:6}=Bus2IP_Data{9:8};
 				// c[i]{5:0}=Bus2IP_Data{7:2}; //6bit
 				// d[i]=Bus2IP_Data{1:0}; //2bit
+				if (((bitPos / 8) != (ifBitPos / 8)) && (ifStatement != null)) {
+					label = label.addDos(ifStatement);
+					ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
+					ifBitPos = bitPos;
+				}
 				while (!done) {
 					int remainingBits = bitPos % 8;
 					if (targetIdx > remainingBits) {
@@ -182,8 +173,10 @@ public class UserLogicCodeGen extends CommonBusCode {
 						else
 							temp = target.addBits(getRange(targetIdx, targetIdx + 1));
 						HDLRange busRange = getRange(bitPos, targetIdx + 1);
-						if (ifStatement == null)
+						if (ifStatement == null) {
 							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
+							ifBitPos = bitPos;
+						}
 						ifStatement = ifStatement.addThenDo(new HDLAssignment().setLeft(temp).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(busRange)));
 						bitPos -= targetIdx + 1;
 						done = true;
@@ -214,6 +207,24 @@ public class UserLogicCodeGen extends CommonBusCode {
 		return hdlSwitchStatement;
 	}
 
+	public static Unit createAdderBus(int regCount) {
+		Definition a = new Definition("a", true, RWType.rw, Type.UINT, 16);
+		Definition b = new Definition("b", true, RWType.rw, Type.UINT, 16);
+		Definition result = new Definition("result", true, RWType.rw, Type.UINT, 16);
+		Row rowIn = new Row("input", null, a, b);
+		Row rowOut = new Row("output", null, new Reference("fill"), result);
+		Column col = new Column("adder");
+		col.rows.add(rowIn);
+		col.rows.add(rowOut);
+		Memory mem = new Memory(new Reference("adder", regCount));
+		Unit unit = new Unit();
+		unit.declarations.put("input", rowIn);
+		unit.declarations.put("output", rowOut);
+		unit.declarations.put("adder", col);
+		unit.memory = mem;
+		return unit;
+	}
+
 	public static Unit create(int regCount) {
 		Definition a = new Definition("a", true, RWType.rw, Type.BIT, 17);
 		Definition b = new Definition("b", true, RWType.rw, Type.BIT, 5);
@@ -228,8 +239,8 @@ public class UserLogicCodeGen extends CommonBusCode {
 	}
 
 	public static void main(String[] args) {
-		Unit defaultUnit = BusGenerator.createDefaultUnit(5);
-		// Unit defaultUnit = create(5);
+		// Unit defaultUnit = BusGenerator.createDefaultUnit(5);
+		Unit defaultUnit = createAdderBus(3);
 		HDLUnit unit = get("Bla", defaultUnit, MemoryModel.buildRows(defaultUnit));
 		System.out.println(unit);
 	}

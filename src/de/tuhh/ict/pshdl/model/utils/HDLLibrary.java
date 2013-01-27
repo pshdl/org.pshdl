@@ -6,6 +6,7 @@ import java.util.concurrent.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 public class HDLLibrary {
 	public Map<HDLQualifiedName, HDLUnit> units = new ConcurrentHashMap<HDLQualifiedName, HDLUnit>();
@@ -32,7 +33,7 @@ public class HDLLibrary {
 	public void addPkg(HDLPackage pkg) {
 		checkFrozen(pkg);
 		for (HDLUnit unit : pkg.getUnits()) {
-			HDLQualifiedName uq = unit.getFullName();
+			HDLQualifiedName uq = fullNameOf(unit);
 			units.put(uq, unit);
 			types.put(uq, unit.asInterface());
 			HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
@@ -82,7 +83,7 @@ public class HDLLibrary {
 	 */
 	public void addVariable(HDLVariable var) {
 		checkFrozen(var);
-		variables.put(var.getFullName(), var);
+		variables.put(fullNameOf(var), var);
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class HDLLibrary {
 	 */
 	public void addFunction(HDLFunction func) {
 		checkFrozen(func);
-		functions.put(func.getFullName(), func);
+		functions.put(fullNameOf(func), func);
 	}
 
 	/**
@@ -209,8 +210,7 @@ public class HDLLibrary {
 	 */
 	public void addInterface(HDLInterface hIf) {
 		checkFrozen(hIf);
-		HDLQualifiedName fullName = hIf.getFullName();
-		types.put(fullName, hIf);
+		types.put(fullNameOf(hIf), hIf);
 	}
 
 	private void checkFrozen(IHDLObject hObject) {
@@ -226,8 +226,7 @@ public class HDLLibrary {
 	 */
 	public void addEnum(HDLEnum hEnum) {
 		checkFrozen(hEnum);
-		HDLQualifiedName fullName = hEnum.getFullName();
-		types.put(fullName, hEnum);
+		types.put(fullNameOf(hEnum), hEnum);
 	}
 
 	public void addSideFiles(List<SideFile> files) {

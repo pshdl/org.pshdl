@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -67,7 +69,7 @@ public class HDLEnum extends AbstractHDLEnum {
 		if (var.length == 1) {
 			return getVariable(var.getLastSegment());
 		}
-		if (getFullName().equals(var.skipLast(1))) {
+		if (fullNameOf(this).equals(var.skipLast(1))) {
 			return getVariable(var.getLastSegment());
 		}
 		return super.resolveVariable(var);

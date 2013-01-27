@@ -11,6 +11,7 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
 import de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity;
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 public class VHDLOutputValidator implements IHDLValidator {
 	public final static String[] keywords = { "abs", "if", "access", "impure", "after", "in", "alias", "inertial", "all", "inout", "and", "is", "architecture", "label", "array",
@@ -51,6 +52,17 @@ public class VHDLOutputValidator implements IHDLValidator {
 
 	@Override
 	public HDLAdvise advise(Problem problem) {
+		IErrorCode code = problem.code;
+		if (code instanceof VHDLErrorCode) {
+			VHDLErrorCode vCode = (VHDLErrorCode) code;
+			switch (vCode) {
+			case KEYWORD_NAME:
+				break;
+			case KEYWORD_TYPE:
+				break;
+
+			}
+		}
 		return null;
 	}
 
@@ -69,21 +81,21 @@ public class VHDLOutputValidator implements IHDLValidator {
 		}
 		HDLUnit[] units = unit.getAllObjectsOf(HDLUnit.class, true);
 		for (HDLUnit hdlUnit : units) {
-			String name = hdlUnit.getFullName().toString('_');
+			String name = fullNameOf(hdlUnit).toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
 		HDLInterface[] ifs = unit.getAllObjectsOf(HDLInterface.class, true);
 		for (HDLInterface hdlUnit : ifs) {
-			String name = hdlUnit.getFullName().toString('_');
+			String name = fullNameOf(hdlUnit).toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
 		HDLEnum[] enums = unit.getAllObjectsOf(HDLEnum.class, true);
 		for (HDLEnum hdlUnit : enums) {
-			String name = hdlUnit.getFullName().toString('_');
+			String name = fullNameOf(hdlUnit).toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}

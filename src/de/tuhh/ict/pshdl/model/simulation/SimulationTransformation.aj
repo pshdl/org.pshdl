@@ -12,6 +12,8 @@ import de.tuhh.ict.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
 import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 public aspect SimulationTransformation {
 	public FluidFrame HDLExpression.toSimulationModel(HDLEvaluationContext context) {
 		throw new RuntimeException("Not implemented!");
@@ -33,7 +35,7 @@ public aspect SimulationTransformation {
 		if (config != null) {
 			config = config.normalize();
 			HDLVariable clk = config.resolveClk();
-			String name = clk.getFullName().toString();
+			String name = fullNameOf(clk).toString();
 			if (clk.getDirection() == HDLDirection.IN) {
 				res.addInput(name);
 				if (config.getClockType() == HDLRegClockType.RISING)
@@ -62,7 +64,7 @@ public aspect SimulationTransformation {
 	public static String getVarName(HDLReference var, boolean withBits) {
 		HDLVariableRef varRef = (HDLVariableRef) var;
 		StringBuilder sb = new StringBuilder();
-		sb.append(var.resolveVar().getFullName());
+		sb.append(fullNameOf(var.resolveVar()));
 		for (HDLExpression exp : varRef.getArray()) {
 			sb.append('[').append(exp).append(']');
 		}
@@ -99,7 +101,7 @@ public aspect SimulationTransformation {
 			case HDLVariableDeclaration:
 				HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
 				for(HDLVariable var: hvd.getVariables()){
-					res.addWith(var.getFullName().toString(),HDLPrimitives.getWidth(var.determineType(), context));
+					res.addWith(fullNameOf(var).toString(),HDLPrimitives.getWidth(var.determineType(), context));
 				}
 				break;
 			default:
@@ -117,7 +119,7 @@ public aspect SimulationTransformation {
 			case HDLVariableDeclaration:
 				HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
 				for(HDLVariable var: hvd.getVariables()){
-					res.addWith(var.getFullName().toString(),HDLPrimitives.getWidth(var.determineType(), context));
+					res.addWith(fullNameOf(var).toString(),HDLPrimitives.getWidth(var.determineType(), context));
 				}
 				break;
 			default:

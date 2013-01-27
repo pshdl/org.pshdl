@@ -8,7 +8,6 @@ import org.antlr.runtime.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.cfiles.*;
 
 public class MemoryModel {
 
@@ -147,7 +146,16 @@ public class MemoryModel {
 		if (declaration instanceof Reference) {
 			Reference ref = (Reference) declaration;
 			NamedElement decl = unit.resolve(ref);
-			addDeclarations(unit, rows, decl, parent, colIndex);
+			if (ref.dimensions.size() != 0) {
+				for (Integer num : ref.dimensions) {
+					for (int i = 0; i < num; i++) {
+						addDeclarations(unit, rows, decl, parent, colIndex);
+					}
+				}
+			} else {
+				addDeclarations(unit, rows, decl, parent, colIndex);
+			}
+			// addDeclarations(unit, rows, decl, parent, colIndex);
 			return;
 		}
 		throw new IllegalArgumentException("Reference not a row, column or reference:" + declaration);

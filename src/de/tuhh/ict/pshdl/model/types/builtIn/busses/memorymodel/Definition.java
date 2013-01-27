@@ -36,7 +36,7 @@ public class Definition implements NamedElement {
 
 	public List<Integer> dimensions = new LinkedList<Integer>();
 
-	public String name;
+	public String name = "fill";
 
 	public boolean register;
 

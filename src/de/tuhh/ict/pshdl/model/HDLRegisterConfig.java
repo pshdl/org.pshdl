@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -285,7 +287,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		HDLRegisterConfig res = this;
 		HDLUnit unit = getContainer(HDLUnit.class);
 		if (unit != null) {
-			HDLQualifiedName fullName = unit.getFullName();
+			HDLQualifiedName fullName = fullNameOf(unit);
 			HDLLibrary library = unit.getLibrary();
 			if (library != null) {
 				HDLConfig config = library.getConfig();

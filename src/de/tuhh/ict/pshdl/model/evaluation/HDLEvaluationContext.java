@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.evaluation;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -23,7 +25,7 @@ public class HDLEvaluationContext {
 		Map<HDLQualifiedName, HDLEvaluationContext> res = new HashMap<HDLQualifiedName, HDLEvaluationContext>();
 		for (HDLUnit unit : pkg.getUnits()) {
 			HDLEvaluationContext hec = createDefault(unit);
-			HDLQualifiedName fullName = unit.getFullName();
+			HDLQualifiedName fullName = fullNameOf(unit);
 			res.put(fullName, hec);
 		}
 		return res;

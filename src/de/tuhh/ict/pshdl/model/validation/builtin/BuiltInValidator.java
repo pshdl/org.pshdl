@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.validation.builtin;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -214,13 +216,13 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
 		Map<String, HDLVariable> nameMap = new HashMap<String, HDLVariable>();
 		for (HDLVariable hdlVariable : vars) {
-			HDLQualifiedName fullName = hdlVariable.getFullName();
+			HDLQualifiedName fullName = fullNameOf(hdlVariable);
 			if (keywordSet.contains(fullName.getLastSegment())) {
 				problems.add(new Problem(ErrorCode.VARIABLE_KEYWORD_NAME, hdlVariable));
 			}
 			HDLVariable put = nameMap.put(fullName.toString().toLowerCase(), hdlVariable);
 			if (put != null) {
-				HDLQualifiedName otherName = put.getFullName();
+				HDLQualifiedName otherName = fullNameOf(put);
 				if (otherName.equals(fullName))
 					problems.add(new Problem(ErrorCode.VARIABLE_SAME_NAME, hdlVariable, put));
 				else
@@ -229,7 +231,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 		for (Entry<String, HDLVariable> entry : nameMap.entrySet()) {
 			HDLVariable var = entry.getValue();
-			HDLQualifiedName fullName = var.getFullName();
+			HDLQualifiedName fullName = fullNameOf(var);
 			String lastSegment = fullName.getLastSegment();
 			HDLQualifiedName type = fullName.getTypePart();
 			HDLQualifiedName localPart = fullName.getLocalPart().skipLast(1);
@@ -238,7 +240,7 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLQualifiedName newName = type.append(scoped);
 				HDLVariable otherVar = nameMap.get(newName.toString().toLowerCase());
 				if (otherVar != null) {
-					HDLQualifiedName otherName = otherVar.getFullName();
+					HDLQualifiedName otherName = fullNameOf(otherVar);
 					if (otherName.equals(newName))
 						problems.add(new Problem(ErrorCode.VARIABLE_SCOPE_SAME_NAME, var, otherVar));
 					else
@@ -527,7 +529,7 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLUnit container = var.getContainer(HDLUnit.class);
 		if (container == null)
 			return null;
-		HDLEvaluationContext hdlEvaluationContext = hContext.get(container.getFullName());
+		HDLEvaluationContext hdlEvaluationContext = hContext.get(fullNameOf(container));
 		return hdlEvaluationContext;
 	}
 

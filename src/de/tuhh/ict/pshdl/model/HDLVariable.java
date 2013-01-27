@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
@@ -122,7 +124,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	public HDLQualifiedName asRef() {
-		return getFullName();
+		return fullNameOf(this);
 	}
 
 	public HDLVariableRef asHDLRef() {

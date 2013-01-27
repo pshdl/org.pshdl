@@ -21,13 +21,14 @@ import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.type.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.libraryunit.*;
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 public aspect VHDLPackageTransformation {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<LibraryUnit> HDLUnit.toVHDL() {
 		List<LibraryUnit> res = new LinkedList<LibraryUnit>();
-		HDLQualifiedName entityName = getFullName();
+		HDLQualifiedName entityName = fullNameOf(this);
 		Entity e = new Entity(entityName.toString('_'));
 		VHDLContext unit = new VHDLContext();
 		
@@ -36,7 +37,19 @@ public aspect VHDLPackageTransformation {
 			HDLEnum resolveHEnum = hdlEnumRef.resolveHEnum();
 			HDLUnit enumContainer=resolveHEnum.getContainer(HDLUnit.class);
 			if (enumContainer==null || !enumContainer.equals(hdlEnumRef.getContainer(HDLUnit.class))){
-				HDLQualifiedName type=resolveHEnum.getFullName();
+				HDLQualifiedName type=fullNameOf(resolveHEnum);
+				if (!type.getSegment(0).equals("pshdl"))
+					unit.addImport(HDLQualifiedName.create("work",getPackageName(type), "all"));
+			}
+		}
+		HDLVariableRef[] vRefs=getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef variableRef : vRefs) {
+			if (variableRef.getClassType()==HDLClass.HDLInterfaceRef)
+				continue;
+			HDLVariable variable = variableRef.resolveVar();
+			HDLUnit enumContainer=variable.getContainer(HDLUnit.class);
+			if (enumContainer==null || !enumContainer.equals(variableRef.getContainer(HDLUnit.class))){
+				HDLQualifiedName type=fullNameOf(variable).skipLast(1);
 				if (!type.getSegment(0).equals("pshdl"))
 					unit.addImport(HDLQualifiedName.create("work",getPackageName(type), "all"));
 			}
@@ -157,7 +170,7 @@ public aspect VHDLPackageTransformation {
 		HDLConfig config = HDLLibrary.getLibrary(hUnit.getLibURI()).getConfig();
 		ps.getSensitivityList().add((Signal) clk);
 		EnumerationLiteral activeRst;
-		if (config.getRegResetType(hUnit.getFullName(), key.getResetType()) == HDLRegResetActiveType.HIGH)
+		if (config.getRegResetType(fullNameOf(hUnit), key.getResetType()) == HDLRegResetActiveType.HIGH)
 			activeRst = StdLogic1164.STD_LOGIC_1;
 		else
 			activeRst = StdLogic1164.STD_LOGIC_0;
@@ -167,12 +180,12 @@ public aspect VHDLPackageTransformation {
 		if (resets != null)
 			rstIfStmnt.getStatements().addAll(resets);
 		FunctionCall edge;
-		if (config.getRegClockType(hUnit.getFullName(), key.getClockType()) == HDLRegClockType.RISING)
+		if (config.getRegClockType(fullNameOf(hUnit), key.getClockType()) == HDLRegClockType.RISING)
 			edge = new FunctionCall(StdLogic1164.RISING_EDGE);
 		else
 			edge = new FunctionCall(StdLogic1164.FALLING_EDGE);
 		edge.getParameters().add(new AssociationElement(clk));
-		if (config.getRegSyncType(hUnit.getFullName(), key.getSyncType()) == HDLRegSyncType.ASYNC) {
+		if (config.getRegSyncType(fullNameOf(hUnit), key.getSyncType()) == HDLRegSyncType.ASYNC) {
 			ps.getSensitivityList().add(rst);
 			ElsifPart elsifPart = rstIfStmnt.createElsifPart(edge);
 			elsifPart.getStatements().addAll(value);
@@ -231,7 +244,7 @@ public aspect VHDLPackageTransformation {
 			}
 			if (decl.getClassType()==HDLClass.HDLEnumDeclaration){
 				HDLEnumDeclaration hvd=(HDLEnumDeclaration) decl;
-				PackageDeclaration	enumPd=new PackageDeclaration(getPackageName(hvd.getHEnum().getFullName()));
+				PackageDeclaration	enumPd=new PackageDeclaration(getPackageName(fullNameOf(hvd.getHEnum())));
 				res.getElements().add(enumPd);
 				VHDLContext vhdl = hvd.toVHDL(VHDLContext.DEFAULT_CTX);
 				Type first = (Type)vhdl.internalTypes.getFirst();
