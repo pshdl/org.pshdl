@@ -6,6 +6,8 @@ import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -464,26 +466,25 @@ public class BuiltInValidator implements IHDLValidator {
 		int dim = 0;
 		for (HDLExpression arr : array) {
 			HDLEvaluationContext context = getContext(hContext, arr);
-			ValueRange accessRange = arr.determineRange(context);
+			Range<BigInteger> accessRange = arr.determineRange(context);
 			if (accessRange == null) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, arr));
 				break;
 			}
-			ValueRange arrayRange = dimensions.get(dim).determineRange(context);
+			Range<BigInteger> arrayRange = dimensions.get(dim).determineRange(context);
 			if (arrayRange == null) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
 				break;
 			}
-			arrayRange = new ValueRange(BigInteger.ZERO, arrayRange.to.subtract(BigInteger.ONE));
+			arrayRange = Ranges.closed(BigInteger.ZERO, arrayRange.upperEndpoint().subtract(BigInteger.ONE));
 			String info = "Expected value range:" + accessRange;
-			if (accessRange.to.signum() < 0)
+			if (accessRange.upperEndpoint().signum() < 0)
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
-			else if (accessRange.from.signum() < 0)
+			else if (accessRange.lowerEndpoint().signum() < 0)
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
-			ValueRange commonRange = arrayRange.and(accessRange);
-			if (commonRange == null)
+			if (!arrayRange.isConnected(accessRange))
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
-			else if (accessRange.to.compareTo(arrayRange.to) > 0)
+			else if (accessRange.upperEndpoint().compareTo(arrayRange.upperEndpoint()) > 0)
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
 
 			dim++;

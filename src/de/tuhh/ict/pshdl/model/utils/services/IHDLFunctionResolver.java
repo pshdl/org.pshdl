@@ -3,6 +3,8 @@ package de.tuhh.ict.pshdl.model.utils.services;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -14,7 +16,7 @@ public interface IHDLFunctionResolver {
 
 	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context);
 
-	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context);
+	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context);
 
 	public String[] getFunctionNames();
 

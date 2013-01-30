@@ -6,6 +6,8 @@ import java.math.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
@@ -736,8 +738,8 @@ public class Insulin {
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								HDLRange r = bits.get(j);
-								ValueRange vr = r.determineRange(context);
-								BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
+								Range<BigInteger> vr = r.determineRange(context);
+								BigInteger add = shift.add(vr.upperEndpoint().subtract(vr.lowerEndpoint()).abs());
 								BigInteger res = constant.shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
 								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
 								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(HDLLiteral.get(res));
@@ -752,8 +754,8 @@ public class Insulin {
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								HDLRange r = bits.get(j);
-								ValueRange vr = r.determineRange(context);
-								BigInteger add = shift.add(vr.to.subtract(vr.from).abs());
+								Range<BigInteger> vr = r.determineRange(context);
+								BigInteger add = shift.add(vr.upperEndpoint().subtract(vr.lowerEndpoint()).abs());
 								HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add)).normalize();
 								HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
 								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));

@@ -8,6 +8,8 @@ import java.util.*;
 
 import org.antlr.runtime.*;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -273,7 +275,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 	}
 
 	@Override
-	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
+	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context) {
 		// TODO Auto-generated method stub
 		return null;
 	}

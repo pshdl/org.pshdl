@@ -1,8 +1,11 @@
 package de.tuhh.ict.pshdl.model.utils.services;
 
+import java.math.*;
+
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
-import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public interface IHDLPrimitive {
 
@@ -16,6 +19,6 @@ public interface IHDLPrimitive {
 
 	public abstract HDLTypeInferenceInfo getManipOpType(HDLManip manip);
 
-	public abstract ValueRange getValueRange(HDLPrimitive pt, HDLEvaluationContext context);
+	public abstract Range<BigInteger> getValueRange(HDLPrimitive pt, HDLEvaluationContext context);
 
 }

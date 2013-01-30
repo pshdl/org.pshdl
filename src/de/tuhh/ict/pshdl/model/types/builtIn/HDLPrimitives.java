@@ -7,6 +7,8 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
@@ -535,7 +537,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 	 * de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext)
 	 */
 	@Override
-	public ValueRange getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {
+	public Range<BigInteger> getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {
 		switch (pt.getType()) {
 		case BOOL:
 		case BIT:
@@ -556,16 +558,16 @@ public class HDLPrimitives implements IHDLPrimitive {
 		throw new IllegalArgumentException("Did not expect type:" + pt.getType());
 	}
 
-	private static ValueRange intRange(BigInteger bitWidth) {
+	private static Range<BigInteger> intRange(BigInteger bitWidth) {
 		BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
 		BigInteger min = max.negate().subtract(BigInteger.ONE);
-		return new ValueRange(min, max);
+		return Ranges.closed(min, max);
 	}
 
-	private static ValueRange uintRange(BigInteger bitWidth) {
+	private static Range<BigInteger> uintRange(BigInteger bitWidth) {
 		BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
 		BigInteger min = BigInteger.ZERO;
-		return new ValueRange(min, max);
+		return Ranges.closed(min, max);
 	}
 
 	public static Integer getWidth(HDLType type, HDLEvaluationContext context) {

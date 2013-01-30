@@ -3,6 +3,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.collect.Range;
+
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -52,7 +54,7 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
+	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context) {
 		switch (getFuncEnum(function)) {
 		case highZ:
 			return null;

@@ -3,6 +3,8 @@ package de.tuhh.ict.pshdl.generator.vhdl;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -57,7 +59,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public ValueRange range(HDLFunctionCall function, HDLEvaluationContext context) {
+	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context) {
 		return null;
 	}
 

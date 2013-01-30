@@ -49,6 +49,16 @@
             	color: rgb(125, 125, 125);
             	
             }
+            #tooltip {
+                background-color: #ffd;
+                border: 1px solid rgba(193, 226, 253, 1);
+                font-family: monospace;
+                border-radius: 8px;
+                padding: 10px;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
             </style>
     </head>
     <body>
@@ -87,5 +97,90 @@
         </table>
         
         <p>This file has been generated on:{DATE}</p>
+<script type="text/javascript">
+//<![CDATA[
+	function TooltipClick(event) {
+		if (!event) var event = window.event;
+		var targ=this;
+
+		var coords = { x: 0, y: 0 };
+		while (targ) {
+			coords.x += targ.offsetLeft;
+			coords.y += targ.offsetTop;
+			targ = targ.offsetParent;
+		}
+		var DIV_Tooltip = document.getElementById('tooltip');
+		if (DIV_Tooltip) {
+			DIV_Tooltip.style.left=coords.x + 'px';
+			//DIV_Tooltip.style.top=coords.y + tdElem.offsetHeight + 'px';
+			DIV_Tooltip.style.top=coords.y + this.offsetHeight + 'px';
+			// replace tooltip content
+			var FirstChild;
+			while (FirstChild = DIV_Tooltip.firstChild) {
+				DIV_Tooltip.removeChild(FirstChild);
+			}
+			var TitleLines = this.title.split(/\n/);
+			for (var i = 0; i < TitleLines.length; i++) {
+				DIV_Tooltip.appendChild(document.createTextNode(TitleLines[i]));
+				if (i < TitleLines.length - 1) {
+					DIV_Tooltip.appendChild(document.createElementNS("http://www.w3.org/1999/xhtml", "br"));
+				}
+			}
+			DIV_Tooltip.style.display = 'block';
+			DIV_Tooltip.style.left = Math.max(0,(coords.x + Math.round((this.offsetWidth - DIV_Tooltip.offsetWidth) / 2))) + 'px';
+		}
+
+		// prevent body.onlick from closing tooltip
+		if (!event) var event = window.event;
+		event.cancelBubble = true;
+		if (event.stopPropagation) {
+			 event.stopPropagation();
+		}
+		return false;
+	}
+
+	// loop over TD elements and add tooltip links
+	var TDElements = document.getElementsByTagName('td');
+	if (TDElements) {
+		// add tooltip links
+		for (var i = 0; i < TDElements.length; i++) {
+			var TD_CurrentCell = TDElements[i];
+			if (TD_CurrentCell.title) {
+				TD_CurrentCell.style.cursor = 'pointer';
+				TD_CurrentCell.onclick = TooltipClick;
+			}
+		}
+
+		// hide tooltip on click on something else
+		if (document.body.addEventListener) {
+			document.body.addEventListener('click', function() {
+				var DIV_Tooltip = document.getElementById('tooltip');
+				DIV_Tooltip.style.display = 'none';
+			}, false);
+		} else if (document.body.attachEvent) { // MSIE before version 9
+			document.body.attachEvent('click', function() {
+				var DIV_Tooltip = document.getElementById('tooltip');
+				DIV_Tooltip.style.display = 'none';
+			}, false);
+		}
+
+		// create tooltip container
+		var DIV_Tooltip = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+		DIV_Tooltip.id = 'tooltip';
+		DIV_Tooltip.onclick = function(event) {
+			// prevent body.onlick from closing tooltip
+			if (!event) var event = window.event;
+			event.cancelBubble = true;
+			if (event.stopPropagation) {
+				 event.stopPropagation();
+			}
+			return false;
+		};
+		DIV_Tooltip.appendChild(document.createTextNode(''));
+		DIV_Tooltip.style.display = 'none';
+		document.body.appendChild(DIV_Tooltip);
+	}
+//]]>
+</script>
     </body>
 </html>

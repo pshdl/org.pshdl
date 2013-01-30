@@ -5,10 +5,13 @@ import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.google.common.collect.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.simulation.RangeTool.RangeVal;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
@@ -137,39 +140,31 @@ public class HDLSimulator {
 						ranges.put(ref.getVarRefName(), set);
 					}
 					for (HDLRange r : ref.getBits()) {
-						ValueRange determineRange = r.determineRange(context);
-						set.add(new RangeVal(determineRange.from, 1));
-						set.add(new RangeVal(determineRange.to, -1));
+						Range<BigInteger> determineRange = r.determineRange(context);
+						set.add(new RangeVal(determineRange.lowerEndpoint(), 1));
+						set.add(new RangeVal(determineRange.upperEndpoint(), -1));
 					}
 				}
 			}
 		}
 		ModificationSet ms = new ModificationSet();
-		Map<HDLQualifiedName, SortedSet<ValueRange>> splitRanges = new LinkedHashMap<HDLQualifiedName, SortedSet<ValueRange>>();
+		Map<HDLQualifiedName, SortedSet<Range<BigInteger>>> splitRanges = new LinkedHashMap<HDLQualifiedName, SortedSet<Range<BigInteger>>>();
 		for (Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
-			SortedSet<ValueRange> split = split(entry.getValue());
+			SortedSet<Range<BigInteger>> split = RangeTool.split(entry.getValue());
 			splitRanges.put(entry.getKey(), split);
-			// HDLConcat cat = new HDLConcat();
-			// for (ValueRange range : split) {
-			// cat = cat.addCats(new
-			// HDLVariableRef().setVar(entry.getKey()).addBits(createRange(range)));
-			// }
-			// HDLAssignment ass = new HDLAssignment().setLeft(new
-			// HDLVariableRef().setVar(entry.getKey())).setRight(cat);
-			// ms.addTo(insulin, HDLUnit.fStatements, ass);
 		}
 		// Change bit access to broken down ranges
 		for (HDLVariableRef ref : refs) {
-			SortedSet<ValueRange> list = splitRanges.get(ref.getVarRefName());
+			SortedSet<Range<BigInteger>> list = splitRanges.get(ref.getVarRefName());
 			if (list != null) {
 				ArrayList<HDLRange> newRanges = new ArrayList<HDLRange>();
 				if (!ref.getBits().isEmpty()) {
 					for (HDLRange bit : ref.getBits()) {
 						if (bit.getFrom() != null) { // Singular ranges don't do
 														// anything
-							ValueRange range = bit.determineRange(context);
-							for (ValueRange newRange : list) {
-								if (range.contains(newRange)) {
+							Range<BigInteger> range = bit.determineRange(context);
+							for (Range<BigInteger> newRange : list) {
+								if (range.isConnected(newRange)) {
 									newRanges.add(createRange(newRange));
 								}
 							}
@@ -178,7 +173,7 @@ public class HDLSimulator {
 						}
 					}
 				} else {
-					for (ValueRange vRange : list) {
+					for (Range<BigInteger> vRange : list) {
 						newRanges.add(createRange(vRange));
 					}
 				}
@@ -191,126 +186,10 @@ public class HDLSimulator {
 		return Insulin.handleMultiBitAccess(apply, context);
 	}
 
-	private static HDLRange createRange(ValueRange newRange) {
-		if (newRange.from.equals(newRange.to))
-			return new HDLRange().setTo(HDLLiteral.get(newRange.to));
-		return new HDLRange().setFrom(HDLLiteral.get(newRange.from)).setTo(HDLLiteral.get(newRange.to));
-	}
-
-	private static class RangeVal implements Comparable<RangeVal> {
-		public final BigInteger value;
-		public int count;
-
-		public RangeVal(BigInteger value, int count) {
-			super();
-			this.value = value;
-			this.count = count;
-		}
-
-		@Override
-		public String toString() {
-			return value + (isStart() ? "S" : "E") + count;
-		}
-
-		@Override
-		public int compareTo(RangeVal o) {
-			// Sort by value first
-			int v = value.compareTo(o.value);
-			if (v != 0)
-				return v;
-			// Then sort Starts before ends
-			return -count;
-		}
-
-		public boolean isStart() {
-			return count > 0;
-		}
-
-	}
-
-	/**
-	 * Sort a List of ranges by their number, then start/end and merge multiple
-	 * start/ends
-	 * 
-	 * @param temp
-	 *            a list of RangeVal which can be unsorted
-	 */
-	private static void preSort(List<RangeVal> temp) {
-		Collections.sort(temp);
-		RangeVal last = null;
-		for (Iterator<RangeVal> iterator = temp.iterator(); iterator.hasNext();) {
-			RangeVal rangeVal = iterator.next();
-			if ((last != null) && last.value.equals(rangeVal.value) && (last.isStart() == rangeVal.isStart())) {
-				iterator.remove();
-				last.count += rangeVal.count;
-			} else
-				last = rangeVal;
-		}
-	}
-
-	/**
-	 * Splits a list into ValueRange Objects that do not overlap each other, but
-	 * fully represent the ranges given by value
-	 * 
-	 * @param value
-	 *            a list of RangeVal Objects that need to be split
-	 * @return
-	 */
-	private static SortedSet<ValueRange> split(List<RangeVal> value) {
-		preSort(value);
-		SortedSet<ValueRange> res = new TreeSet<ValueRange>();
-		int count = 0;
-		BigInteger start = null;
-		for (RangeVal rangeVal : value) {
-			count += rangeVal.count;
-			if (rangeVal.isStart()) {
-				if (start != null) {
-					// If there was an unended start, then we have to end it
-					if (start.equals(rangeVal.value))
-						// Or at the same location
-						res.add(new ValueRange(start, rangeVal.value));
-					else
-						// just one before the new start
-						res.add(new ValueRange(start, rangeVal.value.subtract(BigInteger.ONE)));
-				}
-				// Set the start to the current Element
-				start = rangeVal.value;
-			} else {
-				// End the current range at this Element
-				res.add(new ValueRange(start, rangeVal.value));
-				if (count > 0) {
-					// If we expect another end later, the element following
-					// this will have to start one after
-					start = rangeVal.value.add(BigInteger.ONE);
-				} else
-					// No new range anymore
-					start = null;
-			}
-		}
-		return res;
-	}
-
-	public static void main(String[] args) {
-		// 5->8 9->10 11
-		System.out.println(split(createRanges(5, 8, 9, 10, 11, 11)));
-		// 5, 6->7, 8, 9, 10
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9)));
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9)));
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9)));
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9, 14, 18)));
-		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7)));
-		System.out.println(split(createRanges(2, 2, 7, 13, 7, 10, 5, 5, 6, 6, 7, 7, 5, 8, 10, 10)));
-		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 8)));
-		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 7)));
-	}
-
-	private static List<RangeVal> createRanges(int... r) {
-		List<RangeVal> temp = new LinkedList<RangeVal>();
-		for (int i = 0; i < r.length; i++) {
-			temp.add(new RangeVal(BigInteger.valueOf(r[i]), (i % 2) == 0 ? 1 : -1));
-		}
-		System.out.println("HDLSimulator.createRanges()" + temp);
-		return temp;
+	private static HDLRange createRange(Range<BigInteger> newRange) {
+		if (newRange.lowerEndpoint().equals(newRange.upperEndpoint()))
+			return new HDLRange().setTo(HDLLiteral.get(newRange.upperEndpoint()));
+		return new HDLRange().setFrom(HDLLiteral.get(newRange.lowerEndpoint())).setTo(HDLLiteral.get(newRange.upperEndpoint()));
 	}
 
 	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {
@@ -323,16 +202,15 @@ public class HDLSimulator {
 				// code
 				for (HDLExpression arr : ref.getArray()) {
 					// The range that potentially could be accessed
-					ValueRange accessRange = arr.determineRange(context);
+					Range<BigInteger> accessRange = arr.determineRange(context);
 					// The range that the array could be sized
-					ValueRange dimensionRange = ref.resolveVar().getDimensions().get(0).determineRange(context);
+					Range<BigInteger> dimensionRange = ref.resolveVar().getDimensions().get(0).determineRange(context);
 					// Take the maximum range as the upper boundary and 0 as
 					// lower
-					dimensionRange = new ValueRange(BigInteger.ZERO, dimensionRange.to.subtract(BigInteger.ONE));
-					accessRange = accessRange.and(dimensionRange);
-					if (accessRange == null)
+					dimensionRange = Ranges.closed(BigInteger.ZERO, dimensionRange.upperEndpoint().subtract(BigInteger.ONE));
+					if (!accessRange.isConnected(dimensionRange))
 						throw new HDLProblemException(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr));
-					BigInteger counter = accessRange.from;
+					BigInteger counter = accessRange.lowerEndpoint();
 					List<HDLStatement> replacements = new ArrayList<HDLStatement>();
 					do {
 						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
@@ -346,7 +224,7 @@ public class HDLSimulator {
 							replacements.add(ass);
 						}
 						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(accessRange.to) <= 0);
+					} while (counter.compareTo(accessRange.lowerEndpoint()) <= 0);
 					ms.replace(ass, replacements.toArray(new HDLStatement[0]));
 				}
 			}
@@ -359,22 +237,22 @@ public class HDLSimulator {
 	 * loop parameter
 	 * 
 	 * @param context
-	 * @param insulin
+	 * @param unit
 	 * @return
 	 */
-	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit insulin) {
-		HDLForLoop[] loops = insulin.getAllObjectsOf(HDLForLoop.class, true);
+	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit unit) {
+		HDLForLoop[] loops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		ModificationSet ms = new ModificationSet();
 		for (HDLForLoop loop : loops) {
 			HDLVariable param = loop.getParam();
-			ValueRange r = loop.getRange().get(0).determineRange(context);
+			Range<BigInteger> r = loop.getRange().get(0).determineRange(context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
 				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();
 				if (refs.size() == 0)
 					newStmnts.add(stmnt);
 				else {
-					BigInteger counter = r.from;
+					BigInteger counter = r.upperEndpoint();
 					do {
 						ModificationSet stmntMs = new ModificationSet();
 						for (HDLVariableRef ref : refs) {
@@ -382,11 +260,11 @@ public class HDLSimulator {
 						}
 						newStmnts.add(stmntMs.apply(stmnt));
 						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(r.to) <= 0);
+					} while (counter.compareTo(r.lowerEndpoint()) <= 0);
 				}
 			}
 			ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));
 		}
-		return ms.apply(insulin);
+		return ms.apply(unit);
 	}
 }

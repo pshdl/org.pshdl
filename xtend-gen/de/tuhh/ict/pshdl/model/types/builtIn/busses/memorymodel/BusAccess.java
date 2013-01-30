@@ -41,9 +41,9 @@ public class BusAccess {
     _builder.append("//");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("#ifndef MemoryModelTest_BusStdDefinitions_h");
+    _builder.append("#ifndef BusStdDefinitions_h");
     _builder.newLine();
-    _builder.append("#define MemoryModelTest_BusStdDefinitions_h");
+    _builder.append("#define  BusStdDefinitions_h");
     _builder.newLine();
     _builder.append("#include <stdint.h>");
     _builder.newLine();

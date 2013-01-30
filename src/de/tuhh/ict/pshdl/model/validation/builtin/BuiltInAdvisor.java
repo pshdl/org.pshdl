@@ -1,12 +1,14 @@
 package de.tuhh.ict.pshdl.model.validation.builtin;
 
+import java.math.*;
 import java.util.*;
+
+import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.LevenshteinDistance.*;
-import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
 import de.tuhh.ict.pshdl.model.validation.*;
 
@@ -40,31 +42,33 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The index of the array can only be negative",
 					"When an array is accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
 		case ARRAY_INDEX_OUT_OF_BOUNDS: {
-			ValueRange accessRange = (ValueRange) problem.meta.get("accessRange");
-			ValueRange arrayRange = (ValueRange) problem.meta.get("arrayRange");
+			Range<BigInteger> accessRange = (Range<BigInteger>) problem.meta.get("accessRange");
+			Range<BigInteger> arrayRange = (Range<BigInteger>) problem.meta.get("arrayRange");
 			return new HDLAdvise(problem, "The array index exceeds its capacity", "Valid access index for the array are: " + arrayRange + " while the index has a range of: "
 					+ accessRange + ". These don't overlap which means that the index will never be valid");
 		}
 		case ARRAY_INDEX_POSSIBLY_NEGATIVE: {
-			ValueRange accessRange = (ValueRange) problem.meta.get("accessRange");
-			ValueRange arrayRange = (ValueRange) problem.meta.get("arrayRange");
-			ValueRange commonRange = arrayRange.and(accessRange);
+			Range<BigInteger> accessRange = (Range<BigInteger>) problem.meta.get("accessRange");
+			Range<BigInteger> arrayRange = (Range<BigInteger>) problem.meta.get("arrayRange");
 			String[] solutions;
-			if (commonRange == null)
+			if (!arrayRange.isConnected(accessRange))
 				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
 			else
-				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node,
-						"Manually declare a range for the index with the @range(\"" + arrayRange.from + ";" + arrayRange.to + "\") annotation to define a range" };
-			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.from
+				solutions = new String[] {
+						"Cast the index to uint with:(uint)" + problem.node,
+						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
+								+ "\") annotation to define a range" };
+			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
-			ValueRange accessRange = (ValueRange) problem.meta.get("accessRange");
-			ValueRange arrayRange = (ValueRange) problem.meta.get("arrayRange");
-			ValueRange commonRange = arrayRange.and(accessRange);
+			Range<BigInteger> accessRange = (Range<BigInteger>) problem.meta.get("accessRange");
+			Range<BigInteger> arrayRange = (Range<BigInteger>) problem.meta.get("arrayRange");
+			Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
-					+ " while the highest index of the array is " + arrayRange.to, "Limit the possible range by masking with &", "Downcast the index to a suitable size",
-					"Use the @range(\"" + commonRange.from + ";" + commonRange.to + "\") Annotation to indicate the expected range");
+					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
+					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
+							+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			break;

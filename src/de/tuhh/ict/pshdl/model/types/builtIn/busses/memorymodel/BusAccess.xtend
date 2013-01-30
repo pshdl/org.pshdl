@@ -16,8 +16,8 @@ class BusAccess {
 //  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
 //
 
-#ifndef MemoryModelTest_BusStdDefinitions_h
-#define MemoryModelTest_BusStdDefinitions_h
+#ifndef BusStdDefinitions_h
+#define  BusStdDefinitions_h
 #include <stdint.h>
 
 «FOR I: 1..32» 

@@ -21,7 +21,7 @@ public class MemoryModelSideFiles {
 		String dirName = ipcorename + "_" + version;
 		String rootDir = "drivers/";
 		BusAccess ba = new BusAccess();
-		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.html", builtHTML(memUnit, rows)));
+		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows)));
 		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes()));
 		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes()));
 		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes()));
@@ -68,8 +68,9 @@ public class MemoryModelSideFiles {
 				Integer integer = getAndInc(defIndex, def.name);
 				int size = MemoryModel.getSize(def);
 				if (def.type != Type.UNUSED) {
-					String toolTip = String.format("Width:%d Shift:%d Mask:%08X \nread: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X\nwrite: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d",
-							size, (def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
+					String toolTip = String.format(
+							"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
+							(def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
 					ps.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name, integer);
 				} else {
 					ps.format("<td colspan='%d' class='field %s %s'>%s</td>", size, def.rw + "Style", "", def.name);

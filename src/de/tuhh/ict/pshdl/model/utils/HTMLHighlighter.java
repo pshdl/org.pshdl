@@ -11,7 +11,7 @@ public class HTMLHighlighter extends SyntaxHighlighter {
 	public StringBuilder getSpacing() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = spacing; i > 0; i--) {
-			sb.append("&nbsp;&nbsp;&nbsp;");
+			sb.append("&#160;&#160;&#160;");
 		}
 		return sb;
 	}
@@ -25,7 +25,7 @@ public class HTMLHighlighter extends SyntaxHighlighter {
 
 	@Override
 	public String simpleSpace() {
-		return "&nbsp;";
+		return "&#160;";
 	}
 
 	@Override

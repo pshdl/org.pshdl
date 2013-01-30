@@ -92,41 +92,31 @@ public aspect SimulationTransformation {
 	public FluidFrame HDLUnit.toSimulationModel(HDLEvaluationContext context) {
 		FluidFrame res = new FluidFrame();
 		for (HDLStatement stmnt : getInits()) {
-			switch (stmnt.getClassType()) {
-			case HDLAssignment:
-				FluidFrame sFrame = stmnt.toSimulationModel(context);
-				res.addReferencedFrame(sFrame);
-				res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
-				break;
-			case HDLVariableDeclaration:
-				HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
-				for(HDLVariable var: hvd.getVariables()){
-					res.addWith(fullNameOf(var).toString(),HDLPrimitives.getWidth(var.determineType(), context));
-				}
-				break;
-			default:
-				break;
-			}
+			handleStatement(context, res, stmnt);
 		}
 
 		for (HDLStatement stmnt : getStatements()) {
-			switch (stmnt.getClassType()) {
-			case HDLAssignment:
-				FluidFrame sFrame = stmnt.toSimulationModel(context);
-				res.addReferencedFrame(sFrame);
-				res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
-				break;
-			case HDLVariableDeclaration:
-				HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
-				for(HDLVariable var: hvd.getVariables()){
-					res.addWith(fullNameOf(var).toString(),HDLPrimitives.getWidth(var.determineType(), context));
-				}
-				break;
-			default:
-				break;
-			}
+			handleStatement(context, res, stmnt);
 		}
 		return res;
+	}
+
+	private void HDLUnit.handleStatement(HDLEvaluationContext context, FluidFrame res, HDLStatement stmnt) {
+		switch (stmnt.getClassType()) {
+		case HDLAssignment:
+			FluidFrame sFrame = stmnt.toSimulationModel(context);
+			res.addReferencedFrame(sFrame);
+			res.instructions.add(new ArgumentedInstruction(Instruction.callFrame, Integer.toString(sFrame.id)));
+			break;
+		case HDLVariableDeclaration:
+			HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
+			for(HDLVariable var: hvd.getVariables()){
+				res.addWith(fullNameOf(var).toString(), HDLPrimitives.getWidth(var.determineType(), context));
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	public FluidFrame HDLManip.toSimulationModel(HDLEvaluationContext context) {
