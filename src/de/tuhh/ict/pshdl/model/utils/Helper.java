@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import com.google.common.base.*;
+
 public class Helper {
 	public static byte[] processFile(Class<?> clazz, String string, Map<String, String> options) throws IOException {
 		InputStream stream = clazz.getResourceAsStream(string);
@@ -34,6 +36,7 @@ public class Helper {
 			res.append(line.substring(offset));
 			res.append("\n");
 		}
-		return res.toString().getBytes();
+		stream.close();
+		return res.toString().getBytes(Charsets.UTF_8);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLPackageTransformation.*;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.*;
+import de.tuhh.ict.pshdl.generator.vhdl.libraries.VHDLCastsLibrary.TargetType;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
@@ -104,13 +105,13 @@ public aspect VHDLExpressionTransformation {
 				return getTarget().toVHDL();
 			HDLExpression tWidth = targetType.getWidth();
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
-				return handleLiteral(targetType, tWidth);
+				return VHDLCastsLibrary.handleLiteral(getContainer(), (HDLLiteral) getTarget(), targetType, tWidth);
 			}
 			HDLPrimitive t = (HDLPrimitive) getTarget().determineType();
 			Expression<?> exp = getTarget().toVHDL();
 			HDLPrimitiveType actualType=t.getType();
 			if (tWidth != null) {
-				TargetType resized=getResize(exp, t, tWidth);
+				TargetType resized=VHDLCastsLibrary.getResize(exp, t, tWidth);
 				exp=resized.resized;
 				actualType=resized.newType;
 			}
@@ -119,118 +120,6 @@ public aspect VHDLExpressionTransformation {
 		throw new IllegalArgumentException("Not supported:" + this);
 	}
 	
-	private static class TargetType {
-		public final Expression<?> resized;
-		public final HDLPrimitiveType newType;
-		public TargetType(Expression<?> resized, HDLPrimitiveType newType) {
-			super();
-			this.resized = resized;
-			this.newType = newType;
-		}
-	}
-
-	private TargetType  HDLManip.getResize(Expression<?> exp, HDLPrimitive actualType, HDLExpression tWidth) {
-		if (actualType.getWidth()!=null){
-			BigInteger bt=actualType.getWidth().constantEvaluate(null);
-			if (bt!=null){
-				BigInteger btw=tWidth.constantEvaluate(null);
-				if (bt.equals(btw)){
-					return new TargetType(exp, actualType.getType());
-				}
-			}
-		}
-		Expression<?> width = tWidth.toVHDL();
-		FunctionCall resize = null;
-		HDLPrimitiveType resType=actualType.getType();
-		switch (actualType.getType()) {
-		case BOOL:
-		case STRING:
-			throw new IllegalArgumentException(actualType + " can't have a width.");
-		case BIT:
-			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_BIT);
-			resType=HDLPrimitiveType.BITVECTOR;
-			break;
-		case INTEGER:
-		case NATURAL:
-			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_INT);
-			resType=HDLPrimitiveType.INT;
-			break;
-		case INT:
-		case UINT:
-			resize = new FunctionCall(NumericStd.RESIZE);
-			break;
-		case BITVECTOR:
-			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-			break;
-		}
-		if (resize==null)
-			throw new IllegalArgumentException("Should not happen");
-		resize.getParameters().add(new AssociationElement(exp));
-		resize.getParameters().add(new AssociationElement(width));
-		return new TargetType(resize, resType);
-	}
-	
-	private Expression<?> HDLManip.handleLiteral(HDLPrimitive targetType, HDLExpression tWidth) {
-		HDLLiteral lit = (HDLLiteral) getTarget();
-		if (this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLArithOp)
-			return lit.toVHDL();
-		BigInteger val = lit.getValueAsBigInt();
-		BigInteger width=null;
-		if (tWidth!=null)
-			width=tWidth.constantEvaluate(null);
-		switch (targetType.getType()) {
-		case BIT:
-			if (BigInteger.ZERO.equals(val))
-				return new CharacterLiteral('0');
-			return new CharacterLiteral('1');
-		case NATURAL:
-		case INTEGER:
-			return lit.toVHDL();
-		case INT: 
-			return handleIntUint(tWidth, lit, val, width, HDLPrimitiveType.INT, NumericStd.TO_SIGNED);
-		case UINT:
-			return handleIntUint(tWidth, lit, val, width, HDLPrimitiveType.UINT, NumericStd.TO_UNSIGNED);
-		case BITVECTOR:
-			if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
-				return Aggregate.OTHERS(new CharacterLiteral('0'));
-			if(width!=null)	
-				return lit.toVHDL(width.intValue(), true);
-			FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-			functionCall.getParameters().add(new AssociationElement(lit.toVHDL(val.bitLength(), true)));
-			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
-			return functionCall;
-		case STRING:
-			if (lit.getPresentation()==HDLLiteralPresentation.STR)
-				return lit.toVHDL();
-			throw new IllegalArgumentException("String is not castable");
-		case BOOL:
-			if (lit.getPresentation()==HDLLiteralPresentation.BOOL)
-				return lit.toVHDL();
-			if (BigInteger.ZERO.equals(val))
-				return HDLLiteral.getFalse().toVHDL();
-			return HDLLiteral.getTrue().toVHDL();
-		}
-		throw new IllegalArgumentException("Should not get here");
-	}
-
-	private Expression<?> HDLManip.handleIntUint(HDLExpression tWidth, HDLLiteral lit, BigInteger val, BigInteger width, HDLPrimitiveType to, Function f) {
-		if (BigInteger.ZERO.equals(val) && this.getContainer()!=null && this.getContainer().getClassType()==HDLClass.HDLAssignment)
-			return Aggregate.OTHERS(new CharacterLiteral('0'));
-		if(width!=null && lit.getPresentation()!=HDLLiteralPresentation.NUM)
-			return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
-		if (val.bitLength()>31){
-			if (width!=null)
-				return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
-			FunctionCall functionCall = new FunctionCall(NumericStd.RESIZE);
-			functionCall.getParameters().add(new AssociationElement(VHDLCastsLibrary.cast(lit.toVHDL(val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));
-			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
-			return functionCall;
-		}
-		FunctionCall functionCall = new FunctionCall(f);
-		functionCall.getParameters().add(new AssociationElement(lit.toVHDL()));
-		functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
-		return functionCall;
-	}
 
 	public Range HDLRange.toVHDL(Direction dir) {
 		Expression<?> to = HDLPrimitives.simplifyWidth(this, getTo()).toVHDL();

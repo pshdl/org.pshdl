@@ -5,10 +5,12 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 import java.io.*;
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.cfiles.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
@@ -22,11 +24,11 @@ public class MemoryModelSideFiles {
 		String rootDir = "drivers/";
 		BusAccess ba = new BusAccess();
 		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows)));
-		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes()));
-		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes()));
-		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes()));
-		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows).toString().getBytes()));
-		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef().toString().getBytes()));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes(Charsets.UTF_8)));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes(Charsets.UTF_8)));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes(Charsets.UTF_8)));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows).toString().getBytes(Charsets.UTF_8)));
+		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef().toString().getBytes(Charsets.UTF_8)));
 		return res;
 	}
 
@@ -82,7 +84,7 @@ public class MemoryModelSideFiles {
 			pos++;
 		}
 		options.put("{TABLE}", ps.toString());
-		options.put("{HDLINTERFACE}", MemoryModel.buildHDLInterface(unit, rows).setName("Bus").toString(new HTMLHighlighter(true)));
+		options.put("{HDLINTERFACE}", StringWriteExtension.asString(MemoryModel.buildHDLInterface(unit, rows).setName("Bus"), new HTMLHighlighter(true)));
 		ps.close();
 		try {
 			return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);

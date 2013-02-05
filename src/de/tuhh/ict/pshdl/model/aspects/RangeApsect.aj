@@ -114,10 +114,14 @@ public aspect RangeApsect {
 	}
 
 	public Range<BigInteger>HDLRange.determineRange(HDLEvaluationContext context) {
+		BigInteger to = getTo().constantEvaluate(context);
 		if (getFrom()!=null){
-			return Ranges.closed(getFrom().constantEvaluate(context), getTo().constantEvaluate(context));
+			BigInteger from = getFrom().constantEvaluate(context);
+			if (from.compareTo(to)>0)
+				return Ranges.closed(to, from);
+			return Ranges.closed(from, to);
 		}
-		return Ranges.closed(getTo().constantEvaluate(context),getTo().constantEvaluate(context));
+		return Ranges.closed(to,to);
 	}
 	
 	public Range<BigInteger>HDLEqualityOp.determineRange(HDLEvaluationContext context) {

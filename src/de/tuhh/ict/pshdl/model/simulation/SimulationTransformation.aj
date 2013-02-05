@@ -3,16 +3,17 @@ package de.tuhh.ict.pshdl.model.simulation;
 import java.math.*;
 import java.util.*;
 
+import de.tuhh.ict.pshdl.interpreter.*;
+import de.tuhh.ict.pshdl.interpreter.utils.*;
+import de.tuhh.ict.pshdl.interpreter.utils.FluidFrame.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
-import de.tuhh.ict.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
-import de.tuhh.ict.pshdl.model.simulation.FluidFrame.Instruction;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 
 public aspect SimulationTransformation {
 	public FluidFrame HDLExpression.toSimulationModel(HDLEvaluationContext context) {
@@ -133,18 +134,17 @@ public aspect SimulationTransformation {
 			break;
 		case CAST:
 			HDLPrimitive prim = (HDLPrimitive) getCastTo();
+			HDLPrimitive current=(HDLPrimitive)getTarget().determineType();
+			String currentWidth=getWidth(current, context);
+			String primWidth=getWidth(prim, context);
 			switch (prim.getType()) {
-			case INT:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, prim.getWidth().constantEvaluate(context).toString()));
-				break;
 			case INTEGER:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, "32"));
+			case INT:
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_int, primWidth, currentWidth));
 				break;
 			case UINT:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, prim.getWidth().constantEvaluate(context).toString()));
-				break;
 			case NATURAL:
-				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint, "32"));
+				res.instructions.add(new ArgumentedInstruction(Instruction.cast_uint,  primWidth, currentWidth));
 				break;
 			case BIT:
 			case BITVECTOR:
@@ -155,6 +155,20 @@ public aspect SimulationTransformation {
 			break;
 		}
 		return res;
+	}
+
+	private String HDLManip.getWidth(HDLPrimitive current, HDLEvaluationContext context) {
+		switch (current.getType()){
+		case BIT:
+			return "1";
+		case INTEGER:
+		case NATURAL:
+			return "32";
+		case INT:
+		case UINT:
+			return current.getWidth().constantEvaluate(context).toString();
+		}
+		return null;
 	}
 
 	public FluidFrame HDLVariableRef.toSimulationModel(HDLEvaluationContext context) {
@@ -175,6 +189,10 @@ public aspect SimulationTransformation {
 			break;
 		case PARAMETER:
 		case CONSTANT:
+			BigInteger val=this.constantEvaluate(context);
+			res.constants.put(refName, val);
+			res.instructions.add(new ArgumentedInstruction(Instruction.loadConstant, refName));
+			break;
 		case IN:
 			res.addInput(refName);
 			res.instructions.add(new ArgumentedInstruction(Instruction.loadInput, bits));

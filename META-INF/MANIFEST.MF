@@ -8,7 +8,8 @@ Require-Bundle: de.upb.hni.vmagic;bundle-version="1.0.0",
  org.antlr.runtime;bundle-version="3.2.0",
  org.eclipse.xtend.lib,
  com.google.guava,
- org.eclipse.xtext.xbase.lib
+ org.eclipse.xtext.xbase.lib,
+ de.tuhh.ict.pshdl.interpreter;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.tuhh.ict.pshdl.generator.vhdl;

@@ -1,9 +1,12 @@
 package de.tuhh.ict.pshdl.generator.vhdl.libraries;
 
+import java.math.*;
 import java.util.*;
 
+import de.tuhh.ict.pshdl.generator.vhdl.VHDLExpressionTransformation.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLLiteral.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -13,6 +16,7 @@ import de.upb.hni.vmagic.builtin.*;
 import de.upb.hni.vmagic.declaration.*;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.libraryunit.*;
+import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.type.*;
 
@@ -42,8 +46,14 @@ public class VHDLCastsLibrary {
 			new Constant("newSize", Standard.NATURAL));
 	public static final FunctionDeclaration RESIZE_BIT = new FunctionDeclaration("resizeBit", StdLogic1164.STD_LOGIC, new Constant("s", StdLogic1164.STD_LOGIC), new Constant(
 			"newSize", Standard.NATURAL));
-	public static final FunctionDeclaration RESIZE_INT = new FunctionDeclaration("resizeInt", NumericStd.SIGNED, new Constant("s", StdLogic1164.STD_LOGIC), new Constant("newSize",
+	public static final FunctionDeclaration RESIZE_INT = new FunctionDeclaration("resizeInt", NumericStd.SIGNED, new Constant("s", NumericStd.SIGNED), new Constant("newSize",
 			Standard.NATURAL));
+	public static final FunctionDeclaration RESIZE_UINT = new FunctionDeclaration("resizeUint", NumericStd.UNSIGNED, new Constant("s", NumericStd.UNSIGNED), new Constant(
+			"newSize", Standard.NATURAL));
+	public static final FunctionDeclaration RESIZE_INTEGER = new FunctionDeclaration("resizeInteger", NumericStd.SIGNED, new Constant("s", Standard.INTEGER), new Constant(
+			"newSize", Standard.NATURAL));
+	public static final FunctionDeclaration RESIZE_NATURAL = new FunctionDeclaration("resizeNatural", NumericStd.UNSIGNED, new Constant("s", Standard.NATURAL), new Constant(
+			"newSize", Standard.NATURAL));
 	static {
 		PACKAGE = new PackageDeclaration("pshdl.Casts");
 		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
@@ -74,6 +84,11 @@ public class VHDLCastsLibrary {
 		declarations.add(ACCESS_BITS_UNSIGNED);
 		declarations.add(ACCESS_BITS_SIGNED);
 		declarations.add(RESIZE_SLV);
+		declarations.add(RESIZE_BIT);
+		declarations.add(RESIZE_INT);
+		declarations.add(RESIZE_UINT);
+		declarations.add(RESIZE_INTEGER);
+		declarations.add(RESIZE_NATURAL);
 		declarations.add(MAX);
 		declarations.add(MIN);
 		declarations.add(ABS);
@@ -134,42 +149,123 @@ public class VHDLCastsLibrary {
 		throw new IllegalArgumentException("Unexpected Type:" + left);
 	}
 
-	private static class FunctionCallMap {
-		public final HDLPrimitiveType from;
-		public final HDLPrimitiveType to;
-		public final FunctionDeclaration call;
+	public static class TargetType {
+		public final Expression<?> resized;
+		public final HDLPrimitiveType newType;
 
-		public FunctionCallMap(HDLPrimitiveType from, HDLPrimitiveType to, FunctionDeclaration call) {
+		public TargetType(Expression<?> resized, HDLPrimitiveType newType) {
 			super();
-			this.from = from;
-			this.to = to;
-			this.call = call;
+			this.resized = resized;
+			this.newType = newType;
 		}
+	}
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = (prime * result) + ((from == null) ? 0 : from.hashCode());
-			result = (prime * result) + ((to == null) ? 0 : to.hashCode());
-			return result;
+	public static TargetType getResize(Expression<?> exp, HDLPrimitive actualType, HDLExpression tWidth) {
+		if (actualType.getWidth() != null) {
+			BigInteger bt = actualType.getWidth().constantEvaluate(null);
+			if (bt != null) {
+				BigInteger btw = tWidth.constantEvaluate(null);
+				if (bt.equals(btw)) {
+					return new TargetType(exp, actualType.getType());
+				}
+			}
 		}
+		Expression<?> width = tWidth.toVHDL();
+		FunctionCall resize = null;
+		HDLPrimitiveType resType = actualType.getType();
+		switch (actualType.getType()) {
+		case BOOL:
+		case STRING:
+			throw new IllegalArgumentException(actualType + " can't have a width.");
+		case BIT:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_BIT);
+			resType = HDLPrimitiveType.BITVECTOR;
+			break;
+		case NATURAL:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_NATURAL);
+			resType = HDLPrimitiveType.UINT;
+			break;
+		case INTEGER:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_INTEGER);
+			resType = HDLPrimitiveType.INT;
+			break;
+		case INT:
+			resize = new FunctionCall(RESIZE_INT);
+			break;
+		case UINT:
+			resize = new FunctionCall(RESIZE_UINT);
+			break;
+		case BITVECTOR:
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+			break;
+		}
+		if (resize == null)
+			throw new IllegalArgumentException("Should not happen");
+		resize.getParameters().add(new AssociationElement(exp));
+		resize.getParameters().add(new AssociationElement(width));
+		return new TargetType(resize, resType);
+	}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			FunctionCallMap other = (FunctionCallMap) obj;
-			if (from != other.from)
-				return false;
-			if (to != other.to)
-				return false;
-			return true;
+	public static Expression<?> handleLiteral(IHDLObject container, HDLLiteral lit, HDLPrimitive targetType, HDLExpression tWidth) {
+		if ((container != null) && (container.getClassType() == HDLClass.HDLArithOp))
+			return lit.toVHDL();
+		BigInteger val = lit.getValueAsBigInt();
+		BigInteger width = null;
+		if (tWidth != null)
+			width = tWidth.constantEvaluate(null);
+		switch (targetType.getType()) {
+		case BIT:
+			if (BigInteger.ZERO.equals(val))
+				return new CharacterLiteral('0');
+			return new CharacterLiteral('1');
+		case NATURAL:
+		case INTEGER:
+			return lit.toVHDL();
+		case INT:
+			return handleIntUint(container, tWidth, lit, val, width, HDLPrimitiveType.INT, NumericStd.TO_SIGNED, RESIZE_INTEGER);
+		case UINT:
+			return handleIntUint(container, tWidth, lit, val, width, HDLPrimitiveType.UINT, NumericStd.TO_UNSIGNED, RESIZE_NATURAL);
+		case BITVECTOR:
+			if (BigInteger.ZERO.equals(val) && (container != null) && (container.getClassType() == HDLClass.HDLAssignment))
+				return Aggregate.OTHERS(new CharacterLiteral('0'));
+			if (width != null)
+				return lit.toVHDL(width.intValue(), true);
+			FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+			functionCall.getParameters().add(new AssociationElement(lit.toVHDL(val.bitLength(), true)));
+			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			return functionCall;
+		case STRING:
+			if (lit.getPresentation() == HDLLiteralPresentation.STR)
+				return lit.toVHDL();
+			throw new IllegalArgumentException("String is not castable");
+		case BOOL:
+			if (lit.getPresentation() == HDLLiteralPresentation.BOOL)
+				return lit.toVHDL();
+			if (BigInteger.ZERO.equals(val))
+				return HDLLiteral.getFalse().toVHDL();
+			return HDLLiteral.getTrue().toVHDL();
 		}
+		throw new IllegalArgumentException("Should not get here");
+	}
+
+	private static Expression<?> handleIntUint(IHDLObject container, HDLExpression tWidth, HDLLiteral lit, BigInteger val, BigInteger width, HDLPrimitiveType to,
+			Function castFunc, FunctionDeclaration resize) {
+		if (BigInteger.ZERO.equals(val) && (container != null) && (container.getClassType() == HDLClass.HDLAssignment))
+			return Aggregate.OTHERS(new CharacterLiteral('0'));
+		if ((width != null) && (lit.getPresentation() != HDLLiteralPresentation.NUM))
+			return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
+		if (val.bitLength() > 31) {
+			if (width != null)
+				return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
+			FunctionCall functionCall = new FunctionCall(resize);
+			functionCall.getParameters().add(new AssociationElement(VHDLCastsLibrary.cast(lit.toVHDL(val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));
+			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			return functionCall;
+		}
+		FunctionCall functionCall = new FunctionCall(castFunc);
+		functionCall.getParameters().add(new AssociationElement(lit.toVHDL()));
+		functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+		return functionCall;
 	}
 
 	public static Expression<?> cast(Expression<?> vhdlExpr, HDLPrimitiveType from, HDLPrimitiveType to) {

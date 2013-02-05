@@ -67,7 +67,15 @@ public class RangeTool {
 	 */
 	public static SortedSet<Range<BigInteger>> split(List<RangeVal> value) {
 		preSort(value);
-		SortedSet<Range<BigInteger>> res = new TreeSet<Range<BigInteger>>();
+		SortedSet<Range<BigInteger>> res = new TreeSet<Range<BigInteger>>(new Comparator<Range<BigInteger>>() {
+			@Override
+			public int compare(Range<BigInteger> arg0, Range<BigInteger> arg1) {
+				return ComparisonChain.start() //
+						.compare(arg0.lowerEndpoint(), arg1.lowerEndpoint()) //
+						.compare(arg0.upperEndpoint(), arg1.upperEndpoint()) //
+						.result();
+			}
+		});
 		int count = 0;
 		BigInteger start = null;
 		for (RangeVal rangeVal : value) {

@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -188,7 +189,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 			sb.append("</body></html>");
 			System.out.println(sb);
 			FileOutputStream fos = new FileOutputStream("castTable.html");
-			fos.write(sb.toString().getBytes());
+			fos.write(sb.toString().getBytes(Charsets.UTF_8));
 			fos.close();
 		} catch (Exception e) {
 			e.printStackTrace();

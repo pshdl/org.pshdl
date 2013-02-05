@@ -125,7 +125,7 @@ public class HDLSimulator {
 			}
 			finalStatements.add(new HDLAssignment().setLeft(references.get(entry.getKey())).setRight(current));
 		}
-		return insulin.setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
+		return insulin.setInits(null).setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
@@ -224,7 +224,7 @@ public class HDLSimulator {
 							replacements.add(ass);
 						}
 						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(accessRange.lowerEndpoint()) <= 0);
+					} while (counter.compareTo(accessRange.upperEndpoint()) <= 0);
 					ms.replace(ass, replacements.toArray(new HDLStatement[0]));
 				}
 			}
@@ -252,7 +252,7 @@ public class HDLSimulator {
 				if (refs.size() == 0)
 					newStmnts.add(stmnt);
 				else {
-					BigInteger counter = r.upperEndpoint();
+					BigInteger counter = r.lowerEndpoint();
 					do {
 						ModificationSet stmntMs = new ModificationSet();
 						for (HDLVariableRef ref : refs) {
@@ -260,7 +260,7 @@ public class HDLSimulator {
 						}
 						newStmnts.add(stmntMs.apply(stmnt));
 						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(r.lowerEndpoint()) <= 0);
+					} while (counter.compareTo(r.upperEndpoint()) <= 0);
 				}
 			}
 			ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));

@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import org.eclipse.jdt.annotation.*;
 
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -131,7 +132,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	@Override
 	public String getName() {
-		return "#" + toString(SyntaxHighlighter.none());
+		return "#" + StringWriteExtension.INST.toString(this, SyntaxHighlighter.none());
 	}
 
 	public static HDLPrimitive getInt() {

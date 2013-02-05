@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.*;
 
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
@@ -379,6 +380,11 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	@Override
 	public boolean isFrozen() {
 		return frozen;
+	}
+
+	@Override
+	public String toString() {
+		return StringWriteExtension.INST.toString(this, SyntaxHighlighter.none());
 	}
 
 	// $CONTENT-END$

@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.antlr.runtime.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.*;
@@ -77,7 +78,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 	private InputStream getContentStream(HDLDirectGeneration hdl) {
 		String generatorContent = hdl.getGeneratorContent();
 		String substring = generatorContent.substring(2, generatorContent.length() - 2);
-		return new ByteArrayInputStream(substring.getBytes());
+		return new ByteArrayInputStream(substring.getBytes(Charsets.UTF_8));
 	}
 
 	private int getMemCount(HDLDirectGeneration hdl) {
