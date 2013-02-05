@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -303,7 +304,7 @@ public aspect VHDLStatementTransformation {
 		VHDLContext context = new VHDLContext();
 		HDLExpression hCaseExp = getCaseExp();
 		BigInteger width = null;
-		HDLType type = hCaseExp.determineType();
+		HDLType type = TypeExtension.typeOf(hCaseExp);
 		if (type instanceof HDLPrimitive) {
 			width = ((HDLPrimitive) type).getWidth().constantEvaluate(null);
 			if (width == null)

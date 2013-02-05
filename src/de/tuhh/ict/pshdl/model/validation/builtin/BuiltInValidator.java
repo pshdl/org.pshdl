@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -96,8 +97,8 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLAssignment[] asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
 			HDLEvaluationContext context = getContext(hContext, ass);
-			HDLType lType = ass.getLeft().determineType();
-			HDLType rType = ass.getRight().determineType();
+			HDLType lType = TypeExtension.typeOf(ass.getLeft());
+			HDLType rType = TypeExtension.typeOf(ass.getRight());
 			switch (lType.getClassType()) {
 			case HDLEnum:
 				if (rType.getClassType() != HDLClass.HDLEnum)
@@ -151,7 +152,7 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLConcat hdlConcat : concats) {
 			ArrayList<HDLExpression> cats = hdlConcat.getCats();
 			for (HDLExpression exp : cats) {
-				HDLType type = exp.determineType();
+				HDLType type = TypeExtension.typeOf(exp);
 				if (type instanceof HDLPrimitive) {
 					HDLPrimitive prim = (HDLPrimitive) type;
 					switch (prim.getType()) {
@@ -181,7 +182,7 @@ public class BuiltInValidator implements IHDLValidator {
 			ArrayList<HDLSwitchCaseStatement> cases = switchStatement.getCases();
 			Set<BigInteger> values = new HashSet<BigInteger>();
 			Set<HDLQualifiedName> enums = new HashSet<HDLQualifiedName>();
-			HDLType type = switchStatement.getCaseExp().determineType();
+			HDLType type = TypeExtension.typeOf(switchStatement.getCaseExp());
 			if (type instanceof HDLPrimitive) {
 				HDLPrimitive primitive = (HDLPrimitive) type;
 				if (primitive.getWidth() == null)

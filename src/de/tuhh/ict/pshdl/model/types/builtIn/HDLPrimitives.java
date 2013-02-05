@@ -16,6 +16,7 @@ import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 
@@ -239,8 +240,8 @@ public class HDLPrimitives implements IHDLPrimitive {
 	 */
 	@Override
 	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {
-		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
-		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
+		HDLPrimitive lType = (HDLPrimitive) TypeExtension.typeOf(op.getLeft());
+		HDLPrimitive rType = (HDLPrimitive) TypeExtension.typeOf(op.getRight());
 		HDLArithOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType)) {
 			if (HDLPrimitive.isTargetMatching(rType))
@@ -376,8 +377,8 @@ public class HDLPrimitives implements IHDLPrimitive {
 	 */
 	@Override
 	public HDLTypeInferenceInfo getShiftOpType(HDLShiftOp op) {
-		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
-		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
+		HDLPrimitive lType = (HDLPrimitive) TypeExtension.typeOf(op.getLeft());
+		HDLPrimitive rType = (HDLPrimitive) TypeExtension.typeOf(op.getRight());
 
 		HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
@@ -395,8 +396,8 @@ public class HDLPrimitives implements IHDLPrimitive {
 
 	@Override
 	public HDLTypeInferenceInfo getEqualityOpType(HDLEqualityOp op) {
-		HDLType determineTypeL = op.getLeft().determineType();
-		HDLType determineTypeR = op.getRight().determineType();
+		HDLType determineTypeL = TypeExtension.typeOf(op.getLeft());
+		HDLType determineTypeR = TypeExtension.typeOf(op.getRight());
 		if ((determineTypeL instanceof HDLPrimitive) && (determineTypeR instanceof HDLPrimitive)) {
 			HDLPrimitive lType = (HDLPrimitive) determineTypeL;
 			HDLPrimitive rType = (HDLPrimitive) determineTypeR;
@@ -436,8 +437,8 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLBitOpType type = op.getType();
 		if ((type == HDLBitOpType.LOGI_AND) || (type == HDLBitOpType.LOGI_OR))
 			return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool(), HDLPrimitive.getBool());
-		HDLPrimitive lType = (HDLPrimitive) op.getLeft().determineType();
-		HDLPrimitive rType = (HDLPrimitive) op.getRight().determineType();
+		HDLPrimitive lType = (HDLPrimitive) TypeExtension.typeOf(op.getLeft());
+		HDLPrimitive rType = (HDLPrimitive) TypeExtension.typeOf(op.getRight());
 		if (HDLPrimitive.isTargetMatching(lType)) {
 			if (HDLPrimitive.isTargetMatching(rType))
 				lType = rType;
@@ -469,7 +470,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 	public HDLTypeInferenceInfo getManipOpType(HDLManip manip) {
 		HDLExpression target = manip.getTarget();
 		HDLType castTo = manip.getCastTo();
-		HDLPrimitive determineType = (HDLPrimitive) target.determineType();
+		HDLPrimitive determineType = (HDLPrimitive) TypeExtension.typeOf(target);
 		switch (manip.getType()) {
 		case CAST:
 			// XXX If there ever happens to be another cast, this has to be

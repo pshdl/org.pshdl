@@ -13,6 +13,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 
 
 public aspect SimulationTransformation {
@@ -84,7 +85,7 @@ public aspect SimulationTransformation {
 		while (iter.hasNext()) {
 			HDLExpression exp = iter.next();
 			res.append(exp.toSimulationModel(context));
-			Integer width=HDLPrimitives.getWidth(exp.determineType(), context);
+			Integer width=HDLPrimitives.getWidth(TypeExtension.typeOf(exp), context);
 			res.add(new ArgumentedInstruction(Instruction.concat, width.toString()));
 		}
 		return res;
@@ -112,7 +113,7 @@ public aspect SimulationTransformation {
 		case HDLVariableDeclaration:
 			HDLVariableDeclaration hvd=(HDLVariableDeclaration)stmnt;
 			for(HDLVariable var: hvd.getVariables()){
-				res.addWith(fullNameOf(var).toString(), HDLPrimitives.getWidth(var.determineType(), context));
+				res.addWith(fullNameOf(var).toString(), HDLPrimitives.getWidth(TypeExtension.typeOf(var), context));
 			}
 			break;
 		default:
@@ -134,7 +135,7 @@ public aspect SimulationTransformation {
 			break;
 		case CAST:
 			HDLPrimitive prim = (HDLPrimitive) getCastTo();
-			HDLPrimitive current=(HDLPrimitive)getTarget().determineType();
+			HDLPrimitive current=(HDLPrimitive)TypeExtension.typeOf(getTarget());
 			String currentWidth=getWidth(current, context);
 			String primWidth=getWidth(prim, context);
 			switch (prim.getType()) {

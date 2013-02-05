@@ -6,6 +6,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.HDLObject.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -123,9 +124,9 @@ public aspect ConstantEvaluation {
 			if (im == null) {
 				return null;
 			}
-			BigInteger width = cat.determineType().getWidth().constantEvaluate(context);
+			BigInteger width = TypeExtension.typeOf(cat).getWidth().constantEvaluate(context);
 			if (width == null) {
-				this.addMeta(ProblemSource.SOURCE, cat.determineType().getWidth());
+				this.addMeta(ProblemSource.SOURCE, TypeExtension.typeOf(cat).getWidth());
 				this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
 				return null;
 
@@ -265,7 +266,7 @@ public aspect ConstantEvaluation {
 			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
 			return null;
 		}
-		HDLType type = determineType();
+		HDLType type = TypeExtension.typeOf(this);
 		if (!(type instanceof HDLPrimitive)) {
 			this.addMeta(ProblemSource.SOURCE, this);
 			this.addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);

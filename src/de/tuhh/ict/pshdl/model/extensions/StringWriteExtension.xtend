@@ -142,7 +142,7 @@ class StringWriteExtension {
 		sb.append(highlight.keyword("inline")).append(highlight.simpleSpace).append(highlight.keyword("function")).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
 		sb.append('(')
-		val Iterator<HDLVariable> iter = func.args.iterator;
+		val Iterator<HDLVariable> iter = func.args.iterator
 		while (iter.hasNext) {
 			var HDLVariable hvar = iter.next as HDLVariable
 			sb.append(highlight.varName(hvar))
@@ -160,7 +160,7 @@ class StringWriteExtension {
 		sb.append(highlight.keyword("substitute")).append(highlight.simpleSpace).append(highlight.keyword("function")).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
 		sb.append('(')
-		val Iterator<HDLVariable> iter = func.args.iterator;
+		val Iterator<HDLVariable> iter = func.args.iterator
 		while (iter.hasNext) {
 			var HDLVariable hvar = iter.next as HDLVariable
 			sb.append(highlight.varName(hvar))
@@ -553,7 +553,6 @@ class StringWriteExtension {
 		sb.append('(')
 		for (HDLArgument args : hdg.arguments) {
 			sb.append(args.toString(highlight))
-
 		}
 		sb.append(')')
 		if (hdg.generatorContent != null) {

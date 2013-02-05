@@ -67,34 +67,34 @@ class FullNameExtension {
 		if (unit.getMeta(FULLNAME)!=null)
 			return unit.getMeta(FULLNAME)
 		val HDLQualifiedName fullName = unit.superFullName
-		return fullName.append(new HDLQualifiedName(unit.getName()))
+		return fullName.append(new HDLQualifiedName(unit.name))
 	}
 	
 	def dispatch HDLQualifiedName getFullName(HDLInterface unit) {
 		if (unit.getMeta(FULLNAME)!=null)
 			return unit.getMeta(FULLNAME)
 		val HDLQualifiedName fullName = unit.superFullName
-		return fullName.append(new HDLQualifiedName(unit.getName()))
+		return fullName.append(new HDLQualifiedName(unit.name))
 	}
 	def dispatch HDLQualifiedName getFullName(HDLEnum unit) {
 		if (unit.getMeta(FULLNAME)!=null)
 			return unit.getMeta(FULLNAME)
 		val HDLQualifiedName fullName = unit.superFullName
-		return fullName.append(new HDLQualifiedName(unit.getName()))
+		return fullName.append(new HDLQualifiedName(unit.name))
 	}
 	def dispatch HDLQualifiedName getFullName(HDLFunction unit) {
 		if (unit.getMeta(FULLNAME)!=null)
 			return unit.getMeta(FULLNAME)
 		val HDLQualifiedName fullName = unit.superFullName
-		return fullName.append(new HDLQualifiedName(unit.getName()))
+		return fullName.append(new HDLQualifiedName(unit.name))
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLPackage pkg) {
 		if (pkg.getMeta(FULLNAME)!=null)
 			return pkg.getMeta(FULLNAME)
 		val HDLQualifiedName fullName = pkg.superFullName
-		if (pkg.getPkg() != null)
-			return fullName.append(new HDLQualifiedName(pkg.getPkg()))
+		if (pkg.pkg != null)
+			return fullName.append(new HDLQualifiedName(pkg.pkg))
 		return fullName
 	}
 
@@ -102,31 +102,31 @@ class FullNameExtension {
 		if (unit.getMeta(FULLNAME)!=null)
 			return unit.getMeta(FULLNAME)
 		val HDLQualifiedName fullName = unit.superFullName
-		return fullName.append(new HDLQualifiedName(unit.getName()))
+		return fullName.append(new HDLQualifiedName(unit.name))
 	}
 
 	
 	def dispatch HDLQualifiedName getFullName(IHDLObject obj) {
 		if (obj.getMeta(FULLNAME)!=null)
 			return obj.getMeta(FULLNAME)
-		if (obj.getContainer() != null)
-			return getFullName(obj.getContainer())
+		if (obj.container != null)
+			return getFullName(obj.container)
 		return HDLQualifiedName::EMPTY
 	}
 	
 	def dispatch HDLQualifiedName getFullName(HDLObject obj) {
 		if (obj.getMeta(FULLNAME)!=null)
 			return obj.getMeta(FULLNAME)
-		if (obj.getContainer() != null)
-			return getFullName(obj.getContainer())
+		if (obj.container != null)
+			return getFullName(obj.container)
 		return HDLQualifiedName::EMPTY
 	}
 	
 	def HDLQualifiedName getSuperFullName(HDLObject obj) {
 		if (obj.getMeta(FULLNAME)!=null)
 			return obj.getMeta(FULLNAME)
-		if (obj.getContainer() != null)
-			return getFullName(obj.getContainer())
+		if (obj.container != null)
+			return getFullName(obj.container)
 		return HDLQualifiedName::EMPTY
 	}
 
@@ -139,13 +139,13 @@ class FullNameExtension {
 
 	def static int countInstance(HDLObject obj) {
 		var int count = 0
-		if (obj.getContainer() != null) {
-			val Iterator<IHDLObject> iterator = obj.getContainer().iterator(false)
+		if (obj.container != null) {
+			val Iterator<IHDLObject> iterator = obj.container.iterator(false)
 			while (iterator.hasNext()) {
 				val IHDLObject hdlObject = iterator.next()
 				if (hdlObject == obj)
 					return count
-				if (hdlObject.getClassType() == obj.getClassType())
+				if (hdlObject.classType == obj.classType)
 					count=count+1
 			}
 		}

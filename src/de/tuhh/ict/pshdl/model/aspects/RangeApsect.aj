@@ -9,6 +9,7 @@ import com.google.common.collect.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.aspects.ConstantEvaluation.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.HDLObject.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
@@ -104,7 +105,7 @@ public aspect RangeApsect {
 				return Ranges.closed(BigInteger.ZERO, BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE));
 			}
 		}
-		HDLType type = var.determineType();
+		HDLType type = TypeExtension.typeOf(var);
 		if (type instanceof HDLPrimitive) {
 			return HDLPrimitives.getInstance().getValueRange((HDLPrimitive) type, context);
 		}
@@ -264,6 +265,6 @@ public aspect RangeApsect {
 	}
 
 	public Range<BigInteger>HDLConcat.determineRange(HDLEvaluationContext context) {
-		return HDLPrimitives.getInstance().getValueRange((HDLPrimitive)this.determineType(), context);
+		return HDLPrimitives.getInstance().getValueRange((HDLPrimitive)TypeExtension.typeOf(this), context);
 	}
 }

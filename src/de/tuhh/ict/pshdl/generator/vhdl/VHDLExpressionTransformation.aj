@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
@@ -107,7 +108,7 @@ public aspect VHDLExpressionTransformation {
 			if (getTarget().getClassType() == HDLClass.HDLLiteral) {
 				return VHDLCastsLibrary.handleLiteral(getContainer(), (HDLLiteral) getTarget(), targetType, tWidth);
 			}
-			HDLPrimitive t = (HDLPrimitive) getTarget().determineType();
+			HDLPrimitive t = (HDLPrimitive) TypeExtension.typeOf(getTarget());
 			Expression<?> exp = getTarget().toVHDL();
 			HDLPrimitiveType actualType=t.getType();
 			if (tWidth != null) {
@@ -163,7 +164,7 @@ public aspect VHDLExpressionTransformation {
 	}
 
 	public Expression<?> HDLShiftOp.toVHDL() {
-		HDLPrimitive type = (HDLPrimitive) getLeft().determineType();
+		HDLPrimitive type = (HDLPrimitive) TypeExtension.typeOf(getLeft());
 		return VHDLShiftLibrary.shift(getLeft().toVHDL(), getRight().toVHDL(), type.getType(), getType());
 	}
 

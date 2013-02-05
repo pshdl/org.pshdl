@@ -8,6 +8,7 @@ import com.google.common.collect.*;
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
@@ -69,13 +70,13 @@ public class HDLFunctions {
 				HDLInlineFunction hif = (HDLInlineFunction) rFunc;
 				HDLExpression expression = hif.getReplacementExpression(function);
 				if (expression != null) {
-					HDLType type = expression.determineType();
+					HDLType type = TypeExtension.typeOf(expression);
 					if (type instanceof HDLPrimitive) {
 						HDLPrimitive result = (HDLPrimitive) type;
 						HDLType args[] = new HDLType[function.getParams().size()];
 						int i = 0;
 						for (HDLExpression exp : function.getParams()) {
-							args[i++] = exp.determineType();
+							args[i++] = TypeExtension.typeOf(exp);
 						}
 						return new HDLTypeInferenceInfo(result, args);
 					}

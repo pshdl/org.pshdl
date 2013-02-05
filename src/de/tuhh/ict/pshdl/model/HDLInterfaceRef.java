@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
 
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -91,7 +92,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 		if (resolveHIf == null) {
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
 		}
-		HDLType type = resolveHIf.determineType();
+		HDLType type = TypeExtension.typeOf(resolveHIf);
 		if (type instanceof HDLInterface) {
 			HDLInterface hIf = (HDLInterface) type;
 			String lastSegment2 = getVarRefName().getLastSegment();
