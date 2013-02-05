@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
 
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -95,7 +96,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			case CONSTANT: {
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
-					BigInteger constant = hdlVariable.getDefaultValue().constantEvaluate(null);
+					BigInteger constant = ConstantEvaluate.valueOf(hdlVariable.getDefaultValue());
 					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(resolveHIf).where(HDLReference.fVar).isEqualTo(hdlVariable.asRef()).getAll();
 					for (HDLVariableRef ref : refs) {
 						ms.replace(ref, HDLLiteral.get(constant));

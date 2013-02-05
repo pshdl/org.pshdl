@@ -15,6 +15,7 @@ import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
@@ -88,7 +89,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 			if ("memCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
-				BigInteger regVal = expression.constantEvaluate(null);
+				BigInteger regVal = ConstantEvaluate.valueOf(expression);
 				if (regVal != null) {
 					memCount = regVal.intValue();
 				} else {
@@ -117,7 +118,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 			if ("regCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
-				BigInteger regVal = expression.constantEvaluate(null);
+				BigInteger regVal = ConstantEvaluate.valueOf(expression);
 				if (regVal != null) {
 					regCount = regVal.intValue();
 				} else {

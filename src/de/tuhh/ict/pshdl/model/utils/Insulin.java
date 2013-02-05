@@ -734,7 +734,7 @@ public class Insulin {
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
-						BigInteger constant = ass.getRight().constantEvaluate(context);
+						BigInteger constant = ConstantEvaluate.valueOf(ass.getRight(), context);
 						if (constant != null) {
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {

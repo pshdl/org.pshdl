@@ -9,6 +9,7 @@ import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLLiteral.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
@@ -162,9 +163,9 @@ public class VHDLCastsLibrary {
 
 	public static TargetType getResize(Expression<?> exp, HDLPrimitive actualType, HDLExpression tWidth) {
 		if (actualType.getWidth() != null) {
-			BigInteger bt = actualType.getWidth().constantEvaluate(null);
+			BigInteger bt = ConstantEvaluate.valueOf(actualType.getWidth(), null);
 			if (bt != null) {
-				BigInteger btw = tWidth.constantEvaluate(null);
+				BigInteger btw = ConstantEvaluate.valueOf(tWidth, null);
 				if (bt.equals(btw)) {
 					return new TargetType(exp, actualType.getType());
 				}
@@ -212,7 +213,7 @@ public class VHDLCastsLibrary {
 		BigInteger val = lit.getValueAsBigInt();
 		BigInteger width = null;
 		if (tWidth != null)
-			width = tWidth.constantEvaluate(null);
+			width = ConstantEvaluate.valueOf(tWidth, null);
 		switch (targetType.getType()) {
 		case BIT:
 			if (BigInteger.ZERO.equals(val))

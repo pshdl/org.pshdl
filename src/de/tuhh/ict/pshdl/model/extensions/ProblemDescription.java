@@ -1,0 +1,12 @@
+package de.tuhh.ict.pshdl.model.extensions;
+
+import de.tuhh.ict.pshdl.model.utils.*;
+
+public enum ProblemDescription implements MetaAccess<ProblemDescription> {
+	DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE, ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT, CAN_NOT_USE_PARAMETER, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS, NON_PRIMITVE_TYPE_NOT_EVALUATED, TYPE_NOT_SUPPORTED_FOR_CONSTANTS;
+
+	@Override
+	public boolean inherit() {
+		return true;
+	}
+}

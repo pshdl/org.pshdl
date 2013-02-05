@@ -7,7 +7,6 @@ import java.util.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.aspects.ConstantEvaluation.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.HDLObject.*;
@@ -42,8 +41,8 @@ public aspect RangeApsect {
 	}
 
 	//First we check whether this Expression might be Constant. If so, we do exactly know the range
-	Range<BigInteger> around(HDLExpression from, HDLEvaluationContext context):execution(ValueRange HDLExpression+.determineRange(HDLEvaluationContext)) && this(from) && args(context){
-		BigInteger constant=from.constantEvaluate(context);
+	Range<BigInteger> around(HDLExpression from, HDLEvaluationContext context):execution(Range<BigInteger> HDLExpression+.determineRange(HDLEvaluationContext)) && this(from) && args(context){
+		BigInteger constant=ConstantEvaluate.valueOf(from,context);
 		if (constant!=null)
 			return Ranges.closed(constant, constant);
 		Range<BigInteger> res = proceed(from, context);
@@ -60,7 +59,7 @@ public aspect RangeApsect {
 	}
 
 	public Range<BigInteger>HDLVariableRef.determineRange(HDLEvaluationContext context) {
-		BigInteger val = this.constantEvaluate(context);
+		BigInteger val = ConstantEvaluate.valueOf(this,context);
 		if (val != null)
 			return Ranges.closed(val, val);
 		HDLVariable var=resolveVar();
@@ -94,7 +93,7 @@ public aspect RangeApsect {
 			for (HDLRange r : getBits()) {
 				HDLExpression width=r.getWidth();
 				width=width.copyDeepFrozen(r);
-				BigInteger cw=width.constantEvaluate(context);
+				BigInteger cw=ConstantEvaluate.valueOf(width,context);
 				if (cw==null) {
 					bitWidth=null;
 					break;
@@ -115,9 +114,9 @@ public aspect RangeApsect {
 	}
 
 	public Range<BigInteger>HDLRange.determineRange(HDLEvaluationContext context) {
-		BigInteger to = getTo().constantEvaluate(context);
+		BigInteger to = ConstantEvaluate.valueOf(getTo(),context);
 		if (getFrom()!=null){
-			BigInteger from = getFrom().constantEvaluate(context);
+			BigInteger from = ConstantEvaluate.valueOf(getFrom(),context);
 			if (from.compareTo(to)>0)
 				return Ranges.closed(to, from);
 			return Ranges.closed(from, to);

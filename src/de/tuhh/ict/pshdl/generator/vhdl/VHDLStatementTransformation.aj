@@ -306,7 +306,7 @@ public aspect VHDLStatementTransformation {
 		BigInteger width = null;
 		HDLType type = TypeExtension.typeOf(hCaseExp);
 		if (type instanceof HDLPrimitive) {
-			width = ((HDLPrimitive) type).getWidth().constantEvaluate(null);
+			width = ConstantEvaluate.valueOf(((HDLPrimitive) type).getWidth(),null);
 			if (width == null)
 				throw new IllegalArgumentException("HDLPrimitive switch case needs to have constant width");
 		}
@@ -348,7 +348,7 @@ public aspect VHDLStatementTransformation {
 		Alternative alt;
 		HDLExpression label = e.getKey().getLabel();
 		if (label != null) {
-			BigInteger eval = label.constantEvaluate(null);
+			BigInteger eval = ConstantEvaluate.valueOf(label,null);
 			if (eval != null)
 				alt = cs.createAlternative(VHDLUtils.toBinaryLiteral(bits.intValue(), eval));
 			else

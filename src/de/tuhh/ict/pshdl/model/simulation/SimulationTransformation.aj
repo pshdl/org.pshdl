@@ -167,7 +167,7 @@ public aspect SimulationTransformation {
 			return "32";
 		case INT:
 		case UINT:
-			return current.getWidth().constantEvaluate(context).toString();
+			return ConstantEvaluate.valueOf(current.getWidth(),context).toString();
 		}
 		return null;
 	}
@@ -190,7 +190,7 @@ public aspect SimulationTransformation {
 			break;
 		case PARAMETER:
 		case CONSTANT:
-			BigInteger val=this.constantEvaluate(context);
+			BigInteger val=ConstantEvaluate.valueOf(this, context);
 			res.constants.put(refName, val);
 			res.instructions.add(new ArgumentedInstruction(Instruction.loadConstant, refName));
 			break;

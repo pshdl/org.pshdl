@@ -276,7 +276,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 		if (width == null)
 			return null;
 		width = width.copyDeepFrozen(container);
-		BigInteger newW = width.constantEvaluate(null);
+		BigInteger newW = ConstantEvaluate.valueOf(width, null);
 		if (newW != null)
 			width = new HDLLiteral().setVal(newW.toString());
 		return width;
@@ -548,12 +548,12 @@ public class HDLPrimitives implements IHDLPrimitive {
 
 			return null;
 		case INT:
-			BigInteger bitWidth = pt.getWidth().constantEvaluate(context);
+			BigInteger bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			return intRange(bitWidth);
 		case INTEGER:
 			return intRange(BigInteger.valueOf(32));
 		case UINT:
-			return uintRange(pt.getWidth().constantEvaluate(context));
+			return uintRange(ConstantEvaluate.valueOf(pt.getWidth(), context));
 		case NATURAL:
 			return uintRange(BigInteger.valueOf(32));
 		}
@@ -587,7 +587,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 			case UINT:
 			case INT:
 			case BITVECTOR:
-				width = determineType.getWidth().constantEvaluate(context);
+				width = ConstantEvaluate.valueOf(determineType.getWidth(), context);
 				break;
 			default:
 				throw new IllegalArgumentException("Can not concatenate " + determineType);

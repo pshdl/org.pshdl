@@ -8,6 +8,7 @@ import com.google.common.collect.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLManip.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
@@ -89,7 +90,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
 			HDLEnumRef ref = (HDLEnumRef) function.getParams().get(1);
-			BigInteger hdlExpression = function.getParams().get(0).constantEvaluate(null);
+			BigInteger hdlExpression = ConstantEvaluate.valueOf(function.getParams().get(0));
 			WaitStatement ws = new WaitStatement(new PhysicalLiteral(hdlExpression.toString(), ref.getVarRefName().getLastSegment()));
 			res.addUnclockedStatement(pid, ws, function);
 			return res;

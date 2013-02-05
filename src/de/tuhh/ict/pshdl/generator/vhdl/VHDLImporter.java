@@ -2,14 +2,13 @@ package de.tuhh.ict.pshdl.generator.vhdl;
 
 import java.io.*;
 import java.math.*;
-import java.net.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
@@ -180,7 +179,7 @@ public class VHDLImporter {
 	private static HDLExpression subThenPlus1(HDLExpression from, HDLExpression to) {
 		HDLArithOp left = new HDLArithOp().setLeft(from).setType(HDLArithOpType.MINUS).setRight(to);
 		HDLArithOp op = new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1)).copyDeepFrozen(null);
-		BigInteger constant = op.constantEvaluate(null);
+		BigInteger constant = ConstantEvaluate.valueOf(op);
 		if (constant != null)
 			return HDLLiteral.get(constant);
 		return op;

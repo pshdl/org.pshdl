@@ -11,6 +11,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.simulation.RangeTool.RangeVal;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -44,7 +45,7 @@ public class HDLSimulator {
 				HDLQualifiedName newName = variableRef.getVarRefName();
 				String lastSegment = newName.getLastSegment();
 				for (HDLExpression arr : variableRef.getArray()) {
-					lastSegment += "[" + arr.constantEvaluate(context) + "]";
+					lastSegment += "[" + ConstantEvaluate.valueOf(arr, context) + "]";
 				}
 				newName = newName.skipLast(1).append(lastSegment);
 				ms.replace(variableRef, variableRef.setVar(newName).setArray(null));
@@ -68,7 +69,7 @@ public class HDLSimulator {
 		if (idx >= dim.size()) {
 			return Collections.singletonList(new HDLVariable().setName(name));
 		}
-		BigInteger size = dim.get(idx).constantEvaluate(context);
+		BigInteger size = ConstantEvaluate.valueOf(dim.get(idx), context);
 		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		for (int i = 0; i < size.intValue(); i++) {
 			res.addAll(createArrayVar(dim, i + 1, name + "[" + i + "]", context));
@@ -80,11 +81,11 @@ public class HDLSimulator {
 		ModificationSet ms = new ModificationSet();
 		HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange hdlRange : ranges) {
-			BigInteger toBig = hdlRange.getTo().constantEvaluate(context);
+			BigInteger toBig = ConstantEvaluate.valueOf(hdlRange.getTo(), context);
 			BigInteger fromBig = null;
 			HDLExpression from = hdlRange.getFrom();
 			if (from != null) {
-				fromBig = from.constantEvaluate(context);
+				fromBig = ConstantEvaluate.valueOf(from, context);
 				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig)).setTo(HDLLiteral.get(toBig)));
 			} else {
 				ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig)));
@@ -215,7 +216,7 @@ public class HDLSimulator {
 					do {
 						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
 						ifExp = ifExp.copyDeepFrozen(ass);
-						BigInteger evaluate = ifExp.constantEvaluate(context);
+						BigInteger evaluate = ConstantEvaluate.valueOf(ifExp, context);
 						if (evaluate == null) {
 							HDLVariableRef writeRef = ref.setArray(HDLObject.asList((HDLExpression) HDLLiteral.get(counter)));
 							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp).addThenDo(ass.setLeft(writeRef));

@@ -5,6 +5,7 @@ import java.math.*;
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -83,7 +84,7 @@ public class HDLRange extends AbstractHDLRange {
 			return new HDLLiteral().setVal("1");
 		}
 		if (getTo() != null) {
-			if (BigInteger.ZERO.equals(getTo().constantEvaluate(null))) {
+			if (BigInteger.ZERO.equals(ConstantEvaluate.valueOf(getTo()))) {
 				HDLArithOp simpleWith = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 				return HDLPrimitives.simplifyWidth(this, simpleWith);
 			}
