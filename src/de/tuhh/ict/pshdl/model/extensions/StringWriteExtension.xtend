@@ -2,7 +2,6 @@ package de.tuhh.ict.pshdl.model.extensions
 
 import de.tuhh.ict.pshdl.model.HDLAnnotation
 import de.tuhh.ict.pshdl.model.HDLArgument
-import de.tuhh.ict.pshdl.model.HDLArithOp
 import de.tuhh.ict.pshdl.model.HDLAssignment
 import de.tuhh.ict.pshdl.model.HDLBitOp
 import de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType
@@ -27,11 +26,11 @@ import de.tuhh.ict.pshdl.model.HDLLiteral
 import de.tuhh.ict.pshdl.model.HDLManip
 import de.tuhh.ict.pshdl.model.HDLManip$HDLManipType
 import de.tuhh.ict.pshdl.model.HDLNativeFunction
+import de.tuhh.ict.pshdl.model.HDLOpExpression
 import de.tuhh.ict.pshdl.model.HDLPackage
 import de.tuhh.ict.pshdl.model.HDLPrimitive
 import de.tuhh.ict.pshdl.model.HDLRange
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig
-import de.tuhh.ict.pshdl.model.HDLShiftOp
 import de.tuhh.ict.pshdl.model.HDLStatement
 import de.tuhh.ict.pshdl.model.HDLSubstituteFunction
 import de.tuhh.ict.pshdl.model.HDLSwitchCaseStatement
@@ -42,11 +41,12 @@ import de.tuhh.ict.pshdl.model.HDLUnit
 import de.tuhh.ict.pshdl.model.HDLVariable
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration
 import de.tuhh.ict.pshdl.model.HDLVariableRef
+import de.tuhh.ict.pshdl.model.IHDLObject
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter$Context
 import java.util.Iterator
-import de.tuhh.ict.pshdl.model.IHDLObject
-import de.tuhh.ict.pshdl.model.HDLOpExpression
+
+import static de.tuhh.ict.pshdl.model.extensions.StringWriteExtension.*
 
 class StringWriteExtension {
 	

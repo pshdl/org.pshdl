@@ -1,13 +1,37 @@
 package de.tuhh.ict.pshdl.model.extensions
 
-import java.math.BigInteger
-import de.tuhh.ict.pshdl.model.*
-import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext
+import de.tuhh.ict.pshdl.model.HDLArithOp
+import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*
+import de.tuhh.ict.pshdl.model.HDLBitOp
+import static de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType.*
+import de.tuhh.ict.pshdl.model.HDLConcat
+import de.tuhh.ict.pshdl.model.HDLEnumRef
+import de.tuhh.ict.pshdl.model.HDLEqualityOp
+import static de.tuhh.ict.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
+import de.tuhh.ict.pshdl.model.HDLExpression
+import de.tuhh.ict.pshdl.model.HDLFunctionCall
+import de.tuhh.ict.pshdl.model.HDLLiteral
+import static de.tuhh.ict.pshdl.model.HDLLiteral$HDLLiteralPresentation.*
+import de.tuhh.ict.pshdl.model.HDLManip
+import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
 import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
-import java.util.List
-import java.util.LinkedList
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
+import de.tuhh.ict.pshdl.model.HDLPrimitive
+import de.tuhh.ict.pshdl.model.HDLShiftOp
+import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
+import de.tuhh.ict.pshdl.model.HDLTernary
+import de.tuhh.ict.pshdl.model.HDLType
+import de.tuhh.ict.pshdl.model.HDLVariable
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection
+import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
+import de.tuhh.ict.pshdl.model.HDLVariableRef
+import de.tuhh.ict.pshdl.model.IHDLObject
+import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
+import java.math.BigInteger
+import java.util.LinkedList
+import java.util.List
+
+import static de.tuhh.ict.pshdl.model.extensions.ConstantEvaluate.*
 
 class ConstantEvaluate {
 	public static ConstantEvaluate INST=new ConstantEvaluate
@@ -50,13 +74,13 @@ class ConstantEvaluate {
 			return null
 		}
 		switch (obj.type) {
-		case HDLManip$HDLManipType::ARITH_NEG:
+		case ARITH_NEG:
 			return eval.negate()
-		case HDLManip$HDLManipType::BIT_NEG:
+		case BIT_NEG:
 			return eval.not()
-		case HDLManip$HDLManipType::LOGIC_NEG:
+		case LOGIC_NEG:
 			return boolInt(obj.target.constantEvaluate(context).equals(BigInteger::ZERO))
-		case HDLManip$HDLManipType::CAST:{
+		case CAST:{
 			val HDLType type = obj.castTo
 			if (type instanceof HDLPrimitive) {
 				val HDLPrimitive prim = type  as HDLPrimitive
@@ -114,17 +138,17 @@ class ConstantEvaluate {
 		if (rightVal == null)
 			return null
 		switch (obj.type) {
-		case HDLArithOp$HDLArithOpType::DIV:
+		case DIV:
 			return leftVal.divide(rightVal)
-		case HDLArithOp$HDLArithOpType::MUL:
+		case MUL:
 			return leftVal.multiply(rightVal)
-		case HDLArithOp$HDLArithOpType::MINUS:
+		case MINUS:
 			return leftVal.subtract(rightVal)
-		case HDLArithOp$HDLArithOpType::PLUS:
+		case PLUS:
 			return leftVal.add(rightVal)
-		case HDLArithOp$HDLArithOpType::MOD:
+		case MOD:
 			return leftVal.remainder(rightVal)
-		case HDLArithOp$HDLArithOpType::POW:
+		case POW:
 			return leftVal.pow(rightVal.intValue())
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
@@ -138,18 +162,18 @@ class ConstantEvaluate {
 		if (rightVal == null)
 			return null
 		switch (obj.type) {
-		case HDLBitOp$HDLBitOpType::AND:
+		case AND:
 			return leftVal.and(rightVal)
-		case HDLBitOp$HDLBitOpType::OR:
+		case OR:
 			return leftVal.or(rightVal)
-		case HDLBitOp$HDLBitOpType::XOR:
+		case XOR:
 			return leftVal.xor(rightVal)
-		case HDLBitOp$HDLBitOpType::LOGI_AND: {
+		case LOGI_AND: {
 			val boolean l = !BigInteger::ZERO.equals(leftVal)
 			val boolean r = !BigInteger::ZERO.equals(rightVal)
 			return boolInt(l && r)
 		}
-		case HDLBitOp$HDLBitOpType::LOGI_OR: {
+		case LOGI_OR: {
 			val boolean l = !BigInteger::ZERO.equals(leftVal)
 			val boolean r = !BigInteger::ZERO.equals(rightVal)
 			return boolInt(l || r)
@@ -166,17 +190,17 @@ class ConstantEvaluate {
 		if (rightVal == null)
 			return null
 		switch (obj.type) {
-		case HDLEqualityOp$HDLEqualityOpType::EQ:
+		case EQ:
 			return boolInt(leftVal.equals(rightVal))
-		case HDLEqualityOp$HDLEqualityOpType::NOT_EQ:
+		case NOT_EQ:
 			return boolInt(!leftVal.equals(rightVal))
-		case HDLEqualityOp$HDLEqualityOpType::GREATER:
+		case GREATER:
 			return boolInt(leftVal.compareTo(rightVal) > 0)
-		case HDLEqualityOp$HDLEqualityOpType::GREATER_EQ:
+		case GREATER_EQ:
 			return boolInt(leftVal.compareTo(rightVal) >= 0)
-		case HDLEqualityOp$HDLEqualityOpType::LESS:
+		case LESS:
 			return boolInt(leftVal.compareTo(rightVal) < 0)
-		case HDLEqualityOp$HDLEqualityOpType::LESS_EQ:
+		case LESS_EQ:
 			return boolInt(leftVal.compareTo(rightVal) <= 0)
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
@@ -190,11 +214,11 @@ class ConstantEvaluate {
 		if (rightVal == null)
 			return null
 		switch (obj.type) {
-		case HDLShiftOp$HDLShiftOpType::SLL:
+		case SLL:
 			return leftVal.shiftLeft(rightVal.intValue())
-		case HDLShiftOp$HDLShiftOpType::SRA:
+		case SRA:
 			return leftVal.shiftRight(rightVal.intValue())
-		case HDLShiftOp$HDLShiftOpType::SRL:{
+		case SRL:{
 			val BigInteger shiftRight = leftVal.shiftRight(rightVal.intValue())
 			if (shiftRight.signum() < 0)
 				//XXX This is incorrect. We have to know the width of the
@@ -235,10 +259,10 @@ class ConstantEvaluate {
 		}
 		val HDLVariable hVar = obj.resolveVar()
 		val HDLDirection dir = hVar.direction
-		if (dir == HDLDirection::CONSTANT)
+		if (dir == CONSTANT)
 			return subEvaluate(obj, hVar.defaultValue, context)
 
-		if (dir == HDLDirection::PARAMETER) {
+		if (dir == PARAMETER) {
 			if (context == null) {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::CAN_NOT_USE_PARAMETER)

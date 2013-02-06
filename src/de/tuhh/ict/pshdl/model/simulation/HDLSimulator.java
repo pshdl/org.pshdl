@@ -1,6 +1,5 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
-import java.io.*;
 import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -13,9 +12,7 @@ import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.simulation.RangeTool.RangeVal;
-import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
@@ -141,7 +138,7 @@ public class HDLSimulator {
 						ranges.put(ref.getVarRefName(), set);
 					}
 					for (HDLRange r : ref.getBits()) {
-						Range<BigInteger> determineRange = r.determineRange(context);
+						Range<BigInteger> determineRange = RangeExtension.rangeOf(r, context);
 						set.add(new RangeVal(determineRange.lowerEndpoint(), 1));
 						set.add(new RangeVal(determineRange.upperEndpoint(), -1));
 					}
@@ -163,7 +160,7 @@ public class HDLSimulator {
 					for (HDLRange bit : ref.getBits()) {
 						if (bit.getFrom() != null) { // Singular ranges don't do
 														// anything
-							Range<BigInteger> range = bit.determineRange(context);
+							Range<BigInteger> range = RangeExtension.rangeOf(bit, context);
 							for (Range<BigInteger> newRange : list) {
 								if (range.isConnected(newRange)) {
 									newRanges.add(createRange(newRange));
@@ -203,9 +200,9 @@ public class HDLSimulator {
 				// code
 				for (HDLExpression arr : ref.getArray()) {
 					// The range that potentially could be accessed
-					Range<BigInteger> accessRange = arr.determineRange(context);
+					Range<BigInteger> accessRange = RangeExtension.rangeOf(arr, context);
 					// The range that the array could be sized
-					Range<BigInteger> dimensionRange = ref.resolveVar().getDimensions().get(0).determineRange(context);
+					Range<BigInteger> dimensionRange = RangeExtension.rangeOf(ref.resolveVar().getDimensions().get(0), context);
 					// Take the maximum range as the upper boundary and 0 as
 					// lower
 					dimensionRange = Ranges.closed(BigInteger.ZERO, dimensionRange.upperEndpoint().subtract(BigInteger.ONE));
@@ -246,7 +243,7 @@ public class HDLSimulator {
 		ModificationSet ms = new ModificationSet();
 		for (HDLForLoop loop : loops) {
 			HDLVariable param = loop.getParam();
-			Range<BigInteger> r = loop.getRange().get(0).determineRange(context);
+			Range<BigInteger> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
 				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();

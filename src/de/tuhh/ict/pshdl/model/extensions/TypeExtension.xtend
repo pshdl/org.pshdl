@@ -1,13 +1,40 @@
 package de.tuhh.ict.pshdl.model.extensions
 
-import de.tuhh.ict.pshdl.model.*
-import de.tuhh.ict.pshdl.model.utils.*
-import de.tuhh.ict.pshdl.model.validation.*
-import de.tuhh.ict.pshdl.model.validation.builtin.*
-import de.tuhh.ict.pshdl.model.types.builtIn.*
-import java.util.Iterator
+import de.tuhh.ict.pshdl.model.HDLArithOp
+import de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType
+import de.tuhh.ict.pshdl.model.HDLBitOp
+import de.tuhh.ict.pshdl.model.HDLClass
+import de.tuhh.ict.pshdl.model.HDLConcat
+import de.tuhh.ict.pshdl.model.HDLDirectGeneration
+import de.tuhh.ict.pshdl.model.HDLEnumRef
+import de.tuhh.ict.pshdl.model.HDLEqualityOp
+import de.tuhh.ict.pshdl.model.HDLExpression
+import de.tuhh.ict.pshdl.model.HDLFunctionCall
+import de.tuhh.ict.pshdl.model.HDLInlineFunction
+import de.tuhh.ict.pshdl.model.HDLInterfaceInstantiation
+import de.tuhh.ict.pshdl.model.HDLLiteral
+import de.tuhh.ict.pshdl.model.HDLLiteral$HDLLiteralPresentation
+import de.tuhh.ict.pshdl.model.HDLManip
+import de.tuhh.ict.pshdl.model.HDLPrimitive
+import de.tuhh.ict.pshdl.model.HDLPrimitive$HDLPrimitiveType
+import de.tuhh.ict.pshdl.model.HDLRange
+import de.tuhh.ict.pshdl.model.HDLShiftOp
+import de.tuhh.ict.pshdl.model.HDLTernary
+import de.tuhh.ict.pshdl.model.HDLType
+import de.tuhh.ict.pshdl.model.HDLVariable
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration
+import de.tuhh.ict.pshdl.model.HDLVariableRef
+import de.tuhh.ict.pshdl.model.IHDLObject
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives
+import de.tuhh.ict.pshdl.model.utils.HDLProblemException
+import de.tuhh.ict.pshdl.model.validation.Problem
+import de.tuhh.ict.pshdl.model.validation.builtin.ErrorCode
 import java.math.BigInteger
+import java.util.Iterator
 import java.util.List
+
+import static de.tuhh.ict.pshdl.model.extensions.TypeExtension.*
 
 class TypeExtension {
 	public static TypeExtension INST=new TypeExtension
@@ -139,4 +166,5 @@ class TypeExtension {
 	def dispatch HDLType determineType(HDLInlineFunction func) {
 		throw new HDLProblemException(new Problem(ErrorCode::INLINE_FUNCTION_NO_TYPE, func))
 	}
+	
 }

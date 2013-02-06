@@ -16,7 +16,6 @@ import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.LevenshteinDistance.Score;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
 import de.tuhh.ict.pshdl.model.validation.*;
@@ -467,12 +466,12 @@ public class BuiltInValidator implements IHDLValidator {
 		int dim = 0;
 		for (HDLExpression arr : array) {
 			HDLEvaluationContext context = getContext(hContext, arr);
-			Range<BigInteger> accessRange = arr.determineRange(context);
+			Range<BigInteger> accessRange = RangeExtension.rangeOf(arr, context);
 			if (accessRange == null) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, arr));
 				break;
 			}
-			Range<BigInteger> arrayRange = dimensions.get(dim).determineRange(context);
+			Range<BigInteger> arrayRange = RangeExtension.rangeOf(dimensions.get(dim), context);
 			if (arrayRange == null) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
 				break;
