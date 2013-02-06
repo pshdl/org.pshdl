@@ -67,9 +67,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>("hIf") {
 		@Override
 		public HDLInterface getValue(HDLDirectGeneration obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getHIf();
 		}
 	};
@@ -79,9 +78,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>("generatorID") {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getGeneratorID();
 		}
 	};
@@ -91,9 +89,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>("generatorContent") {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getGeneratorContent();
 		}
 	};
@@ -103,9 +100,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>("include") {
 		@Override
 		public Boolean getValue(HDLDirectGeneration obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getInclude();
 		}
 	};
@@ -115,9 +111,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 
 	@Override
 	public HDLInterface getHIf() {
-		if (hif != null) {
+		if (hif != null)
 			return hif;
-		}
 		hif = HDLGenerators.getInterface(this);
 		return hif;
 	}
@@ -126,20 +121,6 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 		return super.getHIf().asRef();
 	}
 
-	@Override
-	public List<HDLEnumDeclaration> doGetEnumDeclarations() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public List<HDLInterface> doGetInterfaceDeclarations() {
-		return Collections.singletonList(getHIf());
-	}
-
-	@Override
-	public List<HDLVariable> doGetVariables() {
-		return Collections.singletonList(getVar());
-	}
 	// $CONTENT-END$
 
 }

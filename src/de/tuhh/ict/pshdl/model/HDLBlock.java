@@ -50,9 +50,8 @@ public class HDLBlock extends AbstractHDLBlock {
 	public static HDLFieldAccess<HDLBlock, Boolean> fProcess = new HDLFieldAccess<HDLBlock, Boolean>("process") {
 		@Override
 		public Boolean getValue(HDLBlock obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getProcess();
 		}
 	};
@@ -63,9 +62,8 @@ public class HDLBlock extends AbstractHDLBlock {
 	public static HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>>("statements") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLBlock obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getStatements();
 		}
 	};

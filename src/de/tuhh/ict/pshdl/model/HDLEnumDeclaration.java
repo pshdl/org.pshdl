@@ -50,9 +50,8 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>("hEnum") {
 		@Override
 		public HDLEnum getValue(HDLEnumDeclaration obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getHEnum();
 		}
 	};

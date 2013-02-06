@@ -48,9 +48,8 @@ public class HDLArgument extends AbstractHDLArgument {
 	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>("name") {
 		@Override
 		public String getValue(HDLArgument obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getName();
 		}
 	};
@@ -60,9 +59,8 @@ public class HDLArgument extends AbstractHDLArgument {
 	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>("expression") {
 		@Override
 		public HDLExpression getValue(HDLArgument obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getExpression();
 		}
 	};

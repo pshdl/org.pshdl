@@ -57,9 +57,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>("hIf") {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceInstantiation obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getHIfRefName();
 		}
 	};
@@ -70,9 +69,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	@Override
 	public HDLInterface resolveHIf() {
 		HDLInterface resolveHIf = super.resolveHIf();
-		if (resolveHIf == null) {
+		if (resolveHIf == null)
 			return null;
-		}
 		ModificationSet ms = new ModificationSet();
 		ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
 		String prefix = getVar().getName();

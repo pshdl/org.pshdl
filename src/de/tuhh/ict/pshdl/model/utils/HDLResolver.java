@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
 
 public class HDLResolver {
 
@@ -17,19 +18,19 @@ public class HDLResolver {
 
 	private Map<HDLQualifiedName, HDLFunction> funcCache;
 
-	private final IStatementContainer resolveTo;
+	private final IHDLObject resolveTo;
 
 	private Map<HDLQualifiedName, HDLType> typeCache;
 
 	private Map<HDLQualifiedName, HDLVariable> variableCache;
 
-	public HDLResolver(IStatementContainer resolveTo, boolean descent) {
+	public HDLResolver(IHDLObject resolveTo, boolean descent) {
 		super();
 		this.resolveTo = resolveTo;
 		this.descent = descent;
 	}
 
-	public HDLResolver(IStatementContainer resolveTo, boolean descent, String libURI) {
+	public HDLResolver(IHDLObject resolveTo, boolean descent, String libURI) {
 		super();
 		this.resolveTo = resolveTo;
 		this.descent = descent;
@@ -37,10 +38,10 @@ public class HDLResolver {
 
 	protected List<HDLType> doGetTypeDeclarations() {
 		List<HDLType> types = new LinkedList<HDLType>();
-		for (HDLEnumDeclaration hEnumDecl : resolveTo.doGetEnumDeclarations()) {
+		for (HDLEnumDeclaration hEnumDecl : ScopingExtension.INST.doGetEnumDeclarations(resolveTo)) {
 			types.add(hEnumDecl.getHEnum());
 		}
-		for (HDLVariable varDecl : resolveTo.doGetVariables()) {
+		for (HDLVariable varDecl : ScopingExtension.INST.doGetVariables(resolveTo)) {
 			IHDLObject container = varDecl.getContainer();
 			if (container instanceof HDLVariableDeclaration) {
 				HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
@@ -48,7 +49,7 @@ public class HDLResolver {
 					types.add(hvd.getPrimitive());
 			}
 		}
-		for (HDLInterface ifDecl : resolveTo.doGetInterfaceDeclarations()) {
+		for (HDLInterface ifDecl : ScopingExtension.INST.doGetInterfaceDeclarations(resolveTo)) {
 			types.add(ifDecl);
 		}
 		return types;
@@ -71,7 +72,7 @@ public class HDLResolver {
 			return checkCache;
 		if ((resolveTo.getContainer() == null) || !descent)
 			return null;
-		return resolveTo.getContainer().resolveEnum(hEnum);
+		return ScopingExtension.INST.resolveEnum(resolveTo.getContainer(), hEnum);
 	}
 
 	public HDLFunction resolveFunction(HDLQualifiedName hEnum) {
@@ -91,13 +92,13 @@ public class HDLResolver {
 			return checkCache;
 		if ((resolveTo.getContainer() == null) || !descent)
 			return null;
-		return resolveTo.getContainer().resolveFunction(hEnum);
+		return ScopingExtension.INST.resolveFunction(resolveTo.getContainer(), hEnum);
 	}
 
 	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
 		if (ifCache == null) {
 			synchronized (this) {
-				List<HDLInterface> ifDecl = resolveTo.doGetInterfaceDeclarations();
+				List<HDLInterface> ifDecl = ScopingExtension.INST.doGetInterfaceDeclarations(resolveTo);
 				ifCache = new HashMap<HDLQualifiedName, HDLInterface>();
 				for (HDLInterface hdlIfDeclaration : ifDecl) {
 					ifCache.put(fullNameOf(hdlIfDeclaration), hdlIfDeclaration);
@@ -111,7 +112,7 @@ public class HDLResolver {
 			return checkCache;
 		if ((resolveTo.getContainer() == null) || !descent)
 			return null;
-		return resolveTo.getContainer().resolveInterface(hIf);
+		return ScopingExtension.INST.resolveInterface(resolveTo.getContainer(), hIf);
 	}
 
 	public HDLType resolveType(HDLQualifiedName var) {
@@ -142,13 +143,13 @@ public class HDLResolver {
 			}
 			return null;
 		}
-		return resolveTo.getContainer().resolveType(var);
+		return ScopingExtension.INST.resolveType(resolveTo.getContainer(), var);
 	}
 
 	public HDLVariable resolveVariable(HDLQualifiedName var) {
 		if (variableCache == null) {
 			synchronized (this) {
-				List<HDLVariable> varDecl = resolveTo.doGetVariables();
+				List<HDLVariable> varDecl = ScopingExtension.INST.doGetVariables(resolveTo);
 				variableCache = new HashMap<HDLQualifiedName, HDLVariable>();
 				for (HDLVariable declVars : varDecl) {
 					variableCache.put(fullNameOf(declVars), declVars);
@@ -172,7 +173,7 @@ public class HDLResolver {
 			if (!fullNameOf(resolveTo).equals(skipLast)) {
 				HDLType type = resolveType(skipLast);
 				if ((type != null) && (type.getClassType() != HDLClass.HDLPrimitive)) {
-					HDLVariable variable = type.resolveVariable(var);
+					HDLVariable variable = ScopingExtension.INST.resolveVariable(type, var);
 					if (variable != null)
 						return variable;
 				}
@@ -185,7 +186,7 @@ public class HDLResolver {
 		IHDLObject container = resolveTo.getContainer();
 		if ((container == null) || !descent)
 			return null;
-		return container.resolveVariable(var);
+		return ScopingExtension.INST.resolveVariable(container, var);
 	}
 
 	private <T> T checkCache(HDLQualifiedName var, Map<HDLQualifiedName, T> map) {
@@ -202,7 +203,7 @@ public class HDLResolver {
 	public static List<HDLEnumDeclaration> getallEnumDeclarations(List<HDLStatement> stmnts) {
 		List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
 		for (HDLStatement hdlStatement : stmnts) {
-			res.addAll(hdlStatement.doGetEnumDeclarations());
+			res.addAll(ScopingExtension.INST.doGetEnumDeclarations(hdlStatement));
 		}
 		return res;
 	}
@@ -210,7 +211,7 @@ public class HDLResolver {
 	public static List<HDLInterface> getallInterfaceDeclarations(List<HDLStatement> stmnts) {
 		List<HDLInterface> res = new LinkedList<HDLInterface>();
 		for (HDLStatement hdlStatement : stmnts) {
-			res.addAll(hdlStatement.doGetInterfaceDeclarations());
+			res.addAll(ScopingExtension.INST.doGetInterfaceDeclarations(hdlStatement));
 		}
 		return res;
 	}
@@ -218,7 +219,7 @@ public class HDLResolver {
 	public static List<HDLVariable> getallVariableDeclarations(List<HDLStatement> stmnts) {
 		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		for (HDLStatement hdlStatement : stmnts) {
-			res.addAll(hdlStatement.doGetVariables());
+			res.addAll(ScopingExtension.INST.doGetVariables(hdlStatement));
 		}
 		return res;
 	}

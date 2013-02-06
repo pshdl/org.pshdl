@@ -58,9 +58,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>("libURI") {
 		@Override
 		public String getValue(HDLPackage obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getLibURI();
 		}
 	};
@@ -70,9 +69,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>("pkg") {
 		@Override
 		public String getValue(HDLPackage obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getPkg();
 		}
 	};
@@ -82,9 +80,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>("units") {
 		@Override
 		public ArrayList<HDLUnit> getValue(HDLPackage obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getUnits();
 		}
 	};
@@ -95,9 +92,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>("declarations") {
 		@Override
 		public ArrayList<HDLDeclaration> getValue(HDLPackage obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getDeclarations();
 		}
 	};

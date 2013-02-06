@@ -57,9 +57,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>("range") {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLForLoop obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getRange();
 		}
 	};
@@ -69,9 +68,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>("param") {
 		@Override
 		public HDLVariable getValue(HDLForLoop obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getParam();
 		}
 	};
@@ -81,9 +79,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>("dos") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLForLoop obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getDos();
 		}
 	};

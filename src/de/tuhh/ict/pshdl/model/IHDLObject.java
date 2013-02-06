@@ -48,8 +48,6 @@ public interface IHDLObject {
 
 	public boolean isFrozen();
 
-	public HDLFunction resolveFunction(HDLQualifiedName name);
-
 	public EnumSet<HDLClass> getClassSet();
 
 }

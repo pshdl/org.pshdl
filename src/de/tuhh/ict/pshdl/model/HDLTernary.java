@@ -51,9 +51,8 @@ public class HDLTernary extends AbstractHDLTernary {
 	public static HDLFieldAccess<HDLTernary, HDLExpression> fIfExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("ifExpr") {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getIfExpr();
 		}
 	};
@@ -63,9 +62,8 @@ public class HDLTernary extends AbstractHDLTernary {
 	public static HDLFieldAccess<HDLTernary, HDLExpression> fThenExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("thenExpr") {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getThenExpr();
 		}
 	};
@@ -75,9 +73,8 @@ public class HDLTernary extends AbstractHDLTernary {
 	public static HDLFieldAccess<HDLTernary, HDLExpression> fElseExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("elseExpr") {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getElseExpr();
 		}
 	};

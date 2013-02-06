@@ -55,9 +55,8 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 
 		public static HDLShiftOpType getOp(String op) {
 			for (HDLShiftOpType ass : values()) {
-				if (ass.str.equals(op)) {
+				if (ass.str.equals(op))
 					return ass;
-				}
 			}
 			return null;
 		}
@@ -74,9 +73,8 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>("type") {
 		@Override
 		public HDLShiftOpType getValue(HDLShiftOp obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getType();
 		}
 	};

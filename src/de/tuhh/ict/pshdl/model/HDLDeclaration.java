@@ -48,9 +48,8 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	public static HDLFieldAccess<HDLDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLDeclaration, ArrayList<HDLAnnotation>>("annotations") {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLDeclaration obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getAnnotations();
 		}
 	};
@@ -58,9 +57,8 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	// $CONTENT-BEGIN$
 	public HDLAnnotation getAnnotation(Enum<?> range) {
 		for (HDLAnnotation anno : getAnnotations()) {
-			if (anno.getName().equals(range.toString())) {
+			if (anno.getName().equals(range.toString()))
 				return anno;
-			}
 		}
 		return null;
 	}

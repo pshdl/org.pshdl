@@ -1333,84 +1333,84 @@ public class StringWriteExtension {
     return sb.toString();
   }
   
-  public String toString(final IHDLObject func, final SyntaxHighlighter highlight) {
-    if (func instanceof HDLInlineFunction) {
-      return _toString((HDLInlineFunction)func, highlight);
-    } else if (func instanceof HDLNativeFunction) {
-      return _toString((HDLNativeFunction)func, highlight);
-    } else if (func instanceof HDLSubstituteFunction) {
-      return _toString((HDLSubstituteFunction)func, highlight);
-    } else if (func instanceof HDLEnum) {
-      return _toString((HDLEnum)func, highlight);
-    } else if (func instanceof HDLInterfaceRef) {
-      return _toString((HDLInterfaceRef)func, highlight);
-    } else if (func instanceof HDLPrimitive) {
-      return _toString((HDLPrimitive)func, highlight);
-    } else if (func instanceof HDLDirectGeneration) {
-      return _toString((HDLDirectGeneration)func, highlight);
-    } else if (func instanceof HDLEnumDeclaration) {
-      return _toString((HDLEnumDeclaration)func, highlight);
-    } else if (func instanceof HDLForLoop) {
-      return _toString((HDLForLoop)func, highlight);
-    } else if (func instanceof HDLIfStatement) {
-      return _toString((HDLIfStatement)func, highlight);
-    } else if (func instanceof HDLInterfaceDeclaration) {
-      return _toString((HDLInterfaceDeclaration)func, highlight);
-    } else if (func instanceof HDLInterfaceInstantiation) {
-      return _toString((HDLInterfaceInstantiation)func, highlight);
-    } else if (func instanceof HDLSwitchCaseStatement) {
-      return _toString((HDLSwitchCaseStatement)func, highlight);
-    } else if (func instanceof HDLSwitchStatement) {
-      return _toString((HDLSwitchStatement)func, highlight);
-    } else if (func instanceof HDLVariableDeclaration) {
-      return _toString((HDLVariableDeclaration)func, highlight);
-    } else if (func instanceof HDLBitOp) {
-      return _toString((HDLBitOp)func, highlight);
-    } else if (func instanceof HDLEnumRef) {
-      return _toString((HDLEnumRef)func, highlight);
-    } else if (func instanceof HDLEqualityOp) {
-      return _toString((HDLEqualityOp)func, highlight);
-    } else if (func instanceof HDLInterface) {
-      return _toString((HDLInterface)func, highlight);
-    } else if (func instanceof HDLVariableRef) {
-      return _toString((HDLVariableRef)func, highlight);
-    } else if (func instanceof HDLAssignment) {
-      return _toString((HDLAssignment)func, highlight);
-    } else if (func instanceof HDLBlock) {
-      return _toString((HDLBlock)func, highlight);
-    } else if (func instanceof HDLAnnotation) {
-      return _toString((HDLAnnotation)func, highlight);
-    } else if (func instanceof HDLArgument) {
-      return _toString((HDLArgument)func, highlight);
-    } else if (func instanceof HDLConcat) {
-      return _toString((HDLConcat)func, highlight);
-    } else if (func instanceof HDLFunctionCall) {
-      return _toString((HDLFunctionCall)func, highlight);
-    } else if (func instanceof HDLLiteral) {
-      return _toString((HDLLiteral)func, highlight);
-    } else if (func instanceof HDLManip) {
-      return _toString((HDLManip)func, highlight);
-    } else if (func instanceof HDLOpExpression) {
-      return _toString((HDLOpExpression)func, highlight);
-    } else if (func instanceof HDLPackage) {
-      return _toString((HDLPackage)func, highlight);
-    } else if (func instanceof HDLRange) {
-      return _toString((HDLRange)func, highlight);
-    } else if (func instanceof HDLRegisterConfig) {
-      return _toString((HDLRegisterConfig)func, highlight);
-    } else if (func instanceof HDLTernary) {
-      return _toString((HDLTernary)func, highlight);
-    } else if (func instanceof HDLUnit) {
-      return _toString((HDLUnit)func, highlight);
-    } else if (func instanceof HDLVariable) {
-      return _toString((HDLVariable)func, highlight);
-    } else if (func instanceof HDLStatement) {
-      return _toString((HDLStatement)func, highlight);
-    } else if (func instanceof HDLExpression) {
-      return _toString((HDLExpression)func, highlight);
+  public String toString(final IHDLObject e, final SyntaxHighlighter highlight) {
+    if (e instanceof HDLEnum) {
+      return _toString((HDLEnum)e, highlight);
+    } else if (e instanceof HDLInlineFunction) {
+      return _toString((HDLInlineFunction)e, highlight);
+    } else if (e instanceof HDLInterfaceRef) {
+      return _toString((HDLInterfaceRef)e, highlight);
+    } else if (e instanceof HDLNativeFunction) {
+      return _toString((HDLNativeFunction)e, highlight);
+    } else if (e instanceof HDLPrimitive) {
+      return _toString((HDLPrimitive)e, highlight);
+    } else if (e instanceof HDLSubstituteFunction) {
+      return _toString((HDLSubstituteFunction)e, highlight);
+    } else if (e instanceof HDLBitOp) {
+      return _toString((HDLBitOp)e, highlight);
+    } else if (e instanceof HDLDirectGeneration) {
+      return _toString((HDLDirectGeneration)e, highlight);
+    } else if (e instanceof HDLEnumDeclaration) {
+      return _toString((HDLEnumDeclaration)e, highlight);
+    } else if (e instanceof HDLEnumRef) {
+      return _toString((HDLEnumRef)e, highlight);
+    } else if (e instanceof HDLEqualityOp) {
+      return _toString((HDLEqualityOp)e, highlight);
+    } else if (e instanceof HDLForLoop) {
+      return _toString((HDLForLoop)e, highlight);
+    } else if (e instanceof HDLIfStatement) {
+      return _toString((HDLIfStatement)e, highlight);
+    } else if (e instanceof HDLInterface) {
+      return _toString((HDLInterface)e, highlight);
+    } else if (e instanceof HDLInterfaceDeclaration) {
+      return _toString((HDLInterfaceDeclaration)e, highlight);
+    } else if (e instanceof HDLInterfaceInstantiation) {
+      return _toString((HDLInterfaceInstantiation)e, highlight);
+    } else if (e instanceof HDLSwitchCaseStatement) {
+      return _toString((HDLSwitchCaseStatement)e, highlight);
+    } else if (e instanceof HDLSwitchStatement) {
+      return _toString((HDLSwitchStatement)e, highlight);
+    } else if (e instanceof HDLVariableDeclaration) {
+      return _toString((HDLVariableDeclaration)e, highlight);
+    } else if (e instanceof HDLVariableRef) {
+      return _toString((HDLVariableRef)e, highlight);
+    } else if (e instanceof HDLAnnotation) {
+      return _toString((HDLAnnotation)e, highlight);
+    } else if (e instanceof HDLArgument) {
+      return _toString((HDLArgument)e, highlight);
+    } else if (e instanceof HDLAssignment) {
+      return _toString((HDLAssignment)e, highlight);
+    } else if (e instanceof HDLBlock) {
+      return _toString((HDLBlock)e, highlight);
+    } else if (e instanceof HDLConcat) {
+      return _toString((HDLConcat)e, highlight);
+    } else if (e instanceof HDLFunctionCall) {
+      return _toString((HDLFunctionCall)e, highlight);
+    } else if (e instanceof HDLLiteral) {
+      return _toString((HDLLiteral)e, highlight);
+    } else if (e instanceof HDLManip) {
+      return _toString((HDLManip)e, highlight);
+    } else if (e instanceof HDLOpExpression) {
+      return _toString((HDLOpExpression)e, highlight);
+    } else if (e instanceof HDLPackage) {
+      return _toString((HDLPackage)e, highlight);
+    } else if (e instanceof HDLRange) {
+      return _toString((HDLRange)e, highlight);
+    } else if (e instanceof HDLRegisterConfig) {
+      return _toString((HDLRegisterConfig)e, highlight);
+    } else if (e instanceof HDLTernary) {
+      return _toString((HDLTernary)e, highlight);
+    } else if (e instanceof HDLUnit) {
+      return _toString((HDLUnit)e, highlight);
+    } else if (e instanceof HDLVariable) {
+      return _toString((HDLVariable)e, highlight);
+    } else if (e instanceof HDLExpression) {
+      return _toString((HDLExpression)e, highlight);
+    } else if (e instanceof HDLStatement) {
+      return _toString((HDLStatement)e, highlight);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
-        Arrays.<Object>asList(func, highlight).toString());
+        Arrays.<Object>asList(e, highlight).toString());
     }
   }
 }

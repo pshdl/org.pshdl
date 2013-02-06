@@ -55,9 +55,8 @@ public class HDLBitOp extends AbstractHDLBitOp {
 
 		public static HDLBitOpType getOp(String op) {
 			for (HDLBitOpType ass : values()) {
-				if (ass.str.equals(op)) {
+				if (ass.str.equals(op))
 					return ass;
-				}
 			}
 			return null;
 		}
@@ -74,9 +73,8 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	public static HDLFieldAccess<HDLBitOp, HDLBitOpType> fType = new HDLFieldAccess<HDLBitOp, HDLBitOpType>("type") {
 		@Override
 		public HDLBitOpType getValue(HDLBitOp obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getType();
 		}
 	};

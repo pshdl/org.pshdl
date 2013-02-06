@@ -55,9 +55,8 @@ public class HDLArithOp extends AbstractHDLArithOp {
 
 		public static HDLArithOpType getOp(String op) {
 			for (HDLArithOpType ass : values()) {
-				if (ass.str.equals(op)) {
+				if (ass.str.equals(op))
 					return ass;
-				}
 			}
 			return null;
 		}
@@ -74,9 +73,8 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	public static HDLFieldAccess<HDLArithOp, HDLArithOpType> fType = new HDLFieldAccess<HDLArithOp, HDLArithOpType>("type") {
 		@Override
 		public HDLArithOpType getValue(HDLArithOp obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getType();
 		}
 	};

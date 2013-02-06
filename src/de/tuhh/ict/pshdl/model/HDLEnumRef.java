@@ -2,6 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import org.eclipse.jdt.annotation.*;
 
+import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -51,9 +52,8 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>("hEnum") {
 		@Override
 		public HDLQualifiedName getValue(HDLEnumRef obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getHEnumRefName();
 		}
 	};
@@ -62,10 +62,9 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	@Override
 	public HDLVariable resolveVar() {
 		HDLEnum resolveHEnum = resolveHEnum();
-		HDLVariable var = resolveHEnum.getVariable(getVarRefName().getLastSegment());
-		if (var == null) {
+		HDLVariable var = ScopingExtension.getVariable(resolveHEnum, getVarRefName().getLastSegment());
+		if (var == null)
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
-		}
 		return var;
 	}
 

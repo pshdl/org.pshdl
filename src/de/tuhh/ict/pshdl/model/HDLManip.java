@@ -55,9 +55,8 @@ public class HDLManip extends AbstractHDLManip {
 	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>("type") {
 		@Override
 		public HDLManipType getValue(HDLManip obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getType();
 		}
 	};
@@ -67,9 +66,8 @@ public class HDLManip extends AbstractHDLManip {
 	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>("target") {
 		@Override
 		public HDLExpression getValue(HDLManip obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getTarget();
 		}
 	};
@@ -79,9 +77,8 @@ public class HDLManip extends AbstractHDLManip {
 	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>("castTo") {
 		@Override
 		public HDLType getValue(HDLManip obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getCastTo();
 		}
 	};

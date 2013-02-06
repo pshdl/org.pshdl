@@ -50,9 +50,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	public static HDLFieldAccess<HDLSwitchStatement, HDLExpression> fCaseExp = new HDLFieldAccess<HDLSwitchStatement, HDLExpression>("caseExp") {
 		@Override
 		public HDLExpression getValue(HDLSwitchStatement obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getCaseExp();
 		}
 	};
@@ -63,9 +62,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	public static HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>> fCases = new HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>>("cases") {
 		@Override
 		public ArrayList<HDLSwitchCaseStatement> getValue(HDLSwitchStatement obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getCases();
 		}
 	};

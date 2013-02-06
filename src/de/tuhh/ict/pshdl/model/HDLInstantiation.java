@@ -50,9 +50,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>("var") {
 		@Override
 		public HDLVariable getValue(HDLInstantiation obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getVar();
 		}
 	};
@@ -63,9 +62,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>("arguments") {
 		@Override
 		public ArrayList<HDLArgument> getValue(HDLInstantiation obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getArguments();
 		}
 	};

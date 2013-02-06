@@ -1,13 +1,10 @@
 package de.tuhh.ict.pshdl.model;
 
-import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
-
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -55,34 +52,12 @@ public class HDLEnum extends AbstractHDLEnum {
 	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>("enums") {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLEnum obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getEnums();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-
-	@Override
-	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		if (var.length == 1) {
-			return getVariable(var.getLastSegment());
-		}
-		if (fullNameOf(this).equals(var.skipLast(1))) {
-			return getVariable(var.getLastSegment());
-		}
-		return super.resolveVariable(var);
-	}
-
-	public HDLVariable getVariable(String lastSegment) {
-		for (HDLVariable var : getEnums()) {
-			if (var.getName().equals(lastSegment)) {
-				return var;
-			}
-		}
-		return null;
-	}
 
 	// $CONTENT-END$
 

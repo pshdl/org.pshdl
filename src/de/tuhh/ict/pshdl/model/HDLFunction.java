@@ -53,9 +53,8 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>("name") {
 		@Override
 		public String getValue(HDLFunction obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getName();
 		}
 	};

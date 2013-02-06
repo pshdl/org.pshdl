@@ -54,9 +54,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>("ifExp") {
 		@Override
 		public HDLExpression getValue(HDLIfStatement obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getIfExp();
 		}
 	};
@@ -67,9 +66,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("thenDo") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getThenDo();
 		}
 	};
@@ -80,9 +78,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("elseDo") {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getElseDo();
 		}
 	};

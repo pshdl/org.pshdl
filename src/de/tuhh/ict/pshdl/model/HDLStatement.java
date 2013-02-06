@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import de.tuhh.ict.pshdl.model.utils.*;
 
-public interface HDLStatement extends de.tuhh.ict.pshdl.model.utils.IStatementContainer, de.tuhh.ict.pshdl.model.IHDLObject {
+public interface HDLStatement extends de.tuhh.ict.pshdl.model.IHDLObject {
 
 	/**
 	 * Creates a copy of this class with the same fields.

@@ -46,9 +46,8 @@ public abstract class HDLType extends AbstractHDLType {
 	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>("name") {
 		@Override
 		public String getValue(HDLType obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getName();
 		}
 	};

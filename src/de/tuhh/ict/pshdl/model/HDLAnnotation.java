@@ -48,9 +48,8 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>("name") {
 		@Override
 		public String getValue(HDLAnnotation obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getName();
 		}
 	};
@@ -60,9 +59,8 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>("value") {
 		@Override
 		public String getValue(HDLAnnotation obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getValue();
 		}
 	};

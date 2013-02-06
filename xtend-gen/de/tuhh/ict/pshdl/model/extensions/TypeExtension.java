@@ -305,8 +305,6 @@ public class TypeExtension {
   public HDLType determineType(final IHDLObject func) {
     if (func instanceof HDLInlineFunction) {
       return _determineType((HDLInlineFunction)func);
-    } else if (func instanceof HDLVariableDeclaration) {
-      return _determineType((HDLVariableDeclaration)func);
     } else if (func instanceof HDLArithOp) {
       return _determineType((HDLArithOp)func);
     } else if (func instanceof HDLBitOp) {
@@ -317,6 +315,8 @@ public class TypeExtension {
       return _determineType((HDLEqualityOp)func);
     } else if (func instanceof HDLShiftOp) {
       return _determineType((HDLShiftOp)func);
+    } else if (func instanceof HDLVariableDeclaration) {
+      return _determineType((HDLVariableDeclaration)func);
     } else if (func instanceof HDLVariableRef) {
       return _determineType((HDLVariableRef)func);
     } else if (func instanceof HDLConcat) {

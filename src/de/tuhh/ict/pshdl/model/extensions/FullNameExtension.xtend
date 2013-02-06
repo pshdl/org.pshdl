@@ -18,7 +18,6 @@ import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName
 import java.util.Iterator
 
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*
-import de.tuhh.ict.pshdl.model.utils.IStatementContainer
 
 class FullNameExtension {
 	public static GenericMeta<HDLQualifiedName> FULLNAME=new GenericMeta<HDLQualifiedName>("FULLNAME", true)
@@ -130,9 +129,6 @@ class FullNameExtension {
 		return HDLQualifiedName::EMPTY
 	}
 
-	def static HDLQualifiedName fullNameOf(IStatementContainer obj){
-		INST.getFullName(obj)
-	}
 	def static HDLQualifiedName fullNameOf(IHDLObject obj){
 		INST.getFullName(obj)
 	}

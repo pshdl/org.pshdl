@@ -133,7 +133,7 @@ public class Insulin {
 				if (hvd.getDirection() == HDLDirection.PARAMETER) {
 					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType()).setDirection(HDLDirection.CONSTANT);
 					for (HDLVariable var : hvd.getVariables()) {
-						if (hdi.resolveVariable(HDLQualifiedName.create(var.getName())) == null) {
+						if (ScopingExtension.INST.resolveVariable(hdi, HDLQualifiedName.create(var.getName())) == null) {
 							String argName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
 							if (argName == null)
 								argName = var.getName();

@@ -58,9 +58,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 
 		public static HDLAssignmentType getOp(String op) {
 			for (HDLAssignmentType ass : values()) {
-				if (ass.str.equals(op)) {
+				if (ass.str.equals(op))
 					return ass;
-				}
 			}
 			return null;
 		}
@@ -77,9 +76,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>("left") {
 		@Override
 		public HDLReference getValue(HDLAssignment obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getLeft();
 		}
 	};
@@ -89,9 +87,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>("type") {
 		@Override
 		public HDLAssignmentType getValue(HDLAssignment obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getType();
 		}
 	};
@@ -101,9 +98,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>("right") {
 		@Override
 		public HDLExpression getValue(HDLAssignment obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getRight();
 		}
 	};

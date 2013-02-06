@@ -58,9 +58,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>("array") {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariableRef obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getArray();
 		}
 	};
@@ -70,9 +69,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>("bits") {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLVariableRef obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getBits();
 		}
 	};

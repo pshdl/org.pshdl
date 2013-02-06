@@ -60,9 +60,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	public static HDLFieldAccess<HDLVariable, String> fName = new HDLFieldAccess<HDLVariable, String>("name") {
 		@Override
 		public String getValue(HDLVariable obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getName();
 		}
 	};
@@ -73,9 +72,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>("dimensions") {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariable obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getDimensions();
 		}
 	};
@@ -85,9 +83,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	public static HDLFieldAccess<HDLVariable, HDLExpression> fDefaultValue = new HDLFieldAccess<HDLVariable, HDLExpression>("defaultValue") {
 		@Override
 		public HDLExpression getValue(HDLVariable obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getDefaultValue();
 		}
 	};
@@ -98,9 +95,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>("annotations") {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLVariable obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getAnnotations();
 		}
 	};
@@ -133,17 +129,15 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	@Override
 	protected String validateName(String name) {
-		if ((name != null) && name.contains(".")) {
+		if ((name != null) && name.contains("."))
 			throw new IllegalArgumentException("Variable names may not contain a dot");
-		}
 		return super.validateName(name);
 	}
 
 	public HDLAnnotation getAnnotation(Enum<?> range) {
 		for (HDLAnnotation anno : getAnnotations()) {
-			if (anno.getName().equals(range.toString())) {
+			if (anno.getName().equals(range.toString()))
 				return anno;
-			}
 		}
 		if (container instanceof HDLVariableDeclaration) {
 			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;

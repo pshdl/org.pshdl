@@ -1,13 +1,10 @@
 package de.tuhh.ict.pshdl.model;
 
-import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
-
 import java.util.*;
 
 import org.eclipse.jdt.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -54,32 +51,12 @@ public class HDLInterface extends AbstractHDLInterface {
 	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>("ports") {
 		@Override
 		public ArrayList<HDLVariableDeclaration> getValue(HDLInterface obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getPorts();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-
-	@Override
-	public HDLVariable resolveVariable(HDLQualifiedName var) {
-		HDLVariable resolved = getVariable(var.getLastSegment());
-		if (resolved != null) {
-			if (var.length == 1) {
-				return resolved;
-			}
-			if (fullNameOf(this).equals(var.skipLast(1))) {
-				return resolved;
-			}
-		}
-		return super.resolveVariable(var);
-	}
-
-	private HDLVariable getVariable(String lastSegment) {
-		return HDLQuery.select(HDLVariable.class).from(this).where(HDLVariable.fName).lastSegmentIs(lastSegment).getFirst();
-	}
 
 	// $CONTENT-END$
 

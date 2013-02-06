@@ -17,7 +17,6 @@ import de.tuhh.ict.pshdl.model.HDLUnit;
 import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.IHDLObject;
 import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
-import de.tuhh.ict.pshdl.model.utils.IStatementContainer;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
@@ -220,11 +219,6 @@ public class FullNameExtension {
     return HDLQualifiedName.EMPTY;
   }
   
-  public static HDLQualifiedName fullNameOf(final IStatementContainer obj) {
-    HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
-    return _fullName;
-  }
-  
   public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
     HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
     return _fullName;
@@ -270,12 +264,12 @@ public class FullNameExtension {
       return _getFullName((HDLFunction)unit);
     } else if (unit instanceof HDLIfStatement) {
       return _getFullName((HDLIfStatement)unit);
+    } else if (unit instanceof HDLInterface) {
+      return _getFullName((HDLInterface)unit);
     } else if (unit instanceof HDLSwitchCaseStatement) {
       return _getFullName((HDLSwitchCaseStatement)unit);
     } else if (unit instanceof HDLSwitchStatement) {
       return _getFullName((HDLSwitchStatement)unit);
-    } else if (unit instanceof HDLInterface) {
-      return _getFullName((HDLInterface)unit);
     } else if (unit instanceof HDLBlock) {
       return _getFullName((HDLBlock)unit);
     } else if (unit instanceof HDLPackage) {

@@ -55,9 +55,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 
 		public static HDLEqualityOpType getOp(String op) {
 			for (HDLEqualityOpType ass : values()) {
-				if (ass.str.equals(op)) {
+				if (ass.str.equals(op))
 					return ass;
-				}
 			}
 			return null;
 		}
@@ -74,9 +73,8 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	public static HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType> fType = new HDLFieldAccess<HDLEqualityOp, HDLEqualityOpType>("type") {
 		@Override
 		public HDLEqualityOpType getValue(HDLEqualityOp obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getType();
 		}
 	};

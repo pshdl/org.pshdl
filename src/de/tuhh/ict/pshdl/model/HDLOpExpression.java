@@ -48,9 +48,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>("left") {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getLeft();
 		}
 	};
@@ -60,9 +59,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>("right") {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
-			if (obj == null) {
+			if (obj == null)
 				return null;
-			}
 			return obj.getRight();
 		}
 	};
