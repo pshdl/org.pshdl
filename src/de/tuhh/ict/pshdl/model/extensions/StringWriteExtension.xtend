@@ -44,7 +44,6 @@ import de.tuhh.ict.pshdl.model.HDLVariableRef
 import de.tuhh.ict.pshdl.model.IHDLObject
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter$Context
-import java.util.Iterator
 
 import static de.tuhh.ict.pshdl.model.extensions.StringWriteExtension.*
 
@@ -107,13 +106,7 @@ class StringWriteExtension {
 			isStatement=true
 		val StringBuilder sb=if (isStatement) highlight.spacing else new StringBuilder
 		sb.append(highlight.functionCall(func.nameRefName.toString)).append('(')
-		var boolean first = true
-		for (HDLExpression p : func.params) {
-			if (!first)
-				sb.append(',')
-			sb.append(p.toString(highlight))
-			first=false
-		}
+		sb.append('''«FOR HDLExpression p : func.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
 		sb.append(')')
 		if (isStatement)
 			sb.append(';')
@@ -141,15 +134,8 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("inline")).append(highlight.simpleSpace).append(highlight.keyword("function")).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
-		sb.append('(')
-		val Iterator<HDLVariable> iter = func.args.iterator
-		while (iter.hasNext) {
-			var HDLVariable hvar = iter.next as HDLVariable
-			sb.append(highlight.varName(hvar))
-			if (iter.hasNext)
-				sb.append(',')
-		}
-		sb.append(")").append(highlight.simpleSpace).append("->").append(highlight.simpleSpace).append("(").append(func.expr.toString(highlight)).append(")").append(highlight.newLine)
+		sb.append('''(«FOR HDLVariable hVar:func.args SEPARATOR ','»«highlight.varName(hVar)»«ENDFOR»)''')
+		sb.append(highlight.simpleSpace).append("->").append(highlight.simpleSpace).append("(").append(func.expr.toString(highlight)).append(")").append(highlight.newLine)
 		return sb.toString
 	}
 	def dispatch String toString(HDLSubstituteFunction func, SyntaxHighlighter highlight) {
@@ -159,15 +145,8 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("substitute")).append(highlight.simpleSpace).append(highlight.keyword("function")).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
-		sb.append('(')
-		val Iterator<HDLVariable> iter = func.args.iterator
-		while (iter.hasNext) {
-			var HDLVariable hvar = iter.next as HDLVariable
-			sb.append(highlight.varName(hvar))
-			if (iter.hasNext)
-				sb.append(',')
-		}
-		sb.append(")").append(highlight.simpleSpace).append("{").append(highlight.newLine)
+		sb.append('''(«FOR HDLVariable hVar:func.args SEPARATOR ','»«highlight.varName(hVar)»«ENDFOR»)''')
+		sb.append(highlight.simpleSpace).append("{").append(highlight.newLine)
 		highlight.incSpacing
 		for (HDLStatement string : func.stmnts) {
 			sb.append(string.toString(highlight)).append(highlight.newLine)
@@ -199,13 +178,7 @@ class StringWriteExtension {
 			sb.append('[').append(a.toString(highlight)).append(']')
 		}
 		if (ref.bits.size != 0) {
-			sb.append('{')
-			var String spacer = ""
-			for (HDLRange bit : ref.bits) {
-				sb.append(spacer).append(bit.toString(highlight))
-				spacer = ","
-			}
-			sb.append('}')
+			sb.append('''{«FOR HDLRange bit : ref.bits SEPARATOR ','»«bit.toString(highlight)»«ENDFOR»}''')
 		}
 		return sb
 	}
@@ -270,13 +243,9 @@ class StringWriteExtension {
 	def dispatch String toString(HDLForLoop loop, SyntaxHighlighter highlight) {
 		val StringBuilder space = highlight.spacing
 		val StringBuilder sb = new StringBuilder
-		sb.append(space).append(highlight.keyword("for")).append(highlight.simpleSpace).append("(").append(loop.param.name).append(highlight.simpleSpace).append("=").append(highlight.simpleSpace).append("{")
-		var String spacer = ""
-		for (HDLRange range : loop.range) {
-			sb.append(spacer).append(range.toString(highlight))
-			spacer = ","
-		}
-		sb.append("})").append(highlight.simpleSpace).append("{").append(highlight.newLine)
+		sb.append(space).append(highlight.keyword("for")).append(highlight.simpleSpace).append("(").append(loop.param.name).append(highlight.simpleSpace).append("=").append(highlight.simpleSpace)
+		sb.append('''{«FOR HDLRange range : loop.range SEPARATOR ','»«range.toString(highlight)»«ENDFOR»}''')
+		sb.append(")").append(highlight.simpleSpace).append("{").append(highlight.newLine)
 		highlight.incSpacing
 		for (HDLStatement string : loop.dos) {
 			sb.append(string.toString(highlight)).append(highlight.newLine)
@@ -349,16 +318,9 @@ class StringWriteExtension {
 			sb.append(highlight.keyword("enum")).append(highlight.simpleSpace).append(resolveType.toString(highlight))
 		} else
 			sb.append(resolveType.toString(highlight))
-		var String spacing = highlight.simpleSpace
-		for (HDLVariable hvar : hvd.variables) {
-			sb.append(spacing)
-			sb.append(hvar.toString(highlight))
-			spacing = ","
-		}
+		sb.append('''«FOR HDLVariable hvar : hvd.variables BEFORE highlight.simpleSpace SEPARATOR ','»«hvar.toString(highlight)»«ENDFOR»;''')
 		if (highlight.context==SyntaxHighlighter$Context::HDLPackage)
-			sb.append(";").append(highlight.newLine)
-		else
-			sb.append(";")
+			sb.append(highlight.newLine)
 		return sb.toString
 	}
 
@@ -402,13 +364,9 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("enum")).append(highlight.simpleSpace)
 		sb.append(highlight.enumName(decl.HEnum.name))
-		sb.append(highlight.simpleSpace).append("=").append(highlight.simpleSpace).append("{")
-		var String spacer = ""
-		for (HDLVariable henum : decl.HEnum.enums) {
-			sb.append(spacer).append(henum.toString(highlight))
-			spacer = ","+highlight.simpleSpace
-		}
-		sb.append("}").append(highlight.newLine)
+		sb.append(highlight.simpleSpace).append("=").append(highlight.simpleSpace)
+		sb.append('''{«FOR HDLVariable henum : decl.HEnum.enums SEPARATOR ','+highlight.simpleSpace»«henum.toString(highlight)»«ENDFOR»}''')
+		sb.append(highlight.newLine)
 		return sb.toString
 	}
 
@@ -503,17 +461,7 @@ class StringWriteExtension {
 	def dispatch String toString(HDLInterfaceInstantiation hii, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		sb.append(highlight.interfaceName(hii.HIfRefName.toString)).append(highlight.simpleSpace).append(hii.^var.toString(highlight))
-		if (hii.arguments.size!=0){
-			var boolean first=true
-			sb.append('(')
-			for (HDLArgument arg : hii.arguments) {
-				if (!first)
-					sb.append(',')
-				first=false
-				sb.append(arg.toString(highlight))
-			}
-			sb.append(')')
-		}
+		sb.append('''«FOR HDLArgument arg : hii.arguments BEFORE '(' SEPARATOR ',' AFTER ')'»«arg.toString(highlight)»«ENDFOR»''')
 		sb.append(';')
 		return sb.toString
 	}

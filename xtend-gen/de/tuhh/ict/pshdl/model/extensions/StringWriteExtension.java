@@ -57,7 +57,6 @@ import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter;
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter.Context;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
@@ -247,19 +246,21 @@ public class StringWriteExtension {
     String _functionCall = highlight.functionCall(_string);
     StringBuilder _append = sb.append(_functionCall);
     _append.append("(");
-    boolean first = true;
-    ArrayList<HDLExpression> _params = func.getParams();
-    for (final HDLExpression p : _params) {
-      {
-        boolean _not = (!first);
-        if (_not) {
-          sb.append(",");
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      ArrayList<HDLExpression> _params = func.getParams();
+      boolean _hasElements = false;
+      for(final HDLExpression p : _params) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          _builder.appendImmediate(",", "");
         }
         String _string_1 = this.toString(p, highlight);
-        sb.append(_string_1);
-        first = false;
+        _builder.append(_string_1, "");
       }
     }
+    sb.append(_builder.toString());
     sb.append(")");
     if (isStatement) {
       sb.append(";");
@@ -322,38 +323,35 @@ public class StringWriteExtension {
     String _name = func.getName();
     String _functionDecl = highlight.functionDecl(_name);
     sb.append(_functionDecl);
-    sb.append("(");
-    ArrayList<HDLVariable> _args = func.getArgs();
-    final Iterator<HDLVariable> iter = _args.iterator();
-    boolean _hasNext = iter.hasNext();
-    boolean _while = _hasNext;
-    while (_while) {
-      {
-        HDLVariable _next = iter.next();
-        HDLVariable hvar = ((HDLVariable) _next);
-        String _varName = highlight.varName(hvar);
-        sb.append(_varName);
-        boolean _hasNext_1 = iter.hasNext();
-        if (_hasNext_1) {
-          sb.append(",");
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("(");
+    {
+      ArrayList<HDLVariable> _args = func.getArgs();
+      boolean _hasElements = false;
+      for(final HDLVariable hVar : _args) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          _builder.appendImmediate(",", "");
         }
+        String _varName = highlight.varName(hVar);
+        _builder.append(_varName, "");
       }
-      boolean _hasNext_1 = iter.hasNext();
-      _while = _hasNext_1;
     }
-    StringBuilder _append_4 = sb.append(")");
+    _builder.append(")");
+    sb.append(_builder.toString());
     String _simpleSpace_3 = highlight.simpleSpace();
-    StringBuilder _append_5 = _append_4.append(_simpleSpace_3);
-    StringBuilder _append_6 = _append_5.append("->");
+    StringBuilder _append_4 = sb.append(_simpleSpace_3);
+    StringBuilder _append_5 = _append_4.append("->");
     String _simpleSpace_4 = highlight.simpleSpace();
-    StringBuilder _append_7 = _append_6.append(_simpleSpace_4);
-    StringBuilder _append_8 = _append_7.append("(");
+    StringBuilder _append_6 = _append_5.append(_simpleSpace_4);
+    StringBuilder _append_7 = _append_6.append("(");
     HDLExpression _expr = func.getExpr();
     String _string_1 = this.toString(_expr, highlight);
-    StringBuilder _append_9 = _append_8.append(_string_1);
-    StringBuilder _append_10 = _append_9.append(")");
+    StringBuilder _append_8 = _append_7.append(_string_1);
+    StringBuilder _append_9 = _append_8.append(")");
     String _newLine = highlight.newLine();
-    _append_10.append(_newLine);
+    _append_9.append(_newLine);
     return sb.toString();
   }
   
@@ -378,43 +376,40 @@ public class StringWriteExtension {
     String _name = func.getName();
     String _functionDecl = highlight.functionDecl(_name);
     sb.append(_functionDecl);
-    sb.append("(");
-    ArrayList<HDLVariable> _args = func.getArgs();
-    final Iterator<HDLVariable> iter = _args.iterator();
-    boolean _hasNext = iter.hasNext();
-    boolean _while = _hasNext;
-    while (_while) {
-      {
-        HDLVariable _next = iter.next();
-        HDLVariable hvar = ((HDLVariable) _next);
-        String _varName = highlight.varName(hvar);
-        sb.append(_varName);
-        boolean _hasNext_1 = iter.hasNext();
-        if (_hasNext_1) {
-          sb.append(",");
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("(");
+    {
+      ArrayList<HDLVariable> _args = func.getArgs();
+      boolean _hasElements = false;
+      for(final HDLVariable hVar : _args) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          _builder.appendImmediate(",", "");
         }
+        String _varName = highlight.varName(hVar);
+        _builder.append(_varName, "");
       }
-      boolean _hasNext_1 = iter.hasNext();
-      _while = _hasNext_1;
     }
-    StringBuilder _append_4 = sb.append(")");
+    _builder.append(")");
+    sb.append(_builder.toString());
     String _simpleSpace_3 = highlight.simpleSpace();
-    StringBuilder _append_5 = _append_4.append(_simpleSpace_3);
-    StringBuilder _append_6 = _append_5.append("{");
+    StringBuilder _append_4 = sb.append(_simpleSpace_3);
+    StringBuilder _append_5 = _append_4.append("{");
     String _newLine = highlight.newLine();
-    _append_6.append(_newLine);
+    _append_5.append(_newLine);
     highlight.incSpacing();
     ArrayList<HDLStatement> _stmnts = func.getStmnts();
     for (final HDLStatement string : _stmnts) {
       String _string_1 = this.toString(string, highlight);
-      StringBuilder _append_7 = sb.append(_string_1);
+      StringBuilder _append_6 = sb.append(_string_1);
       String _newLine_1 = highlight.newLine();
-      _append_7.append(_newLine_1);
+      _append_6.append(_newLine_1);
     }
     highlight.decSpacing();
-    StringBuilder _append_8 = sb.append("}");
+    StringBuilder _append_7 = sb.append("}");
     String _newLine_2 = highlight.newLine();
-    _append_8.append(_newLine_2);
+    _append_7.append(_newLine_2);
     return sb.toString();
   }
   
@@ -459,18 +454,23 @@ public class StringWriteExtension {
     int _size = _bits.size();
     boolean _notEquals = (_size != 0);
     if (_notEquals) {
-      sb.append("{");
-      String spacer = "";
-      ArrayList<HDLRange> _bits_1 = ref.getBits();
-      for (final HDLRange bit : _bits_1) {
-        {
-          StringBuilder _append_2 = sb.append(spacer);
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("{");
+      {
+        ArrayList<HDLRange> _bits_1 = ref.getBits();
+        boolean _hasElements = false;
+        for(final HDLRange bit : _bits_1) {
+          if (!_hasElements) {
+            _hasElements = true;
+          } else {
+            _builder.appendImmediate(",", "");
+          }
           String _string_1 = this.toString(bit, highlight);
-          _append_2.append(_string_1);
-          spacer = ",";
+          _builder.append(_string_1, "");
         }
       }
-      sb.append("}");
+      _builder.append("}");
+      sb.append(_builder.toString());
     }
     return sb;
   }
@@ -636,35 +636,41 @@ public class StringWriteExtension {
     StringBuilder _append_5 = _append_4.append(_simpleSpace_1);
     StringBuilder _append_6 = _append_5.append("=");
     String _simpleSpace_2 = highlight.simpleSpace();
-    StringBuilder _append_7 = _append_6.append(_simpleSpace_2);
-    _append_7.append("{");
-    String spacer = "";
-    ArrayList<HDLRange> _range = loop.getRange();
-    for (final HDLRange range : _range) {
-      {
-        StringBuilder _append_8 = sb.append(spacer);
+    _append_6.append(_simpleSpace_2);
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("{");
+    {
+      ArrayList<HDLRange> _range = loop.getRange();
+      boolean _hasElements = false;
+      for(final HDLRange range : _range) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          _builder.appendImmediate(",", "");
+        }
         String _string = this.toString(range, highlight);
-        _append_8.append(_string);
-        spacer = ",";
+        _builder.append(_string, "");
       }
     }
-    StringBuilder _append_8 = sb.append("})");
+    _builder.append("}");
+    sb.append(_builder.toString());
+    StringBuilder _append_7 = sb.append(")");
     String _simpleSpace_3 = highlight.simpleSpace();
-    StringBuilder _append_9 = _append_8.append(_simpleSpace_3);
-    StringBuilder _append_10 = _append_9.append("{");
+    StringBuilder _append_8 = _append_7.append(_simpleSpace_3);
+    StringBuilder _append_9 = _append_8.append("{");
     String _newLine = highlight.newLine();
-    _append_10.append(_newLine);
+    _append_9.append(_newLine);
     highlight.incSpacing();
     ArrayList<HDLStatement> _dos = loop.getDos();
     for (final HDLStatement string : _dos) {
-      String _string = this.toString(string, highlight);
-      StringBuilder _append_11 = sb.append(_string);
+      String _string_1 = this.toString(string, highlight);
+      StringBuilder _append_10 = sb.append(_string_1);
       String _newLine_1 = highlight.newLine();
-      _append_11.append(_newLine_1);
+      _append_10.append(_newLine_1);
     }
     highlight.decSpacing();
-    StringBuilder _append_12 = sb.append(space);
-    _append_12.append("}");
+    StringBuilder _append_11 = sb.append(space);
+    _append_11.append("}");
     return sb.toString();
   }
   
@@ -836,24 +842,29 @@ public class StringWriteExtension {
       String _string_3 = this.toString(resolveType, highlight);
       sb.append(_string_3);
     }
-    String spacing = highlight.simpleSpace();
-    ArrayList<HDLVariable> _variables = hvd.getVariables();
-    for (final HDLVariable hvar : _variables) {
-      {
-        sb.append(spacing);
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      ArrayList<HDLVariable> _variables = hvd.getVariables();
+      boolean _hasElements = false;
+      for(final HDLVariable hvar : _variables) {
+        if (!_hasElements) {
+          _hasElements = true;
+          String _simpleSpace_3 = highlight.simpleSpace();
+          _builder.append(_simpleSpace_3, "");
+        } else {
+          _builder.appendImmediate(",", "");
+        }
         String _string_4 = this.toString(hvar, highlight);
-        sb.append(_string_4);
-        spacing = ",";
+        _builder.append(_string_4, "");
       }
     }
+    _builder.append(";");
+    sb.append(_builder.toString());
     Context _context = highlight.getContext();
     boolean _equals = Objects.equal(_context, Context.HDLPackage);
     if (_equals) {
-      StringBuilder _append_4 = sb.append(";");
       String _newLine = highlight.newLine();
-      _append_4.append(_newLine);
-    } else {
-      sb.append(";");
+      sb.append(_newLine);
     }
     return sb.toString();
   }
@@ -939,24 +950,29 @@ public class StringWriteExtension {
     StringBuilder _append_2 = sb.append(_simpleSpace_2);
     StringBuilder _append_3 = _append_2.append("=");
     String _simpleSpace_3 = highlight.simpleSpace();
-    StringBuilder _append_4 = _append_3.append(_simpleSpace_3);
-    _append_4.append("{");
-    String spacer = "";
-    HDLEnum _hEnum_1 = decl.getHEnum();
-    ArrayList<HDLVariable> _enums = _hEnum_1.getEnums();
-    for (final HDLVariable henum : _enums) {
-      {
-        StringBuilder _append_5 = sb.append(spacer);
+    _append_3.append(_simpleSpace_3);
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("{");
+    {
+      HDLEnum _hEnum_1 = decl.getHEnum();
+      ArrayList<HDLVariable> _enums = _hEnum_1.getEnums();
+      boolean _hasElements = false;
+      for(final HDLVariable henum : _enums) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          String _simpleSpace_4 = highlight.simpleSpace();
+          String _plus = ("," + _simpleSpace_4);
+          _builder.appendImmediate(_plus, "");
+        }
         String _string_1 = this.toString(henum, highlight);
-        _append_5.append(_string_1);
-        String _simpleSpace_4 = highlight.simpleSpace();
-        String _plus = ("," + _simpleSpace_4);
-        spacer = _plus;
+        _builder.append(_string_1, "");
       }
     }
-    StringBuilder _append_5 = sb.append("}");
+    _builder.append("}");
+    sb.append(_builder.toString());
     String _newLine = highlight.newLine();
-    _append_5.append(_newLine);
+    sb.append(_newLine);
     return sb.toString();
   }
   
@@ -1217,26 +1233,25 @@ public class StringWriteExtension {
     HDLVariable _var = hii.getVar();
     String _string_1 = this.toString(_var, highlight);
     _append_1.append(_string_1);
-    ArrayList<HDLArgument> _arguments = hii.getArguments();
-    int _size = _arguments.size();
-    boolean _notEquals = (_size != 0);
-    if (_notEquals) {
-      boolean first = true;
-      sb.append("(");
-      ArrayList<HDLArgument> _arguments_1 = hii.getArguments();
-      for (final HDLArgument arg : _arguments_1) {
-        {
-          boolean _not = (!first);
-          if (_not) {
-            sb.append(",");
-          }
-          first = false;
-          String _string_2 = this.toString(arg, highlight);
-          sb.append(_string_2);
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      ArrayList<HDLArgument> _arguments = hii.getArguments();
+      boolean _hasElements = false;
+      for(final HDLArgument arg : _arguments) {
+        if (!_hasElements) {
+          _hasElements = true;
+          _builder.append("(", "");
+        } else {
+          _builder.appendImmediate(",", "");
         }
+        String _string_2 = this.toString(arg, highlight);
+        _builder.append(_string_2, "");
       }
-      sb.append(")");
+      if (_hasElements) {
+        _builder.append(")", "");
+      }
     }
+    sb.append(_builder.toString());
     sb.append(";");
     return sb.toString();
   }

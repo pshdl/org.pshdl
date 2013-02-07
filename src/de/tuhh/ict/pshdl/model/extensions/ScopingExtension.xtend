@@ -109,57 +109,57 @@ class ScopingExtension {
 	}
 	
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLIfStatement obj) {
-		val List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>()
+		val List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>
 		res.addAll(HDLResolver::getallEnumDeclarations(obj.thenDo))
 		res.addAll(HDLResolver::getallEnumDeclarations(obj.elseDo))
 		return res
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLIfStatement obj) {
-		val List<HDLInterface> res = new LinkedList<HDLInterface>()
+		val List<HDLInterface> res = new LinkedList<HDLInterface>
 		res.addAll(HDLResolver::getallInterfaceDeclarations(obj.thenDo))
 		res.addAll(HDLResolver::getallInterfaceDeclarations(obj.elseDo))
 		return res
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLIfStatement obj) {
-		val List<HDLVariable> res = new LinkedList<HDLVariable>()
+		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		res.addAll(HDLResolver::getallVariableDeclarations(obj.thenDo))
 		res.addAll(HDLResolver::getallVariableDeclarations(obj.elseDo))
 		return res
 	}
 	
 	def dispatch  List<HDLEnumDeclaration> doGetEnumDeclarations(IHDLObject gen) {
-		return Collections::emptyList();
+		return Collections::emptyList;
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(IHDLObject gen) {
-		return Collections::emptyList();
+		return Collections::emptyList;
 	}
 
 	def dispatch  List<HDLVariable> doGetVariables(IHDLObject gen) {
-		return Collections::emptyList();
+		return Collections::emptyList;
 	}
 	
 	def dispatch  List<HDLEnumDeclaration> doGetEnumDeclarations(HDLDirectGeneration gen) {
-		return Collections::emptyList();
+		return Collections::emptyList;
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(HDLDirectGeneration gen) {
-		return Collections::singletonList(gen.getHIf());
+		return Collections::singletonList(gen.getHIf);
 	}
 
 	def dispatch  List<HDLVariable> doGetVariables(HDLDirectGeneration gen) {
-		return Collections::singletonList(gen.getVar());
+		return Collections::singletonList(gen.getVar);
 	}
 	
 	def dispatch List<HDLVariable> doGetVariables(HDLInlineFunction obj) {
-		val List<HDLVariable> res = new LinkedList<HDLVariable>()
+		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		res.addAll(obj.args)
 		return res
 	}
 	def dispatch List<HDLVariable> doGetVariables(HDLSubstituteFunction obj) {
-		val List<HDLVariable> res = new LinkedList<HDLVariable>()
+		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		res.addAll(obj.args)
 		return res
 	}
@@ -173,7 +173,7 @@ class ScopingExtension {
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLForLoop obj) {
-		val List<HDLVariable> res = new LinkedList<HDLVariable>()
+		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		res.addAll(HDLResolver::getallVariableDeclarations(obj.dos))
 		res.add(obj.param)
 		return res
@@ -251,25 +251,25 @@ class ScopingExtension {
 	//HDLSwitchStatement
 	
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLSwitchStatement obj) {
-		val List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>()
+		val List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>
 		for (HDLSwitchCaseStatement c : obj.cases) {
-			res.addAll(c.doGetEnumDeclarations())
+			res.addAll(c.doGetEnumDeclarations)
 		}
 		return res
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLSwitchStatement obj) {
-		val List<HDLInterface> res = new LinkedList<HDLInterface>()
+		val List<HDLInterface> res = new LinkedList<HDLInterface>
 		for (HDLSwitchCaseStatement c : obj.cases) {
-			res.addAll(c.doGetInterfaceDeclarations())
+			res.addAll(c.doGetInterfaceDeclarations)
 		}
 		return res
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLSwitchStatement obj) {
-		val List<HDLVariable> res = new LinkedList<HDLVariable>()
+		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		for (HDLSwitchCaseStatement c : obj.cases) {
-			res.addAll(c.doGetVariables())
+			res.addAll(c.doGetVariables)
 		}
 		return res
 	}
@@ -369,7 +369,7 @@ class ScopingExtension {
 	}
 	
 	def dispatch HDLVariable resolveVariable(HDLInterface hIf, HDLQualifiedName hVar) {
-		val HDLVariable resolved = getVariable(hIf, hVar.getLastSegment());
+		val HDLVariable resolved = getVariable(hIf, hVar.getLastSegment);
 		if (resolved != null) {
 			if (hVar.length == 1) {
 				return resolved;
@@ -382,22 +382,22 @@ class ScopingExtension {
 	}
 
 	def private static HDLVariable getVariable(HDLInterface hIf, String lastSegment) {
-		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).getFirst();
+		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).getFirst;
 	}
 	
 	def dispatch HDLVariable resolveVariable(HDLEnum hEnum, HDLQualifiedName hVar) {
 		if (hVar.length == 1) {
-			return getVariable(hEnum, hVar.getLastSegment());
+			return getVariable(hEnum, hVar.getLastSegment);
 		}
 		if (FullNameExtension::fullNameOf(hEnum).equals(hVar.skipLast(1))) {
-			return getVariable(hEnum, hVar.getLastSegment());
+			return getVariable(hEnum, hVar.getLastSegment);
 		}
 		return resolveVariable(hEnum, hVar);
 	}
 
 	def public static HDLVariable getVariable(HDLEnum hEnum, String lastSegment) {
-		for (HDLVariable hVar : hEnum.getEnums()) {
-			if (hVar.getName().equals(lastSegment)) {
+		for (HDLVariable hVar : hEnum.getEnums) {
+			if (hVar.name.equals(lastSegment)) {
 				return hVar;
 			}
 		}

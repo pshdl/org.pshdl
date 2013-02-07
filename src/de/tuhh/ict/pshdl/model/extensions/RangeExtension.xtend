@@ -1,20 +1,40 @@
 package de.tuhh.ict.pshdl.model.extensions
 
-import com.google.common.collect.*
-import java.math.BigInteger
-import static java.math.BigInteger.*
-import de.tuhh.ict.pshdl.model.*
-import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*
-import static de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType.*
-import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
-import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
-import de.tuhh.ict.pshdl.model.types.builtin.*
-import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
+import com.google.common.collect.Range
+import com.google.common.collect.Ranges
+import de.tuhh.ict.pshdl.model.HDLAnnotation
+import de.tuhh.ict.pshdl.model.HDLArithOp
+import de.tuhh.ict.pshdl.model.HDLBitOp
+import de.tuhh.ict.pshdl.model.HDLConcat
+import de.tuhh.ict.pshdl.model.HDLEnumRef
+import de.tuhh.ict.pshdl.model.HDLEqualityOp
+import de.tuhh.ict.pshdl.model.HDLExpression
+import de.tuhh.ict.pshdl.model.HDLForLoop
+import de.tuhh.ict.pshdl.model.HDLFunctionCall
+import de.tuhh.ict.pshdl.model.HDLLiteral
+import de.tuhh.ict.pshdl.model.HDLManip
+import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
+import de.tuhh.ict.pshdl.model.HDLPrimitive
+import de.tuhh.ict.pshdl.model.HDLRange
+import de.tuhh.ict.pshdl.model.HDLShiftOp
+import de.tuhh.ict.pshdl.model.HDLType
+import de.tuhh.ict.pshdl.model.HDLVariable
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration
+import de.tuhh.ict.pshdl.model.HDLVariableRef
+import de.tuhh.ict.pshdl.model.IHDLObject
 import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations
-import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives
+import java.math.BigInteger
+
+import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*
+import static de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType.*
+import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
+import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
+import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
+import static de.tuhh.ict.pshdl.model.extensions.RangeExtension.*
+import static java.math.BigInteger.*
 
 class RangeExtension {
 	
@@ -42,7 +62,7 @@ class RangeExtension {
 		val BigInteger bigVal = ConstantEvaluate::valueOf(obj,context)
 		if (bigVal != null)
 			return Ranges::closed(bigVal, bigVal)
-		val HDLVariable hVar=obj.resolveVar()
+		val HDLVariable hVar=obj.resolveVar
 		var HDLAnnotation range=hVar.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
 		if (range!=null){
 			val value=range.value.split(";")
@@ -68,7 +88,7 @@ class RangeExtension {
 				return res
 			}
 		}
-		if (obj.bits.size()>0){
+		if (obj.bits.size>0){
 			var BigInteger bitWidth=ZERO
 			for (HDLRange r : obj.bits) {
 				var HDLExpression width=r.width
@@ -80,7 +100,7 @@ class RangeExtension {
 				bitWidth=bitWidth.add(cw)
 			}
 			if (bitWidth!=null){
-				return Ranges::closed(ZERO, ONE.shiftLeft(bitWidth.intValue()).subtract(ONE))
+				return Ranges::closed(ZERO, ONE.shiftLeft(bitWidth.intValue).subtract(ONE))
 			}
 		}
 		val HDLType type = TypeExtension::typeOf(hVar)
@@ -114,24 +134,24 @@ class RangeExtension {
 		val Range<BigInteger> rightRange = obj.right.determineRange(context)
 		switch (obj.type) {
 		case SLL: {
-			val BigInteger ff = leftRange.lowerEndpoint().shiftLeft(rightRange.lowerEndpoint().intValue())
-			val BigInteger ft = leftRange.lowerEndpoint().shiftLeft(rightRange.upperEndpoint().intValue())
-			val BigInteger tf = leftRange.upperEndpoint().shiftLeft(rightRange.lowerEndpoint().intValue())
-			val BigInteger tt = leftRange.upperEndpoint().shiftLeft(rightRange.upperEndpoint().intValue())
+			val BigInteger ff = leftRange.lowerEndpoint.shiftLeft(rightRange.lowerEndpoint.intValue)
+			val BigInteger ft = leftRange.lowerEndpoint.shiftLeft(rightRange.upperEndpoint.intValue)
+			val BigInteger tf = leftRange.upperEndpoint.shiftLeft(rightRange.lowerEndpoint.intValue)
+			val BigInteger tt = leftRange.upperEndpoint.shiftLeft(rightRange.upperEndpoint.intValue)
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		case SRA: {
-			val BigInteger ff = leftRange.lowerEndpoint().shiftRight(rightRange.lowerEndpoint().intValue())
-			val BigInteger ft = leftRange.lowerEndpoint().shiftRight(rightRange.upperEndpoint().intValue())
-			val BigInteger tf = leftRange.upperEndpoint().shiftRight(rightRange.lowerEndpoint().intValue())
-			val BigInteger tt = leftRange.upperEndpoint().shiftRight(rightRange.upperEndpoint().intValue())
+			val BigInteger ff = leftRange.lowerEndpoint.shiftRight(rightRange.lowerEndpoint.intValue)
+			val BigInteger ft = leftRange.lowerEndpoint.shiftRight(rightRange.upperEndpoint.intValue)
+			val BigInteger tf = leftRange.upperEndpoint.shiftRight(rightRange.lowerEndpoint.intValue)
+			val BigInteger tt = leftRange.upperEndpoint.shiftRight(rightRange.upperEndpoint.intValue)
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		case SRL: {
-			val BigInteger ff = srl(leftRange.lowerEndpoint(), rightRange.lowerEndpoint())
-			val BigInteger ft = srl(leftRange.lowerEndpoint(), rightRange.upperEndpoint())
-			val BigInteger tf = srl(leftRange.upperEndpoint(), rightRange.lowerEndpoint())
-			val BigInteger tt = srl(leftRange.upperEndpoint(), rightRange.upperEndpoint())
+			val BigInteger ff = srl(leftRange.lowerEndpoint, rightRange.lowerEndpoint)
+			val BigInteger ft = srl(leftRange.lowerEndpoint, rightRange.upperEndpoint)
+			val BigInteger tf = srl(leftRange.upperEndpoint, rightRange.lowerEndpoint)
+			val BigInteger tt = srl(leftRange.upperEndpoint, rightRange.upperEndpoint)
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		}
@@ -139,9 +159,9 @@ class RangeExtension {
 	}
 
 	def private static BigInteger srl(BigInteger a, BigInteger b) {
-		val BigInteger res = a.shiftRight(b.intValue())
-		if (res.signum() < 0)
-			return res.negate()
+		val BigInteger res = a.shiftRight(b.intValue)
+		if (res.signum < 0)
+			return res.negate
 		return res
 	}
 
@@ -152,12 +172,12 @@ class RangeExtension {
 		case obj.type==OR || obj.type==XOR:{
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-			return Ranges::closed(ZERO, ONE.shiftLeft(leftRange.upperEndpoint().bitLength()).subtract(ONE))
+			return Ranges::closed(ZERO, ONE.shiftLeft(leftRange.upperEndpoint.bitLength).subtract(ONE))
 		}
 		case AND: {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-			return Ranges::closed(ZERO, leftRange.upperEndpoint().min(ONE.shiftLeft(rightRange.upperEndpoint().bitLength()).subtract(ONE)))
+			return Ranges::closed(ZERO, leftRange.upperEndpoint.min(ONE.shiftLeft(rightRange.upperEndpoint.bitLength).subtract(ONE)))
 		}
 		case obj.type==LOGI_AND || obj.type==LOGI_OR: {
 			obj.addMeta(SOURCE, obj)
@@ -174,40 +194,40 @@ class RangeExtension {
 		var Range<BigInteger> rightRange = obj.right.determineRange(context)
 		switch (obj.type) {
 		case PLUS:
-			return Ranges::closed(leftRange.lowerEndpoint().add(rightRange.lowerEndpoint()), leftRange.upperEndpoint().add(rightRange.upperEndpoint()))
+			return Ranges::closed(leftRange.lowerEndpoint.add(rightRange.lowerEndpoint), leftRange.upperEndpoint.add(rightRange.upperEndpoint))
 		case MINUS:
-			return Ranges::closed(leftRange.lowerEndpoint().subtract(rightRange.lowerEndpoint()), leftRange.upperEndpoint().subtract(rightRange.upperEndpoint()))
+			return Ranges::closed(leftRange.lowerEndpoint.subtract(rightRange.lowerEndpoint), leftRange.upperEndpoint.subtract(rightRange.upperEndpoint))
 		case DIV: {
-			if (rightRange.lowerEndpoint().equals(ZERO) || rightRange.upperEndpoint().equals(ZERO)) {
+			if (rightRange.lowerEndpoint.equals(ZERO) || rightRange.upperEndpoint.equals(ZERO)) {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, ZERO_DIVIDE)
 				return null
 			}
-			if (rightRange.lowerEndpoint().signum() * rightRange.upperEndpoint().signum() < 0 || rightRange.upperEndpoint().signum() == 0) {
+			if (rightRange.lowerEndpoint.signum * rightRange.upperEndpoint.signum < 0 || rightRange.upperEndpoint.signum == 0) {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, POSSIBLY_ZERO_DIVIDE)
 			}
-			rightRange = Ranges::closed(ONE.divide(rightRange.lowerEndpoint()), ONE.divide(rightRange.upperEndpoint()))
-			val BigInteger ff = leftRange.lowerEndpoint().multiply(rightRange.lowerEndpoint())
-			val BigInteger ft = leftRange.lowerEndpoint().multiply(rightRange.upperEndpoint())
-			val BigInteger tf = leftRange.upperEndpoint().multiply(rightRange.lowerEndpoint())
-			val BigInteger tt = leftRange.upperEndpoint().multiply(rightRange.upperEndpoint())
+			rightRange = Ranges::closed(ONE.divide(rightRange.lowerEndpoint), ONE.divide(rightRange.upperEndpoint))
+			val BigInteger ff = leftRange.lowerEndpoint.multiply(rightRange.lowerEndpoint)
+			val BigInteger ft = leftRange.lowerEndpoint.multiply(rightRange.upperEndpoint)
+			val BigInteger tf = leftRange.upperEndpoint.multiply(rightRange.lowerEndpoint)
+			val BigInteger tt = leftRange.upperEndpoint.multiply(rightRange.upperEndpoint)
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		case MUL: {
-			val BigInteger ff = leftRange.lowerEndpoint().multiply(rightRange.lowerEndpoint())
-			val BigInteger ft = leftRange.lowerEndpoint().multiply(rightRange.upperEndpoint())
-			val BigInteger tf = leftRange.upperEndpoint().multiply(rightRange.lowerEndpoint())
-			val BigInteger tt = leftRange.upperEndpoint().multiply(rightRange.upperEndpoint())
+			val BigInteger ff = leftRange.lowerEndpoint.multiply(rightRange.lowerEndpoint)
+			val BigInteger ft = leftRange.lowerEndpoint.multiply(rightRange.upperEndpoint)
+			val BigInteger tf = leftRange.upperEndpoint.multiply(rightRange.lowerEndpoint)
+			val BigInteger tt = leftRange.upperEndpoint.multiply(rightRange.upperEndpoint)
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		case MOD:
-			return Ranges::closed(ZERO, rightRange.upperEndpoint().subtract(ONE).min(leftRange.upperEndpoint()))
+			return Ranges::closed(ZERO, rightRange.upperEndpoint.subtract(ONE).min(leftRange.upperEndpoint))
 		case POW: {
-			val BigInteger ff = leftRange.lowerEndpoint().pow(rightRange.lowerEndpoint().intValue())
-			val BigInteger ft = leftRange.lowerEndpoint().pow(rightRange.upperEndpoint().intValue())
-			val BigInteger tf = leftRange.upperEndpoint().pow(rightRange.lowerEndpoint().intValue())
-			val BigInteger tt = leftRange.upperEndpoint().pow(rightRange.upperEndpoint().intValue())
+			val BigInteger ff = leftRange.lowerEndpoint.pow(rightRange.lowerEndpoint.intValue)
+			val BigInteger ft = leftRange.lowerEndpoint.pow(rightRange.upperEndpoint.intValue)
+			val BigInteger tf = leftRange.upperEndpoint.pow(rightRange.lowerEndpoint.intValue)
+			val BigInteger tt = leftRange.upperEndpoint.pow(rightRange.upperEndpoint.intValue)
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		}
@@ -226,7 +246,7 @@ class RangeExtension {
 		case CAST: {
 			val HDLType type = obj.castTo
 			if (type instanceof HDLPrimitive) {
-				val Range<BigInteger> castRange = HDLPrimitives::getInstance().getValueRange(type as HDLPrimitive, context)
+				val Range<BigInteger> castRange = HDLPrimitives::getInstance.getValueRange(type as HDLPrimitive, context)
 				return castRange.intersection(right)
 			}
 			obj.addMeta(SOURCE, obj)
@@ -234,9 +254,9 @@ class RangeExtension {
 			return null
 		}
 		case ARITH_NEG:
-			return Ranges::closed(right.upperEndpoint().negate(), right.lowerEndpoint().negate())
+			return Ranges::closed(right.upperEndpoint.negate, right.lowerEndpoint.negate)
 		case BIT_NEG:
-			return Ranges::closed(ZERO, ONE.shiftLeft(right.upperEndpoint().bitLength()).subtract(ONE))
+			return Ranges::closed(ZERO, ONE.shiftLeft(right.upperEndpoint.bitLength).subtract(ONE))
 		case LOGIC_NEG: {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)

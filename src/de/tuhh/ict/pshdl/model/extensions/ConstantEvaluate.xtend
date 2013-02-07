@@ -27,6 +27,7 @@ import de.tuhh.ict.pshdl.model.HDLVariableRef
 import de.tuhh.ict.pshdl.model.IHDLObject
 import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
+import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
 import java.math.BigInteger
 import java.util.LinkedList
 import java.util.List
@@ -42,7 +43,6 @@ class ConstantEvaluate {
 	def static BigInteger valueOf(HDLExpression exp, HDLEvaluationContext context){
 		return INST.constantEvaluate(exp, context)
 	}
-	
 	public static GenericMeta<IHDLObject> SOURCE=new GenericMeta("SOURCE", true)
 	
 	def dispatch BigInteger constantEvaluate(HDLTernary obj, HDLEvaluationContext context) {
@@ -54,7 +54,7 @@ class ConstantEvaluate {
 			return obj.thenExpr.constantEvaluate(context)
 		}
 		obj.addMeta(SOURCE, obj.ifExpr)
-		obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
+		obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
 		return null
 	}
 
@@ -75,9 +75,9 @@ class ConstantEvaluate {
 		}
 		switch (obj.type) {
 		case ARITH_NEG:
-			return eval.negate()
+			return eval.negate
 		case BIT_NEG:
-			return eval.not()
+			return eval.not
 		case LOGIC_NEG:
 			return boolInt(obj.target.constantEvaluate(context).equals(BigInteger::ZERO))
 		case CAST:{
@@ -87,13 +87,13 @@ class ConstantEvaluate {
 				if (prim.width != null) {
 					val BigInteger width = prim.width.constantEvaluate(context)
 					if (width!=null)
-						return eval.mod(BigInteger::ONE.shiftLeft(width.intValue()))
+						return eval.mod(BigInteger::ONE.shiftLeft(width.intValue))
 					return null
 				}
 				return eval
 			}
 			obj.addMeta(SOURCE, obj.target)
-			obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::NON_PRIMITVE_TYPE_NOT_EVALUATED)
+			obj.addMeta(DESCRIPTION, NON_PRIMITVE_TYPE_NOT_EVALUATED)
 			return null
 		}
 
@@ -111,11 +111,11 @@ class ConstantEvaluate {
 			val BigInteger width = TypeExtension::typeOf(cat).width.constantEvaluate(context)
 			if (width == null) {
 				obj.addMeta(SOURCE, TypeExtension::typeOf(cat).width)
-				obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
+				obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
 				return null
 
 			}
-			sum = sum.shiftLeft(width.intValue()).or(im)
+			sum = sum.shiftLeft(width.intValue).or(im)
 		}
 		return sum
 	}
@@ -124,7 +124,7 @@ class ConstantEvaluate {
 		val BigInteger leftVal = left.constantEvaluate(context)
 		if (leftVal == null) {
 			container.addMeta(SOURCE, left)
-			container.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::SUBEXPRESSION_DID_NOT_EVALUATE)
+			container.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE)
 			return null
 		}
 		return leftVal
@@ -149,7 +149,7 @@ class ConstantEvaluate {
 		case MOD:
 			return leftVal.remainder(rightVal)
 		case POW:
-			return leftVal.pow(rightVal.intValue())
+			return leftVal.pow(rightVal.intValue)
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
@@ -215,14 +215,14 @@ class ConstantEvaluate {
 			return null
 		switch (obj.type) {
 		case SLL:
-			return leftVal.shiftLeft(rightVal.intValue())
+			return leftVal.shiftLeft(rightVal.intValue)
 		case SRA:
-			return leftVal.shiftRight(rightVal.intValue())
+			return leftVal.shiftRight(rightVal.intValue)
 		case SRL:{
-			val BigInteger shiftRight = leftVal.shiftRight(rightVal.intValue())
-			if (shiftRight.signum() < 0)
+			val BigInteger shiftRight = leftVal.shiftRight(rightVal.intValue)
+			if (shiftRight.signum < 0)
 				//XXX This is incorrect. We have to know the width of the
-				return shiftRight.negate()
+				return shiftRight.negate
 			return shiftRight
 		}
 		}
@@ -230,7 +230,7 @@ class ConstantEvaluate {
 	}
 
 	def dispatch BigInteger constantEvaluate(HDLFunctionCall obj, HDLEvaluationContext context) {
-		val List<BigInteger> args = new LinkedList<BigInteger>()
+		val List<BigInteger> args = new LinkedList<BigInteger>
 		for (HDLExpression arg : obj.params) {
 			val BigInteger bigVal = subEvaluate(obj, arg, context)
 			if (bigVal == null)
@@ -241,23 +241,23 @@ class ConstantEvaluate {
 	}
 
 	def dispatch BigInteger constantEvaluate(HDLVariableRef obj, HDLEvaluationContext context) {
-		if (obj.array.size() != 0) {
+		if (obj.array.size != 0) {
 			obj.addMeta(SOURCE, obj)
-			obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
+			obj.addMeta(DESCRIPTION, ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
 			return null
 		}
-		if (obj.bits.size() != 0) {
+		if (obj.bits.size != 0) {
 			obj.addMeta(SOURCE, obj)
-			obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
+			obj.addMeta(DESCRIPTION, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
 			return null
 		}
 		val HDLType type = TypeExtension::typeOf(obj)
 		if (!(type instanceof HDLPrimitive)) {
 			obj.addMeta(SOURCE, obj)
-			obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::TYPE_NOT_SUPPORTED_FOR_CONSTANTS)
+			obj.addMeta(DESCRIPTION, TYPE_NOT_SUPPORTED_FOR_CONSTANTS)
 			return null
 		}
-		val HDLVariable hVar = obj.resolveVar()
+		val HDLVariable hVar = obj.resolveVar
 		val HDLDirection dir = hVar.direction
 		if (dir == CONSTANT)
 			return subEvaluate(obj, hVar.defaultValue, context)
@@ -265,26 +265,26 @@ class ConstantEvaluate {
 		if (dir == PARAMETER) {
 			if (context == null) {
 				obj.addMeta(SOURCE, obj)
-				obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::CAN_NOT_USE_PARAMETER)
+				obj.addMeta(DESCRIPTION, CAN_NOT_USE_PARAMETER)
 				return null
 			}
 			val HDLExpression cRef = context.get(hVar)
 			val BigInteger cRefEval = cRef.constantEvaluate(context)
 			if (cRefEval == null) {
 				obj.addMeta(SOURCE, cRef)
-				obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT)
+				obj.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT)
 				return null
 			}
 			return cRefEval
 		}
 		obj.addMeta(SOURCE, obj)
-		obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
+		obj.addMeta(DESCRIPTION, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
 		return null
 	}
 
 	def dispatch BigInteger constantEvaluate(HDLEnumRef obj, HDLEvaluationContext context) {
 		obj.addMeta(SOURCE, obj)
-		obj.addMeta(ProblemDescription::DESCRIPTION, ProblemDescription::ENUMS_NOT_SUPPORTED_FOR_CONSTANTS)
+		obj.addMeta(DESCRIPTION, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS)
 		return null
 	}
 

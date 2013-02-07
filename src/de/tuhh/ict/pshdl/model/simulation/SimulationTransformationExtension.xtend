@@ -59,7 +59,7 @@ class SimulationTransformationExtension {
 
 	def dispatch FluidFrame toSimulationModel(HDLAssignment obj, HDLEvaluationContext context) {
 		val HDLReference left = obj.left
-		val HDLVariable hVar = left.resolveVar()
+		val HDLVariable hVar = left.resolveVar
 		var HDLRegisterConfig config = hVar.registerConfig
 		var FluidFrame res
 		if (config != null)
@@ -67,9 +67,9 @@ class SimulationTransformationExtension {
 		else
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true))
 		if (config != null) {
-			config = config.normalize()
-			val HDLVariable clk = config.resolveClk()
-			val String name = FullNameExtension::fullNameOf(clk).toString()
+			config = config.normalize
+			val HDLVariable clk = config.resolveClk
+			val String name = FullNameExtension::fullNameOf(clk).toString
 			if (clk.direction == IN) {
 				res.addInput(name)
 				if (config.clockType == RISING)
@@ -88,7 +88,7 @@ class SimulationTransformationExtension {
 		var boolean hasBits = false
 		if (left instanceof HDLVariableRef) {
 			val HDLVariableRef variableRef = left as HDLVariableRef
-			if (!variableRef.bits.isEmpty())
+			if (!variableRef.bits.isEmpty)
 				hasBits = true
 		}
 		res.setInternal(dir == INTERNAL || hasBits)
@@ -96,8 +96,8 @@ class SimulationTransformationExtension {
 	}
 
 	def static String getVarName(HDLVariableRef hVar, boolean withBits) {
-		val StringBuilder sb = new StringBuilder()
-		sb.append(FullNameExtension::fullNameOf(hVar.resolveVar()))
+		val StringBuilder sb = new StringBuilder
+		sb.append(FullNameExtension::fullNameOf(hVar.resolveVar))
 		for (HDLExpression exp : hVar.array) {
 			sb.append('[').append(exp).append(']')
 		}
@@ -106,24 +106,24 @@ class SimulationTransformationExtension {
 				sb.append('{').append(exp).append('}')
 			}
 		}
-		return sb.toString()
+		return sb.toString
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLConcat obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
-		val Iterator<HDLExpression> iter = obj.cats.iterator()
-		res.append(iter.next().toSimulationModel(context))
-		while (iter.hasNext()) {
-			val HDLExpression exp = iter.next()
+		val FluidFrame res = new FluidFrame
+		val Iterator<HDLExpression> iter = obj.cats.iterator
+		res.append(iter.next.toSimulationModel(context))
+		while (iter.hasNext) {
+			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context))
 			val int width=HDLPrimitives::getWidth(TypeExtension::typeOf(exp), context)
-			res.add(new ArgumentedInstruction(concat, width.toString()))
+			res.add(new ArgumentedInstruction(concat, width.toString))
 		}
 		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLUnit obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
+		val FluidFrame res = new FluidFrame
 		for (HDLStatement stmnt : obj.inits) {
 			handleStatement(context, res, stmnt)
 		}
@@ -144,7 +144,7 @@ class SimulationTransformationExtension {
 		case HDLVariableDeclaration:{
 			val HDLVariableDeclaration hvd=stmnt as HDLVariableDeclaration
 			for(HDLVariable hVar: hvd.variables){
-				res.addWith(FullNameExtension::fullNameOf(hVar).toString(), HDLPrimitives::getWidth(TypeExtension::typeOf(hVar), context))
+				res.addWith(FullNameExtension::fullNameOf(hVar).toString, HDLPrimitives::getWidth(TypeExtension::typeOf(hVar), context))
 			}
 		}
 		}
@@ -185,23 +185,23 @@ class SimulationTransformationExtension {
 		case current.type==INTEGER || current.type==NATURAL:
 			return "32"
 		case current.type==INT||current.type==UINT:
-			return ConstantEvaluate::valueOf(current.width,context).toString()
+			return ConstantEvaluate::valueOf(current.width,context).toString
 		}
 		return null
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
-		val String refName = obj.varRefName.toString()
-		val bits = new ArrayList<String>(obj.bits.size() + 1)
+		val FluidFrame res = new FluidFrame
+		val String refName = obj.varRefName.toString
+		val bits = new ArrayList<String>(obj.bits.size + 1)
 		bits.add(refName)
-		if (!obj.bits.isEmpty()) {
+		if (!obj.bits.isEmpty) {
 			for(HDLRange  r: obj.bits){
-				bits.add(r.toString())
+				bits.add(r.toString)
 			}
 		}
 		val String[] arrBits=bits
-		val HDLVariable hVar = obj.resolveVar()
+		val HDLVariable hVar = obj.resolveVar
 		val HDLDirection dir = hVar.direction
 		switch (dir) {
 		case INTERNAL:
@@ -230,7 +230,7 @@ class SimulationTransformationExtension {
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLTernary obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
+		val FluidFrame res = new FluidFrame
 		res.setPredicate(true)
 		res.append(obj.ifExpr.toSimulationModel(context))
 		val FluidFrame thenFrame = obj.thenExpr.toSimulationModel(context)
@@ -245,19 +245,19 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLLiteral obj, HDLEvaluationContext context) {
 		val BigInteger value = obj.valueAsBigInt
 
-		val FluidFrame res = new FluidFrame()
+		val FluidFrame res = new FluidFrame
 		if (BigInteger::ZERO.equals(value)) {
 			res.add(const0)
 			return res
 		}
-		val String key = value.toString()
+		val String key = value.toString
 		res.constants.put(key, value)
 		res.instructions.add(new ArgumentedInstruction(loadConstant, key))
 		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLBitOp obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
+		val FluidFrame res = new FluidFrame
 		res.append(obj.left.toSimulationModel(context))
 		res.append(obj.right.toSimulationModel(context))
 		switch (obj.type) {
@@ -276,7 +276,7 @@ class SimulationTransformationExtension {
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLArithOp obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
+		val FluidFrame res = new FluidFrame
 		res.append(obj.left.toSimulationModel(context))
 		res.append(obj.right.toSimulationModel(context))
 		switch (obj.type) {
@@ -297,7 +297,7 @@ class SimulationTransformationExtension {
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLShiftOp obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame()
+		val FluidFrame res = new FluidFrame
 		res.append(obj.left.toSimulationModel(context))
 		res.append(obj.right.toSimulationModel(context))
 		switch (obj.type) {

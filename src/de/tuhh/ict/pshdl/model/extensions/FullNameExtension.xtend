@@ -137,8 +137,8 @@ class FullNameExtension {
 		var int count = 0
 		if (obj.container != null) {
 			val Iterator<IHDLObject> iterator = obj.container.iterator(false)
-			while (iterator.hasNext()) {
-				val IHDLObject hdlObject = iterator.next()
+			while (iterator.hasNext) {
+				val IHDLObject hdlObject = iterator.next
 				if (hdlObject == obj)
 					return count
 				if (hdlObject.classType == obj.classType)

@@ -7,7 +7,7 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
 
 public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
-	public enum HDLBuiltInAnnotations implements IHDLAnnotation {
+	public static enum HDLBuiltInAnnotations implements IHDLAnnotation {
 		/**
 		 * Generated signal
 		 */
