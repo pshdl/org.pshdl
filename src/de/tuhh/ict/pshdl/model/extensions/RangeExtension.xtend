@@ -168,8 +168,8 @@ class RangeExtension {
 	def dispatch Range<BigInteger> determineRange(HDLBitOp obj, HDLEvaluationContext context) {
 		val Range<BigInteger> leftRange = obj.left.determineRange(context)
 		val Range<BigInteger> rightRange = obj.right.determineRange(context)
-		switch (obj.type) {
-		case obj.type==OR || obj.type==XOR:{
+		switch (type: obj.type) {
+		case type==OR || type==XOR:{
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
 			return Ranges::closed(ZERO, ONE.shiftLeft(leftRange.upperEndpoint.bitLength).subtract(ONE))
@@ -179,7 +179,7 @@ class RangeExtension {
 			obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
 			return Ranges::closed(ZERO, leftRange.upperEndpoint.min(ONE.shiftLeft(rightRange.upperEndpoint.bitLength).subtract(ONE)))
 		}
-		case obj.type==LOGI_AND || obj.type==LOGI_OR: {
+		case type==LOGI_AND || type==LOGI_OR: {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
 			return Ranges::closed(ZERO, ONE)

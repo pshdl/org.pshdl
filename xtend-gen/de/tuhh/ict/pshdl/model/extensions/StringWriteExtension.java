@@ -210,11 +210,12 @@ public class StringWriteExtension {
         if (!_hasElements) {
           _hasElements = true;
         } else {
-          _builder.appendImmediate("#", "");
+          String _operator = highlight.operator("#");
+          _builder.appendImmediate(_operator, "");
         }
         String _string = this.toString(cat, highlight);
-        String _operator = highlight.operator(_string);
-        _builder.append(_operator, "");
+        String _operator_1 = highlight.operator(_string);
+        _builder.append(_operator_1, "");
       }
     }
     return _builder.toString();

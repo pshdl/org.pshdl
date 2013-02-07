@@ -102,19 +102,19 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			res.setNoSensitivity(pid);
 			IHDLObject container = function.getContainer();
 			HDLAssignment ass = setValue(ref, 0, container);
-			res.addUnclockedStatement(pid, ass.toVHDL(pid).getStatement(), ass);
+			res.addUnclockedStatement(pid, VHDLStatementExtension.vhdlOf(ass, pid).getStatement(), ass);
 			HDLFunctionCall wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1)).addParams(params.get(2)).copyDeepFrozen(container);
-			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
+			res.addUnclockedStatement(pid, VHDLStatementExtension.vhdlOf(wait, pid).getStatement(), wait);
 			ass = setValue(ref, 1, container);
-			res.addUnclockedStatement(pid, ass.toVHDL(pid).getStatement(), ass);
+			res.addUnclockedStatement(pid, VHDLStatementExtension.vhdlOf(ass, pid).getStatement(), ass);
 			wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1)).addParams(params.get(2)).copyDeepFrozen(container);
-			res.addUnclockedStatement(pid, wait.toVHDL(pid).getStatement(), wait);
+			res.addUnclockedStatement(pid, VHDLStatementExtension.vhdlOf(wait, pid).getStatement(), wait);
 			return res;
 		}
 		case waitUntil: {
 			VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
-			WaitStatement ws = new WaitStatement(function.getParams().get(0).toVHDL(), null);
+			WaitStatement ws = new WaitStatement(VHDLExpressionExtension.vhdlOf(function.getParams().get(0)), null);
 			res.addUnclockedStatement(pid, ws, function);
 			return res;
 		}

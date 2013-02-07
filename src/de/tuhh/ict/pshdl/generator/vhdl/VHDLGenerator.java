@@ -3,7 +3,6 @@ package de.tuhh.ict.pshdl.generator.vhdl;
 import java.io.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.output.*;
@@ -35,6 +34,6 @@ public class VHDLGenerator {
 
 	private static VhdlFile generateVHDL(HDLPackage pkg) {
 		pkg = Insulin.transform(pkg);
-		return pkg.toVHDL();
+		return VHDLPackageExtension.INST.toVHDL(pkg);
 	}
 }

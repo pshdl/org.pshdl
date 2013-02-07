@@ -93,7 +93,7 @@ class StringWriteExtension {
 	}
 
 	def dispatch String toString(HDLConcat concat, SyntaxHighlighter highlight) 
-		'''«FOR HDLExpression cat : concat.cats SEPARATOR '#'»«highlight.operator(cat.toString(highlight))»«ENDFOR»'''
+		'''«FOR HDLExpression cat : concat.cats SEPARATOR highlight.operator("#")»«highlight.operator(cat.toString(highlight))»«ENDFOR»'''
 
 	def dispatch String toString(HDLFunctionCall func, SyntaxHighlighter highlight) {
 		var boolean isStatement=false

@@ -302,17 +302,15 @@ public class RangeExtension {
     HDLExpression _right = obj.getRight();
     final Range<BigInteger> rightRange = this.determineRange(_right, context);
     HDLBitOpType _type = obj.getType();
-    final HDLBitOpType _switchValue = _type;
+    final HDLBitOpType type = _type;
     boolean _matched = false;
     if (!_matched) {
       boolean _or = false;
-      HDLBitOpType _type_1 = obj.getType();
-      boolean _equals = Objects.equal(_type_1, HDLBitOpType.OR);
+      boolean _equals = Objects.equal(type, HDLBitOpType.OR);
       if (_equals) {
         _or = true;
       } else {
-        HDLBitOpType _type_2 = obj.getType();
-        boolean _equals_1 = Objects.equal(_type_2, HDLBitOpType.XOR);
+        boolean _equals_1 = Objects.equal(type, HDLBitOpType.XOR);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -327,7 +325,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOpType.AND)) {
+      if (Objects.equal(type,HDLBitOpType.AND)) {
         _matched=true;
         obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);
@@ -342,13 +340,11 @@ public class RangeExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
-      HDLBitOpType _type_3 = obj.getType();
-      boolean _equals_2 = Objects.equal(_type_3, HDLBitOpType.LOGI_AND);
+      boolean _equals_2 = Objects.equal(type, HDLBitOpType.LOGI_AND);
       if (_equals_2) {
         _or_1 = true;
       } else {
-        HDLBitOpType _type_4 = obj.getType();
-        boolean _equals_3 = Objects.equal(_type_4, HDLBitOpType.LOGI_OR);
+        boolean _equals_3 = Objects.equal(type, HDLBitOpType.LOGI_OR);
         _or_1 = (_equals_2 || _equals_3);
       }
       if (_or_1) {

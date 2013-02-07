@@ -11,7 +11,6 @@ import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
-import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
@@ -87,7 +86,7 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 			Aggregate aggregate = new Aggregate();
 			HDLRange range = new HDLRange().setFrom(HDLLiteral.get(1)).setTo(function.getParams().get(0));
-			aggregate.createAssociation(new CharacterLiteral('Z'), range.toVHDL(Direction.TO));
+			aggregate.createAssociation(new CharacterLiteral('Z'), VHDLExpressionExtension.INST.toVHDL(range, Direction.TO));
 			return aggregate;
 		}
 		return null;

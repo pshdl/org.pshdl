@@ -3,14 +3,12 @@ package de.tuhh.ict.pshdl.generator.vhdl.libraries;
 import java.math.*;
 import java.util.*;
 
-import de.tuhh.ict.pshdl.generator.vhdl.VHDLExpressionTransformation.*;
+import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLLiteral.*;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.extensions.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
@@ -131,15 +129,15 @@ public class VHDLCastsLibrary {
 		case BITVECTOR:
 			if (range == null)
 				throw new IllegalArgumentException("Can not have null width");
-			return StdLogic1164.STD_LOGIC_VECTOR(range.toVHDL(Direction.DOWNTO));
+			return StdLogic1164.STD_LOGIC_VECTOR(VHDLExpressionExtension.INST.toVHDL(range, Direction.DOWNTO));
 		case INT:
 			if (range == null)
 				throw new IllegalArgumentException("Can not have null width");
-			return NumericStd.SIGNED(range.toVHDL(Direction.DOWNTO));
+			return NumericStd.SIGNED(VHDLExpressionExtension.INST.toVHDL(range, Direction.DOWNTO));
 		case UINT:
 			if (range == null)
 				throw new IllegalArgumentException("Can not have null width");
-			return NumericStd.UNSIGNED(range.toVHDL(Direction.DOWNTO));
+			return NumericStd.UNSIGNED(VHDLExpressionExtension.INST.toVHDL(range, Direction.DOWNTO));
 		case INTEGER:
 			return Standard.INTEGER;
 		case NATURAL:
@@ -171,7 +169,7 @@ public class VHDLCastsLibrary {
 				}
 			}
 		}
-		Expression<?> width = tWidth.toVHDL();
+		Expression<?> width = VHDLExpressionExtension.vhdlOf(tWidth);
 		FunctionCall resize = null;
 		HDLPrimitiveType resType = actualType.getType();
 		switch (actualType.getType()) {
@@ -209,7 +207,7 @@ public class VHDLCastsLibrary {
 
 	public static Expression<?> handleLiteral(IHDLObject container, HDLLiteral lit, HDLPrimitive targetType, HDLExpression tWidth) {
 		if ((container != null) && (container.getClassType() == HDLClass.HDLArithOp))
-			return lit.toVHDL();
+			return VHDLExpressionExtension.vhdlOf(lit);
 		BigInteger val = lit.getValueAsBigInt();
 		BigInteger width = null;
 		if (tWidth != null)
@@ -221,7 +219,7 @@ public class VHDLCastsLibrary {
 			return new CharacterLiteral('1');
 		case NATURAL:
 		case INTEGER:
-			return lit.toVHDL();
+			return VHDLExpressionExtension.vhdlOf(lit);
 		case INT:
 			return handleIntUint(container, tWidth, lit, val, width, HDLPrimitiveType.INT, NumericStd.TO_SIGNED, RESIZE_INTEGER);
 		case UINT:
@@ -230,21 +228,21 @@ public class VHDLCastsLibrary {
 			if (BigInteger.ZERO.equals(val) && (container != null) && (container.getClassType() == HDLClass.HDLAssignment))
 				return Aggregate.OTHERS(new CharacterLiteral('0'));
 			if (width != null)
-				return lit.toVHDL(width.intValue(), true);
+				return VHDLExpressionExtension.INST.toVHDL(lit, width.intValue(), true);
 			FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
-			functionCall.getParameters().add(new AssociationElement(lit.toVHDL(val.bitLength(), true)));
-			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.INST.toVHDL(lit, val.bitLength(), true)));
+			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
 			return functionCall;
 		case STRING:
 			if (lit.getPresentation() == HDLLiteralPresentation.STR)
-				return lit.toVHDL();
+				return VHDLExpressionExtension.vhdlOf(lit);
 			throw new IllegalArgumentException("String is not castable");
 		case BOOL:
 			if (lit.getPresentation() == HDLLiteralPresentation.BOOL)
-				return lit.toVHDL();
+				return VHDLExpressionExtension.vhdlOf(lit);
 			if (BigInteger.ZERO.equals(val))
-				return HDLLiteral.getFalse().toVHDL();
-			return HDLLiteral.getTrue().toVHDL();
+				return VHDLExpressionExtension.vhdlOf(HDLLiteral.getFalse());
+			return VHDLExpressionExtension.vhdlOf(HDLLiteral.getTrue());
 		}
 		throw new IllegalArgumentException("Should not get here");
 	}
@@ -254,18 +252,19 @@ public class VHDLCastsLibrary {
 		if (BigInteger.ZERO.equals(val) && (container != null) && (container.getClassType() == HDLClass.HDLAssignment))
 			return Aggregate.OTHERS(new CharacterLiteral('0'));
 		if ((width != null) && (lit.getPresentation() != HDLLiteralPresentation.NUM))
-			return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
+			return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
 		if (val.bitLength() > 31) {
 			if (width != null)
-				return VHDLCastsLibrary.cast(lit.toVHDL(width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
+				return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
 			FunctionCall functionCall = new FunctionCall(resize);
-			functionCall.getParameters().add(new AssociationElement(VHDLCastsLibrary.cast(lit.toVHDL(val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));
-			functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+			functionCall.getParameters().add(
+					new AssociationElement(VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));
+			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
 			return functionCall;
 		}
 		FunctionCall functionCall = new FunctionCall(castFunc);
-		functionCall.getParameters().add(new AssociationElement(lit.toVHDL()));
-		functionCall.getParameters().add(new AssociationElement(tWidth.toVHDL()));
+		functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(lit)));
+		functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
 		return functionCall;
 	}
 
