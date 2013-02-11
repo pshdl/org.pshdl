@@ -84,6 +84,12 @@ public class RangeExtension {
       return Ranges.<BigInteger>closed(bigVal, bigVal);
     }
     final HDLVariable hVar = obj.resolveVar();
+    boolean _equals = Objects.equal(hVar, null);
+    if (_equals) {
+      obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+      obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
+      return null;
+    }
     HDLAnnotation range = hVar.getAnnotation(HDLBuiltInAnnotations.range);
     boolean _notEquals_1 = (!Objects.equal(range, null));
     if (_notEquals_1) {
@@ -143,8 +149,8 @@ public class RangeExtension {
           HDLExpression _copyDeepFrozen = width.copyDeepFrozen(r_1);
           width = _copyDeepFrozen;
           BigInteger cw = ConstantEvaluate.valueOf(width, context);
-          boolean _equals = Objects.equal(cw, null);
-          if (_equals) {
+          boolean _equals_1 = Objects.equal(cw, null);
+          if (_equals_1) {
             bitWidth = null;
           }
           BigInteger _add = bitWidth.add(cw);
@@ -590,18 +596,18 @@ public class RangeExtension {
   }
   
   public Range<BigInteger> determineRange(final IHDLObject obj, final HDLEvaluationContext context) {
-    if (obj instanceof HDLArithOp) {
+    if (obj instanceof HDLEnumRef) {
+      return _determineRange((HDLEnumRef)obj, context);
+    } else if (obj instanceof HDLVariableRef) {
+      return _determineRange((HDLVariableRef)obj, context);
+    } else if (obj instanceof HDLArithOp) {
       return _determineRange((HDLArithOp)obj, context);
     } else if (obj instanceof HDLBitOp) {
       return _determineRange((HDLBitOp)obj, context);
-    } else if (obj instanceof HDLEnumRef) {
-      return _determineRange((HDLEnumRef)obj, context);
     } else if (obj instanceof HDLEqualityOp) {
       return _determineRange((HDLEqualityOp)obj, context);
     } else if (obj instanceof HDLShiftOp) {
       return _determineRange((HDLShiftOp)obj, context);
-    } else if (obj instanceof HDLVariableRef) {
-      return _determineRange((HDLVariableRef)obj, context);
     } else if (obj instanceof HDLConcat) {
       return _determineRange((HDLConcat)obj, context);
     } else if (obj instanceof HDLFunctionCall) {

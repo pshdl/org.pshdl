@@ -61,7 +61,10 @@ public class RWValidation {
 			Set<String> writeList = hii.getVar().getMeta(Init.written);
 			if (writeList == null)
 				writeList = new HashSet<String>();
-			ArrayList<HDLVariableDeclaration> ports = hii.resolveHIf().getPorts();
+			HDLInterface resolveHIf = hii.resolveHIf();
+			if (resolveHIf == null)
+				continue;
+			ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
 			for (HDLVariableDeclaration hvd : ports) {
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
@@ -94,21 +97,26 @@ public class RWValidation {
 		for (HDLReference ref : list) {
 			if (BuiltInValidator.skipExp(ref))
 				continue;
-			if (ref.getContainer() instanceof HDLAssignment) {
-				HDLAssignment ass = (HDLAssignment) ref.getContainer();
+			IHDLObject container = ref.getContainer();
+			if (container instanceof HDLAssignment) {
+				HDLAssignment ass = (HDLAssignment) container;
 				if ((ass.getLeft() == ref) && (ass.getType() == HDLAssignmentType.ASSGN))
 					// If it is a non-trivial assign, it contains a read
 					continue;
 			}
 			// XXX check for interface and ensure that it is only this instance
-			HDLVariable var = ref.resolveVar();
-			if (ref instanceof HDLInterfaceRef) {
-				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-				HDLVariable hVar = hir.resolveHIf();
-				incMeta(hVar, IntegerMeta.ACCESS);
-				addStringMeta(var.getName(), hVar, Init.read);
-			} else
-				incMeta(var, IntegerMeta.READ_COUNT);
+			if (ref instanceof HDLUnresolvedFragment)
+				return;
+			HDLVariable var = ((HDLResolvedRef) ref).resolveVar();
+			if (var != null) {
+				if (ref instanceof HDLInterfaceRef) {
+					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
+					HDLVariable hVar = hir.resolveHIf();
+					incMeta(hVar, IntegerMeta.ACCESS);
+					addStringMeta(var.getName(), hVar, Init.read);
+				} else
+					incMeta(var, IntegerMeta.READ_COUNT);
+			}
 		}
 	}
 
@@ -150,16 +158,19 @@ public class RWValidation {
 				if (BuiltInValidator.skipExp(ref))
 					continue;
 				HDLVariable var = ref.resolveVar();
+				if (var == null)
+					continue;
+				IHDLObject container = ass.getContainer();
 				if (ref instanceof HDLInterfaceRef) {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
 					HDLVariable hVar = hir.resolveHIf();
 					incMeta(hVar, IntegerMeta.ACCESS);
 					addStringMeta(var.getName(), hVar, Init.written);
-					if ((ass.getContainer().getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
+					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
 						addStringMeta(hir.getVarRefName().getLastSegment(), hVar, Init.full);
 					}
 				} else {
-					if ((ass.getContainer().getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0))
+					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0))
 						var.addMeta(Init.full, Collections.singleton(var.getName()));
 					incMeta(var, IntegerMeta.WRITE_COUNT);
 				}

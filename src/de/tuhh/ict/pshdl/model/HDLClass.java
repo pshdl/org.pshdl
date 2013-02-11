@@ -6,6 +6,9 @@ public enum HDLClass {
 	HDLObject(HDLObject.class), // HDLObject
 	HDLExpression(HDLExpression.class), // HDLExpression
 	HDLReference(HDLReference.class), // HDLReference
+	HDLUnresolvedFragment(HDLUnresolvedFragment.class), // HDLUnresolvedFragment
+	HDLUnresolvedFragmentFunction(HDLUnresolvedFragmentFunction.class), // HDLUnresolvedFragmentFunction
+	HDLResolvedRef(HDLResolvedRef.class), // HDLResolvedRef
 	HDLEnumRef(HDLEnumRef.class), // HDLEnumRef
 	HDLVariableRef(HDLVariableRef.class), // HDLVariableRef
 	HDLInterfaceRef(HDLInterfaceRef.class), // HDLInterfaceRef

@@ -5,6 +5,7 @@ import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
+import de.tuhh.ict.pshdl.model.HDLClass;
 import de.tuhh.ict.pshdl.model.HDLConcat;
 import de.tuhh.ict.pshdl.model.HDLEnumRef;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp;
@@ -22,6 +23,7 @@ import de.tuhh.ict.pshdl.model.HDLShiftOp;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLTernary;
 import de.tuhh.ict.pshdl.model.HDLType;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
 import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.HDLVariableRef;
@@ -30,6 +32,7 @@ import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext;
 import de.tuhh.ict.pshdl.model.extensions.ProblemDescription;
 import de.tuhh.ict.pshdl.model.extensions.TypeExtension;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
+import de.tuhh.ict.pshdl.model.utils.Insulin;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +63,20 @@ public class ConstantEvaluate {
       return _genericMeta;
     }
   }.apply();
+  
+  protected BigInteger _constantEvaluate(final HDLUnresolvedFragment obj, final HDLEvaluationContext context) {
+    IHDLObject _resolveFragment = Insulin.resolveFragment(obj);
+    IHDLObject _container = obj.getContainer();
+    IHDLObject _copyDeepFrozen = _resolveFragment==null?(IHDLObject)null:_resolveFragment.copyDeepFrozen(_container);
+    return _copyDeepFrozen==null?(BigInteger)null:this.constantEvaluate(_copyDeepFrozen, context);
+  }
+  
+  protected BigInteger _constantEvaluate(final IHDLObject obj, final HDLEvaluationContext context) {
+    HDLClass _classType = obj.getClassType();
+    String _plus = ("Did not implement constantEvaulate for type:" + _classType);
+    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
+    throw _illegalArgumentException;
+  }
   
   protected BigInteger _constantEvaluate(final HDLTernary obj, final HDLEvaluationContext context) {
     HDLExpression _ifExpr = obj.getIfExpr();
@@ -485,24 +502,30 @@ public class ConstantEvaluate {
       return null;
     }
     final HDLVariable hVar = obj.resolveVar();
-    final HDLDirection dir = hVar.getDirection();
-    boolean _equals = Objects.equal(dir, HDLDirection.CONSTANT);
+    boolean _equals = Objects.equal(hVar, null);
     if (_equals) {
+      obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+      obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
+      return null;
+    }
+    final HDLDirection dir = hVar.getDirection();
+    boolean _equals_1 = Objects.equal(dir, HDLDirection.CONSTANT);
+    if (_equals_1) {
       HDLExpression _defaultValue = hVar.getDefaultValue();
       return this.subEvaluate(obj, _defaultValue, context);
     }
-    boolean _equals_1 = Objects.equal(dir, HDLDirection.PARAMETER);
-    if (_equals_1) {
-      boolean _equals_2 = Objects.equal(context, null);
-      if (_equals_2) {
+    boolean _equals_2 = Objects.equal(dir, HDLDirection.PARAMETER);
+    if (_equals_2) {
+      boolean _equals_3 = Objects.equal(context, null);
+      if (_equals_3) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return null;
       }
       final HDLExpression cRef = context.get(hVar);
       final BigInteger cRefEval = this.constantEvaluate(cRef, context);
-      boolean _equals_3 = Objects.equal(cRefEval, null);
-      if (_equals_3) {
+      boolean _equals_4 = Objects.equal(cRefEval, null);
+      if (_equals_4) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return null;
@@ -531,18 +554,20 @@ public class ConstantEvaluate {
   }
   
   public BigInteger constantEvaluate(final IHDLObject obj, final HDLEvaluationContext context) {
-    if (obj instanceof HDLArithOp) {
+    if (obj instanceof HDLEnumRef) {
+      return _constantEvaluate((HDLEnumRef)obj, context);
+    } else if (obj instanceof HDLVariableRef) {
+      return _constantEvaluate((HDLVariableRef)obj, context);
+    } else if (obj instanceof HDLArithOp) {
       return _constantEvaluate((HDLArithOp)obj, context);
     } else if (obj instanceof HDLBitOp) {
       return _constantEvaluate((HDLBitOp)obj, context);
-    } else if (obj instanceof HDLEnumRef) {
-      return _constantEvaluate((HDLEnumRef)obj, context);
     } else if (obj instanceof HDLEqualityOp) {
       return _constantEvaluate((HDLEqualityOp)obj, context);
     } else if (obj instanceof HDLShiftOp) {
       return _constantEvaluate((HDLShiftOp)obj, context);
-    } else if (obj instanceof HDLVariableRef) {
-      return _constantEvaluate((HDLVariableRef)obj, context);
+    } else if (obj instanceof HDLUnresolvedFragment) {
+      return _constantEvaluate((HDLUnresolvedFragment)obj, context);
     } else if (obj instanceof HDLConcat) {
       return _constantEvaluate((HDLConcat)obj, context);
     } else if (obj instanceof HDLFunctionCall) {
@@ -553,6 +578,8 @@ public class ConstantEvaluate {
       return _constantEvaluate((HDLManip)obj, context);
     } else if (obj instanceof HDLTernary) {
       return _constantEvaluate((HDLTernary)obj, context);
+    } else if (obj != null) {
+      return _constantEvaluate(obj, context);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(obj, context).toString());

@@ -32,10 +32,12 @@ import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLRange;
 import de.tuhh.ict.pshdl.model.HDLReference;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig;
+import de.tuhh.ict.pshdl.model.HDLResolvedRef;
 import de.tuhh.ict.pshdl.model.HDLStatement;
 import de.tuhh.ict.pshdl.model.HDLSwitchCaseStatement;
 import de.tuhh.ict.pshdl.model.HDLSwitchStatement;
 import de.tuhh.ict.pshdl.model.HDLType;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
 import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -802,7 +804,7 @@ public class VHDLStatementExtension {
     final VHDLContext context = _vHDLContext;
     SignalAssignment sa = null;
     final HDLReference ref = obj.getLeft();
-    final HDLVariable hvar = ref.resolveVar();
+    final HDLVariable hvar = this.resolveVar(ref);
     final ArrayList<HDLExpression> dim = hvar.getDimensions();
     boolean _and = false;
     int _size = dim.size();
@@ -868,6 +870,14 @@ public class VHDLStatementExtension {
       context.addUnclockedStatement(pid, sa, obj);
     }
     return context;
+  }
+  
+  public HDLVariable resolveVar(final HDLReference reference) {
+    if ((reference instanceof HDLUnresolvedFragment)) {
+      RuntimeException _runtimeException = new RuntimeException("Can not use unresolved fragments");
+      throw _runtimeException;
+    }
+    return ((HDLResolvedRef) reference).resolveVar();
   }
   
   protected VHDLContext _toVHDL(final HDLForLoop obj, final int pid) {

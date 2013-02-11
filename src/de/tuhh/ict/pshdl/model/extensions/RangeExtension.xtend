@@ -63,6 +63,11 @@ class RangeExtension {
 		if (bigVal != null)
 			return Ranges::closed(bigVal, bigVal)
 		val HDLVariable hVar=obj.resolveVar
+		if (hVar == null) {
+			obj.addMeta(SOURCE, obj)
+			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
+			return null
+		}
 		var HDLAnnotation range=hVar.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
 		if (range!=null){
 			val value=range.value.split(";")

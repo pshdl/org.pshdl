@@ -220,8 +220,17 @@ public class FullNameExtension {
   }
   
   public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
-    HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
-    return _fullName;
+    HDLQualifiedName _xblockexpression = null;
+    {
+      boolean _equals = Objects.equal(obj, null);
+      if (_equals) {
+        NullPointerException _nullPointerException = new NullPointerException("Can not get a name for null");
+        throw _nullPointerException;
+      }
+      HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
+      _xblockexpression = (_fullName);
+    }
+    return _xblockexpression;
   }
   
   public static int countInstance(final HDLObject obj) {

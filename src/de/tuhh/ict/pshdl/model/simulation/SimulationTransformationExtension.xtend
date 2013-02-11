@@ -41,6 +41,8 @@ import static de.tuhh.ict.pshdl.model.HDLRegisterConfig$HDLRegClockType.*
 import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static de.tuhh.ict.pshdl.model.simulation.SimulationTransformationExtension.*
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.HDLResolvedRef
 
 class SimulationTransformationExtension {
 	public static SimulationTransformationExtension INST=new SimulationTransformationExtension
@@ -94,7 +96,11 @@ class SimulationTransformationExtension {
 		res.setInternal(dir == INTERNAL || hasBits)
 		return res
 	}
-
+	def HDLVariable resolveVar(HDLReference reference) {
+		if(reference instanceof HDLUnresolvedFragment)
+			throw new RuntimeException("Can not use unresolved fragments")
+		return (reference as HDLResolvedRef).resolveVar
+	}
 	def static String getVarName(HDLVariableRef hVar, boolean withBits) {
 		val StringBuilder sb = new StringBuilder
 		sb.append(FullNameExtension::fullNameOf(hVar.resolveVar))

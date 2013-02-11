@@ -125,7 +125,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param val
 	 * @return
 	 */
-	public static HDLLiteral get(long val) {
+	public static @NonNull
+	HDLLiteral get(long val) {
 		return new HDLLiteral().setStr(false).setVal(Long.toString(val));
 	}
 
@@ -163,7 +164,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		return HDLLiteralPresentation.NUM;
 	}
 
-	public static HDLLiteral get(BigInteger constant) {
+	public static @NonNull
+	HDLLiteral get(@NonNull BigInteger constant) {
 		return new HDLLiteral().setStr(false).setVal(constant.toString());
 	}
 

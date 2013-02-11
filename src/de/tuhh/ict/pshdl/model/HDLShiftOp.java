@@ -53,6 +53,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 			this.str = op;
 		}
 
+		@Nullable
 		public static HDLShiftOpType getOp(String op) {
 			for (HDLShiftOpType ass : values()) {
 				if (ass.str.equals(op))
@@ -62,6 +63,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 		}
 
 		@Override
+		@NonNull
 		public String toString() {
 			return str;
 		}

@@ -35,6 +35,9 @@ import java.util.Iterator
 import java.util.List
 
 import static de.tuhh.ict.pshdl.model.extensions.TypeExtension.*
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.utils.Insulin
+import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
 
 class TypeExtension {
 	public static TypeExtension INST=new TypeExtension
@@ -42,9 +45,10 @@ class TypeExtension {
 	def static HDLType typeOf(IHDLObject obj){
 		if (!obj.isFrozen)
 			throw new IllegalArgumentException("Target needs to be frozen")
-		val HDLType res = INST.determineType(obj)
-		if (res!=null)
+		var HDLType res = INST.determineType(obj)
+		if (res!=null){
 			return res.copyDeepFrozen(obj)
+		}
 		return res
 	}
 	
@@ -79,9 +83,18 @@ class TypeExtension {
 	}
 	
 	def dispatch HDLType determineType(HDLExpression cat){
-		throw new RuntimeException("Did not correctly implement determineType for:"+cat)	
+		throw new RuntimeException("Did not correctly implement determineType for:"+cat.classType)	
 	}
 
+	private static GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", false);
+
+	def dispatch HDLType determineType(HDLUnresolvedFragment cat) {
+		if (cat.hasMeta(DETERMINE_TYPE_RESOLVE))
+			return null
+		cat.setMeta(DETERMINE_TYPE_RESOLVE)
+		return Insulin::resolveFragment(cat)?.copyDeepFrozen(cat.container)?.determineType
+	}
+	
 	def dispatch HDLType determineType(HDLConcat cat) {
 		val Iterator<HDLExpression> iter = cat.cats.iterator
 		var HDLPrimitive type = iter.next.determineType as HDLPrimitive
@@ -131,7 +144,7 @@ class TypeExtension {
 	def dispatch HDLType determineType(HDLVariableRef ref) {
 		val List<HDLRange> bits = ref.bits
 		if (bits.size == 0)
-			return ref.resolveVar.determineType
+			return ref.resolveVar?.determineType
 		if (bits.size == 1 && bits.get(0).from == null)
 			return HDLPrimitive::bit
 		val Iterator<HDLRange> iter = bits.iterator
@@ -140,7 +153,7 @@ class TypeExtension {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType::PLUS).setRight(iter.next.width)
 			width = HDLPrimitives::simplifyWidth(ref, width)
 		}
-		return (ref.resolveVar.determineType as HDLPrimitive).setWidth(width)
+		return (ref.resolveVar?.determineType as HDLPrimitive).setWidth(width)
 	}
 
 	def dispatch HDLType determineType(HDLArithOp aop) {

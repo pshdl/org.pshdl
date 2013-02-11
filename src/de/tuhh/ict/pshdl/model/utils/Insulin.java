@@ -35,9 +35,10 @@ public class Insulin {
 	public static <T extends HDLObject> T transform(T orig) {
 		if (orig.hasMeta(insulated))
 			return orig;
-		RWValidation.annotateReadCount(orig);
-		RWValidation.annotateWriteCount(orig);
-		T apply = handleOutPortRead(orig);
+		T apply = resolveFragments(orig);
+		RWValidation.annotateReadCount(apply);
+		RWValidation.annotateWriteCount(apply);
+		apply = handleOutPortRead(apply);
 		apply = includeGenerators(apply);
 		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
@@ -50,9 +51,127 @@ public class Insulin {
 		apply = fixDoubleNegate(apply);
 		apply = fortifyType(apply);
 		// apply = simplifyExpressions(apply);
-		apply.validateAllFields(orig.getContainer(), true);
+		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	public static <T extends HDLObject> T resolveFragments(T pkg) {
+		HDLUnresolvedFragment[] fragments;
+		do {
+			ModificationSet ms = new ModificationSet();
+			fragments = pkg.getAllObjectsOf(HDLUnresolvedFragment.class, true);
+			for (HDLUnresolvedFragment uFrag : fragments) {
+				IHDLObject container = uFrag.getContainer();
+				if ((container instanceof HDLUnresolvedFragment)) {
+					HDLUnresolvedFragment fragment = (HDLUnresolvedFragment) container;
+					if (fragment.getSub() == uFrag)
+						continue;
+				}
+				IHDLObject resolved = resolveFragment(uFrag);
+				if (resolved != null)
+					ms.replace(uFrag, resolved);
+			}
+			T newPkg = ms.apply(pkg);
+			if ((newPkg == pkg) && (fragments.length != 0)) {
+				return pkg;
+			}
+			pkg = newPkg;
+		} while (fragments.length > 0);
+		return pkg;
+	}
+
+	public static IHDLObject resolveFragment(HDLUnresolvedFragment uFrag) {
+		HDLQualifiedName hVar = new HDLQualifiedName(uFrag.getFrag());
+		if (uFrag.getClassType() != HDLClass.HDLUnresolvedFragmentFunction) {
+			HDLVariable variable = ScopingExtension.INST.resolveVariable(uFrag, hVar);
+			HDLUnresolvedFragment sub = uFrag.getSub();
+			if (variable != null) {
+				if (sub == null) {
+					return variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits());
+				}
+				HDLType type = TypeExtension.typeOf(variable);
+				if (type != null) {
+					HDLQualifiedName typeName = fullNameOf(type);
+					HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
+							.setArray(sub.getArray()).setBits(sub.getBits());
+					return hir;
+				}
+			}
+			HDLType type = ScopingExtension.INST.resolveEnum(uFrag, hVar);
+			if (type != null) {
+				if (sub != null) {
+					HDLQualifiedName typeName = fullNameOf(type);
+					HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
+					return enumRef;
+				}
+			}
+			type = ScopingExtension.INST.resolveType(uFrag, hVar);
+			if (type != null) {
+				if (sub != null) {
+					HDLQualifiedName typeName = fullNameOf(type);
+					if (type instanceof HDLEnum) {
+						HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
+						return enumRef;
+					}
+				}
+			}
+		} else {
+			HDLUnresolvedFragmentFunction uff = (HDLUnresolvedFragmentFunction) uFrag;
+			HDLFunctionCall call = new HDLFunctionCall().setName(hVar).setParams(uff.getParams());
+			return call;
+		}
+		IHDLObject container = uFrag.getContainer();
+		if (container instanceof HDLSwitchCaseStatement) {
+			HDLSwitchCaseStatement caseStatement = (HDLSwitchCaseStatement) container;
+			IHDLObject caseContainer = caseStatement.getContainer();
+			if (caseContainer instanceof HDLSwitchStatement) {
+				HDLSwitchStatement switchStatement = (HDLSwitchStatement) caseContainer;
+				HDLType switchType = TypeExtension.typeOf(switchStatement.getCaseExp());
+				return createFullEnum(uFrag, switchType);
+			}
+		}
+		if (container instanceof HDLEqualityOp) {
+			HDLEqualityOp equalityOp = (HDLEqualityOp) container;
+			if (equalityOp.getLeft() == uFrag) {
+				HDLType type = TypeExtension.typeOf(equalityOp.getRight());
+				return createFullEnum(uFrag, type);
+			}
+			if (equalityOp.getRight() == uFrag) {
+				HDLType type = TypeExtension.typeOf(equalityOp.getLeft());
+				return createFullEnum(uFrag, type);
+			}
+		}
+		if (container instanceof HDLAssignment) {
+			HDLAssignment assignment = (HDLAssignment) container;
+			HDLType typeOf = TypeExtension.typeOf(assignment.getLeft());
+			return createFullEnum(uFrag, typeOf);
+		}
+		// throw new IllegalArgumentException("Unable to resolve fragment:" +
+		// uFrag);
+		return null;
+	}
+
+	/**
+	 * Attempt to create an enum if the type provided is an actual enum
+	 * 
+	 * @param uFrag
+	 *            the fragment
+	 * @param type
+	 *            the type
+	 * @return may return null if not successful
+	 */
+	private static HDLEnumRef createFullEnum(HDLUnresolvedFragment uFrag, HDLType type) {
+		if (type instanceof HDLEnum) {
+			HDLEnum enumType = (HDLEnum) type;
+			HDLVariable variable = ScopingExtension.getVariable(enumType, uFrag.getFrag());
+			if (variable != null) {
+				HDLQualifiedName typeName = fullNameOf(enumType);
+				HDLEnumRef enumRef = new HDLEnumRef().setHEnum(enumType.asRef()).setVar(typeName.append(uFrag.getFrag()));
+				return enumRef;
+			}
+		}
+		return null;
 	}
 
 	private static <T extends HDLObject> T pushSignIntoLiteral(T pkg) {
@@ -129,6 +248,8 @@ public class Insulin {
 				argMap.put(hdlArgument.getName(), hdlArgument.getExpression());
 			}
 			HDLInterface hIf = hdi.resolveHIf();
+			if (hIf == null)
+				continue;
 			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
 				if (hvd.getDirection() == HDLDirection.PARAMETER) {
 					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType()).setDirection(HDLDirection.CONSTANT);
@@ -237,6 +358,8 @@ public class Insulin {
 			if ((meta == null) || (dimensions.size() != 0))
 				meta = new HashSet<String>();
 			HDLInterface hIf = hi.resolveHIf();
+			if (hIf == null)
+				continue;
 			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
 				HDLDirection direction = hvd.getDirection();
 				if ((direction == HDLDirection.IN) || (direction == HDLDirection.INOUT)) {

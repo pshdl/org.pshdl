@@ -130,6 +130,8 @@ class FullNameExtension {
 	}
 
 	def static HDLQualifiedName fullNameOf(IHDLObject obj){
+		if (obj==null)
+			throw new NullPointerException("Can not get a name for null")
 		INST.getFullName(obj)
 	}
 

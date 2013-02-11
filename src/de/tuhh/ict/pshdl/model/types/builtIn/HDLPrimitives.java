@@ -7,8 +7,11 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 import com.google.common.base.*;
 import com.google.common.collect.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -27,7 +30,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 	public static class HDLInferenceTriple {
 		public HDLPrimitiveType left, right, result;
 
-		public HDLInferenceTriple(HDLPrimitiveType left, HDLPrimitiveType right, HDLPrimitiveType result) {
+		public HDLInferenceTriple(@NonNull HDLPrimitiveType left, @NonNull HDLPrimitiveType right, HDLPrimitiveType result) {
 			super();
 			this.left = left;
 			this.right = right;
@@ -261,10 +264,12 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLPrimitive newLType = lType.setType(triple.left);
 		HDLPrimitive newRType = rType.setType(triple.right);
 		if ((triple.left == INT) && (triple.right == UINT)) {
-			newRType = newRType.setWidth(new HDLArithOp().setLeft(newRType.getWidth()).setType(PLUS).setRight(HDLLiteral.get(1)));
+			HDLExpression rTypeWidth = checkNotNull(newRType.getWidth(), "The type should have been Integer or natural if width equals null");
+			newRType = newRType.setWidth(new HDLArithOp().setLeft(rTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
 		if ((triple.left == UINT) && (triple.right == INT)) {
-			newLType = newLType.setWidth(new HDLArithOp().setLeft(newLType.getWidth()).setType(PLUS).setRight(HDLLiteral.get(1)));
+			HDLExpression lTypeWidth = checkNotNull(newLType.getWidth(), "The type should have been Integer or natural if width equals null");
+			newLType = newLType.setWidth(new HDLArithOp().setLeft(lTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
 		HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
@@ -362,9 +367,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 				return new HDLArithOp().setLeft(leftW).setType(PLUS).setRight(leftW);
 			if ((leftW == null) && (rightW != null))
 				return new HDLArithOp().setLeft(rightW).setType(PLUS).setRight(rightW);
-			return new HDLArithOp().setLeft(leftW).setType(PLUS).setRight(rightW);
+			if ((leftW != null) && (rightW != null))
+				return new HDLArithOp().setLeft(leftW).setType(PLUS).setRight(rightW);
 		}
-
 		return null;
 	}
 

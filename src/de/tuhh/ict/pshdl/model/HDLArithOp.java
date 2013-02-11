@@ -53,6 +53,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 			this.str = op;
 		}
 
+		@Nullable
 		public static HDLArithOpType getOp(String op) {
 			for (HDLArithOpType ass : values()) {
 				if (ass.str.equals(op))
@@ -62,6 +63,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 		}
 
 		@Override
+		@NonNull
 		public String toString() {
 			return str;
 		}

@@ -87,6 +87,8 @@ import java.util.Set
 import static de.tuhh.ict.pshdl.generator.vhdl.VHDLStatementExtension.*
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations.*
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.HDLResolvedRef
 
 class VHDLStatementExtension {
 	public static VHDLStatementExtension INST= new VHDLStatementExtension
@@ -469,6 +471,12 @@ class VHDLStatementExtension {
 		else
 			context.addUnclockedStatement(pid, sa, obj)
 		return context
+	}
+	
+	def HDLVariable resolveVar(HDLReference reference) {
+		if(reference instanceof HDLUnresolvedFragment)
+			throw new RuntimeException("Can not use unresolved fragments")
+		return (reference as HDLResolvedRef).resolveVar
 	}
 
 	def dispatch VHDLContext toVHDL(HDLForLoop obj, int pid) {

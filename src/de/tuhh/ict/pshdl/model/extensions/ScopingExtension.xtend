@@ -320,7 +320,9 @@ class ScopingExtension {
 		var HDLLibrary library=obj.library
 		if (obj.library == null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
-		return library.resolveFunction(obj.imports, hFunc)
+		val newImports=obj.imports
+		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
+		return library.resolveFunction(newImports, hFunc)
 	}
 
 	def dispatch HDLInterface resolveInterface(HDLUnit obj, HDLQualifiedName hIf) {
@@ -337,7 +339,9 @@ class ScopingExtension {
 		var HDLLibrary library=obj.library
 		if (obj.library == null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
-		return library.resolve(obj.imports, type)
+		val newImports=obj.imports
+		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
+		return library.resolve(newImports, type)
 	}
 
 	def dispatch HDLVariable resolveVariable(HDLUnit obj, HDLQualifiedName hVar) {
@@ -347,7 +351,9 @@ class ScopingExtension {
 		var HDLLibrary library=obj.library
 		if (obj.library == null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
-		return library.resolveVariable(obj.imports, hVar)
+		val newImports=obj.imports
+		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
+		return library.resolveVariable(newImports, hVar)
 	}
 
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLUnit obj) {

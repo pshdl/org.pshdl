@@ -78,15 +78,16 @@ public class HDLRange extends AbstractHDLRange {
 	 * @return
 	 */
 	public HDLExpression getWidth() {
-		if (getFrom() == null)
+		HDLExpression f = getFrom();
+		if (f == null)
 			return new HDLLiteral().setVal("1");
 		if (getTo() != null) {
 			if (BigInteger.ZERO.equals(ConstantEvaluate.valueOf(getTo()))) {
-				HDLArithOp simpleWith = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+				HDLArithOp simpleWith = new HDLArithOp().setLeft(f).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 				return HDLPrimitives.simplifyWidth(this, simpleWith);
 			}
 		}
-		HDLArithOp rangeDist = new HDLArithOp().setLeft(getFrom()).setType(HDLArithOpType.MINUS).setRight(getTo());
+		HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
 		HDLExpression absRange = PSHDLLib.ABS.getReplacementExpressionArgs(this, rangeDist);
 		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);

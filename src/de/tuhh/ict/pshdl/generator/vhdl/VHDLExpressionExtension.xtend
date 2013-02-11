@@ -79,11 +79,11 @@ class VHDLExpressionExtension {
 	}
 	
 	def dispatch Expression<?> toVHDL(HDLExpression exp){
-		throw new IllegalArgumentException("Not implemented")
+		throw new IllegalArgumentException("Not implemented for type:"+exp.classType)
 	}
 
 	def dispatch Name<?> toVHDL(HDLReference ref){
-		throw new IllegalArgumentException("Not implemented")
+		throw new IllegalArgumentException("Not implemented for type:"+ref.classType)
 	}
 
 	

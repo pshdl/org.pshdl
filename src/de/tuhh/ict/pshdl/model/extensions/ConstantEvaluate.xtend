@@ -33,6 +33,8 @@ import java.util.LinkedList
 import java.util.List
 
 import static de.tuhh.ict.pshdl.model.extensions.ConstantEvaluate.*
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.utils.Insulin
 
 class ConstantEvaluate {
 	public static ConstantEvaluate INST=new ConstantEvaluate
@@ -45,6 +47,12 @@ class ConstantEvaluate {
 	}
 	public static GenericMeta<IHDLObject> SOURCE=new GenericMeta("SOURCE", true)
 	
+	def dispatch BigInteger constantEvaluate(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
+		return Insulin::resolveFragment(obj)?.copyDeepFrozen(obj.container)?.constantEvaluate(context)
+	}
+	def dispatch BigInteger constantEvaluate(IHDLObject obj, HDLEvaluationContext context) {
+		throw new IllegalArgumentException("Did not implement constantEvaulate for type:"+obj.classType)
+	}
 	def dispatch BigInteger constantEvaluate(HDLTernary obj, HDLEvaluationContext context) {
 		val BigInteger res=obj.ifExpr.constantEvaluate(context)
 		if (res!=null){
@@ -258,6 +266,11 @@ class ConstantEvaluate {
 			return null
 		}
 		val HDLVariable hVar = obj.resolveVar
+		if (hVar == null) {
+			obj.addMeta(SOURCE, obj)
+			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
+			return null
+		}
 		val HDLDirection dir = hVar.direction
 		if (dir == CONSTANT)
 			return subEvaluate(obj, hVar.defaultValue, context)

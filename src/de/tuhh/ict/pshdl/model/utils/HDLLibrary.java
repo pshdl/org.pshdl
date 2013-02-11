@@ -110,26 +110,30 @@ public class HDLLibrary {
 	 */
 	public HDLVariable resolveVariable(ArrayList<String> imports, HDLQualifiedName type) {
 		imports.add("pshdl.*");
-		HDLVariable hdlType = variables.get(type);
-		if (hdlType == null) {
+		HDLVariable hdlVariable = variables.get(type);
+		if (hdlVariable == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
 			// type + " @" + this);
 			for (String string : imports) {
-				if (string.endsWith(type.toString()))
-					return variables.get(new HDLQualifiedName(string));
+				if (string.endsWith(type.toString())) {
+					hdlVariable = variables.get(new HDLQualifiedName(string));
+					if (hdlVariable != null)
+						return Insulin.resolveFragments(hdlVariable);
+				}
 			}
 			for (String string : imports) {
 				if (string.endsWith(".*")) {
 					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
-					HDLVariable newType = variables.get(newTypeName);
-					if (newType != null) {
-						return newType;
-					}
+					hdlVariable = variables.get(newTypeName);
+					if (hdlVariable != null)
+						return Insulin.resolveFragments(hdlVariable);
 				}
 			}
 		}
-		return hdlType;
+		if (hdlVariable != null)
+			return Insulin.resolveFragments(hdlVariable);
+		return null;
 	}
 
 	/**
@@ -145,26 +149,30 @@ public class HDLLibrary {
 	 */
 	public HDLFunction resolveFunction(ArrayList<String> imports, HDLQualifiedName type) {
 		imports.add("pshdl.*");
-		HDLFunction hdlType = functions.get(type);
-		if (hdlType == null) {
+		HDLFunction hdlFunction = functions.get(type);
+		if (hdlFunction == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
 			// type + " @" + this);
 			for (String string : imports) {
-				if (string.endsWith(type.toString()))
-					return functions.get(new HDLQualifiedName(string));
+				if (string.endsWith(type.toString())) {
+					hdlFunction = functions.get(new HDLQualifiedName(string));
+					if (hdlFunction != null)
+						return Insulin.resolveFragments(hdlFunction);
+				}
 			}
 			for (String string : imports) {
 				if (string.endsWith(".*")) {
 					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
-					HDLFunction newType = functions.get(newTypeName);
-					if (newType != null) {
-						return newType;
-					}
+					hdlFunction = functions.get(newTypeName);
+					if (hdlFunction != null)
+						return Insulin.resolveFragments(hdlFunction);
 				}
 			}
 		}
-		return hdlType;
+		if (hdlFunction != null)
+			return Insulin.resolveFragments(hdlFunction);
+		return null;
 	}
 
 	/**
@@ -194,12 +202,14 @@ public class HDLLibrary {
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
 					HDLType newType = types.get(newTypeName);
 					if (newType != null) {
-						return newType;
+						return Insulin.resolveFragments(newType);
 					}
 				}
 			}
 		}
-		return hdlType;
+		if (hdlType != null)
+			return Insulin.resolveFragments(hdlType);
+		return null;
 	}
 
 	/**

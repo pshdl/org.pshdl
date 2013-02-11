@@ -70,6 +70,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			this.str = op;
 		}
 
+		@Nullable
 		public static HDLDirection getOp(String op) {
 			for (HDLDirection ass : values()) {
 				if (ass.str.equals(op))
@@ -79,6 +80,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 
 		@Override
+		@NonNull
 		public String toString() {
 			return str;
 		}

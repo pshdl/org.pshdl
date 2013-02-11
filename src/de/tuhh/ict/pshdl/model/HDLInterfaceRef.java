@@ -8,8 +8,6 @@ import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.validation.*;
-import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 /**
  * The class HDLInterfaceRef contains the following fields
@@ -85,10 +83,11 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	// $CONTENT-BEGIN$
 
 	@Override
+	@Nullable
 	public HDLVariable resolveVar() {
 		HDLVariable resolveHIf = resolveHIf();
 		if (resolveHIf == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
+			return null;
 		HDLType type = TypeExtension.typeOf(resolveHIf);
 		if (type instanceof HDLInterface) {
 			HDLInterface hIf = (HDLInterface) type;
@@ -101,7 +100,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 				}
 			}
 		}
-		throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
+		return null;
 	}
 
 	// $CONTENT-END$

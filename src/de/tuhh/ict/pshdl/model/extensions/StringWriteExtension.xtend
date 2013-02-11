@@ -46,6 +46,8 @@ import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter$Context
 
 import static de.tuhh.ict.pshdl.model.extensions.StringWriteExtension.*
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragmentFunction
 
 class StringWriteExtension {
 	
@@ -80,6 +82,21 @@ class StringWriteExtension {
 	def dispatch String toString(HDLEqualityOp op, SyntaxHighlighter highlight) 
 		'''(«op.left.toString(highlight)»«highlight.simpleSpace»«highlight.operator(op.type.toString)»«highlight.simpleSpace»«op.right.toString(highlight)»)'''
 
+	def dispatch String toString(HDLUnresolvedFragmentFunction frag, SyntaxHighlighter highlight) {
+		val String sup=_toString(frag as HDLUnresolvedFragment, highlight)
+		val res=sup+'''(«FOR HDLExpression p : frag.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»)'''
+		return res
+	}
+	def dispatch String toString(HDLUnresolvedFragment frag, SyntaxHighlighter highlight) {
+		val StringBuilder sb=new StringBuilder
+		sb.append(frag.frag)
+		sb.append('''«FOR HDLExpression p : frag.array BEFORE '[' SEPARATOR '][' AFTER ']'»«p.toString(highlight)»«ENDFOR»''')
+		sb.append('''«FOR HDLRange p : frag.bits BEFORE '{' SEPARATOR ',' AFTER '}'»«p.toString(highlight)»«ENDFOR»''')
+		if (frag.sub!=null){
+			sb.append('.').append(frag.sub.toString(highlight))
+		}
+		return sb.toString
+	}
 	def dispatch String toString(HDLBitOp bitOp, SyntaxHighlighter highlight) {
 		val StringBuilder sb = new StringBuilder
 		sb.append("(").append(bitOp.left.toString(highlight))

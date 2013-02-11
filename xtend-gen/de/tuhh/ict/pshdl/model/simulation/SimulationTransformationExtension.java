@@ -21,12 +21,14 @@ import de.tuhh.ict.pshdl.model.HDLRange;
 import de.tuhh.ict.pshdl.model.HDLReference;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
+import de.tuhh.ict.pshdl.model.HDLResolvedRef;
 import de.tuhh.ict.pshdl.model.HDLShiftOp;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import de.tuhh.ict.pshdl.model.HDLStatement;
 import de.tuhh.ict.pshdl.model.HDLTernary;
 import de.tuhh.ict.pshdl.model.HDLType;
 import de.tuhh.ict.pshdl.model.HDLUnit;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
 import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -70,7 +72,7 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLAssignment obj, final HDLEvaluationContext context) {
     final HDLReference left = obj.getLeft();
-    final HDLVariable hVar = left.resolveVar();
+    final HDLVariable hVar = this.resolveVar(left);
     HDLRegisterConfig config = hVar.getRegisterConfig();
     FluidFrame res = null;
     boolean _notEquals = (!Objects.equal(config, null));
@@ -141,6 +143,14 @@ public class SimulationTransformationExtension {
     }
     res.setInternal(_or);
     return res;
+  }
+  
+  public HDLVariable resolveVar(final HDLReference reference) {
+    if ((reference instanceof HDLUnresolvedFragment)) {
+      RuntimeException _runtimeException = new RuntimeException("Can not use unresolved fragments");
+      throw _runtimeException;
+    }
+    return ((HDLResolvedRef) reference).resolveVar();
   }
   
   public static String getVarName(final HDLVariableRef hVar, final boolean withBits) {
@@ -643,14 +653,14 @@ public class SimulationTransformationExtension {
   }
   
   public FluidFrame toSimulationModel(final IHDLObject obj, final HDLEvaluationContext context) {
-    if (obj instanceof HDLArithOp) {
+    if (obj instanceof HDLVariableRef) {
+      return _toSimulationModel((HDLVariableRef)obj, context);
+    } else if (obj instanceof HDLArithOp) {
       return _toSimulationModel((HDLArithOp)obj, context);
     } else if (obj instanceof HDLBitOp) {
       return _toSimulationModel((HDLBitOp)obj, context);
     } else if (obj instanceof HDLShiftOp) {
       return _toSimulationModel((HDLShiftOp)obj, context);
-    } else if (obj instanceof HDLVariableRef) {
-      return _toSimulationModel((HDLVariableRef)obj, context);
     } else if (obj instanceof HDLAssignment) {
       return _toSimulationModel((HDLAssignment)obj, context);
     } else if (obj instanceof HDLConcat) {

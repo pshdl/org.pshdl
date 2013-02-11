@@ -463,8 +463,13 @@ public class ScopingExtension {
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
       library = _library_1;
     }
-    ArrayList<String> _imports = obj.getImports();
-    return library.resolveFunction(_imports, hFunc);
+    final ArrayList<String> newImports = obj.getImports();
+    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
+    HDLQualifiedName _skipLast = _fullNameOf.skipLast(1);
+    HDLQualifiedName _append = _skipLast.append("*");
+    String _string = _append.toString();
+    newImports.add(_string);
+    return library.resolveFunction(newImports, hFunc);
   }
   
   protected HDLInterface _resolveInterface(final HDLUnit obj, final HDLQualifiedName hIf) {
@@ -493,8 +498,13 @@ public class ScopingExtension {
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
       library = _library_1;
     }
-    ArrayList<String> _imports = obj.getImports();
-    return library.resolve(_imports, type);
+    final ArrayList<String> newImports = obj.getImports();
+    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
+    HDLQualifiedName _skipLast = _fullNameOf.skipLast(1);
+    HDLQualifiedName _append = _skipLast.append("*");
+    String _string = _append.toString();
+    newImports.add(_string);
+    return library.resolve(newImports, type);
   }
   
   protected HDLVariable _resolveVariable(final HDLUnit obj, final HDLQualifiedName hVar) {
@@ -512,8 +522,13 @@ public class ScopingExtension {
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
       library = _library_1;
     }
-    ArrayList<String> _imports = obj.getImports();
-    return library.resolveVariable(_imports, hVar);
+    final ArrayList<String> newImports = obj.getImports();
+    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
+    HDLQualifiedName _skipLast = _fullNameOf.skipLast(1);
+    HDLQualifiedName _append = _skipLast.append("*");
+    String _string = _append.toString();
+    newImports.add(_string);
+    return library.resolveVariable(newImports, hVar);
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLUnit obj) {

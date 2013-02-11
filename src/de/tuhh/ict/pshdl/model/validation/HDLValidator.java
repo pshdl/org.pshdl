@@ -36,6 +36,7 @@ public class HDLValidator {
 	}
 
 	public static Set<Problem> validate(HDLPackage pkg, Map<HDLQualifiedName, HDLEvaluationContext> context) {
+		pkg = Insulin.resolveFragments(pkg);
 		Set<Problem> res = new LinkedHashSet<Problem>();
 		if (context == null)
 			context = HDLEvaluationContext.createDefault(pkg);

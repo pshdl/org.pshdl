@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
 
+import org.eclipse.jdt.annotation.*;
+
 public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
 	private final String[] qfn;
@@ -60,7 +62,8 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return qfn[i];
 	}
 
-	public static HDLQualifiedName create(String... segments) {
+	public static @NonNull
+	HDLQualifiedName create(String... segments) {
 		return new HDLQualifiedName(segments);
 	}
 

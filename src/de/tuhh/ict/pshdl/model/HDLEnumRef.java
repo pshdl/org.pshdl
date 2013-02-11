@@ -6,8 +6,6 @@ import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.validation.*;
-import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 /**
  * The class HDLEnumRef contains the following fields
@@ -62,9 +60,9 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	@Override
 	public HDLVariable resolveVar() {
 		HDLEnum resolveHEnum = resolveHEnum();
+		if (resolveHEnum == null)
+			return null;
 		HDLVariable var = ScopingExtension.getVariable(resolveHEnum, getVarRefName().getLastSegment());
-		if (var == null)
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
 		return var;
 	}
 

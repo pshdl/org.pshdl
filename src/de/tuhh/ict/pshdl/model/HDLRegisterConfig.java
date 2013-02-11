@@ -150,26 +150,35 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String DEF_RST = "$rst";
 	public static final String DEF_CLK = "$clk";
 
+	@NonNull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig().setClk(HDLQualifiedName.create(DEF_CLK)).setRst(HDLQualifiedName.create(DEF_RST)).setResetValue(HDLLiteral.get(0));
 	}
 
+	@NonNull
 	public static HDLRegisterConfig fromArgs(ArrayList<HDLArgument> args) {
 		HDLRegisterConfig config = defaultConfig();
 		for (HDLArgument genArgs : args) {
 			String name = genArgs.getName();
+			HDLQualifiedName refName = getRefName(genArgs.getExpression());
 			if (RESET_PARAM.equals(name)) {
-				config = config.setRst(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
+				if (refName == null)
+					throw new IllegalArgumentException("Can not get a name for clk from:" + genArgs.getExpression());
+				config = config.setRst(refName);
 			}
 			if (CLOCK_PARAM.equals(name)) {
-				config = config.setClk(((HDLVariableRef) genArgs.getExpression()).getVarRefName());
+				if (refName == null)
+					throw new IllegalArgumentException("Can not get a name for rst from:" + genArgs.getExpression());
+				config = config.setClk(refName);
 			}
 			if (EDGE_PARAM.equals(name)) {
 				String value = getString(genArgs);
 				if (value != null) {
 					config = config.setClockType(HDLRegClockType.valueOf(value.toUpperCase()));
 				} else {
-					config = config.setClockType(HDLRegClockType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+					if (refName == null)
+						throw new IllegalArgumentException("Can not get a name for edge parameter from:" + genArgs.getExpression());
+					config = config.setClockType(HDLRegClockType.valueOf(refName.getLastSegment()));
 				}
 			}
 			if (RESET_SYNC_PARAM.equals(name)) {
@@ -177,7 +186,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				if (value != null) {
 					config = config.setSyncType(HDLRegSyncType.valueOf(value.toUpperCase()));
 				} else {
-					config = config.setSyncType(HDLRegSyncType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+					if (refName == null)
+						throw new IllegalArgumentException("Can not get a name for sync parameter from:" + genArgs.getExpression());
+					config = config.setSyncType(HDLRegSyncType.valueOf(refName.getLastSegment()));
 				}
 			}
 			if (RESET_TYPE_PARAM.equals(name)) {
@@ -185,7 +196,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				if (value != null) {
 					config = config.setResetType(HDLRegResetActiveType.valueOf(value.toUpperCase()));
 				} else {
-					config = config.setResetType(HDLRegResetActiveType.valueOf(((HDLEnumRef) genArgs.getExpression()).getVarRefName().getLastSegment()));
+					if (refName == null)
+						throw new IllegalArgumentException("Can not get a name for sync parameter from:" + genArgs.getExpression());
+					config = config.setResetType(HDLRegResetActiveType.valueOf(refName.getLastSegment()));
 				}
 			}
 			if (RESET_VALUE_PARAM.equals(name)) {
@@ -195,6 +208,29 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		return config;
 	}
 
+	/**
+	 * Attempts to get a name for expression
+	 * 
+	 * @param expression
+	 * @return
+	 */
+	@Nullable
+	private static HDLQualifiedName getRefName(HDLExpression expression) {
+		if (expression instanceof HDLVariableRef) {
+			HDLResolvedRef rr = (HDLResolvedRef) expression;
+			return rr.getVarRefName();
+		}
+		if (expression instanceof HDLUnresolvedFragment) {
+			HDLUnresolvedFragment uf = (HDLUnresolvedFragment) expression;
+			HDLUnresolvedFragment sub = uf.getSub();
+			if (sub != null)
+				return new HDLQualifiedName(uf.getFrag()).append(sub.getFrag());
+			return new HDLQualifiedName(uf.getFrag());
+		}
+		return null;
+	}
+
+	@Nullable
 	private static String getString(HDLArgument genArgs) {
 		if (genArgs.getExpression() instanceof HDLLiteral) {
 			HDLLiteral lit = (HDLLiteral) genArgs.getExpression();

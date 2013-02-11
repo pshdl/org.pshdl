@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -22,6 +23,8 @@ import de.tuhh.ict.pshdl.model.validation.*;
 
 public class BuiltInValidator implements IHDLValidator {
 
+	public static final GenericMeta<Range<BigInteger>> ARRAY_RANGE = new GenericMeta<Range<BigInteger>>("arrayRange", true);
+	public static final GenericMeta<Range<BigInteger>> ACCESS_RANGE = new GenericMeta<Range<BigInteger>>("accessRange", true);
 	public static String[] PSHDL_KEYWORDS = new String[] { "bit", "out", "string", "switch", "include", "process", "for", "function", "import", "else", "extends", "native",
 			"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
 			"param", "register", "interface" };
@@ -47,6 +50,7 @@ public class BuiltInValidator implements IHDLValidator {
 		// TODO find a way to distinguish between context dependent problems and
 		// others
 		try {
+			checkUnresolved(pkg, problems);
 			RWValidation.checkVariableUsage(pkg, problems);
 			checkFunctionCalls(pkg, problems, hContext);
 			pkg = Insulin.inlineFunctions(pkg);
@@ -89,6 +93,67 @@ public class BuiltInValidator implements IHDLValidator {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void checkUnresolved(HDLPackage pkg, Set<Problem> problems) {
+		HDLUnresolvedFragment[] fragments = pkg.getAllObjectsOf(HDLUnresolvedFragment.class, true);
+		for (HDLUnresolvedFragment fragment : fragments) {
+			IHDLObject container = fragment.getContainer();
+			if ((container instanceof HDLUnresolvedFragment)) {
+				HDLUnresolvedFragment contFrag = (HDLUnresolvedFragment) container;
+				if (contFrag.getSub() == fragment)
+					continue;
+			}
+			problems.add(new Problem(ErrorCode.UNRESOLVED_FRAGMENT, fragment));
+		}
+		HDLResolvedRef[] refs = pkg.getAllObjectsOf(HDLResolvedRef.class, true);
+		for (HDLResolvedRef ref : refs) {
+			HDLVariable resolveVar = ref.resolveVar();
+			if (resolveVar == null) {
+				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, ref));
+			}
+			if (ref instanceof HDLEnumRef) {
+				HDLEnumRef enumRef = (HDLEnumRef) ref;
+				HDLEnum resolveHEnum = enumRef.resolveHEnum();
+				if (resolveHEnum == null) {
+					problems.add(new Problem(ErrorCode.UNRESOLVED_ENUM, ref));
+				}
+			}
+			if (ref instanceof HDLInterfaceRef) {
+				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
+				HDLVariable hIf = hir.resolveHIf();
+				if (hIf == null) {
+					problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, ref));
+				}
+			}
+		}
+		HDLFunctionCall[] functionCalls = pkg.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (HDLFunctionCall call : functionCalls) {
+			HDLFunction function = call.resolveName();
+			if (function == null)
+				problems.add(new Problem(ErrorCode.UNRESOLVED_FUNCTION, call));
+		}
+		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (HDLVariableDeclaration hvd : hvds) {
+			HDLType type = hvd.resolveType();
+			if (type == null)
+				problems.add(new Problem(ErrorCode.UNRESOLVED_TYPE, hvd));
+		}
+		HDLInterfaceInstantiation[] hiis = pkg.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
+		for (HDLInterfaceInstantiation hii : hiis) {
+			HDLType type = hii.resolveHIf();
+			if (type == null)
+				problems.add(new Problem(ErrorCode.UNRESOLVED_INTERFACE, hii));
+		}
+		HDLRegisterConfig[] regs = pkg.getAllObjectsOf(HDLRegisterConfig.class, true);
+		for (HDLRegisterConfig reg : regs) {
+			if (reg.resolveClk() == null) {
+				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, reg));
+			}
+			if (reg.resolveRst() == null) {
+				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, reg));
+			}
 		}
 	}
 
@@ -204,6 +269,9 @@ public class BuiltInValidator implements IHDLValidator {
 								problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
 						}
 					} else {
+						HDLType labelType = TypeExtension.typeOf(label);
+						if (!type.equals(labelType))
+							problems.add(new Problem(ErrorCode.SWITCH_LABEL_WRONG_ENUM, caseStatement));
 						if (!enums.add(((HDLEnumRef) label).getVarRefName()))
 							problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
 					}
@@ -336,7 +404,12 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkCombinedAssignment(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		Collection<HDLAssignment> all = HDLQuery.select(HDLAssignment.class).from(unit).where(HDLAssignment.fType).isNotEqualTo(HDLAssignment.HDLAssignmentType.ASSGN).getAll();
 		for (HDLAssignment ass : all) {
-			if (ass.getLeft().resolveVar().getRegisterConfig() == null) {
+			HDLReference ref = ass.getLeft();
+			if (ref instanceof HDLUnresolvedFragment) {
+				return;
+			}
+			HDLVariable var = ((HDLResolvedRef) ref).resolveVar();
+			if ((var != null) && (var.getRegisterConfig() == null)) {
 				problems.add(new Problem(ErrorCode.COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
 			}
 		}
@@ -402,12 +475,16 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLVariableRef ref : refs) {
 			if (skipExp(ref))
 				continue;
-			ArrayList<HDLExpression> dimensions = ref.resolveVar().getDimensions();
-			compareBoundaries(problems, hContext, ref, dimensions, ref.getArray());
-			if (ref instanceof HDLInterfaceRef) {
-				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-				HDLVariable var = hir.resolveHIf();
-				compareBoundaries(problems, hContext, ref, var.getDimensions(), hir.getIfArray());
+			HDLVariable resolveVar = ref.resolveVar();
+			if (resolveVar != null) {
+				ArrayList<HDLExpression> dimensions = resolveVar.getDimensions();
+				compareBoundaries(problems, hContext, ref, dimensions, ref.getArray());
+				if (ref instanceof HDLInterfaceRef) {
+					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
+					HDLVariable var = hir.resolveHIf();
+					if (var != null)
+						compareBoundaries(problems, hContext, ref, var.getDimensions(), hir.getIfArray());
+				}
 			}
 		}
 	}
@@ -433,32 +510,35 @@ public class BuiltInValidator implements IHDLValidator {
 		} else if ((dimensions.size() > array.size())) {
 			// Check whether dimensions have been left out. This is only ok when
 			// it is an assignment and the other dimension is the same
-			HDLClass containerType = ref.getContainer().getClassType();
-			if (containerType == HDLClass.HDLAssignment) {
-				HDLAssignment ass = (HDLAssignment) ref.getContainer();
+			IHDLObject container = ref.getContainer();
+			if (container instanceof HDLAssignment) {
+				HDLAssignment ass = (HDLAssignment) container;
 				HDLReference left = ass.getLeft();
 				if (left.getClassType() == HDLClass.HDLEnumRef) {
 					problems.add(new Problem(ErrorCode.ASSIGNMENT_ENUM_NOT_WRITABLE, left));
 				} else {
 					HDLVariableRef varRef = (HDLVariableRef) left;
-					ArrayList<HDLExpression> targetDim = varRef.resolveVar().getDimensions();
-					for (int i = 0; i < varRef.getArray().size(); i++) {
-						if (targetDim.size() == 0) {
-							problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, varRef));
-							return;
+					HDLVariable var = varRef.resolveVar();
+					if (var != null) {
+						ArrayList<HDLExpression> targetDim = var.getDimensions();
+						for (int i = 0; i < varRef.getArray().size(); i++) {
+							if (targetDim.size() == 0) {
+								problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, varRef));
+								return;
+							}
+							targetDim.remove(0);
 						}
-						targetDim.remove(0);
-					}
-					if (left != ref) {
-						validateArrayAssignment(problems, hContext, ref, ass, left, targetDim);
-					} else {
-						if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
-							problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
+						if (left != ref) {
+							validateArrayAssignment(problems, hContext, ref, ass, left, targetDim);
+						} else {
+							if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
+								problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
+							}
 						}
 					}
 				}
-			} else if (containerType == HDLClass.HDLVariable) {
-				HDLVariable var = (HDLVariable) ref.getContainer();
+			} else if (container instanceof HDLVariable) {
+				HDLVariable var = (HDLVariable) container;
 				validateArrayAssignment(problems, hContext, ref, var, var, var.getDimensions());
 			} else
 				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION, ref));
@@ -479,13 +559,13 @@ public class BuiltInValidator implements IHDLValidator {
 			arrayRange = Ranges.closed(BigInteger.ZERO, arrayRange.upperEndpoint().subtract(BigInteger.ONE));
 			String info = "Expected value range:" + accessRange;
 			if (accessRange.upperEndpoint().signum() < 0)
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			else if (accessRange.lowerEndpoint().signum() < 0)
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			if (!arrayRange.isConnected(accessRange))
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			else if (accessRange.upperEndpoint().compareTo(arrayRange.upperEndpoint()) > 0)
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta("accessRange", accessRange).addMeta("arrayRange", arrayRange));
+				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 
 			dim++;
 		}
@@ -494,6 +574,8 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void validateArrayAssignment(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, IHDLObject ass, IHDLObject left,
 			ArrayList<HDLExpression> targetDim) {
 		HDLVariable right = ref.resolveVar();
+		if (right == null)
+			return;
 		ArrayList<HDLExpression> sourceDim = right.getDimensions();
 		for (int i = 0; i < ref.getArray().size(); i++) {
 			if (sourceDim.size() == 0) {

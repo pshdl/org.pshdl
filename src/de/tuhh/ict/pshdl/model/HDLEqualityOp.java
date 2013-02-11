@@ -53,6 +53,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 			this.str = op;
 		}
 
+		@Nullable
 		public static HDLEqualityOpType getOp(String op) {
 			for (HDLEqualityOpType ass : values()) {
 				if (ass.str.equals(op))
@@ -62,6 +63,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 		}
 
 		@Override
+		@NonNull
 		public String toString() {
 			return str;
 		}

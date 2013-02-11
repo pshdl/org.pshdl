@@ -58,6 +58,9 @@ import java.util.TreeSet
 
 import static de.tuhh.ict.pshdl.generator.vhdl.VHDLPackageExtension.*
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*
+import de.tuhh.ict.pshdl.model.HDLReference
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.HDLResolvedRef
 
 class VHDLPackageExtension {
 
@@ -209,6 +212,12 @@ class VHDLPackageExtension {
 		}
 		return sensitivity
 	}
+	def HDLVariable resolveVar(HDLReference reference) {
+		if(reference instanceof HDLUnresolvedFragment)
+			throw new RuntimeException("Can not use unresolved fragments")
+		return (reference as HDLResolvedRef).resolveVar
+	}
+
 
 	def private SequentialStatement createIfStatement(HDLUnit hUnit, ProcessStatement ps, HDLRegisterConfig key, LinkedList<SequentialStatement> value, VHDLContext unit) {
 		var Signal clk =  new HDLVariableRef().setVar(key.clkRefName).toVHDL as Signal

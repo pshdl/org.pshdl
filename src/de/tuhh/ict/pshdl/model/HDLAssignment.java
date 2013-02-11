@@ -56,6 +56,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			this.str = op;
 		}
 
+		@Nullable
 		public static HDLAssignmentType getOp(String op) {
 			for (HDLAssignmentType ass : values()) {
 				if (ass.str.equals(op))
@@ -65,6 +66,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		}
 
 		@Override
+		@NonNull
 		public String toString() {
 			return str;
 		}

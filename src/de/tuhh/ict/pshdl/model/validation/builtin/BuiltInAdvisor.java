@@ -6,7 +6,6 @@ import java.util.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.LevenshteinDistance.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
@@ -25,31 +24,24 @@ public class BuiltInAdvisor {
 					"Check the message for information what might be incorrect", "Check the documentation for the " + annoName + " Annotation");
 		case ANNOTATION_UNKNOWN: {
 			String lastName = ((HDLAnnotation) problem.node).getName();
-			Score[] topMatches = LevenshteinDistance.getTopMatches(lastName, true, HDLAnnotations.knownAnnotations());
-			StringBuilder matchSolution = new StringBuilder();
-			matchSolution.append("Annotations that you might have meant: ");
-			for (int i = 0; i < Math.min(3, topMatches.length); i++) {
-				Score score = topMatches[i];
-				if (i != 0)
-					matchSolution.append(", ");
-				matchSolution.append('@').append(score.string);
-			}
+			Set<String> knownAnnotations = HDLCore.getCompilerInformation().registeredAnnotations.keySet();
+			String annoProposal = getMatchProposal(knownAnnotations, "Generators", lastName);
 			return new HDLAdvise(problem, "The annotation: " + lastName + " is not known",
-					"The annotation you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", matchSolution.toString(),
+					"The annotation you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", annoProposal,
 					"Check the installed libraries of the compiler");
 		}
 		case ARRAY_INDEX_NEGATIVE:
 			return new HDLAdvise(problem, "The index of the array can only be negative",
 					"When an array is accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
 		case ARRAY_INDEX_OUT_OF_BOUNDS: {
-			Range<BigInteger> accessRange = (Range<BigInteger>) problem.meta.get("accessRange");
-			Range<BigInteger> arrayRange = (Range<BigInteger>) problem.meta.get("arrayRange");
+			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			return new HDLAdvise(problem, "The array index exceeds its capacity", "Valid access index for the array are: " + arrayRange + " while the index has a range of: "
 					+ accessRange + ". These don't overlap which means that the index will never be valid");
 		}
 		case ARRAY_INDEX_POSSIBLY_NEGATIVE: {
-			Range<BigInteger> accessRange = (Range<BigInteger>) problem.meta.get("accessRange");
-			Range<BigInteger> arrayRange = (Range<BigInteger>) problem.meta.get("arrayRange");
+			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			String[] solutions;
 			if (!arrayRange.isConnected(accessRange))
 				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
@@ -62,8 +54,8 @@ public class BuiltInAdvisor {
 					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
-			Range<BigInteger> accessRange = (Range<BigInteger>) problem.meta.get("accessRange");
-			Range<BigInteger> arrayRange = (Range<BigInteger>) problem.meta.get("arrayRange");
+			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
 					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
@@ -95,18 +87,10 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The generator contains an information", problem.info);
 		case GENERATOR_NOT_KNOWN: {
 			String genName = ((HDLDirectGeneration) problem.node).getGeneratorID();
-			Set<String> genIDs = HDLGenerators.getAllGeneratorIDs();
-			Score[] topMatches = LevenshteinDistance.getTopMatches(genName, true, genIDs.toArray(new String[genIDs.size()]));
-			StringBuilder matchSolution = new StringBuilder();
-			matchSolution.append("Generators that you might have meant: ");
-			for (int i = 0; i < Math.min(3, topMatches.length); i++) {
-				Score score = topMatches[i];
-				if (i != 0)
-					matchSolution.append(", ");
-				matchSolution.append('@').append(score.string);
-			}
+			Set<String> genIDs = HDLCore.getCompilerInformation().registeredGenerators.keySet();
+			String generatorProposal = getMatchProposal(genIDs, "Generators", genName);
 			return new HDLAdvise(problem, "The generator with the id: " + genName + " is not known",
-					"The generator you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", matchSolution.toString(),
+					"The generator you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", generatorProposal,
 					"Check the installed generators of the compiler");
 		}
 		case INTERFACE_IN_PORT_NEVER_WRITTEN: {
@@ -149,18 +133,21 @@ public class BuiltInAdvisor {
 		case IN_PORT_CANT_REGISTER:
 			return new HDLAdvise(problem, "A variable of direction in can not be declared a register",
 					"It does not make much sense to declare a incoming variable as register as the data is directly coming from the outside", "Revmoed the register keyword");
-		case IN_PORT_NEVER_READ:
+		case IN_PORT_NEVER_READ: {
 			HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The variable:" + var.getName() + " is declared with direction in, but never read",
 					"A variable with direction in should be used otherwise it is rather useless", "Remove it");
-		case MULTI_PROCESS_WRITE:
+		}
+		case MULTI_PROCESS_WRITE: {
 			return new HDLAdvise(problem, "Only a single process can write to a variable",
 					"Multiple writes to a variable will lead to a X in the VHDL simulation, it is thus not allowed. Reads from multiples process on the other hand are allowed",
 					"Merge all write access to one process");
-		case NO_SUCH_FUNCTION:
+		}
+		case NO_SUCH_FUNCTION: {
 			HDLQualifiedName genName = ((HDLFunctionCall) problem.node).getNameRefName();
 			return new HDLAdvise(problem, "The function:" + genName + " can not be found", "The function could not be found, maybe you misspelled it.", "Double check the name",
 					"Check your imports");
+		}
 		case ONLY_ONE_CLOCK_ANNOTATION_ALLOWED:
 			return new HDLAdvise(problem, "Only one variable is allowed to be annotated with the @clock annotation",
 					"Declaring multiple variables as @clock does not make much sense as it is unclear which one should be used as subsitute for $clk",
@@ -170,7 +157,10 @@ public class BuiltInAdvisor {
 					"Declaring multiple variables as @reset does not make much sense as it is unclear which one should be used as subsitute for $rst",
 					"Remove one @reset annotation");
 		case OUT_PORT_NEVER_WRITTEN:
-			break;
+			HDLVariable var = (HDLVariable) problem.node;
+			return new HDLAdvise(problem, "The variable:" + var.getName() + " is read, but never written",
+					"Only reading an internal variable does not make much sense as it needs to be written as well", "Write to it", "Remove it");
+
 		case PARAMETER_OR_CONSTANT_NEVER_READ:
 			break;
 		case UNRESOLVED_ENUM:
@@ -182,6 +172,18 @@ public class BuiltInAdvisor {
 		case UNRESOLVED_TYPE:
 			break;
 		case UNRESOLVED_VARIABLE:
+			break;
+		case UNRESOLVED_FRAGMENT: {
+			HDLUnresolvedFragment uf = (HDLUnresolvedFragment) problem.node;
+			Set<String> funcIDs = HDLCore.getCompilerInformation().registeredFunctions.keySet();
+			String functionProposal = getMatchProposal(funcIDs, "Functions", uf.getFrag());
+			return new HDLAdvise(
+					problem,
+					"The fragment:" + problem.node + " can not be resolved",
+					"Fragments are unrecognized references to something. It could be a function, an enum or a variable. The compiler was however unable to properly determine what it is.",
+					"If you want to reference a variable check that the spelling is correct and that the variable is visible in this scope", functionProposal);
+		}
+		case UNRESOLVED_FUNCTION:
 			break;
 		case UNSUPPORTED_TYPE_FOR_OP:
 			switch (problem.node.getClassType()) {
@@ -252,8 +254,28 @@ public class BuiltInAdvisor {
 			break;
 		case ASSIGNMENT_ENUM_NOT_WRITABLE:
 			break;
+		case ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS:
+			break;
+		case ARRAY_DIMENSIONS_NOT_CONSTANT:
+			break;
+		case SWITCH_LABEL_WRONG_ENUM:
+			break;
 		}
 		return null;
+	}
+
+	private static String getMatchProposal(Set<String> funcIDs, String type, String name) {
+		Score[] topMatches = LevenshteinDistance.getTopMatches(name, true, funcIDs.toArray(new String[funcIDs.size()]));
+		StringBuilder matchSolution = new StringBuilder();
+		matchSolution.append(type + " that you might have meant: ");
+		for (int i = 0; i < Math.min(3, topMatches.length); i++) {
+			Score score = topMatches[i];
+			if (i != 0)
+				matchSolution.append(", ");
+			matchSolution.append('@').append(score.string);
+		}
+		String functionProposal = matchSolution.toString();
+		return functionProposal;
 	}
 
 }

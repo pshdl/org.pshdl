@@ -55,6 +55,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			this.str = op;
 		}
 
+		@Nullable
 		public static HDLPrimitiveType getOp(String op) {
 			for (HDLPrimitiveType ass : values()) {
 				if (ass.str.equals(op))
@@ -64,6 +65,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		}
 
 		@Override
+		@NonNull
 		public String toString() {
 			return str;
 		}
@@ -127,7 +129,8 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	@Override
-	public String getName() {
+	public @NonNull
+	String getName() {
 		return "#" + StringWriteExtension.INST.toString(this, SyntaxHighlighter.none());
 	}
 

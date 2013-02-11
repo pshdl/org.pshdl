@@ -16,12 +16,14 @@ import de.tuhh.ict.pshdl.model.HDLInterfaceInstantiation;
 import de.tuhh.ict.pshdl.model.HDLLiteral;
 import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
 import de.tuhh.ict.pshdl.model.HDLManip;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLRange;
 import de.tuhh.ict.pshdl.model.HDLShiftOp;
 import de.tuhh.ict.pshdl.model.HDLTernary;
 import de.tuhh.ict.pshdl.model.HDLType;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
 import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
 import de.tuhh.ict.pshdl.model.HDLVariableRef;
@@ -29,6 +31,7 @@ import de.tuhh.ict.pshdl.model.IHDLObject;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
 import de.tuhh.ict.pshdl.model.utils.HDLProblemException;
+import de.tuhh.ict.pshdl.model.utils.Insulin;
 import de.tuhh.ict.pshdl.model.utils.services.HDLTypeInferenceInfo;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLPrimitive;
 import de.tuhh.ict.pshdl.model.validation.Problem;
@@ -56,7 +59,7 @@ public class TypeExtension {
       IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Target needs to be frozen");
       throw _illegalArgumentException;
     }
-    final HDLType res = TypeExtension.INST.determineType(obj);
+    HDLType res = TypeExtension.INST.determineType(obj);
     boolean _notEquals = (!Objects.equal(res, null));
     if (_notEquals) {
       return res.copyDeepFrozen(obj);
@@ -125,9 +128,29 @@ public class TypeExtension {
   }
   
   protected HDLType _determineType(final HDLExpression cat) {
-    String _plus = ("Did not correctly implement determineType for:" + cat);
+    HDLClass _classType = cat.getClassType();
+    String _plus = ("Did not correctly implement determineType for:" + _classType);
     RuntimeException _runtimeException = new RuntimeException(_plus);
     throw _runtimeException;
+  }
+  
+  private static GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new Function0<GenericMeta<Boolean>>() {
+    public GenericMeta<Boolean> apply() {
+      GenericMeta<Boolean> _genericMeta = new GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", false);
+      return _genericMeta;
+    }
+  }.apply();
+  
+  protected HDLType _determineType(final HDLUnresolvedFragment cat) {
+    boolean _hasMeta = cat.hasMeta(TypeExtension.DETERMINE_TYPE_RESOLVE);
+    if (_hasMeta) {
+      return null;
+    }
+    cat.setMeta(TypeExtension.DETERMINE_TYPE_RESOLVE);
+    IHDLObject _resolveFragment = Insulin.resolveFragment(cat);
+    IHDLObject _container = cat.getContainer();
+    IHDLObject _copyDeepFrozen = _resolveFragment==null?(IHDLObject)null:_resolveFragment.copyDeepFrozen(_container);
+    return _copyDeepFrozen==null?(HDLType)null:this.determineType(_copyDeepFrozen);
   }
   
   protected HDLType _determineType(final HDLConcat cat) {
@@ -225,7 +248,7 @@ public class TypeExtension {
     boolean _equals = (_size == 0);
     if (_equals) {
       HDLVariable _resolveVar = ref.resolveVar();
-      return this.determineType(_resolveVar);
+      return _resolveVar==null?(HDLType)null:this.determineType(_resolveVar);
     }
     boolean _and = false;
     int _size_1 = bits.size();
@@ -263,7 +286,7 @@ public class TypeExtension {
       _while = _hasNext_1;
     }
     HDLVariable _resolveVar_1 = ref.resolveVar();
-    HDLType _determineType = this.determineType(_resolveVar_1);
+    HDLType _determineType = _resolveVar_1==null?(HDLType)null:this.determineType(_resolveVar_1);
     return ((HDLPrimitive) _determineType).setWidth(width);
   }
   
@@ -302,40 +325,42 @@ public class TypeExtension {
     throw _hDLProblemException;
   }
   
-  public HDLType determineType(final IHDLObject func) {
-    if (func instanceof HDLInlineFunction) {
-      return _determineType((HDLInlineFunction)func);
-    } else if (func instanceof HDLArithOp) {
-      return _determineType((HDLArithOp)func);
-    } else if (func instanceof HDLBitOp) {
-      return _determineType((HDLBitOp)func);
-    } else if (func instanceof HDLEnumRef) {
-      return _determineType((HDLEnumRef)func);
-    } else if (func instanceof HDLEqualityOp) {
-      return _determineType((HDLEqualityOp)func);
-    } else if (func instanceof HDLShiftOp) {
-      return _determineType((HDLShiftOp)func);
-    } else if (func instanceof HDLVariableDeclaration) {
-      return _determineType((HDLVariableDeclaration)func);
-    } else if (func instanceof HDLVariableRef) {
-      return _determineType((HDLVariableRef)func);
-    } else if (func instanceof HDLConcat) {
-      return _determineType((HDLConcat)func);
-    } else if (func instanceof HDLFunctionCall) {
-      return _determineType((HDLFunctionCall)func);
-    } else if (func instanceof HDLLiteral) {
-      return _determineType((HDLLiteral)func);
-    } else if (func instanceof HDLManip) {
-      return _determineType((HDLManip)func);
-    } else if (func instanceof HDLTernary) {
-      return _determineType((HDLTernary)func);
-    } else if (func instanceof HDLVariable) {
-      return _determineType((HDLVariable)func);
-    } else if (func instanceof HDLExpression) {
-      return _determineType((HDLExpression)func);
+  public HDLType determineType(final IHDLObject ref) {
+    if (ref instanceof HDLEnumRef) {
+      return _determineType((HDLEnumRef)ref);
+    } else if (ref instanceof HDLInlineFunction) {
+      return _determineType((HDLInlineFunction)ref);
+    } else if (ref instanceof HDLVariableRef) {
+      return _determineType((HDLVariableRef)ref);
+    } else if (ref instanceof HDLArithOp) {
+      return _determineType((HDLArithOp)ref);
+    } else if (ref instanceof HDLBitOp) {
+      return _determineType((HDLBitOp)ref);
+    } else if (ref instanceof HDLEqualityOp) {
+      return _determineType((HDLEqualityOp)ref);
+    } else if (ref instanceof HDLShiftOp) {
+      return _determineType((HDLShiftOp)ref);
+    } else if (ref instanceof HDLUnresolvedFragment) {
+      return _determineType((HDLUnresolvedFragment)ref);
+    } else if (ref instanceof HDLVariableDeclaration) {
+      return _determineType((HDLVariableDeclaration)ref);
+    } else if (ref instanceof HDLConcat) {
+      return _determineType((HDLConcat)ref);
+    } else if (ref instanceof HDLFunctionCall) {
+      return _determineType((HDLFunctionCall)ref);
+    } else if (ref instanceof HDLLiteral) {
+      return _determineType((HDLLiteral)ref);
+    } else if (ref instanceof HDLManip) {
+      return _determineType((HDLManip)ref);
+    } else if (ref instanceof HDLTernary) {
+      return _determineType((HDLTernary)ref);
+    } else if (ref instanceof HDLVariable) {
+      return _determineType((HDLVariable)ref);
+    } else if (ref instanceof HDLExpression) {
+      return _determineType((HDLExpression)ref);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
-        Arrays.<Object>asList(func).toString());
+        Arrays.<Object>asList(ref).toString());
     }
   }
 }

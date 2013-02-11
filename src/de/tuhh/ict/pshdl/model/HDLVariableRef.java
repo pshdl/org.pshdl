@@ -7,8 +7,6 @@ import org.eclipse.jdt.annotation.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.validation.*;
-import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 /**
  * The class HDLVariableRef contains the following fields
@@ -74,17 +72,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 			return obj.getBits();
 		}
 	};
-
 	// $CONTENT-BEGIN$
-
-	@Override
-	public HDLVariable resolveVar() {
-		HDLVariable var = super.resolveVar();
-		if (var == null)
-			// HDLObject.printInfo(this);
-			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
-		return var;
-	}
 
 	// $CONTENT-END$
 

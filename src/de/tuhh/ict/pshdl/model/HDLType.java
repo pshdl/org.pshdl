@@ -53,6 +53,7 @@ public abstract class HDLType extends AbstractHDLType {
 	};
 
 	// $CONTENT-BEGIN$
+	@NonNull
 	public HDLQualifiedName asRef() {
 		return new HDLQualifiedName(getName());
 	}

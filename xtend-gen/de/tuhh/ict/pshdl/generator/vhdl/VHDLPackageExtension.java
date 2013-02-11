@@ -20,8 +20,10 @@ import de.tuhh.ict.pshdl.model.HDLRegisterConfig;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
+import de.tuhh.ict.pshdl.model.HDLResolvedRef;
 import de.tuhh.ict.pshdl.model.HDLStatement;
 import de.tuhh.ict.pshdl.model.HDLUnit;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
 import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -344,7 +346,7 @@ public class VHDLPackageExtension {
                   IHDLObject _container_1 = ref.getContainer();
                   final HDLAssignment hAss = ((HDLAssignment) _container_1);
                   HDLReference _left = hAss.getLeft();
-                  HDLVariable _resolveVar = _left.resolveVar();
+                  HDLVariable _resolveVar = this.resolveVar(_left);
                   HDLRegisterConfig _registerConfig = _resolveVar.getRegisterConfig();
                   boolean _notEquals = (!Objects.equal(_registerConfig, null));
                   if (_notEquals) {
@@ -371,6 +373,14 @@ public class VHDLPackageExtension {
       sensitivity.add(_signal);
     }
     return sensitivity;
+  }
+  
+  public HDLVariable resolveVar(final HDLReference reference) {
+    if ((reference instanceof HDLUnresolvedFragment)) {
+      RuntimeException _runtimeException = new RuntimeException("Can not use unresolved fragments");
+      throw _runtimeException;
+    }
+    return ((HDLResolvedRef) reference).resolveVar();
   }
   
   private SequentialStatement createIfStatement(final HDLUnit hUnit, final ProcessStatement ps, final HDLRegisterConfig key, final LinkedList<SequentialStatement> value, final VHDLContext unit) {

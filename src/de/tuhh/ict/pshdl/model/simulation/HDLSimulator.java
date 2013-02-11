@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -78,11 +80,10 @@ public class HDLSimulator {
 		ModificationSet ms = new ModificationSet();
 		HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange hdlRange : ranges) {
-			BigInteger toBig = ConstantEvaluate.valueOf(hdlRange.getTo(), context);
-			BigInteger fromBig = null;
+			BigInteger toBig = checkNotNull(ConstantEvaluate.valueOf(hdlRange.getTo(), context), "Given the context it should always be non null");
 			HDLExpression from = hdlRange.getFrom();
 			if (from != null) {
-				fromBig = ConstantEvaluate.valueOf(from, context);
+				BigInteger fromBig = checkNotNull(ConstantEvaluate.valueOf(from, context), "Given the context it should always be non null");
 				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig)).setTo(HDLLiteral.get(toBig)));
 			} else {
 				ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig)));
@@ -121,7 +122,8 @@ public class HDLSimulator {
 					break;
 				}
 			}
-			finalStatements.add(new HDLAssignment().setLeft(references.get(entry.getKey())).setRight(current));
+			if (current != null)
+				finalStatements.add(new HDLAssignment().setLeft(references.get(entry.getKey())).setRight(current));
 		}
 		return insulin.setInits(null).setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
 	}

@@ -92,12 +92,16 @@ public class VHDLExpressionExtension {
   }
   
   protected Expression<? extends Object> _toVHDL(final HDLExpression exp) {
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Not implemented");
+    HDLClass _classType = exp.getClassType();
+    String _plus = ("Not implemented for type:" + _classType);
+    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
   }
   
   protected Name<? extends Object> _toVHDL(final HDLReference ref) {
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Not implemented");
+    HDLClass _classType = ref.getClassType();
+    String _plus = ("Not implemented for type:" + _classType);
+    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
   }
   
@@ -646,20 +650,20 @@ public class VHDLExpressionExtension {
   public Expression<?> toVHDL(final IHDLObject obj) {
     if (obj instanceof HDLInterfaceRef) {
       return _toVHDL((HDLInterfaceRef)obj);
+    } else if (obj instanceof HDLEnumRef) {
+      return _toVHDL((HDLEnumRef)obj);
+    } else if (obj instanceof HDLVariableRef) {
+      return _toVHDL((HDLVariableRef)obj);
     } else if (obj instanceof HDLArithOp) {
       return _toVHDL((HDLArithOp)obj);
     } else if (obj instanceof HDLBitOp) {
       return _toVHDL((HDLBitOp)obj);
-    } else if (obj instanceof HDLEnumRef) {
-      return _toVHDL((HDLEnumRef)obj);
     } else if (obj instanceof HDLEqualityOp) {
       return _toVHDL((HDLEqualityOp)obj);
     } else if (obj instanceof HDLFunction) {
       return _toVHDL((HDLFunction)obj);
     } else if (obj instanceof HDLShiftOp) {
       return _toVHDL((HDLShiftOp)obj);
-    } else if (obj instanceof HDLVariableRef) {
-      return _toVHDL((HDLVariableRef)obj);
     } else if (obj instanceof HDLConcat) {
       return _toVHDL((HDLConcat)obj);
     } else if (obj instanceof HDLFunctionCall) {

@@ -57,6 +57,11 @@ public class Problem {
 			context.addMeta(ProblemAccess.PROBLEM, this);
 	}
 
+	public <T> Problem addMeta(MetaAccess<T> key, T value) {
+		meta.put(key.name(), value);
+		return this;
+	}
+
 	public Problem addMeta(String key, Object value) {
 		meta.put(key, value);
 		return this;
@@ -121,6 +126,11 @@ public class Problem {
 		if (severity != other.severity)
 			return false;
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getMeta(MetaAccess<T> m) {
+		return (T) meta.get(m.name());
 	}
 
 }

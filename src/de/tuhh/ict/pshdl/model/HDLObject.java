@@ -72,12 +72,15 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
+	@NonNull
 	public abstract IHDLObject copy();
 
 	@Override
+	@NonNull
 	public abstract IHDLObject copyFiltered(CopyFilter filter);
 
 	@Override
+	@NonNull
 	public IHDLObject copyDeepFrozen(IHDLObject container) {
 		IHDLObject copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
@@ -173,6 +176,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		return (K) metaData.get(key);
 	}
 
+	@NonNull
 	public static <T> ArrayList<T> asList(T... items) {
 		ArrayList<T> res = new ArrayList<T>();
 		for (T t : items) {
@@ -325,7 +329,8 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
-	public HDLObject setContainer(IHDLObject container) {
+	public @NonNull
+	HDLObject setContainer(@Nullable IHDLObject container) {
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (this.container != null)
