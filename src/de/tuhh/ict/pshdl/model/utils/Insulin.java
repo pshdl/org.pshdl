@@ -82,6 +82,16 @@ public class Insulin {
 	}
 
 	public static IHDLObject resolveFragment(HDLUnresolvedFragment uFrag) {
+		// Single fragment (no function) resolves to variable -> Variable
+		// Single fragment (function) resolved to function -> FunctionCall
+		// Fragment (no bits, no function) resolves to variable,
+		// -> fragment (no function) -> Interface Ref
+		// -> fragment (function) -> FunctionCall (first fragment as arg)
+		// Fragment (no bits, no function, no array) resolves to Enum
+		// -> fragment (no bits, no function, no array) -> EnumRef
+		// Fragment (no bits, no array, no function) does not resolve
+		// -> append until we get a Type
+		// -> resolves to enum ->
 		HDLQualifiedName hVar = new HDLQualifiedName(uFrag.getFrag());
 		if (uFrag.getClassType() != HDLClass.HDLUnresolvedFragmentFunction) {
 			HDLVariable variable = ScopingExtension.INST.resolveVariable(uFrag, hVar);
@@ -91,7 +101,7 @@ public class Insulin {
 					return variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits());
 				}
 				HDLType type = TypeExtension.typeOf(variable);
-				if (type != null) {
+				if ((type != null) && (type.getClassType() == HDLClass.HDLInterface)) {
 					HDLQualifiedName typeName = fullNameOf(type);
 					HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
 							.setArray(sub.getArray()).setBits(sub.getBits());

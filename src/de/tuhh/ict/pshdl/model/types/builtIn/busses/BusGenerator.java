@@ -6,7 +6,7 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
-import org.antlr.runtime.*;
+import org.antlr.v4.runtime.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
@@ -20,6 +20,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBui
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
@@ -70,7 +71,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 	}
 
 	private HDLInterface createInterface(HDLDirectGeneration hdl, String name) throws FileNotFoundException, IOException, RecognitionException {
-		Unit unit = MemoryModel.parseUnit(getContentStream(hdl));
+		Unit unit = MemoryModelAST.parseUnit(getContentStream(hdl));
 		List<Row> rows = MemoryModel.buildRows(unit);
 		HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
 		return bId;
@@ -150,7 +151,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 			unit = createDefaultUnit(getRegCount(hdl));
 		} else {
 			try {
-				unit = MemoryModel.parseUnit(getContentStream(hdl));
+				unit = MemoryModelAST.parseUnit(getContentStream(hdl));
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
 			}

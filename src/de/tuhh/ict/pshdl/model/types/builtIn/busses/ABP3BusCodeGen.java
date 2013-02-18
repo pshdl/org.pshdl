@@ -3,7 +3,7 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 import java.io.*;
 import java.util.*;
 
-import org.antlr.runtime.*;
+import org.antlr.v4.runtime.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
@@ -15,6 +15,7 @@ import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 public class ABP3BusCodeGen extends CommonBusCode {
@@ -141,7 +142,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, RecognitionException {
-		Unit unit = MemoryModel.parseUnit(new FileInputStream(args[0]));
+		Unit unit = MemoryModelAST.parseUnit(new FileInputStream(args[0]));
 		System.out.println(unit);
 		System.out.println(get("Bla", unit, MemoryModel.buildRows(unit)));
 	}

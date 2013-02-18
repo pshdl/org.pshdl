@@ -53,6 +53,9 @@ class StringWriteExtension {
 	
 	public static StringWriteExtension INST=new StringWriteExtension
 
+	def dispatch String toString(IHDLObject exp, SyntaxHighlighter highlight) {
+		throw new RuntimeException("Did not implement toString for "+exp.classType)
+	}
 	def dispatch String toString(HDLExpression exp, SyntaxHighlighter highlight) {
 		throw new RuntimeException("Did not implement toString for "+exp.classType)
 	}
@@ -61,6 +64,8 @@ class StringWriteExtension {
 	}
 	
 	def static String asString(IHDLObject exp, SyntaxHighlighter highlight) {
+		if (exp==null)
+			throw new IllegalArgumentException("Can not handle null argument") 
 		return INST.toString(exp, highlight)
 	}
 
@@ -331,7 +336,9 @@ class StringWriteExtension {
 			sb.append(highlight.direction(dirString)).append(highlight.simpleSpace)
 		if (hvd.register != null)
 			sb.append(hvd.register.toString(highlight))
-		if (resolveType instanceof HDLEnum) {
+		if (resolveType==null){
+			sb.append("#UNRESOLVED_TYPE#")
+		} else if (resolveType instanceof HDLEnum) {
 			sb.append(highlight.keyword("enum")).append(highlight.simpleSpace).append(resolveType.toString(highlight))
 		} else
 			sb.append(resolveType.toString(highlight))

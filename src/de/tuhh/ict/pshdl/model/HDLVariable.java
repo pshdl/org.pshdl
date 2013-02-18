@@ -119,10 +119,12 @@ public class HDLVariable extends AbstractHDLVariable {
 		return null;
 	}
 
+	@NonNull
 	public HDLQualifiedName asRef() {
 		return fullNameOf(this);
 	}
 
+	@NonNull
 	public HDLVariableRef asHDLRef() {
 		return new HDLVariableRef().setVar(asRef());
 	}

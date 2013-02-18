@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.util.*;
 
-public class Memory {
+public class Memory implements NamedElement {
 	public List<Reference> references = new LinkedList<Reference>();
 
 	public Memory() {
@@ -24,5 +24,10 @@ public class Memory {
 		}
 		sb.append('}');
 		return sb.toString();
+	}
+
+	@Override
+	public String getName() {
+		return "memory";
 	}
 }

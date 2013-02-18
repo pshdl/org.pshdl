@@ -35,6 +35,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBui
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLPrimitive;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -434,30 +435,37 @@ public class RangeExtension {
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.POSSIBLY_ZERO_DIVIDE);
         }
         BigInteger _lowerEndpoint_6 = rightRange.lowerEndpoint();
-        BigInteger _divide = BigInteger.ONE.divide(_lowerEndpoint_6);
+        BigDecimal _bigDecimal = new BigDecimal(_lowerEndpoint_6);
+        BigDecimal _divide = BigDecimal.ONE.divide(_bigDecimal);
         BigInteger _upperEndpoint_7 = rightRange.upperEndpoint();
-        BigInteger _divide_1 = BigInteger.ONE.divide(_upperEndpoint_7);
-        Range<BigInteger> _closed = Ranges.<BigInteger>closed(_divide, _divide_1);
-        rightRange = _closed;
+        BigDecimal _bigDecimal_1 = new BigDecimal(_upperEndpoint_7);
+        BigDecimal _divide_1 = BigDecimal.ONE.divide(_bigDecimal_1);
+        final Range<BigDecimal> mulRange = Ranges.<BigDecimal>closed(_divide, _divide_1);
         BigInteger _lowerEndpoint_7 = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_8 = rightRange.lowerEndpoint();
-        final BigInteger ff = _lowerEndpoint_7.multiply(_lowerEndpoint_8);
+        BigDecimal _bigDecimal_2 = new BigDecimal(_lowerEndpoint_7);
+        BigDecimal _lowerEndpoint_8 = mulRange.lowerEndpoint();
+        final BigDecimal ff = _bigDecimal_2.multiply(_lowerEndpoint_8);
         BigInteger _lowerEndpoint_9 = leftRange.lowerEndpoint();
-        BigInteger _upperEndpoint_8 = rightRange.upperEndpoint();
-        final BigInteger ft = _lowerEndpoint_9.multiply(_upperEndpoint_8);
+        BigDecimal _bigDecimal_3 = new BigDecimal(_lowerEndpoint_9);
+        BigDecimal _upperEndpoint_8 = mulRange.upperEndpoint();
+        final BigDecimal ft = _bigDecimal_3.multiply(_upperEndpoint_8);
         BigInteger _upperEndpoint_9 = leftRange.upperEndpoint();
-        BigInteger _lowerEndpoint_10 = rightRange.lowerEndpoint();
-        final BigInteger tf = _upperEndpoint_9.multiply(_lowerEndpoint_10);
+        BigDecimal _bigDecimal_4 = new BigDecimal(_upperEndpoint_9);
+        BigDecimal _lowerEndpoint_10 = mulRange.lowerEndpoint();
+        final BigDecimal tf = _bigDecimal_4.multiply(_lowerEndpoint_10);
         BigInteger _upperEndpoint_10 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_11 = rightRange.upperEndpoint();
-        final BigInteger tt = _upperEndpoint_10.multiply(_upperEndpoint_11);
-        BigInteger _min = ff.min(ft);
-        BigInteger _min_1 = _min.min(tf);
-        BigInteger _min_2 = _min_1.min(tt);
-        BigInteger _max = ff.max(ft);
-        BigInteger _max_1 = _max.max(tf);
-        BigInteger _max_2 = _max_1.max(tt);
-        return Ranges.<BigInteger>closed(_min_2, _max_2);
+        BigDecimal _bigDecimal_5 = new BigDecimal(_upperEndpoint_10);
+        BigDecimal _upperEndpoint_11 = mulRange.upperEndpoint();
+        final BigDecimal tt = _bigDecimal_5.multiply(_upperEndpoint_11);
+        BigDecimal _min = ff.min(ft);
+        BigDecimal _min_1 = _min.min(tf);
+        BigDecimal _min_2 = _min_1.min(tt);
+        BigInteger _bigInteger = _min_2.toBigInteger();
+        BigDecimal _max = ff.max(ft);
+        BigDecimal _max_1 = _max.max(tf);
+        BigDecimal _max_2 = _max_1.max(tt);
+        BigInteger _bigInteger_1 = _max_2.toBigInteger();
+        return Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
       }
     }
     if (!_matched) {

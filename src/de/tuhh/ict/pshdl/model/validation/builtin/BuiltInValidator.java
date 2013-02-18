@@ -272,7 +272,7 @@ public class BuiltInValidator implements IHDLValidator {
 						HDLType labelType = TypeExtension.typeOf(label);
 						if (!type.equals(labelType))
 							problems.add(new Problem(ErrorCode.SWITCH_LABEL_WRONG_ENUM, caseStatement));
-						if (!enums.add(((HDLEnumRef) label).getVarRefName()))
+						if ((label instanceof HDLEnumRef) && !enums.add(((HDLEnumRef) label).getVarRefName()))
 							problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
 					}
 				}
@@ -556,7 +556,8 @@ public class BuiltInValidator implements IHDLValidator {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
 				break;
 			}
-			arrayRange = Ranges.closed(BigInteger.ZERO, arrayRange.upperEndpoint().subtract(BigInteger.ONE));
+			BigInteger upperEndpoint = arrayRange.upperEndpoint();
+			arrayRange = Ranges.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
 			String info = "Expected value range:" + accessRange;
 			if (accessRange.upperEndpoint().signum() < 0)
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
@@ -564,7 +565,7 @@ public class BuiltInValidator implements IHDLValidator {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			if (!arrayRange.isConnected(accessRange))
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			else if (accessRange.upperEndpoint().compareTo(arrayRange.upperEndpoint()) > 0)
+			else if (accessRange.upperEndpoint().compareTo(upperEndpoint) > 0)
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 
 			dim++;

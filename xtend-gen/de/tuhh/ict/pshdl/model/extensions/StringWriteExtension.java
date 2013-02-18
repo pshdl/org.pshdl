@@ -71,6 +71,13 @@ public class StringWriteExtension {
     }
   }.apply();
   
+  protected String _toString(final IHDLObject exp, final SyntaxHighlighter highlight) {
+    HDLClass _classType = exp.getClassType();
+    String _plus = ("Did not implement toString for " + _classType);
+    RuntimeException _runtimeException = new RuntimeException(_plus);
+    throw _runtimeException;
+  }
+  
   protected String _toString(final HDLExpression exp, final SyntaxHighlighter highlight) {
     HDLClass _classType = exp.getClassType();
     String _plus = ("Did not implement toString for " + _classType);
@@ -86,6 +93,11 @@ public class StringWriteExtension {
   }
   
   public static String asString(final IHDLObject exp, final SyntaxHighlighter highlight) {
+    boolean _equals = Objects.equal(exp, null);
+    if (_equals) {
+      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Can not handle null argument");
+      throw _illegalArgumentException;
+    }
     return StringWriteExtension.INST.toString(exp, highlight);
   }
   
@@ -910,16 +922,21 @@ public class StringWriteExtension {
       String _string_1 = this.toString(_register_1, highlight);
       sb.append(_string_1);
     }
-    if ((resolveType instanceof HDLEnum)) {
-      String _keyword = highlight.keyword("enum");
-      StringBuilder _append_2 = sb.append(_keyword);
-      String _simpleSpace_2 = highlight.simpleSpace();
-      StringBuilder _append_3 = _append_2.append(_simpleSpace_2);
-      String _string_2 = this.toString(resolveType, highlight);
-      _append_3.append(_string_2);
+    boolean _equals = Objects.equal(resolveType, null);
+    if (_equals) {
+      sb.append("#UNRESOLVED_TYPE#");
     } else {
-      String _string_3 = this.toString(resolveType, highlight);
-      sb.append(_string_3);
+      if ((resolveType instanceof HDLEnum)) {
+        String _keyword = highlight.keyword("enum");
+        StringBuilder _append_2 = sb.append(_keyword);
+        String _simpleSpace_2 = highlight.simpleSpace();
+        StringBuilder _append_3 = _append_2.append(_simpleSpace_2);
+        String _string_2 = this.toString(resolveType, highlight);
+        _append_3.append(_string_2);
+      } else {
+        String _string_3 = this.toString(resolveType, highlight);
+        sb.append(_string_3);
+      }
     }
     StringConcatenation _builder = new StringConcatenation();
     {
@@ -940,8 +957,8 @@ public class StringWriteExtension {
     _builder.append(";");
     sb.append(_builder.toString());
     Context _context = highlight.getContext();
-    boolean _equals = Objects.equal(_context, Context.HDLPackage);
-    if (_equals) {
+    boolean _equals_1 = Objects.equal(_context, Context.HDLPackage);
+    if (_equals_1) {
       String _newLine = highlight.newLine();
       sb.append(_newLine);
     }
@@ -1506,6 +1523,8 @@ public class StringWriteExtension {
       return _toString((HDLExpression)ref, highlight);
     } else if (ref instanceof HDLStatement) {
       return _toString((HDLStatement)ref, highlight);
+    } else if (ref != null) {
+      return _toString(ref, highlight);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(ref, highlight).toString());

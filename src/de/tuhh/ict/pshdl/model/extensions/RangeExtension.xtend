@@ -35,6 +35,7 @@ import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
 import static de.tuhh.ict.pshdl.model.extensions.RangeExtension.*
 import static java.math.BigInteger.*
+import java.math.BigDecimal
 
 class RangeExtension {
 	
@@ -212,12 +213,12 @@ class RangeExtension {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, POSSIBLY_ZERO_DIVIDE)
 			}
-			rightRange = Ranges::closed(ONE.divide(rightRange.lowerEndpoint), ONE.divide(rightRange.upperEndpoint))
-			val BigInteger ff = leftRange.lowerEndpoint.multiply(rightRange.lowerEndpoint)
-			val BigInteger ft = leftRange.lowerEndpoint.multiply(rightRange.upperEndpoint)
-			val BigInteger tf = leftRange.upperEndpoint.multiply(rightRange.lowerEndpoint)
-			val BigInteger tt = leftRange.upperEndpoint.multiply(rightRange.upperEndpoint)
-			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
+			val mulRange = Ranges::closed(BigDecimal::ONE.divide(new BigDecimal(rightRange.lowerEndpoint)), BigDecimal::ONE.divide(new BigDecimal(rightRange.upperEndpoint)))
+			val BigDecimal ff = new BigDecimal(leftRange.lowerEndpoint).multiply(mulRange.lowerEndpoint)
+			val BigDecimal ft = new BigDecimal(leftRange.lowerEndpoint).multiply(mulRange.upperEndpoint)
+			val BigDecimal tf = new BigDecimal(leftRange.upperEndpoint).multiply(mulRange.lowerEndpoint)
+			val BigDecimal tt = new BigDecimal(leftRange.upperEndpoint).multiply(mulRange.upperEndpoint)
+			return Ranges::closed(ff.min(ft).min(tf).min(tt).toBigInteger, ff.max(ft).max(tf).max(tt).toBigInteger)
 		}
 		case MUL: {
 			val BigInteger ff = leftRange.lowerEndpoint.multiply(rightRange.lowerEndpoint)

@@ -18,6 +18,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName
 import java.util.Iterator
 
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*
+import org.eclipse.jdt.annotation.NonNull
 
 class FullNameExtension {
 	public static GenericMeta<HDLQualifiedName> FULLNAME=new GenericMeta<HDLQualifiedName>("FULLNAME", true)
@@ -129,6 +130,7 @@ class FullNameExtension {
 		return HDLQualifiedName::EMPTY
 	}
 
+	@NonNull
 	def static HDLQualifiedName fullNameOf(IHDLObject obj){
 		if (obj==null)
 			throw new NullPointerException("Can not get a name for null")

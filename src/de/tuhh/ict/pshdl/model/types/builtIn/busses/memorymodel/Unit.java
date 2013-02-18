@@ -3,13 +3,12 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.*;
 
 public class Unit {
-	public int rowWidth = 32;
 	public Map<String, NamedElement> declarations = new LinkedHashMap<String, NamedElement>();
 	public Memory memory;
+	public static final int rowWidth = 32;
 
-	public Unit(int rowWidth, Map<String, NamedElement> declarations, Memory memory) {
+	public Unit(Map<String, NamedElement> declarations, Memory memory) {
 		super();
-		this.rowWidth = rowWidth;
 		this.declarations = declarations;
 		this.memory = memory;
 	}
@@ -20,7 +19,6 @@ public class Unit {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("rowWidth=").append(rowWidth).append(":\n");
 		for (NamedElement dec : declarations.values()) {
 			sb.append(dec).append('\n');
 		}

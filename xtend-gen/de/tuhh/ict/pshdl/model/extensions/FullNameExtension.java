@@ -19,6 +19,7 @@ import de.tuhh.ict.pshdl.model.IHDLObject;
 import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
 import java.util.Arrays;
 import java.util.Iterator;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 @SuppressWarnings("all")
@@ -219,6 +220,7 @@ public class FullNameExtension {
     return HDLQualifiedName.EMPTY;
   }
   
+  @NonNull
   public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
     HDLQualifiedName _xblockexpression = null;
     {

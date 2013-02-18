@@ -6,6 +6,8 @@ import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.*;
+
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -64,7 +66,7 @@ public class HDLSimulator {
 		return ms.apply(insulin);
 	}
 
-	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, String name, HDLEvaluationContext context) {
+	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, @NonNull String name, HDLEvaluationContext context) {
 		if (idx >= dim.size()) {
 			return Collections.singletonList(new HDLVariable().setName(name));
 		}
@@ -118,7 +120,8 @@ public class HDLSimulator {
 				if (current == null)
 					current = next.getRight();
 				// XXX Add if cases
-				if (next.getContainer().getClassType() == HDLClass.HDLUnit) {
+				IHDLObject container = next.getContainer();
+				if (container.getClassType() == HDLClass.HDLUnit) {
 					break;
 				}
 			}

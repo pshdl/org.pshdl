@@ -1,5 +1,7 @@
 package de.tuhh.ict.pshdl.model;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.math.*;
 import java.util.*;
 
@@ -94,7 +96,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			case CONSTANT: {
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
-					BigInteger constant = ConstantEvaluate.valueOf(hdlVariable.getDefaultValue());
+					BigInteger constant = checkNotNull(ConstantEvaluate.valueOf(hdlVariable.getDefaultValue()),
+							"The evaluation of a constant should always return a constant. The constant was:%s", hdlVariable);
 					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(resolveHIf).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
 					for (HDLVariableRef ref : refs) {
 						ms.replace(ref, HDLLiteral.get(constant));

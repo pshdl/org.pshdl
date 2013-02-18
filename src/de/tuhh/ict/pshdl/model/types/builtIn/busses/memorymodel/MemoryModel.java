@@ -3,17 +3,16 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 import java.io.*;
 import java.util.*;
 
-import org.antlr.runtime.*;
-
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 
 public class MemoryModel {
 
 	public static void main(String[] args) throws Exception {
 		File file = new File(args[0]);
-		Unit unit = parseUnit(new FileInputStream(file));
+		Unit unit = MemoryModelAST.parseUnit(new FileInputStream(file));
 		System.out.println(unit);
 		List<Row> rows = buildRows(unit);
 		byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
@@ -31,14 +30,15 @@ public class MemoryModel {
 		System.out.println(hdi);
 	}
 
-	public static Unit parseUnit(InputStream stream) throws FileNotFoundException, IOException, RecognitionException {
-		ANTLRInputStream input = new ANTLRInputStream(stream);
-		MemoryModelLexer lexer = new MemoryModelLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		MemoryModelParser parser = new MemoryModelParser(tokens);
-		Unit unit = parser.unit();
-		return unit;
-	}
+	// public static Unit parseUnit(InputStream stream) throws
+	// FileNotFoundException, IOException, RecognitionException {
+	// ANTLRInputStream input = new ANTLRInputStream(stream);
+	// MemoryModelLexer lexer = new MemoryModelLexer(input);
+	// CommonTokenStream tokens = new CommonTokenStream(lexer);
+	// MemoryModelParser parser = new MemoryModelParser(tokens);
+	// Unit unit = parser.unit();
+	// return unit;
+	// }
 
 	public static HDLInterface buildHDLInterface(Unit unit, List<Row> rows) {
 		Map<String, Definition> definitions = new HashMap<String, Definition>();
