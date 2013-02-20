@@ -22,6 +22,7 @@ public enum HDLClass {
 	HDLManip(HDLManip.class), // HDLManip
 	HDLConcat(HDLConcat.class), // HDLConcat
 	HDLTernary(HDLTernary.class), // HDLTernary
+	HDLArrayInit(HDLArrayInit.class), // HDLArrayInit
 	HDLStatement(HDLStatement.class), // HDLStatement
 	HDLDeclaration(HDLDeclaration.class), // HDLDeclaration
 	HDLFunction(HDLFunction.class), // HDLFunction
