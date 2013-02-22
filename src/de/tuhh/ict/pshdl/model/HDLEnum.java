@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -30,7 +30,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnum(@Nullable IHDLObject container, @NonNull String name, @NonNull ArrayList<HDLVariable> enums, boolean validate) {
+	public HDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull ArrayList<HDLVariable> enums, boolean validate) {
 		super(container, name, enums, validate);
 	}
 

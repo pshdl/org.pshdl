@@ -4,7 +4,7 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -43,8 +43,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRegisterConfig(@Nullable IHDLObject container, @NonNull HDLQualifiedName clk, @NonNull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @NonNull HDLExpression resetValue, boolean validate) {
+	public HDLRegisterConfig(@Nullable IHDLObject container, @Nonnull HDLQualifiedName clk, @Nonnull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue, boolean validate) {
 		super(container, clk, rst, clockType, resetType, syncType, resetValue, validate);
 	}
 
@@ -150,12 +150,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String DEF_RST = "$rst";
 	public static final String DEF_CLK = "$clk";
 
-	@NonNull
+	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig().setClk(HDLQualifiedName.create(DEF_CLK)).setRst(HDLQualifiedName.create(DEF_RST)).setResetValue(HDLLiteral.get(0));
 	}
 
-	@NonNull
+	@Nonnull
 	public static HDLRegisterConfig fromArgs(ArrayList<HDLArgument> args) {
 		HDLRegisterConfig config = defaultConfig();
 		for (HDLArgument genArgs : args) {

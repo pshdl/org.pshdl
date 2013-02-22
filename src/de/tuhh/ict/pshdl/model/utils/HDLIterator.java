@@ -7,7 +7,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 
 public class HDLIterator implements Iterator<IHDLObject> {
-	private final class SingleObjectIterator implements Iterator<HDLObject> {
+	private final class SingleObjectIterator implements Iterator<IHDLObject> {
 		private HDLObject hdo;
 
 		private SingleObjectIterator(HDLObject hdo) {
@@ -40,28 +40,26 @@ public class HDLIterator implements Iterator<IHDLObject> {
 
 	}
 
-	private List<Iterator<HDLObject>> iters = new LinkedList<Iterator<HDLObject>>();
-	private Iterator<Iterator<HDLObject>> delegate;
-	private Iterator<HDLObject> current;
-
-	public HDLIterator(HDLObject obj) throws IllegalArgumentException, IllegalAccessException {
-		this(obj, false);
-	}
+	private List<Iterator<IHDLObject>> iters = new LinkedList<Iterator<IHDLObject>>();
+	private Iterator<Iterator<IHDLObject>> delegate;
+	private Iterator<IHDLObject> current;
 
 	public HDLIterator(HDLObject obj, boolean deep) throws IllegalArgumentException, IllegalAccessException {
 		Class<? extends HDLObject> clazz = obj.getClass();
 		addAllFields(obj, clazz, deep);
 		delegate = iters.iterator();
-		if (delegate.hasNext())
+		if (delegate.hasNext()) {
 			current = delegate.next();
-		else
+		} else {
 			current = new SingleObjectIterator(null);
+		}
 	}
 
 	private void addAllFields(HDLObject obj, Class<?> clazz, boolean deep) throws IllegalAccessException {
 		Class<?> superClazz = clazz.getSuperclass();
-		if ((superClazz != null) && !superClazz.getName().endsWith("HDLObject"))
+		if ((superClazz != null) && !superClazz.getName().endsWith("HDLObject")) {
 			addAllFields(obj, superClazz, deep);
+		}
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			if (field.getAnnotation(Visit.class) != null) {
@@ -69,14 +67,17 @@ public class HDLIterator implements Iterator<IHDLObject> {
 				Object object = field.get(obj);
 				if (object instanceof HDLObject) {
 					final HDLObject hdo = (HDLObject) object;
-					if (hdo != null)
+					if (hdo != null) {
 						iters.add(new SingleObjectIterator(hdo));
+					}
 				}
 				if (object instanceof Collection) {
 					@SuppressWarnings("unchecked")
 					Collection<HDLObject> chdo = (Collection<HDLObject>) object;
 					if (deep) {
-						iters.add(chdo.iterator());
+						for (HDLObject hdlObject : chdo) {
+							iters.add(hdlObject.iterator(deep));
+						}
 					} else {
 						for (HDLObject hdlObject : chdo) {
 							iters.add(new SingleObjectIterator(hdlObject));
@@ -100,7 +101,7 @@ public class HDLIterator implements Iterator<IHDLObject> {
 	}
 
 	@Override
-	public HDLObject next() {
+	public IHDLObject next() {
 		return current.next();
 	}
 

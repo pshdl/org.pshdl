@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -27,7 +27,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLConcat(@Nullable IHDLObject container, @NonNull ArrayList<HDLExpression> cats, boolean validate) {
+	public HDLConcat(@Nullable IHDLObject container, @Nonnull ArrayList<HDLExpression> cats, boolean validate) {
 		super(container, cats, validate);
 	}
 

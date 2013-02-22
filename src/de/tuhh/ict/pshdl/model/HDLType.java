@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -24,7 +24,7 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLType(@Nullable IHDLObject container, @NonNull String name, boolean validate) {
+	public HDLType(@Nullable IHDLObject container, @Nonnull String name, boolean validate) {
 		super(container, name, validate);
 	}
 
@@ -53,7 +53,7 @@ public abstract class HDLType extends AbstractHDLType {
 	};
 
 	// $CONTENT-BEGIN$
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName asRef() {
 		return new HDLQualifiedName(getName());
 	}

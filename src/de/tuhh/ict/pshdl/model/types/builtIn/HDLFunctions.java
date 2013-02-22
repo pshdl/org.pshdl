@@ -11,7 +11,7 @@ import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
-import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import de.upb.hni.vmagic.expression.*;
 
 public class HDLFunctions {
@@ -58,12 +58,13 @@ public class HDLFunctions {
 
 	public static HDLTypeInferenceInfo getInferenceInfo(HDLFunctionCall function) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null)
+		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
 				HDLTypeInferenceInfo resolve = resolver.resolve(function);
 				if (resolve != null)
 					return resolve;
 			}
+		}
 		HDLFunction rFunc = function.resolveName();
 		if (rFunc != null) {
 			if (rFunc instanceof HDLInlineFunction) {
@@ -88,45 +89,49 @@ public class HDLFunctions {
 
 	public static BigInteger constantEvaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null)
+		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
 				BigInteger eval = resolver.evaluate(function, args, context);
 				if (eval != null)
 					return eval;
 			}
+		}
 		return null;
 	}
 
 	public static Range<BigInteger> determineRange(HDLFunctionCall function, HDLEvaluationContext context) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null)
+		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
 				Range<BigInteger> eval = resolver.range(function, context);
 				if (eval != null)
 					return eval;
 			}
+		}
 		return null;
 	}
 
 	public static VHDLContext toVHDL(HDLFunctionCall function, int pid) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null)
+		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
 				VHDLContext eval = resolver.toVHDL(function, pid);
 				if (eval != null)
 					return eval;
 			}
+		}
 		return null;
 	}
 
 	public static Expression<?> toVHDLExpression(HDLFunctionCall function) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null)
+		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
 				Expression<?> eval = resolver.toVHDLExpression(function);
 				if (eval != null)
 					return eval;
 			}
+		}
 		return null;
 	}
 }

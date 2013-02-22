@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -28,7 +28,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInstantiation(@Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate) {
+	public HDLInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate) {
 		super(container, var, arguments, validate);
 	}
 

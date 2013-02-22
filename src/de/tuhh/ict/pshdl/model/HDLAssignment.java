@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -31,7 +31,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLAssignment(@Nullable IHDLObject container, @NonNull HDLReference left, @Nullable HDLAssignmentType type, @NonNull HDLExpression right, boolean validate) {
+	public HDLAssignment(@Nullable IHDLObject container, @Nonnull HDLReference left, @Nullable HDLAssignmentType type, @Nonnull HDLExpression right, boolean validate) {
 		super(container, left, type, right, validate);
 	}
 
@@ -66,7 +66,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 		}
 
 		@Override
-		@NonNull
+		@Nonnull
 		public String toString() {
 			return str;
 		}

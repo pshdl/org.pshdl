@@ -4,7 +4,7 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -49,8 +49,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String libURI, @NonNull String name,
-			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> inits, @Nullable ArrayList<HDLStatement> statements, @NonNull Boolean simulation,
+	public HDLUnit(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name,
+			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> inits, @Nullable ArrayList<HDLStatement> statements, @Nonnull Boolean simulation,
 			boolean validate) {
 		super(container, annotations, libURI, name, imports, inits, statements, simulation, validate);
 	}

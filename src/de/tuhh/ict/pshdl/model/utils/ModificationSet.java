@@ -76,10 +76,11 @@ public class ModificationSet {
 							}
 						}
 						multiAdd(res, before, container);
-						if (replace.size() != 0)
+						if (replace.size() != 0) {
 							multiAdd(res, replace, container);
-						else
+						} else {
 							singleAdd(res, t, container);
+						}
 						multiAdd(res, after, container);
 					} else {
 						singleAdd(res, t, container);
@@ -182,8 +183,9 @@ public class ModificationSet {
 		if (list != null) {
 			List<Modification> res = new LinkedList<ModificationSet.Modification>();
 			for (Modification modification : list) {
-				if (modification.subject == object)
+				if (modification.subject == object) {
 					res.add(modification);
+				}
 			}
 			return res;
 		}
@@ -207,8 +209,9 @@ public class ModificationSet {
 
 	private void insert(IHDLObject subject, Modification mod) {
 		List<Modification> list = replacements.get(getHash(subject));
-		if (list == null)
+		if (list == null) {
 			list = new LinkedList<ModificationSet.Modification>();
+		}
 		list.add(mod);
 		replacements.put(getHash(subject), list);
 	}
@@ -272,8 +275,9 @@ public class ModificationSet {
 			Iterator<Modification> iter = list.iterator();
 			while (iter.hasNext()) {
 				ModificationSet.Modification mod = iter.next();
-				if (mod.subject == subject)
+				if (mod.subject == subject) {
 					iter.remove();
+				}
 			}
 		}
 	}

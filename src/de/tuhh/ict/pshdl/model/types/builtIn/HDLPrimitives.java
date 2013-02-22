@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model.types.builtIn;
 
+import static com.google.common.base.Preconditions.*;
 import static de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType.*;
 import static de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType.*;
 
@@ -7,11 +8,10 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -30,7 +30,7 @@ public class HDLPrimitives implements IHDLPrimitive {
 	public static class HDLInferenceTriple {
 		public HDLPrimitiveType left, right, result;
 
-		public HDLInferenceTriple(@NonNull HDLPrimitiveType left, @NonNull HDLPrimitiveType right, HDLPrimitiveType result) {
+		public HDLInferenceTriple(@Nonnull HDLPrimitiveType left, @Nonnull HDLPrimitiveType right, HDLPrimitiveType result) {
 			super();
 			this.left = left;
 			this.right = right;
@@ -73,8 +73,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 	}
 
 	public static IHDLPrimitive getInstance() {
-		if (hdlPrimitives == null)
+		if (hdlPrimitives == null) {
 			hdlPrimitives = new HDLPrimitives();
+		}
 		return hdlPrimitives;
 	}
 
@@ -84,8 +85,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			result.result = BOOL;
 		}
 		for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
-			if (right == BOOL)
+			if (right == BOOL) {
 				continue;
+			}
 			res.put(new HDLInferenceTriple(BIT, right, null), new HDLInferenceTriple(BITVECTOR, BITVECTOR, BOOL));
 			res.put(new HDLInferenceTriple(BITVECTOR, right, null), new HDLInferenceTriple(BITVECTOR, BITVECTOR, BOOL));
 		}
@@ -98,11 +100,13 @@ public class HDLPrimitives implements IHDLPrimitive {
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initBitResolution() {
 		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
 		for (HDLPrimitiveType left : HDLPrimitiveType.values()) {
-			if (left == BOOL)
+			if (left == BOOL) {
 				continue;
+			}
 			for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
-				if (right == BOOL)
+				if (right == BOOL) {
 					continue;
+				}
 				res.put(new HDLInferenceTriple(left, right, null), new HDLInferenceTriple(left, left, left));
 			}
 		}
@@ -213,15 +217,17 @@ public class HDLPrimitives implements IHDLPrimitive {
 				HDLInferenceTriple triple = map.get(new HDLInferenceTriple(left, right, null));
 				if (triple != null) {
 					sb.append("<td>");
-					if (triple.left != left)
+					if (triple.left != left) {
 						sb.append("<span class='cast'>").append(triple.left.name().toLowerCase()).append("</span>");
-					else
+					} else {
 						sb.append(left.name().toLowerCase());
+					}
 					sb.append("</td><td>");
-					if (triple.right != right)
+					if (triple.right != right) {
 						sb.append("<span class='cast'>").append(triple.right.name().toLowerCase()).append("</span>");
-					else
+					} else {
 						sb.append(right.name().toLowerCase());
+					}
 					sb.append("</td><td>");
 					sb.append(triple.result.name().toLowerCase());
 					sb.append("</td>");
@@ -247,11 +253,13 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLPrimitive rType = (HDLPrimitive) TypeExtension.typeOf(op.getRight());
 		HDLArithOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType)) {
-			if (HDLPrimitive.isTargetMatching(rType))
+			if (HDLPrimitive.isTargetMatching(rType)) {
 				lType = rType;
+			}
 		}
-		if (HDLPrimitive.isTargetMatching(rType))
+		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
+		}
 		HDLInferenceTriple triple = arithResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
 			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
@@ -282,8 +290,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			return null;
 		width = width.copyDeepFrozen(container);
 		BigInteger newW = ConstantEvaluate.valueOf(width, null);
-		if (newW != null)
+		if (newW != null) {
 			width = new HDLLiteral().setVal(newW.toString());
+		}
 		return width;
 	}
 
@@ -324,11 +333,13 @@ public class HDLPrimitives implements IHDLPrimitive {
 
 	private HDLExpression getWidth(IHDLObject exp, HDLArithOpType type, HDLTypeInferenceInfo info) {
 		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
-		if (leftW != null)
+		if (leftW != null) {
 			leftW = leftW.copyFiltered(CopyFilter.DEEP_META); // XXX Remove
+		}
 		HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
-		if (rightW != null)
+		if (rightW != null) {
 			rightW = rightW.copyFiltered(CopyFilter.DEEP_META); // XXX Remove
+		}
 		switch (type) {
 		case POW:
 			// The result type of pow can only be natural
@@ -407,11 +418,13 @@ public class HDLPrimitives implements IHDLPrimitive {
 			HDLPrimitive lType = (HDLPrimitive) determineTypeL;
 			HDLPrimitive rType = (HDLPrimitive) determineTypeR;
 			if (HDLPrimitive.isTargetMatching(lType)) {
-				if (HDLPrimitive.isTargetMatching(rType))
+				if (HDLPrimitive.isTargetMatching(rType)) {
 					lType = rType;
+				}
 			}
-			if (HDLPrimitive.isTargetMatching(rType))
+			if (HDLPrimitive.isTargetMatching(rType)) {
 				rType = lType;
+			}
 			if (nonOrderType.contains(lType.getType()) || nonOrderCompType.contains(rType.getType()))
 				if (!nonOrderCompType.contains(op.getType())) {
 					HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
@@ -445,11 +458,13 @@ public class HDLPrimitives implements IHDLPrimitive {
 		HDLPrimitive lType = (HDLPrimitive) TypeExtension.typeOf(op.getLeft());
 		HDLPrimitive rType = (HDLPrimitive) TypeExtension.typeOf(op.getRight());
 		if (HDLPrimitive.isTargetMatching(lType)) {
-			if (HDLPrimitive.isTargetMatching(rType))
+			if (HDLPrimitive.isTargetMatching(rType)) {
 				lType = rType;
+			}
 		}
-		if (HDLPrimitive.isTargetMatching(rType))
+		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
+		}
 		HDLInferenceTriple triple = bitResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
 			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
@@ -457,8 +472,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			return hdi;
 		}
 		HDLExpression width = lType.getWidth();
-		if ((width == null) && (rType.getWidth() != null))
+		if ((width == null) && (rType.getWidth() != null)) {
 			width = rType.getWidth();
+		}
 		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width == null ? null : width), lType.setType(triple.left),
 				lType.setType(triple.right));
 		return normalize(info, op);

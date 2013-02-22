@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -46,7 +46,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLVariableDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
-			@Nullable HDLDirection direction, @NonNull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @NonNull ArrayList<HDLVariable> variables, boolean validate) {
+			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull ArrayList<HDLVariable> variables, boolean validate) {
 		super(container, annotations, register, direction, type, primitive, variables, validate);
 	}
 
@@ -80,7 +80,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		}
 
 		@Override
-		@NonNull
+		@Nonnull
 		public String toString() {
 			return str;
 		}

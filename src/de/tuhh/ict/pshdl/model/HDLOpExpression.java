@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -26,7 +26,7 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLOpExpression(@Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, boolean validate) {
+	public HDLOpExpression(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, boolean validate) {
 		super(container, left, right, validate);
 	}
 

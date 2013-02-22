@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.math.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -28,7 +28,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLLiteral(@Nullable IHDLObject container, @NonNull String val, @Nullable Boolean str, boolean validate) {
+	public HDLLiteral(@Nullable IHDLObject container, @Nonnull String val, @Nullable Boolean str, boolean validate) {
 		super(container, val, str, validate);
 	}
 
@@ -125,7 +125,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param val
 	 * @return
 	 */
-	public static @NonNull
+	public static @Nonnull
 	HDLLiteral get(long val) {
 		return new HDLLiteral().setStr(false).setVal(Long.toString(val));
 	}
@@ -164,8 +164,8 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		return HDLLiteralPresentation.NUM;
 	}
 
-	public static @NonNull
-	HDLLiteral get(@NonNull BigInteger constant) {
+	public static @Nonnull
+	HDLLiteral get(@Nonnull BigInteger constant) {
 		return new HDLLiteral().setStr(false).setVal(constant.toString());
 	}
 

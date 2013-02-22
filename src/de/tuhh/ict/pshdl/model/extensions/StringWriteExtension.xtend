@@ -48,6 +48,7 @@ import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter$Context
 import static de.tuhh.ict.pshdl.model.extensions.StringWriteExtension.*
 import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
 import de.tuhh.ict.pshdl.model.HDLUnresolvedFragmentFunction
+import de.tuhh.ict.pshdl.model.HDLArrayInit
 
 class StringWriteExtension {
 	
@@ -69,6 +70,11 @@ class StringWriteExtension {
 		return INST.toString(exp, highlight)
 	}
 
+	def dispatch String toString(HDLArrayInit array, SyntaxHighlighter highlight){
+		if (array.exp.size==1)
+			return array.exp.get(0).toString(highlight)
+		return '''{«FOR e:array.exp SEPARATOR ','»«ENDFOR»}'''
+	}
 	def dispatch String toString(HDLAnnotation anno, SyntaxHighlighter highlight){
 		val StringBuilder sb=new StringBuilder
 		sb.append(highlight.annotation(anno.name))

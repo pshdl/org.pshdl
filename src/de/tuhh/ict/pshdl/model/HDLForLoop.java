@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -35,7 +35,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLForLoop(@Nullable IHDLObject container, @NonNull ArrayList<HDLRange> range, @NonNull HDLVariable param, @NonNull ArrayList<HDLStatement> dos, boolean validate) {
+	public HDLForLoop(@Nullable IHDLObject container, @Nonnull ArrayList<HDLRange> range, @Nonnull HDLVariable param, @Nonnull ArrayList<HDLStatement> dos, boolean validate) {
 		super(container, range, param, dos, validate);
 	}
 

@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -29,7 +29,7 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunctionCall(@Nullable IHDLObject container, @NonNull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params, boolean validate) {
+	public HDLFunctionCall(@Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params, boolean validate) {
 		super(container, name, params, validate);
 	}
 

@@ -2,8 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="xtend-gen"/>
+	<classpathentry kind="src" path="model-gen"/>
+	<classpathentry kind="src" path="model"/>
+	<classpathentry kind="src" path="vhdl"/>
+	<classpathentry kind="src" path="simulation"/>
+	<classpathentry kind="src" path="generator"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="antlr-runtime-4.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/PSHDLExternalDeps"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

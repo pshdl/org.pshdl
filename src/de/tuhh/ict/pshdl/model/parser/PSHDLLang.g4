@@ -42,7 +42,7 @@ psBlock :
 
 // Rule PSProcess
 psProcess :
-	'process' '{' psBlock* '}'
+	isProcess='process' '{' psBlock* '}'
 ;
 
 // Rule PSInstantiation
@@ -58,12 +58,7 @@ psInterfaceInstantiation :
 
 // Rule PSDirectGeneration
 psDirectGeneration :
-	isInclude='include'? psInterface psVariable psGenerator ';'
-;
-
-// Rule PSGenerator
-psGenerator :
-	'=' 'generate' RULE_ID psPassedArguments? RULE_GENERATOR_CONTENT?
+	isInclude='include'? psInterface psVariable '=' 'generate' RULE_ID psPassedArguments? RULE_GENERATOR_CONTENT? ';'
 ;
 
 // Rule PSPassedArguments
@@ -80,61 +75,27 @@ psArgument :
 	RULE_ID '=' psExpression
 ;
 
-// Rule PSEqualityOp
-psEqualityOp :
-	'==' |
-	'!='
-;
-
-psEqualityCompOp :
-	'<' |
-	'<=' |
-	'>' |
-	'>='
-;
-
-// Rule PSShiftOp
-psShiftOp :
-	'<<' |
-	'>>' |
-	'>>>'
-;
-
-// Rule PSAddOp
-psAddOp :
-	'+' |
-	'-'
-;
-
-// Rule PSMulOp
-psMulOp :
-	'**' |
-	'*' |
-	'/' |
-	'%'
-;
-
 // Rule PSCast
 psCast :
 	'(' psPrimitiveType psWidth? ')'
 ;
 
 psExpression :
-	(psCast | '!'<assoc=right> | '~'<assoc=right> | '-'<assoc=right>) psExpression |
-	psExpression psMulOp psExpression |
-	psExpression psAddOp psExpression |
-	psExpression psShiftOp psExpression |
-	psExpression psEqualityCompOp psExpression |
-	psExpression psEqualityOp psExpression |
-	psExpression '&' psExpression |
-	psExpression '^' psExpression |
-	psExpression '|' psExpression |
-	psExpression '#' psExpression |
-	psExpression '&&' psExpression |
-	psExpression '||' psExpression |
-	psExpression '?' psExpression ':' psExpression|
-	psValue |
-	'(' psExpression ')'
+	(psCast | type='!'<assoc=right> | type='~'<assoc=right> | type='-'<assoc=right>) psExpression  #psManip
+	| psExpression op=('**' | '*' | '/' | '%') psExpression							#psMul
+	| psExpression op=('+' | '-') psExpression 										#psAdd
+	| psExpression op=('<<' | '>>' | '>>>') psExpression 							#psShift
+	| psExpression op=('<' | '<=' | '>' | '>=') psExpression						#psEqualityComp
+	| psExpression op=('==' | '!=') psExpression									#psEquality
+	| psExpression '&' psExpression													#psBitAnd
+	| psExpression '^'<assoc=right> psExpression									#psBitXor
+	| psExpression '|' psExpression													#psBitOr
+	| psExpression '#' psExpression													#psConcat
+	| psExpression '&&' psExpression												#psBitLogAnd
+	| psExpression '||' psExpression												#psBitLogOr
+	| psExpression '?' psExpression ':' psExpression								#psTernary
+	| psValue 																		#psValueExp
+	| '(' psExpression ')'															#psParens
 ;
 
 psValue :
@@ -150,7 +111,7 @@ psBitAccess :
 
 // Rule PSAccessRange
 psAccessRange :
-	psExpression ( ':' psExpression )?
+	from=psExpression ( ':' to=psExpression )?
 ;
 
 // Rule PSVariableRef
@@ -247,18 +208,18 @@ psCompoundStatement :
 
 // Rule PSIfStatement
 psIfStatement :
-	'if' '(' psExpression ')' ruleSimpleBlock 
-	('else' ruleSimpleBlock )?
+	'if' '(' psExpression ')' ifBlk=psSimpleBlock 
+	('else' elseBlk=psSimpleBlock )?
 ;
 
-ruleSimpleBlock : 
+psSimpleBlock : 
 	'{' psBlock* '}' |
 	psBlock
 ;
 
 // Rule PSForStatement
 psForStatement :
-	'for' '(' psVariable '=' psBitAccess ')' ruleSimpleBlock
+	'for' '(' psVariable '=' psBitAccess ')' psSimpleBlock
 ;
 
 // Rule PSSwitchStatement
@@ -310,9 +271,15 @@ psDeclAssignment :
 ;
 
 psArrayInit :
-	   (psExpression (',' psExpression )*) 	|
-	'{' psArrayInit  (',' psArrayInit )* '}'
+	   psExpression 	|
+	'{' psArrayInitSub  (',' psArrayInitSub )* '}'
 ;
+
+psArrayInitSub :
+	   psExpression (',' psExpression)*	|
+	'{' psArrayInitSub  (',' psArrayInitSub )* '}'
+;
+
 
 // Rule PSArray
 psArray :
@@ -378,6 +345,46 @@ psPortDeclaration :
 psQualifiedName :
 	RULE_ID ('.' RULE_ID)*
 ;
+
+
+AND:'&';
+OR:'|';
+XOR:'^';
+LOGI_AND:'&&';
+LOGI_OR:'||';
+MUL:'*';
+DIV:'/';
+//MINUS:'-';
+PLUS:'+';
+MOD:'%';
+POW:'**';
+SLL:'<<';
+SRA:'>>';
+SRL:'>>>';
+EQ:'==';
+NOT_EQ:'!=';
+LESS:'<';
+LESS_EQ:'<=';
+GREATER:'>';
+GREATER_EQ:'>=';
+ASSGN:'=';
+ADD_ASSGN:'+=';
+SUB_ASSGN:'-=';
+MUL_ASSGN:'*=';
+DIV_ASSGN:'/=';
+MOD_ASSGN:'%=';
+AND_ASSGN:'&=';
+XOR_ASSGN:'^=';
+OR_ASSGN:'|=';
+SLL_ASSGN:'<<=';
+SRL_ASSGN:'>>>=';
+SRA_ASSGN:'>>=';
+ARITH_NEG:'-';
+BIT_NEG:'~';
+LOGIC_NEG:'!';
+
+MODULE:'module';
+TESTBENCH:'testbench';
 
 RULE_PS_LITERAL_TERMINAL :
 	'0b' ( '0' | '1' | '_')+ |

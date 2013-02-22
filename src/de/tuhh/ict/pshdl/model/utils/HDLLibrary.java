@@ -1,12 +1,13 @@
 package de.tuhh.ict.pshdl.model.utils;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
-import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 public class HDLLibrary {
 	public Map<HDLQualifiedName, HDLUnit> units = new ConcurrentHashMap<HDLQualifiedName, HDLUnit>();
@@ -201,9 +202,8 @@ public class HDLLibrary {
 					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
 					HDLType newType = types.get(newTypeName);
-					if (newType != null) {
+					if (newType != null)
 						return Insulin.resolveFragments(newType);
-					}
 				}
 			}
 		}
@@ -245,5 +245,9 @@ public class HDLLibrary {
 
 	public HDLConfig getConfig() {
 		return config;
+	}
+
+	public static void unregister(String libURI) {
+		libs.remove(libURI);
 	}
 }

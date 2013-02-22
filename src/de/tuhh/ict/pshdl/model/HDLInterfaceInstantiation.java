@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.*;
 import java.math.*;
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -36,7 +36,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(@Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLQualifiedName hIf,
+	public HDLInterfaceInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf,
 			boolean validate) {
 		super(container, var, arguments, hIf, validate);
 	}

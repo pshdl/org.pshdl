@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -26,7 +26,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArgument(@Nullable IHDLObject container, @NonNull String name, @NonNull HDLExpression expression, boolean validate) {
+	public HDLArgument(@Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLExpression expression, boolean validate) {
 		super(container, name, expression, validate);
 	}
 

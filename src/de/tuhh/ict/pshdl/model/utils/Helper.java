@@ -13,8 +13,9 @@ public class Helper {
 		sb.append("(");
 		boolean first = true;
 		for (String key : options.keySet()) {
-			if (!first)
+			if (!first) {
 				sb.append('|');
+			}
 			sb.append(Pattern.quote(key));
 			first = false;
 		}

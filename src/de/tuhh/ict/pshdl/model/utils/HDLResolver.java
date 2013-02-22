@@ -45,8 +45,9 @@ public class HDLResolver {
 			IHDLObject container = varDecl.getContainer();
 			if (container instanceof HDLVariableDeclaration) {
 				HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
-				if (hvd.getPrimitive() != null)
+				if (hvd.getPrimitive() != null) {
 					types.add(hvd.getPrimitive());
+				}
 			}
 		}
 		for (HDLInterface ifDecl : ScopingExtension.INST.doGetInterfaceDeclarations(resolveTo)) {
@@ -164,9 +165,8 @@ public class HDLResolver {
 			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(fullNameOf(resolveTo).getTypePart())) {
 				String string = var.getLastSegment();
 				for (Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {
-					if (entry.getKey().getLastSegment().equals(string)) {
+					if (entry.getKey().getLastSegment().equals(string))
 						return entry.getValue();
-					}
 				}
 			}
 			HDLQualifiedName skipLast = var.skipLast(1);

@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -29,7 +29,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEqualityOp(@Nullable IHDLObject container, @NonNull HDLExpression left, @NonNull HDLExpression right, @NonNull HDLEqualityOpType type, boolean validate) {
+	public HDLEqualityOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLEqualityOpType type, boolean validate) {
 		super(container, left, right, type, validate);
 	}
 
@@ -63,7 +63,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 		}
 
 		@Override
-		@NonNull
+		@Nonnull
 		public String toString() {
 			return str;
 		}

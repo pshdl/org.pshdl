@@ -5,7 +5,7 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
@@ -24,25 +24,22 @@ public class HDLGenerators {
 
 	public static List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
-		if (generator != null) {
+		if (generator != null)
 			return generator.getPortAdditions(hdl);
-		}
 		return null;
 	}
 
 	public static HDLInterface getInterface(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
-		if (generator != null) {
+		if (generator != null)
 			return generator.getInterface(hdl).copyDeepFrozen(hdl);
-		}
 		return null;
 	}
 
 	public static HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
-		if (generator != null) {
+		if (generator != null)
 			return generator.getImplementation(hdl);
-		}
 		return null;
 	}
 

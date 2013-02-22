@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model.extensions;
 import com.google.common.base.Objects;
 import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLArrayInit;
 import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLClass;
 import de.tuhh.ict.pshdl.model.HDLConcat;
@@ -125,6 +126,30 @@ public class TypeExtension {
       return hvd.getPrimitive();
     }
     return hvd.resolveType();
+  }
+  
+  protected HDLType _determineType(final HDLArrayInit ai) {
+    ArrayList<HDLExpression> _exp = ai.getExp();
+    int _size = _exp.size();
+    boolean _equals = (_size == 1);
+    if (_equals) {
+      ArrayList<HDLExpression> _exp_1 = ai.getExp();
+      HDLExpression _get = _exp_1.get(0);
+      return this.determineType(_get);
+    }
+    HDLPrimitive res = HDLPrimitive.getNatural();
+    ArrayList<HDLExpression> _exp_2 = ai.getExp();
+    for (final HDLExpression exp : _exp_2) {
+      {
+        final HDLType sub = this.determineType(exp);
+        boolean _equals_1 = sub.equals(exp);
+        boolean _not = (!_equals_1);
+        if (_not) {
+          return sub;
+        }
+      }
+    }
+    return res;
   }
   
   protected HDLType _determineType(final HDLExpression cat) {
@@ -344,6 +369,8 @@ public class TypeExtension {
       return _determineType((HDLUnresolvedFragment)ref);
     } else if (ref instanceof HDLVariableDeclaration) {
       return _determineType((HDLVariableDeclaration)ref);
+    } else if (ref instanceof HDLArrayInit) {
+      return _determineType((HDLArrayInit)ref);
     } else if (ref instanceof HDLConcat) {
       return _determineType((HDLConcat)ref);
     } else if (ref instanceof HDLFunctionCall) {

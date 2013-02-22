@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -29,7 +29,7 @@ public class HDLTernary extends AbstractHDLTernary {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLTernary(@Nullable IHDLObject container, @NonNull HDLExpression ifExpr, @NonNull HDLExpression thenExpr, @NonNull HDLExpression elseExpr, boolean validate) {
+	public HDLTernary(@Nullable IHDLObject container, @Nonnull HDLExpression ifExpr, @Nonnull HDLExpression thenExpr, @Nonnull HDLExpression elseExpr, boolean validate) {
 		super(container, ifExpr, thenExpr, elseExpr, validate);
 	}
 

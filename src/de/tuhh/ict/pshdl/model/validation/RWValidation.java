@@ -10,8 +10,8 @@ import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 import de.tuhh.ict.pshdl.model.validation.builtin.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
 public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {
@@ -19,16 +19,18 @@ public class RWValidation {
 		annotateWriteCount(unit);
 		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
-			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || BuiltInValidator.skipExp(hdlVariable))
+			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || BuiltInValidator.skipExp(hdlVariable)) {
 				continue;
+			}
 			Integer readCount = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
 			readCount = readCount == null ? 0 : readCount;
 			Integer writeCount = hdlVariable.getMeta(IntegerMeta.WRITE_COUNT);
 			writeCount = writeCount == null ? 0 : writeCount;
 			Integer accessCount = hdlVariable.getMeta(IntegerMeta.ACCESS);
 			accessCount = accessCount == null ? 0 : accessCount;
-			if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null))
+			if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null)) {
 				continue;
+			}
 			if ((readCount == 0) && (writeCount == 0) && (accessCount == 0)) {
 				problems.add(new Problem(UNUSED_VARIABLE, hdlVariable));
 			} else {
@@ -56,22 +58,26 @@ public class RWValidation {
 		HDLInterfaceInstantiation[] his = unit.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hii : his) {
 			Set<String> readList = hii.getVar().getMeta(Init.read);
-			if (readList == null)
+			if (readList == null) {
 				readList = new HashSet<String>();
+			}
 			Set<String> writeList = hii.getVar().getMeta(Init.written);
-			if (writeList == null)
+			if (writeList == null) {
 				writeList = new HashSet<String>();
+			}
 			HDLInterface resolveHIf = hii.resolveHIf();
-			if (resolveHIf == null)
+			if (resolveHIf == null) {
 				continue;
+			}
 			ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
 			for (HDLVariableDeclaration hvd : ports) {
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
 					boolean written = writeList.contains(hdlVariable.getName());
 					boolean read = readList.contains(hdlVariable.getName());
-					if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null))
+					if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null)) {
 						continue;
+					}
 					HDLDirection dir = hdlVariable.getDirection();
 					// XXX Take care of inout
 					if (!read && !written && !((dir == PARAMETER) || (dir == CONSTANT))) {
@@ -95,14 +101,16 @@ public class RWValidation {
 	public static void annotateReadCount(HDLObject orig) {
 		HDLReference[] list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
-			if (BuiltInValidator.skipExp(ref))
+			if (BuiltInValidator.skipExp(ref)) {
 				continue;
+			}
 			IHDLObject container = ref.getContainer();
 			if (container instanceof HDLAssignment) {
 				HDLAssignment ass = (HDLAssignment) container;
-				if ((ass.getLeft() == ref) && (ass.getType() == HDLAssignmentType.ASSGN))
+				if ((ass.getLeft() == ref) && (ass.getType() == HDLAssignmentType.ASSGN)) {
 					// If it is a non-trivial assign, it contains a read
 					continue;
+				}
 			}
 			// XXX check for interface and ensure that it is only this instance
 			if (ref instanceof HDLUnresolvedFragment)
@@ -114,8 +122,9 @@ public class RWValidation {
 					HDLVariable hVar = hir.resolveHIf();
 					incMeta(hVar, IntegerMeta.ACCESS);
 					addStringMeta(var.getName(), hVar, Init.read);
-				} else
+				} else {
 					incMeta(var, IntegerMeta.READ_COUNT);
+				}
 			}
 		}
 	}
@@ -155,11 +164,13 @@ public class RWValidation {
 			HDLReference left = ass.getLeft();
 			if (left instanceof HDLVariableRef) {
 				HDLVariableRef ref = (HDLVariableRef) left;
-				if (BuiltInValidator.skipExp(ref))
+				if (BuiltInValidator.skipExp(ref)) {
 					continue;
+				}
 				HDLVariable var = ref.resolveVar();
-				if (var == null)
+				if (var == null) {
 					continue;
+				}
 				IHDLObject container = ass.getContainer();
 				if (ref instanceof HDLInterfaceRef) {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
@@ -170,8 +181,9 @@ public class RWValidation {
 						addStringMeta(hir.getVarRefName().getLastSegment(), hVar, Init.full);
 					}
 				} else {
-					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0))
+					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
 						var.addMeta(Init.full, Collections.singleton(var.getName()));
+					}
 					incMeta(var, IntegerMeta.WRITE_COUNT);
 				}
 				HDLBlock block = ass.getContainer(HDLBlock.class);
@@ -180,12 +192,14 @@ public class RWValidation {
 				}
 				if ((var.getMeta(BlockMeta.block) != null) && (var.getMeta(BlockMeta.block) != block)) {
 					Set<HDLBlock> meta = var.getMeta(BlockMetaClash.clash);
-					if (meta == null)
+					if (meta == null) {
 						meta = new HashSet<HDLBlock>();
-					if (block == null)
+					}
+					if (block == null) {
 						meta.add(UNIT_BLOCK);
-					else
+					} else {
 						meta.add(block);
+					}
 					var.addMeta(BlockMetaClash.clash, meta);
 				}
 				var.addMeta(BlockMeta.block, block);
@@ -199,18 +213,20 @@ public class RWValidation {
 
 	private static void addStringMeta(String value, HDLVariable hVar, Init init) {
 		Set<String> written = hVar.getMeta(init);
-		if (written == null)
+		if (written == null) {
 			written = new HashSet<String>();
+		}
 		written.add(value);
 		hVar.addMeta(init, written);
 	}
 
 	private static void incMeta(HDLVariable var, MetaAccess<Integer> metaAccess) {
 		Integer meta = var.getMeta(metaAccess);
-		if (meta == null)
+		if (meta == null) {
 			meta = 1;
-		else
+		} else {
 			meta++;
+		}
 		var.addMeta(metaAccess, meta);
 	}
 }

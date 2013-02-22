@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -31,7 +31,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPrimitive(@Nullable IHDLObject container, @NonNull String name, @NonNull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate) {
+	public HDLPrimitive(@Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate) {
 		super(container, name, type, width, validate);
 	}
 
@@ -65,7 +65,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		}
 
 		@Override
-		@NonNull
+		@Nonnull
 		public String toString() {
 			return str;
 		}
@@ -129,7 +129,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	@Override
-	public @NonNull
+	public @Nonnull
 	String getName() {
 		return "#" + StringWriteExtension.INST.toString(this, SyntaxHighlighter.none());
 	}

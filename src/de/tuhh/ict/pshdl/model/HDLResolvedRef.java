@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -24,7 +24,7 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLResolvedRef(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, boolean validate) {
+	public HDLResolvedRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, boolean validate) {
 		super(container, var, validate);
 	}
 

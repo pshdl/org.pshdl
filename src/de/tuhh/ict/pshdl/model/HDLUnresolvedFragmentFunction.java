@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -37,7 +37,7 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnresolvedFragmentFunction(@Nullable IHDLObject container, @NonNull String frag, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+	public HDLUnresolvedFragmentFunction(@Nullable IHDLObject container, @Nonnull String frag, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
 			@Nullable HDLUnresolvedFragment sub, @Nullable ArrayList<HDLExpression> params, boolean validate) {
 		super(container, frag, array, bits, sub, params, validate);
 	}

@@ -61,8 +61,9 @@ public interface CopyFilter {
 					IHDLObject obj = (IHDLObject) t;
 					T copyFiltered = (T) obj.copyFiltered(this);
 					res.add(copyFiltered);
-				} else
+				} else {
 					res.add(t);
+				}
 			}
 			return res;
 		}

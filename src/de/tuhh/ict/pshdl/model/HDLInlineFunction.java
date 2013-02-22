@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -34,8 +34,8 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInlineFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @Nullable ArrayList<HDLVariable> args,
-			@NonNull HDLExpression expr, boolean validate) {
+	public HDLInlineFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nullable ArrayList<HDLVariable> args,
+			@Nonnull HDLExpression expr, boolean validate) {
 		super(container, annotations, name, args, expr, validate);
 	}
 

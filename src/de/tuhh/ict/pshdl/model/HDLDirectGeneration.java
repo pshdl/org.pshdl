@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
@@ -44,8 +44,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLDirectGeneration(@Nullable IHDLObject container, @NonNull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @NonNull HDLInterface hIf,
-			@NonNull String generatorID, @NonNull String generatorContent, @NonNull Boolean include, boolean validate) {
+	public HDLDirectGeneration(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @Nonnull HDLInterface hIf,
+			@Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include, boolean validate) {
 		super(container, var, arguments, hIf, generatorID, generatorContent, include, validate);
 	}
 
@@ -110,7 +110,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	private HDLInterface hif = null;
 
 	@Override
-	public @NonNull
+	public @Nonnull
 	HDLInterface getHIf() {
 		if (hif != null)
 			return hif;

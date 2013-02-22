@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -28,7 +28,7 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumRef(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, @NonNull HDLQualifiedName hEnum, boolean validate) {
+	public HDLEnumRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nonnull HDLQualifiedName hEnum, boolean validate) {
 		super(container, var, hEnum, validate);
 	}
 

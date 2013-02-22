@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.parser.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
@@ -29,7 +30,24 @@ public class Problem {
 	public final String info;
 	public final int pid;
 	public final Map<String, Object> meta = new HashMap<String, Object>();
+	public final int line;
+	public final int length;
+	public final boolean isSyntax;
+	public final int offsetInLine;
 	private static AtomicInteger uid = new AtomicInteger();
+
+	public Problem(IErrorCode code, String msg, int line, int offsetInLine, int length) {
+		this.code = code;
+		this.node = null;
+		this.context = null;
+		this.info = msg;
+		this.pid = uid.incrementAndGet();
+		this.severity = code.getSeverity();
+		this.line = line;
+		this.offsetInLine = offsetInLine;
+		this.length = length;
+		isSyntax = true;
+	}
 
 	public Problem(IErrorCode code, IHDLObject node) {
 		this(code, node, null, null);
@@ -52,9 +70,29 @@ public class Problem {
 		this.node = node;
 		this.info = info;
 		this.pid = uid.incrementAndGet();
+		this.isSyntax = false;
 		node.addMeta(ProblemAccess.PROBLEM, this);
-		if (context != null)
+		if (context != null) {
 			context.addMeta(ProblemAccess.PROBLEM, this);
+		}
+		SourceInfo sInfo = findMeta(node);
+		if (sInfo != null) {
+			line = sInfo.startLine;
+			offsetInLine = sInfo.startPosInLine;
+			length = sInfo.length;
+
+		} else {
+			offsetInLine = -1;
+			line = -1;
+			length = -1;
+		}
+	}
+
+	private SourceInfo findMeta(IHDLObject node) {
+		SourceInfo sInfo = node.getMeta(SourceInfo.INFO);
+		if ((sInfo == null) && (node.getContainer() != null))
+			return findMeta(node.getContainer());
+		return sInfo;
 	}
 
 	public <T> Problem addMeta(MetaAccess<T> key, T value) {
@@ -73,6 +111,9 @@ public class Problem {
 	}
 
 	public String toStringWithoutSeverity() {
+		if (isSyntax)
+			return "Syntax error in line:" + line + ":" + offsetInLine + " -> " + info;
+
 		String preText = "";
 		IHDLObject inlineType = checkInlineType(node);
 		if (inlineType != null) {
@@ -82,20 +123,21 @@ public class Problem {
 		if (advise != null)
 			return preText + advise.message;
 		String string = preText + code.name().toLowerCase() + " for: " + node;
-		if (context != null)
+		if (context != null) {
 			string += " @ " + context;
-		if (info != null)
+		}
+		if (info != null) {
 			string += " info:" + info;
+		}
 		return string;
 	}
 
 	private IHDLObject checkInlineType(IHDLObject node) {
 		if (node == null)
 			return null;
-		Object meta = node.getMeta(HDLInlineFunction.META);
-		if (meta != null) {
+		Object meta = node.getMeta(HDLFunction.META);
+		if (meta != null)
 			return (IHDLObject) meta;
-		}
 		return checkInlineType(node.getContainer());
 	}
 

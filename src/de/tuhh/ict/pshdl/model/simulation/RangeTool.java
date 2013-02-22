@@ -52,8 +52,9 @@ public class RangeTool {
 			if ((last != null) && last.value.equals(rangeVal.value) && (last.isStart() == rangeVal.isStart())) {
 				iterator.remove();
 				last.count += rangeVal.count;
-			} else
+			} else {
 				last = rangeVal;
+			}
 		}
 	}
 
@@ -83,15 +84,16 @@ public class RangeTool {
 			if (rangeVal.isStart()) {
 				if (start != null) {
 					// If there was an unended start, then we have to end it
-					if (start.equals(rangeVal.value))
+					if (start.equals(rangeVal.value)) {
 						// Or at the same location
 						res.add(Ranges.closed(start, rangeVal.value));
-					// res.add(new ValueRange(start, rangeVal.value));
-					else
+						// res.add(new ValueRange(start, rangeVal.value));
+					} else {
 						// just one before the new start
 						res.add(Ranges.closed(start, rangeVal.value.subtract(BigInteger.ONE)));
-					// res.add(new ValueRange(start,
-					// rangeVal.value.subtract(BigInteger.ONE)));
+						// res.add(new ValueRange(start,
+						// rangeVal.value.subtract(BigInteger.ONE)));
+					}
 				}
 				// Set the start to the current Element
 				start = rangeVal.value;
@@ -102,9 +104,10 @@ public class RangeTool {
 					// If we expect another end later, the element following
 					// this will have to start one after
 					start = rangeVal.value.add(BigInteger.ONE);
-				} else
+				} else {
 					// No new range anymore
 					start = null;
+				}
 			}
 		}
 		return res;

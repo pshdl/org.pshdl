@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -28,7 +28,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(@Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate) {
+	public HDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate) {
 		super(container, name, ports, validate);
 	}
 

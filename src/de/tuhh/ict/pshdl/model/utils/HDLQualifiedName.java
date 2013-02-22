@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
@@ -28,7 +28,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		this(qfn == null ? new String[0] : qfn.split("\\."));
 	}
 
-	@NonNull
+	@Nonnull
 	public String[] getQfn() {
 		return qfn;
 	}
@@ -61,17 +61,17 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return toString(c);
 	}
 
-	@NonNull
+	@Nonnull
 	public String getSegment(int i) {
 		return qfn[i];
 	}
 
-	@NonNull
+	@Nonnull
 	public static HDLQualifiedName create(String... segments) {
 		return new HDLQualifiedName(segments);
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName skipLast(int i) {
 		int len = qfn.length - i;
 		if (len < 0)
@@ -81,7 +81,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return new HDLQualifiedName(newQfn);
 	}
 
-	@NonNull
+	@Nonnull
 	public String getLastSegment() {
 		return qfn[qfn.length - 1];
 	}
@@ -93,7 +93,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	 *            the separator
 	 * @return
 	 */
-	@NonNull
+	@Nonnull
 	public String toString(char c) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -114,7 +114,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	 *            the segment to append
 	 * @return a new HDLQualifiedName instance
 	 */
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName append(String name) {
 		int len = length + 1;
 		String[] newQfn = new String[len];
@@ -123,7 +123,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return new HDLQualifiedName(newQfn);
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName skipFirst(int i) {
 		int len = qfn.length - i;
 		if (len < 0)
@@ -133,12 +133,12 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return new HDLQualifiedName(newQfn);
 	}
 
-	@NonNull
+	@Nonnull
 	public static HDLQualifiedName create(List<String> segments) {
 		return new HDLQualifiedName(segments.toArray(new String[segments.size()]));
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName toSegment(int i) {
 		int len = i;
 		if ((len < 0) || (len >= qfn.length))
@@ -148,7 +148,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return new HDLQualifiedName(newQfn);
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName append(HDLQualifiedName hdlQualifiedName) {
 		LinkedList<String> ll = new LinkedList<String>();
 		ll.addAll(Arrays.asList(this.qfn));
@@ -156,26 +156,28 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		return HDLQualifiedName.create(ll);
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName getTypePart() {
 		List<String> res = new LinkedList<String>();
 		for (String segment : qfn) {
-			if (segment.charAt(0) != '$')
+			if (segment.charAt(0) != '$') {
 				res.add(segment);
-			else
+			} else {
 				break;
+			}
 		}
 		return create(res);
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName getLocalPart() {
 		List<String> res = new LinkedList<String>();
 		if (qfn.length <= 1)
 			return this;
 		for (String segment : qfn) {
-			if (segment.charAt(0) == '$')
+			if (segment.charAt(0) == '$') {
 				res.add(segment);
+			}
 		}
 		res.add(getLastSegment());
 		return create(res);

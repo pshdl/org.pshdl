@@ -38,14 +38,14 @@ public class MemoryModelSideFiles {
 		options.put("{DATE}", new Date().toString());
 		Formatter ps = new Formatter();
 		ps.format("<tr><td>Offset</td>");
-		for (int i = 0; i < unit.rowWidth; i++) {
-			ps.format("<td>%d</td>", unit.rowWidth - i - 1);
+		for (int i = 0; i < Unit.rowWidth; i++) {
+			ps.format("<td>%d</td>", Unit.rowWidth - i - 1);
 		}
 		ps.format("<td>Row</td></tr>");
 		options.put("{HEADER}", ps.toString());
 		ps.close();
 		ps = new Formatter();
-		int mul = unit.rowWidth / 8;
+		int mul = Unit.rowWidth / 8;
 		int pos = 0;
 		Column current = null;
 		int colIndex = -1;
@@ -56,11 +56,11 @@ public class MemoryModelSideFiles {
 				if (row.column == null) {
 					current = null;
 					colIndex = -1;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>\n", unit.rowWidth + 2, "Without Column");
+					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>\n", Unit.rowWidth + 2, "Without Column");
 				} else {
 					current = row.column;
 					colIndex = row.colIndex;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>\n", unit.rowWidth + 2, row.column.name, row.colIndex);
+					ps.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>\n", Unit.rowWidth + 2, row.column.name, row.colIndex);
 				}
 			}
 			ps.format("<tr>");

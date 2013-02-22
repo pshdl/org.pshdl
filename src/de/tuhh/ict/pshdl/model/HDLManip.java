@@ -1,6 +1,6 @@
 package de.tuhh.ict.pshdl.model;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -29,7 +29,7 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLManip(@Nullable IHDLObject container, @NonNull HDLManipType type, @NonNull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
+	public HDLManip(@Nullable IHDLObject container, @Nonnull HDLManipType type, @Nonnull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
 		super(container, type, target, castTo, validate);
 	}
 

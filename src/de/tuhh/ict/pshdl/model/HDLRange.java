@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.math.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.extensions.*;
@@ -31,7 +31,7 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLRange(@Nullable IHDLObject container, @Nullable HDLExpression from, @NonNull HDLExpression to, boolean validate) {
+	public HDLRange(@Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
 		super(container, from, to, validate);
 	}
 

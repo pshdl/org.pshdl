@@ -4,7 +4,7 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -37,7 +37,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariable(@Nullable IHDLObject container, @NonNull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+	public HDLVariable(@Nullable IHDLObject container, @Nonnull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
 			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
 		super(container, name, dimensions, defaultValue, annotations, validate);
 	}
@@ -119,12 +119,12 @@ public class HDLVariable extends AbstractHDLVariable {
 		return null;
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLQualifiedName asRef() {
 		return fullNameOf(this);
 	}
 
-	@NonNull
+	@Nonnull
 	public HDLVariableRef asHDLRef() {
 		return new HDLVariableRef().setVar(asRef());
 	}

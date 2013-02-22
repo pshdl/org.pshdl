@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -72,15 +72,15 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
-	@NonNull
+	@Nonnull
 	public abstract IHDLObject copy();
 
 	@Override
-	@NonNull
+	@Nonnull
 	public abstract IHDLObject copyFiltered(CopyFilter filter);
 
 	@Override
-	@NonNull
+	@Nonnull
 	public IHDLObject copyDeepFrozen(IHDLObject container) {
 		IHDLObject copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
@@ -176,7 +176,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		return (K) metaData.get(key);
 	}
 
-	@NonNull
+	@Nonnull
 	public static <T> ArrayList<T> asList(T... items) {
 		ArrayList<T> res = new ArrayList<T>();
 		for (T t : items) {
@@ -329,7 +329,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
-	public @NonNull
+	public @Nonnull
 	HDLObject setContainer(@Nullable IHDLObject container) {
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");

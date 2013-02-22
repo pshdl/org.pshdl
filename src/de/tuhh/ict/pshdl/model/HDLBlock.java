@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -28,7 +28,7 @@ public class HDLBlock extends AbstractHDLBlock {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBlock(@Nullable IHDLObject container, @NonNull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate) {
+	public HDLBlock(@Nullable IHDLObject container, @Nonnull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate) {
 		super(container, process, statements, validate);
 	}
 

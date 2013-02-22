@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -31,7 +31,7 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @NonNull Boolean simOnly, boolean validate) {
+	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly, boolean validate) {
 		super(container, annotations, name, simOnly, validate);
 	}
 

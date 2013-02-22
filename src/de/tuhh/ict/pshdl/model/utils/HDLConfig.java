@@ -2,7 +2,6 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
 
-import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
@@ -24,10 +23,11 @@ public class HDLConfig {
 	}
 
 	public void setRegClockType(HDLQualifiedName name, HDLRegClockType type) {
-		if (name == null)
+		if (name == null) {
 			defaultClockType = type;
-		else
+		} else {
 			unitClockType.put(name, type);
+		}
 	}
 
 	public HDLRegResetActiveType getRegResetType(HDLQualifiedName name, HDLRegResetActiveType actual) {
@@ -39,10 +39,11 @@ public class HDLConfig {
 	}
 
 	public void setRegResetType(HDLQualifiedName name, HDLRegResetActiveType type) {
-		if (name == null)
+		if (name == null) {
 			defaultResetType = type;
-		else
+		} else {
 			unitResetType.put(name, type);
+		}
 	}
 
 	public HDLRegSyncType getRegSyncType(HDLQualifiedName name, HDLRegSyncType actual) {
@@ -54,14 +55,11 @@ public class HDLConfig {
 	}
 
 	public void setRegSyncType(HDLQualifiedName name, HDLRegSyncType type) {
-		if (name == null)
+		if (name == null) {
 			defaultSyncType = type;
-		else
+		} else {
 			unitSyncType.put(name, type);
-	}
-
-	public HDLRegisterConfig normalize(HDLRegisterConfig config) {
-		return null;
+		}
 	}
 
 }

@@ -189,13 +189,13 @@ public class MemoryModel {
 				usedSize += handleDefinition(definitions, def);
 			}
 		}
-		if (usedSize > unit.rowWidth)
+		if (usedSize > Unit.rowWidth)
 			throw new IllegalArgumentException("The row:" + row.name + " has more bits (" + usedSize + ") than a row has bits.");
-		if ((usedSize != unit.rowWidth) && (fillFound == false))
+		if ((usedSize != Unit.rowWidth) && (fillFound == false))
 			throw new IllegalArgumentException("The row:" + row.name + " has a size of:" + usedSize + " but does not contain a fill");
-		if (usedSize == unit.rowWidth)
+		if (usedSize == Unit.rowWidth)
 			definitions.remove(unusedFill);
-		unusedFill.width = unit.rowWidth - usedSize;
+		unusedFill.width = Unit.rowWidth - usedSize;
 		for (Definition definition : definitions) {
 			res.definitions.add(definition);
 		}

@@ -6,13 +6,13 @@ import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import de.tuhh.ict.pshdl.model.HDLEqualityOp.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.simulation.RangeTool.RangeVal;
@@ -66,10 +66,9 @@ public class HDLSimulator {
 		return ms.apply(insulin);
 	}
 
-	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, @NonNull String name, HDLEvaluationContext context) {
-		if (idx >= dim.size()) {
+	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, @Nonnull String name, HDLEvaluationContext context) {
+		if (idx >= dim.size())
 			return Collections.singletonList(new HDLVariable().setName(name));
-		}
 		BigInteger size = ConstantEvaluate.valueOf(dim.get(idx), context);
 		List<HDLVariable> res = new LinkedList<HDLVariable>();
 		for (int i = 0; i < size.intValue(); i++) {
@@ -117,16 +116,18 @@ public class HDLSimulator {
 			HDLExpression current = null;
 			while (reverseIter.hasNext()) {
 				HDLAssignment next = reverseIter.next();
-				if (current == null)
+				if (current == null) {
 					current = next.getRight();
+				}
 				// XXX Add if cases
 				IHDLObject container = next.getContainer();
 				if (container.getClassType() == HDLClass.HDLUnit) {
 					break;
 				}
 			}
-			if (current != null)
+			if (current != null) {
 				finalStatements.add(new HDLAssignment().setLeft(references.get(entry.getKey())).setRight(current));
+			}
 		}
 		return insulin.setInits(null).setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
 	}
@@ -251,10 +252,10 @@ public class HDLSimulator {
 			Range<BigInteger> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
-				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLVariableRef.fVar).lastSegmentIs(param.getName()).getAll();
-				if (refs.size() == 0)
+				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
+				if (refs.size() == 0) {
 					newStmnts.add(stmnt);
-				else {
+				} else {
 					BigInteger counter = r.lowerEndpoint();
 					do {
 						ModificationSet stmntMs = new ModificationSet();

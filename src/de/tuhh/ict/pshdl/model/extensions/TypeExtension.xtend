@@ -38,6 +38,7 @@ import static de.tuhh.ict.pshdl.model.extensions.TypeExtension.*
 import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
 import de.tuhh.ict.pshdl.model.utils.Insulin
 import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
+import de.tuhh.ict.pshdl.model.HDLArrayInit
 
 class TypeExtension {
 	public static TypeExtension INST=new TypeExtension
@@ -82,6 +83,17 @@ class TypeExtension {
 		return hvd.resolveType
 	}
 	
+	def dispatch HDLType determineType(HDLArrayInit ai){
+		if (ai.exp.size==1)
+			return ai.exp.get(0).determineType
+		var res=HDLPrimitive::natural
+		for(exp:ai.exp){
+			val sub=exp.determineType
+			if (!sub.equals(exp))
+				return sub
+		}
+		return res
+	}
 	def dispatch HDLType determineType(HDLExpression cat){
 		throw new RuntimeException("Did not correctly implement determineType for:"+cat.classType)	
 	}

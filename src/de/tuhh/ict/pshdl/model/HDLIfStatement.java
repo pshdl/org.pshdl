@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -31,7 +31,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLIfStatement(@Nullable IHDLObject container, @NonNull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo, @Nullable ArrayList<HDLStatement> elseDo,
+	public HDLIfStatement(@Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo, @Nullable ArrayList<HDLStatement> elseDo,
 			boolean validate) {
 		super(container, ifExp, thenDo, elseDo, validate);
 	}

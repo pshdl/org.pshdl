@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -32,7 +32,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableRef(@Nullable IHDLObject container, @NonNull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+	public HDLVariableRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
 			boolean validate) {
 		super(container, var, array, bits, validate);
 	}
@@ -73,6 +73,19 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 		}
 	};
 	// $CONTENT-BEGIN$
+
+	private HDLVariable resolveVarCache;
+
+	@Override
+	public HDLVariable resolveVar() {
+		if (resolveVarCache != null)
+			return resolveVarCache;
+		HDLVariable resolveVar = super.resolveVar();
+		if ((resolveVar != null) && frozen) {
+			resolveVarCache = resolveVar;
+		}
+		return resolveVar;
+	}
 
 	// $CONTENT-END$
 

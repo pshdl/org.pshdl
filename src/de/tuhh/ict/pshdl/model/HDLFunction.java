@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -29,7 +29,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, boolean validate) {
+	public HDLFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, boolean validate) {
 		super(container, annotations, name, validate);
 	}
 
@@ -60,7 +60,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 
 	public static final String META = "INLINED_FROM";
 
-	@NonNull
+	@Nonnull
 	public <T extends IHDLObject> T substitute(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, T stmnt, IHDLObject origin) {
 		ModificationSet msExp = new ModificationSet();
 		@SuppressWarnings("unchecked")

@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
-import org.eclipse.jdt.annotation.*;
+import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -34,7 +34,7 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSubstituteFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @NonNull String name, @Nullable ArrayList<HDLVariable> args,
+	public HDLSubstituteFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nullable ArrayList<HDLVariable> args,
 			@Nullable ArrayList<HDLStatement> stmnts, boolean validate) {
 		super(container, annotations, name, args, stmnts, validate);
 	}

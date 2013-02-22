@@ -64,8 +64,9 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T> {
 		public MultiListIterator(List<Iterator<T>> iters) {
 			super();
 			delegate = iters.iterator();
-			if (delegate.hasNext())
+			if (delegate.hasNext()) {
 				current = delegate.next();
+			}
 		}
 
 		@Override

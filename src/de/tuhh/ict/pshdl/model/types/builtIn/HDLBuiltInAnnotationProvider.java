@@ -3,8 +3,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 import java.math.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
+import de.tuhh.ict.pshdl.model.utils.services.*;
 
 public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 	public static enum HDLBuiltInAnnotations implements IHDLAnnotation {
@@ -74,17 +74,15 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 					return this + " does not expect any arguments";
 				break;
 			case VHDLComponent:
-				if (!((value == null) || "declare".equals(value) || "import".equals(value))) {
+				if (!((value == null) || "declare".equals(value) || "import".equals(value)))
 					return this + " only accepts 'declare' or 'import' as parameter. If no parameter is supplied import is assumed.";
-				}
 				break;
 			case range:
 				if (value == null)
 					return this + " expects an argument with the expected range of the variable. The format is from;to";
 				String[] split = value.split(";");
-				if (split.length != 2) {
+				if (split.length != 2)
 					return this + " expects an argument with the expected range of the variable. The given value:" + value + " is not valid. The format is from;to";
-				}
 				try {
 					new BigInteger(split[0]);
 				} catch (Exception e) {

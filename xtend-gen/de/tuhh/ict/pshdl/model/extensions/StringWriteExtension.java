@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model.extensions;
 import com.google.common.base.Objects;
 import de.tuhh.ict.pshdl.model.HDLAnnotation;
 import de.tuhh.ict.pshdl.model.HDLArgument;
+import de.tuhh.ict.pshdl.model.HDLArrayInit;
 import de.tuhh.ict.pshdl.model.HDLAssignment;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLBitOp;
@@ -99,6 +100,32 @@ public class StringWriteExtension {
       throw _illegalArgumentException;
     }
     return StringWriteExtension.INST.toString(exp, highlight);
+  }
+  
+  protected String _toString(final HDLArrayInit array, final SyntaxHighlighter highlight) {
+    ArrayList<HDLExpression> _exp = array.getExp();
+    int _size = _exp.size();
+    boolean _equals = (_size == 1);
+    if (_equals) {
+      ArrayList<HDLExpression> _exp_1 = array.getExp();
+      HDLExpression _get = _exp_1.get(0);
+      return this.toString(_get, highlight);
+    }
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("{");
+    {
+      ArrayList<HDLExpression> _exp_2 = array.getExp();
+      boolean _hasElements = false;
+      for(final HDLExpression e : _exp_2) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          _builder.appendImmediate(",", "");
+        }
+      }
+    }
+    _builder.append("}");
+    return _builder.toString();
   }
   
   protected String _toString(final HDLAnnotation anno, final SyntaxHighlighter highlight) {
@@ -1493,6 +1520,8 @@ public class StringWriteExtension {
       return _toString((HDLAnnotation)ref, highlight);
     } else if (ref instanceof HDLArgument) {
       return _toString((HDLArgument)ref, highlight);
+    } else if (ref instanceof HDLArrayInit) {
+      return _toString((HDLArrayInit)ref, highlight);
     } else if (ref instanceof HDLAssignment) {
       return _toString((HDLAssignment)ref, highlight);
     } else if (ref instanceof HDLBlock) {
