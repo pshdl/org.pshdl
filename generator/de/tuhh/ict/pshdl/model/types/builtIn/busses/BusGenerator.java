@@ -15,7 +15,6 @@ import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
-import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;

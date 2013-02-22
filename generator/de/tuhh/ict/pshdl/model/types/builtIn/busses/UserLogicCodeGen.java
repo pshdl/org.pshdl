@@ -10,7 +10,8 @@ import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 public class UserLogicCodeGen extends CommonBusCode {

@@ -6,14 +6,13 @@ import java.util.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLManip.*;
+import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.evaluation.*;
-import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
-import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
+import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.statement.*;

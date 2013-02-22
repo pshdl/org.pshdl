@@ -1,26 +1,16 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
-import com.google.common.base.Objects;
-import de.tuhh.ict.pshdl.model.HDLBlock;
-import de.tuhh.ict.pshdl.model.HDLClass;
-import de.tuhh.ict.pshdl.model.HDLEnum;
-import de.tuhh.ict.pshdl.model.HDLForLoop;
-import de.tuhh.ict.pshdl.model.HDLFunction;
-import de.tuhh.ict.pshdl.model.HDLIfStatement;
-import de.tuhh.ict.pshdl.model.HDLInterface;
-import de.tuhh.ict.pshdl.model.HDLObject;
-import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
-import de.tuhh.ict.pshdl.model.HDLPackage;
-import de.tuhh.ict.pshdl.model.HDLSwitchCaseStatement;
-import de.tuhh.ict.pshdl.model.HDLSwitchStatement;
-import de.tuhh.ict.pshdl.model.HDLUnit;
-import de.tuhh.ict.pshdl.model.HDLVariable;
-import de.tuhh.ict.pshdl.model.IHDLObject;
-import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
-import java.util.Arrays;
-import java.util.Iterator;
-import javax.annotation.Nonnull;
+import java.util.*;
+
+import javax.annotation.*;
+
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+
+import com.google.common.base.*;
+
+import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
+import de.tuhh.ict.pshdl.model.utils.*;
 
 @SuppressWarnings("all")
 public class FullNameExtension {

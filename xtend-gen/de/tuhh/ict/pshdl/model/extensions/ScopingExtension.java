@@ -1,49 +1,20 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
-import com.google.common.base.Objects;
-import de.tuhh.ict.pshdl.model.HDLAssignment;
-import de.tuhh.ict.pshdl.model.HDLBlock;
-import de.tuhh.ict.pshdl.model.HDLDirectGeneration;
-import de.tuhh.ict.pshdl.model.HDLEnum;
-import de.tuhh.ict.pshdl.model.HDLEnumDeclaration;
-import de.tuhh.ict.pshdl.model.HDLForLoop;
-import de.tuhh.ict.pshdl.model.HDLFunction;
-import de.tuhh.ict.pshdl.model.HDLIfStatement;
-import de.tuhh.ict.pshdl.model.HDLInlineFunction;
-import de.tuhh.ict.pshdl.model.HDLInterface;
-import de.tuhh.ict.pshdl.model.HDLInterfaceDeclaration;
-import de.tuhh.ict.pshdl.model.HDLInterfaceInstantiation;
-import de.tuhh.ict.pshdl.model.HDLObject;
+import java.util.*;
+
+import org.eclipse.xtext.xbase.lib.Functions.Function0;
+
+import com.google.common.base.*;
+
+import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
-import de.tuhh.ict.pshdl.model.HDLPackage;
-import de.tuhh.ict.pshdl.model.HDLStatement;
-import de.tuhh.ict.pshdl.model.HDLSubstituteFunction;
-import de.tuhh.ict.pshdl.model.HDLSwitchCaseStatement;
-import de.tuhh.ict.pshdl.model.HDLSwitchStatement;
-import de.tuhh.ict.pshdl.model.HDLType;
-import de.tuhh.ict.pshdl.model.HDLUnit;
-import de.tuhh.ict.pshdl.model.HDLVariable;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
-import de.tuhh.ict.pshdl.model.IHDLObject;
-import de.tuhh.ict.pshdl.model.extensions.FullNameExtension;
-import de.tuhh.ict.pshdl.model.utils.HDLLibrary;
-import de.tuhh.ict.pshdl.model.utils.HDLProblemException;
-import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
-import de.tuhh.ict.pshdl.model.utils.HDLQuery;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldSelector;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.Result;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.Selector;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.Source;
-import de.tuhh.ict.pshdl.model.utils.HDLResolver;
-import de.tuhh.ict.pshdl.model.utils.MetaAccess;
-import de.tuhh.ict.pshdl.model.validation.Problem;
-import de.tuhh.ict.pshdl.model.validation.builtin.ErrorCode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 @SuppressWarnings("all")
 public class ScopingExtension {

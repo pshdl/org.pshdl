@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
+import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 import static de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity.*;
 
 import java.util.*;
@@ -8,10 +9,9 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
-import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
+import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity;
-import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
 public class VHDLOutputValidator implements IHDLValidator {
 	public final static String[] keywords = { "abs", "if", "access", "impure", "after", "in", "alias", "inertial", "all", "inout", "and", "is", "architecture", "label", "array",

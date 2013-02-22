@@ -1,10 +1,8 @@
 // Generated from MemoryModel.g4 by ANTLR 4.0
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 
 public class MemoryModelBaseListener implements MemoryModelListener {
 	@Override public void enterUnit(MemoryModelParser.UnitContext ctx) { }

@@ -1,47 +1,24 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Range;
-import com.google.common.collect.Ranges;
-import de.tuhh.ict.pshdl.model.HDLAnnotation;
-import de.tuhh.ict.pshdl.model.HDLArithOp;
+import java.math.*;
+import java.util.*;
+
+import org.eclipse.xtext.xbase.lib.*;
+import org.eclipse.xtext.xbase.lib.Functions.Function0;
+
+import com.google.common.base.*;
+import com.google.common.collect.*;
+
+import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
-import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
-import de.tuhh.ict.pshdl.model.HDLConcat;
-import de.tuhh.ict.pshdl.model.HDLEnumRef;
-import de.tuhh.ict.pshdl.model.HDLEqualityOp;
-import de.tuhh.ict.pshdl.model.HDLExpression;
-import de.tuhh.ict.pshdl.model.HDLForLoop;
-import de.tuhh.ict.pshdl.model.HDLFunctionCall;
-import de.tuhh.ict.pshdl.model.HDLLiteral;
-import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
-import de.tuhh.ict.pshdl.model.HDLPrimitive;
-import de.tuhh.ict.pshdl.model.HDLRange;
-import de.tuhh.ict.pshdl.model.HDLShiftOp;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
-import de.tuhh.ict.pshdl.model.HDLType;
-import de.tuhh.ict.pshdl.model.HDLVariable;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
-import de.tuhh.ict.pshdl.model.HDLVariableRef;
-import de.tuhh.ict.pshdl.model.IHDLObject;
-import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext;
-import de.tuhh.ict.pshdl.model.extensions.ConstantEvaluate;
-import de.tuhh.ict.pshdl.model.extensions.ProblemDescription;
-import de.tuhh.ict.pshdl.model.extensions.TypeExtension;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
-import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLPrimitive;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.eclipse.xtext.xbase.lib.Conversions;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import de.tuhh.ict.pshdl.model.types.builtIn.*;
+import de.tuhh.ict.pshdl.model.utils.services.*;
 
 @SuppressWarnings("all")
 public class RangeExtension {

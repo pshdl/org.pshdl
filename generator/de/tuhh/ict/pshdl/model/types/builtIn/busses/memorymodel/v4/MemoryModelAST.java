@@ -6,8 +6,18 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.AliasContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ColumnContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DeclarationContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DefinitionContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.MemoryContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ReferenceContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.RowContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.UnitContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.WarnTypeContext;
 
 public class MemoryModelAST extends MemoryModelBaseListener {
 

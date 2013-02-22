@@ -34,7 +34,7 @@ import de.tuhh.ict.pshdl.model.HDLVariable
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection
 import de.tuhh.ict.pshdl.model.HDLVariableRef
-import de.tuhh.ict.pshdl.model.extensions.ConstantEvaluate
+import de.tuhh.ict.pshdl.model.evaluation.ConstantEvaluate
 import de.tuhh.ict.pshdl.model.extensions.FullNameExtension
 import de.tuhh.ict.pshdl.model.extensions.TypeExtension
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions

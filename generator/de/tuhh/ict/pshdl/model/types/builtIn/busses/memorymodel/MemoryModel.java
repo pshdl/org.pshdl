@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.*;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 

@@ -5,7 +5,7 @@ import java.math.*;
 import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
-import de.tuhh.ict.pshdl.model.extensions.*;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;

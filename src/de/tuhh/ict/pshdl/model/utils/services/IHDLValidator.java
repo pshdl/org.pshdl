@@ -5,8 +5,8 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
+import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity;
 
 public interface IHDLValidator {

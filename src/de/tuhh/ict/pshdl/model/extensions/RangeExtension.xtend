@@ -26,6 +26,7 @@ import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives
+import de.tuhh.ict.pshdl.model.evaluation.ConstantEvaluate
 import java.math.BigInteger
 
 import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*

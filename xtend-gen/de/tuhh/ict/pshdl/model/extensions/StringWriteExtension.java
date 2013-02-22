@@ -1,67 +1,24 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
-import com.google.common.base.Objects;
-import de.tuhh.ict.pshdl.model.HDLAnnotation;
-import de.tuhh.ict.pshdl.model.HDLArgument;
-import de.tuhh.ict.pshdl.model.HDLArrayInit;
-import de.tuhh.ict.pshdl.model.HDLAssignment;
+import java.util.*;
+
+import org.eclipse.xtend2.lib.*;
+import org.eclipse.xtext.xbase.lib.Functions.Function0;
+
+import com.google.common.base.*;
+
+import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
-import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
-import de.tuhh.ict.pshdl.model.HDLBlock;
-import de.tuhh.ict.pshdl.model.HDLClass;
-import de.tuhh.ict.pshdl.model.HDLConcat;
-import de.tuhh.ict.pshdl.model.HDLDeclaration;
-import de.tuhh.ict.pshdl.model.HDLDirectGeneration;
-import de.tuhh.ict.pshdl.model.HDLEnum;
-import de.tuhh.ict.pshdl.model.HDLEnumDeclaration;
-import de.tuhh.ict.pshdl.model.HDLEnumRef;
-import de.tuhh.ict.pshdl.model.HDLEqualityOp;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
-import de.tuhh.ict.pshdl.model.HDLExpression;
-import de.tuhh.ict.pshdl.model.HDLForLoop;
-import de.tuhh.ict.pshdl.model.HDLFunctionCall;
-import de.tuhh.ict.pshdl.model.HDLIfStatement;
-import de.tuhh.ict.pshdl.model.HDLInlineFunction;
-import de.tuhh.ict.pshdl.model.HDLInterface;
-import de.tuhh.ict.pshdl.model.HDLInterfaceDeclaration;
-import de.tuhh.ict.pshdl.model.HDLInterfaceInstantiation;
-import de.tuhh.ict.pshdl.model.HDLInterfaceRef;
-import de.tuhh.ict.pshdl.model.HDLLiteral;
-import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
-import de.tuhh.ict.pshdl.model.HDLNativeFunction;
-import de.tuhh.ict.pshdl.model.HDLOpExpression;
-import de.tuhh.ict.pshdl.model.HDLPackage;
-import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
-import de.tuhh.ict.pshdl.model.HDLRange;
-import de.tuhh.ict.pshdl.model.HDLReference;
-import de.tuhh.ict.pshdl.model.HDLRegisterConfig;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
-import de.tuhh.ict.pshdl.model.HDLStatement;
-import de.tuhh.ict.pshdl.model.HDLSubstituteFunction;
-import de.tuhh.ict.pshdl.model.HDLSwitchCaseStatement;
-import de.tuhh.ict.pshdl.model.HDLSwitchStatement;
-import de.tuhh.ict.pshdl.model.HDLTernary;
-import de.tuhh.ict.pshdl.model.HDLType;
-import de.tuhh.ict.pshdl.model.HDLUnit;
-import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
-import de.tuhh.ict.pshdl.model.HDLUnresolvedFragmentFunction;
-import de.tuhh.ict.pshdl.model.HDLVariable;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import de.tuhh.ict.pshdl.model.HDLVariableRef;
-import de.tuhh.ict.pshdl.model.IHDLObject;
-import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
-import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter;
+import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.SyntaxHighlighter.Context;
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 @SuppressWarnings("all")
 public class StringWriteExtension {

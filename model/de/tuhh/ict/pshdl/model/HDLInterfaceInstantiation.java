@@ -7,7 +7,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import de.tuhh.ict.pshdl.model.extensions.*;
+import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;

@@ -3,9 +3,9 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLAssignment.*;
+import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import de.tuhh.ict.pshdl.model.utils.*;
 
 public class CommonBusCode {

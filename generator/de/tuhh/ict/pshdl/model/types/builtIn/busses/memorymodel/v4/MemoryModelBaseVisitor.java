@@ -1,8 +1,6 @@
 // Generated from MemoryModel.g4 by ANTLR 4.0
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4;
 import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 public class MemoryModelBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MemoryModelVisitor<T> {
 	@Override public T visitUnit(MemoryModelParser.UnitContext ctx) { return visitChildren(ctx); }

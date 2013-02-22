@@ -1,40 +1,39 @@
-package de.tuhh.ict.pshdl.model.extensions
+package de.tuhh.ict.pshdl.model.evaluation
 
 import de.tuhh.ict.pshdl.model.HDLArithOp
-import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*
 import de.tuhh.ict.pshdl.model.HDLBitOp
-import static de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType.*
 import de.tuhh.ict.pshdl.model.HDLConcat
 import de.tuhh.ict.pshdl.model.HDLEnumRef
 import de.tuhh.ict.pshdl.model.HDLEqualityOp
-import static de.tuhh.ict.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
 import de.tuhh.ict.pshdl.model.HDLExpression
 import de.tuhh.ict.pshdl.model.HDLFunctionCall
 import de.tuhh.ict.pshdl.model.HDLLiteral
-import static de.tuhh.ict.pshdl.model.HDLLiteral$HDLLiteralPresentation.*
+import de.tuhh.ict.pshdl.model.HDLLiteral$HDLLiteralPresentation
 import de.tuhh.ict.pshdl.model.HDLManip
-import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
 import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
 import de.tuhh.ict.pshdl.model.HDLPrimitive
 import de.tuhh.ict.pshdl.model.HDLShiftOp
-import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import de.tuhh.ict.pshdl.model.HDLTernary
 import de.tuhh.ict.pshdl.model.HDLType
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
 import de.tuhh.ict.pshdl.model.HDLVariable
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection
-import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import de.tuhh.ict.pshdl.model.HDLVariableRef
 import de.tuhh.ict.pshdl.model.IHDLObject
-import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext
+import de.tuhh.ict.pshdl.model.extensions.TypeExtension
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions
-import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
+import de.tuhh.ict.pshdl.model.utils.Insulin
 import java.math.BigInteger
 import java.util.LinkedList
 import java.util.List
 
-import static de.tuhh.ict.pshdl.model.extensions.ConstantEvaluate.*
-import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
-import de.tuhh.ict.pshdl.model.utils.Insulin
+import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*
+import static de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType.*
+import static de.tuhh.ict.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
+import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
+import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
+import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
+import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
 
 class ConstantEvaluate {
 	public static ConstantEvaluate INST=new ConstantEvaluate
