@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project de.tuhh.ict.pshdl.model.v2">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/PSHDLCompiler.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="de.tuhh.ict.pshdl.generator.vhdl.PSHDLCompiler"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.model.v2/bin"/>
+            <fileset dir="/Users/karstenbecker/Dropbox/PSHDL/de.tuhh.ict.pshdl.interpreter/bin"/>
+            <fileset dir="/Users/karstenbecker/Dropbox/PSHDL/de.upb.hni.vmagic/bin"/>
+            <fileset dir="/Users/karstenbecker/Dropbox/PSHDL/PSHDLExternalDeps/bin"/>
+        </jar>
+    </target>
+</project>
