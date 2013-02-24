@@ -1,24 +1,44 @@
 package de.tuhh.ict.pshdl.model.evaluation;
 
-import java.math.*;
-import java.util.*;
-
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
-
-import com.google.common.base.*;
-
-import de.tuhh.ict.pshdl.model.*;
+import com.google.common.base.Objects;
+import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
+import de.tuhh.ict.pshdl.model.HDLClass;
+import de.tuhh.ict.pshdl.model.HDLConcat;
+import de.tuhh.ict.pshdl.model.HDLEnumRef;
+import de.tuhh.ict.pshdl.model.HDLEqualityOp;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import de.tuhh.ict.pshdl.model.HDLExpression;
+import de.tuhh.ict.pshdl.model.HDLFunctionCall;
+import de.tuhh.ict.pshdl.model.HDLLiteral;
 import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
+import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
 import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
+import de.tuhh.ict.pshdl.model.HDLPrimitive;
+import de.tuhh.ict.pshdl.model.HDLRange;
+import de.tuhh.ict.pshdl.model.HDLShiftOp;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
+import de.tuhh.ict.pshdl.model.HDLTernary;
+import de.tuhh.ict.pshdl.model.HDLType;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
+import de.tuhh.ict.pshdl.model.HDLVariable;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import de.tuhh.ict.pshdl.model.extensions.*;
-import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.HDLVariableRef;
+import de.tuhh.ict.pshdl.model.IHDLObject;
+import de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext;
+import de.tuhh.ict.pshdl.model.extensions.ProblemDescription;
+import de.tuhh.ict.pshdl.model.extensions.TypeExtension;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
+import de.tuhh.ict.pshdl.model.utils.Insulin;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 @SuppressWarnings("all")
 public class ConstantEvaluate {

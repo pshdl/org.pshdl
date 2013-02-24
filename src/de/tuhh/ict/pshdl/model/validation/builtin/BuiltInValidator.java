@@ -46,7 +46,7 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	@Override
-	public void check(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	public boolean check(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		// TODO find a way to distinguish between context dependent problems and
 		// others
 		try {
@@ -60,6 +60,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkConstantBoundaries(pkg, problems, hContext);
 			checkArrayBoundaries(pkg, problems, hContext);
 			checkConstantEquals(pkg, problems, hContext);
+			checkBitAcces(pkg, problems, hContext);
 			// TODO Validate value ranges, check for 0 divide
 			// TODO Check for POW only power of 2
 			checkCombinedAssignment(pkg, problems, hContext);
@@ -70,7 +71,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkInputReg(pkg, problems, hContext);
 			checkLiteralConcat(pkg, problems);
 			// TODO Validate bitWidth mismatch
-			// checkBitWidthAssignments(pkg, problems, hContext);
+			checkAssignments(pkg, problems, hContext);
 			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
@@ -90,9 +91,37 @@ public class BuiltInValidator implements IHDLValidator {
 			// TODO Out port array need to be constant
 			// TODO Check for bit access on left assignment side when right is
 			// matching
+			// TODO check for register of constant/parameter
+			// TODO check for register of global constants
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	private void checkBitAcces(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		HDLVariableRef[] refs = pkg.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef ref : refs) {
+			if (skipExp(ref))
+				continue;
+			if (ref.getBits().size() != 0) {
+				HDLType varType = TypeExtension.typeOf(ref.resolveVar());
+				if (!(varType instanceof HDLPrimitive)) {
+					problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType));
+				} else {
+					HDLPrimitive primitive = (HDLPrimitive) varType;
+					switch (primitive.getType()) {
+					case BITVECTOR:
+					case INT:
+					case UINT:
+						break;
+					default:
+						problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE, ref, varType));
+					}
+				}
+			}
 		}
 	}
 
@@ -157,57 +186,72 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkBitWidthAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private void checkAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLAssignment[] asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
+			if (skipExp(ass))
+				continue;
 			HDLEvaluationContext context = getContext(hContext, ass);
-			HDLType lType = TypeExtension.typeOf(ass.getLeft());
-			HDLType rType = TypeExtension.typeOf(ass.getRight());
-			switch (lType.getClassType()) {
-			case HDLEnum:
-				if (rType.getClassType() != HDLClass.HDLEnum)
-					problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_ENUM, ass));
-				break;
-			case HDLPrimitive:
-				if (rType.getClassType() != HDLClass.HDLPrimitive) {
-					problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_PRIMITIVE, ass));
-				} else {
-					HDLPrimitive left = (HDLPrimitive) lType;
-					HDLPrimitive right = (HDLPrimitive) rType;
-					switch (left.getType()) {
-					case BIT:
-						if (right.getType() != HDLPrimitiveType.BIT) {
-							if (right.getWidth() != null) {
-								BigInteger w = ConstantEvaluate.valueOf(right.getWidth(), context);
-								if (!w.equals(BigInteger.ONE))
-									problems.add(new Problem(ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR, ass.getRight(), ass));
-							}
-						}
-						break;
-					case BITVECTOR:
-						break;
-					case BOOL:
-						break;
-					case INT:
-						break;
-					case INTEGER:
-						break;
-					case NATURAL:
-						break;
-					case STRING:
-						break;
-					case UINT:
-						break;
-					default:
-						break;
-
-					}
-				}
-				break;
-			case HDLInterface:
-			default:
-				problems.add(new Problem(ErrorCode.ASSIGNEMENT_NOT_SUPPORTED, ass));
+			checkAss(ass, ass.getLeft(), ass.getRight(), problems, context);
+		}
+		HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
+		for (HDLVariable hdlVariable : vars) {
+			if (hdlVariable.getDefaultValue() != null) {
+				HDLEvaluationContext context = getContext(hContext, hdlVariable);
+				checkAss(hdlVariable, hdlVariable, hdlVariable.getDefaultValue(), problems, context);
 			}
+		}
+	}
+
+	private void checkAss(IHDLObject obj, IHDLObject leftRef, HDLExpression rightExp, Set<Problem> problems, HDLEvaluationContext context) {
+		HDLType lType = TypeExtension.typeOf(leftRef);
+		HDLType rType = TypeExtension.typeOf(rightExp);
+		if ((lType == null) || (rType == null))
+			return;
+		switch (lType.getClassType()) {
+		case HDLEnum:
+			if (rType.getClassType() != HDLClass.HDLEnum)
+				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_ENUM, obj));
+			break;
+		case HDLPrimitive:
+			if (rType.getClassType() != HDLClass.HDLPrimitive) {
+				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_PRIMITIVE, obj));
+			} else {
+				HDLPrimitive left = (HDLPrimitive) lType;
+				HDLPrimitive right = (HDLPrimitive) rType;
+				switch (left.getType()) {
+				case BIT:
+					if (right.getType() != HDLPrimitiveType.BIT) {
+						if (right.getWidth() != null) {
+							BigInteger w = ConstantEvaluate.valueOf(right.getWidth(), context);
+							if (!w.equals(BigInteger.ONE))
+								problems.add(new Problem(ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
+						}
+					}
+					break;
+				case BITVECTOR:
+					break;
+				case BOOL:
+					break;
+				case INT:
+					break;
+				case INTEGER:
+					break;
+				case NATURAL:
+					break;
+				case STRING:
+					break;
+				case UINT:
+					break;
+				default:
+					break;
+
+				}
+			}
+			break;
+		case HDLInterface:
+		default:
+			problems.add(new Problem(ErrorCode.ASSIGNEMENT_NOT_SUPPORTED, obj));
 		}
 	}
 

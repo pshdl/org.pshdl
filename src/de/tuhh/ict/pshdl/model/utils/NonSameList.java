@@ -2,7 +2,7 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
 
-public class NonSameList<T> extends AbstractSet<T> implements Set<T> {
+public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable {
 	private Map<Integer, List<T>> map = new LinkedHashMap<Integer, List<T>>();
 
 	public NonSameList(Collection<T> value) {

@@ -386,6 +386,7 @@ public class Insulin {
 							continue;
 						}
 						ArrayList<HDLExpression> varDim = var.getDimensions();
+						@SuppressWarnings("unchecked")
 						ArrayList<HDLExpression> cloneDim = (ArrayList<HDLExpression>) dimensions.clone();
 						cloneDim.addAll(varDim);
 						HDLExpression defaultValue = getDefaultValue(hvd, null, var);
@@ -504,7 +505,7 @@ public class Insulin {
 		HDLUnit[] units = apply.getAllObjectsOf(HDLUnit.class, true);
 		for (HDLUnit unit : units) {
 			HDLVariable defClkVar = new HDLVariable().setName("clk").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
-			HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLBuiltInAnnotations.clock.create(null));
+			HDLVariable defRstVar = new HDLVariable().setName("rst").addAnnotations(HDLBuiltInAnnotations.reset.create(null));
 			boolean customClk = false, customRst = false;
 			// Find all clock annotated Signals
 			HDLVariable newVar = extractVar(unit, HDLBuiltInAnnotations.clock);
@@ -896,16 +897,17 @@ public class Insulin {
 								shift = add.add(BigInteger.ONE);
 							}
 						} else {
-							String varName = ref.getVarRefName().getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
+							HDLQualifiedName varRefName = ref.getVarRefName();
+							String varName = varRefName.getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
 							HDLQualifiedName hVarName = new HDLQualifiedName(varName);
-							replacements.add(new HDLVariableDeclaration().setType(TypeExtension.typeOf(ref)).addVariables(
-									new HDLVariable().setName(varName).setDefaultValue(ass.getRight())));
+							replacements.add(new HDLVariableDeclaration().setType(TypeExtension.typeOf(ref)).addVariables(new HDLVariable().setName(varName)));
+							replacements.add(new HDLAssignment().setLeft(new HDLVariableRef().setVar(varRefName.skipLast(1).append(varName))).setRight(ass.getRight()));
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								HDLRange r = bits.get(j);
 								Range<BigInteger> vr = RangeExtension.rangeOf(r, context);
 								BigInteger add = shift.add(vr.upperEndpoint().subtract(vr.lowerEndpoint()).abs());
-								HDLRange newRange = new HDLRange().setFrom(HDLLiteral.get(shift)).setTo(HDLLiteral.get(add)).normalize();
+								HDLRange newRange = new HDLRange().setTo(HDLLiteral.get(shift)).setFrom(HDLLiteral.get(add)).normalize();
 								HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
 								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
 								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);

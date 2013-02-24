@@ -30,6 +30,8 @@ import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives
 import java.math.BigInteger
 import java.util.ArrayList
 import java.util.Iterator
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
+import de.tuhh.ict.pshdl.model.HDLResolvedRef
 
 import static de.tuhh.ict.pshdl.interpreter.utils.FluidFrame$Instruction.*
 import static de.tuhh.ict.pshdl.model.HDLArithOp$HDLArithOpType.*
@@ -41,8 +43,6 @@ import static de.tuhh.ict.pshdl.model.HDLRegisterConfig$HDLRegClockType.*
 import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static de.tuhh.ict.pshdl.model.simulation.SimulationTransformationExtension.*
-import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
-import de.tuhh.ict.pshdl.model.HDLResolvedRef
 
 class SimulationTransformationExtension {
 	public static SimulationTransformationExtension INST=new SimulationTransformationExtension
@@ -72,28 +72,18 @@ class SimulationTransformationExtension {
 			config = config.normalize
 			val HDLVariable clk = config.resolveClk
 			val String name = FullNameExtension::fullNameOf(clk).toString
-			if (clk.direction == IN) {
-				res.addInput(name)
-				if (config.clockType == RISING)
-					res.add(new ArgumentedInstruction(isRisingEdgeInput, name))
-				else
-					res.add(new ArgumentedInstruction(isFallingEdgeInput, name))
-			} else {
-				if (config.clockType == RISING)
-					res.add(new ArgumentedInstruction(isRisingEdgeInternal, name))
-				else
-					res.add(new ArgumentedInstruction(isFallingEdgeInternal, name))
-			}
+			if (config.clockType == RISING)
+				res.add(new ArgumentedInstruction(isRisingEdgeInternal2, name))
+			else
+				res.add(new ArgumentedInstruction(isFallingEdgeInternal2, name))
 		}
 		res.append(obj.right.toSimulationModel(context))
-		val HDLDirection dir = hVar.direction
 		var boolean hasBits = false
 		if (left instanceof HDLVariableRef) {
 			val HDLVariableRef variableRef = left as HDLVariableRef
 			if (!variableRef.bits.isEmpty)
 				hasBits = true
 		}
-		res.setInternal(dir == INTERNAL || hasBits)
 		return res
 	}
 	def HDLVariable resolveVar(HDLReference reference) {
@@ -190,15 +180,16 @@ class SimulationTransformationExtension {
 			return "1"
 		case current.type==INTEGER || current.type==NATURAL:
 			return "32"
-		case current.type==INT||current.type==UINT:
+		case current.type==INT||current.type==UINT||current.type==BITVECTOR:
 			return ConstantEvaluate::valueOf(current.width,context).toString
 		}
-		return null
+		throw new IllegalArgumentException(current+" is not a valid type");
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
-		val String refName = obj.varRefName.toString
+		var hVar=obj.resolveVar
+		val String refName = hVar.asRef.toString
 		val bits = new ArrayList<String>(obj.bits.size + 1)
 		bits.add(refName)
 		if (!obj.bits.isEmpty) {
@@ -207,27 +198,20 @@ class SimulationTransformationExtension {
 			}
 		}
 		val String[] arrBits=bits
-		val HDLVariable hVar = obj.resolveVar
 		val HDLDirection dir = hVar.direction
 		switch (dir) {
 		case INTERNAL:
-			res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
+			res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
 		case dir==PARAMETER || dir==CONSTANT:{
 			val BigInteger bVal=ConstantEvaluate::valueOf(obj, context)
 			res.constants.put(refName, bVal)
 			res.instructions.add(new ArgumentedInstruction(loadConstant, refName))
 		}
 		case IN:{
-			res.addInput(refName)
-			res.instructions.add(new ArgumentedInstruction(loadInput, arrBits))
-			}
+			res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
+		}
 		case dir==OUT || dir==INOUT:{
-			if (bits.size > 1) {
-				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
-			} else {
-				res.addInput(refName)
-				res.instructions.add(new ArgumentedInstruction(loadInput, arrBits))
-			}
+			res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
 		}
 		default:
 			throw new IllegalArgumentException("Did not expect obj here" + dir)

@@ -57,9 +57,11 @@ public class VHDLOutputValidator implements IHDLValidator {
 			VHDLErrorCode vCode = (VHDLErrorCode) code;
 			switch (vCode) {
 			case KEYWORD_NAME:
-				break;
+				return new HDLAdvise(problem, "The used name is a keyword in VHDL",
+						"Keywords will be escaped using the extended identifier convention, this may look strange, but is fully working", "Don't use a VHDL keyword as identifier");
 			case KEYWORD_TYPE:
-				break;
+				return new HDLAdvise(problem, "The used type name is a keyword in VHDL",
+						"Keywords will be escaped using the extended identifier convention, this may look strange, but is fully working", "Don't use a VHDL keyword as identifier");
 
 			}
 		}
@@ -67,8 +69,9 @@ public class VHDLOutputValidator implements IHDLValidator {
 	}
 
 	@Override
-	public void check(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> context) {
+	public boolean check(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> context) {
 		checkNames(unit, problems);
+		return true;
 	}
 
 	private void checkNames(HDLPackage unit, Set<Problem> problems) {

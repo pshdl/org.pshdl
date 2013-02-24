@@ -46,6 +46,7 @@ import de.tuhh.ict.pshdl.model.IHDLObject;
 import de.tuhh.ict.pshdl.model.evaluation.ConstantEvaluate;
 import de.tuhh.ict.pshdl.model.extensions.FullNameExtension;
 import de.tuhh.ict.pshdl.model.extensions.TypeExtension;
+import de.tuhh.ict.pshdl.model.parser.SourceInfo;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
 import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
@@ -88,6 +89,7 @@ import de.upb.hni.vmagic.type.ConstrainedArray;
 import de.upb.hni.vmagic.type.EnumerationType;
 import de.upb.hni.vmagic.type.SubtypeIndication;
 import de.upb.hni.vmagic.type.UnresolvedType;
+import de.upb.hni.vmagic.util.Comments;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,6 +103,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 @SuppressWarnings("all")
@@ -175,7 +178,50 @@ public class VHDLStatementExtension {
       VHDLContext _vHDL = this.toVHDL(stmnt, newPid);
       res.merge(_vHDL, false);
     }
-    return res;
+    return this.attachComment(res, obj);
+  }
+  
+  public VHDLContext attachComment(final VHDLContext context, final IHDLObject block) {
+    try {
+      final SourceInfo srcInfo = block.<SourceInfo>getMeta(SourceInfo.INFO);
+      boolean _and = false;
+      boolean _notEquals = (!Objects.equal(srcInfo, null));
+      if (!_notEquals) {
+        _and = false;
+      } else {
+        SequentialStatement _statement = context.getStatement();
+        boolean _notEquals_1 = (!Objects.equal(_statement, null));
+        _and = (_notEquals && _notEquals_1);
+      }
+      if (_and) {
+        ArrayList<String> _arrayList = new ArrayList<String>();
+        final ArrayList<String> newComments = _arrayList;
+        for (final String comment : srcInfo.comments) {
+          boolean _startsWith = comment.startsWith("//");
+          if (_startsWith) {
+            int _length = comment.length();
+            int _minus = (_length - 1);
+            String _substring = comment.substring(2, _minus);
+            newComments.add(_substring);
+          } else {
+            int _length_1 = comment.length();
+            int _minus_1 = (_length_1 - 2);
+            final String newComment = comment.substring(2, _minus_1);
+            String[] _split = newComment.split("\n");
+            newComments.addAll(((Collection<? extends String>)Conversions.doWrapArray(_split)));
+          }
+        }
+        SequentialStatement _statement_1 = context.getStatement();
+        Comments.setComments(_statement_1, newComments);
+      }
+    } catch (final Throwable _t) {
+      if (_t instanceof Exception) {
+        final Exception e = (Exception)_t;
+      } else {
+        throw Exceptions.sneakyThrow(_t);
+      }
+    }
+    return context;
   }
   
   protected VHDLContext _toVHDL(final HDLEnumDeclaration obj, final int pid) {
@@ -193,7 +239,7 @@ public class VHDLStatementExtension {
     String _name_1 = hEnum.getName();
     EnumerationType _enumerationType = new EnumerationType(_name_1, enumArr);
     res.addInternalTypeDeclaration(_enumerationType);
-    return res;
+    return this.attachComment(res, obj);
   }
   
   protected VHDLContext _toVHDL(final HDLInterfaceDeclaration obj, final int pid) {
@@ -444,7 +490,7 @@ public class VHDLStatementExtension {
       List<ConcurrentStatement> _statements = forLoop.getStatements();
       _statements.add(instantiation);
     }
-    return res;
+    return this.attachComment(res, obj);
   }
   
   public String asIndex(final Integer integer) {
@@ -681,7 +727,7 @@ public class VHDLStatementExtension {
         }
       }
     }
-    return res;
+    return this.attachComment(res, obj);
   }
   
   protected VHDLContext _toVHDL(final HDLSwitchStatement obj, final int pid) {
@@ -760,7 +806,7 @@ public class VHDLStatementExtension {
       }
       context.addUnclockedStatement(pid, cs_1, obj);
     }
-    return context;
+    return this.attachComment(context, obj);
   }
   
   private Alternative createAlternative(final CaseStatement cs, final Entry<HDLSwitchCaseStatement,VHDLContext> e, final BigInteger bits) {
@@ -796,7 +842,7 @@ public class VHDLStatementExtension {
       VHDLContext _vHDL = this.toVHDL(stmnt, pid);
       res.merge(_vHDL, false);
     }
-    return res;
+    return this.attachComment(res, obj);
   }
   
   protected VHDLContext _toVHDL(final HDLAssignment obj, final int pid) {
@@ -869,7 +915,7 @@ public class VHDLStatementExtension {
     } else {
       context.addUnclockedStatement(pid, sa, obj);
     }
-    return context;
+    return this.attachComment(context, obj);
   }
   
   public HDLVariable resolveVar(final HDLReference reference) {
@@ -923,7 +969,7 @@ public class VHDLStatementExtension {
       _statements.addAll(_get_2);
       res.addUnclockedStatement(pid, fStmnt, obj);
     }
-    return res;
+    return this.attachComment(res, obj);
   }
   
   protected VHDLContext _toVHDL(final HDLIfStatement obj, final int pid) {
@@ -1003,7 +1049,7 @@ public class VHDLStatementExtension {
       }
       res.addUnclockedStatement(pid, ifs, obj);
     }
-    return res;
+    return this.attachComment(res, obj);
   }
   
   protected VHDLContext _toVHDL(final HDLFunction obj, final int pid) {

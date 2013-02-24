@@ -63,7 +63,7 @@ public enum HDLClass {
 		this.clazz = clazz;
 	}
 
-	public static HDLClass getClassFor(Class<?> clazz) {
+	public static synchronized HDLClass getClassFor(Class<?> clazz) {
 		if (classMap == null) {
 			classMap = new HashMap<Class<?>, HDLClass>();
 			for (HDLClass cl : values()) {

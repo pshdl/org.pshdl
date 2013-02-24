@@ -1,22 +1,57 @@
 package de.tuhh.ict.pshdl.model.parser;
 
-import java.util.*;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.eclipse.xtext.xbase.lib.*;
-
-import com.google.common.base.*;
-
-import de.tuhh.ict.pshdl.model.*;
+import com.google.common.base.Objects;
+import de.tuhh.ict.pshdl.model.HDLAnnotation;
+import de.tuhh.ict.pshdl.model.HDLArgument;
+import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLArrayInit;
+import de.tuhh.ict.pshdl.model.HDLAssignment;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
+import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
+import de.tuhh.ict.pshdl.model.HDLBlock;
+import de.tuhh.ict.pshdl.model.HDLConcat;
+import de.tuhh.ict.pshdl.model.HDLDeclaration;
+import de.tuhh.ict.pshdl.model.HDLDirectGeneration;
+import de.tuhh.ict.pshdl.model.HDLEnum;
+import de.tuhh.ict.pshdl.model.HDLEnumDeclaration;
+import de.tuhh.ict.pshdl.model.HDLEqualityOp;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import de.tuhh.ict.pshdl.model.HDLExpression;
+import de.tuhh.ict.pshdl.model.HDLForLoop;
+import de.tuhh.ict.pshdl.model.HDLIfStatement;
+import de.tuhh.ict.pshdl.model.HDLInlineFunction;
+import de.tuhh.ict.pshdl.model.HDLInterface;
+import de.tuhh.ict.pshdl.model.HDLInterfaceDeclaration;
+import de.tuhh.ict.pshdl.model.HDLInterfaceInstantiation;
+import de.tuhh.ict.pshdl.model.HDLLiteral;
+import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
+import de.tuhh.ict.pshdl.model.HDLNativeFunction;
+import de.tuhh.ict.pshdl.model.HDLPackage;
+import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import de.tuhh.ict.pshdl.model.HDLRange;
+import de.tuhh.ict.pshdl.model.HDLReference;
+import de.tuhh.ict.pshdl.model.HDLRegisterConfig;
+import de.tuhh.ict.pshdl.model.HDLShiftOp;
 import de.tuhh.ict.pshdl.model.HDLShiftOp.HDLShiftOpType;
+import de.tuhh.ict.pshdl.model.HDLStatement;
+import de.tuhh.ict.pshdl.model.HDLSubstituteFunction;
+import de.tuhh.ict.pshdl.model.HDLSwitchCaseStatement;
+import de.tuhh.ict.pshdl.model.HDLSwitchStatement;
+import de.tuhh.ict.pshdl.model.HDLTernary;
+import de.tuhh.ict.pshdl.model.HDLType;
+import de.tuhh.ict.pshdl.model.HDLUnit;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragmentFunction;
+import de.tuhh.ict.pshdl.model.HDLVariable;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import de.tuhh.ict.pshdl.model.HDLVariableRef;
+import de.tuhh.ict.pshdl.model.IHDLObject;
+import de.tuhh.ict.pshdl.model.parser.PSHDLLangLexer;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsAccessRangeContext;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsAddContext;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsAnnotationContext;
@@ -88,7 +123,16 @@ import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsVariableContext;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsVariableDeclarationContext;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsVariableRefContext;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsWidthContext;
-import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.parser.SourceInfo;
+import de.tuhh.ict.pshdl.model.utils.HDLLibrary;
+import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.xtext.xbase.lib.ListExtensions;
 
 @SuppressWarnings("all")
 public class ParserToModelExtension {

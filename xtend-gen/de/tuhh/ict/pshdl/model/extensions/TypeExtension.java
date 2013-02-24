@@ -1,22 +1,49 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
-import java.math.*;
-import java.util.*;
-
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
-
-import com.google.common.base.*;
-
-import de.tuhh.ict.pshdl.model.*;
+import com.google.common.base.Objects;
+import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLArrayInit;
+import de.tuhh.ict.pshdl.model.HDLBitOp;
+import de.tuhh.ict.pshdl.model.HDLClass;
+import de.tuhh.ict.pshdl.model.HDLConcat;
+import de.tuhh.ict.pshdl.model.HDLDirectGeneration;
+import de.tuhh.ict.pshdl.model.HDLEnumRef;
+import de.tuhh.ict.pshdl.model.HDLEqualityOp;
+import de.tuhh.ict.pshdl.model.HDLExpression;
+import de.tuhh.ict.pshdl.model.HDLFunctionCall;
+import de.tuhh.ict.pshdl.model.HDLInlineFunction;
+import de.tuhh.ict.pshdl.model.HDLInterfaceInstantiation;
+import de.tuhh.ict.pshdl.model.HDLLiteral;
 import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
+import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
+import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
-import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.services.*;
-import de.tuhh.ict.pshdl.model.validation.*;
-import de.tuhh.ict.pshdl.model.validation.builtin.*;
+import de.tuhh.ict.pshdl.model.HDLRange;
+import de.tuhh.ict.pshdl.model.HDLRegisterConfig;
+import de.tuhh.ict.pshdl.model.HDLShiftOp;
+import de.tuhh.ict.pshdl.model.HDLTernary;
+import de.tuhh.ict.pshdl.model.HDLType;
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment;
+import de.tuhh.ict.pshdl.model.HDLVariable;
+import de.tuhh.ict.pshdl.model.HDLVariableDeclaration;
+import de.tuhh.ict.pshdl.model.HDLVariableRef;
+import de.tuhh.ict.pshdl.model.IHDLObject;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
+import de.tuhh.ict.pshdl.model.utils.HDLProblemException;
+import de.tuhh.ict.pshdl.model.utils.Insulin;
+import de.tuhh.ict.pshdl.model.utils.services.HDLTypeInferenceInfo;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLPrimitive;
+import de.tuhh.ict.pshdl.model.validation.Problem;
+import de.tuhh.ict.pshdl.model.validation.builtin.ErrorCode;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 @SuppressWarnings("all")
 public class TypeExtension {
@@ -50,7 +77,21 @@ public class TypeExtension {
    *         otherwise.
    */
   protected HDLType _determineType(final HDLVariable hVar) {
+    String _name = hVar.getName();
+    boolean _equals = Objects.equal(HDLRegisterConfig.DEF_CLK, _name);
+    if (_equals) {
+      return HDLPrimitive.getBit();
+    }
+    String _name_1 = hVar.getName();
+    boolean _equals_1 = Objects.equal(HDLRegisterConfig.DEF_RST, _name_1);
+    if (_equals_1) {
+      return HDLPrimitive.getBit();
+    }
     final IHDLObject container = hVar.getContainer();
+    boolean _equals_2 = Objects.equal(container, null);
+    if (_equals_2) {
+      return null;
+    }
     HDLClass _classType = container.getClassType();
     final HDLClass _switchValue = _classType;
     boolean _matched = false;
@@ -163,6 +204,10 @@ public class TypeExtension {
     boolean _while = _hasNext;
     while (_while) {
       {
+        boolean _equals = Objects.equal(width, null);
+        if (_equals) {
+          return null;
+        }
         HDLExpression _next_1 = iter.next();
         HDLType _determineType_1 = this.determineType(_next_1);
         type = ((HDLPrimitive) _determineType_1);
@@ -183,7 +228,12 @@ public class TypeExtension {
     return _setWidth.setContainer(cat);
   }
   
-  public static HDLExpression getWidth(final HDLPrimitive type) {
+  protected static HDLExpression _getWidth(final IHDLObject obj) {
+    final HDLType type = TypeExtension.INST.determineType(obj);
+    return TypeExtension.getWidth(type);
+  }
+  
+  protected static HDLExpression _getWidth(final HDLPrimitive type) {
     final HDLExpression width = type.getWidth();
     HDLPrimitiveType _type = type.getType();
     boolean _equals = Objects.equal(_type, HDLPrimitiveType.BIT);
@@ -362,6 +412,17 @@ public class TypeExtension {
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(ref).toString());
+    }
+  }
+  
+  public static HDLExpression getWidth(final IHDLObject type) {
+    if (type instanceof HDLPrimitive) {
+      return _getWidth((HDLPrimitive)type);
+    } else if (type != null) {
+      return _getWidth(type);
+    } else {
+      throw new IllegalArgumentException("Unhandled parameter types: " +
+        Arrays.<Object>asList(type).toString());
     }
   }
 }

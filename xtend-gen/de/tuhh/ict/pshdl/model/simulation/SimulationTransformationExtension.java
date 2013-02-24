@@ -95,35 +95,19 @@ public class SimulationTransformationExtension {
       final HDLVariable clk = config.resolveClk();
       HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(clk);
       final String name = _fullNameOf.toString();
-      HDLDirection _direction = clk.getDirection();
-      boolean _equals = Objects.equal(_direction, HDLDirection.IN);
+      HDLRegClockType _clockType = config.getClockType();
+      boolean _equals = Objects.equal(_clockType, HDLRegClockType.RISING);
       if (_equals) {
-        res.addInput(name);
-        HDLRegClockType _clockType = config.getClockType();
-        boolean _equals_1 = Objects.equal(_clockType, HDLRegClockType.RISING);
-        if (_equals_1) {
-          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdgeInput, name);
-          res.add(_argumentedInstruction);
-        } else {
-          ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdgeInput, name);
-          res.add(_argumentedInstruction_1);
-        }
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdgeInternal2, name);
+        res.add(_argumentedInstruction);
       } else {
-        HDLRegClockType _clockType_1 = config.getClockType();
-        boolean _equals_2 = Objects.equal(_clockType_1, HDLRegClockType.RISING);
-        if (_equals_2) {
-          ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.isRisingEdgeInternal, name);
-          res.add(_argumentedInstruction_2);
-        } else {
-          ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.isFallingEdgeInternal, name);
-          res.add(_argumentedInstruction_3);
-        }
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdgeInternal2, name);
+        res.add(_argumentedInstruction_1);
       }
     }
     HDLExpression _right = obj.getRight();
     FluidFrame _simulationModel = this.toSimulationModel(_right, context);
     res.append(_simulationModel);
-    final HDLDirection dir = hVar.getDirection();
     boolean hasBits = false;
     if ((left instanceof HDLVariableRef)) {
       final HDLVariableRef variableRef = ((HDLVariableRef) left);
@@ -134,14 +118,6 @@ public class SimulationTransformationExtension {
         hasBits = true;
       }
     }
-    boolean _or = false;
-    boolean _equals_3 = Objects.equal(dir, HDLDirection.INTERNAL);
-    if (_equals_3) {
-      _or = true;
-    } else {
-      _or = (_equals_3 || hasBits);
-    }
-    res.setInternal(_or);
     return res;
   }
   
@@ -380,14 +356,22 @@ public class SimulationTransformationExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
+      boolean _or_2 = false;
       HDLPrimitiveType _type_3 = current.getType();
       boolean _equals_2 = Objects.equal(_type_3, HDLPrimitiveType.INT);
       if (_equals_2) {
-        _or_1 = true;
+        _or_2 = true;
       } else {
         HDLPrimitiveType _type_4 = current.getType();
         boolean _equals_3 = Objects.equal(_type_4, HDLPrimitiveType.UINT);
-        _or_1 = (_equals_2 || _equals_3);
+        _or_2 = (_equals_2 || _equals_3);
+      }
+      if (_or_2) {
+        _or_1 = true;
+      } else {
+        HDLPrimitiveType _type_5 = current.getType();
+        boolean _equals_4 = Objects.equal(_type_5, HDLPrimitiveType.BITVECTOR);
+        _or_1 = (_or_2 || _equals_4);
       }
       if (_or_1) {
         _matched=true;
@@ -396,14 +380,17 @@ public class SimulationTransformationExtension {
         return _valueOf.toString();
       }
     }
-    return null;
+    String _plus = (current + " is not a valid type");
+    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
+    throw _illegalArgumentException;
   }
   
   protected FluidFrame _toSimulationModel(final HDLVariableRef obj, final HDLEvaluationContext context) {
     FluidFrame _fluidFrame = new FluidFrame();
     final FluidFrame res = _fluidFrame;
-    HDLQualifiedName _varRefName = obj.getVarRefName();
-    final String refName = _varRefName.toString();
+    HDLVariable hVar = obj.resolveVar();
+    HDLQualifiedName _asRef = hVar.asRef();
+    final String refName = _asRef.toString();
     ArrayList<HDLRange> _bits = obj.getBits();
     int _size = _bits.size();
     int _plus = (_size + 1);
@@ -421,13 +408,12 @@ public class SimulationTransformationExtension {
       }
     }
     final String[] arrBits = ((String[])Conversions.unwrapArray(bits, String.class));
-    final HDLVariable hVar = obj.resolveVar();
     final HDLDirection dir = hVar.getDirection();
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(dir,HDLDirection.INTERNAL)) {
         _matched=true;
-        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadInternal, arrBits);
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadInternal2, arrBits);
         res.instructions.add(_argumentedInstruction);
       }
     }
@@ -451,8 +437,7 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(dir,HDLDirection.IN)) {
         _matched=true;
-        res.addInput(refName);
-        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.loadInput, arrBits);
+        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.loadInternal2, arrBits);
         res.instructions.add(_argumentedInstruction_2);
       }
     }
@@ -467,16 +452,8 @@ public class SimulationTransformationExtension {
       }
       if (_or_1) {
         _matched=true;
-        int _size_1 = bits.size();
-        boolean _greaterThan = (_size_1 > 1);
-        if (_greaterThan) {
-          ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.loadInternal, arrBits);
-          res.instructions.add(_argumentedInstruction_3);
-        } else {
-          res.addInput(refName);
-          ArgumentedInstruction _argumentedInstruction_4 = new ArgumentedInstruction(Instruction.loadInput, arrBits);
-          res.instructions.add(_argumentedInstruction_4);
-        }
+        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.loadInternal2, arrBits);
+        res.instructions.add(_argumentedInstruction_3);
       }
     }
     if (!_matched) {

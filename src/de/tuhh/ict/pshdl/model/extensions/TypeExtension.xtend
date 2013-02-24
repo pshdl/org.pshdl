@@ -39,6 +39,8 @@ import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
 import de.tuhh.ict.pshdl.model.utils.Insulin
 import de.tuhh.ict.pshdl.model.HDLObject$GenericMeta
 import de.tuhh.ict.pshdl.model.HDLArrayInit
+import de.tuhh.ict.pshdl.model.utils.HDLConfig
+import de.tuhh.ict.pshdl.model.HDLRegisterConfig
 
 class TypeExtension {
 	public static TypeExtension INST=new TypeExtension
@@ -61,7 +63,13 @@ class TypeExtension {
 	 *         otherwise.
 	 */
 	def dispatch HDLType determineType(HDLVariable hVar) {
+		if (HDLRegisterConfig::DEF_CLK==hVar.name)
+			return HDLPrimitive::bit
+		if (HDLRegisterConfig::DEF_RST==hVar.name)
+			return HDLPrimitive::bit
 		val IHDLObject container = hVar.container
+		if (container==null)
+			return null
 		switch (container.classType) {
 		case HDLClass::HDLVariableDeclaration:
 			return (container as HDLVariableDeclaration).determineType
@@ -112,6 +120,9 @@ class TypeExtension {
 		var HDLPrimitive type = iter.next.determineType as HDLPrimitive
 		var HDLExpression width = getWidth(type)
 		while (iter.hasNext) {
+			if (width==null)
+				//This can happen when we have invalid concatenations
+				return null
 			type = iter.next.determineType as HDLPrimitive
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType::PLUS).setRight(getWidth(type))
 			width = HDLPrimitives::simplifyWidth(cat, width)
@@ -119,7 +130,12 @@ class TypeExtension {
 		return HDLPrimitive::bitvector.setWidth(width).setContainer(cat)
 	}
 
-	def static HDLExpression getWidth(HDLPrimitive type) {
+	def static dispatch HDLExpression getWidth(IHDLObject obj) {
+		val type=INST.determineType(obj)
+		return getWidth(type)
+	}
+	
+	def static dispatch HDLExpression getWidth(HDLPrimitive type) {
 		val HDLExpression width = type.width
 		if (type.type == HDLPrimitive$HDLPrimitiveType::BIT)
 			return HDLLiteral::get(1)

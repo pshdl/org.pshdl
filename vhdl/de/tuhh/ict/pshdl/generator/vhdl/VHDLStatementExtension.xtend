@@ -89,6 +89,9 @@ import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations.*
 import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
 import de.tuhh.ict.pshdl.model.HDLResolvedRef
+import de.tuhh.ict.pshdl.model.IHDLObject
+import de.tuhh.ict.pshdl.model.parser.SourceInfo
+import de.upb.hni.vmagic.util.Comments
 
 class VHDLStatementExtension {
 	public static VHDLStatementExtension INST= new VHDLStatementExtension
@@ -121,8 +124,27 @@ class VHDLStatementExtension {
 		for (HDLStatement stmnt : obj.statements) {
 			res.merge(stmnt.toVHDL(newPid), false)
 		}
-		return res
+		return res.attachComment(obj)
 	}
+	def VHDLContext attachComment(VHDLContext context, IHDLObject block) {
+		try {
+			val srcInfo=block.getMeta(SourceInfo::INFO)
+			if (srcInfo!=null && context.statement!=null){
+				val newComments=new ArrayList<String>
+				for (String comment:srcInfo.comments){
+					if (comment.startsWith("//"))
+						newComments.add(comment.substring(2,comment.length-1))
+					else{
+						val newComment=comment.substring(2, comment.length-2)						
+						newComments.addAll(newComment.split("\n"))
+					}
+				}				
+				Comments::setComments(context.statement, newComments)
+			}
+		} catch (Exception e){} 
+		return context
+	}
+
 
 	def dispatch VHDLContext toVHDL(HDLEnumDeclaration obj, int pid) {
 		val VHDLContext res = new VHDLContext
@@ -133,7 +155,7 @@ class VHDLStatementExtension {
 		}
 		val String[] enumArr=enums
 		res.addInternalTypeDeclaration(new EnumerationType(hEnum.name, enumArr))
-		return res
+		return res.attachComment(obj)
 	}
 
 	def dispatch VHDLContext toVHDL(HDLInterfaceDeclaration obj, int pid) {
@@ -255,7 +277,7 @@ class VHDLStatementExtension {
 				throw new IllegalArgumentException("Should not get here")
 			forLoop.statements.add(instantiation)
 		}
-		return res
+		return res.attachComment(obj)
 	}
 	
 	def String asIndex(Integer integer) {
@@ -368,7 +390,7 @@ class VHDLStatementExtension {
 				}
 			}
 		}
-		return res
+		return res.attachComment(obj)
 	}
 
 	def dispatch VHDLContext toVHDL(HDLSwitchStatement obj, int pid) {
@@ -412,7 +434,7 @@ class VHDLStatementExtension {
 			}
 			context.addUnclockedStatement(pid, cs, obj)
 		}
-		return context
+		return context.attachComment(obj)
 	}
 
 	def private Alternative createAlternative(CaseStatement cs, Map$Entry<HDLSwitchCaseStatement, VHDLContext> e, BigInteger bits) {
@@ -437,7 +459,7 @@ class VHDLStatementExtension {
 		for (HDLStatement stmnt : obj.dos) {
 			res.merge(stmnt.toVHDL(pid), false)
 		}
-		return res
+		return res.attachComment(obj)
 	}
 
 	def dispatch VHDLContext toVHDL(HDLAssignment obj, int pid) {
@@ -470,7 +492,7 @@ class VHDLStatementExtension {
 			context.addClockedStatement(config, sa)
 		else
 			context.addUnclockedStatement(pid, sa, obj)
-		return context
+		return context.attachComment(obj)
 	}
 	
 	def HDLVariable resolveVar(HDLReference reference) {
@@ -496,7 +518,7 @@ class VHDLStatementExtension {
 			fStmnt.statements.addAll(context.unclockedStatements.get(pid))
 			res.addUnclockedStatement(pid, fStmnt, obj)
 		}
-		return res
+		return res.attachComment(obj)
 	}
 
 	def dispatch VHDLContext toVHDL(HDLIfStatement obj, int pid) {
@@ -531,7 +553,7 @@ class VHDLStatementExtension {
 				ifs.elseStatements.addAll(elseCtx.unclockedStatements.get(pid))
 			res.addUnclockedStatement(pid, ifs, obj)
 		}
-		return res
+		return res.attachComment(obj)
 	}
 
 	def dispatch VHDLContext toVHDL(HDLFunction obj, int pid) {

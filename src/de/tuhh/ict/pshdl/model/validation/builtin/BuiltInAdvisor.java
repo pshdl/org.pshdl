@@ -64,6 +64,9 @@ public class BuiltInAdvisor {
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			break;
+		case BIT_ACCESS_NOT_POSSIBLE:
+			return new HDLAdvise(problem, "Can not access bits of this type",
+					"Only bits from primitive types with a known with can be access, that is either int<?>,uint<?>,bit<?>.", "cast type to a known width");
 		case COMBINED_ASSIGNMENT_NOT_ALLOWED:
 			return new HDLAdvise(problem, "A combined assignment can only be used on registers",
 					"Using a combined assignment on a non register variable will cause a combinaatorical loop. This is not what you want on a FPGA",

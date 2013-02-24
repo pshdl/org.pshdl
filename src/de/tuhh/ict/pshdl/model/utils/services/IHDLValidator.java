@@ -16,7 +16,7 @@ public interface IHDLValidator {
 		public ProblemSeverity getSeverity();
 	}
 
-	public void check(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> context);
+	public boolean check(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> context);
 
 	public Class<?> getErrorClass();
 

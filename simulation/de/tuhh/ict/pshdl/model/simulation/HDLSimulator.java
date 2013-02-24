@@ -109,44 +109,59 @@ public class HDLSimulator {
 		}
 		HDLVariableDeclaration[] hvds = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		ArrayList<HDLStatement> finalStatements = new ArrayList<HDLStatement>();
+		ArrayList<HDLStatement> initStatements = new ArrayList<HDLStatement>();
 		finalStatements.addAll(Arrays.asList(hvds));
+		int insertIndex = finalStatements.size();
 		for (Entry<String, LinkedList<HDLAssignment>> entry : writeOps.entrySet()) {
 			LinkedList<HDLAssignment> list = entry.getValue();
 			Iterator<HDLAssignment> reverseIter = list.descendingIterator();
-			HDLExpression current = null;
 			while (reverseIter.hasNext()) {
 				HDLAssignment next = reverseIter.next();
-				if (current == null) {
-					current = next.getRight();
-				}
 				// XXX Add if cases
+
 				IHDLObject container = next.getContainer();
 				if (container.getClassType() == HDLClass.HDLUnit) {
+					initStatements.add(next);
 					break;
 				}
-			}
-			if (current != null) {
-				finalStatements.add(new HDLAssignment().setLeft(references.get(entry.getKey())).setRight(current));
+				if (container.getClassType() == HDLClass.HDLIfStatement) {
+					HDLIfStatement hif = (HDLIfStatement) container;
+					finalStatements.add(insertIndex, hif.setThenDo(HDLObject.asList((HDLStatement) next)));
+				}
 			}
 		}
-		return insulin.setInits(null).setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
+		return insulin.setInits(initStatements).setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
 		HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
 		Map<HDLQualifiedName, List<RangeVal>> ranges = new LinkedHashMap<HDLQualifiedName, List<RangeVal>>();
+		Map<HDLQualifiedName, Range<BigInteger>> fullRanges = new LinkedHashMap<HDLQualifiedName, Range<BigInteger>>();
 		for (HDLVariableRef ref : refs) {
-			if (ref.resolveVar().getDirection() != HDLDirection.IN) {
-				if (ref.getBits().size() > 0) {
-					List<RangeVal> set = ranges.get(ref.getVarRefName());
-					if (set == null) {
-						set = new LinkedList<RangeVal>();
-						ranges.put(ref.getVarRefName(), set);
-					}
-					for (HDLRange r : ref.getBits()) {
-						Range<BigInteger> determineRange = RangeExtension.rangeOf(r, context);
-						set.add(new RangeVal(determineRange.lowerEndpoint(), 1));
-						set.add(new RangeVal(determineRange.upperEndpoint(), -1));
+			if (ref.getContainer() instanceof HDLAssignment) {
+				HDLAssignment ass = (HDLAssignment) ref.getContainer();
+				if (ass.getLeft() == ref) {
+					HDLVariable resolveVar = ref.resolveVar();
+					if (resolveVar.getDirection() != HDLDirection.IN) {
+						HDLQualifiedName varRefName = ref.getVarRefName();
+						if (ref.getBits().size() > 0) {
+							List<RangeVal> set = ranges.get(varRefName);
+							if (set == null) {
+								set = new LinkedList<RangeVal>();
+								ranges.put(varRefName, set);
+							}
+							for (HDLRange r : ref.getBits()) {
+								Range<BigInteger> determineRange = RangeExtension.rangeOf(r, context);
+								set.add(new RangeVal(determineRange.lowerEndpoint(), 1));
+								set.add(new RangeVal(determineRange.upperEndpoint(), -1));
+							}
+						} else {
+							HDLExpression width = TypeExtension.getWidth(resolveVar);
+							if (width != null) {
+								BigInteger bWidth = ConstantEvaluate.valueOf(width, context);
+								fullRanges.put(varRefName, Ranges.closed(BigInteger.ZERO, bWidth.subtract(BigInteger.ONE)));
+							}
+						}
 					}
 				}
 			}
@@ -154,8 +169,15 @@ public class HDLSimulator {
 		ModificationSet ms = new ModificationSet();
 		Map<HDLQualifiedName, SortedSet<Range<BigInteger>>> splitRanges = new LinkedHashMap<HDLQualifiedName, SortedSet<Range<BigInteger>>>();
 		for (Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
-			SortedSet<Range<BigInteger>> split = RangeTool.split(entry.getValue());
-			splitRanges.put(entry.getKey(), split);
+			List<RangeVal> value = entry.getValue();
+			HDLQualifiedName varName = entry.getKey();
+			if (fullRanges.containsKey(varName)) {
+				Range<BigInteger> fullWidth = fullRanges.get(varName);
+				value.add(new RangeVal(fullWidth.lowerEndpoint(), 1));
+				value.add(new RangeVal(fullWidth.upperEndpoint(), -1));
+			}
+			SortedSet<Range<BigInteger>> split = RangeTool.split(value);
+			splitRanges.put(varName, split);
 		}
 		// Change bit access to broken down ranges
 		for (HDLVariableRef ref : refs) {
@@ -169,16 +191,16 @@ public class HDLSimulator {
 							Range<BigInteger> range = RangeExtension.rangeOf(bit, context);
 							for (Range<BigInteger> newRange : list) {
 								if (range.isConnected(newRange)) {
-									newRanges.add(createRange(newRange));
+									newRanges.add(0, createRange(newRange));
 								}
 							}
 						} else {
-							newRanges.add(bit);
+							newRanges.add(0, bit);
 						}
 					}
 				} else {
 					for (Range<BigInteger> vRange : list) {
-						newRanges.add(createRange(vRange));
+						newRanges.add(0, createRange(vRange));
 					}
 				}
 				if (newRanges.size() != 0) {
@@ -193,7 +215,7 @@ public class HDLSimulator {
 	private static HDLRange createRange(Range<BigInteger> newRange) {
 		if (newRange.lowerEndpoint().equals(newRange.upperEndpoint()))
 			return new HDLRange().setTo(HDLLiteral.get(newRange.upperEndpoint()));
-		return new HDLRange().setFrom(HDLLiteral.get(newRange.lowerEndpoint())).setTo(HDLLiteral.get(newRange.upperEndpoint()));
+		return new HDLRange().setTo(HDLLiteral.get(newRange.lowerEndpoint())).setFrom(HDLLiteral.get(newRange.upperEndpoint()));
 	}
 
 	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {
