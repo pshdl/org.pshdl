@@ -112,7 +112,7 @@ public class Problem {
 
 	public String toStringWithoutSeverity() {
 		if (isSyntax)
-			return "Syntax error in line:" + line + ":" + offsetInLine + " -> " + info;
+			return info;
 
 		String preText = "";
 		IHDLObject inlineType = checkInlineType(node);

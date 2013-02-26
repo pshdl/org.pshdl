@@ -263,6 +263,20 @@ public class BuiltInAdvisor {
 			break;
 		case SWITCH_LABEL_WRONG_ENUM:
 			break;
+		case BIT_ACCESS_NOT_POSSIBLE_ON_TYPE:
+			break;
+		case CONSTANT_PORT_CANT_REGISTER:
+			break;
+		case GLOBAL_CANT_REGISTER:
+			break;
+		case RANGE_NOT_DOWN:
+			break;
+		case RANGE_NOT_UP:
+			break;
+		case RANGE_OVERLAP:
+			break;
+		case UNKNOWN_RANGE:
+			break;
 		}
 		return null;
 	}

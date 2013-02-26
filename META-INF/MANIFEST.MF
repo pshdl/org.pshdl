@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: V2
-Bundle-SymbolicName: de.tuhh.ict.pshdl.model.v2
+Bundle-SymbolicName: de.tuhh.ict.pshdl
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: de.tuhh.ict.pshdl.interpreter;bundle-version="1.0.0",
  de.upb.hni.vmagic;bundle-version="1.0.0",

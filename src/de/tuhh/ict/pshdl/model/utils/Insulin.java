@@ -612,7 +612,30 @@ public class Insulin {
 		fortifyDefaultAndResetExpressions(apply, ms);
 		foritfyArrays(apply, ms);
 		foritfyFunctions(apply, ms);
+		foritfyConcats(apply, ms);
 		return ms.apply(apply);
+	}
+
+	private static void foritfyConcats(HDLObject apply, ModificationSet ms) {
+		HDLConcat cats[] = apply.getAllObjectsOf(HDLConcat.class, true);
+		for (HDLConcat hdlConcat : cats) {
+			ArrayList<HDLExpression> catExp = hdlConcat.getCats();
+			for (HDLExpression hdlExpression : catExp) {
+				HDLPrimitive typeOf = (HDLPrimitive) TypeExtension.typeOf(hdlExpression);
+				switch (typeOf.getType()) {
+				case BIT:
+				case BITVECTOR:
+					continue;
+				case INT:
+				case UINT:
+					cast(ms, typeOf.setType(HDLPrimitiveType.BITVECTOR), hdlExpression);
+					break;
+				default:
+					throw new IllegalArgumentException("Type:" + typeOf + " not supported in concatenations");
+				}
+			}
+		}
+
 	}
 
 	private static void foritfyFunctions(HDLObject apply, ModificationSet ms) {

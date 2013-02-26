@@ -92,7 +92,7 @@ class VHDLPackageExtension {
 				val HDLUnit enumContainer=variable.getContainer(typeof(HDLUnit))
 				if (enumContainer==null || !enumContainer.equals(variableRef.getContainer(typeof(HDLUnit)))){
 					val HDLQualifiedName type=fullNameOf(variable).skipLast(1)
-					if (!type.getSegment(0).equals("pshdl"))
+					if (type.length>0 && !type.getSegment(0).equals("pshdl"))
 						unit.addImport(HDLQualifiedName::create("work",getPackageName(type), "all"))
 				}
 			}

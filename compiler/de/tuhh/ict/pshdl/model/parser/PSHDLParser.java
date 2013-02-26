@@ -77,6 +77,8 @@ public class PSHDLParser {
 					NoViableAltException noVi = (NoViableAltException) e;
 					error = SyntaxErrors.NoViableAlternative;
 					Token t = noVi.getStartToken();
+					charPositionInLine = t.getCharPositionInLine();
+					line = t.getLine();
 					String text = t.getText();
 					if (text != null) {
 						length = text.length();

@@ -159,10 +159,17 @@ public class VHDLPackageExtension {
         if (_or) {
           HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(variable);
           final HDLQualifiedName type = _fullNameOf.skipLast(1);
-          String _segment = type.getSegment(0);
-          boolean _equals_2 = _segment.equals("pshdl");
-          boolean _not_1 = (!_equals_2);
-          if (_not_1) {
+          boolean _and = false;
+          boolean _greaterThan = (type.length > 0);
+          if (!_greaterThan) {
+            _and = false;
+          } else {
+            String _segment = type.getSegment(0);
+            boolean _equals_2 = _segment.equals("pshdl");
+            boolean _not_1 = (!_equals_2);
+            _and = (_greaterThan && _not_1);
+          }
+          if (_and) {
             String _packageName = this.getPackageName(type);
             HDLQualifiedName _create = HDLQualifiedName.create("work", _packageName, "all");
             unit.addImport(_create);

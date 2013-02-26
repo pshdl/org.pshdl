@@ -20,4 +20,8 @@ public class HDLCore {
 	public static CompilerInformation getCompilerInformation() {
 		return info;
 	}
+
+	public static void defaultInit() {
+		init(new IServiceProvider.ServiceLoaderProvider());
+	}
 }

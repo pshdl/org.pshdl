@@ -55,7 +55,7 @@ class ConstantEvaluate {
 	def dispatch BigInteger constantEvaluate(HDLTernary obj, HDLEvaluationContext context) {
 		val BigInteger res=obj.ifExpr.constantEvaluate(context)
 		if (res!=null){
-			if (BigInteger::ZERO.equals(res)){
+			if (0bi.equals(res)){
 				return obj.elseExpr.constantEvaluate(context)
 			}
 			return obj.thenExpr.constantEvaluate(context)
@@ -86,7 +86,7 @@ class ConstantEvaluate {
 		case BIT_NEG:
 			return eval.not
 		case LOGIC_NEG:
-			return boolInt(obj.target.constantEvaluate(context).equals(BigInteger::ZERO))
+			return boolInt(obj.target.constantEvaluate(context).equals(0bi))
 		case CAST:{
 			val HDLType type = obj.castTo
 			if (type instanceof HDLPrimitive) {
@@ -94,7 +94,7 @@ class ConstantEvaluate {
 				if (prim.width != null) {
 					val BigInteger width = prim.width.constantEvaluate(context)
 					if (width!=null)
-						return eval.mod(BigInteger::ONE.shiftLeft(width.intValue))
+						return eval.mod(1bi.shiftLeft(width.intValue))
 					return null
 				}
 				return eval
@@ -109,7 +109,7 @@ class ConstantEvaluate {
 	}
 
 	def dispatch BigInteger constantEvaluate(HDLConcat obj, HDLEvaluationContext context) {
-		var BigInteger sum = BigInteger::ZERO
+		var BigInteger sum = 0bi
 		for (HDLExpression cat : obj.cats) {
 			val BigInteger im = subEvaluate(obj, cat, context)
 			if (im == null) {
@@ -176,13 +176,13 @@ class ConstantEvaluate {
 		case XOR:
 			return leftVal.xor(rightVal)
 		case LOGI_AND: {
-			val boolean l = !BigInteger::ZERO.equals(leftVal)
-			val boolean r = !BigInteger::ZERO.equals(rightVal)
+			val boolean l = !0bi.equals(leftVal)
+			val boolean r = !0bi.equals(rightVal)
 			return boolInt(l && r)
 		}
 		case LOGI_OR: {
-			val boolean l = !BigInteger::ZERO.equals(leftVal)
-			val boolean r = !BigInteger::ZERO.equals(rightVal)
+			val boolean l = !0bi.equals(leftVal)
+			val boolean r = !0bi.equals(rightVal)
 			return boolInt(l || r)
 		}
 		}
@@ -301,6 +301,6 @@ class ConstantEvaluate {
 	}
 
 	def static BigInteger boolInt(boolean b) {
-		return if (b) BigInteger::ONE else BigInteger::ZERO
+		return if (b) 1bi else 0bi
 	}
 }

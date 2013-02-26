@@ -96,7 +96,7 @@ class RangeExtension {
 			}
 		}
 		if (obj.bits.size>0){
-			var BigInteger bitWidth=ZERO
+			var BigInteger bitWidth=0bi
 			for (HDLRange r : obj.bits) {
 				var HDLExpression width=r.width
 				width=width.copyDeepFrozen(r)
@@ -107,7 +107,7 @@ class RangeExtension {
 				bitWidth=bitWidth.add(cw)
 			}
 			if (bitWidth!=null){
-				return Ranges::closed(ZERO, ONE.shiftLeft(bitWidth.intValue).subtract(ONE))
+				return Ranges::closed(0bi, 1bi.shiftLeft(bitWidth.intValue).subtract(1bi))
 			}
 		}
 		val HDLType type = TypeExtension::typeOf(hVar)
@@ -133,7 +133,7 @@ class RangeExtension {
 	def dispatch Range<BigInteger> determineRange(HDLEqualityOp obj, HDLEvaluationContext context) {
 		obj.addMeta(SOURCE, obj)
 		obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
-		return Ranges::closed(ZERO, ONE)
+		return Ranges::closed(0bi, 1bi)
 	}
 
 	def dispatch Range<BigInteger> determineRange(HDLShiftOp obj, HDLEvaluationContext context) {
@@ -179,17 +179,17 @@ class RangeExtension {
 		case type==OR || type==XOR:{
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-			return Ranges::closed(ZERO, ONE.shiftLeft(leftRange.upperEndpoint.bitLength).subtract(ONE))
+			return Ranges::closed(0bi, 1bi.shiftLeft(leftRange.upperEndpoint.bitLength).subtract(1bi))
 		}
 		case AND: {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-			return Ranges::closed(ZERO, leftRange.upperEndpoint.min(ONE.shiftLeft(rightRange.upperEndpoint.bitLength).subtract(ONE)))
+			return Ranges::closed(0bi, leftRange.upperEndpoint.min(1bi.shiftLeft(rightRange.upperEndpoint.bitLength).subtract(1bi)))
 		}
 		case type==LOGI_AND || type==LOGI_OR: {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
-			return Ranges::closed(ZERO, ONE)
+			return Ranges::closed(0bi, 1bi)
 		}
 		}
 		throw new RuntimeException("Incorrectly implemented obj op")
@@ -205,7 +205,7 @@ class RangeExtension {
 		case MINUS:
 			return Ranges::closed(leftRange.lowerEndpoint.subtract(rightRange.lowerEndpoint), leftRange.upperEndpoint.subtract(rightRange.upperEndpoint))
 		case DIV: {
-			if (rightRange.lowerEndpoint.equals(ZERO) || rightRange.upperEndpoint.equals(ZERO)) {
+			if (rightRange.lowerEndpoint.equals(0bi) || rightRange.upperEndpoint.equals(0bi)) {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, ZERO_DIVIDE)
 				return null
@@ -214,7 +214,7 @@ class RangeExtension {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, POSSIBLY_ZERO_DIVIDE)
 			}
-			val mulRange = Ranges::closed(BigDecimal::ONE.divide(new BigDecimal(rightRange.lowerEndpoint)), BigDecimal::ONE.divide(new BigDecimal(rightRange.upperEndpoint)))
+			val mulRange = Ranges::closed(1bd.divide(new BigDecimal(rightRange.lowerEndpoint)), 1bd.divide(new BigDecimal(rightRange.upperEndpoint)))
 			val BigDecimal ff = new BigDecimal(leftRange.lowerEndpoint).multiply(mulRange.lowerEndpoint)
 			val BigDecimal ft = new BigDecimal(leftRange.lowerEndpoint).multiply(mulRange.upperEndpoint)
 			val BigDecimal tf = new BigDecimal(leftRange.upperEndpoint).multiply(mulRange.lowerEndpoint)
@@ -229,7 +229,7 @@ class RangeExtension {
 			return Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt))
 		}
 		case MOD:
-			return Ranges::closed(ZERO, rightRange.upperEndpoint.subtract(ONE).min(leftRange.upperEndpoint))
+			return Ranges::closed(0bi, rightRange.upperEndpoint.subtract(1bi).min(leftRange.upperEndpoint))
 		case POW: {
 			val BigInteger ff = leftRange.lowerEndpoint.pow(rightRange.lowerEndpoint.intValue)
 			val BigInteger ft = leftRange.lowerEndpoint.pow(rightRange.upperEndpoint.intValue)
@@ -263,11 +263,11 @@ class RangeExtension {
 		case ARITH_NEG:
 			return Ranges::closed(right.upperEndpoint.negate, right.lowerEndpoint.negate)
 		case BIT_NEG:
-			return Ranges::closed(ZERO, ONE.shiftLeft(right.upperEndpoint.bitLength).subtract(ONE))
+			return Ranges::closed(0bi, 1bi.shiftLeft(right.upperEndpoint.bitLength).subtract(1bi))
 		case LOGIC_NEG: {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
-			return Ranges::closed(ZERO, ONE)
+			return Ranges::closed(0bi, 1bi)
 		}
 		}
 		throw new RuntimeException("Incorrectly implemented obj op")

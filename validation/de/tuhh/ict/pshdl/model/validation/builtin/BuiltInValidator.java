@@ -62,43 +62,100 @@ public class BuiltInValidator implements IHDLValidator {
 			checkConstantEquals(pkg, problems, hContext);
 			checkBitAcces(pkg, problems, hContext);
 			// TODO Validate value ranges, check for 0 divide
+			checkRangeDirections(pkg, problems, hContext);
 			// TODO Check for POW only power of 2
 			checkCombinedAssignment(pkg, problems, hContext);
 			checkAnnotations(pkg, problems, hContext);
 			checkType(pkg, problems, hContext);
 			checkProessWrite(pkg, problems, hContext);
 			checkGenerators(pkg, problems, hContext);
-			checkInputReg(pkg, problems, hContext);
 			checkLiteralConcat(pkg, problems);
 			// TODO Validate bitWidth mismatch
 			checkAssignments(pkg, problems, hContext);
-			// TODO Check bit access direction
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
 			// collision
 			// TODO check for proper variable naming
 			// TODO check for valid parameter
 			checkSwitchStatements(pkg, problems, hContext);
-			// TODO Check for Range direction
 			// TODO Type checking!
 			// TODO Check for combinatorical loop.
 			// TODO Check for multiple assignment in same Scope
 			// TODO No processes in Module
 			// TODO no I/O variables in block
-			// TODO no Registers in Testbench
 			// TODO warn for name collision in generators
-			// TODO check for same name with different case
-			// TODO Out port array need to be constant
+			// TODO Out port array size need to be constant
 			// TODO Check for bit access on left assignment side when right is
 			// matching
+			// TODO no Registers in Testbench/Global gen
 			// TODO check for register of constant/parameter
 			// TODO check for register of global constants
+			checkRegisters(pkg, problems, hContext);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 		return true;
+	}
+
+	private void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (HDLVariableDeclaration hvd : hvds) {
+			if (hvd.getRegister() != null) {
+				switch (hvd.getDirection()) {
+				case CONSTANT:
+				case PARAMETER:
+					problems.add(new Problem(ErrorCode.CONSTANT_PORT_CANT_REGISTER, hvd));
+					break;
+				case IN:
+					problems.add(new Problem(ErrorCode.IN_PORT_CANT_REGISTER, hvd));
+					break;
+				default:
+				}
+				if (hvd.getContainer().getClassType() == HDLClass.HDLPackage) {
+					problems.add(new Problem(ErrorCode.GLOBAL_CANT_REGISTER, hvd));
+				}
+			}
+		}
+	}
+
+	private void checkRangeDirections(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
+		for (HDLRange hdlRange : ranges) {
+			// If it is a single range, there is no direction :)
+			HDLExpression from = hdlRange.getFrom();
+			if (from == null)
+				continue;
+			if (skipExp(hdlRange))
+				continue;
+			HDLEvaluationContext context = getContext(hContext, hdlRange);
+			// For loop ranges are up to
+			Range<BigInteger> fromRangeOf = RangeExtension.rangeOf(from, context);
+			HDLExpression to = hdlRange.getTo();
+			Range<BigInteger> toRangeOf = RangeExtension.rangeOf(to, context);
+			if (fromRangeOf == null) {
+				problems.add(new Problem(ErrorCode.UNKNOWN_RANGE, from));
+				continue;
+			}
+			if (toRangeOf == null) {
+				problems.add(new Problem(ErrorCode.UNKNOWN_RANGE, to));
+				continue;
+			}
+			if (fromRangeOf.isConnected(toRangeOf)) {
+				problems.add(new Problem(ErrorCode.RANGE_OVERLAP, hdlRange));
+				continue;
+			}
+			if (hdlRange.getContainer() instanceof HDLForLoop) {
+				if (fromRangeOf.upperEndpoint().compareTo(toRangeOf.lowerEndpoint()) > 0) {
+					problems.add(new Problem(ErrorCode.RANGE_NOT_UP, hdlRange));
+				}
+			} else {
+				if (toRangeOf.lowerEndpoint().compareTo(fromRangeOf.upperEndpoint()) > 0) {
+					problems.add(new Problem(ErrorCode.RANGE_NOT_DOWN, hdlRange));
+				}
+			}
+		}
 	}
 
 	private void checkBitAcces(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
@@ -362,16 +419,6 @@ public class BuiltInValidator implements IHDLValidator {
 				}
 			}
 		}
-	}
-
-	private static void checkInputReg(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		Collection<HDLVariableDeclaration> allIns = HDLQuery.select(HDLVariableDeclaration.class).from(pkg).where(HDLVariableDeclaration.fDirection).isEqualTo(HDLDirection.IN)
-				.getAll();
-		for (HDLVariableDeclaration inPort : allIns) {
-			if (inPort.getRegister() != null)
-				problems.add(new Problem(ErrorCode.IN_PORT_CANT_REGISTER, inPort));
-		}
-
 	}
 
 	private static void checkGenerators(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

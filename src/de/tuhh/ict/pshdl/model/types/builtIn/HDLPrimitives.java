@@ -88,6 +88,9 @@ public class HDLPrimitives implements IHDLPrimitive {
 			if (right == BOOL) {
 				continue;
 			}
+			if (right == STRING) {
+				continue;
+			}
 			res.put(new HDLInferenceTriple(BIT, right, null), new HDLInferenceTriple(BITVECTOR, BITVECTOR, BOOL));
 			res.put(new HDLInferenceTriple(BITVECTOR, right, null), new HDLInferenceTriple(BITVECTOR, BITVECTOR, BOOL));
 		}
@@ -103,8 +106,14 @@ public class HDLPrimitives implements IHDLPrimitive {
 			if (left == BOOL) {
 				continue;
 			}
+			if (left == STRING) {
+				continue;
+			}
 			for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
 				if (right == BOOL) {
+					continue;
+				}
+				if (right == STRING) {
 					continue;
 				}
 				res.put(new HDLInferenceTriple(left, right, null), new HDLInferenceTriple(left, left, left));
@@ -173,7 +182,6 @@ public class HDLPrimitives implements IHDLPrimitive {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(intRange(BigInteger.valueOf(0)));
 		System.out.println(intRange(BigInteger.valueOf(1)));
 		System.out.println(intRange(BigInteger.valueOf(16)));
 		System.out.println(intRange(BigInteger.valueOf(9)));
