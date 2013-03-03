@@ -1,6 +1,5 @@
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
-import com.google.common.base.Objects;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Column;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
@@ -19,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.IntegerRange;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 
 @SuppressWarnings("all")
@@ -733,7 +733,7 @@ public class BusAccess {
     LinkedList<Definition> _linkedList = new LinkedList<Definition>();
     final List<Definition> res = _linkedList;
     for (final NamedElement ne : row.definitions) {
-      boolean _notEquals = (!Objects.equal(((Definition) ne).type, Type.UNUSED));
+      boolean _notEquals = ObjectExtensions.operator_notEquals(((Definition) ne).type, Type.UNUSED);
       if (_notEquals) {
         res.add(((Definition) ne));
       }
@@ -836,7 +836,7 @@ public class BusAccess {
   public CharSequence generateConditions(final Row row, final Definition d) {
     StringConcatenation _builder = new StringConcatenation();
     {
-      boolean _equals = Objects.equal(d.warn, WarnType.silentLimit);
+      boolean _equals = ObjectExtensions.operator_equals(d.warn, WarnType.silentLimit);
       if (_equals) {
         _builder.append("if (");
         String _varName = this.getVarName(row, d);
@@ -857,7 +857,7 @@ public class BusAccess {
         _builder.append("}");
         _builder.newLine();
         {
-          boolean _equals_1 = Objects.equal(d.type, Type.INT);
+          boolean _equals_1 = ObjectExtensions.operator_equals(d.type, Type.INT);
           if (_equals_1) {
             _builder.append("if (");
             String _varName_2 = this.getVarName(row, d);
@@ -880,7 +880,7 @@ public class BusAccess {
           }
         }
       } else {
-        boolean _equals_2 = Objects.equal(d.warn, WarnType.limit);
+        boolean _equals_2 = ObjectExtensions.operator_equals(d.warn, WarnType.limit);
         if (_equals_2) {
           _builder.append("if (");
           String _varName_4 = this.getVarName(row, d);
@@ -915,7 +915,7 @@ public class BusAccess {
           _builder.append("}");
           _builder.newLine();
           {
-            boolean _equals_3 = Objects.equal(d.type, Type.INT);
+            boolean _equals_3 = ObjectExtensions.operator_equals(d.type, Type.INT);
             if (_equals_3) {
               _builder.append("if (");
               String _varName_7 = this.getVarName(row, d);
@@ -952,7 +952,7 @@ public class BusAccess {
             }
           }
         } else {
-          boolean _equals_4 = Objects.equal(d.warn, WarnType.silentMask);
+          boolean _equals_4 = ObjectExtensions.operator_equals(d.warn, WarnType.silentMask);
           if (_equals_4) {
             _builder.append("if (");
             String _varName_10 = this.getVarName(row, d);
@@ -973,7 +973,7 @@ public class BusAccess {
             _builder.append("}");
             _builder.newLine();
             {
-              boolean _equals_5 = Objects.equal(d.type, Type.INT);
+              boolean _equals_5 = ObjectExtensions.operator_equals(d.type, Type.INT);
               if (_equals_5) {
                 _builder.append("if (");
                 String _varName_12 = this.getVarName(row, d);
@@ -996,7 +996,7 @@ public class BusAccess {
               }
             }
           } else {
-            boolean _equals_6 = Objects.equal(d.warn, WarnType.mask);
+            boolean _equals_6 = ObjectExtensions.operator_equals(d.warn, WarnType.mask);
             if (_equals_6) {
               _builder.append("if (");
               String _varName_14 = this.getVarName(row, d);
@@ -1031,7 +1031,7 @@ public class BusAccess {
               _builder.append("}");
               _builder.newLine();
               {
-                boolean _equals_7 = Objects.equal(d.type, Type.INT);
+                boolean _equals_7 = ObjectExtensions.operator_equals(d.type, Type.INT);
                 if (_equals_7) {
                   _builder.append("if (");
                   String _varName_17 = this.getVarName(row, d);
@@ -1068,7 +1068,7 @@ public class BusAccess {
                 }
               }
             } else {
-              boolean _equals_8 = Objects.equal(d.warn, WarnType.silentError);
+              boolean _equals_8 = ObjectExtensions.operator_equals(d.warn, WarnType.silentError);
               if (_equals_8) {
                 _builder.append("if (");
                 String _varName_20 = this.getVarName(row, d);
@@ -1084,7 +1084,7 @@ public class BusAccess {
                 _builder.append("}");
                 _builder.newLine();
                 {
-                  boolean _equals_9 = Objects.equal(d.type, Type.INT);
+                  boolean _equals_9 = ObjectExtensions.operator_equals(d.type, Type.INT);
                   if (_equals_9) {
                     _builder.append("if (");
                     String _varName_21 = this.getVarName(row, d);
@@ -1102,7 +1102,7 @@ public class BusAccess {
                   }
                 }
               } else {
-                boolean _equals_10 = Objects.equal(d.warn, WarnType.error);
+                boolean _equals_10 = ObjectExtensions.operator_equals(d.warn, WarnType.error);
                 if (_equals_10) {
                   _builder.append("if (");
                   String _varName_22 = this.getVarName(row, d);
@@ -1129,7 +1129,7 @@ public class BusAccess {
                   _builder.append("}");
                   _builder.newLine();
                   {
-                    boolean _equals_11 = Objects.equal(d.type, Type.INT);
+                    boolean _equals_11 = ObjectExtensions.operator_equals(d.type, Type.INT);
                     if (_equals_11) {
                       _builder.append("if (");
                       String _varName_24 = this.getVarName(row, d);
@@ -1179,11 +1179,12 @@ public class BusAccess {
   
   public boolean hasWrite(final NamedElement ne) {
     boolean _and = false;
-    boolean _notEquals = (!Objects.equal(((Definition) ne).rw, RWType.r));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(
+      ((Definition) ne).rw, RWType.r);
     if (!_notEquals) {
       _and = false;
     } else {
-      boolean _notEquals_1 = (!Objects.equal(((Definition) ne).type, Type.UNUSED));
+      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(((Definition) ne).type, Type.UNUSED);
       _and = (_notEquals && _notEquals_1);
     }
     return _and;
@@ -1206,7 +1207,7 @@ public class BusAccess {
   }
   
   public int getMaxValue(final Definition d) {
-    boolean _notEquals = (!Objects.equal(d.type, Type.INT));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(d.type, Type.INT);
     if (_notEquals) {
       int _size = MemoryModel.getSize(d);
       int _doubleLessThan = (1 << _size);

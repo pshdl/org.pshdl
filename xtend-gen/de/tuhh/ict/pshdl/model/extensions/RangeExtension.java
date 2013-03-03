@@ -34,7 +34,6 @@ import de.tuhh.ict.pshdl.model.extensions.TypeExtension;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLPrimitive;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class RangeExtension {
@@ -80,19 +80,19 @@ public class RangeExtension {
   
   protected Range<BigInteger> _determineRange(final HDLVariableRef obj, final HDLEvaluationContext context) {
     final BigInteger bigVal = ConstantEvaluate.valueOf(obj, context);
-    boolean _notEquals = (!Objects.equal(bigVal, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(bigVal, null);
     if (_notEquals) {
       return Ranges.<BigInteger>closed(bigVal, bigVal);
     }
     final HDLVariable hVar = obj.resolveVar();
-    boolean _equals = Objects.equal(hVar, null);
+    boolean _equals = ObjectExtensions.operator_equals(hVar, null);
     if (_equals) {
       obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return null;
     }
     HDLAnnotation range = hVar.getAnnotation(HDLBuiltInAnnotations.range);
-    boolean _notEquals_1 = (!Objects.equal(range, null));
+    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(range, null);
     if (_notEquals_1) {
       String _value = range.getValue();
       final String[] value = _value.split(";");
@@ -103,7 +103,7 @@ public class RangeExtension {
       return Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
     }
     IHDLObject _container = hVar.getContainer();
-    boolean _notEquals_2 = (!Objects.equal(_container, null));
+    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_container, null);
     if (_notEquals_2) {
       IHDLObject _container_1 = hVar.getContainer();
       if ((_container_1 instanceof HDLVariableDeclaration)) {
@@ -111,7 +111,7 @@ public class RangeExtension {
         final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) _container_2);
         HDLAnnotation _annotation = hvd.getAnnotation(HDLBuiltInAnnotations.range);
         range = _annotation;
-        boolean _notEquals_3 = (!Objects.equal(range, null));
+        boolean _notEquals_3 = ObjectExtensions.operator_notEquals(range, null);
         if (_notEquals_3) {
           String _value_1 = range.getValue();
           final String[] value_1 = _value_1.split(";");
@@ -150,7 +150,7 @@ public class RangeExtension {
           HDLExpression _copyDeepFrozen = width.copyDeepFrozen(r_1);
           width = _copyDeepFrozen;
           BigInteger cw = ConstantEvaluate.valueOf(width, context);
-          boolean _equals_1 = Objects.equal(cw, null);
+          boolean _equals_1 = ObjectExtensions.operator_equals(cw, null);
           if (_equals_1) {
             bitWidth = null;
           }
@@ -158,7 +158,7 @@ public class RangeExtension {
           bitWidth = _add;
         }
       }
-      boolean _notEquals_4 = (!Objects.equal(bitWidth, null));
+      boolean _notEquals_4 = ObjectExtensions.operator_notEquals(bitWidth, null);
       if (_notEquals_4) {
         int _intValue = bitWidth.intValue();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
@@ -168,7 +168,7 @@ public class RangeExtension {
     }
     final HDLType type = TypeExtension.typeOf(hVar);
     if ((type instanceof HDLPrimitive)) {
-      IHDLPrimitive _instance = HDLPrimitives.getInstance();
+      HDLPrimitives _instance = HDLPrimitives.getInstance();
       return _instance.getValueRange(((HDLPrimitive) type), context);
     }
     obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
@@ -180,7 +180,7 @@ public class RangeExtension {
     HDLExpression _to = obj.getTo();
     final BigInteger to = ConstantEvaluate.valueOf(_to, context);
     HDLExpression _from = obj.getFrom();
-    boolean _notEquals = (!Objects.equal(_from, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_from, null);
     if (_notEquals) {
       HDLExpression _from_1 = obj.getFrom();
       final BigInteger from = ConstantEvaluate.valueOf(_from_1, context);
@@ -313,11 +313,11 @@ public class RangeExtension {
     boolean _matched = false;
     if (!_matched) {
       boolean _or = false;
-      boolean _equals = Objects.equal(type, HDLBitOpType.OR);
+      boolean _equals = ObjectExtensions.operator_equals(type, HDLBitOpType.OR);
       if (_equals) {
         _or = true;
       } else {
-        boolean _equals_1 = Objects.equal(type, HDLBitOpType.XOR);
+        boolean _equals_1 = ObjectExtensions.operator_equals(type, HDLBitOpType.XOR);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -347,11 +347,11 @@ public class RangeExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
-      boolean _equals_2 = Objects.equal(type, HDLBitOpType.LOGI_AND);
+      boolean _equals_2 = ObjectExtensions.operator_equals(type, HDLBitOpType.LOGI_AND);
       if (_equals_2) {
         _or_1 = true;
       } else {
-        boolean _equals_3 = Objects.equal(type, HDLBitOpType.LOGI_OR);
+        boolean _equals_3 = ObjectExtensions.operator_equals(type, HDLBitOpType.LOGI_OR);
         _or_1 = (_equals_2 || _equals_3);
       }
       if (_or_1) {
@@ -551,7 +551,7 @@ public class RangeExtension {
         _matched=true;
         final HDLType type = obj.getCastTo();
         if ((type instanceof HDLPrimitive)) {
-          IHDLPrimitive _instance = HDLPrimitives.getInstance();
+          HDLPrimitives _instance = HDLPrimitives.getInstance();
           final Range<BigInteger> castRange = _instance.getValueRange(((HDLPrimitive) type), context);
           return castRange.intersection(right);
         }
@@ -599,7 +599,7 @@ public class RangeExtension {
   protected Range<BigInteger> _determineRange(final HDLConcat obj, final HDLEvaluationContext context) {
     HDLType _typeOf = TypeExtension.typeOf(obj);
     final HDLPrimitive type = ((HDLPrimitive) _typeOf);
-    IHDLPrimitive _instance = HDLPrimitives.getInstance();
+    HDLPrimitives _instance = HDLPrimitives.getInstance();
     return _instance.getValueRange(type, context);
   }
   

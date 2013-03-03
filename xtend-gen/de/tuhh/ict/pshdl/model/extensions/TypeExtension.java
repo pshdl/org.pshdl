@@ -35,7 +35,6 @@ import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
 import de.tuhh.ict.pshdl.model.utils.HDLProblemException;
 import de.tuhh.ict.pshdl.model.utils.Insulin;
 import de.tuhh.ict.pshdl.model.utils.services.HDLTypeInferenceInfo;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLPrimitive;
 import de.tuhh.ict.pshdl.model.validation.Problem;
 import de.tuhh.ict.pshdl.model.validation.builtin.ErrorCode;
 import java.math.BigInteger;
@@ -44,6 +43,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class TypeExtension {
@@ -62,7 +62,7 @@ public class TypeExtension {
       throw _illegalArgumentException;
     }
     HDLType res = TypeExtension.INST.determineType(obj);
-    boolean _notEquals = (!Objects.equal(res, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(res, null);
     if (_notEquals) {
       return res.copyDeepFrozen(obj);
     }
@@ -78,17 +78,17 @@ public class TypeExtension {
    */
   protected HDLType _determineType(final HDLVariable hVar) {
     String _name = hVar.getName();
-    boolean _equals = Objects.equal(HDLRegisterConfig.DEF_CLK, _name);
+    boolean _equals = ObjectExtensions.operator_equals(HDLRegisterConfig.DEF_CLK, _name);
     if (_equals) {
       return HDLPrimitive.getBit();
     }
     String _name_1 = hVar.getName();
-    boolean _equals_1 = Objects.equal(HDLRegisterConfig.DEF_RST, _name_1);
+    boolean _equals_1 = ObjectExtensions.operator_equals(HDLRegisterConfig.DEF_RST, _name_1);
     if (_equals_1) {
       return HDLPrimitive.getBit();
     }
     final IHDLObject container = hVar.getContainer();
-    boolean _equals_2 = Objects.equal(container, null);
+    boolean _equals_2 = ObjectExtensions.operator_equals(container, null);
     if (_equals_2) {
       return null;
     }
@@ -136,7 +136,7 @@ public class TypeExtension {
   
   protected HDLType _determineType(final HDLVariableDeclaration hvd) {
     HDLPrimitive _primitive = hvd.getPrimitive();
-    boolean _notEquals = (!Objects.equal(_primitive, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_primitive, null);
     if (_notEquals) {
       return hvd.getPrimitive();
     }
@@ -204,7 +204,7 @@ public class TypeExtension {
     boolean _while = _hasNext;
     while (_while) {
       {
-        boolean _equals = Objects.equal(width, null);
+        boolean _equals = ObjectExtensions.operator_equals(width, null);
         if (_equals) {
           return null;
         }
@@ -236,7 +236,7 @@ public class TypeExtension {
   protected static HDLExpression _getWidth(final HDLPrimitive type) {
     final HDLExpression width = type.getWidth();
     HDLPrimitiveType _type = type.getType();
-    boolean _equals = Objects.equal(_type, HDLPrimitiveType.BIT);
+    boolean _equals = ObjectExtensions.operator_equals(_type, HDLPrimitiveType.BIT);
     if (_equals) {
       return HDLLiteral.get(1);
     }
@@ -248,7 +248,7 @@ public class TypeExtension {
   }
   
   protected HDLType _determineType(final HDLManip manip) {
-    IHDLPrimitive _instance = HDLPrimitives.getInstance();
+    HDLPrimitives _instance = HDLPrimitives.getInstance();
     HDLTypeInferenceInfo _manipOpType = _instance.getManipOpType(manip);
     return _manipOpType.result;
   }
@@ -278,7 +278,7 @@ public class TypeExtension {
     }
     String _val = lit.getVal();
     char _charAt = _val.charAt(0);
-    final boolean isSigned = (!Objects.equal(Character.valueOf(_charAt), "-"));
+    final boolean isSigned = ObjectExtensions.operator_notEquals(Character.valueOf(_charAt), "-");
     final BigInteger bigVal = lit.getValueAsBigInt();
     int _bitLength = bigVal.bitLength();
     boolean _greaterThan = (_bitLength > 31);
@@ -307,7 +307,7 @@ public class TypeExtension {
     } else {
       HDLRange _get = bits.get(0);
       HDLExpression _from = _get.getFrom();
-      boolean _equals_2 = Objects.equal(_from, null);
+      boolean _equals_2 = ObjectExtensions.operator_equals(_from, null);
       _and = (_equals_1 && _equals_2);
     }
     if (_and) {
@@ -340,25 +340,25 @@ public class TypeExtension {
   }
   
   protected HDLType _determineType(final HDLArithOp aop) {
-    IHDLPrimitive _instance = HDLPrimitives.getInstance();
+    HDLPrimitives _instance = HDLPrimitives.getInstance();
     HDLTypeInferenceInfo _arithOpType = _instance.getArithOpType(aop);
     return _arithOpType.result;
   }
   
   protected HDLType _determineType(final HDLBitOp bop) {
-    IHDLPrimitive _instance = HDLPrimitives.getInstance();
+    HDLPrimitives _instance = HDLPrimitives.getInstance();
     HDLTypeInferenceInfo _bitOpType = _instance.getBitOpType(bop);
     return _bitOpType.result;
   }
   
   protected HDLType _determineType(final HDLShiftOp sop) {
-    IHDLPrimitive _instance = HDLPrimitives.getInstance();
+    HDLPrimitives _instance = HDLPrimitives.getInstance();
     HDLTypeInferenceInfo _shiftOpType = _instance.getShiftOpType(sop);
     return _shiftOpType.result;
   }
   
   protected HDLType _determineType(final HDLEqualityOp eop) {
-    IHDLPrimitive _instance = HDLPrimitives.getInstance();
+    HDLPrimitives _instance = HDLPrimitives.getInstance();
     HDLTypeInferenceInfo _equalityOpType = _instance.getEqualityOpType(eop);
     return _equalityOpType.result;
   }

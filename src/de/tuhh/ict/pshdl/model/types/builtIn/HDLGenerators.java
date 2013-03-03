@@ -2,8 +2,11 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
 import de.tuhh.ict.pshdl.model.validation.*;
@@ -24,19 +27,30 @@ public class HDLGenerators {
 
 	public static List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
-		if (generator != null)
-			return generator.getPortAdditions(hdl);
+		if (generator != null) {
+			List<HDLVariableDeclaration> portAdditions = generator.getPortAdditions(hdl);
+			if (portAdditions != null) {
+				for (HDLVariableDeclaration hvd : portAdditions) {
+					hvd.addAnnotations(HDLBuiltInAnnotations.genSignal.create(hdl.getGeneratorID()));
+				}
+			}
+			return portAdditions;
+		}
 		return null;
 	}
 
-	public static HDLInterface getInterface(HDLDirectGeneration hdl) {
+	public static Optional<HDLInterface> getInterface(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
-		if (generator != null)
-			return generator.getInterface(hdl).copyDeepFrozen(hdl);
+		if (generator != null) {
+			Optional<HDLInterface> hif = generator.getInterface(hdl);
+			if (hif.isPresent())
+				return Optional.of(hif.get().copyDeepFrozen(hdl));
+			return hif;
+		}
 		return null;
 	}
 
-	public static HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
+	public static Optional<HDLGenerationInfo> getImplementation(HDLDirectGeneration hdl) {
 		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
 		if (generator != null)
 			return generator.getImplementation(hdl);

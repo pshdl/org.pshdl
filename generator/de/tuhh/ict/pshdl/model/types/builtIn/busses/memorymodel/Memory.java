@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.util.*;
 
+import org.antlr.v4.runtime.*;
+
 public class Memory implements NamedElement {
 	public List<Reference> references = new LinkedList<Reference>();
 
@@ -29,5 +31,12 @@ public class Memory implements NamedElement {
 	@Override
 	public String getName() {
 		return "memory";
+	}
+
+	public Token token;
+
+	@Override
+	public void setLocation(Token start) {
+		this.token = start;
 	}
 }

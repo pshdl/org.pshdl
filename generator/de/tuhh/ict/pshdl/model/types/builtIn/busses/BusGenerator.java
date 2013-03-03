@@ -5,13 +5,11 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
-
-import org.antlr.v4.runtime.*;
+import java.util.Map.Entry;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
 
-import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -21,18 +19,27 @@ import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWTyp
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
-import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
 import de.tuhh.ict.pshdl.model.validation.*;
+import de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity;
 import de.tuhh.ict.pshdl.model.validation.builtin.*;
-import de.upb.hni.vmagic.expression.*;
 
-public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDLFunctionResolver {
+public class BusGenerator implements IHDLGenerator {
+
+	public static enum BusErrors implements IErrorCode {
+		invalid_reference, underfilled_row, overfilled_row;
+
+		@Override
+		public ProblemSeverity getSeverity() {
+			return ProblemSeverity.ERROR;
+		}
+
+	}
 
 	@Override
-	public HDLInterface getInterface(HDLDirectGeneration hdl) {
+	public Optional<HDLInterface> getInterface(HDLDirectGeneration hdl) {
 		String name = fullNameOf(hdl).append(hdl.getIfName()).toString();
 		if (hdl.getGeneratorContent().length() != 0) {
 			try {
@@ -45,7 +52,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 			Unit unit = createDefaultUnit(getRegCount(hdl));
 			List<Row> rows = MemoryModel.buildRows(unit);
 			HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
-			return bId;
+			return Optional.of(bId);
 		} catch (Exception e) {
 		}
 		HDLInterface hIf = new HDLInterface().setName(name);
@@ -55,8 +62,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 		hvd = hvd.addAnnotations(HDLBuiltInAnnotations.genSignal.create(null));
 		hIf = hIf.addPorts(hvd);
 		hIf.setContainer(hdl);
-		// System.out.println("PLBGenerator.getInterface()" + hIf);
-		return hIf;
+		return Optional.of(hIf);
 	}
 
 	private HDLExpression getRegCountLiteral(HDLDirectGeneration hdl) {
@@ -69,17 +75,48 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 		throw new IllegalArgumentException("The parameter regCount is not valid!");
 	}
 
-	private HDLInterface createInterface(HDLDirectGeneration hdl, String name) throws FileNotFoundException, IOException, RecognitionException {
-		Unit unit = MemoryModelAST.parseUnit(getContentStream(hdl));
+	private Optional<HDLInterface> createInterface(HDLDirectGeneration hdl, String name) {
+		Set<Problem> problems = Sets.newHashSet();
+		Unit unit;
+		try {
+			unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems);
+			if (!validate(unit, problems))
+				return Optional.absent();
+		} catch (IOException e) {
+			return Optional.absent();
+		}
 		List<Row> rows = MemoryModel.buildRows(unit);
 		HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
-		return bId;
+		return Optional.of(bId);
 	}
 
-	private InputStream getContentStream(HDLDirectGeneration hdl) {
+	private boolean validate(Unit unit, Set<Problem> problems) {
+		if (unit == null)
+			return false;
+		for (Problem problem : problems) {
+			if (problem.severity == ProblemSeverity.ERROR)
+				return false;
+		}
+		boolean hasError = false;
+		for (Entry<String, NamedElement> entry : unit.declarations.entrySet()) {
+			if (entry.getValue() instanceof Reference) {
+				Reference ref = (Reference) entry.getValue();
+				NamedElement decl = unit.declarations.get(ref.getName());
+				if ((decl == null) && !"fill".equals(ref.name)) {
+					String message = "Can not resolve the reference to object:" + ref.name;
+					problems.add(new Problem(BusErrors.invalid_reference, message, ref.token.getLine(), ref.token.getCharPositionInLine(), ref.token.getText().length(), ref.token
+							.getStartIndex()));
+					hasError = true;
+				}
+			}
+		}
+		return !hasError;
+	}
+
+	private String getContentStream(HDLDirectGeneration hdl) {
 		String generatorContent = hdl.getGeneratorContent();
 		String substring = generatorContent.substring(2, generatorContent.length() - 2);
-		return new ByteArrayInputStream(substring.getBytes(Charsets.UTF_8));
+		return substring;
 	}
 
 	private int getMemCount(HDLDirectGeneration hdl) {
@@ -143,14 +180,17 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 	}
 
 	@Override
-	public HDLGenerationInfo getImplementation(HDLDirectGeneration hdl) {
+	public Optional<HDLGenerationInfo> getImplementation(HDLDirectGeneration hdl) {
 		Unit unit;
 		int memCount = getMemCount(hdl);
 		if (hdl.getGeneratorContent().length() == 0) {
 			unit = createDefaultUnit(getRegCount(hdl));
 		} else {
 			try {
-				unit = MemoryModelAST.parseUnit(getContentStream(hdl));
+				Set<Problem> problems = Sets.newHashSet();
+				unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems);
+				if (!validate(unit, problems))
+					return Optional.absent();
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
 			}
@@ -166,18 +206,18 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("de.tuhh.ict.plb", unit, rows));
 			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false));
 			hdgi.files.addAll(sideFiles);
-			return hdgi;
+			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
 			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("de.tuhh.ict.axi", unit, rows));
 			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true));
 			hdgi.files.addAll(sideFiles);
-			return hdgi;
+			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
 			HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("de.tuhh.ict.apb", unit, rows));
 			hdgi.files.addAll(sideFiles);
-			return hdgi;
+			return Optional.of(hdgi);
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
 	}
@@ -234,24 +274,27 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 
 	@Override
 	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
-		HDLGenerationInfo info = getImplementation(hdl);
-		List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
-		HDLVariableDeclaration[] hvd = info.unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hdlVariableDeclaration : hvd) {
-			switch (hdlVariableDeclaration.getDirection()) {
-			case CONSTANT:
-			case PARAMETER:
-			case IN:
-			case INOUT:
-			case OUT:
-				res.add(hdlVariableDeclaration.addAnnotations(HDLBuiltInAnnotations.genSignal.create(hdl.getIfName().toString())));
-				break;
-			case HIDDEN:
-			case INTERNAL:
-				break;
+		Optional<HDLGenerationInfo> opt = getImplementation(hdl);
+		if (opt.isPresent()) {
+			List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+			HDLVariableDeclaration[] hvd = opt.get().unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+			for (HDLVariableDeclaration hdlVariableDeclaration : hvd) {
+				switch (hdlVariableDeclaration.getDirection()) {
+				case CONSTANT:
+				case PARAMETER:
+				case IN:
+				case INOUT:
+				case OUT:
+					res.add(hdlVariableDeclaration.addAnnotations(HDLBuiltInAnnotations.genSignal.create(hdl.getIfName().toString())));
+					break;
+				case HIDDEN:
+				case INTERNAL:
+					break;
+				}
 			}
+			return res;
 		}
-		return res;
+		return Lists.newLinkedList();
 	}
 
 	@Override
@@ -262,67 +305,6 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider, IHDL
 				"This parameter is mandatory. It indicates how many sw registers should be accessible in the ip core. The number can be a constant or a string");
 		gi.arguments.put("version", "The version ID to use for the generated pcore");
 		return gi;
-	}
-
-	@Override
-	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String[] getFunctionNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public VHDLContext toVHDL(HDLFunctionCall function, int pid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public FunctionCall toVHDLExpression(HDLFunctionCall function) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public FunctionInformation getFunctionInfo(String funcName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static enum BusMarker implements IHDLAnnotation {
-		BusInterface;
-
-		@Override
-		public String validate(String value) {
-			return null;
-		}
-
-		@Override
-		public AnnotationInformation getAnnotationInformation() {
-			return new AnnotationInformation(BusMarker.class.getSimpleName(), name(), "Tags a Unit as a generated bus", "the interface that it implements");
-		}
-	}
-
-	@Override
-	public IHDLAnnotation[] getAnnotations() {
-		return BusMarker.values();
 	}
 
 }

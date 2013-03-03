@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class StringWriteExtension {
@@ -94,7 +95,7 @@ public class StringWriteExtension {
   }
   
   public static String asString(final IHDLObject exp, final SyntaxHighlighter highlight) {
-    boolean _equals = Objects.equal(exp, null);
+    boolean _equals = ObjectExtensions.operator_equals(exp, null);
     if (_equals) {
       IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Can not handle null argument");
       throw _illegalArgumentException;
@@ -107,11 +108,17 @@ public class StringWriteExtension {
     int _size = _exp.size();
     boolean _equals = (_size == 1);
     if (_equals) {
+      String _entering = this.entering(array, highlight);
       ArrayList<HDLExpression> _exp_1 = array.getExp();
       HDLExpression _get = _exp_1.get(0);
-      return this.toString(_get, highlight);
+      String _string = this.toString(_get, highlight);
+      String _plus = (_entering + _string);
+      String _leaving = this.leaving(array, highlight);
+      return (_plus + _leaving);
     }
     StringConcatenation _builder = new StringConcatenation();
+    String _entering_1 = this.entering(array, highlight);
+    _builder.append(_entering_1, "");
     _builder.append("{");
     {
       ArrayList<HDLExpression> _exp_2 = array.getExp();
@@ -125,17 +132,29 @@ public class StringWriteExtension {
       }
     }
     _builder.append("}");
+    String _leaving_1 = this.leaving(array, highlight);
+    _builder.append(_leaving_1, "");
     return _builder.toString();
+  }
+  
+  public String leaving(final IHDLObject init, final SyntaxHighlighter highlighter) {
+    return highlighter.leaving(init);
+  }
+  
+  public String entering(final IHDLObject init, final SyntaxHighlighter highlighter) {
+    return highlighter.entering(init);
   }
   
   protected String _toString(final HDLAnnotation anno, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(anno, highlight);
+    sb.append(_entering);
     String _name = anno.getName();
     String _annotation = highlight.annotation(_name);
     sb.append(_annotation);
     String _value = anno.getValue();
-    boolean _notEquals = (!Objects.equal(_value, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_value, null);
     if (_notEquals) {
       StringBuilder _append = sb.append("(");
       String _value_1 = anno.getValue();
@@ -145,11 +164,15 @@ public class StringWriteExtension {
       StringBuilder _append_1 = _append.append(_string);
       _append_1.append(")");
     }
+    String _leaving = this.leaving(anno, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLTernary tern, final SyntaxHighlighter highlight) {
     StringConcatenation _builder = new StringConcatenation();
+    String _entering = this.entering(tern, highlight);
+    _builder.append(_entering, "");
     _builder.append("(");
     HDLExpression _ifExpr = tern.getIfExpr();
     String _string = this.toString(_ifExpr, highlight);
@@ -165,11 +188,15 @@ public class StringWriteExtension {
     String _string_2 = this.toString(_elseExpr, highlight);
     _builder.append(_string_2, "");
     _builder.append(")");
+    String _leaving = this.leaving(tern, highlight);
+    _builder.append(_leaving, "");
     return _builder.toString();
   }
   
   protected String _toString(final HDLOpExpression op, final SyntaxHighlighter highlight) {
     StringConcatenation _builder = new StringConcatenation();
+    String _entering = this.entering(op, highlight);
+    _builder.append(_entering, "");
     _builder.append("(");
     HDLExpression _left = op.getLeft();
     String _string = this.toString(_left, highlight);
@@ -182,11 +209,15 @@ public class StringWriteExtension {
     String _string_2 = this.toString(_right, highlight);
     _builder.append(_string_2, "");
     _builder.append(")");
+    String _leaving = this.leaving(op, highlight);
+    _builder.append(_leaving, "");
     return _builder.toString();
   }
   
   protected String _toString(final HDLEqualityOp op, final SyntaxHighlighter highlight) {
     StringConcatenation _builder = new StringConcatenation();
+    String _entering = this.entering(op, highlight);
+    _builder.append(_entering, "");
     _builder.append("(");
     HDLExpression _left = op.getLeft();
     String _string = this.toString(_left, highlight);
@@ -203,11 +234,15 @@ public class StringWriteExtension {
     String _string_2 = this.toString(_right, highlight);
     _builder.append(_string_2, "");
     _builder.append(")");
+    String _leaving = this.leaving(op, highlight);
+    _builder.append(_leaving, "");
     return _builder.toString();
   }
   
   protected String _toString(final HDLUnresolvedFragmentFunction frag, final SyntaxHighlighter highlight) {
-    final String sup = this._toString(((HDLUnresolvedFragment) frag), highlight);
+    String _entering = this.entering(frag, highlight);
+    String _stringFrag = this.toStringFrag(frag, highlight);
+    String _plus = (_entering + _stringFrag);
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("(");
     {
@@ -224,11 +259,20 @@ public class StringWriteExtension {
       }
     }
     _builder.append(")");
-    final String res = (sup + _builder.toString());
-    return res;
+    final String res = (_plus + _builder.toString());
+    String _leaving = this.leaving(frag, highlight);
+    return (res + _leaving);
   }
   
   protected String _toString(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight) {
+    String _entering = this.entering(frag, highlight);
+    String _stringFrag = this.toStringFrag(frag, highlight);
+    String _plus = (_entering + _stringFrag);
+    String _leaving = this.leaving(frag, highlight);
+    return (_plus + _leaving);
+  }
+  
+  public String toStringFrag(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     String _frag = frag.getFrag();
@@ -272,7 +316,7 @@ public class StringWriteExtension {
     }
     sb.append(_builder_1.toString());
     HDLUnresolvedFragment _sub = frag.getSub();
-    boolean _notEquals = (!Objects.equal(_sub, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_sub, null);
     if (_notEquals) {
       StringBuilder _append = sb.append(".");
       HDLUnresolvedFragment _sub_1 = frag.getSub();
@@ -285,17 +329,19 @@ public class StringWriteExtension {
   protected String _toString(final HDLBitOp bitOp, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(bitOp, highlight);
+    sb.append(_entering);
     StringBuilder _append = sb.append("(");
     HDLExpression _left = bitOp.getLeft();
     String _string = this.toString(_left, highlight);
     _append.append(_string);
     final HDLBitOpType type = bitOp.getType();
     boolean _or = false;
-    boolean _equals = Objects.equal(type, HDLBitOpType.LOGI_AND);
+    boolean _equals = ObjectExtensions.operator_equals(type, HDLBitOpType.LOGI_AND);
     if (_equals) {
       _or = true;
     } else {
-      boolean _equals_1 = Objects.equal(type, HDLBitOpType.LOGI_OR);
+      boolean _equals_1 = ObjectExtensions.operator_equals(type, HDLBitOpType.LOGI_OR);
       _or = (_equals || _equals_1);
     }
     if (_or) {
@@ -315,11 +361,15 @@ public class StringWriteExtension {
     String _string_3 = this.toString(_right, highlight);
     StringBuilder _append_3 = sb.append(_string_3);
     _append_3.append(")");
+    String _leaving = this.leaving(bitOp, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLConcat concat, final SyntaxHighlighter highlight) {
     StringConcatenation _builder = new StringConcatenation();
+    String _entering = this.entering(concat, highlight);
+    _builder.append(_entering, "");
     {
       ArrayList<HDLExpression> _cats = concat.getCats();
       boolean _hasElements = false;
@@ -335,6 +385,8 @@ public class StringWriteExtension {
         _builder.append(_operator_1, "");
       }
     }
+    String _leaving = this.leaving(concat, highlight);
+    _builder.append(_leaving, "");
     return _builder.toString();
   }
   
@@ -359,6 +411,8 @@ public class StringWriteExtension {
       _xifexpression = _stringBuilder;
     }
     final StringBuilder sb = _xifexpression;
+    String _entering = this.entering(func, highlight);
+    sb.append(_entering);
     HDLQualifiedName _nameRefName = func.getNameRefName();
     String _string = _nameRefName.toString();
     String _functionCall = highlight.functionCall(_string);
@@ -383,12 +437,16 @@ public class StringWriteExtension {
     if (isStatement) {
       sb.append(";");
     }
+    String _leaving = this.leaving(func, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLNativeFunction func, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(func, highlight);
+    sb.append(_entering);
     ArrayList<HDLAnnotation> _annotations = func.getAnnotations();
     for (final HDLAnnotation anno : _annotations) {
       String _string = this.toString(anno, highlight);
@@ -417,12 +475,16 @@ public class StringWriteExtension {
     StringBuilder _append_3 = _append_2.append(";");
     String _newLine = highlight.newLine();
     _append_3.append(_newLine);
+    String _leaving = this.leaving(func, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLInlineFunction func, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(func, highlight);
+    sb.append(_entering);
     ArrayList<HDLAnnotation> _annotations = func.getAnnotations();
     for (final HDLAnnotation anno : _annotations) {
       String _string = this.toString(anno, highlight);
@@ -470,12 +532,16 @@ public class StringWriteExtension {
     StringBuilder _append_9 = _append_8.append(")");
     String _newLine = highlight.newLine();
     _append_9.append(_newLine);
+    String _leaving = this.leaving(func, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLSubstituteFunction func, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(func, highlight);
+    sb.append(_entering);
     ArrayList<HDLAnnotation> _annotations = func.getAnnotations();
     for (final HDLAnnotation anno : _annotations) {
       String _string = this.toString(anno, highlight);
@@ -528,12 +594,16 @@ public class StringWriteExtension {
     StringBuilder _append_7 = sb.append("}");
     String _newLine_2 = highlight.newLine();
     _append_7.append(_newLine_2);
+    String _leaving = this.leaving(func, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLInterfaceRef ref, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(ref, highlight);
+    sb.append(_entering);
     HDLQualifiedName _hIfRefName = ref.getHIfRefName();
     String _lastSegment = _hIfRefName.getLastSegment();
     String _interfaceRef = highlight.interfaceRef(_lastSegment);
@@ -548,17 +618,25 @@ public class StringWriteExtension {
     sb.append(".");
     StringBuilder _varRef = this.varRef(ref, highlight);
     sb.append(_varRef);
+    String _leaving = this.leaving(ref, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLVariableRef ref, final SyntaxHighlighter highlight) {
+    String _entering = this.entering(ref, highlight);
     StringBuilder _varRef = this.varRef(ref, highlight);
-    return _varRef.toString();
+    String _string = _varRef.toString();
+    String _plus = (_entering + _string);
+    String _leaving = this.leaving(ref, highlight);
+    return (_plus + _leaving);
   }
   
   public StringBuilder varRef(final HDLVariableRef ref, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(ref, highlight);
+    sb.append(_entering);
     String _variableRefName = highlight.variableRefName(ref);
     sb.append(_variableRefName);
     ArrayList<HDLExpression> _array = ref.getArray();
@@ -590,19 +668,29 @@ public class StringWriteExtension {
       _builder.append("}");
       sb.append(_builder.toString());
     }
+    String _leaving = this.leaving(ref, highlight);
+    sb.append(_leaving);
     return sb;
   }
   
   protected String _toString(final HDLLiteral lit, final SyntaxHighlighter highlight) {
     Boolean _str = lit.getStr();
     if ((_str).booleanValue()) {
+      String _entering = this.entering(lit, highlight);
       String _val = lit.getVal();
       String _plus = ("\"" + _val);
       String _plus_1 = (_plus + "\"");
-      return highlight.literal(_plus_1);
+      String _literal = highlight.literal(_plus_1);
+      String _plus_2 = (_entering + _literal);
+      String _leaving = this.leaving(lit, highlight);
+      return (_plus_2 + _leaving);
     }
+    String _entering_1 = this.entering(lit, highlight);
     String _val_1 = lit.getVal();
-    return highlight.literal(_val_1);
+    String _literal_1 = highlight.literal(_val_1);
+    String _plus_3 = (_entering_1 + _literal_1);
+    String _leaving_1 = this.leaving(lit, highlight);
+    return (_plus_3 + _leaving_1);
   }
   
   protected String _toString(final HDLManip manip, final SyntaxHighlighter highlight) {
@@ -611,10 +699,14 @@ public class StringWriteExtension {
     if (!_matched) {
       if (Objects.equal(manipType,HDLManipType.ARITH_NEG)) {
         _matched=true;
+        String _entering = this.entering(manip, highlight);
         String _operator = highlight.operator("-");
+        String _plus = (_entering + _operator);
         HDLExpression _target = manip.getTarget();
         String _string = this.toString(_target, highlight);
-        return (_operator + _string);
+        String _plus_1 = (_plus + _string);
+        String _leaving = this.leaving(manip, highlight);
+        return (_plus_1 + _leaving);
       }
     }
     if (!_matched) {
@@ -622,53 +714,65 @@ public class StringWriteExtension {
         _matched=true;
         HDLType _castTo = manip.getCastTo();
         final HDLPrimitive type = ((HDLPrimitive) _castTo);
+        final String entering = this.entering(manip, highlight);
         String _xifexpression = null;
         HDLExpression _width = type.getWidth();
-        boolean _notEquals = (!Objects.equal(_width, null));
+        boolean _notEquals = ObjectExtensions.operator_notEquals(_width, null);
         if (_notEquals) {
           HDLExpression _width_1 = type.getWidth();
           String _string_1 = this.toString(_width_1, highlight);
-          String _plus = ("<" + _string_1);
-          String _plus_1 = (_plus + ">");
-          String _width_2 = highlight.width(_plus_1);
+          String _plus_2 = ("<" + _string_1);
+          String _plus_3 = (_plus_2 + ">");
+          String _width_2 = highlight.width(_plus_3);
           _xifexpression = _width_2;
         } else {
           _xifexpression = "";
         }
         final String width = _xifexpression;
+        String _plus_4 = (entering + "(");
         HDLPrimitiveType _type = type.getType();
         String _string_2 = _type.toString();
         String _lowerCase = _string_2.toLowerCase();
         String _keyword = highlight.keyword(_lowerCase);
-        String _plus_2 = ("(" + _keyword);
-        String _plus_3 = (_plus_2 + width);
-        String _plus_4 = (_plus_3 + ")");
+        String _plus_5 = (_plus_4 + _keyword);
+        String _plus_6 = (_plus_5 + width);
+        String _plus_7 = (_plus_6 + ")");
         HDLExpression _target_1 = manip.getTarget();
         String _string_3 = this.toString(_target_1, highlight);
-        return (_plus_4 + _string_3);
+        String _plus_8 = (_plus_7 + _string_3);
+        String _leaving_1 = this.leaving(manip, highlight);
+        return (_plus_8 + _leaving_1);
       }
     }
     if (!_matched) {
       if (Objects.equal(manipType,HDLManipType.BIT_NEG)) {
         _matched=true;
+        String _entering_1 = this.entering(manip, highlight);
         String _operator_1 = highlight.operator("~");
+        String _plus_9 = (_entering_1 + _operator_1);
         HDLExpression _target_2 = manip.getTarget();
         String _string_4 = this.toString(_target_2, highlight);
-        return (_operator_1 + _string_4);
+        String _plus_10 = (_plus_9 + _string_4);
+        String _leaving_2 = this.leaving(manip, highlight);
+        return (_plus_10 + _leaving_2);
       }
     }
     if (!_matched) {
       if (Objects.equal(manipType,HDLManipType.LOGIC_NEG)) {
         _matched=true;
+        String _entering_2 = this.entering(manip, highlight);
         String _operator_2 = highlight.operator("!");
+        String _plus_11 = (_entering_2 + _operator_2);
         HDLExpression _target_3 = manip.getTarget();
         String _string_5 = this.toString(_target_3, highlight);
-        return (_operator_2 + _string_5);
+        String _plus_12 = (_plus_11 + _string_5);
+        String _leaving_3 = this.leaving(manip, highlight);
+        return (_plus_12 + _leaving_3);
       }
     }
     HDLManipType _type_1 = manip.getType();
-    String _plus_5 = ("Unexpected Type:" + _type_1);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_5);
+    String _plus_13 = ("Unexpected Type:" + _type_1);
+    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_13);
     throw _illegalArgumentException;
   }
   
@@ -676,6 +780,8 @@ public class StringWriteExtension {
     StringBuilder _spacing = highlight.getSpacing();
     StringBuilder _stringBuilder = new StringBuilder(_spacing);
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(block, highlight);
+    sb.append(_entering);
     Boolean _process = block==null?(Boolean)null:block.getProcess();
     if ((_process).booleanValue()) {
       StringBuilder _append = sb.append("process");
@@ -697,11 +803,15 @@ public class StringWriteExtension {
     StringBuilder _spacing_1 = highlight.getSpacing();
     StringBuilder _append_3 = sb.append(_spacing_1);
     _append_3.append("}");
+    String _leaving = this.leaving(block, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLAssignment ass, final SyntaxHighlighter highlight) {
     final StringBuilder builder = highlight.getSpacing();
+    String _entering = this.entering(ass, highlight);
+    builder.append(_entering);
     HDLReference _left = ass.getLeft();
     String _string = this.toString(_left, highlight);
     builder.append(_string);
@@ -713,19 +823,23 @@ public class StringWriteExtension {
     String _string_2 = this.toString(_right, highlight);
     StringBuilder _append = builder.append(_string_2);
     _append.append(";");
+    String _leaving = this.leaving(ass, highlight);
+    builder.append(_leaving);
     return builder.toString();
   }
   
   protected String _toString(final HDLPrimitive prim, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(prim, highlight);
+    sb.append(_entering);
     HDLPrimitiveType _type = prim.getType();
     String _string = _type.toString();
     String _lowerCase = _string.toLowerCase();
     String _primitiveType = highlight.primitiveType(_lowerCase);
     sb.append(_primitiveType);
     HDLExpression _width = prim.getWidth();
-    boolean _notEquals = (!Objects.equal(_width, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_width, null);
     if (_notEquals) {
       HDLExpression _width_1 = prim.getWidth();
       String _string_1 = this.toString(_width_1, highlight);
@@ -734,6 +848,8 @@ public class StringWriteExtension {
       String _width_2 = highlight.width(_plus_1);
       sb.append(_width_2);
     }
+    String _leaving = this.leaving(prim, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
@@ -741,6 +857,8 @@ public class StringWriteExtension {
     final StringBuilder space = highlight.getSpacing();
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(loop, highlight);
+    sb.append(_entering);
     StringBuilder _append = sb.append(space);
     String _keyword = highlight.keyword("for");
     StringBuilder _append_1 = _append.append(_keyword);
@@ -789,11 +907,15 @@ public class StringWriteExtension {
     highlight.decSpacing();
     StringBuilder _append_11 = sb.append(space);
     _append_11.append("}");
+    String _leaving = this.leaving(loop, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLIfStatement ifStmnt, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(ifStmnt, highlight);
+    sb.append(_entering);
     final String origSpacing = sb.toString();
     String _keyword = highlight.keyword("if");
     StringBuilder _append = sb.append(_keyword);
@@ -843,13 +965,17 @@ public class StringWriteExtension {
     highlight.decSpacing();
     StringBuilder _append_15 = sb.append(origSpacing);
     _append_15.append("}");
+    String _leaving = this.leaving(ifStmnt, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLSwitchCaseStatement caseStmnt, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(caseStmnt, highlight);
+    sb.append(_entering);
     HDLExpression _label = caseStmnt.getLabel();
-    boolean _equals = Objects.equal(_label, null);
+    boolean _equals = ObjectExtensions.operator_equals(_label, null);
     if (_equals) {
       String _keyword = highlight.keyword("default");
       StringBuilder _append = sb.append(_keyword);
@@ -886,11 +1012,15 @@ public class StringWriteExtension {
     StringBuilder _spacing = highlight.getSpacing();
     StringBuilder _append_11 = sb.append(_spacing);
     _append_11.append("}");
+    String _leaving = this.leaving(caseStmnt, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLSwitchStatement switchStmnt, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(switchStmnt, highlight);
+    sb.append(_entering);
     String _keyword = highlight.keyword("switch");
     StringBuilder _append = sb.append(_keyword);
     StringBuilder _append_1 = _append.append("(");
@@ -915,14 +1045,18 @@ public class StringWriteExtension {
     StringBuilder _spacing = highlight.getSpacing();
     StringBuilder _append_7 = sb.append(_spacing);
     _append_7.append("}");
+    String _leaving = this.leaving(switchStmnt, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLVariableDeclaration hvd, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(hvd, highlight);
+    sb.append(_entering);
     final HDLType resolveType = hvd.resolveType();
     ArrayList<HDLAnnotation> _annotations = hvd.getAnnotations();
-    boolean _notEquals = (!Objects.equal(_annotations, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_annotations, null);
     if (_notEquals) {
       ArrayList<HDLAnnotation> _annotations_1 = hvd.getAnnotations();
       for (final HDLAnnotation hdla : _annotations_1) {
@@ -943,13 +1077,13 @@ public class StringWriteExtension {
       _append_1.append(_simpleSpace_1);
     }
     HDLRegisterConfig _register = hvd.getRegister();
-    boolean _notEquals_1 = (!Objects.equal(_register, null));
+    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_register, null);
     if (_notEquals_1) {
       HDLRegisterConfig _register_1 = hvd.getRegister();
       String _string_1 = this.toString(_register_1, highlight);
       sb.append(_string_1);
     }
-    boolean _equals = Objects.equal(resolveType, null);
+    boolean _equals = ObjectExtensions.operator_equals(resolveType, null);
     if (_equals) {
       sb.append("#UNRESOLVED_TYPE#");
     } else {
@@ -984,17 +1118,21 @@ public class StringWriteExtension {
     _builder.append(";");
     sb.append(_builder.toString());
     Context _context = highlight.getContext();
-    boolean _equals_1 = Objects.equal(_context, Context.HDLPackage);
+    boolean _equals_1 = ObjectExtensions.operator_equals(_context, Context.HDLPackage);
     if (_equals_1) {
       String _newLine = highlight.newLine();
       sb.append(_newLine);
     }
+    String _leaving = this.leaving(hvd, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLInterfaceDeclaration hid, final SyntaxHighlighter highlight) {
     highlight.pushContext(Context.HDLInterface);
     final StringBuilder annos = highlight.getSpacing();
+    String _entering = this.entering(hid, highlight);
+    annos.append(_entering);
     ArrayList<HDLAnnotation> _annotations = hid.getAnnotations();
     for (final HDLAnnotation anno : _annotations) {
       String _string = this.toString(anno, highlight);
@@ -1005,12 +1143,16 @@ public class StringWriteExtension {
     HDLInterface _hIf = hid.getHIf();
     String _string_1 = this.toString(_hIf, highlight);
     annos.append(_string_1);
+    String _leaving = this.leaving(hid, highlight);
+    annos.append(_leaving);
     highlight.popContext();
     return annos.toString();
   }
   
   protected String _toString(final HDLInterface hif, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(hif, highlight);
+    sb.append(_entering);
     String _keyword = highlight.keyword("interface");
     StringBuilder _append = sb.append(_keyword);
     String _simpleSpace = highlight.simpleSpace();
@@ -1033,27 +1175,39 @@ public class StringWriteExtension {
     StringBuilder _append_3 = sb.append("}");
     String _newLine_2 = highlight.newLine();
     _append_3.append(_newLine_2);
+    String _leaving = this.leaving(hif, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLEnumRef ref, final SyntaxHighlighter highlight) {
+    String _entering = this.entering(ref, highlight);
     HDLQualifiedName _hEnumRefName = ref.getHEnumRefName();
     String _string = _hEnumRefName.toString();
     String _enumRefType = highlight.enumRefType(_string);
-    String _plus = (_enumRefType + ".");
+    String _plus = (_entering + _enumRefType);
+    String _plus_1 = (_plus + ".");
     HDLQualifiedName _varRefName = ref.getVarRefName();
     String _lastSegment = _varRefName.getLastSegment();
     String _enumRefVar = highlight.enumRefVar(_lastSegment);
-    return (_plus + _enumRefVar);
+    String _plus_2 = (_plus_1 + _enumRefVar);
+    String _leaving = this.leaving(ref, highlight);
+    return (_plus_2 + _leaving);
   }
   
   protected String _toString(final HDLEnum e, final SyntaxHighlighter highlight) {
+    String _entering = this.entering(e, highlight);
     String _name = e.getName();
-    return highlight.enumName(_name);
+    String _enumName = highlight.enumName(_name);
+    String _plus = (_entering + _enumName);
+    String _leaving = this.leaving(e, highlight);
+    return (_plus + _leaving);
   }
   
   protected String _toString(final HDLEnumDeclaration decl, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(decl, highlight);
+    sb.append(_entering);
     ArrayList<HDLAnnotation> _annotations = decl.getAnnotations();
     for (final HDLAnnotation anno : _annotations) {
       String _string = this.toString(anno, highlight);
@@ -1096,12 +1250,16 @@ public class StringWriteExtension {
     sb.append(_builder.toString());
     String _newLine = highlight.newLine();
     sb.append(_newLine);
+    String _leaving = this.leaving(decl, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLRegisterConfig reg, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(reg, highlight);
+    sb.append(_entering);
     String _keyword = highlight.keyword("register");
     sb.append(_keyword);
     final HDLRegisterConfig defaultReg = HDLRegisterConfig.defaultConfig();
@@ -1141,7 +1299,7 @@ public class StringWriteExtension {
     }
     boolean _and = false;
     HDLRegClockType _clockType = reg.getClockType();
-    boolean _notEquals = (!Objects.equal(_clockType, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_clockType, null);
     if (!_notEquals) {
       _and = false;
     } else {
@@ -1170,7 +1328,7 @@ public class StringWriteExtension {
     }
     boolean _and_1 = false;
     HDLRegSyncType _syncType = reg.getSyncType();
-    boolean _notEquals_1 = (!Objects.equal(_syncType, null));
+    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_syncType, null);
     if (!_notEquals_1) {
       _and_1 = false;
     } else {
@@ -1199,7 +1357,7 @@ public class StringWriteExtension {
     }
     boolean _and_2 = false;
     HDLRegResetActiveType _resetType = reg.getResetType();
-    boolean _notEquals_2 = (!Objects.equal(_resetType, null));
+    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_resetType, null);
     if (!_notEquals_2) {
       _and_2 = false;
     } else {
@@ -1250,6 +1408,8 @@ public class StringWriteExtension {
     }
     String _simpleSpace = highlight.simpleSpace();
     sb.append(_simpleSpace);
+    String _leaving = this.leaving(reg, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
@@ -1257,8 +1417,10 @@ public class StringWriteExtension {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     highlight.pushContext(Context.HDLPackage);
+    String _entering = this.entering(pkg, highlight);
+    sb.append(_entering);
     String _pkg = pkg.getPkg();
-    boolean _notEquals = (!Objects.equal(_pkg, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_pkg, null);
     if (_notEquals) {
       String _keyword = highlight.keyword("package");
       StringBuilder _append = sb.append(_keyword);
@@ -1281,6 +1443,8 @@ public class StringWriteExtension {
       String _string_1 = this.toString(unit, highlight);
       sb.append(_string_1);
     }
+    String _leaving = this.leaving(pkg, highlight);
+    sb.append(_leaving);
     highlight.popContext();
     return sb.toString();
   }
@@ -1289,6 +1453,8 @@ public class StringWriteExtension {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     highlight.pushContext(Context.HDLUnit);
+    String _entering = this.entering(unit, highlight);
+    sb.append(_entering);
     Boolean _simulation = unit.getSimulation();
     boolean _not = (!_simulation);
     if (_not) {
@@ -1341,12 +1507,16 @@ public class StringWriteExtension {
     StringBuilder _append_11 = sb.append("}");
     String _newLine_4 = highlight.newLine();
     _append_11.append(_newLine_4);
+    String _leaving = this.leaving(unit, highlight);
+    sb.append(_leaving);
     highlight.popContext();
     return sb.toString();
   }
   
   protected String _toString(final HDLInterfaceInstantiation hii, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    String _entering = this.entering(hii, highlight);
+    sb.append(_entering);
     HDLQualifiedName _hIfRefName = hii.getHIfRefName();
     String _string = _hIfRefName.toString();
     String _interfaceName = highlight.interfaceName(_string);
@@ -1376,12 +1546,16 @@ public class StringWriteExtension {
     }
     sb.append(_builder.toString());
     sb.append(";");
+    String _leaving = this.leaving(hii, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLArgument arg, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    String _entering = this.entering(arg, highlight);
+    sb.append(_entering);
     String _name = arg.getName();
     String _param = highlight.param(_name);
     StringBuilder _append = sb.append(_param);
@@ -1389,27 +1563,38 @@ public class StringWriteExtension {
     HDLExpression _expression = arg.getExpression();
     String _string = this.toString(_expression, highlight);
     _append_1.append(_string);
+    String _leaving = this.leaving(arg, highlight);
+    sb.append(_leaving);
     return sb.toString();
   }
   
   protected String _toString(final HDLRange range, final SyntaxHighlighter highlight) {
     HDLExpression _from = range.getFrom();
-    boolean _notEquals = (!Objects.equal(_from, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_from, null);
     if (_notEquals) {
+      String _entering = this.entering(range, highlight);
       HDLExpression _from_1 = range.getFrom();
       String _string = this.toString(_from_1, highlight);
-      String _plus = (_string + ":");
+      String _plus = (_entering + _string);
+      String _plus_1 = (_plus + ":");
       HDLExpression _to = range.getTo();
       String _string_1 = this.toString(_to, highlight);
-      return (_plus + _string_1);
+      String _plus_2 = (_plus_1 + _string_1);
+      String _leaving = this.leaving(range, highlight);
+      return (_plus_2 + _leaving);
     }
+    String _entering_1 = this.entering(range, highlight);
     HDLExpression _to_1 = range.getTo();
-    return this.toString(_to_1, highlight);
+    String _string_2 = this.toString(_to_1, highlight);
+    String _plus_3 = (_entering_1 + _string_2);
+    String _leaving_1 = this.leaving(range, highlight);
+    return (_plus_3 + _leaving_1);
   }
   
   protected String _toString(final HDLVariable hVar, final SyntaxHighlighter highlight) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
+    this.entering(hVar, highlight);
     ArrayList<HDLAnnotation> _annotations = hVar.getAnnotations();
     for (final HDLAnnotation anno : _annotations) {
       String _string = this.toString(anno, highlight);
@@ -1427,18 +1612,20 @@ public class StringWriteExtension {
       _append_2.append("]");
     }
     HDLExpression _defaultValue = hVar.getDefaultValue();
-    boolean _notEquals = (!Objects.equal(_defaultValue, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_defaultValue, null);
     if (_notEquals) {
       StringBuilder _append_3 = sb.append("=");
       HDLExpression _defaultValue_1 = hVar.getDefaultValue();
       String _string_2 = this.toString(_defaultValue_1, highlight);
       _append_3.append(_string_2);
     }
+    this.leaving(hVar, highlight);
     return sb.toString();
   }
   
   protected String _toString(final HDLDirectGeneration hdg, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
+    this.entering(hdg, highlight);
     HDLInterface _hIf = hdg.getHIf();
     String _name = _hIf.getName();
     String _interfaceName = highlight.interfaceName(_name);
@@ -1460,7 +1647,7 @@ public class StringWriteExtension {
     }
     sb.append(")");
     String _generatorContent = hdg.getGeneratorContent();
-    boolean _notEquals = (!Objects.equal(_generatorContent, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_generatorContent, null);
     if (_notEquals) {
       String _generatorID_2 = hdg.getGeneratorID();
       String _generatorContent_1 = hdg.getGeneratorContent();
@@ -1468,6 +1655,7 @@ public class StringWriteExtension {
       sb.append(_generatorContent_2);
     }
     sb.append(";");
+    this.leaving(hdg, highlight);
     return sb.toString();
   }
   

@@ -53,9 +53,6 @@ public class CompilerInformation implements Serializable {
 	}
 
 	public static class GeneratorInformation implements Serializable {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -6351106148480464153L;
 		public final String provider;
 		public final String name;

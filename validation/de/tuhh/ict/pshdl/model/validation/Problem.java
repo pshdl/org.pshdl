@@ -34,9 +34,10 @@ public class Problem {
 	public final int length;
 	public final boolean isSyntax;
 	public final int offsetInLine;
+	public final int totalOffset;
 	private static AtomicInteger uid = new AtomicInteger();
 
-	public Problem(IErrorCode code, String msg, int line, int offsetInLine, int length) {
+	public Problem(IErrorCode code, String msg, int line, int offsetInLine, int length, int totalOffset) {
 		this.code = code;
 		this.node = null;
 		this.context = null;
@@ -46,6 +47,7 @@ public class Problem {
 		this.line = line;
 		this.offsetInLine = offsetInLine;
 		this.length = length;
+		this.totalOffset = totalOffset;
 		isSyntax = true;
 	}
 
@@ -80,11 +82,12 @@ public class Problem {
 			line = sInfo.startLine;
 			offsetInLine = sInfo.startPosInLine;
 			length = sInfo.length;
-
+			totalOffset = sInfo.totalOffset;
 		} else {
 			offsetInLine = -1;
 			line = -1;
 			length = -1;
+			totalOffset = -1;
 		}
 	}
 

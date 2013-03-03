@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.util.*;
 
+import org.antlr.v4.runtime.*;
+
 public class Alias implements NamedElement {
 	public String name;
 	public LinkedList<NamedElement> definitions = new LinkedList<NamedElement>();
@@ -33,5 +35,12 @@ public class Alias implements NamedElement {
 		}
 		sb.append('}');
 		return sb.toString();
+	}
+
+	public Token token;
+
+	@Override
+	public void setLocation(Token start) {
+		this.token = start;
 	}
 }

@@ -1,6 +1,5 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
-import com.google.common.base.Objects;
 import de.tuhh.ict.pshdl.model.HDLAssignment;
 import de.tuhh.ict.pshdl.model.HDLBlock;
 import de.tuhh.ict.pshdl.model.HDLDirectGeneration;
@@ -44,6 +43,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class ScopingExtension {
@@ -56,7 +56,7 @@ public class ScopingExtension {
   
   public HDLVariable resolveVariableDefault(final IHDLObject obj, final HDLQualifiedName hVar) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       return null;
     }
@@ -70,7 +70,7 @@ public class ScopingExtension {
   
   protected HDLFunction _resolveFunction(final IHDLObject obj, final HDLQualifiedName hVar) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       return null;
     }
@@ -80,7 +80,7 @@ public class ScopingExtension {
   
   protected HDLEnum _resolveEnum(final IHDLObject obj, final HDLQualifiedName hEnum) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       return null;
     }
@@ -90,7 +90,7 @@ public class ScopingExtension {
   
   protected HDLType _resolveType(final IHDLObject obj, final HDLQualifiedName type) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       return null;
     }
@@ -100,7 +100,7 @@ public class ScopingExtension {
   
   protected HDLInterface _resolveInterface(final IHDLObject obj, final HDLQualifiedName hIf) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       return null;
     }
@@ -117,7 +117,7 @@ public class ScopingExtension {
   
   public HDLResolver resolver(final IHDLObject statement, final boolean descent) {
     HDLResolver resolver = statement.<HDLResolver>getMeta(ScopingExtension.RESOLVER);
-    boolean _equals = Objects.equal(resolver, null);
+    boolean _equals = ObjectExtensions.operator_equals(resolver, null);
     if (_equals) {
       HDLResolver _hDLResolver = new HDLResolver(statement, descent);
       resolver = _hDLResolver;
@@ -267,7 +267,7 @@ public class ScopingExtension {
   
   protected HDLEnum _resolveEnum(final HDLAssignment obj, final HDLQualifiedName hEnum) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       String _plus = ("for hEnum:" + hEnum);
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_ENUM, obj, _plus);
@@ -280,7 +280,7 @@ public class ScopingExtension {
   
   protected HDLInterface _resolveInterface(final HDLAssignment obj, final HDLQualifiedName hIf) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       String _plus = ("for interface:" + hIf);
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_INTERFACE, obj, _plus);
@@ -293,7 +293,7 @@ public class ScopingExtension {
   
   protected HDLType _resolveType(final HDLAssignment obj, final HDLQualifiedName hVar) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       String _plus = ("for type:" + hVar);
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_TYPE, obj, _plus);
@@ -306,7 +306,7 @@ public class ScopingExtension {
   
   protected HDLVariable _resolveVariable(final HDLAssignment obj, final HDLQualifiedName hVar) {
     IHDLObject _container = obj.getContainer();
-    boolean _equals = Objects.equal(_container, null);
+    boolean _equals = ObjectExtensions.operator_equals(_container, null);
     if (_equals) {
       String _plus = ("for hVariable:" + hVar);
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_VARIABLE, obj, _plus);
@@ -385,7 +385,7 @@ public class ScopingExtension {
   
   protected HDLFunction _resolveFunction(final HDLPackage obj, final HDLQualifiedName hFunc) {
     HDLLibrary library = obj.getLibrary();
-    boolean _equals = Objects.equal(library, null);
+    boolean _equals = ObjectExtensions.operator_equals(library, null);
     if (_equals) {
       String _libURI = obj.getLibURI();
       HDLLibrary _library = HDLLibrary.getLibrary(_libURI);
@@ -410,7 +410,7 @@ public class ScopingExtension {
   protected HDLType _resolveType(final HDLPackage obj, final HDLQualifiedName type) {
     HDLLibrary library = obj.getLibrary();
     HDLLibrary _library = obj.getLibrary();
-    boolean _equals = Objects.equal(_library, null);
+    boolean _equals = ObjectExtensions.operator_equals(_library, null);
     if (_equals) {
       String _libURI = obj.getLibURI();
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
@@ -425,7 +425,7 @@ public class ScopingExtension {
   protected HDLVariable _resolveVariable(final HDLPackage obj, final HDLQualifiedName hVar) {
     HDLLibrary library = obj.getLibrary();
     HDLLibrary _library = obj.getLibrary();
-    boolean _equals = Objects.equal(_library, null);
+    boolean _equals = ObjectExtensions.operator_equals(_library, null);
     if (_equals) {
       String _libURI = obj.getLibURI();
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
@@ -440,7 +440,7 @@ public class ScopingExtension {
   protected HDLEnum _resolveEnum(final HDLUnit obj, final HDLQualifiedName hEnum) {
     HDLResolver _resolver = this.resolver(obj, false);
     final HDLEnum resolveEnum = _resolver.resolveEnum(hEnum);
-    boolean _notEquals = (!Objects.equal(resolveEnum, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(resolveEnum, null);
     if (_notEquals) {
       return resolveEnum;
     }
@@ -451,13 +451,13 @@ public class ScopingExtension {
   protected HDLFunction _resolveFunction(final HDLUnit obj, final HDLQualifiedName hFunc) {
     HDLResolver _resolver = this.resolver(obj, false);
     final HDLFunction resolveEnum = _resolver.resolveFunction(hFunc);
-    boolean _notEquals = (!Objects.equal(resolveEnum, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(resolveEnum, null);
     if (_notEquals) {
       return resolveEnum;
     }
     HDLLibrary library = obj.getLibrary();
     HDLLibrary _library = obj.getLibrary();
-    boolean _equals = Objects.equal(_library, null);
+    boolean _equals = ObjectExtensions.operator_equals(_library, null);
     if (_equals) {
       String _libURI = obj.getLibURI();
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
@@ -475,7 +475,7 @@ public class ScopingExtension {
   protected HDLInterface _resolveInterface(final HDLUnit obj, final HDLQualifiedName hIf) {
     HDLResolver _resolver = this.resolver(obj, false);
     final HDLInterface resolveInterface = _resolver.resolveInterface(hIf);
-    boolean _notEquals = (!Objects.equal(resolveInterface, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(resolveInterface, null);
     if (_notEquals) {
       return resolveInterface;
     }
@@ -486,13 +486,13 @@ public class ScopingExtension {
   protected HDLType _resolveType(final HDLUnit obj, final HDLQualifiedName type) {
     HDLResolver _resolver = this.resolver(obj, false);
     final HDLType resolveType = _resolver.resolveType(type);
-    boolean _notEquals = (!Objects.equal(resolveType, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(resolveType, null);
     if (_notEquals) {
       return resolveType;
     }
     HDLLibrary library = obj.getLibrary();
     HDLLibrary _library = obj.getLibrary();
-    boolean _equals = Objects.equal(_library, null);
+    boolean _equals = ObjectExtensions.operator_equals(_library, null);
     if (_equals) {
       String _libURI = obj.getLibURI();
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
@@ -510,13 +510,13 @@ public class ScopingExtension {
   protected HDLVariable _resolveVariable(final HDLUnit obj, final HDLQualifiedName hVar) {
     HDLResolver _resolver = this.resolver(obj, false);
     final HDLVariable hdlVariable = _resolver.resolveVariable(hVar);
-    boolean _notEquals = (!Objects.equal(hdlVariable, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(hdlVariable, null);
     if (_notEquals) {
       return hdlVariable;
     }
     HDLLibrary library = obj.getLibrary();
     HDLLibrary _library = obj.getLibrary();
-    boolean _equals = Objects.equal(_library, null);
+    boolean _equals = ObjectExtensions.operator_equals(_library, null);
     if (_equals) {
       String _libURI = obj.getLibURI();
       HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
@@ -561,7 +561,7 @@ public class ScopingExtension {
   protected HDLVariable _resolveVariable(final HDLInterface hIf, final HDLQualifiedName hVar) {
     String _lastSegment = hVar.getLastSegment();
     final HDLVariable resolved = ScopingExtension.getVariable(hIf, _lastSegment);
-    boolean _notEquals = (!Objects.equal(resolved, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(resolved, null);
     if (_notEquals) {
       boolean _equals = (hVar.length == 1);
       if (_equals) {

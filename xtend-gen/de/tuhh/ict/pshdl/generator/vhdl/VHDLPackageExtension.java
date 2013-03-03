@@ -1,6 +1,5 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLContext;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLExpressionExtension;
@@ -78,6 +77,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class VHDLPackageExtension {
@@ -117,7 +117,7 @@ public class VHDLPackageExtension {
         final HDLEnum resolveHEnum = hdlEnumRef.resolveHEnum();
         final HDLUnit enumContainer = resolveHEnum.<HDLUnit>getContainer(HDLUnit.class);
         boolean _or = false;
-        boolean _equals = Objects.equal(enumContainer, null);
+        boolean _equals = ObjectExtensions.operator_equals(enumContainer, null);
         if (_equals) {
           _or = true;
         } else {
@@ -142,12 +142,12 @@ public class VHDLPackageExtension {
     final HDLVariableRef[] vRefs = obj.<HDLVariableRef>getAllObjectsOf(HDLVariableRef.class, true);
     for (final HDLVariableRef variableRef : vRefs) {
       HDLClass _classType = variableRef.getClassType();
-      boolean _notEquals = (!Objects.equal(_classType, HDLClass.HDLInterfaceRef));
+      boolean _notEquals = ObjectExtensions.operator_notEquals(_classType, HDLClass.HDLInterfaceRef);
       if (_notEquals) {
         final HDLVariable variable = variableRef.resolveVar();
         final HDLUnit enumContainer = variable.<HDLUnit>getContainer(HDLUnit.class);
         boolean _or = false;
-        boolean _equals = Objects.equal(enumContainer, null);
+        boolean _equals = ObjectExtensions.operator_equals(enumContainer, null);
         if (_equals) {
           _or = true;
         } else {
@@ -355,11 +355,11 @@ public class VHDLPackageExtension {
                   HDLReference _left = hAss.getLeft();
                   HDLVariable _resolveVar = this.resolveVar(_left);
                   HDLRegisterConfig _registerConfig = _resolveVar.getRegisterConfig();
-                  boolean _notEquals = (!Objects.equal(_registerConfig, null));
+                  boolean _notEquals = ObjectExtensions.operator_notEquals(_registerConfig, null);
                   if (_notEquals) {
                   } else {
                     HDLReference _left_1 = hAss.getLeft();
-                    boolean _notEquals_1 = (!Objects.equal(_left_1, ref));
+                    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_left_1, ref);
                     if (_notEquals_1) {
                       String _vHDLName = this.vee.getVHDLName(ref);
                       vars.add(_vHDLName);
@@ -410,7 +410,7 @@ public class VHDLPackageExtension {
     HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hUnit);
     HDLRegResetActiveType _resetType = key.getResetType();
     HDLRegResetActiveType _regResetType = config.getRegResetType(_fullNameOf, _resetType);
-    boolean _equals = Objects.equal(_regResetType, HDLRegResetActiveType.HIGH);
+    boolean _equals = ObjectExtensions.operator_equals(_regResetType, HDLRegResetActiveType.HIGH);
     if (_equals) {
       activeRst = StdLogic1164.STD_LOGIC_1;
     } else {
@@ -420,7 +420,7 @@ public class VHDLPackageExtension {
     IfStatement _ifStatement = new IfStatement(_equals_1);
     IfStatement rstIfStmnt = _ifStatement;
     final LinkedList<SequentialStatement> resets = unit.resetStatements.get(key);
-    boolean _notEquals = (!Objects.equal(resets, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(resets, null);
     if (_notEquals) {
       List<SequentialStatement> _statements = rstIfStmnt.getStatements();
       _statements.addAll(resets);
@@ -429,7 +429,7 @@ public class VHDLPackageExtension {
     HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(hUnit);
     HDLRegClockType _clockType = key.getClockType();
     HDLRegClockType _regClockType = config.getRegClockType(_fullNameOf_1, _clockType);
-    boolean _equals_2 = Objects.equal(_regClockType, HDLRegClockType.RISING);
+    boolean _equals_2 = ObjectExtensions.operator_equals(_regClockType, HDLRegClockType.RISING);
     if (_equals_2) {
       FunctionCall _functionCall = new FunctionCall(StdLogic1164.RISING_EDGE);
       edge = _functionCall;
@@ -443,7 +443,7 @@ public class VHDLPackageExtension {
     HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(hUnit);
     HDLRegSyncType _syncType = key.getSyncType();
     HDLRegSyncType _regSyncType = config.getRegSyncType(_fullNameOf_2, _syncType);
-    boolean _equals_3 = Objects.equal(_regSyncType, HDLRegSyncType.ASYNC);
+    boolean _equals_3 = ObjectExtensions.operator_equals(_regSyncType, HDLRegSyncType.ASYNC);
     if (_equals_3) {
       List<Signal> _sensitivityList_1 = ps.getSensitivityList();
       _sensitivityList_1.add(rst);
@@ -512,10 +512,10 @@ public class VHDLPackageExtension {
     for (final HDLDeclaration decl : _declarations) {
       {
         HDLClass _classType = decl.getClassType();
-        boolean _equals = Objects.equal(_classType, HDLClass.HDLVariableDeclaration);
+        boolean _equals = ObjectExtensions.operator_equals(_classType, HDLClass.HDLVariableDeclaration);
         if (_equals) {
           final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) decl);
-          boolean _equals_1 = Objects.equal(pd, null);
+          boolean _equals_1 = ObjectExtensions.operator_equals(pd, null);
           if (_equals_1) {
             String _pkg = obj.getPkg();
             HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_pkg);
@@ -527,11 +527,11 @@ public class VHDLPackageExtension {
           }
           final VHDLContext vhdl = this.vse.toVHDL(hvd, VHDLContext.DEFAULT_CTX);
           ConstantDeclaration first = vhdl.constants.getFirst();
-          boolean _equals_2 = Objects.equal(first, null);
+          boolean _equals_2 = ObjectExtensions.operator_equals(first, null);
           if (_equals_2) {
             ConstantDeclaration _first = vhdl.constantsPkg.getFirst();
             first = _first;
-            boolean _equals_3 = Objects.equal(first, null);
+            boolean _equals_3 = ObjectExtensions.operator_equals(first, null);
             if (_equals_3) {
               IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Expected constant declaration but found none!");
               throw _illegalArgumentException;
@@ -541,7 +541,7 @@ public class VHDLPackageExtension {
           _declarations_1.add(first);
         }
         HDLClass _classType_1 = decl.getClassType();
-        boolean _equals_4 = Objects.equal(_classType_1, HDLClass.HDLEnumDeclaration);
+        boolean _equals_4 = ObjectExtensions.operator_equals(_classType_1, HDLClass.HDLEnumDeclaration);
         if (_equals_4) {
           final HDLEnumDeclaration hvd_1 = ((HDLEnumDeclaration) decl);
           HDLEnum _hEnum = hvd_1.getHEnum();
@@ -554,7 +554,7 @@ public class VHDLPackageExtension {
           final VHDLContext vhdl_1 = this.vse.toVHDL(hvd_1, VHDLContext.DEFAULT_CTX);
           BlockDeclarativeItem _first_1 = vhdl_1.internalTypes.getFirst();
           final Type first_1 = ((Type) _first_1);
-          boolean _equals_5 = Objects.equal(first_1, null);
+          boolean _equals_5 = ObjectExtensions.operator_equals(first_1, null);
           if (_equals_5) {
             IllegalArgumentException _illegalArgumentException_1 = new IllegalArgumentException("Expected enum type declaration but found none!");
             throw _illegalArgumentException_1;

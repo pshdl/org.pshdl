@@ -3,8 +3,19 @@ package de.tuhh.ict.pshdl.model.utils;
 import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.parser.*;
 
 public class SyntaxHighlighter {
+
+	private boolean includeComments;
+
+	public SyntaxHighlighter() {
+		this(false);
+	}
+
+	public SyntaxHighlighter(boolean includeComments) {
+		this.includeComments = includeComments;
+	}
 
 	public static enum Context {
 		HDLPackage, HDLUnit, HDLStatement, HDLExpression, HDLInterface;
@@ -30,8 +41,30 @@ public class SyntaxHighlighter {
 		spacing--;
 	}
 
+	public static final SyntaxHighlighter none(boolean includeComments) {
+		return new SyntaxHighlighter(includeComments);
+	}
+
 	public static final SyntaxHighlighter none() {
 		return new SyntaxHighlighter();
+	}
+
+	public String leaving(IHDLObject obj) {
+		return "";
+	}
+
+	public String entering(IHDLObject obj) {
+		if (includeComments) {
+			SourceInfo meta = obj.getMeta(SourceInfo.INFO);
+			if ((meta != null) && !meta.comments.isEmpty()) {
+				StringBuilder sb = new StringBuilder();
+				for (String comment : meta.comments) {
+					sb.append(comment);
+				}
+				return sb.toString();
+			}
+		}
+		return "";
 	}
 
 	public String annotation(String name) {

@@ -23,4 +23,23 @@ Export-Package: de.tuhh.ict.pshdl.generator.vhdl; uses:="de.upb.hni.vmagic.decla
  de.tuhh.ict.pshdl.model.utils.services; uses:="de.upb.hni.vmagic.expression,  de.tuhh.ict.pshdl.generator.vhdl,  de.tuhh.ict.pshdl.model.evaluation,  de.tuhh.ict.pshdl.model",
  de.tuhh.ict.pshdl.model.validation;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model",
  de.tuhh.ict.pshdl.model.validation.builtin
+Import-Package: org.antlr.v4,
+ org.antlr.v4.analysis,
+ org.antlr.v4.automata,
+ org.antlr.v4.codegen,
+ org.antlr.v4.codegen.model,
+ org.antlr.v4.codegen.model.chunk,
+ org.antlr.v4.codegen.model.decl,
+ org.antlr.v4.misc,
+ org.antlr.v4.parse,
+ org.antlr.v4.runtime,
+ org.antlr.v4.runtime.atn,
+ org.antlr.v4.runtime.dfa,
+ org.antlr.v4.runtime.misc,
+ org.antlr.v4.runtime.tree,
+ org.antlr.v4.runtime.tree.gui,
+ org.antlr.v4.semantics,
+ org.antlr.v4.tool,
+ org.antlr.v4.tool.ast,
+ org.antlr.v4.tool.interp
 

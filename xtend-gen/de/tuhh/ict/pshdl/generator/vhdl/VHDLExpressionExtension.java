@@ -77,6 +77,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class VHDLExpressionExtension {
@@ -158,7 +159,7 @@ public class VHDLExpressionExtension {
       ArrayList<HDLRange> _bits_2 = ref.getBits();
       final HDLRange r = _bits_2.get(0);
       HDLExpression _from = r.getFrom();
-      boolean _equals = Objects.equal(_from, null);
+      boolean _equals = ObjectExtensions.operator_equals(_from, null);
       if (_equals) {
         HDLExpression _to = r.getTo();
         Expression<?> _vHDL_1 = this.toVHDL(_to);
@@ -233,11 +234,11 @@ public class VHDLExpressionExtension {
     }
     if (!_matched) {
       boolean _or = false;
-      boolean _equals = Objects.equal(type, HDLManipType.LOGIC_NEG);
+      boolean _equals = ObjectExtensions.operator_equals(type, HDLManipType.LOGIC_NEG);
       if (_equals) {
         _or = true;
       } else {
-        boolean _equals_1 = Objects.equal(type, HDLManipType.BIT_NEG);
+        boolean _equals_1 = ObjectExtensions.operator_equals(type, HDLManipType.BIT_NEG);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -253,7 +254,7 @@ public class VHDLExpressionExtension {
         _matched=true;
         HDLType _castTo = obj.getCastTo();
         final HDLPrimitive targetType = ((HDLPrimitive) _castTo);
-        boolean _equals_2 = Objects.equal(targetType, HDLPrimitiveType.STRING);
+        boolean _equals_2 = ObjectExtensions.operator_equals(targetType, HDLPrimitiveType.STRING);
         if (_equals_2) {
           HDLExpression _target_2 = obj.getTarget();
           return this.toVHDL(_target_2);
@@ -261,7 +262,7 @@ public class VHDLExpressionExtension {
         final HDLExpression tWidth = targetType.getWidth();
         HDLExpression _target_3 = obj.getTarget();
         HDLClass _classType = _target_3.getClassType();
-        boolean _equals_3 = Objects.equal(_classType, HDLClass.HDLLiteral);
+        boolean _equals_3 = ObjectExtensions.operator_equals(_classType, HDLClass.HDLLiteral);
         if (_equals_3) {
           IHDLObject _container = obj.getContainer();
           HDLExpression _target_4 = obj.getTarget();
@@ -273,7 +274,7 @@ public class VHDLExpressionExtension {
         HDLExpression _target_6 = obj.getTarget();
         Expression<?> exp = this.toVHDL(_target_6);
         HDLPrimitiveType actualType = t.getType();
-        boolean _notEquals = (!Objects.equal(tWidth, null));
+        boolean _notEquals = ObjectExtensions.operator_notEquals(tWidth, null);
         if (_notEquals) {
           final TargetType resized = VHDLCastsLibrary.getResize(exp, t, tWidth);
           exp = resized.resized;
@@ -293,7 +294,7 @@ public class VHDLExpressionExtension {
     HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(obj, _to);
     final Expression<?> to = this.toVHDL(_simplifyWidth);
     HDLExpression _from = obj.getFrom();
-    boolean _equals = Objects.equal(_from, null);
+    boolean _equals = ObjectExtensions.operator_equals(_from, null);
     if (_equals) {
       Range _range = new Range(to, dir, to);
       return _range;
@@ -308,7 +309,7 @@ public class VHDLExpressionExtension {
   protected Literal<? extends Object> _toVHDL(final HDLLiteral obj) {
     int length = (-1);
     BigInteger _valueAsBigInt = obj.getValueAsBigInt();
-    boolean _notEquals = (!Objects.equal(_valueAsBigInt, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_valueAsBigInt, null);
     if (_notEquals) {
       BigInteger _valueAsBigInt_1 = obj.getValueAsBigInt();
       int _bitLength = _valueAsBigInt_1.bitLength();
@@ -486,11 +487,11 @@ public class VHDLExpressionExtension {
     boolean _matched = false;
     if (!_matched) {
       boolean _or = false;
-      boolean _equals = Objects.equal(type, HDLBitOpType.AND);
+      boolean _equals = ObjectExtensions.operator_equals(type, HDLBitOpType.AND);
       if (_equals) {
         _or = true;
       } else {
-        boolean _equals_1 = Objects.equal(type, HDLBitOpType.LOGI_AND);
+        boolean _equals_1 = ObjectExtensions.operator_equals(type, HDLBitOpType.LOGI_AND);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -506,11 +507,11 @@ public class VHDLExpressionExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
-      boolean _equals_2 = Objects.equal(type, HDLBitOpType.OR);
+      boolean _equals_2 = ObjectExtensions.operator_equals(type, HDLBitOpType.OR);
       if (_equals_2) {
         _or_1 = true;
       } else {
-        boolean _equals_3 = Objects.equal(type, HDLBitOpType.LOGI_OR);
+        boolean _equals_3 = ObjectExtensions.operator_equals(type, HDLBitOpType.LOGI_OR);
         _or_1 = (_equals_2 || _equals_3);
       }
       if (_or_1) {

@@ -110,11 +110,11 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	private HDLInterface hif = null;
 
 	@Override
-	public @Nonnull
-	HDLInterface getHIf() {
+	@Nonnull
+	public HDLInterface getHIf() {
 		if (hif != null)
 			return hif;
-		hif = HDLGenerators.getInterface(this);
+		hif = HDLGenerators.getInterface(this).orNull();
 		return hif;
 	}
 

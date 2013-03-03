@@ -105,6 +105,7 @@ import java.util.Set;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class VHDLStatementExtension {
@@ -155,7 +156,7 @@ public class VHDLStatementExtension {
     boolean process = false;
     boolean _and = false;
     Boolean _process = obj.getProcess();
-    boolean _notEquals = (!Objects.equal(_process, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_process, null);
     if (!_notEquals) {
       _and = false;
     } else {
@@ -185,12 +186,12 @@ public class VHDLStatementExtension {
     try {
       final SourceInfo srcInfo = block.<SourceInfo>getMeta(SourceInfo.INFO);
       boolean _and = false;
-      boolean _notEquals = (!Objects.equal(srcInfo, null));
+      boolean _notEquals = ObjectExtensions.operator_notEquals(srcInfo, null);
       if (!_notEquals) {
         _and = false;
       } else {
         SequentialStatement _statement = context.getStatement();
-        boolean _notEquals_1 = (!Objects.equal(_statement, null));
+        boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_statement, null);
         _and = (_notEquals && _notEquals_1);
       }
       if (_and) {
@@ -268,12 +269,12 @@ public class VHDLStatementExtension {
     ConcurrentStatement instantiation = null;
     final ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
     boolean _and = false;
-    boolean _notEquals = (!Objects.equal(hid, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(hid, null);
     if (!_notEquals) {
       _and = false;
     } else {
       HDLAnnotation _annotation = hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent);
-      boolean _notEquals_1 = (!Objects.equal(_annotation, null));
+      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_annotation, null);
       _and = (_notEquals && _notEquals_1);
     }
     if (_and) {
@@ -419,14 +420,14 @@ public class VHDLStatementExtension {
         }
       } else {
         HDLDirection _direction_1 = hvd.getDirection();
-        boolean _equals_1 = Objects.equal(_direction_1, HDLDirection.PARAMETER);
+        boolean _equals_1 = ObjectExtensions.operator_equals(_direction_1, HDLDirection.PARAMETER);
         if (_equals_1) {
           ArrayList<HDLVariable> _variables_1 = hvd.getVariables();
           for (final HDLVariable hvar_1 : _variables_1) {
             {
               HDLVariable sigVar = hvar_1;
               String _meta = hvar_1.<String>getMeta(HDLInterfaceInstantiation.ORIG_NAME);
-              boolean _notEquals_2 = (!Objects.equal(_meta, null));
+              boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_meta, null);
               if (_notEquals_2) {
                 String _meta_1 = hvar_1.<String>getMeta(HDLInterfaceInstantiation.ORIG_NAME);
                 HDLVariable _setName = hvar_1.setName(_meta_1);
@@ -470,7 +471,7 @@ public class VHDLStatementExtension {
           Range _vHDL_1 = this.vee.toVHDL(range, Direction.TO);
           ForGenerateStatement _forGenerateStatement = new ForGenerateStatement(_plus, _asIndex, _vHDL_1);
           final ForGenerateStatement newFor = _forGenerateStatement;
-          boolean _notEquals_2 = (!Objects.equal(forLoop, null));
+          boolean _notEquals_2 = ObjectExtensions.operator_notEquals(forLoop, null);
           if (_notEquals_2) {
             List<ConcurrentStatement> _statements = forLoop.getStatements();
             _statements.add(newFor);
@@ -482,7 +483,7 @@ public class VHDLStatementExtension {
           i = _plus_1;
         }
       }
-      boolean _equals_3 = Objects.equal(forLoop, null);
+      boolean _equals_3 = ObjectExtensions.operator_equals(forLoop, null);
       if (_equals_3) {
         IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Should not get here");
         throw _illegalArgumentException;
@@ -503,7 +504,7 @@ public class VHDLStatementExtension {
     if (external) {
       HDLQualifiedName fullName = null;
       HDLQualifiedName _meta = hvar.<HDLQualifiedName>getMeta(VHDLStatementExtension.ORIGINAL_FULLNAME);
-      boolean _notEquals = (!Objects.equal(_meta, null));
+      boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
       if (_notEquals) {
         HDLQualifiedName _meta_1 = hvar.<HDLQualifiedName>getMeta(VHDLStatementExtension.ORIGINAL_FULLNAME);
         fullName = _meta_1;
@@ -531,7 +532,7 @@ public class VHDLStatementExtension {
     String _string = HDLBuiltInAnnotations.VHDLType.toString();
     Result<HDLAnnotation,String> _isEqualTo = _where.isEqualTo(_string);
     final HDLAnnotation typeAnno = _isEqualTo.getFirst();
-    boolean _notEquals = (!Objects.equal(typeAnno, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(typeAnno, null);
     if (_notEquals) {
       String _value = typeAnno.getValue();
       HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_value);
@@ -541,12 +542,12 @@ public class VHDLStatementExtension {
       EnumerationType _enumerationType = new EnumerationType(_lastSegment);
       type = _enumerationType;
     } else {
-      boolean _notEquals_1 = (!Objects.equal(primitive, null));
+      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(primitive, null);
       if (_notEquals_1) {
         SubtypeIndication _type = VHDLCastsLibrary.getType(primitive);
         type = _type;
         HDLRegisterConfig _register = obj.getRegister();
-        boolean _notEquals_2 = (!Objects.equal(_register, null));
+        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_register, null);
         if (_notEquals_2) {
           HDLRegisterConfig _register_1 = obj.getRegister();
           HDLExpression _resetValue = _register_1.getResetValue();
@@ -571,13 +572,13 @@ public class VHDLStatementExtension {
         }
       }
     }
-    boolean _notEquals_3 = (!Objects.equal(type, null));
+    boolean _notEquals_3 = ObjectExtensions.operator_notEquals(type, null);
     if (_notEquals_3) {
       ArrayList<HDLVariable> _variables = obj.getVariables();
       for (final HDLVariable hvar : _variables) {
         {
           HDLAnnotation _annotation = hvar.getAnnotation(HDLBuiltInAnnotations.VHDLNoExplicitReset);
-          final boolean noExplicitResetVar = (!Objects.equal(_annotation, null));
+          final boolean noExplicitResetVar = ObjectExtensions.operator_notEquals(_annotation, null);
           SubtypeIndication varType = type;
           ArrayList<HDLExpression> _dimensions = hvar.getDimensions();
           int _size = _dimensions.size();
@@ -611,7 +612,7 @@ public class VHDLStatementExtension {
             varType = arrType;
           }
           boolean _and = false;
-          boolean _notEquals_5 = (!Objects.equal(resetValue, null));
+          boolean _notEquals_5 = ObjectExtensions.operator_notEquals(resetValue, null);
           if (!_notEquals_5) {
             _and = false;
           } else {
@@ -646,7 +647,7 @@ public class VHDLStatementExtension {
           Constant _constant = new Constant(_name_2, varType);
           final Constant constant = _constant;
           HDLExpression _defaultValue = hvar.getDefaultValue();
-          boolean _notEquals_7 = (!Objects.equal(_defaultValue, null));
+          boolean _notEquals_7 = ObjectExtensions.operator_notEquals(_defaultValue, null);
           if (_notEquals_7) {
             HDLExpression _defaultValue_1 = hvar.getDefaultValue();
             Expression<?> _vHDL = this.vee.toVHDL(_defaultValue_1);
@@ -698,12 +699,12 @@ public class VHDLStatementExtension {
           if (!_matched) {
             boolean _or = false;
             HDLDirection _direction_1 = obj.getDirection();
-            boolean _equals = Objects.equal(_direction_1, HDLDirection.HIDDEN);
+            boolean _equals = ObjectExtensions.operator_equals(_direction_1, HDLDirection.HIDDEN);
             if (_equals) {
               _or = true;
             } else {
               HDLDirection _direction_2 = obj.getDirection();
-              boolean _equals_1 = Objects.equal(_direction_2, HDLDirection.CONSTANT);
+              boolean _equals_1 = ObjectExtensions.operator_equals(_direction_2, HDLDirection.CONSTANT);
               _or = (_equals || _equals_1);
             }
             if (_or) {
@@ -740,7 +741,7 @@ public class VHDLStatementExtension {
       HDLExpression _width = ((HDLPrimitive) type).getWidth();
       BigInteger _valueOf = ConstantEvaluate.valueOf(_width, null);
       width = _valueOf;
-      boolean _equals = Objects.equal(width, null);
+      boolean _equals = ObjectExtensions.operator_equals(width, null);
       if (_equals) {
         IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("HDLPrimitive switch case needs to have constant width");
         throw _illegalArgumentException;
@@ -776,7 +777,7 @@ public class VHDLStatementExtension {
             final Alternative alt = this.createAlternative(cs_1, e, width);
             VHDLContext _value = e.getValue();
             final LinkedList<SequentialStatement> clockCase = _value.clockedStatements.get(hdlRegisterConfig);
-            boolean _notEquals = (!Objects.equal(clockCase, null));
+            boolean _notEquals = ObjectExtensions.operator_notEquals(clockCase, null);
             if (_notEquals) {
               List<SequentialStatement> _statements = alt.getStatements();
               _statements.addAll(clockCase);
@@ -795,7 +796,7 @@ public class VHDLStatementExtension {
           final Alternative alt = this.createAlternative(cs_1, e, width);
           VHDLContext _value = e.getValue();
           LinkedList<SequentialStatement> _get = _value.unclockedStatements.get(Integer.valueOf(pid));
-          boolean _notEquals = (!Objects.equal(_get, null));
+          boolean _notEquals = ObjectExtensions.operator_notEquals(_get, null);
           if (_notEquals) {
             List<SequentialStatement> _statements = alt.getStatements();
             VHDLContext _value_1 = e.getValue();
@@ -813,10 +814,10 @@ public class VHDLStatementExtension {
     Alternative alt = null;
     HDLSwitchCaseStatement _key = e.getKey();
     final HDLExpression label = _key.getLabel();
-    boolean _notEquals = (!Objects.equal(label, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(label, null);
     if (_notEquals) {
       final BigInteger eval = ConstantEvaluate.valueOf(label, null);
-      boolean _notEquals_1 = (!Objects.equal(eval, null));
+      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(eval, null);
       if (_notEquals_1) {
         int _intValue = bits.intValue();
         Literal<? extends Object> _binaryLiteral = VHDLUtils.toBinaryLiteral(_intValue, eval);
@@ -859,7 +860,7 @@ public class VHDLStatementExtension {
       _and = false;
     } else {
       HDLClass _classType = ref.getClassType();
-      boolean _equals = Objects.equal(_classType, HDLClass.HDLVariableRef);
+      boolean _equals = ObjectExtensions.operator_equals(_classType, HDLClass.HDLVariableRef);
       _and = (_notEquals && _equals);
     }
     if (_and) {
@@ -872,7 +873,7 @@ public class VHDLStatementExtension {
       boolean _notEquals_1 = (_size_1 != 0);
       if (_notEquals_1) {
         final HDLAnnotation typeAnno = hvar.getAnnotation(HDLBuiltInAnnotations.VHDLType);
-        boolean _notEquals_2 = (!Objects.equal(typeAnno, null));
+        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(typeAnno, null);
         if (_notEquals_2) {
           Expression<?> _vHDL = this.vee.toVHDL(ref);
           String _value = typeAnno.getValue();
@@ -909,7 +910,7 @@ public class VHDLStatementExtension {
       sa = _signalAssignment_3;
     }
     final HDLRegisterConfig config = hvar.getRegisterConfig();
-    boolean _notEquals_3 = (!Objects.equal(config, null));
+    boolean _notEquals_3 = ObjectExtensions.operator_notEquals(config, null);
     if (_notEquals_3) {
       context.addClockedStatement(config, sa);
     } else {
@@ -955,7 +956,7 @@ public class VHDLStatementExtension {
       }
     }
     LinkedList<SequentialStatement> _get = context.unclockedStatements.get(Integer.valueOf(pid));
-    boolean _notEquals = (!Objects.equal(_get, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(_get, null);
     if (_notEquals) {
       HDLVariable _param = obj.getParam();
       String _name = _param.getName();
@@ -1004,14 +1005,14 @@ public class VHDLStatementExtension {
         IfStatement _ifStatement = new IfStatement(ifExp);
         final IfStatement ifs = _ifStatement;
         LinkedList<SequentialStatement> _get = thenCtx.clockedStatements.get(config);
-        boolean _notEquals = (!Objects.equal(_get, null));
+        boolean _notEquals = ObjectExtensions.operator_notEquals(_get, null);
         if (_notEquals) {
           List<SequentialStatement> _statements = ifs.getStatements();
           LinkedList<SequentialStatement> _get_1 = thenCtx.clockedStatements.get(config);
           _statements.addAll(_get_1);
         }
         LinkedList<SequentialStatement> _get_2 = elseCtx.clockedStatements.get(config);
-        boolean _notEquals_1 = (!Objects.equal(_get_2, null));
+        boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_get_2, null);
         if (_notEquals_1) {
           List<SequentialStatement> _elseStatements = ifs.getElseStatements();
           LinkedList<SequentialStatement> _get_3 = elseCtx.clockedStatements.get(config);
@@ -1034,14 +1035,14 @@ public class VHDLStatementExtension {
       IfStatement _ifStatement = new IfStatement(ifExp);
       final IfStatement ifs = _ifStatement;
       LinkedList<SequentialStatement> _get = thenCtx.unclockedStatements.get(Integer.valueOf(pid));
-      boolean _notEquals_2 = (!Objects.equal(_get, null));
+      boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_get, null);
       if (_notEquals_2) {
         List<SequentialStatement> _statements = ifs.getStatements();
         LinkedList<SequentialStatement> _get_1 = thenCtx.unclockedStatements.get(Integer.valueOf(pid));
         _statements.addAll(_get_1);
       }
       LinkedList<SequentialStatement> _get_2 = elseCtx.unclockedStatements.get(Integer.valueOf(pid));
-      boolean _notEquals_3 = (!Objects.equal(_get_2, null));
+      boolean _notEquals_3 = ObjectExtensions.operator_notEquals(_get_2, null);
       if (_notEquals_3) {
         List<SequentialStatement> _elseStatements = ifs.getElseStatements();
         LinkedList<SequentialStatement> _get_3 = elseCtx.unclockedStatements.get(Integer.valueOf(pid));

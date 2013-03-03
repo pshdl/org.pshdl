@@ -6,6 +6,7 @@ import java.math.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -296,40 +297,41 @@ public class Insulin {
 		ModificationSet ms = new ModificationSet();
 		HDLDirectGeneration[] gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration generation : gens) {
-			HDLGenerationInfo generationInfo = HDLGenerators.getImplementation(generation);
-			if (generation.getInclude()) {
-				HDLQualifiedName ifRef = generation.getHIf().asRef();
-				HDLQualifiedName fullName = fullNameOf(generation);
-				// System.out.println("Insulin.includeGenerators()" +
-				// generationInfo.unit);
-				HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
-				HDLStatement[] inits = generationInfo.unit.getInits().toArray(new HDLStatement[0]);
-				ArrayList<HDLStatement> allStmnt = new ArrayList<HDLStatement>();
-				allStmnt.addAll(Arrays.asList(stmnts));
-				allStmnt.addAll(Arrays.asList(inits));
-				ms.replace(generation, allStmnt.toArray(new HDLStatement[allStmnt.size()]));
-				HDLInterfaceRef[] ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
-				for (HDLInterfaceRef hdI : ifRefs) {
-					if (TypeExtension.typeOf(hdI.resolveHIf()).asRef().equals(ifRef)) {
-						HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
-						ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(hdI.getArray()).setBits(hdI.getBits()));
+			Optional<HDLGenerationInfo> optional = HDLGenerators.getImplementation(generation);
+			if (optional.isPresent()) {
+				HDLGenerationInfo generationInfo = optional.get();
+				if (generation.getInclude()) {
+					HDLQualifiedName ifRef = generation.getHIf().asRef();
+					HDLQualifiedName fullName = fullNameOf(generation);
+					HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
+					HDLStatement[] inits = generationInfo.unit.getInits().toArray(new HDLStatement[0]);
+					ArrayList<HDLStatement> allStmnt = new ArrayList<HDLStatement>();
+					allStmnt.addAll(Arrays.asList(stmnts));
+					allStmnt.addAll(Arrays.asList(inits));
+					ms.replace(generation, allStmnt.toArray(new HDLStatement[allStmnt.size()]));
+					HDLInterfaceRef[] ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
+					for (HDLInterfaceRef hdI : ifRefs) {
+						if (TypeExtension.typeOf(hdI.resolveHIf()).asRef().equals(ifRef)) {
+							HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
+							ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(hdI.getArray()).setBits(hdI.getBits()));
+						}
 					}
 				}
+				String libURI = null;
+				switch (apply.getClassType()) {
+				case HDLPackage:
+					libURI = ((HDLPackage) apply).getLibURI();
+					break;
+				case HDLUnit:
+					libURI = ((HDLUnit) apply).getLibURI();
+					break;
+				default:
+					libURI = apply.getContainer(HDLUnit.class).getLibURI();
+					break;
+				}
+				HDLLibrary library = HDLLibrary.getLibrary(libURI);
+				library.addSideFiles(generationInfo.files);
 			}
-			String libURI = null;
-			switch (apply.getClassType()) {
-			case HDLPackage:
-				libURI = ((HDLPackage) apply).getLibURI();
-				break;
-			case HDLUnit:
-				libURI = ((HDLUnit) apply).getLibURI();
-				break;
-			default:
-				libURI = apply.getContainer(HDLUnit.class).getLibURI();
-				break;
-			}
-			HDLLibrary library = HDLLibrary.getLibrary(libURI);
-			library.addSideFiles(generationInfo.files);
 		}
 		return ms.apply(apply);
 	}

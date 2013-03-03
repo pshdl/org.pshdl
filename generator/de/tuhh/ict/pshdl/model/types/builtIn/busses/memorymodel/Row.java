@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.util.*;
 
+import org.antlr.v4.runtime.*;
+
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 
 public class Row implements NamedElement {
@@ -60,5 +62,12 @@ public class Row implements NamedElement {
 		}
 		sb.append('}');
 		return sb.toString();
+	}
+
+	public Token token;
+
+	@Override
+	public void setLocation(Token start) {
+		this.token = start;
 	}
 }

@@ -16,9 +16,12 @@ public class SourceInfo {
 	public final int length;
 	public final List<String> comments = new LinkedList<String>();
 
+	public final int totalOffset;
+
 	public SourceInfo(BufferedTokenStream tokens, ParserRuleContext context) {
 		this.context = context;
 		this.startLine = context.start.getLine();
+		this.totalOffset = context.start.getStartIndex();
 		this.startPosInLine = context.start.getCharPositionInLine();
 		this.endLine = context.stop.getLine();
 		this.endPosInLine = context.stop.getCharPositionInLine();

@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class SimulationTransformationExtension {
@@ -75,7 +76,7 @@ public class SimulationTransformationExtension {
     final HDLVariable hVar = this.resolveVar(left);
     HDLRegisterConfig config = hVar.getRegisterConfig();
     FluidFrame res = null;
-    boolean _notEquals = (!Objects.equal(config, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(config, null);
     if (_notEquals) {
       HDLReference _left = obj.getLeft();
       String _varName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true);
@@ -88,7 +89,7 @@ public class SimulationTransformationExtension {
       FluidFrame _fluidFrame_1 = new FluidFrame(_varName_1);
       res = _fluidFrame_1;
     }
-    boolean _notEquals_1 = (!Objects.equal(config, null));
+    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(config, null);
     if (_notEquals_1) {
       HDLRegisterConfig _normalize = config.normalize();
       config = _normalize;
@@ -96,7 +97,7 @@ public class SimulationTransformationExtension {
       HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(clk);
       final String name = _fullNameOf.toString();
       HDLRegClockType _clockType = config.getClockType();
-      boolean _equals = Objects.equal(_clockType, HDLRegClockType.RISING);
+      boolean _equals = ObjectExtensions.operator_equals(_clockType, HDLRegClockType.RISING);
       if (_equals) {
         ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdgeInternal2, name);
         res.add(_argumentedInstruction);
@@ -270,12 +271,12 @@ public class SimulationTransformationExtension {
         if (!_matched_1) {
           boolean _or = false;
           HDLPrimitiveType _type_2 = prim.getType();
-          boolean _equals = Objects.equal(_type_2, HDLPrimitiveType.INTEGER);
+          boolean _equals = ObjectExtensions.operator_equals(_type_2, HDLPrimitiveType.INTEGER);
           if (_equals) {
             _or = true;
           } else {
             HDLPrimitiveType _type_3 = prim.getType();
-            boolean _equals_1 = Objects.equal(_type_3, HDLPrimitiveType.INT);
+            boolean _equals_1 = ObjectExtensions.operator_equals(_type_3, HDLPrimitiveType.INT);
             _or = (_equals || _equals_1);
           }
           if (_or) {
@@ -287,12 +288,12 @@ public class SimulationTransformationExtension {
         if (!_matched_1) {
           boolean _or_1 = false;
           HDLPrimitiveType _type_4 = prim.getType();
-          boolean _equals_2 = Objects.equal(_type_4, HDLPrimitiveType.UINT);
+          boolean _equals_2 = ObjectExtensions.operator_equals(_type_4, HDLPrimitiveType.UINT);
           if (_equals_2) {
             _or_1 = true;
           } else {
             HDLPrimitiveType _type_5 = prim.getType();
-            boolean _equals_3 = Objects.equal(_type_5, HDLPrimitiveType.NATURAL);
+            boolean _equals_3 = ObjectExtensions.operator_equals(_type_5, HDLPrimitiveType.NATURAL);
             _or_1 = (_equals_2 || _equals_3);
           }
           if (_or_1) {
@@ -304,12 +305,12 @@ public class SimulationTransformationExtension {
         if (!_matched_1) {
           boolean _or_2 = false;
           HDLPrimitiveType _type_6 = prim.getType();
-          boolean _equals_4 = Objects.equal(_type_6, HDLPrimitiveType.BIT);
+          boolean _equals_4 = ObjectExtensions.operator_equals(_type_6, HDLPrimitiveType.BIT);
           if (_equals_4) {
             _or_2 = true;
           } else {
             HDLPrimitiveType _type_7 = prim.getType();
-            boolean _equals_5 = Objects.equal(_type_7, HDLPrimitiveType.BITVECTOR);
+            boolean _equals_5 = ObjectExtensions.operator_equals(_type_7, HDLPrimitiveType.BITVECTOR);
             _or_2 = (_equals_4 || _equals_5);
           }
           if (_or_2) {
@@ -341,12 +342,12 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       boolean _or = false;
       HDLPrimitiveType _type_1 = current.getType();
-      boolean _equals = Objects.equal(_type_1, HDLPrimitiveType.INTEGER);
+      boolean _equals = ObjectExtensions.operator_equals(_type_1, HDLPrimitiveType.INTEGER);
       if (_equals) {
         _or = true;
       } else {
         HDLPrimitiveType _type_2 = current.getType();
-        boolean _equals_1 = Objects.equal(_type_2, HDLPrimitiveType.NATURAL);
+        boolean _equals_1 = ObjectExtensions.operator_equals(_type_2, HDLPrimitiveType.NATURAL);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -358,19 +359,19 @@ public class SimulationTransformationExtension {
       boolean _or_1 = false;
       boolean _or_2 = false;
       HDLPrimitiveType _type_3 = current.getType();
-      boolean _equals_2 = Objects.equal(_type_3, HDLPrimitiveType.INT);
+      boolean _equals_2 = ObjectExtensions.operator_equals(_type_3, HDLPrimitiveType.INT);
       if (_equals_2) {
         _or_2 = true;
       } else {
         HDLPrimitiveType _type_4 = current.getType();
-        boolean _equals_3 = Objects.equal(_type_4, HDLPrimitiveType.UINT);
+        boolean _equals_3 = ObjectExtensions.operator_equals(_type_4, HDLPrimitiveType.UINT);
         _or_2 = (_equals_2 || _equals_3);
       }
       if (_or_2) {
         _or_1 = true;
       } else {
         HDLPrimitiveType _type_5 = current.getType();
-        boolean _equals_4 = Objects.equal(_type_5, HDLPrimitiveType.BITVECTOR);
+        boolean _equals_4 = ObjectExtensions.operator_equals(_type_5, HDLPrimitiveType.BITVECTOR);
         _or_1 = (_or_2 || _equals_4);
       }
       if (_or_1) {
@@ -419,11 +420,11 @@ public class SimulationTransformationExtension {
     }
     if (!_matched) {
       boolean _or = false;
-      boolean _equals = Objects.equal(dir, HDLDirection.PARAMETER);
+      boolean _equals = ObjectExtensions.operator_equals(dir, HDLDirection.PARAMETER);
       if (_equals) {
         _or = true;
       } else {
-        boolean _equals_1 = Objects.equal(dir, HDLDirection.CONSTANT);
+        boolean _equals_1 = ObjectExtensions.operator_equals(dir, HDLDirection.CONSTANT);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -443,11 +444,11 @@ public class SimulationTransformationExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
-      boolean _equals_2 = Objects.equal(dir, HDLDirection.OUT);
+      boolean _equals_2 = ObjectExtensions.operator_equals(dir, HDLDirection.OUT);
       if (_equals_2) {
         _or_1 = true;
       } else {
-        boolean _equals_3 = Objects.equal(dir, HDLDirection.INOUT);
+        boolean _equals_3 = ObjectExtensions.operator_equals(dir, HDLDirection.INOUT);
         _or_1 = (_equals_2 || _equals_3);
       }
       if (_or_1) {

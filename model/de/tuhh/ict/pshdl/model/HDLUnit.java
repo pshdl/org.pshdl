@@ -155,10 +155,13 @@ public class HDLUnit extends AbstractHDLUnit {
 			return unitIF;
 		HDLQualifiedName fullName = fullNameOf(this);
 		unitIF = new HDLInterface().setName(fullName.toString());
-		HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
-
 		Collection<HDLVariableDeclaration> declarations = new LinkedList<HDLVariableDeclaration>();
-		declarations.addAll(Arrays.asList(hvds));
+		HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (HDLVariableDeclaration hvd : hvds) {
+			if (hvd.getContainer(HDLInterface.class) == null) {
+				declarations.add(hvd);
+			}
+		}
 		HDLDirectGeneration[] generators = getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration hdgi : generators) {
 			if (hdgi.getInclude()) {

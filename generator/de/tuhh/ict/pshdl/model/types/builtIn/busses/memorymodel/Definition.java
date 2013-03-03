@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.util.*;
 
+import org.antlr.v4.runtime.*;
+
 public class Definition implements NamedElement {
 	public enum WarnType {
 		mask, silentMask, limit, silentLimit, error, silentError;
@@ -133,5 +135,12 @@ public class Definition implements NamedElement {
 		res.register = register;
 		res.warn = warn;
 		return res;
+	}
+
+	public Token token;
+
+	@Override
+	public void setLocation(Token start) {
+		this.token = start;
 	}
 }

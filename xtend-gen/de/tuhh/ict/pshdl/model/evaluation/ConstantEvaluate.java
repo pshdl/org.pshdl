@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class ConstantEvaluate {
@@ -81,7 +82,7 @@ public class ConstantEvaluate {
   protected BigInteger _constantEvaluate(final HDLTernary obj, final HDLEvaluationContext context) {
     HDLExpression _ifExpr = obj.getIfExpr();
     final BigInteger res = this.constantEvaluate(_ifExpr, context);
-    boolean _notEquals = (!Objects.equal(res, null));
+    boolean _notEquals = ObjectExtensions.operator_notEquals(res, null);
     if (_notEquals) {
       boolean _equals = BigInteger.ZERO.equals(res);
       if (_equals) {
@@ -119,7 +120,7 @@ public class ConstantEvaluate {
   protected BigInteger _constantEvaluate(final HDLManip obj, final HDLEvaluationContext context) {
     HDLExpression _target = obj.getTarget();
     final BigInteger eval = this.subEvaluate(obj, _target, context);
-    boolean _equals = Objects.equal(eval, null);
+    boolean _equals = ObjectExtensions.operator_equals(eval, null);
     if (_equals) {
       return null;
     }
@@ -154,11 +155,11 @@ public class ConstantEvaluate {
         if ((type instanceof HDLPrimitive)) {
           final HDLPrimitive prim = ((HDLPrimitive) type);
           HDLExpression _width = prim.getWidth();
-          boolean _notEquals = (!Objects.equal(_width, null));
+          boolean _notEquals = ObjectExtensions.operator_notEquals(_width, null);
           if (_notEquals) {
             HDLExpression _width_1 = prim.getWidth();
             final BigInteger width = this.constantEvaluate(_width_1, context);
-            boolean _notEquals_1 = (!Objects.equal(width, null));
+            boolean _notEquals_1 = ObjectExtensions.operator_notEquals(width, null);
             if (_notEquals_1) {
               int _intValue = width.intValue();
               BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
@@ -184,14 +185,14 @@ public class ConstantEvaluate {
     for (final HDLExpression cat : _cats) {
       {
         final BigInteger im = this.subEvaluate(obj, cat, context);
-        boolean _equals = Objects.equal(im, null);
+        boolean _equals = ObjectExtensions.operator_equals(im, null);
         if (_equals) {
           return null;
         }
         HDLType _typeOf = TypeExtension.typeOf(cat);
         HDLExpression _width = _typeOf.getWidth();
         final BigInteger width = this.constantEvaluate(_width, context);
-        boolean _equals_1 = Objects.equal(width, null);
+        boolean _equals_1 = ObjectExtensions.operator_equals(width, null);
         if (_equals_1) {
           HDLType _typeOf_1 = TypeExtension.typeOf(cat);
           HDLExpression _width_1 = _typeOf_1.getWidth();
@@ -210,7 +211,7 @@ public class ConstantEvaluate {
   
   public BigInteger subEvaluate(final HDLExpression container, final HDLExpression left, final HDLEvaluationContext context) {
     final BigInteger leftVal = this.constantEvaluate(left, context);
-    boolean _equals = Objects.equal(leftVal, null);
+    boolean _equals = ObjectExtensions.operator_equals(leftVal, null);
     if (_equals) {
       container.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, left);
       container.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE);
@@ -222,13 +223,13 @@ public class ConstantEvaluate {
   protected BigInteger _constantEvaluate(final HDLArithOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
     final BigInteger leftVal = this.subEvaluate(obj, _left, context);
-    boolean _equals = Objects.equal(leftVal, null);
+    boolean _equals = ObjectExtensions.operator_equals(leftVal, null);
     if (_equals) {
       return null;
     }
     HDLExpression _right = obj.getRight();
     final BigInteger rightVal = this.subEvaluate(obj, _right, context);
-    boolean _equals_1 = Objects.equal(rightVal, null);
+    boolean _equals_1 = ObjectExtensions.operator_equals(rightVal, null);
     if (_equals_1) {
       return null;
     }
@@ -279,13 +280,13 @@ public class ConstantEvaluate {
   protected BigInteger _constantEvaluate(final HDLBitOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
     final BigInteger leftVal = this.subEvaluate(obj, _left, context);
-    boolean _equals = Objects.equal(leftVal, null);
+    boolean _equals = ObjectExtensions.operator_equals(leftVal, null);
     if (_equals) {
       return null;
     }
     HDLExpression _right = obj.getRight();
     final BigInteger rightVal = this.subEvaluate(obj, _right, context);
-    boolean _equals_1 = Objects.equal(rightVal, null);
+    boolean _equals_1 = ObjectExtensions.operator_equals(rightVal, null);
     if (_equals_1) {
       return null;
     }
@@ -349,13 +350,13 @@ public class ConstantEvaluate {
   protected BigInteger _constantEvaluate(final HDLEqualityOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
     final BigInteger leftVal = this.subEvaluate(obj, _left, context);
-    boolean _equals = Objects.equal(leftVal, null);
+    boolean _equals = ObjectExtensions.operator_equals(leftVal, null);
     if (_equals) {
       return null;
     }
     HDLExpression _right = obj.getRight();
     final BigInteger rightVal = this.subEvaluate(obj, _right, context);
-    boolean _equals_1 = Objects.equal(rightVal, null);
+    boolean _equals_1 = ObjectExtensions.operator_equals(rightVal, null);
     if (_equals_1) {
       return null;
     }
@@ -416,13 +417,13 @@ public class ConstantEvaluate {
   protected BigInteger _constantEvaluate(final HDLShiftOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
     final BigInteger leftVal = this.subEvaluate(obj, _left, context);
-    boolean _equals = Objects.equal(leftVal, null);
+    boolean _equals = ObjectExtensions.operator_equals(leftVal, null);
     if (_equals) {
       return null;
     }
     HDLExpression _right = obj.getRight();
     final BigInteger rightVal = this.subEvaluate(obj, _right, context);
-    boolean _equals_1 = Objects.equal(rightVal, null);
+    boolean _equals_1 = ObjectExtensions.operator_equals(rightVal, null);
     if (_equals_1) {
       return null;
     }
@@ -467,7 +468,7 @@ public class ConstantEvaluate {
     for (final HDLExpression arg : _params) {
       {
         final BigInteger bigVal = this.subEvaluate(obj, arg, context);
-        boolean _equals = Objects.equal(bigVal, null);
+        boolean _equals = ObjectExtensions.operator_equals(bigVal, null);
         if (_equals) {
           return null;
         }
@@ -502,21 +503,21 @@ public class ConstantEvaluate {
       return null;
     }
     final HDLVariable hVar = obj.resolveVar();
-    boolean _equals = Objects.equal(hVar, null);
+    boolean _equals = ObjectExtensions.operator_equals(hVar, null);
     if (_equals) {
       obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return null;
     }
     final HDLDirection dir = hVar.getDirection();
-    boolean _equals_1 = Objects.equal(dir, HDLDirection.CONSTANT);
+    boolean _equals_1 = ObjectExtensions.operator_equals(dir, HDLDirection.CONSTANT);
     if (_equals_1) {
       HDLExpression _defaultValue = hVar.getDefaultValue();
       return this.subEvaluate(obj, _defaultValue, context);
     }
-    boolean _equals_2 = Objects.equal(dir, HDLDirection.PARAMETER);
+    boolean _equals_2 = ObjectExtensions.operator_equals(dir, HDLDirection.PARAMETER);
     if (_equals_2) {
-      boolean _equals_3 = Objects.equal(context, null);
+      boolean _equals_3 = ObjectExtensions.operator_equals(context, null);
       if (_equals_3) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
@@ -524,7 +525,7 @@ public class ConstantEvaluate {
       }
       final HDLExpression cRef = context.get(hVar);
       final BigInteger cRefEval = this.constantEvaluate(cRef, context);
-      boolean _equals_4 = Objects.equal(cRefEval, null);
+      boolean _equals_4 = ObjectExtensions.operator_equals(cRefEval, null);
       if (_equals_4) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
