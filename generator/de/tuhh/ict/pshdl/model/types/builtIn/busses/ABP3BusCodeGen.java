@@ -5,6 +5,9 @@ import java.util.*;
 
 import org.antlr.v4.runtime.*;
 
+import com.google.common.base.*;
+import com.google.common.io.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
@@ -17,6 +20,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.validation.*;
 
 public class ABP3BusCodeGen extends CommonBusCode {
 
@@ -142,7 +146,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, RecognitionException {
-		Unit unit = MemoryModelAST.parseUnit(new FileInputStream(args[0]));
+		Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new HashSet<Problem>());
 		System.out.println(unit);
 		System.out.println(get("Bla", unit, MemoryModel.buildRows(unit)));
 	}

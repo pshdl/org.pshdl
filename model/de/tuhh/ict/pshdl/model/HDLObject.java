@@ -11,6 +11,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import de.tuhh.ict.pshdl.model.utils.internal.*;
 
 /**
  * The class HDLObject contains the following fields
@@ -70,10 +71,6 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 		}
 	}
-
-	@Override
-	@Nonnull
-	public abstract IHDLObject copy();
 
 	@Override
 	@Nonnull
@@ -291,15 +288,6 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			}
 		}
 		return list;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T extends IHDLObject> ArrayList<T> copyAll(ArrayList<T> array) {
-		ArrayList<T> res = new ArrayList<T>(array.size());
-		for (T hdlExpression : array) {
-			res.add((T) hdlExpression.copy());
-		}
-		return res;
 	}
 
 	@Override

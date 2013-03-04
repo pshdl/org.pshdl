@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.internal.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class MemoryModelSideFiles {

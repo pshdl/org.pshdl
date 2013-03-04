@@ -7,7 +7,8 @@ import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.LevenshteinDistance.Score;
+import de.tuhh.ict.pshdl.model.utils.internal.*;
+import de.tuhh.ict.pshdl.model.utils.internal.LevenshteinDistance.*;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
 import de.tuhh.ict.pshdl.model.validation.*;
 

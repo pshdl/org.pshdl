@@ -10,14 +10,6 @@ public interface HDLExpression extends de.tuhh.ict.pshdl.model.IHDLObject {
 	 * @return a new instance of this class.
 	 */
 	@Override
-	public abstract HDLExpression copy();
-
-	/**
-	 * Creates a copy of this class with the same fields.
-	 * 
-	 * @return a new instance of this class.
-	 */
-	@Override
 	public abstract HDLExpression copyFiltered(CopyFilter filter);
 
 	/**
