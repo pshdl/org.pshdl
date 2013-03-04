@@ -160,9 +160,11 @@ public class HDLSimulator {
 								ranges.put(varRefName, set);
 							}
 							for (HDLRange r : ref.getBits()) {
-								Range<BigInteger> determineRange = RangeExtension.rangeOf(r, context);
-								set.add(new RangeVal(determineRange.lowerEndpoint(), 1));
-								set.add(new RangeVal(determineRange.upperEndpoint(), -1));
+								Optional<Range<BigInteger>> determineRange = RangeExtension.rangeOf(r, context);
+								if (!determineRange.isPresent())
+									throw new IllegalArgumentException("Can not determine Range for:" + r);
+								set.add(new RangeVal(determineRange.get().lowerEndpoint(), 1));
+								set.add(new RangeVal(determineRange.get().upperEndpoint(), -1));
 							}
 						} else {
 							HDLExpression width = TypeExtension.getWidth(resolveVar);
@@ -199,9 +201,11 @@ public class HDLSimulator {
 					for (HDLRange bit : ref.getBits()) {
 						if (bit.getFrom() != null) { // Singular ranges don't do
 														// anything
-							Range<BigInteger> range = RangeExtension.rangeOf(bit, context);
+							Optional<Range<BigInteger>> range = RangeExtension.rangeOf(bit, context);
+							if (!range.isPresent())
+								throw new IllegalArgumentException("Can not determine Range of:" + bit);
 							for (Range<BigInteger> newRange : list) {
-								if (range.isConnected(newRange)) {
+								if (range.get().isConnected(newRange)) {
 									newRanges.add(0, createRange(newRange));
 								}
 							}
@@ -239,9 +243,15 @@ public class HDLSimulator {
 				// code
 				for (HDLExpression arr : ref.getArray()) {
 					// The range that potentially could be accessed
-					Range<BigInteger> accessRange = RangeExtension.rangeOf(arr, context);
+					Optional<Range<BigInteger>> accessRangeRaw = RangeExtension.rangeOf(arr, context);
 					// The range that the array could be sized
-					Range<BigInteger> dimensionRange = RangeExtension.rangeOf(ref.resolveVar().getDimensions().get(0), context);
+					if (!accessRangeRaw.isPresent())
+						throw new IllegalArgumentException("Can not determine Range of :" + arr);
+					Range<BigInteger> accessRange = accessRangeRaw.get();
+					Optional<Range<BigInteger>> dimensionRangeRaw = RangeExtension.rangeOf(ref.resolveVar().getDimensions().get(0), context);
+					if (!dimensionRangeRaw.isPresent())
+						throw new IllegalArgumentException("Can not determine Range of :" + arr);
+					Range<BigInteger> dimensionRange = dimensionRangeRaw.get();
 					// Take the maximum range as the upper boundary and 0 as
 					// lower
 					dimensionRange = Ranges.closed(BigInteger.ZERO, dimensionRange.upperEndpoint().subtract(BigInteger.ONE));
@@ -282,14 +292,14 @@ public class HDLSimulator {
 		ModificationSet ms = new ModificationSet();
 		for (HDLForLoop loop : loops) {
 			HDLVariable param = loop.getParam();
-			Range<BigInteger> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
+			Optional<Range<BigInteger>> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
 			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 			for (HDLStatement stmnt : loop.getDos()) {
 				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
 				if (refs.size() == 0) {
 					newStmnts.add(stmnt);
 				} else {
-					BigInteger counter = r.lowerEndpoint();
+					BigInteger counter = r.get().lowerEndpoint();
 					do {
 						ModificationSet stmntMs = new ModificationSet();
 						for (HDLVariableRef ref : refs) {
@@ -297,7 +307,7 @@ public class HDLSimulator {
 						}
 						newStmnts.add(stmntMs.apply(stmnt));
 						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(r.upperEndpoint()) <= 0);
+					} while (counter.compareTo(r.get().upperEndpoint()) <= 0);
 				}
 			}
 			ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));

@@ -913,13 +913,16 @@ public class Insulin {
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								HDLRange r = bits.get(j);
-								Range<BigInteger> vr = RangeExtension.rangeOf(r, context);
-								BigInteger add = shift.add(vr.upperEndpoint().subtract(vr.lowerEndpoint()).abs());
-								BigInteger res = constant.get().shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
-								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
-								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(HDLLiteral.get(res));
-								replacements.add(newAss);
-								shift = add.add(BigInteger.ONE);
+								Optional<Range<BigInteger>> vr = RangeExtension.rangeOf(r, context);
+								if (vr.isPresent()) {
+									BigInteger add = shift.add(vr.get().upperEndpoint().subtract(vr.get().lowerEndpoint()).abs());
+									BigInteger res = constant.get().shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
+									HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
+									HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(HDLLiteral.get(res));
+									replacements.add(newAss);
+									shift = add.add(BigInteger.ONE);
+								} else
+									throw new IllegalArgumentException("Can not determine range of " + r + " for multi bit access");
 							}
 						} else {
 							HDLQualifiedName varRefName = ref.getVarRefName();
@@ -930,14 +933,17 @@ public class Insulin {
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								HDLRange r = bits.get(j);
-								Range<BigInteger> vr = RangeExtension.rangeOf(r, context);
-								BigInteger add = shift.add(vr.upperEndpoint().subtract(vr.lowerEndpoint()).abs());
-								HDLRange newRange = new HDLRange().setTo(HDLLiteral.get(shift)).setFrom(HDLLiteral.get(add)).normalize();
-								HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
-								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
-								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);
-								replacements.add(newAss);
-								shift = add.add(BigInteger.ONE);
+								Optional<Range<BigInteger>> vr = RangeExtension.rangeOf(r, context);
+								if (vr.isPresent()) {
+									BigInteger add = shift.add(vr.get().upperEndpoint().subtract(vr.get().lowerEndpoint()).abs());
+									HDLRange newRange = new HDLRange().setTo(HDLLiteral.get(shift)).setFrom(HDLLiteral.get(add)).normalize();
+									HDLExpression bitOp = new HDLVariableRef().setVar(hVarName).setBits(HDLObject.asList(newRange));
+									HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
+									HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(bitOp);
+									replacements.add(newAss);
+									shift = add.add(BigInteger.ONE);
+								} else
+									throw new IllegalArgumentException("Can not determine range of " + r + " for multi bit access");
 							}
 						}
 						ms.replace(ass, replacements.toArray(new HDLStatement[0]));

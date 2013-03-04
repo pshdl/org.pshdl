@@ -100,16 +100,16 @@ public class HDLFunctions {
 		return Optional.absent();
 	}
 
-	public static Range<BigInteger> determineRange(HDLFunctionCall function, HDLEvaluationContext context) {
+	public static Optional<Range<BigInteger>> determineRange(HDLFunctionCall function, HDLEvaluationContext context) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
 				Range<BigInteger> eval = resolver.range(function, context);
 				if (eval != null)
-					return eval;
+					return Optional.of(eval);
 			}
 		}
-		return null;
+		return Optional.absent();
 	}
 
 	public static VHDLContext toVHDL(HDLFunctionCall function, int pid) {

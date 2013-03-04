@@ -533,29 +533,29 @@ public class HDLPrimitives {
 		return null;
 	}
 
-	public Range<BigInteger> getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {
+	public Optional<Range<BigInteger>> getValueRange(HDLPrimitive pt, HDLEvaluationContext context) {
 		switch (pt.getType()) {
 		case BOOL:
 		case BIT:
 		case BITVECTOR:
 		case STRING:
-			return null;
+			return Optional.absent();
 		case INT: {
 			Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
 				return null;
-			return intRange(bitWidth.get());
+			return Optional.of(intRange(bitWidth.get()));
 		}
 		case INTEGER:
-			return intRange(BigInteger.valueOf(32));
+			return Optional.of(intRange(BigInteger.valueOf(32)));
 		case UINT: {
 			Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
 				return null;
-			return uintRange(bitWidth.get());
+			return Optional.of(uintRange(bitWidth.get()));
 		}
 		case NATURAL:
-			return uintRange(BigInteger.valueOf(32));
+			return Optional.of(uintRange(BigInteger.valueOf(32)));
 		}
 		throw new IllegalArgumentException("Did not expect type:" + pt.getType());
 	}

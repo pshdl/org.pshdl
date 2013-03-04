@@ -133,27 +133,27 @@ public class BuiltInValidator implements IHDLValidator {
 				continue;
 			HDLEvaluationContext context = getContext(hContext, hdlRange);
 			// For loop ranges are up to
-			Range<BigInteger> fromRangeOf = RangeExtension.rangeOf(from, context);
-			HDLExpression to = hdlRange.getTo();
-			Range<BigInteger> toRangeOf = RangeExtension.rangeOf(to, context);
-			if (fromRangeOf == null) {
+			Optional<Range<BigInteger>> fromRangeOf = RangeExtension.rangeOf(from, context);
+			if (!fromRangeOf.isPresent()) {
 				problems.add(new Problem(ErrorCode.UNKNOWN_RANGE, from));
 				continue;
 			}
-			if (toRangeOf == null) {
+			HDLExpression to = hdlRange.getTo();
+			Optional<Range<BigInteger>> toRangeOf = RangeExtension.rangeOf(to, context);
+			if (!toRangeOf.isPresent()) {
 				problems.add(new Problem(ErrorCode.UNKNOWN_RANGE, to));
 				continue;
 			}
-			if (fromRangeOf.isConnected(toRangeOf)) {
+			if (fromRangeOf.get().isConnected(toRangeOf.get())) {
 				problems.add(new Problem(ErrorCode.RANGE_OVERLAP, hdlRange));
 				continue;
 			}
 			if (hdlRange.getContainer() instanceof HDLForLoop) {
-				if (fromRangeOf.upperEndpoint().compareTo(toRangeOf.lowerEndpoint()) > 0) {
+				if (fromRangeOf.get().upperEndpoint().compareTo(toRangeOf.get().lowerEndpoint()) > 0) {
 					problems.add(new Problem(ErrorCode.RANGE_NOT_UP, hdlRange));
 				}
 			} else {
-				if (toRangeOf.lowerEndpoint().compareTo(fromRangeOf.upperEndpoint()) > 0) {
+				if (toRangeOf.get().lowerEndpoint().compareTo(fromRangeOf.get().upperEndpoint()) > 0) {
 					problems.add(new Problem(ErrorCode.RANGE_NOT_DOWN, hdlRange));
 				}
 			}
@@ -642,16 +642,18 @@ public class BuiltInValidator implements IHDLValidator {
 		int dim = 0;
 		for (HDLExpression arr : array) {
 			HDLEvaluationContext context = getContext(hContext, arr);
-			Range<BigInteger> accessRange = RangeExtension.rangeOf(arr, context);
-			if (accessRange == null) {
+			Optional<Range<BigInteger>> accessRangeRaw = RangeExtension.rangeOf(arr, context);
+			if (!accessRangeRaw.isPresent()) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, arr));
 				break;
 			}
-			Range<BigInteger> arrayRange = RangeExtension.rangeOf(dimensions.get(dim), context);
-			if (arrayRange == null) {
+			Optional<Range<BigInteger>> arrayRangeRaw = RangeExtension.rangeOf(dimensions.get(dim), context);
+			if (!arrayRangeRaw.isPresent()) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
 				break;
 			}
+			Range<BigInteger> accessRange = accessRangeRaw.get();
+			Range<BigInteger> arrayRange = arrayRangeRaw.get();
 			BigInteger upperEndpoint = arrayRange.upperEndpoint();
 			arrayRange = Ranges.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
 			String info = "Expected value range:" + accessRange;

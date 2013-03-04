@@ -53,11 +53,11 @@ public class RangeExtension {
     }
   }.apply();
   
-  public static Range<BigInteger> rangeOf(final IHDLObject obj) {
+  public static Optional<Range<BigInteger>> rangeOf(final IHDLObject obj) {
     return RangeExtension.INST.determineRange(obj, null);
   }
   
-  public static Range<BigInteger> rangeOf(final IHDLObject obj, final HDLEvaluationContext context) {
+  public static Optional<Range<BigInteger>> rangeOf(final IHDLObject obj, final HDLEvaluationContext context) {
     return RangeExtension.INST.determineRange(obj, context);
   }
   
@@ -68,31 +68,33 @@ public class RangeExtension {
     }
   }.apply();
   
-  protected Range<BigInteger> _determineRange(final HDLExpression obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLExpression obj, final HDLEvaluationContext context) {
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
     throw _runtimeException;
   }
   
-  protected Range<BigInteger> _determineRange(final HDLLiteral obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLLiteral obj, final HDLEvaluationContext context) {
     BigInteger _valueAsBigInt = obj.getValueAsBigInt();
     BigInteger _valueAsBigInt_1 = obj.getValueAsBigInt();
-    return Ranges.<BigInteger>closed(_valueAsBigInt, _valueAsBigInt_1);
+    Range<BigInteger> _closed = Ranges.<BigInteger>closed(_valueAsBigInt, _valueAsBigInt_1);
+    return Optional.<Range<BigInteger>>of(_closed);
   }
   
-  protected Range<BigInteger> _determineRange(final HDLVariableRef obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLVariableRef obj, final HDLEvaluationContext context) {
     final Optional<BigInteger> bigVal = ConstantEvaluate.valueOf(obj, context);
     boolean _isPresent = bigVal.isPresent();
     if (_isPresent) {
       BigInteger _get = bigVal.get();
       BigInteger _get_1 = bigVal.get();
-      return Ranges.<BigInteger>closed(_get, _get_1);
+      Range<BigInteger> _closed = Ranges.<BigInteger>closed(_get, _get_1);
+      return Optional.<Range<BigInteger>>of(_closed);
     }
     final HDLVariable hVar = obj.resolveVar();
     boolean _equals = ObjectExtensions.operator_equals(hVar, null);
     if (_equals) {
       obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
-      return null;
+      return Optional.<Range<BigInteger>>absent();
     }
     HDLAnnotation range = hVar.getAnnotation(HDLBuiltInAnnotations.range);
     boolean _notEquals = ObjectExtensions.operator_notEquals(range, null);
@@ -103,7 +105,8 @@ public class RangeExtension {
       BigInteger _bigInteger = new BigInteger(_get_2);
       String _get_3 = ((List<String>)Conversions.doWrapArray(value)).get(1);
       BigInteger _bigInteger_1 = new BigInteger(_get_3);
-      return Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
+      Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
+      return Optional.<Range<BigInteger>>of(_closed_1);
     }
     IHDLObject _container = hVar.getContainer();
     boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_container, null);
@@ -122,7 +125,8 @@ public class RangeExtension {
           BigInteger _bigInteger_2 = new BigInteger(_get_4);
           String _get_5 = ((List<String>)Conversions.doWrapArray(value_1)).get(1);
           BigInteger _bigInteger_3 = new BigInteger(_get_5);
-          return Ranges.<BigInteger>closed(_bigInteger_2, _bigInteger_3);
+          Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(_bigInteger_2, _bigInteger_3);
+          return Optional.<Range<BigInteger>>of(_closed_2);
         }
       }
       IHDLObject _container_3 = hVar.getContainer();
@@ -131,16 +135,27 @@ public class RangeExtension {
         final HDLForLoop loop = ((HDLForLoop) _container_4);
         ArrayList<HDLRange> _range = loop.getRange();
         HDLRange _get_6 = _range.get(0);
-        Range<BigInteger> res = this.determineRange(_get_6, context);
-        boolean _notEquals_3 = ObjectExtensions.operator_notEquals(res, null);
-        if (_notEquals_3) {
+        final Optional<Range<BigInteger>> zeroR = this.determineRange(_get_6, context);
+        boolean _isPresent_1 = zeroR.isPresent();
+        if (_isPresent_1) {
+          Range<BigInteger> res = zeroR.get();
           ArrayList<HDLRange> _range_1 = loop.getRange();
           for (final HDLRange r : _range_1) {
-            Range<BigInteger> _determineRange = this.determineRange(r, context);
-            Range<BigInteger> _span = res.span(_determineRange);
-            res = _span;
+            {
+              final Optional<Range<BigInteger>> rRange = this.determineRange(r, context);
+              boolean _isPresent_2 = rRange.isPresent();
+              if (_isPresent_2) {
+                Range<BigInteger> _get_7 = rRange.get();
+                Range<BigInteger> _span = res.span(_get_7);
+                res = _span;
+              } else {
+                Optional.absent();
+              }
+            }
           }
-          return res;
+          return Optional.<Range<BigInteger>>of(res);
+        } else {
+          return Optional.<Range<BigInteger>>absent();
         }
       }
     }
@@ -156,8 +171,8 @@ public class RangeExtension {
           HDLExpression _copyDeepFrozen = width.copyDeepFrozen(r_1);
           width = _copyDeepFrozen;
           Optional<BigInteger> cw = ConstantEvaluate.valueOf(width, context);
-          boolean _isPresent_1 = cw.isPresent();
-          boolean _not = (!_isPresent_1);
+          boolean _isPresent_2 = cw.isPresent();
+          boolean _not = (!_isPresent_2);
           if (_not) {
             bitWidth = null;
           } else {
@@ -167,12 +182,13 @@ public class RangeExtension {
           }
         }
       }
-      boolean _notEquals_4 = ObjectExtensions.operator_notEquals(bitWidth, null);
-      if (_notEquals_4) {
+      boolean _notEquals_3 = ObjectExtensions.operator_notEquals(bitWidth, null);
+      if (_notEquals_3) {
         int _intValue = bitWidth.intValue();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
         BigInteger _subtract = _shiftLeft.subtract(BigInteger.ONE);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, _subtract);
+        Range<BigInteger> _closed_3 = Ranges.<BigInteger>closed(BigInteger.ZERO, _subtract);
+        return Optional.<Range<BigInteger>>of(_closed_3);
       }
     }
     final HDLType type = TypeExtension.typeOf(hVar);
@@ -182,16 +198,16 @@ public class RangeExtension {
     }
     obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
-    return null;
+    return Optional.<Range<BigInteger>>absent();
   }
   
-  protected Range<BigInteger> _determineRange(final HDLRange obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLRange obj, final HDLEvaluationContext context) {
     HDLExpression _to = obj.getTo();
     final Optional<BigInteger> to = ConstantEvaluate.valueOf(_to, context);
     boolean _isPresent = to.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
-      return null;
+      return Optional.<Range<BigInteger>>absent();
     }
     HDLExpression _from = obj.getFrom();
     boolean _notEquals = ObjectExtensions.operator_notEquals(_from, null);
@@ -201,7 +217,7 @@ public class RangeExtension {
       boolean _isPresent_1 = from.isPresent();
       boolean _not_1 = (!_isPresent_1);
       if (_not_1) {
-        return null;
+        return Optional.<Range<BigInteger>>absent();
       }
       BigInteger _get = from.get();
       BigInteger _get_1 = to.get();
@@ -210,48 +226,70 @@ public class RangeExtension {
       if (_greaterThan) {
         BigInteger _get_2 = to.get();
         BigInteger _get_3 = from.get();
-        return Ranges.<BigInteger>closed(_get_2, _get_3);
+        Range<BigInteger> _closed = Ranges.<BigInteger>closed(_get_2, _get_3);
+        return Optional.<Range<BigInteger>>of(_closed);
       }
       BigInteger _get_4 = from.get();
       BigInteger _get_5 = to.get();
-      return Ranges.<BigInteger>closed(_get_4, _get_5);
+      Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(_get_4, _get_5);
+      return Optional.<Range<BigInteger>>of(_closed_1);
     }
     BigInteger _get_6 = to.get();
     BigInteger _get_7 = to.get();
-    return Ranges.<BigInteger>closed(_get_6, _get_7);
+    Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(_get_6, _get_7);
+    return Optional.<Range<BigInteger>>of(_closed_2);
   }
   
-  protected Range<BigInteger> _determineRange(final HDLEqualityOp obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLEqualityOp obj, final HDLEvaluationContext context) {
     obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
-    return Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
+    Range<BigInteger> _closed = Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
+    return Optional.<Range<BigInteger>>of(_closed);
   }
   
-  protected Range<BigInteger> _determineRange(final HDLShiftOp obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLShiftOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
-    final Range<BigInteger> leftRange = this.determineRange(_left, context);
+    final Optional<Range<BigInteger>> leftRange = this.determineRange(_left, context);
+    boolean _isPresent = leftRange.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLExpression _right = obj.getRight();
-    final Range<BigInteger> rightRange = this.determineRange(_right, context);
+    final Optional<Range<BigInteger>> rightRange = this.determineRange(_right, context);
+    boolean _isPresent_1 = rightRange.isPresent();
+    boolean _not_1 = (!_isPresent_1);
+    if (_not_1) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLShiftOpType _type = obj.getType();
     final HDLShiftOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SLL)) {
         _matched=true;
-        BigInteger _lowerEndpoint = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_1 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get = leftRange.get();
+        BigInteger _lowerEndpoint = _get.lowerEndpoint();
+        Range<BigInteger> _get_1 = rightRange.get();
+        BigInteger _lowerEndpoint_1 = _get_1.lowerEndpoint();
         int _intValue = _lowerEndpoint_1.intValue();
         final BigInteger ff = _lowerEndpoint.shiftLeft(_intValue);
-        BigInteger _lowerEndpoint_2 = leftRange.lowerEndpoint();
-        BigInteger _upperEndpoint = rightRange.upperEndpoint();
+        Range<BigInteger> _get_2 = leftRange.get();
+        BigInteger _lowerEndpoint_2 = _get_2.lowerEndpoint();
+        Range<BigInteger> _get_3 = rightRange.get();
+        BigInteger _upperEndpoint = _get_3.upperEndpoint();
         int _intValue_1 = _upperEndpoint.intValue();
         final BigInteger ft = _lowerEndpoint_2.shiftLeft(_intValue_1);
-        BigInteger _upperEndpoint_1 = leftRange.upperEndpoint();
-        BigInteger _lowerEndpoint_3 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_4 = leftRange.get();
+        BigInteger _upperEndpoint_1 = _get_4.upperEndpoint();
+        Range<BigInteger> _get_5 = rightRange.get();
+        BigInteger _lowerEndpoint_3 = _get_5.lowerEndpoint();
         int _intValue_2 = _lowerEndpoint_3.intValue();
         final BigInteger tf = _upperEndpoint_1.shiftLeft(_intValue_2);
-        BigInteger _upperEndpoint_2 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_3 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_6 = leftRange.get();
+        BigInteger _upperEndpoint_2 = _get_6.upperEndpoint();
+        Range<BigInteger> _get_7 = rightRange.get();
+        BigInteger _upperEndpoint_3 = _get_7.upperEndpoint();
         int _intValue_3 = _upperEndpoint_3.intValue();
         final BigInteger tt = _upperEndpoint_2.shiftLeft(_intValue_3);
         BigInteger _min = ff.min(ft);
@@ -260,26 +298,35 @@ public class RangeExtension {
         BigInteger _max = ff.max(ft);
         BigInteger _max_1 = _max.max(tf);
         BigInteger _max_2 = _max_1.max(tt);
-        return Ranges.<BigInteger>closed(_min_2, _max_2);
+        Range<BigInteger> _closed = Ranges.<BigInteger>closed(_min_2, _max_2);
+        return Optional.<Range<BigInteger>>of(_closed);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SRA)) {
         _matched=true;
-        BigInteger _lowerEndpoint_4 = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_5 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_8 = leftRange.get();
+        BigInteger _lowerEndpoint_4 = _get_8.lowerEndpoint();
+        Range<BigInteger> _get_9 = rightRange.get();
+        BigInteger _lowerEndpoint_5 = _get_9.lowerEndpoint();
         int _intValue_4 = _lowerEndpoint_5.intValue();
         final BigInteger ff_1 = _lowerEndpoint_4.shiftRight(_intValue_4);
-        BigInteger _lowerEndpoint_6 = leftRange.lowerEndpoint();
-        BigInteger _upperEndpoint_4 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_10 = leftRange.get();
+        BigInteger _lowerEndpoint_6 = _get_10.lowerEndpoint();
+        Range<BigInteger> _get_11 = rightRange.get();
+        BigInteger _upperEndpoint_4 = _get_11.upperEndpoint();
         int _intValue_5 = _upperEndpoint_4.intValue();
         final BigInteger ft_1 = _lowerEndpoint_6.shiftRight(_intValue_5);
-        BigInteger _upperEndpoint_5 = leftRange.upperEndpoint();
-        BigInteger _lowerEndpoint_7 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_12 = leftRange.get();
+        BigInteger _upperEndpoint_5 = _get_12.upperEndpoint();
+        Range<BigInteger> _get_13 = rightRange.get();
+        BigInteger _lowerEndpoint_7 = _get_13.lowerEndpoint();
         int _intValue_6 = _lowerEndpoint_7.intValue();
         final BigInteger tf_1 = _upperEndpoint_5.shiftRight(_intValue_6);
-        BigInteger _upperEndpoint_6 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_7 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_14 = leftRange.get();
+        BigInteger _upperEndpoint_6 = _get_14.upperEndpoint();
+        Range<BigInteger> _get_15 = rightRange.get();
+        BigInteger _upperEndpoint_7 = _get_15.upperEndpoint();
         int _intValue_7 = _upperEndpoint_7.intValue();
         final BigInteger tt_1 = _upperEndpoint_6.shiftRight(_intValue_7);
         BigInteger _min_3 = ff_1.min(ft_1);
@@ -288,23 +335,32 @@ public class RangeExtension {
         BigInteger _max_3 = ff_1.max(ft_1);
         BigInteger _max_4 = _max_3.max(tf_1);
         BigInteger _max_5 = _max_4.max(tt_1);
-        return Ranges.<BigInteger>closed(_min_5, _max_5);
+        Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(_min_5, _max_5);
+        return Optional.<Range<BigInteger>>of(_closed_1);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SRL)) {
         _matched=true;
-        BigInteger _lowerEndpoint_8 = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_9 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_16 = leftRange.get();
+        BigInteger _lowerEndpoint_8 = _get_16.lowerEndpoint();
+        Range<BigInteger> _get_17 = rightRange.get();
+        BigInteger _lowerEndpoint_9 = _get_17.lowerEndpoint();
         final BigInteger ff_2 = RangeExtension.srl(_lowerEndpoint_8, _lowerEndpoint_9);
-        BigInteger _lowerEndpoint_10 = leftRange.lowerEndpoint();
-        BigInteger _upperEndpoint_8 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_18 = leftRange.get();
+        BigInteger _lowerEndpoint_10 = _get_18.lowerEndpoint();
+        Range<BigInteger> _get_19 = rightRange.get();
+        BigInteger _upperEndpoint_8 = _get_19.upperEndpoint();
         final BigInteger ft_2 = RangeExtension.srl(_lowerEndpoint_10, _upperEndpoint_8);
-        BigInteger _upperEndpoint_9 = leftRange.upperEndpoint();
-        BigInteger _lowerEndpoint_11 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_20 = leftRange.get();
+        BigInteger _upperEndpoint_9 = _get_20.upperEndpoint();
+        Range<BigInteger> _get_21 = rightRange.get();
+        BigInteger _lowerEndpoint_11 = _get_21.lowerEndpoint();
         final BigInteger tf_2 = RangeExtension.srl(_upperEndpoint_9, _lowerEndpoint_11);
-        BigInteger _upperEndpoint_10 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_11 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_22 = leftRange.get();
+        BigInteger _upperEndpoint_10 = _get_22.upperEndpoint();
+        Range<BigInteger> _get_23 = rightRange.get();
+        BigInteger _upperEndpoint_11 = _get_23.upperEndpoint();
         final BigInteger tt_2 = RangeExtension.srl(_upperEndpoint_10, _upperEndpoint_11);
         BigInteger _min_6 = ff_2.min(ft_2);
         BigInteger _min_7 = _min_6.min(tf_2);
@@ -312,7 +368,8 @@ public class RangeExtension {
         BigInteger _max_6 = ff_2.max(ft_2);
         BigInteger _max_7 = _max_6.max(tf_2);
         BigInteger _max_8 = _max_7.max(tt_2);
-        return Ranges.<BigInteger>closed(_min_8, _max_8);
+        Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(_min_8, _max_8);
+        return Optional.<Range<BigInteger>>of(_closed_2);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
@@ -330,11 +387,21 @@ public class RangeExtension {
     return res;
   }
   
-  protected Range<BigInteger> _determineRange(final HDLBitOp obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLBitOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
-    final Range<BigInteger> leftRange = this.determineRange(_left, context);
+    final Optional<Range<BigInteger>> leftRange = this.determineRange(_left, context);
+    boolean _isPresent = leftRange.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLExpression _right = obj.getRight();
-    final Range<BigInteger> rightRange = this.determineRange(_right, context);
+    final Optional<Range<BigInteger>> rightRange = this.determineRange(_right, context);
+    boolean _isPresent_1 = rightRange.isPresent();
+    boolean _not_1 = (!_isPresent_1);
+    if (_not_1) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLBitOpType _type = obj.getType();
     final HDLBitOpType type = _type;
     boolean _matched = false;
@@ -351,11 +418,13 @@ public class RangeExtension {
         _matched=true;
         obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);
-        BigInteger _upperEndpoint = leftRange.upperEndpoint();
+        Range<BigInteger> _get = leftRange.get();
+        BigInteger _upperEndpoint = _get.upperEndpoint();
         int _bitLength = _upperEndpoint.bitLength();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_bitLength);
         BigInteger _subtract = _shiftLeft.subtract(BigInteger.ONE);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, _subtract);
+        Range<BigInteger> _closed = Ranges.<BigInteger>closed(BigInteger.ZERO, _subtract);
+        return Optional.<Range<BigInteger>>of(_closed);
       }
     }
     if (!_matched) {
@@ -363,13 +432,16 @@ public class RangeExtension {
         _matched=true;
         obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);
-        BigInteger _upperEndpoint_1 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_2 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_1 = leftRange.get();
+        BigInteger _upperEndpoint_1 = _get_1.upperEndpoint();
+        Range<BigInteger> _get_2 = rightRange.get();
+        BigInteger _upperEndpoint_2 = _get_2.upperEndpoint();
         int _bitLength_1 = _upperEndpoint_2.bitLength();
         BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(_bitLength_1);
         BigInteger _subtract_1 = _shiftLeft_1.subtract(BigInteger.ONE);
         BigInteger _min = _upperEndpoint_1.min(_subtract_1);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, _min);
+        Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(BigInteger.ZERO, _min);
+        return Optional.<Range<BigInteger>>of(_closed_1);
       }
     }
     if (!_matched) {
@@ -385,74 +457,100 @@ public class RangeExtension {
         _matched=true;
         obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
+        Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
+        return Optional.<Range<BigInteger>>of(_closed_2);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
     throw _runtimeException;
   }
   
-  protected Range<BigInteger> _determineRange(final HDLArithOp obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLArithOp obj, final HDLEvaluationContext context) {
     HDLExpression _left = obj.getLeft();
-    final Range<BigInteger> leftRange = this.determineRange(_left, context);
+    final Optional<Range<BigInteger>> leftRange = this.determineRange(_left, context);
+    boolean _isPresent = leftRange.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLExpression _right = obj.getRight();
-    Range<BigInteger> rightRange = this.determineRange(_right, context);
+    final Optional<Range<BigInteger>> rightRange = this.determineRange(_right, context);
+    boolean _isPresent_1 = rightRange.isPresent();
+    boolean _not_1 = (!_isPresent_1);
+    if (_not_1) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLArithOpType _type = obj.getType();
     final HDLArithOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.PLUS)) {
         _matched=true;
-        BigInteger _lowerEndpoint = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_1 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get = leftRange.get();
+        BigInteger _lowerEndpoint = _get.lowerEndpoint();
+        Range<BigInteger> _get_1 = rightRange.get();
+        BigInteger _lowerEndpoint_1 = _get_1.lowerEndpoint();
         BigInteger _add = _lowerEndpoint.add(_lowerEndpoint_1);
-        BigInteger _upperEndpoint = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_1 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_2 = leftRange.get();
+        BigInteger _upperEndpoint = _get_2.upperEndpoint();
+        Range<BigInteger> _get_3 = rightRange.get();
+        BigInteger _upperEndpoint_1 = _get_3.upperEndpoint();
         BigInteger _add_1 = _upperEndpoint.add(_upperEndpoint_1);
-        return Ranges.<BigInteger>closed(_add, _add_1);
+        Range<BigInteger> _closed = Ranges.<BigInteger>closed(_add, _add_1);
+        return Optional.<Range<BigInteger>>of(_closed);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.MINUS)) {
         _matched=true;
-        BigInteger _lowerEndpoint_2 = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_3 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_4 = leftRange.get();
+        BigInteger _lowerEndpoint_2 = _get_4.lowerEndpoint();
+        Range<BigInteger> _get_5 = rightRange.get();
+        BigInteger _lowerEndpoint_3 = _get_5.lowerEndpoint();
         BigInteger _subtract = _lowerEndpoint_2.subtract(_lowerEndpoint_3);
-        BigInteger _upperEndpoint_2 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_3 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_6 = leftRange.get();
+        BigInteger _upperEndpoint_2 = _get_6.upperEndpoint();
+        Range<BigInteger> _get_7 = rightRange.get();
+        BigInteger _upperEndpoint_3 = _get_7.upperEndpoint();
         BigInteger _subtract_1 = _upperEndpoint_2.subtract(_upperEndpoint_3);
-        return Ranges.<BigInteger>closed(_subtract, _subtract_1);
+        Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(_subtract, _subtract_1);
+        return Optional.<Range<BigInteger>>of(_closed_1);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.DIV)) {
         _matched=true;
         boolean _or = false;
-        BigInteger _lowerEndpoint_4 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_8 = rightRange.get();
+        BigInteger _lowerEndpoint_4 = _get_8.lowerEndpoint();
         boolean _equals = _lowerEndpoint_4.equals(BigInteger.ZERO);
         if (_equals) {
           _or = true;
         } else {
-          BigInteger _upperEndpoint_4 = rightRange.upperEndpoint();
+          Range<BigInteger> _get_9 = rightRange.get();
+          BigInteger _upperEndpoint_4 = _get_9.upperEndpoint();
           boolean _equals_1 = _upperEndpoint_4.equals(BigInteger.ZERO);
           _or = (_equals || _equals_1);
         }
         if (_or) {
           obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ZERO_DIVIDE);
-          return null;
+          return Optional.<Range<BigInteger>>absent();
         }
         boolean _or_1 = false;
-        BigInteger _lowerEndpoint_5 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_10 = rightRange.get();
+        BigInteger _lowerEndpoint_5 = _get_10.lowerEndpoint();
         int _signum = _lowerEndpoint_5.signum();
-        BigInteger _upperEndpoint_5 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_11 = rightRange.get();
+        BigInteger _upperEndpoint_5 = _get_11.upperEndpoint();
         int _signum_1 = _upperEndpoint_5.signum();
         int _multiply = (_signum * _signum_1);
         boolean _lessThan = (_multiply < 0);
         if (_lessThan) {
           _or_1 = true;
         } else {
-          BigInteger _upperEndpoint_6 = rightRange.upperEndpoint();
+          Range<BigInteger> _get_12 = rightRange.get();
+          BigInteger _upperEndpoint_6 = _get_12.upperEndpoint();
           int _signum_2 = _upperEndpoint_6.signum();
           boolean _equals_2 = (_signum_2 == 0);
           _or_1 = (_lessThan || _equals_2);
@@ -461,26 +559,32 @@ public class RangeExtension {
           obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.POSSIBLY_ZERO_DIVIDE);
         }
-        BigInteger _lowerEndpoint_6 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_13 = rightRange.get();
+        BigInteger _lowerEndpoint_6 = _get_13.lowerEndpoint();
         BigDecimal _bigDecimal = new BigDecimal(_lowerEndpoint_6);
         BigDecimal _divide = BigDecimal.ONE.divide(_bigDecimal);
-        BigInteger _upperEndpoint_7 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_14 = rightRange.get();
+        BigInteger _upperEndpoint_7 = _get_14.upperEndpoint();
         BigDecimal _bigDecimal_1 = new BigDecimal(_upperEndpoint_7);
         BigDecimal _divide_1 = BigDecimal.ONE.divide(_bigDecimal_1);
         final Range<BigDecimal> mulRange = Ranges.<BigDecimal>closed(_divide, _divide_1);
-        BigInteger _lowerEndpoint_7 = leftRange.lowerEndpoint();
+        Range<BigInteger> _get_15 = leftRange.get();
+        BigInteger _lowerEndpoint_7 = _get_15.lowerEndpoint();
         BigDecimal _bigDecimal_2 = new BigDecimal(_lowerEndpoint_7);
         BigDecimal _lowerEndpoint_8 = mulRange.lowerEndpoint();
         final BigDecimal ff = _bigDecimal_2.multiply(_lowerEndpoint_8);
-        BigInteger _lowerEndpoint_9 = leftRange.lowerEndpoint();
+        Range<BigInteger> _get_16 = leftRange.get();
+        BigInteger _lowerEndpoint_9 = _get_16.lowerEndpoint();
         BigDecimal _bigDecimal_3 = new BigDecimal(_lowerEndpoint_9);
         BigDecimal _upperEndpoint_8 = mulRange.upperEndpoint();
         final BigDecimal ft = _bigDecimal_3.multiply(_upperEndpoint_8);
-        BigInteger _upperEndpoint_9 = leftRange.upperEndpoint();
+        Range<BigInteger> _get_17 = leftRange.get();
+        BigInteger _upperEndpoint_9 = _get_17.upperEndpoint();
         BigDecimal _bigDecimal_4 = new BigDecimal(_upperEndpoint_9);
         BigDecimal _lowerEndpoint_10 = mulRange.lowerEndpoint();
         final BigDecimal tf = _bigDecimal_4.multiply(_lowerEndpoint_10);
-        BigInteger _upperEndpoint_10 = leftRange.upperEndpoint();
+        Range<BigInteger> _get_18 = leftRange.get();
+        BigInteger _upperEndpoint_10 = _get_18.upperEndpoint();
         BigDecimal _bigDecimal_5 = new BigDecimal(_upperEndpoint_10);
         BigDecimal _upperEndpoint_11 = mulRange.upperEndpoint();
         final BigDecimal tt = _bigDecimal_5.multiply(_upperEndpoint_11);
@@ -492,23 +596,32 @@ public class RangeExtension {
         BigDecimal _max_1 = _max.max(tf);
         BigDecimal _max_2 = _max_1.max(tt);
         BigInteger _bigInteger_1 = _max_2.toBigInteger();
-        return Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
+        Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
+        return Optional.<Range<BigInteger>>of(_closed_2);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.MUL)) {
         _matched=true;
-        BigInteger _lowerEndpoint_11 = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_12 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_19 = leftRange.get();
+        BigInteger _lowerEndpoint_11 = _get_19.lowerEndpoint();
+        Range<BigInteger> _get_20 = rightRange.get();
+        BigInteger _lowerEndpoint_12 = _get_20.lowerEndpoint();
         final BigInteger ff_1 = _lowerEndpoint_11.multiply(_lowerEndpoint_12);
-        BigInteger _lowerEndpoint_13 = leftRange.lowerEndpoint();
-        BigInteger _upperEndpoint_12 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_21 = leftRange.get();
+        BigInteger _lowerEndpoint_13 = _get_21.lowerEndpoint();
+        Range<BigInteger> _get_22 = rightRange.get();
+        BigInteger _upperEndpoint_12 = _get_22.upperEndpoint();
         final BigInteger ft_1 = _lowerEndpoint_13.multiply(_upperEndpoint_12);
-        BigInteger _upperEndpoint_13 = leftRange.upperEndpoint();
-        BigInteger _lowerEndpoint_14 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_23 = leftRange.get();
+        BigInteger _upperEndpoint_13 = _get_23.upperEndpoint();
+        Range<BigInteger> _get_24 = rightRange.get();
+        BigInteger _lowerEndpoint_14 = _get_24.lowerEndpoint();
         final BigInteger tf_1 = _upperEndpoint_13.multiply(_lowerEndpoint_14);
-        BigInteger _upperEndpoint_14 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_15 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_25 = leftRange.get();
+        BigInteger _upperEndpoint_14 = _get_25.upperEndpoint();
+        Range<BigInteger> _get_26 = rightRange.get();
+        BigInteger _upperEndpoint_15 = _get_26.upperEndpoint();
         final BigInteger tt_1 = _upperEndpoint_14.multiply(_upperEndpoint_15);
         BigInteger _min_3 = ff_1.min(ft_1);
         BigInteger _min_4 = _min_3.min(tf_1);
@@ -516,36 +629,48 @@ public class RangeExtension {
         BigInteger _max_3 = ff_1.max(ft_1);
         BigInteger _max_4 = _max_3.max(tf_1);
         BigInteger _max_5 = _max_4.max(tt_1);
-        return Ranges.<BigInteger>closed(_min_5, _max_5);
+        Range<BigInteger> _closed_3 = Ranges.<BigInteger>closed(_min_5, _max_5);
+        return Optional.<Range<BigInteger>>of(_closed_3);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.MOD)) {
         _matched=true;
-        BigInteger _upperEndpoint_16 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_27 = rightRange.get();
+        BigInteger _upperEndpoint_16 = _get_27.upperEndpoint();
         BigInteger _subtract_2 = _upperEndpoint_16.subtract(BigInteger.ONE);
-        BigInteger _upperEndpoint_17 = leftRange.upperEndpoint();
+        Range<BigInteger> _get_28 = leftRange.get();
+        BigInteger _upperEndpoint_17 = _get_28.upperEndpoint();
         BigInteger _min_6 = _subtract_2.min(_upperEndpoint_17);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, _min_6);
+        Range<BigInteger> _closed_4 = Ranges.<BigInteger>closed(BigInteger.ZERO, _min_6);
+        return Optional.<Range<BigInteger>>of(_closed_4);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.POW)) {
         _matched=true;
-        BigInteger _lowerEndpoint_15 = leftRange.lowerEndpoint();
-        BigInteger _lowerEndpoint_16 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_29 = leftRange.get();
+        BigInteger _lowerEndpoint_15 = _get_29.lowerEndpoint();
+        Range<BigInteger> _get_30 = rightRange.get();
+        BigInteger _lowerEndpoint_16 = _get_30.lowerEndpoint();
         int _intValue = _lowerEndpoint_16.intValue();
         final BigInteger ff_2 = _lowerEndpoint_15.pow(_intValue);
-        BigInteger _lowerEndpoint_17 = leftRange.lowerEndpoint();
-        BigInteger _upperEndpoint_18 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_31 = leftRange.get();
+        BigInteger _lowerEndpoint_17 = _get_31.lowerEndpoint();
+        Range<BigInteger> _get_32 = rightRange.get();
+        BigInteger _upperEndpoint_18 = _get_32.upperEndpoint();
         int _intValue_1 = _upperEndpoint_18.intValue();
         final BigInteger ft_2 = _lowerEndpoint_17.pow(_intValue_1);
-        BigInteger _upperEndpoint_19 = leftRange.upperEndpoint();
-        BigInteger _lowerEndpoint_18 = rightRange.lowerEndpoint();
+        Range<BigInteger> _get_33 = leftRange.get();
+        BigInteger _upperEndpoint_19 = _get_33.upperEndpoint();
+        Range<BigInteger> _get_34 = rightRange.get();
+        BigInteger _lowerEndpoint_18 = _get_34.lowerEndpoint();
         int _intValue_2 = _lowerEndpoint_18.intValue();
         final BigInteger tf_2 = _upperEndpoint_19.pow(_intValue_2);
-        BigInteger _upperEndpoint_20 = leftRange.upperEndpoint();
-        BigInteger _upperEndpoint_21 = rightRange.upperEndpoint();
+        Range<BigInteger> _get_35 = leftRange.get();
+        BigInteger _upperEndpoint_20 = _get_35.upperEndpoint();
+        Range<BigInteger> _get_36 = rightRange.get();
+        BigInteger _upperEndpoint_21 = _get_36.upperEndpoint();
         int _intValue_3 = _upperEndpoint_21.intValue();
         final BigInteger tt_2 = _upperEndpoint_20.pow(_intValue_3);
         BigInteger _min_7 = ff_2.min(ft_2);
@@ -554,22 +679,28 @@ public class RangeExtension {
         BigInteger _max_6 = ff_2.max(ft_2);
         BigInteger _max_7 = _max_6.max(tf_2);
         BigInteger _max_8 = _max_7.max(tt_2);
-        return Ranges.<BigInteger>closed(_min_9, _max_8);
+        Range<BigInteger> _closed_5 = Ranges.<BigInteger>closed(_min_9, _max_8);
+        return Optional.<Range<BigInteger>>of(_closed_5);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
     throw _runtimeException;
   }
   
-  protected Range<BigInteger> _determineRange(final HDLEnumRef obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLEnumRef obj, final HDLEvaluationContext context) {
     obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ENUMS_NOT_SUPPORTED_FOR_CONSTANTS);
-    return null;
+    return Optional.<Range<BigInteger>>absent();
   }
   
-  protected Range<BigInteger> _determineRange(final HDLManip obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLManip obj, final HDLEvaluationContext context) {
     HDLExpression _target = obj.getTarget();
-    final Range<BigInteger> right = this.determineRange(_target, context);
+    final Optional<Range<BigInteger>> right = this.determineRange(_target, context);
+    boolean _isPresent = right.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLManipType _type = obj.getType();
     final HDLManipType _switchValue = _type;
     boolean _matched = false;
@@ -579,32 +710,50 @@ public class RangeExtension {
         final HDLType type = obj.getCastTo();
         if ((type instanceof HDLPrimitive)) {
           HDLPrimitives _instance = HDLPrimitives.getInstance();
-          final Range<BigInteger> castRange = _instance.getValueRange(((HDLPrimitive) type), context);
-          return castRange.intersection(right);
+          final Optional<Range<BigInteger>> castRange = _instance.getValueRange(((HDLPrimitive) type), context);
+          boolean _isPresent_1 = castRange.isPresent();
+          boolean _not_1 = (!_isPresent_1);
+          if (_not_1) {
+            return Optional.<Range<BigInteger>>absent();
+          }
+          boolean _isPresent_2 = right.isPresent();
+          boolean _not_2 = (!_isPresent_2);
+          if (_not_2) {
+            return Optional.<Range<BigInteger>>absent();
+          }
+          Range<BigInteger> _get = castRange.get();
+          Range<BigInteger> _get_1 = right.get();
+          Range<BigInteger> _intersection = _get.intersection(_get_1);
+          return Optional.<Range<BigInteger>>of(_intersection);
         }
         obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
-        return null;
+        return Optional.<Range<BigInteger>>absent();
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLManipType.ARITH_NEG)) {
         _matched=true;
-        BigInteger _upperEndpoint = right.upperEndpoint();
+        Range<BigInteger> _get_2 = right.get();
+        BigInteger _upperEndpoint = _get_2.upperEndpoint();
         BigInteger _negate = _upperEndpoint.negate();
-        BigInteger _lowerEndpoint = right.lowerEndpoint();
+        Range<BigInteger> _get_3 = right.get();
+        BigInteger _lowerEndpoint = _get_3.lowerEndpoint();
         BigInteger _negate_1 = _lowerEndpoint.negate();
-        return Ranges.<BigInteger>closed(_negate, _negate_1);
+        Range<BigInteger> _closed = Ranges.<BigInteger>closed(_negate, _negate_1);
+        return Optional.<Range<BigInteger>>of(_closed);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLManipType.BIT_NEG)) {
         _matched=true;
-        BigInteger _upperEndpoint_1 = right.upperEndpoint();
+        Range<BigInteger> _get_4 = right.get();
+        BigInteger _upperEndpoint_1 = _get_4.upperEndpoint();
         int _bitLength = _upperEndpoint_1.bitLength();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_bitLength);
         BigInteger _subtract = _shiftLeft.subtract(BigInteger.ONE);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, _subtract);
+        Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(BigInteger.ZERO, _subtract);
+        return Optional.<Range<BigInteger>>of(_closed_1);
       }
     }
     if (!_matched) {
@@ -612,25 +761,26 @@ public class RangeExtension {
         _matched=true;
         obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
-        return Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
+        Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
+        return Optional.<Range<BigInteger>>of(_closed_2);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
     throw _runtimeException;
   }
   
-  protected Range<BigInteger> _determineRange(final HDLFunctionCall obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLFunctionCall obj, final HDLEvaluationContext context) {
     return HDLFunctions.determineRange(obj, context);
   }
   
-  protected Range<BigInteger> _determineRange(final HDLConcat obj, final HDLEvaluationContext context) {
+  protected Optional<Range<BigInteger>> _determineRange(final HDLConcat obj, final HDLEvaluationContext context) {
     HDLType _typeOf = TypeExtension.typeOf(obj);
     final HDLPrimitive type = ((HDLPrimitive) _typeOf);
     HDLPrimitives _instance = HDLPrimitives.getInstance();
     return _instance.getValueRange(type, context);
   }
   
-  public Range<BigInteger> determineRange(final IHDLObject obj, final HDLEvaluationContext context) {
+  public Optional<Range<BigInteger>> determineRange(final IHDLObject obj, final HDLEvaluationContext context) {
     if (obj instanceof HDLEnumRef) {
       return _determineRange((HDLEnumRef)obj, context);
     } else if (obj instanceof HDLVariableRef) {
