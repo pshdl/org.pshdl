@@ -43,6 +43,7 @@ import static de.tuhh.ict.pshdl.model.HDLRegisterConfig$HDLRegClockType.*
 import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static de.tuhh.ict.pshdl.model.simulation.SimulationTransformationExtension.*
+import com.google.common.base.Optional
 
 class SimulationTransformationExtension {
 	public static SimulationTransformationExtension INST=new SimulationTransformationExtension
@@ -180,8 +181,11 @@ class SimulationTransformationExtension {
 			return "1"
 		case current.type==INTEGER || current.type==NATURAL:
 			return "32"
-		case current.type==INT||current.type==UINT||current.type==BITVECTOR:
-			return ConstantEvaluate::valueOf(current.width,context).toString
+		case current.type==INT||current.type==UINT||current.type==BITVECTOR:{
+			val res=ConstantEvaluate::valueOf(current.width,context)
+			if (res.present)
+				return res.get.toString
+		}
 		}
 		throw new IllegalArgumentException(current+" is not a valid type");
 	}
@@ -203,8 +207,10 @@ class SimulationTransformationExtension {
 		case INTERNAL:
 			res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
 		case dir==PARAMETER || dir==CONSTANT:{
-			val BigInteger bVal=ConstantEvaluate::valueOf(obj, context)
-			res.constants.put(refName, bVal)
+			val Optional<BigInteger> bVal=ConstantEvaluate::valueOf(obj, context)
+			if (!bVal.present)
+				throw new IllegalArgumentException("Const/param should be constant")
+			res.constants.put(refName, bVal.get)
 			res.instructions.add(new ArgumentedInstruction(loadConstant, refName))
 		}
 		case IN:{

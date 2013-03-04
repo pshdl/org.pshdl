@@ -4,6 +4,8 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
@@ -179,9 +181,9 @@ public class VHDLImporter {
 	private static HDLExpression subThenPlus1(HDLExpression from, HDLExpression to) {
 		HDLArithOp left = new HDLArithOp().setLeft(from).setType(HDLArithOpType.MINUS).setRight(to);
 		HDLArithOp op = new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1)).copyDeepFrozen(null);
-		BigInteger constant = ConstantEvaluate.valueOf(op);
-		if (constant != null)
-			return HDLLiteral.get(constant);
+		Optional<BigInteger> constant = ConstantEvaluate.valueOf(op);
+		if (constant.isPresent())
+			return HDLLiteral.get(constant.get());
 		return op;
 	}
 

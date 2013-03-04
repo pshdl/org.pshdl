@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLContext;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLExpressionExtension;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLOutputValidator;
@@ -735,14 +736,15 @@ public class VHDLStatementExtension {
     VHDLContext _vHDLContext = new VHDLContext();
     final VHDLContext context = _vHDLContext;
     final HDLExpression hCaseExp = obj.getCaseExp();
-    BigInteger width = null;
+    Optional<BigInteger> width = Optional.<BigInteger>absent();
     final HDLType type = TypeExtension.typeOf(hCaseExp);
     if ((type instanceof HDLPrimitive)) {
       HDLExpression _width = ((HDLPrimitive) type).getWidth();
-      BigInteger _valueOf = ConstantEvaluate.valueOf(_width, null);
+      Optional<BigInteger> _valueOf = ConstantEvaluate.valueOf(_width, null);
       width = _valueOf;
-      boolean _equals = ObjectExtensions.operator_equals(width, null);
-      if (_equals) {
+      boolean _isPresent = width.isPresent();
+      boolean _not = (!_isPresent);
+      if (_not) {
         IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("HDLPrimitive switch case needs to have constant width");
         throw _illegalArgumentException;
       }
@@ -810,17 +812,25 @@ public class VHDLStatementExtension {
     return this.attachComment(context, obj);
   }
   
-  private Alternative createAlternative(final CaseStatement cs, final Entry<HDLSwitchCaseStatement,VHDLContext> e, final BigInteger bits) {
+  private Alternative createAlternative(final CaseStatement cs, final Entry<HDLSwitchCaseStatement,VHDLContext> e, final Optional<BigInteger> bits) {
     Alternative alt = null;
     HDLSwitchCaseStatement _key = e.getKey();
     final HDLExpression label = _key.getLabel();
     boolean _notEquals = ObjectExtensions.operator_notEquals(label, null);
     if (_notEquals) {
-      final BigInteger eval = ConstantEvaluate.valueOf(label, null);
-      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(eval, null);
-      if (_notEquals_1) {
-        int _intValue = bits.intValue();
-        Literal<? extends Object> _binaryLiteral = VHDLUtils.toBinaryLiteral(_intValue, eval);
+      final Optional<BigInteger> eval = ConstantEvaluate.valueOf(label, null);
+      boolean _isPresent = eval.isPresent();
+      if (_isPresent) {
+        boolean _isPresent_1 = bits.isPresent();
+        boolean _not = (!_isPresent_1);
+        if (_not) {
+          IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("The width needs to be known for primitive types!");
+          throw _illegalArgumentException;
+        }
+        BigInteger _get = bits.get();
+        int _intValue = _get.intValue();
+        BigInteger _get_1 = eval.get();
+        Literal<? extends Object> _binaryLiteral = VHDLUtils.toBinaryLiteral(_intValue, _get_1);
         Alternative _createAlternative = cs.createAlternative(_binaryLiteral);
         alt = _createAlternative;
       } else {

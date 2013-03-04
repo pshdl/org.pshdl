@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.generator.vhdl;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -54,8 +55,8 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	}
 
 	@Override
-	public BigInteger evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
-		return null;
+	public Optional<BigInteger> evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
+		return Optional.absent();
 	}
 
 	@Override
@@ -89,8 +90,10 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
 			HDLEnumRef ref = (HDLEnumRef) function.getParams().get(1);
-			BigInteger hdlExpression = ConstantEvaluate.valueOf(function.getParams().get(0));
-			WaitStatement ws = new WaitStatement(new PhysicalLiteral(hdlExpression.toString(), ref.getVarRefName().getLastSegment()));
+			Optional<BigInteger> hdlExpression = ConstantEvaluate.valueOf(function.getParams().get(0));
+			if (!hdlExpression.isPresent())
+				throw new IllegalArgumentException(function.getParams().get(0) + " is not constant");
+			WaitStatement ws = new WaitStatement(new PhysicalLiteral(hdlExpression.get().toString(), ref.getVarRefName().getLastSegment()));
 			res.addUnclockedStatement(pid, ws, function);
 			return res;
 		}

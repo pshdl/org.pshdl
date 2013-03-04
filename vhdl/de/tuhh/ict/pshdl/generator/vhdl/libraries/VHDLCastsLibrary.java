@@ -3,6 +3,8 @@ package de.tuhh.ict.pshdl.generator.vhdl.libraries;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.generator.vhdl.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -13,6 +15,7 @@ import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;
 import de.upb.hni.vmagic.declaration.*;
+import de.upb.hni.vmagic.declaration.Function;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.libraryunit.*;
 import de.upb.hni.vmagic.literal.*;
@@ -161,10 +164,10 @@ public class VHDLCastsLibrary {
 
 	public static TargetType getResize(Expression<?> exp, HDLPrimitive actualType, HDLExpression tWidth) {
 		if (actualType.getWidth() != null) {
-			BigInteger bt = ConstantEvaluate.valueOf(actualType.getWidth(), null);
-			if (bt != null) {
-				BigInteger btw = ConstantEvaluate.valueOf(tWidth, null);
-				if (bt.equals(btw)) {
+			Optional<BigInteger> bt = ConstantEvaluate.valueOf(actualType.getWidth(), null);
+			if (bt.isPresent()) {
+				Optional<BigInteger> btw = ConstantEvaluate.valueOf(tWidth, null);
+				if (btw.isPresent() && bt.get().equals(btw.get())) {
 					return new TargetType(exp, actualType.getType());
 				}
 			}
@@ -209,7 +212,7 @@ public class VHDLCastsLibrary {
 		if ((container != null) && (container.getClassType() == HDLClass.HDLArithOp))
 			return VHDLExpressionExtension.vhdlOf(lit);
 		BigInteger val = lit.getValueAsBigInt();
-		BigInteger width = null;
+		Optional<BigInteger> width = null;
 		if (tWidth != null)
 			width = ConstantEvaluate.valueOf(tWidth, null);
 		switch (targetType.getType()) {
@@ -227,8 +230,8 @@ public class VHDLCastsLibrary {
 		case BITVECTOR:
 			if (BigInteger.ZERO.equals(val) && (container != null) && (container.getClassType() == HDLClass.HDLAssignment))
 				return Aggregate.OTHERS(new CharacterLiteral('0'));
-			if (width != null)
-				return VHDLExpressionExtension.INST.toVHDL(lit, width.intValue(), true);
+			if (width.isPresent())
+				return VHDLExpressionExtension.INST.toVHDL(lit, width.get().intValue(), true);
 			FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
 			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.INST.toVHDL(lit, val.bitLength(), true)));
 			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
@@ -247,15 +250,15 @@ public class VHDLCastsLibrary {
 		throw new IllegalArgumentException("Should not get here");
 	}
 
-	private static Expression<?> handleIntUint(IHDLObject container, HDLExpression tWidth, HDLLiteral lit, BigInteger val, BigInteger width, HDLPrimitiveType to,
+	private static Expression<?> handleIntUint(IHDLObject container, HDLExpression tWidth, HDLLiteral lit, BigInteger val, Optional<BigInteger> width, HDLPrimitiveType to,
 			Function castFunc, FunctionDeclaration resize) {
 		if (BigInteger.ZERO.equals(val) && (container != null) && (container.getClassType() == HDLClass.HDLAssignment))
 			return Aggregate.OTHERS(new CharacterLiteral('0'));
-		if ((width != null) && (lit.getPresentation() != HDLLiteralPresentation.NUM))
-			return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
+		if ((width.isPresent()) && (lit.getPresentation() != HDLLiteralPresentation.NUM))
+			return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.get().intValue(), true), HDLPrimitiveType.BITVECTOR, to);
 		if (val.bitLength() > 31) {
-			if (width != null)
-				return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.intValue(), true), HDLPrimitiveType.BITVECTOR, to);
+			if (width.isPresent())
+				return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.get().intValue(), true), HDLPrimitiveType.BITVECTOR, to);
 			FunctionCall functionCall = new FunctionCall(resize);
 			functionCall.getParameters().add(
 					new AssociationElement(VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));

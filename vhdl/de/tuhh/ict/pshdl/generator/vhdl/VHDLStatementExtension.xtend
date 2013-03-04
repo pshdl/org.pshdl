@@ -92,6 +92,7 @@ import de.tuhh.ict.pshdl.model.HDLResolvedRef
 import de.tuhh.ict.pshdl.model.IHDLObject
 import de.tuhh.ict.pshdl.model.parser.SourceInfo
 import de.upb.hni.vmagic.util.Comments
+import com.google.common.base.Optional
 
 class VHDLStatementExtension {
 	public static VHDLStatementExtension INST= new VHDLStatementExtension
@@ -396,11 +397,11 @@ class VHDLStatementExtension {
 	def dispatch VHDLContext toVHDL(HDLSwitchStatement obj, int pid) {
 		val VHDLContext context = new VHDLContext
 		val HDLExpression hCaseExp = obj.caseExp
-		var BigInteger width = null
+		var Optional<BigInteger> width = Optional::absent
 		val HDLType type = TypeExtension::typeOf(hCaseExp)
 		if (type instanceof HDLPrimitive) {
 			width = ConstantEvaluate::valueOf((type as HDLPrimitive).width,null)
-			if (width == null)
+			if (!width.present)
 				throw new IllegalArgumentException("HDLPrimitive switch case needs to have constant width")
 		}
 		val Expression<?> caseExp = hCaseExp.toVHDL
@@ -437,13 +438,16 @@ class VHDLStatementExtension {
 		return context.attachComment(obj)
 	}
 
-	def private Alternative createAlternative(CaseStatement cs, Map$Entry<HDLSwitchCaseStatement, VHDLContext> e, BigInteger bits) {
+	def private Alternative createAlternative(CaseStatement cs, Map$Entry<HDLSwitchCaseStatement, VHDLContext> e, Optional<BigInteger> bits) {
 		var Alternative alt
 		val HDLExpression label = e.key.label
 		if (label != null) {
-			val BigInteger eval = ConstantEvaluate::valueOf(label,null)
-			if (eval != null)
-				alt = cs.createAlternative(VHDLUtils::toBinaryLiteral(bits.intValue, eval))
+			val Optional<BigInteger> eval = ConstantEvaluate::valueOf(label,null)
+			if (eval.present){
+				if (!bits.present)
+					throw new IllegalArgumentException("The width needs to be known for primitive types!")
+				alt = cs.createAlternative(VHDLUtils::toBinaryLiteral(bits.get.intValue, eval.get))
+			}
 			else
 				alt = cs.createAlternative(label.toVHDL);// The only valid
 															// reason here is an

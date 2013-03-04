@@ -126,9 +126,9 @@ public class BusGenerator implements IHDLGenerator {
 			if ("memCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
-				BigInteger regVal = ConstantEvaluate.valueOf(expression);
-				if (regVal != null) {
-					memCount = regVal.intValue();
+				Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
+				if (regVal.isPresent()) {
+					memCount = regVal.get().intValue();
 				} else {
 					if (expression instanceof HDLLiteral) {
 						HDLLiteral lit = (HDLLiteral) expression;
@@ -155,9 +155,9 @@ public class BusGenerator implements IHDLGenerator {
 			if ("regCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
-				BigInteger regVal = ConstantEvaluate.valueOf(expression);
-				if (regVal != null) {
-					regCount = regVal.intValue();
+				Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
+				if (regVal.isPresent()) {
+					regCount = regVal.get().intValue();
 				} else {
 					if (expression instanceof HDLLiteral) {
 						HDLLiteral lit = (HDLLiteral) expression;

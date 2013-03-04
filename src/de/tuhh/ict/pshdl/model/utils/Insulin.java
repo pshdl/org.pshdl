@@ -908,14 +908,14 @@ public class Insulin {
 						// b{1}=b_bitAcces{sumOfWidthRightToIdx};
 						// b{2:3}=b_bitAccess{from-min(from,to)+sumOfWidthRightToIdx:to-min(from,to)+sumOfWidthRightToIdx};
 						List<HDLStatement> replacements = new LinkedList<HDLStatement>();
-						BigInteger constant = ConstantEvaluate.valueOf(ass.getRight(), context);
-						if (constant != null) {
+						Optional<BigInteger> constant = ConstantEvaluate.valueOf(ass.getRight(), context);
+						if (constant.isPresent()) {
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								HDLRange r = bits.get(j);
 								Range<BigInteger> vr = RangeExtension.rangeOf(r, context);
 								BigInteger add = shift.add(vr.upperEndpoint().subtract(vr.lowerEndpoint()).abs());
-								BigInteger res = constant.shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
+								BigInteger res = constant.get().shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
 								HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
 								HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(HDLLiteral.get(res));
 								replacements.add(newAss);

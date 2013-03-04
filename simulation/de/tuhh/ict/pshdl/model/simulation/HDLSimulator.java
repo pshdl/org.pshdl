@@ -1,13 +1,12 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
-import static com.google.common.base.Preconditions.*;
-
 import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -46,7 +45,11 @@ public class HDLSimulator {
 				HDLQualifiedName newName = variableRef.getVarRefName();
 				String lastSegment = newName.getLastSegment();
 				for (HDLExpression arr : variableRef.getArray()) {
-					lastSegment += "[" + ConstantEvaluate.valueOf(arr, context) + "]";
+					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(arr, context);
+					if (valueOf.isPresent())
+						lastSegment += "[" + valueOf.get() + "]";
+					else
+						throw new IllegalArgumentException(arr + " not constant");
 				}
 				newName = newName.skipLast(1).append(lastSegment);
 				ms.replace(variableRef, variableRef.setVar(newName).setArray(null));
@@ -69,9 +72,11 @@ public class HDLSimulator {
 	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, @Nonnull String name, HDLEvaluationContext context) {
 		if (idx >= dim.size())
 			return Collections.singletonList(new HDLVariable().setName(name));
-		BigInteger size = ConstantEvaluate.valueOf(dim.get(idx), context);
+		Optional<BigInteger> size = ConstantEvaluate.valueOf(dim.get(idx), context);
+		if (!size.isPresent())
+			throw new IllegalArgumentException("The dimension " + dim.get(idx) + " is not constant.");
 		List<HDLVariable> res = new LinkedList<HDLVariable>();
-		for (int i = 0; i < size.intValue(); i++) {
+		for (int i = 0; i < size.get().intValue(); i++) {
 			res.addAll(createArrayVar(dim, i + 1, name + "[" + i + "]", context));
 		}
 		return res;
@@ -81,13 +86,17 @@ public class HDLSimulator {
 		ModificationSet ms = new ModificationSet();
 		HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange hdlRange : ranges) {
-			BigInteger toBig = checkNotNull(ConstantEvaluate.valueOf(hdlRange.getTo(), context), "Given the context it should always be non null");
+			Optional<BigInteger> toBig = ConstantEvaluate.valueOf(hdlRange.getTo(), context);
+			if (!toBig.isPresent())
+				throw new IllegalArgumentException("Given the context it should always be non null");
 			HDLExpression from = hdlRange.getFrom();
 			if (from != null) {
-				BigInteger fromBig = checkNotNull(ConstantEvaluate.valueOf(from, context), "Given the context it should always be non null");
-				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig)).setTo(HDLLiteral.get(toBig)));
+				Optional<BigInteger> fromBig = ConstantEvaluate.valueOf(from, context);
+				if (!fromBig.isPresent())
+					throw new IllegalArgumentException("Given the context it should always be non null");
+				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig.get())).setTo(HDLLiteral.get(toBig.get())));
 			} else {
-				ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig)));
+				ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig.get())));
 			}
 		}
 		return ms.apply(insulin);
@@ -158,8 +167,10 @@ public class HDLSimulator {
 						} else {
 							HDLExpression width = TypeExtension.getWidth(resolveVar);
 							if (width != null) {
-								BigInteger bWidth = ConstantEvaluate.valueOf(width, context);
-								fullRanges.put(varRefName, Ranges.closed(BigInteger.ZERO, bWidth.subtract(BigInteger.ONE)));
+								Optional<BigInteger> bWidth = ConstantEvaluate.valueOf(width, context);
+								if (!bWidth.isPresent())
+									throw new IllegalArgumentException("Given the context this should be constant");
+								fullRanges.put(varRefName, Ranges.closed(BigInteger.ZERO, bWidth.get().subtract(BigInteger.ONE)));
 							}
 						}
 					}
@@ -241,8 +252,8 @@ public class HDLSimulator {
 					do {
 						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
 						ifExp = ifExp.copyDeepFrozen(ass);
-						BigInteger evaluate = ConstantEvaluate.valueOf(ifExp, context);
-						if (evaluate == null) {
+						Optional<BigInteger> evaluate = ConstantEvaluate.valueOf(ifExp, context);
+						if (!evaluate.isPresent()) {
 							HDLVariableRef writeRef = ref.setArray(HDLObject.asList((HDLExpression) HDLLiteral.get(counter)));
 							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp).addThenDo(ass.setLeft(writeRef));
 							replacements.add(ifStmnt);

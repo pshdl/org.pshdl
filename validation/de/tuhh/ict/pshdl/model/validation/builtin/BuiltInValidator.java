@@ -1,11 +1,13 @@
 package de.tuhh.ict.pshdl.model.validation.builtin;
 
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+import static de.tuhh.ict.pshdl.model.utils.HDLQuery.*;
 
 import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
@@ -280,8 +282,8 @@ public class BuiltInValidator implements IHDLValidator {
 				case BIT:
 					if (right.getType() != HDLPrimitiveType.BIT) {
 						if (right.getWidth() != null) {
-							BigInteger w = ConstantEvaluate.valueOf(right.getWidth(), context);
-							if (!w.equals(BigInteger.ONE))
+							Optional<BigInteger> w = ConstantEvaluate.valueOf(right.getWidth(), context);
+							if (w.isPresent() && !w.get().equals(BigInteger.ONE))
 								problems.add(new Problem(ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
 						}
 					}
@@ -362,11 +364,11 @@ public class BuiltInValidator implements IHDLValidator {
 					defaultFound = true;
 				} else {
 					if (!isEnum) {
-						BigInteger constant = ConstantEvaluate.valueOf(label, null);
-						if (constant == null) {
+						Optional<BigInteger> constant = ConstantEvaluate.valueOf(label, null);
+						if (!constant.isPresent()) {
 							problems.add(new Problem(ErrorCode.SWITCH_LABEL_NOT_CONSTANT, caseStatement));
 						} else {
-							if (!values.add(constant))
+							if (!values.add(constant.get()))
 								problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
 						}
 					} else {
@@ -511,9 +513,9 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLEqualityOp op : equalities) {
 			if (skipExp(op))
 				continue;
-			BigInteger res = ConstantEvaluate.valueOf(op, getContext(hContext, op));
-			if (res != null) {
-				if (res.equals(BigInteger.ONE))
+			Optional<BigInteger> res = ConstantEvaluate.valueOf(op, getContext(hContext, op));
+			if (res.isPresent()) {
+				if (res.get().equals(BigInteger.ONE))
 					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_TRUE, op));
 				else
 					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_FALSE, op));
@@ -527,16 +529,19 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private static void checkConstantBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		// XXX Check Array Dimensions
-		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection)
-				.isEqualTo(HDLDirection.CONSTANT).or(HDLDirection.PARAMETER);
+		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class)//
+				.from(unit).where(HDLVariableDeclaration.fDirection)//
+				.matches(isEqualTo(HDLDirection.CONSTANT))//
+				.or(isEqualTo(HDLDirection.PARAMETER)) //
+				.getAll();
 		for (HDLVariableDeclaration hvd : constants) {
 			for (HDLVariable var : hvd.getVariables()) {
 				if (var.getDefaultValue() == null) {
 					problems.add(new Problem(ErrorCode.CONSTANT_NEED_DEFAULTVALUE, var));
 				} else {
 					HDLExpression def = var.getDefaultValue();
-					BigInteger constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
-					if (constant == null) {
+					Optional<BigInteger> constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
+					if (!constant.isPresent()) {
 						if (!(def instanceof HDLLiteral))
 							problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
 
@@ -547,13 +552,13 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLForLoop[] forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop hdlForLoop : forLoops) {
 			for (HDLRange r : hdlForLoop.getRange()) {
-				BigInteger evalTo = ConstantEvaluate.valueOf(r.getTo(), getContext(hContext, r));
-				if (evalTo == null) {
+				Optional<BigInteger> evalTo = ConstantEvaluate.valueOf(r.getTo(), getContext(hContext, r));
+				if (!evalTo.isPresent()) {
 					problems.add(new Problem(ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT, r.getTo(), r, null));
 				}
 				if (r.getFrom() != null) {
-					BigInteger evalFrom = ConstantEvaluate.valueOf(r.getFrom(), getContext(hContext, r));
-					if (evalFrom == null) {
+					Optional<BigInteger> evalFrom = ConstantEvaluate.valueOf(r.getFrom(), getContext(hContext, r));
+					if (!evalFrom.isPresent()) {
 						problems.add(new Problem(ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT, r.getFrom(), r, null));
 					}
 				}
@@ -683,12 +688,12 @@ public class BuiltInValidator implements IHDLValidator {
 			for (int i = 0; i < targetDim.size(); i++) {
 				HDLExpression target = targetDim.get(i);
 				HDLExpression source = sourceDim.get(i);
-				BigInteger t = ConstantEvaluate.valueOf(target, context);
-				BigInteger s = ConstantEvaluate.valueOf(source, context);
-				if (s == null) {
+				Optional<BigInteger> t = ConstantEvaluate.valueOf(target, context);
+				Optional<BigInteger> s = ConstantEvaluate.valueOf(source, context);
+				if (!s.isPresent()) {
 					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, right));
 				}
-				if (t == null) {
+				if (!t.isPresent()) {
 					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, left));
 				}
 				if ((t != null) && (s != null)) {

@@ -2,8 +2,9 @@ package de.tuhh.ict.pshdl.model;
 
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
 
 public interface IHDLObject {
 	public HDLClass getClassType();
@@ -26,7 +27,7 @@ public interface IHDLObject {
 
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep);
 
-	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher);
+	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, Predicate<K>... matcher);
 
 	public <T extends IHDLObject> T getContainer(Class<T> clazz);
 

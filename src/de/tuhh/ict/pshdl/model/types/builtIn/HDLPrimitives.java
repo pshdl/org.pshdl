@@ -296,9 +296,9 @@ public class HDLPrimitives {
 		if (width == null)
 			return null;
 		width = width.copyDeepFrozen(container);
-		BigInteger newW = ConstantEvaluate.valueOf(width, null);
-		if (newW != null) {
-			width = new HDLLiteral().setVal(newW.toString());
+		Optional<BigInteger> newW = ConstantEvaluate.valueOf(width, null);
+		if (newW.isPresent()) {
+			width = new HDLLiteral().setVal(newW.get().toString());
 		}
 		return width;
 	}
@@ -539,15 +539,21 @@ public class HDLPrimitives {
 		case BIT:
 		case BITVECTOR:
 		case STRING:
-
 			return null;
-		case INT:
-			BigInteger bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
-			return intRange(bitWidth);
+		case INT: {
+			Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
+			if (!bitWidth.isPresent())
+				return null;
+			return intRange(bitWidth.get());
+		}
 		case INTEGER:
 			return intRange(BigInteger.valueOf(32));
-		case UINT:
-			return uintRange(ConstantEvaluate.valueOf(pt.getWidth(), context));
+		case UINT: {
+			Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
+			if (!bitWidth.isPresent())
+				return null;
+			return uintRange(bitWidth.get());
+		}
 		case NATURAL:
 			return uintRange(BigInteger.valueOf(32));
 		}
@@ -581,7 +587,7 @@ public class HDLPrimitives {
 			case UINT:
 			case INT:
 			case BITVECTOR:
-				width = ConstantEvaluate.valueOf(determineType.getWidth(), context);
+				width = ConstantEvaluate.valueOf(determineType.getWidth(), context).orNull();
 				break;
 			default:
 				throw new IllegalArgumentException("Can not concatenate " + determineType);

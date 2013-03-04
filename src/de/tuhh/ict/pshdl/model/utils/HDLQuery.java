@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model.utils;
 
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 
 public class HDLQuery {
@@ -15,13 +17,7 @@ public class HDLQuery {
 		public abstract K getValue(T obj);
 	}
 
-	public static interface FieldMatcher<T> {
-		boolean matches(T obj);
-
-		FieldMatcher<T> setParameter(T param);
-	}
-
-	private static class EqualsMatcher<T> implements FieldMatcher<T> {
+	private static class EqualsMatcher<T> implements Predicate<T> {
 		private Object equalsTo;
 		private boolean invert;
 
@@ -31,7 +27,7 @@ public class HDLQuery {
 		}
 
 		@Override
-		public boolean matches(T obj) {
+		public boolean apply(T obj) {
 			if (equalsTo == null) {
 				boolean b = obj == null ? true : false;
 				if (invert)
@@ -44,13 +40,9 @@ public class HDLQuery {
 			return equals;
 		}
 
-		@Override
-		public EqualsMatcher<T> setParameter(T param) {
-			return new EqualsMatcher<T>(param, invert);
-		}
 	}
 
-	private static class StartsWithMatcher<T> implements FieldMatcher<T> {
+	private static class StartsWithMatcher<T> implements Predicate<T> {
 		private T equalsTo;
 
 		public StartsWithMatcher(T equalsTo) {
@@ -58,20 +50,15 @@ public class HDLQuery {
 		}
 
 		@Override
-		public boolean matches(T obj) {
+		public boolean apply(T obj) {
 			if (obj == null)
 				return false;
 			return obj.toString().startsWith(equalsTo.toString());
 		}
 
-		@Override
-		public StartsWithMatcher<T> setParameter(T param) {
-			return new StartsWithMatcher<T>(param);
-		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private static class LastSegmentMatcher implements FieldMatcher {
+	private static class LastSegmentMatcher<T> implements Predicate<T> {
 		private HDLQualifiedName equalsTo;
 		private boolean matchLocally = false;
 
@@ -85,7 +72,7 @@ public class HDLQuery {
 		}
 
 		@Override
-		public boolean matches(Object obj) {
+		public boolean apply(T obj) {
 			if (obj == null)
 				return false;
 			if (matchLocally)
@@ -93,19 +80,15 @@ public class HDLQuery {
 			return new HDLQualifiedName(obj.toString()).getLastSegment().equals(equalsTo.getLastSegment());
 		}
 
-		@Override
-		public LastSegmentMatcher setParameter(Object param) {
-			return new LastSegmentMatcher(param.toString());
-		}
 	}
 
 	public static class Result<T, K> {
 		private HDLFieldAccess<T, K> field;
 		private IHDLObject from;
 		private Class<T> clazz;
-		private FieldMatcher<K> matcher;
+		private Predicate<K> matcher;
 
-		public Result(IHDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
+		public Result(IHDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, Predicate<K> matcher) {
 			this.from = from;
 			this.clazz = clazz;
 			this.field = field;
@@ -126,11 +109,10 @@ public class HDLQuery {
 			return null;
 		}
 
-		public Collection<T> or(K parameter) {
-			Collection<T> res = from.getAllObjectsOf(clazz, field, matcher);
-			res.addAll(from.getAllObjectsOf(clazz, field, matcher.setParameter(parameter)));
-			return res;
+		public Result<T, K> or(Predicate<K> value) {
+			return new Result<T, K>(from, clazz, field, Predicates.or(matcher, value));
 		}
+
 	}
 
 	public static class FieldSelector<T, K> {
@@ -152,7 +134,6 @@ public class HDLQuery {
 			return new Result<T, K>(from, clazz, field, new StartsWithMatcher<K>(ifRef));
 		}
 
-		@SuppressWarnings("unchecked")
 		public Result<T, K> lastSegmentIs(String lastSegment) {
 			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(lastSegment));
 		}
@@ -163,6 +144,10 @@ public class HDLQuery {
 
 		public Result<T, K> matchesLocally(HDLQualifiedName fullName) {
 			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(fullName, true));
+		}
+
+		public Result<T, K> matches(Predicate<K> predicate) {
+			return new Result<T, K>(from, clazz, field, predicate);
 		}
 
 	}
@@ -197,6 +182,26 @@ public class HDLQuery {
 
 	public static <T extends IHDLObject> Source<T> select(Class<T> clazz) {
 		return new Source<T>(clazz);
+	}
+
+	public static <K> Predicate<K> isEqualTo(K value) {
+		return new EqualsMatcher<K>(value, false);
+	}
+
+	public static <K> Predicate<K> startsWith(K value) {
+		return new StartsWithMatcher<K>(value);
+	}
+
+	public static <K> Predicate<K> isNotEqualTo(K value) {
+		return new EqualsMatcher<K>(value, true);
+	}
+
+	public static <K> Predicate<K> lastSegmentIs(String value) {
+		return new LastSegmentMatcher<K>(value);
+	}
+
+	public static <K> Predicate<K> matchesLocally(HDLQualifiedName value) {
+		return new LastSegmentMatcher<K>(value, true);
 	}
 
 }

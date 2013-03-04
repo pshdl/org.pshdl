@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model.evaluation;
 
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
+import static de.tuhh.ict.pshdl.model.utils.HDLQuery.*;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -31,17 +32,27 @@ public class HDLEvaluationContext {
 		return res;
 	}
 
+	/**
+	 * Generates a default context where all parameter are assumed to be the
+	 * constant they are initialized with
+	 * 
+	 * @param unit
+	 *            the unit to create the context for
+	 * @return a HDLEvaluationContext with all parameters set to their default
+	 */
 	public static HDLEvaluationContext createDefault(HDLUnit unit) {
 		Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
-		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(unit).where(HDLVariableDeclaration.fDirection)
-				.isEqualTo(HDLDirection.CONSTANT).or(HDLDirection.PARAMETER);
+		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class)//
+				.from(unit).where(HDLVariableDeclaration.fDirection)//
+				.matches(isEqualTo(HDLDirection.CONSTANT))//
+				.or(isEqualTo(HDLDirection.PARAMETER)) //
+				.getAll();
 		for (HDLVariableDeclaration hvd : constants) {
 			for (HDLVariable var : hvd.getVariables()) {
 				c.put(var.getName(), var.getDefaultValue());
 			}
 		}
-		HDLEvaluationContext hec = new HDLEvaluationContext(c);
-		return hec;
+		return new HDLEvaluationContext(c);
 	}
 
 	@Override

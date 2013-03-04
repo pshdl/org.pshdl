@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import de.tuhh.ict.pshdl.interpreter.utils.FluidFrame;
 import de.tuhh.ict.pshdl.interpreter.utils.FluidFrame.ArgumentedInstruction;
 import de.tuhh.ict.pshdl.interpreter.utils.FluidFrame.Instruction;
@@ -377,8 +378,12 @@ public class SimulationTransformationExtension {
       if (_or_1) {
         _matched=true;
         HDLExpression _width = current.getWidth();
-        BigInteger _valueOf = ConstantEvaluate.valueOf(_width, context);
-        return _valueOf.toString();
+        final Optional<BigInteger> res = ConstantEvaluate.valueOf(_width, context);
+        boolean _isPresent = res.isPresent();
+        if (_isPresent) {
+          BigInteger _get = res.get();
+          return _get.toString();
+        }
       }
     }
     String _plus = (current + " is not a valid type");
@@ -429,8 +434,15 @@ public class SimulationTransformationExtension {
       }
       if (_or) {
         _matched=true;
-        final BigInteger bVal = ConstantEvaluate.valueOf(obj, context);
-        res.constants.put(refName, bVal);
+        final Optional<BigInteger> bVal = ConstantEvaluate.valueOf(obj, context);
+        boolean _isPresent = bVal.isPresent();
+        boolean _not_1 = (!_isPresent);
+        if (_not_1) {
+          IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Const/param should be constant");
+          throw _illegalArgumentException;
+        }
+        BigInteger _get = bVal.get();
+        res.constants.put(refName, _get);
         ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.loadConstant, refName);
         res.instructions.add(_argumentedInstruction_1);
       }
@@ -459,8 +471,8 @@ public class SimulationTransformationExtension {
     }
     if (!_matched) {
       String _plus_1 = ("Did not expect obj here" + dir);
-      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_1);
-      throw _illegalArgumentException;
+      IllegalArgumentException _illegalArgumentException_1 = new IllegalArgumentException(_plus_1);
+      throw _illegalArgumentException_1;
     }
     return res;
   }

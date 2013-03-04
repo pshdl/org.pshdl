@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import de.tuhh.ict.pshdl.model.HDLAnnotation;
@@ -79,10 +80,12 @@ public class RangeExtension {
   }
   
   protected Range<BigInteger> _determineRange(final HDLVariableRef obj, final HDLEvaluationContext context) {
-    final BigInteger bigVal = ConstantEvaluate.valueOf(obj, context);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(bigVal, null);
-    if (_notEquals) {
-      return Ranges.<BigInteger>closed(bigVal, bigVal);
+    final Optional<BigInteger> bigVal = ConstantEvaluate.valueOf(obj, context);
+    boolean _isPresent = bigVal.isPresent();
+    if (_isPresent) {
+      BigInteger _get = bigVal.get();
+      BigInteger _get_1 = bigVal.get();
+      return Ranges.<BigInteger>closed(_get, _get_1);
     }
     final HDLVariable hVar = obj.resolveVar();
     boolean _equals = ObjectExtensions.operator_equals(hVar, null);
@@ -92,33 +95,33 @@ public class RangeExtension {
       return null;
     }
     HDLAnnotation range = hVar.getAnnotation(HDLBuiltInAnnotations.range);
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(range, null);
-    if (_notEquals_1) {
+    boolean _notEquals = ObjectExtensions.operator_notEquals(range, null);
+    if (_notEquals) {
       String _value = range.getValue();
       final String[] value = _value.split(";");
-      String _get = ((List<String>)Conversions.doWrapArray(value)).get(0);
-      BigInteger _bigInteger = new BigInteger(_get);
-      String _get_1 = ((List<String>)Conversions.doWrapArray(value)).get(1);
-      BigInteger _bigInteger_1 = new BigInteger(_get_1);
+      String _get_2 = ((List<String>)Conversions.doWrapArray(value)).get(0);
+      BigInteger _bigInteger = new BigInteger(_get_2);
+      String _get_3 = ((List<String>)Conversions.doWrapArray(value)).get(1);
+      BigInteger _bigInteger_1 = new BigInteger(_get_3);
       return Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
     }
     IHDLObject _container = hVar.getContainer();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_container, null);
-    if (_notEquals_2) {
+    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_container, null);
+    if (_notEquals_1) {
       IHDLObject _container_1 = hVar.getContainer();
       if ((_container_1 instanceof HDLVariableDeclaration)) {
         IHDLObject _container_2 = hVar.getContainer();
         final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) _container_2);
         HDLAnnotation _annotation = hvd.getAnnotation(HDLBuiltInAnnotations.range);
         range = _annotation;
-        boolean _notEquals_3 = ObjectExtensions.operator_notEquals(range, null);
-        if (_notEquals_3) {
+        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(range, null);
+        if (_notEquals_2) {
           String _value_1 = range.getValue();
           final String[] value_1 = _value_1.split(";");
-          String _get_2 = ((List<String>)Conversions.doWrapArray(value_1)).get(0);
-          BigInteger _bigInteger_2 = new BigInteger(_get_2);
-          String _get_3 = ((List<String>)Conversions.doWrapArray(value_1)).get(1);
-          BigInteger _bigInteger_3 = new BigInteger(_get_3);
+          String _get_4 = ((List<String>)Conversions.doWrapArray(value_1)).get(0);
+          BigInteger _bigInteger_2 = new BigInteger(_get_4);
+          String _get_5 = ((List<String>)Conversions.doWrapArray(value_1)).get(1);
+          BigInteger _bigInteger_3 = new BigInteger(_get_5);
           return Ranges.<BigInteger>closed(_bigInteger_2, _bigInteger_3);
         }
       }
@@ -127,15 +130,18 @@ public class RangeExtension {
         IHDLObject _container_4 = hVar.getContainer();
         final HDLForLoop loop = ((HDLForLoop) _container_4);
         ArrayList<HDLRange> _range = loop.getRange();
-        HDLRange _get_4 = _range.get(0);
-        Range<BigInteger> res = this.determineRange(_get_4, context);
-        ArrayList<HDLRange> _range_1 = loop.getRange();
-        for (final HDLRange r : _range_1) {
-          Range<BigInteger> _determineRange = this.determineRange(r, context);
-          Range<BigInteger> _span = res.span(_determineRange);
-          res = _span;
+        HDLRange _get_6 = _range.get(0);
+        Range<BigInteger> res = this.determineRange(_get_6, context);
+        boolean _notEquals_3 = ObjectExtensions.operator_notEquals(res, null);
+        if (_notEquals_3) {
+          ArrayList<HDLRange> _range_1 = loop.getRange();
+          for (final HDLRange r : _range_1) {
+            Range<BigInteger> _determineRange = this.determineRange(r, context);
+            Range<BigInteger> _span = res.span(_determineRange);
+            res = _span;
+          }
+          return res;
         }
-        return res;
       }
     }
     ArrayList<HDLRange> _bits = obj.getBits();
@@ -149,13 +155,16 @@ public class RangeExtension {
           HDLExpression width = r_1.getWidth();
           HDLExpression _copyDeepFrozen = width.copyDeepFrozen(r_1);
           width = _copyDeepFrozen;
-          BigInteger cw = ConstantEvaluate.valueOf(width, context);
-          boolean _equals_1 = ObjectExtensions.operator_equals(cw, null);
-          if (_equals_1) {
+          Optional<BigInteger> cw = ConstantEvaluate.valueOf(width, context);
+          boolean _isPresent_1 = cw.isPresent();
+          boolean _not = (!_isPresent_1);
+          if (_not) {
             bitWidth = null;
+          } else {
+            BigInteger _get_7 = cw.get();
+            BigInteger _add = bitWidth.add(_get_7);
+            bitWidth = _add;
           }
-          BigInteger _add = bitWidth.add(cw);
-          bitWidth = _add;
         }
       }
       boolean _notEquals_4 = ObjectExtensions.operator_notEquals(bitWidth, null);
@@ -178,20 +187,38 @@ public class RangeExtension {
   
   protected Range<BigInteger> _determineRange(final HDLRange obj, final HDLEvaluationContext context) {
     HDLExpression _to = obj.getTo();
-    final BigInteger to = ConstantEvaluate.valueOf(_to, context);
+    final Optional<BigInteger> to = ConstantEvaluate.valueOf(_to, context);
+    boolean _isPresent = to.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return null;
+    }
     HDLExpression _from = obj.getFrom();
     boolean _notEquals = ObjectExtensions.operator_notEquals(_from, null);
     if (_notEquals) {
       HDLExpression _from_1 = obj.getFrom();
-      final BigInteger from = ConstantEvaluate.valueOf(_from_1, context);
-      int _compareTo = from.compareTo(to);
+      final Optional<BigInteger> from = ConstantEvaluate.valueOf(_from_1, context);
+      boolean _isPresent_1 = from.isPresent();
+      boolean _not_1 = (!_isPresent_1);
+      if (_not_1) {
+        return null;
+      }
+      BigInteger _get = from.get();
+      BigInteger _get_1 = to.get();
+      int _compareTo = _get.compareTo(_get_1);
       boolean _greaterThan = (_compareTo > 0);
       if (_greaterThan) {
-        return Ranges.<BigInteger>closed(to, from);
+        BigInteger _get_2 = to.get();
+        BigInteger _get_3 = from.get();
+        return Ranges.<BigInteger>closed(_get_2, _get_3);
       }
-      return Ranges.<BigInteger>closed(from, to);
+      BigInteger _get_4 = from.get();
+      BigInteger _get_5 = to.get();
+      return Ranges.<BigInteger>closed(_get_4, _get_5);
     }
-    return Ranges.<BigInteger>closed(to, to);
+    BigInteger _get_6 = to.get();
+    BigInteger _get_7 = to.get();
+    return Ranges.<BigInteger>closed(_get_6, _get_7);
   }
   
   protected Range<BigInteger> _determineRange(final HDLEqualityOp obj, final HDLEvaluationContext context) {

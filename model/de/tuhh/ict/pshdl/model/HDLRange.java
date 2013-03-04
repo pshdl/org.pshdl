@@ -4,6 +4,8 @@ import java.math.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -82,7 +84,8 @@ public class HDLRange extends AbstractHDLRange {
 		if (f == null)
 			return new HDLLiteral().setVal("1");
 		if (getTo() != null) {
-			if (BigInteger.ZERO.equals(ConstantEvaluate.valueOf(getTo()))) {
+			Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(getTo());
+			if (valueOf.isPresent() && BigInteger.ZERO.equals(valueOf.get())) {
 				HDLArithOp simpleWith = new HDLArithOp().setLeft(f).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 				return HDLPrimitives.simplifyWidth(this, simpleWith);
 			}

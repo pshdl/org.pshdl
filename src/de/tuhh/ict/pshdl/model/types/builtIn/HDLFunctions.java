@@ -3,6 +3,7 @@ package de.tuhh.ict.pshdl.model.types.builtIn;
 import java.math.*;
 import java.util.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.generator.vhdl.*;
@@ -87,16 +88,16 @@ public class HDLFunctions {
 		return null;
 	}
 
-	public static BigInteger constantEvaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
+	public static Optional<BigInteger> constantEvaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
 		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
 			for (IHDLFunctionResolver resolver : list) {
-				BigInteger eval = resolver.evaluate(function, args, context);
-				if (eval != null)
+				Optional<BigInteger> eval = resolver.evaluate(function, args, context);
+				if (eval.isPresent())
 					return eval;
 			}
 		}
-		return null;
+		return Optional.absent();
 	}
 
 	public static Range<BigInteger> determineRange(HDLFunctionCall function, HDLEvaluationContext context) {

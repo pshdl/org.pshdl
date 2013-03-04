@@ -6,10 +6,11 @@ import java.util.Map.Entry;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
-import de.tuhh.ict.pshdl.model.utils.HDLQuery.FieldMatcher;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import de.tuhh.ict.pshdl.model.utils.internal.*;
 
@@ -278,13 +279,16 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Override
-	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, FieldMatcher<K> matcher) {
+	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, Predicate<K>... matcher) {
 		T[] allObjectsOf = getAllObjectsOf(clazz, true);
 		Set<T> list = new NonSameList<T>();
 		for (T t : allObjectsOf) {
 			K value = field.getValue(t);
-			if (matcher.matches(value)) {
-				list.add(t);
+			for (Predicate<K> predicate : matcher) {
+				if (predicate.apply(value)) {
+					list.add(t);
+					break;
+				}
 			}
 		}
 		return list;
