@@ -72,13 +72,17 @@ public class HDLFunctions {
 				HDLInlineFunction hif = (HDLInlineFunction) rFunc;
 				HDLExpression expression = hif.getReplacementExpression(function);
 				if (expression != null) {
-					HDLType type = TypeExtension.typeOf(expression);
-					if (type instanceof HDLPrimitive) {
-						HDLPrimitive result = (HDLPrimitive) type;
+					Optional<? extends HDLType> type = TypeExtension.typeOf(expression);
+					if (type.isPresent() && (type.get() instanceof HDLPrimitive)) {
+						HDLPrimitive result = (HDLPrimitive) type.get();
 						HDLType args[] = new HDLType[function.getParams().size()];
 						int i = 0;
 						for (HDLExpression exp : function.getParams()) {
-							args[i++] = TypeExtension.typeOf(exp);
+							Optional<? extends HDLType> expType = TypeExtension.typeOf(exp);
+							if (expType.isPresent())
+								args[i++] = expType.get();
+							else
+								return null;
 						}
 						return new HDLTypeInferenceInfo(result, args);
 					}

@@ -123,9 +123,9 @@ class RangeExtension {
 				return Optional::of(Ranges::closed(0bi, 1bi.shiftLeft(bitWidth.intValue).subtract(1bi)))
 			}
 		}
-		val HDLType type = TypeExtension::typeOf(hVar)
-		if (type instanceof HDLPrimitive) {
-			return HDLPrimitives::instance.getValueRange(type as HDLPrimitive, context)
+		val Optional<? extends HDLType> type = TypeExtension::typeOf(hVar)
+		if (type.present && type.get instanceof HDLPrimitive) {
+			return HDLPrimitives::instance.getValueRange(type.get as HDLPrimitive, context)
 		}
 		obj.addMeta(SOURCE, obj)
 		obj.addMeta(DESCRIPTION, NON_PRIMITVE_TYPE_NOT_EVALUATED)
@@ -319,7 +319,9 @@ class RangeExtension {
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLConcat obj, HDLEvaluationContext context) {
-		val type = TypeExtension::typeOf(obj) as HDLPrimitive
-		return HDLPrimitives::instance.getValueRange(type, context)
+		val type = TypeExtension::typeOf(obj)
+		if (!type.present)
+			return Optional::absent
+		return HDLPrimitives::instance.getValueRange(type.get as HDLPrimitive, context)
 	}
 }

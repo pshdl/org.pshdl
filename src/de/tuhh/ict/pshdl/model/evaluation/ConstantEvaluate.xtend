@@ -133,9 +133,15 @@ class ConstantEvaluate {
 			if (!im.present) {
 				return Optional::absent
 			}
-			val Optional<BigInteger> width = TypeExtension::typeOf(cat).width.constantEvaluate(context)
+			val type=TypeExtension::typeOf(cat)
+			if (!type.present){
+				obj.addMeta(SOURCE, cat)
+				obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
+				return Optional::absent
+			}
+			val Optional<BigInteger> width = type.get.width.constantEvaluate(context)
 			if (!width.present) {
-				obj.addMeta(SOURCE, TypeExtension::typeOf(cat).width)
+				obj.addMeta(SOURCE, type.get.width)
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
 				return Optional::absent
 
@@ -276,8 +282,8 @@ class ConstantEvaluate {
 			obj.addMeta(DESCRIPTION, BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
 			return Optional::absent
 		}
-		val HDLType type = TypeExtension::typeOf(obj)
-		if (!(type instanceof HDLPrimitive)) {
+		val Optional<? extends HDLType> type = TypeExtension::typeOf(obj)
+		if (!type.present || !(type.get instanceof HDLPrimitive)) {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, TYPE_NOT_SUPPORTED_FOR_CONSTANTS)
 			return Optional::absent

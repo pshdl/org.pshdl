@@ -216,23 +216,31 @@ public class ConstantEvaluate {
         if (_not) {
           return Optional.<BigInteger>absent();
         }
-        HDLType _typeOf = TypeExtension.typeOf(cat);
-        HDLExpression _width = _typeOf.getWidth();
-        final Optional<BigInteger> width = this.constantEvaluate(_width, context);
-        boolean _isPresent_1 = width.isPresent();
+        final Optional<? extends HDLType> type = TypeExtension.typeOf(cat);
+        boolean _isPresent_1 = type.isPresent();
         boolean _not_1 = (!_isPresent_1);
         if (_not_1) {
-          HDLType _typeOf_1 = TypeExtension.typeOf(cat);
-          HDLExpression _width_1 = _typeOf_1.getWidth();
+          obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cat);
+          obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
+          return Optional.<BigInteger>absent();
+        }
+        HDLType _get = type.get();
+        HDLExpression _width = _get.getWidth();
+        final Optional<BigInteger> width = this.constantEvaluate(_width, context);
+        boolean _isPresent_2 = width.isPresent();
+        boolean _not_2 = (!_isPresent_2);
+        if (_not_2) {
+          HDLType _get_1 = type.get();
+          HDLExpression _width_1 = _get_1.getWidth();
           obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, _width_1);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
           return Optional.<BigInteger>absent();
         }
-        BigInteger _get = width.get();
-        int _intValue = _get.intValue();
+        BigInteger _get_2 = width.get();
+        int _intValue = _get_2.intValue();
         BigInteger _shiftLeft = sum.shiftLeft(_intValue);
-        BigInteger _get_1 = im.get();
-        BigInteger _or = _shiftLeft.or(_get_1);
+        BigInteger _get_3 = im.get();
+        BigInteger _or = _shiftLeft.or(_get_3);
         sum = _or;
       }
     }
@@ -588,9 +596,18 @@ public class ConstantEvaluate {
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
-    final HDLType type = TypeExtension.typeOf(obj);
-    boolean _not = (!(type instanceof HDLPrimitive));
+    final Optional<? extends HDLType> type = TypeExtension.typeOf(obj);
+    boolean _or = false;
+    boolean _isPresent = type.isPresent();
+    boolean _not = (!_isPresent);
     if (_not) {
+      _or = true;
+    } else {
+      HDLType _get = type.get();
+      boolean _not_1 = (!(_get instanceof HDLPrimitive));
+      _or = (_not || _not_1);
+    }
+    if (_or) {
       obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
@@ -618,9 +635,9 @@ public class ConstantEvaluate {
       }
       final HDLExpression cRef = context.get(hVar);
       final Optional<BigInteger> cRefEval = this.constantEvaluate(cRef, context);
-      boolean _isPresent = cRefEval.isPresent();
-      boolean _not_1 = (!_isPresent);
-      if (_not_1) {
+      boolean _isPresent_1 = cRefEval.isPresent();
+      boolean _not_2 = (!_isPresent_1);
+      if (_not_2) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();

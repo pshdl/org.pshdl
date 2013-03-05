@@ -169,8 +169,9 @@ public class SimulationTransformationExtension {
         final HDLExpression exp = iter.next();
         FluidFrame _simulationModel_1 = this.toSimulationModel(exp, context);
         res.append(_simulationModel_1);
-        HDLType _typeOf = TypeExtension.typeOf(exp);
-        final int width = (HDLPrimitives.getWidth(_typeOf, context)).intValue();
+        Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(exp);
+        HDLType _get = _typeOf.get();
+        final int width = (HDLPrimitives.getWidth(_get, context)).intValue();
         String _string = Integer.valueOf(width).toString();
         ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.concat, _string);
         res.add(_argumentedInstruction);
@@ -223,8 +224,9 @@ public class SimulationTransformationExtension {
         for (final HDLVariable hVar : _variables) {
           HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
           String _string = _fullNameOf.toString();
-          HDLType _typeOf = TypeExtension.typeOf(hVar);
-          Integer _width = HDLPrimitives.getWidth(_typeOf, context);
+          Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(hVar);
+          HDLType _get = _typeOf.get();
+          Integer _width = HDLPrimitives.getWidth(_get, context);
           res.addWith(_string, _width);
         }
       }
@@ -262,8 +264,9 @@ public class SimulationTransformationExtension {
         HDLType _castTo = obj.getCastTo();
         final HDLPrimitive prim = ((HDLPrimitive) _castTo);
         HDLExpression _target_1 = obj.getTarget();
-        HDLType _typeOf = TypeExtension.typeOf(_target_1);
-        final HDLPrimitive current = ((HDLPrimitive) _typeOf);
+        Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(_target_1);
+        HDLType _get = _typeOf.get();
+        final HDLPrimitive current = ((HDLPrimitive) _get);
         final String currentWidth = this.getWidth(current, context);
         final String primWidth = this.getWidth(prim, context);
         HDLPrimitiveType _type_1 = prim.getType();

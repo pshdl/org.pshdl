@@ -113,7 +113,7 @@ class SimulationTransformationExtension {
 		while (iter.hasNext) {
 			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context))
-			val int width=HDLPrimitives::getWidth(TypeExtension::typeOf(exp), context)
+			val int width=HDLPrimitives::getWidth(TypeExtension::typeOf(exp).get, context)
 			res.add(new ArgumentedInstruction(concat, width.toString))
 		}
 		return res
@@ -141,7 +141,7 @@ class SimulationTransformationExtension {
 		case HDLVariableDeclaration:{
 			val HDLVariableDeclaration hvd=stmnt as HDLVariableDeclaration
 			for(HDLVariable hVar: hvd.variables){
-				res.addWith(FullNameExtension::fullNameOf(hVar).toString, HDLPrimitives::getWidth(TypeExtension::typeOf(hVar), context))
+				res.addWith(FullNameExtension::fullNameOf(hVar).toString, HDLPrimitives::getWidth(TypeExtension::typeOf(hVar).get, context))
 			}
 		}
 		}
@@ -158,7 +158,7 @@ class SimulationTransformationExtension {
 			res.add(logic_neg)
 		case CAST:{
 			val HDLPrimitive prim =  obj.castTo as HDLPrimitive
-			val HDLPrimitive current=TypeExtension::typeOf(obj.target) as HDLPrimitive
+			val HDLPrimitive current=TypeExtension::typeOf(obj.target).get as HDLPrimitive
 			val String currentWidth=getWidth(current, context)
 			val String primWidth=getWidth(prim, context)
 			switch (prim.type) {

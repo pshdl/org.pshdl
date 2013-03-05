@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLUtils;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.VHDLCastsLibrary;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.VHDLCastsLibrary.TargetType;
@@ -269,8 +270,9 @@ public class VHDLExpressionExtension {
           return VHDLCastsLibrary.handleLiteral(_container, ((HDLLiteral) _target_4), targetType, tWidth);
         }
         HDLExpression _target_5 = obj.getTarget();
-        HDLType _typeOf = TypeExtension.typeOf(_target_5);
-        final HDLPrimitive t = ((HDLPrimitive) _typeOf);
+        Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(_target_5);
+        HDLType _get = _typeOf.get();
+        final HDLPrimitive t = ((HDLPrimitive) _get);
         HDLExpression _target_6 = obj.getTarget();
         Expression<?> exp = this.toVHDL(_target_6);
         HDLPrimitiveType actualType = t.getType();
@@ -389,8 +391,9 @@ public class VHDLExpressionExtension {
   
   protected Expression<? extends Object> _toVHDL(final HDLShiftOp obj) {
     HDLExpression _left = obj.getLeft();
-    HDLType _typeOf = TypeExtension.typeOf(_left);
-    final HDLPrimitive type = ((HDLPrimitive) _typeOf);
+    Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(_left);
+    HDLType _get = _typeOf.get();
+    final HDLPrimitive type = ((HDLPrimitive) _get);
     HDLExpression _left_1 = obj.getLeft();
     Expression<?> _vHDL = this.toVHDL(_left_1);
     HDLExpression _right = obj.getRight();

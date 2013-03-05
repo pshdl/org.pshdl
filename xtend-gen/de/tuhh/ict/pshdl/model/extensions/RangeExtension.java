@@ -191,10 +191,19 @@ public class RangeExtension {
         return Optional.<Range<BigInteger>>of(_closed_3);
       }
     }
-    final HDLType type = TypeExtension.typeOf(hVar);
-    if ((type instanceof HDLPrimitive)) {
+    final Optional<? extends HDLType> type = TypeExtension.typeOf(hVar);
+    boolean _and = false;
+    boolean _isPresent_2 = type.isPresent();
+    if (!_isPresent_2) {
+      _and = false;
+    } else {
+      HDLType _get_7 = type.get();
+      _and = (_isPresent_2 && (_get_7 instanceof HDLPrimitive));
+    }
+    if (_and) {
       HDLPrimitives _instance = HDLPrimitives.getInstance();
-      return _instance.getValueRange(((HDLPrimitive) type), context);
+      HDLType _get_8 = type.get();
+      return _instance.getValueRange(((HDLPrimitive) _get_8), context);
     }
     obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
@@ -774,10 +783,15 @@ public class RangeExtension {
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLConcat obj, final HDLEvaluationContext context) {
-    HDLType _typeOf = TypeExtension.typeOf(obj);
-    final HDLPrimitive type = ((HDLPrimitive) _typeOf);
+    final Optional<? extends HDLType> type = TypeExtension.typeOf(obj);
+    boolean _isPresent = type.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return Optional.<Range<BigInteger>>absent();
+    }
     HDLPrimitives _instance = HDLPrimitives.getInstance();
-    return _instance.getValueRange(type, context);
+    HDLType _get = type.get();
+    return _instance.getValueRange(((HDLPrimitive) _get), context);
   }
   
   public Optional<Range<BigInteger>> determineRange(final IHDLObject obj, final HDLEvaluationContext context) {

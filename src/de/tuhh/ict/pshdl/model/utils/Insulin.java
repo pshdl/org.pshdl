@@ -101,9 +101,9 @@ public class Insulin {
 			if (variable != null) {
 				if (sub == null)
 					return variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits());
-				HDLType type = TypeExtension.typeOf(variable);
-				if ((type != null) && (type.getClassType() == HDLClass.HDLInterface)) {
-					HDLQualifiedName typeName = fullNameOf(type);
+				Optional<? extends HDLType> type = TypeExtension.typeOf(variable);
+				if ((type.isPresent()) && (type.get().getClassType() == HDLClass.HDLInterface)) {
+					HDLQualifiedName typeName = fullNameOf(type.get());
 					HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
 							.setArray(sub.getArray()).setBits(sub.getBits());
 					return hir;
@@ -138,25 +138,29 @@ public class Insulin {
 			IHDLObject caseContainer = caseStatement.getContainer();
 			if (caseContainer instanceof HDLSwitchStatement) {
 				HDLSwitchStatement switchStatement = (HDLSwitchStatement) caseContainer;
-				HDLType switchType = TypeExtension.typeOf(switchStatement.getCaseExp());
-				return createFullEnum(uFrag, switchType);
+				Optional<? extends HDLType> switchType = TypeExtension.typeOf(switchStatement.getCaseExp());
+				if (switchType.isPresent())
+					return createFullEnum(uFrag, switchType.get());
 			}
 		}
 		if (container instanceof HDLEqualityOp) {
 			HDLEqualityOp equalityOp = (HDLEqualityOp) container;
 			if (equalityOp.getLeft() == uFrag) {
-				HDLType type = TypeExtension.typeOf(equalityOp.getRight());
-				return createFullEnum(uFrag, type);
+				Optional<? extends HDLType> type = TypeExtension.typeOf(equalityOp.getRight());
+				if (type.isPresent())
+					return createFullEnum(uFrag, type.get());
 			}
 			if (equalityOp.getRight() == uFrag) {
-				HDLType type = TypeExtension.typeOf(equalityOp.getLeft());
-				return createFullEnum(uFrag, type);
+				Optional<? extends HDLType> type = TypeExtension.typeOf(equalityOp.getLeft());
+				if (type.isPresent())
+					return createFullEnum(uFrag, type.get());
 			}
 		}
 		if (container instanceof HDLAssignment) {
 			HDLAssignment assignment = (HDLAssignment) container;
-			HDLType typeOf = TypeExtension.typeOf(assignment.getLeft());
-			return createFullEnum(uFrag, typeOf);
+			Optional<? extends HDLType> typeOf = TypeExtension.typeOf(assignment.getLeft());
+			if (typeOf.isPresent())
+				return createFullEnum(uFrag, typeOf.get());
 		}
 		// throw new IllegalArgumentException("Unable to resolve fragment:" +
 		// uFrag);
@@ -311,7 +315,7 @@ public class Insulin {
 					ms.replace(generation, allStmnt.toArray(new HDLStatement[allStmnt.size()]));
 					HDLInterfaceRef[] ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
 					for (HDLInterfaceRef hdI : ifRefs) {
-						if (TypeExtension.typeOf(hdI.resolveHIf()).asRef().equals(ifRef)) {
+						if (TypeExtension.typeOf(hdI.resolveHIf()).get().asRef().equals(ifRef)) {
 							HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
 							ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(hdI.getArray()).setBits(hdI.getBits()));
 						}
@@ -623,7 +627,7 @@ public class Insulin {
 		for (HDLConcat hdlConcat : cats) {
 			ArrayList<HDLExpression> catExp = hdlConcat.getCats();
 			for (HDLExpression hdlExpression : catExp) {
-				HDLPrimitive typeOf = (HDLPrimitive) TypeExtension.typeOf(hdlExpression);
+				HDLPrimitive typeOf = (HDLPrimitive) TypeExtension.typeOf(hdlExpression).get();
 				switch (typeOf.getType()) {
 				case BIT:
 				case BITVECTOR:
@@ -683,7 +687,7 @@ public class Insulin {
 		HDLVariableDeclaration[] primitives = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : primitives) {
 			HDLRegisterConfig reg = hvd.getRegister();
-			HDLType determineType = TypeExtension.typeOf(hvd);
+			HDLType determineType = TypeExtension.typeOf(hvd).get();
 			if (reg != null) {
 				fortify(ms, reg.getResetValue(), determineType);
 			}
@@ -726,7 +730,7 @@ public class Insulin {
 			if (BuiltInValidator.skipExp(assignment)) {
 				continue;
 			}
-			HDLType leftType = TypeExtension.typeOf(assignment.getLeft());
+			HDLType leftType = TypeExtension.typeOf(assignment.getLeft()).get();
 			HDLExpression exp = assignment.getRight();
 			if (exp.getClassType() == HDLClass.HDLEqualityOp) {
 				HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp)
@@ -797,7 +801,7 @@ public class Insulin {
 	}
 
 	private static void makeBool(ModificationSet ms, HDLExpression exp) {
-		HDLManip zero = new HDLManip().setType(HDLManipType.CAST).setCastTo(TypeExtension.typeOf(exp)).setTarget(HDLLiteral.get(0));
+		HDLManip zero = new HDLManip().setType(HDLManipType.CAST).setCastTo(TypeExtension.typeOf(exp).get()).setTarget(HDLLiteral.get(0));
 		ms.replace(exp, new HDLEqualityOp().setLeft(exp).setType(HDLEqualityOpType.NOT_EQ).setRight(zero));
 	}
 
@@ -806,8 +810,8 @@ public class Insulin {
 			HDLPrimitive pt = (HDLPrimitive) targetType;
 			if (BuiltInValidator.skipExp(exp))
 				return;
-			HDLType lt = TypeExtension.typeOf(exp);
-			if (!targetType.equals(lt)) {
+			Optional<? extends HDLType> lt = TypeExtension.typeOf(exp);
+			if (lt.isPresent() && !targetType.equals(lt.get())) {
 				if (pt.getType() == HDLPrimitiveType.BOOL) {
 					makeBool(ms, exp);
 				} else {
@@ -928,7 +932,7 @@ public class Insulin {
 							HDLQualifiedName varRefName = ref.getVarRefName();
 							String varName = varRefName.getLastSegment() + "_" + objectID.getAndIncrement() + "_bitAccess";
 							HDLQualifiedName hVarName = new HDLQualifiedName(varName);
-							replacements.add(new HDLVariableDeclaration().setType(TypeExtension.typeOf(ref)).addVariables(new HDLVariable().setName(varName)));
+							replacements.add(new HDLVariableDeclaration().setType(TypeExtension.typeOf(ref).get()).addVariables(new HDLVariable().setName(varName)));
 							replacements.add(new HDLAssignment().setLeft(new HDLVariableRef().setVar(varRefName.skipLast(1).append(varName))).setRight(ass.getRight()));
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {

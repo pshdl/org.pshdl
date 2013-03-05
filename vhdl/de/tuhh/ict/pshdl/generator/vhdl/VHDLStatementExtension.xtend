@@ -398,9 +398,9 @@ class VHDLStatementExtension {
 		val VHDLContext context = new VHDLContext
 		val HDLExpression hCaseExp = obj.caseExp
 		var Optional<BigInteger> width = Optional::absent
-		val HDLType type = TypeExtension::typeOf(hCaseExp)
-		if (type instanceof HDLPrimitive) {
-			width = ConstantEvaluate::valueOf((type as HDLPrimitive).width,null)
+		val type = TypeExtension::typeOf(hCaseExp)
+		if (type.present && type.get instanceof HDLPrimitive) {
+			width = ConstantEvaluate::valueOf((type.get as HDLPrimitive).width,null)
 			if (!width.present)
 				throw new IllegalArgumentException("HDLPrimitive switch case needs to have constant width")
 		}

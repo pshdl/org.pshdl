@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -88,9 +90,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 		HDLVariable resolveHIf = resolveHIf();
 		if (resolveHIf == null)
 			return null;
-		HDLType type = TypeExtension.typeOf(resolveHIf);
-		if (type instanceof HDLInterface) {
-			HDLInterface hIf = (HDLInterface) type;
+		Optional<? extends HDLType> type = TypeExtension.typeOf(resolveHIf);
+		if (type.isPresent() && (type.get() instanceof HDLInterface)) {
+			HDLInterface hIf = (HDLInterface) type.get();
 			String lastSegment2 = getVarRefName().getLastSegment();
 			for (HDLVariableDeclaration vd : hIf.getPorts()) {
 				for (HDLVariable hv : vd.getVariables()) {

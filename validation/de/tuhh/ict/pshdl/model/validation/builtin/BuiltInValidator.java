@@ -166,18 +166,20 @@ public class BuiltInValidator implements IHDLValidator {
 			if (skipExp(ref))
 				continue;
 			if (ref.getBits().size() != 0) {
-				HDLType varType = TypeExtension.typeOf(ref.resolveVar());
-				if (!(varType instanceof HDLPrimitive)) {
-					problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType));
+				Optional<? extends HDLType> varType = TypeExtension.typeOf(ref.resolveVar());
+				if (!varType.isPresent()) {
+					// Don't know type, do nothing then..
+				} else if (!(varType.get() instanceof HDLPrimitive)) {
+					problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType.get()));
 				} else {
-					HDLPrimitive primitive = (HDLPrimitive) varType;
+					HDLPrimitive primitive = (HDLPrimitive) varType.get();
 					switch (primitive.getType()) {
 					case BITVECTOR:
 					case INT:
 					case UINT:
 						break;
 					default:
-						problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE, ref, varType));
+						problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
 					}
 				}
 			}
@@ -263,21 +265,21 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private void checkAss(IHDLObject obj, IHDLObject leftRef, HDLExpression rightExp, Set<Problem> problems, HDLEvaluationContext context) {
-		HDLType lType = TypeExtension.typeOf(leftRef);
-		HDLType rType = TypeExtension.typeOf(rightExp);
-		if ((lType == null) || (rType == null))
+		Optional<? extends HDLType> lType = TypeExtension.typeOf(leftRef);
+		Optional<? extends HDLType> rType = TypeExtension.typeOf(rightExp);
+		if ((!lType.isPresent()) || (!rType.isPresent()))
 			return;
-		switch (lType.getClassType()) {
+		switch (lType.get().getClassType()) {
 		case HDLEnum:
-			if (rType.getClassType() != HDLClass.HDLEnum)
+			if (rType.get().getClassType() != HDLClass.HDLEnum)
 				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_ENUM, obj));
 			break;
 		case HDLPrimitive:
-			if (rType.getClassType() != HDLClass.HDLPrimitive) {
+			if (rType.get().getClassType() != HDLClass.HDLPrimitive) {
 				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_PRIMITIVE, obj));
 			} else {
-				HDLPrimitive left = (HDLPrimitive) lType;
-				HDLPrimitive right = (HDLPrimitive) rType;
+				HDLPrimitive left = (HDLPrimitive) lType.get();
+				HDLPrimitive right = (HDLPrimitive) rType.get();
 				switch (left.getType()) {
 				case BIT:
 					if (right.getType() != HDLPrimitiveType.BIT) {
@@ -319,25 +321,26 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLConcat hdlConcat : concats) {
 			ArrayList<HDLExpression> cats = hdlConcat.getCats();
 			for (HDLExpression exp : cats) {
-				HDLType type = TypeExtension.typeOf(exp);
-				if (type instanceof HDLPrimitive) {
-					HDLPrimitive prim = (HDLPrimitive) type;
-					switch (prim.getType()) {
-					case BIT:
-					case BITVECTOR:
-					case INT:
-					case UINT:
-						break;
-					case BOOL:
-					case INTEGER:
-					case NATURAL:
-					case STRING:
-						problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, prim));
-						break;
-					}
-				} else
-					problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, type));
-
+				Optional<? extends HDLType> type = TypeExtension.typeOf(exp);
+				if (type.isPresent()) {
+					if (type.get() instanceof HDLPrimitive) {
+						HDLPrimitive prim = (HDLPrimitive) type.get();
+						switch (prim.getType()) {
+						case BIT:
+						case BITVECTOR:
+						case INT:
+						case UINT:
+							break;
+						case BOOL:
+						case INTEGER:
+						case NATURAL:
+						case STRING:
+							problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, prim));
+							break;
+						}
+					} else
+						problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, type.get()));
+				}
 			}
 		}
 	}
@@ -349,13 +352,15 @@ public class BuiltInValidator implements IHDLValidator {
 			ArrayList<HDLSwitchCaseStatement> cases = switchStatement.getCases();
 			Set<BigInteger> values = new HashSet<BigInteger>();
 			Set<HDLQualifiedName> enums = new HashSet<HDLQualifiedName>();
-			HDLType type = TypeExtension.typeOf(switchStatement.getCaseExp());
-			if (type instanceof HDLPrimitive) {
-				HDLPrimitive primitive = (HDLPrimitive) type;
+			Optional<? extends HDLType> type = TypeExtension.typeOf(switchStatement.getCaseExp());
+			if (!type.isPresent())
+				continue;
+			if (type.get() instanceof HDLPrimitive) {
+				HDLPrimitive primitive = (HDLPrimitive) type.get();
 				if (primitive.getWidth() == null)
 					problems.add(new Problem(ErrorCode.SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
 			}
-			boolean isEnum = type instanceof HDLEnum;
+			boolean isEnum = type.get() instanceof HDLEnum;
 			for (HDLSwitchCaseStatement caseStatement : cases) {
 				HDLExpression label = caseStatement.getLabel();
 				if (label == null) {
@@ -372,8 +377,8 @@ public class BuiltInValidator implements IHDLValidator {
 								problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
 						}
 					} else {
-						HDLType labelType = TypeExtension.typeOf(label);
-						if (!type.equals(labelType))
+						Optional<? extends HDLType> labelType = TypeExtension.typeOf(label);
+						if (labelType.isPresent() && !type.get().equals(labelType.get()))
 							problems.add(new Problem(ErrorCode.SWITCH_LABEL_WRONG_ENUM, caseStatement));
 						if ((label instanceof HDLEnumRef) && !enums.add(((HDLEnumRef) label).getVarRefName()))
 							problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));

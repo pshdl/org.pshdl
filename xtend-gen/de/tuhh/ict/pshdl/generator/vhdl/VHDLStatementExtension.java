@@ -737,13 +737,22 @@ public class VHDLStatementExtension {
     final VHDLContext context = _vHDLContext;
     final HDLExpression hCaseExp = obj.getCaseExp();
     Optional<BigInteger> width = Optional.<BigInteger>absent();
-    final HDLType type = TypeExtension.typeOf(hCaseExp);
-    if ((type instanceof HDLPrimitive)) {
-      HDLExpression _width = ((HDLPrimitive) type).getWidth();
+    final Optional<? extends HDLType> type = TypeExtension.typeOf(hCaseExp);
+    boolean _and = false;
+    boolean _isPresent = type.isPresent();
+    if (!_isPresent) {
+      _and = false;
+    } else {
+      HDLType _get = type.get();
+      _and = (_isPresent && (_get instanceof HDLPrimitive));
+    }
+    if (_and) {
+      HDLType _get_1 = type.get();
+      HDLExpression _width = ((HDLPrimitive) _get_1).getWidth();
       Optional<BigInteger> _valueOf = ConstantEvaluate.valueOf(_width, null);
       width = _valueOf;
-      boolean _isPresent = width.isPresent();
-      boolean _not = (!_isPresent);
+      boolean _isPresent_1 = width.isPresent();
+      boolean _not = (!_isPresent_1);
       if (_not) {
         IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("HDLPrimitive switch case needs to have constant width");
         throw _illegalArgumentException;
@@ -797,13 +806,13 @@ public class VHDLStatementExtension {
         {
           final Alternative alt = this.createAlternative(cs_1, e, width);
           VHDLContext _value = e.getValue();
-          LinkedList<SequentialStatement> _get = _value.unclockedStatements.get(Integer.valueOf(pid));
-          boolean _notEquals = ObjectExtensions.operator_notEquals(_get, null);
+          LinkedList<SequentialStatement> _get_2 = _value.unclockedStatements.get(Integer.valueOf(pid));
+          boolean _notEquals = ObjectExtensions.operator_notEquals(_get_2, null);
           if (_notEquals) {
             List<SequentialStatement> _statements = alt.getStatements();
             VHDLContext _value_1 = e.getValue();
-            LinkedList<SequentialStatement> _get_1 = _value_1.unclockedStatements.get(Integer.valueOf(pid));
-            _statements.addAll(_get_1);
+            LinkedList<SequentialStatement> _get_3 = _value_1.unclockedStatements.get(Integer.valueOf(pid));
+            _statements.addAll(_get_3);
           }
         }
       }
