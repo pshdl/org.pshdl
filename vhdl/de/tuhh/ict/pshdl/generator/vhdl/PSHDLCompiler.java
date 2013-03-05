@@ -48,15 +48,15 @@ public class PSHDLCompiler {
 		HDLLibrary.registerLibrary(libUri, lib);
 		Set<Problem> syntaxProblems = new HashSet<Problem>();
 		HDLPackage parse = PSHDLParser.parse(resource, libUri, syntaxProblems);
-		for (Problem issue : syntaxProblems) {
+		for (Problem issue : syntaxProblems)
 			if (issue.severity == ProblemSeverity.ERROR)
 				return new CompileResult(syntaxProblems, null, "<ERROR>", null);
-		}
 		Set<Problem> validate = HDLValidator.validate(parse, null);
 		boolean hasValidationError = false;
 		for (Problem issue : validate) {
-			if (issue.severity == ProblemSeverity.ERROR)
+			if (issue.severity == ProblemSeverity.ERROR) {
 				hasValidationError = true;
+			}
 			syntaxProblems.add(issue);
 		}
 		if (hasValidationError)
@@ -66,8 +66,9 @@ public class PSHDLCompiler {
 			String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(hdlPackage));
 			HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
 			String name = "<Unknown>";
-			if (units.length != 0)
+			if (units.length != 0) {
 				name = units[0].getName();
+			}
 			return new CompileResult(syntaxProblems, vhdlCode, name, lib.sideFiles);
 		}
 		return new CompileResult(syntaxProblems, "", "<emptyFile>", lib.sideFiles);
@@ -94,7 +95,7 @@ public class PSHDLCompiler {
 				System.out.print(" vhdl:" + comp);
 				comp.reset().start();
 				if (vhdl != null) {
-					String code = (VhdlOutput.toVhdlString(vhdl));
+					String val = (VhdlOutput.toVhdlString(vhdl));
 				}
 			}
 			System.out.println();
@@ -126,8 +127,9 @@ public class PSHDLCompiler {
 				boolean hasError = false;
 				for (Problem problem : problems) {
 					System.out.println(problem);
-					if (problem.severity == ProblemSeverity.ERROR)
+					if (problem.severity == ProblemSeverity.ERROR) {
 						hasError = true;
+					}
 				}
 				if (hasError)
 					return null;

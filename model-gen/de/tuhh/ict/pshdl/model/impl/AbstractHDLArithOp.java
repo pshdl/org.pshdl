@@ -44,6 +44,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * 
 	 * @return the field
 	 */
+	@Override
 	public @Nonnull
 	HDLArithOpType getType() {
 		return type;
@@ -60,6 +61,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLArithOp copy() {
 		HDLArithOp newObject = new HDLArithOp(null, left, right, type, false);
@@ -72,6 +74,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLArithOp copyFiltered(CopyFilter filter) {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
@@ -85,6 +88,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLArithOp copyDeepFrozen(IHDLObject container) {
 		HDLArithOp copy = copyFiltered(CopyFilter.DEEP_META);
@@ -101,8 +105,9 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * @return the same instance of {@link HDLArithOp} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLArithOp setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLArithOp setContainer(@Nullable IHDLObject container) {
 		return (HDLArithOp) super.setContainer(container);
 	}
 
@@ -114,8 +119,9 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLArithOp} with the updated left field.
 	 */
-	public @Nonnull
-	HDLArithOp setLeft(@Nonnull HDLExpression left) {
+	@Override
+	@Nonnull
+	public HDLArithOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
 		HDLArithOp res = new HDLArithOp(container, left, right, type, false);
 		return res;
@@ -130,8 +136,9 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * @return a new instance of {@link HDLArithOp} with the updated right
 	 *         field.
 	 */
-	public @Nonnull
-	HDLArithOp setRight(@Nonnull HDLExpression right) {
+	@Override
+	@Nonnull
+	public HDLArithOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
 		HDLArithOp res = new HDLArithOp(container, left, right, type, false);
 		return res;
@@ -145,8 +152,8 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLArithOp} with the updated type field.
 	 */
-	public @Nonnull
-	HDLArithOp setType(@Nonnull HDLArithOpType type) {
+	@Nonnull
+	public HDLArithOp setType(@Nonnull HDLArithOpType type) {
 		type = validateType(type);
 		HDLArithOp res = new HDLArithOp(container, left, right, type, false);
 		return res;
@@ -184,6 +191,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -200,11 +208,13 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateType(getType());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLArithOp, HDLClass.HDLOpExpression, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

@@ -38,7 +38,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 		this.params = new ArrayList<HDLExpression>();
 		if (params != null) {
 			for (HDLExpression newValue : params) {
-				this.params.add((HDLExpression) newValue);
+				this.params.add(newValue);
 			}
 		}
 	}
@@ -72,6 +72,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction copy() {
 		HDLUnresolvedFragmentFunction newObject = new HDLUnresolvedFragmentFunction(null, frag, array, bits, sub, params, false);
@@ -84,6 +85,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction copyFiltered(CopyFilter filter) {
 		String filteredfrag = filter.copyObject("frag", this, frag);
@@ -100,6 +102,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLUnresolvedFragmentFunction copyDeepFrozen(IHDLObject container) {
 		HDLUnresolvedFragmentFunction copy = copyFiltered(CopyFilter.DEEP_META);
@@ -116,8 +119,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return the same instance of {@link HDLUnresolvedFragmentFunction} with
 	 *         the updated container field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction setContainer(@Nullable IHDLObject container) {
 		return (HDLUnresolvedFragmentFunction) super.setContainer(container);
 	}
 
@@ -130,8 +134,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated frag field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction setFrag(@Nonnull String frag) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction setFrag(@Nonnull String frag) {
 		frag = validateFrag(frag);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -145,8 +150,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated array field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction setArray(@Nullable ArrayList<HDLExpression> array) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction setArray(@Nullable ArrayList<HDLExpression> array) {
 		array = validateArray(array);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -161,8 +167,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated array field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction addArray(@Nullable HDLExpression newArray) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction addArray(@Nullable HDLExpression newArray) {
 		if (newArray == null)
 			throw new IllegalArgumentException("Element of array can not be null!");
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
@@ -180,8 +187,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated array field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction removeArray(@Nullable HDLExpression newArray) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction removeArray(@Nullable HDLExpression newArray) {
 		if (newArray == null)
 			throw new IllegalArgumentException("Removed element of array can not be null!");
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
@@ -199,8 +207,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated array field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction removeArray(int idx) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction removeArray(int idx) {
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(idx);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
@@ -215,8 +224,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated bits field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction setBits(@Nullable ArrayList<HDLRange> bits) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction setBits(@Nullable ArrayList<HDLRange> bits) {
 		bits = validateBits(bits);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -230,8 +240,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated bits field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction addBits(@Nullable HDLRange newBits) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction addBits(@Nullable HDLRange newBits) {
 		if (newBits == null)
 			throw new IllegalArgumentException("Element of bits can not be null!");
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
@@ -249,8 +260,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated bits field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction removeBits(@Nullable HDLRange newBits) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction removeBits(@Nullable HDLRange newBits) {
 		if (newBits == null)
 			throw new IllegalArgumentException("Removed element of bits can not be null!");
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
@@ -268,8 +280,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated bits field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction removeBits(int idx) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction removeBits(int idx) {
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(idx);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
@@ -284,8 +297,9 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated sub field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction setSub(@Nullable HDLUnresolvedFragment sub) {
+	@Override
+	@Nonnull
+	public HDLUnresolvedFragmentFunction setSub(@Nullable HDLUnresolvedFragment sub) {
 		sub = validateSub(sub);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -299,8 +313,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated params field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction setParams(@Nullable ArrayList<HDLExpression> params) {
+	@Nonnull
+	public HDLUnresolvedFragmentFunction setParams(@Nullable ArrayList<HDLExpression> params) {
 		params = validateParams(params);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -315,8 +329,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated params field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction addParams(@Nullable HDLExpression newParams) {
+	@Nonnull
+	public HDLUnresolvedFragmentFunction addParams(@Nullable HDLExpression newParams) {
 		if (newParams == null)
 			throw new IllegalArgumentException("Element of params can not be null!");
 		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
@@ -334,8 +348,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated params field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction removeParams(@Nullable HDLExpression newParams) {
+	@Nonnull
+	public HDLUnresolvedFragmentFunction removeParams(@Nullable HDLExpression newParams) {
 		if (newParams == null)
 			throw new IllegalArgumentException("Removed element of params can not be null!");
 		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
@@ -353,8 +367,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
 	 *         updated params field.
 	 */
-	public @Nonnull
-	HDLUnresolvedFragmentFunction removeParams(int idx) {
+	@Nonnull
+	public HDLUnresolvedFragmentFunction removeParams(int idx) {
 		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(idx);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
@@ -393,6 +407,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -400,7 +415,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 		if (frag != null) {
 			sb.append(".setFrag(").append('"' + frag + '"').append(")");
 		}
-		if (array != null) {
+		if (array != null)
 			if (array.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : array) {
@@ -408,8 +423,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
-		if (bits != null) {
+		if (bits != null)
 			if (bits.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : bits) {
@@ -417,11 +431,10 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		if (sub != null) {
 			sb.append(".setSub(").append(sub.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (params != null) {
+		if (params != null)
 			if (params.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : params) {
@@ -429,10 +442,10 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateParams(getParams());
@@ -443,6 +456,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLUnresolvedFragmentFunction, HDLClass.HDLUnresolvedFragment, HDLClass.HDLStatement, HDLClass.HDLReference, HDLClass.HDLExpression,
 				HDLClass.HDLObject);

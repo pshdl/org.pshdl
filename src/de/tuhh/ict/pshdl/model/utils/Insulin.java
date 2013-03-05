@@ -70,9 +70,9 @@ public class Insulin {
 						continue;
 					}
 				}
-				IHDLObject resolved = resolveFragment(uFrag);
-				if (resolved != null) {
-					ms.replace(uFrag, resolved);
+				Optional<? extends IHDLObject> resolved = resolveFragment(uFrag);
+				if (resolved.isPresent()) {
+					ms.replace(uFrag, resolved.get());
 				}
 			}
 			T newPkg = ms.apply(pkg);
@@ -83,7 +83,7 @@ public class Insulin {
 		return pkg;
 	}
 
-	public static IHDLObject resolveFragment(HDLUnresolvedFragment uFrag) {
+	public static Optional<? extends IHDLObject> resolveFragment(HDLUnresolvedFragment uFrag) {
 		// Single fragment (no function) resolves to variable -> Variable
 		// Single fragment (function) resolved to function -> FunctionCall
 		// Fragment (no bits, no function) resolves to variable,
@@ -96,41 +96,40 @@ public class Insulin {
 		// -> resolves to enum ->
 		HDLQualifiedName hVar = new HDLQualifiedName(uFrag.getFrag());
 		if (uFrag.getClassType() != HDLClass.HDLUnresolvedFragmentFunction) {
-			HDLVariable variable = ScopingExtension.INST.resolveVariable(uFrag, hVar);
+			Optional<HDLVariable> variableRaw = ScopingExtension.INST.resolveVariable(uFrag, hVar);
 			HDLUnresolvedFragment sub = uFrag.getSub();
-			if (variable != null) {
+			if (variableRaw.isPresent()) {
+				HDLVariable variable = variableRaw.get();
 				if (sub == null)
-					return variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits());
+					return Optional.of(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()));
 				Optional<? extends HDLType> type = TypeExtension.typeOf(variable);
 				if ((type.isPresent()) && (type.get().getClassType() == HDLClass.HDLInterface)) {
 					HDLQualifiedName typeName = fullNameOf(type.get());
 					HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
 							.setArray(sub.getArray()).setBits(sub.getBits());
-					return hir;
+					return Optional.of(hir);
 				}
 			}
-			HDLType type = ScopingExtension.INST.resolveEnum(uFrag, hVar);
-			if (type != null) {
+			Optional<HDLEnum> enumRaw = ScopingExtension.INST.resolveEnum(uFrag, hVar);
+			if (enumRaw.isPresent())
 				if (sub != null) {
-					HDLQualifiedName typeName = fullNameOf(type);
+					HDLQualifiedName typeName = fullNameOf(enumRaw.get());
 					HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
-					return enumRef;
+					return Optional.of(enumRef);
 				}
-			}
-			type = ScopingExtension.INST.resolveType(uFrag, hVar);
-			if (type != null) {
+			Optional<? extends HDLType> typeRaw = ScopingExtension.INST.resolveType(uFrag, hVar);
+			if (typeRaw.isPresent())
 				if (sub != null) {
-					HDLQualifiedName typeName = fullNameOf(type);
-					if (type instanceof HDLEnum) {
+					HDLQualifiedName typeName = fullNameOf(typeRaw.get());
+					if (typeRaw.get() instanceof HDLEnum) {
 						HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
-						return enumRef;
+						return Optional.of(enumRef);
 					}
 				}
-			}
 		} else {
 			HDLUnresolvedFragmentFunction uff = (HDLUnresolvedFragmentFunction) uFrag;
 			HDLFunctionCall call = new HDLFunctionCall().setName(hVar).setParams(uff.getParams());
-			return call;
+			return Optional.of(call);
 		}
 		IHDLObject container = uFrag.getContainer();
 		if (container instanceof HDLSwitchCaseStatement) {
@@ -162,9 +161,8 @@ public class Insulin {
 			if (typeOf.isPresent())
 				return createFullEnum(uFrag, typeOf.get());
 		}
-		// throw new IllegalArgumentException("Unable to resolve fragment:" +
-		// uFrag);
-		return null;
+		// TODO consume all fragments to one QFN and attempt to resolve type
+		return Optional.absent();
 	}
 
 	/**
@@ -176,41 +174,39 @@ public class Insulin {
 	 *            the type
 	 * @return may return null if not successful
 	 */
-	private static HDLEnumRef createFullEnum(HDLUnresolvedFragment uFrag, HDLType type) {
+	private static Optional<HDLEnumRef> createFullEnum(HDLUnresolvedFragment uFrag, HDLType type) {
 		if (type instanceof HDLEnum) {
 			HDLEnum enumType = (HDLEnum) type;
-			HDLVariable variable = ScopingExtension.getVariable(enumType, uFrag.getFrag());
-			if (variable != null) {
+			Optional<HDLVariable> variable = ScopingExtension.getVariable(enumType, uFrag.getFrag());
+			if (variable.isPresent()) {
 				HDLQualifiedName typeName = fullNameOf(enumType);
 				HDLEnumRef enumRef = new HDLEnumRef().setHEnum(enumType.asRef()).setVar(typeName.append(uFrag.getFrag()));
-				return enumRef;
+				return Optional.of(enumRef);
 			}
 		}
-		return null;
+		return Optional.absent();
 	}
 
 	private static <T extends HDLObject> T pushSignIntoLiteral(T pkg) {
 		HDLLiteral[] literals = pkg.getAllObjectsOf(HDLLiteral.class, true);
 		ModificationSet ms = new ModificationSet();
-		for (HDLLiteral hdlLiteral : literals) {
+		for (HDLLiteral hdlLiteral : literals)
 			if (hdlLiteral.getContainer() instanceof HDLManip) {
 				HDLManip manip = (HDLManip) hdlLiteral.getContainer();
-				if (manip.getType() == HDLManipType.ARITH_NEG) {
+				if (manip.getType() == HDLManipType.ARITH_NEG)
 					if (hdlLiteral.getVal().charAt(0) == '-') {
 						ms.replace(manip, hdlLiteral.setVal(hdlLiteral.getVal().substring(1)));
 					} else {
 						ms.replace(manip, hdlLiteral.setVal("-" + hdlLiteral.getVal()));
 					}
-				}
 			}
-		}
 		return ms.apply(pkg);
 	}
 
 	public static <T extends HDLObject> T fixDoubleNegate(T pkg) {
 		ModificationSet ms = new ModificationSet();
 		HDLManip[] manips = pkg.getAllObjectsOf(HDLManip.class, true);
-		for (HDLManip manip : manips) {
+		for (HDLManip manip : manips)
 			if (manip.getType() == HDLManipType.ARITH_NEG) {
 				HDLExpression target = manip.getTarget();
 				if (target instanceof HDLManip) {
@@ -227,7 +223,6 @@ public class Insulin {
 					}
 				}
 			}
-		}
 		return ms.apply(pkg);
 	}
 
@@ -235,19 +230,21 @@ public class Insulin {
 		ModificationSet ms = new ModificationSet();
 		HDLFunctionCall[] functions = pkg.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (HDLFunctionCall hdi : functions) {
-			HDLFunction function = hdi.resolveName();
-			switch (function.getClassType()) {
-			case HDLInlineFunction:
-				HDLInlineFunction hif = (HDLInlineFunction) function;
-				HDLExpression equivalenExpression = hif.getReplacementExpression(hdi);
-				ms.replace(hdi, equivalenExpression);
-				break;
-			case HDLSubstituteFunction:
-				HDLSubstituteFunction hsf = (HDLSubstituteFunction) function;
-				HDLStatement[] statements = hsf.getReplacementStatements(hdi);
-				ms.replace(hdi, statements);
-				break;
-			default:
+			Optional<HDLFunction> function = hdi.resolveName();
+			if (function.isPresent()) {
+				switch (function.get().getClassType()) {
+				case HDLInlineFunction:
+					HDLInlineFunction hif = (HDLInlineFunction) function.get();
+					HDLExpression equivalenExpression = hif.getReplacementExpression(hdi);
+					ms.replace(hdi, equivalenExpression);
+					break;
+				case HDLSubstituteFunction:
+					HDLSubstituteFunction hsf = (HDLSubstituteFunction) function.get();
+					HDLStatement[] statements = hsf.getReplacementStatements(hdi);
+					ms.replace(hdi, statements);
+					break;
+				default:
+				}
 			}
 		}
 		return ms.apply(pkg);
@@ -262,15 +259,15 @@ public class Insulin {
 			for (HDLArgument hdlArgument : arguments) {
 				argMap.put(hdlArgument.getName(), hdlArgument.getExpression());
 			}
-			HDLInterface hIf = hdi.resolveHIf();
-			if (hIf == null) {
+			Optional<HDLInterface> hIf = hdi.resolveHIf();
+			if (!hIf.isPresent()) {
 				continue;
 			}
-			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
+			for (HDLVariableDeclaration hvd : hIf.get().getPorts())
 				if (hvd.getDirection() == HDLDirection.PARAMETER) {
-					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType()).setDirection(HDLDirection.CONSTANT);
-					for (HDLVariable var : hvd.getVariables()) {
-						if (ScopingExtension.INST.resolveVariable(hdi, HDLQualifiedName.create(var.getName())) == null) {
+					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType().get()).setDirection(HDLDirection.CONSTANT);
+					for (HDLVariable var : hvd.getVariables())
+						if (!ScopingExtension.INST.resolveVariable(hdi, HDLQualifiedName.create(var.getName())).isPresent()) {
 							String argName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
 							if (argName == null) {
 								argName = var.getName();
@@ -280,12 +277,10 @@ public class Insulin {
 							}
 							newHVD = newHVD.addVariables(var);
 						}
-					}
 					if (!newHVD.getVariables().isEmpty()) {
 						ms.insertBefore(hdi, newHVD);
 					}
 				}
-			}
 		}
 		return ms.apply(apply);
 	}
@@ -314,12 +309,11 @@ public class Insulin {
 					allStmnt.addAll(Arrays.asList(inits));
 					ms.replace(generation, allStmnt.toArray(new HDLStatement[allStmnt.size()]));
 					HDLInterfaceRef[] ifRefs = apply.getAllObjectsOf(HDLInterfaceRef.class, true);
-					for (HDLInterfaceRef hdI : ifRefs) {
-						if (TypeExtension.typeOf(hdI.resolveHIf()).get().asRef().equals(ifRef)) {
+					for (HDLInterfaceRef hdI : ifRefs)
+						if (TypeExtension.typeOf(hdI.resolveHIf().get()).get().asRef().equals(ifRef)) {
 							HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
 							ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(hdI.getArray()).setBits(hdI.getBits()));
 						}
-					}
 				}
 				String libURI = null;
 				switch (apply.getClassType()) {
@@ -352,7 +346,7 @@ public class Insulin {
 	private static <T extends HDLObject> T generateInitializations(T apply) {
 		ModificationSet ms = new ModificationSet();
 		HDLVariableDeclaration[] allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hvd : allVarDecls) {
+		for (HDLVariableDeclaration hvd : allVarDecls)
 			if (!doNotInit.contains(hvd.getDirection())) {
 				HDLRegisterConfig register = hvd.getRegister();
 				for (HDLVariable var : hvd.getVariables()) {
@@ -368,7 +362,6 @@ public class Insulin {
 
 				}
 			}
-		}
 		HDLInterfaceInstantiation[] hii = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hi : hii) {
 			HDLUnit unit = hi.getContainer(HDLUnit.class);
@@ -380,11 +373,11 @@ public class Insulin {
 			if ((meta == null) || (dimensions.size() != 0)) {
 				meta = new HashSet<String>();
 			}
-			HDLInterface hIf = hi.resolveHIf();
-			if (hIf == null) {
+			Optional<HDLInterface> hIf = hi.resolveHIf();
+			if (!hIf.isPresent()) {
 				continue;
 			}
-			for (HDLVariableDeclaration hvd : hIf.getPorts()) {
+			for (HDLVariableDeclaration hvd : hIf.get().getPorts()) {
 				HDLDirection direction = hvd.getDirection();
 				if ((direction == HDLDirection.IN) || (direction == HDLDirection.INOUT)) {
 					for (HDLVariable var : hvd.getVariables()) {
@@ -412,7 +405,7 @@ public class Insulin {
 		boolean synchedArray = false;
 		if (defaultValue instanceof HDLVariableRef) {
 			HDLVariableRef ref = (HDLVariableRef) defaultValue;
-			synchedArray = ref.resolveVar().getDimensions().size() != 0;
+			synchedArray = ref.resolveVar().get().getDimensions().size() != 0;
 		}
 		HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
 		HDLBlock obj = var.getMeta(RWValidation.BlockMeta.block);
@@ -428,7 +421,7 @@ public class Insulin {
 
 	private static HDLExpression getDefaultValue(HDLVariableDeclaration hvd, HDLRegisterConfig register, HDLVariable var) {
 		HDLExpression defaultValue = var.getDefaultValue();
-		if ((defaultValue == null) && (register == null)) {
+		if ((defaultValue == null) && (register == null))
 			if ((hvd.getPrimitive() != null)) {
 				if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null) {
 					switch (hvd.getPrimitive().getType()) {
@@ -446,13 +439,12 @@ public class Insulin {
 					}
 				}
 			} else {
-				HDLType resolveType = hvd.resolveType();
+				HDLType resolveType = hvd.resolveType().get();
 				if (resolveType instanceof HDLEnum) {
 					HDLEnum hEnum = (HDLEnum) resolveType;
 					return new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
 				}
 			}
-		}
 		return defaultValue;
 	}
 
@@ -691,11 +683,10 @@ public class Insulin {
 			if (reg != null) {
 				fortify(ms, reg.getResetValue(), determineType);
 			}
-			for (HDLVariable var : hvd.getVariables()) {
+			for (HDLVariable var : hvd.getVariables())
 				if (var.getDefaultValue() != null) {
 					fortify(ms, var.getDefaultValue(), determineType);
 				}
-			}
 		}
 	}
 
@@ -811,13 +802,12 @@ public class Insulin {
 			if (BuiltInValidator.skipExp(exp))
 				return;
 			Optional<? extends HDLType> lt = TypeExtension.typeOf(exp);
-			if (lt.isPresent() && !targetType.equals(lt.get())) {
+			if (lt.isPresent() && !targetType.equals(lt.get()))
 				if (pt.getType() == HDLPrimitiveType.BOOL) {
 					makeBool(ms, exp);
 				} else {
 					cast(ms, pt, exp);
 				}
-			}
 		}
 	}
 
@@ -875,7 +865,7 @@ public class Insulin {
 	private static <T extends HDLObject> T handleMultiForLoop(T apply) {
 		ModificationSet ms = new ModificationSet();
 		HDLForLoop[] loops = apply.getAllObjectsOf(HDLForLoop.class, true);
-		for (HDLForLoop loop : loops) {
+		for (HDLForLoop loop : loops)
 			if (loop.getRange().size() > 1) {
 				HDLForLoop[] newLoops = new HDLForLoop[loop.getRange().size()];
 				int i = 0;
@@ -884,7 +874,6 @@ public class Insulin {
 				}
 				ms.replace(loop, newLoops);
 			}
-		}
 		return ms.apply(apply);
 	}
 
@@ -996,7 +985,7 @@ public class Insulin {
 						if (hdv.getRegister() != null) {
 							register = hdv.getRegister();
 						}
-						ms.insertAfter(origHdv, new HDLVariableDeclaration().setRegister(register).setType(origHdv.resolveType()).addVariables(outVar));
+						ms.insertAfter(origHdv, new HDLVariableDeclaration().setRegister(register).setType(origHdv.resolveType().get()).addVariables(outVar));
 						hdv = hdv.removeVariables(var);
 					}
 
@@ -1004,11 +993,10 @@ public class Insulin {
 					HDLQualifiedName originalFQN = var.asRef();
 					HDLQualifiedName newFQN = outVar.asRef();
 					HDLVariableRef[] reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
-					for (HDLVariableRef varRef : reads) {
+					for (HDLVariableRef varRef : reads)
 						if (varRef.getVarRefName().equals(originalFQN)) {
 							ms.replace(varRef, varRef.setVar(newFQN));
 						}
-					}
 				}
 			}
 			if (origHdv != hdv) {

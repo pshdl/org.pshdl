@@ -83,8 +83,9 @@ public class VHDLContext {
 	private <K, T> void mergeListMap(VHDLContext vhdl, Map<K, LinkedList<T>> map, Map<K, LinkedList<T>> local) {
 		for (Entry<K, LinkedList<T>> e : map.entrySet()) {
 			LinkedList<T> list = local.get(e.getKey());
-			if (list == null)
+			if (list == null) {
 				list = new LinkedList<T>();
+			}
 			list.addAll(e.getValue());
 			local.put(e.getKey(), list);
 		}
@@ -151,15 +152,13 @@ public class VHDLContext {
 		if ((clockedStatements.size() > 1) || (unclockedStatements.size() > 1))
 			throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
 		for (LinkedList<SequentialStatement> clkd : clockedStatements.values()) {
-			if (clkd.size() > 1) {
+			if (clkd.size() > 1)
 				throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
-			}
 			return clkd.getFirst();
 		}
 		for (LinkedList<SequentialStatement> clkd : unclockedStatements.values()) {
-			if (clkd.size() > 1) {
+			if (clkd.size() > 1)
 				throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
-			}
 			return clkd.getFirst();
 		}
 		throw new NoSuchElementException("No Statement found");
@@ -170,10 +169,11 @@ public class VHDLContext {
 	}
 
 	public void addTypeDeclaration(BlockDeclarativeItem type, boolean isExternal) {
-		if (isExternal)
+		if (isExternal) {
 			externalTypes.add(type);
-		else
+		} else {
 			internalTypes.add(type);
+		}
 	}
 
 	public boolean hasPkgDeclarations() {

@@ -82,7 +82,7 @@ public class RangeTool {
 		for (RangeVal rangeVal : value) {
 			count += rangeVal.count;
 			if (rangeVal.isStart()) {
-				if (start != null) {
+				if (start != null)
 					// If there was an unended start, then we have to end it
 					if (start.equals(rangeVal.value)) {
 						// Or at the same location
@@ -91,10 +91,9 @@ public class RangeTool {
 					} else {
 						// just one before the new start
 						res.add(Ranges.closed(start, rangeVal.value.subtract(BigInteger.ONE)));
-						// res.add(new ValueRange(start,
-						// rangeVal.value.subtract(BigInteger.ONE)));
 					}
-				}
+				// res.add(new ValueRange(start,
+				// rangeVal.value.subtract(BigInteger.ONE)));
 				// Set the start to the current Element
 				start = rangeVal.value;
 			} else {

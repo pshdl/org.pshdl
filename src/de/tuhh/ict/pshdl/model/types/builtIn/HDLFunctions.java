@@ -66,10 +66,10 @@ public class HDLFunctions {
 					return resolve;
 			}
 		}
-		HDLFunction rFunc = function.resolveName();
-		if (rFunc != null) {
-			if (rFunc instanceof HDLInlineFunction) {
-				HDLInlineFunction hif = (HDLInlineFunction) rFunc;
+		Optional<HDLFunction> rFunc = function.resolveName();
+		if (rFunc.isPresent())
+			if (rFunc.get() instanceof HDLInlineFunction) {
+				HDLInlineFunction hif = (HDLInlineFunction) rFunc.get();
 				HDLExpression expression = hif.getReplacementExpression(function);
 				if (expression != null) {
 					Optional<? extends HDLType> type = TypeExtension.typeOf(expression);
@@ -79,16 +79,15 @@ public class HDLFunctions {
 						int i = 0;
 						for (HDLExpression exp : function.getParams()) {
 							Optional<? extends HDLType> expType = TypeExtension.typeOf(exp);
-							if (expType.isPresent())
+							if (expType.isPresent()) {
 								args[i++] = expType.get();
-							else
+							} else
 								return null;
 						}
 						return new HDLTypeInferenceInfo(result, args);
 					}
 				}
 			}
-		}
 		return null;
 	}
 

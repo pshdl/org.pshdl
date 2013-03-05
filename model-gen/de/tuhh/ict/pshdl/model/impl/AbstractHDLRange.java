@@ -28,7 +28,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 			from = validateFrom(from);
 		}
 		if (from != null) {
-			this.from = (HDLExpression) from;
+			this.from = from;
 		} else {
 			this.from = null;
 		}
@@ -36,7 +36,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 			to = validateTo(to);
 		}
 		if (to != null) {
-			this.to = (HDLExpression) to;
+			this.to = to;
 		} else {
 			this.to = null;
 		}
@@ -89,6 +89,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLRange copy() {
 		HDLRange newObject = new HDLRange(null, from, to, false);
@@ -101,6 +102,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLRange copyFiltered(CopyFilter filter) {
 		HDLExpression filteredfrom = filter.copyObject("from", this, from);
@@ -113,6 +115,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLRange copyDeepFrozen(IHDLObject container) {
 		HDLRange copy = copyFiltered(CopyFilter.DEEP_META);
@@ -129,8 +132,9 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * @return the same instance of {@link HDLRange} with the updated container
 	 *         field.
 	 */
-	public @Nonnull
-	HDLRange setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLRange setContainer(@Nullable IHDLObject container) {
 		return (HDLRange) super.setContainer(container);
 	}
 
@@ -141,8 +145,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 *            sets the new from of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLRange} with the updated from field.
 	 */
-	public @Nonnull
-	HDLRange setFrom(@Nullable HDLExpression from) {
+	@Nonnull
+	public HDLRange setFrom(@Nullable HDLExpression from) {
 		from = validateFrom(from);
 		HDLRange res = new HDLRange(container, from, to, false);
 		return res;
@@ -156,8 +160,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLRange} with the updated to field.
 	 */
-	public @Nonnull
-	HDLRange setTo(@Nonnull HDLExpression to) {
+	@Nonnull
+	public HDLRange setTo(@Nonnull HDLExpression to) {
 		to = validateTo(to);
 		HDLRange res = new HDLRange(container, from, to, false);
 		return res;
@@ -201,6 +205,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -214,6 +219,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateFrom(getFrom());
@@ -226,6 +232,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLRange, HDLClass.HDLObject);
 	}

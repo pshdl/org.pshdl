@@ -41,19 +41,20 @@ public class CommonBusCode {
 
 	public static HDLRange getRange(int bitPos, int size) {
 		HDLRange range = new HDLRange().setTo(HDLLiteral.get(bitPos - (size - 1)));
-		if (size != 1)
+		if (size != 1) {
 			range = range.setFrom(HDLLiteral.get(bitPos));
+		}
 		return range;
 	}
 
 	public static Map<String, Boolean> buildArrayMap(HDLInterface hdi) {
 		Map<String, Boolean> isArray = new HashMap<String, Boolean>();
-		for (HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true)) {
-			if (var.getDimensions().size() != 0)
+		for (HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true))
+			if (var.getDimensions().size() != 0) {
 				isArray.put(var.getName(), true);
-			else
+			} else {
 				isArray.put(var.getName(), false);
-		}
+			}
 		return isArray;
 	}
 }

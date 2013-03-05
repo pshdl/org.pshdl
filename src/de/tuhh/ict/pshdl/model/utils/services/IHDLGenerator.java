@@ -10,6 +10,7 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import de.tuhh.ict.pshdl.model.validation.*;
 
 /**

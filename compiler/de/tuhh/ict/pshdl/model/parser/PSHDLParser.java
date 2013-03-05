@@ -42,13 +42,13 @@ public class PSHDLParser {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens")));
 		String line = null;
 		List<String> keywords = new ArrayList<String>();
-		while ((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null)
 			if (line.charAt(0) == '\'') {
 				String keyWord = line.substring(1, line.lastIndexOf('\''));
-				if (keyWord.matches("[a-z]+"))
+				if (keyWord.matches("[a-z]+")) {
 					keywords.add(keyWord);
+				}
 			}
-		}
 		reader.close();
 		return keywords.toArray(new String[keywords.size()]);
 	}

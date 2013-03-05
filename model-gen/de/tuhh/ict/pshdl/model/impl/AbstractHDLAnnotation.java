@@ -78,6 +78,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLAnnotation copy() {
 		HDLAnnotation newObject = new HDLAnnotation(null, name, value, false);
@@ -90,6 +91,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLAnnotation copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
@@ -102,6 +104,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLAnnotation copyDeepFrozen(IHDLObject container) {
 		HDLAnnotation copy = copyFiltered(CopyFilter.DEEP_META);
@@ -118,8 +121,9 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * @return the same instance of {@link HDLAnnotation} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLAnnotation setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLAnnotation setContainer(@Nullable IHDLObject container) {
 		return (HDLAnnotation) super.setContainer(container);
 	}
 
@@ -132,8 +136,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * @return a new instance of {@link HDLAnnotation} with the updated name
 	 *         field.
 	 */
-	public @Nonnull
-	HDLAnnotation setName(@Nonnull String name) {
+	@Nonnull
+	public HDLAnnotation setName(@Nonnull String name) {
 		name = validateName(name);
 		HDLAnnotation res = new HDLAnnotation(container, name, value, false);
 		return res;
@@ -147,8 +151,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * @return a new instance of {@link HDLAnnotation} with the updated value
 	 *         field.
 	 */
-	public @Nonnull
-	HDLAnnotation setValue(@Nullable String value) {
+	@Nonnull
+	public HDLAnnotation setValue(@Nullable String value) {
 		value = validateValue(value);
 		HDLAnnotation res = new HDLAnnotation(container, name, value, false);
 		return res;
@@ -192,6 +196,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -205,12 +210,14 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateName(getName());
 		validateValue(getValue());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLAnnotation, HDLClass.HDLObject);
 	}

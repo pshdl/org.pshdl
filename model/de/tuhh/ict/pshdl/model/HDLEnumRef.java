@@ -2,6 +2,8 @@ package de.tuhh.ict.pshdl.model;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -58,11 +60,11 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 
 	// $CONTENT-BEGIN$
 	@Override
-	public HDLVariable resolveVar() {
-		HDLEnum resolveHEnum = resolveHEnum();
-		if (resolveHEnum == null)
-			return null;
-		HDLVariable var = ScopingExtension.getVariable(resolveHEnum, getVarRefName().getLastSegment());
+	public Optional<HDLVariable> resolveVar() {
+		Optional<HDLEnum> resolveHEnum = resolveHEnum();
+		if (!resolveHEnum.isPresent())
+			return Optional.absent();
+		Optional<HDLVariable> var = ScopingExtension.getVariable(resolveHEnum.get(), getVarRefName().getLastSegment());
 		return var;
 	}
 

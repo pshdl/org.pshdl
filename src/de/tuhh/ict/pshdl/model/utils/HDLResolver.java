@@ -5,6 +5,8 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 
@@ -56,7 +58,7 @@ public class HDLResolver {
 		return types;
 	}
 
-	public HDLEnum resolveEnum(HDLQualifiedName hEnum) {
+	public Optional<HDLEnum> resolveEnum(HDLQualifiedName hEnum) {
 		if (enumCache == null) {
 			synchronized (this) {
 				HDLEnumDeclaration[] enumDecl = resolveTo.getAllObjectsOf(HDLEnumDeclaration.class, false);
@@ -70,13 +72,13 @@ public class HDLResolver {
 		// existant
 		HDLEnum checkCache = checkCache(hEnum, enumCache);
 		if (checkCache != null)
-			return checkCache;
+			return Optional.of(checkCache);
 		if ((resolveTo.getContainer() == null) || !descent)
-			return null;
+			return Optional.absent();
 		return ScopingExtension.INST.resolveEnum(resolveTo.getContainer(), hEnum);
 	}
 
-	public HDLFunction resolveFunction(HDLQualifiedName hEnum) {
+	public Optional<HDLFunction> resolveFunction(HDLQualifiedName hEnum) {
 		if (funcCache == null) {
 			synchronized (this) {
 				HDLFunction[] enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
@@ -90,13 +92,13 @@ public class HDLResolver {
 		// existant
 		HDLFunction checkCache = checkCache(hEnum, funcCache);
 		if (checkCache != null)
-			return checkCache;
+			return Optional.of(checkCache);
 		if ((resolveTo.getContainer() == null) || !descent)
-			return null;
+			return Optional.absent();
 		return ScopingExtension.INST.resolveFunction(resolveTo.getContainer(), hEnum);
 	}
 
-	public HDLInterface resolveInterface(HDLQualifiedName hIf) {
+	public Optional<HDLInterface> resolveInterface(HDLQualifiedName hIf) {
 		if (ifCache == null) {
 			synchronized (this) {
 				List<HDLInterface> ifDecl = ScopingExtension.INST.doGetInterfaceDeclarations(resolveTo);
@@ -110,13 +112,13 @@ public class HDLResolver {
 		// existant
 		HDLInterface checkCache = checkCache(hIf, ifCache);
 		if (checkCache != null)
-			return checkCache;
+			return Optional.of(checkCache);
 		if ((resolveTo.getContainer() == null) || !descent)
-			return null;
+			return Optional.absent();
 		return ScopingExtension.INST.resolveInterface(resolveTo.getContainer(), hIf);
 	}
 
-	public HDLType resolveType(HDLQualifiedName var) {
+	public Optional<? extends HDLType> resolveType(HDLQualifiedName var) {
 		if (typeCache == null) {
 			synchronized (this) {
 				List<HDLType> typeDecl = doGetTypeDeclarations();
@@ -128,7 +130,7 @@ public class HDLResolver {
 		}
 		HDLType checkCache = checkCache(var, typeCache);
 		if (checkCache != null)
-			return checkCache;
+			return Optional.of(checkCache);
 		if ((resolveTo.getContainer() == null) || !descent) {
 			if (resolveTo instanceof HDLUnit) {
 				HDLUnit unit = (HDLUnit) resolveTo;
@@ -142,12 +144,12 @@ public class HDLResolver {
 					}
 				}
 			}
-			return null;
+			return Optional.absent();
 		}
 		return ScopingExtension.INST.resolveType(resolveTo.getContainer(), var);
 	}
 
-	public HDLVariable resolveVariable(HDLQualifiedName var) {
+	public Optional<HDLVariable> resolveVariable(HDLQualifiedName var) {
 		if (variableCache == null) {
 			synchronized (this) {
 				List<HDLVariable> varDecl = ScopingExtension.INST.doGetVariables(resolveTo);
@@ -159,33 +161,32 @@ public class HDLResolver {
 		}
 		HDLVariable checkCache = checkCache(var, variableCache);
 		if (checkCache != null)
-			return checkCache;
+			return Optional.of(checkCache);
 		if (var.length > 1) {
 			// Using lastSgement if $for0.I or ThisObject.I
 			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(fullNameOf(resolveTo).getTypePart())) {
 				String string = var.getLastSegment();
-				for (Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {
+				for (Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet())
 					if (entry.getKey().getLastSegment().equals(string))
-						return entry.getValue();
-				}
+						return Optional.of(entry.getValue());
 			}
 			HDLQualifiedName skipLast = var.skipLast(1);
 			if (!fullNameOf(resolveTo).equals(skipLast)) {
-				HDLType type = resolveType(skipLast);
-				if ((type != null) && (type.getClassType() != HDLClass.HDLPrimitive)) {
-					HDLVariable variable = ScopingExtension.INST.resolveVariable(type, var);
-					if (variable != null)
+				Optional<? extends HDLType> type = resolveType(skipLast);
+				if ((type.isPresent()) && (type.get().getClassType() != HDLClass.HDLPrimitive)) {
+					Optional<HDLVariable> variable = ScopingExtension.INST.resolveVariable(type.get(), var);
+					if (variable.isPresent())
 						return variable;
 				}
 			}
 		}
 		if (HDLRegisterConfig.DEF_CLK.equals(var.getLastSegment()))
-			return HDLRegisterConfig.defaultClk();
+			return Optional.of(HDLRegisterConfig.defaultClk());
 		if (HDLRegisterConfig.DEF_RST.equals(var.getLastSegment()))
-			return HDLRegisterConfig.defaultRst();
+			return Optional.of(HDLRegisterConfig.defaultRst());
 		IHDLObject container = resolveTo.getContainer();
 		if ((container == null) || !descent)
-			return null;
+			return Optional.absent();
 		return ScopingExtension.INST.resolveVariable(container, var);
 	}
 

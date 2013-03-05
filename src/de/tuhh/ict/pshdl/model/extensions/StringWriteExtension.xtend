@@ -376,7 +376,7 @@ class StringWriteExtension {
 	def dispatch String toString(HDLVariableDeclaration hvd, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		sb.append(hvd.entering(highlight))
-		val HDLType resolveType = hvd.resolveType
+		val resolveType = hvd.resolveType
 		if (hvd.annotations != null) {
 			for (HDLAnnotation hdla : hvd.annotations) {
 				sb.append(hdla.toString(highlight)).append(highlight.simpleSpace)
@@ -387,12 +387,12 @@ class StringWriteExtension {
 			sb.append(highlight.direction(dirString)).append(highlight.simpleSpace)
 		if (hvd.register != null)
 			sb.append(hvd.register.toString(highlight))
-		if (resolveType==null){
+		if (!resolveType.present){
 			sb.append("#UNRESOLVED_TYPE#")
-		} else if (resolveType instanceof HDLEnum) {
-			sb.append(highlight.keyword("enum")).append(highlight.simpleSpace).append(resolveType.toString(highlight))
+		} else if (resolveType.get instanceof HDLEnum) {
+			sb.append(highlight.keyword("enum")).append(highlight.simpleSpace).append(resolveType.get.toString(highlight))
 		} else
-			sb.append(resolveType.toString(highlight))
+			sb.append(resolveType.get.toString(highlight))
 		sb.append('''«FOR HDLVariable hvar : hvd.variables BEFORE highlight.simpleSpace SEPARATOR ','»«hvar.toString(highlight)»«ENDFOR»;''')
 		if (highlight.context==SyntaxHighlighter$Context::HDLPackage)
 			sb.append(highlight.newLine)

@@ -5,6 +5,8 @@ import static de.tuhh.ict.pshdl.model.validation.builtin.ErrorCode.*;
 
 import java.util.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLAssignment.HDLAssignmentType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
@@ -65,11 +67,11 @@ public class RWValidation {
 			if (writeList == null) {
 				writeList = new HashSet<String>();
 			}
-			HDLInterface resolveHIf = hii.resolveHIf();
-			if (resolveHIf == null) {
+			Optional<HDLInterface> resolveHIf = hii.resolveHIf();
+			if (!resolveHIf.isPresent()) {
 				continue;
 			}
-			ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
+			ArrayList<HDLVariableDeclaration> ports = resolveHIf.get().getPorts();
 			for (HDLVariableDeclaration hvd : ports) {
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
@@ -115,17 +117,18 @@ public class RWValidation {
 			// XXX check for interface and ensure that it is only this instance
 			if (ref instanceof HDLUnresolvedFragment)
 				return;
-			HDLVariable var = ((HDLResolvedRef) ref).resolveVar();
-			if (var != null) {
+			Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
+			if (var.isPresent())
 				if (ref instanceof HDLInterfaceRef) {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-					HDLVariable hVar = hir.resolveHIf();
-					incMeta(hVar, IntegerMeta.ACCESS);
-					addStringMeta(var.getName(), hVar, Init.read);
+					Optional<HDLVariable> hVar = hir.resolveHIf();
+					if (hVar.isPresent()) {
+						incMeta(hVar.get(), IntegerMeta.ACCESS);
+						addStringMeta(var.get().getName(), hVar.get(), Init.read);
+					}
 				} else {
-					incMeta(var, IntegerMeta.READ_COUNT);
+					incMeta(var.get(), IntegerMeta.READ_COUNT);
 				}
-			}
 		}
 	}
 
@@ -167,31 +170,34 @@ public class RWValidation {
 				if (BuiltInValidator.skipExp(ref)) {
 					continue;
 				}
-				HDLVariable var = ref.resolveVar();
-				if (var == null) {
+				Optional<HDLVariable> var = ref.resolveVar();
+				if (!var.isPresent()) {
 					continue;
 				}
 				IHDLObject container = ass.getContainer();
+				HDLVariable hdlVariable = var.get();
 				if (ref instanceof HDLInterfaceRef) {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-					HDLVariable hVar = hir.resolveHIf();
-					incMeta(hVar, IntegerMeta.ACCESS);
-					addStringMeta(var.getName(), hVar, Init.written);
-					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
-						addStringMeta(hir.getVarRefName().getLastSegment(), hVar, Init.full);
+					Optional<HDLVariable> hVar = hir.resolveHIf();
+					if (hVar.isPresent()) {
+						incMeta(hVar.get(), IntegerMeta.ACCESS);
+						addStringMeta(hdlVariable.getName(), hVar.get(), Init.written);
+						if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
+							addStringMeta(hir.getVarRefName().getLastSegment(), hVar.get(), Init.full);
+						}
 					}
 				} else {
 					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
-						var.addMeta(Init.full, Collections.singleton(var.getName()));
+						hdlVariable.addMeta(Init.full, Collections.singleton(hdlVariable.getName()));
 					}
-					incMeta(var, IntegerMeta.WRITE_COUNT);
+					incMeta(hdlVariable, IntegerMeta.WRITE_COUNT);
 				}
 				HDLBlock block = ass.getContainer(HDLBlock.class);
 				if (block == null) {
 					block = UNIT_BLOCK;
 				}
-				if ((var.getMeta(BlockMeta.block) != null) && (var.getMeta(BlockMeta.block) != block)) {
-					Set<HDLBlock> meta = var.getMeta(BlockMetaClash.clash);
+				if ((hdlVariable.getMeta(BlockMeta.block) != null) && (hdlVariable.getMeta(BlockMeta.block) != block)) {
+					Set<HDLBlock> meta = hdlVariable.getMeta(BlockMetaClash.clash);
 					if (meta == null) {
 						meta = new HashSet<HDLBlock>();
 					}
@@ -200,9 +206,9 @@ public class RWValidation {
 					} else {
 						meta.add(block);
 					}
-					var.addMeta(BlockMetaClash.clash, meta);
+					hdlVariable.addMeta(BlockMetaClash.clash, meta);
 				}
-				var.addMeta(BlockMeta.block, block);
+				hdlVariable.addMeta(BlockMeta.block, block);
 			}
 		}
 		Collection<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();

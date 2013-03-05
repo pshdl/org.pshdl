@@ -34,14 +34,14 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		this.range = new ArrayList<HDLRange>();
 		if (range != null) {
 			for (HDLRange newValue : range) {
-				this.range.add((HDLRange) newValue);
+				this.range.add(newValue);
 			}
 		}
 		if (validate) {
 			param = validateParam(param);
 		}
 		if (param != null) {
-			this.param = (HDLVariable) param;
+			this.param = param;
 		} else {
 			this.param = null;
 		}
@@ -51,7 +51,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		this.dos = new ArrayList<HDLStatement>();
 		if (dos != null) {
 			for (HDLStatement newValue : dos) {
-				this.dos.add((HDLStatement) newValue);
+				this.dos.add(newValue);
 			}
 		}
 	}
@@ -131,6 +131,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLForLoop copy() {
 		HDLForLoop newObject = new HDLForLoop(null, range, param, dos, false);
@@ -143,6 +144,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLForLoop copyFiltered(CopyFilter filter) {
 		ArrayList<HDLRange> filteredrange = filter.copyContainer("range", this, range);
@@ -156,6 +158,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLForLoop copyDeepFrozen(IHDLObject container) {
 		HDLForLoop copy = copyFiltered(CopyFilter.DEEP_META);
@@ -172,8 +175,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return the same instance of {@link HDLForLoop} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLForLoop setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLForLoop setContainer(@Nullable IHDLObject container) {
 		return (HDLForLoop) super.setContainer(container);
 	}
 
@@ -187,8 +191,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated range
 	 *         field.
 	 */
-	public @Nonnull
-	HDLForLoop setRange(@Nonnull ArrayList<HDLRange> range) {
+	@Nonnull
+	public HDLForLoop setRange(@Nonnull ArrayList<HDLRange> range) {
 		range = validateRange(range);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
 		return res;
@@ -203,8 +207,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated range
 	 *         field.
 	 */
-	public @Nonnull
-	HDLForLoop addRange(@Nonnull HDLRange newRange) {
+	@Nonnull
+	public HDLForLoop addRange(@Nonnull HDLRange newRange) {
 		if (newRange == null)
 			throw new IllegalArgumentException("Element of range can not be null!");
 		ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
@@ -222,8 +226,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated range
 	 *         field.
 	 */
-	public @Nonnull
-	HDLForLoop removeRange(@Nonnull HDLRange newRange) {
+	@Nonnull
+	public HDLForLoop removeRange(@Nonnull HDLRange newRange) {
 		if (newRange == null)
 			throw new IllegalArgumentException("Removed element of range can not be null!");
 		ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
@@ -241,8 +245,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated range
 	 *         field.
 	 */
-	public @Nonnull
-	HDLForLoop removeRange(int idx) {
+	@Nonnull
+	public HDLForLoop removeRange(int idx) {
 		ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
 		range.remove(idx);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
@@ -258,8 +262,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated param
 	 *         field.
 	 */
-	public @Nonnull
-	HDLForLoop setParam(@Nonnull HDLVariable param) {
+	@Nonnull
+	public HDLForLoop setParam(@Nonnull HDLVariable param) {
 		param = validateParam(param);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
 		return res;
@@ -274,8 +278,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 *            least one element.
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
-	public @Nonnull
-	HDLForLoop setDos(@Nonnull ArrayList<HDLStatement> dos) {
+	@Nonnull
+	public HDLForLoop setDos(@Nonnull ArrayList<HDLStatement> dos) {
 		dos = validateDos(dos);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
 		return res;
@@ -288,8 +292,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 *            the value that should be added to the field {@link #getDos()}
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
-	public @Nonnull
-	HDLForLoop addDos(@Nonnull HDLStatement newDos) {
+	@Nonnull
+	public HDLForLoop addDos(@Nonnull HDLStatement newDos) {
 		if (newDos == null)
 			throw new IllegalArgumentException("Element of dos can not be null!");
 		ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
@@ -306,8 +310,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 *            {@link #getDos()}
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
-	public @Nonnull
-	HDLForLoop removeDos(@Nonnull HDLStatement newDos) {
+	@Nonnull
+	public HDLForLoop removeDos(@Nonnull HDLStatement newDos) {
 		if (newDos == null)
 			throw new IllegalArgumentException("Removed element of dos can not be null!");
 		ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
@@ -324,8 +328,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 *            {@link #getDos()}
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
-	public @Nonnull
-	HDLForLoop removeDos(int idx) {
+	@Nonnull
+	public HDLForLoop removeDos(int idx) {
 		ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.remove(idx);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
@@ -376,11 +380,12 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLForLoop()");
-		if (range != null) {
+		if (range != null)
 			if (range.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : range) {
@@ -388,11 +393,10 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		if (param != null) {
 			sb.append(".setParam(").append(param.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (dos != null) {
+		if (dos != null)
 			if (dos.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : dos) {
@@ -400,10 +404,10 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateRange(getRange());
@@ -424,6 +428,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLForLoop, HDLClass.HDLCompound, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

@@ -56,7 +56,7 @@ public interface CopyFilter {
 			if (object == null)
 				return null;
 			ArrayList<T> res = new ArrayList<T>();
-			for (T t : object) {
+			for (T t : object)
 				if (t instanceof HDLObject) {
 					IHDLObject obj = (IHDLObject) t;
 					T copyFiltered = (T) obj.copyFiltered(this);
@@ -64,7 +64,6 @@ public interface CopyFilter {
 				} else {
 					res.add(t);
 				}
-			}
 			return res;
 		}
 

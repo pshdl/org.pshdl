@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -40,7 +42,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	protected final HDLQualifiedName hEnum;
 
 	@Nullable
-	public HDLEnum resolveHEnum() {
+	public Optional<HDLEnum> resolveHEnum() {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
 		return ScopingExtension.INST.resolveEnum(this, hEnum);
@@ -61,6 +63,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLEnumRef copy() {
 		HDLEnumRef newObject = new HDLEnumRef(null, var, hEnum, false);
@@ -73,6 +76,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLEnumRef copyFiltered(CopyFilter filter) {
 		HDLQualifiedName filteredvar = filter.copyObject("var", this, var);
@@ -85,6 +89,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLEnumRef copyDeepFrozen(IHDLObject container) {
 		HDLEnumRef copy = copyFiltered(CopyFilter.DEEP_META);
@@ -101,8 +106,9 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * @return the same instance of {@link HDLEnumRef} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLEnumRef setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLEnumRef setContainer(@Nullable IHDLObject container) {
 		return (HDLEnumRef) super.setContainer(container);
 	}
 
@@ -114,8 +120,9 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLEnumRef} with the updated var field.
 	 */
-	public @Nonnull
-	HDLEnumRef setVar(@Nonnull HDLQualifiedName var) {
+	@Override
+	@Nonnull
+	public HDLEnumRef setVar(@Nonnull HDLQualifiedName var) {
 		var = validateVar(var);
 		HDLEnumRef res = new HDLEnumRef(container, var, hEnum, false);
 		return res;
@@ -130,8 +137,8 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * @return a new instance of {@link HDLEnumRef} with the updated hEnum
 	 *         field.
 	 */
-	public @Nonnull
-	HDLEnumRef setHEnum(@Nonnull HDLQualifiedName hEnum) {
+	@Nonnull
+	public HDLEnumRef setHEnum(@Nonnull HDLQualifiedName hEnum) {
 		hEnum = validateHEnum(hEnum);
 		HDLEnumRef res = new HDLEnumRef(container, var, hEnum, false);
 		return res;
@@ -169,6 +176,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -182,6 +190,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHEnum(getHEnumRefName());
@@ -190,6 +199,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHEnumRefName()));
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLEnumRef, HDLClass.HDLResolvedRef, HDLClass.HDLReference, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

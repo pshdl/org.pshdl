@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.generator.vhdl;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLContext;
 import de.tuhh.ict.pshdl.generator.vhdl.VHDLExpressionExtension;
@@ -114,8 +115,9 @@ public class VHDLPackageExtension {
     final HDLEnumRef[] hRefs = obj.<HDLEnumRef>getAllObjectsOf(HDLEnumRef.class, true);
     for (final HDLEnumRef hdlEnumRef : hRefs) {
       {
-        final HDLEnum resolveHEnum = hdlEnumRef.resolveHEnum();
-        final HDLUnit enumContainer = resolveHEnum.<HDLUnit>getContainer(HDLUnit.class);
+        final Optional<HDLEnum> resolveHEnum = hdlEnumRef.resolveHEnum();
+        HDLEnum _get = resolveHEnum.get();
+        final HDLUnit enumContainer = _get.<HDLUnit>getContainer(HDLUnit.class);
         boolean _or = false;
         boolean _equals = ObjectExtensions.operator_equals(enumContainer, null);
         if (_equals) {
@@ -127,7 +129,8 @@ public class VHDLPackageExtension {
           _or = (_equals || _not);
         }
         if (_or) {
-          final HDLQualifiedName type = FullNameExtension.fullNameOf(resolveHEnum);
+          HDLEnum _get_1 = resolveHEnum.get();
+          final HDLQualifiedName type = FullNameExtension.fullNameOf(_get_1);
           String _segment = type.getSegment(0);
           boolean _equals_2 = _segment.equals("pshdl");
           boolean _not_1 = (!_equals_2);
@@ -144,8 +147,16 @@ public class VHDLPackageExtension {
       HDLClass _classType = variableRef.getClassType();
       boolean _notEquals = ObjectExtensions.operator_notEquals(_classType, HDLClass.HDLInterfaceRef);
       if (_notEquals) {
-        final HDLVariable variable = variableRef.resolveVar();
-        final HDLUnit enumContainer = variable.<HDLUnit>getContainer(HDLUnit.class);
+        final Optional<HDLVariable> variable = variableRef.resolveVar();
+        boolean _isPresent = variable.isPresent();
+        boolean _not = (!_isPresent);
+        if (_not) {
+          String _plus = ("Can not resolve:" + variableRef);
+          IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
+          throw _illegalArgumentException;
+        }
+        HDLVariable _get = variable.get();
+        final HDLUnit enumContainer = _get.<HDLUnit>getContainer(HDLUnit.class);
         boolean _or = false;
         boolean _equals = ObjectExtensions.operator_equals(enumContainer, null);
         if (_equals) {
@@ -153,11 +164,12 @@ public class VHDLPackageExtension {
         } else {
           HDLUnit _container = variableRef.<HDLUnit>getContainer(HDLUnit.class);
           boolean _equals_1 = enumContainer.equals(_container);
-          boolean _not = (!_equals_1);
-          _or = (_equals || _not);
+          boolean _not_1 = (!_equals_1);
+          _or = (_equals || _not_1);
         }
         if (_or) {
-          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(variable);
+          HDLVariable _get_1 = variable.get();
+          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(_get_1);
           final HDLQualifiedName type = _fullNameOf.skipLast(1);
           boolean _and = false;
           boolean _greaterThan = (type.length > 0);
@@ -166,8 +178,8 @@ public class VHDLPackageExtension {
           } else {
             String _segment = type.getSegment(0);
             boolean _equals_2 = _segment.equals("pshdl");
-            boolean _not_1 = (!_equals_2);
-            _and = (_greaterThan && _not_1);
+            boolean _not_2 = (!_equals_2);
+            _and = (_greaterThan && _not_2);
           }
           if (_and) {
             String _packageName = this.getPackageName(type);
@@ -198,9 +210,9 @@ public class VHDLPackageExtension {
       List<PackageDeclarativeItem> _declarations_1 = pd.getDeclarations();
       _declarations_1.addAll(unit.constantsPkg);
       res.add(pd);
-      String _plus = ("work." + libName);
-      String _plus_1 = (_plus + ".all");
-      UseClause _useClause = new UseClause(_plus_1);
+      String _plus_1 = ("work." + libName);
+      String _plus_2 = (_plus_1 + ".all");
+      UseClause _useClause = new UseClause(_plus_2);
       res.add(_useClause);
       VHDLPackageExtension.addDefaultLibs(res, unit);
     }
@@ -340,8 +352,9 @@ public class VHDLPackageExtension {
         final HDLVariableRef[] refs = stmnt.<HDLVariableRef>getAllObjectsOf(HDLVariableRef.class, true);
         for (final HDLVariableRef ref : refs) {
           {
-            final HDLVariable hvar = ref.resolveVar();
-            final IHDLObject container = hvar.getContainer();
+            final Optional<HDLVariable> hvar = ref.resolveVar();
+            HDLVariable _get_1 = hvar.get();
+            final IHDLObject container = _get_1.getContainer();
             if ((container instanceof HDLVariableDeclaration)) {
               final HDLVariableDeclaration hdv = ((HDLVariableDeclaration) container);
               HDLDirection _direction = hdv.getDirection();
@@ -387,7 +400,8 @@ public class VHDLPackageExtension {
       RuntimeException _runtimeException = new RuntimeException("Can not use unresolved fragments");
       throw _runtimeException;
     }
-    return ((HDLResolvedRef) reference).resolveVar();
+    Optional<HDLVariable> _resolveVar = ((HDLResolvedRef) reference).resolveVar();
+    return _resolveVar.get();
   }
   
   private SequentialStatement createIfStatement(final HDLUnit hUnit, final ProcessStatement ps, final HDLRegisterConfig key, final LinkedList<SequentialStatement> value, final VHDLContext unit) {
@@ -476,8 +490,9 @@ public class VHDLPackageExtension {
             {
               final HDLVariableRef[] refs = hvar.<HDLVariableRef>getAllObjectsOf(HDLVariableRef.class, true);
               for (final HDLVariableRef ref : refs) {
-                HDLVariable _resolveVar = ref.resolveVar();
-                _resolveVar.setMeta(VHDLStatementExtension.EXPORT);
+                Optional<HDLVariable> _resolveVar = ref.resolveVar();
+                HDLVariable _get = _resolveVar.get();
+                _get.setMeta(VHDLStatementExtension.EXPORT);
               }
               final String origName = hvar.getName();
               final String name = VHDLOutputValidator.getVHDLName(origName);

@@ -57,10 +57,9 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 		@Nullable
 		public static HDLPrimitiveType getOp(String op) {
-			for (HDLPrimitiveType ass : values()) {
+			for (HDLPrimitiveType ass : values())
 				if (ass.str.equals(op))
 					return ass;
-			}
 			return null;
 		}
 

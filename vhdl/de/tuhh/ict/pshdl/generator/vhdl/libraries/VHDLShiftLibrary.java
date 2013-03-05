@@ -20,8 +20,7 @@ public class VHDLShiftLibrary {
 		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
 		HDLPrimitiveType[] values = HDLPrimitiveType.values();
 		for (HDLShiftOpType op : HDLShiftOpType.values()) {
-			for (int i = 0; i < values.length; i++) {
-				HDLPrimitiveType left = values[i];
+			for (HDLPrimitiveType left : values) {
 				String name = getFunctionName(op, left);
 				SubtypeIndication lt = VHDLCastsLibrary.getType(left);
 				if (lt != null) {

@@ -257,21 +257,18 @@ public class HDLPrimitives {
 	 */
 	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {
 		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
-		if (!typeOfLeft.isPresent()) {
+		if (!typeOfLeft.isPresent())
 			return createError("left");
-		}
 		HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
 		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
-		if (!typeOfRight.isPresent()) {
+		if (!typeOfRight.isPresent())
 			return createError("right");
-		}
 		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
 		HDLArithOpType type = op.getType();
-		if (HDLPrimitive.isTargetMatching(lType)) {
+		if (HDLPrimitive.isTargetMatching(lType))
 			if (HDLPrimitive.isTargetMatching(rType)) {
 				lType = rType;
 			}
-		}
 		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
 		}
@@ -401,14 +398,12 @@ public class HDLPrimitives {
 
 	public HDLTypeInferenceInfo getShiftOpType(HDLShiftOp op) {
 		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
-		if (!typeOfLeft.isPresent()) {
+		if (!typeOfLeft.isPresent())
 			return createError("left");
-		}
 		HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
 		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
-		if (!typeOfRight.isPresent()) {
+		if (!typeOfRight.isPresent())
 			return createError("right");
-		}
 		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
 		HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
@@ -426,23 +421,20 @@ public class HDLPrimitives {
 
 	public HDLTypeInferenceInfo getEqualityOpType(HDLEqualityOp op) {
 		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
-		if (!typeOfLeft.isPresent()) {
+		if (!typeOfLeft.isPresent())
 			return createError("left");
-		}
 		HDLType determineTypeL = typeOfLeft.get();
 		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
-		if (!typeOfRight.isPresent()) {
+		if (!typeOfRight.isPresent())
 			return createError("right");
-		}
 		HDLType determineTypeR = typeOfRight.get();
 		if ((determineTypeL instanceof HDLPrimitive) && (determineTypeR instanceof HDLPrimitive)) {
 			HDLPrimitive lType = (HDLPrimitive) determineTypeL;
 			HDLPrimitive rType = (HDLPrimitive) determineTypeR;
-			if (HDLPrimitive.isTargetMatching(lType)) {
+			if (HDLPrimitive.isTargetMatching(lType))
 				if (HDLPrimitive.isTargetMatching(rType)) {
 					lType = rType;
 				}
-			}
 			if (HDLPrimitive.isTargetMatching(rType)) {
 				rType = lType;
 			}
@@ -469,20 +461,17 @@ public class HDLPrimitives {
 		if ((type == HDLBitOpType.LOGI_AND) || (type == HDLBitOpType.LOGI_OR))
 			return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool(), HDLPrimitive.getBool());
 		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
-		if (!typeOfLeft.isPresent()) {
+		if (!typeOfLeft.isPresent())
 			return createError("left");
-		}
 		HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
 		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
-		if (!typeOfRight.isPresent()) {
+		if (!typeOfRight.isPresent())
 			return createError("right");
-		}
 		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
-		if (HDLPrimitive.isTargetMatching(lType)) {
+		if (HDLPrimitive.isTargetMatching(lType))
 			if (HDLPrimitive.isTargetMatching(rType)) {
 				lType = rType;
 			}
-		}
 		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
 		}
@@ -505,9 +494,8 @@ public class HDLPrimitives {
 		HDLExpression target = manip.getTarget();
 		HDLType castTo = manip.getCastTo();
 		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(target);
-		if (!typeOfLeft.isPresent()) {
+		if (!typeOfLeft.isPresent())
 			return createError("left");
-		}
 		HDLPrimitive determineType = (HDLPrimitive) typeOfLeft.get();
 		switch (manip.getType()) {
 		case CAST:

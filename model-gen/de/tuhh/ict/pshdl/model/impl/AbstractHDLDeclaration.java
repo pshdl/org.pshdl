@@ -28,7 +28,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		this.annotations = new ArrayList<HDLAnnotation>();
 		if (annotations != null) {
 			for (HDLAnnotation newValue : annotations) {
-				this.annotations.add((HDLAnnotation) newValue);
+				this.annotations.add(newValue);
 			}
 		}
 	}
@@ -71,6 +71,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLDeclaration copy();
 
@@ -79,6 +80,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLDeclaration copyFiltered(CopyFilter filter);
 
@@ -87,6 +89,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLDeclaration copyDeepFrozen(IHDLObject container);
 
@@ -122,11 +125,12 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLDeclaration()");
-		if (annotations != null) {
+		if (annotations != null)
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -134,10 +138,10 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateAnnotations(getAnnotations());
@@ -148,6 +152,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLDeclaration, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

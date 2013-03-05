@@ -82,10 +82,16 @@ public class ConstantEvaluate {
   }.apply();
   
   protected Optional<BigInteger> _constantEvaluate(final HDLUnresolvedFragment obj, final HDLEvaluationContext context) {
-    IHDLObject _resolveFragment = Insulin.resolveFragment(obj);
+    final Optional<? extends IHDLObject> type = Insulin.resolveFragment(obj);
+    boolean _isPresent = type.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return Optional.<BigInteger>absent();
+    }
+    IHDLObject _get = type.get();
     IHDLObject _container = obj.getContainer();
-    IHDLObject _copyDeepFrozen = _resolveFragment==null?(IHDLObject)null:_resolveFragment.copyDeepFrozen(_container);
-    return _copyDeepFrozen==null?(Optional<BigInteger>)null:this.constantEvaluate(_copyDeepFrozen, context);
+    IHDLObject _copyDeepFrozen = _get.copyDeepFrozen(_container);
+    return this.constantEvaluate(_copyDeepFrozen, context);
   }
   
   protected Optional<BigInteger> _constantEvaluate(final IHDLObject obj, final HDLEvaluationContext context) {
@@ -612,32 +618,36 @@ public class ConstantEvaluate {
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
-    final HDLVariable hVar = obj.resolveVar();
-    boolean _equals = ObjectExtensions.operator_equals(hVar, null);
-    if (_equals) {
+    final Optional<HDLVariable> hVar = obj.resolveVar();
+    boolean _isPresent_1 = hVar.isPresent();
+    boolean _not_2 = (!_isPresent_1);
+    if (_not_2) {
       obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<BigInteger>absent();
     }
-    final HDLDirection dir = hVar.getDirection();
-    boolean _equals_1 = ObjectExtensions.operator_equals(dir, HDLDirection.CONSTANT);
-    if (_equals_1) {
-      HDLExpression _defaultValue = hVar.getDefaultValue();
+    HDLVariable _get_1 = hVar.get();
+    final HDLDirection dir = _get_1.getDirection();
+    boolean _equals = ObjectExtensions.operator_equals(dir, HDLDirection.CONSTANT);
+    if (_equals) {
+      HDLVariable _get_2 = hVar.get();
+      HDLExpression _defaultValue = _get_2.getDefaultValue();
       return this.subEvaluate(obj, _defaultValue, context);
     }
-    boolean _equals_2 = ObjectExtensions.operator_equals(dir, HDLDirection.PARAMETER);
-    if (_equals_2) {
-      boolean _equals_3 = ObjectExtensions.operator_equals(context, null);
-      if (_equals_3) {
+    boolean _equals_1 = ObjectExtensions.operator_equals(dir, HDLDirection.PARAMETER);
+    if (_equals_1) {
+      boolean _equals_2 = ObjectExtensions.operator_equals(context, null);
+      if (_equals_2) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return Optional.<BigInteger>absent();
       }
-      final HDLExpression cRef = context.get(hVar);
+      HDLVariable _get_3 = hVar.get();
+      final HDLExpression cRef = context.get(_get_3);
       final Optional<BigInteger> cRefEval = this.constantEvaluate(cRef, context);
-      boolean _isPresent_1 = cRefEval.isPresent();
-      boolean _not_2 = (!_isPresent_1);
-      if (_not_2) {
+      boolean _isPresent_2 = cRefEval.isPresent();
+      boolean _not_3 = (!_isPresent_2);
+      if (_not_3) {
         obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();

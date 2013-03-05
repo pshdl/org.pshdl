@@ -22,9 +22,8 @@ public class VHDLUtils {
 
 	public static Literal<?> toHexLiteral(int widthInt, BigInteger lit) {
 		StringBuilder sb = new StringBuilder(widthInt / 4);
-		if ((widthInt % 4) != 0) {
+		if ((widthInt % 4) != 0)
 			return toBinaryLiteral(widthInt, lit);
-		}
 		if (lit.signum() < 0) {
 			BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
 			sb.append(lit.abs().and(mask).xor(mask).add(BigInteger.ONE).toString(16));
@@ -37,12 +36,14 @@ public class VHDLUtils {
 
 	private static StringBuilder zeroFill(int widthInt, String binLit) {
 		StringBuilder sb = new StringBuilder();
-		for (int i = widthInt; i > binLit.length(); i--)
+		for (int i = widthInt; i > binLit.length(); i--) {
 			sb.append('0');
-		if (binLit.length() > widthInt)
+		}
+		if (binLit.length() > widthInt) {
 			sb.append(binLit.substring(binLit.length() - widthInt));
-		else
+		} else {
 			sb.append(binLit);
+		}
 		return sb;
 	}
 

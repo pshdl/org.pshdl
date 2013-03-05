@@ -44,6 +44,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * 
 	 * @return the field
 	 */
+	@Override
 	public @Nonnull
 	HDLBitOpType getType() {
 		return type;
@@ -60,6 +61,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLBitOp copy() {
 		HDLBitOp newObject = new HDLBitOp(null, left, right, type, false);
@@ -72,6 +74,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLBitOp copyFiltered(CopyFilter filter) {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
@@ -85,6 +88,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLBitOp copyDeepFrozen(IHDLObject container) {
 		HDLBitOp copy = copyFiltered(CopyFilter.DEEP_META);
@@ -101,8 +105,9 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * @return the same instance of {@link HDLBitOp} with the updated container
 	 *         field.
 	 */
-	public @Nonnull
-	HDLBitOp setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLBitOp setContainer(@Nullable IHDLObject container) {
 		return (HDLBitOp) super.setContainer(container);
 	}
 
@@ -114,8 +119,9 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLBitOp} with the updated left field.
 	 */
-	public @Nonnull
-	HDLBitOp setLeft(@Nonnull HDLExpression left) {
+	@Override
+	@Nonnull
+	public HDLBitOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
 		HDLBitOp res = new HDLBitOp(container, left, right, type, false);
 		return res;
@@ -129,8 +135,9 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLBitOp} with the updated right field.
 	 */
-	public @Nonnull
-	HDLBitOp setRight(@Nonnull HDLExpression right) {
+	@Override
+	@Nonnull
+	public HDLBitOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
 		HDLBitOp res = new HDLBitOp(container, left, right, type, false);
 		return res;
@@ -144,8 +151,8 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLBitOp} with the updated type field.
 	 */
-	public @Nonnull
-	HDLBitOp setType(@Nonnull HDLBitOpType type) {
+	@Nonnull
+	public HDLBitOp setType(@Nonnull HDLBitOpType type) {
 		type = validateType(type);
 		HDLBitOp res = new HDLBitOp(container, left, right, type, false);
 		return res;
@@ -183,6 +190,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -199,11 +207,13 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateType(getType());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLBitOp, HDLClass.HDLOpExpression, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

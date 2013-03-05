@@ -20,8 +20,8 @@ import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
-import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.Problem.ProblemSeverity;
 import de.tuhh.ict.pshdl.model.validation.builtin.*;
@@ -67,11 +67,9 @@ public class BusGenerator implements IHDLGenerator {
 
 	private HDLExpression getRegCountLiteral(HDLDirectGeneration hdl) {
 		ArrayList<HDLArgument> args = hdl.getArguments();
-		for (HDLArgument arg : args) {
-			if ("regCount".equals(arg.getName())) {
+		for (HDLArgument arg : args)
+			if ("regCount".equals(arg.getName()))
 				return arg.getExpression();
-			}
-		}
 		throw new IllegalArgumentException("The parameter regCount is not valid!");
 	}
 
@@ -93,12 +91,11 @@ public class BusGenerator implements IHDLGenerator {
 	private boolean validate(Unit unit, Set<Problem> problems) {
 		if (unit == null)
 			return false;
-		for (Problem problem : problems) {
+		for (Problem problem : problems)
 			if (problem.severity == ProblemSeverity.ERROR)
 				return false;
-		}
 		boolean hasError = false;
-		for (Entry<String, NamedElement> entry : unit.declarations.entrySet()) {
+		for (Entry<String, NamedElement> entry : unit.declarations.entrySet())
 			if (entry.getValue() instanceof Reference) {
 				Reference ref = (Reference) entry.getValue();
 				NamedElement decl = unit.declarations.get(ref.getName());
@@ -109,7 +106,6 @@ public class BusGenerator implements IHDLGenerator {
 					hasError = true;
 				}
 			}
-		}
 		return !hasError;
 	}
 
@@ -122,58 +118,52 @@ public class BusGenerator implements IHDLGenerator {
 	private int getMemCount(HDLDirectGeneration hdl) {
 		ArrayList<HDLArgument> args = hdl.getArguments();
 		int memCount = 0;
-		for (HDLArgument arg : args) {
+		for (HDLArgument arg : args)
 			if ("memCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
 				Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
 				if (regVal.isPresent()) {
 					memCount = regVal.get().intValue();
-				} else {
-					if (expression instanceof HDLLiteral) {
-						HDLLiteral lit = (HDLLiteral) expression;
-						// String literals are allowed as well...
-						if (lit.getStr()) {
-							try {
-								memCount = Integer.parseInt(lit.getVal());
-							} catch (NumberFormatException e) {
-								throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
-							}
+				} else if (expression instanceof HDLLiteral) {
+					HDLLiteral lit = (HDLLiteral) expression;
+					// String literals are allowed as well...
+					if (lit.getStr()) {
+						try {
+							memCount = Integer.parseInt(lit.getVal());
+						} catch (NumberFormatException e) {
+							throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
 						}
-					} else
-						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
-				}
+					}
+				} else
+					throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
 			}
-		}
 		return memCount;
 	}
 
 	private int getRegCount(HDLDirectGeneration hdl) {
 		ArrayList<HDLArgument> args = hdl.getArguments();
 		int regCount = -1;
-		for (HDLArgument arg : args) {
+		for (HDLArgument arg : args)
 			if ("regCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
 				Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
 				if (regVal.isPresent()) {
 					regCount = regVal.get().intValue();
-				} else {
-					if (expression instanceof HDLLiteral) {
-						HDLLiteral lit = (HDLLiteral) expression;
-						// String literals are allowed as well...
-						if (lit.getStr()) {
-							try {
-								regCount = Integer.parseInt(lit.getVal());
-							} catch (NumberFormatException e) {
-								throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
-							}
+				} else if (expression instanceof HDLLiteral) {
+					HDLLiteral lit = (HDLLiteral) expression;
+					// String literals are allowed as well...
+					if (lit.getStr()) {
+						try {
+							regCount = Integer.parseInt(lit.getVal());
+						} catch (NumberFormatException e) {
+							throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
 						}
-					} else
-						throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
-				}
+					}
+				} else
+					throw new IllegalArgumentException("The value of the parameter regCount is not valid! It probably is not constant.");
 			}
-		}
 		if (regCount == -1)
 			throw new IllegalArgumentException("The parameter regCount is not present!");
 		return regCount;
@@ -233,11 +223,9 @@ public class BusGenerator implements IHDLGenerator {
 	}
 
 	private String getVersion(HDLDirectGeneration hdl) {
-		for (HDLArgument arg : hdl.getArguments()) {
-			if ("version".equals(arg.getName())) {
+		for (HDLArgument arg : hdl.getArguments())
+			if ("version".equals(arg.getName()))
 				return ((HDLLiteral) arg.getExpression()).getVal();
-			}
-		}
 		return "v1_00_a";
 	}
 

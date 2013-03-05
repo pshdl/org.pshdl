@@ -110,14 +110,12 @@ public class PSHDLLangParser extends Parser {
 				setState(118);
 				_la = _input.LA(1);
 				if (_la == 30) {
-					{
-						setState(114);
-						match(30);
-						setState(115);
-						psQualifiedName();
-						setState(116);
-						match(41);
-					}
+					setState(114);
+					match(30);
+					setState(115);
+					psQualifiedName();
+					setState(116);
+					match(41);
 				}
 
 				setState(124);
@@ -220,10 +218,10 @@ public class PSHDLLangParser extends Parser {
 					_la = _input.LA(1);
 				}
 				setState(133);
-				((PsUnitContext) _localctx).unitType = _input.LT(1);
+				_localctx.unitType = _input.LT(1);
 				_la = _input.LA(1);
 				if (!((_la == MODULE) || (_la == TESTBENCH))) {
-					((PsUnitContext) _localctx).unitType = (Token) _errHandler.recoverInline(this);
+					_localctx.unitType = _errHandler.recoverInline(this);
 				}
 				consume();
 				setState(134);
@@ -339,10 +337,8 @@ public class PSHDLLangParser extends Parser {
 				setState(156);
 				_la = _input.LA(1);
 				if (_la == 17) {
-					{
-						setState(155);
-						match(17);
-					}
+					setState(155);
+					match(17);
 				}
 
 			}
@@ -448,7 +444,7 @@ public class PSHDLLangParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 				setState(163);
-				((PsProcessContext) _localctx).isProcess = match(39);
+				_localctx.isProcess = match(39);
 				setState(164);
 				match(31);
 				setState(168);
@@ -573,19 +569,15 @@ public class PSHDLLangParser extends Parser {
 				setState(180);
 				_la = _input.LA(1);
 				if (_la == 3) {
-					{
-						setState(179);
-						psArray();
-					}
+					setState(179);
+					psArray();
 				}
 
 				setState(183);
 				_la = _input.LA(1);
 				if (_la == 25) {
-					{
-						setState(182);
-						psPassedArguments();
-					}
+					setState(182);
+					psPassedArguments();
 				}
 
 				setState(185);
@@ -644,10 +636,8 @@ public class PSHDLLangParser extends Parser {
 				setState(188);
 				_la = _input.LA(1);
 				if (_la == 42) {
-					{
-						setState(187);
-						((PsDirectGenerationContext) _localctx).isInclude = match(42);
-					}
+					setState(187);
+					_localctx.isInclude = match(42);
 				}
 
 				setState(190);
@@ -663,19 +653,15 @@ public class PSHDLLangParser extends Parser {
 				setState(196);
 				_la = _input.LA(1);
 				if (_la == 25) {
-					{
-						setState(195);
-						psPassedArguments();
-					}
+					setState(195);
+					psPassedArguments();
 				}
 
 				setState(199);
 				_la = _input.LA(1);
 				if (_la == RULE_GENERATOR_CONTENT) {
-					{
-						setState(198);
-						match(RULE_GENERATOR_CONTENT);
-					}
+					setState(198);
+					match(RULE_GENERATOR_CONTENT);
 				}
 
 				setState(201);
@@ -722,25 +708,23 @@ public class PSHDLLangParser extends Parser {
 				setState(212);
 				_la = _input.LA(1);
 				if (_la == RULE_ID) {
-					{
-						setState(204);
-						psArgument();
-						setState(209);
+					setState(204);
+					psArgument();
+					setState(209);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					while (_la == 23) {
+						{
+							{
+								setState(205);
+								match(23);
+								setState(206);
+								psArgument();
+							}
+						}
+						setState(211);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
-						while (_la == 23) {
-							{
-								{
-									setState(205);
-									match(23);
-									setState(206);
-									psArgument();
-								}
-							}
-							setState(211);
-							_errHandler.sync(this);
-							_la = _input.LA(1);
-						}
 					}
 				}
 
@@ -832,10 +816,8 @@ public class PSHDLLangParser extends Parser {
 				setState(223);
 				_la = _input.LA(1);
 				if (_la == LESS) {
-					{
-						setState(222);
-						psWidth();
-					}
+					setState(222);
+					psWidth();
 				}
 
 				setState(225);
@@ -1185,7 +1167,7 @@ public class PSHDLLangParser extends Parser {
 								((PsMulContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << MUL) | (1L << DIV) | (1L << MOD) | (1L << POW))) != 0)))) {
-									((PsMulContext) _localctx).op = (Token) _errHandler.recoverInline(this);
+									((PsMulContext) _localctx).op = _errHandler.recoverInline(this);
 								}
 								consume();
 								setState(244);
@@ -1203,7 +1185,7 @@ public class PSHDLLangParser extends Parser {
 								((PsAddContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!((_la == PLUS) || (_la == ARITH_NEG))) {
-									((PsAddContext) _localctx).op = (Token) _errHandler.recoverInline(this);
+									((PsAddContext) _localctx).op = _errHandler.recoverInline(this);
 								}
 								consume();
 								setState(247);
@@ -1221,7 +1203,7 @@ public class PSHDLLangParser extends Parser {
 								((PsShiftContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << SLL) | (1L << SRA) | (1L << SRL))) != 0)))) {
-									((PsShiftContext) _localctx).op = (Token) _errHandler.recoverInline(this);
+									((PsShiftContext) _localctx).op = _errHandler.recoverInline(this);
 								}
 								consume();
 								setState(250);
@@ -1239,7 +1221,7 @@ public class PSHDLLangParser extends Parser {
 								((PsEqualityCompContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!((((((_la - 63)) & ~0x3f) == 0) && (((1L << (_la - 63)) & ((1L << (LESS - 63)) | (1L << (LESS_EQ - 63)) | (1L << (GREATER - 63)) | (1L << (GREATER_EQ - 63)))) != 0)))) {
-									((PsEqualityCompContext) _localctx).op = (Token) _errHandler.recoverInline(this);
+									((PsEqualityCompContext) _localctx).op = _errHandler.recoverInline(this);
 								}
 								consume();
 								setState(253);
@@ -1257,7 +1239,7 @@ public class PSHDLLangParser extends Parser {
 								((PsEqualityContext) _localctx).op = _input.LT(1);
 								_la = _input.LA(1);
 								if (!((_la == EQ) || (_la == NOT_EQ))) {
-									((PsEqualityContext) _localctx).op = (Token) _errHandler.recoverInline(this);
+									((PsEqualityContext) _localctx).op = _errHandler.recoverInline(this);
 								}
 								consume();
 								setState(256);
@@ -1531,16 +1513,14 @@ public class PSHDLLangParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 				setState(302);
-				((PsAccessRangeContext) _localctx).from = psExpression(0);
+				_localctx.from = psExpression(0);
 				setState(305);
 				_la = _input.LA(1);
 				if (_la == 24) {
-					{
-						setState(303);
-						match(24);
-						setState(304);
-						((PsAccessRangeContext) _localctx).to = psExpression(0);
-					}
+					setState(303);
+					match(24);
+					setState(304);
+					_localctx.to = psExpression(0);
 				}
 
 			}
@@ -1594,12 +1574,10 @@ public class PSHDLLangParser extends Parser {
 					while ((_alt != 2) && (_alt != -1)) {
 						if (_alt == 1) {
 							{
-								{
-									setState(308);
-									match(37);
-									setState(309);
-									psRefPart();
-								}
+								setState(308);
+								match(37);
+								setState(309);
+								psRefPart();
 							}
 						}
 						setState(314);
@@ -1612,14 +1590,14 @@ public class PSHDLLangParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 					setState(315);
-					((PsVariableRefContext) _localctx).isClk = match(40);
+					_localctx.isClk = match(40);
 				}
 				break;
 			case 27:
 				enterOuterAlt(_localctx, 3);
 				{
 					setState(316);
-					((PsVariableRefContext) _localctx).isRst = match(27);
+					_localctx.isRst = match(27);
 				}
 				break;
 			default:
@@ -2033,25 +2011,23 @@ public class PSHDLLangParser extends Parser {
 				setState(372);
 				_la = _input.LA(1);
 				if (_la == RULE_ID) {
-					{
-						setState(364);
-						psVariable();
-						setState(369);
+					setState(364);
+					psVariable();
+					setState(369);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					while (_la == 23) {
+						{
+							{
+								setState(365);
+								match(23);
+								setState(366);
+								psVariable();
+							}
+						}
+						setState(371);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
-						while (_la == 23) {
-							{
-								{
-									setState(365);
-									match(23);
-									setState(366);
-									psVariable();
-								}
-							}
-							setState(371);
-							_errHandler.sync(this);
-							_la = _input.LA(1);
-						}
 					}
 				}
 
@@ -2095,10 +2071,8 @@ public class PSHDLLangParser extends Parser {
 				setState(377);
 				_la = _input.LA(1);
 				if (_la == 10) {
-					{
-						setState(376);
-						((PsNativeFunctionContext) _localctx).isSim = match(10);
-					}
+					setState(376);
+					_localctx.isSim = match(10);
 				}
 
 				setState(379);
@@ -2186,25 +2160,23 @@ public class PSHDLLangParser extends Parser {
 				_la = _input.LA(1);
 				if ((((((_la - 25)) & ~0x3f) == 0) && (((1L << (_la - 25)) & ((1L << (25 - 25)) | (1L << (27 - 25)) | (1L << (40 - 25)) | (1L << (ARITH_NEG - 25))
 						| (1L << (BIT_NEG - 25)) | (1L << (LOGIC_NEG - 25)) | (1L << (RULE_PS_LITERAL_TERMINAL - 25)) | (1L << (RULE_ID - 25)) | (1L << (RULE_STRING - 25)))) != 0))) {
-					{
-						setState(387);
-						psExpression(0);
-						setState(392);
+					setState(387);
+					psExpression(0);
+					setState(392);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					while (_la == 23) {
+						{
+							{
+								setState(388);
+								match(23);
+								setState(389);
+								psExpression(0);
+							}
+						}
+						setState(394);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
-						while (_la == 23) {
-							{
-								{
-									setState(388);
-									match(23);
-									setState(389);
-									psExpression(0);
-								}
-							}
-							setState(394);
-							_errHandler.sync(this);
-							_la = _input.LA(1);
-						}
 					}
 				}
 
@@ -2258,12 +2230,10 @@ public class PSHDLLangParser extends Parser {
 				if ((((((_la - 67)) & ~0x3f) == 0) && (((1L << (_la - 67)) & ((1L << (ASSGN - 67)) | (1L << (ADD_ASSGN - 67)) | (1L << (SUB_ASSGN - 67)) | (1L << (MUL_ASSGN - 67))
 						| (1L << (DIV_ASSGN - 67)) | (1L << (MOD_ASSGN - 67)) | (1L << (AND_ASSGN - 67)) | (1L << (XOR_ASSGN - 67)) | (1L << (OR_ASSGN - 67))
 						| (1L << (SLL_ASSGN - 67)) | (1L << (SRL_ASSGN - 67)) | (1L << (SRA_ASSGN - 67)))) != 0))) {
-					{
-						setState(400);
-						psAssignmentOp();
-						setState(401);
-						psExpression(0);
-					}
+					setState(400);
+					psAssignmentOp();
+					setState(401);
+					psExpression(0);
 				}
 
 				setState(405);
@@ -2420,14 +2390,14 @@ public class PSHDLLangParser extends Parser {
 				setState(417);
 				match(12);
 				setState(418);
-				((PsIfStatementContext) _localctx).ifBlk = psSimpleBlock();
+				_localctx.ifBlk = psSimpleBlock();
 				setState(421);
 				switch (getInterpreter().adaptivePredict(_input, 40, _ctx)) {
 				case 1: {
 					setState(419);
 					match(34);
 					setState(420);
-					((PsIfStatementContext) _localctx).elseBlk = psSimpleBlock();
+					_localctx.elseBlk = psSimpleBlock();
 				}
 					break;
 				}
@@ -2786,10 +2756,8 @@ public class PSHDLLangParser extends Parser {
 				setState(475);
 				_la = _input.LA(1);
 				if (_la == 41) {
-					{
-						setState(474);
-						match(41);
-					}
+					setState(474);
+					match(41);
 				}
 
 			}
@@ -3058,10 +3026,8 @@ public class PSHDLLangParser extends Parser {
 				setState(503);
 				_la = _input.LA(1);
 				if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 4) | (1L << 6) | (1L << 18) | (1L << 22) | (1L << 46))) != 0))) {
-					{
-						setState(502);
-						psDirection();
-					}
+					setState(502);
+					psDirection();
 				}
 
 				setState(505);
@@ -3154,21 +3120,17 @@ public class PSHDLLangParser extends Parser {
 				setState(524);
 				_la = _input.LA(1);
 				if (_la == 3) {
-					{
-						setState(523);
-						psArray();
-					}
+					setState(523);
+					psArray();
 				}
 
 				setState(528);
 				_la = _input.LA(1);
 				if (_la == ASSGN) {
-					{
-						setState(526);
-						match(ASSGN);
-						setState(527);
-						psArrayInit();
-					}
+					setState(526);
+					match(ASSGN);
+					setState(527);
+					psArrayInit();
 				}
 
 			}
@@ -3321,12 +3283,10 @@ public class PSHDLLangParser extends Parser {
 					while ((_alt != 2) && (_alt != -1)) {
 						if (_alt == 1) {
 							{
-								{
-									setState(545);
-									match(23);
-									setState(546);
-									psExpression(0);
-								}
+								setState(545);
+								match(23);
+								setState(546);
+								psExpression(0);
 							}
 						}
 						setState(551);
@@ -3501,14 +3461,12 @@ public class PSHDLLangParser extends Parser {
 				setState(579);
 				_la = _input.LA(1);
 				if (_la == 25) {
-					{
-						setState(576);
-						match(25);
-						setState(577);
-						match(RULE_STRING);
-						setState(578);
-						match(12);
-					}
+					setState(576);
+					match(25);
+					setState(577);
+					match(RULE_STRING);
+					setState(578);
+					match(12);
 				}
 
 			}
@@ -3597,19 +3555,15 @@ public class PSHDLLangParser extends Parser {
 				setState(588);
 				_la = _input.LA(1);
 				if (_la == 2) {
-					{
-						setState(584);
-						((PsPrimitiveContext) _localctx).isRegister = match(2);
-						setState(586);
-						_la = _input.LA(1);
-						if (_la == 25) {
-							{
-								setState(585);
-								psPassedArguments();
-							}
-						}
-
+					setState(584);
+					_localctx.isRegister = match(2);
+					setState(586);
+					_la = _input.LA(1);
+					if (_la == 25) {
+						setState(585);
+						psPassedArguments();
 					}
+
 				}
 
 				setState(596);
@@ -3624,10 +3578,8 @@ public class PSHDLLangParser extends Parser {
 					setState(592);
 					_la = _input.LA(1);
 					if (_la == LESS) {
-						{
-							setState(591);
-							psWidth();
-						}
+						setState(591);
+						psWidth();
 					}
 
 				}
@@ -3763,12 +3715,10 @@ public class PSHDLLangParser extends Parser {
 				setState(608);
 				_la = _input.LA(1);
 				if (_la == 33) {
-					{
-						setState(606);
-						match(33);
-						setState(607);
-						psInterfaceExtends();
-					}
+					setState(606);
+					match(33);
+					setState(607);
+					psInterfaceExtends();
 				}
 
 				setState(610);
@@ -4041,6 +3991,7 @@ public class PSHDLLangParser extends Parser {
 		return _localctx;
 	}
 
+	@Override
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		case 12:

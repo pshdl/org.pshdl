@@ -5,6 +5,8 @@ import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
@@ -109,32 +111,28 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public HDLVariable resolveVariable(ArrayList<String> imports, HDLQualifiedName type) {
+	public Optional<HDLVariable> resolveVariable(ArrayList<String> imports, HDLQualifiedName type) {
 		imports.add("pshdl.*");
 		HDLVariable hdlVariable = variables.get(type);
 		if (hdlVariable == null) {
-			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
-			// type + " @" + this);
-			for (String string : imports) {
+			for (String string : imports)
 				if (string.endsWith(type.toString())) {
 					hdlVariable = variables.get(new HDLQualifiedName(string));
 					if (hdlVariable != null)
-						return Insulin.resolveFragments(hdlVariable);
+						return Optional.fromNullable(Insulin.resolveFragments(hdlVariable));
 				}
-			}
-			for (String string : imports) {
+			for (String string : imports)
 				if (string.endsWith(".*")) {
 					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
 					hdlVariable = variables.get(newTypeName);
 					if (hdlVariable != null)
-						return Insulin.resolveFragments(hdlVariable);
+						return Optional.fromNullable(Insulin.resolveFragments(hdlVariable));
 				}
-			}
 		}
 		if (hdlVariable != null)
-			return Insulin.resolveFragments(hdlVariable);
-		return null;
+			return Optional.fromNullable(Insulin.resolveFragments(hdlVariable));
+		return Optional.absent();
 	}
 
 	/**
@@ -148,32 +146,30 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public HDLFunction resolveFunction(ArrayList<String> imports, HDLQualifiedName type) {
+	public Optional<HDLFunction> resolveFunction(ArrayList<String> imports, HDLQualifiedName type) {
 		imports.add("pshdl.*");
 		HDLFunction hdlFunction = functions.get(type);
 		if (hdlFunction == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
 			// type + " @" + this);
-			for (String string : imports) {
+			for (String string : imports)
 				if (string.endsWith(type.toString())) {
 					hdlFunction = functions.get(new HDLQualifiedName(string));
 					if (hdlFunction != null)
-						return Insulin.resolveFragments(hdlFunction);
+						return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
 				}
-			}
-			for (String string : imports) {
+			for (String string : imports)
 				if (string.endsWith(".*")) {
 					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
 					hdlFunction = functions.get(newTypeName);
 					if (hdlFunction != null)
-						return Insulin.resolveFragments(hdlFunction);
+						return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
 				}
-			}
 		}
 		if (hdlFunction != null)
-			return Insulin.resolveFragments(hdlFunction);
-		return null;
+			return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
+		return Optional.absent();
 	}
 
 	/**
@@ -187,29 +183,27 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public HDLType resolve(ArrayList<String> imports, HDLQualifiedName type) {
+	public Optional<? extends HDLType> resolve(ArrayList<String> imports, HDLQualifiedName type) {
 		imports.add("pshdl.*");
 		HDLType hdlType = types.get(type);
 		if (hdlType == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
 			// type + " @" + this);
-			for (String string : imports) {
+			for (String string : imports)
 				if (string.endsWith(type.toString()))
-					return types.get(new HDLQualifiedName(string));
-			}
-			for (String string : imports) {
+					return Optional.fromNullable(types.get(new HDLQualifiedName(string)));
+			for (String string : imports)
 				if (string.endsWith(".*")) {
 					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
 					// System.out.println("HDLLibrary.resolve()" + newTypeName);
 					HDLType newType = types.get(newTypeName);
 					if (newType != null)
-						return Insulin.resolveFragments(newType);
+						return Optional.of(Insulin.resolveFragments(newType));
 				}
-			}
 		}
 		if (hdlType != null)
-			return Insulin.resolveFragments(hdlType);
-		return null;
+			return Optional.fromNullable(Insulin.resolveFragments(hdlType));
+		return Optional.absent();
 	}
 
 	/**

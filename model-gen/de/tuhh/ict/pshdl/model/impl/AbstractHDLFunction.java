@@ -60,6 +60,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLFunction copy();
 
@@ -68,6 +69,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLFunction copyFiltered(CopyFilter filter);
 
@@ -76,6 +78,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLFunction copyDeepFrozen(IHDLObject container);
 
@@ -111,11 +114,12 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLFunction()");
-		if (annotations != null) {
+		if (annotations != null)
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -123,18 +127,19 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateName(getName());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLFunction, HDLClass.HDLDeclaration, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

@@ -60,6 +60,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLNativeFunction copy() {
 		HDLNativeFunction newObject = new HDLNativeFunction(null, annotations, name, simOnly, false);
@@ -72,6 +73,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLNativeFunction copyFiltered(CopyFilter filter) {
 		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
@@ -85,6 +87,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLNativeFunction copyDeepFrozen(IHDLObject container) {
 		HDLNativeFunction copy = copyFiltered(CopyFilter.DEEP_META);
@@ -101,8 +104,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return the same instance of {@link HDLNativeFunction} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLNativeFunction setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLNativeFunction setContainer(@Nullable IHDLObject container) {
 		return (HDLNativeFunction) super.setContainer(container);
 	}
 
@@ -115,8 +119,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLNativeFunction setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	@Override
+	@Nonnull
+	public HDLNativeFunction setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
 		return res;
@@ -131,8 +136,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLNativeFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
+	@Override
+	@Nonnull
+	public HDLNativeFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
@@ -150,8 +156,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLNativeFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
+	@Override
+	@Nonnull
+	public HDLNativeFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
@@ -169,8 +176,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLNativeFunction removeAnnotations(int idx) {
+	@Nonnull
+	public HDLNativeFunction removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
 		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
@@ -186,8 +193,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated name
 	 *         field.
 	 */
-	public @Nonnull
-	HDLNativeFunction setName(@Nonnull String name) {
+	@Override
+	@Nonnull
+	public HDLNativeFunction setName(@Nonnull String name) {
 		name = validateName(name);
 		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
 		return res;
@@ -202,8 +210,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated
 	 *         simOnly field.
 	 */
-	public @Nonnull
-	HDLNativeFunction setSimOnly(@Nonnull Boolean simOnly) {
+	@Nonnull
+	public HDLNativeFunction setSimOnly(@Nonnull Boolean simOnly) {
 		simOnly = validateSimOnly(simOnly);
 		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
 		return res;
@@ -218,8 +226,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @return a new instance of {@link HDLNativeFunction} with the updated
 	 *         simOnly field.
 	 */
-	public @Nonnull
-	HDLNativeFunction setSimOnly(boolean simOnly) {
+	@Nonnull
+	public HDLNativeFunction setSimOnly(boolean simOnly) {
 		simOnly = validateSimOnly(simOnly);
 		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
 		return res;
@@ -257,11 +265,12 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLNativeFunction()");
-		if (annotations != null) {
+		if (annotations != null)
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -269,7 +278,6 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
@@ -279,11 +287,13 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateSimOnly(getSimOnly());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLNativeFunction, HDLClass.HDLFunction, HDLClass.HDLDeclaration, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

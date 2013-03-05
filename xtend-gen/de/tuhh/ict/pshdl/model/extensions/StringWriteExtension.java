@@ -1,6 +1,7 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import de.tuhh.ict.pshdl.model.HDLAnnotation;
 import de.tuhh.ict.pshdl.model.HDLArgument;
 import de.tuhh.ict.pshdl.model.HDLArrayInit;
@@ -1054,7 +1055,7 @@ public class StringWriteExtension {
     final StringBuilder sb = highlight.getSpacing();
     String _entering = this.entering(hvd, highlight);
     sb.append(_entering);
-    final HDLType resolveType = hvd.resolveType();
+    final Optional<? extends HDLType> resolveType = hvd.resolveType();
     ArrayList<HDLAnnotation> _annotations = hvd.getAnnotations();
     boolean _notEquals = ObjectExtensions.operator_notEquals(_annotations, null);
     if (_notEquals) {
@@ -1083,19 +1084,23 @@ public class StringWriteExtension {
       String _string_1 = this.toString(_register_1, highlight);
       sb.append(_string_1);
     }
-    boolean _equals = ObjectExtensions.operator_equals(resolveType, null);
-    if (_equals) {
+    boolean _isPresent = resolveType.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
       sb.append("#UNRESOLVED_TYPE#");
     } else {
-      if ((resolveType instanceof HDLEnum)) {
+      HDLType _get = resolveType.get();
+      if ((_get instanceof HDLEnum)) {
         String _keyword = highlight.keyword("enum");
         StringBuilder _append_2 = sb.append(_keyword);
         String _simpleSpace_2 = highlight.simpleSpace();
         StringBuilder _append_3 = _append_2.append(_simpleSpace_2);
-        String _string_2 = this.toString(resolveType, highlight);
+        HDLType _get_1 = resolveType.get();
+        String _string_2 = this.toString(_get_1, highlight);
         _append_3.append(_string_2);
       } else {
-        String _string_3 = this.toString(resolveType, highlight);
+        HDLType _get_2 = resolveType.get();
+        String _string_3 = this.toString(_get_2, highlight);
         sb.append(_string_3);
       }
     }
@@ -1118,8 +1123,8 @@ public class StringWriteExtension {
     _builder.append(";");
     sb.append(_builder.toString());
     Context _context = highlight.getContext();
-    boolean _equals_1 = ObjectExtensions.operator_equals(_context, Context.HDLPackage);
-    if (_equals_1) {
+    boolean _equals = ObjectExtensions.operator_equals(_context, Context.HDLPackage);
+    if (_equals) {
       String _newLine = highlight.newLine();
       sb.append(_newLine);
     }

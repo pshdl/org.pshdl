@@ -32,6 +32,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLValueType copy();
 
@@ -40,6 +41,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLValueType copyFiltered(CopyFilter filter);
 
@@ -48,6 +50,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLValueType copyDeepFrozen(IHDLObject container);
 
@@ -77,6 +80,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -87,10 +91,12 @@ public abstract class AbstractHDLValueType extends HDLType {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLValueType, HDLClass.HDLType, HDLClass.HDLObject);
 	}

@@ -89,64 +89,63 @@ public class RangeExtension {
       Range<BigInteger> _closed = Ranges.<BigInteger>closed(_get, _get_1);
       return Optional.<Range<BigInteger>>of(_closed);
     }
-    final HDLVariable hVar = obj.resolveVar();
-    boolean _equals = ObjectExtensions.operator_equals(hVar, null);
-    if (_equals) {
+    final Optional<HDLVariable> hVar = obj.resolveVar();
+    boolean _isPresent_1 = hVar.isPresent();
+    boolean _not = (!_isPresent_1);
+    if (_not) {
       obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<Range<BigInteger>>absent();
     }
-    HDLAnnotation range = hVar.getAnnotation(HDLBuiltInAnnotations.range);
+    HDLVariable _get_2 = hVar.get();
+    HDLAnnotation range = _get_2.getAnnotation(HDLBuiltInAnnotations.range);
     boolean _notEquals = ObjectExtensions.operator_notEquals(range, null);
     if (_notEquals) {
       String _value = range.getValue();
       final String[] value = _value.split(";");
-      String _get_2 = ((List<String>)Conversions.doWrapArray(value)).get(0);
-      BigInteger _bigInteger = new BigInteger(_get_2);
-      String _get_3 = ((List<String>)Conversions.doWrapArray(value)).get(1);
-      BigInteger _bigInteger_1 = new BigInteger(_get_3);
+      String _get_3 = ((List<String>)Conversions.doWrapArray(value)).get(0);
+      BigInteger _bigInteger = new BigInteger(_get_3);
+      String _get_4 = ((List<String>)Conversions.doWrapArray(value)).get(1);
+      BigInteger _bigInteger_1 = new BigInteger(_get_4);
       Range<BigInteger> _closed_1 = Ranges.<BigInteger>closed(_bigInteger, _bigInteger_1);
       return Optional.<Range<BigInteger>>of(_closed_1);
     }
-    IHDLObject _container = hVar.getContainer();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_container, null);
+    HDLVariable _get_5 = hVar.get();
+    final IHDLObject container = _get_5.getContainer();
+    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(container, null);
     if (_notEquals_1) {
-      IHDLObject _container_1 = hVar.getContainer();
-      if ((_container_1 instanceof HDLVariableDeclaration)) {
-        IHDLObject _container_2 = hVar.getContainer();
-        final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) _container_2);
+      if ((container instanceof HDLVariableDeclaration)) {
+        final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) container);
         HDLAnnotation _annotation = hvd.getAnnotation(HDLBuiltInAnnotations.range);
         range = _annotation;
         boolean _notEquals_2 = ObjectExtensions.operator_notEquals(range, null);
         if (_notEquals_2) {
           String _value_1 = range.getValue();
           final String[] value_1 = _value_1.split(";");
-          String _get_4 = ((List<String>)Conversions.doWrapArray(value_1)).get(0);
-          BigInteger _bigInteger_2 = new BigInteger(_get_4);
-          String _get_5 = ((List<String>)Conversions.doWrapArray(value_1)).get(1);
-          BigInteger _bigInteger_3 = new BigInteger(_get_5);
+          String _get_6 = ((List<String>)Conversions.doWrapArray(value_1)).get(0);
+          BigInteger _bigInteger_2 = new BigInteger(_get_6);
+          String _get_7 = ((List<String>)Conversions.doWrapArray(value_1)).get(1);
+          BigInteger _bigInteger_3 = new BigInteger(_get_7);
           Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(_bigInteger_2, _bigInteger_3);
           return Optional.<Range<BigInteger>>of(_closed_2);
         }
       }
-      IHDLObject _container_3 = hVar.getContainer();
-      if ((_container_3 instanceof HDLForLoop)) {
-        IHDLObject _container_4 = hVar.getContainer();
-        final HDLForLoop loop = ((HDLForLoop) _container_4);
+      if ((container instanceof HDLForLoop)) {
+        final HDLForLoop loop = ((HDLForLoop) container);
         ArrayList<HDLRange> _range = loop.getRange();
-        HDLRange _get_6 = _range.get(0);
-        final Optional<Range<BigInteger>> zeroR = this.determineRange(_get_6, context);
-        boolean _isPresent_1 = zeroR.isPresent();
-        if (_isPresent_1) {
+        HDLRange _get_8 = _range.get(0);
+        final Optional<Range<BigInteger>> zeroR = this.determineRange(_get_8, context);
+        boolean _isPresent_2 = zeroR.isPresent();
+        if (_isPresent_2) {
           Range<BigInteger> res = zeroR.get();
           ArrayList<HDLRange> _range_1 = loop.getRange();
           for (final HDLRange r : _range_1) {
             {
               final Optional<Range<BigInteger>> rRange = this.determineRange(r, context);
-              boolean _isPresent_2 = rRange.isPresent();
-              if (_isPresent_2) {
-                Range<BigInteger> _get_7 = rRange.get();
-                Range<BigInteger> _span = res.span(_get_7);
+              boolean _isPresent_3 = rRange.isPresent();
+              if (_isPresent_3) {
+                Range<BigInteger> _get_9 = rRange.get();
+                Range<BigInteger> _span = res.span(_get_9);
                 res = _span;
               } else {
                 Optional.absent();
@@ -171,13 +170,13 @@ public class RangeExtension {
           HDLExpression _copyDeepFrozen = width.copyDeepFrozen(r_1);
           width = _copyDeepFrozen;
           Optional<BigInteger> cw = ConstantEvaluate.valueOf(width, context);
-          boolean _isPresent_2 = cw.isPresent();
-          boolean _not = (!_isPresent_2);
-          if (_not) {
+          boolean _isPresent_3 = cw.isPresent();
+          boolean _not_1 = (!_isPresent_3);
+          if (_not_1) {
             bitWidth = null;
           } else {
-            BigInteger _get_7 = cw.get();
-            BigInteger _add = bitWidth.add(_get_7);
+            BigInteger _get_9 = cw.get();
+            BigInteger _add = bitWidth.add(_get_9);
             bitWidth = _add;
           }
         }
@@ -191,19 +190,20 @@ public class RangeExtension {
         return Optional.<Range<BigInteger>>of(_closed_3);
       }
     }
-    final Optional<? extends HDLType> type = TypeExtension.typeOf(hVar);
+    HDLVariable _get_9 = hVar.get();
+    final Optional<? extends HDLType> type = TypeExtension.typeOf(_get_9);
     boolean _and = false;
-    boolean _isPresent_2 = type.isPresent();
-    if (!_isPresent_2) {
+    boolean _isPresent_3 = type.isPresent();
+    if (!_isPresent_3) {
       _and = false;
     } else {
-      HDLType _get_7 = type.get();
-      _and = (_isPresent_2 && (_get_7 instanceof HDLPrimitive));
+      HDLType _get_10 = type.get();
+      _and = (_isPresent_3 && (_get_10 instanceof HDLPrimitive));
     }
     if (_and) {
       HDLPrimitives _instance = HDLPrimitives.getInstance();
-      HDLType _get_8 = type.get();
-      return _instance.getValueRange(((HDLPrimitive) _get_8), context);
+      HDLType _get_11 = type.get();
+      return _instance.getValueRange(((HDLPrimitive) _get_11), context);
     }
     obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);

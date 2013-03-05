@@ -152,13 +152,15 @@ public class UserLogicCodeGen extends CommonBusCode {
 					int remainingBits = bitPos % 8;
 					if (targetIdx > remainingBits) {
 						HDLReference temp;
-						if (def.width == -1)
+						if (def.width == -1) {
 							temp = target;
-						else
+						} else {
 							temp = target.addBits(getRange(targetIdx, remainingBits + 1));
+						}
 						HDLRange busRange = getRange(bitPos, remainingBits + 1);
-						if (ifStatement == null)
+						if (ifStatement == null) {
 							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
+						}
 						ifStatement = ifStatement.addThenDo(new HDLAssignment().setLeft(temp).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(busRange)));
 						bitPos -= remainingBits + 1;
 						targetIdx -= remainingBits + 1;
@@ -169,10 +171,11 @@ public class UserLogicCodeGen extends CommonBusCode {
 						}
 					} else {
 						HDLReference temp;
-						if (def.width == -1)
+						if (def.width == -1) {
 							temp = target;
-						else
+						} else {
 							temp = target.addBits(getRange(targetIdx, targetIdx + 1));
+						}
 						HDLRange busRange = getRange(bitPos, targetIdx + 1);
 						if (ifStatement == null) {
 							ifStatement = new HDLIfStatement().setIfExp(be.addBits(getRange(bitPos / 8, 1)));
@@ -187,8 +190,9 @@ public class UserLogicCodeGen extends CommonBusCode {
 				bitPos -= MemoryModel.getSize(def);
 			}
 		}
-		if ((ifStatement != null) && !ifStatement.getThenDo().isEmpty())
+		if ((ifStatement != null) && !ifStatement.getThenDo().isEmpty()) {
 			label = label.addDos(ifStatement);
+		}
 		return label;
 	}
 

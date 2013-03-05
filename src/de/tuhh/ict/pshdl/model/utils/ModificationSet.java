@@ -88,22 +88,20 @@ public class ModificationSet {
 				}
 				List<Modification> mods = getModWithoutCheck(container);
 				if (mods != null) {
-					for (Modification mod : mods) {
+					for (Modification mod : mods)
 						if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
 							multiAdd(res, (List<T>) mod.with, container);
 						}
-					}
 				}
 				return res;
 			}
 			List<Modification> mods = getModWithoutCheck(container);
 			if (mods != null) {
 				ArrayList<T> res = new ArrayList<T>();
-				for (Modification mod : mods) {
+				for (Modification mod : mods)
 					if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
 						multiAdd(res, (List<T>) mod.with, container);
 					}
-				}
 				if (res.size() != 0)
 					return res;
 			}
@@ -170,10 +168,9 @@ public class ModificationSet {
 		if (object instanceof IHDLObject) {
 			IHDLObject original = (IHDLObject) object;
 			Integer modID = original.getMeta(ModID.id);
-			if (modID != null) {
+			if (modID != null)
 				if (modID == id)
 					return null;
-			}
 		}
 		return getModWithoutCheck(object);
 	}
@@ -182,11 +179,10 @@ public class ModificationSet {
 		List<Modification> list = replacements.get(getHash(object));
 		if (list != null) {
 			List<Modification> res = new LinkedList<ModificationSet.Modification>();
-			for (Modification modification : list) {
+			for (Modification modification : list)
 				if (modification.subject == object) {
 					res.add(modification);
 				}
-			}
 			return res;
 		}
 		return null;

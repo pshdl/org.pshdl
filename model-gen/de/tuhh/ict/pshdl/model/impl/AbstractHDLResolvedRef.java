@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -38,7 +40,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 	protected final HDLQualifiedName var;
 
 	@Nullable
-	public HDLVariable resolveVar() {
+	public Optional<HDLVariable> resolveVar() {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
 		return ScopingExtension.INST.resolveVariable(this, var);
@@ -62,6 +64,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLResolvedRef copy();
 
@@ -70,6 +73,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLResolvedRef copyFiltered(CopyFilter filter);
 
@@ -78,6 +82,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLResolvedRef copyDeepFrozen(IHDLObject container);
 
@@ -113,6 +118,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -123,6 +129,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateVar(getVarRefName());
@@ -131,6 +138,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLResolvedRef, HDLClass.HDLReference, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

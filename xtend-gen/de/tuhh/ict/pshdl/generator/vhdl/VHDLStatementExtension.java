@@ -259,7 +259,8 @@ public class VHDLStatementExtension {
   protected VHDLContext _toVHDL(final HDLInterfaceInstantiation obj, final int pid) {
     VHDLContext _vHDLContext = new VHDLContext();
     final VHDLContext res = _vHDLContext;
-    final HDLInterface hIf = obj.resolveHIf();
+    Optional<HDLInterface> _resolveHIf = obj.resolveHIf();
+    final HDLInterface hIf = _resolveHIf.get();
     final HDLVariable hVar = obj.getVar();
     HDLVariable _var = obj.getVar();
     final String ifName = _var.getName();
@@ -555,7 +556,8 @@ public class VHDLStatementExtension {
           resetValue = _resetValue;
         }
       } else {
-        final HDLType hType = obj.resolveType();
+        Optional<? extends HDLType> _resolveType = obj.resolveType();
+        final HDLType hType = _resolveType.get();
         if ((hType instanceof HDLEnum)) {
           final HDLEnum hEnum = ((HDLEnum) hType);
           String _name = hEnum.getName();
@@ -624,8 +626,9 @@ public class VHDLStatementExtension {
             boolean synchedArray = false;
             if ((resetValue instanceof HDLVariableRef)) {
               final HDLVariableRef ref = ((HDLVariableRef) resetValue);
-              HDLVariable _resolveVar = ref.resolveVar();
-              ArrayList<HDLExpression> _dimensions_2 = _resolveVar.getDimensions();
+              Optional<HDLVariable> _resolveVar = ref.resolveVar();
+              HDLVariable _get_1 = _resolveVar.get();
+              ArrayList<HDLExpression> _dimensions_2 = _get_1.getDimensions();
               int _size_1 = _dimensions_2.size();
               boolean _notEquals_6 = (_size_1 != 0);
               synchedArray = _notEquals_6;
@@ -943,7 +946,8 @@ public class VHDLStatementExtension {
       RuntimeException _runtimeException = new RuntimeException("Can not use unresolved fragments");
       throw _runtimeException;
     }
-    return ((HDLResolvedRef) reference).resolveVar();
+    Optional<HDLVariable> _resolveVar = ((HDLResolvedRef) reference).resolveVar();
+    return _resolveVar.get();
   }
   
   protected VHDLContext _toVHDL(final HDLForLoop obj, final int pid) {

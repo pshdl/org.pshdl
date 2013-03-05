@@ -1,5 +1,6 @@
 // Generated from MemoryModel.g4 by ANTLR 4.0
 package de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.v4;
+
 import org.antlr.v4.runtime.tree.*;
 
 public interface MemoryModelVisitor<T> extends ParseTreeVisitor<T> {

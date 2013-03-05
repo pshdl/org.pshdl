@@ -28,7 +28,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 			left = validateLeft(left);
 		}
 		if (left != null) {
-			this.left = (HDLExpression) left;
+			this.left = left;
 		} else {
 			this.left = null;
 		}
@@ -36,7 +36,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 			right = validateRight(right);
 		}
 		if (right != null) {
-			this.right = (HDLExpression) right;
+			this.right = right;
 		} else {
 			this.right = null;
 		}
@@ -97,6 +97,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLOpExpression copy();
 
@@ -105,6 +106,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLOpExpression copyFiltered(CopyFilter filter);
 
@@ -113,6 +115,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLOpExpression copyDeepFrozen(IHDLObject container);
 
@@ -154,6 +157,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -167,6 +171,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateLeft(getLeft());
@@ -179,6 +184,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLOpExpression, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

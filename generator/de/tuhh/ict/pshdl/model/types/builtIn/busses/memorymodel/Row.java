@@ -37,14 +37,17 @@ public class Row implements NamedElement {
 			def.bitPos = bitPos;
 			bitPos -= MemoryModel.getSize(def);
 			Integer integer = defCount.get(def.name);
-			if (integer == null)
+			if (integer == null) {
 				integer = 0;
+			}
 			def.arrayIndex = integer;
 			defCount.put(def.name, ++integer);
-			if ((def.rw == RWType.rw) || (def.rw == RWType.w))
+			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
 				readOnly = false;
-			if ((def.rw == RWType.rw) || (def.rw == RWType.r))
+			}
+			if ((def.rw == RWType.rw) || (def.rw == RWType.r)) {
 				writeOnly = false;
+			}
 		}
 	}
 

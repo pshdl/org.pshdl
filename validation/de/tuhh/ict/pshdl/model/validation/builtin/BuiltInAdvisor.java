@@ -8,7 +8,7 @@ import com.google.common.collect.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.internal.*;
-import de.tuhh.ict.pshdl.model.utils.internal.LevenshteinDistance.*;
+import de.tuhh.ict.pshdl.model.utils.internal.LevenshteinDistance.Score;
 import de.tuhh.ict.pshdl.model.validation.HDLValidator.HDLAdvise;
 import de.tuhh.ict.pshdl.model.validation.*;
 
@@ -44,13 +44,14 @@ public class BuiltInAdvisor {
 			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
 			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			String[] solutions;
-			if (!arrayRange.isConnected(accessRange))
+			if (!arrayRange.isConnected(accessRange)) {
 				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
-			else
+			} else {
 				solutions = new String[] {
 						"Cast the index to uint with:(uint)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
 								+ "\") annotation to define a range" };
+			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
 		}
@@ -288,8 +289,9 @@ public class BuiltInAdvisor {
 		matchSolution.append(type + " that you might have meant: ");
 		for (int i = 0; i < Math.min(3, topMatches.length); i++) {
 			Score score = topMatches[i];
-			if (i != 0)
+			if (i != 0) {
 				matchSolution.append(", ");
+			}
 			matchSolution.append('@').append(score.string);
 		}
 		String functionProposal = matchSolution.toString();

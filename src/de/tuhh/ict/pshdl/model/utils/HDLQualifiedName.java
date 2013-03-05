@@ -159,13 +159,12 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	@Nonnull
 	public HDLQualifiedName getTypePart() {
 		List<String> res = new LinkedList<String>();
-		for (String segment : qfn) {
+		for (String segment : qfn)
 			if (segment.charAt(0) != '$') {
 				res.add(segment);
 			} else {
 				break;
 			}
-		}
 		return create(res);
 	}
 
@@ -174,11 +173,10 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		List<String> res = new LinkedList<String>();
 		if (qfn.length <= 1)
 			return this;
-		for (String segment : qfn) {
+		for (String segment : qfn)
 			if (segment.charAt(0) == '$') {
 				res.add(segment);
 			}
-		}
 		res.add(getLastSegment());
 		return create(res);
 	}

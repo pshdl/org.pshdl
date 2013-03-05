@@ -157,20 +157,18 @@ public class HDLUnit extends AbstractHDLUnit {
 		unitIF = new HDLInterface().setName(fullName.toString());
 		Collection<HDLVariableDeclaration> declarations = new LinkedList<HDLVariableDeclaration>();
 		HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hvd : hvds) {
+		for (HDLVariableDeclaration hvd : hvds)
 			if (hvd.getContainer(HDLInterface.class) == null) {
 				declarations.add(hvd);
 			}
-		}
 		HDLDirectGeneration[] generators = getAllObjectsOf(HDLDirectGeneration.class, true);
-		for (HDLDirectGeneration hdgi : generators) {
+		for (HDLDirectGeneration hdgi : generators)
 			if (hdgi.getInclude()) {
 				List<HDLVariableDeclaration> portAdditions = HDLGenerators.getPortAdditions(hdgi);
 				if (portAdditions != null) {
 					declarations.addAll(portAdditions);
 				}
 			}
-		}
 		HDLVariable clk = null, rst = null;
 		boolean hasReg = false;
 		for (HDLVariableDeclaration hvd : declarations) {
@@ -205,20 +203,18 @@ public class HDLUnit extends AbstractHDLUnit {
 				hasReg = true;
 			}
 		}
-		if (hasReg) {
+		if (hasReg)
 			if ((clk == null) && (rst == null)) {
 				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
 			}
-		}
 		ModificationSet ms = new ModificationSet();
 		HDLVariableRef[] refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : refs) {
+		for (HDLVariableRef ref : refs)
 			if (ref.getVarRefName().length == 1) {
 				ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
 			}
-		}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);
 		if (!unitIF.isFrozen()) {

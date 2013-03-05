@@ -28,7 +28,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 			var = validateVar(var);
 		}
 		if (var != null) {
-			this.var = (HDLVariable) var;
+			this.var = var;
 		} else {
 			this.var = null;
 		}
@@ -38,7 +38,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		this.arguments = new ArrayList<HDLArgument>();
 		if (arguments != null) {
 			for (HDLArgument newValue : arguments) {
-				this.arguments.add((HDLArgument) newValue);
+				this.arguments.add(newValue);
 			}
 		}
 	}
@@ -104,6 +104,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLInstantiation copy();
 
@@ -112,6 +113,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLInstantiation copyFiltered(CopyFilter filter);
 
@@ -120,6 +122,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLInstantiation copyDeepFrozen(IHDLObject container);
 
@@ -161,6 +164,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -168,7 +172,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (arguments != null) {
+		if (arguments != null)
 			if (arguments.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLArgument o : arguments) {
@@ -176,10 +180,10 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateVar(getVar());
@@ -194,6 +198,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLInstantiation, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

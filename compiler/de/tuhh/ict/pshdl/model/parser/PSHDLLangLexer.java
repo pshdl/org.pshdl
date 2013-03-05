@@ -69,15 +69,15 @@ public class PSHDLLangLexer extends Lexer {
 	public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 		switch (ruleIndex) {
 		case 88:
-			RULE_ML_COMMENT_action((RuleContext) _localctx, actionIndex);
+			RULE_ML_COMMENT_action(_localctx, actionIndex);
 			break;
 
 		case 90:
-			RULE_SL_COMMENT_action((RuleContext) _localctx, actionIndex);
+			RULE_SL_COMMENT_action(_localctx, actionIndex);
 			break;
 
 		case 91:
-			RULE_WS_action((RuleContext) _localctx, actionIndex);
+			RULE_WS_action(_localctx, actionIndex);
 			break;
 		}
 	}

@@ -167,7 +167,7 @@ class VHDLStatementExtension {
 
 	def dispatch VHDLContext toVHDL(HDLInterfaceInstantiation obj, int pid) {
 		val VHDLContext res = new VHDLContext
-		val HDLInterface hIf = obj.resolveHIf
+		val HDLInterface hIf = obj.resolveHIf.get
 		val HDLVariable hVar = obj.^var
 		val String ifName = obj.^var.name
 		val HDLQualifiedName asRef = hIf.asRef
@@ -316,7 +316,7 @@ class VHDLStatementExtension {
 					resetValue = obj.register.resetValue
 				}
 			} else {
-				val HDLType hType = obj.resolveType
+				val HDLType hType = obj.resolveType.get
 				if (hType instanceof HDLEnum) {
 					val HDLEnum hEnum = hType as HDLEnum
 					type = new EnumerationType(hEnum.name)
@@ -346,7 +346,7 @@ class VHDLStatementExtension {
 					var boolean synchedArray = false
 					if (resetValue instanceof HDLVariableRef) {
 						val HDLVariableRef ref =  resetValue as HDLVariableRef
-						synchedArray = ref.resolveVar.dimensions.size != 0
+						synchedArray = ref.resolveVar.get.dimensions.size != 0
 					}
 					val HDLStatement initLoop = Insulin::createArrayForLoop(hvar.dimensions, 0, resetValue, new HDLVariableRef().setVar(hvar.asRef), synchedArray).copyDeepFrozen(obj)
 					val VHDLContext vhdl = initLoop.toVHDL(pid)
@@ -502,7 +502,7 @@ class VHDLStatementExtension {
 	def HDLVariable resolveVar(HDLReference reference) {
 		if(reference instanceof HDLUnresolvedFragment)
 			throw new RuntimeException("Can not use unresolved fragments")
-		return (reference as HDLResolvedRef).resolveVar
+		return (reference as HDLResolvedRef).resolveVar.get
 	}
 
 	def dispatch VHDLContext toVHDL(HDLForLoop obj, int pid) {

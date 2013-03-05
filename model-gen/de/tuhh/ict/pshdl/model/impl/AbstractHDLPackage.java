@@ -43,7 +43,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		this.units = new ArrayList<HDLUnit>();
 		if (units != null) {
 			for (HDLUnit newValue : units) {
-				this.units.add((HDLUnit) newValue);
+				this.units.add(newValue);
 			}
 		}
 		if (validate) {
@@ -52,7 +52,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		this.declarations = new ArrayList<HDLDeclaration>();
 		if (declarations != null) {
 			for (HDLDeclaration newValue : declarations) {
-				this.declarations.add((HDLDeclaration) newValue);
+				this.declarations.add(newValue);
 			}
 		}
 	}
@@ -142,6 +142,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLPackage copy() {
 		HDLPackage newObject = new HDLPackage(null, libURI, pkg, units, declarations, false);
@@ -154,6 +155,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLPackage copyFiltered(CopyFilter filter) {
 		String filteredlibURI = filter.copyObject("libURI", this, libURI);
@@ -168,6 +170,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLPackage copyDeepFrozen(IHDLObject container) {
 		HDLPackage copy = copyFiltered(CopyFilter.DEEP_META);
@@ -184,8 +187,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return the same instance of {@link HDLPackage} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLPackage setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLPackage setContainer(@Nullable IHDLObject container) {
 		return (HDLPackage) super.setContainer(container);
 	}
 
@@ -198,8 +202,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated libURI
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPackage setLibURI(@Nonnull String libURI) {
+	@Nonnull
+	public HDLPackage setLibURI(@Nonnull String libURI) {
 		libURI = validateLibURI(libURI);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
 		return res;
@@ -212,8 +216,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 *            sets the new pkg of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLPackage} with the updated pkg field.
 	 */
-	public @Nonnull
-	HDLPackage setPkg(@Nullable String pkg) {
+	@Nonnull
+	public HDLPackage setPkg(@Nullable String pkg) {
 		pkg = validatePkg(pkg);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
 		return res;
@@ -227,8 +231,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated units
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPackage setUnits(@Nullable ArrayList<HDLUnit> units) {
+	@Nonnull
+	public HDLPackage setUnits(@Nullable ArrayList<HDLUnit> units) {
 		units = validateUnits(units);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
 		return res;
@@ -243,8 +247,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated units
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPackage addUnits(@Nullable HDLUnit newUnits) {
+	@Nonnull
+	public HDLPackage addUnits(@Nullable HDLUnit newUnits) {
 		if (newUnits == null)
 			throw new IllegalArgumentException("Element of units can not be null!");
 		ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
@@ -262,8 +266,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated units
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPackage removeUnits(@Nullable HDLUnit newUnits) {
+	@Nonnull
+	public HDLPackage removeUnits(@Nullable HDLUnit newUnits) {
 		if (newUnits == null)
 			throw new IllegalArgumentException("Removed element of units can not be null!");
 		ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
@@ -281,8 +285,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated units
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPackage removeUnits(int idx) {
+	@Nonnull
+	public HDLPackage removeUnits(int idx) {
 		ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
 		units.remove(idx);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
@@ -298,8 +302,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated
 	 *         declarations field.
 	 */
-	public @Nonnull
-	HDLPackage setDeclarations(@Nullable ArrayList<HDLDeclaration> declarations) {
+	@Nonnull
+	public HDLPackage setDeclarations(@Nullable ArrayList<HDLDeclaration> declarations) {
 		declarations = validateDeclarations(declarations);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
 		return res;
@@ -314,8 +318,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated
 	 *         declarations field.
 	 */
-	public @Nonnull
-	HDLPackage addDeclarations(@Nullable HDLDeclaration newDeclarations) {
+	@Nonnull
+	public HDLPackage addDeclarations(@Nullable HDLDeclaration newDeclarations) {
 		if (newDeclarations == null)
 			throw new IllegalArgumentException("Element of declarations can not be null!");
 		ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
@@ -333,8 +337,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated
 	 *         declarations field.
 	 */
-	public @Nonnull
-	HDLPackage removeDeclarations(@Nullable HDLDeclaration newDeclarations) {
+	@Nonnull
+	public HDLPackage removeDeclarations(@Nullable HDLDeclaration newDeclarations) {
 		if (newDeclarations == null)
 			throw new IllegalArgumentException("Removed element of declarations can not be null!");
 		ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
@@ -352,8 +356,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @return a new instance of {@link HDLPackage} with the updated
 	 *         declarations field.
 	 */
-	public @Nonnull
-	HDLPackage removeDeclarations(int idx) {
+	@Nonnull
+	public HDLPackage removeDeclarations(int idx) {
 		ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
 		declarations.remove(idx);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
@@ -410,6 +414,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -420,7 +425,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		if (pkg != null) {
 			sb.append(".setPkg(").append('"' + pkg + '"').append(")");
 		}
-		if (units != null) {
+		if (units != null)
 			if (units.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLUnit o : units) {
@@ -428,8 +433,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
-		if (declarations != null) {
+		if (declarations != null)
 			if (declarations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLDeclaration o : declarations) {
@@ -437,10 +441,10 @@ public abstract class AbstractHDLPackage extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateLibURI(getLibURI());
@@ -459,6 +463,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLPackage, HDLClass.HDLObject);
 	}

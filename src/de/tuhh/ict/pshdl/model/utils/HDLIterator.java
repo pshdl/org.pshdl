@@ -61,7 +61,7 @@ public class HDLIterator implements Iterator<IHDLObject> {
 			addAllFields(obj, superClazz, deep);
 		}
 		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
+		for (Field field : fields)
 			if (field.getAnnotation(Visit.class) != null) {
 				field.setAccessible(true);
 				Object object = field.get(obj);
@@ -85,7 +85,6 @@ public class HDLIterator implements Iterator<IHDLObject> {
 					}
 				}
 			}
-		}
 	}
 
 	@Override

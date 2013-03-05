@@ -21,10 +21,9 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 			list.add(arg0);
 			map.put(System.identityHashCode(arg0), list);
 		} else {
-			for (T t : list) {
+			for (T t : list)
 				if (t == arg0)
 					return false;
-			}
 			list.add(arg0);
 		}
 		return true;
@@ -40,10 +39,9 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 		List<T> list = map.get(System.identityHashCode(arg0));
 		if (list == null)
 			return false;
-		for (T t : list) {
+		for (T t : list)
 			if (t == arg0)
 				return true;
-		}
 		return false;
 	}
 

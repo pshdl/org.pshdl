@@ -30,6 +30,7 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLReference copy();
 
@@ -38,6 +39,7 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLReference copyFiltered(CopyFilter filter);
 
@@ -46,6 +48,7 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public abstract HDLReference copyDeepFrozen(IHDLObject container);
 
@@ -75,6 +78,7 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -82,10 +86,12 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLReference, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

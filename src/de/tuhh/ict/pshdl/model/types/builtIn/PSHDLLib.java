@@ -69,11 +69,10 @@ public class PSHDLLib {
 				pkg = pkg.addDeclarations(func);
 			}
 			CompilerInformation info = HDLCore.getCompilerInformation();
-			for (Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet()) {
+			for (Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet())
 				if (e.getValue().type == FunctionType.NATIVE) {
 					pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
 				}
-			}
 			pkg.freeze(null);
 			LIB = pkg;
 		}

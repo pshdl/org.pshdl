@@ -9,7 +9,6 @@ import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLClass;
 import de.tuhh.ict.pshdl.model.HDLConcat;
 import de.tuhh.ict.pshdl.model.HDLDirectGeneration;
-import de.tuhh.ict.pshdl.model.HDLEnum;
 import de.tuhh.ict.pshdl.model.HDLEnumRef;
 import de.tuhh.ict.pshdl.model.HDLEqualityOp;
 import de.tuhh.ict.pshdl.model.HDLExpression;
@@ -97,7 +96,7 @@ public class TypeExtension {
     final IHDLObject container = hVar.getContainer();
     boolean _equals_2 = ObjectExtensions.operator_equals(container, null);
     if (_equals_2) {
-      Optional.absent();
+      return Optional.<HDLType>absent();
     }
     HDLClass _classType = container.getClassType();
     final HDLClass _switchValue = _classType;
@@ -118,8 +117,7 @@ public class TypeExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLClass.HDLInterfaceInstantiation)) {
         _matched=true;
-        HDLInterface _resolveHIf = ((HDLInterfaceInstantiation) container).resolveHIf();
-        return Optional.<HDLInterface>fromNullable(_resolveHIf);
+        return ((HDLInterfaceInstantiation) container).resolveHIf();
       }
     }
     if (!_matched) {
@@ -151,8 +149,7 @@ public class TypeExtension {
       HDLPrimitive _primitive_1 = hvd.getPrimitive();
       return Optional.<HDLPrimitive>of(_primitive_1);
     }
-    HDLType _resolveType = hvd.resolveType();
-    return Optional.<HDLType>of(_resolveType);
+    return hvd.resolveType();
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLArrayInit ai) {
@@ -199,13 +196,15 @@ public class TypeExtension {
       return Optional.<HDLType>absent();
     }
     cat.setMeta(TypeExtension.DETERMINE_TYPE_RESOLVE);
-    IHDLObject resolved = Insulin.resolveFragment(cat);
-    boolean _equals = ObjectExtensions.operator_equals(resolved, null);
-    if (_equals) {
+    Optional<? extends IHDLObject> resolved = Insulin.resolveFragment(cat);
+    boolean _isPresent = resolved.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
       return Optional.<HDLType>absent();
     }
+    IHDLObject _get = resolved.get();
     IHDLObject _container = cat.getContainer();
-    IHDLObject _copyDeepFrozen = resolved.copyDeepFrozen(_container);
+    IHDLObject _copyDeepFrozen = _get.copyDeepFrozen(_container);
     return this.determineType(_copyDeepFrozen);
   }
   
@@ -228,7 +227,7 @@ public class TypeExtension {
       {
         boolean _equals = ObjectExtensions.operator_equals(width, null);
         if (_equals) {
-          Optional.absent();
+          return Optional.<HDLType>absent();
         }
         HDLExpression _next_1 = iter.next();
         final Optional<? extends HDLType> nextCatType = this.determineType(_next_1);
@@ -279,8 +278,7 @@ public class TypeExtension {
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLEnumRef ref) {
-    HDLEnum _resolveHEnum = ref.resolveHEnum();
-    return Optional.<HDLEnum>fromNullable(_resolveHEnum);
+    return ref.resolveHEnum();
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLManip manip) {
@@ -336,8 +334,14 @@ public class TypeExtension {
     int _size = bits.size();
     boolean _equals = (_size == 0);
     if (_equals) {
-      HDLVariable _resolveVar = ref.resolveVar();
-      return _resolveVar==null?(Optional<? extends HDLType>)null:this.determineType(_resolveVar);
+      Optional<HDLVariable> res = ref.resolveVar();
+      boolean _isPresent = res.isPresent();
+      if (_isPresent) {
+        HDLVariable _get = res.get();
+        return this.determineType(_get);
+      } else {
+        return Optional.<HDLType>absent();
+      }
     }
     boolean _and = false;
     int _size_1 = bits.size();
@@ -345,8 +349,8 @@ public class TypeExtension {
     if (!_equals_1) {
       _and = false;
     } else {
-      HDLRange _get = bits.get(0);
-      HDLExpression _from = _get.getFrom();
+      HDLRange _get_1 = bits.get(0);
+      HDLExpression _from = _get_1.getFrom();
       boolean _equals_2 = ObjectExtensions.operator_equals(_from, null);
       _and = (_equals_1 && _equals_2);
     }
@@ -375,19 +379,21 @@ public class TypeExtension {
       boolean _hasNext_1 = iter.hasNext();
       _while = _hasNext_1;
     }
-    final HDLVariable hVar = ref.resolveVar();
-    boolean _equals_3 = ObjectExtensions.operator_equals(hVar, null);
-    if (_equals_3) {
-      return Optional.<HDLType>absent();
-    }
-    final Optional<? extends HDLType> type = this.determineType(hVar);
-    boolean _isPresent = type.isPresent();
-    boolean _not = (!_isPresent);
+    final Optional<HDLVariable> hVar = ref.resolveVar();
+    boolean _isPresent_1 = hVar.isPresent();
+    boolean _not = (!_isPresent_1);
     if (_not) {
       return Optional.<HDLType>absent();
     }
-    HDLType _get_1 = type.get();
-    HDLPrimitive _setWidth = ((HDLPrimitive) _get_1).setWidth(width);
+    HDLVariable _get_2 = hVar.get();
+    final Optional<? extends HDLType> type = this.determineType(_get_2);
+    boolean _isPresent_2 = type.isPresent();
+    boolean _not_1 = (!_isPresent_2);
+    if (_not_1) {
+      return Optional.<HDLType>absent();
+    }
+    HDLType _get_3 = type.get();
+    HDLPrimitive _setWidth = ((HDLPrimitive) _get_3).setWidth(width);
     return Optional.<HDLPrimitive>of(_setWidth);
   }
   

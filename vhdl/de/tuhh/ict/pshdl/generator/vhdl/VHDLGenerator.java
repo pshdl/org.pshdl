@@ -23,8 +23,9 @@ public class VHDLGenerator {
 		try {
 			VhdlOutput.print(visitor);
 			String name = unit.getPkg();
-			if (name == null)
+			if (name == null) {
 				name = unit.getUnits().get(0).getName();
+			}
 			VhdlOutput.toFile(visitor, targetDir + FS + name + ".vhd");
 		} catch (IOException e) {
 			e.printStackTrace();

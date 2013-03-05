@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -77,16 +79,15 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	private HDLVariable resolveVarCache;
 
 	@Override
-	public HDLVariable resolveVar() {
+	public Optional<HDLVariable> resolveVar() {
 		if (resolveVarCache != null)
-			return resolveVarCache;
-		HDLVariable resolveVar = super.resolveVar();
-		if ((resolveVar != null) && frozen) {
-			resolveVarCache = resolveVar;
+			return Optional.of(resolveVarCache);
+		Optional<HDLVariable> resolveVar = super.resolveVar();
+		if ((resolveVar.isPresent()) && frozen) {
+			resolveVarCache = resolveVar.get();
 		}
 		return resolveVar;
 	}
-
 	// $CONTENT-END$
 
 }

@@ -65,7 +65,10 @@ class ConstantEvaluate {
 	public static GenericMeta<IHDLObject> SOURCE=new GenericMeta("SOURCE", true)
 	
 	def dispatch Optional<BigInteger> constantEvaluate(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
-		return Insulin::resolveFragment(obj)?.copyDeepFrozen(obj.container)?.constantEvaluate(context)
+		val type=Insulin::resolveFragment(obj)
+		if (!type.present)
+			return Optional::absent
+		return type.get.copyDeepFrozen(obj.container).constantEvaluate(context)
 	}
 	def dispatch Optional<BigInteger> constantEvaluate(IHDLObject obj, HDLEvaluationContext context) {
 		throw new IllegalArgumentException("Did not implement constantEvaulate for type:"+obj.classType)
@@ -288,15 +291,15 @@ class ConstantEvaluate {
 			obj.addMeta(DESCRIPTION, TYPE_NOT_SUPPORTED_FOR_CONSTANTS)
 			return Optional::absent
 		}
-		val HDLVariable hVar = obj.resolveVar
-		if (hVar == null) {
+		val hVar = obj.resolveVar
+		if (!hVar.present) {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional::absent
 		}
-		val HDLDirection dir = hVar.direction
+		val HDLDirection dir = hVar.get.direction
 		if (dir == CONSTANT)
-			return subEvaluate(obj, hVar.defaultValue, context)
+			return subEvaluate(obj, hVar.get.defaultValue, context)
 
 		if (dir == PARAMETER) {
 			if (context == null) {
@@ -304,7 +307,7 @@ class ConstantEvaluate {
 				obj.addMeta(DESCRIPTION, CAN_NOT_USE_PARAMETER)
 				return Optional::absent
 			}
-			val HDLExpression cRef = context.get(hVar)
+			val HDLExpression cRef = context.get(hVar.get)
 			val Optional<BigInteger> cRefEval = cRef.constantEvaluate(context)
 			if (!cRefEval.present) {
 				obj.addMeta(SOURCE, cRef)

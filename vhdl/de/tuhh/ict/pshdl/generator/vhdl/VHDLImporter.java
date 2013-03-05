@@ -138,20 +138,18 @@ public class VHDLImporter {
 		String pkg = null;
 		for (LibraryDeclarativeRegion lib : rootScope.getLibraries()) {
 			for (VhdlFile file : lib.getFiles()) {
-				for (LibraryUnit libraryUnit : file.getElements()) {
+				for (LibraryUnit libraryUnit : file.getElements())
 					if (libraryUnit instanceof PackageDeclaration) {
 						PackageDeclaration pd = (PackageDeclaration) libraryUnit;
 						pkg = pd.getIdentifier();
 						List<PackageDeclarativeItem> declarations = pd.getDeclarations();
-						for (PackageDeclarativeItem pdi : declarations) {
+						for (PackageDeclarativeItem pdi : declarations)
 							if (pdi instanceof Type) {
 								Type t = (Type) pdi;
 								if (t.getIdentifier().equalsIgnoreCase(identifier))
 									return "work." + pkg + "." + identifier;
 							}
-						}
 					}
-				}
 			}
 		}
 		return null;
@@ -161,10 +159,11 @@ public class VHDLImporter {
 		HDLExpression from = getExpression(dr.getFrom(), false);
 		HDLExpression to = getExpression(dr.getTo(), false);
 		HDLExpression width;
-		if (dr.getDirection() == Direction.DOWNTO)
+		if (dr.getDirection() == Direction.DOWNTO) {
 			width = subThenPlus1(from, to);
-		else
+		} else {
 			width = subThenPlus1(to, from);
+		}
 		return width;
 	}
 
@@ -172,8 +171,9 @@ public class VHDLImporter {
 			ArrayList<HDLExpression> dimensions) {
 		HDLPrimitive p = new HDLPrimitive().setType(pt).setWidth(width);
 		HDLExpression hDefault = null;
-		if (defaultValue != null)
+		if (defaultValue != null) {
 			hDefault = getExpression(defaultValue, pt == HDLPrimitiveType.STRING);
+		}
 		return new HDLVariableDeclaration().setDirection(direction).setType(p)
 				.addVariables(new HDLVariable().setName(name.getLastSegment()).setDimensions(dimensions).setDefaultValue(hDefault));
 	}

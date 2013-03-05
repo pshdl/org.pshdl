@@ -69,12 +69,13 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	public static GenericMeta<String> ORIG_NAME = new GenericMeta<String>("ORIG_NAME", true);
 
 	@Override
-	public HDLInterface resolveHIf() {
-		HDLInterface resolveHIf = super.resolveHIf();
-		if (resolveHIf == null)
-			return null;
+	public Optional<HDLInterface> resolveHIf() {
+		Optional<HDLInterface> resolveHIf = super.resolveHIf();
+		if (!resolveHIf.isPresent())
+			return Optional.absent();
 		ModificationSet ms = new ModificationSet();
-		ArrayList<HDLVariableDeclaration> ports = resolveHIf.getPorts();
+		HDLInterface getInterface = resolveHIf.get();
+		ArrayList<HDLVariableDeclaration> ports = getInterface.getPorts();
 		String prefix = getVar().getName();
 		for (HDLVariableDeclaration hvd : ports) {
 			switch (hvd.getDirection()) {
@@ -85,7 +86,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 					HDLVariable newVar = hdlVariable.setName(newName);
 					newVar.addMeta(ORIG_NAME, hdlVariable.getName());
 					ms.replace(hdlVariable, newVar);
-					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(resolveHIf).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
+					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
 					for (HDLVariableRef ref : refs) {
 						// Make local only so that it is resolved locally first
 						ms.replace(ref, ref.setVar(HDLQualifiedName.create(newName)));
@@ -99,7 +100,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 					Optional<BigInteger> constant = ConstantEvaluate.valueOf(hdlVariable.getDefaultValue());
 					if (!constant.isPresent())
 						throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", hdlVariable));
-					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(resolveHIf).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
+					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
 					for (HDLVariableRef ref : refs) {
 						ms.replace(ref, HDLLiteral.get(constant.get()));
 					}
@@ -111,8 +112,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 
 			}
 		}
-		HDLInterface newIF = ms.apply(resolveHIf);
-		return newIF;
+		return Optional.of(ms.apply(getInterface));
 	}
 
 	// $CONTENT-END$

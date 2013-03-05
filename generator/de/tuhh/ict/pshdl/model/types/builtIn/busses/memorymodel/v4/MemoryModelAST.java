@@ -70,12 +70,15 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		if (warnType != null) {
 			boolean isSilent = warnType.silent != null;
 			String typeString = warnType.typeString.getText();
-			if ("mask".equals(typeString))
+			if ("mask".equals(typeString)) {
 				def.warn = isSilent ? WarnType.silentMask : WarnType.mask;
-			if ("error".equals(typeString))
+			}
+			if ("error".equals(typeString)) {
 				def.warn = isSilent ? WarnType.silentError : WarnType.error;
-			if ("limit".equals(typeString))
+			}
+			if ("limit".equals(typeString)) {
 				def.warn = isSilent ? WarnType.silentLimit : WarnType.limit;
+			}
 		}
 		obj = def;
 		addNamedElement(def);
@@ -121,8 +124,9 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 
 	@Override
 	public void exitDeclaration(DeclarationContext ctx) {
-		if (decl != null)
+		if (decl != null) {
 			unit.declarations.put(decl.getName(), decl);
+		}
 	}
 
 	@Override

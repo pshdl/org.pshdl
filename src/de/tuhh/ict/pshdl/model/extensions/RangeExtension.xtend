@@ -65,22 +65,23 @@ class RangeExtension {
 		val Optional<BigInteger> bigVal = ConstantEvaluate::valueOf(obj, context)
 		if (bigVal.present)
 			return Optional::of(Ranges::closed(bigVal.get, bigVal.get))
-		val HDLVariable hVar = obj.resolveVar
-		if (hVar == null) {
+		val hVar = obj.resolveVar
+		if (!hVar.present) {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional::absent
 		}
-		var HDLAnnotation range = hVar.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
+		var HDLAnnotation range = hVar.get.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
 		if (range != null) {
 			val value = range.value.split(";")
 
 			//TODO Allow simple references
 			return Optional::of(Ranges::closed(new BigInteger(value.get(0)), new BigInteger(value.get(1))))
 		}
-		if (hVar.container != null) {
-			if (hVar.container instanceof HDLVariableDeclaration) {
-				val HDLVariableDeclaration hvd = hVar.container as HDLVariableDeclaration
+		val container=hVar.get.container
+		if (container != null) {
+			if (container instanceof HDLVariableDeclaration) {
+				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
 				range = hvd.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
 				if (range != null) {
 					val String[] value = range.value.split(";")
@@ -89,8 +90,8 @@ class RangeExtension {
 					return Optional::of(Ranges::closed(new BigInteger(value.get(0)), new BigInteger(value.get(1))))
 				}
 			}
-			if (hVar.container instanceof HDLForLoop) {
-				val HDLForLoop loop = hVar.container as HDLForLoop
+			if (container instanceof HDLForLoop) {
+				val HDLForLoop loop = container as HDLForLoop
 				val zeroR = loop.range.get(0).determineRange(context)
 				if (zeroR.present) {
 					var Range<BigInteger> res = zeroR.get
@@ -123,7 +124,7 @@ class RangeExtension {
 				return Optional::of(Ranges::closed(0bi, 1bi.shiftLeft(bitWidth.intValue).subtract(1bi)))
 			}
 		}
-		val Optional<? extends HDLType> type = TypeExtension::typeOf(hVar)
+		val Optional<? extends HDLType> type = TypeExtension::typeOf(hVar.get)
 		if (type.present && type.get instanceof HDLPrimitive) {
 			return HDLPrimitives::instance.getValueRange(type.get as HDLPrimitive, context)
 		}

@@ -32,7 +32,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 			left = validateLeft(left);
 		}
 		if (left != null) {
-			this.left = (HDLReference) left;
+			this.left = left;
 		} else {
 			this.left = null;
 		}
@@ -44,7 +44,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 			right = validateRight(right);
 		}
 		if (right != null) {
-			this.right = (HDLExpression) right;
+			this.right = right;
 		} else {
 			this.right = null;
 		}
@@ -117,6 +117,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLAssignment copy() {
 		HDLAssignment newObject = new HDLAssignment(null, left, type, right, false);
@@ -129,6 +130,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLAssignment copyFiltered(CopyFilter filter) {
 		HDLReference filteredleft = filter.copyObject("left", this, left);
@@ -142,6 +144,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLAssignment copyDeepFrozen(IHDLObject container) {
 		HDLAssignment copy = copyFiltered(CopyFilter.DEEP_META);
@@ -158,8 +161,9 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * @return the same instance of {@link HDLAssignment} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLAssignment setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLAssignment setContainer(@Nullable IHDLObject container) {
 		return (HDLAssignment) super.setContainer(container);
 	}
 
@@ -172,8 +176,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * @return a new instance of {@link HDLAssignment} with the updated left
 	 *         field.
 	 */
-	public @Nonnull
-	HDLAssignment setLeft(@Nonnull HDLReference left) {
+	@Nonnull
+	public HDLAssignment setLeft(@Nonnull HDLReference left) {
 		left = validateLeft(left);
 		HDLAssignment res = new HDLAssignment(container, left, type, right, false);
 		return res;
@@ -188,8 +192,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * @return a new instance of {@link HDLAssignment} with the updated type
 	 *         field.
 	 */
-	public @Nonnull
-	HDLAssignment setType(@Nullable HDLAssignmentType type) {
+	@Nonnull
+	public HDLAssignment setType(@Nullable HDLAssignmentType type) {
 		type = validateType(type);
 		HDLAssignment res = new HDLAssignment(container, left, type, right, false);
 		return res;
@@ -204,8 +208,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * @return a new instance of {@link HDLAssignment} with the updated right
 	 *         field.
 	 */
-	public @Nonnull
-	HDLAssignment setRight(@Nonnull HDLExpression right) {
+	@Nonnull
+	public HDLAssignment setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
 		HDLAssignment res = new HDLAssignment(container, left, type, right, false);
 		return res;
@@ -255,6 +259,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -271,6 +276,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateLeft(getLeft());
@@ -284,6 +290,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLAssignment, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

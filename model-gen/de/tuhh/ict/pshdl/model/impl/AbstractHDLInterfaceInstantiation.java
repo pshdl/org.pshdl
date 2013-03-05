@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -43,7 +45,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	protected final HDLQualifiedName hIf;
 
 	@Nullable
-	public HDLInterface resolveHIf() {
+	public Optional<HDLInterface> resolveHIf() {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
 		return ScopingExtension.INST.resolveInterface(this, hIf);
@@ -64,6 +66,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation copy() {
 		HDLInterfaceInstantiation newObject = new HDLInterfaceInstantiation(null, var, arguments, hIf, false);
@@ -76,6 +79,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation copyFiltered(CopyFilter filter) {
 		HDLVariable filteredvar = filter.copyObject("var", this, var);
@@ -89,6 +93,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLInterfaceInstantiation copyDeepFrozen(IHDLObject container) {
 		HDLInterfaceInstantiation copy = copyFiltered(CopyFilter.DEEP_META);
@@ -105,8 +110,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return the same instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated container field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLInterfaceInstantiation setContainer(@Nullable IHDLObject container) {
 		return (HDLInterfaceInstantiation) super.setContainer(container);
 	}
 
@@ -119,8 +125,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated var field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation setVar(@Nonnull HDLVariable var) {
+	@Override
+	@Nonnull
+	public HDLInterfaceInstantiation setVar(@Nonnull HDLVariable var) {
 		var = validateVar(var);
 		HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(container, var, arguments, hIf, false);
 		return res;
@@ -135,8 +142,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated arguments field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation setArguments(@Nullable ArrayList<HDLArgument> arguments) {
+	@Override
+	@Nonnull
+	public HDLInterfaceInstantiation setArguments(@Nullable ArrayList<HDLArgument> arguments) {
 		arguments = validateArguments(arguments);
 		HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(container, var, arguments, hIf, false);
 		return res;
@@ -151,8 +159,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated arguments field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation addArguments(@Nullable HDLArgument newArguments) {
+	@Override
+	@Nonnull
+	public HDLInterfaceInstantiation addArguments(@Nullable HDLArgument newArguments) {
 		if (newArguments == null)
 			throw new IllegalArgumentException("Element of arguments can not be null!");
 		ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
@@ -170,8 +179,9 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated arguments field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation removeArguments(@Nullable HDLArgument newArguments) {
+	@Override
+	@Nonnull
+	public HDLInterfaceInstantiation removeArguments(@Nullable HDLArgument newArguments) {
 		if (newArguments == null)
 			throw new IllegalArgumentException("Removed element of arguments can not be null!");
 		ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
@@ -189,8 +199,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated arguments field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation removeArguments(int idx) {
+	@Nonnull
+	public HDLInterfaceInstantiation removeArguments(int idx) {
 		ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.remove(idx);
 		HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(container, var, arguments, hIf, false);
@@ -206,8 +216,8 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @return a new instance of {@link HDLInterfaceInstantiation} with the
 	 *         updated hIf field.
 	 */
-	public @Nonnull
-	HDLInterfaceInstantiation setHIf(@Nonnull HDLQualifiedName hIf) {
+	@Nonnull
+	public HDLInterfaceInstantiation setHIf(@Nonnull HDLQualifiedName hIf) {
 		hIf = validateHIf(hIf);
 		HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(container, var, arguments, hIf, false);
 		return res;
@@ -245,6 +255,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -252,7 +263,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (arguments != null) {
+		if (arguments != null)
 			if (arguments.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLArgument o : arguments) {
@@ -260,13 +271,13 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		if (hIf != null) {
 			sb.append(".setHIf(HDLQualifiedName.create(\"").append(hIf).append("\"))");
 		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHIf(getHIfRefName());
@@ -275,6 +286,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLInterfaceInstantiation, HDLClass.HDLInstantiation, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

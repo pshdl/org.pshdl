@@ -35,7 +35,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 			width = validateWidth(width);
 		}
 		if (width != null) {
-			this.width = (HDLExpression) width;
+			this.width = width;
 		} else {
 			this.width = null;
 		}
@@ -73,6 +73,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * 
 	 * @return the field
 	 */
+	@Override
 	public @Nullable
 	HDLExpression getWidth() {
 		return width;
@@ -87,6 +88,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLPrimitive copy() {
 		HDLPrimitive newObject = new HDLPrimitive(null, name, type, width, false);
@@ -99,6 +101,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLPrimitive copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
@@ -112,6 +115,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLPrimitive copyDeepFrozen(IHDLObject container) {
 		HDLPrimitive copy = copyFiltered(CopyFilter.DEEP_META);
@@ -128,8 +132,9 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * @return the same instance of {@link HDLPrimitive} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLPrimitive setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLPrimitive setContainer(@Nullable IHDLObject container) {
 		return (HDLPrimitive) super.setContainer(container);
 	}
 
@@ -142,8 +147,9 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * @return a new instance of {@link HDLPrimitive} with the updated name
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPrimitive setName(@Nonnull String name) {
+	@Override
+	@Nonnull
+	public HDLPrimitive setName(@Nonnull String name) {
 		name = validateName(name);
 		HDLPrimitive res = new HDLPrimitive(container, name, type, width, false);
 		return res;
@@ -158,8 +164,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * @return a new instance of {@link HDLPrimitive} with the updated type
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPrimitive setType(@Nonnull HDLPrimitiveType type) {
+	@Nonnull
+	public HDLPrimitive setType(@Nonnull HDLPrimitiveType type) {
 		type = validateType(type);
 		HDLPrimitive res = new HDLPrimitive(container, name, type, width, false);
 		return res;
@@ -173,8 +179,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * @return a new instance of {@link HDLPrimitive} with the updated width
 	 *         field.
 	 */
-	public @Nonnull
-	HDLPrimitive setWidth(@Nullable HDLExpression width) {
+	@Nonnull
+	public HDLPrimitive setWidth(@Nullable HDLExpression width) {
 		width = validateWidth(width);
 		HDLPrimitive res = new HDLPrimitive(container, name, type, width, false);
 		return res;
@@ -218,6 +224,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -234,6 +241,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateType(getType());
@@ -243,6 +251,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLPrimitive, HDLClass.HDLValueType, HDLClass.HDLType, HDLClass.HDLObject);
 	}

@@ -35,7 +35,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 			target = validateTarget(target);
 		}
 		if (target != null) {
-			this.target = (HDLExpression) target;
+			this.target = target;
 		} else {
 			this.target = null;
 		}
@@ -43,7 +43,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 			castTo = validateCastTo(castTo);
 		}
 		if (castTo != null) {
-			this.castTo = (HDLType) castTo;
+			this.castTo = castTo;
 		} else {
 			this.castTo = null;
 		}
@@ -115,6 +115,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLManip copy() {
 		HDLManip newObject = new HDLManip(null, type, target, castTo, false);
@@ -127,6 +128,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLManip copyFiltered(CopyFilter filter) {
 		HDLManipType filteredtype = filter.copyObject("type", this, type);
@@ -140,6 +142,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLManip copyDeepFrozen(IHDLObject container) {
 		HDLManip copy = copyFiltered(CopyFilter.DEEP_META);
@@ -156,8 +159,9 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * @return the same instance of {@link HDLManip} with the updated container
 	 *         field.
 	 */
-	public @Nonnull
-	HDLManip setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLManip setContainer(@Nullable IHDLObject container) {
 		return (HDLManip) super.setContainer(container);
 	}
 
@@ -169,8 +173,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLManip} with the updated type field.
 	 */
-	public @Nonnull
-	HDLManip setType(@Nonnull HDLManipType type) {
+	@Nonnull
+	public HDLManip setType(@Nonnull HDLManipType type) {
 		type = validateType(type);
 		HDLManip res = new HDLManip(container, type, target, castTo, false);
 		return res;
@@ -184,8 +188,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLManip} with the updated target field.
 	 */
-	public @Nonnull
-	HDLManip setTarget(@Nonnull HDLExpression target) {
+	@Nonnull
+	public HDLManip setTarget(@Nonnull HDLExpression target) {
 		target = validateTarget(target);
 		HDLManip res = new HDLManip(container, type, target, castTo, false);
 		return res;
@@ -198,8 +202,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 *            sets the new castTo of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLManip} with the updated castTo field.
 	 */
-	public @Nonnull
-	HDLManip setCastTo(@Nullable HDLType castTo) {
+	@Nonnull
+	public HDLManip setCastTo(@Nullable HDLType castTo) {
 		castTo = validateCastTo(castTo);
 		HDLManip res = new HDLManip(container, type, target, castTo, false);
 		return res;
@@ -249,6 +253,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -265,6 +270,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateType(getType());
@@ -278,6 +284,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLManip, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

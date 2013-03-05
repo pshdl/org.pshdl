@@ -150,7 +150,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		if (FALSE.equals(string))
 			return HDLLiteralPresentation.BOOL;
 		char zeroChar = string.charAt(0);
-		if (zeroChar == '0') {
+		if (zeroChar == '0')
 			if (string.length() > 1) {
 				switch (string.charAt(1)) {
 				case 'x':
@@ -160,7 +160,6 @@ public class HDLLiteral extends AbstractHDLLiteral {
 				}
 			} else
 				return HDLLiteralPresentation.NUM;
-		}
 		return HDLLiteralPresentation.NUM;
 	}
 

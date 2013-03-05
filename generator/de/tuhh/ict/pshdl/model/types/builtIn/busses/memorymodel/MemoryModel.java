@@ -48,10 +48,11 @@ public class MemoryModel {
 					throw new IllegalArgumentException("Two definitions with same name exist, but their type differs:" + def + " vs " + stockDef);
 				definitions.put(name, def);
 				Integer val = defDimension.get(name);
-				if (val == null)
+				if (val == null) {
 					defDimension.put(name, 1);
-				else
+				} else {
 					defDimension.put(name, val + 1);
+				}
 
 			}
 		}
@@ -60,22 +61,25 @@ public class MemoryModel {
 			HDLPrimitive type = null;
 			switch (def.type) {
 			case BIT:
-				if (def.width == -1)
+				if (def.width == -1) {
 					type = HDLPrimitive.getBit();
-				else
+				} else {
 					type = HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(def.width));
+				}
 				break;
 			case INT:
-				if (def.width == -1)
+				if (def.width == -1) {
 					type = HDLPrimitive.getInteger();
-				else
+				} else {
 					type = HDLPrimitive.getInt().setWidth(HDLLiteral.get(def.width));
+				}
 				break;
 			case UINT:
-				if (def.width == -1)
+				if (def.width == -1) {
 					type = HDLPrimitive.getNatural();
-				else
+				} else {
 					type = HDLPrimitive.getUint().setWidth(HDLLiteral.get(def.width));
+				}
 				break;
 			case UNUSED:
 				continue;
@@ -95,8 +99,9 @@ public class MemoryModel {
 			}
 			HDLVariable var = new HDLVariable().setName(def.name);
 			Integer dim = defDimension.get(def.name);
-			if (dim != 1)
+			if (dim != 1) {
 				var = var.addDimensions(HDLLiteral.get(dim));
+			}
 			hdv = hdv.addVariables(var);
 			hdi = hdi.addPorts(hdv);
 		}
@@ -189,8 +194,9 @@ public class MemoryModel {
 			throw new IllegalArgumentException("The row:" + row.name + " has more bits (" + usedSize + ") than a row has bits.");
 		if ((usedSize != Unit.rowWidth) && (fillFound == false))
 			throw new IllegalArgumentException("The row:" + row.name + " has a size of:" + usedSize + " but does not contain a fill");
-		if (usedSize == Unit.rowWidth)
+		if (usedSize == Unit.rowWidth) {
 			definitions.remove(unusedFill);
+		}
 		unusedFill.width = Unit.rowWidth - usedSize;
 		for (Definition definition : definitions) {
 			res.definitions.add(definition);

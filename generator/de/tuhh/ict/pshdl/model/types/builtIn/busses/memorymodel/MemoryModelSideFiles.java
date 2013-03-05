@@ -53,7 +53,7 @@ public class MemoryModelSideFiles {
 		Map<String, Integer> defIndex = new HashMap<String, Integer>();
 		Map<String, Integer> rowIndex = new HashMap<String, Integer>();
 		for (Row row : rows) {
-			if ((row.column != current) || (row.colIndex != colIndex)) {
+			if ((row.column != current) || (row.colIndex != colIndex))
 				if (row.column == null) {
 					current = null;
 					colIndex = -1;
@@ -63,7 +63,6 @@ public class MemoryModelSideFiles {
 					colIndex = row.colIndex;
 					ps.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>\n", Unit.rowWidth + 2, row.column.name, row.colIndex);
 				}
-			}
 			ps.format("<tr>");
 			ps.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
 			for (NamedElement dec : row.definitions) {
@@ -97,8 +96,9 @@ public class MemoryModelSideFiles {
 
 	private static Integer getAndInc(Map<String, Integer> defIndex, String name) {
 		Integer integer = defIndex.get(name);
-		if (integer == null)
+		if (integer == null) {
 			integer = 0;
+		}
 		defIndex.put(name, integer + 1);
 		return integer;
 	}

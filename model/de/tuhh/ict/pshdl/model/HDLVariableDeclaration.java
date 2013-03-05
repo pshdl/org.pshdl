@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -72,10 +74,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 		@Nullable
 		public static HDLDirection getOp(String op) {
-			for (HDLDirection ass : values()) {
+			for (HDLDirection ass : values())
 				if (ass.str.equals(op))
 					return ass;
-			}
 			return null;
 		}
 
@@ -146,9 +147,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	// $CONTENT-BEGIN$
 
 	@Override
-	public HDLType resolveType() {
+	public Optional<? extends HDLType> resolveType() {
 		if (getPrimitive() != null)
-			return getPrimitive();
+			return Optional.<HDLType> fromNullable(getPrimitive());
 		return super.resolveType();
 	}
 

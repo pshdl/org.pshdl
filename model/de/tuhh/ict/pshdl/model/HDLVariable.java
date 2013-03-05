@@ -137,10 +137,9 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	public HDLAnnotation getAnnotation(Enum<?> range) {
-		for (HDLAnnotation anno : getAnnotations()) {
+		for (HDLAnnotation anno : getAnnotations())
 			if (anno.getName().equals(range.toString()))
 				return anno;
-		}
 		if (container instanceof HDLVariableDeclaration) {
 			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
 			return vhd.getAnnotation(range);

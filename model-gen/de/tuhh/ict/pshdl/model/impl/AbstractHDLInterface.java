@@ -30,7 +30,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 		this.ports = new ArrayList<HDLVariableDeclaration>();
 		if (ports != null) {
 			for (HDLVariableDeclaration newValue : ports) {
-				this.ports.add((HDLVariableDeclaration) newValue);
+				this.ports.add(newValue);
 			}
 		}
 	}
@@ -64,6 +64,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLInterface copy() {
 		HDLInterface newObject = new HDLInterface(null, name, ports, false);
@@ -76,6 +77,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLInterface copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
@@ -88,6 +90,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLInterface copyDeepFrozen(IHDLObject container) {
 		HDLInterface copy = copyFiltered(CopyFilter.DEEP_META);
@@ -104,8 +107,9 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @return the same instance of {@link HDLInterface} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLInterface setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLInterface setContainer(@Nullable IHDLObject container) {
 		return (HDLInterface) super.setContainer(container);
 	}
 
@@ -118,8 +122,9 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @return a new instance of {@link HDLInterface} with the updated name
 	 *         field.
 	 */
-	public @Nonnull
-	HDLInterface setName(@Nonnull String name) {
+	@Override
+	@Nonnull
+	public HDLInterface setName(@Nonnull String name) {
 		name = validateName(name);
 		HDLInterface res = new HDLInterface(container, name, ports, false);
 		return res;
@@ -133,8 +138,8 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @return a new instance of {@link HDLInterface} with the updated ports
 	 *         field.
 	 */
-	public @Nonnull
-	HDLInterface setPorts(@Nullable ArrayList<HDLVariableDeclaration> ports) {
+	@Nonnull
+	public HDLInterface setPorts(@Nullable ArrayList<HDLVariableDeclaration> ports) {
 		ports = validatePorts(ports);
 		HDLInterface res = new HDLInterface(container, name, ports, false);
 		return res;
@@ -149,8 +154,8 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @return a new instance of {@link HDLInterface} with the updated ports
 	 *         field.
 	 */
-	public @Nonnull
-	HDLInterface addPorts(@Nullable HDLVariableDeclaration newPorts) {
+	@Nonnull
+	public HDLInterface addPorts(@Nullable HDLVariableDeclaration newPorts) {
 		if (newPorts == null)
 			throw new IllegalArgumentException("Element of ports can not be null!");
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
@@ -168,8 +173,8 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @return a new instance of {@link HDLInterface} with the updated ports
 	 *         field.
 	 */
-	public @Nonnull
-	HDLInterface removePorts(@Nullable HDLVariableDeclaration newPorts) {
+	@Nonnull
+	public HDLInterface removePorts(@Nullable HDLVariableDeclaration newPorts) {
 		if (newPorts == null)
 			throw new IllegalArgumentException("Removed element of ports can not be null!");
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
@@ -187,8 +192,8 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @return a new instance of {@link HDLInterface} with the updated ports
 	 *         field.
 	 */
-	public @Nonnull
-	HDLInterface removePorts(int idx) {
+	@Nonnull
+	public HDLInterface removePorts(int idx) {
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.remove(idx);
 		HDLInterface res = new HDLInterface(container, name, ports, false);
@@ -227,6 +232,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -234,7 +240,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (ports != null) {
+		if (ports != null)
 			if (ports.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariableDeclaration o : ports) {
@@ -242,10 +248,10 @@ public abstract class AbstractHDLInterface extends HDLType {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validatePorts(getPorts());
@@ -256,6 +262,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLInterface, HDLClass.HDLType, HDLClass.HDLObject);
 	}

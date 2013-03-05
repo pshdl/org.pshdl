@@ -8,7 +8,6 @@ import java.util.*;
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.internal.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
@@ -68,8 +67,9 @@ public class BusGenSideFiles {
 		StringBuilder ports = new StringBuilder();
 		StringBuilder portMap = new StringBuilder();
 		for (HDLVariableDeclaration vhd : asInterface.getPorts()) {
-			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null)
+			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null) {
 				continue;
+			}
 			StringBuilder targetMap = null;
 			StringBuilder target = null;
 			HDLDirection direction = vhd.getDirection();
@@ -154,8 +154,9 @@ public class BusGenSideFiles {
 		StringBuilder generics = new StringBuilder();
 		StringBuilder ports = new StringBuilder();
 		for (HDLVariableDeclaration vhd : asInterface.getPorts()) {
-			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null)
+			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null) {
 				continue;
+			}
 			if (vhd.getPrimitive() == null)
 				throw new IllegalArgumentException("Only primitive types are supported as in/out pins in a bus based unit");
 			StringBuilder type = new StringBuilder();
@@ -198,7 +199,7 @@ public class BusGenSideFiles {
 			default:
 				throw new IllegalArgumentException("Direction:" + vhd.getDirection() + " not supported");
 			}
-			for (HDLVariable var : vhd.getVariables()) {
+			for (HDLVariable var : vhd.getVariables())
 				if (vhd.getDirection() == HDLDirection.PARAMETER) {
 					HDLExpression defaultValue = var.getDefaultValue();
 					String init = "";
@@ -209,7 +210,6 @@ public class BusGenSideFiles {
 				} else {
 					ports.append("PORT ").append(var.getName()).append(type).append('\n');
 				}
-			}
 		}
 		for (int i = 0; i < memCount; i++) {
 			generics.append("PARAMETER C_MEM" + i + "_BASEADDR = 0xffffffff, DT = std_logic_vector, PAIR = C_MEM" + i + "_HIGHADDR, ADDRESS = BASE, BUS = SPLB");

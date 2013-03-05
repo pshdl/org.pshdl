@@ -66,11 +66,10 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	public static void copyMetaData(IHDLObject src, IHDLObject target, boolean all) {
 		Map<MetaAccess<?>, Object> srcMeta = ((HDLObject) src).metaData;
 		Map<MetaAccess<?>, Object> targetMeta = ((HDLObject) target).metaData;
-		for (Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet()) {
+		for (Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet())
 			if (all || entry.getKey().inherit()) {
 				targetMeta.put(entry.getKey(), entry.getValue());
 			}
-		}
 	}
 
 	@Override
@@ -254,11 +253,10 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 			return (T[]) Array.newInstance(clazz.clazz, 0);
 		if (deep == false) {
 			LinkedList<IHDLObject> res = new LinkedList<IHDLObject>();
-			for (IHDLObject ihdlObject : list) {
+			for (IHDLObject ihdlObject : list)
 				if (ihdlObject.getContainer() == this) {
 					res.add(ihdlObject);
 				}
-			}
 			return res.toArray((T[]) Array.newInstance(clazz.clazz, res.size()));
 		}
 		// T[] res = (T[]) Array.newInstance(clazz.clazz, list.length);
@@ -284,12 +282,11 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 		Set<T> list = new NonSameList<T>();
 		for (T t : allObjectsOf) {
 			K value = field.getValue(t);
-			for (Predicate<K> predicate : matcher) {
+			for (Predicate<K> predicate : matcher)
 				if (predicate.apply(value)) {
 					list.add(t);
 					break;
 				}
-			}
 		}
 		return list;
 	}

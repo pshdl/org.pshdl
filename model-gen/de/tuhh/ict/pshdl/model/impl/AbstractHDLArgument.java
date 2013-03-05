@@ -32,7 +32,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 			expression = validateExpression(expression);
 		}
 		if (expression != null) {
-			this.expression = (HDLExpression) expression;
+			this.expression = expression;
 		} else {
 			this.expression = null;
 		}
@@ -86,6 +86,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLArgument copy() {
 		HDLArgument newObject = new HDLArgument(null, name, expression, false);
@@ -98,6 +99,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLArgument copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
@@ -110,6 +112,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLArgument copyDeepFrozen(IHDLObject container) {
 		HDLArgument copy = copyFiltered(CopyFilter.DEEP_META);
@@ -126,8 +129,9 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * @return the same instance of {@link HDLArgument} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLArgument setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLArgument setContainer(@Nullable IHDLObject container) {
 		return (HDLArgument) super.setContainer(container);
 	}
 
@@ -140,8 +144,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * @return a new instance of {@link HDLArgument} with the updated name
 	 *         field.
 	 */
-	public @Nonnull
-	HDLArgument setName(@Nonnull String name) {
+	@Nonnull
+	public HDLArgument setName(@Nonnull String name) {
 		name = validateName(name);
 		HDLArgument res = new HDLArgument(container, name, expression, false);
 		return res;
@@ -156,8 +160,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * @return a new instance of {@link HDLArgument} with the updated expression
 	 *         field.
 	 */
-	public @Nonnull
-	HDLArgument setExpression(@Nonnull HDLExpression expression) {
+	@Nonnull
+	public HDLArgument setExpression(@Nonnull HDLExpression expression) {
 		expression = validateExpression(expression);
 		HDLArgument res = new HDLArgument(container, name, expression, false);
 		return res;
@@ -201,6 +205,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -214,6 +219,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateName(getName());
@@ -223,6 +229,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLArgument, HDLClass.HDLObject);
 	}

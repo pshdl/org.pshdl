@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import de.tuhh.ict.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
@@ -63,7 +65,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 			resetValue = validateResetValue(resetValue);
 		}
 		if (resetValue != null) {
-			this.resetValue = (HDLExpression) resetValue;
+			this.resetValue = resetValue;
 		} else {
 			this.resetValue = null;
 		}
@@ -82,7 +84,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	protected final HDLQualifiedName clk;
 
 	@Nullable
-	public HDLVariable resolveClk() {
+	public Optional<HDLVariable> resolveClk() {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
 		return ScopingExtension.INST.resolveVariable(this, clk);
@@ -101,7 +103,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	protected final HDLQualifiedName rst;
 
 	@Nullable
-	public HDLVariable resolveRst() {
+	public Optional<HDLVariable> resolveRst() {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
 		return ScopingExtension.INST.resolveVariable(this, rst);
@@ -189,6 +191,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLRegisterConfig copy() {
 		HDLRegisterConfig newObject = new HDLRegisterConfig(null, clk, rst, clockType, resetType, syncType, resetValue, false);
@@ -201,6 +204,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLRegisterConfig copyFiltered(CopyFilter filter) {
 		HDLQualifiedName filteredclk = filter.copyObject("clk", this, clk);
@@ -218,6 +222,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLRegisterConfig copyDeepFrozen(IHDLObject container) {
 		HDLRegisterConfig copy = copyFiltered(CopyFilter.DEEP_META);
@@ -234,8 +239,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return the same instance of {@link HDLRegisterConfig} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLRegisterConfig setContainer(@Nullable IHDLObject container) {
 		return (HDLRegisterConfig) super.setContainer(container);
 	}
 
@@ -248,8 +254,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated clk
 	 *         field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setClk(@Nonnull HDLQualifiedName clk) {
+	@Nonnull
+	public HDLRegisterConfig setClk(@Nonnull HDLQualifiedName clk) {
 		clk = validateClk(clk);
 		HDLRegisterConfig res = new HDLRegisterConfig(container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
@@ -264,8 +270,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated rst
 	 *         field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setRst(@Nonnull HDLQualifiedName rst) {
+	@Nonnull
+	public HDLRegisterConfig setRst(@Nonnull HDLQualifiedName rst) {
 		rst = validateRst(rst);
 		HDLRegisterConfig res = new HDLRegisterConfig(container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
@@ -280,8 +286,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated
 	 *         clockType field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setClockType(@Nullable HDLRegClockType clockType) {
+	@Nonnull
+	public HDLRegisterConfig setClockType(@Nullable HDLRegClockType clockType) {
 		clockType = validateClockType(clockType);
 		HDLRegisterConfig res = new HDLRegisterConfig(container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
@@ -296,8 +302,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated
 	 *         resetType field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setResetType(@Nullable HDLRegResetActiveType resetType) {
+	@Nonnull
+	public HDLRegisterConfig setResetType(@Nullable HDLRegResetActiveType resetType) {
 		resetType = validateResetType(resetType);
 		HDLRegisterConfig res = new HDLRegisterConfig(container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
@@ -312,8 +318,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated
 	 *         syncType field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setSyncType(@Nullable HDLRegSyncType syncType) {
+	@Nonnull
+	public HDLRegisterConfig setSyncType(@Nullable HDLRegSyncType syncType) {
 		syncType = validateSyncType(syncType);
 		HDLRegisterConfig res = new HDLRegisterConfig(container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
@@ -328,8 +334,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated
 	 *         resetValue field.
 	 */
-	public @Nonnull
-	HDLRegisterConfig setResetValue(@Nonnull HDLExpression resetValue) {
+	@Nonnull
+	public HDLRegisterConfig setResetValue(@Nonnull HDLExpression resetValue) {
 		resetValue = validateResetValue(resetValue);
 		HDLRegisterConfig res = new HDLRegisterConfig(container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
@@ -397,6 +403,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -422,6 +429,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateClk(getClkRefName());
@@ -441,6 +449,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLRegisterConfig, HDLClass.HDLObject);
 	}

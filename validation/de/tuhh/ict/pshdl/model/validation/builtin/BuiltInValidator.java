@@ -103,7 +103,7 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hvd : hvds) {
+		for (HDLVariableDeclaration hvd : hvds)
 			if (hvd.getRegister() != null) {
 				switch (hvd.getDirection()) {
 				case CONSTANT:
@@ -119,7 +119,6 @@ public class BuiltInValidator implements IHDLValidator {
 					problems.add(new Problem(ErrorCode.GLOBAL_CANT_REGISTER, hvd));
 				}
 			}
-		}
 	}
 
 	private void checkRangeDirections(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
@@ -127,10 +126,12 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLRange hdlRange : ranges) {
 			// If it is a single range, there is no direction :)
 			HDLExpression from = hdlRange.getFrom();
-			if (from == null)
+			if (from == null) {
 				continue;
-			if (skipExp(hdlRange))
+			}
+			if (skipExp(hdlRange)) {
 				continue;
+			}
 			HDLEvaluationContext context = getContext(hContext, hdlRange);
 			// For loop ranges are up to
 			Optional<Range<BigInteger>> fromRangeOf = RangeExtension.rangeOf(from, context);
@@ -152,10 +153,8 @@ public class BuiltInValidator implements IHDLValidator {
 				if (fromRangeOf.get().upperEndpoint().compareTo(toRangeOf.get().lowerEndpoint()) > 0) {
 					problems.add(new Problem(ErrorCode.RANGE_NOT_UP, hdlRange));
 				}
-			} else {
-				if (toRangeOf.get().lowerEndpoint().compareTo(fromRangeOf.get().upperEndpoint()) > 0) {
-					problems.add(new Problem(ErrorCode.RANGE_NOT_DOWN, hdlRange));
-				}
+			} else if (toRangeOf.get().lowerEndpoint().compareTo(fromRangeOf.get().upperEndpoint()) > 0) {
+				problems.add(new Problem(ErrorCode.RANGE_NOT_DOWN, hdlRange));
 			}
 		}
 	}
@@ -163,23 +162,27 @@ public class BuiltInValidator implements IHDLValidator {
 	private void checkBitAcces(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariableRef[] refs = pkg.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			if (skipExp(ref))
+			if (skipExp(ref)) {
 				continue;
+			}
 			if (ref.getBits().size() != 0) {
-				Optional<? extends HDLType> varType = TypeExtension.typeOf(ref.resolveVar());
-				if (!varType.isPresent()) {
-					// Don't know type, do nothing then..
-				} else if (!(varType.get() instanceof HDLPrimitive)) {
-					problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType.get()));
-				} else {
-					HDLPrimitive primitive = (HDLPrimitive) varType.get();
-					switch (primitive.getType()) {
-					case BITVECTOR:
-					case INT:
-					case UINT:
-						break;
-					default:
-						problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
+				Optional<HDLVariable> resolveVar = ref.resolveVar();
+				if (resolveVar.isPresent()) {
+					Optional<? extends HDLType> varType = TypeExtension.typeOf(resolveVar.get());
+					if (!varType.isPresent()) {
+						// Don't know type, do nothing then..
+					} else if (!(varType.get() instanceof HDLPrimitive)) {
+						problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType.get()));
+					} else {
+						HDLPrimitive primitive = (HDLPrimitive) varType.get();
+						switch (primitive.getType()) {
+						case BITVECTOR:
+						case INT:
+						case UINT:
+							break;
+						default:
+							problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
+						}
 					}
 				}
 			}
@@ -192,49 +195,53 @@ public class BuiltInValidator implements IHDLValidator {
 			IHDLObject container = fragment.getContainer();
 			if ((container instanceof HDLUnresolvedFragment)) {
 				HDLUnresolvedFragment contFrag = (HDLUnresolvedFragment) container;
-				if (contFrag.getSub() == fragment)
+				if (contFrag.getSub() == fragment) {
 					continue;
+				}
 			}
 			problems.add(new Problem(ErrorCode.UNRESOLVED_FRAGMENT, fragment));
 		}
 		HDLResolvedRef[] refs = pkg.getAllObjectsOf(HDLResolvedRef.class, true);
 		for (HDLResolvedRef ref : refs) {
-			HDLVariable resolveVar = ref.resolveVar();
-			if (resolveVar == null) {
+			Optional<HDLVariable> resolveVar = ref.resolveVar();
+			if (!resolveVar.isPresent()) {
 				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, ref));
 			}
 			if (ref instanceof HDLEnumRef) {
 				HDLEnumRef enumRef = (HDLEnumRef) ref;
-				HDLEnum resolveHEnum = enumRef.resolveHEnum();
-				if (resolveHEnum == null) {
+				Optional<HDLEnum> resolveHEnum = enumRef.resolveHEnum();
+				if (!resolveHEnum.isPresent()) {
 					problems.add(new Problem(ErrorCode.UNRESOLVED_ENUM, ref));
 				}
 			}
 			if (ref instanceof HDLInterfaceRef) {
 				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-				HDLVariable hIf = hir.resolveHIf();
-				if (hIf == null) {
+				Optional<HDLVariable> hIf = hir.resolveHIf();
+				if (!hIf.isPresent()) {
 					problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, ref));
 				}
 			}
 		}
 		HDLFunctionCall[] functionCalls = pkg.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (HDLFunctionCall call : functionCalls) {
-			HDLFunction function = call.resolveName();
-			if (function == null)
+			Optional<HDLFunction> function = call.resolveName();
+			if (!function.isPresent()) {
 				problems.add(new Problem(ErrorCode.UNRESOLVED_FUNCTION, call));
+			}
 		}
 		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : hvds) {
-			HDLType type = hvd.resolveType();
-			if (type == null)
+			Optional<? extends HDLType> type = hvd.resolveType();
+			if (!type.isPresent()) {
 				problems.add(new Problem(ErrorCode.UNRESOLVED_TYPE, hvd));
+			}
 		}
 		HDLInterfaceInstantiation[] hiis = pkg.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hii : hiis) {
-			HDLType type = hii.resolveHIf();
-			if (type == null)
+			Optional<HDLInterface> type = hii.resolveHIf();
+			if (!type.isPresent()) {
 				problems.add(new Problem(ErrorCode.UNRESOLVED_INTERFACE, hii));
+			}
 		}
 		HDLRegisterConfig[] regs = pkg.getAllObjectsOf(HDLRegisterConfig.class, true);
 		for (HDLRegisterConfig reg : regs) {
@@ -250,18 +257,18 @@ public class BuiltInValidator implements IHDLValidator {
 	private void checkAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLAssignment[] asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : asss) {
-			if (skipExp(ass))
+			if (skipExp(ass)) {
 				continue;
+			}
 			HDLEvaluationContext context = getContext(hContext, ass);
 			checkAss(ass, ass.getLeft(), ass.getRight(), problems, context);
 		}
 		HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
-		for (HDLVariable hdlVariable : vars) {
+		for (HDLVariable hdlVariable : vars)
 			if (hdlVariable.getDefaultValue() != null) {
 				HDLEvaluationContext context = getContext(hContext, hdlVariable);
 				checkAss(hdlVariable, hdlVariable, hdlVariable.getDefaultValue(), problems, context);
 			}
-		}
 	}
 
 	private void checkAss(IHDLObject obj, IHDLObject leftRef, HDLExpression rightExp, Set<Problem> problems, HDLEvaluationContext context) {
@@ -271,8 +278,9 @@ public class BuiltInValidator implements IHDLValidator {
 			return;
 		switch (lType.get().getClassType()) {
 		case HDLEnum:
-			if (rType.get().getClassType() != HDLClass.HDLEnum)
+			if (rType.get().getClassType() != HDLClass.HDLEnum) {
 				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_ENUM, obj));
+			}
 			break;
 		case HDLPrimitive:
 			if (rType.get().getClassType() != HDLClass.HDLPrimitive) {
@@ -282,13 +290,13 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLPrimitive right = (HDLPrimitive) rType.get();
 				switch (left.getType()) {
 				case BIT:
-					if (right.getType() != HDLPrimitiveType.BIT) {
+					if (right.getType() != HDLPrimitiveType.BIT)
 						if (right.getWidth() != null) {
 							Optional<BigInteger> w = ConstantEvaluate.valueOf(right.getWidth(), context);
-							if (w.isPresent() && !w.get().equals(BigInteger.ONE))
+							if (w.isPresent() && !w.get().equals(BigInteger.ONE)) {
 								problems.add(new Problem(ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
+							}
 						}
-					}
 					break;
 				case BITVECTOR:
 					break;
@@ -322,7 +330,7 @@ public class BuiltInValidator implements IHDLValidator {
 			ArrayList<HDLExpression> cats = hdlConcat.getCats();
 			for (HDLExpression exp : cats) {
 				Optional<? extends HDLType> type = TypeExtension.typeOf(exp);
-				if (type.isPresent()) {
+				if (type.isPresent())
 					if (type.get() instanceof HDLPrimitive) {
 						HDLPrimitive prim = (HDLPrimitive) type.get();
 						switch (prim.getType()) {
@@ -338,9 +346,9 @@ public class BuiltInValidator implements IHDLValidator {
 							problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, prim));
 							break;
 						}
-					} else
+					} else {
 						problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, type.get()));
-				}
+					}
 			}
 		}
 	}
@@ -353,40 +361,43 @@ public class BuiltInValidator implements IHDLValidator {
 			Set<BigInteger> values = new HashSet<BigInteger>();
 			Set<HDLQualifiedName> enums = new HashSet<HDLQualifiedName>();
 			Optional<? extends HDLType> type = TypeExtension.typeOf(switchStatement.getCaseExp());
-			if (!type.isPresent())
+			if (!type.isPresent()) {
 				continue;
+			}
 			if (type.get() instanceof HDLPrimitive) {
 				HDLPrimitive primitive = (HDLPrimitive) type.get();
-				if (primitive.getWidth() == null)
+				if (primitive.getWidth() == null) {
 					problems.add(new Problem(ErrorCode.SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
+				}
 			}
 			boolean isEnum = type.get() instanceof HDLEnum;
 			for (HDLSwitchCaseStatement caseStatement : cases) {
 				HDLExpression label = caseStatement.getLabel();
 				if (label == null) {
-					if (defaultFound)
+					if (defaultFound) {
 						problems.add(new Problem(ErrorCode.SWITCH_MULTIPLE_DEFAULT, caseStatement));
+					}
 					defaultFound = true;
+				} else if (!isEnum) {
+					Optional<BigInteger> constant = ConstantEvaluate.valueOf(label, null);
+					if (!constant.isPresent()) {
+						problems.add(new Problem(ErrorCode.SWITCH_LABEL_NOT_CONSTANT, caseStatement));
+					} else if (!values.add(constant.get())) {
+						problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
+					}
 				} else {
-					if (!isEnum) {
-						Optional<BigInteger> constant = ConstantEvaluate.valueOf(label, null);
-						if (!constant.isPresent()) {
-							problems.add(new Problem(ErrorCode.SWITCH_LABEL_NOT_CONSTANT, caseStatement));
-						} else {
-							if (!values.add(constant.get()))
-								problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
-						}
-					} else {
-						Optional<? extends HDLType> labelType = TypeExtension.typeOf(label);
-						if (labelType.isPresent() && !type.get().equals(labelType.get()))
-							problems.add(new Problem(ErrorCode.SWITCH_LABEL_WRONG_ENUM, caseStatement));
-						if ((label instanceof HDLEnumRef) && !enums.add(((HDLEnumRef) label).getVarRefName()))
-							problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
+					Optional<? extends HDLType> labelType = TypeExtension.typeOf(label);
+					if (labelType.isPresent() && !type.get().equals(labelType.get())) {
+						problems.add(new Problem(ErrorCode.SWITCH_LABEL_WRONG_ENUM, caseStatement));
+					}
+					if ((label instanceof HDLEnumRef) && !enums.add(((HDLEnumRef) label).getVarRefName())) {
+						problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
 					}
 				}
 			}
-			if (!defaultFound)
+			if (!defaultFound) {
 				problems.add(new Problem(ErrorCode.SWITCH_NO_DEFAULT, switchStatement));
+			}
 		}
 	}
 
@@ -401,10 +412,11 @@ public class BuiltInValidator implements IHDLValidator {
 			HDLVariable put = nameMap.put(fullName.toString().toLowerCase(), hdlVariable);
 			if (put != null) {
 				HDLQualifiedName otherName = fullNameOf(put);
-				if (otherName.equals(fullName))
+				if (otherName.equals(fullName)) {
 					problems.add(new Problem(ErrorCode.VARIABLE_SAME_NAME, hdlVariable, put));
-				else
+				} else {
 					problems.add(new Problem(ErrorCode.VARIABLE_SAME_NAME_DIFFERENT_CASE, hdlVariable, put));
+				}
 			}
 		}
 		for (Entry<String, HDLVariable> entry : nameMap.entrySet()) {
@@ -419,10 +431,11 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLVariable otherVar = nameMap.get(newName.toString().toLowerCase());
 				if (otherVar != null) {
 					HDLQualifiedName otherName = fullNameOf(otherVar);
-					if (otherName.equals(newName))
+					if (otherName.equals(newName)) {
 						problems.add(new Problem(ErrorCode.VARIABLE_SCOPE_SAME_NAME, var, otherVar));
-					else
+					} else {
 						problems.add(new Problem(ErrorCode.VARIABLE_SCOPE_SAME_NAME_DIFFERENT_CASE, var, otherVar));
+					}
 				}
 			}
 		}
@@ -441,9 +454,10 @@ public class BuiltInValidator implements IHDLValidator {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
 			if (info == null) {
 				try {
-					HDLFunction f = function.resolveName();
-					if (f == null)
+					Optional<HDLFunction> f = function.resolveName();
+					if (!f.isPresent()) {
 						problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+					}
 				} catch (Exception e) {
 					problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
 				}
@@ -453,18 +467,18 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private static void checkProessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
-		for (HDLVariable var : vars) {
+		for (HDLVariable var : vars)
 			if (var.hasMeta(RWValidation.BlockMetaClash.clash)) {
 				problems.add(new Problem(ErrorCode.MULTI_PROCESS_WRITE, var));
 			}
-		}
 	}
 
 	private static void checkType(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLOpExpression[] ops = unit.getAllObjectsOf(HDLOpExpression.class, true);
 		for (HDLOpExpression ope : ops) {
-			if (skipExp(ope))
+			if (skipExp(ope)) {
 				continue;
+			}
 			HDLTypeInferenceInfo info = null;
 			switch (ope.getClassType()) {
 			case HDLArithOp:
@@ -484,8 +498,9 @@ public class BuiltInValidator implements IHDLValidator {
 			}
 			if (info == null)
 				throw new IllegalArgumentException("Info should not be null");
-			if (info.error != null)
+			if (info.error != null) {
 				problems.add(new Problem(ErrorCode.UNSUPPORTED_TYPE_FOR_OP, ope, info.error));
+			}
 		}
 	}
 
@@ -503,11 +518,10 @@ public class BuiltInValidator implements IHDLValidator {
 		Collection<HDLAssignment> all = HDLQuery.select(HDLAssignment.class).from(unit).where(HDLAssignment.fType).isNotEqualTo(HDLAssignment.HDLAssignmentType.ASSGN).getAll();
 		for (HDLAssignment ass : all) {
 			HDLReference ref = ass.getLeft();
-			if (ref instanceof HDLUnresolvedFragment) {
+			if (ref instanceof HDLUnresolvedFragment)
 				return;
-			}
-			HDLVariable var = ((HDLResolvedRef) ref).resolveVar();
-			if ((var != null) && (var.getRegisterConfig() == null)) {
+			Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
+			if ((var.isPresent()) && (var.get().getRegisterConfig() == null)) {
 				problems.add(new Problem(ErrorCode.COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
 			}
 		}
@@ -516,15 +530,16 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkConstantEquals(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLEqualityOp[] equalities = unit.getAllObjectsOf(HDLEqualityOp.class, true);
 		for (HDLEqualityOp op : equalities) {
-			if (skipExp(op))
+			if (skipExp(op)) {
 				continue;
-			Optional<BigInteger> res = ConstantEvaluate.valueOf(op, getContext(hContext, op));
-			if (res.isPresent()) {
-				if (res.get().equals(BigInteger.ONE))
-					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_TRUE, op));
-				else
-					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_FALSE, op));
 			}
+			Optional<BigInteger> res = ConstantEvaluate.valueOf(op, getContext(hContext, op));
+			if (res.isPresent())
+				if (res.get().equals(BigInteger.ONE)) {
+					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_TRUE, op));
+				} else {
+					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_FALSE, op));
+				}
 		}
 	}
 
@@ -540,19 +555,17 @@ public class BuiltInValidator implements IHDLValidator {
 				.or(isEqualTo(HDLDirection.PARAMETER)) //
 				.getAll();
 		for (HDLVariableDeclaration hvd : constants) {
-			for (HDLVariable var : hvd.getVariables()) {
+			for (HDLVariable var : hvd.getVariables())
 				if (var.getDefaultValue() == null) {
 					problems.add(new Problem(ErrorCode.CONSTANT_NEED_DEFAULTVALUE, var));
 				} else {
 					HDLExpression def = var.getDefaultValue();
 					Optional<BigInteger> constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
-					if (!constant.isPresent()) {
-						if (!(def instanceof HDLLiteral))
+					if (!constant.isPresent())
+						if (!(def instanceof HDLLiteral)) {
 							problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
-
-					}
+						}
 				}
-			}
 		}
 		HDLForLoop[] forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop hdlForLoop : forLoops) {
@@ -574,17 +587,19 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariableRef[] refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
-			if (skipExp(ref))
+			if (skipExp(ref)) {
 				continue;
-			HDLVariable resolveVar = ref.resolveVar();
-			if (resolveVar != null) {
-				ArrayList<HDLExpression> dimensions = resolveVar.getDimensions();
+			}
+			Optional<HDLVariable> resolveVar = ref.resolveVar();
+			if (resolveVar.isPresent()) {
+				ArrayList<HDLExpression> dimensions = resolveVar.get().getDimensions();
 				compareBoundaries(problems, hContext, ref, dimensions, ref.getArray());
 				if (ref instanceof HDLInterfaceRef) {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-					HDLVariable var = hir.resolveHIf();
-					if (var != null)
-						compareBoundaries(problems, hContext, ref, var.getDimensions(), hir.getIfArray());
+					Optional<HDLVariable> var = hir.resolveHIf();
+					if (var.isPresent()) {
+						compareBoundaries(problems, hContext, ref, var.get().getDimensions(), hir.getIfArray());
+					}
 				}
 			}
 		}
@@ -619,9 +634,9 @@ public class BuiltInValidator implements IHDLValidator {
 					problems.add(new Problem(ErrorCode.ASSIGNMENT_ENUM_NOT_WRITABLE, left));
 				} else {
 					HDLVariableRef varRef = (HDLVariableRef) left;
-					HDLVariable var = varRef.resolveVar();
-					if (var != null) {
-						ArrayList<HDLExpression> targetDim = var.getDimensions();
+					Optional<HDLVariable> var = varRef.resolveVar();
+					if (var.isPresent()) {
+						ArrayList<HDLExpression> targetDim = var.get().getDimensions();
 						for (int i = 0; i < varRef.getArray().size(); i++) {
 							if (targetDim.size() == 0) {
 								problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, varRef));
@@ -631,18 +646,17 @@ public class BuiltInValidator implements IHDLValidator {
 						}
 						if (left != ref) {
 							validateArrayAssignment(problems, hContext, ref, ass, left, targetDim);
-						} else {
-							if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
-								problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
-							}
+						} else if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
+							problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
 						}
 					}
 				}
 			} else if (container instanceof HDLVariable) {
 				HDLVariable var = (HDLVariable) container;
 				validateArrayAssignment(problems, hContext, ref, var, var, var.getDimensions());
-			} else
+			} else {
 				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION, ref));
+			}
 		}
 		int dim = 0;
 		for (HDLExpression arr : array) {
@@ -662,14 +676,16 @@ public class BuiltInValidator implements IHDLValidator {
 			BigInteger upperEndpoint = arrayRange.upperEndpoint();
 			arrayRange = Ranges.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
 			String info = "Expected value range:" + accessRange;
-			if (accessRange.upperEndpoint().signum() < 0)
+			if (accessRange.upperEndpoint().signum() < 0) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			else if (accessRange.lowerEndpoint().signum() < 0)
+			} else if (accessRange.lowerEndpoint().signum() < 0) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			if (!arrayRange.isConnected(accessRange))
+			}
+			if (!arrayRange.isConnected(accessRange)) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			else if (accessRange.upperEndpoint().compareTo(upperEndpoint) > 0)
+			} else if (accessRange.upperEndpoint().compareTo(upperEndpoint) > 0) {
 				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
+			}
 
 			dim++;
 		}
@@ -677,10 +693,10 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private static void validateArrayAssignment(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, IHDLObject ass, IHDLObject left,
 			ArrayList<HDLExpression> targetDim) {
-		HDLVariable right = ref.resolveVar();
-		if (right == null)
+		Optional<HDLVariable> right = ref.resolveVar();
+		if (!right.isPresent())
 			return;
-		ArrayList<HDLExpression> sourceDim = right.getDimensions();
+		ArrayList<HDLExpression> sourceDim = right.get().getDimensions();
 		for (int i = 0; i < ref.getArray().size(); i++) {
 			if (sourceDim.size() == 0) {
 				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
@@ -688,9 +704,9 @@ public class BuiltInValidator implements IHDLValidator {
 			}
 			sourceDim.remove(0);
 		}
-		if (targetDim.size() != sourceDim.size())
+		if (targetDim.size() != sourceDim.size()) {
 			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ass));
-		else {
+		} else {
 			HDLEvaluationContext context = getContext(hContext, ass);
 			for (int i = 0; i < targetDim.size(); i++) {
 				HDLExpression target = targetDim.get(i);
@@ -698,16 +714,15 @@ public class BuiltInValidator implements IHDLValidator {
 				Optional<BigInteger> t = ConstantEvaluate.valueOf(target, context);
 				Optional<BigInteger> s = ConstantEvaluate.valueOf(source, context);
 				if (!s.isPresent()) {
-					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, right));
+					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, right.get()));
 				}
 				if (!t.isPresent()) {
 					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, left));
 				}
-				if ((t != null) && (s != null)) {
+				if ((t != null) && (s != null))
 					if (!s.equals(t)) {
 						problems.add(new Problem(ErrorCode.ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS, ass));
 					}
-				}
 			}
 		}
 	}
@@ -722,15 +737,17 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private static void checkClockAndResetAnnotation(HDLPackage unit, Set<Problem> problems) {
 		Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.clock.toString()).getAll();
-		if (clocks.size() > 1)
+		if (clocks.size() > 1) {
 			for (HDLAnnotation anno : clocks) {
 				problems.add(new Problem(ErrorCode.ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
 			}
+		}
 		Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.reset.toString()).getAll();
-		if (resets.size() > 1)
+		if (resets.size() > 1) {
 			for (HDLAnnotation anno : resets) {
 				problems.add(new Problem(ErrorCode.ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));
 			}
+		}
 	}
 
 	@Override

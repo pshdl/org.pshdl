@@ -78,6 +78,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLLiteral copy() {
 		HDLLiteral newObject = new HDLLiteral(null, val, str, false);
@@ -90,6 +91,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLLiteral copyFiltered(CopyFilter filter) {
 		String filteredval = filter.copyObject("val", this, val);
@@ -102,6 +104,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLLiteral copyDeepFrozen(IHDLObject container) {
 		HDLLiteral copy = copyFiltered(CopyFilter.DEEP_META);
@@ -118,8 +121,9 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * @return the same instance of {@link HDLLiteral} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLLiteral setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLLiteral setContainer(@Nullable IHDLObject container) {
 		return (HDLLiteral) super.setContainer(container);
 	}
 
@@ -131,8 +135,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 *            <code>null</code>.
 	 * @return a new instance of {@link HDLLiteral} with the updated val field.
 	 */
-	public @Nonnull
-	HDLLiteral setVal(@Nonnull String val) {
+	@Nonnull
+	public HDLLiteral setVal(@Nonnull String val) {
 		val = validateVal(val);
 		HDLLiteral res = new HDLLiteral(container, val, str, false);
 		return res;
@@ -145,8 +149,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 *            sets the new str of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLLiteral} with the updated str field.
 	 */
-	public @Nonnull
-	HDLLiteral setStr(@Nullable Boolean str) {
+	@Nonnull
+	public HDLLiteral setStr(@Nullable Boolean str) {
 		str = validateStr(str);
 		HDLLiteral res = new HDLLiteral(container, val, str, false);
 		return res;
@@ -159,8 +163,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 *            sets the new str of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLLiteral} with the updated str field.
 	 */
-	public @Nonnull
-	HDLLiteral setStr(boolean str) {
+	@Nonnull
+	public HDLLiteral setStr(boolean str) {
 		str = validateStr(str);
 		HDLLiteral res = new HDLLiteral(container, val, str, false);
 		return res;
@@ -204,6 +208,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -217,12 +222,14 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateVal(getVal());
 		validateStr(getStr());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLLiteral, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

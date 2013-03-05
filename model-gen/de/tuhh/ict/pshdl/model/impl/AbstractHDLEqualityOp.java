@@ -44,6 +44,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * 
 	 * @return the field
 	 */
+	@Override
 	public @Nonnull
 	HDLEqualityOpType getType() {
 		return type;
@@ -60,6 +61,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLEqualityOp copy() {
 		HDLEqualityOp newObject = new HDLEqualityOp(null, left, right, type, false);
@@ -72,6 +74,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLEqualityOp copyFiltered(CopyFilter filter) {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
@@ -85,6 +88,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLEqualityOp copyDeepFrozen(IHDLObject container) {
 		HDLEqualityOp copy = copyFiltered(CopyFilter.DEEP_META);
@@ -101,8 +105,9 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * @return the same instance of {@link HDLEqualityOp} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLEqualityOp setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLEqualityOp setContainer(@Nullable IHDLObject container) {
 		return (HDLEqualityOp) super.setContainer(container);
 	}
 
@@ -115,8 +120,9 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * @return a new instance of {@link HDLEqualityOp} with the updated left
 	 *         field.
 	 */
-	public @Nonnull
-	HDLEqualityOp setLeft(@Nonnull HDLExpression left) {
+	@Override
+	@Nonnull
+	public HDLEqualityOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
 		HDLEqualityOp res = new HDLEqualityOp(container, left, right, type, false);
 		return res;
@@ -131,8 +137,9 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * @return a new instance of {@link HDLEqualityOp} with the updated right
 	 *         field.
 	 */
-	public @Nonnull
-	HDLEqualityOp setRight(@Nonnull HDLExpression right) {
+	@Override
+	@Nonnull
+	public HDLEqualityOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
 		HDLEqualityOp res = new HDLEqualityOp(container, left, right, type, false);
 		return res;
@@ -147,8 +154,8 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * @return a new instance of {@link HDLEqualityOp} with the updated type
 	 *         field.
 	 */
-	public @Nonnull
-	HDLEqualityOp setType(@Nonnull HDLEqualityOpType type) {
+	@Nonnull
+	public HDLEqualityOp setType(@Nonnull HDLEqualityOpType type) {
 		type = validateType(type);
 		HDLEqualityOp res = new HDLEqualityOp(container, left, right, type, false);
 		return res;
@@ -186,6 +193,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -202,11 +210,13 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateType(getType());
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLEqualityOp, HDLClass.HDLOpExpression, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

@@ -28,7 +28,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 			caseExp = validateCaseExp(caseExp);
 		}
 		if (caseExp != null) {
-			this.caseExp = (HDLExpression) caseExp;
+			this.caseExp = caseExp;
 		} else {
 			this.caseExp = null;
 		}
@@ -38,7 +38,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 		this.cases = new ArrayList<HDLSwitchCaseStatement>();
 		if (cases != null) {
 			for (HDLSwitchCaseStatement newValue : cases) {
-				this.cases.add((HDLSwitchCaseStatement) newValue);
+				this.cases.add(newValue);
 			}
 		}
 	}
@@ -92,6 +92,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLSwitchStatement copy() {
 		HDLSwitchStatement newObject = new HDLSwitchStatement(null, caseExp, cases, false);
@@ -104,6 +105,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLSwitchStatement copyFiltered(CopyFilter filter) {
 		HDLExpression filteredcaseExp = filter.copyObject("caseExp", this, caseExp);
@@ -116,6 +118,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLSwitchStatement copyDeepFrozen(IHDLObject container) {
 		HDLSwitchStatement copy = copyFiltered(CopyFilter.DEEP_META);
@@ -132,8 +135,9 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @return the same instance of {@link HDLSwitchStatement} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLSwitchStatement setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLSwitchStatement setContainer(@Nullable IHDLObject container) {
 		return (HDLSwitchStatement) super.setContainer(container);
 	}
 
@@ -146,8 +150,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLSwitchStatement} with the updated
 	 *         caseExp field.
 	 */
-	public @Nonnull
-	HDLSwitchStatement setCaseExp(@Nonnull HDLExpression caseExp) {
+	@Nonnull
+	public HDLSwitchStatement setCaseExp(@Nonnull HDLExpression caseExp) {
 		caseExp = validateCaseExp(caseExp);
 		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
 		return res;
@@ -161,8 +165,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLSwitchStatement} with the updated
 	 *         cases field.
 	 */
-	public @Nonnull
-	HDLSwitchStatement setCases(@Nullable ArrayList<HDLSwitchCaseStatement> cases) {
+	@Nonnull
+	public HDLSwitchStatement setCases(@Nullable ArrayList<HDLSwitchCaseStatement> cases) {
 		cases = validateCases(cases);
 		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
 		return res;
@@ -177,8 +181,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLSwitchStatement} with the updated
 	 *         cases field.
 	 */
-	public @Nonnull
-	HDLSwitchStatement addCases(@Nullable HDLSwitchCaseStatement newCases) {
+	@Nonnull
+	public HDLSwitchStatement addCases(@Nullable HDLSwitchCaseStatement newCases) {
 		if (newCases == null)
 			throw new IllegalArgumentException("Element of cases can not be null!");
 		ArrayList<HDLSwitchCaseStatement> cases = (ArrayList<HDLSwitchCaseStatement>) this.cases.clone();
@@ -196,8 +200,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLSwitchStatement} with the updated
 	 *         cases field.
 	 */
-	public @Nonnull
-	HDLSwitchStatement removeCases(@Nullable HDLSwitchCaseStatement newCases) {
+	@Nonnull
+	public HDLSwitchStatement removeCases(@Nullable HDLSwitchCaseStatement newCases) {
 		if (newCases == null)
 			throw new IllegalArgumentException("Removed element of cases can not be null!");
 		ArrayList<HDLSwitchCaseStatement> cases = (ArrayList<HDLSwitchCaseStatement>) this.cases.clone();
@@ -215,8 +219,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLSwitchStatement} with the updated
 	 *         cases field.
 	 */
-	public @Nonnull
-	HDLSwitchStatement removeCases(int idx) {
+	@Nonnull
+	public HDLSwitchStatement removeCases(int idx) {
 		ArrayList<HDLSwitchCaseStatement> cases = (ArrayList<HDLSwitchCaseStatement>) this.cases.clone();
 		cases.remove(idx);
 		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
@@ -261,6 +265,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -268,7 +273,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 		if (caseExp != null) {
 			sb.append(".setCaseExp(").append(caseExp.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (cases != null) {
+		if (cases != null)
 			if (cases.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLSwitchCaseStatement o : cases) {
@@ -276,10 +281,10 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateCaseExp(getCaseExp());
@@ -294,6 +299,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLSwitchStatement, HDLClass.HDLCompound, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

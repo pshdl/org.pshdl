@@ -60,10 +60,8 @@ public class VHDLCastsLibrary {
 		PACKAGE = new PackageDeclaration("pshdl.Casts");
 		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
 		HDLPrimitiveType[] values = HDLPrimitiveType.values();
-		for (int i = 0; i < values.length; i++) {
-			HDLPrimitiveType left = values[i];
-			for (int j = 0; j < values.length; j++) {
-				HDLPrimitiveType right = values[j];
+		for (HDLPrimitiveType left : values) {
+			for (HDLPrimitiveType right : values) {
 				if (right == left) {
 					continue;
 				}
@@ -167,9 +165,8 @@ public class VHDLCastsLibrary {
 			Optional<BigInteger> bt = ConstantEvaluate.valueOf(actualType.getWidth(), null);
 			if (bt.isPresent()) {
 				Optional<BigInteger> btw = ConstantEvaluate.valueOf(tWidth, null);
-				if (btw.isPresent() && bt.get().equals(btw.get())) {
+				if (btw.isPresent() && bt.get().equals(btw.get()))
 					return new TargetType(exp, actualType.getType());
-				}
 			}
 		}
 		Expression<?> width = VHDLExpressionExtension.vhdlOf(tWidth);
@@ -213,8 +210,9 @@ public class VHDLCastsLibrary {
 			return VHDLExpressionExtension.vhdlOf(lit);
 		BigInteger val = lit.getValueAsBigInt();
 		Optional<BigInteger> width = null;
-		if (tWidth != null)
+		if (tWidth != null) {
 			width = ConstantEvaluate.valueOf(tWidth, null);
+		}
 		switch (targetType.getType()) {
 		case BIT:
 			if (BigInteger.ZERO.equals(val))

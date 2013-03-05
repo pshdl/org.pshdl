@@ -94,7 +94,8 @@ public class SimulationTransformationExtension {
     if (_notEquals_1) {
       HDLRegisterConfig _normalize = config.normalize();
       config = _normalize;
-      final HDLVariable clk = config.resolveClk();
+      Optional<HDLVariable> _resolveClk = config.resolveClk();
+      final HDLVariable clk = _resolveClk.get();
       HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(clk);
       final String name = _fullNameOf.toString();
       HDLRegClockType _clockType = config.getClockType();
@@ -128,14 +129,16 @@ public class SimulationTransformationExtension {
       RuntimeException _runtimeException = new RuntimeException("Can not use unresolved fragments");
       throw _runtimeException;
     }
-    return ((HDLResolvedRef) reference).resolveVar();
+    Optional<HDLVariable> _resolveVar = ((HDLResolvedRef) reference).resolveVar();
+    return _resolveVar.get();
   }
   
   public static String getVarName(final HDLVariableRef hVar, final boolean withBits) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
-    HDLVariable _resolveVar = hVar.resolveVar();
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(_resolveVar);
+    Optional<HDLVariable> _resolveVar = hVar.resolveVar();
+    HDLVariable _get = _resolveVar.get();
+    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(_get);
     sb.append(_fullNameOf);
     ArrayList<HDLExpression> _array = hVar.getArray();
     for (final HDLExpression exp : _array) {
@@ -397,8 +400,9 @@ public class SimulationTransformationExtension {
   protected FluidFrame _toSimulationModel(final HDLVariableRef obj, final HDLEvaluationContext context) {
     FluidFrame _fluidFrame = new FluidFrame();
     final FluidFrame res = _fluidFrame;
-    HDLVariable hVar = obj.resolveVar();
-    HDLQualifiedName _asRef = hVar.asRef();
+    Optional<HDLVariable> hVar = obj.resolveVar();
+    HDLVariable _get = hVar.get();
+    HDLQualifiedName _asRef = _get.asRef();
     final String refName = _asRef.toString();
     ArrayList<HDLRange> _bits = obj.getBits();
     int _size = _bits.size();
@@ -417,7 +421,8 @@ public class SimulationTransformationExtension {
       }
     }
     final String[] arrBits = ((String[])Conversions.unwrapArray(bits, String.class));
-    final HDLDirection dir = hVar.getDirection();
+    HDLVariable _get_1 = hVar.get();
+    final HDLDirection dir = _get_1.getDirection();
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(dir,HDLDirection.INTERNAL)) {
@@ -444,8 +449,8 @@ public class SimulationTransformationExtension {
           IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Const/param should be constant");
           throw _illegalArgumentException;
         }
-        BigInteger _get = bVal.get();
-        res.constants.put(refName, _get);
+        BigInteger _get_2 = bVal.get();
+        res.constants.put(refName, _get_2);
         ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.loadConstant, refName);
         res.instructions.add(_argumentedInstruction_1);
       }

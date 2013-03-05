@@ -77,10 +77,10 @@ class VHDLPackageExtension {
 		
 		val HDLEnumRef[] hRefs=obj.getAllObjectsOf(typeof(HDLEnumRef), true)
 		for (HDLEnumRef hdlEnumRef : hRefs) {
-			val HDLEnum resolveHEnum = hdlEnumRef.resolveHEnum
-			val HDLUnit enumContainer=resolveHEnum.getContainer(typeof(HDLUnit))
+			val resolveHEnum = hdlEnumRef.resolveHEnum
+			val HDLUnit enumContainer=resolveHEnum.get.getContainer(typeof(HDLUnit))
 			if (enumContainer==null || !enumContainer.equals(hdlEnumRef.getContainer(typeof(HDLUnit)))){
-				val HDLQualifiedName type=fullNameOf(resolveHEnum)
+				val HDLQualifiedName type=fullNameOf(resolveHEnum.get)
 				if (!type.getSegment(0).equals("pshdl"))
 					unit.addImport(HDLQualifiedName::create("work",getPackageName(type), "all"))
 			}
@@ -88,10 +88,12 @@ class VHDLPackageExtension {
 		val HDLVariableRef[] vRefs=obj.getAllObjectsOf(typeof(HDLVariableRef), true)
 		for (HDLVariableRef variableRef : vRefs) {
 			if (variableRef.classType!=HDLClass::HDLInterfaceRef){
-				val HDLVariable variable = variableRef.resolveVar
-				val HDLUnit enumContainer=variable.getContainer(typeof(HDLUnit))
+				val variable = variableRef.resolveVar
+				if (!variable.present)
+					throw new IllegalArgumentException("Can not resolve:"+variableRef)
+				val HDLUnit enumContainer=variable.get.getContainer(typeof(HDLUnit))
 				if (enumContainer==null || !enumContainer.equals(variableRef.getContainer(typeof(HDLUnit)))){
-					val HDLQualifiedName type=fullNameOf(variable).skipLast(1)
+					val HDLQualifiedName type=fullNameOf(variable.get).skipLast(1)
 					if (type.length>0 && !type.getSegment(0).equals("pshdl"))
 						unit.addImport(HDLQualifiedName::create("work",getPackageName(type), "all"))
 				}
@@ -189,8 +191,8 @@ class VHDLPackageExtension {
 		for (HDLStatement stmnt : ctx.sensitiveStatements.get(pid)) {
 			val HDLVariableRef[] refs = stmnt.getAllObjectsOf(typeof(HDLVariableRef), true)
 			for (HDLVariableRef ref : refs) {
-				val HDLVariable hvar = ref.resolveVar
-				val IHDLObject container = hvar.container
+				val hvar = ref.resolveVar
+				val IHDLObject container = hvar.get.container
 				if (container instanceof HDLVariableDeclaration) {
 					val HDLVariableDeclaration hdv = container as HDLVariableDeclaration
 					if (!notSensitive.contains(hdv.direction)) {
@@ -215,7 +217,7 @@ class VHDLPackageExtension {
 	def HDLVariable resolveVar(HDLReference reference) {
 		if(reference instanceof HDLUnresolvedFragment)
 			throw new RuntimeException("Can not use unresolved fragments")
-		return (reference as HDLResolvedRef).resolveVar
+		return (reference as HDLResolvedRef).resolveVar.get
 	}
 
 
@@ -261,7 +263,7 @@ class VHDLPackageExtension {
 					val HDLVariableRef[] refs = hvar.getAllObjectsOf(typeof(HDLVariableRef), true)
 					for (HDLVariableRef ref : refs) {
 						//Check which variable declaration contains references and mark those references as the ones that should be declared in a package
-						ref.resolveVar.setMeta(VHDLStatementExtension::EXPORT)
+						ref.resolveVar.get.setMeta(VHDLStatementExtension::EXPORT)
 					}
 					val String origName = hvar.name
 					val String name=VHDLOutputValidator::getVHDLName(origName)

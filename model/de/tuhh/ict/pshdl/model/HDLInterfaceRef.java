@@ -86,11 +86,11 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 
 	@Override
 	@Nullable
-	public HDLVariable resolveVar() {
-		HDLVariable resolveHIf = resolveHIf();
-		if (resolveHIf == null)
-			return null;
-		Optional<? extends HDLType> type = TypeExtension.typeOf(resolveHIf);
+	public Optional<HDLVariable> resolveVar() {
+		Optional<HDLVariable> resolveHIf = resolveHIf();
+		if (!resolveHIf.isPresent())
+			return Optional.absent();
+		Optional<? extends HDLType> type = TypeExtension.typeOf(resolveHIf.get());
 		if (type.isPresent() && (type.get() instanceof HDLInterface)) {
 			HDLInterface hIf = (HDLInterface) type.get();
 			String lastSegment2 = getVarRefName().getLastSegment();
@@ -98,11 +98,11 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 				for (HDLVariable hv : vd.getVariables()) {
 					String lastSegment = hv.getName();
 					if (lastSegment.equals(lastSegment2))
-						return hv;
+						return Optional.of(hv);
 				}
 			}
 		}
-		return null;
+		return Optional.absent();
 	}
 
 	// $CONTENT-END$

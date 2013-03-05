@@ -31,7 +31,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 			ifExp = validateIfExp(ifExp);
 		}
 		if (ifExp != null) {
-			this.ifExp = (HDLExpression) ifExp;
+			this.ifExp = ifExp;
 		} else {
 			this.ifExp = null;
 		}
@@ -41,7 +41,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		this.thenDo = new ArrayList<HDLStatement>();
 		if (thenDo != null) {
 			for (HDLStatement newValue : thenDo) {
-				this.thenDo.add((HDLStatement) newValue);
+				this.thenDo.add(newValue);
 			}
 		}
 		if (validate) {
@@ -50,7 +50,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		this.elseDo = new ArrayList<HDLStatement>();
 		if (elseDo != null) {
 			for (HDLStatement newValue : elseDo) {
-				this.elseDo.add((HDLStatement) newValue);
+				this.elseDo.add(newValue);
 			}
 		}
 	}
@@ -124,6 +124,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLIfStatement copy() {
 		HDLIfStatement newObject = new HDLIfStatement(null, ifExp, thenDo, elseDo, false);
@@ -136,6 +137,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLIfStatement copyFiltered(CopyFilter filter) {
 		HDLExpression filteredifExp = filter.copyObject("ifExp", this, ifExp);
@@ -149,6 +151,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLIfStatement copyDeepFrozen(IHDLObject container) {
 		HDLIfStatement copy = copyFiltered(CopyFilter.DEEP_META);
@@ -165,8 +168,9 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return the same instance of {@link HDLIfStatement} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLIfStatement setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLIfStatement setContainer(@Nullable IHDLObject container) {
 		return (HDLIfStatement) super.setContainer(container);
 	}
 
@@ -179,8 +183,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated ifExp
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement setIfExp(@Nonnull HDLExpression ifExp) {
+	@Nonnull
+	public HDLIfStatement setIfExp(@Nonnull HDLExpression ifExp) {
 		ifExp = validateIfExp(ifExp);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
 		return res;
@@ -194,8 +198,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement setThenDo(@Nullable ArrayList<HDLStatement> thenDo) {
+	@Nonnull
+	public HDLIfStatement setThenDo(@Nullable ArrayList<HDLStatement> thenDo) {
 		thenDo = validateThenDo(thenDo);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
 		return res;
@@ -210,8 +214,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement addThenDo(@Nullable HDLStatement newThenDo) {
+	@Nonnull
+	public HDLIfStatement addThenDo(@Nullable HDLStatement newThenDo) {
 		if (newThenDo == null)
 			throw new IllegalArgumentException("Element of thenDo can not be null!");
 		ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
@@ -229,8 +233,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement removeThenDo(@Nullable HDLStatement newThenDo) {
+	@Nonnull
+	public HDLIfStatement removeThenDo(@Nullable HDLStatement newThenDo) {
 		if (newThenDo == null)
 			throw new IllegalArgumentException("Removed element of thenDo can not be null!");
 		ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
@@ -248,8 +252,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement removeThenDo(int idx) {
+	@Nonnull
+	public HDLIfStatement removeThenDo(int idx) {
 		ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
 		thenDo.remove(idx);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
@@ -264,8 +268,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement setElseDo(@Nullable ArrayList<HDLStatement> elseDo) {
+	@Nonnull
+	public HDLIfStatement setElseDo(@Nullable ArrayList<HDLStatement> elseDo) {
 		elseDo = validateElseDo(elseDo);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
 		return res;
@@ -280,8 +284,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement addElseDo(@Nullable HDLStatement newElseDo) {
+	@Nonnull
+	public HDLIfStatement addElseDo(@Nullable HDLStatement newElseDo) {
 		if (newElseDo == null)
 			throw new IllegalArgumentException("Element of elseDo can not be null!");
 		ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
@@ -299,8 +303,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement removeElseDo(@Nullable HDLStatement newElseDo) {
+	@Nonnull
+	public HDLIfStatement removeElseDo(@Nullable HDLStatement newElseDo) {
 		if (newElseDo == null)
 			throw new IllegalArgumentException("Removed element of elseDo can not be null!");
 		ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
@@ -318,8 +322,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
 	 *         field.
 	 */
-	public @Nonnull
-	HDLIfStatement removeElseDo(int idx) {
+	@Nonnull
+	public HDLIfStatement removeElseDo(int idx) {
 		ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
 		elseDo.remove(idx);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
@@ -370,6 +374,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -377,7 +382,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		if (ifExp != null) {
 			sb.append(".setIfExp(").append(ifExp.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (thenDo != null) {
+		if (thenDo != null)
 			if (thenDo.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : thenDo) {
@@ -385,8 +390,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
-		if (elseDo != null) {
+		if (elseDo != null)
 			if (elseDo.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : elseDo) {
@@ -394,10 +398,10 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateIfExp(getIfExp());
@@ -418,6 +422,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLIfStatement, HDLClass.HDLCompound, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

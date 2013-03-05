@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.extensions.*;
@@ -43,7 +45,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 			register = validateRegister(register);
 		}
 		if (register != null) {
-			this.register = (HDLRegisterConfig) register;
+			this.register = register;
 		} else {
 			this.register = null;
 		}
@@ -59,7 +61,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 			primitive = validatePrimitive(primitive);
 		}
 		if (primitive != null) {
-			this.primitive = (HDLPrimitive) primitive;
+			this.primitive = primitive;
 		} else {
 			this.primitive = null;
 		}
@@ -69,7 +71,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		this.variables = new ArrayList<HDLVariable>();
 		if (variables != null) {
 			for (HDLVariable newValue : variables) {
-				this.variables.add((HDLVariable) newValue);
+				this.variables.add(newValue);
 			}
 		}
 	}
@@ -120,7 +122,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	protected final HDLQualifiedName type;
 
 	@Nullable
-	public HDLType resolveType() {
+	public Optional<? extends HDLType> resolveType() {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
 		return ScopingExtension.INST.resolveType(this, type);
@@ -180,6 +182,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLVariableDeclaration copy() {
 		HDLVariableDeclaration newObject = new HDLVariableDeclaration(null, annotations, register, direction, type, primitive, variables, false);
@@ -192,6 +195,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLVariableDeclaration copyFiltered(CopyFilter filter) {
 		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
@@ -209,6 +213,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLVariableDeclaration copyDeepFrozen(IHDLObject container) {
 		HDLVariableDeclaration copy = copyFiltered(CopyFilter.DEEP_META);
@@ -225,8 +230,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return the same instance of {@link HDLVariableDeclaration} with the
 	 *         updated container field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLVariableDeclaration setContainer(@Nullable IHDLObject container) {
 		return (HDLVariableDeclaration) super.setContainer(container);
 	}
 
@@ -239,8 +245,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	@Override
+	@Nonnull
+	public HDLVariableDeclaration setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -255,8 +262,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
+	@Override
+	@Nonnull
+	public HDLVariableDeclaration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
@@ -274,8 +282,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
+	@Override
+	@Nonnull
+	public HDLVariableDeclaration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
@@ -293,8 +302,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         annotations field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration removeAnnotations(int idx) {
+	@Nonnull
+	public HDLVariableDeclaration removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
@@ -310,8 +319,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         register field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setRegister(@Nullable HDLRegisterConfig register) {
+	@Nonnull
+	public HDLVariableDeclaration setRegister(@Nullable HDLRegisterConfig register) {
 		register = validateRegister(register);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -326,8 +335,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         direction field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setDirection(@Nullable HDLDirection direction) {
+	@Nonnull
+	public HDLVariableDeclaration setDirection(@Nullable HDLDirection direction) {
 		direction = validateDirection(direction);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -342,8 +351,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         type field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setType(@Nonnull HDLQualifiedName type) {
+	@Nonnull
+	public HDLVariableDeclaration setType(@Nonnull HDLQualifiedName type) {
 		type = validateType(type);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -358,8 +367,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         primitive field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setPrimitive(@Nullable HDLPrimitive primitive) {
+	@Nonnull
+	public HDLVariableDeclaration setPrimitive(@Nullable HDLPrimitive primitive) {
 		primitive = validatePrimitive(primitive);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -375,8 +384,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         variables field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration setVariables(@Nonnull ArrayList<HDLVariable> variables) {
+	@Nonnull
+	public HDLVariableDeclaration setVariables(@Nonnull ArrayList<HDLVariable> variables) {
 		variables = validateVariables(variables);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -391,8 +400,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         variables field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration addVariables(@Nonnull HDLVariable newVariables) {
+	@Nonnull
+	public HDLVariableDeclaration addVariables(@Nonnull HDLVariable newVariables) {
 		if (newVariables == null)
 			throw new IllegalArgumentException("Element of variables can not be null!");
 		ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
@@ -410,8 +419,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         variables field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration removeVariables(@Nonnull HDLVariable newVariables) {
+	@Nonnull
+	public HDLVariableDeclaration removeVariables(@Nonnull HDLVariable newVariables) {
 		if (newVariables == null)
 			throw new IllegalArgumentException("Removed element of variables can not be null!");
 		ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
@@ -429,8 +438,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @return a new instance of {@link HDLVariableDeclaration} with the updated
 	 *         variables field.
 	 */
-	public @Nonnull
-	HDLVariableDeclaration removeVariables(int idx) {
+	@Nonnull
+	public HDLVariableDeclaration removeVariables(int idx) {
 		ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
 		variables.remove(idx);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
@@ -493,11 +502,12 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLVariableDeclaration()");
-		if (annotations != null) {
+		if (annotations != null)
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -505,7 +515,6 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		if (register != null) {
 			sb.append(".setRegister(").append(register.toConstructionString(spacing + "\t")).append(")");
 		}
@@ -518,7 +527,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		if (primitive != null) {
 			sb.append(".setPrimitive(").append(primitive.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (variables != null) {
+		if (variables != null)
 			if (variables.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariable o : variables) {
@@ -526,10 +535,10 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		}
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateRegister(getRegister());
@@ -553,6 +562,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLVariableDeclaration, HDLClass.HDLDeclaration, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}

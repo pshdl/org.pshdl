@@ -30,7 +30,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 			ifExpr = validateIfExpr(ifExpr);
 		}
 		if (ifExpr != null) {
-			this.ifExpr = (HDLExpression) ifExpr;
+			this.ifExpr = ifExpr;
 		} else {
 			this.ifExpr = null;
 		}
@@ -38,7 +38,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 			thenExpr = validateThenExpr(thenExpr);
 		}
 		if (thenExpr != null) {
-			this.thenExpr = (HDLExpression) thenExpr;
+			this.thenExpr = thenExpr;
 		} else {
 			this.thenExpr = null;
 		}
@@ -46,7 +46,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 			elseExpr = validateElseExpr(elseExpr);
 		}
 		if (elseExpr != null) {
-			this.elseExpr = (HDLExpression) elseExpr;
+			this.elseExpr = elseExpr;
 		} else {
 			this.elseExpr = null;
 		}
@@ -121,6 +121,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLTernary copy() {
 		HDLTernary newObject = new HDLTernary(null, ifExpr, thenExpr, elseExpr, false);
@@ -133,6 +134,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLTernary copyFiltered(CopyFilter filter) {
 		HDLExpression filteredifExpr = filter.copyObject("ifExpr", this, ifExpr);
@@ -146,6 +148,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * 
 	 * @return a new instance of this class.
 	 */
+	@Override
 	@Nonnull
 	public HDLTernary copyDeepFrozen(IHDLObject container) {
 		HDLTernary copy = copyFiltered(CopyFilter.DEEP_META);
@@ -162,8 +165,9 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * @return the same instance of {@link HDLTernary} with the updated
 	 *         container field.
 	 */
-	public @Nonnull
-	HDLTernary setContainer(@Nullable IHDLObject container) {
+	@Override
+	@Nonnull
+	public HDLTernary setContainer(@Nullable IHDLObject container) {
 		return (HDLTernary) super.setContainer(container);
 	}
 
@@ -176,8 +180,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * @return a new instance of {@link HDLTernary} with the updated ifExpr
 	 *         field.
 	 */
-	public @Nonnull
-	HDLTernary setIfExpr(@Nonnull HDLExpression ifExpr) {
+	@Nonnull
+	public HDLTernary setIfExpr(@Nonnull HDLExpression ifExpr) {
 		ifExpr = validateIfExpr(ifExpr);
 		HDLTernary res = new HDLTernary(container, ifExpr, thenExpr, elseExpr, false);
 		return res;
@@ -192,8 +196,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * @return a new instance of {@link HDLTernary} with the updated thenExpr
 	 *         field.
 	 */
-	public @Nonnull
-	HDLTernary setThenExpr(@Nonnull HDLExpression thenExpr) {
+	@Nonnull
+	public HDLTernary setThenExpr(@Nonnull HDLExpression thenExpr) {
 		thenExpr = validateThenExpr(thenExpr);
 		HDLTernary res = new HDLTernary(container, ifExpr, thenExpr, elseExpr, false);
 		return res;
@@ -208,8 +212,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * @return a new instance of {@link HDLTernary} with the updated elseExpr
 	 *         field.
 	 */
-	public @Nonnull
-	HDLTernary setElseExpr(@Nonnull HDLExpression elseExpr) {
+	@Nonnull
+	public HDLTernary setElseExpr(@Nonnull HDLExpression elseExpr) {
 		elseExpr = validateElseExpr(elseExpr);
 		HDLTernary res = new HDLTernary(container, ifExpr, thenExpr, elseExpr, false);
 		return res;
@@ -259,6 +263,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 		return result;
 	}
 
+	@Override
 	public String toConstructionString(String spacing) {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
@@ -275,6 +280,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 		return sb.toString();
 	}
 
+	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateIfExpr(getIfExpr());
@@ -291,6 +297,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 		}
 	}
 
+	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLTernary, HDLClass.HDLExpression, HDLClass.HDLObject);
 	}

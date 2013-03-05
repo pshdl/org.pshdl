@@ -71,7 +71,7 @@ class SimulationTransformationExtension {
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true))
 		if (config != null) {
 			config = config.normalize
-			val HDLVariable clk = config.resolveClk
+			val HDLVariable clk = config.resolveClk.get
 			val String name = FullNameExtension::fullNameOf(clk).toString
 			if (config.clockType == RISING)
 				res.add(new ArgumentedInstruction(isRisingEdgeInternal2, name))
@@ -90,11 +90,11 @@ class SimulationTransformationExtension {
 	def HDLVariable resolveVar(HDLReference reference) {
 		if(reference instanceof HDLUnresolvedFragment)
 			throw new RuntimeException("Can not use unresolved fragments")
-		return (reference as HDLResolvedRef).resolveVar
+		return (reference as HDLResolvedRef).resolveVar.get
 	}
 	def static String getVarName(HDLVariableRef hVar, boolean withBits) {
 		val StringBuilder sb = new StringBuilder
-		sb.append(FullNameExtension::fullNameOf(hVar.resolveVar))
+		sb.append(FullNameExtension::fullNameOf(hVar.resolveVar.get))
 		for (HDLExpression exp : hVar.array) {
 			sb.append('[').append(exp).append(']')
 		}
@@ -193,7 +193,7 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
 		var hVar=obj.resolveVar
-		val String refName = hVar.asRef.toString
+		val String refName = hVar.get.asRef.toString
 		val bits = new ArrayList<String>(obj.bits.size + 1)
 		bits.add(refName)
 		if (!obj.bits.isEmpty) {
@@ -202,7 +202,7 @@ class SimulationTransformationExtension {
 			}
 		}
 		val String[] arrBits=bits
-		val HDLDirection dir = hVar.direction
+		val HDLDirection dir = hVar.get.direction
 		switch (dir) {
 		case INTERNAL:
 			res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
