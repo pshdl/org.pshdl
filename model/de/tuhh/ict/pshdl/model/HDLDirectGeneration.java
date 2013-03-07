@@ -6,7 +6,6 @@ import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
-import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -118,8 +117,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 		return hif;
 	}
 
-	public HDLQualifiedName getIfName() {
-		return super.getHIf().asRef();
+	public String getIfName() {
+		return super.getHIf().getName();
 	}
 
 	// $CONTENT-END$

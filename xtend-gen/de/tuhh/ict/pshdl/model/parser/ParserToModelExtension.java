@@ -875,10 +875,8 @@ public class ParserToModelExtension {
     HDLDirectGeneration _hDLDirectGeneration = new HDLDirectGeneration();
     HDLDirectGeneration gen = _hDLDirectGeneration.setGeneratorContent("");
     boolean _notEquals = ObjectExtensions.operator_notEquals(context.isInclude, null);
-    if (_notEquals) {
-      HDLDirectGeneration _setInclude = gen.setInclude(true);
-      gen = _setInclude;
-    }
+    HDLDirectGeneration _setInclude = gen.setInclude(_notEquals);
+    gen = _setInclude;
     PsInterfaceContext _psInterface = context.psInterface();
     IHDLObject _hDL = this.toHDL(_psInterface);
     HDLDirectGeneration _setHIf = gen.setHIf(((HDLInterface) _hDL));

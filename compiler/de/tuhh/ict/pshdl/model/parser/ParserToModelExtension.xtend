@@ -445,8 +445,7 @@ class ParserToModelExtension {
 	
 	def dispatch IHDLObject toHDL(PsDirectGenerationContext context) {
 		var gen=new HDLDirectGeneration().setGeneratorContent("")
-		if (context.isInclude!=null)
-			gen=gen.setInclude(true)
+		gen=gen.setInclude(context.isInclude!=null)
 		gen=gen.setHIf(context.psInterface.toHDL as HDLInterface)
 		gen=gen.setVar(context.psVariable.toHDL as HDLVariable)
 		gen=gen.setGeneratorID(context.RULE_ID.text)

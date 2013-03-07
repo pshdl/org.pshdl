@@ -40,7 +40,7 @@ public class BusGenerator implements IHDLGenerator {
 
 	@Override
 	public Optional<HDLInterface> getInterface(HDLDirectGeneration hdl) {
-		String name = fullNameOf(hdl).append(hdl.getIfName()).toString();
+		String name = hdl.getIfName();
 		if (hdl.getGeneratorContent().length() != 0) {
 			try {
 				return createInterface(hdl, name);

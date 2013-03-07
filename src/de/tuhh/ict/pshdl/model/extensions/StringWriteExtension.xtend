@@ -105,7 +105,18 @@ class StringWriteExtension {
 		'''«op.entering(highlight)»(«op.left.toString(highlight)»«highlight.simpleSpace»«highlight.operator(op.type.toString)»«highlight.simpleSpace»«op.right.toString(highlight)»)«op.leaving(highlight)»'''
 
 	def dispatch String toString(HDLUnresolvedFragmentFunction frag, SyntaxHighlighter highlight) {
-		val res=frag.entering(highlight)+toStringFrag(frag, highlight)+'''(«FOR HDLExpression p : frag.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»)'''
+		var boolean isStatement=false
+		val container=frag.container
+		if (container instanceof HDLStatement)
+			isStatement=true
+		if (container instanceof HDLBlock)
+			isStatement=true
+		if (container instanceof HDLUnit)
+			isStatement=true
+		val String sb=if (isStatement) highlight.spacing.toString else ""
+		var res=sb+frag.entering(highlight)+toStringFrag(frag, highlight)+'''(«FOR HDLExpression p : frag.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»)'''
+		if (isStatement)
+			res=res+";"
 		return res+frag.leaving(highlight)
 	}
 	def dispatch String toString(HDLUnresolvedFragment frag, SyntaxHighlighter highlight) {
@@ -346,15 +357,15 @@ class StringWriteExtension {
 		val StringBuilder sb = highlight.spacing
 		sb.append(caseStmnt.entering(highlight))
 		if (caseStmnt.label == null)
-			sb.append(highlight.keyword("default")).append(':').append(highlight.simpleSpace).append('{').append(highlight.newLine)
+			sb.append(highlight.keyword("default")).append(':').append(highlight.simpleSpace).append(highlight.newLine)
 		else
-			sb.append(highlight.keyword("case")).append(highlight.simpleSpace).append(caseStmnt.label.toString(highlight)).append(':').append(highlight.simpleSpace).append('{').append(highlight.newLine)
+			sb.append(highlight.keyword("case")).append(highlight.simpleSpace).append(caseStmnt.label.toString(highlight)).append(':').append(highlight.simpleSpace).append(highlight.newLine)
 		highlight.incSpacing
 		for (HDLStatement stmnt : caseStmnt.dos) {
 			sb.append(stmnt.toString(highlight)).append(highlight.newLine)
 		}
 		highlight.decSpacing
-		sb.append(highlight.spacing).append('}')
+		sb.append(highlight.spacing)
 		sb.append(caseStmnt.leaving(highlight))
 		return sb.toString
 	}
@@ -592,7 +603,8 @@ class StringWriteExtension {
 	def dispatch String toString(HDLDirectGeneration hdg, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		hdg.entering(highlight)
-		sb.append(highlight.interfaceName(hdg.HIf.name)).append(highlight.simpleSpace).append(highlight.varName(hdg.^var)).append("=").append(highlight.generatorID(hdg.generatorID))
+		sb.append(highlight.interfaceName(hdg.HIf.name)).append(highlight.simpleSpace).append(highlight.varName(hdg.^var)).append("=")
+		sb.append(highlight.simpleSpace).append(highlight.keyword("generate")).append(highlight.simpleSpace).append(highlight.generatorID(hdg.generatorID))
 		sb.append('(')
 		for (HDLArgument args : hdg.arguments) {
 			sb.append(args.toString(highlight))
