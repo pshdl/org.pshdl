@@ -13,10 +13,10 @@ public class Definition implements NamedElement {
 			switch (this) {
 			case limit:
 				return "limit";
-			case mask:
-				return "mask";
 			case silentLimit:
 				return "silent limit";
+			case mask:
+				return "mask";
 			case silentMask:
 				return "silent mask";
 			case error:

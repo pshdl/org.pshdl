@@ -94,7 +94,49 @@ public class Insulin {
 		// Fragment (no bits, no array, no function) does not resolve
 		// -> append until we get a Type
 		// -> resolves to enum ->
-		HDLQualifiedName hVar = new HDLQualifiedName(uFrag.getFrag());
+		HDLQualifiedName fqn = HDLQualifiedName.EMPTY;
+		HDLUnresolvedFragment cFrag = uFrag;
+		while (cFrag != null) {
+			fqn = fqn.append(cFrag.getFrag());
+			Optional<? extends IHDLObject> attemptResolve = attemptResolve(cFrag, fqn);
+			if (attemptResolve.isPresent())
+				return attemptResolve;
+			cFrag = cFrag.getSub();
+		}
+		IHDLObject container = uFrag.getContainer();
+		if (container instanceof HDLSwitchCaseStatement) {
+			HDLSwitchCaseStatement caseStatement = (HDLSwitchCaseStatement) container;
+			IHDLObject caseContainer = caseStatement.getContainer();
+			if (caseContainer instanceof HDLSwitchStatement) {
+				HDLSwitchStatement switchStatement = (HDLSwitchStatement) caseContainer;
+				Optional<? extends HDLType> switchType = TypeExtension.typeOf(switchStatement.getCaseExp());
+				if (switchType.isPresent())
+					return createFullEnum(uFrag, switchType.get());
+			}
+		}
+		if (container instanceof HDLEqualityOp) {
+			HDLEqualityOp equalityOp = (HDLEqualityOp) container;
+			if (equalityOp.getLeft() == uFrag) {
+				Optional<? extends HDLType> type = TypeExtension.typeOf(equalityOp.getRight());
+				if (type.isPresent())
+					return createFullEnum(uFrag, type.get());
+			}
+			if (equalityOp.getRight() == uFrag) {
+				Optional<? extends HDLType> type = TypeExtension.typeOf(equalityOp.getLeft());
+				if (type.isPresent())
+					return createFullEnum(uFrag, type.get());
+			}
+		}
+		if (container instanceof HDLAssignment) {
+			HDLAssignment assignment = (HDLAssignment) container;
+			Optional<? extends HDLType> typeOf = TypeExtension.typeOf(assignment.getLeft());
+			if (typeOf.isPresent())
+				return createFullEnum(uFrag, typeOf.get());
+		}
+		return Optional.absent();
+	}
+
+	protected static Optional<? extends IHDLObject> attemptResolve(HDLUnresolvedFragment uFrag, HDLQualifiedName hVar) {
 		if (uFrag.getClassType() != HDLClass.HDLUnresolvedFragmentFunction) {
 			Optional<HDLVariable> variableRaw = ScopingExtension.INST.resolveVariable(uFrag, hVar);
 			HDLUnresolvedFragment sub = uFrag.getSub();
@@ -131,37 +173,6 @@ public class Insulin {
 			HDLFunctionCall call = new HDLFunctionCall().setName(hVar).setParams(uff.getParams());
 			return Optional.of(call);
 		}
-		IHDLObject container = uFrag.getContainer();
-		if (container instanceof HDLSwitchCaseStatement) {
-			HDLSwitchCaseStatement caseStatement = (HDLSwitchCaseStatement) container;
-			IHDLObject caseContainer = caseStatement.getContainer();
-			if (caseContainer instanceof HDLSwitchStatement) {
-				HDLSwitchStatement switchStatement = (HDLSwitchStatement) caseContainer;
-				Optional<? extends HDLType> switchType = TypeExtension.typeOf(switchStatement.getCaseExp());
-				if (switchType.isPresent())
-					return createFullEnum(uFrag, switchType.get());
-			}
-		}
-		if (container instanceof HDLEqualityOp) {
-			HDLEqualityOp equalityOp = (HDLEqualityOp) container;
-			if (equalityOp.getLeft() == uFrag) {
-				Optional<? extends HDLType> type = TypeExtension.typeOf(equalityOp.getRight());
-				if (type.isPresent())
-					return createFullEnum(uFrag, type.get());
-			}
-			if (equalityOp.getRight() == uFrag) {
-				Optional<? extends HDLType> type = TypeExtension.typeOf(equalityOp.getLeft());
-				if (type.isPresent())
-					return createFullEnum(uFrag, type.get());
-			}
-		}
-		if (container instanceof HDLAssignment) {
-			HDLAssignment assignment = (HDLAssignment) container;
-			Optional<? extends HDLType> typeOf = TypeExtension.typeOf(assignment.getLeft());
-			if (typeOf.isPresent())
-				return createFullEnum(uFrag, typeOf.get());
-		}
-		// TODO consume all fragments to one QFN and attempt to resolve type
 		return Optional.absent();
 	}
 
@@ -853,6 +864,9 @@ public class Insulin {
 				op = new HDLShiftOp().setType(HDLShiftOpType.SRL);
 				break;
 			case ASSGN:
+				continue;
+			}
+			if (op == null) {
 				continue;
 			}
 			op = op.setLeft(hdlAssignment.getLeft()).setRight(hdlAssignment.getRight());

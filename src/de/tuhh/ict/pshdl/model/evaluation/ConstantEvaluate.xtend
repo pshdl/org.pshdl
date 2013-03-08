@@ -37,46 +37,48 @@ import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
 import com.google.common.base.Optional
 
 class ConstantEvaluate {
-	public static ConstantEvaluate INST=new ConstantEvaluate
-	
+	public static ConstantEvaluate INST = new ConstantEvaluate
+
 	/**
 	 * Attempts to determine a constant that the given Expression can be replaced with. This method does not use parameters
 	 * as their value depends on the context.
 	 * 
 	 * @return an absent Optional if not successful
 	 */
-	def static Optional<BigInteger> valueOf(HDLExpression exp){
+	def static Optional<BigInteger> valueOf(HDLExpression exp) {
 		return INST.constantEvaluate(exp, null)
 	}
-	
+
 	/**
 	 * Attempts to determine a constant that the given Expression can be replaced with. If parameter are encountered, 
 	 * the provided context is used to retrieve a value for them.
 	 * 
 	 * @return an absent Optional if not successful
 	 */
-	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context){
+	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
 		return INST.constantEvaluate(exp, context)
 	}
-	
+
 	/**
 	 * This annotation can be used to find out what caused the evaluation to fail
 	 */
-	public static GenericMeta<IHDLObject> SOURCE=new GenericMeta("SOURCE", true)
-	
+	public static GenericMeta<IHDLObject> SOURCE = new GenericMeta("SOURCE", true)
+
 	def dispatch Optional<BigInteger> constantEvaluate(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
-		val type=Insulin::resolveFragment(obj)
+		val type = Insulin::resolveFragment(obj)
 		if (!type.present)
 			return Optional::absent
 		return type.get.copyDeepFrozen(obj.container).constantEvaluate(context)
 	}
+
 	def dispatch Optional<BigInteger> constantEvaluate(IHDLObject obj, HDLEvaluationContext context) {
-		throw new IllegalArgumentException("Did not implement constantEvaulate for type:"+obj.classType)
+		throw new IllegalArgumentException("Did not implement constantEvaulate for type:" + obj.classType)
 	}
+
 	def dispatch Optional<BigInteger> constantEvaluate(HDLTernary obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> res=obj.ifExpr.constantEvaluate(context)
-		if (res.present){
-			if (0bi.equals(res.get)){
+		val Optional<BigInteger> res = obj.ifExpr.constantEvaluate(context)
+		if (res.present) {
+			if (0bi.equals(res.get)) {
 				return obj.elseExpr.constantEvaluate(context)
 			}
 			return obj.thenExpr.constantEvaluate(context)
@@ -87,11 +89,11 @@ class ConstantEvaluate {
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLLiteral obj, HDLEvaluationContext context) {
-		switch (obj.presentation){
-		case HDLLiteral$HDLLiteralPresentation::STR:
-			return Optional::absent
-		case HDLLiteral$HDLLiteralPresentation::BOOL:
-			return Optional::absent
+		switch (obj.presentation) {
+			case HDLLiteral$HDLLiteralPresentation::STR:
+				return Optional::absent
+			case HDLLiteral$HDLLiteralPresentation::BOOL:
+				return Optional::absent
 		}
 		return Optional::of(obj.valueAsBigInt)
 	}
@@ -102,29 +104,32 @@ class ConstantEvaluate {
 			return Optional::absent
 		}
 		switch (obj.type) {
-		case ARITH_NEG:
-			return Optional::of(eval.get.negate)
-		case BIT_NEG:
-			return Optional::of(eval.get.not)
-		case LOGIC_NEG:
-			return boolInt(obj.target.constantEvaluate(context).equals(0bi))
-		case CAST:{
-			val HDLType type = obj.castTo
-			if (type instanceof HDLPrimitive) {
-				val HDLPrimitive prim = type  as HDLPrimitive
-				if (prim.width != null) {
-					val Optional<BigInteger> width = prim.width.constantEvaluate(context)
-					if (width!=null)
-						return Optional::of(eval.get.mod(1bi.shiftLeft(width.get.intValue)))
-					return Optional::absent
-				}
-				return eval
+			case ARITH_NEG:
+				return Optional::of(eval.get.negate)
+			case BIT_NEG:
+				return Optional::of(eval.get.not)
+			case LOGIC_NEG: {
+				val const = obj.target.constantEvaluate(context)
+				if (const.present)
+					return boolInt(const.get.equals(0bi))
+				return Optional::absent
 			}
-			obj.addMeta(SOURCE, obj.target)
-			obj.addMeta(DESCRIPTION, NON_PRIMITVE_TYPE_NOT_EVALUATED)
-			return Optional::absent
-		}
-
+			case CAST: {
+				val HDLType type = obj.castTo
+				if (type instanceof HDLPrimitive) {
+					val HDLPrimitive prim = type  as HDLPrimitive
+					if (prim.width != null) {
+						val Optional<BigInteger> width = prim.width.constantEvaluate(context)
+						if (width != null)
+							return Optional::of(eval.get.mod(1bi.shiftLeft(width.get.intValue)))
+						return Optional::absent
+					}
+					return eval
+				}
+				obj.addMeta(SOURCE, obj.target)
+				obj.addMeta(DESCRIPTION, NON_PRIMITVE_TYPE_NOT_EVALUATED)
+				return Optional::absent
+			}
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
@@ -136,8 +141,8 @@ class ConstantEvaluate {
 			if (!im.present) {
 				return Optional::absent
 			}
-			val type=TypeExtension::typeOf(cat)
-			if (!type.present){
+			val type = TypeExtension::typeOf(cat)
+			if (!type.present) {
 				obj.addMeta(SOURCE, cat)
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
 				return Optional::absent
@@ -172,18 +177,18 @@ class ConstantEvaluate {
 		if (!rightVal.present)
 			return Optional::absent
 		switch (obj.type) {
-		case DIV:
-			return Optional::of(leftVal.get.divide(rightVal.get))
-		case MUL:
-			return Optional::of(leftVal.get.multiply(rightVal.get))
-		case MINUS:
-			return Optional::of(leftVal.get.subtract(rightVal.get))
-		case PLUS:
-			return Optional::of(leftVal.get.add(rightVal.get))
-		case MOD:
-			return Optional::of(leftVal.get.remainder(rightVal.get))
-		case POW:
-			return Optional::of(leftVal.get.pow(rightVal.get.intValue))
+			case DIV:
+				return Optional::of(leftVal.get.divide(rightVal.get))
+			case MUL:
+				return Optional::of(leftVal.get.multiply(rightVal.get))
+			case MINUS:
+				return Optional::of(leftVal.get.subtract(rightVal.get))
+			case PLUS:
+				return Optional::of(leftVal.get.add(rightVal.get))
+			case MOD:
+				return Optional::of(leftVal.get.remainder(rightVal.get))
+			case POW:
+				return Optional::of(leftVal.get.pow(rightVal.get.intValue))
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
@@ -196,22 +201,22 @@ class ConstantEvaluate {
 		if (!rightVal.present)
 			return Optional::absent
 		switch (obj.type) {
-		case AND:
-			return Optional::of(leftVal.get.and(rightVal.get))
-		case OR:
-			return Optional::of(leftVal.get.or(rightVal.get))
-		case XOR:
-			return Optional::of(leftVal.get.xor(rightVal.get))
-		case LOGI_AND: {
-			val boolean l = !0bi.equals(leftVal.get)
-			val boolean r = !0bi.equals(rightVal.get)
-			return boolInt(l && r)
-		}
-		case LOGI_OR: {
-			val boolean l = !0bi.equals(leftVal.get)
-			val boolean r = !0bi.equals(rightVal.get)
-			return boolInt(l || r)
-		}
+			case AND:
+				return Optional::of(leftVal.get.and(rightVal.get))
+			case OR:
+				return Optional::of(leftVal.get.or(rightVal.get))
+			case XOR:
+				return Optional::of(leftVal.get.xor(rightVal.get))
+			case LOGI_AND: {
+				val boolean l = !0bi.equals(leftVal.get)
+				val boolean r = !0bi.equals(rightVal.get)
+				return boolInt(l && r)
+			}
+			case LOGI_OR: {
+				val boolean l = !0bi.equals(leftVal.get)
+				val boolean r = !0bi.equals(rightVal.get)
+				return boolInt(l || r)
+			}
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
@@ -224,18 +229,18 @@ class ConstantEvaluate {
 		if (!rightVal.present)
 			return Optional::absent
 		switch (obj.type) {
-		case EQ:
-			return boolInt(leftVal.get.equals(rightVal.get))
-		case NOT_EQ:
-			return boolInt(!leftVal.get.equals(rightVal.get))
-		case GREATER:
-			return boolInt(leftVal.get.compareTo(rightVal.get) > 0)
-		case GREATER_EQ:
-			return boolInt(leftVal.get.compareTo(rightVal.get) >= 0)
-		case LESS:
-			return boolInt(leftVal.get.compareTo(rightVal.get) < 0)
-		case LESS_EQ:
-			return boolInt(leftVal.get.compareTo(rightVal.get) <= 0)
+			case EQ:
+				return boolInt(leftVal.get.equals(rightVal.get))
+			case NOT_EQ:
+				return boolInt(!leftVal.get.equals(rightVal.get))
+			case GREATER:
+				return boolInt(leftVal.get.compareTo(rightVal.get) > 0)
+			case GREATER_EQ:
+				return boolInt(leftVal.get.compareTo(rightVal.get) >= 0)
+			case LESS:
+				return boolInt(leftVal.get.compareTo(rightVal.get) < 0)
+			case LESS_EQ:
+				return boolInt(leftVal.get.compareTo(rightVal.get) <= 0)
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
@@ -248,17 +253,17 @@ class ConstantEvaluate {
 		if (!rightVal.present)
 			return Optional::absent
 		switch (obj.type) {
-		case SLL:
-			return Optional::of(leftVal.get.shiftLeft(rightVal.get.intValue))
-		case SRA:
-			return Optional::of(leftVal.get.shiftRight(rightVal.get.intValue))
-		case SRL:{
-			val BigInteger shiftRight = leftVal.get.shiftRight(rightVal.get.intValue)
-			if (shiftRight.signum < 0)
-				//XXX This is incorrect. We have to know the width of the
-				return Optional::of(shiftRight.negate)
-			return Optional::of(shiftRight)
-		}
+			case SLL:
+				return Optional::of(leftVal.get.shiftLeft(rightVal.get.intValue))
+			case SRA:
+				return Optional::of(leftVal.get.shiftRight(rightVal.get.intValue))
+			case SRL: {
+				val BigInteger shiftRight = leftVal.get.shiftRight(rightVal.get.intValue)
+				if (shiftRight.signum < 0)
+					//XXX This is incorrect. We have to know the width of the
+					return Optional::of(shiftRight.negate)
+				return Optional::of(shiftRight)
+			}
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
@@ -328,6 +333,6 @@ class ConstantEvaluate {
 	}
 
 	def static Optional<BigInteger> boolInt(boolean b) {
-		return if (b) Optional::of(1bi) else Optional::of(0bi)
+		return if(b) Optional::of(1bi) else Optional::of(0bi)
 	}
 }

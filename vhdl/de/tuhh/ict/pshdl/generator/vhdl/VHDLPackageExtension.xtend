@@ -64,38 +64,38 @@ import de.tuhh.ict.pshdl.model.HDLResolvedRef
 
 class VHDLPackageExtension {
 
-	extension VHDLExpressionExtension vee=new VHDLExpressionExtension
-	extension VHDLStatementExtension vse=new VHDLStatementExtension
-	
-	public static VHDLPackageExtension INST=new VHDLPackageExtension
-	
+	extension VHDLExpressionExtension vee = new VHDLExpressionExtension
+	extension VHDLStatementExtension vse = new VHDLStatementExtension
+
+	public static VHDLPackageExtension INST = new VHDLPackageExtension
+
 	def List<LibraryUnit> toVHDL(HDLUnit obj) {
 		val List<LibraryUnit> res = new LinkedList<LibraryUnit>
 		val HDLQualifiedName entityName = fullNameOf(obj)
 		val Entity e = new Entity(entityName.dashString)
 		val VHDLContext unit = new VHDLContext
-		
-		val HDLEnumRef[] hRefs=obj.getAllObjectsOf(typeof(HDLEnumRef), true)
+
+		val HDLEnumRef[] hRefs = obj.getAllObjectsOf(typeof(HDLEnumRef), true)
 		for (HDLEnumRef hdlEnumRef : hRefs) {
 			val resolveHEnum = hdlEnumRef.resolveHEnum
-			val HDLUnit enumContainer=resolveHEnum.get.getContainer(typeof(HDLUnit))
-			if (enumContainer==null || !enumContainer.equals(hdlEnumRef.getContainer(typeof(HDLUnit)))){
-				val HDLQualifiedName type=fullNameOf(resolveHEnum.get)
+			val HDLUnit enumContainer = resolveHEnum.get.getContainer(typeof(HDLUnit))
+			if (enumContainer == null || !enumContainer.equals(hdlEnumRef.getContainer(typeof(HDLUnit)))) {
+				val HDLQualifiedName type = fullNameOf(resolveHEnum.get)
 				if (!type.getSegment(0).equals("pshdl"))
-					unit.addImport(HDLQualifiedName::create("work",getPackageName(type), "all"))
+					unit.addImport(HDLQualifiedName::create("work", getPackageName(type), "all"))
 			}
 		}
-		val HDLVariableRef[] vRefs=obj.getAllObjectsOf(typeof(HDLVariableRef), true)
+		val HDLVariableRef[] vRefs = obj.getAllObjectsOf(typeof(HDLVariableRef), true)
 		for (HDLVariableRef variableRef : vRefs) {
-			if (variableRef.classType!=HDLClass::HDLInterfaceRef){
+			if (variableRef.classType != HDLClass::HDLInterfaceRef) {
 				val variable = variableRef.resolveVar
 				if (!variable.present)
-					throw new IllegalArgumentException("Can not resolve:"+variableRef)
-				val HDLUnit enumContainer=variable.get.getContainer(typeof(HDLUnit))
-				if (enumContainer==null || !enumContainer.equals(variableRef.getContainer(typeof(HDLUnit)))){
-					val HDLQualifiedName type=fullNameOf(variable.get).skipLast(1)
-					if (type.length>0 && !type.getSegment(0).equals("pshdl"))
-						unit.addImport(HDLQualifiedName::create("work",getPackageName(type), "all"))
+					throw new IllegalArgumentException("Can not resolve:" + variableRef)
+				val HDLUnit enumContainer = variable.get.getContainer(typeof(HDLUnit))
+				if (enumContainer == null || !enumContainer.equals(variableRef.getContainer(typeof(HDLUnit)))) {
+					val HDLQualifiedName type = fullNameOf(variable.get).skipLast(1)
+					if (type.length > 0 && !type.getSegment(0).equals("pshdl"))
+						unit.addImport(HDLQualifiedName::create("work", getPackageName(type), "all"))
 				}
 			}
 		}
@@ -110,8 +110,8 @@ class VHDLPackageExtension {
 		if (unit.hasPkgDeclarations) {
 			val String libName = getPackageName(entityName)
 			val PackageDeclaration pd = new PackageDeclaration(libName)
-			pd.declarations.addAll( unit.externalTypes as List)
-			pd.declarations.addAll( unit.constantsPkg)
+			pd.declarations.addAll(unit.externalTypes as List)
+			pd.declarations.addAll(unit.constantsPkg)
 			res.add(pd)
 			res.add(new UseClause("work." + libName + ".all"))
 			addDefaultLibs(res, unit)
@@ -124,7 +124,7 @@ class VHDLPackageExtension {
 		e.declarations.addAll(unit.internalTypes as List)
 		a.declarations.addAll(unit.internals as List)
 		a.statements.addAll(unit.concurrentStatements)
-		for (Map$Entry<Integer,LinkedList<SequentialStatement>> uc: unit.unclockedStatements.entrySet){
+		for (Map$Entry<Integer,LinkedList<SequentialStatement>> uc : unit.unclockedStatements.entrySet) {
 			val ProcessStatement ps = new ProcessStatement
 			ps.sensitivityList.addAll(createSensitivyList(unit, uc.key))
 			ps.statements.addAll(uc.value)
@@ -139,24 +139,24 @@ class VHDLPackageExtension {
 		return res
 	}
 
-	def public  String getPackageName(HDLQualifiedName entityName) {
+	def public String getPackageName(HDLQualifiedName entityName) {
 		return entityName.dashString + "Pkg"
 	}
-	
-	def  dashString(HDLQualifiedName name) { 
+
+	def dashString(HDLQualifiedName name) {
 		return name.toString('_'.charAt(0))
 	}
 
 	def public HDLQualifiedName getPackageNameRef(HDLQualifiedName entityName) {
 		if (entityName.getSegment(0).equals("VHDL"))
 			return entityName.skipFirst(1)
-		return HDLQualifiedName::create("work",entityName.dashString+"Pkg")
+		return HDLQualifiedName::create("work", entityName.dashString + "Pkg")
 	}
-	
+
 	def public HDLQualifiedName getNameRef(HDLQualifiedName entityName) {
 		if (entityName.getSegment(0).equals("VHDL"))
 			return entityName.skipFirst(1)
-		return HDLQualifiedName::create("work",entityName.dashString)
+		return HDLQualifiedName::create("work", entityName.dashString)
 	}
 
 	def private static addDefaultLibs(List<LibraryUnit> res, VHDLContext unit) {
@@ -167,12 +167,12 @@ class VHDLPackageExtension {
 		res.add(VHDLCastsLibrary::USE_CLAUSE)
 		res.add(VHDLShiftLibrary::USE_CLAUSE)
 		res.add(new UseClause("pshdl.types.all"))
-		val Set<String> usedLibs=new HashSet<String>
+		val Set<String> usedLibs = new HashSet<String>
 		usedLibs.add("pshdl")
 		usedLibs.add("ieee")
 		usedLibs.add("work")
 		for (HDLQualifiedName i : unit.imports) {
-			val String lib=i.getSegment(0)
+			val String lib = i.getSegment(0)
 			if (!usedLibs.contains(lib)) {
 				res.add(new LibraryClause(lib))
 				usedLibs.add(lib)
@@ -181,7 +181,8 @@ class VHDLPackageExtension {
 		}
 	}
 
-	private static EnumSet<HDLDirection> notSensitive = EnumSet::of(HDLDirection::HIDDEN, HDLDirection::PARAMETER, HDLDirection::CONSTANT)
+	private static EnumSet<HDLDirection> notSensitive = EnumSet::of(HDLDirection::HIDDEN, HDLDirection::PARAMETER,
+		HDLDirection::CONSTANT)
 
 	def private Collection<? extends Signal> createSensitivyList(VHDLContext ctx, int pid) {
 		if (ctx.noSensitivity.containsKey(pid))
@@ -197,9 +198,8 @@ class VHDLPackageExtension {
 					val HDLVariableDeclaration hdv = container as HDLVariableDeclaration
 					if (!notSensitive.contains(hdv.direction)) {
 						if (ref.container instanceof HDLAssignment) {
-							val HDLAssignment hAss =  ref.container as HDLAssignment
+							val HDLAssignment hAss = ref.container as HDLAssignment
 							if (hAss.left.resolveVar.registerConfig != null) {
-								
 							} else if (hAss.left != ref)
 								vars.add(ref.VHDLName)
 						} else
@@ -214,16 +214,17 @@ class VHDLPackageExtension {
 		}
 		return sensitivity
 	}
+
 	def HDLVariable resolveVar(HDLReference reference) {
-		if(reference instanceof HDLUnresolvedFragment)
+		if (reference instanceof HDLUnresolvedFragment)
 			throw new RuntimeException("Can not use unresolved fragments")
 		return (reference as HDLResolvedRef).resolveVar.get
 	}
 
-
-	def private SequentialStatement createIfStatement(HDLUnit hUnit, ProcessStatement ps, HDLRegisterConfig key, LinkedList<SequentialStatement> value, VHDLContext unit) {
-		var Signal clk =  new HDLVariableRef().setVar(key.clkRefName).toVHDL as Signal
-		var Signal rst =  new HDLVariableRef().setVar(key.rstRefName).toVHDL as Signal
+	def private SequentialStatement createIfStatement(HDLUnit hUnit, ProcessStatement ps, HDLRegisterConfig key,
+		LinkedList<SequentialStatement> value, VHDLContext unit) {
+		var Signal clk = new HDLVariableRef().setVar(key.clkRefName).toVHDL as Signal
+		var Signal rst = new HDLVariableRef().setVar(key.rstRefName).toVHDL as Signal
 		val HDLConfig config = HDLLibrary::getLibrary(hUnit.getLibURI).config
 		ps.sensitivityList.add(clk)
 		var EnumerationLiteral activeRst
@@ -256,55 +257,57 @@ class VHDLPackageExtension {
 	def VhdlFile toVHDL(HDLPackage obj) {
 		val VhdlFile res = new VhdlFile
 		for (HDLUnit unit : obj.units) {
-			val ModificationSet ms=new ModificationSet
+			val ModificationSet ms = new ModificationSet
 			val HDLVariableDeclaration[] hvds = unit.getAllObjectsOf(typeof(HDLVariableDeclaration), true)
 			for (HDLVariableDeclaration hvd : hvds) {
 				for (HDLVariable hvar : hvd.variables) {
 					val HDLVariableRef[] refs = hvar.getAllObjectsOf(typeof(HDLVariableRef), true)
 					for (HDLVariableRef ref : refs) {
+
 						//Check which variable declaration contains references and mark those references as the ones that should be declared in a package
 						ref.resolveVar.get.setMeta(VHDLStatementExtension::EXPORT)
 					}
 					val String origName = hvar.name
-					val String name=VHDLOutputValidator::getVHDLName(origName)
-					if (!origName.equals(name)){
-						val HDLVariable newVar=hvar.setName(name)
+					val String name = VHDLOutputValidator::getVHDLName(origName)
+					if (!origName.equals(name)) {
+						val HDLVariable newVar = hvar.setName(name)
 						ms.replace(hvar, newVar)
-						val Collection<HDLVariableRef> varRefs=HDLQuery::select(typeof(HDLVariableRef)).from(obj).where(HDLVariableRef::fVar).isEqualTo(hvar.asRef).all
-						val HDLQualifiedName newVarRef=newVar.asRef
+						val Collection<HDLVariableRef> varRefs = HDLQuery::select(typeof(HDLVariableRef)).from(obj).
+							where(HDLVariableRef::fVar).isEqualTo(hvar.asRef).all
+						val HDLQualifiedName newVarRef = newVar.asRef
 						for (HDLVariableRef ref : varRefs) {
 							ms.replace(ref, ref.setVar(newVarRef))
 						}
 					}
 				}
 			}
-			val HDLUnit newUnit=ms.apply(unit)
+			val HDLUnit newUnit = ms.apply(unit)
 			res.elements.addAll(newUnit.toVHDL)
 		}
-		var PackageDeclaration pd=null
-		for (HDLDeclaration decl:obj.declarations){
-			if (decl.classType==HDLClass::HDLVariableDeclaration){
-				val HDLVariableDeclaration hvd= decl as HDLVariableDeclaration
-				if (pd==null){
-					pd=new PackageDeclaration(getPackageName(new HDLQualifiedName(obj.pkg)))
+		var PackageDeclaration pd = null
+		for (HDLDeclaration decl : obj.declarations) {
+			if (decl.classType == HDLClass::HDLVariableDeclaration) {
+				val HDLVariableDeclaration hvd = decl as HDLVariableDeclaration
+				if (pd == null) {
+					pd = new PackageDeclaration(getPackageName(new HDLQualifiedName(obj.pkg)))
 					res.elements.add(pd)
 				}
 				val VHDLContext vhdl = hvd.toVHDL(VHDLContext::DEFAULT_CTX)
 				var ConstantDeclaration first = vhdl.constants.first
-				if (first==null) {
-					first=vhdl.constantsPkg.first
-					if (first==null)
+				if (first == null) {
+					first = vhdl.constantsPkg.first
+					if (first == null)
 						throw new IllegalArgumentException("Expected constant declaration but found none!")
 				}
 				pd.declarations.add(first)
 			}
-			if (decl.classType==HDLClass::HDLEnumDeclaration){
-				val HDLEnumDeclaration hvd= decl as HDLEnumDeclaration
-				val PackageDeclaration	enumPd=new PackageDeclaration(getPackageName(fullNameOf(hvd.HEnum)))
+			if (decl.classType == HDLClass::HDLEnumDeclaration) {
+				val HDLEnumDeclaration hvd = decl as HDLEnumDeclaration
+				val PackageDeclaration enumPd = new PackageDeclaration(getPackageName(fullNameOf(hvd.HEnum)))
 				res.elements.add(enumPd)
 				val VHDLContext vhdl = hvd.toVHDL(VHDLContext::DEFAULT_CTX)
 				val Type first = vhdl.internalTypes.first as Type
-				if (first==null)
+				if (first == null)
 					throw new IllegalArgumentException("Expected enum type declaration but found none!")
 				enumPd.declarations.add(first)
 			}

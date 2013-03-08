@@ -38,6 +38,7 @@ import static de.tuhh.ict.pshdl.model.extensions.RangeExtension.*
 import static java.math.BigInteger.*
 import java.math.BigDecimal
 import com.google.common.base.Optional
+import de.tuhh.ict.pshdl.model.HDLUnresolvedFragment
 
 class RangeExtension {
 
@@ -54,7 +55,11 @@ class RangeExtension {
 	public static GenericMeta<IHDLObject> SOURCE = new GenericMeta("SOURCE", true)
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLExpression obj, HDLEvaluationContext context) {
-		throw new RuntimeException("Incorrectly implemented obj op")
+		throw new RuntimeException("Incorrectly implemented obj op:" + obj.classType + " " + obj)
+	}
+
+	def dispatch Optional<Range<BigInteger>> determineRange(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
+		return Optional::absent
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLLiteral obj, HDLEvaluationContext context) {
@@ -78,7 +83,7 @@ class RangeExtension {
 			//TODO Allow simple references
 			return Optional::of(Ranges::closed(new BigInteger(value.get(0)), new BigInteger(value.get(1))))
 		}
-		val container=hVar.get.container
+		val container = hVar.get.container
 		if (container != null) {
 			if (container instanceof HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
@@ -100,7 +105,7 @@ class RangeExtension {
 						if (rRange.present)
 							res = res.span(rRange.get)
 						else
-						 	Optional::absent
+							Optional::absent
 					}
 					return Optional::of(res)
 				} else {
@@ -205,13 +210,16 @@ class RangeExtension {
 			case type == OR || type == XOR: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-				return Optional::of(Ranges::closed(0bi, 1bi.shiftLeft(leftRange.get.upperEndpoint.bitLength).subtract(1bi)))
+				return Optional::of(
+					Ranges::closed(0bi, 1bi.shiftLeft(leftRange.get.upperEndpoint.bitLength).subtract(1bi)))
 			}
 			case AND: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-				return Optional::of(Ranges::closed(0bi,
-					leftRange.get.upperEndpoint.min(1bi.shiftLeft(rightRange.get.upperEndpoint.bitLength).subtract(1bi))))
+				return Optional::of(
+					Ranges::closed(0bi,
+						leftRange.get.upperEndpoint.min(
+							1bi.shiftLeft(rightRange.get.upperEndpoint.bitLength).subtract(1bi))))
 			}
 			case type == LOGI_AND || type == LOGI_OR: {
 				obj.addMeta(SOURCE, obj)
@@ -232,11 +240,13 @@ class RangeExtension {
 			return Optional::absent
 		switch (obj.type) {
 			case PLUS:
-				return Optional::of(Ranges::closed(leftRange.get.lowerEndpoint.add(rightRange.get.lowerEndpoint),
-					leftRange.get.upperEndpoint.add(rightRange.get.upperEndpoint)))
+				return Optional::of(
+					Ranges::closed(leftRange.get.lowerEndpoint.add(rightRange.get.lowerEndpoint),
+						leftRange.get.upperEndpoint.add(rightRange.get.upperEndpoint)))
 			case MINUS:
-				return Optional::of(Ranges::closed(leftRange.get.lowerEndpoint.subtract(rightRange.get.lowerEndpoint),
-					leftRange.get.upperEndpoint.subtract(rightRange.get.upperEndpoint)))
+				return Optional::of(
+					Ranges::closed(leftRange.get.lowerEndpoint.subtract(rightRange.get.lowerEndpoint),
+						leftRange.get.upperEndpoint.subtract(rightRange.get.upperEndpoint)))
 			case DIV: {
 				if (rightRange.get.lowerEndpoint.equals(0bi) || rightRange.get.upperEndpoint.equals(0bi)) {
 					obj.addMeta(SOURCE, obj)
@@ -254,7 +264,8 @@ class RangeExtension {
 				val BigDecimal ft = new BigDecimal(leftRange.get.lowerEndpoint).multiply(mulRange.upperEndpoint)
 				val BigDecimal tf = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.lowerEndpoint)
 				val BigDecimal tt = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.upperEndpoint)
-				return Optional::of(Ranges::closed(ff.min(ft).min(tf).min(tt).toBigInteger, ff.max(ft).max(tf).max(tt).toBigInteger))
+				return Optional::of(
+					Ranges::closed(ff.min(ft).min(tf).min(tt).toBigInteger, ff.max(ft).max(tf).max(tt).toBigInteger))
 			}
 			case MUL: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.multiply(rightRange.get.lowerEndpoint)
@@ -264,7 +275,8 @@ class RangeExtension {
 				return Optional::of(Ranges::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case MOD:
-				return Optional::of(Ranges::closed(0bi, rightRange.get.upperEndpoint.subtract(1bi).min(leftRange.get.upperEndpoint)))
+				return Optional::of(
+					Ranges::closed(0bi, rightRange.get.upperEndpoint.subtract(1bi).min(leftRange.get.upperEndpoint)))
 			case POW: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.pow(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger ft = leftRange.get.lowerEndpoint.pow(rightRange.get.upperEndpoint.intValue)
@@ -290,8 +302,8 @@ class RangeExtension {
 			case CAST: {
 				val HDLType type = obj.castTo
 				if (type instanceof HDLPrimitive) {
-					val Optional<Range<BigInteger>> castRange = HDLPrimitives::getInstance.getValueRange(type as HDLPrimitive,
-						context)
+					val Optional<Range<BigInteger>> castRange = HDLPrimitives::getInstance.getValueRange(
+						type as HDLPrimitive, context)
 					if (!castRange.present)
 						return Optional::absent
 					if (!right.present)

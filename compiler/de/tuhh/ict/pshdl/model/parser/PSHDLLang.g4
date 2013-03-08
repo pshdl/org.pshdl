@@ -121,11 +121,14 @@ psFuncParam :
 ;
 
 psFuncType : 
-	RULE_ID | (psPrimitiveType psWidth? psOptionalArray*  )
+	(RULE_ID | psPrimitiveType psOptionalWidth? | isInterface='interface' | isEnum='enum') psOptionalArray*
 ;
 
+psOptionalWidth:
+	'<' (psValue|RULE_ID)? '>'
+;
 psOptionalArray:
-	'[' psExpression? ']'
+	'[' (psValue|RULE_ID)? ']'
 ;
 
 psNativeFunction :

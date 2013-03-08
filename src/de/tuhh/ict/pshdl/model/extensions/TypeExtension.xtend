@@ -44,18 +44,18 @@ import de.tuhh.ict.pshdl.model.HDLRegisterConfig
 import com.google.common.base.Optional
 
 class TypeExtension {
-	public static TypeExtension INST=new TypeExtension
-	
-	def static Optional<? extends HDLType> typeOf(IHDLObject obj){
+	public static TypeExtension INST = new TypeExtension
+
+	def static Optional<? extends HDLType> typeOf(IHDLObject obj) {
 		if (!obj.isFrozen)
 			throw new IllegalArgumentException("Target needs to be frozen")
 		var res = INST.determineType(obj)
-		if (res.present){
+		if (res.present) {
 			return Optional::of(res.get.copyDeepFrozen(obj))
 		}
 		return Optional::absent
 	}
-	
+
 	/**
 	 * Attempt to determine the type of this HDLVariable. For this to work it
 	 * needs to have a valid container.
@@ -64,26 +64,27 @@ class TypeExtension {
 	 *         otherwise.
 	 */
 	def dispatch Optional<? extends HDLType> determineType(HDLVariable hVar) {
-		if (HDLRegisterConfig::DEF_CLK==hVar.name)
+		if (HDLRegisterConfig::DEF_CLK == hVar.name)
 			return Optional::of(HDLPrimitive::bit)
-		if (HDLRegisterConfig::DEF_RST==hVar.name)
+		if (HDLRegisterConfig::DEF_RST == hVar.name)
 			return Optional::of(HDLPrimitive::bit)
 		val IHDLObject container = hVar.container
-		if (container==null)
+		if (container == null)
 			return Optional::absent
 		switch (container.classType) {
-		case HDLClass::HDLVariableDeclaration:
-			return (container as HDLVariableDeclaration).determineType
-		case HDLClass::HDLDirectGeneration:
-			return Optional::of((container as HDLDirectGeneration).HIf)
-		case HDLClass::HDLInterfaceInstantiation:
-			return (container as HDLInterfaceInstantiation).resolveHIf
-		case HDLClass::HDLForLoop:
-			return Optional::of(HDLPrimitive::natural)
-		case HDLClass::HDLInlineFunction:
-			throw new HDLProblemException(new Problem(ErrorCode::INLINE_FUNCTION_NO_TYPE, hVar))
+			case HDLClass::HDLVariableDeclaration:
+				return (container as HDLVariableDeclaration).determineType
+			case HDLClass::HDLDirectGeneration:
+				return Optional::of((container as HDLDirectGeneration).HIf)
+			case HDLClass::HDLInterfaceInstantiation:
+				return (container as HDLInterfaceInstantiation).resolveHIf
+			case HDLClass::HDLForLoop:
+				return Optional::of(HDLPrimitive::natural)
+			case HDLClass::HDLInlineFunction:
+				throw new HDLProblemException(new Problem(ErrorCode::INLINE_FUNCTION_NO_TYPE, hVar))
 		}
-		throw new IllegalArgumentException("Failed to resolve type of " + hVar + " caused by an unexpected container: " + container)
+		throw new IllegalArgumentException(
+			"Failed to resolve type of " + hVar + " caused by an unexpected container: " + container)
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableDeclaration hvd) {
@@ -91,46 +92,48 @@ class TypeExtension {
 			return Optional::of(hvd.primitive)
 		return hvd.resolveType
 	}
-	
-	def dispatch Optional<? extends HDLType> determineType(HDLArrayInit ai){
-		if (ai.exp.size==1)
+
+	def dispatch Optional<? extends HDLType> determineType(HDLArrayInit ai) {
+		if (ai.exp.size == 1)
 			return ai.exp.get(0).determineType
-		var res=HDLPrimitive::natural
-		for(exp:ai.exp){
-			val sub=exp.determineType
-			if (!sub.equals(exp))
+		var res = HDLPrimitive::natural
+		for (exp : ai.exp) {
+			val sub = exp.determineType
+			if (sub.present && !sub.get.equals(res))
 				return sub
 		}
 		return Optional::of(res)
 	}
-	def dispatch Optional<? extends HDLType> determineType(HDLExpression cat){
-		throw new RuntimeException("Did not correctly implement determineType for:"+cat.classType)	
+
+	def dispatch Optional<? extends HDLType> determineType(HDLExpression cat) {
+		throw new RuntimeException("Did not correctly implement determineType for:" + cat.classType)
 	}
 
-	private static GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", false);
+	private static GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE",
+		false);
 
 	def dispatch Optional<? extends HDLType> determineType(HDLUnresolvedFragment cat) {
 		if (cat.hasMeta(DETERMINE_TYPE_RESOLVE))
 			return Optional::absent
 		cat.setMeta(DETERMINE_TYPE_RESOLVE)
-		var resolved=Insulin::resolveFragment(cat)
+		var resolved = Insulin::resolveFragment(cat)
 		if (!resolved.present)
 			return Optional::absent
 		return resolved.get.copyDeepFrozen(cat.container).determineType
 	}
-	
+
 	def dispatch Optional<? extends HDLType> determineType(HDLConcat cat) {
 		val Iterator<HDLExpression> iter = cat.cats.iterator
-		val nextType=iter.next.determineType;
+		val nextType = iter.next.determineType;
 		if (!nextType.present)
 			return Optional::absent
 		var HDLPrimitive type = nextType.get as HDLPrimitive
 		var HDLExpression width = getWidth(type)
 		while (iter.hasNext) {
-			if (width==null)
+			if (width == null)
 				//This can happen when we have invalid concatenations
 				return Optional::absent
-			val nextCatType=iter.next.determineType
+			val nextCatType = iter.next.determineType
 			if (!nextCatType.present)
 				return Optional::absent
 			type = nextCatType.get as HDLPrimitive
@@ -141,12 +144,12 @@ class TypeExtension {
 	}
 
 	def static dispatch HDLExpression getWidth(IHDLObject obj) {
-		val type=INST.determineType(obj)
+		val type = INST.determineType(obj)
 		if (!type.present)
 			return null;
 		return getWidth(type.get)
 	}
-	
+
 	def static dispatch HDLExpression getWidth(HDLPrimitive type) {
 		val HDLExpression width = type.width
 		if (type.type == HDLPrimitive$HDLPrimitiveType::BIT)
@@ -167,24 +170,25 @@ class TypeExtension {
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLLiteral lit) {
+
 		// Actually depends on context
-		switch (lit.presentation){
-		case HDLLiteral$HDLLiteralPresentation::STR:
-			return Optional::of(new HDLPrimitive().setType(HDLPrimitive$HDLPrimitiveType::STRING))
-		case HDLLiteral$HDLLiteralPresentation::BOOL:
-			return Optional::of(new HDLPrimitive().setType(HDLPrimitive$HDLPrimitiveType::BOOL))
+		switch (lit.presentation) {
+			case HDLLiteral$HDLLiteralPresentation::STR:
+				return Optional::of(new HDLPrimitive().setType(HDLPrimitive$HDLPrimitiveType::STRING))
+			case HDLLiteral$HDLLiteralPresentation::BOOL:
+				return Optional::of(new HDLPrimitive().setType(HDLPrimitive$HDLPrimitiveType::BOOL))
 		}
-		val boolean isSigned=lit.^val.charAt(0) != '-'
-		val BigInteger bigVal=lit.valueAsBigInt
-		if (bigVal.bitLength>31)
+		val boolean isSigned = lit.^val.charAt(0) != '-'
+		val BigInteger bigVal = lit.valueAsBigInt
+		if (bigVal.bitLength > 31)
 			return Optional::of(HDLPrimitive::uint.setWidth(HDLLiteral::get(bigVal.bitLength)))
 		return Optional::of(HDLPrimitive::target(isSigned))
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableRef ref) {
 		val List<HDLRange> bits = ref.bits
-		if (bits.size == 0){
-			var res=ref.resolveVar
+		if (bits.size == 0) {
+			var res = ref.resolveVar
 			if (res.present)
 				return res.get.determineType
 			else
@@ -198,10 +202,10 @@ class TypeExtension {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType::PLUS).setRight(iter.next.width)
 			width = HDLPrimitives::simplifyWidth(ref, width)
 		}
-		val hVar=ref.resolveVar
+		val hVar = ref.resolveVar
 		if (!hVar.present)
 			return Optional::absent
-		val type=hVar.get.determineType;
+		val type = hVar.get.determineType;
 		if (!type.present)
 			return Optional::absent
 		return Optional::of((type.get as HDLPrimitive).setWidth(width))
@@ -222,13 +226,13 @@ class TypeExtension {
 	def dispatch Optional<? extends HDLType> determineType(HDLEqualityOp eop) {
 		return Optional::fromNullable(HDLPrimitives::instance.getEqualityOpType(eop).result)
 	}
-	
-	def dispatch Optional<? extends HDLType> determineType(HDLTernary tern){
+
+	def dispatch Optional<? extends HDLType> determineType(HDLTernary tern) {
 		return tern.thenExpr.determineType
 	}
-	
+
 	def dispatch Optional<? extends HDLType> determineType(HDLInlineFunction func) {
 		throw new HDLProblemException(new Problem(ErrorCode::INLINE_FUNCTION_NO_TYPE, func))
 	}
-	
+
 }

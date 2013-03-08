@@ -709,13 +709,13 @@ public class BuiltInValidator implements IHDLValidator {
 		} else {
 			HDLEvaluationContext context = getContext(hContext, ass);
 			for (int i = 0; i < targetDim.size(); i++) {
-				HDLExpression target = targetDim.get(i);
 				HDLExpression source = sourceDim.get(i);
-				Optional<BigInteger> t = ConstantEvaluate.valueOf(target, context);
 				Optional<BigInteger> s = ConstantEvaluate.valueOf(source, context);
 				if (!s.isPresent()) {
 					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, right.get()));
 				}
+				HDLExpression target = targetDim.get(i);
+				Optional<BigInteger> t = ConstantEvaluate.valueOf(target, context);
 				if (!t.isPresent()) {
 					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, left));
 				}

@@ -84,6 +84,8 @@ public class MemoryModel {
 			case UNUSED:
 				continue;
 			}
+			if (type == null)
+				throw new IllegalArgumentException("Should not happen");
 			HDLVariableDeclaration hdv = new HDLVariableDeclaration().setType(type);
 			hdv = hdv.setRegister(def.register ? HDLRegisterConfig.defaultConfig() : null);
 			switch (def.rw) {

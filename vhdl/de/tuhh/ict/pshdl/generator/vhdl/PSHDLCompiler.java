@@ -51,6 +51,7 @@ public class PSHDLCompiler {
 		for (Problem issue : syntaxProblems)
 			if (issue.severity == ProblemSeverity.ERROR)
 				return new CompileResult(syntaxProblems, null, "<ERROR>", null);
+		parse = Insulin.resolveFragments(parse);
 		Set<Problem> validate = HDLValidator.validate(parse, null);
 		boolean hasValidationError = false;
 		for (Problem issue : validate) {
