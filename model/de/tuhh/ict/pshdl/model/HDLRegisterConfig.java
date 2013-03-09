@@ -2,8 +2,6 @@ package de.tuhh.ict.pshdl.model;
 
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
 
-import java.util.*;
-
 import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -156,7 +154,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	}
 
 	@Nonnull
-	public static HDLRegisterConfig fromArgs(ArrayList<HDLArgument> args) {
+	public static HDLRegisterConfig fromArgs(Iterable<HDLArgument> args) {
 		HDLRegisterConfig config = defaultConfig();
 		for (HDLArgument genArgs : args) {
 			String name = genArgs.getName();

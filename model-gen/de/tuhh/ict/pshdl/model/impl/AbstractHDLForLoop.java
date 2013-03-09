@@ -26,7 +26,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLForLoop(@Nullable IHDLObject container, @Nonnull ArrayList<HDLRange> range, @Nonnull HDLVariable param, @Nonnull ArrayList<HDLStatement> dos, boolean validate) {
+	public AbstractHDLForLoop(@Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nonnull Iterable<HDLStatement> dos, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			range = validateRange(range);
@@ -72,15 +72,15 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLRange> getRange() {
+	@Nonnull
+	public ArrayList<HDLRange> getRange() {
 		return (ArrayList<HDLRange>) range.clone();
 	}
 
-	protected ArrayList<HDLRange> validateRange(ArrayList<HDLRange> range) {
+	protected Iterable<HDLRange> validateRange(Iterable<HDLRange> range) {
 		if (range == null)
 			throw new IllegalArgumentException("The field range can not be null!");
-		if (range.size() < 1)
+		if (!range.iterator().hasNext())
 			throw new IllegalArgumentException("The field range must contain at least one item!");
 		return range;
 	}
@@ -93,8 +93,8 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLVariable getParam() {
+	@Nonnull
+	public HDLVariable getParam() {
 		return param;
 	}
 
@@ -113,15 +113,15 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getDos() {
+	@Nonnull
+	public ArrayList<HDLStatement> getDos() {
 		return (ArrayList<HDLStatement>) dos.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateDos(ArrayList<HDLStatement> dos) {
+	protected Iterable<HDLStatement> validateDos(Iterable<HDLStatement> dos) {
 		if (dos == null)
 			throw new IllegalArgumentException("The field dos can not be null!");
-		if (dos.size() < 1)
+		if (!dos.iterator().hasNext())
 			throw new IllegalArgumentException("The field dos must contain at least one item!");
 		return dos;
 	}
@@ -192,7 +192,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLForLoop setRange(@Nonnull ArrayList<HDLRange> range) {
+	public HDLForLoop setRange(@Nonnull Iterable<HDLRange> range) {
 		range = validateRange(range);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
 		return res;
@@ -279,7 +279,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
 	@Nonnull
-	public HDLForLoop setDos(@Nonnull ArrayList<HDLStatement> dos) {
+	public HDLForLoop setDos(@Nonnull Iterable<HDLStatement> dos) {
 		dos = validateDos(dos);
 		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
 		return res;
@@ -385,7 +385,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLForLoop()");
-		if (range != null)
+		if (range != null) {
 			if (range.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : range) {
@@ -393,10 +393,11 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (param != null) {
 			sb.append(".setParam(").append(param.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (dos != null)
+		if (dos != null) {
 			if (dos.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : dos) {
@@ -404,6 +405,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

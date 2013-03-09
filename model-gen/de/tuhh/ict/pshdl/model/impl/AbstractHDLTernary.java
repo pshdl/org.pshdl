@@ -67,8 +67,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getIfExpr() {
+	@Nonnull
+	public HDLExpression getIfExpr() {
 		return ifExpr;
 	}
 
@@ -86,8 +86,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getThenExpr() {
+	@Nonnull
+	public HDLExpression getThenExpr() {
 		return thenExpr;
 	}
 
@@ -105,8 +105,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getElseExpr() {
+	@Nonnull
+	public HDLExpression getElseExpr() {
 		return elseExpr;
 	}
 

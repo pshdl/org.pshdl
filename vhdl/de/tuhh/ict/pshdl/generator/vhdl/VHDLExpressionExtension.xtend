@@ -70,6 +70,9 @@ import static de.tuhh.ict.pshdl.model.HDLBitOp$HDLBitOpType.*
 import static de.tuhh.ict.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
 import static de.tuhh.ict.pshdl.model.HDLLiteral$HDLLiteralPresentation.*
 import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
+import de.tuhh.ict.pshdl.model.HDLArrayInit
+import de.upb.hni.vmagic.expression.Aggregate
+import java.util.ArrayList
 
 class VHDLExpressionExtension {
 
@@ -125,14 +128,14 @@ class VHDLExpressionExtension {
 		return result
 	}
 
+	def dispatch Expression<?> toVHDL(HDLArrayInit obj) {
+		return new Aggregate(obj.exp.fold(new LinkedList<Expression<?>>)[l, e | l.add(e.toVHDL); l])
+	}
+
 	def dispatch Name<?> toVHDL(HDLInterfaceRef obj) {
 		var Name<?> result = new Signal(obj.VHDLName, UnresolvedType::NO_NAME)
 		if (obj.ifArray.size != 0) {
-			val List<Expression> indices = new LinkedList<Expression>
-			for (HDLExpression arr : obj.ifArray) {
-				indices.add(arr.toVHDL)
-			}
-			result = new ArrayElement<Name<?>>(result, indices)
+			result = new ArrayElement<Name<?>>(result, obj.ifArray.fold(new LinkedList<Expression>)[l, e | l.add(e.toVHDL); l])
 		}
 		return getRef(result, obj)
 	}

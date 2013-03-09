@@ -56,8 +56,8 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getLeft() {
+	@Nonnull
+	public HDLExpression getLeft() {
 		return left;
 	}
 
@@ -75,8 +75,8 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getRight() {
+	@Nonnull
+	public HDLExpression getRight() {
 		return right;
 	}
 
@@ -86,11 +86,11 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 		return right;
 	}
 
-	public abstract @Nonnull
-	HDLOpExpression setLeft(@Nonnull HDLExpression left);
+	@Nonnull
+	public abstract HDLOpExpression setLeft(@Nonnull HDLExpression left);
 
-	public abstract @Nonnull
-	HDLOpExpression setRight(@Nonnull HDLExpression right);
+	@Nonnull
+	public abstract HDLOpExpression setRight(@Nonnull HDLExpression right);
 
 	/**
 	 * Creates a copy of this class with the same fields.

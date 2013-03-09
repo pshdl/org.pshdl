@@ -822,7 +822,6 @@ public class Insulin {
 		}
 	}
 
-	@SuppressWarnings("null")
 	private static <T extends HDLObject> T handlePostfixOp(T apply) {
 		ModificationSet ms = new ModificationSet();
 		HDLAssignment[] loops = apply.getAllObjectsOf(HDLAssignment.class, true);

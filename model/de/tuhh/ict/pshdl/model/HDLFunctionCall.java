@@ -29,7 +29,7 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunctionCall(@Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params, boolean validate) {
+	public HDLFunctionCall(@Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable Iterable<HDLExpression> params, boolean validate) {
 		super(container, name, params, validate);
 	}
 

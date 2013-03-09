@@ -95,11 +95,13 @@ public class HDLQuery {
 			this.matcher = matcher;
 		}
 
+		@SuppressWarnings("unchecked")
 		public Collection<T> getAll() {
 			return from.getAllObjectsOf(clazz, field, matcher);
 		}
 
 		public T getFirst() {
+			@SuppressWarnings("unchecked")
 			Collection<T> res = from.getAllObjectsOf(clazz, field, matcher);
 			if (res.isEmpty())
 				return null;
@@ -135,7 +137,7 @@ public class HDLQuery {
 		}
 
 		public Result<T, K> lastSegmentIs(String lastSegment) {
-			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(lastSegment));
+			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher<K>(lastSegment));
 		}
 
 		public Result<T, K> isNotEqualTo(K value) {
@@ -143,7 +145,7 @@ public class HDLQuery {
 		}
 
 		public Result<T, K> matchesLocally(HDLQualifiedName fullName) {
-			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher(fullName, true));
+			return new Result<T, K>(from, clazz, field, new LastSegmentMatcher<K>(fullName, true));
 		}
 
 		public Result<T, K> matches(Predicate<K> predicate) {

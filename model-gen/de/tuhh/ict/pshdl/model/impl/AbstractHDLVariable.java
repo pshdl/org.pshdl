@@ -26,8 +26,8 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLVariable(@Nullable IHDLObject container, @Nonnull String name, @Nullable ArrayList<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
-			@Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
+	public AbstractHDLVariable(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+			@Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			name = validateName(name);
@@ -76,8 +76,8 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getName() {
+	@Nonnull
+	public String getName() {
 		return name;
 	}
 
@@ -95,12 +95,12 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getDimensions() {
+	@Nonnull
+	public ArrayList<HDLExpression> getDimensions() {
 		return (ArrayList<HDLExpression>) dimensions.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateDimensions(ArrayList<HDLExpression> dimensions) {
+	protected Iterable<HDLExpression> validateDimensions(Iterable<HDLExpression> dimensions) {
 		if (dimensions == null)
 			return new ArrayList<HDLExpression>();
 		return dimensions;
@@ -114,8 +114,8 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLExpression getDefaultValue() {
+	@Nullable
+	public HDLExpression getDefaultValue() {
 		return defaultValue;
 	}
 
@@ -131,12 +131,12 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLAnnotation> getAnnotations() {
+	@Nonnull
+	public ArrayList<HDLAnnotation> getAnnotations() {
 		return (ArrayList<HDLAnnotation>) annotations.clone();
 	}
 
-	protected ArrayList<HDLAnnotation> validateAnnotations(ArrayList<HDLAnnotation> annotations) {
+	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
 		if (annotations == null)
 			return new ArrayList<HDLAnnotation>();
 		return annotations;
@@ -224,7 +224,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLVariable setDimensions(@Nullable ArrayList<HDLExpression> dimensions) {
+	public HDLVariable setDimensions(@Nullable Iterable<HDLExpression> dimensions) {
 		dimensions = validateDimensions(dimensions);
 		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
 		return res;
@@ -311,7 +311,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 *         annotations field.
 	 */
 	@Nonnull
-	public HDLVariable setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLVariable setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
 		return res;
@@ -430,7 +430,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (dimensions != null)
+		if (dimensions != null) {
 			if (dimensions.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : dimensions) {
@@ -438,10 +438,11 @@ public abstract class AbstractHDLVariable extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (defaultValue != null) {
 			sb.append(".setDefaultValue(").append(defaultValue.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -449,6 +450,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

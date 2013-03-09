@@ -1,7 +1,5 @@
 package de.tuhh.ict.pshdl.model;
 
-import java.util.*;
-
 import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -31,7 +29,7 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly, boolean validate) {
+	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly, boolean validate) {
 		super(container, annotations, name, simOnly, validate);
 	}
 

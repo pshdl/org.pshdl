@@ -126,8 +126,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLRegClockType getClockType() {
+	@Nullable
+	public HDLRegClockType getClockType() {
 		return clockType;
 	}
 
@@ -142,8 +142,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLRegResetActiveType getResetType() {
+	@Nullable
+	public HDLRegResetActiveType getResetType() {
 		return resetType;
 	}
 
@@ -158,8 +158,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLRegSyncType getSyncType() {
+	@Nullable
+	public HDLRegSyncType getSyncType() {
 		return syncType;
 	}
 
@@ -175,8 +175,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getResetValue() {
+	@Nonnull
+	public HDLExpression getResetValue() {
 		return resetValue;
 	}
 

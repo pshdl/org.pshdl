@@ -24,7 +24,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLIfStatement(@Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo, @Nullable ArrayList<HDLStatement> elseDo,
+	public AbstractHDLIfStatement(@Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable Iterable<HDLStatement> thenDo, @Nullable Iterable<HDLStatement> elseDo,
 			boolean validate) {
 		super(container, validate);
 		if (validate) {
@@ -70,8 +70,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getIfExp() {
+	@Nonnull
+	public HDLExpression getIfExp() {
 		return ifExp;
 	}
 
@@ -89,12 +89,12 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getThenDo() {
+	@Nonnull
+	public ArrayList<HDLStatement> getThenDo() {
 		return (ArrayList<HDLStatement>) thenDo.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateThenDo(ArrayList<HDLStatement> thenDo) {
+	protected Iterable<HDLStatement> validateThenDo(Iterable<HDLStatement> thenDo) {
 		if (thenDo == null)
 			return new ArrayList<HDLStatement>();
 		return thenDo;
@@ -108,12 +108,12 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getElseDo() {
+	@Nonnull
+	public ArrayList<HDLStatement> getElseDo() {
 		return (ArrayList<HDLStatement>) elseDo.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateElseDo(ArrayList<HDLStatement> elseDo) {
+	protected Iterable<HDLStatement> validateElseDo(Iterable<HDLStatement> elseDo) {
 		if (elseDo == null)
 			return new ArrayList<HDLStatement>();
 		return elseDo;
@@ -199,7 +199,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLIfStatement setThenDo(@Nullable ArrayList<HDLStatement> thenDo) {
+	public HDLIfStatement setThenDo(@Nullable Iterable<HDLStatement> thenDo) {
 		thenDo = validateThenDo(thenDo);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
 		return res;
@@ -269,7 +269,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLIfStatement setElseDo(@Nullable ArrayList<HDLStatement> elseDo) {
+	public HDLIfStatement setElseDo(@Nullable Iterable<HDLStatement> elseDo) {
 		elseDo = validateElseDo(elseDo);
 		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
 		return res;
@@ -382,7 +382,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		if (ifExp != null) {
 			sb.append(".setIfExp(").append(ifExp.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (thenDo != null)
+		if (thenDo != null) {
 			if (thenDo.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : thenDo) {
@@ -390,7 +390,8 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (elseDo != null)
+		}
+		if (elseDo != null) {
 			if (elseDo.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : elseDo) {
@@ -398,6 +399,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

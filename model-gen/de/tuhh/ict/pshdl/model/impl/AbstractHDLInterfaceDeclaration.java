@@ -22,7 +22,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterfaceDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull HDLInterface hIf, boolean validate) {
+	public AbstractHDLInterfaceDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLInterface hIf, boolean validate) {
 		super(container, annotations, validate);
 		if (validate) {
 			hIf = validateHIf(hIf);
@@ -47,8 +47,8 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLInterface getHIf() {
+	@Nonnull
+	public HDLInterface getHIf() {
 		return hIf;
 	}
 
@@ -123,7 +123,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 */
 	@Override
 	@Nonnull
-	public HDLInterfaceDeclaration setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLInterfaceDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(container, annotations, hIf, false);
 		return res;
@@ -239,7 +239,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLInterfaceDeclaration()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -247,6 +247,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (hIf != null) {
 			sb.append(".setHIf(").append(hIf.toConstructionString(spacing + "\t")).append(")");
 		}

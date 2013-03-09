@@ -32,9 +32,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLUnit(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name,
-			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> inits, @Nullable ArrayList<HDLStatement> statements, @Nonnull Boolean simulation,
-			boolean validate) {
+	public AbstractHDLUnit(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name,
+			@Nullable Iterable<String> imports, @Nullable Iterable<HDLStatement> inits, @Nullable Iterable<HDLStatement> statements, @Nonnull Boolean simulation, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			annotations = validateAnnotations(annotations);
@@ -105,12 +104,12 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLAnnotation> getAnnotations() {
+	@Nonnull
+	public ArrayList<HDLAnnotation> getAnnotations() {
 		return (ArrayList<HDLAnnotation>) annotations.clone();
 	}
 
-	protected ArrayList<HDLAnnotation> validateAnnotations(ArrayList<HDLAnnotation> annotations) {
+	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
 		if (annotations == null)
 			return new ArrayList<HDLAnnotation>();
 		return annotations;
@@ -123,8 +122,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getLibURI() {
+	@Nonnull
+	public String getLibURI() {
 		return libURI;
 	}
 
@@ -141,8 +140,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getName() {
+	@Nonnull
+	public String getName() {
 		return name;
 	}
 
@@ -159,12 +158,12 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<String> getImports() {
+	@Nonnull
+	public ArrayList<String> getImports() {
 		return (ArrayList<String>) imports.clone();
 	}
 
-	protected ArrayList<String> validateImports(ArrayList<String> imports) {
+	protected Iterable<String> validateImports(Iterable<String> imports) {
 		if (imports == null)
 			return new ArrayList<String>();
 		return imports;
@@ -178,12 +177,12 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getInits() {
+	@Nonnull
+	public ArrayList<HDLStatement> getInits() {
 		return (ArrayList<HDLStatement>) inits.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateInits(ArrayList<HDLStatement> inits) {
+	protected Iterable<HDLStatement> validateInits(Iterable<HDLStatement> inits) {
 		if (inits == null)
 			return new ArrayList<HDLStatement>();
 		return inits;
@@ -197,12 +196,12 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getStatements() {
+	@Nonnull
+	public ArrayList<HDLStatement> getStatements() {
 		return (ArrayList<HDLStatement>) statements.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateStatements(ArrayList<HDLStatement> statements) {
+	protected Iterable<HDLStatement> validateStatements(Iterable<HDLStatement> statements) {
 		if (statements == null)
 			return new ArrayList<HDLStatement>();
 		return statements;
@@ -215,8 +214,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	Boolean getSimulation() {
+	@Nonnull
+	public Boolean getSimulation() {
 		return simulation;
 	}
 
@@ -296,7 +295,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLUnit setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLUnit setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLUnit res = new HDLUnit(container, annotations, libURI, name, imports, inits, statements, simulation, false);
 		return res;
@@ -395,7 +394,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * @return a new instance of {@link HDLUnit} with the updated imports field.
 	 */
 	@Nonnull
-	public HDLUnit setImports(@Nullable ArrayList<String> imports) {
+	public HDLUnit setImports(@Nullable Iterable<String> imports) {
 		imports = validateImports(imports);
 		HDLUnit res = new HDLUnit(container, annotations, libURI, name, imports, inits, statements, simulation, false);
 		return res;
@@ -461,7 +460,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 * @return a new instance of {@link HDLUnit} with the updated inits field.
 	 */
 	@Nonnull
-	public HDLUnit setInits(@Nullable ArrayList<HDLStatement> inits) {
+	public HDLUnit setInits(@Nullable Iterable<HDLStatement> inits) {
 		inits = validateInits(inits);
 		HDLUnit res = new HDLUnit(container, annotations, libURI, name, imports, inits, statements, simulation, false);
 		return res;
@@ -529,7 +528,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLUnit setStatements(@Nullable ArrayList<HDLStatement> statements) {
+	public HDLUnit setStatements(@Nullable Iterable<HDLStatement> statements) {
 		statements = validateStatements(statements);
 		HDLUnit res = new HDLUnit(container, annotations, libURI, name, imports, inits, statements, simulation, false);
 		return res;
@@ -695,7 +694,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLUnit()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -703,13 +702,14 @@ public abstract class AbstractHDLUnit extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (libURI != null) {
 			sb.append(".setLibURI(").append('"' + libURI + '"').append(")");
 		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (imports != null)
+		if (imports != null) {
 			if (imports.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (String o : imports) {
@@ -718,7 +718,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (inits != null)
+		}
+		if (inits != null) {
 			if (inits.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : inits) {
@@ -726,7 +727,8 @@ public abstract class AbstractHDLUnit extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (statements != null)
+		}
+		if (statements != null) {
 			if (statements.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : statements) {
@@ -734,6 +736,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (simulation != null) {
 			sb.append(".setSimulation(").append(simulation).append(")");
 		}

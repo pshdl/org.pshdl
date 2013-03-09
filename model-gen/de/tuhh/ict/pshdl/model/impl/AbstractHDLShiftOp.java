@@ -45,8 +45,8 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	 * @return the field
 	 */
 	@Override
-	public @Nonnull
-	HDLShiftOpType getType() {
+	@Nonnull
+	public HDLShiftOpType getType() {
 		return type;
 	}
 

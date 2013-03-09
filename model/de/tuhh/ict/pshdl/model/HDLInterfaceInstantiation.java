@@ -36,7 +36,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterfaceInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf,
+	public HDLInterfaceInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf,
 			boolean validate) {
 		super(container, var, arguments, hIf, validate);
 	}

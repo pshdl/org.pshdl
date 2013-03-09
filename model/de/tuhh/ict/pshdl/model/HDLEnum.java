@@ -30,7 +30,7 @@ public class HDLEnum extends AbstractHDLEnum {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull ArrayList<HDLVariable> enums, boolean validate) {
+	public HDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
 		super(container, name, enums, validate);
 	}
 

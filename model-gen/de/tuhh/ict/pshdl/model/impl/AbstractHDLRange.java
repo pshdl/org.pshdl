@@ -56,8 +56,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLExpression getFrom() {
+	@Nullable
+	public HDLExpression getFrom() {
 		return from;
 	}
 
@@ -73,8 +73,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getTo() {
+	@Nonnull
+	public HDLExpression getTo() {
 		return to;
 	}
 

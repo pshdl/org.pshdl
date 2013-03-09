@@ -25,7 +25,7 @@ public class HDLArrayInit extends AbstractHDLArrayInit {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLArrayInit(@Nullable IHDLObject container, @Nullable ArrayList<HDLExpression> exp, boolean validate) {
+	public HDLArrayInit(@Nullable IHDLObject container, @Nullable Iterable<HDLExpression> exp, boolean validate) {
 		super(container, exp, validate);
 	}
 

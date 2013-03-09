@@ -31,7 +31,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLIfStatement(@Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable ArrayList<HDLStatement> thenDo, @Nullable ArrayList<HDLStatement> elseDo,
+	public HDLIfStatement(@Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable Iterable<HDLStatement> thenDo, @Nullable Iterable<HDLStatement> elseDo,
 			boolean validate) {
 		super(container, ifExp, thenDo, elseDo, validate);
 	}

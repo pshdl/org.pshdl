@@ -34,7 +34,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+	public HDLVariableRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			boolean validate) {
 		super(container, var, array, bits, validate);
 	}

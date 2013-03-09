@@ -51,8 +51,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getName() {
+	@Nonnull
+	public String getName() {
 		return name;
 	}
 
@@ -70,8 +70,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getExpression() {
+	@Nonnull
+	public HDLExpression getExpression() {
 		return expression;
 	}
 

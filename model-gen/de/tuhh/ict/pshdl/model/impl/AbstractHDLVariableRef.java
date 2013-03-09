@@ -24,7 +24,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLVariableRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+	public AbstractHDLVariableRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			boolean validate) {
 		super(container, var, validate);
 		if (validate) {
@@ -61,12 +61,12 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getArray() {
+	@Nonnull
+	public ArrayList<HDLExpression> getArray() {
 		return (ArrayList<HDLExpression>) array.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateArray(ArrayList<HDLExpression> array) {
+	protected Iterable<HDLExpression> validateArray(Iterable<HDLExpression> array) {
 		if (array == null)
 			return new ArrayList<HDLExpression>();
 		return array;
@@ -80,12 +80,12 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLRange> getBits() {
+	@Nonnull
+	public ArrayList<HDLRange> getBits() {
 		return (ArrayList<HDLRange>) bits.clone();
 	}
 
-	protected ArrayList<HDLRange> validateBits(ArrayList<HDLRange> bits) {
+	protected Iterable<HDLRange> validateBits(Iterable<HDLRange> bits) {
 		if (bits == null)
 			return new ArrayList<HDLRange>();
 		return bits;
@@ -172,7 +172,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLVariableRef setArray(@Nullable ArrayList<HDLExpression> array) {
+	public HDLVariableRef setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
 		HDLVariableRef res = new HDLVariableRef(container, var, array, bits, false);
 		return res;
@@ -242,7 +242,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLVariableRef setBits(@Nullable ArrayList<HDLRange> bits) {
+	public HDLVariableRef setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
 		HDLVariableRef res = new HDLVariableRef(container, var, array, bits, false);
 		return res;
@@ -348,7 +348,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		if (var != null) {
 			sb.append(".setVar(HDLQualifiedName.create(\"").append(var).append("\"))");
 		}
-		if (array != null)
+		if (array != null) {
 			if (array.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : array) {
@@ -356,7 +356,8 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (bits != null)
+		}
+		if (bits != null) {
 			if (bits.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : bits) {
@@ -364,6 +365,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

@@ -34,7 +34,7 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnresolvedFragment(@Nullable IHDLObject container, @Nonnull String frag, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+	public HDLUnresolvedFragment(@Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			@Nullable HDLUnresolvedFragment sub, boolean validate) {
 		super(container, frag, array, bits, sub, validate);
 	}

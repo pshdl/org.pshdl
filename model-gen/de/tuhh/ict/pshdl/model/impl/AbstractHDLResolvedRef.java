@@ -56,8 +56,8 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 		return var;
 	}
 
-	public abstract @Nonnull
-	HDLResolvedRef setVar(@Nonnull HDLQualifiedName var);
+	@Nonnull
+	public abstract HDLResolvedRef setVar(@Nonnull HDLQualifiedName var);
 
 	/**
 	 * Creates a copy of this class with the same fields.

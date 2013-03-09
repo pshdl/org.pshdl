@@ -29,8 +29,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLUnresolvedFragmentFunction(@Nullable IHDLObject container, @Nonnull String frag, @Nullable ArrayList<HDLExpression> array,
-			@Nullable ArrayList<HDLRange> bits, @Nullable HDLUnresolvedFragment sub, @Nullable ArrayList<HDLExpression> params, boolean validate) {
+	public AbstractHDLUnresolvedFragmentFunction(@Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
+			@Nullable HDLUnresolvedFragment sub, @Nullable Iterable<HDLExpression> params, boolean validate) {
 		super(container, frag, array, bits, sub, validate);
 		if (validate) {
 			params = validateParams(params);
@@ -56,12 +56,12 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getParams() {
+	@Nonnull
+	public ArrayList<HDLExpression> getParams() {
 		return (ArrayList<HDLExpression>) params.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateParams(ArrayList<HDLExpression> params) {
+	protected Iterable<HDLExpression> validateParams(Iterable<HDLExpression> params) {
 		if (params == null)
 			return new ArrayList<HDLExpression>();
 		return params;
@@ -152,7 +152,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 */
 	@Override
 	@Nonnull
-	public HDLUnresolvedFragmentFunction setArray(@Nullable ArrayList<HDLExpression> array) {
+	public HDLUnresolvedFragmentFunction setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -226,7 +226,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 */
 	@Override
 	@Nonnull
-	public HDLUnresolvedFragmentFunction setBits(@Nullable ArrayList<HDLRange> bits) {
+	public HDLUnresolvedFragmentFunction setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -314,7 +314,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	 *         updated params field.
 	 */
 	@Nonnull
-	public HDLUnresolvedFragmentFunction setParams(@Nullable ArrayList<HDLExpression> params) {
+	public HDLUnresolvedFragmentFunction setParams(@Nullable Iterable<HDLExpression> params) {
 		params = validateParams(params);
 		HDLUnresolvedFragmentFunction res = new HDLUnresolvedFragmentFunction(container, frag, array, bits, sub, params, false);
 		return res;
@@ -415,7 +415,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 		if (frag != null) {
 			sb.append(".setFrag(").append('"' + frag + '"').append(")");
 		}
-		if (array != null)
+		if (array != null) {
 			if (array.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : array) {
@@ -423,7 +423,8 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (bits != null)
+		}
+		if (bits != null) {
 			if (bits.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : bits) {
@@ -431,10 +432,11 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (sub != null) {
 			sb.append(".setSub(").append(sub.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (params != null)
+		if (params != null) {
 			if (params.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : params) {
@@ -442,6 +444,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

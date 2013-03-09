@@ -28,7 +28,7 @@ public class HDLBlock extends AbstractHDLBlock {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLBlock(@Nullable IHDLObject container, @Nonnull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate) {
+	public HDLBlock(@Nullable IHDLObject container, @Nonnull Boolean process, @Nullable Iterable<HDLStatement> statements, boolean validate) {
 		super(container, process, statements, validate);
 	}
 

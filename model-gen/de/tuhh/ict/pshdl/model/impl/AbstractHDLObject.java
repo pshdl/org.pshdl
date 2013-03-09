@@ -38,8 +38,8 @@ public abstract class AbstractHDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	IHDLObject getContainer() {
+	@Nullable
+	public IHDLObject getContainer() {
 		return container;
 	}
 
@@ -47,8 +47,8 @@ public abstract class AbstractHDLObject {
 		return container;
 	}
 
-	public abstract @Nonnull
-	HDLObject setContainer(@Nullable IHDLObject container);
+	@Nonnull
+	public abstract HDLObject setContainer(@Nullable IHDLObject container);
 
 	/**
 	 * Creates a copy of this class with the same fields.

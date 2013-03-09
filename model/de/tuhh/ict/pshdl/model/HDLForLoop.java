@@ -35,7 +35,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLForLoop(@Nullable IHDLObject container, @Nonnull ArrayList<HDLRange> range, @Nonnull HDLVariable param, @Nonnull ArrayList<HDLStatement> dos, boolean validate) {
+	public HDLForLoop(@Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nonnull Iterable<HDLStatement> dos, boolean validate) {
 		super(container, range, param, dos, validate);
 	}
 

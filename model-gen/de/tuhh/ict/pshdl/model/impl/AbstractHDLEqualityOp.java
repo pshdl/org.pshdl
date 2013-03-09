@@ -45,8 +45,8 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * @return the field
 	 */
 	@Override
-	public @Nonnull
-	HDLEqualityOpType getType() {
+	@Nonnull
+	public HDLEqualityOpType getType() {
 		return type;
 	}
 

@@ -26,8 +26,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLPackage(@Nullable IHDLObject container, @Nonnull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
-			@Nullable ArrayList<HDLDeclaration> declarations, boolean validate) {
+	public AbstractHDLPackage(@Nullable IHDLObject container, @Nonnull String libURI, @Nullable String pkg, @Nullable Iterable<HDLUnit> units,
+			@Nullable Iterable<HDLDeclaration> declarations, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			libURI = validateLibURI(libURI);
@@ -72,8 +72,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getLibURI() {
+	@Nonnull
+	public String getLibURI() {
 		return libURI;
 	}
 
@@ -90,8 +90,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	String getPkg() {
+	@Nullable
+	public String getPkg() {
 		return pkg;
 	}
 
@@ -107,12 +107,12 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLUnit> getUnits() {
+	@Nonnull
+	public ArrayList<HDLUnit> getUnits() {
 		return (ArrayList<HDLUnit>) units.clone();
 	}
 
-	protected ArrayList<HDLUnit> validateUnits(ArrayList<HDLUnit> units) {
+	protected Iterable<HDLUnit> validateUnits(Iterable<HDLUnit> units) {
 		if (units == null)
 			return new ArrayList<HDLUnit>();
 		return units;
@@ -126,12 +126,12 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLDeclaration> getDeclarations() {
+	@Nonnull
+	public ArrayList<HDLDeclaration> getDeclarations() {
 		return (ArrayList<HDLDeclaration>) declarations.clone();
 	}
 
-	protected ArrayList<HDLDeclaration> validateDeclarations(ArrayList<HDLDeclaration> declarations) {
+	protected Iterable<HDLDeclaration> validateDeclarations(Iterable<HDLDeclaration> declarations) {
 		if (declarations == null)
 			return new ArrayList<HDLDeclaration>();
 		return declarations;
@@ -232,7 +232,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLPackage setUnits(@Nullable ArrayList<HDLUnit> units) {
+	public HDLPackage setUnits(@Nullable Iterable<HDLUnit> units) {
 		units = validateUnits(units);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
 		return res;
@@ -303,7 +303,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 *         declarations field.
 	 */
 	@Nonnull
-	public HDLPackage setDeclarations(@Nullable ArrayList<HDLDeclaration> declarations) {
+	public HDLPackage setDeclarations(@Nullable Iterable<HDLDeclaration> declarations) {
 		declarations = validateDeclarations(declarations);
 		HDLPackage res = new HDLPackage(container, libURI, pkg, units, declarations, false);
 		return res;
@@ -425,7 +425,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		if (pkg != null) {
 			sb.append(".setPkg(").append('"' + pkg + '"').append(")");
 		}
-		if (units != null)
+		if (units != null) {
 			if (units.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLUnit o : units) {
@@ -433,7 +433,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (declarations != null)
+		}
+		if (declarations != null) {
 			if (declarations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLDeclaration o : declarations) {
@@ -441,6 +442,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

@@ -22,7 +22,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLSwitchStatement(@Nullable IHDLObject container, @Nonnull HDLExpression caseExp, @Nullable ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
+	public AbstractHDLSwitchStatement(@Nullable IHDLObject container, @Nonnull HDLExpression caseExp, @Nullable Iterable<HDLSwitchCaseStatement> cases, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			caseExp = validateCaseExp(caseExp);
@@ -57,8 +57,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getCaseExp() {
+	@Nonnull
+	public HDLExpression getCaseExp() {
 		return caseExp;
 	}
 
@@ -76,12 +76,12 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLSwitchCaseStatement> getCases() {
+	@Nonnull
+	public ArrayList<HDLSwitchCaseStatement> getCases() {
 		return (ArrayList<HDLSwitchCaseStatement>) cases.clone();
 	}
 
-	protected ArrayList<HDLSwitchCaseStatement> validateCases(ArrayList<HDLSwitchCaseStatement> cases) {
+	protected Iterable<HDLSwitchCaseStatement> validateCases(Iterable<HDLSwitchCaseStatement> cases) {
 		if (cases == null)
 			return new ArrayList<HDLSwitchCaseStatement>();
 		return cases;
@@ -166,7 +166,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 *         cases field.
 	 */
 	@Nonnull
-	public HDLSwitchStatement setCases(@Nullable ArrayList<HDLSwitchCaseStatement> cases) {
+	public HDLSwitchStatement setCases(@Nullable Iterable<HDLSwitchCaseStatement> cases) {
 		cases = validateCases(cases);
 		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
 		return res;
@@ -273,7 +273,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 		if (caseExp != null) {
 			sb.append(".setCaseExp(").append(caseExp.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (cases != null)
+		if (cases != null) {
 			if (cases.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLSwitchCaseStatement o : cases) {
@@ -281,6 +281,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

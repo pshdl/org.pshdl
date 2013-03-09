@@ -45,8 +45,8 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * @return the field
 	 */
 	@Override
-	public @Nonnull
-	HDLArithOpType getType() {
+	@Nonnull
+	public HDLArithOpType getType() {
 		return type;
 	}
 

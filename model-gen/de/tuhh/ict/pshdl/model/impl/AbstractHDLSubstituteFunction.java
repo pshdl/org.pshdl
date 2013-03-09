@@ -26,8 +26,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLSubstituteFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name,
-			@Nullable ArrayList<HDLVariable> args, @Nullable ArrayList<HDLStatement> stmnts, boolean validate) {
+	public AbstractHDLSubstituteFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLVariable> args,
+			@Nullable Iterable<HDLStatement> stmnts, boolean validate) {
 		super(container, annotations, name, validate);
 		if (validate) {
 			args = validateArgs(args);
@@ -63,12 +63,12 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLVariable> getArgs() {
+	@Nonnull
+	public ArrayList<HDLVariable> getArgs() {
 		return (ArrayList<HDLVariable>) args.clone();
 	}
 
-	protected ArrayList<HDLVariable> validateArgs(ArrayList<HDLVariable> args) {
+	protected Iterable<HDLVariable> validateArgs(Iterable<HDLVariable> args) {
 		if (args == null)
 			return new ArrayList<HDLVariable>();
 		return args;
@@ -82,12 +82,12 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getStmnts() {
+	@Nonnull
+	public ArrayList<HDLStatement> getStmnts() {
 		return (ArrayList<HDLStatement>) stmnts.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateStmnts(ArrayList<HDLStatement> stmnts) {
+	protected Iterable<HDLStatement> validateStmnts(Iterable<HDLStatement> stmnts) {
 		if (stmnts == null)
 			return new ArrayList<HDLStatement>();
 		return stmnts;
@@ -160,7 +160,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 */
 	@Override
 	@Nonnull
-	public HDLSubstituteFunction setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLSubstituteFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLSubstituteFunction res = new HDLSubstituteFunction(container, annotations, name, args, stmnts, false);
 		return res;
@@ -249,7 +249,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 *         args field.
 	 */
 	@Nonnull
-	public HDLSubstituteFunction setArgs(@Nullable ArrayList<HDLVariable> args) {
+	public HDLSubstituteFunction setArgs(@Nullable Iterable<HDLVariable> args) {
 		args = validateArgs(args);
 		HDLSubstituteFunction res = new HDLSubstituteFunction(container, annotations, name, args, stmnts, false);
 		return res;
@@ -318,7 +318,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 *         stmnts field.
 	 */
 	@Nonnull
-	public HDLSubstituteFunction setStmnts(@Nullable ArrayList<HDLStatement> stmnts) {
+	public HDLSubstituteFunction setStmnts(@Nullable Iterable<HDLStatement> stmnts) {
 		stmnts = validateStmnts(stmnts);
 		HDLSubstituteFunction res = new HDLSubstituteFunction(container, annotations, name, args, stmnts, false);
 		return res;
@@ -422,7 +422,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLSubstituteFunction()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -430,10 +430,11 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (args != null)
+		if (args != null) {
 			if (args.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariable o : args) {
@@ -441,7 +442,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (stmnts != null)
+		}
+		if (stmnts != null) {
 			if (stmnts.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : stmnts) {
@@ -449,6 +451,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

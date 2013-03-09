@@ -63,8 +63,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLManipType getType() {
+	@Nonnull
+	public HDLManipType getType() {
 		return type;
 	}
 
@@ -82,8 +82,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getTarget() {
+	@Nonnull
+	public HDLExpression getTarget() {
 		return target;
 	}
 
@@ -101,8 +101,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLType getCastTo() {
+	@Nullable
+	public HDLType getCastTo() {
 		return castTo;
 	}
 

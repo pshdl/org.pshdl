@@ -1027,16 +1027,23 @@ public class StringWriteExtension {
       _append_7.append(_newLine_1);
     }
     highlight.incSpacing();
-    ArrayList<HDLStatement> _dos = caseStmnt.getDos();
-    for (final HDLStatement stmnt : _dos) {
-      String _string_1 = this.toString(stmnt, highlight);
-      StringBuilder _append_8 = sb.append(_string_1);
-      String _newLine_2 = highlight.newLine();
-      _append_8.append(_newLine_2);
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      ArrayList<HDLStatement> _dos = caseStmnt.getDos();
+      boolean _hasElements = false;
+      for(final HDLStatement stmnt : _dos) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          String _newLine_2 = highlight.newLine();
+          _builder.appendImmediate(_newLine_2, "");
+        }
+        String _string_1 = this.toString(stmnt, highlight);
+        _builder.append(_string_1, "");
+      }
     }
+    sb.append(_builder.toString());
     highlight.decSpacing();
-    StringBuilder _spacing = highlight.getSpacing();
-    sb.append(_spacing);
     String _leaving = this.leaving(caseStmnt, highlight);
     sb.append(_leaving);
     return sb.toString();

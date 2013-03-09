@@ -23,8 +23,13 @@ public class SourceInfo {
 		this.startLine = context.start.getLine();
 		this.totalOffset = context.start.getStartIndex();
 		this.startPosInLine = context.start.getCharPositionInLine();
-		this.endLine = context.stop.getLine();
-		this.endPosInLine = context.stop.getCharPositionInLine();
+		if (context.stop != null) {
+			this.endLine = context.stop.getLine();
+			this.endPosInLine = context.stop.getCharPositionInLine();
+		} else {
+			this.endLine = startLine;
+			this.endPosInLine = startPosInLine;
+		}
 		this.length = tokens.getText(context.getSourceInterval()).length();
 		if (tokens != null) {
 			List<Token> hidden = tokens.getHiddenTokensToLeft(context.start.getTokenIndex(), PSHDLLangLexer.COMMENTS);

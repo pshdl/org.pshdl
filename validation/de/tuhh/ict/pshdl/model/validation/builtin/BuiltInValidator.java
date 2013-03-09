@@ -53,9 +53,9 @@ public class BuiltInValidator implements IHDLValidator {
 		// others
 		try {
 			checkUnresolved(pkg, problems);
-			RWValidation.checkVariableUsage(pkg, problems);
 			checkFunctionCalls(pkg, problems, hContext);
 			pkg = Insulin.inlineFunctions(pkg);
+			RWValidation.checkVariableUsage(pkg, problems);
 			pkg = Insulin.setParameterOnInstance(pkg);
 			checkVariableNaming(pkg, problems);
 			checkClockAndResetAnnotation(pkg, problems);
@@ -522,6 +522,12 @@ public class BuiltInValidator implements IHDLValidator {
 				return;
 			Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
 			if ((var.isPresent()) && (var.get().getRegisterConfig() == null)) {
+				HDLBlock container = ass.getContainer(HDLBlock.class);
+				if ((container != null) && container.getProcess()) {
+					// If the assignment is happening within a process, chances
+					// are that the dev is trying something legal
+					continue;
+				}
 				problems.add(new Problem(ErrorCode.COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
 			}
 		}

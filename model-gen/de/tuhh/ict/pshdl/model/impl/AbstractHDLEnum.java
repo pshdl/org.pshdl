@@ -23,7 +23,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull ArrayList<HDLVariable> enums, boolean validate) {
+	public AbstractHDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
 		super(container, name, validate);
 		if (validate) {
 			enums = validateEnums(enums);
@@ -50,15 +50,15 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLVariable> getEnums() {
+	@Nonnull
+	public ArrayList<HDLVariable> getEnums() {
 		return (ArrayList<HDLVariable>) enums.clone();
 	}
 
-	protected ArrayList<HDLVariable> validateEnums(ArrayList<HDLVariable> enums) {
+	protected Iterable<HDLVariable> validateEnums(Iterable<HDLVariable> enums) {
 		if (enums == null)
 			throw new IllegalArgumentException("The field enums can not be null!");
-		if (enums.size() < 1)
+		if (!enums.iterator().hasNext())
 			throw new IllegalArgumentException("The field enums must contain at least one item!");
 		return enums;
 	}
@@ -143,7 +143,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 * @return a new instance of {@link HDLEnum} with the updated enums field.
 	 */
 	@Nonnull
-	public HDLEnum setEnums(@Nonnull ArrayList<HDLVariable> enums) {
+	public HDLEnum setEnums(@Nonnull Iterable<HDLVariable> enums) {
 		enums = validateEnums(enums);
 		HDLEnum res = new HDLEnum(container, name, enums, false);
 		return res;
@@ -241,7 +241,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (enums != null)
+		if (enums != null) {
 			if (enums.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariable o : enums) {
@@ -249,6 +249,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

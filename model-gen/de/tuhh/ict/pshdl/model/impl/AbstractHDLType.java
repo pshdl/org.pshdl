@@ -39,8 +39,8 @@ public abstract class AbstractHDLType extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getName() {
+	@Nonnull
+	public String getName() {
 		return name;
 	}
 
@@ -50,8 +50,8 @@ public abstract class AbstractHDLType extends HDLObject {
 		return name;
 	}
 
-	public abstract @Nonnull
-	HDLType setName(@Nonnull String name);
+	@Nonnull
+	public abstract HDLType setName(@Nonnull String name);
 
 	/**
 	 * Creates a copy of this class with the same fields.

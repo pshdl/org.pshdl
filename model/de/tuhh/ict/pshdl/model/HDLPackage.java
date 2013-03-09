@@ -35,8 +35,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPackage(@Nullable IHDLObject container, @Nonnull String libURI, @Nullable String pkg, @Nullable ArrayList<HDLUnit> units,
-			@Nullable ArrayList<HDLDeclaration> declarations, boolean validate) {
+	public HDLPackage(@Nullable IHDLObject container, @Nonnull String libURI, @Nullable String pkg, @Nullable Iterable<HDLUnit> units,
+			@Nullable Iterable<HDLDeclaration> declarations, boolean validate) {
 		super(container, libURI, pkg, units, declarations, validate);
 	}
 

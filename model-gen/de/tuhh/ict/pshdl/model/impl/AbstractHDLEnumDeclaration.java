@@ -22,7 +22,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLEnumDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull HDLEnum hEnum, boolean validate) {
+	public AbstractHDLEnumDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLEnum hEnum, boolean validate) {
 		super(container, annotations, validate);
 		if (validate) {
 			hEnum = validateHEnum(hEnum);
@@ -47,8 +47,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLEnum getHEnum() {
+	@Nonnull
+	public HDLEnum getHEnum() {
 		return hEnum;
 	}
 
@@ -123,7 +123,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 */
 	@Override
 	@Nonnull
-	public HDLEnumDeclaration setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLEnumDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLEnumDeclaration res = new HDLEnumDeclaration(container, annotations, hEnum, false);
 		return res;
@@ -239,7 +239,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLEnumDeclaration()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -247,6 +247,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (hEnum != null) {
 			sb.append(".setHEnum(").append(hEnum.toConstructionString(spacing + "\t")).append(")");
 		}

@@ -23,8 +23,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLNativeFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly,
-			boolean validate) {
+	public AbstractHDLNativeFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly, boolean validate) {
 		super(container, annotations, name, validate);
 		if (validate) {
 			simOnly = validateSimOnly(simOnly);
@@ -44,8 +43,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	Boolean getSimOnly() {
+	@Nonnull
+	public Boolean getSimOnly() {
 		return simOnly;
 	}
 
@@ -121,7 +120,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 */
 	@Override
 	@Nonnull
-	public HDLNativeFunction setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLNativeFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
 		return res;
@@ -270,7 +269,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLNativeFunction()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -278,6 +277,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}

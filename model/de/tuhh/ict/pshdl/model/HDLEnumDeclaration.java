@@ -1,7 +1,5 @@
 package de.tuhh.ict.pshdl.model;
 
-import java.util.*;
-
 import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.impl.*;
@@ -28,7 +26,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnumDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull HDLEnum hEnum, boolean validate) {
+	public HDLEnumDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLEnum hEnum, boolean validate) {
 		super(container, annotations, hEnum, validate);
 	}
 

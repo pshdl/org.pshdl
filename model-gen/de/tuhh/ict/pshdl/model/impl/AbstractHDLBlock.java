@@ -22,7 +22,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLBlock(@Nullable IHDLObject container, @Nonnull Boolean process, @Nullable ArrayList<HDLStatement> statements, boolean validate) {
+	public AbstractHDLBlock(@Nullable IHDLObject container, @Nonnull Boolean process, @Nullable Iterable<HDLStatement> statements, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			process = validateProcess(process);
@@ -52,8 +52,8 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	Boolean getProcess() {
+	@Nonnull
+	public Boolean getProcess() {
 		return process;
 	}
 
@@ -71,12 +71,12 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getStatements() {
+	@Nonnull
+	public ArrayList<HDLStatement> getStatements() {
 		return (ArrayList<HDLStatement>) statements.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateStatements(ArrayList<HDLStatement> statements) {
+	protected Iterable<HDLStatement> validateStatements(Iterable<HDLStatement> statements) {
 		if (statements == null)
 			return new ArrayList<HDLStatement>();
 		return statements;
@@ -178,7 +178,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	 *         field.
 	 */
 	@Nonnull
-	public HDLBlock setStatements(@Nullable ArrayList<HDLStatement> statements) {
+	public HDLBlock setStatements(@Nullable Iterable<HDLStatement> statements) {
 		statements = validateStatements(statements);
 		HDLBlock res = new HDLBlock(container, process, statements, false);
 		return res;
@@ -285,7 +285,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 		if (process != null) {
 			sb.append(".setProcess(").append(process).append(")");
 		}
-		if (statements != null)
+		if (statements != null) {
 			if (statements.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : statements) {
@@ -293,6 +293,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

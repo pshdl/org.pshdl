@@ -381,11 +381,8 @@ class StringWriteExtension {
 			sb.append(highlight.keyword("case")).append(highlight.simpleSpace).append(
 				caseStmnt.label.toString(highlight)).append(':').append(highlight.simpleSpace).append(highlight.newLine)
 		highlight.incSpacing
-		for (HDLStatement stmnt : caseStmnt.dos) {
-			sb.append(stmnt.toString(highlight)).append(highlight.newLine)
-		}
+		sb.append('''«FOR HDLStatement stmnt : caseStmnt.dos SEPARATOR highlight.newLine»«stmnt.toString(highlight)»«ENDFOR»''')
 		highlight.decSpacing
-		sb.append(highlight.spacing)
 		sb.append(caseStmnt.leaving(highlight))
 		return sb.toString
 	}

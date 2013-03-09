@@ -22,7 +22,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate) {
+	public AbstractHDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLVariableDeclaration> ports, boolean validate) {
 		super(container, name, validate);
 		if (validate) {
 			ports = validatePorts(ports);
@@ -48,12 +48,12 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLVariableDeclaration> getPorts() {
+	@Nonnull
+	public ArrayList<HDLVariableDeclaration> getPorts() {
 		return (ArrayList<HDLVariableDeclaration>) ports.clone();
 	}
 
-	protected ArrayList<HDLVariableDeclaration> validatePorts(ArrayList<HDLVariableDeclaration> ports) {
+	protected Iterable<HDLVariableDeclaration> validatePorts(Iterable<HDLVariableDeclaration> ports) {
 		if (ports == null)
 			return new ArrayList<HDLVariableDeclaration>();
 		return ports;
@@ -139,7 +139,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLInterface setPorts(@Nullable ArrayList<HDLVariableDeclaration> ports) {
+	public HDLInterface setPorts(@Nullable Iterable<HDLVariableDeclaration> ports) {
 		ports = validatePorts(ports);
 		HDLInterface res = new HDLInterface(container, name, ports, false);
 		return res;
@@ -240,7 +240,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (ports != null)
+		if (ports != null) {
 			if (ports.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariableDeclaration o : ports) {
@@ -248,6 +248,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

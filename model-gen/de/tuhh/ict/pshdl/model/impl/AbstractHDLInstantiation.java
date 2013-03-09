@@ -22,7 +22,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, boolean validate) {
+	public AbstractHDLInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			var = validateVar(var);
@@ -57,8 +57,8 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLVariable getVar() {
+	@Nonnull
+	public HDLVariable getVar() {
 		return var;
 	}
 
@@ -76,28 +76,28 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLArgument> getArguments() {
+	@Nonnull
+	public ArrayList<HDLArgument> getArguments() {
 		return (ArrayList<HDLArgument>) arguments.clone();
 	}
 
-	protected ArrayList<HDLArgument> validateArguments(ArrayList<HDLArgument> arguments) {
+	protected Iterable<HDLArgument> validateArguments(Iterable<HDLArgument> arguments) {
 		if (arguments == null)
 			return new ArrayList<HDLArgument>();
 		return arguments;
 	}
 
-	public abstract @Nonnull
-	HDLInstantiation setVar(@Nonnull HDLVariable var);
+	@Nonnull
+	public abstract HDLInstantiation setVar(@Nonnull HDLVariable var);
 
-	public abstract @Nonnull
-	HDLInstantiation setArguments(@Nullable ArrayList<HDLArgument> arguments);
+	@Nonnull
+	public abstract HDLInstantiation setArguments(@Nullable Iterable<HDLArgument> arguments);
 
-	public abstract @Nonnull
-	HDLInstantiation addArguments(@Nullable HDLArgument arguments);
+	@Nonnull
+	public abstract HDLInstantiation addArguments(@Nullable HDLArgument arguments);
 
-	public abstract @Nonnull
-	HDLInstantiation removeArguments(@Nullable HDLArgument arguments);
+	@Nonnull
+	public abstract HDLInstantiation removeArguments(@Nullable HDLArgument arguments);
 
 	/**
 	 * Creates a copy of this class with the same fields.
@@ -172,7 +172,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (arguments != null)
+		if (arguments != null) {
 			if (arguments.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLArgument o : arguments) {
@@ -180,6 +180,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

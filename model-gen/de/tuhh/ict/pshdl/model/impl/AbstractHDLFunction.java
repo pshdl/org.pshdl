@@ -21,7 +21,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, boolean validate) {
+	public AbstractHDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, boolean validate) {
 		super(container, annotations, validate);
 		if (validate) {
 			name = validateName(name);
@@ -41,8 +41,8 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getName() {
+	@Nonnull
+	public String getName() {
 		return name;
 	}
 
@@ -52,8 +52,8 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		return name;
 	}
 
-	public abstract @Nonnull
-	HDLFunction setName(@Nonnull String name);
+	@Nonnull
+	public abstract HDLFunction setName(@Nonnull String name);
 
 	/**
 	 * Creates a copy of this class with the same fields.
@@ -119,7 +119,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLFunction()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -127,6 +127,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}

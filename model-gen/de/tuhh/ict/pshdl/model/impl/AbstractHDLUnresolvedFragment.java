@@ -26,7 +26,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLUnresolvedFragment(@Nullable IHDLObject container, @Nonnull String frag, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
+	public AbstractHDLUnresolvedFragment(@Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			@Nullable HDLUnresolvedFragment sub, boolean validate) {
 		super(container, validate);
 		if (validate) {
@@ -76,8 +76,8 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getFrag() {
+	@Nonnull
+	public String getFrag() {
 		return frag;
 	}
 
@@ -95,12 +95,12 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getArray() {
+	@Nonnull
+	public ArrayList<HDLExpression> getArray() {
 		return (ArrayList<HDLExpression>) array.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateArray(ArrayList<HDLExpression> array) {
+	protected Iterable<HDLExpression> validateArray(Iterable<HDLExpression> array) {
 		if (array == null)
 			return new ArrayList<HDLExpression>();
 		return array;
@@ -114,12 +114,12 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLRange> getBits() {
+	@Nonnull
+	public ArrayList<HDLRange> getBits() {
 		return (ArrayList<HDLRange>) bits.clone();
 	}
 
-	protected ArrayList<HDLRange> validateBits(ArrayList<HDLRange> bits) {
+	protected Iterable<HDLRange> validateBits(Iterable<HDLRange> bits) {
 		if (bits == null)
 			return new ArrayList<HDLRange>();
 		return bits;
@@ -133,8 +133,8 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLUnresolvedFragment getSub() {
+	@Nullable
+	public HDLUnresolvedFragment getSub() {
 		return sub;
 	}
 
@@ -223,7 +223,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 *         array field.
 	 */
 	@Nonnull
-	public HDLUnresolvedFragment setArray(@Nullable ArrayList<HDLExpression> array) {
+	public HDLUnresolvedFragment setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
 		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
 		return res;
@@ -293,7 +293,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 *         bits field.
 	 */
 	@Nonnull
-	public HDLUnresolvedFragment setBits(@Nullable ArrayList<HDLRange> bits) {
+	public HDLUnresolvedFragment setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
 		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
 		return res;
@@ -426,7 +426,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 		if (frag != null) {
 			sb.append(".setFrag(").append('"' + frag + '"').append(")");
 		}
-		if (array != null)
+		if (array != null) {
 			if (array.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : array) {
@@ -434,7 +434,8 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (bits != null)
+		}
+		if (bits != null) {
 			if (bits.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : bits) {
@@ -442,6 +443,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (sub != null) {
 			sb.append(".setSub(").append(sub.toConstructionString(spacing + "\t")).append(")");
 		}

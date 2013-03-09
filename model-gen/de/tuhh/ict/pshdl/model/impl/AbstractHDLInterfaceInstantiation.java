@@ -28,7 +28,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterfaceInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf,
+	public AbstractHDLInterfaceInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf,
 			boolean validate) {
 		super(container, var, arguments, validate);
 		if (validate) {
@@ -144,7 +144,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	 */
 	@Override
 	@Nonnull
-	public HDLInterfaceInstantiation setArguments(@Nullable ArrayList<HDLArgument> arguments) {
+	public HDLInterfaceInstantiation setArguments(@Nullable Iterable<HDLArgument> arguments) {
 		arguments = validateArguments(arguments);
 		HDLInterfaceInstantiation res = new HDLInterfaceInstantiation(container, var, arguments, hIf, false);
 		return res;
@@ -263,7 +263,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (arguments != null)
+		if (arguments != null) {
 			if (arguments.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLArgument o : arguments) {
@@ -271,6 +271,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (hIf != null) {
 			sb.append(".setHIf(HDLQualifiedName.create(\"").append(hIf).append("\"))");
 		}

@@ -34,7 +34,7 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInlineFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nullable ArrayList<HDLVariable> args,
+	public HDLInlineFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLVariable> args,
 			@Nonnull HDLExpression expr, boolean validate) {
 		super(container, annotations, name, args, expr, validate);
 	}

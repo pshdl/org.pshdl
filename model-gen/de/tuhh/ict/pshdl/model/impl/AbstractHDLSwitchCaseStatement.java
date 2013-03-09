@@ -22,7 +22,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLSwitchCaseStatement(@Nullable IHDLObject container, @Nullable HDLExpression label, @Nullable ArrayList<HDLStatement> dos, boolean validate) {
+	public AbstractHDLSwitchCaseStatement(@Nullable IHDLObject container, @Nullable HDLExpression label, @Nullable Iterable<HDLStatement> dos, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			label = validateLabel(label);
@@ -57,8 +57,8 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLExpression getLabel() {
+	@Nullable
+	public HDLExpression getLabel() {
 		return label;
 	}
 
@@ -74,12 +74,12 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLStatement> getDos() {
+	@Nonnull
+	public ArrayList<HDLStatement> getDos() {
 		return (ArrayList<HDLStatement>) dos.clone();
 	}
 
-	protected ArrayList<HDLStatement> validateDos(ArrayList<HDLStatement> dos) {
+	protected Iterable<HDLStatement> validateDos(Iterable<HDLStatement> dos) {
 		if (dos == null)
 			return new ArrayList<HDLStatement>();
 		return dos;
@@ -163,7 +163,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 	 *         dos field.
 	 */
 	@Nonnull
-	public HDLSwitchCaseStatement setDos(@Nullable ArrayList<HDLStatement> dos) {
+	public HDLSwitchCaseStatement setDos(@Nullable Iterable<HDLStatement> dos) {
 		dos = validateDos(dos);
 		HDLSwitchCaseStatement res = new HDLSwitchCaseStatement(container, label, dos, false);
 		return res;
@@ -269,7 +269,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 		if (label != null) {
 			sb.append(".setLabel(").append(label.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (dos != null)
+		if (dos != null) {
 			if (dos.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLStatement o : dos) {
@@ -277,6 +277,7 @@ public abstract class AbstractHDLSwitchCaseStatement extends HDLCompound {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

@@ -9,6 +9,7 @@ import de.tuhh.ict.pshdl.generator.vhdl.libraries.VHDLShiftLibrary;
 import de.tuhh.ict.pshdl.generator.vhdl.libraries.VHDLTypesLibrary;
 import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLArrayInit;
 import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLClass;
@@ -43,6 +44,7 @@ import de.upb.hni.vmagic.Range;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.Standard;
 import de.upb.hni.vmagic.expression.Add;
+import de.upb.hni.vmagic.expression.Aggregate;
 import de.upb.hni.vmagic.expression.And;
 import de.upb.hni.vmagic.expression.Concatenate;
 import de.upb.hni.vmagic.expression.Divide;
@@ -78,6 +80,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.Functions.Function2;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
@@ -175,6 +179,25 @@ public class VHDLExpressionExtension {
     return result;
   }
   
+  protected Expression<? extends Object> _toVHDL(final HDLArrayInit obj) {
+    ArrayList<HDLExpression> _exp = obj.getExp();
+    LinkedList<Expression<?>> _linkedList = new LinkedList<Expression<?>>();
+    final Function2<LinkedList<Expression<?>>,HDLExpression,LinkedList<Expression<?>>> _function = new Function2<LinkedList<Expression<?>>,HDLExpression,LinkedList<Expression<?>>>() {
+        public LinkedList<Expression<?>> apply(final LinkedList<Expression<?>> l, final HDLExpression e) {
+          LinkedList<Expression<?>> _xblockexpression = null;
+          {
+            Expression<?> _vHDL = VHDLExpressionExtension.this.toVHDL(e);
+            l.add(_vHDL);
+            _xblockexpression = (l);
+          }
+          return _xblockexpression;
+        }
+      };
+    LinkedList<Expression<?>> _fold = IterableExtensions.<HDLExpression, LinkedList<Expression<?>>>fold(_exp, _linkedList, _function);
+    Aggregate _aggregate = new Aggregate(_fold);
+    return _aggregate;
+  }
+  
   protected Name<? extends Object> _toVHDL(final HDLInterfaceRef obj) {
     String _vHDLName = this.getVHDLName(obj);
     Signal _signal = new Signal(_vHDLName, UnresolvedType.NO_NAME);
@@ -183,14 +206,21 @@ public class VHDLExpressionExtension {
     int _size = _ifArray.size();
     boolean _notEquals = (_size != 0);
     if (_notEquals) {
-      LinkedList<Expression> _linkedList = new LinkedList<Expression>();
-      final List<Expression> indices = _linkedList;
       ArrayList<HDLExpression> _ifArray_1 = obj.getIfArray();
-      for (final HDLExpression arr : _ifArray_1) {
-        Expression<?> _vHDL = this.toVHDL(arr);
-        indices.add(_vHDL);
-      }
-      ArrayElement<Name<?>> _arrayElement = new ArrayElement<Name<?>>(result, indices);
+      LinkedList<Expression> _linkedList = new LinkedList<Expression>();
+      final Function2<LinkedList<Expression>,HDLExpression,LinkedList<Expression>> _function = new Function2<LinkedList<Expression>,HDLExpression,LinkedList<Expression>>() {
+          public LinkedList<Expression> apply(final LinkedList<Expression> l, final HDLExpression e) {
+            LinkedList<Expression> _xblockexpression = null;
+            {
+              Expression<?> _vHDL = VHDLExpressionExtension.this.toVHDL(e);
+              l.add(_vHDL);
+              _xblockexpression = (l);
+            }
+            return _xblockexpression;
+          }
+        };
+      LinkedList<Expression> _fold = IterableExtensions.<HDLExpression, LinkedList<Expression>>fold(_ifArray_1, _linkedList, _function);
+      ArrayElement<Name<?>> _arrayElement = new ArrayElement<Name<?>>(result, _fold);
       result = _arrayElement;
     }
     return this.getRef(result, obj);
@@ -668,6 +698,8 @@ public class VHDLExpressionExtension {
       return _toVHDL((HDLFunction)obj);
     } else if (obj instanceof HDLShiftOp) {
       return _toVHDL((HDLShiftOp)obj);
+    } else if (obj instanceof HDLArrayInit) {
+      return _toVHDL((HDLArrayInit)obj);
     } else if (obj instanceof HDLConcat) {
       return _toVHDL((HDLConcat)obj);
     } else if (obj instanceof HDLFunctionCall) {

@@ -38,8 +38,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLVariableDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
-			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull ArrayList<HDLVariable> variables, boolean validate) {
+	public AbstractHDLVariableDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull Iterable<HDLVariable> variables, boolean validate) {
 		super(container, annotations, validate);
 		if (validate) {
 			register = validateRegister(register);
@@ -93,8 +93,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLRegisterConfig getRegister() {
+	@Nullable
+	public HDLRegisterConfig getRegister() {
 		return register;
 	}
 
@@ -110,8 +110,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLDirection getDirection() {
+	@Nonnull
+	public HDLDirection getDirection() {
 		return direction == null ? HDLDirection.INTERNAL : direction;
 	}
 
@@ -146,8 +146,8 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	HDLPrimitive getPrimitive() {
+	@Nullable
+	public HDLPrimitive getPrimitive() {
 		return primitive;
 	}
 
@@ -164,15 +164,15 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLVariable> getVariables() {
+	@Nonnull
+	public ArrayList<HDLVariable> getVariables() {
 		return (ArrayList<HDLVariable>) variables.clone();
 	}
 
-	protected ArrayList<HDLVariable> validateVariables(ArrayList<HDLVariable> variables) {
+	protected Iterable<HDLVariable> validateVariables(Iterable<HDLVariable> variables) {
 		if (variables == null)
 			throw new IllegalArgumentException("The field variables can not be null!");
-		if (variables.size() < 1)
+		if (!variables.iterator().hasNext())
 			throw new IllegalArgumentException("The field variables must contain at least one item!");
 		return variables;
 	}
@@ -247,7 +247,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 */
 	@Override
 	@Nonnull
-	public HDLVariableDeclaration setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLVariableDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -385,7 +385,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 *         variables field.
 	 */
 	@Nonnull
-	public HDLVariableDeclaration setVariables(@Nonnull ArrayList<HDLVariable> variables) {
+	public HDLVariableDeclaration setVariables(@Nonnull Iterable<HDLVariable> variables) {
 		variables = validateVariables(variables);
 		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
 		return res;
@@ -507,7 +507,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLVariableDeclaration()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -515,6 +515,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (register != null) {
 			sb.append(".setRegister(").append(register.toConstructionString(spacing + "\t")).append(")");
 		}
@@ -527,7 +528,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		if (primitive != null) {
 			sb.append(".setPrimitive(").append(primitive.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (variables != null)
+		if (variables != null) {
 			if (variables.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariable o : variables) {
@@ -535,6 +536,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

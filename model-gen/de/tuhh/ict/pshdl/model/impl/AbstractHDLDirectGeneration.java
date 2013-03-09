@@ -32,7 +32,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLDirectGeneration(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable ArrayList<HDLArgument> arguments, @Nonnull HDLInterface hIf,
+	public AbstractHDLDirectGeneration(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf,
 			@Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include, boolean validate) {
 		super(container, var, arguments, validate);
 		if (validate) {
@@ -73,8 +73,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLInterface getHIf() {
+	@Nonnull
+	public HDLInterface getHIf() {
 		return hIf;
 	}
 
@@ -91,8 +91,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getGeneratorID() {
+	@Nonnull
+	public String getGeneratorID() {
 		return generatorID;
 	}
 
@@ -109,8 +109,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getGeneratorContent() {
+	@Nonnull
+	public String getGeneratorContent() {
 		return generatorContent;
 	}
 
@@ -127,8 +127,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	Boolean getInclude() {
+	@Nonnull
+	public Boolean getInclude() {
 		return include;
 	}
 
@@ -225,7 +225,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 */
 	@Override
 	@Nonnull
-	public HDLDirectGeneration setArguments(@Nullable ArrayList<HDLArgument> arguments) {
+	public HDLDirectGeneration setArguments(@Nullable Iterable<HDLArgument> arguments) {
 		arguments = validateArguments(arguments);
 		HDLDirectGeneration res = new HDLDirectGeneration(container, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
@@ -426,7 +426,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
-		if (arguments != null)
+		if (arguments != null) {
 			if (arguments.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLArgument o : arguments) {
@@ -434,6 +434,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (hIf != null) {
 			sb.append(".setHIf(").append(hIf.toConstructionString(spacing + "\t")).append(")");
 		}

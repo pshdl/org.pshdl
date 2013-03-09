@@ -58,9 +58,10 @@ public class HDLAssignment extends AbstractHDLAssignment {
 
 		@Nullable
 		public static HDLAssignmentType getOp(String op) {
-			for (HDLAssignmentType ass : values())
+			for (HDLAssignmentType ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
+			}
 			return null;
 		}
 

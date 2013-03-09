@@ -33,8 +33,8 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterfaceRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable ArrayList<HDLExpression> array, @Nullable ArrayList<HDLRange> bits,
-			@Nonnull HDLQualifiedName hIf, @Nullable ArrayList<HDLExpression> ifArray, boolean validate) {
+	public AbstractHDLInterfaceRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
+			@Nonnull HDLQualifiedName hIf, @Nullable Iterable<HDLExpression> ifArray, boolean validate) {
 		super(container, var, array, bits, validate);
 		if (validate) {
 			hIf = validateHIf(hIf);
@@ -84,12 +84,12 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getIfArray() {
+	@Nonnull
+	public ArrayList<HDLExpression> getIfArray() {
 		return (ArrayList<HDLExpression>) ifArray.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateIfArray(ArrayList<HDLExpression> ifArray) {
+	protected Iterable<HDLExpression> validateIfArray(Iterable<HDLExpression> ifArray) {
 		if (ifArray == null)
 			return new ArrayList<HDLExpression>();
 		return ifArray;
@@ -179,7 +179,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	 */
 	@Override
 	@Nonnull
-	public HDLInterfaceRef setArray(@Nullable ArrayList<HDLExpression> array) {
+	public HDLInterfaceRef setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
 		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
 		return res;
@@ -253,7 +253,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	 */
 	@Override
 	@Nonnull
-	public HDLInterfaceRef setBits(@Nullable ArrayList<HDLRange> bits) {
+	public HDLInterfaceRef setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
 		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
 		return res;
@@ -341,7 +341,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	 *         ifArray field.
 	 */
 	@Nonnull
-	public HDLInterfaceRef setIfArray(@Nullable ArrayList<HDLExpression> ifArray) {
+	public HDLInterfaceRef setIfArray(@Nullable Iterable<HDLExpression> ifArray) {
 		ifArray = validateIfArray(ifArray);
 		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
 		return res;
@@ -448,7 +448,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 		if (var != null) {
 			sb.append(".setVar(HDLQualifiedName.create(\"").append(var).append("\"))");
 		}
-		if (array != null)
+		if (array != null) {
 			if (array.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : array) {
@@ -456,7 +456,8 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
-		if (bits != null)
+		}
+		if (bits != null) {
 			if (bits.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLRange o : bits) {
@@ -464,10 +465,11 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (hIf != null) {
 			sb.append(".setHIf(HDLQualifiedName.create(\"").append(hIf).append("\"))");
 		}
-		if (ifArray != null)
+		if (ifArray != null) {
 			if (ifArray.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : ifArray) {
@@ -475,6 +477,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

@@ -27,7 +27,7 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLConcat(@Nullable IHDLObject container, @Nonnull ArrayList<HDLExpression> cats, boolean validate) {
+	public HDLConcat(@Nullable IHDLObject container, @Nonnull Iterable<HDLExpression> cats, boolean validate) {
 		super(container, cats, validate);
 	}
 

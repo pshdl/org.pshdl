@@ -26,7 +26,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInlineFunction(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String name, @Nullable ArrayList<HDLVariable> args,
+	public AbstractHDLInlineFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLVariable> args,
 			@Nonnull HDLExpression expr, boolean validate) {
 		super(container, annotations, name, validate);
 		if (validate) {
@@ -62,12 +62,12 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLVariable> getArgs() {
+	@Nonnull
+	public ArrayList<HDLVariable> getArgs() {
 		return (ArrayList<HDLVariable>) args.clone();
 	}
 
-	protected ArrayList<HDLVariable> validateArgs(ArrayList<HDLVariable> args) {
+	protected Iterable<HDLVariable> validateArgs(Iterable<HDLVariable> args) {
 		if (args == null)
 			return new ArrayList<HDLVariable>();
 		return args;
@@ -81,8 +81,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getExpr() {
+	@Nonnull
+	public HDLExpression getExpr() {
 		return expr;
 	}
 
@@ -159,7 +159,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 */
 	@Override
 	@Nonnull
-	public HDLInlineFunction setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations) {
+	public HDLInlineFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
 		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, expr, false);
 		return res;
@@ -248,7 +248,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 *         field.
 	 */
 	@Nonnull
-	public HDLInlineFunction setArgs(@Nullable ArrayList<HDLVariable> args) {
+	public HDLInlineFunction setArgs(@Nullable Iterable<HDLVariable> args) {
 		args = validateArgs(args);
 		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, expr, false);
 		return res;
@@ -367,7 +367,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLInlineFunction()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -375,10 +375,11 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
-		if (args != null)
+		if (args != null) {
 			if (args.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLVariable o : args) {
@@ -386,6 +387,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		if (expr != null) {
 			sb.append(".setExpr(").append(expr.toConstructionString(spacing + "\t")).append(")");
 		}

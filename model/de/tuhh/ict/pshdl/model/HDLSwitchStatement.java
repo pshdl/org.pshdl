@@ -28,7 +28,7 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSwitchStatement(@Nullable IHDLObject container, @Nonnull HDLExpression caseExp, @Nullable ArrayList<HDLSwitchCaseStatement> cases, boolean validate) {
+	public HDLSwitchStatement(@Nullable IHDLObject container, @Nonnull HDLExpression caseExp, @Nullable Iterable<HDLSwitchCaseStatement> cases, boolean validate) {
 		super(container, caseExp, cases, validate);
 	}
 

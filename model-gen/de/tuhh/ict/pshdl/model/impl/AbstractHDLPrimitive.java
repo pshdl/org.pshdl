@@ -54,8 +54,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLPrimitiveType getType() {
+	@Nonnull
+	public HDLPrimitiveType getType() {
 		return type;
 	}
 
@@ -74,8 +74,8 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * @return the field
 	 */
 	@Override
-	public @Nullable
-	HDLExpression getWidth() {
+	@Nullable
+	public HDLExpression getWidth() {
 		return width;
 	}
 

@@ -20,7 +20,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLArrayInit(@Nullable IHDLObject container, @Nullable ArrayList<HDLExpression> exp, boolean validate) {
+	public AbstractHDLArrayInit(@Nullable IHDLObject container, @Nullable Iterable<HDLExpression> exp, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			exp = validateExp(exp);
@@ -46,12 +46,12 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getExp() {
+	@Nonnull
+	public ArrayList<HDLExpression> getExp() {
 		return (ArrayList<HDLExpression>) exp.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateExp(ArrayList<HDLExpression> exp) {
+	protected Iterable<HDLExpression> validateExp(Iterable<HDLExpression> exp) {
 		if (exp == null)
 			return new ArrayList<HDLExpression>();
 		return exp;
@@ -119,7 +119,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 *         field.
 	 */
 	@Nonnull
-	public HDLArrayInit setExp(@Nullable ArrayList<HDLExpression> exp) {
+	public HDLArrayInit setExp(@Nullable Iterable<HDLExpression> exp) {
 		exp = validateExp(exp);
 		HDLArrayInit res = new HDLArrayInit(container, exp, false);
 		return res;
@@ -216,7 +216,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLArrayInit()");
-		if (exp != null)
+		if (exp != null) {
 			if (exp.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : exp) {
@@ -224,6 +224,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

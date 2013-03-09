@@ -46,8 +46,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getVal() {
+	@Nonnull
+	public String getVal() {
 		return val;
 	}
 
@@ -64,8 +64,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	Boolean getStr() {
+	@Nullable
+	public Boolean getStr() {
 		return str;
 	}
 

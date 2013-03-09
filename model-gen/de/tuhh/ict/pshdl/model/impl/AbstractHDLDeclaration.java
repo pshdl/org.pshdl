@@ -20,7 +20,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, boolean validate) {
+	public AbstractHDLDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			annotations = validateAnnotations(annotations);
@@ -46,25 +46,25 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLAnnotation> getAnnotations() {
+	@Nonnull
+	public ArrayList<HDLAnnotation> getAnnotations() {
 		return (ArrayList<HDLAnnotation>) annotations.clone();
 	}
 
-	protected ArrayList<HDLAnnotation> validateAnnotations(ArrayList<HDLAnnotation> annotations) {
+	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
 		if (annotations == null)
 			return new ArrayList<HDLAnnotation>();
 		return annotations;
 	}
 
-	public abstract @Nonnull
-	HDLDeclaration setAnnotations(@Nullable ArrayList<HDLAnnotation> annotations);
+	@Nonnull
+	public abstract HDLDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations);
 
-	public abstract @Nonnull
-	HDLDeclaration addAnnotations(@Nullable HDLAnnotation annotations);
+	@Nonnull
+	public abstract HDLDeclaration addAnnotations(@Nullable HDLAnnotation annotations);
 
-	public abstract @Nonnull
-	HDLDeclaration removeAnnotations(@Nullable HDLAnnotation annotations);
+	@Nonnull
+	public abstract HDLDeclaration removeAnnotations(@Nullable HDLAnnotation annotations);
 
 	/**
 	 * Creates a copy of this class with the same fields.
@@ -130,7 +130,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLDeclaration()");
-		if (annotations != null)
+		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLAnnotation o : annotations) {
@@ -138,6 +138,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

@@ -28,7 +28,7 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable ArrayList<HDLVariableDeclaration> ports, boolean validate) {
+	public HDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLVariableDeclaration> ports, boolean validate) {
 		super(container, name, ports, validate);
 	}
 

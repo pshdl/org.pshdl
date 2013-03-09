@@ -65,8 +65,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLReference getLeft() {
+	@Nonnull
+	public HDLReference getLeft() {
 		return left;
 	}
 
@@ -84,8 +84,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLAssignmentType getType() {
+	@Nonnull
+	public HDLAssignmentType getType() {
 		return type == null ? HDLAssignmentType.ASSGN : type;
 	}
 
@@ -101,8 +101,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	HDLExpression getRight() {
+	@Nonnull
+	public HDLExpression getRight() {
 		return right;
 	}
 

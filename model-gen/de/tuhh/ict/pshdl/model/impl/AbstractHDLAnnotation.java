@@ -46,8 +46,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nonnull
-	String getName() {
+	@Nonnull
+	public String getName() {
 		return name;
 	}
 
@@ -64,8 +64,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * 
 	 * @return the field
 	 */
-	public @Nullable
-	String getValue() {
+	@Nullable
+	public String getValue() {
 		return value;
 	}
 

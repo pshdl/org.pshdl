@@ -49,9 +49,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLUnit(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name,
-			@Nullable ArrayList<String> imports, @Nullable ArrayList<HDLStatement> inits, @Nullable ArrayList<HDLStatement> statements, @Nonnull Boolean simulation,
-			boolean validate) {
+	public HDLUnit(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name, @Nullable Iterable<String> imports,
+			@Nullable Iterable<HDLStatement> inits, @Nullable Iterable<HDLStatement> statements, @Nonnull Boolean simulation, boolean validate) {
 		super(container, annotations, libURI, name, imports, inits, statements, simulation, validate);
 	}
 

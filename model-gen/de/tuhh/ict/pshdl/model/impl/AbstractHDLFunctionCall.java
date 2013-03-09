@@ -27,7 +27,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLFunctionCall(@Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable ArrayList<HDLExpression> params, boolean validate) {
+	public AbstractHDLFunctionCall(@Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable Iterable<HDLExpression> params, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			name = validateName(name);
@@ -77,12 +77,12 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getParams() {
+	@Nonnull
+	public ArrayList<HDLExpression> getParams() {
 		return (ArrayList<HDLExpression>) params.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateParams(ArrayList<HDLExpression> params) {
+	protected Iterable<HDLExpression> validateParams(Iterable<HDLExpression> params) {
 		if (params == null)
 			return new ArrayList<HDLExpression>();
 		return params;
@@ -167,7 +167,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 *         field.
 	 */
 	@Nonnull
-	public HDLFunctionCall setParams(@Nullable ArrayList<HDLExpression> params) {
+	public HDLFunctionCall setParams(@Nullable Iterable<HDLExpression> params) {
 		params = validateParams(params);
 		HDLFunctionCall res = new HDLFunctionCall(container, name, params, false);
 		return res;
@@ -274,7 +274,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 		if (name != null) {
 			sb.append(".setName(HDLQualifiedName.create(\"").append(name).append("\"))");
 		}
-		if (params != null)
+		if (params != null) {
 			if (params.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : params) {
@@ -282,6 +282,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

@@ -47,8 +47,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLVariableDeclaration(@Nullable IHDLObject container, @Nullable ArrayList<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
-			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull ArrayList<HDLVariable> variables, boolean validate) {
+	public HDLVariableDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull Iterable<HDLVariable> variables, boolean validate) {
 		super(container, annotations, register, direction, type, primitive, variables, validate);
 	}
 
@@ -74,9 +74,10 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 		@Nullable
 		public static HDLDirection getOp(String op) {
-			for (HDLDirection ass : values())
+			for (HDLDirection ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
+			}
 			return null;
 		}
 

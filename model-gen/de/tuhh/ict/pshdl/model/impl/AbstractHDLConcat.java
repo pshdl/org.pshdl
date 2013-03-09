@@ -21,7 +21,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLConcat(@Nullable IHDLObject container, @Nonnull ArrayList<HDLExpression> cats, boolean validate) {
+	public AbstractHDLConcat(@Nullable IHDLObject container, @Nonnull Iterable<HDLExpression> cats, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			cats = validateCats(cats);
@@ -48,15 +48,15 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
-	public @Nonnull
-	ArrayList<HDLExpression> getCats() {
+	@Nonnull
+	public ArrayList<HDLExpression> getCats() {
 		return (ArrayList<HDLExpression>) cats.clone();
 	}
 
-	protected ArrayList<HDLExpression> validateCats(ArrayList<HDLExpression> cats) {
+	protected Iterable<HDLExpression> validateCats(Iterable<HDLExpression> cats) {
 		if (cats == null)
 			throw new IllegalArgumentException("The field cats can not be null!");
-		if (cats.size() < 1)
+		if (!cats.iterator().hasNext())
 			throw new IllegalArgumentException("The field cats must contain at least one item!");
 		return cats;
 	}
@@ -124,7 +124,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 * @return a new instance of {@link HDLConcat} with the updated cats field.
 	 */
 	@Nonnull
-	public HDLConcat setCats(@Nonnull ArrayList<HDLExpression> cats) {
+	public HDLConcat setCats(@Nonnull Iterable<HDLExpression> cats) {
 		cats = validateCats(cats);
 		HDLConcat res = new HDLConcat(container, cats, false);
 		return res;
@@ -218,7 +218,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 		boolean first = true;
 		StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLConcat()");
-		if (cats != null)
+		if (cats != null) {
 			if (cats.size() > 0) {
 				sb.append('\n').append(spacing);
 				for (HDLExpression o : cats) {
@@ -226,6 +226,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 					sb.append('\n').append(spacing).append(")");
 				}
 			}
+		}
 		return sb.toString();
 	}
 

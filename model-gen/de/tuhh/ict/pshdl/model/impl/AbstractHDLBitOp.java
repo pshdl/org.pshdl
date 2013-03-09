@@ -45,8 +45,8 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * @return the field
 	 */
 	@Override
-	public @Nonnull
-	HDLBitOpType getType() {
+	@Nonnull
+	public HDLBitOpType getType() {
 		return type;
 	}
 
