@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import de.tuhh.ict.pshdl.model.HDLArithOp;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLArrayInit;
 import de.tuhh.ict.pshdl.model.HDLBitOp;
 import de.tuhh.ict.pshdl.model.HDLBitOp.HDLBitOpType;
 import de.tuhh.ict.pshdl.model.HDLClass;
@@ -92,6 +93,10 @@ public class ConstantEvaluate {
     IHDLObject _container = obj.getContainer();
     IHDLObject _copyDeepFrozen = _get.copyDeepFrozen(_container);
     return this.constantEvaluate(_copyDeepFrozen, context);
+  }
+  
+  protected Optional<BigInteger> _constantEvaluate(final HDLArrayInit obj, final HDLEvaluationContext context) {
+    return Optional.<BigInteger>absent();
   }
   
   protected Optional<BigInteger> _constantEvaluate(final IHDLObject obj, final HDLEvaluationContext context) {
@@ -697,6 +702,8 @@ public class ConstantEvaluate {
       return _constantEvaluate((HDLShiftOp)obj, context);
     } else if (obj instanceof HDLUnresolvedFragment) {
       return _constantEvaluate((HDLUnresolvedFragment)obj, context);
+    } else if (obj instanceof HDLArrayInit) {
+      return _constantEvaluate((HDLArrayInit)obj, context);
     } else if (obj instanceof HDLConcat) {
       return _constantEvaluate((HDLConcat)obj, context);
     } else if (obj instanceof HDLFunctionCall) {

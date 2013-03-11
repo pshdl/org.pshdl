@@ -35,6 +35,7 @@ import static de.tuhh.ict.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import static de.tuhh.ict.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
 import com.google.common.base.Optional
+import de.tuhh.ict.pshdl.model.HDLArrayInit
 
 class ConstantEvaluate {
 	public static ConstantEvaluate INST = new ConstantEvaluate
@@ -71,6 +72,10 @@ class ConstantEvaluate {
 		return type.get.copyDeepFrozen(obj.container).constantEvaluate(context)
 	}
 
+	def dispatch Optional<BigInteger> constantEvaluate(HDLArrayInit obj, HDLEvaluationContext context) {
+		return Optional::absent
+	}
+	
 	def dispatch Optional<BigInteger> constantEvaluate(IHDLObject obj, HDLEvaluationContext context) {
 		throw new IllegalArgumentException("Did not implement constantEvaulate for type:" + obj.classType)
 	}

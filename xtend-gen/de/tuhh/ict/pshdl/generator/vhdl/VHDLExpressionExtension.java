@@ -40,6 +40,7 @@ import de.tuhh.ict.pshdl.model.types.builtIn.HDLFunctions;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLPrimitives;
 import de.tuhh.ict.pshdl.model.utils.HDLQualifiedName;
 import de.upb.hni.vmagic.AssociationElement;
+import de.upb.hni.vmagic.Choices;
 import de.upb.hni.vmagic.Range;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.Standard;
@@ -68,6 +69,7 @@ import de.upb.hni.vmagic.expression.Rem;
 import de.upb.hni.vmagic.expression.Subtract;
 import de.upb.hni.vmagic.expression.Xor;
 import de.upb.hni.vmagic.literal.BasedLiteral;
+import de.upb.hni.vmagic.literal.CharacterLiteral;
 import de.upb.hni.vmagic.literal.DecimalLiteral;
 import de.upb.hni.vmagic.literal.StringLiteral;
 import de.upb.hni.vmagic.object.ArrayElement;
@@ -83,6 +85,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.eclipse.xtext.xbase.lib.Functions.Function2;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ObjectExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure2;
 
 @SuppressWarnings("all")
 public class VHDLExpressionExtension {
@@ -181,21 +184,29 @@ public class VHDLExpressionExtension {
   
   protected Expression<? extends Object> _toVHDL(final HDLArrayInit obj) {
     ArrayList<HDLExpression> _exp = obj.getExp();
-    LinkedList<Expression<?>> _linkedList = new LinkedList<Expression<?>>();
-    final Function2<LinkedList<Expression<?>>,HDLExpression,LinkedList<Expression<?>>> _function = new Function2<LinkedList<Expression<?>>,HDLExpression,LinkedList<Expression<?>>>() {
-        public LinkedList<Expression<?>> apply(final LinkedList<Expression<?>> l, final HDLExpression e) {
-          LinkedList<Expression<?>> _xblockexpression = null;
-          {
-            Expression<?> _vHDL = VHDLExpressionExtension.this.toVHDL(e);
-            l.add(_vHDL);
-            _xblockexpression = (l);
-          }
-          return _xblockexpression;
+    int _size = _exp.size();
+    boolean _equals = (_size == 1);
+    if (_equals) {
+      ArrayList<HDLExpression> _exp_1 = obj.getExp();
+      HDLExpression _get = _exp_1.get(0);
+      return this.toVHDL(_get);
+    }
+    Aggregate _aggregate = new Aggregate();
+    final Aggregate aggr = _aggregate;
+    ArrayList<HDLExpression> _exp_2 = obj.getExp();
+    final Procedure2<HDLExpression,Integer> _function = new Procedure2<HDLExpression,Integer>() {
+        public void apply(final HDLExpression e, final Integer i) {
+          Expression<?> _vHDL = VHDLExpressionExtension.this.toVHDL(e);
+          DecimalLiteral _decimalLiteral = new DecimalLiteral((i).intValue());
+          aggr.createAssociation(_vHDL, _decimalLiteral);
         }
       };
-    LinkedList<Expression<?>> _fold = IterableExtensions.<HDLExpression, LinkedList<Expression<?>>>fold(_exp, _linkedList, _function);
-    Aggregate _aggregate = new Aggregate(_fold);
-    return _aggregate;
+    IterableExtensions.<HDLExpression>forEach(_exp_2, _function);
+    char _charAt = "0".charAt(0);
+    CharacterLiteral _characterLiteral = new CharacterLiteral(_charAt);
+    Aggregate _OTHERS = Aggregate.OTHERS(_characterLiteral);
+    aggr.createAssociation(_OTHERS, Choices.OTHERS);
+    return aggr;
   }
   
   protected Name<? extends Object> _toVHDL(final HDLInterfaceRef obj) {

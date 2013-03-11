@@ -17,7 +17,7 @@ public interface CopyFilter {
 
 	public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T object);
 
-	public <T> ArrayList<T> copyContainer(String feature, HDLObject container, ArrayList<T> object);
+	public <T> ArrayList<T> copyContainer(String feature, HDLObject container, Iterable<T> object);
 
 	public static class DeepCloneFilter implements CopyFilter {
 
@@ -52,7 +52,7 @@ public interface CopyFilter {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> ArrayList<T> copyContainer(String feature, HDLObject container, ArrayList<T> object) {
+		public <T> ArrayList<T> copyContainer(String feature, HDLObject container, Iterable<T> object) {
 			if (object == null)
 				return null;
 			ArrayList<T> res = new ArrayList<T>();

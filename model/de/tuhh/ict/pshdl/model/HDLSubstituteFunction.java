@@ -84,7 +84,7 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 
 	public static final String META = "INLINED_FROM";
 
-	private HDLStatement[] createStatements(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, IHDLObject origin) {
+	private HDLStatement[] createStatements(Iterable<HDLVariable> args, Iterable<HDLExpression> params, IHDLObject origin) {
 		HDLStatement[] res = new HDLStatement[getStmnts().size()];
 		int pos = 0;
 		for (HDLStatement stmnt : getStmnts()) {

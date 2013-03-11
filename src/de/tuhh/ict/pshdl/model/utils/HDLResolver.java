@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import com.google.common.base.*;
-
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.extensions.*;
 
@@ -146,7 +145,7 @@ public class HDLResolver {
 				if (uri != null) {
 					HDLLibrary library = HDLLibrary.getLibrary(uri);
 					if (library != null) {
-						ArrayList<String> imports = unit.getImports();
+						List<String> imports = unit.getImports();
 						imports.add(fullNameOf(unit).skipLast(1).append("*").toString());
 						return library.resolve(imports, var);
 					}

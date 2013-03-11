@@ -73,6 +73,8 @@ import static de.tuhh.ict.pshdl.model.HDLManip$HDLManipType.*
 import de.tuhh.ict.pshdl.model.HDLArrayInit
 import de.upb.hni.vmagic.expression.Aggregate
 import java.util.ArrayList
+import de.upb.hni.vmagic.Choices
+import de.upb.hni.vmagic.literal.CharacterLiteral
 
 class VHDLExpressionExtension {
 
@@ -129,13 +131,19 @@ class VHDLExpressionExtension {
 	}
 
 	def dispatch Expression<?> toVHDL(HDLArrayInit obj) {
-		return new Aggregate(obj.exp.fold(new LinkedList<Expression<?>>)[l, e | l.add(e.toVHDL); l])
+		if (obj.exp.size==1)
+			return obj.exp.get(0).toVHDL
+		val aggr = new Aggregate()
+		obj.exp.forEach([e, i|aggr.createAssociation(e.toVHDL, new DecimalLiteral(i))])
+		aggr.createAssociation(Aggregate::OTHERS(new CharacterLiteral('0'.charAt(0))), Choices::OTHERS)
+		return aggr
 	}
 
 	def dispatch Name<?> toVHDL(HDLInterfaceRef obj) {
 		var Name<?> result = new Signal(obj.VHDLName, UnresolvedType::NO_NAME)
 		if (obj.ifArray.size != 0) {
-			result = new ArrayElement<Name<?>>(result, obj.ifArray.fold(new LinkedList<Expression>)[l, e | l.add(e.toVHDL); l])
+			result = new ArrayElement<Name<?>>(result,
+				obj.ifArray.fold(new LinkedList<Expression>)[l, e|l.add(e.toVHDL); l])
 		}
 		return getRef(result, obj)
 	}

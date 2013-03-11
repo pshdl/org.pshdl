@@ -561,17 +561,22 @@ public class BuiltInValidator implements IHDLValidator {
 				.or(isEqualTo(HDLDirection.PARAMETER)) //
 				.getAll();
 		for (HDLVariableDeclaration hvd : constants) {
-			for (HDLVariable var : hvd.getVariables())
+			for (HDLVariable var : hvd.getVariables()) {
+				HDLExpression def = var.getDefaultValue();
 				if (var.getDefaultValue() == null) {
 					problems.add(new Problem(ErrorCode.CONSTANT_NEED_DEFAULTVALUE, var));
 				} else {
-					HDLExpression def = var.getDefaultValue();
-					Optional<BigInteger> constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
-					if (!constant.isPresent())
-						if (!(def instanceof HDLLiteral)) {
-							problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
-						}
+					if (def instanceof HDLArrayInit) {
+						checkConstantsArrayInit(problems, (HDLArrayInit) def);
+					} else {
+						Optional<BigInteger> constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
+						if (!constant.isPresent())
+							if (!(def instanceof HDLLiteral)) {
+								problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
+							}
+					}
 				}
+			}
 		}
 		HDLForLoop[] forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		for (HDLForLoop hdlForLoop : forLoops) {
@@ -587,6 +592,19 @@ public class BuiltInValidator implements IHDLValidator {
 					}
 				}
 			}
+		}
+	}
+
+	private static void checkConstantsArrayInit(Set<Problem> problems, HDLArrayInit arrayInit) {
+		for (HDLExpression exp : arrayInit.getExp()) {
+			Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(exp);
+			if (!valueOf.isPresent())
+				if (exp instanceof HDLArrayInit) {
+					HDLArrayInit hai = (HDLArrayInit) exp;
+					checkConstantsArrayInit(problems, hai);
+				} else {
+					problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, exp, arrayInit, null));
+				}
 		}
 	}
 

@@ -47,7 +47,7 @@ public class ModificationSet {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> ArrayList<T> copyContainer(String feature, HDLObject container, ArrayList<T> object) {
+		public <T> ArrayList<T> copyContainer(String feature, HDLObject container, Iterable<T> object) {
 			if (object != null) {
 				ArrayList<T> res = new ArrayList<T>();
 				for (T t : object) {

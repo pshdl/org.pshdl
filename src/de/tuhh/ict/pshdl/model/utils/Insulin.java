@@ -57,7 +57,7 @@ public class Insulin {
 		return apply;
 	}
 
-	public static <T extends HDLObject> T resolveFragments(T pkg) {
+	public static <T extends IHDLObject> T resolveFragments(T pkg) {
 		HDLUnresolvedFragment[] fragments;
 		do {
 			ModificationSet ms = new ModificationSet();
@@ -418,7 +418,12 @@ public class Insulin {
 			HDLVariableRef ref = (HDLVariableRef) defaultValue;
 			synchedArray = ref.resolveVar().get().getDimensions().size() != 0;
 		}
-		HDLStatement init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
+		HDLStatement init;
+		if (defaultValue instanceof HDLArrayInit) {
+			HDLArrayInit hai = (HDLArrayInit) defaultValue;
+			init = new HDLAssignment().setLeft(setVar).setRight(hai);
+		} else
+			init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
 		HDLBlock obj = var.getMeta(RWValidation.BlockMeta.block);
 		if ((obj != null) && (obj != RWValidation.UNIT_BLOCK)) {
 			insertFirstStatement(ms, obj, init);
@@ -694,10 +699,28 @@ public class Insulin {
 			if (reg != null) {
 				fortify(ms, reg.getResetValue(), determineType);
 			}
-			for (HDLVariable var : hvd.getVariables())
-				if (var.getDefaultValue() != null) {
-					fortify(ms, var.getDefaultValue(), determineType);
+			for (HDLVariable var : hvd.getVariables()) {
+				HDLExpression defaultValue = var.getDefaultValue();
+				if (!(defaultValue instanceof HDLArrayInit)) {
+					if (defaultValue != null) {
+						fortify(ms, defaultValue, determineType);
+					}
+				} else {
+					HDLArrayInit hai = (HDLArrayInit) defaultValue;
+					fortifyArrayInitExp(ms, determineType, hai);
 				}
+			}
+		}
+	}
+
+	private static void fortifyArrayInitExp(ModificationSet ms, HDLType determineType, HDLArrayInit hai) {
+		for (HDLExpression exp : hai.getExp()) {
+			if (exp instanceof HDLArrayInit) {
+				HDLArrayInit subHai = (HDLArrayInit) exp;
+				fortifyArrayInitExp(ms, determineType, subHai);
+			} else {
+				fortify(ms, exp, determineType);
+			}
 		}
 	}
 
@@ -729,12 +752,13 @@ public class Insulin {
 	private static void fortifyAssignments(HDLObject apply, ModificationSet ms) {
 		HDLAssignment[] assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment assignment : assignments) {
-			if (BuiltInValidator.skipExp(assignment)) {
+			if (BuiltInValidator.skipExp(assignment))
 				continue;
-			}
 			HDLType leftType = TypeExtension.typeOf(assignment.getLeft()).get();
 			HDLExpression exp = assignment.getRight();
-			if (exp.getClassType() == HDLClass.HDLEqualityOp) {
+			if (exp.getClassType() == HDLClass.HDLArrayInit)
+				fortifyArrayInitExp(ms, leftType, (HDLArrayInit) exp);
+			else if (exp.getClassType() == HDLClass.HDLEqualityOp) {
 				HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp)
 						.addThenDo(assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(HDLLiteral.get(1))))
 						.addElseDo(assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(HDLLiteral.get(0))));

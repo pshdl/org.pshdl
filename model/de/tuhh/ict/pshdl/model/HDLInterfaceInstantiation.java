@@ -98,11 +98,18 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 				ArrayList<HDLVariable> variables = hvd.getVariables();
 				for (HDLVariable hdlVariable : variables) {
 					Optional<BigInteger> constant = ConstantEvaluate.valueOf(hdlVariable.getDefaultValue());
-					if (!constant.isPresent())
-						throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", hdlVariable));
-					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
-					for (HDLVariableRef ref : refs) {
-						ms.replace(ref, HDLLiteral.get(constant.get()));
+					if (!constant.isPresent()) {
+						if (hdlVariable.getDefaultValue() instanceof HDLArrayInit) {
+							HDLArrayInit hdlArrayInit = (HDLArrayInit) hdlVariable.getDefaultValue();
+							inlineConstants(ms, hdlArrayInit);
+						} else
+							throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", hdlVariable));
+					} else {
+						Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef())
+								.getAll();
+						for (HDLVariableRef ref : refs) {
+							ms.replace(ref, HDLLiteral.get(constant.get()));
+						}
 					}
 				}
 				break;
@@ -113,6 +120,22 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			}
 		}
 		return Optional.of(ms.apply(getInterface));
+	}
+
+	private void inlineConstants(ModificationSet ms, HDLArrayInit hdlArrayInit) {
+		for (HDLExpression exp : hdlArrayInit.getExp()) {
+			Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(exp);
+			if (valueOf.isPresent()) {
+				ms.replace(exp, HDLLiteral.get(valueOf.get()));
+			} else {
+				if (exp instanceof HDLArrayInit) {
+					HDLArrayInit hai = (HDLArrayInit) exp;
+					inlineConstants(ms, hai);
+				} else {
+					throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", exp));
+				}
+			}
+		}
 	}
 
 	// $CONTENT-END$

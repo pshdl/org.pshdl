@@ -394,7 +394,7 @@ public class ScopingExtension {
     }
     String _pkg = obj.getPkg();
     String _plus = (_pkg + ".*");
-    ArrayList<String> _asList = HDLObject.<String>asList(_plus);
+    Iterable<String> _asList = HDLObject.<String>asList(_plus);
     return library.resolveFunction(_asList, hFunc);
   }
   
@@ -441,7 +441,7 @@ public class ScopingExtension {
     }
     String _pkg = obj.getPkg();
     String _plus = (_pkg + ".*");
-    ArrayList<String> _asList = HDLObject.<String>asList(_plus);
+    Iterable<String> _asList = HDLObject.<String>asList(_plus);
     return library.resolve(_asList, type);
   }
   
@@ -456,7 +456,7 @@ public class ScopingExtension {
     }
     String _pkg = obj.getPkg();
     String _plus = (_pkg + ".*");
-    ArrayList<String> _asList = HDLObject.<String>asList(_plus);
+    Iterable<String> _asList = HDLObject.<String>asList(_plus);
     return library.resolveVariable(_asList, hVar);
   }
   

@@ -130,6 +130,8 @@ public class StringWriteExtension {
         } else {
           _builder.appendImmediate(",", "");
         }
+        String _string_1 = this.toString(e, highlight);
+        _builder.append(_string_1, "");
       }
     }
     _builder.append("}");

@@ -61,24 +61,25 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	public static final String META = "INLINED_FROM";
 
 	@Nonnull
-	public <T extends IHDLObject> T substitute(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, T stmnt, IHDLObject origin) {
+	public <T extends IHDLObject> T substitute(Iterable<HDLVariable> paraneter, Iterable<HDLExpression> arguments, T stmnt, IHDLObject origin) {
 		ModificationSet msExp = new ModificationSet();
 		@SuppressWarnings("unchecked")
 		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
-		for (int i = 0; i < args.size(); i++) {
-			HDLVariable arg = args.get(i);
-			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(arg.getName()).getAll();
+		Iterator<HDLExpression> argIter = arguments.iterator();
+		for (HDLVariable param : paraneter) {
+			HDLExpression arg = argIter.next();
+			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
-				HDLExpression exp = params.get(i).copyFiltered(CopyFilter.DEEP_META);
+				HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
 					if (exp instanceof HDLVariableRef) {
 						HDLVariableRef ref = (HDLVariableRef) exp;
 						HDLVariableRef nref = ref;
 						for (HDLRange bit : argRef.getBits()) {
-							nref = nref.addBits(substitute(args, params, bit, origin));
+							nref = nref.addBits(substitute(paraneter, arguments, bit, origin));
 						}
 						for (HDLExpression aExp : argRef.getArray()) {
-							nref = nref.addArray(substitute(args, params, aExp, origin));
+							nref = nref.addArray(substitute(paraneter, arguments, aExp, origin));
 						}
 						msExp.replace(argRef, nref);
 					} else {

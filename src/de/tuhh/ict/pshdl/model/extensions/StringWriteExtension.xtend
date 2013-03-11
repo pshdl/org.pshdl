@@ -75,7 +75,7 @@ class StringWriteExtension {
 	def dispatch String toString(HDLArrayInit array, SyntaxHighlighter highlight) {
 		if (array.exp.size == 1)
 			return array.entering(highlight) + array.exp.get(0).toString(highlight) + array.leaving(highlight)
-		return '''«array.entering(highlight)»{«FOR e : array.exp SEPARATOR ','»«ENDFOR»}«array.leaving(highlight)»'''
+		return '''«array.entering(highlight)»{«FOR e : array.exp SEPARATOR ','»«e.toString(highlight)»«ENDFOR»}«array.leaving(highlight)»'''
 	}
 
 	def String leaving(IHDLObject init, SyntaxHighlighter highlighter) {

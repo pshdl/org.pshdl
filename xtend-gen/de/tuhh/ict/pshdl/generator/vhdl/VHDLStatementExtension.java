@@ -393,7 +393,7 @@ public class VHDLStatementExtension {
                 String _string_4 = name.toString();
                 HDLAnnotation _create = HDLBuiltInAnnotations.VHDLType.create(_string_4);
                 HDLVariable _addAnnotations = _setDimensions.addAnnotations(_create);
-                ArrayList<HDLVariable> _asList = HDLObject.<HDLVariable>asList(_addAnnotations);
+                Iterable<HDLVariable> _asList = HDLObject.<HDLVariable>asList(_addAnnotations);
                 HDLVariableDeclaration _setVariables = _setDirection.setVariables(_asList);
                 final HDLVariableDeclaration newHVD = _setVariables.copyDeepFrozen(obj);
                 VHDLContext _vHDL_1 = this.toVHDL(newHVD, pid);
@@ -401,7 +401,7 @@ public class VHDLStatementExtension {
               } else {
                 HDLVariableDeclaration _setDirection_1 = hvd.setDirection(HDLDirection.INTERNAL);
                 HDLVariable _setDimensions_1 = sigVar.setDimensions(null);
-                ArrayList<HDLVariable> _asList_1 = HDLObject.<HDLVariable>asList(_setDimensions_1);
+                Iterable<HDLVariable> _asList_1 = HDLObject.<HDLVariable>asList(_setDimensions_1);
                 HDLVariableDeclaration _setVariables_1 = _setDirection_1.setVariables(_asList_1);
                 final HDLVariableDeclaration newHVD_1 = _setVariables_1.copyDeepFrozen(obj);
                 VHDLContext _vHDL_2 = this.toVHDL(newHVD_1, pid);
@@ -409,7 +409,7 @@ public class VHDLStatementExtension {
               }
             } else {
               HDLVariableDeclaration _setDirection_2 = hvd.setDirection(HDLDirection.INTERNAL);
-              ArrayList<HDLVariable> _asList_2 = HDLObject.<HDLVariable>asList(sigVar);
+              Iterable<HDLVariable> _asList_2 = HDLObject.<HDLVariable>asList(sigVar);
               HDLVariableDeclaration _setVariables_2 = _setDirection_2.setVariables(_asList_2);
               final HDLVariableDeclaration newHVD_2 = _setVariables_2.copyDeepFrozen(obj);
               VHDLContext _vHDL_3 = this.toVHDL(newHVD_2, pid);
@@ -895,17 +895,26 @@ public class VHDLStatementExtension {
       for (final HDLExpression exp : _array) {
         dim.remove(0);
       }
+      boolean _and_1 = false;
       int _size_1 = dim.size();
       boolean _notEquals_1 = (_size_1 != 0);
-      if (_notEquals_1) {
+      if (!_notEquals_1) {
+        _and_1 = false;
+      } else {
+        HDLExpression _right = obj.getRight();
+        HDLClass _classType_1 = _right.getClassType();
+        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_classType_1, HDLClass.HDLArrayInit);
+        _and_1 = (_notEquals_1 && _notEquals_2);
+      }
+      if (_and_1) {
         final HDLAnnotation typeAnno = hvar.getAnnotation(HDLBuiltInAnnotations.VHDLType);
-        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(typeAnno, null);
-        if (_notEquals_2) {
+        boolean _notEquals_3 = ObjectExtensions.operator_notEquals(typeAnno, null);
+        if (_notEquals_3) {
           Expression<?> _vHDL = this.vee.toVHDL(ref);
           String _value = typeAnno.getValue();
           UnresolvedType _unresolvedType = new UnresolvedType(_value);
-          HDLExpression _right = obj.getRight();
-          Expression<?> _vHDL_1 = this.vee.toVHDL(_right);
+          HDLExpression _right_1 = obj.getRight();
+          Expression<?> _vHDL_1 = this.vee.toVHDL(_right_1);
           TypeConversion _typeConversion = new TypeConversion(_unresolvedType, _vHDL_1);
           SignalAssignment _signalAssignment = new SignalAssignment(((SignalAssignmentTarget) _vHDL), _typeConversion);
           sa = _signalAssignment;
@@ -915,29 +924,29 @@ public class VHDLStatementExtension {
           boolean _isExternal = hvd.isExternal();
           String _arrayRefName = VHDLStatementExtension.getArrayRefName(hvar, _isExternal);
           UnresolvedType _unresolvedType_1 = new UnresolvedType(_arrayRefName);
-          HDLExpression _right_1 = obj.getRight();
-          Expression<?> _vHDL_3 = this.vee.toVHDL(_right_1);
+          HDLExpression _right_2 = obj.getRight();
+          Expression<?> _vHDL_3 = this.vee.toVHDL(_right_2);
           TypeConversion _typeConversion_1 = new TypeConversion(_unresolvedType_1, _vHDL_3);
           SignalAssignment _signalAssignment_1 = new SignalAssignment(((SignalAssignmentTarget) _vHDL_2), _typeConversion_1);
           sa = _signalAssignment_1;
         }
       } else {
         Expression<?> _vHDL_4 = this.vee.toVHDL(ref);
-        HDLExpression _right_2 = obj.getRight();
-        Expression<?> _vHDL_5 = this.vee.toVHDL(_right_2);
+        HDLExpression _right_3 = obj.getRight();
+        Expression<?> _vHDL_5 = this.vee.toVHDL(_right_3);
         SignalAssignment _signalAssignment_2 = new SignalAssignment(((SignalAssignmentTarget) _vHDL_4), _vHDL_5);
         sa = _signalAssignment_2;
       }
     } else {
       Expression<?> _vHDL_6 = this.vee.toVHDL(ref);
-      HDLExpression _right_3 = obj.getRight();
-      Expression<?> _vHDL_7 = this.vee.toVHDL(_right_3);
+      HDLExpression _right_4 = obj.getRight();
+      Expression<?> _vHDL_7 = this.vee.toVHDL(_right_4);
       SignalAssignment _signalAssignment_3 = new SignalAssignment(((SignalAssignmentTarget) _vHDL_6), _vHDL_7);
       sa = _signalAssignment_3;
     }
     final HDLRegisterConfig config = hvar.getRegisterConfig();
-    boolean _notEquals_3 = ObjectExtensions.operator_notEquals(config, null);
-    if (_notEquals_3) {
+    boolean _notEquals_4 = ObjectExtensions.operator_notEquals(config, null);
+    if (_notEquals_4) {
       context.addClockedStatement(config, sa);
     } else {
       context.addUnclockedStatement(pid, sa, obj);

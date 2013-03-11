@@ -111,8 +111,7 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public Optional<HDLVariable> resolveVariable(ArrayList<String> imports, HDLQualifiedName type) {
-		imports.add("pshdl.*");
+	public Optional<HDLVariable> resolveVariable(Iterable<String> imports, HDLQualifiedName type) {
 		HDLVariable hdlVariable = variables.get(type);
 		if (hdlVariable == null) {
 			for (String string : imports)
@@ -121,13 +120,14 @@ public class HDLLibrary {
 					if (hdlVariable != null)
 						return Optional.fromNullable(Insulin.resolveFragments(hdlVariable));
 				}
+			Optional<HDLVariable> genericImport = checkGenericImport(type, "pshdl.*", variables);
+			if (genericImport.isPresent())
+				return genericImport;
 			for (String string : imports)
 				if (string.endsWith(".*")) {
-					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
-					// System.out.println("HDLLibrary.resolve()" + newTypeName);
-					hdlVariable = variables.get(newTypeName);
-					if (hdlVariable != null)
-						return Optional.fromNullable(Insulin.resolveFragments(hdlVariable));
+					genericImport = checkGenericImport(type, string, variables);
+					if (genericImport.isPresent())
+						return genericImport;
 				}
 		}
 		if (hdlVariable != null)
@@ -146,8 +146,7 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public Optional<HDLFunction> resolveFunction(ArrayList<String> imports, HDLQualifiedName type) {
-		imports.add("pshdl.*");
+	public Optional<HDLFunction> resolveFunction(Iterable<String> imports, HDLQualifiedName type) {
 		HDLFunction hdlFunction = functions.get(type);
 		if (hdlFunction == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
@@ -158,13 +157,14 @@ public class HDLLibrary {
 					if (hdlFunction != null)
 						return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
 				}
+			Optional<HDLFunction> genericImport = checkGenericImport(type, "pshdl.*", functions);
+			if (genericImport.isPresent())
+				return genericImport;
 			for (String string : imports)
 				if (string.endsWith(".*")) {
-					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
-					// System.out.println("HDLLibrary.resolve()" + newTypeName);
-					hdlFunction = functions.get(newTypeName);
-					if (hdlFunction != null)
-						return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
+					genericImport = checkGenericImport(type, string, functions);
+					if (genericImport.isPresent())
+						return genericImport;
 				}
 		}
 		if (hdlFunction != null)
@@ -183,8 +183,7 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public Optional<? extends HDLType> resolve(ArrayList<String> imports, HDLQualifiedName type) {
-		imports.add("pshdl.*");
+	public Optional<? extends HDLType> resolve(Iterable<String> imports, HDLQualifiedName type) {
 		HDLType hdlType = types.get(type);
 		if (hdlType == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
@@ -192,17 +191,26 @@ public class HDLLibrary {
 			for (String string : imports)
 				if (string.endsWith(type.toString()))
 					return Optional.fromNullable(types.get(new HDLQualifiedName(string)));
+			Optional<HDLType> genericImport = checkGenericImport(type, "pshdl.*", types);
+			if (genericImport.isPresent())
+				return genericImport;
 			for (String string : imports)
 				if (string.endsWith(".*")) {
-					HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
-					// System.out.println("HDLLibrary.resolve()" + newTypeName);
-					HDLType newType = types.get(newTypeName);
-					if (newType != null)
-						return Optional.of(Insulin.resolveFragments(newType));
+					genericImport = checkGenericImport(type, string, types);
+					if (genericImport.isPresent())
+						return genericImport;
 				}
 		}
 		if (hdlType != null)
 			return Optional.fromNullable(Insulin.resolveFragments(hdlType));
+		return Optional.absent();
+	}
+
+	private <T extends IHDLObject> Optional<T> checkGenericImport(HDLQualifiedName type, String string, Map<HDLQualifiedName, T> map) {
+		HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
+		T newType = map.get(newTypeName);
+		if (newType != null)
+			return Optional.of(Insulin.resolveFragments(newType));
 		return Optional.absent();
 	}
 

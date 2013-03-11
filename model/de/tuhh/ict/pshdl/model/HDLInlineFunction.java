@@ -82,7 +82,7 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 		return createExpression(args, params, hdi);
 	}
 
-	private HDLExpression createExpression(ArrayList<HDLVariable> args, ArrayList<HDLExpression> params, IHDLObject origin) {
+	private HDLExpression createExpression(Iterable<HDLVariable> args, Iterable<HDLExpression> params, IHDLObject origin) {
 		return substitute(args, params, getExpr(), origin);
 	}
 

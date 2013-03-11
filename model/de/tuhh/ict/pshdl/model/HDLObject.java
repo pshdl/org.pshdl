@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import javax.annotation.*;
 
 import com.google.common.base.*;
-
 import de.tuhh.ict.pshdl.model.extensions.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
@@ -174,7 +173,12 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 	}
 
 	@Nonnull
-	public static <T> ArrayList<T> asList(T... items) {
+	public static <T> Iterable<T> asList(T items) {
+		return Collections.singleton(items);
+	}
+
+	@Nonnull
+	public static <T> Iterable<T> asList(T... items) {
 		ArrayList<T> res = new ArrayList<T>();
 		for (T t : items) {
 			res.add(t);

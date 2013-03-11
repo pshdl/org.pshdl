@@ -93,6 +93,8 @@ import de.tuhh.ict.pshdl.model.IHDLObject
 import de.tuhh.ict.pshdl.model.parser.SourceInfo
 import de.upb.hni.vmagic.util.Comments
 import com.google.common.base.Optional
+import de.tuhh.ict.pshdl.model.utils.HDLLibrary
+import de.tuhh.ict.pshdl.model.HDLArrayInit
 
 class VHDLStatementExtension {
 	public static VHDLStatementExtension INST = new VHDLStatementExtension
@@ -494,7 +496,7 @@ class VHDLStatementExtension {
 				for (HDLExpression exp : varRef.array) {
 					dim.remove(0)
 				}
-				if (dim.size != 0) {
+				if (dim.size != 0 && obj.right.classType != HDLClass::HDLArrayInit) {
 
 					//XXX Implement correct array assignment for non full assignments
 					val HDLAnnotation typeAnno = hvar.getAnnotation(VHDLType)
