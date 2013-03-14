@@ -130,16 +130,16 @@ public class TypeExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLClass.HDLInlineFunction)) {
         _matched=true;
-        Problem _problem = new Problem(ErrorCode.INLINE_FUNCTION_NO_TYPE, hVar);
-        HDLProblemException _hDLProblemException = new HDLProblemException(_problem);
-        throw _hDLProblemException;
+        return Optional.<HDLType>absent();
       }
     }
-    String _plus = ("Failed to resolve type of " + hVar);
-    String _plus_1 = (_plus + " caused by an unexpected container: ");
-    String _plus_2 = (_plus_1 + container);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_2);
-    throw _illegalArgumentException;
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLClass.HDLSubstituteFunction)) {
+        _matched=true;
+        return Optional.<HDLType>absent();
+      }
+    }
+    return Optional.<HDLType>absent();
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLVariableDeclaration hvd) {
@@ -298,7 +298,8 @@ public class TypeExtension {
   
   protected Optional<? extends HDLType> _determineType(final HDLFunctionCall call) {
     HDLTypeInferenceInfo _inferenceInfo = HDLFunctions.getInferenceInfo(call);
-    return Optional.<HDLType>fromNullable(_inferenceInfo.result);
+    HDLType _result = _inferenceInfo==null?(HDLType)null:_inferenceInfo.result;
+    return Optional.<HDLType>fromNullable(_result);
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLLiteral lit) {

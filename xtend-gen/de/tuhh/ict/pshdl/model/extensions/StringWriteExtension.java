@@ -244,15 +244,37 @@ public class StringWriteExtension {
   
   protected String _toString(final HDLUnresolvedFragmentFunction frag, final SyntaxHighlighter highlight) {
     boolean isStatement = false;
-    final IHDLObject container = frag.getContainer();
-    if ((container instanceof HDLStatement)) {
-      isStatement = true;
+    IHDLObject _container = frag.getContainer();
+    final IHDLObject container = _container;
+    boolean _matched = false;
+    if (!_matched) {
+      if (container instanceof HDLStatement) {
+        final HDLStatement _hDLStatement = (HDLStatement)container;
+        _matched=true;
+        boolean _and = false;
+        boolean _not = (!(_hDLStatement instanceof HDLAssignment));
+        if (!_not) {
+          _and = false;
+        } else {
+          boolean _not_1 = (!(_hDLStatement instanceof HDLFunctionCall));
+          _and = (_not && _not_1);
+        }
+        isStatement = _and;
+      }
     }
-    if ((container instanceof HDLBlock)) {
-      isStatement = true;
+    if (!_matched) {
+      if (container instanceof HDLBlock) {
+        final HDLBlock _hDLBlock = (HDLBlock)container;
+        _matched=true;
+        isStatement = true;
+      }
     }
-    if ((container instanceof HDLUnit)) {
-      isStatement = true;
+    if (!_matched) {
+      if (container instanceof HDLUnit) {
+        final HDLUnit _hDLUnit = (HDLUnit)container;
+        _matched=true;
+        isStatement = true;
+      }
     }
     String _xifexpression = null;
     if (isStatement) {
@@ -422,15 +444,37 @@ public class StringWriteExtension {
   
   protected String _toString(final HDLFunctionCall func, final SyntaxHighlighter highlight) {
     boolean isStatement = false;
-    final IHDLObject container = func.getContainer();
-    if ((container instanceof HDLStatement)) {
-      isStatement = true;
+    IHDLObject _container = func.getContainer();
+    final IHDLObject container = _container;
+    boolean _matched = false;
+    if (!_matched) {
+      if (container instanceof HDLStatement) {
+        final HDLStatement _hDLStatement = (HDLStatement)container;
+        _matched=true;
+        boolean _and = false;
+        boolean _not = (!(_hDLStatement instanceof HDLAssignment));
+        if (!_not) {
+          _and = false;
+        } else {
+          boolean _not_1 = (!(_hDLStatement instanceof HDLFunctionCall));
+          _and = (_not && _not_1);
+        }
+        isStatement = _and;
+      }
     }
-    if ((container instanceof HDLBlock)) {
-      isStatement = true;
+    if (!_matched) {
+      if (container instanceof HDLBlock) {
+        final HDLBlock _hDLBlock = (HDLBlock)container;
+        _matched=true;
+        isStatement = true;
+      }
     }
-    if ((container instanceof HDLUnit)) {
-      isStatement = true;
+    if (!_matched) {
+      if (container instanceof HDLUnit) {
+        final HDLUnit _hDLUnit = (HDLUnit)container;
+        _matched=true;
+        isStatement = true;
+      }
     }
     StringBuilder _xifexpression = null;
     if (isStatement) {

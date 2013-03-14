@@ -9,6 +9,7 @@ import de.tuhh.ict.pshdl.model.impl.*;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
  * </ul>
  */
 public abstract class HDLValueType extends AbstractHDLValueType {
@@ -19,11 +20,13 @@ public abstract class HDLValueType extends AbstractHDLValueType {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLValueType(@Nullable IHDLObject container, @Nonnull String name, boolean validate) {
-		super(container, name, validate);
+	public HDLValueType(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
+		super(container, name, dim, validate);
 	}
 
 	public HDLValueType() {

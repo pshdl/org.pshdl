@@ -109,13 +109,11 @@ class StringWriteExtension {
 
 	def dispatch String toString(HDLUnresolvedFragmentFunction frag, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
-		val container = frag.container
-		if (container instanceof HDLStatement)
-			isStatement = true
-		if (container instanceof HDLBlock)
-			isStatement = true
-		if (container instanceof HDLUnit)
-			isStatement = true
+		switch (container: frag.container) {
+			HDLStatement: 	isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
+			HDLBlock: 		isStatement = true
+			HDLUnit: 		isStatement = true
+		}
 		val String sb = if(isStatement) highlight.spacing.toString else ""
 		var res = sb + frag.entering(highlight) + toStringFrag(frag, highlight) +
 			'''(«FOR HDLExpression p : frag.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»)'''
@@ -160,13 +158,11 @@ class StringWriteExtension {
 
 	def dispatch String toString(HDLFunctionCall func, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
-		val container = func.container
-		if (container instanceof HDLStatement)
-			isStatement = true
-		if (container instanceof HDLBlock)
-			isStatement = true
-		if (container instanceof HDLUnit)
-			isStatement = true
+		switch (container: func.container) {
+			HDLStatement: 	isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
+			HDLBlock: 		isStatement = true
+			HDLUnit: 		isStatement = true
+		}
 		val StringBuilder sb = if(isStatement) highlight.spacing else new StringBuilder
 		sb.append(func.entering(highlight))
 		sb.append(highlight.functionCall(func.nameRefName.toString)).append('(')

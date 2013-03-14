@@ -81,10 +81,11 @@ class TypeExtension {
 			case HDLClass::HDLForLoop:
 				return Optional::of(HDLPrimitive::natural)
 			case HDLClass::HDLInlineFunction:
-				throw new HDLProblemException(new Problem(ErrorCode::INLINE_FUNCTION_NO_TYPE, hVar))
+				return Optional::absent
+			case HDLClass::HDLSubstituteFunction:
+				return Optional::absent
 		}
-		throw new IllegalArgumentException(
-			"Failed to resolve type of " + hVar + " caused by an unexpected container: " + container)
+		return Optional::absent
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableDeclaration hvd) {
@@ -166,7 +167,7 @@ class TypeExtension {
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLFunctionCall call) {
-		return Optional::fromNullable(HDLFunctions::getInferenceInfo(call).result)
+		return Optional::fromNullable(HDLFunctions::getInferenceInfo(call)?.result)
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLLiteral lit) {

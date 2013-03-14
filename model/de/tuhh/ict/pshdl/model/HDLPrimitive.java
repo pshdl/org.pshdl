@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.*;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
  * <li>HDLPrimitiveType type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression width. Can be <code>null</code>.</li>
  * </ul>
@@ -24,6 +25,8 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param width
@@ -31,8 +34,9 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLPrimitive(@Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLPrimitiveType type, @Nullable HDLExpression width, boolean validate) {
-		super(container, name, type, width, validate);
+	public HDLPrimitive(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull HDLPrimitiveType type, @Nullable HDLExpression width,
+			boolean validate) {
+		super(container, name, dim, type, width, validate);
 	}
 
 	public HDLPrimitive() {

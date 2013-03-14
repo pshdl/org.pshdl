@@ -17,13 +17,16 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLVariableDeclaration> ports, boolean validate) {
-		super(container, name, validate);
+	public AbstractHDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nullable Iterable<HDLVariableDeclaration> ports,
+			boolean validate) {
+		super(container, name, dim, validate);
 		if (validate) {
 			ports = validatePorts(ports);
 		}
@@ -67,7 +70,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Override
 	@Nonnull
 	public HDLInterface copy() {
-		HDLInterface newObject = new HDLInterface(null, name, ports, false);
+		HDLInterface newObject = new HDLInterface(null, name, dim, ports, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -81,8 +84,9 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Nonnull
 	public HDLInterface copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
+		ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
 		ArrayList<HDLVariableDeclaration> filteredports = filter.copyContainer("ports", this, ports);
-		return filter.postFilter((HDLInterface) this, new HDLInterface(null, filteredname, filteredports, false));
+		return filter.postFilter((HDLInterface) this, new HDLInterface(null, filteredname, filtereddim, filteredports, false));
 	}
 
 	/**
@@ -126,7 +130,79 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Nonnull
 	public HDLInterface setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLInterface res = new HDLInterface(container, name, ports, false);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getDim()}.
+	 * 
+	 * @param dim
+	 *            sets the new dim of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLInterface} with the updated dim
+	 *         field.
+	 */
+	@Override
+	@Nonnull
+	public HDLInterface setDim(@Nullable Iterable<HDLExpression> dim) {
+		dim = validateDim(dim);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		return res;
+	}
+
+	/**
+	 * Adds a new value to the field {@link #getDim()}.
+	 * 
+	 * @param newDim
+	 *            the value that should be added to the field {@link #getDim()}
+	 * @return a new instance of {@link HDLInterface} with the updated dim
+	 *         field.
+	 */
+	@Override
+	@Nonnull
+	public HDLInterface addDim(@Nullable HDLExpression newDim) {
+		if (newDim == null)
+			throw new IllegalArgumentException("Element of dim can not be null!");
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.add(newDim);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getDim()}.
+	 * 
+	 * @param newDim
+	 *            the value that should be removed from the field
+	 *            {@link #getDim()}
+	 * @return a new instance of {@link HDLInterface} with the updated dim
+	 *         field.
+	 */
+	@Override
+	@Nonnull
+	public HDLInterface removeDim(@Nullable HDLExpression newDim) {
+		if (newDim == null)
+			throw new IllegalArgumentException("Removed element of dim can not be null!");
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.remove(newDim);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getDim()}.
+	 * 
+	 * @param idx
+	 *            the index of the value that should be removed from the field
+	 *            {@link #getDim()}
+	 * @return a new instance of {@link HDLInterface} with the updated dim
+	 *         field.
+	 */
+	@Nonnull
+	public HDLInterface removeDim(int idx) {
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.remove(idx);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
 		return res;
 	}
 
@@ -141,7 +217,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Nonnull
 	public HDLInterface setPorts(@Nullable Iterable<HDLVariableDeclaration> ports) {
 		ports = validatePorts(ports);
-		HDLInterface res = new HDLInterface(container, name, ports, false);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
 		return res;
 	}
 
@@ -160,7 +236,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 			throw new IllegalArgumentException("Element of ports can not be null!");
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.add(newPorts);
-		HDLInterface res = new HDLInterface(container, name, ports, false);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
 		return res;
 	}
 
@@ -179,7 +255,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 			throw new IllegalArgumentException("Removed element of ports can not be null!");
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.remove(newPorts);
-		HDLInterface res = new HDLInterface(container, name, ports, false);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
 		return res;
 	}
 
@@ -196,7 +272,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	public HDLInterface removePorts(int idx) {
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.remove(idx);
-		HDLInterface res = new HDLInterface(container, name, ports, false);
+		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
 		return res;
 	}
 
@@ -239,6 +315,15 @@ public abstract class AbstractHDLInterface extends HDLType {
 		sb.append('\n').append(spacing).append("new HDLInterface()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
+		}
+		if (dim != null) {
+			if (dim.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLExpression o : dim) {
+					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
 		}
 		if (ports != null) {
 			if (ports.size() > 0) {

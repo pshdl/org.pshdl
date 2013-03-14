@@ -131,9 +131,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 				if (exp instanceof HDLArrayInit) {
 					HDLArrayInit hai = (HDLArrayInit) exp;
 					inlineConstants(ms, hai);
-				} else {
+				} else
 					throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", exp));
-				}
 			}
 		}
 	}

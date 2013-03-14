@@ -6,6 +6,7 @@ import javax.annotation.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.*;
+import de.tuhh.ict.pshdl.model.utils.HDLIterator.Visit;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLType extends HDLObject {
@@ -16,20 +17,32 @@ public abstract class AbstractHDLType extends HDLObject {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLType(@Nullable IHDLObject container, @Nonnull String name, boolean validate) {
+	public AbstractHDLType(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			name = validateName(name);
 		}
 		this.name = name;
+		if (validate) {
+			dim = validateDim(dim);
+		}
+		this.dim = new ArrayList<HDLExpression>();
+		if (dim != null) {
+			for (HDLExpression newValue : dim) {
+				this.dim.add(newValue);
+			}
+		}
 	}
 
 	public AbstractHDLType() {
 		super();
 		this.name = null;
+		this.dim = new ArrayList<HDLExpression>();
 	}
 
 	protected final String name;
@@ -50,8 +63,36 @@ public abstract class AbstractHDLType extends HDLObject {
 		return name;
 	}
 
+	@Visit
+	protected final ArrayList<HDLExpression> dim;
+
+	/**
+	 * Get the dim field. Can be <code>null</code>.
+	 * 
+	 * @return a clone of the field. Will never return <code>null</code>.
+	 */
+	@Nonnull
+	public ArrayList<HDLExpression> getDim() {
+		return (ArrayList<HDLExpression>) dim.clone();
+	}
+
+	protected Iterable<HDLExpression> validateDim(Iterable<HDLExpression> dim) {
+		if (dim == null)
+			return new ArrayList<HDLExpression>();
+		return dim;
+	}
+
 	@Nonnull
 	public abstract HDLType setName(@Nonnull String name);
+
+	@Nonnull
+	public abstract HDLType setDim(@Nullable Iterable<HDLExpression> dim);
+
+	@Nonnull
+	public abstract HDLType addDim(@Nullable HDLExpression dim);
+
+	@Nonnull
+	public abstract HDLType removeDim(@Nullable HDLExpression dim);
 
 	/**
 	 * Creates a copy of this class with the same fields.
@@ -96,6 +137,11 @@ public abstract class AbstractHDLType extends HDLObject {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (dim == null) {
+			if (other.dim != null)
+				return false;
+		} else if (!dim.equals(other.dim))
+			return false;
 		return true;
 	}
 
@@ -108,6 +154,7 @@ public abstract class AbstractHDLType extends HDLObject {
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+		result = (prime * result) + ((dim == null) ? 0 : dim.hashCode());
 		hashCache = result;
 		return result;
 	}
@@ -120,6 +167,15 @@ public abstract class AbstractHDLType extends HDLObject {
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
+		if (dim != null) {
+			if (dim.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLExpression o : dim) {
+					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
+		}
 		return sb.toString();
 	}
 
@@ -127,6 +183,12 @@ public abstract class AbstractHDLType extends HDLObject {
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateName(getName());
+		validateDim(getDim());
+		if (getDim() != null) {
+			for (HDLExpression o : getDim()) {
+				o.validateAllFields(this, checkResolve);
+			}
+		}
 	}
 
 	@Override

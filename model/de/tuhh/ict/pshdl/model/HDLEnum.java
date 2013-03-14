@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLVariable> enums. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * </ul>
@@ -24,14 +25,16 @@ public class HDLEnum extends AbstractHDLEnum {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param enums
 	 *            the value for enums. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
-		super(container, name, enums, validate);
+	public HDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
+		super(container, name, dim, enums, validate);
 	}
 
 	public HDLEnum() {

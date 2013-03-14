@@ -12,6 +12,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLVariableDeclaration> ports. Can be <code>null</code>.</li>
  * </ul>
  */
@@ -23,13 +24,16 @@ public class HDLInterface extends AbstractHDLInterface {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param ports
 	 *            the value for ports. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLVariableDeclaration> ports, boolean validate) {
-		super(container, name, ports, validate);
+	public HDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nullable Iterable<HDLVariableDeclaration> ports,
+			boolean validate) {
+		super(container, name, dim, ports, validate);
 	}
 
 	public HDLInterface() {

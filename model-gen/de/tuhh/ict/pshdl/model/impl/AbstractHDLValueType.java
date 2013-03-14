@@ -16,11 +16,13 @@ public abstract class AbstractHDLValueType extends HDLType {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLValueType(@Nullable IHDLObject container, @Nonnull String name, boolean validate) {
-		super(container, name, validate);
+	public AbstractHDLValueType(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
+		super(container, name, dim, validate);
 	}
 
 	public AbstractHDLValueType() {
@@ -87,6 +89,15 @@ public abstract class AbstractHDLValueType extends HDLType {
 		sb.append('\n').append(spacing).append("new HDLValueType()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
+		}
+		if (dim != null) {
+			if (dim.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLExpression o : dim) {
+					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
 		}
 		return sb.toString();
 	}

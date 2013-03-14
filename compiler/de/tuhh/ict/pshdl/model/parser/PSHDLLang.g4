@@ -117,18 +117,7 @@ psSubstituteFunction :
 ;
 
 psFuncParam :
-	'(' ( psFuncType? psVariable ( ',' psFuncType? psVariable )* )? ')'
-;
-
-psFuncType : 
-	(RULE_ID | psPrimitiveType psOptionalWidth? | isInterface='interface' | isEnum='enum') psOptionalArray*
-;
-
-psOptionalWidth:
-	'<' (psValue|RULE_ID)? '>'
-;
-psOptionalArray:
-	'[' (psValue|RULE_ID)? ']'
+	'(' ( psVariable ( ',' psVariable )* )? ')'
 ;
 
 psNativeFunction :

@@ -45,7 +45,6 @@ public enum HDLClass {
 	HDLRange(HDLRange.class), // HDLRange
 	HDLUnit(HDLUnit.class), // HDLUnit
 	HDLRegisterConfig(HDLRegisterConfig.class), // HDLRegisterConfig
-	HDLFunctionParameter(HDLFunctionParameter.class), // HDLFunctionParameter
 	HDLVariable(HDLVariable.class), // HDLVariable
 	HDLType(HDLType.class), // HDLType
 	HDLInterface(HDLInterface.class), // HDLInterface

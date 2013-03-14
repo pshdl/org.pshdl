@@ -17,14 +17,16 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param dim
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param enums
 	 *            the value for enums. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
-		super(container, name, validate);
+	public AbstractHDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
+		super(container, name, dim, validate);
 		if (validate) {
 			enums = validateEnums(enums);
 		}
@@ -71,7 +73,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Override
 	@Nonnull
 	public HDLEnum copy() {
-		HDLEnum newObject = new HDLEnum(null, name, enums, false);
+		HDLEnum newObject = new HDLEnum(null, name, dim, enums, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -85,8 +87,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Nonnull
 	public HDLEnum copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
+		ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
 		ArrayList<HDLVariable> filteredenums = filter.copyContainer("enums", this, enums);
-		return filter.postFilter((HDLEnum) this, new HDLEnum(null, filteredname, filteredenums, false));
+		return filter.postFilter((HDLEnum) this, new HDLEnum(null, filteredname, filtereddim, filteredenums, false));
 	}
 
 	/**
@@ -129,7 +132,75 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Nonnull
 	public HDLEnum setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLEnum res = new HDLEnum(container, name, enums, false);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getDim()}.
+	 * 
+	 * @param dim
+	 *            sets the new dim of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLEnum} with the updated dim field.
+	 */
+	@Override
+	@Nonnull
+	public HDLEnum setDim(@Nullable Iterable<HDLExpression> dim) {
+		dim = validateDim(dim);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
+		return res;
+	}
+
+	/**
+	 * Adds a new value to the field {@link #getDim()}.
+	 * 
+	 * @param newDim
+	 *            the value that should be added to the field {@link #getDim()}
+	 * @return a new instance of {@link HDLEnum} with the updated dim field.
+	 */
+	@Override
+	@Nonnull
+	public HDLEnum addDim(@Nullable HDLExpression newDim) {
+		if (newDim == null)
+			throw new IllegalArgumentException("Element of dim can not be null!");
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.add(newDim);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getDim()}.
+	 * 
+	 * @param newDim
+	 *            the value that should be removed from the field
+	 *            {@link #getDim()}
+	 * @return a new instance of {@link HDLEnum} with the updated dim field.
+	 */
+	@Override
+	@Nonnull
+	public HDLEnum removeDim(@Nullable HDLExpression newDim) {
+		if (newDim == null)
+			throw new IllegalArgumentException("Removed element of dim can not be null!");
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.remove(newDim);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getDim()}.
+	 * 
+	 * @param idx
+	 *            the index of the value that should be removed from the field
+	 *            {@link #getDim()}
+	 * @return a new instance of {@link HDLEnum} with the updated dim field.
+	 */
+	@Nonnull
+	public HDLEnum removeDim(int idx) {
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.remove(idx);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
 		return res;
 	}
 
@@ -145,7 +216,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Nonnull
 	public HDLEnum setEnums(@Nonnull Iterable<HDLVariable> enums) {
 		enums = validateEnums(enums);
-		HDLEnum res = new HDLEnum(container, name, enums, false);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
 		return res;
 	}
 
@@ -163,7 +234,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 			throw new IllegalArgumentException("Element of enums can not be null!");
 		ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.add(newEnums);
-		HDLEnum res = new HDLEnum(container, name, enums, false);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
 		return res;
 	}
 
@@ -181,7 +252,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 			throw new IllegalArgumentException("Removed element of enums can not be null!");
 		ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.remove(newEnums);
-		HDLEnum res = new HDLEnum(container, name, enums, false);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
 		return res;
 	}
 
@@ -197,7 +268,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	public HDLEnum removeEnums(int idx) {
 		ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.remove(idx);
-		HDLEnum res = new HDLEnum(container, name, enums, false);
+		HDLEnum res = new HDLEnum(container, name, dim, enums, false);
 		return res;
 	}
 
@@ -240,6 +311,15 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		sb.append('\n').append(spacing).append("new HDLEnum()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
+		}
+		if (dim != null) {
+			if (dim.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLExpression o : dim) {
+					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
 		}
 		if (enums != null) {
 			if (enums.size() > 0) {
