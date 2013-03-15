@@ -283,7 +283,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHIf(getHIfRefName());
 		if (checkResolve && (getHIfRefName() != null))
-			if (resolveHIf() == null)
+			if (!resolveHIf().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
 	}
 

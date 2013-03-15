@@ -434,11 +434,11 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateClk(getClkRefName());
 		if (checkResolve && (getClkRefName() != null))
-			if (resolveClk() == null)
+			if (!resolveClk().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getClkRefName()));
 		validateRst(getRstRefName());
 		if (checkResolve && (getRstRefName() != null))
-			if (resolveRst() == null)
+			if (!resolveRst().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getRstRefName()));
 		validateClockType(getClockType());
 		validateResetType(getResetType());

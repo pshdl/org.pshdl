@@ -550,7 +550,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		validateDirection(getDirection());
 		validateType(getTypeRefName());
 		if (checkResolve && (getTypeRefName() != null))
-			if (resolveType() == null)
+			if (!resolveType().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getTypeRefName()));
 		validatePrimitive(getPrimitive());
 		if (getPrimitive() != null) {

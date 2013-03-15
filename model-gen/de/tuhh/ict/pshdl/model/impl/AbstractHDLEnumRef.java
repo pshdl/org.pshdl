@@ -195,7 +195,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateHEnum(getHEnumRefName());
 		if (checkResolve && (getHEnumRefName() != null))
-			if (resolveHEnum() == null)
+			if (!resolveHEnum().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHEnumRefName()));
 	}
 

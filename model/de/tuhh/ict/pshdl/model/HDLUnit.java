@@ -24,6 +24,7 @@ import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>ArrayList<HDLStatement> inits. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
  * <li>Boolean simulation. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLQualifiedName> extend. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLUnit extends AbstractHDLUnit {
@@ -46,12 +47,15 @@ public class HDLUnit extends AbstractHDLUnit {
 	 *            the value for statements. Can be <code>null</code>.
 	 * @param simulation
 	 *            the value for simulation. Can <b>not</b> be <code>null</code>.
+	 * @param extend
+	 *            the value for extend. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
 	public HDLUnit(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name, @Nullable Iterable<String> imports,
-			@Nullable Iterable<HDLStatement> inits, @Nullable Iterable<HDLStatement> statements, @Nonnull Boolean simulation, boolean validate) {
-		super(container, annotations, libURI, name, imports, inits, statements, simulation, validate);
+			@Nullable Iterable<HDLStatement> inits, @Nullable Iterable<HDLStatement> statements, @Nonnull Boolean simulation, @Nullable Iterable<HDLQualifiedName> extend,
+			boolean validate) {
+		super(container, annotations, libURI, name, imports, inits, statements, simulation, extend, validate);
 	}
 
 	public HDLUnit() {
@@ -144,6 +148,18 @@ public class HDLUnit extends AbstractHDLUnit {
 			if (obj == null)
 				return null;
 			return obj.getSimulation();
+		}
+	};
+	/**
+	 * The accessor for the field extend which is of type
+	 * ArrayList<HDLQualifiedName>.
+	 */
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>> fExtend = new HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>>("extend") {
+		@Override
+		public ArrayList<HDLQualifiedName> getValue(HDLUnit obj) {
+			if (obj == null)
+				return null;
+			return obj.getExtendRefName();
 		}
 	};
 	// $CONTENT-BEGIN$

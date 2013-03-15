@@ -291,7 +291,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 		super.validateAllFields(expectedParent, checkResolve);
 		validateName(getNameRefName());
 		if (checkResolve && (getNameRefName() != null))
-			if (resolveName() == null)
+			if (!resolveName().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getNameRefName()));
 		validateParams(getParams());
 		if (getParams() != null) {

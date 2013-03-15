@@ -134,7 +134,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateVar(getVarRefName());
 		if (checkResolve && (getVarRefName() != null))
-			if (resolveVar() == null)
+			if (!resolveVar().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getVarRefName()));
 	}
 

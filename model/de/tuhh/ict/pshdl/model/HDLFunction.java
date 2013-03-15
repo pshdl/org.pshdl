@@ -69,9 +69,8 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
 		Iterator<HDLExpression> argIter = arguments.iterator();
 		for (HDLVariable param : paraneter) {
-			if (!argIter.hasNext()) {
+			if (!argIter.hasNext())
 				throw new HDLProblemException(new Problem(ErrorCode.FUNCTION_NOT_ENOUGH_ARGUMENTS, this));
-			}
 			HDLExpression arg = argIter.next();
 			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
