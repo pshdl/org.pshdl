@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import com.google.common.base.*;
+import com.google.common.io.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.parser.*;
@@ -31,9 +32,9 @@ public class PSHDLCompiler {
 		public Set<Problem> syntaxProblems;
 		public String vhdlCode;
 		public String entityName;
-		public List<SideFile> sideFiles;
+		public Collection<SideFile> sideFiles;
 
-		public CompileResult(Set<Problem> syntaxProblems, String vhdlCode, String entityName, List<SideFile> sideFiles) {
+		public CompileResult(Set<Problem> syntaxProblems, String vhdlCode, String entityName, Collection<SideFile> sideFiles) {
 			super();
 			this.syntaxProblems = syntaxProblems;
 			this.vhdlCode = vhdlCode;
@@ -63,16 +64,16 @@ public class PSHDLCompiler {
 		if (hasValidationError)
 			return new CompileResult(syntaxProblems, null, "<ERROR>", null);
 		if (parse.getUnits().size() > 0) {
-			HDLPackage hdlPackage = Insulin.transform(parse);
+			HDLPackage hdlPackage = Insulin.transform(parse, resource.getAbsolutePath());
 			String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(hdlPackage));
 			HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
 			String name = "<Unknown>";
 			if (units.length != 0) {
 				name = units[0].getName();
 			}
-			return new CompileResult(syntaxProblems, vhdlCode, name, lib.sideFiles);
+			return new CompileResult(syntaxProblems, vhdlCode, name, lib.sideFiles.values());
 		}
-		return new CompileResult(syntaxProblems, "", "<emptyFile>", lib.sideFiles);
+		return new CompileResult(syntaxProblems, "", "<emptyFile>", lib.sideFiles.values());
 
 	}
 
@@ -85,11 +86,11 @@ public class PSHDLCompiler {
 			System.out.print("Compiling:" + string);
 			Stopwatch comp = new Stopwatch().start();
 			HDLLibrary.registerLibrary(string, setup.lib);
-			HDLPackage pkg = loadHDLUnit(string, true, string);
+			HDLPackage pkg = loadHDLUnit(new File(string), true, string);
 			System.out.print(" loading:" + comp);
 			comp.reset().start();
 			if (!string.endsWith("vhdl") && !string.endsWith("vhd")) {
-				pkg = Insulin.transform(pkg);
+				pkg = Insulin.transform(pkg, new File(string).getAbsolutePath());
 				System.out.print(" insulin:" + comp);
 				comp.reset().start();
 				VhdlFile vhdl = VHDLPackageExtension.INST.toVHDL(pkg);
@@ -104,13 +105,13 @@ public class PSHDLCompiler {
 		System.out.println("Done! Total time:" + sw);
 	}
 
-	protected static HDLPackage loadHDLUnit(String string, boolean validate, String libURI) {
-		File file = new File(string);
-		if (string.endsWith(".vhdl") || string.endsWith(".vhd")) {
+	protected static HDLPackage loadHDLUnit(File file, boolean validate, String libURI) {
+		String fileName = file.getName();
+		if (fileName.endsWith(".vhdl") || fileName.endsWith(".vhd")) {
 			FileInputStream fis;
 			try {
 				fis = new FileInputStream(file);
-				List<HDLInterface> pkg = VHDLImporter.importFile(HDLQualifiedName.create("VHDL", "work"), fis, HDLLibrary.getLibrary(libURI));
+				List<HDLInterface> pkg = VHDLImporter.importFile(HDLQualifiedName.create("VHDL", "work"), fis, HDLLibrary.getLibrary(libURI), file.getAbsolutePath());
 				HDLPackage res = new HDLPackage();
 				for (HDLInterface hdlInterface : pkg) {
 					res.addDeclarations(new HDLInterfaceDeclaration().setHIf(hdlInterface));
@@ -136,10 +137,48 @@ public class PSHDLCompiler {
 					return null;
 			}
 			unit.validateAllFields(null, false);
-			return Insulin.resolveFragments(unit);
+			HDLPackage resolveFragments = Insulin.resolveFragments(unit);
+			return resolveFragments;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Parse and add a unit to the HDLLibrary so that all references can be
+	 * resolved later
+	 * 
+	 * @param contents
+	 *            the PSHDL module to add
+	 * @param absolutePath
+	 *            a source file name for this module
+	 * @param problems
+	 *            syntax errors will be added to this Set when encountered
+	 * @throws IOException
+	 */
+	public void add(File f, Set<Problem> problems) throws IOException {
+		add(Files.toString(f, Charsets.UTF_8), f.getAbsolutePath(), problems);
+	}
+
+	/**
+	 * Parse and add a unit to the HDLLibrary so that all references can be
+	 * resolved later
+	 * 
+	 * @param contents
+	 *            the PSHDL module to add
+	 * @param absolutePath
+	 *            a source file name for this module
+	 * @param problems
+	 *            syntax errors will be added to this Set when encountered
+	 */
+	public void add(String contents, String absolutePath, Set<Problem> problems) {
+		HDLLibrary.registerLibrary(absolutePath, lib);
+		PSHDLParser.parseString(contents, absolutePath, problems, absolutePath);
+	}
+
+	public void close() {
+		lib.unregister();
+		lib = null;
 	}
 }

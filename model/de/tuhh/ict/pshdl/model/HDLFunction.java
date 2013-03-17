@@ -7,8 +7,6 @@ import javax.annotation.*;
 import de.tuhh.ict.pshdl.model.impl.*;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import de.tuhh.ict.pshdl.model.validation.*;
-import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 /**
  * The class HDLFunction contains the following fields
@@ -69,8 +67,9 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
 		Iterator<HDLExpression> argIter = arguments.iterator();
 		for (HDLVariable param : paraneter) {
-			if (!argIter.hasNext())
-				throw new HDLProblemException(new Problem(ErrorCode.FUNCTION_NOT_ENOUGH_ARGUMENTS, this));
+			if (!argIter.hasNext()) {
+				continue;
+			}
 			HDLExpression arg = argIter.next();
 			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {

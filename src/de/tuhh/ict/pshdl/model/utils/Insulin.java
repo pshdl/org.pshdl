@@ -33,14 +33,14 @@ import de.tuhh.ict.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 public class Insulin {
 	public static final GenericMeta<Boolean> insulated = new GenericMeta<Boolean>("insulated", true);
 
-	public static <T extends HDLObject> T transform(T orig) {
+	public static <T extends HDLObject> T transform(T orig, String src) {
 		if (orig.hasMeta(insulated))
 			return orig;
 		T apply = resolveFragments(orig);
 		RWValidation.annotateReadCount(apply);
 		RWValidation.annotateWriteCount(apply);
 		apply = handleOutPortRead(apply);
-		apply = includeGenerators(apply);
+		apply = includeGenerators(apply, src);
 		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
 		apply = pushSignIntoLiteral(apply);
@@ -341,9 +341,10 @@ public class Insulin {
 	 * includes, it will be included and the references resolved
 	 * 
 	 * @param apply
+	 * @param src
 	 * @return
 	 */
-	private static <T extends HDLObject> T includeGenerators(T apply) {
+	private static <T extends HDLObject> T includeGenerators(T apply, String src) {
 		ModificationSet ms = new ModificationSet();
 		HDLDirectGeneration[] gens = apply.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (HDLDirectGeneration generation : gens) {
@@ -379,7 +380,7 @@ public class Insulin {
 					break;
 				}
 				HDLLibrary library = HDLLibrary.getLibrary(libURI);
-				library.addSideFiles(generationInfo.files);
+				library.addSideFiles(generationInfo.files, src);
 			}
 		}
 		return ms.apply(apply);

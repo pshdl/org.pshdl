@@ -29,7 +29,7 @@ public class VHDLImporter {
 	private static RootDeclarativeRegion rootScope;
 	private static LibraryDeclarativeRegion workScope;
 
-	public static List<HDLInterface> importFile(HDLQualifiedName pkg, InputStream is, HDLLibrary lib) {
+	public static List<HDLInterface> importFile(HDLQualifiedName pkg, InputStream is, HDLLibrary lib, String src) {
 		init();
 		List<HDLInterface> res = new LinkedList<HDLInterface>();
 		try {
@@ -63,7 +63,7 @@ public class VHDLImporter {
 					}
 					vInterface.freeze(null);
 					res.add(vInterface);
-					lib.addInterface(vInterface);
+					lib.addInterface(vInterface, src);
 				}
 				workScope.getFiles().add(file);
 				// System.out.println("VHDLImporter.importFile()" + unit);
@@ -269,7 +269,7 @@ public class VHDLImporter {
 
 	private static void importFile(File f, HDLLibrary lib, String targetPackage) throws IOException {
 		FileInputStream fis = new FileInputStream(f);
-		List<HDLInterface> hifs = importFile(new HDLQualifiedName(targetPackage), fis, lib);
+		List<HDLInterface> hifs = importFile(new HDLQualifiedName(targetPackage), fis, lib, f.getAbsolutePath());
 		for (HDLInterface hdi : hifs) {
 			System.out.println(hdi);
 		}

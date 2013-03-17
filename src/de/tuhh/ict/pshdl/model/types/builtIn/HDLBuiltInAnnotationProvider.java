@@ -9,6 +9,10 @@ import de.tuhh.ict.pshdl.model.utils.services.*;
 public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 	public static enum HDLBuiltInAnnotations implements IHDLAnnotation {
 		/**
+		 * Automatically generate an interface for the HDLUnit
+		 */
+		autoInterface,
+		/**
 		 * Generated signal
 		 */
 		genSignal,

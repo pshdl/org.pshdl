@@ -144,12 +144,12 @@ public class ParserToModelExtension {
     this.tokens = tokens;
   }
   
-  public static HDLPackage toHDL(final BufferedTokenStream tokens, final PsModelContext ctx, final String libURI) {
+  public static HDLPackage toHDL(final BufferedTokenStream tokens, final PsModelContext ctx, final String libURI, final String src) {
     ParserToModelExtension _parserToModelExtension = new ParserToModelExtension(tokens);
-    return _parserToModelExtension.toHDLPkg(ctx, libURI);
+    return _parserToModelExtension.toHDLPkg(ctx, libURI, src);
   }
   
-  public HDLPackage toHDLPkg(final PsModelContext ctx, final String libURI) {
+  public HDLPackage toHDLPkg(final PsModelContext ctx, final String libURI, final String src) {
     HDLPackage _hDLPackage = new HDLPackage();
     HDLPackage pkg = _hDLPackage.setLibURI(libURI);
     PsQualifiedNameContext _psQualifiedName = ctx.psQualifiedName();
@@ -182,7 +182,7 @@ public class ParserToModelExtension {
     pkg = _setDeclarations;
     pkg.freeze(null);
     HDLLibrary _library = HDLLibrary.getLibrary(libURI);
-    _library.addPkg(pkg);
+    _library.addPkg(pkg, src);
     HDLPackage _attachContext = this.<HDLPackage>attachContext(pkg, ctx);
     return ((HDLPackage) _attachContext);
   }

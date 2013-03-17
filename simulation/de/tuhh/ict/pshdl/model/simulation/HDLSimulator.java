@@ -21,8 +21,8 @@ import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
 public class HDLSimulator {
 
-	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context) {
-		HDLUnit insulin = Insulin.transform(unit);
+	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src) {
+		HDLUnit insulin = Insulin.transform(unit, src);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createMultiplexArrayWrite(context, insulin);
 		insulin = renameArrayAccess(context, insulin);

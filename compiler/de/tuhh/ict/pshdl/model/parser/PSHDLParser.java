@@ -7,8 +7,13 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.misc.*;
 
+import com.google.common.base.*;
+
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.extensions.*;
+import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsExtendsContext;
 import de.tuhh.ict.pshdl.model.parser.PSHDLLangParser.PsModelContext;
+import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.utils.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import de.tuhh.ict.pshdl.model.utils.services.*;
@@ -55,7 +60,7 @@ public class PSHDLParser {
 
 	public static HDLPackage parse(File file, String libURI, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
 		FileInputStream fis = new FileInputStream(file);
-		HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems);
+		HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
 		fis.close();
 		return hdl;
 	}
@@ -115,11 +120,55 @@ public class PSHDLParser {
 
 	}
 
-	public static HDLPackage parseString(String input, String libURI, final Set<Problem> syntaxProblems) {
-		return parseStream(new ANTLRInputStream(input), libURI, syntaxProblems);
+	public static class Rewriter extends PSHDLLangBaseListener {
+		private TokenStreamRewriter rewriter;
+
+		public Rewriter(TokenStream ts) {
+			rewriter = new TokenStreamRewriter(ts);
+		}
+
+		@Override
+		public void enterPsExtends(PsExtendsContext ctx) {
+		}
 	}
 
-	private static HDLPackage parseStream(ANTLRInputStream input, String libURI, final Set<Problem> syntaxProblems) {
+	public static String annotateUnit(String original, HDLUnit unit) {
+		for (HDLAnnotation anno : unit.getAnnotations()) {
+			if (HDLBuiltInAnnotations.autoInterface.is(anno)) {
+				HDLInterface hif = unit.asInterface();
+				HDLQualifiedName fqn = FullNameExtension.fullNameOf(unit);
+				HDLQualifiedName lastFQN = fqn.skipLast(1).append("I" + fqn.getLastSegment());
+				Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(unit, lastFQN);
+				boolean needExtend = !unit.getExtendRefName().contains(lastFQN);
+				if (resolveInterface.isPresent()) {
+					SourceInfo info = resolveInterface.get().getMeta(SourceInfo.INFO);
+
+				} else {
+				}
+			}
+		}
+		return original;
+	}
+
+	/**
+	 * Parses the given input String and generates a output {@link HDLPackage}
+	 * if it succeed
+	 * 
+	 * @param input
+	 *            the String to parse and convert
+	 * @param libURI
+	 *            the library URI to retrieve a registered {@link HDLLibrary}
+	 * @param syntaxProblems
+	 *            a HashSet where syntax problems will be added to
+	 * @param src
+	 *            the resource from which this String was derived
+	 * @return a {@link HDLPackage} if successful, <code>null</code>l otherwise
+	 */
+	public static HDLPackage parseString(String input, String libURI, final Set<Problem> syntaxProblems, String src) {
+		return parseStream(new ANTLRInputStream(input), libURI, syntaxProblems, src);
+	}
+
+	private static HDLPackage parseStream(ANTLRInputStream input, String libURI, final Set<Problem> syntaxProblems, String src) {
 		PSHDLLangLexer lexer = new PSHDLLangLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		PSHDLLangParser parser = new PSHDLLangParser(tokens);
@@ -128,7 +177,7 @@ public class PSHDLParser {
 		parser.addErrorListener(listener);
 		PsModelContext psModel = parser.psModel();
 		if (syntaxProblems.size() == 0) {
-			HDLPackage hdl = ParserToModelExtension.toHDL(tokens, psModel, libURI);
+			HDLPackage hdl = ParserToModelExtension.toHDL(tokens, psModel, libURI, src);
 			return hdl;
 		}
 		return null;

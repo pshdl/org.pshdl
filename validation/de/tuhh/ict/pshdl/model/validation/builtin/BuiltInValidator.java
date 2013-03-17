@@ -452,11 +452,22 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLFunctionCall[] functions = unit.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (HDLFunctionCall function : functions) {
 			HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
+			// Substitute functions don't have any interference info because
+			// they don't actually return anything
 			if (info == null) {
 				try {
 					Optional<HDLFunction> f = function.resolveName();
 					if (!f.isPresent()) {
 						problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+					} else {
+						HDLFunction hdlFunction = f.get();
+						switch (hdlFunction.getClassType()) {
+						case HDLSubstituteFunction:
+							HDLSubstituteFunction sub = (HDLSubstituteFunction) hdlFunction;
+							if (sub.getArgs().size() != function.getParams().size()) {
+								problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+							}
+						}
 					}
 				} catch (Exception e) {
 					problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));

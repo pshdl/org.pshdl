@@ -10,7 +10,11 @@ psModel :
 ;
 
 psUnit :
-	psAnnotation* unitType=( 'module' | 'testbench' ) psInterface '{' psImports* psBlock* '}'
+	psAnnotation* unitType=( 'module' | 'testbench' ) psInterface psExtends? '{' psImports* psBlock* '}'
+;
+
+psExtends:
+	'extends' psQualifiedName (',' psQualifiedName)*
 ;
 
 psImports :
