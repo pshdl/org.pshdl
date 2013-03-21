@@ -134,7 +134,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class ParserToModelExtension {
@@ -153,8 +152,8 @@ public class ParserToModelExtension {
     HDLPackage _hDLPackage = new HDLPackage();
     HDLPackage pkg = _hDLPackage.setLibURI(libURI);
     PsQualifiedNameContext _psQualifiedName = ctx.psQualifiedName();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psQualifiedName, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psQualifiedName != null);
+    if (_tripleNotEquals) {
       PsQualifiedNameContext _psQualifiedName_1 = ctx.psQualifiedName();
       String _name = this.toName(_psQualifiedName_1);
       HDLPackage _setPkg = pkg.setPkg(_name);
@@ -205,8 +204,8 @@ public class ParserToModelExtension {
   }
   
   public <T extends IHDLObject> T attachContext(final T obj, final ParserRuleContext context) {
-    boolean _equals = ObjectExtensions.operator_equals(obj, null);
-    if (_equals) {
+    boolean _tripleEquals = (obj == null);
+    if (_tripleEquals) {
       NullPointerException _nullPointerException = new NullPointerException("Null is not allowed");
       throw _nullPointerException;
     }
@@ -230,8 +229,8 @@ public class ParserToModelExtension {
   protected HDLBlock _toHDL(final PsProcessContext context) {
     HDLBlock _hDLBlock = new HDLBlock();
     HDLBlock block = _hDLBlock;
-    boolean _notEquals = ObjectExtensions.operator_notEquals(context.isProcess, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (context.isProcess != null);
+    if (_tripleNotEquals) {
       HDLBlock _setProcess = block.setProcess(true);
       block = _setProcess;
     }
@@ -253,8 +252,8 @@ public class ParserToModelExtension {
     final String name = _psAnnotationType.getText();
     String value = null;
     TerminalNode _RULE_STRING = context.RULE_STRING();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_RULE_STRING, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_RULE_STRING != null);
+    if (_tripleNotEquals) {
       TerminalNode _RULE_STRING_1 = context.RULE_STRING();
       String str = _RULE_STRING_1.getText();
       int _length = str.length();
@@ -271,30 +270,30 @@ public class ParserToModelExtension {
   
   protected HDLDeclaration _toHDL(final PsDeclarationTypeContext context) {
     PsFunctionDeclarationContext _psFunctionDeclaration = context.psFunctionDeclaration();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psFunctionDeclaration, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psFunctionDeclaration != null);
+    if (_tripleNotEquals) {
       PsFunctionDeclarationContext _psFunctionDeclaration_1 = context.psFunctionDeclaration();
       IHDLObject _hDL = this.toHDL(_psFunctionDeclaration_1);
       IHDLObject _attachContext = this.<IHDLObject>attachContext(_hDL, context);
       return ((HDLDeclaration) _attachContext);
     }
     PsTypeDeclarationContext _psTypeDeclaration = context.psTypeDeclaration();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psTypeDeclaration, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psTypeDeclaration != null);
+    if (_tripleNotEquals_1) {
       PsTypeDeclarationContext _psTypeDeclaration_1 = context.psTypeDeclaration();
       IHDLObject _hDL_1 = this.toHDL(_psTypeDeclaration_1);
       IHDLObject _attachContext_1 = this.<IHDLObject>attachContext(_hDL_1, context);
       return ((HDLDeclaration) _attachContext_1);
     }
     PsVariableDeclarationContext _psVariableDeclaration = context.psVariableDeclaration();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psVariableDeclaration, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_psVariableDeclaration != null);
+    if (_tripleNotEquals_2) {
       PsVariableDeclarationContext _psVariableDeclaration_1 = context.psVariableDeclaration();
       IHDLObject _hDL_2 = this.toHDL(_psVariableDeclaration_1);
       IHDLObject _attachContext_2 = this.<IHDLObject>attachContext(_hDL_2, context);
       return ((HDLDeclaration) _attachContext_2);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsDeclarationTypeContext> _class = context.getClass();
     String _plus = ("Not implemented:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -309,8 +308,8 @@ public class ParserToModelExtension {
     res = _setType;
     HDLDirection dir = HDLDirection.INTERNAL;
     PsDirectionContext _psDirection = context.psDirection();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psDirection, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psDirection != null);
+    if (_tripleNotEquals) {
       PsDirectionContext _psDirection_1 = context.psDirection();
       String _text = _psDirection_1.getText();
       HDLDirection _op = HDLDirection.getOp(_text);
@@ -325,14 +324,14 @@ public class ParserToModelExtension {
       res = _addVariables;
     }
     PsPrimitiveContext _psPrimitive_1 = context.psPrimitive();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psPrimitive_1.isRegister, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psPrimitive_1.isRegister != null);
+    if (_tripleNotEquals_1) {
       ArrayList<HDLArgument> _arrayList = new ArrayList<HDLArgument>();
       Iterable<HDLArgument> args = _arrayList;
       PsPrimitiveContext _psPrimitive_2 = context.psPrimitive();
       PsPassedArgumentsContext _psPassedArguments = _psPrimitive_2.psPassedArguments();
-      boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psPassedArguments, null);
-      if (_notEquals_2) {
+      boolean _tripleNotEquals_2 = (_psPassedArguments != null);
+      if (_tripleNotEquals_2) {
         PsPrimitiveContext _psPrimitive_3 = context.psPrimitive();
         PsPassedArgumentsContext _psPassedArguments_1 = _psPrimitive_3.psPassedArguments();
         List<PsArgumentContext> _psArgument = _psPassedArguments_1.psArgument();
@@ -354,8 +353,8 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsArrayInitContext context) {
     PsExpressionContext _psExpression = context.psExpression();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psExpression, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psExpression != null);
+    if (_tripleNotEquals) {
       PsExpressionContext _psExpression_1 = context.psExpression();
       IHDLObject _hDL = this.toHDL(_psExpression_1);
       return this.<IHDLObject>attachContext(_hDL, context);
@@ -375,8 +374,8 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsArrayInitSubContext context) {
     List<PsExpressionContext> _psExpression = context.psExpression();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psExpression, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psExpression != null);
+    if (_tripleNotEquals) {
       List<PsExpressionContext> _psExpression_1 = context.psExpression();
       int _size = _psExpression_1.size();
       boolean _equals = (_size == 1);
@@ -413,8 +412,8 @@ public class ParserToModelExtension {
   
   protected HDLType _toHDL(final PsPrimitiveContext context) {
     PsQualifiedNameContext _psQualifiedName = context.psQualifiedName();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psQualifiedName, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psQualifiedName != null);
+    if (_tripleNotEquals) {
       HDLEnum _hDLEnum = new HDLEnum();
       PsQualifiedNameContext _psQualifiedName_1 = context.psQualifiedName();
       String _name = this.toName(_psQualifiedName_1);
@@ -451,8 +450,8 @@ public class ParserToModelExtension {
     HDLVariable _setAnnotations = res.setAnnotations(_map);
     res = _setAnnotations;
     PsArrayContext _psArray = context.psArray();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psArray, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psArray != null);
+    if (_tripleNotEquals) {
       PsArrayContext _psArray_1 = context.psArray();
       List<PsExpressionContext> _psExpression = _psArray_1.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function_1 = new Function1<PsExpressionContext,HDLExpression>() {
@@ -466,8 +465,8 @@ public class ParserToModelExtension {
       res = _setDimensions;
     }
     PsArrayInitContext _psArrayInit = context.psArrayInit();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psArrayInit, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psArrayInit != null);
+    if (_tripleNotEquals_1) {
       PsArrayInitContext _psArrayInit_1 = context.psArrayInit();
       IHDLObject _hDL = this.toHDL(_psArrayInit_1);
       HDLVariable _setDefaultValue = res.setDefaultValue(((HDLExpression) _hDL));
@@ -482,8 +481,8 @@ public class ParserToModelExtension {
   }
   
   public HDLPrimitiveType getResultingType(final HDLPrimitiveType pt, final HDLExpression width) {
-    boolean _notEquals = ObjectExtensions.operator_notEquals(width, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (width != null);
+    if (_tripleNotEquals) {
       boolean _matched = false;
       if (!_matched) {
         if (Objects.equal(pt,HDLPrimitiveType.BIT)) {
@@ -517,8 +516,8 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsValueContext context) {
     TerminalNode _RULE_PS_LITERAL_TERMINAL = context.RULE_PS_LITERAL_TERMINAL();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_RULE_PS_LITERAL_TERMINAL, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_RULE_PS_LITERAL_TERMINAL != null);
+    if (_tripleNotEquals) {
       HDLLiteral _hDLLiteral = new HDLLiteral();
       HDLLiteral _setStr = _hDLLiteral.setStr(false);
       TerminalNode _RULE_PS_LITERAL_TERMINAL_1 = context.RULE_PS_LITERAL_TERMINAL();
@@ -527,8 +526,8 @@ public class ParserToModelExtension {
       return this.<HDLLiteral>attachContext(_setVal, context);
     }
     TerminalNode _RULE_STRING = context.RULE_STRING();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_RULE_STRING, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_RULE_STRING != null);
+    if (_tripleNotEquals_1) {
       TerminalNode _RULE_STRING_1 = context.RULE_STRING();
       String str = _RULE_STRING_1.getText();
       int _length = str.length();
@@ -541,13 +540,13 @@ public class ParserToModelExtension {
       return this.<HDLLiteral>attachContext(_setVal_1, context);
     }
     PsVariableRefContext _psVariableRef = context.psVariableRef();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psVariableRef, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_psVariableRef != null);
+    if (_tripleNotEquals_2) {
       PsVariableRefContext _psVariableRef_1 = context.psVariableRef();
       IHDLObject _hDL = this.toHDL(_psVariableRef_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsValueContext> _class = context.getClass();
     String _plus = ("Not correctly implemented:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -746,8 +745,8 @@ public class ParserToModelExtension {
     IHDLObject _hDL = this.toHDL(_psExpression);
     HDLManip res = _hDLManip.setTarget(((HDLExpression) _hDL));
     PsCastContext _psCast = context.psCast();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psCast, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psCast != null);
+    if (_tripleNotEquals) {
       HDLManip _setType = res.setType(HDLManipType.CAST);
       res = _setType;
       PsCastContext _psCast_1 = context.psCast();
@@ -806,7 +805,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLExpression _toHDL(final PsExpressionContext context) {
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsExpressionContext> _class = context.getClass();
     String _plus = ("Not implemented:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -836,20 +835,20 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsTypeDeclarationContext context) {
     PsEnumDeclarationContext _psEnumDeclaration = context.psEnumDeclaration();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psEnumDeclaration, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psEnumDeclaration != null);
+    if (_tripleNotEquals) {
       PsEnumDeclarationContext _psEnumDeclaration_1 = context.psEnumDeclaration();
       IHDLObject _hDL = this.toHDL(_psEnumDeclaration_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
     PsInterfaceDeclarationContext _psInterfaceDeclaration = context.psInterfaceDeclaration();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psInterfaceDeclaration, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psInterfaceDeclaration != null);
+    if (_tripleNotEquals_1) {
       PsInterfaceDeclarationContext _psInterfaceDeclaration_1 = context.psInterfaceDeclaration();
       IHDLObject _hDL_1 = this.toHDL(_psInterfaceDeclaration_1);
       return this.<IHDLObject>attachContext(_hDL_1, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsTypeDeclarationContext> _class = context.getClass();
     String _plus = ("Not implemented:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -895,27 +894,27 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsBlockContext context) {
     PsDeclarationContext _psDeclaration = context.psDeclaration();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psDeclaration, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psDeclaration != null);
+    if (_tripleNotEquals) {
       PsDeclarationContext _psDeclaration_1 = context.psDeclaration();
       IHDLObject _hDL = this.toHDL(_psDeclaration_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
     PsInstantiationContext _psInstantiation = context.psInstantiation();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psInstantiation, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psInstantiation != null);
+    if (_tripleNotEquals_1) {
       PsInstantiationContext _psInstantiation_1 = context.psInstantiation();
       IHDLObject _hDL_1 = this.toHDL(_psInstantiation_1);
       return this.<IHDLObject>attachContext(_hDL_1, context);
     }
     PsStatementContext _psStatement = context.psStatement();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psStatement, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_psStatement != null);
+    if (_tripleNotEquals_2) {
       PsStatementContext _psStatement_1 = context.psStatement();
       IHDLObject _hDL_2 = this.toHDL(_psStatement_1);
       return this.<IHDLObject>attachContext(_hDL_2, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsBlockContext> _class = context.getClass();
     String _plus = ("Not correctly implemented type:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -924,8 +923,8 @@ public class ParserToModelExtension {
   protected HDLDirectGeneration _toHDL(final PsDirectGenerationContext context) {
     HDLDirectGeneration _hDLDirectGeneration = new HDLDirectGeneration();
     HDLDirectGeneration gen = _hDLDirectGeneration.setGeneratorContent("");
-    boolean _notEquals = ObjectExtensions.operator_notEquals(context.isInclude, null);
-    HDLDirectGeneration _setInclude = gen.setInclude(_notEquals);
+    boolean _tripleNotEquals = (context.isInclude != null);
+    HDLDirectGeneration _setInclude = gen.setInclude(_tripleNotEquals);
     gen = _setInclude;
     PsInterfaceContext _psInterface = context.psInterface();
     IHDLObject _hDL = this.toHDL(_psInterface);
@@ -940,8 +939,8 @@ public class ParserToModelExtension {
     HDLDirectGeneration _setGeneratorID = gen.setGeneratorID(_text);
     gen = _setGeneratorID;
     PsPassedArgumentsContext _psPassedArguments = context.psPassedArguments();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psPassedArguments, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psPassedArguments != null);
+    if (_tripleNotEquals_1) {
       PsPassedArgumentsContext _psPassedArguments_1 = context.psPassedArguments();
       List<PsArgumentContext> _psArgument = _psPassedArguments_1.psArgument();
       final Function1<PsArgumentContext,HDLArgument> _function = new Function1<PsArgumentContext,HDLArgument>() {
@@ -955,8 +954,8 @@ public class ParserToModelExtension {
       gen = _setArguments;
     }
     TerminalNode _RULE_GENERATOR_CONTENT = context.RULE_GENERATOR_CONTENT();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_RULE_GENERATOR_CONTENT, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_RULE_GENERATOR_CONTENT != null);
+    if (_tripleNotEquals_2) {
       TerminalNode _RULE_GENERATOR_CONTENT_1 = context.RULE_GENERATOR_CONTENT();
       String _text_1 = _RULE_GENERATOR_CONTENT_1.getText();
       HDLDirectGeneration _setGeneratorContent = gen.setGeneratorContent(_text_1);
@@ -981,20 +980,20 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsInstantiationContext context) {
     PsDirectGenerationContext _psDirectGeneration = context.psDirectGeneration();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psDirectGeneration, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psDirectGeneration != null);
+    if (_tripleNotEquals) {
       PsDirectGenerationContext _psDirectGeneration_1 = context.psDirectGeneration();
       IHDLObject _hDL = this.toHDL(_psDirectGeneration_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
     PsInterfaceInstantiationContext _psInterfaceInstantiation = context.psInterfaceInstantiation();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psInterfaceInstantiation, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psInterfaceInstantiation != null);
+    if (_tripleNotEquals_1) {
       PsInterfaceInstantiationContext _psInterfaceInstantiation_1 = context.psInterfaceInstantiation();
       IHDLObject _hDL_1 = this.toHDL(_psInterfaceInstantiation_1);
       return this.<IHDLObject>attachContext(_hDL_1, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsInstantiationContext> _class = context.getClass();
     String _plus = ("Not implemented type:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -1064,8 +1063,8 @@ public class ParserToModelExtension {
     String _name = this.toName(_psFunction);
     HDLNativeFunction _setName = func.setName(_name);
     func = _setName;
-    boolean _notEquals = ObjectExtensions.operator_notEquals(context.isSim, null);
-    HDLNativeFunction _setSimOnly = func.setSimOnly(_notEquals);
+    boolean _tripleNotEquals = (context.isSim != null);
+    HDLNativeFunction _setSimOnly = func.setSimOnly(_tripleNotEquals);
     func = _setSimOnly;
     return this.<HDLNativeFunction>attachContext(func, context);
   }
@@ -1102,27 +1101,27 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsFunctionDeclarationContext context) {
     PsInlineFunctionContext _psInlineFunction = context.psInlineFunction();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psInlineFunction, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psInlineFunction != null);
+    if (_tripleNotEquals) {
       PsInlineFunctionContext _psInlineFunction_1 = context.psInlineFunction();
       IHDLObject _hDL = this.toHDL(_psInlineFunction_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
     PsNativeFunctionContext _psNativeFunction = context.psNativeFunction();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psNativeFunction, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psNativeFunction != null);
+    if (_tripleNotEquals_1) {
       PsNativeFunctionContext _psNativeFunction_1 = context.psNativeFunction();
       IHDLObject _hDL_1 = this.toHDL(_psNativeFunction_1);
       return this.<IHDLObject>attachContext(_hDL_1, context);
     }
     PsSubstituteFunctionContext _psSubstituteFunction = context.psSubstituteFunction();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psSubstituteFunction, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_psSubstituteFunction != null);
+    if (_tripleNotEquals_2) {
       PsSubstituteFunctionContext _psSubstituteFunction_1 = context.psSubstituteFunction();
       IHDLObject _hDL_2 = this.toHDL(_psSubstituteFunction_1);
       return this.<IHDLObject>attachContext(_hDL_2, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsFunctionDeclarationContext> _class = context.getClass();
     String _plus = ("Not implemented type:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -1131,8 +1130,8 @@ public class ParserToModelExtension {
   protected HDLUnresolvedFragment _toHDL(final PsRefPartContext context) {
     HDLUnresolvedFragment frag = null;
     PsFuncArgsContext _psFuncArgs = context.psFuncArgs();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psFuncArgs, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psFuncArgs != null);
+    if (_tripleNotEquals) {
       HDLUnresolvedFragmentFunction _hDLUnresolvedFragmentFunction = new HDLUnresolvedFragmentFunction();
       TerminalNode _RULE_ID = context.RULE_ID();
       String _text = _RULE_ID.getText();
@@ -1155,8 +1154,8 @@ public class ParserToModelExtension {
       HDLUnresolvedFragment _setFrag = _hDLUnresolvedFragment.setFrag(_text_1);
       frag = _setFrag;
       PsArrayContext _psArray = context.psArray();
-      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psArray, null);
-      if (_notEquals_1) {
+      boolean _tripleNotEquals_1 = (_psArray != null);
+      if (_tripleNotEquals_1) {
         PsArrayContext _psArray_1 = context.psArray();
         List<PsExpressionContext> _psExpression_1 = _psArray_1.psExpression();
         final Function1<PsExpressionContext,HDLExpression> _function_1 = new Function1<PsExpressionContext,HDLExpression>() {
@@ -1170,8 +1169,8 @@ public class ParserToModelExtension {
         frag = _setArray;
       }
       PsBitAccessContext _psBitAccess = context.psBitAccess();
-      boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psBitAccess, null);
-      if (_notEquals_2) {
+      boolean _tripleNotEquals_2 = (_psBitAccess != null);
+      if (_tripleNotEquals_2) {
         PsBitAccessContext _psBitAccess_1 = context.psBitAccess();
         List<PsAccessRangeContext> _psAccessRange = _psBitAccess_1.psAccessRange();
         final Function1<PsAccessRangeContext,HDLRange> _function_2 = new Function1<PsAccessRangeContext,HDLRange>() {
@@ -1189,14 +1188,14 @@ public class ParserToModelExtension {
   }
   
   protected HDLReference _toHDL(final PsVariableRefContext context) {
-    boolean _notEquals = ObjectExtensions.operator_notEquals(context.isClk, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (context.isClk != null);
+    if (_tripleNotEquals) {
       HDLVariable _defaultClk = HDLRegisterConfig.defaultClk();
       HDLVariableRef _asHDLRef = _defaultClk.asHDLRef();
       return this.<HDLVariableRef>attachContext(_asHDLRef, context);
     }
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(context.isRst, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (context.isRst != null);
+    if (_tripleNotEquals_1) {
       HDLVariable _defaultRst = HDLRegisterConfig.defaultRst();
       HDLVariableRef _asHDLRef_1 = _defaultRst.asHDLRef();
       return this.<HDLVariableRef>attachContext(_asHDLRef_1, context);
@@ -1208,8 +1207,8 @@ public class ParserToModelExtension {
       {
         IHDLObject _hDL = this.toHDL(sub);
         HDLUnresolvedFragment frag = ((HDLUnresolvedFragment) _hDL);
-        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(current, null);
-        if (_notEquals_2) {
+        boolean _tripleNotEquals_2 = (current != null);
+        if (_tripleNotEquals_2) {
           HDLUnresolvedFragment _setSub = frag.setSub(current);
           frag = _setSub;
         }
@@ -1223,8 +1222,8 @@ public class ParserToModelExtension {
     HDLRange _hDLRange = new HDLRange();
     IHDLObject _hDL = this.toHDL(context.from);
     HDLRange res = _hDLRange.setTo(((HDLExpression) _hDL));
-    boolean _notEquals = ObjectExtensions.operator_notEquals(context.to, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (context.to != null);
+    if (_tripleNotEquals) {
       IHDLObject _hDL_1 = this.toHDL(context.from);
       HDLRange _setFrom = res.setFrom(((HDLExpression) _hDL_1));
       IHDLObject _hDL_2 = this.toHDL(context.to);
@@ -1238,8 +1237,8 @@ public class ParserToModelExtension {
     HDLSwitchCaseStatement _hDLSwitchCaseStatement = new HDLSwitchCaseStatement();
     HDLSwitchCaseStatement hCase = _hDLSwitchCaseStatement;
     PsValueContext _psValue = context.psValue();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psValue, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psValue != null);
+    if (_tripleNotEquals) {
       PsValueContext _psValue_1 = context.psValue();
       IHDLObject _hDL = this.toHDL(_psValue_1);
       HDLSwitchCaseStatement _setLabel = hCase.setLabel(((HDLExpression) _hDL));
@@ -1281,8 +1280,8 @@ public class ParserToModelExtension {
     IHDLObject _hDL = this.toHDL(_psVariable);
     HDLVariable hVar = ((HDLVariable) _hDL);
     PsArrayContext _psArray = context.psArray();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psArray, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psArray != null);
+    if (_tripleNotEquals) {
       PsArrayContext _psArray_1 = context.psArray();
       List<PsExpressionContext> _psExpression = _psArray_1.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function = new Function1<PsExpressionContext,HDLExpression>() {
@@ -1301,8 +1300,8 @@ public class ParserToModelExtension {
     HDLQualifiedName _fQNName = this.toFQNName(_psQualifiedName);
     HDLInterfaceInstantiation hii = _setVar.setHIf(_fQNName);
     PsPassedArgumentsContext _psPassedArguments = context.psPassedArguments();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psPassedArguments, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psPassedArguments != null);
+    if (_tripleNotEquals_1) {
       PsPassedArgumentsContext _psPassedArguments_1 = context.psPassedArguments();
       List<PsArgumentContext> _psArgument = _psPassedArguments_1.psArgument();
       final Function1<PsArgumentContext,HDLArgument> _function_1 = new Function1<PsArgumentContext,HDLArgument>() {
@@ -1363,8 +1362,8 @@ public class ParserToModelExtension {
     List<HDLStatement> _map = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock, _function);
     HDLIfStatement _setThenDo = res.setThenDo(_map);
     res = _setThenDo;
-    boolean _notEquals = ObjectExtensions.operator_notEquals(context.elseBlk, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (context.elseBlk != null);
+    if (_tripleNotEquals) {
       List<PsBlockContext> _psBlock_1 = context.elseBlk.psBlock();
       final Function1<PsBlockContext,HDLStatement> _function_1 = new Function1<PsBlockContext,HDLStatement>() {
           public HDLStatement apply(final PsBlockContext it) {
@@ -1381,27 +1380,27 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsCompoundStatementContext context) {
     PsForStatementContext _psForStatement = context.psForStatement();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psForStatement, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psForStatement != null);
+    if (_tripleNotEquals) {
       PsForStatementContext _psForStatement_1 = context.psForStatement();
       IHDLObject _hDL = this.toHDL(_psForStatement_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
     PsIfStatementContext _psIfStatement = context.psIfStatement();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psIfStatement, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psIfStatement != null);
+    if (_tripleNotEquals_1) {
       PsIfStatementContext _psIfStatement_1 = context.psIfStatement();
       IHDLObject _hDL_1 = this.toHDL(_psIfStatement_1);
       return this.<IHDLObject>attachContext(_hDL_1, context);
     }
     PsSwitchStatementContext _psSwitchStatement = context.psSwitchStatement();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psSwitchStatement, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_psSwitchStatement != null);
+    if (_tripleNotEquals_2) {
       PsSwitchStatementContext _psSwitchStatement_1 = context.psSwitchStatement();
       IHDLObject _hDL_2 = this.toHDL(_psSwitchStatement_1);
       return this.<IHDLObject>attachContext(_hDL_2, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsCompoundStatementContext> _class = context.getClass();
     String _plus = ("Unhandled type:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -1409,27 +1408,27 @@ public class ParserToModelExtension {
   
   protected IHDLObject _toHDL(final PsStatementContext context) {
     PsAssignmentOrFuncContext _psAssignmentOrFunc = context.psAssignmentOrFunc();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psAssignmentOrFunc, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psAssignmentOrFunc != null);
+    if (_tripleNotEquals) {
       PsAssignmentOrFuncContext _psAssignmentOrFunc_1 = context.psAssignmentOrFunc();
       IHDLObject _hDL = this.toHDL(_psAssignmentOrFunc_1);
       return this.<IHDLObject>attachContext(_hDL, context);
     }
     PsCompoundStatementContext _psCompoundStatement = context.psCompoundStatement();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_psCompoundStatement, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_psCompoundStatement != null);
+    if (_tripleNotEquals_1) {
       PsCompoundStatementContext _psCompoundStatement_1 = context.psCompoundStatement();
       IHDLObject _hDL_1 = this.toHDL(_psCompoundStatement_1);
       return this.<IHDLObject>attachContext(_hDL_1, context);
     }
     PsProcessContext _psProcess = context.psProcess();
-    boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_psProcess, null);
-    if (_notEquals_2) {
+    boolean _tripleNotEquals_2 = (_psProcess != null);
+    if (_tripleNotEquals_2) {
       PsProcessContext _psProcess_1 = context.psProcess();
       IHDLObject _hDL_2 = this.toHDL(_psProcess_1);
       return this.<IHDLObject>attachContext(_hDL_2, context);
     }
-    Class<? extends Object> _class = context.getClass();
+    Class<? extends PsStatementContext> _class = context.getClass();
     String _plus = ("Unhandled type:" + _class);
     IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
     throw _illegalArgumentException;
@@ -1440,8 +1439,8 @@ public class ParserToModelExtension {
     IHDLObject _hDL = this.toHDL(_psVariableRef);
     final HDLReference hVar = ((HDLReference) _hDL);
     PsAssignmentOpContext _psAssignmentOp = context.psAssignmentOp();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_psAssignmentOp, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_psAssignmentOp != null);
+    if (_tripleNotEquals) {
       PsAssignmentOpContext _psAssignmentOp_1 = context.psAssignmentOp();
       String _text = _psAssignmentOp_1.getText();
       final HDLAssignmentType type = HDLAssignmentType.getOp(_text);

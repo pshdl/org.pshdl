@@ -103,10 +103,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.eclipse.xtext.xbase.lib.CollectionExtensions;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
+import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
-import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class VHDLStatementExtension {
@@ -121,6 +122,7 @@ public class VHDLStatementExtension {
     return VHDLStatementExtension.INST.toVHDL(stmnt, pid);
   }
   
+  @Extension
   private VHDLExpressionExtension vee = new Function0<VHDLExpressionExtension>() {
     public VHDLExpressionExtension apply() {
       VHDLExpressionExtension _vHDLExpressionExtension = new VHDLExpressionExtension();
@@ -158,12 +160,12 @@ public class VHDLStatementExtension {
     boolean process = false;
     boolean _and = false;
     Boolean _process = obj.getProcess();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_process, null);
-    if (!_notEquals) {
+    boolean _tripleNotEquals = (_process != null);
+    if (!_tripleNotEquals) {
       _and = false;
     } else {
       Boolean _process_1 = obj.getProcess();
-      _and = (_notEquals && (_process_1).booleanValue());
+      _and = (_tripleNotEquals && (_process_1).booleanValue());
     }
     if (_and) {
       process = true;
@@ -188,13 +190,13 @@ public class VHDLStatementExtension {
     try {
       final SourceInfo srcInfo = block.<SourceInfo>getMeta(SourceInfo.INFO);
       boolean _and = false;
-      boolean _notEquals = ObjectExtensions.operator_notEquals(srcInfo, null);
-      if (!_notEquals) {
+      boolean _tripleNotEquals = (srcInfo != null);
+      if (!_tripleNotEquals) {
         _and = false;
       } else {
         SequentialStatement _statement = context.getStatement();
-        boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_statement, null);
-        _and = (_notEquals && _notEquals_1);
+        boolean _tripleNotEquals_1 = (_statement != null);
+        _and = (_tripleNotEquals && _tripleNotEquals_1);
       }
       if (_and) {
         ArrayList<String> _arrayList = new ArrayList<String>();
@@ -211,7 +213,7 @@ public class VHDLStatementExtension {
             int _minus_1 = (_length_1 - 2);
             final String newComment = comment.substring(2, _minus_1);
             String[] _split = newComment.split("\n");
-            newComments.addAll(((Collection<? extends String>)Conversions.doWrapArray(_split)));
+            CollectionExtensions.<String>addAll(newComments, _split);
           }
         }
         SequentialStatement _statement_1 = context.getStatement();
@@ -272,13 +274,13 @@ public class VHDLStatementExtension {
     ConcurrentStatement instantiation = null;
     final ArrayList<HDLVariableDeclaration> ports = hIf.getPorts();
     boolean _and = false;
-    boolean _notEquals = ObjectExtensions.operator_notEquals(hid, null);
-    if (!_notEquals) {
+    boolean _tripleNotEquals = (hid != null);
+    if (!_tripleNotEquals) {
       _and = false;
     } else {
       HDLAnnotation _annotation = hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent);
-      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_annotation, null);
-      _and = (_notEquals && _notEquals_1);
+      boolean _tripleNotEquals_1 = (_annotation != null);
+      _and = (_tripleNotEquals && _tripleNotEquals_1);
     }
     if (_and) {
       final HDLAnnotation anno = hid.getAnnotation(HDLBuiltInAnnotations.VHDLComponent);
@@ -380,8 +382,8 @@ public class VHDLStatementExtension {
             }
             ArrayList<HDLExpression> _dimensions_2 = hvar.getDimensions();
             int _size = _dimensions_2.size();
-            boolean _notEquals_2 = (_size != 0);
-            if (_notEquals_2) {
+            boolean _notEquals = (_size != 0);
+            if (_notEquals) {
               boolean _isEmpty = typeAnno.isEmpty();
               if (_isEmpty) {
                 HDLQualifiedName _packageNameRef = VHDLPackageExtension.INST.getPackageNameRef(asRef);
@@ -417,29 +419,29 @@ public class VHDLStatementExtension {
             }
             String _name_1 = hvar.getName();
             String _vHDLName = VHDLOutputValidator.getVHDLName(_name_1);
-            Expression<?> _vHDL_4 = this.vee.toVHDL(ref);
+            Expression<? extends Object> _vHDL_4 = this.vee.toVHDL(ref);
             AssociationElement _associationElement = new AssociationElement(_vHDLName, _vHDL_4);
             portMap.add(_associationElement);
           }
         }
       } else {
         HDLDirection _direction_1 = hvd.getDirection();
-        boolean _equals_1 = ObjectExtensions.operator_equals(_direction_1, HDLDirection.PARAMETER);
+        boolean _equals_1 = Objects.equal(_direction_1, HDLDirection.PARAMETER);
         if (_equals_1) {
           ArrayList<HDLVariable> _variables_1 = hvd.getVariables();
           for (final HDLVariable hvar_1 : _variables_1) {
             {
               HDLVariable sigVar = hvar_1;
               String _meta = hvar_1.<String>getMeta(HDLInterfaceInstantiation.ORIG_NAME);
-              boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_meta, null);
-              if (_notEquals_2) {
+              boolean _tripleNotEquals_2 = (_meta != null);
+              if (_tripleNotEquals_2) {
                 String _meta_1 = hvar_1.<String>getMeta(HDLInterfaceInstantiation.ORIG_NAME);
                 HDLVariable _setName = hvar_1.setName(_meta_1);
                 sigVar = _setName;
               }
               final HDLVariableRef ref = hvar_1.asHDLRef();
               String _name = sigVar.getName();
-              Expression<?> _vHDL_1 = this.vee.toVHDL(ref);
+              Expression<? extends Object> _vHDL_1 = this.vee.toVHDL(ref);
               AssociationElement _associationElement = new AssociationElement(_name, _vHDL_1);
               genericMap.add(_associationElement);
             }
@@ -476,8 +478,8 @@ public class VHDLStatementExtension {
           Range _vHDL_1 = this.vee.toVHDL(range, Direction.TO);
           ForGenerateStatement _forGenerateStatement = new ForGenerateStatement(_plus, _asIndex, _vHDL_1);
           final ForGenerateStatement newFor = _forGenerateStatement;
-          boolean _notEquals_2 = ObjectExtensions.operator_notEquals(forLoop, null);
-          if (_notEquals_2) {
+          boolean _tripleNotEquals_2 = (forLoop != null);
+          if (_tripleNotEquals_2) {
             List<ConcurrentStatement> _statements = forLoop.getStatements();
             _statements.add(newFor);
           } else {
@@ -488,8 +490,8 @@ public class VHDLStatementExtension {
           i = _plus_1;
         }
       }
-      boolean _equals_3 = ObjectExtensions.operator_equals(forLoop, null);
-      if (_equals_3) {
+      boolean _tripleEquals = (forLoop == null);
+      if (_tripleEquals) {
         IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Should not get here");
         throw _illegalArgumentException;
       }
@@ -509,8 +511,8 @@ public class VHDLStatementExtension {
     if (external) {
       HDLQualifiedName fullName = null;
       HDLQualifiedName _meta = hvar.<HDLQualifiedName>getMeta(VHDLStatementExtension.ORIGINAL_FULLNAME);
-      boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-      if (_notEquals) {
+      boolean _tripleNotEquals = (_meta != null);
+      if (_tripleNotEquals) {
         HDLQualifiedName _meta_1 = hvar.<HDLQualifiedName>getMeta(VHDLStatementExtension.ORIGINAL_FULLNAME);
         fullName = _meta_1;
       } else {
@@ -537,8 +539,8 @@ public class VHDLStatementExtension {
     String _string = HDLBuiltInAnnotations.VHDLType.toString();
     Result<HDLAnnotation,String> _isEqualTo = _where.isEqualTo(_string);
     final HDLAnnotation typeAnno = _isEqualTo.getFirst();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(typeAnno, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (typeAnno != null);
+    if (_tripleNotEquals) {
       String _value = typeAnno.getValue();
       HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_value);
       final HDLQualifiedName value = _hDLQualifiedName;
@@ -547,13 +549,13 @@ public class VHDLStatementExtension {
       EnumerationType _enumerationType = new EnumerationType(_lastSegment);
       type = _enumerationType;
     } else {
-      boolean _notEquals_1 = ObjectExtensions.operator_notEquals(primitive, null);
-      if (_notEquals_1) {
+      boolean _tripleNotEquals_1 = (primitive != null);
+      if (_tripleNotEquals_1) {
         SubtypeIndication _type = VHDLCastsLibrary.getType(primitive);
         type = _type;
         HDLRegisterConfig _register = obj.getRegister();
-        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_register, null);
-        if (_notEquals_2) {
+        boolean _tripleNotEquals_2 = (_register != null);
+        if (_tripleNotEquals_2) {
           HDLRegisterConfig _register_1 = obj.getRegister();
           HDLExpression _resetValue = _register_1.getResetValue();
           resetValue = _resetValue;
@@ -578,20 +580,20 @@ public class VHDLStatementExtension {
         }
       }
     }
-    boolean _notEquals_3 = ObjectExtensions.operator_notEquals(type, null);
-    if (_notEquals_3) {
+    boolean _tripleNotEquals_3 = (type != null);
+    if (_tripleNotEquals_3) {
       ArrayList<HDLVariable> _variables = obj.getVariables();
       for (final HDLVariable hvar : _variables) {
         {
           HDLAnnotation _annotation = hvar.getAnnotation(HDLBuiltInAnnotations.VHDLNoExplicitReset);
-          final boolean noExplicitResetVar = ObjectExtensions.operator_notEquals(_annotation, null);
+          final boolean noExplicitResetVar = (_annotation != null);
           SubtypeIndication varType = type;
           ArrayList<HDLExpression> _dimensions = hvar.getDimensions();
           int _size = _dimensions.size();
-          boolean _notEquals_4 = (_size != 0);
-          if (_notEquals_4) {
-            LinkedList<DiscreteRange<?>> _linkedList = new LinkedList<DiscreteRange<?>>();
-            final LinkedList<DiscreteRange<?>> ranges = _linkedList;
+          boolean _notEquals = (_size != 0);
+          if (_notEquals) {
+            LinkedList<DiscreteRange<? extends Object>> _linkedList = new LinkedList<DiscreteRange<? extends Object>>();
+            final LinkedList<DiscreteRange<? extends Object>> ranges = _linkedList;
             ArrayList<HDLExpression> _dimensions_1 = hvar.getDimensions();
             for (final HDLExpression arrayWidth : _dimensions_1) {
               {
@@ -613,18 +615,18 @@ public class VHDLStatementExtension {
             final boolean external = obj.isExternal();
             final DiscreteRange[] arrRangs = ((DiscreteRange[])Conversions.unwrapArray(ranges, DiscreteRange.class));
             String _arrayRefName = VHDLStatementExtension.getArrayRefName(hvar, external);
-            ConstrainedArray _constrainedArray = new ConstrainedArray(_arrayRefName, type, ((List<DiscreteRange>)Conversions.doWrapArray(arrRangs)));
+            ConstrainedArray _constrainedArray = new ConstrainedArray(_arrayRefName, type, arrRangs);
             final ConstrainedArray arrType = _constrainedArray;
             res.addTypeDeclaration(arrType, external);
             varType = arrType;
           }
           boolean _and = false;
-          boolean _notEquals_5 = ObjectExtensions.operator_notEquals(resetValue, null);
-          if (!_notEquals_5) {
+          boolean _tripleNotEquals_4 = (resetValue != null);
+          if (!_tripleNotEquals_4) {
             _and = false;
           } else {
             boolean _not = (!noExplicitResetVar);
-            _and = (_notEquals_5 && _not);
+            _and = (_tripleNotEquals_4 && _not);
           }
           if (_and) {
             boolean synchedArray = false;
@@ -634,8 +636,8 @@ public class VHDLStatementExtension {
               HDLVariable _get_1 = _resolveVar.get();
               ArrayList<HDLExpression> _dimensions_2 = _get_1.getDimensions();
               int _size_1 = _dimensions_2.size();
-              boolean _notEquals_6 = (_size_1 != 0);
-              synchedArray = _notEquals_6;
+              boolean _notEquals_1 = (_size_1 != 0);
+              synchedArray = _notEquals_1;
             }
             ArrayList<HDLExpression> _dimensions_3 = hvar.getDimensions();
             HDLVariableRef _hDLVariableRef = new HDLVariableRef();
@@ -655,10 +657,10 @@ public class VHDLStatementExtension {
           Constant _constant = new Constant(_name_2, varType);
           final Constant constant = _constant;
           HDLExpression _defaultValue = hvar.getDefaultValue();
-          boolean _notEquals_7 = ObjectExtensions.operator_notEquals(_defaultValue, null);
-          if (_notEquals_7) {
+          boolean _tripleNotEquals_5 = (_defaultValue != null);
+          if (_tripleNotEquals_5) {
             HDLExpression _defaultValue_1 = hvar.getDefaultValue();
-            Expression<?> _vHDL = this.vee.toVHDL(_defaultValue_1);
+            Expression<? extends Object> _vHDL = this.vee.toVHDL(_defaultValue_1);
             constant.setDefaultValue(_vHDL);
           }
           if (noExplicitResetVar) {
@@ -707,12 +709,12 @@ public class VHDLStatementExtension {
           if (!_matched) {
             boolean _or = false;
             HDLDirection _direction_1 = obj.getDirection();
-            boolean _equals = ObjectExtensions.operator_equals(_direction_1, HDLDirection.HIDDEN);
+            boolean _equals = Objects.equal(_direction_1, HDLDirection.HIDDEN);
             if (_equals) {
               _or = true;
             } else {
               HDLDirection _direction_2 = obj.getDirection();
-              boolean _equals_1 = ObjectExtensions.operator_equals(_direction_2, HDLDirection.CONSTANT);
+              boolean _equals_1 = Objects.equal(_direction_2, HDLDirection.CONSTANT);
               _or = (_equals || _equals_1);
             }
             if (_or) {
@@ -795,8 +797,8 @@ public class VHDLStatementExtension {
             final Alternative alt = this.createAlternative(cs_1, e, width);
             VHDLContext _value = e.getValue();
             final LinkedList<SequentialStatement> clockCase = _value.clockedStatements.get(hdlRegisterConfig);
-            boolean _notEquals = ObjectExtensions.operator_notEquals(clockCase, null);
-            if (_notEquals) {
+            boolean _tripleNotEquals = (clockCase != null);
+            if (_tripleNotEquals) {
               List<SequentialStatement> _statements = alt.getStatements();
               _statements.addAll(clockCase);
             }
@@ -814,8 +816,8 @@ public class VHDLStatementExtension {
           final Alternative alt = this.createAlternative(cs_1, e, width);
           VHDLContext _value = e.getValue();
           LinkedList<SequentialStatement> _get_2 = _value.unclockedStatements.get(Integer.valueOf(pid));
-          boolean _notEquals = ObjectExtensions.operator_notEquals(_get_2, null);
-          if (_notEquals) {
+          boolean _tripleNotEquals = (_get_2 != null);
+          if (_tripleNotEquals) {
             List<SequentialStatement> _statements = alt.getStatements();
             VHDLContext _value_1 = e.getValue();
             LinkedList<SequentialStatement> _get_3 = _value_1.unclockedStatements.get(Integer.valueOf(pid));
@@ -832,8 +834,8 @@ public class VHDLStatementExtension {
     Alternative alt = null;
     HDLSwitchCaseStatement _key = e.getKey();
     final HDLExpression label = _key.getLabel();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(label, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (label != null);
+    if (_tripleNotEquals) {
       final Optional<BigInteger> eval = ConstantEvaluate.valueOf(label, null);
       boolean _isPresent = eval.isPresent();
       if (_isPresent) {
@@ -850,7 +852,7 @@ public class VHDLStatementExtension {
         Alternative _createAlternative = cs.createAlternative(_binaryLiteral);
         alt = _createAlternative;
       } else {
-        Expression<?> _vHDL = this.vee.toVHDL(label);
+        Expression<? extends Object> _vHDL = this.vee.toVHDL(label);
         Alternative _createAlternative_1 = cs.createAlternative(_vHDL);
         alt = _createAlternative_1;
       }
@@ -886,7 +888,7 @@ public class VHDLStatementExtension {
       _and = false;
     } else {
       HDLClass _classType = ref.getClassType();
-      boolean _equals = ObjectExtensions.operator_equals(_classType, HDLClass.HDLVariableRef);
+      boolean _equals = Objects.equal(_classType, HDLClass.HDLVariableRef);
       _and = (_notEquals && _equals);
     }
     if (_and) {
@@ -903,50 +905,50 @@ public class VHDLStatementExtension {
       } else {
         HDLExpression _right = obj.getRight();
         HDLClass _classType_1 = _right.getClassType();
-        boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_classType_1, HDLClass.HDLArrayInit);
+        boolean _notEquals_2 = (!Objects.equal(_classType_1, HDLClass.HDLArrayInit));
         _and_1 = (_notEquals_1 && _notEquals_2);
       }
       if (_and_1) {
         final HDLAnnotation typeAnno = hvar.getAnnotation(HDLBuiltInAnnotations.VHDLType);
-        boolean _notEquals_3 = ObjectExtensions.operator_notEquals(typeAnno, null);
-        if (_notEquals_3) {
-          Expression<?> _vHDL = this.vee.toVHDL(ref);
+        boolean _tripleNotEquals = (typeAnno != null);
+        if (_tripleNotEquals) {
+          Expression<? extends Object> _vHDL = this.vee.toVHDL(ref);
           String _value = typeAnno.getValue();
           UnresolvedType _unresolvedType = new UnresolvedType(_value);
           HDLExpression _right_1 = obj.getRight();
-          Expression<?> _vHDL_1 = this.vee.toVHDL(_right_1);
+          Expression<? extends Object> _vHDL_1 = this.vee.toVHDL(_right_1);
           TypeConversion _typeConversion = new TypeConversion(_unresolvedType, _vHDL_1);
           SignalAssignment _signalAssignment = new SignalAssignment(((SignalAssignmentTarget) _vHDL), _typeConversion);
           sa = _signalAssignment;
         } else {
           final HDLVariableDeclaration hvd = hvar.<HDLVariableDeclaration>getContainer(HDLVariableDeclaration.class);
-          Expression<?> _vHDL_2 = this.vee.toVHDL(ref);
+          Expression<? extends Object> _vHDL_2 = this.vee.toVHDL(ref);
           boolean _isExternal = hvd.isExternal();
           String _arrayRefName = VHDLStatementExtension.getArrayRefName(hvar, _isExternal);
           UnresolvedType _unresolvedType_1 = new UnresolvedType(_arrayRefName);
           HDLExpression _right_2 = obj.getRight();
-          Expression<?> _vHDL_3 = this.vee.toVHDL(_right_2);
+          Expression<? extends Object> _vHDL_3 = this.vee.toVHDL(_right_2);
           TypeConversion _typeConversion_1 = new TypeConversion(_unresolvedType_1, _vHDL_3);
           SignalAssignment _signalAssignment_1 = new SignalAssignment(((SignalAssignmentTarget) _vHDL_2), _typeConversion_1);
           sa = _signalAssignment_1;
         }
       } else {
-        Expression<?> _vHDL_4 = this.vee.toVHDL(ref);
+        Expression<? extends Object> _vHDL_4 = this.vee.toVHDL(ref);
         HDLExpression _right_3 = obj.getRight();
-        Expression<?> _vHDL_5 = this.vee.toVHDL(_right_3);
+        Expression<? extends Object> _vHDL_5 = this.vee.toVHDL(_right_3);
         SignalAssignment _signalAssignment_2 = new SignalAssignment(((SignalAssignmentTarget) _vHDL_4), _vHDL_5);
         sa = _signalAssignment_2;
       }
     } else {
-      Expression<?> _vHDL_6 = this.vee.toVHDL(ref);
+      Expression<? extends Object> _vHDL_6 = this.vee.toVHDL(ref);
       HDLExpression _right_4 = obj.getRight();
-      Expression<?> _vHDL_7 = this.vee.toVHDL(_right_4);
+      Expression<? extends Object> _vHDL_7 = this.vee.toVHDL(_right_4);
       SignalAssignment _signalAssignment_3 = new SignalAssignment(((SignalAssignmentTarget) _vHDL_6), _vHDL_7);
       sa = _signalAssignment_3;
     }
     final HDLRegisterConfig config = hvar.getRegisterConfig();
-    boolean _notEquals_4 = ObjectExtensions.operator_notEquals(config, null);
-    if (_notEquals_4) {
+    boolean _tripleNotEquals_1 = (config != null);
+    if (_tripleNotEquals_1) {
       context.addClockedStatement(config, sa);
     } else {
       context.addUnclockedStatement(pid, sa, obj);
@@ -992,8 +994,8 @@ public class VHDLStatementExtension {
       }
     }
     LinkedList<SequentialStatement> _get = context.unclockedStatements.get(Integer.valueOf(pid));
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_get, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_get != null);
+    if (_tripleNotEquals) {
       HDLVariable _param = obj.getParam();
       String _name = _param.getName();
       ArrayList<HDLRange> _range = obj.getRange();
@@ -1041,15 +1043,15 @@ public class VHDLStatementExtension {
         IfStatement _ifStatement = new IfStatement(ifExp);
         final IfStatement ifs = _ifStatement;
         LinkedList<SequentialStatement> _get = thenCtx.clockedStatements.get(config);
-        boolean _notEquals = ObjectExtensions.operator_notEquals(_get, null);
-        if (_notEquals) {
+        boolean _tripleNotEquals = (_get != null);
+        if (_tripleNotEquals) {
           List<SequentialStatement> _statements = ifs.getStatements();
           LinkedList<SequentialStatement> _get_1 = thenCtx.clockedStatements.get(config);
           _statements.addAll(_get_1);
         }
         LinkedList<SequentialStatement> _get_2 = elseCtx.clockedStatements.get(config);
-        boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_get_2, null);
-        if (_notEquals_1) {
+        boolean _tripleNotEquals_1 = (_get_2 != null);
+        if (_tripleNotEquals_1) {
           List<SequentialStatement> _elseStatements = ifs.getElseStatements();
           LinkedList<SequentialStatement> _get_3 = elseCtx.clockedStatements.get(config);
           _elseStatements.addAll(_get_3);
@@ -1071,15 +1073,15 @@ public class VHDLStatementExtension {
       IfStatement _ifStatement = new IfStatement(ifExp);
       final IfStatement ifs = _ifStatement;
       LinkedList<SequentialStatement> _get = thenCtx.unclockedStatements.get(Integer.valueOf(pid));
-      boolean _notEquals_2 = ObjectExtensions.operator_notEquals(_get, null);
-      if (_notEquals_2) {
+      boolean _tripleNotEquals = (_get != null);
+      if (_tripleNotEquals) {
         List<SequentialStatement> _statements = ifs.getStatements();
         LinkedList<SequentialStatement> _get_1 = thenCtx.unclockedStatements.get(Integer.valueOf(pid));
         _statements.addAll(_get_1);
       }
       LinkedList<SequentialStatement> _get_2 = elseCtx.unclockedStatements.get(Integer.valueOf(pid));
-      boolean _notEquals_3 = ObjectExtensions.operator_notEquals(_get_2, null);
-      if (_notEquals_3) {
+      boolean _tripleNotEquals_1 = (_get_2 != null);
+      if (_tripleNotEquals_1) {
         List<SequentialStatement> _elseStatements = ifs.getElseStatements();
         LinkedList<SequentialStatement> _get_3 = elseCtx.unclockedStatements.get(Integer.valueOf(pid));
         _elseStatements.addAll(_get_3);

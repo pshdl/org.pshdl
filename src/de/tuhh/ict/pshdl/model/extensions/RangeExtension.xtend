@@ -77,18 +77,18 @@ class RangeExtension {
 			return Optional::absent
 		}
 		var HDLAnnotation range = hVar.get.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
-		if (range != null) {
+		if (range !== null) {
 			val value = range.value.split(";")
 
 			//TODO Allow simple references
 			return Optional::of(Ranges::closed(new BigInteger(value.get(0)), new BigInteger(value.get(1))))
 		}
 		val container = hVar.get.container
-		if (container != null) {
+		if (container !== null) {
 			if (container instanceof HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
 				range = hvd.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
-				if (range != null) {
+				if (range !== null) {
 					val String[] value = range.value.split(";")
 
 					//TODO Allow simple references
@@ -125,7 +125,7 @@ class RangeExtension {
 					bitWidth = bitWidth.add(cw.get)
 				}
 			}
-			if (bitWidth != null) {
+			if (bitWidth !== null) {
 				return Optional::of(Ranges::closed(0bi, 1bi.shiftLeft(bitWidth.intValue).subtract(1bi)))
 			}
 		}
@@ -142,7 +142,7 @@ class RangeExtension {
 		val Optional<BigInteger> to = ConstantEvaluate::valueOf(obj.to, context)
 		if (!to.present)
 			return Optional::absent;
-		if (obj.from != null) {
+		if (obj.from !== null) {
 			val Optional<BigInteger> from = ConstantEvaluate::valueOf(obj.from, context)
 			if (!from.present)
 				return Optional::absent;

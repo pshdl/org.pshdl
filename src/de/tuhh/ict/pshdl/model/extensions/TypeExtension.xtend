@@ -69,7 +69,7 @@ class TypeExtension {
 		if (HDLRegisterConfig::DEF_RST == hVar.name)
 			return Optional::of(HDLPrimitive::bit)
 		val IHDLObject container = hVar.container
-		if (container == null)
+		if (container === null)
 			return Optional::absent
 		switch (container.classType) {
 			case HDLClass::HDLVariableDeclaration:
@@ -89,7 +89,7 @@ class TypeExtension {
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableDeclaration hvd) {
-		if (hvd.primitive != null)
+		if (hvd.primitive !== null)
 			return Optional::of(hvd.primitive)
 		return hvd.resolveType
 	}
@@ -131,7 +131,7 @@ class TypeExtension {
 		var HDLPrimitive type = nextType.get as HDLPrimitive
 		var HDLExpression width = getWidth(type)
 		while (iter.hasNext) {
-			if (width == null)
+			if (width === null)
 				//This can happen when we have invalid concatenations
 				return Optional::absent
 			val nextCatType = iter.next.determineType
@@ -195,7 +195,7 @@ class TypeExtension {
 			else
 				return Optional::absent
 		}
-		if (bits.size == 1 && bits.get(0).from == null)
+		if (bits.size == 1 && bits.get(0).from === null)
 			return Optional::of(HDLPrimitive::bit)
 		val Iterator<HDLRange> iter = bits.iterator
 		var HDLExpression width = HDLPrimitives::simplifyWidth(ref, iter.next.width)

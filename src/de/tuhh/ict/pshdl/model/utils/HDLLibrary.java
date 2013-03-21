@@ -10,6 +10,7 @@ import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.types.builtIn.*;
 import de.tuhh.ict.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
@@ -225,6 +226,7 @@ public class HDLLibrary {
 				break;
 			}
 		}
+		objects.removeAll(src);
 	}
 
 	/**
@@ -342,4 +344,32 @@ public class HDLLibrary {
 			}
 		}
 	}
+
+	public Map<MetaAccess<?>, Object> metaData = new HashMap<MetaAccess<?>, Object>();
+
+	public void addMeta(String key, Object value) {
+		metaData.put(new GenericMeta<Object>(key, true), value);
+	}
+
+	public Object getMeta(String key) {
+		return metaData.get(new GenericMeta<Object>(key, true));
+	}
+
+	public <K> void addMeta(MetaAccess<K> key, K value) {
+		metaData.put(key, value);
+	}
+
+	public void setMeta(MetaAccess<Boolean> meta) {
+		addMeta(meta, true);
+	}
+
+	public boolean hasMeta(MetaAccess<?> key) {
+		return getMeta(key) != null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K> K getMeta(MetaAccess<K> key) {
+		return (K) metaData.get(key);
+	}
+
 }

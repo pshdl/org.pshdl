@@ -128,7 +128,7 @@ class ParserToModelExtension {
 
 	def HDLPackage toHDLPkg(PsModelContext ctx, String libURI, String src) {
 		var pkg = new HDLPackage().setLibURI(libURI)
-		if (ctx.psQualifiedName != null)
+		if (ctx.psQualifiedName !== null)
 			pkg = pkg.setPkg(ctx.psQualifiedName.toName)
 		pkg = pkg.setUnits(ctx.psUnit.map[toHDLUnit(libURI)])
 		pkg = pkg.setDeclarations(ctx.psDeclaration.map[toHDL as HDLDeclaration])
@@ -144,7 +144,7 @@ class ParserToModelExtension {
 	}
 
 	def <T extends IHDLObject> T attachContext(T obj, ParserRuleContext context) {
-		if (obj == null)
+		if (obj === null)
 			throw new NullPointerException("Null is not allowed")
 		obj.addMeta(SourceInfo::INFO, new SourceInfo(tokens, context))
 		return obj //attachContext method body
@@ -158,7 +158,7 @@ class ParserToModelExtension {
 
 	def dispatch HDLBlock toHDL(PsProcessContext context) {
 		var block = new HDLBlock
-		if (context.isProcess != null)
+		if (context.isProcess !== null)
 			block = block.setProcess(true)
 		block = block.setStatements(context.psBlock.map[toHDL as HDLStatement])
 		return block.attachContext(context)
@@ -167,7 +167,7 @@ class ParserToModelExtension {
 	def dispatch HDLAnnotation toHDL(PsAnnotationContext context) {
 		val name = context.psAnnotationType.text
 		var String value = null
-		if (context.RULE_STRING != null) {
+		if (context.RULE_STRING !== null) {
 			var str = context.RULE_STRING.text
 			str = str.substring(1, str.length - 1)
 			value = str
@@ -176,11 +176,11 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLDeclaration toHDL(PsDeclarationTypeContext context) {
-		if (context.psFunctionDeclaration != null)
+		if (context.psFunctionDeclaration !== null)
 			return context.psFunctionDeclaration.toHDL.attachContext(context) as HDLDeclaration
-		if (context.psTypeDeclaration != null)
+		if (context.psTypeDeclaration !== null)
 			return context.psTypeDeclaration.toHDL.attachContext(context) as HDLDeclaration
-		if (context.psVariableDeclaration != null)
+		if (context.psVariableDeclaration !== null)
 			return context.psVariableDeclaration.toHDL.attachContext(context) as HDLDeclaration
 		throw new IllegalArgumentException("Not implemented:" + context.getClass)
 	}
@@ -189,14 +189,14 @@ class ParserToModelExtension {
 		var res = new HDLVariableDeclaration
 		res = res.setType(context.psPrimitive.toHDL as HDLType)
 		var HDLDirection dir = HDLDirection::INTERNAL
-		if (context.psDirection != null)
+		if (context.psDirection !== null)
 			dir = HDLDirection::getOp(context.psDirection.text)
 		res = res.setDirection(dir)
 		for (varDecl : context.psDeclAssignment)
 			res = res.addVariables(varDecl.toHDL as HDLVariable)
-		if (context.psPrimitive.isRegister != null) {
+		if (context.psPrimitive.isRegister !== null) {
 			var Iterable<HDLArgument> args = new ArrayList<HDLArgument>
-			if (context.psPrimitive.psPassedArguments != null)
+			if (context.psPrimitive.psPassedArguments !== null)
 				args = context.psPrimitive.psPassedArguments.psArgument.map[toHDL as HDLArgument]
 			res = res.setRegister(HDLRegisterConfig::fromArgs(args))
 		}
@@ -204,7 +204,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsArrayInitContext context) {
-		if (context.psExpression != null) {
+		if (context.psExpression !== null) {
 			return context.psExpression.toHDL.attachContext(context)
 		}
 		val arr = new HDLArrayInit().setExp(context.psArrayInitSub.map[toHDL as HDLExpression])
@@ -212,7 +212,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsArrayInitSubContext context) {
-		if (context.psExpression != null) {
+		if (context.psExpression !== null) {
 			if (context.psExpression.size == 1)
 				return context.psExpression.get(0).toHDL.attachContext(context)
 			val arr = new HDLArrayInit().setExp(context.psExpression.map[toHDL as HDLExpression])
@@ -223,7 +223,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLType toHDL(PsPrimitiveContext context) {
-		if (context.psQualifiedName != null)
+		if (context.psQualifiedName !== null)
 			return new HDLEnum().setName(context.psQualifiedName.toName).attachContext(context)
 		val HDLPrimitiveType pt = HDLPrimitiveType::valueOf(context.psPrimitiveType.text.toUpperCase)
 		val HDLExpression width = context.psWidth?.toHDL as HDLExpression
@@ -233,9 +233,9 @@ class ParserToModelExtension {
 	def dispatch HDLVariable toHDL(PsDeclAssignmentContext context) {
 		var HDLVariable res = new HDLVariable().setName(context.psVariable.toName)
 		res = res.setAnnotations(context.psAnnotation.map[toHDL as HDLAnnotation])
-		if (context.psArray != null)
+		if (context.psArray !== null)
 			res = res.setDimensions(context.psArray.psExpression.map[toHDL as HDLExpression])
-		if (context.psArrayInit != null)
+		if (context.psArrayInit !== null)
 			res = res.setDefaultValue(context.psArrayInit.toHDL as HDLExpression)
 		return res.attachContext(context)
 	}
@@ -245,7 +245,7 @@ class ParserToModelExtension {
 	}
 
 	def HDLPrimitiveType getResultingType(HDLPrimitiveType pt, HDLExpression width) {
-		if (width != null) {
+		if (width !== null) {
 			switch (pt) {
 				case HDLPrimitiveType::BIT:
 					return HDLPrimitiveType::BITVECTOR //NOATTACH getResultingType method body
@@ -266,14 +266,14 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsValueContext context) {
-		if (context.RULE_PS_LITERAL_TERMINAL != null)
+		if (context.RULE_PS_LITERAL_TERMINAL !== null)
 			return new HDLLiteral().setStr(false).setVal(context.RULE_PS_LITERAL_TERMINAL.text).attachContext(context)
-		if (context.RULE_STRING != null) {
+		if (context.RULE_STRING !== null) {
 			var str = context.RULE_STRING.text
 			str = str.substring(1, str.length - 1)
 			return new HDLLiteral().setStr(true).setVal(str).attachContext(context)
 		}
-		if (context.psVariableRef != null)
+		if (context.psVariableRef !== null)
 			return context.psVariableRef.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Not correctly implemented:" + context.getClass)
 	}
@@ -371,7 +371,7 @@ class ParserToModelExtension {
 
 	def dispatch HDLManip toHDL(PsManipContext context) {
 		var res = new HDLManip().setTarget(context.psExpression.toHDL as HDLExpression)
-		if (context.psCast != null) {
+		if (context.psCast !== null) {
 			res = res.setType(HDLManip$HDLManipType::CAST)
 			res = res.setCastTo(context.psCast.toHDL as HDLType)
 		} else {
@@ -419,9 +419,9 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsTypeDeclarationContext context) {
-		if (context.psEnumDeclaration != null)
+		if (context.psEnumDeclaration !== null)
 			return context.psEnumDeclaration.toHDL.attachContext(context)
-		if (context.psInterfaceDeclaration != null)
+		if (context.psInterfaceDeclaration !== null)
 			return context.psInterfaceDeclaration.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Not implemented:" + context.getClass)
 	}
@@ -439,24 +439,24 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsBlockContext context) {
-		if (context.psDeclaration != null)
+		if (context.psDeclaration !== null)
 			return context.psDeclaration.toHDL.attachContext(context)
-		if (context.psInstantiation != null)
+		if (context.psInstantiation !== null)
 			return context.psInstantiation.toHDL.attachContext(context)
-		if (context.psStatement != null)
+		if (context.psStatement !== null)
 			return context.psStatement.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Not correctly implemented type:" + context.getClass());
 	}
 
 	def dispatch HDLDirectGeneration toHDL(PsDirectGenerationContext context) {
 		var gen = new HDLDirectGeneration().setGeneratorContent("")
-		gen = gen.setInclude(context.isInclude != null)
+		gen = gen.setInclude(context.isInclude !== null)
 		gen = gen.setHIf(context.psInterface.toHDL as HDLInterface)
 		gen = gen.setVar(context.psVariable.toHDL as HDLVariable)
 		gen = gen.setGeneratorID(context.RULE_ID.text)
-		if (context.psPassedArguments != null)
+		if (context.psPassedArguments !== null)
 			gen = gen.setArguments(context.psPassedArguments.psArgument.map[toHDL as HDLArgument])
-		if (context.RULE_GENERATOR_CONTENT != null)
+		if (context.RULE_GENERATOR_CONTENT !== null)
 			gen = gen.setGeneratorContent(context.RULE_GENERATOR_CONTENT.text)
 		return gen.attachContext(context);
 	}
@@ -470,9 +470,9 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsInstantiationContext context) {
-		if (context.psDirectGeneration != null)
+		if (context.psDirectGeneration !== null)
 			return context.psDirectGeneration.toHDL.attachContext(context)
-		if (context.psInterfaceInstantiation != null)
+		if (context.psInterfaceInstantiation !== null)
 			return context.psInterfaceInstantiation.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Not implemented type:" + context.getClass());
 	}
@@ -498,7 +498,7 @@ class ParserToModelExtension {
 	def dispatch HDLNativeFunction toHDL(PsNativeFunctionContext context) {
 		var func = new HDLNativeFunction
 		func = func.setName(context.psFunction.toName)
-		func = func.setSimOnly(context.isSim != null)
+		func = func.setSimOnly(context.isSim !== null)
 		return func.attachContext(context)
 	}
 
@@ -515,39 +515,39 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsFunctionDeclarationContext context) {
-		if (context.psInlineFunction != null)
+		if (context.psInlineFunction !== null)
 			return context.psInlineFunction.toHDL.attachContext(context)
-		if (context.psNativeFunction != null)
+		if (context.psNativeFunction !== null)
 			return context.psNativeFunction.toHDL.attachContext(context)
-		if (context.psSubstituteFunction != null)
+		if (context.psSubstituteFunction !== null)
 			return context.psSubstituteFunction.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Not implemented type:" + context.getClass());
 	}
 
 	def dispatch HDLUnresolvedFragment toHDL(PsRefPartContext context) {
 		var HDLUnresolvedFragment frag;
-		if (context.psFuncArgs() != null) {
+		if (context.psFuncArgs() !== null) {
 			var HDLUnresolvedFragmentFunction uff = new HDLUnresolvedFragmentFunction().setFrag(context.RULE_ID.text);
 			frag = uff.setParams(context.psFuncArgs().psExpression.map[toHDL as HDLExpression])
 		} else {
 			frag = new HDLUnresolvedFragment().setFrag(context.RULE_ID.text);
-			if (context.psArray != null)
+			if (context.psArray !== null)
 				frag = frag.setArray(context.psArray.psExpression.map[toHDL as HDLExpression])
-			if (context.psBitAccess != null)
+			if (context.psBitAccess !== null)
 				frag = frag.setBits(context.psBitAccess.psAccessRange.map[toHDL as HDLRange])
 		}
 		return frag.attachContext(context);
 	}
 
 	def dispatch HDLReference toHDL(PsVariableRefContext context) {
-		if (context.isClk != null)
+		if (context.isClk !== null)
 			return HDLRegisterConfig::defaultClk.asHDLRef.attachContext(context)
-		if (context.isRst != null)
+		if (context.isRst !== null)
 			return HDLRegisterConfig::defaultRst.asHDLRef.attachContext(context)
 		var HDLUnresolvedFragment current = null
 		for (sub : context.psRefPart.reverseView) {
 			var frag = sub.toHDL as HDLUnresolvedFragment
-			if (current != null) {
+			if (current !== null) {
 				frag = frag.setSub(current)
 			}
 			current = frag
@@ -562,14 +562,14 @@ class ParserToModelExtension {
 		//Whereas a range {a,b}
 		//becomes from=a to=b
 		var res = new HDLRange().setTo(context.from.toHDL as HDLExpression)
-		if (context.to != null)
+		if (context.to !== null)
 			res = res.setFrom(context.from.toHDL as HDLExpression).setTo(context.to.toHDL as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLSwitchCaseStatement toHDL(PsCaseStatementsContext context) {
 		var hCase = new HDLSwitchCaseStatement
-		if (context.psValue != null)
+		if (context.psValue !== null)
 			hCase = hCase.setLabel(context.psValue.toHDL as HDLExpression)
 		hCase = hCase.setDos(context.psBlock.map[toHDL as HDLStatement])
 		return hCase.attachContext(context)
@@ -583,10 +583,10 @@ class ParserToModelExtension {
 
 	def dispatch HDLInterfaceInstantiation toHDL(PsInterfaceInstantiationContext context) {
 		var hVar = context.psVariable.toHDL as HDLVariable
-		if (context.psArray != null)
+		if (context.psArray !== null)
 			hVar = hVar.setDimensions(context.psArray.psExpression.map[toHDL as HDLExpression])
 		var hii = new HDLInterfaceInstantiation().setVar(hVar).setHIf(context.psQualifiedName.toFQNName)
-		if (context.psPassedArguments != null)
+		if (context.psPassedArguments !== null)
 			hii = hii.setArguments(context.psPassedArguments.psArgument.map[toHDL as HDLArgument])
 		return hii.attachContext(context)
 	}
@@ -601,34 +601,34 @@ class ParserToModelExtension {
 	def dispatch HDLIfStatement toHDL(PsIfStatementContext context) {
 		var res = new HDLIfStatement().setIfExp(context.psExpression.toHDL as HDLExpression)
 		res = res.setThenDo(context.ifBlk.psBlock.map[toHDL as HDLStatement])
-		if (context.elseBlk != null)
+		if (context.elseBlk !== null)
 			res = res.setElseDo(context.elseBlk.psBlock.map[toHDL as HDLStatement])
 		return res.attachContext(context)
 	}
 
 	def dispatch IHDLObject toHDL(PsCompoundStatementContext context) {
-		if (context.psForStatement != null)
+		if (context.psForStatement !== null)
 			return context.psForStatement.toHDL.attachContext(context)
-		if (context.psIfStatement != null)
+		if (context.psIfStatement !== null)
 			return context.psIfStatement.toHDL.attachContext(context)
-		if (context.psSwitchStatement != null)
+		if (context.psSwitchStatement !== null)
 			return context.psSwitchStatement.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Unhandled type:" + context.getClass());
 	}
 
 	def dispatch IHDLObject toHDL(PsStatementContext context) {
-		if (context.psAssignmentOrFunc != null)
+		if (context.psAssignmentOrFunc !== null)
 			return context.psAssignmentOrFunc.toHDL.attachContext(context)
-		if (context.psCompoundStatement != null)
+		if (context.psCompoundStatement !== null)
 			return context.psCompoundStatement.toHDL.attachContext(context)
-		if (context.psProcess != null)
+		if (context.psProcess !== null)
 			return context.psProcess.toHDL.attachContext(context)
 		throw new IllegalArgumentException("Unhandled type:" + context.getClass());
 	}
 
 	def dispatch IHDLObject toHDL(PsAssignmentOrFuncContext context) {
 		val hVar = context.psVariableRef.toHDL as HDLReference
-		if (context.psAssignmentOp != null) {
+		if (context.psAssignmentOp !== null) {
 			val type = HDLAssignment$HDLAssignmentType::getOp(context.psAssignmentOp.text)
 			var ass = new HDLAssignment().setLeft(hVar).setType(type)
 			ass = ass.setRight(context.psExpression.toHDL as HDLExpression)

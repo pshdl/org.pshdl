@@ -8,6 +8,7 @@ import com.google.common.base.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLArithOp.HDLArithOpType;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
@@ -25,15 +26,22 @@ import de.upb.hni.vmagic.parser.*;
 import de.upb.hni.vmagic.type.*;
 
 public class VHDLImporter {
+	private static class Scopes {
+		public final RootDeclarativeRegion rootScope;
+		public final LibraryDeclarativeRegion workScope;
 
-	private static RootDeclarativeRegion rootScope;
-	private static LibraryDeclarativeRegion workScope;
+		public Scopes(RootDeclarativeRegion rootScope, LibraryDeclarativeRegion workScope) {
+			super();
+			this.rootScope = rootScope;
+			this.workScope = workScope;
+		}
+	}
 
 	public static List<HDLInterface> importFile(HDLQualifiedName pkg, InputStream is, HDLLibrary lib, String src) {
-		init();
+		Scopes scopes = getScopes(lib);
 		List<HDLInterface> res = new LinkedList<HDLInterface>();
 		try {
-			VhdlFile file = VhdlParser.parseStream(is, new VhdlParserSettings(), rootScope, workScope);
+			VhdlFile file = VhdlParser.parseStream(is, new VhdlParserSettings(), scopes.rootScope, scopes.workScope);
 			List<LibraryUnit> list = file.getElements();
 			for (LibraryUnit unit : list) {
 				if (unit instanceof Entity) {
@@ -46,7 +54,7 @@ public class VHDLImporter {
 						for (Signal signal : signals) {
 							HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
 							HDLQualifiedName qfn = pkg.append(id).append(signal.getIdentifier());
-							HDLVariableDeclaration var = getVariable(null, signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>());
+							HDLVariableDeclaration var = getVariable(null, signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>(), scopes);
 							vInterface = vInterface.addPorts(var);
 						}
 					}
@@ -56,7 +64,7 @@ public class VHDLImporter {
 						for (Constant signal : signals) {
 							HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
 							HDLQualifiedName qfn = pkg.append(id).append(signal.getIdentifier());
-							HDLVariableDeclaration var = getVariable(signal.getDefaultValue(), signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>());
+							HDLVariableDeclaration var = getVariable(signal.getDefaultValue(), signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>(), scopes);
 							var = var.setDirection(HDLDirection.PARAMETER);
 							vInterface = vInterface.addPorts(var);
 						}
@@ -65,7 +73,7 @@ public class VHDLImporter {
 					res.add(vInterface);
 					lib.addInterface(vInterface, src);
 				}
-				workScope.getFiles().add(file);
+				getScopes(lib).workScope.getFiles().add(file);
 				// System.out.println("VHDLImporter.importFile()" + unit);
 			}
 		} catch (IOException e) {
@@ -76,20 +84,26 @@ public class VHDLImporter {
 		return res;
 	}
 
-	private static void init() {
-		if (rootScope != null)
-			return;
-		rootScope = new RootDeclarativeRegion();
-		workScope = new LibraryDeclarativeRegion("work");
+	private final static MetaAccess<Scopes> SCOPES = new GenericMeta<VHDLImporter.Scopes>("SCOPES", true);
+
+	private static Scopes getScopes(HDLLibrary lib) {
+		Scopes scopes = lib.getMeta(SCOPES);
+		if (scopes != null)
+			return scopes;
+		RootDeclarativeRegion rootScope = new RootDeclarativeRegion();
+		LibraryDeclarativeRegion workScope = new LibraryDeclarativeRegion("work");
 		rootScope.getLibraries().add(workScope);
+		scopes = new Scopes(rootScope, workScope);
+		lib.addMeta(SCOPES, scopes);
+		return scopes;
 	}
 
 	public static HDLVariableDeclaration getVariable(Expression<?> defaultValue, SubtypeIndication left, HDLDirection direction, HDLQualifiedName qfn, HDLExpression width,
-			ArrayList<HDLExpression> dimensions) {
+			ArrayList<HDLExpression> dimensions, Scopes scopes) {
 		if (left instanceof IndexSubtypeIndication) {
 			IndexSubtypeIndication isi = (IndexSubtypeIndication) left;
 			Range dr = (Range) isi.getRanges().get(0);
-			return getVariable(defaultValue, isi.getBaseType(), direction, qfn, convertRange(dr), dimensions);
+			return getVariable(defaultValue, isi.getBaseType(), direction, qfn, convertRange(dr), dimensions, scopes);
 		}
 		if (StdLogic1164.STD_LOGIC.equals(left) || StdLogic1164.STD_ULOGIC.equals(left) || Standard.BIT.equals(left))
 			return createVar(defaultValue, direction, HDLPrimitiveType.BIT, qfn, width, dimensions);
@@ -112,20 +126,20 @@ public class VHDLImporter {
 			ConstrainedArray ca = (ConstrainedArray) left;
 			@SuppressWarnings("rawtypes")
 			List<DiscreteRange> ranges = ca.getIndexRanges();
-			workScope.getScope().resolve(ca.getIdentifier());
+			scopes.workScope.getScope().resolve(ca.getIdentifier());
 			for (DiscreteRange<?> discreteRange : ranges) {
 				dimensions.add(convertRange((Range) discreteRange));
 			}
-			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions);
-			var = var.addAnnotations(new HDLAnnotation().setName(HDLBuiltInAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier())));
+			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions, scopes);
+			var = var.addAnnotations(new HDLAnnotation().setName(HDLBuiltInAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier(), scopes)));
 			return var;
 		}
 		if (left instanceof UnconstrainedArray) {
 			UnconstrainedArray ca = (UnconstrainedArray) left;
-			workScope.getScope().resolve(ca.getIdentifier());
+			scopes.workScope.getScope().resolve(ca.getIdentifier());
 			dimensions.add(HDLLiteral.get(-20));
-			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions);
-			var = var.addAnnotations(new HDLAnnotation().setName(HDLBuiltInAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier())));
+			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions, scopes);
+			var = var.addAnnotations(new HDLAnnotation().setName(HDLBuiltInAnnotations.VHDLType.toString()).setValue(getFullName(ca.getIdentifier(), scopes)));
 			return var;
 		}
 		if (left instanceof EnumerationType) {
@@ -134,9 +148,9 @@ public class VHDLImporter {
 		throw new IllegalArgumentException("Unexpected Type:" + left);
 	}
 
-	private static String getFullName(String identifier) {
+	private static String getFullName(String identifier, Scopes scopes) {
 		String pkg = null;
-		for (LibraryDeclarativeRegion lib : rootScope.getLibraries()) {
+		for (LibraryDeclarativeRegion lib : scopes.rootScope.getLibraries()) {
 			for (VhdlFile file : lib.getFiles()) {
 				for (LibraryUnit libraryUnit : file.getElements())
 					if (libraryUnit instanceof PackageDeclaration) {

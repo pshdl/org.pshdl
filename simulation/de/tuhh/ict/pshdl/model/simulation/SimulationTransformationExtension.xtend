@@ -65,11 +65,11 @@ class SimulationTransformationExtension {
 		val HDLVariable hVar = left.resolveVar
 		var HDLRegisterConfig config = hVar.registerConfig
 		var FluidFrame res
-		if (config != null)
+		if (config !== null)
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + "$reg")
 		else
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true))
-		if (config != null) {
+		if (config !== null) {
 			config = config.normalize
 			val HDLVariable clk = config.resolveClk.get
 			val String name = FullNameExtension::fullNameOf(clk).toString

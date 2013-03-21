@@ -1,5 +1,6 @@
 package de.tuhh.ict.pshdl.model.extensions;
 
+import com.google.common.base.Objects;
 import de.tuhh.ict.pshdl.model.HDLBlock;
 import de.tuhh.ict.pshdl.model.HDLClass;
 import de.tuhh.ict.pshdl.model.HDLEnum;
@@ -20,7 +21,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
-import org.eclipse.xtext.xbase.lib.ObjectExtensions;
 
 @SuppressWarnings("all")
 public class FullNameExtension {
@@ -40,8 +40,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLForLoop loop) {
     HDLQualifiedName _meta = loop.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return loop.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(loop);
@@ -52,8 +52,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLBlock block) {
     HDLQualifiedName _meta = block.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return block.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(block);
@@ -64,8 +64,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLIfStatement ifStamnt) {
     HDLQualifiedName _meta = ifStamnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return ifStamnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(ifStamnt);
@@ -76,8 +76,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLSwitchStatement stmnt) {
     HDLQualifiedName _meta = stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(stmnt);
@@ -88,8 +88,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLSwitchCaseStatement stmnt) {
     HDLQualifiedName _meta = stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(stmnt);
@@ -100,8 +100,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLUnit unit) {
     HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
@@ -112,8 +112,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLInterface unit) {
     HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
@@ -124,8 +124,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLEnum unit) {
     HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
@@ -136,8 +136,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLFunction unit) {
     HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
@@ -148,14 +148,14 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLPackage pkg) {
     HDLQualifiedName _meta = pkg.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return pkg.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(pkg);
     String _pkg = pkg.getPkg();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_pkg, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_pkg != null);
+    if (_tripleNotEquals_1) {
       String _pkg_1 = pkg.getPkg();
       HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_pkg_1);
       return fullName.append(_hDLQualifiedName);
@@ -165,8 +165,8 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLVariable unit) {
     HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
@@ -177,13 +177,13 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final IHDLObject obj) {
     HDLQualifiedName _meta = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     IHDLObject _container = obj.getContainer();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_container, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_container != null);
+    if (_tripleNotEquals_1) {
       IHDLObject _container_1 = obj.getContainer();
       return this.getFullName(_container_1);
     }
@@ -192,13 +192,13 @@ public class FullNameExtension {
   
   protected HDLQualifiedName _getFullName(final HDLObject obj) {
     HDLQualifiedName _meta = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     IHDLObject _container = obj.getContainer();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_container, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_container != null);
+    if (_tripleNotEquals_1) {
       IHDLObject _container_1 = obj.getContainer();
       return this.getFullName(_container_1);
     }
@@ -207,13 +207,13 @@ public class FullNameExtension {
   
   public HDLQualifiedName getSuperFullName(final HDLObject obj) {
     HDLQualifiedName _meta = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_meta, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
       return obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     }
     IHDLObject _container = obj.getContainer();
-    boolean _notEquals_1 = ObjectExtensions.operator_notEquals(_container, null);
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_1 = (_container != null);
+    if (_tripleNotEquals_1) {
       IHDLObject _container_1 = obj.getContainer();
       return this.getFullName(_container_1);
     }
@@ -224,8 +224,8 @@ public class FullNameExtension {
   public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
     HDLQualifiedName _xblockexpression = null;
     {
-      boolean _equals = ObjectExtensions.operator_equals(obj, null);
-      if (_equals) {
+      boolean _tripleEquals = (obj == null);
+      if (_tripleEquals) {
         NullPointerException _nullPointerException = new NullPointerException("Can not get a name for null");
         throw _nullPointerException;
       }
@@ -238,8 +238,8 @@ public class FullNameExtension {
   public static int countInstance(final HDLObject obj) {
     int count = 0;
     IHDLObject _container = obj.getContainer();
-    boolean _notEquals = ObjectExtensions.operator_notEquals(_container, null);
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_container != null);
+    if (_tripleNotEquals) {
       IHDLObject _container_1 = obj.getContainer();
       final Iterator<IHDLObject> iterator = _container_1.iterator(false);
       boolean _hasNext = iterator.hasNext();
@@ -247,13 +247,13 @@ public class FullNameExtension {
       while (_while) {
         {
           final IHDLObject hdlObject = iterator.next();
-          boolean _equals = ObjectExtensions.operator_equals(hdlObject, obj);
+          boolean _equals = Objects.equal(hdlObject, obj);
           if (_equals) {
             return count;
           }
           HDLClass _classType = hdlObject.getClassType();
           HDLClass _classType_1 = obj.getClassType();
-          boolean _equals_1 = ObjectExtensions.operator_equals(_classType, _classType_1);
+          boolean _equals_1 = Objects.equal(_classType, _classType_1);
           if (_equals_1) {
             int _plus = (count + 1);
             count = _plus;

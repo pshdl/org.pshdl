@@ -67,7 +67,7 @@ class StringWriteExtension {
 	}
 
 	def static String asString(IHDLObject exp, SyntaxHighlighter highlight) {
-		if (exp == null)
+		if (exp === null)
 			throw new IllegalArgumentException("Can not handle null argument")
 		return INST.toString(exp, highlight)
 	}
@@ -90,7 +90,7 @@ class StringWriteExtension {
 		val StringBuilder sb = new StringBuilder
 		sb.append(anno.entering(highlight))
 		sb.append(highlight.annotation(anno.name))
-		if (anno.value != null)
+		if (anno.value !== null)
 			sb.append("(").append(highlight.string("\"" + anno.value + "\"")).append(")")
 		sb.append(anno.leaving(highlight))
 		return sb.toString
@@ -132,7 +132,7 @@ class StringWriteExtension {
 		sb.append(
 			'''«FOR HDLExpression p : frag.array BEFORE '[' SEPARATOR '][' AFTER ']'»«p.toString(highlight)»«ENDFOR»''')
 		sb.append('''«FOR HDLRange p : frag.bits BEFORE '{' SEPARATOR ',' AFTER '}'»«p.toString(highlight)»«ENDFOR»''')
-		if (frag.sub != null) {
+		if (frag.sub !== null) {
 			sb.append('.').append(frag.sub.toString(highlight))
 		}
 		return sb.toString
@@ -274,7 +274,7 @@ class StringWriteExtension {
 			case HDLManip$HDLManipType::CAST: {
 				val HDLPrimitive type = manip.castTo as HDLPrimitive
 				val entering = manip.entering(highlight)
-				val String width = if(type.width != null) highlight.width("<" + type.width.toString(highlight) + ">") else ""
+				val String width = if(type.width !== null) highlight.width("<" + type.width.toString(highlight) + ">") else ""
 				return entering + "(" + highlight.keyword(type.type.toString.toLowerCase) + width + ")" +
 					manip.target.toString(highlight) + manip.leaving(highlight)
 			}
@@ -319,7 +319,7 @@ class StringWriteExtension {
 		val StringBuilder sb = new StringBuilder
 		sb.append(prim.entering(highlight))
 		sb.append(highlight.primitiveType(prim.type.toString.toLowerCase))
-		if (prim.width != null) {
+		if (prim.width !== null) {
 			sb.append(highlight.width('<' + prim.width.toString(highlight) + '>'))
 		}
 		sb.append(prim.leaving(highlight))
@@ -371,7 +371,7 @@ class StringWriteExtension {
 	def dispatch String toString(HDLSwitchCaseStatement caseStmnt, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		sb.append(caseStmnt.entering(highlight))
-		if (caseStmnt.label == null)
+		if (caseStmnt.label === null)
 			sb.append(highlight.keyword("default")).append(':').append(highlight.simpleSpace).append(highlight.newLine)
 		else
 			sb.append(highlight.keyword("case")).append(highlight.simpleSpace).append(
@@ -402,7 +402,7 @@ class StringWriteExtension {
 		val StringBuilder sb = highlight.spacing
 		sb.append(hvd.entering(highlight))
 		val resolveType = hvd.resolveType
-		if (hvd.annotations != null) {
+		if (hvd.annotations !== null) {
 			for (HDLAnnotation hdla : hvd.annotations) {
 				sb.append(hdla.toString(highlight)).append(highlight.simpleSpace)
 			}
@@ -410,7 +410,7 @@ class StringWriteExtension {
 		val String dirString = hvd.direction.toString
 		if (dirString.length > 0)
 			sb.append(highlight.direction(dirString)).append(highlight.simpleSpace)
-		if (hvd.register != null)
+		if (hvd.register !== null)
 			sb.append(hvd.register.toString(highlight))
 		if (!resolveType.present) {
 			sb.append("#UNRESOLVED_TYPE#")
@@ -503,21 +503,21 @@ class StringWriteExtension {
 				highlight.variableRefName(reg.rstRefName))
 			first = false
 		}
-		if (reg.clockType != null && !reg.clockType.equals(defaultReg.clockType)) {
+		if (reg.clockType !== null && !reg.clockType.equals(defaultReg.clockType)) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::EDGE_PARAM)).append('=').append(
 				highlight.enumRefType("Edge")).append('.').append(highlight.enumRefVar(reg.clockType.toString))
 			first = false
 		}
-		if (reg.syncType != null && !reg.syncType.equals(defaultReg.syncType)) {
+		if (reg.syncType !== null && !reg.syncType.equals(defaultReg.syncType)) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_SYNC_PARAM)).append('=').append(
 				highlight.enumRefType("Sync")).append('.').append(highlight.enumRefVar(reg.syncType.toString))
 			first = false
 		}
-		if (reg.resetType != null && !reg.resetType.equals(defaultReg.resetType)) {
+		if (reg.resetType !== null && !reg.resetType.equals(defaultReg.resetType)) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_TYPE_PARAM)).append('=').append(
@@ -543,7 +543,7 @@ class StringWriteExtension {
 		val StringBuilder sb = new StringBuilder
 		highlight.pushContext(SyntaxHighlighter$Context::HDLPackage)
 		sb.append(pkg.entering(highlight))
-		if (pkg.pkg != null)
+		if (pkg.pkg !== null)
 			sb.append(highlight.keyword("package")).append(highlight.simpleSpace).append(highlight.packageName(pkg.pkg)).
 				append(";").append(highlight.newLine)
 		for (HDLDeclaration decl : pkg.declarations) {
@@ -606,7 +606,7 @@ class StringWriteExtension {
 	}
 
 	def dispatch String toString(HDLRange range, SyntaxHighlighter highlight) {
-		if (range.from != null) {
+		if (range.from !== null) {
 			return range.entering(highlight) + range.from.toString(highlight) + ":" + range.to.toString(highlight) +
 				range.leaving(highlight)
 		}
@@ -623,7 +623,7 @@ class StringWriteExtension {
 		for (HDLExpression arr : hVar.dimensions) {
 			sb.append('[').append(arr.toString(highlight)).append(']')
 		}
-		if (hVar.defaultValue != null)
+		if (hVar.defaultValue !== null)
 			sb.append('=').append(hVar.defaultValue.toString(highlight))
 		hVar.leaving(highlight)
 		return sb.toString
@@ -641,7 +641,7 @@ class StringWriteExtension {
 			sb.append(args.toString(highlight))
 		}
 		sb.append(')')
-		if (hdg.generatorContent != null) {
+		if (hdg.generatorContent !== null) {
 			sb.append(highlight.generatorContent(hdg.generatorID, hdg.generatorContent))
 		}
 		sb.append(";")

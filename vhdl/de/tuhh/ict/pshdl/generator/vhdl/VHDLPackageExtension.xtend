@@ -79,7 +79,7 @@ class VHDLPackageExtension {
 		for (HDLEnumRef hdlEnumRef : hRefs) {
 			val resolveHEnum = hdlEnumRef.resolveHEnum
 			val HDLUnit enumContainer = resolveHEnum.get.getContainer(typeof(HDLUnit))
-			if (enumContainer == null || !enumContainer.equals(hdlEnumRef.getContainer(typeof(HDLUnit)))) {
+			if (enumContainer === null || !enumContainer.equals(hdlEnumRef.getContainer(typeof(HDLUnit)))) {
 				val HDLQualifiedName type = fullNameOf(resolveHEnum.get)
 				if (!type.getSegment(0).equals("pshdl"))
 					unit.addImport(HDLQualifiedName::create("work", getPackageName(type), "all"))
@@ -92,7 +92,7 @@ class VHDLPackageExtension {
 				if (!variable.present)
 					throw new IllegalArgumentException("Can not resolve:" + variableRef)
 				val HDLUnit enumContainer = variable.get.getContainer(typeof(HDLUnit))
-				if (enumContainer == null || !enumContainer.equals(variableRef.getContainer(typeof(HDLUnit)))) {
+				if (enumContainer === null || !enumContainer.equals(variableRef.getContainer(typeof(HDLUnit)))) {
 					val HDLQualifiedName type = fullNameOf(variable.get).skipLast(1)
 					if (type.length > 0 && !type.getSegment(0).equals("pshdl"))
 						unit.addImport(HDLQualifiedName::create("work", getPackageName(type), "all"))
@@ -199,7 +199,7 @@ class VHDLPackageExtension {
 					if (!notSensitive.contains(hdv.direction)) {
 						if (ref.container instanceof HDLAssignment) {
 							val HDLAssignment hAss = ref.container as HDLAssignment
-							if (hAss.left.resolveVar.registerConfig != null) {
+							if (hAss.left.resolveVar.registerConfig !== null) {
 							} else if (hAss.left != ref)
 								vars.add(ref.VHDLName)
 						} else
@@ -234,7 +234,7 @@ class VHDLPackageExtension {
 			activeRst = StdLogic1164::STD_LOGIC_0
 		var IfStatement rstIfStmnt = new IfStatement(new Equals(rst, activeRst))
 		val LinkedList<SequentialStatement> resets = unit.resetStatements.get(key)
-		if (resets != null)
+		if (resets !== null)
 			rstIfStmnt.statements.addAll(resets)
 		var FunctionCall edge
 		if (config.getRegClockType(fullNameOf(hUnit), key.clockType) == HDLRegisterConfig$HDLRegClockType::RISING)
@@ -288,15 +288,15 @@ class VHDLPackageExtension {
 		for (HDLDeclaration decl : obj.declarations) {
 			if (decl.classType == HDLClass::HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = decl as HDLVariableDeclaration
-				if (pd == null) {
+				if (pd === null) {
 					pd = new PackageDeclaration(getPackageName(new HDLQualifiedName(obj.pkg)))
 					res.elements.add(pd)
 				}
 				val VHDLContext vhdl = hvd.toVHDL(VHDLContext::DEFAULT_CTX)
 				var ConstantDeclaration first = vhdl.constants.first
-				if (first == null) {
+				if (first === null) {
 					first = vhdl.constantsPkg.first
-					if (first == null)
+					if (first === null)
 						throw new IllegalArgumentException("Expected constant declaration but found none!")
 				}
 				pd.declarations.add(first)
@@ -307,7 +307,7 @@ class VHDLPackageExtension {
 				res.elements.add(enumPd)
 				val VHDLContext vhdl = hvd.toVHDL(VHDLContext::DEFAULT_CTX)
 				val Type first = vhdl.internalTypes.first as Type
-				if (first == null)
+				if (first === null)
 					throw new IllegalArgumentException("Expected enum type declaration but found none!")
 				enumPd.declarations.add(first)
 			}

@@ -121,7 +121,7 @@ class VHDLStatementExtension {
 	def dispatch VHDLContext toVHDL(HDLBlock obj, int pid) {
 		val VHDLContext res = new VHDLContext
 		var boolean process = false
-		if (obj.process != null && obj.process) {
+		if (obj.process !== null && obj.process) {
 			process = true
 		}
 		val newPid = if(process) res.newProcessID else pid
@@ -134,7 +134,7 @@ class VHDLStatementExtension {
 	def VHDLContext attachComment(VHDLContext context, IHDLObject block) {
 		try {
 			val srcInfo = block.getMeta(SourceInfo::INFO)
-			if (srcInfo != null && context.statement != null) {
+			if (srcInfo !== null && context.statement !== null) {
 				val newComments = new ArrayList<String>
 				for (String comment : srcInfo.comments) {
 					if (comment.startsWith("//"))
@@ -183,7 +183,7 @@ class VHDLStatementExtension {
 		// Perform instantiation as Component rather than Entity if
 		// VHDLComponent Annotation is present
 		val ArrayList<HDLVariableDeclaration> ports = hIf.ports
-		if (hid != null && hid.getAnnotation(VHDLComponent) != null) {
+		if (hid !== null && hid.getAnnotation(VHDLComponent) !== null) {
 			val HDLAnnotation anno = hid.getAnnotation(VHDLComponent)
 			if ("declare".equals(anno.value)) {
 				val Component c = new Component(asRef.lastSegment.toString)
@@ -262,7 +262,7 @@ class VHDLStatementExtension {
 				if (hvd.direction == HDLDirection::PARAMETER) {
 					for (HDLVariable hvar : hvd.variables) {
 						var HDLVariable sigVar = hvar
-						if (hvar.getMeta(HDLInterfaceInstantiation::ORIG_NAME) != null)
+						if (hvar.getMeta(HDLInterfaceInstantiation::ORIG_NAME) !== null)
 							sigVar = hvar.setName(hvar.getMeta(HDLInterfaceInstantiation::ORIG_NAME))
 
 						val HDLVariableRef ref = hvar.asHDLRef
@@ -282,14 +282,14 @@ class VHDLStatementExtension {
 				val HDLRange range = new HDLRange().setFrom(HDLLiteral::get(0)).setTo(to).setContainer(obj)
 				val ForGenerateStatement newFor = new ForGenerateStatement("generate_" + ifName, i.asIndex,
 					range.toVHDL(Range$Direction::TO))
-				if (forLoop != null)
+				if (forLoop !== null)
 					forLoop.statements.add(newFor)
 				else
 					res.addConcurrentStatement(newFor)
 				forLoop = newFor
 				i = i + 1;
 			}
-			if (forLoop == null)
+			if (forLoop === null)
 				throw new IllegalArgumentException("Should not get here")
 			forLoop.statements.add(instantiation)
 		}
@@ -304,7 +304,7 @@ class VHDLStatementExtension {
 	def static String getArrayRefName(HDLVariable hvar, boolean external) {
 		if (external) {
 			var HDLQualifiedName fullName
-			if (hvar.getMeta(ORIGINAL_FULLNAME) != null)
+			if (hvar.getMeta(ORIGINAL_FULLNAME) !== null)
 				fullName = hvar.getMeta(ORIGINAL_FULLNAME)
 			else
 				fullName = FullNameExtension::fullNameOf(hvar)
@@ -320,14 +320,14 @@ class VHDLStatementExtension {
 		var HDLExpression resetValue = null
 		val HDLAnnotation typeAnno = HDLQuery::select(typeof(HDLAnnotation)).from(obj).where(HDLAnnotation::fName).
 			isEqualTo(VHDLType.toString).first
-		if (typeAnno != null) {
+		if (typeAnno !== null) {
 			val HDLQualifiedName value = new HDLQualifiedName(typeAnno.value)
 			res.addImport(value)
 			type = new EnumerationType(value.lastSegment)
 		} else {
-			if (primitive != null) {
+			if (primitive !== null) {
 				type = VHDLCastsLibrary::getType(primitive)
-				if (obj.register != null) {
+				if (obj.register !== null) {
 					resetValue = obj.register.resetValue
 				}
 			} else {
@@ -340,9 +340,9 @@ class VHDLStatementExtension {
 				}
 			}
 		}
-		if (type != null) {
+		if (type !== null) {
 			for (HDLVariable hvar : obj.variables) {
-				val boolean noExplicitResetVar = hvar.getAnnotation(VHDLNoExplicitReset) != null
+				val boolean noExplicitResetVar = hvar.getAnnotation(VHDLNoExplicitReset) !== null
 				var SubtypeIndication varType = type
 				if (hvar.dimensions.size != 0) {
 					val ranges = new LinkedList<DiscreteRange<?>>
@@ -359,7 +359,7 @@ class VHDLStatementExtension {
 					res.addTypeDeclaration(arrType, external)
 					varType = arrType
 				}
-				if (resetValue != null && !noExplicitResetVar) {
+				if (resetValue !== null && !noExplicitResetVar) {
 					var boolean synchedArray = false
 					if (resetValue instanceof HDLVariableRef) {
 						val HDLVariableRef ref = resetValue as HDLVariableRef
@@ -372,7 +372,7 @@ class VHDLStatementExtension {
 				}
 				val Signal s = new Signal(hvar.name, varType)
 				val Constant constant = new Constant(hvar.name, varType)
-				if (hvar.defaultValue != null)
+				if (hvar.defaultValue !== null)
 					constant.setDefaultValue(hvar.defaultValue.toVHDL)
 				if (noExplicitResetVar) {
 					var Aggregate assign = Aggregate::OTHERS(new CharacterLiteral('0'.charAt(0)))
@@ -438,7 +438,7 @@ class VHDLStatementExtension {
 			for (Map$Entry<HDLSwitchCaseStatement, VHDLContext> e : ctxs.entrySet) {
 				val Alternative alt = createAlternative(cs, e, width)
 				val LinkedList<SequentialStatement> clockCase = e.value.clockedStatements.get(hdlRegisterConfig)
-				if (clockCase != null) {
+				if (clockCase !== null) {
 					alt.statements.addAll(clockCase)
 				}
 			}
@@ -448,7 +448,7 @@ class VHDLStatementExtension {
 			val CaseStatement cs = new CaseStatement(caseExp)
 			for (Map$Entry<HDLSwitchCaseStatement, VHDLContext> e : ctxs.entrySet) {
 				val Alternative alt = createAlternative(cs, e, width)
-				if (e.value.unclockedStatements.get(pid) != null)
+				if (e.value.unclockedStatements.get(pid) !== null)
 					alt.statements.addAll(e.value.unclockedStatements.get(pid))
 			}
 			context.addUnclockedStatement(pid, cs, obj)
@@ -460,7 +460,7 @@ class VHDLStatementExtension {
 		Optional<BigInteger> bits) {
 		var Alternative alt
 		val HDLExpression label = e.key.label
-		if (label != null) {
+		if (label !== null) {
 			val Optional<BigInteger> eval = ConstantEvaluate::valueOf(label, null)
 			if (eval.present) {
 				if (!bits.present)
@@ -500,7 +500,7 @@ class VHDLStatementExtension {
 
 					//XXX Implement correct array assignment for non full assignments
 					val HDLAnnotation typeAnno = hvar.getAnnotation(VHDLType)
-					if (typeAnno != null) {
+					if (typeAnno !== null) {
 						sa = new SignalAssignment(ref.toVHDL as SignalAssignmentTarget,
 							new TypeConversion(new UnresolvedType(typeAnno.value), obj.right.toVHDL))
 					} else {
@@ -515,7 +515,7 @@ class VHDLStatementExtension {
 			} else
 				sa = new SignalAssignment(ref.toVHDL as SignalAssignmentTarget, obj.right.toVHDL)
 			val HDLRegisterConfig config = hvar.registerConfig
-			if (config != null)
+			if (config !== null)
 				context.addClockedStatement(config, sa)
 			else
 				context.addUnclockedStatement(pid, sa, obj)
@@ -540,7 +540,7 @@ class VHDLStatementExtension {
 				fStmnt.statements.addAll(e.value)
 				res.addClockedStatement(e.key, fStmnt)
 			}
-			if (context.unclockedStatements.get(pid) != null) {
+			if (context.unclockedStatements.get(pid) !== null) {
 				val ForStatement fStmnt = new ForStatement(obj.param.name, obj.range.get(0).toVHDL(Range$Direction::TO))
 				fStmnt.statements.addAll(context.unclockedStatements.get(pid))
 				res.addUnclockedStatement(pid, fStmnt, obj)
@@ -566,17 +566,17 @@ class VHDLStatementExtension {
 			val Expression<?> ifExp = obj.ifExp.toVHDL
 			for (HDLRegisterConfig config : configs) {
 				val IfStatement ifs = new IfStatement(ifExp)
-				if (thenCtx.clockedStatements.get(config) != null)
+				if (thenCtx.clockedStatements.get(config) !== null)
 					ifs.statements.addAll(thenCtx.clockedStatements.get(config))
-				if (elseCtx.clockedStatements.get(config) != null)
+				if (elseCtx.clockedStatements.get(config) !== null)
 					ifs.elseStatements.addAll(elseCtx.clockedStatements.get(config))
 				res.addClockedStatement(config, ifs)
 			}
 			if (thenCtx.unclockedStatements.size != 0 || elseCtx.unclockedStatements.size != 0) {
 				val IfStatement ifs = new IfStatement(ifExp)
-				if (thenCtx.unclockedStatements.get(pid) != null)
+				if (thenCtx.unclockedStatements.get(pid) !== null)
 					ifs.statements.addAll(thenCtx.unclockedStatements.get(pid))
-				if (elseCtx.unclockedStatements.get(pid) != null)
+				if (elseCtx.unclockedStatements.get(pid) !== null)
 					ifs.elseStatements.addAll(elseCtx.unclockedStatements.get(pid))
 				res.addUnclockedStatement(pid, ifs, obj)
 			}

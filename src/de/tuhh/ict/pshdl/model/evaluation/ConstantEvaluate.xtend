@@ -123,9 +123,9 @@ class ConstantEvaluate {
 				val HDLType type = obj.castTo
 				if (type instanceof HDLPrimitive) {
 					val HDLPrimitive prim = type  as HDLPrimitive
-					if (prim.width != null) {
+					if (prim.width !== null) {
 						val Optional<BigInteger> width = prim.width.constantEvaluate(context)
-						if (width != null)
+						if (width.present)
 							return Optional::of(eval.get.mod(1bi.shiftLeft(width.get.intValue)))
 						return Optional::absent
 					}
@@ -312,7 +312,7 @@ class ConstantEvaluate {
 			return subEvaluate(obj, hVar.get.defaultValue, context)
 
 		if (dir == PARAMETER) {
-			if (context == null) {
+			if (context === null) {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, CAN_NOT_USE_PARAMETER)
 				return Optional::absent

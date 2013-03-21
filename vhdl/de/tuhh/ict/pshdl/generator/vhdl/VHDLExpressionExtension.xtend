@@ -121,7 +121,7 @@ class VHDLExpressionExtension {
 			if (ref.bits.size > 1)
 				throw new IllegalArgumentException("Multi bit access not supported")
 			val HDLRange r = ref.bits.get(0)
-			if (r.from == null) {
+			if (r.from === null) {
 				result = new ArrayElement<Name<?>>(result, r.to.toVHDL)
 			} else {
 				result = new Slice<Name<?>>(result, r.toVHDL(Range$Direction::DOWNTO))
@@ -183,7 +183,7 @@ class VHDLExpressionExtension {
 				val HDLPrimitive t = TypeExtension::typeOf(obj.target).get as HDLPrimitive
 				var Expression<?> exp = obj.target.toVHDL
 				var HDLPrimitiveType actualType = t.type
-				if (tWidth != null) {
+				if (tWidth !== null) {
 					val TargetType resized = VHDLCastsLibrary::getResize(exp, t, tWidth)
 					exp = resized.resized
 					actualType = resized.newType
@@ -196,14 +196,14 @@ class VHDLExpressionExtension {
 
 	def Range toVHDL(HDLRange obj, Range$Direction dir) {
 		val Expression<?> to = HDLPrimitives::simplifyWidth(obj, obj.to).toVHDL
-		if (obj.from == null)
+		if (obj.from === null)
 			return new Range(to, dir, to)
 		return new Range(HDLPrimitives::simplifyWidth(obj, obj.from).toVHDL, dir, to)
 	}
 
 	def dispatch Literal<?> toVHDL(HDLLiteral obj) {
 		var int length = -1
-		if (obj.valueAsBigInt != null)
+		if (obj.valueAsBigInt !== null)
 			length = obj.valueAsBigInt.bitLength
 		return obj.toVHDL(length, false)
 	}

@@ -44,7 +44,7 @@ class ScopingExtension {
 	public static ScopingExtension INST = new ScopingExtension
 
 	def Optional<HDLVariable> resolveVariableDefault(IHDLObject obj, HDLQualifiedName hVar) {
-		if (obj.container == null) {
+		if (obj.container === null) {
 			return Optional::absent
 		}
 		return obj.container.resolveVariable(hVar)
@@ -55,25 +55,25 @@ class ScopingExtension {
 	}
 
 	def dispatch Optional<HDLFunction> resolveFunction(IHDLObject obj, HDLQualifiedName hVar) {
-		if (obj.container == null)
+		if (obj.container === null)
 			return Optional::absent
 		return obj.container.resolveFunction(hVar)
 	}
 
 	def dispatch Optional<HDLEnum> resolveEnum(IHDLObject obj, HDLQualifiedName hEnum) {
-		if (obj.container == null)
+		if (obj.container === null)
 			return Optional::absent
 		return obj.container.resolveEnum(hEnum)
 	}
 
 	def dispatch Optional<? extends HDLType> resolveType(IHDLObject obj, HDLQualifiedName type) {
-		if (obj.container == null)
+		if (obj.container === null)
 			return Optional::absent
 		return obj.container.resolveType(type)
 	}
 
 	def dispatch Optional<HDLInterface> resolveInterface(IHDLObject obj, HDLQualifiedName hIf) {
-		if (obj.container == null)
+		if (obj.container === null)
 			return Optional::absent
 		return obj.container.resolveInterface(hIf)
 	}
@@ -82,7 +82,7 @@ class ScopingExtension {
 
 	def resolver(IHDLObject statement, boolean descent) {
 		var HDLResolver resolver = statement.getMeta(RESOLVER)
-		if (resolver == null) {
+		if (resolver === null) {
 			resolver = new HDLResolver(statement, descent)
 			statement.addMeta(RESOLVER, resolver)
 		}
@@ -194,25 +194,25 @@ class ScopingExtension {
 	}
 
 	def dispatch Optional<HDLEnum> resolveEnum(HDLAssignment obj, de.tuhh.ict.pshdl.model.utils.HDLQualifiedName hEnum) {
-		if (obj.container == null)
+		if (obj.container === null)
 			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_ENUM, obj, "for hEnum:" + hEnum))
 		return obj.container.resolveEnum(hEnum)
 	}
 
 	def dispatch Optional<HDLInterface> resolveInterface(HDLAssignment obj, HDLQualifiedName hIf) {
-		if (obj.container == null)
+		if (obj.container === null)
 			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_INTERFACE, obj, "for interface:" + hIf))
 		return obj.container.resolveInterface(hIf)
 	}
 
 	def dispatch Optional<? extends HDLType> resolveType(HDLAssignment obj, HDLQualifiedName hVar) {
-		if (obj.container == null)
+		if (obj.container === null)
 			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_TYPE, obj, "for type:" + hVar))
 		return obj.container.resolveType(hVar)
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLAssignment obj, HDLQualifiedName hVar) {
-		if (obj.container == null)
+		if (obj.container === null)
 			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_VARIABLE, obj, "for hVariable:" + hVar))
 		return obj.container.resolveVariable(hVar)
 	}
@@ -275,7 +275,7 @@ class ScopingExtension {
 	//HDLPackage stuff
 	def dispatch Optional<HDLFunction> resolveFunction(HDLPackage obj, HDLQualifiedName hFunc) {
 		var HDLLibrary library = obj.library
-		if (library == null)
+		if (library === null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
 		return library.resolveFunction(HDLObject::asList(obj.pkg + ".*"), hFunc)
 	}
@@ -296,14 +296,14 @@ class ScopingExtension {
 
 	def dispatch Optional<? extends HDLType> resolveType(HDLPackage obj, HDLQualifiedName type) {
 		var HDLLibrary library = obj.library
-		if (obj.library == null)
+		if (obj.library === null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
 		return library.resolve(HDLObject::asList(obj.pkg + ".*"), type)
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLPackage obj, HDLQualifiedName hVar) {
 		var HDLLibrary library = obj.library
-		if (obj.library == null)
+		if (obj.library === null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
 		return library.resolveVariable(HDLObject::asList(obj.pkg + ".*"), hVar)
 	}
@@ -324,7 +324,7 @@ class ScopingExtension {
 		if (resolveEnum.present)
 			return resolveEnum
 		var HDLLibrary library = obj.library
-		if (obj.library == null)
+		if (obj.library === null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
 		val newImports = obj.imports
 		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
@@ -346,7 +346,7 @@ class ScopingExtension {
 		if (resolveType.present)
 			return resolveType
 		var HDLLibrary library = obj.library
-		if (obj.library == null)
+		if (obj.library === null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
 		val newImports = obj.imports
 		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
@@ -358,7 +358,7 @@ class ScopingExtension {
 		if (hdlVariable.present)
 			return hdlVariable
 		var HDLLibrary library = obj.library
-		if (obj.library == null)
+		if (obj.library === null)
 			library = HDLLibrary::getLibrary(obj.getLibURI)
 		val newImports = obj.imports
 		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
@@ -385,7 +385,7 @@ class ScopingExtension {
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLInterface hIf, HDLQualifiedName hVar) {
 		val HDLVariable resolved = getVariable(hIf, hVar.getLastSegment);
-		if (resolved != null) {
+		if (resolved !== null) {
 			if (hVar.length == 1) {
 				return Optional::of(resolved);
 			}

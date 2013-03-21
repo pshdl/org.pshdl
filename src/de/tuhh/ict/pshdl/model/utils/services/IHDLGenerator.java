@@ -48,6 +48,31 @@ public interface IHDLGenerator {
 			this.contents = contents;
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((relPath == null) ? 0 : relPath.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			SideFile other = (SideFile) obj;
+			if (relPath == null) {
+				if (other.relPath != null)
+					return false;
+			} else if (!relPath.equals(other.relPath))
+				return false;
+			return true;
+		}
+
 	}
 
 	/**

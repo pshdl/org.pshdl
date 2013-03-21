@@ -100,7 +100,7 @@ public class RWValidation {
 		}
 	}
 
-	public static void annotateReadCount(HDLObject orig) {
+	public static void annotateReadCount(IHDLObject orig) {
 		HDLReference[] list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
 			if (BuiltInValidator.skipExp(ref)) {
@@ -161,7 +161,7 @@ public class RWValidation {
 
 	public static HDLBlock UNIT_BLOCK = new HDLBlock();
 
-	public static void annotateWriteCount(HDLObject orig) {
+	public static void annotateWriteCount(IHDLObject orig) {
 		HDLAssignment[] list = orig.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment ass : list) {
 			HDLReference left = ass.getLeft();

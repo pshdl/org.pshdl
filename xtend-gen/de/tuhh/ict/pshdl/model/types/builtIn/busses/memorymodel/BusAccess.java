@@ -6,6 +6,8 @@ import java.util.*;
 import org.eclipse.xtend2.lib.*;
 import org.eclipse.xtext.xbase.lib.*;
 
+import com.google.common.base.Objects;
+
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
@@ -143,7 +145,7 @@ public class BusAccess {
 		_builder.newLine();
 		_builder.append("}");
 		_builder.newLine();
-		CharSequence _generatePrint = this.generatePrint(rows);
+		String _generatePrint = this.generatePrint(rows);
 		_builder.append(_generatePrint, "");
 		_builder.newLineIfNotEmpty();
 		return _builder;
@@ -177,7 +179,7 @@ public class BusAccess {
 		_builder.append("void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *msg);");
 		_builder.newLine();
 		_builder.newLine();
-		CharSequence _generatePrintDef = this.generatePrintDef(rows);
+		String _generatePrintDef = this.generatePrintDef(rows);
 		_builder.append(_generatePrintDef, "");
 		_builder.newLineIfNotEmpty();
 		_builder.append("#endif");
@@ -186,9 +188,9 @@ public class BusAccess {
 		return _builder;
 	}
 
-	public CharSequence generatePrintDef(final List<Row> rows) {
+	public String generatePrintDef(final List<Row> rows) {
 		StringConcatenation _builder = new StringConcatenation();
-		CharSequence res = _builder;
+		String res = _builder.toString();
 		HashSet<String> _hashSet = new HashSet<String>();
 		final HashSet<String> checkedRows = _hashSet;
 		for (final Row row : rows) {
@@ -204,7 +206,7 @@ public class BusAccess {
 					_builder_1.append(row.name, "");
 					_builder_1.append("_t *data);");
 					_builder_1.newLineIfNotEmpty();
-					String _plus = (res + _builder_1.toString());
+					String _plus = (res + _builder_1);
 					res = _plus;
 				}
 				checkedRows.add(row.name);
@@ -213,9 +215,9 @@ public class BusAccess {
 		return res;
 	}
 
-	public CharSequence generatePrint(final List<Row> rows) {
+	public String generatePrint(final List<Row> rows) {
 		StringConcatenation _builder = new StringConcatenation();
-		CharSequence res = _builder;
+		String res = _builder.toString();
 		HashSet<String> _hashSet = new HashSet<String>();
 		final HashSet<String> checkedRows = _hashSet;
 		for (final Row row : rows) {
@@ -263,7 +265,7 @@ public class BusAccess {
 					_builder_1.newLineIfNotEmpty();
 					_builder_1.append("}");
 					_builder_1.newLine();
-					String _plus = (res + _builder_1.toString());
+					String _plus = (res + _builder_1);
 					res = _plus;
 				}
 				checkedRows.add(row.name);
@@ -298,7 +300,7 @@ public class BusAccess {
 		_builder.append("#include \"BusStdDefinitions.h\"");
 		_builder.newLine();
 		_builder.newLine();
-		CharSequence _generateDeclarations = this.generateDeclarations(unit, rows);
+		String _generateDeclarations = this.generateDeclarations(unit, rows);
 		_builder.append(_generateDeclarations, "");
 		_builder.newLineIfNotEmpty();
 		_builder.newLine();
@@ -307,9 +309,9 @@ public class BusAccess {
 		return _builder;
 	}
 
-	public CharSequence generateDeclarations(final Unit unit, final List<Row> rows) {
+	public String generateDeclarations(final Unit unit, final List<Row> rows) {
 		StringConcatenation _builder = new StringConcatenation();
-		CharSequence res = _builder;
+		String res = _builder.toString();
 		HashSet<String> _hashSet = new HashSet<String>();
 		final HashSet<String> checkedRows = _hashSet;
 		for (final Row row : rows) {
@@ -354,7 +356,7 @@ public class BusAccess {
 					_builder_1.append(row.name, "");
 					_builder_1.append("_t;");
 					_builder_1.newLineIfNotEmpty();
-					String _plus = (res + _builder_1.toString());
+					String _plus = (res + _builder_1);
 					res = _plus;
 					boolean _hasWriteDefs = this.hasWriteDefs(row);
 					if (_hasWriteDefs) {
@@ -368,7 +370,7 @@ public class BusAccess {
 						{
 							List<Definition> _writeDefs = this.writeDefs(row);
 							for (final Definition definition : _writeDefs) {
-								CharSequence _parameter = this.getParameter(row, definition, false);
+								String _parameter = this.getParameter(row, definition, false);
 								_builder_2.append(_parameter, "");
 							}
 						}
@@ -381,7 +383,7 @@ public class BusAccess {
 						_builder_2.append(row.name, "");
 						_builder_2.append("_t *newVal);");
 						_builder_2.newLineIfNotEmpty();
-						String _plus_1 = (res + _builder_2.toString());
+						String _plus_1 = (res + _builder_2);
 						res = _plus_1;
 					}
 					StringConcatenation _builder_3 = new StringConcatenation();
@@ -394,7 +396,7 @@ public class BusAccess {
 					{
 						List<Definition> _allDefs_1 = this.allDefs(row);
 						for (final Definition definition_1 : _allDefs_1) {
-							CharSequence _parameter_1 = this.getParameter(row, definition_1, true);
+							String _parameter_1 = this.getParameter(row, definition_1, true);
 							_builder_3.append(_parameter_1, "");
 						}
 					}
@@ -407,7 +409,7 @@ public class BusAccess {
 					_builder_3.append(row.name, "");
 					_builder_3.append("_t *result);");
 					_builder_3.newLineIfNotEmpty();
-					String _plus_2 = (res + _builder_3.toString());
+					String _plus_2 = (res + _builder_3);
 					res = _plus_2;
 					checkedRows.add(row.name);
 				}
@@ -442,7 +444,7 @@ public class BusAccess {
 					_builder_1.append(col.name, "");
 					_builder_1.append("_t;");
 					_builder_1.newLineIfNotEmpty();
-					String _plus = (res + _builder_1.toString());
+					String _plus = (res + _builder_1);
 					res = _plus;
 				}
 			}
@@ -534,7 +536,7 @@ public class BusAccess {
 		{
 			List<Definition> _allDefs = this.allDefs(row);
 			for (final Definition definition : _allDefs) {
-				CharSequence _parameter = this.getParameter(row, definition, true);
+				String _parameter = this.getParameter(row, definition, true);
 				_builder.append(_parameter, "");
 			}
 		}
@@ -544,7 +546,7 @@ public class BusAccess {
 		_builder.append("uint32_t val=0;");
 		_builder.newLine();
 		_builder.append("\t");
-		CharSequence _generateAddressReadSwitch = this.generateAddressReadSwitch(row, rows);
+		String _generateAddressReadSwitch = this.generateAddressReadSwitch(row, rows);
 		_builder.append(_generateAddressReadSwitch, "	");
 		_builder.newLineIfNotEmpty();
 		{
@@ -638,7 +640,7 @@ public class BusAccess {
 		{
 			List<Definition> _writeDefs = this.writeDefs(row);
 			for (final Definition d : _writeDefs) {
-				CharSequence _parameter = this.getParameter(row, d, false);
+				String _parameter = this.getParameter(row, d, false);
 				_builder.append(_parameter, "");
 			}
 		}
@@ -658,14 +660,14 @@ public class BusAccess {
 		{
 			List<Definition> _writeDefs_2 = this.writeDefs(row);
 			for (final Definition d_1 : _writeDefs_2) {
-				CharSequence _shifted = this.shifted(d_1, row);
+				String _shifted = this.shifted(d_1, row);
 				_builder.append(_shifted, "	");
 			}
 		}
 		_builder.append(" 0;");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t");
-		CharSequence _generateAddressSwitch = this.generateAddressSwitch(row, rows);
+		String _generateAddressSwitch = this.generateAddressSwitch(row, rows);
 		_builder.append(_generateAddressSwitch, "	");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t");
@@ -705,7 +707,7 @@ public class BusAccess {
 		return _builder;
 	}
 
-	public CharSequence shifted(final Definition d, final Row row) {
+	public String shifted(final Definition d, final Row row) {
 		StringConcatenation _builder = new StringConcatenation();
 		_builder.append(" ");
 		_builder.append("(");
@@ -715,14 +717,14 @@ public class BusAccess {
 		int _shiftVal = this.shiftVal(d);
 		_builder.append(_shiftVal, " ");
 		_builder.append(") |");
-		return _builder;
+		return _builder.toString();
 	}
 
 	public List<Definition> allDefs(final Row row) {
 		LinkedList<Definition> _linkedList = new LinkedList<Definition>();
 		final List<Definition> res = _linkedList;
 		for (final NamedElement ne : row.definitions) {
-			boolean _notEquals = ObjectExtensions.operator_notEquals(((Definition) ne).type, Type.UNUSED);
+			boolean _notEquals = (!Objects.equal(((Definition) ne).type, Type.UNUSED));
 			if (_notEquals) {
 				res.add(((Definition) ne));
 			}
@@ -742,13 +744,13 @@ public class BusAccess {
 		return res;
 	}
 
-	public CharSequence generateAddressReadSwitch(final Row row, final List<Row> rows) {
+	public String generateAddressReadSwitch(final Row row, final List<Row> rows) {
 		int idx = 0;
 		int rIdx = 0;
 		StringConcatenation _builder = new StringConcatenation();
 		_builder.append("switch (index) {");
 		_builder.newLine();
-		CharSequence res = _builder;
+		String res = _builder.toString();
 		for (final Row r : rows) {
 			{
 				boolean _equals = r.name.equals(row.name);
@@ -760,7 +762,7 @@ public class BusAccess {
 					_builder_1.append(idx, "");
 					_builder_1.append("]; break;");
 					_builder_1.newLineIfNotEmpty();
-					String _plus = (res + _builder_1.toString());
+					String _plus = (res + _builder_1);
 					res = _plus;
 					int _plus_1 = (rIdx + 1);
 					rIdx = _plus_1;
@@ -782,18 +784,18 @@ public class BusAccess {
 		_builder_1.newLine();
 		_builder_1.append("}");
 		_builder_1.newLine();
-		String _plus = (res + _builder_1.toString());
+		String _plus = (res + _builder_1);
 		res = _plus;
 		return res;
 	}
 
-	public CharSequence generateAddressSwitch(final Row row, final List<Row> rows) {
+	public String generateAddressSwitch(final Row row, final List<Row> rows) {
 		int idx = 0;
 		int rIdx = 0;
 		StringConcatenation _builder = new StringConcatenation();
 		_builder.append("switch (index) {");
 		_builder.newLine();
-		CharSequence res = _builder;
+		String res = _builder.toString();
 		for (final Row r : rows) {
 			{
 				boolean _equals = r.name.equals(row.name);
@@ -805,7 +807,7 @@ public class BusAccess {
 					_builder_1.append(idx, "");
 					_builder_1.append("]=newVal; return 1;");
 					_builder_1.newLineIfNotEmpty();
-					String _plus = (res + _builder_1.toString());
+					String _plus = (res + _builder_1);
 					res = _plus;
 					int _plus_1 = (rIdx + 1);
 					rIdx = _plus_1;
@@ -817,7 +819,7 @@ public class BusAccess {
 		StringConcatenation _builder_1 = new StringConcatenation();
 		_builder_1.append("}");
 		_builder_1.newLine();
-		String _plus = (res + _builder_1.toString());
+		String _plus = (res + _builder_1);
 		res = _plus;
 		return res;
 	}
@@ -825,7 +827,7 @@ public class BusAccess {
 	public CharSequence generateConditions(final Row row, final Definition d) {
 		StringConcatenation _builder = new StringConcatenation();
 		{
-			boolean _equals = ObjectExtensions.operator_equals(d.warn, WarnType.silentLimit);
+			boolean _equals = Objects.equal(d.warn, WarnType.silentLimit);
 			if (_equals) {
 				_builder.append("if (");
 				String _varName = this.getVarName(row, d);
@@ -846,7 +848,7 @@ public class BusAccess {
 				_builder.append("}");
 				_builder.newLine();
 				{
-					boolean _equals_1 = ObjectExtensions.operator_equals(d.type, Type.INT);
+					boolean _equals_1 = Objects.equal(d.type, Type.INT);
 					if (_equals_1) {
 						_builder.append("if (");
 						String _varName_2 = this.getVarName(row, d);
@@ -869,7 +871,7 @@ public class BusAccess {
 					}
 				}
 			} else {
-				boolean _equals_2 = ObjectExtensions.operator_equals(d.warn, WarnType.limit);
+				boolean _equals_2 = Objects.equal(d.warn, WarnType.limit);
 				if (_equals_2) {
 					_builder.append("if (");
 					String _varName_4 = this.getVarName(row, d);
@@ -904,7 +906,7 @@ public class BusAccess {
 					_builder.append("}");
 					_builder.newLine();
 					{
-						boolean _equals_3 = ObjectExtensions.operator_equals(d.type, Type.INT);
+						boolean _equals_3 = Objects.equal(d.type, Type.INT);
 						if (_equals_3) {
 							_builder.append("if (");
 							String _varName_7 = this.getVarName(row, d);
@@ -941,7 +943,7 @@ public class BusAccess {
 						}
 					}
 				} else {
-					boolean _equals_4 = ObjectExtensions.operator_equals(d.warn, WarnType.silentMask);
+					boolean _equals_4 = Objects.equal(d.warn, WarnType.silentMask);
 					if (_equals_4) {
 						_builder.append("if (");
 						String _varName_10 = this.getVarName(row, d);
@@ -962,7 +964,7 @@ public class BusAccess {
 						_builder.append("}");
 						_builder.newLine();
 						{
-							boolean _equals_5 = ObjectExtensions.operator_equals(d.type, Type.INT);
+							boolean _equals_5 = Objects.equal(d.type, Type.INT);
 							if (_equals_5) {
 								_builder.append("if (");
 								String _varName_12 = this.getVarName(row, d);
@@ -985,7 +987,7 @@ public class BusAccess {
 							}
 						}
 					} else {
-						boolean _equals_6 = ObjectExtensions.operator_equals(d.warn, WarnType.mask);
+						boolean _equals_6 = Objects.equal(d.warn, WarnType.mask);
 						if (_equals_6) {
 							_builder.append("if (");
 							String _varName_14 = this.getVarName(row, d);
@@ -1020,7 +1022,7 @@ public class BusAccess {
 							_builder.append("}");
 							_builder.newLine();
 							{
-								boolean _equals_7 = ObjectExtensions.operator_equals(d.type, Type.INT);
+								boolean _equals_7 = Objects.equal(d.type, Type.INT);
 								if (_equals_7) {
 									_builder.append("if (");
 									String _varName_17 = this.getVarName(row, d);
@@ -1057,7 +1059,7 @@ public class BusAccess {
 								}
 							}
 						} else {
-							boolean _equals_8 = ObjectExtensions.operator_equals(d.warn, WarnType.silentError);
+							boolean _equals_8 = Objects.equal(d.warn, WarnType.silentError);
 							if (_equals_8) {
 								_builder.append("if (");
 								String _varName_20 = this.getVarName(row, d);
@@ -1073,7 +1075,7 @@ public class BusAccess {
 								_builder.append("}");
 								_builder.newLine();
 								{
-									boolean _equals_9 = ObjectExtensions.operator_equals(d.type, Type.INT);
+									boolean _equals_9 = Objects.equal(d.type, Type.INT);
 									if (_equals_9) {
 										_builder.append("if (");
 										String _varName_21 = this.getVarName(row, d);
@@ -1091,7 +1093,7 @@ public class BusAccess {
 									}
 								}
 							} else {
-								boolean _equals_10 = ObjectExtensions.operator_equals(d.warn, WarnType.error);
+								boolean _equals_10 = Objects.equal(d.warn, WarnType.error);
 								if (_equals_10) {
 									_builder.append("if (");
 									String _varName_22 = this.getVarName(row, d);
@@ -1118,7 +1120,7 @@ public class BusAccess {
 									_builder.append("}");
 									_builder.newLine();
 									{
-										boolean _equals_11 = ObjectExtensions.operator_equals(d.type, Type.INT);
+										boolean _equals_11 = Objects.equal(d.type, Type.INT);
 										if (_equals_11) {
 											_builder.append("if (");
 											String _varName_24 = this.getVarName(row, d);
@@ -1167,11 +1169,11 @@ public class BusAccess {
 
 	public boolean hasWrite(final NamedElement ne) {
 		boolean _and = false;
-		boolean _notEquals = ObjectExtensions.operator_notEquals(((Definition) ne).rw, RWType.r);
+		boolean _notEquals = (!Objects.equal(((Definition) ne).rw, RWType.r));
 		if (!_notEquals) {
 			_and = false;
 		} else {
-			boolean _notEquals_1 = ObjectExtensions.operator_notEquals(((Definition) ne).type, Type.UNUSED);
+			boolean _notEquals_1 = (!Objects.equal(((Definition) ne).type, Type.UNUSED));
 			_and = (_notEquals && _notEquals_1);
 		}
 		return _and;
@@ -1194,7 +1196,7 @@ public class BusAccess {
 	}
 
 	public int getMaxValue(final Definition d) {
-		boolean _notEquals = ObjectExtensions.operator_notEquals(d.type, Type.INT);
+		boolean _notEquals = (!Objects.equal(d.type, Type.INT));
 		if (_notEquals) {
 			int _size = MemoryModel.getSize(d);
 			int _doubleLessThan = (1 << _size);
@@ -1207,7 +1209,7 @@ public class BusAccess {
 		}
 	}
 
-	public CharSequence getParameter(final Row row, final Definition d, final boolean pointer) {
+	public String getParameter(final Row row, final Definition d, final boolean pointer) {
 		StringConcatenation _builder = new StringConcatenation();
 		_builder.append(", ");
 		CharSequence _busType = this.getBusType(d);
@@ -1220,7 +1222,7 @@ public class BusAccess {
 		}
 		String _varName = this.getVarName(row, d);
 		_builder.append(_varName, "");
-		return _builder;
+		return _builder.toString();
 	}
 
 	public String getVarName(final Row row, final Definition d) {
