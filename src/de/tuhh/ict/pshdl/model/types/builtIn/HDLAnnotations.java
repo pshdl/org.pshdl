@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.utils.services.*;
+import de.tuhh.ict.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
 import de.tuhh.ict.pshdl.model.validation.*;
 import de.tuhh.ict.pshdl.model.validation.builtin.*;
 
@@ -14,7 +15,10 @@ public class HDLAnnotations {
 		annotations = new HashMap<String, IHDLAnnotation>();
 		for (IHDLAnnotation anno : sp.getAllAnnotations()) {
 			annotations.put(anno.name(), anno);
-			info.registeredAnnotations.put(anno.name(), anno.getAnnotationInformation());
+			AnnotationInformation annoInfo = anno.getAnnotationInformation();
+			if (annoInfo == null)
+				throw new IllegalArgumentException(anno.name() + " does not provide annotation info!");
+			info.registeredAnnotations.put(anno.name(), annoInfo);
 		}
 	}
 

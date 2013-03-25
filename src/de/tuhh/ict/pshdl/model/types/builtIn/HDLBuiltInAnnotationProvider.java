@@ -69,6 +69,7 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		@Override
 		public String validate(String value) {
 			switch (this) {
+			case autoInterface:
 			case genSignal:
 			case VHDLLatchable:
 			case VHDLNoExplicitReset:
@@ -109,6 +110,9 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		@Override
 		public AnnotationInformation getAnnotationInformation() {
 			switch (this) {
+			case autoInterface:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
+						"Units that have this Annotation will get an interface declaration atop it's declaration", null);
 			case VHDLLatchable:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
 						"This annotation causes the default initialization to 0 to be omitted. This MAY cause a latch to be created.", null);
@@ -136,10 +140,8 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case VHDLComponent:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
 						"Designates an interface that should be instantiated as component rather than as entity", null);
-			default:
-				break;
 			}
-			return null;
+			throw new IllegalArgumentException("Forgot to implement AnnotationInformation for:" + this);
 		}
 	}
 

@@ -71,6 +71,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkType(pkg, problems, hContext);
 			checkProessWrite(pkg, problems, hContext);
 			checkGenerators(pkg, problems, hContext);
+			checkConstantPackageDeclarations(pkg, problems, hContext);
 			checkLiteralConcat(pkg, problems);
 			// TODO Validate bitWidth mismatch
 			checkAssignments(pkg, problems, hContext);
@@ -90,8 +91,6 @@ public class BuiltInValidator implements IHDLValidator {
 			// TODO Check for bit access on left assignment side when right is
 			// matching
 			// TODO no Registers in Testbench/Global gen
-			// TODO check for register of constant/parameter
-			// TODO check for register of global constants
 			checkRegisters(pkg, problems, hContext);
 
 		} catch (Exception e) {
@@ -99,6 +98,28 @@ public class BuiltInValidator implements IHDLValidator {
 			return false;
 		}
 		return true;
+	}
+
+	private void checkConstantPackageDeclarations(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
+		for (HDLVariableDeclaration hvd : hvds) {
+			if (hvd.getRegister() != null) {
+				problems.add(new Problem(ErrorCode.GLOBAL_CANT_REGISTER, hvd));
+			}
+			if (hvd.getDirection() != HDLDirection.CONSTANT) {
+				problems.add(new Problem(ErrorCode.GLOBAL_NOT_CONSTANT, hvd));
+			}
+			for (HDLVariable var : hvd.getVariables()) {
+				if (var.getDefaultValue() == null) {
+					problems.add(new Problem(ErrorCode.GLOBAL_NOT_CONSTANT, var));
+				} else {
+					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(var.getDefaultValue());
+					if (!valueOf.isPresent()) {
+						problems.add(new Problem(ErrorCode.GLOBAL_NOT_CONSTANT, var));
+					}
+				}
+			}
+		}
 	}
 
 	private void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
@@ -114,9 +135,6 @@ public class BuiltInValidator implements IHDLValidator {
 					problems.add(new Problem(ErrorCode.IN_PORT_CANT_REGISTER, hvd));
 					break;
 				default:
-				}
-				if (hvd.getContainer().getClassType() == HDLClass.HDLPackage) {
-					problems.add(new Problem(ErrorCode.GLOBAL_CANT_REGISTER, hvd));
 				}
 			}
 	}
@@ -620,6 +638,18 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkArrayBoundaries(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		for (HDLVariable var : vars) {
+			HDLDirection dir = var.getDirection();
+			if ((dir != null) && dir.isIO()) {
+				for (HDLExpression dim : var.getDimensions()) {
+					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(dim);
+					if (!valueOf.isPresent()) {
+						problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, dim));
+					}
+				}
+			}
+		}
 		HDLVariableRef[] refs = unit.getAllObjectsOf(HDLVariableRef.class, true);
 		for (HDLVariableRef ref : refs) {
 			if (skipExp(ref)) {
@@ -671,6 +701,7 @@ public class BuiltInValidator implements IHDLValidator {
 					HDLVariableRef varRef = (HDLVariableRef) left;
 					Optional<HDLVariable> var = varRef.resolveVar();
 					if (var.isPresent()) {
+						HDLEvaluationContext context = getContext(hContext, ass);
 						ArrayList<HDLExpression> targetDim = var.get().getDimensions();
 						for (int i = 0; i < varRef.getArray().size(); i++) {
 							if (targetDim.size() == 0) {
@@ -680,7 +711,7 @@ public class BuiltInValidator implements IHDLValidator {
 							targetDim.remove(0);
 						}
 						if (left != ref) {
-							validateArrayAssignment(problems, hContext, ref, ass, left, targetDim);
+							validateArrayAssignment(problems, context, ref, ass, left, targetDim);
 						} else if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
 							problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
 						}
@@ -688,7 +719,8 @@ public class BuiltInValidator implements IHDLValidator {
 				}
 			} else if (container instanceof HDLVariable) {
 				HDLVariable var = (HDLVariable) container;
-				validateArrayAssignment(problems, hContext, ref, var, var, var.getDimensions());
+				HDLEvaluationContext context = getContext(hContext, var);
+				validateArrayAssignment(problems, context, ref, var, var, var.getDimensions());
 			} else {
 				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION, ref));
 			}
@@ -726,7 +758,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private static void validateArrayAssignment(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, IHDLObject ass, IHDLObject left,
+	private static void validateArrayAssignment(Set<Problem> problems, HDLEvaluationContext context, HDLVariableRef ref, IHDLObject ass, IHDLObject left,
 			ArrayList<HDLExpression> targetDim) {
 		Optional<HDLVariable> right = ref.resolveVar();
 		if (!right.isPresent())
@@ -742,7 +774,10 @@ public class BuiltInValidator implements IHDLValidator {
 		if (targetDim.size() != sourceDim.size()) {
 			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ass));
 		} else {
-			HDLEvaluationContext context = getContext(hContext, ass);
+			HDLDirection direction = right.get().getDirection();
+			if ((direction != null) && direction.isIO()) {
+				context = null;
+			}
 			for (int i = 0; i < targetDim.size(); i++) {
 				HDLExpression source = sourceDim.get(i);
 				Optional<BigInteger> s = ConstantEvaluate.valueOf(source, context);

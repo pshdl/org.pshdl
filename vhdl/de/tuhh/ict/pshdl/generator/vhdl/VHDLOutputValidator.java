@@ -57,11 +57,11 @@ public class VHDLOutputValidator implements IHDLValidator {
 			VHDLErrorCode vCode = (VHDLErrorCode) code;
 			switch (vCode) {
 			case KEYWORD_NAME:
-				return new HDLAdvise(problem, "The used name is a keyword in VHDL",
-						"Keywords will be escaped using the extended identifier convention, this may look strange, but is fully working", "Don't use a VHDL keyword as identifier");
+				return new HDLAdvise(problem, "The used name is a keyword or an extended identifier in VHDL",
+						"Keywords will be escaped using the extended identifier convention, this may look strange, but is fully working",
+						"Don't use a VHDL keyword or don't end with an underscore as identifier");
 			case KEYWORD_TYPE:
-				return new HDLAdvise(problem, "The used type name is a keyword in VHDL",
-						"Keywords will be escaped using the extended identifier convention, this may look strange, but is fully working", "Don't use a VHDL keyword as identifier");
+				return new HDLAdvise(problem, "The used type name is a keyword in VHDL", "Keywords are not supported for type names", "Don't use a VHDL keyword as identifier");
 
 			}
 		}

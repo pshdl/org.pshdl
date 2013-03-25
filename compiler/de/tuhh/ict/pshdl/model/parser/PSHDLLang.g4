@@ -311,10 +311,12 @@ RULE_PS_LITERAL_TERMINAL :
 ;
 
 fragment
-IDCHAR : 'a' .. 'z' | 'A' .. 'Z' | '_';
+    IDCHARFIRST : 'a' .. 'z' | 'A' .. 'Z';
+fragment
+    IDCHAR : IDCHARFIRST | '_' | '0' .. '9';
 
 RULE_ID :
-	IDCHAR ( IDCHAR | '0' .. '9' )*
+	IDCHARFIRST IDCHAR*
 ;
 
 fragment

@@ -115,7 +115,7 @@ public class HDLLibrary {
 			HDLQualifiedName uq = fullNameOf(unit);
 			objects.put(src, new Record(src, Record.RecordType.unit, uq));
 			units.put(uq, unit);
-			types.put(uq, unit.asInterface());
+			addInterface(unit.asInterface(), uq.toString());
 			HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
 			for (HDLInterface hdlInterface : list) {
 				addInterface(hdlInterface, src);
@@ -220,6 +220,7 @@ public class HDLLibrary {
 				break;
 			case unit:
 				units.remove(record.ref);
+				types.remove(record.ref);
 				break;
 			case variable:
 				variables.remove(record.ref);

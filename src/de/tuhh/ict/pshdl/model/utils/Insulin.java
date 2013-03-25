@@ -531,6 +531,10 @@ public class Insulin {
 	}
 
 	private static void insertFirstStatement(ModificationSet ms, IHDLObject container, HDLStatement stmnt) {
+		if (container == null)
+			// This can happen if the container is HDLPackage for example for
+			// global constants
+			return;
 		if ((container.getClassType() != HDLClass.HDLUnit) && (container.getClassType() != HDLClass.HDLBlock)) {
 			insertFirstStatement(ms, container.getContainer(), stmnt);
 			return;

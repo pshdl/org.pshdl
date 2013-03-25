@@ -247,6 +247,10 @@ public class VHDLImporter {
 			return new HDLLiteral().setVal("false");
 		if (Standard.BOOLEAN_TRUE.equals(from))
 			return new HDLLiteral().setVal("true");
+		if (from instanceof Parentheses) {
+			Parentheses p = (Parentheses) from;
+			return getExpression(p.getExpression(), canBeString);
+		}
 		throw new IllegalArgumentException("Expression not yet supported:" + from);
 	}
 

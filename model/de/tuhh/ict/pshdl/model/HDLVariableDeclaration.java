@@ -86,6 +86,21 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		public String toString() {
 			return str;
 		}
+
+		public boolean isIO() {
+			switch (this) {
+			case CONSTANT:
+			case HIDDEN:
+			case INTERNAL:
+				return false;
+			case IN:
+			case INOUT:
+			case OUT:
+			case PARAMETER:
+				return true;
+			}
+			return false;
+		}
 	}
 
 	/**

@@ -32,7 +32,25 @@ import de.upb.hni.vmagic.output.*;
  * @author Karsten Becker
  * 
  */
-public class PSHDLCompiler {
+public class PStoVHDLCompiler {
+
+	/**
+	 * Do not report any progress and proceed whenever possible
+	 * 
+	 * @author Karsten Becker
+	 * 
+	 */
+	public static final class NullListener implements ICompilationListener {
+		@Override
+		public boolean startVHDL(String src, HDLPackage parse) {
+			return true;
+		}
+
+		@Override
+		public boolean continueWith(String src, HDLPackage parse, Set<Problem> validate) {
+			return true;
+		}
+	}
 
 	public interface ICompilationListener {
 
@@ -70,7 +88,7 @@ public class PSHDLCompiler {
 	private String libURI;
 	private Map<String, HDLPackage> parsedContent = Maps.newLinkedHashMap();
 
-	private PSHDLCompiler(String libURI) {
+	private PStoVHDLCompiler(String libURI) {
 		lib = new HDLLibrary();
 		this.libURI = libURI;
 		HDLLibrary.registerLibrary(libURI, lib);
@@ -82,12 +100,12 @@ public class PSHDLCompiler {
 	 * 
 	 * @param libURI
 	 *            a unique libURI for registering the {@link HDLLibrary}
-	 * @return the {@link PSHDLCompiler}
+	 * @return the {@link PStoVHDLCompiler}
 	 */
-	public static PSHDLCompiler setup(String libURI) {
+	public static PStoVHDLCompiler setup(String libURI) {
 		if (!HDLCore.isInitialized())
 			throw new RuntimeException("The HDLCore needs to be initialized first!");
-		return new PSHDLCompiler(libURI);
+		return new PStoVHDLCompiler(libURI);
 	}
 
 	/**
@@ -100,24 +118,25 @@ public class PSHDLCompiler {
 		/**
 		 * Problems that occurred during validation
 		 */
-		public Set<Problem> syntaxProblems;
+		public final Set<Problem> syntaxProblems;
 		/**
-		 * The generated VHDL code if the compilation was successful
+		 * The generated VHDL code if the compilation was successful,
+		 * <code>null</code> otherwise
 		 */
-		public String vhdlCode;
+		public final String vhdlCode;
 		/**
 		 * The name of the first entity encountered for display purposes. Will
 		 * be &lt;ERROR&gt; if not successful
 		 */
-		public String entityName;
+		public final String entityName;
 		/**
 		 * All additional files that have been generated
 		 */
-		public Set<SideFile> sideFiles;
+		public final Set<SideFile> sideFiles;
 		/**
 		 * The src for which this code was generated
 		 */
-		public String src;
+		public final String src;
 
 		public CompileResult(Set<Problem> syntaxProblems, String vhdlCode, String entityName, Collection<SideFile> sideFiles, String src) {
 			super();
@@ -132,6 +151,10 @@ public class PSHDLCompiler {
 			}
 		}
 
+		public boolean hasError() {
+			return vhdlCode == null;
+		}
+
 	}
 
 	/**
@@ -141,12 +164,15 @@ public class PSHDLCompiler {
 	 * 
 	 * @param listener
 	 *            a call back interface for reporting progress on the
-	 *            compilation
+	 *            compilation. If <code>null</code> {@link NullListener} will be
+	 *            used.
 	 * @return a list of {@link CompileResult}s. If a file contained an error,
 	 *         the field VHDLCode will be <code>null</code>
-	 * @throws IOException
 	 */
-	public List<CompileResult> compileToVHDL(ICompilationListener listener) throws IOException {
+	public List<CompileResult> compileToVHDL(ICompilationListener listener) {
+		if (listener == null) {
+			listener = new NullListener();
+		}
 		List<CompileResult> res = Lists.newArrayListWithCapacity(parsedContent.size());
 		Set<Problem> syntaxProblems = new HashSet<Problem>();
 		for (Entry<String, HDLPackage> e : parsedContent.entrySet()) {
@@ -174,6 +200,7 @@ public class PSHDLCompiler {
 					name = units[0].getName();
 				}
 				res.add(new CompileResult(syntaxProblems, vhdlCode, name, lib.sideFiles.values(), src));
+				lib.sideFiles.clear();
 			}
 		}
 		return res;
@@ -193,7 +220,7 @@ public class PSHDLCompiler {
 		}
 		Stopwatch sw = new Stopwatch().start();
 		HDLCore.defaultInit();
-		PSHDLCompiler compiler = setup("CMDLINE");
+		PStoVHDLCompiler compiler = setup("CMDLINE");
 		CompilerInformation information = HDLCore.getCompilerInformation();
 		System.out.println("PSHDLCompiler.main()" + information);
 		System.out.println("Init: " + sw);
@@ -241,32 +268,38 @@ public class PSHDLCompiler {
 		});
 		for (CompileResult result : results) {
 			if (result.vhdlCode != null) {
-				String newName = new File(result.src).getName();
-				newName = newName.substring(0, newName.length() - 5) + "vhd";
-				FileOutputStream fos = new FileOutputStream(new File(outDir, newName));
-				fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
-				fos.close();
-				if (result.sideFiles != null) {
-					for (SideFile sd : result.sideFiles) {
-						File file = new File(outDir + "/" + sd.relPath);
-						File parentFile = file.getParentFile();
-						if ((parentFile != null) && !parentFile.exists()) {
-							parentFile.mkdirs();
-						}
-						fos = new FileOutputStream(file);
-						if (sd.contents == SideFile.THIS) {
-							fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
-						} else {
-							fos.write(sd.contents);
-						}
-						fos.close();
-					}
-				}
+				writeFiles(outDir, result);
 			} else {
 				System.out.println("Failed to generate code for:" + result.src);
 			}
 		}
 		System.out.println("Done! Total time:" + sw);
+	}
+
+	public static void writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
+		if (result.hasError())
+			return;
+		String newName = new File(result.src).getName();
+		newName = newName.substring(0, newName.length() - 5) + "vhd";
+		FileOutputStream fos = new FileOutputStream(new File(outDir, newName));
+		fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
+		fos.close();
+		if (result.sideFiles != null) {
+			for (SideFile sd : result.sideFiles) {
+				File file = new File(outDir + "/" + sd.relPath);
+				File parentFile = file.getParentFile();
+				if ((parentFile != null) && !parentFile.exists()) {
+					parentFile.mkdirs();
+				}
+				fos = new FileOutputStream(file);
+				if (sd.contents == SideFile.THIS) {
+					fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
+				} else {
+					fos.write(sd.contents);
+				}
+				fos.close();
+			}
+		}
 	}
 
 	/**
@@ -331,6 +364,7 @@ public class PSHDLCompiler {
 	 */
 	public void remove(String src) {
 		lib.removeAllSrc(src);
+		parsedContent.remove(src);
 	}
 
 	/**

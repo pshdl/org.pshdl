@@ -21,7 +21,7 @@ public class RWValidation {
 		annotateWriteCount(unit);
 		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
-			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || BuiltInValidator.skipExp(hdlVariable)) {
+			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || isGlobal(hdlVariable) || BuiltInValidator.skipExp(hdlVariable)) {
 				continue;
 			}
 			Integer readCount = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
@@ -77,7 +77,8 @@ public class RWValidation {
 				for (HDLVariable hdlVariable : variables) {
 					boolean written = writeList.contains(hdlVariable.getName());
 					boolean read = readList.contains(hdlVariable.getName());
-					if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null)) {
+					if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || isGlobal(hdlVariable)
+							|| (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null)) {
 						continue;
 					}
 					HDLDirection dir = hdlVariable.getDirection();
@@ -100,6 +101,16 @@ public class RWValidation {
 		}
 	}
 
+	public static boolean isGlobal(HDLVariable hdlVariable) {
+		IHDLObject container = hdlVariable.getContainer();
+		if (container == null)
+			return false;
+		IHDLObject superContainer = container.getContainer();
+		if (superContainer instanceof HDLPackage)
+			return true;
+		return false;
+	}
+
 	public static void annotateReadCount(IHDLObject orig) {
 		HDLReference[] list = orig.getAllObjectsOf(HDLReference.class, true);
 		for (HDLReference ref : list) {
@@ -118,17 +129,22 @@ public class RWValidation {
 			if (ref instanceof HDLUnresolvedFragment)
 				return;
 			Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
-			if (var.isPresent())
+			if (var.isPresent()) {
+				HDLVariable rVar = var.get();
+				if (isGlobal(rVar)) {
+					continue;
+				}
 				if (ref instanceof HDLInterfaceRef) {
 					HDLInterfaceRef hir = (HDLInterfaceRef) ref;
 					Optional<HDLVariable> hVar = hir.resolveHIf();
 					if (hVar.isPresent()) {
 						incMeta(hVar.get(), IntegerMeta.ACCESS);
-						addStringMeta(var.get().getName(), hVar.get(), Init.read);
+						addStringMeta(rVar.getName(), hVar.get(), Init.read);
 					}
 				} else {
-					incMeta(var.get(), IntegerMeta.READ_COUNT);
+					incMeta(rVar, IntegerMeta.READ_COUNT);
 				}
+			}
 		}
 	}
 
