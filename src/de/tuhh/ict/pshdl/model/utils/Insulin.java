@@ -1,3 +1,29 @@
+/*******************************************************************************
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ *     
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for 
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ ******************************************************************************/
 package de.tuhh.ict.pshdl.model.utils;
 
 import static de.tuhh.ict.pshdl.model.extensions.FullNameExtension.*;
@@ -239,26 +265,34 @@ public class Insulin {
 		return ms.apply(pkg);
 	}
 
+	/**
+	 * Finds cases where a either a ARITH_NEG contains another ARITH_NEG, or
+	 * where an ARITH_NEG contains a negative literal
+	 * 
+	 * @param pkg
+	 *            the IHDLObject to transform
+	 * @return the new object without the double negate
+	 */
 	public static <T extends IHDLObject> T fixDoubleNegate(T pkg) {
 		ModificationSet ms = new ModificationSet();
-		HDLManip[] manips = pkg.getAllObjectsOf(HDLManip.class, true);
-		for (HDLManip manip : manips)
-			if (manip.getType() == HDLManipType.ARITH_NEG) {
-				HDLExpression target = manip.getTarget();
-				if (target instanceof HDLManip) {
-					HDLManip innerManip = (HDLManip) target;
-					if (innerManip.getType() == HDLManipType.ARITH_NEG) {
-						ms.replace(manip, innerManip.getTarget());
-					}
-				}
-				if (target instanceof HDLLiteral) {
-					HDLLiteral lit = (HDLLiteral) target;
-					BigInteger valueAsBigInt = lit.getValueAsBigInt();
-					if (valueAsBigInt.signum() <= 0) {
-						ms.replace(manip, HDLLiteral.get(valueAsBigInt.negate()));
-					}
+		Collection<HDLManip> manips = HDLQuery.select(HDLManip.class).from(pkg) //
+				.where(HDLManip.fType).isEqualTo(HDLManipType.ARITH_NEG).getAll();
+		for (HDLManip manip : manips) {
+			HDLExpression target = manip.getTarget();
+			if (target instanceof HDLManip) {
+				HDLManip innerManip = (HDLManip) target;
+				if (innerManip.getType() == HDLManipType.ARITH_NEG) {
+					ms.replace(manip, innerManip.getTarget());
 				}
 			}
+			if (target instanceof HDLLiteral) {
+				HDLLiteral lit = (HDLLiteral) target;
+				BigInteger valueAsBigInt = lit.getValueAsBigInt();
+				if (valueAsBigInt.signum() <= 0) {
+					ms.replace(manip, HDLLiteral.get(valueAsBigInt.negate()));
+				}
+			}
+		}
 		return ms.apply(pkg);
 	}
 
