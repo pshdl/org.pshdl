@@ -6,8 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Require-Bundle: de.tuhh.ict.pshdl.interpreter;bundle-version="1.0.0",
  de.upb.hni.vmagic;bundle-version="1.0.0",
  org.eclipse.xtend.lib,
- com.google.guava,
- org.eclipse.xtext.xbase.lib
+ org.eclipse.xtext.xbase.lib,
+ com.google.guava
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.tuhh.ict.pshdl.generator.vhdl; uses:="de.upb.hni.vmagic.declaration,  de.upb.hni.vmagic.expression,  de.tuhh.ict.pshdl.model.utils.services,  de.upb.hni.vmagic,  de.upb.hni.vmagic.object,  de.upb.hni.vmagic.type,  de.upb.hni.vmagic.concurrent,  de.upb.hni.vmagic.statement,  de.tuhh.ict.pshdl.model.utils,  de.tuhh.ict.pshdl.model.evaluation,  de.tuhh.ict.pshdl.model",

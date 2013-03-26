@@ -9,8 +9,8 @@
 	<classpathentry kind="src" path="xtend-gen"/>
 	<classpathentry kind="src" path="model-gen"/>
 	<classpathentry kind="src" path="validation"/>
+	<classpathentry kind="src" path="jsr305"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/PSHDLExternalDeps"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
