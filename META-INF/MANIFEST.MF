@@ -1,28 +1,48 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: V2
-Bundle-SymbolicName: de.tuhh.ict.pshdl
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: de.tuhh.ict.pshdl.interpreter;bundle-version="1.0.0",
+Bundle-Name: PSHDL Model and Compiler
+Bundle-SymbolicName: org.pshdl
+Bundle-Version: 0.2.0.a
+Require-Bundle: org.pshdl.interpreter;bundle-version="1.0.0",
  de.upb.hni.vmagic;bundle-version="1.0.0",
  org.eclipse.xtend.lib,
  org.eclipse.xtext.xbase.lib,
  com.google.guava
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.tuhh.ict.pshdl.generator.vhdl; uses:="de.upb.hni.vmagic.declaration,  de.upb.hni.vmagic.expression,  de.tuhh.ict.pshdl.model.utils.services,  de.upb.hni.vmagic,  de.upb.hni.vmagic.object,  de.upb.hni.vmagic.type,  de.upb.hni.vmagic.concurrent,  de.upb.hni.vmagic.statement,  de.tuhh.ict.pshdl.model.utils,  de.tuhh.ict.pshdl.model.evaluation,  de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model;uses:="de.tuhh.ict.pshdl.model.impl,de.tuhh.ict.pshdl.model.utils",
- de.tuhh.ict.pshdl.model.evaluation;uses:="de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.extensions,
- de.tuhh.ict.pshdl.model.impl;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.parser,
- de.tuhh.ict.pshdl.model.simulation;uses:="de.tuhh.ict.pshdl.model.evaluation,de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.types.builtIn; uses:="de.upb.hni.vmagic.expression,  de.tuhh.ict.pshdl.model.utils.services,  de.tuhh.ict.pshdl.generator.vhdl,  de.tuhh.ict.pshdl.model.evaluation,  de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.types.builtIn.busses,
- de.tuhh.ict.pshdl.model.utils;uses:="de.tuhh.ict.pshdl.model.utils.services,de.tuhh.ict.pshdl.model.evaluation,de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.utils.services; uses:="de.upb.hni.vmagic.expression,  de.tuhh.ict.pshdl.generator.vhdl,  de.tuhh.ict.pshdl.model.evaluation,  de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.validation;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model",
- de.tuhh.ict.pshdl.model.validation.builtin
+Export-Package: org.pshdl.generator.vhdl;
+  uses:="de.upb.hni.vmagic.declaration,
+   de.upb.hni.vmagic.expression,
+   de.tuhh.ict.pshdl.model.utils.services,
+   de.upb.hni.vmagic,
+   de.upb.hni.vmagic.object,
+   de.upb.hni.vmagic.type,
+   de.upb.hni.vmagic.concurrent,
+   de.upb.hni.vmagic.statement,
+   de.tuhh.ict.pshdl.model.utils,
+   de.tuhh.ict.pshdl.model.evaluation,
+   de.tuhh.ict.pshdl.model",
+ org.pshdl.model;uses:="de.tuhh.ict.pshdl.model.impl,de.tuhh.ict.pshdl.model.utils",
+ org.pshdl.model.evaluation;uses:="de.tuhh.ict.pshdl.model",
+ org.pshdl.model.extensions,
+ org.pshdl.model.impl;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model",
+ org.pshdl.model.parser,
+ org.pshdl.model.simulation;uses:="de.tuhh.ict.pshdl.model.evaluation,de.tuhh.ict.pshdl.model",
+ org.pshdl.model.types.builtIn;
+  uses:="de.upb.hni.vmagic.expression,
+   de.tuhh.ict.pshdl.model.utils.services,
+   de.tuhh.ict.pshdl.generator.vhdl,
+   de.tuhh.ict.pshdl.model.evaluation,
+   de.tuhh.ict.pshdl.model",
+ org.pshdl.model.types.builtIn.busses,
+ org.pshdl.model.utils;uses:="de.tuhh.ict.pshdl.model.utils.services,de.tuhh.ict.pshdl.model.evaluation,de.tuhh.ict.pshdl.model",
+ org.pshdl.model.utils.services;
+  uses:="de.upb.hni.vmagic.expression,
+   de.tuhh.ict.pshdl.generator.vhdl,
+   de.tuhh.ict.pshdl.model.evaluation,
+   de.tuhh.ict.pshdl.model",
+ org.pshdl.model.validation;uses:="de.tuhh.ict.pshdl.model.utils,de.tuhh.ict.pshdl.model",
+ org.pshdl.model.validation.builtin
 Import-Package: org.antlr.v4,
  org.antlr.v4.analysis,
  org.antlr.v4.automata,
@@ -42,4 +62,5 @@ Import-Package: org.antlr.v4,
  org.antlr.v4.tool,
  org.antlr.v4.tool.ast,
  org.antlr.v4.tool.interp
+Bundle-Vendor: pshdl.org
 
