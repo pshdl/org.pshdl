@@ -1,3 +1,29 @@
+/**
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ * 
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ */
 package de.tuhh.ict.pshdl.model.extensions;
 
 import com.google.common.base.Objects;
@@ -19,7 +45,6 @@ import de.tuhh.ict.pshdl.model.HDLFunctionCall;
 import de.tuhh.ict.pshdl.model.HDLLiteral;
 import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
-import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLRange;
 import de.tuhh.ict.pshdl.model.HDLShiftOp;
@@ -43,29 +68,37 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
+/**
+ * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
+ * code that will likely cause problems. For example when one parameter specifies the size of an array and
+ * another specifies the upper bound for the range of a for loop.
+ * 
+ * @author Karsten Becker
+ */
 @SuppressWarnings("all")
 public class RangeExtension {
-  public static RangeExtension INST = new Function0<RangeExtension>() {
+  private static RangeExtension INST = new Function0<RangeExtension>() {
     public RangeExtension apply() {
       RangeExtension _rangeExtension = new RangeExtension();
       return _rangeExtension;
     }
   }.apply();
   
-  public static Optional<Range<BigInteger>> rangeOf(final IHDLObject obj) {
+  /**
+   * Attempts to determine the range of an {@link HDLExpression}. If not successful check ProblemDescription
+   * Meta for information.
+   */
+  public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj) {
     return RangeExtension.INST.determineRange(obj, null);
   }
   
-  public static Optional<Range<BigInteger>> rangeOf(final IHDLObject obj, final HDLEvaluationContext context) {
+  /**
+   * Attempts to determine the range of an {@link HDLExpression}. If not successful check ProblemDescription
+   * Meta for information.
+   */
+  public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj, final HDLEvaluationContext context) {
     return RangeExtension.INST.determineRange(obj, context);
   }
-  
-  public static GenericMeta<IHDLObject> SOURCE = new Function0<GenericMeta<IHDLObject>>() {
-    public GenericMeta<IHDLObject> apply() {
-      GenericMeta<IHDLObject> _genericMeta = new GenericMeta<IHDLObject>("SOURCE", true);
-      return _genericMeta;
-    }
-  }.apply();
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLExpression obj, final HDLEvaluationContext context) {
     HDLClass _classType = obj.getClassType();
@@ -100,7 +133,7 @@ public class RangeExtension {
     boolean _isPresent_1 = hVar.isPresent();
     boolean _not = (!_isPresent_1);
     if (_not) {
-      obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<Range<BigInteger>>absent();
     }
@@ -141,14 +174,14 @@ public class RangeExtension {
         final HDLForLoop loop = ((HDLForLoop) container);
         ArrayList<HDLRange> _range = loop.getRange();
         HDLRange _get_8 = _range.get(0);
-        final Optional<Range<BigInteger>> zeroR = this.determineRange(_get_8, context);
+        final Optional<Range<BigInteger>> zeroR = RangeExtension.rangeOf(_get_8, context);
         boolean _isPresent_2 = zeroR.isPresent();
         if (_isPresent_2) {
           Range<BigInteger> res = zeroR.get();
           ArrayList<HDLRange> _range_1 = loop.getRange();
           for (final HDLRange r : _range_1) {
             {
-              final Optional<Range<BigInteger>> rRange = this.determineRange(r, context);
+              final Optional<Range<BigInteger>> rRange = RangeExtension.rangeOf(r, context);
               boolean _isPresent_3 = rRange.isPresent();
               if (_isPresent_3) {
                 Range<BigInteger> _get_9 = rRange.get();
@@ -212,12 +245,16 @@ public class RangeExtension {
       HDLType _get_11 = type.get();
       return _instance.getValueRange(((HDLPrimitive) _get_11), context);
     }
-    obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
     return Optional.<Range<BigInteger>>absent();
   }
   
-  protected Optional<Range<BigInteger>> _determineRange(final HDLRange obj, final HDLEvaluationContext context) {
+  public static Optional<Range<BigInteger>> rangeOf(final HDLRange obj) {
+    return RangeExtension.rangeOf(obj, null);
+  }
+  
+  public static Optional<Range<BigInteger>> rangeOf(final HDLRange obj, final HDLEvaluationContext context) {
     HDLExpression _to = obj.getTo();
     final Optional<BigInteger> to = ConstantEvaluate.valueOf(_to, context);
     boolean _isPresent = to.isPresent();
@@ -257,7 +294,7 @@ public class RangeExtension {
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLEqualityOp obj, final HDLEvaluationContext context) {
-    obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
     Range<BigInteger> _closed = Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
     return Optional.<Range<BigInteger>>of(_closed);
@@ -432,7 +469,7 @@ public class RangeExtension {
       }
       if (_or) {
         _matched=true;
-        obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);
         Range<BigInteger> _get = leftRange.get();
         BigInteger _upperEndpoint = _get.upperEndpoint();
@@ -446,7 +483,7 @@ public class RangeExtension {
     if (!_matched) {
       if (Objects.equal(type,HDLBitOpType.AND)) {
         _matched=true;
-        obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);
         Range<BigInteger> _get_1 = leftRange.get();
         BigInteger _upperEndpoint_1 = _get_1.upperEndpoint();
@@ -471,7 +508,7 @@ public class RangeExtension {
       }
       if (_or_1) {
         _matched=true;
-        obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
         Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
         return Optional.<Range<BigInteger>>of(_closed_2);
@@ -549,7 +586,7 @@ public class RangeExtension {
           _or = (_equals || _equals_1);
         }
         if (_or) {
-          obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ZERO_DIVIDE);
           return Optional.<Range<BigInteger>>absent();
         }
@@ -572,7 +609,7 @@ public class RangeExtension {
           _or_1 = (_lessThan || _equals_2);
         }
         if (_or_1) {
-          obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.POSSIBLY_ZERO_DIVIDE);
         }
         Range<BigInteger> _get_13 = rightRange.get();
@@ -704,7 +741,7 @@ public class RangeExtension {
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLEnumRef obj, final HDLEvaluationContext context) {
-    obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ENUMS_NOT_SUPPORTED_FOR_CONSTANTS);
     return Optional.<Range<BigInteger>>absent();
   }
@@ -743,7 +780,7 @@ public class RangeExtension {
           Range<BigInteger> _intersection = _get.intersection(_get_1);
           return Optional.<Range<BigInteger>>of(_intersection);
         }
-        obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
         return Optional.<Range<BigInteger>>absent();
       }
@@ -776,7 +813,7 @@ public class RangeExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLManipType.LOGIC_NEG)) {
         _matched=true;
-        obj.<IHDLObject>addMeta(RangeExtension.SOURCE, obj);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
         Range<BigInteger> _closed_2 = Ranges.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
         return Optional.<Range<BigInteger>>of(_closed_2);
@@ -802,7 +839,7 @@ public class RangeExtension {
     return _instance.getValueRange(((HDLPrimitive) _get), context);
   }
   
-  public Optional<Range<BigInteger>> determineRange(final IHDLObject obj, final HDLEvaluationContext context) {
+  public Optional<Range<BigInteger>> determineRange(final HDLExpression obj, final HDLEvaluationContext context) {
     if (obj instanceof HDLEnumRef) {
       return _determineRange((HDLEnumRef)obj, context);
     } else if (obj instanceof HDLVariableRef) {
@@ -825,10 +862,8 @@ public class RangeExtension {
       return _determineRange((HDLLiteral)obj, context);
     } else if (obj instanceof HDLManip) {
       return _determineRange((HDLManip)obj, context);
-    } else if (obj instanceof HDLRange) {
-      return _determineRange((HDLRange)obj, context);
-    } else if (obj instanceof HDLExpression) {
-      return _determineRange((HDLExpression)obj, context);
+    } else if (obj != null) {
+      return _determineRange(obj, context);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(obj, context).toString());

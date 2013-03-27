@@ -1,3 +1,29 @@
+/**
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ * 
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ */
 package de.tuhh.ict.pshdl.model.evaluation;
 
 import com.google.common.base.Objects;
@@ -18,7 +44,6 @@ import de.tuhh.ict.pshdl.model.HDLLiteral;
 import de.tuhh.ict.pshdl.model.HDLLiteral.HDLLiteralPresentation;
 import de.tuhh.ict.pshdl.model.HDLManip;
 import de.tuhh.ict.pshdl.model.HDLManip.HDLManipType;
-import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.HDLPrimitive;
 import de.tuhh.ict.pshdl.model.HDLRange;
 import de.tuhh.ict.pshdl.model.HDLShiftOp;
@@ -42,9 +67,16 @@ import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
+/**
+ * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link de.tuhh.ict.pshdl.model.IHDLObject}. Of course
+ * this only works when the given IHDLObject is truly constant. Parameters are not considered constant, unless
+ * they can be found in the given {@link de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext}.
+ * 
+ * @author Karsten Becker
+ */
 @SuppressWarnings("all")
 public class ConstantEvaluate {
-  public static ConstantEvaluate INST = new Function0<ConstantEvaluate>() {
+  private static ConstantEvaluate INST = new Function0<ConstantEvaluate>() {
     public ConstantEvaluate apply() {
       ConstantEvaluate _constantEvaluate = new ConstantEvaluate();
       return _constantEvaluate;
@@ -55,7 +87,7 @@ public class ConstantEvaluate {
    * Attempts to determine a constant that the given Expression can be replaced with. This method does not use parameters
    * as their value depends on the context.
    * 
-   * @return an absent Optional if not successful
+   * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
    */
   public static Optional<BigInteger> valueOf(final HDLExpression exp) {
     return ConstantEvaluate.INST.constantEvaluate(exp, null);
@@ -65,21 +97,11 @@ public class ConstantEvaluate {
    * Attempts to determine a constant that the given Expression can be replaced with. If parameter are encountered,
    * the provided context is used to retrieve a value for them.
    * 
-   * @return an absent Optional if not successful
+   * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
    */
   public static Optional<BigInteger> valueOf(final HDLExpression exp, final HDLEvaluationContext context) {
     return ConstantEvaluate.INST.constantEvaluate(exp, context);
   }
-  
-  /**
-   * This annotation can be used to find out what caused the evaluation to fail
-   */
-  public static GenericMeta<IHDLObject> SOURCE = new Function0<GenericMeta<IHDLObject>>() {
-    public GenericMeta<IHDLObject> apply() {
-      GenericMeta<IHDLObject> _genericMeta = new GenericMeta<IHDLObject>("SOURCE", true);
-      return _genericMeta;
-    }
-  }.apply();
   
   protected Optional<BigInteger> _constantEvaluate(final HDLUnresolvedFragment obj, final HDLEvaluationContext context) {
     final Optional<? extends IHDLObject> type = Insulin.resolveFragment(obj);
@@ -120,7 +142,7 @@ public class ConstantEvaluate {
       return this.constantEvaluate(_thenExpr, context);
     }
     HDLExpression _ifExpr_1 = obj.getIfExpr();
-    obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, _ifExpr_1);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _ifExpr_1);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
     return Optional.<BigInteger>absent();
   }
@@ -211,7 +233,7 @@ public class ConstantEvaluate {
           return eval;
         }
         HDLExpression _target_2 = obj.getTarget();
-        obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, _target_2);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _target_2);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
         return Optional.<BigInteger>absent();
       }
@@ -235,7 +257,7 @@ public class ConstantEvaluate {
         boolean _isPresent_1 = type.isPresent();
         boolean _not_1 = (!_isPresent_1);
         if (_not_1) {
-          obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cat);
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, cat);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
           return Optional.<BigInteger>absent();
         }
@@ -247,7 +269,7 @@ public class ConstantEvaluate {
         if (_not_2) {
           HDLType _get_1 = type.get();
           HDLExpression _width_1 = _get_1.getWidth();
-          obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, _width_1);
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _width_1);
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
           return Optional.<BigInteger>absent();
         }
@@ -267,7 +289,7 @@ public class ConstantEvaluate {
     boolean _isPresent = leftVal.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
-      container.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, left);
+      container.<IHDLObject>addMeta(ProblemDescription.SOURCE, left);
       container.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE);
       return Optional.<BigInteger>absent();
     }
@@ -599,7 +621,7 @@ public class ConstantEvaluate {
     int _size = _array.size();
     boolean _notEquals = (_size != 0);
     if (_notEquals) {
-      obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
@@ -607,7 +629,7 @@ public class ConstantEvaluate {
     int _size_1 = _bits.size();
     boolean _notEquals_1 = (_size_1 != 0);
     if (_notEquals_1) {
-      obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
@@ -623,7 +645,7 @@ public class ConstantEvaluate {
       _or = (_not || _not_1);
     }
     if (_or) {
-      obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
@@ -631,7 +653,7 @@ public class ConstantEvaluate {
     boolean _isPresent_1 = hVar.isPresent();
     boolean _not_2 = (!_isPresent_1);
     if (_not_2) {
-      obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<BigInteger>absent();
     }
@@ -647,7 +669,7 @@ public class ConstantEvaluate {
     if (_equals_1) {
       boolean _tripleEquals = (context == null);
       if (_tripleEquals) {
-        obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return Optional.<BigInteger>absent();
       }
@@ -657,19 +679,19 @@ public class ConstantEvaluate {
       boolean _isPresent_2 = cRefEval.isPresent();
       boolean _not_3 = (!_isPresent_2);
       if (_not_3) {
-        obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, cRef);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();
       }
       return cRefEval;
     }
-    obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
     return Optional.<BigInteger>absent();
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLEnumRef obj, final HDLEvaluationContext context) {
-    obj.<IHDLObject>addMeta(ConstantEvaluate.SOURCE, obj);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ENUMS_NOT_SUPPORTED_FOR_CONSTANTS);
     return Optional.<BigInteger>absent();
   }

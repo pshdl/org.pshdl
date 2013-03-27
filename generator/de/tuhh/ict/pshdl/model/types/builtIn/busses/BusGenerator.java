@@ -37,7 +37,6 @@ import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.tuhh.ict.pshdl.model.*;
-import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.evaluation.*;
 import de.tuhh.ict.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import de.tuhh.ict.pshdl.model.types.builtIn.busses.memorymodel.*;
@@ -81,22 +80,7 @@ public class BusGenerator implements IHDLGenerator {
 			return Optional.of(bId);
 		} catch (Exception e) {
 		}
-		HDLInterface hIf = new HDLInterface().setName(name);
-		HDLExpression regCount = getRegCountLiteral(hdl);
-		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(32)));
-		hvd = hvd.setDirection(HDLDirection.INOUT).addVariables(new HDLVariable().setName("regs").addDimensions(regCount));
-		hvd = hvd.addAnnotations(HDLBuiltInAnnotations.genSignal.create(null));
-		hIf = hIf.addPorts(hvd);
-		hIf.setContainer(hdl);
-		return Optional.of(hIf);
-	}
-
-	private HDLExpression getRegCountLiteral(HDLDirectGeneration hdl) {
-		ArrayList<HDLArgument> args = hdl.getArguments();
-		for (HDLArgument arg : args)
-			if ("regCount".equals(arg.getName()))
-				return arg.getExpression();
-		throw new IllegalArgumentException("The parameter regCount is not valid!");
+		return Optional.absent();
 	}
 
 	private Optional<HDLInterface> createInterface(HDLDirectGeneration hdl, String name) {

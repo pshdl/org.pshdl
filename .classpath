@@ -6,9 +6,9 @@
 	<classpathentry kind="src" path="vhdl"/>
 	<classpathentry kind="src" path="simulation"/>
 	<classpathentry kind="src" path="compiler"/>
+	<classpathentry kind="src" path="validation"/>
 	<classpathentry kind="src" path="xtend-gen"/>
 	<classpathentry kind="src" path="model-gen"/>
-	<classpathentry kind="src" path="validation"/>
 	<classpathentry kind="src" path="jsr305"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

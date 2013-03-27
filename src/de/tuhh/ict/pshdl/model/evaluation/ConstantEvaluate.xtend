@@ -1,3 +1,29 @@
+/*******************************************************************************
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ *     
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for 
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ ******************************************************************************/
 package de.tuhh.ict.pshdl.model.evaluation
 
 import de.tuhh.ict.pshdl.model.HDLArithOp
@@ -37,14 +63,21 @@ import static de.tuhh.ict.pshdl.model.extensions.ProblemDescription.*
 import com.google.common.base.Optional
 import de.tuhh.ict.pshdl.model.HDLArrayInit
 
+/**
+ * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link de.tuhh.ict.pshdl.model.IHDLObject}. Of course
+ * this only works when the given IHDLObject is truly constant. Parameters are not considered constant, unless
+ * they can be found in the given {@link de.tuhh.ict.pshdl.model.evaluation.HDLEvaluationContext}.
+ * 
+ * @author Karsten Becker
+ */
 class ConstantEvaluate {
-	public static ConstantEvaluate INST = new ConstantEvaluate
+	private static ConstantEvaluate INST = new ConstantEvaluate
 
 	/**
 	 * Attempts to determine a constant that the given Expression can be replaced with. This method does not use parameters
 	 * as their value depends on the context.
 	 * 
-	 * @return an absent Optional if not successful
+	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
 	 */
 	def static Optional<BigInteger> valueOf(HDLExpression exp) {
 		return INST.constantEvaluate(exp, null)
@@ -54,16 +87,11 @@ class ConstantEvaluate {
 	 * Attempts to determine a constant that the given Expression can be replaced with. If parameter are encountered, 
 	 * the provided context is used to retrieve a value for them.
 	 * 
-	 * @return an absent Optional if not successful
-	 */
+	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
+	 */  
 	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
 		return INST.constantEvaluate(exp, context)
 	}
-
-	/**
-	 * This annotation can be used to find out what caused the evaluation to fail
-	 */
-	public static GenericMeta<IHDLObject> SOURCE = new GenericMeta("SOURCE", true)
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
 		val type = Insulin::resolveFragment(obj)

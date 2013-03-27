@@ -36,6 +36,16 @@ import de.tuhh.ict.pshdl.model.*;
 import de.tuhh.ict.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * This is used to resolve parameter to constants. When a HDLUnit has parameter
+ * ports, they can be initialized with a constant. However this constant does
+ * not need to be the value the unit is instantiated with. This context stores a
+ * mapping for those parameters to the actual value. See
+ * {@link ConstantEvaluate#constantEvaluate(IHDLObject, HDLEvaluationContext)}
+ * 
+ * @author Karsten Becker
+ * 
+ */
 public class HDLEvaluationContext {
 
 	private Map<String, HDLExpression> context;
@@ -44,10 +54,26 @@ public class HDLEvaluationContext {
 		this.context = context;
 	}
 
+	/**
+	 * Returns the value for the given {@link HDLVariable}
+	 * 
+	 * @param ref
+	 *            the name of this variable is used to lookup the value
+	 * @return the value if successful, <code>null</code> if no such value can
+	 *         be found
+	 */
 	public HDLExpression get(HDLVariable ref) {
 		return context.get(ref.getName());
 	}
 
+	/**
+	 * Generates a default context where all parameter are assumed to be the
+	 * constant they are initialized with
+	 * 
+	 * @param unit
+	 *            the unit to create the context for
+	 * @return a HDLEvaluationContext with all parameters set to their default
+	 */
 	public static Map<HDLQualifiedName, HDLEvaluationContext> createDefault(HDLPackage pkg) {
 		Map<HDLQualifiedName, HDLEvaluationContext> res = new HashMap<HDLQualifiedName, HDLEvaluationContext>();
 		for (HDLUnit unit : pkg.getUnits()) {
@@ -90,10 +116,6 @@ public class HDLEvaluationContext {
 			spacer = ",";
 		}
 		return sb.toString();
-	}
-
-	public int getPrevious(String string) {
-		throw new RuntimeException("Not implemented");
 	}
 
 }

@@ -1,3 +1,29 @@
+/**
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ * 
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ */
 package de.tuhh.ict.pshdl.model.extensions;
 
 import com.google.common.base.Objects;
@@ -22,8 +48,17 @@ import java.util.Iterator;
 import javax.annotation.Nonnull;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
+/**
+ * The FullNameExtension provides a {@link HDLQualifiedName} for every IHDLObject.
+ * See {@link FullNameExtension#fullNameOf(IHDLObject)}
+ * 
+ * @author Karsten Becker
+ */
 @SuppressWarnings("all")
 public class FullNameExtension {
+  /**
+   * This annotation is used to store {@ink HDLQualifiedName} for the case that the resolution diverges from the actual tree
+   */
   public static GenericMeta<HDLQualifiedName> FULLNAME = new Function0<GenericMeta<HDLQualifiedName>>() {
     public GenericMeta<HDLQualifiedName> apply() {
       GenericMeta<HDLQualifiedName> _genericMeta = new GenericMeta<HDLQualifiedName>("FULLNAME", true);
@@ -31,12 +66,61 @@ public class FullNameExtension {
     }
   }.apply();
   
-  public static FullNameExtension INST = new Function0<FullNameExtension>() {
+  private static FullNameExtension INST = new Function0<FullNameExtension>() {
     public FullNameExtension apply() {
       FullNameExtension _fullNameExtension = new FullNameExtension();
       return _fullNameExtension;
     }
   }.apply();
+  
+  /**
+   * Returns the {@link HDLQualifiedName} for the given obj.
+   */
+  @Nonnull
+  public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
+    HDLQualifiedName _xblockexpression = null;
+    {
+      boolean _tripleEquals = (obj == null);
+      if (_tripleEquals) {
+        NullPointerException _nullPointerException = new NullPointerException("Can not get a name for null");
+        throw _nullPointerException;
+      }
+      HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
+      _xblockexpression = (_fullName);
+    }
+    return _xblockexpression;
+  }
+  
+  private static int countInstance(final HDLObject obj) {
+    int count = 0;
+    IHDLObject _container = obj.getContainer();
+    boolean _tripleNotEquals = (_container != null);
+    if (_tripleNotEquals) {
+      IHDLObject _container_1 = obj.getContainer();
+      final Iterator<IHDLObject> iterator = _container_1.iterator(false);
+      boolean _hasNext = iterator.hasNext();
+      boolean _while = _hasNext;
+      while (_while) {
+        {
+          final IHDLObject hdlObject = iterator.next();
+          boolean _equals = Objects.equal(hdlObject, obj);
+          if (_equals) {
+            return count;
+          }
+          HDLClass _classType = hdlObject.getClassType();
+          HDLClass _classType_1 = obj.getClassType();
+          boolean _equals_1 = Objects.equal(_classType, _classType_1);
+          if (_equals_1) {
+            int _plus = (count + 1);
+            count = _plus;
+          }
+        }
+        boolean _hasNext_1 = iterator.hasNext();
+        _while = _hasNext_1;
+      }
+    }
+    return count;
+  }
   
   protected HDLQualifiedName _getFullName(final HDLForLoop loop) {
     HDLQualifiedName _meta = loop.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
@@ -218,52 +302,6 @@ public class FullNameExtension {
       return this.getFullName(_container_1);
     }
     return HDLQualifiedName.EMPTY;
-  }
-  
-  @Nonnull
-  public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
-    HDLQualifiedName _xblockexpression = null;
-    {
-      boolean _tripleEquals = (obj == null);
-      if (_tripleEquals) {
-        NullPointerException _nullPointerException = new NullPointerException("Can not get a name for null");
-        throw _nullPointerException;
-      }
-      HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
-      _xblockexpression = (_fullName);
-    }
-    return _xblockexpression;
-  }
-  
-  public static int countInstance(final HDLObject obj) {
-    int count = 0;
-    IHDLObject _container = obj.getContainer();
-    boolean _tripleNotEquals = (_container != null);
-    if (_tripleNotEquals) {
-      IHDLObject _container_1 = obj.getContainer();
-      final Iterator<IHDLObject> iterator = _container_1.iterator(false);
-      boolean _hasNext = iterator.hasNext();
-      boolean _while = _hasNext;
-      while (_while) {
-        {
-          final IHDLObject hdlObject = iterator.next();
-          boolean _equals = Objects.equal(hdlObject, obj);
-          if (_equals) {
-            return count;
-          }
-          HDLClass _classType = hdlObject.getClassType();
-          HDLClass _classType_1 = obj.getClassType();
-          boolean _equals_1 = Objects.equal(_classType, _classType_1);
-          if (_equals_1) {
-            int _plus = (count + 1);
-            count = _plus;
-          }
-        }
-        boolean _hasNext_1 = iterator.hasNext();
-        _while = _hasNext_1;
-      }
-    }
-    return count;
   }
   
   public HDLQualifiedName getFullName(final IHDLObject unit) {

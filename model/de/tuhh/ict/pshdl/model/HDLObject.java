@@ -380,7 +380,7 @@ public abstract class HDLObject extends AbstractHDLObject implements de.tuhh.ict
 
 	@Override
 	public String toString() {
-		return StringWriteExtension.INST.toString(this, SyntaxHighlighter.none());
+		return StringWriteExtension.asString(this, SyntaxHighlighter.none());
 	}
 
 	// $CONTENT-END$

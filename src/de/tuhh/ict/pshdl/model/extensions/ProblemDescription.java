@@ -26,9 +26,23 @@
  ******************************************************************************/
 package de.tuhh.ict.pshdl.model.extensions;
 
+import de.tuhh.ict.pshdl.model.*;
+import de.tuhh.ict.pshdl.model.HDLObject.GenericMeta;
 import de.tuhh.ict.pshdl.model.utils.*;
 
+/**
+ * This {@link MetaAccess} is used to annotate an {@link IHDLObject} with
+ * information on why an evaluation failed. Use
+ * {@link ProblemDescription#DESCRIPTION} to access the value.
+ * 
+ * @author Karsten Becker
+ * 
+ */
 public enum ProblemDescription implements MetaAccess<ProblemDescription> {
+
+	/**
+	 * Used to access the {@link ProblemDescription}
+	 */
 	DESCRIPTION,
 	// Did not evaluate
 	SUBEXPRESSION_DID_NOT_EVALUATE, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT, VARIABLE_NOT_RESOLVED,
@@ -38,6 +52,13 @@ public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 	BOOLEAN_NOT_SUPPORTED_FOR_RANGES, BIT_NOT_SUPPORTED_FOR_RANGES, ZERO_DIVIDE, POSSIBLY_ZERO_DIVIDE,
 	// Others
 	NON_PRIMITVE_TYPE_NOT_EVALUATED, CAN_NOT_USE_PARAMETER;
+
+	/**
+	 * This annotation can be used to find out what caused the evaluation to
+	 * fail. When this marker can be found, also check
+	 * {@link ProblemDescription.DESCRIPTION}
+	 */
+	public static final GenericMeta<IHDLObject> SOURCE = new GenericMeta<IHDLObject>("SOURCE", true);
 
 	@Override
 	public boolean inherit() {

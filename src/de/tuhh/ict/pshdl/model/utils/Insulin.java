@@ -518,7 +518,7 @@ public class Insulin {
 				if (var.getAnnotation(HDLBuiltInAnnotations.VHDLLatchable) == null) {
 					switch (hvd.getPrimitive().getType()) {
 					case STRING:
-						return null;
+						return HDLLiteral.getString("");
 					case BOOL:
 						return HDLLiteral.getFalse();
 					case BIT:

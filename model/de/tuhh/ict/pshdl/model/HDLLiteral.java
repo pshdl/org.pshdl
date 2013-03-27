@@ -237,6 +237,10 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		return new HDLLiteral().setVal(TRUE);
 	}
 
+	public static HDLExpression getString(String string) {
+		return new HDLLiteral().setStr(true).setVal(string);
+	}
+
 	// $CONTENT-END$
 
 }
