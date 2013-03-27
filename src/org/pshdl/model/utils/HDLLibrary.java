@@ -33,9 +33,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLObject.*;
+import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.services.IHDLGenerator.*;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;

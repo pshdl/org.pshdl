@@ -29,7 +29,7 @@ package org.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.*;
 
 import org.antlr.v4.runtime.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 
 public class Row implements NamedElement {
 	public String name;

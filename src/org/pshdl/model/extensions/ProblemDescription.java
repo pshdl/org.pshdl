@@ -26,8 +26,8 @@
  ******************************************************************************/
 package org.pshdl.model.extensions;
 
+import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.*;
-import org.pshdl.model.HDLObject.*;
 import org.pshdl.model.utils.*;
 
 /**

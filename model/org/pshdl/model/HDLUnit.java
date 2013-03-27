@@ -32,13 +32,12 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.impl.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLUnit contains the following fields

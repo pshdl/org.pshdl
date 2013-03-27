@@ -30,10 +30,9 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 import com.google.common.base.*;
 
@@ -112,21 +111,6 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 		@Nonnull
 		public String toString() {
 			return str;
-		}
-
-		public boolean isIO() {
-			switch (this) {
-			case CONSTANT:
-			case HIDDEN:
-			case INTERNAL:
-				return false;
-			case IN:
-			case INOUT:
-			case OUT:
-			case PARAMETER:
-				return true;
-			}
-			return false;
 		}
 	}
 

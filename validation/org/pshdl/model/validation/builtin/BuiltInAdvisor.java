@@ -32,9 +32,9 @@ import java.util.*;
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.internal.*;
-import org.pshdl.model.utils.internal.LevenshteinDistance.*;
+import org.pshdl.model.utils.internal.LevenshteinDistance.Score;
+import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.HDLValidator.*;
 
 import com.google.common.collect.*;
 

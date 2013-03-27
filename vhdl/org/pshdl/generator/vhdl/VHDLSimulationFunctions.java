@@ -30,19 +30,17 @@ import java.math.*;
 import java.util.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLManip.*;
+import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
 
-import org.pshdl.generator.vhdl.*;
-import org.pshdl.model.evaluation.*;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
 import de.upb.hni.vmagic.statement.*;

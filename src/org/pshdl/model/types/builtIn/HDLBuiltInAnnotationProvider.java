@@ -29,8 +29,8 @@ package org.pshdl.model.types.builtIn;
 import java.math.*;
 
 import org.pshdl.model.*;
+import org.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
 
 public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 	public static enum HDLBuiltInAnnotations implements IHDLAnnotation {

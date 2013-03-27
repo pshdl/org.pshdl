@@ -28,13 +28,10 @@ package org.pshdl.model;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.impl.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLQuery.*;
-
-import org.pshdl.model.extensions.*;
 
 /**
  * The class HDLPrimitive contains the following fields

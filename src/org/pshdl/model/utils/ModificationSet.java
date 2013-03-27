@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 public class ModificationSet {
 

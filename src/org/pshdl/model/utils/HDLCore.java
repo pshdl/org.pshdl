@@ -30,7 +30,7 @@ import java.util.*;
 
 import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.IServiceProvider.*;
+import org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider;
 import org.pshdl.model.validation.*;
 
 /**

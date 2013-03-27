@@ -37,10 +37,10 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
-import org.pshdl.model.HDLBitOp.*;
-import org.pshdl.model.HDLEqualityOp.*;
-import org.pshdl.model.HDLPrimitive.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLBitOp.HDLBitOpType;
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
@@ -48,9 +48,6 @@ import org.pshdl.model.utils.services.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
 
 public class HDLPrimitives {
 
@@ -280,8 +277,7 @@ public class HDLPrimitives {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
+	 * @see org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
 	 * .tuhh.ict.pshdl.model.HDLArithOp)
 	 */
 	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {

@@ -30,16 +30,14 @@ import java.io.*;
 import java.util.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import org.pshdl.model.validation.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.google.common.io.*;
-
-import org.pshdl.model.types.builtIn.busses.memorymodel.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 
 public class MemoryModel {
 

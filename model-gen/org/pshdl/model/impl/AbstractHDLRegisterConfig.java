@@ -31,16 +31,16 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLRegisterConfig.*;
+import org.pshdl.model.HDLRegisterConfig.HDLRegClockType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
-
-import org.pshdl.model.extensions.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLRegisterConfig extends HDLObject {

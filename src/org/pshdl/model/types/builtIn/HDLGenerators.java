@@ -30,9 +30,9 @@ import java.util.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.IHDLGenerator.*;
+import org.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 

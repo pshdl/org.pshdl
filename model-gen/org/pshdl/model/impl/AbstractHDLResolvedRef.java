@@ -38,8 +38,6 @@ import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
 
-import org.pshdl.model.extensions.*;
-
 @SuppressWarnings("all")
 public abstract class AbstractHDLResolvedRef extends HDLReference {
 	/**

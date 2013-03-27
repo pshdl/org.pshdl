@@ -32,7 +32,7 @@ import javax.annotation.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolvedFragment {

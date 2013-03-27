@@ -31,7 +31,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.utils.*;
 
 @SuppressWarnings("all")

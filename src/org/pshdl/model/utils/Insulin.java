@@ -33,31 +33,28 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
-import org.pshdl.model.HDLAssignment.*;
-import org.pshdl.model.HDLBitOp.*;
-import org.pshdl.model.HDLEqualityOp.*;
-import org.pshdl.model.HDLManip.*;
-import org.pshdl.model.HDLObject.*;
-import org.pshdl.model.HDLPrimitive.*;
-import org.pshdl.model.HDLShiftOp.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLAssignment.HDLAssignmentType;
+import org.pshdl.model.HDLBitOp.HDLBitOpType;
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.IHDLGenerator.*;
+import org.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.RWValidation.*;
+import org.pshdl.model.validation.RWValidation.Init;
 import org.pshdl.model.validation.builtin.*;
-import org.pshdl.model.validation.builtin.BuiltInValidator.*;
+import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
 
 public class Insulin {
 	public static final GenericMeta<Boolean> insulated = new GenericMeta<Boolean>("insulated", true);

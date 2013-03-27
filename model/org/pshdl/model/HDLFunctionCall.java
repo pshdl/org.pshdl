@@ -30,10 +30,9 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLFunctionCall contains the following fields

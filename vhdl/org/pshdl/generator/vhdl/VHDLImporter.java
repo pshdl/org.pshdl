@@ -31,17 +31,16 @@ import java.math.*;
 import java.util.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
-import org.pshdl.model.HDLObject.*;
-import org.pshdl.model.HDLPrimitive.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
 
 import com.google.common.base.*;
 
-import org.pshdl.model.evaluation.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;

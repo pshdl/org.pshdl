@@ -30,9 +30,8 @@ import java.math.*;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLLiteral contains the following fields

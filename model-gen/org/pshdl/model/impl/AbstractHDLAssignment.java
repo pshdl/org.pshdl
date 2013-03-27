@@ -31,9 +31,9 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLAssignment.*;
+import org.pshdl.model.HDLAssignment.HDLAssignmentType;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLAssignment extends HDLObject implements HDLStatement {

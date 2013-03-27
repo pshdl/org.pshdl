@@ -30,7 +30,7 @@ import javax.annotation.*;
 
 import org.pshdl.model.impl.*;
 import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
  * The class HDLDirectGeneration contains the following fields

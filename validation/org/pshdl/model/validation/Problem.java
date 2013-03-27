@@ -32,8 +32,8 @@ import java.util.concurrent.atomic.*;
 import org.pshdl.model.*;
 import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.services.IHDLValidator.*;
-import org.pshdl.model.validation.HDLValidator.*;
+import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
+import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 
 public class Problem {
 	public enum ProblemAccess implements MetaAccess<Problem> {

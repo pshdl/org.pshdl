@@ -30,13 +30,14 @@ import java.math.*;
 import java.util.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
-import org.pshdl.model.HDLAssignment.*;
-import org.pshdl.model.HDLManip.*;
-import org.pshdl.model.HDLPrimitive.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLAssignment.HDLAssignmentType;
+import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.busses.memorymodel.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import org.pshdl.model.utils.*;
 
 public class UserLogicCodeGen extends CommonBusCode {

@@ -28,8 +28,8 @@ package org.pshdl.model.validation.builtin;
 
 import static org.pshdl.model.validation.Problem.ProblemSeverity.*;
 
-import org.pshdl.model.utils.services.IHDLValidator.*;
-import org.pshdl.model.validation.Problem.*;
+import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
+import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 public enum ErrorCode implements IErrorCode {
 	// RWValidation

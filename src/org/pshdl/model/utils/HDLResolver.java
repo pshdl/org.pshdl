@@ -36,8 +36,6 @@ import org.pshdl.model.extensions.*;
 
 import com.google.common.base.*;
 
-import org.pshdl.model.extensions.*;
-
 public class HDLResolver {
 
 	private boolean descent;

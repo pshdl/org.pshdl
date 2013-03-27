@@ -31,15 +31,13 @@ import java.util.*;
 
 import org.pshdl.generator.vhdl.*;
 import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
-import org.pshdl.model.HDLLiteral.*;
-import org.pshdl.model.HDLPrimitive.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLLiteral.HDLLiteralPresentation;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.evaluation.*;
 
 import com.google.common.base.*;
 
-import org.pshdl.generator.vhdl.*;
-import org.pshdl.model.evaluation.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.builtin.*;

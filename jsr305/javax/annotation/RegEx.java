@@ -1,14 +1,9 @@
 package javax.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.lang.annotation.*;
+import java.util.regex.*;
 
-import javax.annotation.meta.TypeQualifierNickname;
-import javax.annotation.meta.TypeQualifierValidator;
-import javax.annotation.meta.When;
+import javax.annotation.meta.*;
 
 /**
  * This qualifier is used to denote String values that should be a Regular
@@ -20,23 +15,24 @@ import javax.annotation.meta.When;
 @TypeQualifierNickname
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RegEx {
-    When when() default When.ALWAYS;
+	When when() default When.ALWAYS;
 
-    static class Checker implements TypeQualifierValidator<RegEx> {
+	static class Checker implements TypeQualifierValidator<RegEx> {
 
-        public When forConstantValue(RegEx annotation, Object value) {
-            if (!(value instanceof String))
-                return When.NEVER;
+		@Override
+		public When forConstantValue(RegEx annotation, Object value) {
+			if (!(value instanceof String))
+				return When.NEVER;
 
-            try {
-                Pattern.compile((String) value);
-            } catch (PatternSyntaxException e) {
-                return When.NEVER;
-            }
-            return When.ALWAYS;
+			try {
+				Pattern.compile((String) value);
+			} catch (PatternSyntaxException e) {
+				return When.NEVER;
+			}
+			return When.ALWAYS;
 
-        }
+		}
 
-    }
+	}
 
 }

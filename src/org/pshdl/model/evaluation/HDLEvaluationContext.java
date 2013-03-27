@@ -33,10 +33,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.utils.*;
-
-import org.pshdl.model.evaluation.*;
 
 /**
  * This is used to resolve parameter to constants. When a HDLUnit has parameter

@@ -30,15 +30,12 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 import com.google.common.base.*;
-
-import org.pshdl.model.extensions.*;
 
 /**
  * The class HDLInterfaceRef contains the following fields

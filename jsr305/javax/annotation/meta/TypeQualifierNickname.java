@@ -1,8 +1,6 @@
 package javax.annotation.meta;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 
@@ -17,12 +15,11 @@ import java.lang.annotation.Target;
  * 
  * 
  * <code>
- @Documented
- @TypeQualifierNickname @Pattern("[0-9]{3}-[0-9]{2}-[0-9]{4}") 
- @Retention(RetentionPolicy.RUNTIME)
- public @interface SocialSecurityNumber {
- }
- </code>
+ * 
+ * @Documented
+ * @TypeQualifierNickname @Pattern("[0-9]{3}-[0-9]{2}-[0-9]{4}")
+ * @Retention(RetentionPolicy.RUNTIME) public @interface SocialSecurityNumber {
+ *                                     } </code>
  * 
  * 
  */

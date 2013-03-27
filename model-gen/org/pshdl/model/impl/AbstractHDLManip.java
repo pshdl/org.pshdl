@@ -31,9 +31,9 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLManip.*;
+import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLManip extends HDLObject implements HDLExpression {

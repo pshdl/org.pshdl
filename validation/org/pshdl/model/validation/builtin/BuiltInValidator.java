@@ -34,23 +34,20 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLObject.*;
-import org.pshdl.model.HDLPrimitive.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.*;
+import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.HDLValidator.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
 
 public class BuiltInValidator implements IHDLValidator {
 
@@ -670,7 +667,7 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable var : vars) {
 			HDLDirection dir = var.getDirection();
-			if ((dir != null) && dir.isIO()) {
+			if ((dir == HDLDirection.IN) || (dir == HDLDirection.INOUT) || (dir == HDLDirection.OUT)) {
 				for (HDLExpression dim : var.getDimensions()) {
 					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(dim);
 					if (!valueOf.isPresent()) {
@@ -803,8 +800,8 @@ public class BuiltInValidator implements IHDLValidator {
 		if (targetDim.size() != sourceDim.size()) {
 			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ass));
 		} else {
-			HDLDirection direction = right.get().getDirection();
-			if ((direction != null) && direction.isIO()) {
+			HDLDirection dir = right.get().getDirection();
+			if ((dir == HDLDirection.IN) || (dir == HDLDirection.INOUT) || (dir == HDLDirection.OUT)) {
 				context = null;
 			}
 			for (int i = 0; i < targetDim.size(); i++) {

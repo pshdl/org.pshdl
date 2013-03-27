@@ -32,14 +32,13 @@ import java.util.*;
 import org.pshdl.generator.vhdl.*;
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.Range;
 
-import org.pshdl.generator.vhdl.*;
 import de.upb.hni.vmagic.Range.Direction;
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;

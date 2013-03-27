@@ -33,16 +33,13 @@ import java.util.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
+import org.pshdl.model.types.builtIn.busses.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.internal.*;
-import org.pshdl.model.utils.services.IHDLGenerator.*;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 import com.google.common.base.*;
-
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.types.builtIn.busses.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
 
 public class MemoryModelSideFiles {
 

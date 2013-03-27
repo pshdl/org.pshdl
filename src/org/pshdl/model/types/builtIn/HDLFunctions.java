@@ -34,13 +34,12 @@ import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
 
-import org.pshdl.model.extensions.*;
 import de.upb.hni.vmagic.expression.*;
 
 public class HDLFunctions {

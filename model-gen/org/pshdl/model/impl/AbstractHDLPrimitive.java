@@ -31,9 +31,9 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLPrimitive.*;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLPrimitive extends HDLValueType {

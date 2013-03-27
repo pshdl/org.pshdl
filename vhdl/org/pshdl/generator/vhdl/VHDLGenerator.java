@@ -31,7 +31,6 @@ import java.io.*;
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
 
-import org.pshdl.generator.vhdl.*;
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.output.*;
 

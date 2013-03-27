@@ -28,7 +28,9 @@ package org.pshdl.model.utils;
 
 import java.util.*;
 
-import org.pshdl.model.HDLRegisterConfig.*;
+import org.pshdl.model.HDLRegisterConfig.HDLRegClockType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 
 public class HDLConfig {
 	private HDLRegClockType defaultClockType = HDLRegClockType.RISING;

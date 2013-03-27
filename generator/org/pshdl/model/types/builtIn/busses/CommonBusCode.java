@@ -29,9 +29,9 @@ package org.pshdl.model.types.builtIn.busses;
 import java.util.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLAssignment.*;
+import org.pshdl.model.HDLAssignment.HDLAssignmentType;
 import org.pshdl.model.types.builtIn.busses.memorymodel.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import org.pshdl.model.utils.*;
 
 public class CommonBusCode {

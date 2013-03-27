@@ -28,7 +28,6 @@ package org.pshdl.model;
 
 import java.util.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
 
 import com.google.common.base.*;

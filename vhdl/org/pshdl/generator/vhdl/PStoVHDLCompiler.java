@@ -34,15 +34,14 @@ import org.pshdl.model.*;
 import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.IHDLGenerator.*;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.Problem.*;
+import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.google.common.io.*;
 
-import org.pshdl.generator.vhdl.*;
 import de.upb.hni.vmagic.output.*;
 
 /**

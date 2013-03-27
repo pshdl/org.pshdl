@@ -35,22 +35,21 @@ import java.util.Map.Entry;
 
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.busses.memorymodel.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
 import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
-import org.pshdl.model.utils.services.IHDLValidator.*;
+import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.Problem.*;
+import org.pshdl.model.validation.Problem.ProblemSeverity;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-
-import org.pshdl.model.evaluation.*;
 
 public class BusGenerator implements IHDLGenerator {
 

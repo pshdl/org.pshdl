@@ -28,7 +28,6 @@ package org.pshdl.model;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
 import org.pshdl.model.impl.*;
 
 /**

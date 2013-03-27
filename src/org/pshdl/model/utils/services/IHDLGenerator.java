@@ -33,8 +33,8 @@ import javax.annotation.*;
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
-import org.pshdl.model.utils.services.IHDLValidator.*;
+import org.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
+import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.*;
 
 import com.google.common.base.*;

@@ -33,20 +33,17 @@ import java.util.Map.Entry;
 import javax.annotation.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLEqualityOp.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
-import org.pshdl.model.simulation.RangeTool.*;
+import org.pshdl.model.simulation.RangeTool.RangeVal;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
 
 public class HDLSimulator {
 

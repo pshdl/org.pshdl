@@ -28,8 +28,8 @@ package org.pshdl.generator.vhdl.libraries;
 
 import java.util.*;
 
-import org.pshdl.model.HDLPrimitive.*;
-import org.pshdl.model.HDLShiftOp.*;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 
 import de.upb.hni.vmagic.*;
 import de.upb.hni.vmagic.builtin.*;

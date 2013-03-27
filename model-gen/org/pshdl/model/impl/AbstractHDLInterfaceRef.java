@@ -33,13 +33,11 @@ import javax.annotation.*;
 import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
-
-import org.pshdl.model.extensions.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {

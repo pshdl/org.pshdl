@@ -26,7 +26,6 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
 
 public interface HDLStatement extends org.pshdl.model.IHDLObject {

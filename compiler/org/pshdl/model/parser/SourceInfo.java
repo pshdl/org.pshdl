@@ -29,7 +29,7 @@ package org.pshdl.model.parser;
 import java.util.*;
 
 import org.antlr.v4.runtime.*;
-import org.pshdl.model.HDLObject.*;
+import org.pshdl.model.HDLObject.GenericMeta;
 
 public class SourceInfo {
 

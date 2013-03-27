@@ -30,16 +30,13 @@ import java.math.*;
 
 import javax.annotation.*;
 
-import org.pshdl.model.*;
-import org.pshdl.model.HDLArithOp.*;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.HDLQuery.*;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 import com.google.common.base.*;
-
-import org.pshdl.model.evaluation.*;
 
 /**
  * The class HDLRange contains the following fields

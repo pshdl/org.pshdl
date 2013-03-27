@@ -32,10 +32,10 @@ import java.io.*;
 import java.util.*;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLVariableDeclaration.*;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.internal.*;
-import org.pshdl.model.utils.services.IHDLGenerator.*;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
 public class BusGenSideFiles {
 

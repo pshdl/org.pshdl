@@ -29,12 +29,12 @@ package org.pshdl.model.types.builtIn;
 import java.util.Map.Entry;
 
 import org.pshdl.model.*;
-import org.pshdl.model.HDLEqualityOp.*;
-import org.pshdl.model.HDLManip.*;
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.CompilerInformation.*;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.*;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
+import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 
 public class PSHDLLib {
 

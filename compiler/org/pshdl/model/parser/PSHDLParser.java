@@ -34,18 +34,16 @@ import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.misc.*;
 import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
-import org.pshdl.model.parser.PSHDLLangParser.*;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
+import org.pshdl.model.parser.PSHDLLangParser.PsExtendsContext;
+import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.utils.services.*;
-import org.pshdl.model.utils.services.IHDLValidator.*;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.Problem.*;
+import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.base.*;
-
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.parser.*;
 
 public class PSHDLParser {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
