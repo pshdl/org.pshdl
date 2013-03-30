@@ -154,7 +154,9 @@ class TypeExtension {
 		val nextType = iter.next.determineType;
 		if (!nextType.present)
 			return Optional::absent
-		var HDLPrimitive type = nextType.get as HDLPrimitive
+		var HDLType type = nextType.get
+		if (!(type instanceof HDLPrimitive))
+			return Optional::absent
 		var HDLExpression width = getWidth(type)
 		while (iter.hasNext) {
 			if (width === null)
@@ -163,7 +165,9 @@ class TypeExtension {
 			val nextCatType = iter.next.determineType
 			if (!nextCatType.present)
 				return Optional::absent
-			type = nextCatType.get as HDLPrimitive
+			type = nextCatType.get
+			if (!(type instanceof HDLPrimitive))
+				return Optional::absent
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType::PLUS).setRight(getWidth(type))
 			width = HDLPrimitives::simplifyWidth(cat, width)
 		}

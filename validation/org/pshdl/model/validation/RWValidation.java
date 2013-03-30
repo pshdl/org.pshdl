@@ -33,6 +33,7 @@ import java.util.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
+import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
@@ -174,23 +175,9 @@ public class RWValidation {
 		}
 	}
 
-	public static enum BlockMeta implements MetaAccess<HDLBlock> {
-		block;
+	public static final GenericMeta<HDLBlock> BLOCK_META = new GenericMeta<HDLBlock>("BLOCK_META", true);
 
-		@Override
-		public boolean inherit() {
-			return true;
-		}
-	}
-
-	public static enum BlockMetaClash implements MetaAccess<Set<HDLBlock>> {
-		clash;
-
-		@Override
-		public boolean inherit() {
-			return true;
-		}
-	}
+	public static final GenericMeta<Set<HDLBlock>> BLOCK_META_CLASH = new GenericMeta<Set<HDLBlock>>("BLOCK_META_CLASH", true);
 
 	public static enum Init implements MetaAccess<Set<String>> {
 		full, written, read;
@@ -238,8 +225,8 @@ public class RWValidation {
 				if (block == null) {
 					block = UNIT_BLOCK;
 				}
-				if ((hdlVariable.getMeta(BlockMeta.block) != null) && (hdlVariable.getMeta(BlockMeta.block) != block)) {
-					Set<HDLBlock> meta = hdlVariable.getMeta(BlockMetaClash.clash);
+				if ((hdlVariable.getMeta(BLOCK_META) != null) && (hdlVariable.getMeta(BLOCK_META) != block)) {
+					Set<HDLBlock> meta = hdlVariable.getMeta(BLOCK_META_CLASH);
 					if (meta == null) {
 						meta = new HashSet<HDLBlock>();
 					}
@@ -248,9 +235,9 @@ public class RWValidation {
 					} else {
 						meta.add(block);
 					}
-					hdlVariable.addMeta(BlockMetaClash.clash, meta);
+					hdlVariable.addMeta(BLOCK_META_CLASH, meta);
 				}
-				hdlVariable.addMeta(BlockMeta.block, block);
+				hdlVariable.addMeta(BLOCK_META, block);
 			}
 		}
 		Collection<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();

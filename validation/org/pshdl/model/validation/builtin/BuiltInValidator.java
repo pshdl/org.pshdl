@@ -126,6 +126,11 @@ public class BuiltInValidator implements IHDLValidator {
 		return true;
 	}
 
+	/**
+	 * Check that constants declared on the global scope are indeed constant and
+	 * not registers
+	 * 
+	 */
 	private void checkConstantPackageDeclarations(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
 		for (HDLVariableDeclaration hvd : hvds) {
@@ -148,6 +153,9 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
+	/**
+	 * Check that registers are neither constants nor in ports
+	 */
 	private void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : hvds)
@@ -165,6 +173,10 @@ public class BuiltInValidator implements IHDLValidator {
 			}
 	}
 
+	/**
+	 * Check that the from range is of the right correction. That is from>to for
+	 * variables and to>from for loops
+	 */
 	private void checkRangeDirections(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
 		for (HDLRange hdlRange : ranges) {
@@ -492,6 +504,10 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
+	/**
+	 * Checks whether called functions exists, whether they have the correct
+	 * number of arguments etc..
+	 */
 	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLFunctionCall[] functions = unit.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (HDLFunctionCall function : functions) {
@@ -499,22 +515,17 @@ public class BuiltInValidator implements IHDLValidator {
 			// Substitute functions don't have any interference info because
 			// they don't actually return anything
 			if (info == null) {
-				try {
-					Optional<HDLFunction> f = function.resolveName();
-					if (!f.isPresent()) {
-						problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
-					} else {
-						HDLFunction hdlFunction = f.get();
-						switch (hdlFunction.getClassType()) {
-						case HDLSubstituteFunction:
-							HDLSubstituteFunction sub = (HDLSubstituteFunction) hdlFunction;
-							if (sub.getArgs().size() != function.getParams().size()) {
-								problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
-							}
+				Optional<HDLFunction> f = function.resolveName();
+				if (!f.isPresent()) {
+					problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+				} else {
+					HDLFunction hdlFunction = f.get();
+					if (hdlFunction instanceof HDLSubstituteFunction) {
+						HDLSubstituteFunction sub = (HDLSubstituteFunction) hdlFunction;
+						if (sub.getArgs().size() != function.getParams().size()) {
+							problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
 						}
 					}
-				} catch (Exception e) {
-					problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
 				}
 			}
 		}
@@ -523,7 +534,7 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkProessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable var : vars)
-			if (var.hasMeta(RWValidation.BlockMetaClash.clash)) {
+			if (var.hasMeta(RWValidation.BLOCK_META_CLASH)) {
 				problems.add(new Problem(ErrorCode.MULTI_PROCESS_WRITE, var));
 			}
 	}

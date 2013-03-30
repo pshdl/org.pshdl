@@ -252,8 +252,11 @@ public class TypeExtension {
     if (_not) {
       return Optional.<HDLType>absent();
     }
-    HDLType _get = nextType.get();
-    HDLPrimitive type = ((HDLPrimitive) _get);
+    HDLType type = nextType.get();
+    boolean _not_1 = (!(type instanceof HDLPrimitive));
+    if (_not_1) {
+      return Optional.<HDLType>absent();
+    }
     HDLExpression width = TypeExtension.getWidth(type);
     boolean _hasNext = iter.hasNext();
     boolean _while = _hasNext;
@@ -266,12 +269,16 @@ public class TypeExtension {
         HDLExpression _next_1 = iter.next();
         final Optional<? extends HDLType> nextCatType = this.determineType(_next_1);
         boolean _isPresent_1 = nextCatType.isPresent();
-        boolean _not_1 = (!_isPresent_1);
-        if (_not_1) {
+        boolean _not_2 = (!_isPresent_1);
+        if (_not_2) {
           return Optional.<HDLType>absent();
         }
-        HDLType _get_1 = nextCatType.get();
-        type = ((HDLPrimitive) _get_1);
+        HDLType _get = nextCatType.get();
+        type = _get;
+        boolean _not_3 = (!(type instanceof HDLPrimitive));
+        if (_not_3) {
+          return Optional.<HDLType>absent();
+        }
         HDLArithOp _hDLArithOp = new HDLArithOp();
         HDLArithOp _setLeft = _hDLArithOp.setLeft(width);
         HDLArithOp _setType = _setLeft.setType(HDLArithOpType.PLUS);

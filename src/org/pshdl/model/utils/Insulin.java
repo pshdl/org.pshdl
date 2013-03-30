@@ -163,6 +163,11 @@ public class Insulin {
 			if (typeOf.isPresent())
 				return createFullEnum(uFrag, typeOf.get());
 		}
+		if (container instanceof HDLVariable) {
+			Optional<? extends HDLType> typeOf = TypeExtension.typeOf(container);
+			if (typeOf.isPresent())
+				return createFullEnum(uFrag, typeOf.get());
+		}
 		return Optional.absent();
 	}
 
@@ -500,7 +505,7 @@ public class Insulin {
 		} else {
 			init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
 		}
-		HDLBlock obj = var.getMeta(RWValidation.BlockMeta.block);
+		HDLBlock obj = var.getMeta(RWValidation.BLOCK_META);
 		if ((obj != null) && (obj != RWValidation.UNIT_BLOCK)) {
 			insertFirstStatement(ms, obj, init);
 		} else {
