@@ -39,34 +39,12 @@ import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
-import org.pshdl.model.utils.services.*;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.base.*;
 
 public class PSHDLParser {
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		File file = new File(args[0]);
-		HDLCore.init(new IServiceProvider.ServiceLoaderProvider());
-		String libURI = "bla";
-		HDLLibrary.registerLibrary(libURI, new HDLLibrary());
-
-		if (file.isDirectory()) {
-			File[] listFiles = file.listFiles(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File arg0, String arg1) {
-					return arg1.endsWith(".pshdl");
-				}
-			});
-			for (File pF : listFiles) {
-				parse(pF, libURI, new HashSet<Problem>());
-			}
-		} else {
-			parse(file, libURI, new HashSet<Problem>());
-		}
-	}
 
 	public static String[] getKeywords() throws Exception {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens")));
@@ -126,7 +104,7 @@ public class PSHDLParser {
 				error = SyntaxErrors.LexerNoViableAlternative;
 			}
 			if (e instanceof InputMismatchException) {
-				error = SyntaxErrors.LexerNoViableAlternative;
+				error = SyntaxErrors.InputMismatch;
 			}
 			if (e instanceof FailedPredicateException) {
 				error = SyntaxErrors.FailedPredicate;

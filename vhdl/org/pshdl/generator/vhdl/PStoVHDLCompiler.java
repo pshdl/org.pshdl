@@ -201,8 +201,8 @@ public class PStoVHDLCompiler {
 			listener = new NullListener();
 		}
 		List<CompileResult> res = Lists.newArrayListWithCapacity(parsedContent.size());
-		Set<Problem> syntaxProblems = new HashSet<Problem>();
 		for (Entry<String, HDLPackage> e : parsedContent.entrySet()) {
+			Set<Problem> syntaxProblems = new HashSet<Problem>();
 			HDLPackage parse = e.getValue();
 			String src = e.getKey();
 			if (listener.startVHDL(src, parse)) {
