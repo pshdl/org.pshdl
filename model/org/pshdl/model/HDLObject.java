@@ -316,7 +316,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	@SuppressWarnings("unchecked")
 	public <T extends IHDLObject> T getContainer(Class<T> clazz) {
 		if (container != null) {
-			if (container.getClass().equals(clazz))
+			if (clazz.isInstance(container))
 				return (T) container;
 			return container.getContainer(clazz);
 		}

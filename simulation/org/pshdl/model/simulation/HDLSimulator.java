@@ -28,7 +28,7 @@ package org.pshdl.model.simulation;
 
 import java.math.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.concurrent.atomic.*;
 
 import javax.annotation.*;
 
@@ -54,13 +54,99 @@ public class HDLSimulator {
 		insulin = renameArrayAccess(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
-		insulin = createTernary(context, insulin);
+		insulin = convertTernary(context, insulin);
+		insulin = removeDoubleAssignments(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
-		// generate cat statement for ranges
 		// generate reset condition
-		// Starting from the end, generate ternary op for each switch/if
-		// statement
+	}
+
+	private static class InitTuple {
+		public final HDLReference ref;
+		public final IHDLObject container;
+
+		public InitTuple(HDLReference ref, IHDLObject container) {
+			super();
+			this.ref = ref;
+			this.container = container;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((container == null) ? 0 : container.hashCode());
+			result = (prime * result) + ((ref == null) ? 0 : ref.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			InitTuple other = (InitTuple) obj;
+			if (container != other.container)
+				return false;
+			if (ref == null) {
+				if (other.ref != null)
+					return false;
+			} else if (!ref.equals(other.ref))
+				return false;
+			return true;
+		}
+
+	}
+
+	private static HDLUnit removeDoubleAssignments(HDLEvaluationContext context, HDLUnit insulin) {
+		ModificationSet ms = new ModificationSet();
+		HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
+		Map<InitTuple, HDLAssignment> scopeWrites = new HashMap<InitTuple, HDLAssignment>();
+		for (HDLAssignment hdlAssignment : asss) {
+			IHDLObject container = hdlAssignment.getContainer();
+			InitTuple it = new InitTuple(hdlAssignment.getLeft(), container);
+			HDLAssignment otherAss = scopeWrites.get(it);
+			if (otherAss != null) {
+				if (container instanceof HDLIfStatement) {
+					HDLIfStatement hdlIfStatement = (HDLIfStatement) container;
+					ArrayList<HDLStatement> thenDo = hdlIfStatement.getThenDo();
+					ArrayList<HDLStatement> elseDo = hdlIfStatement.getThenDo();
+					if (thenDo.contains(otherAss) && thenDo.contains(hdlAssignment)) {
+						ms.remove(otherAss);
+					} else if (elseDo.contains(otherAss) && elseDo.contains(hdlAssignment)) {
+						ms.remove(otherAss);
+					}
+				} else {
+					ms.remove(otherAss);
+				}
+			}
+			scopeWrites.put(it, hdlAssignment);
+		}
+		return ms.apply(insulin);
+	}
+
+	private static AtomicInteger tempID = new AtomicInteger();
+
+	private static HDLUnit convertTernary(HDLEvaluationContext context, HDLUnit insulin) {
+		ModificationSet ms = new ModificationSet();
+		HDLTernary[] ternaries = insulin.getAllObjectsOf(HDLTernary.class, true);
+		for (HDLTernary ternary : ternaries) {
+			Optional<? extends HDLType> typeOf = TypeExtension.typeOf(ternary);
+			String name = "$tmp_" + tempID.getAndIncrement();
+			HDLVariable var = new HDLVariable().setName(name);
+			HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(typeOf.get()).addVariables(var);
+			HDLAssignment newAss = new HDLAssignment().setLeft(var.asHDLRef());
+			HDLIfStatement ifStatement = new HDLIfStatement()//
+					.setIfExp(ternary.getIfExpr())//
+					.addThenDo(newAss.setRight(ternary.getThenExpr()))//
+					.addElseDo(newAss.setRight(ternary.getElseExpr()));
+			ms.replace(ternary, var.asHDLRef());
+			ms.insertBefore(ternary.getContainer(HDLStatement.class), hvd, ifStatement);
+		}
+		return ms.apply(insulin);
 	}
 
 	private static HDLUnit renameArrayAccess(HDLEvaluationContext context, HDLUnit insulin) {
@@ -125,46 +211,6 @@ public class HDLSimulator {
 			}
 		}
 		return ms.apply(insulin);
-	}
-
-	private static HDLUnit createTernary(HDLEvaluationContext context, HDLUnit insulin) {
-		HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
-		Map<String, LinkedList<HDLAssignment>> writeOps = new LinkedHashMap<String, LinkedList<HDLAssignment>>();
-		Map<String, HDLReference> references = new LinkedHashMap<String, HDLReference>();
-		for (HDLAssignment ass : asss) {
-			String key = ass.getLeft().toString();
-			LinkedList<HDLAssignment> list = writeOps.get(key);
-			if (list == null) {
-				list = new LinkedList<HDLAssignment>();
-				writeOps.put(key, list);
-			}
-			references.put(key, ass.getLeft());
-			list.add(ass);
-		}
-		HDLVariableDeclaration[] hvds = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		ArrayList<HDLStatement> finalStatements = new ArrayList<HDLStatement>();
-		ArrayList<HDLStatement> initStatements = new ArrayList<HDLStatement>();
-		finalStatements.addAll(Arrays.asList(hvds));
-		int insertIndex = finalStatements.size();
-		for (Entry<String, LinkedList<HDLAssignment>> entry : writeOps.entrySet()) {
-			LinkedList<HDLAssignment> list = entry.getValue();
-			Iterator<HDLAssignment> reverseIter = list.descendingIterator();
-			while (reverseIter.hasNext()) {
-				HDLAssignment next = reverseIter.next();
-				// XXX Add if cases
-
-				IHDLObject container = next.getContainer();
-				if (container.getClassType() == HDLClass.HDLUnit) {
-					initStatements.add(next);
-					break;
-				}
-				if (container.getClassType() == HDLClass.HDLIfStatement) {
-					HDLIfStatement hif = (HDLIfStatement) container;
-					finalStatements.add(insertIndex, hif.setThenDo(HDLObject.asList((HDLStatement) next)));
-				}
-			}
-		}
-		return insulin.setInits(initStatements).setStatements(finalStatements).copyDeepFrozen(insulin.getContainer());
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {

@@ -86,6 +86,7 @@ public class ModificationSet {
 						List<T> before = new LinkedList<T>();
 						List<T> after = new LinkedList<T>();
 						List<T> replace = new LinkedList<T>();
+						boolean remove = false;
 						for (Modification modification : mods) {
 							switch (modification.type) {
 							case INSERT_AFTER:
@@ -99,13 +100,18 @@ public class ModificationSet {
 								break;
 							case ADD:
 								break;
+							case REMOVE:
+								remove = true;
+								break;
 							}
 						}
 						multiAdd(res, before, container);
 						if (replace.size() != 0) {
 							multiAdd(res, replace, container);
 						} else {
-							singleAdd(res, t, container);
+							if (!remove) {
+								singleAdd(res, t, container);
+							}
 						}
 						multiAdd(res, after, container);
 					} else {
@@ -161,7 +167,7 @@ public class ModificationSet {
 	}
 
 	private static enum ModificationType {
-		REPLACE, INSERT_BEFORE, INSERT_AFTER, ADD;
+		REPLACE, INSERT_BEFORE, INSERT_AFTER, ADD, REMOVE;
 	}
 
 	private static class Modification {
@@ -212,6 +218,11 @@ public class ModificationSet {
 			return res;
 		}
 		return null;
+	}
+
+	public void remove(IHDLObject subject) {
+		Modification mod = new Modification(subject, ModificationType.REMOVE, null);
+		insert(subject, mod);
 	}
 
 	public void replace(IHDLObject subject, IHDLObject... with) {

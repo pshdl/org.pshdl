@@ -61,6 +61,7 @@ import org.pshdl.model.HDLResolvedRef
 
 import static org.pshdl.interpreter.utils.FluidFrame$Instruction.*
 import static org.pshdl.model.HDLArithOp$HDLArithOpType.*
+import static org.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
 import static org.pshdl.model.HDLBitOp$HDLBitOpType.*
 import static org.pshdl.model.HDLClass.*
 import static org.pshdl.model.HDLManip$HDLManipType.*
@@ -70,6 +71,8 @@ import static org.pshdl.model.HDLShiftOp$HDLShiftOpType.*
 import static org.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static org.pshdl.model.simulation.SimulationTransformationExtension.*
 import com.google.common.base.Optional
+import org.pshdl.model.HDLIfStatement
+import org.pshdl.model.HDLEqualityOp
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -79,11 +82,38 @@ class SimulationTransformationExtension {
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLExpression obj, HDLEvaluationContext context) {
-		throw new RuntimeException("Not implemented!")
+		throw new RuntimeException("Not implemented! "+obj.classType+" "+obj)
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLStatement obj, HDLEvaluationContext context) {
-		throw new RuntimeException("Not implemented!")
+		throw new RuntimeException("Not implemented! "+obj.classType+" "+obj)
+	}
+	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context) {
+		val FluidFrame res=new FluidFrame
+		for (HDLVariable hVar : obj.variables) {
+			res.addWith(FullNameExtension::fullNameOf(hVar).toString,
+				HDLPrimitives::getWidth(TypeExtension::typeOf(hVar).get, context))
+		}
+		return res
+	}
+
+	def dispatch FluidFrame toSimulationModel(HDLIfStatement obj, HDLEvaluationContext context) {
+		val name=FullNameExtension::fullNameOf(obj).toString
+		val ifModel=obj.ifExp.toSimulationModel(context)
+		ifModel.setName("$Pred_"+name)
+		for (s:obj.thenDo){
+			val thenDo=s.toSimulationModel(context)
+			if (thenDo.hasInstructions)
+				thenDo.instructions.addFirst(new ArgumentedInstruction(posPredicate, name))
+			ifModel.addReferencedFrame(thenDo)
+		}
+		for (s:obj.elseDo){
+			val elseDo=s.toSimulationModel(context)
+			if (elseDo.hasInstructions)
+				elseDo.instructions.addFirst(new ArgumentedInstruction(negPredicate, name))
+			ifModel.addReferencedFrame(elseDo)
+		}
+		return ifModel
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLAssignment obj, HDLEvaluationContext context) {
@@ -100,9 +130,9 @@ class SimulationTransformationExtension {
 			val HDLVariable clk = config.resolveClk.get
 			val String name = FullNameExtension::fullNameOf(clk).toString
 			if (config.clockType == RISING)
-				res.add(new ArgumentedInstruction(isRisingEdgeInternal2, name))
+				res.add(new ArgumentedInstruction(isRisingEdgeInternal, name))
 			else
-				res.add(new ArgumentedInstruction(isFallingEdgeInternal2, name))
+				res.add(new ArgumentedInstruction(isFallingEdgeInternal, name))
 		}
 		res.append(obj.right.toSimulationModel(context))
 		var boolean hasBits = false
@@ -150,30 +180,12 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLUnit obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
 		for (HDLStatement stmnt : obj.inits) {
-			handleStatement(context, res, stmnt)
+			res.addReferencedFrame(stmnt.toSimulationModel(context))
 		}
-
 		for (HDLStatement stmnt : obj.statements) {
-			handleStatement(context, res, stmnt)
+			res.addReferencedFrame(stmnt.toSimulationModel(context))
 		}
 		return res
-	}
-
-	def private handleStatement(HDLEvaluationContext context, FluidFrame res, HDLStatement stmnt) {
-		switch (stmnt.classType) {
-			case HDLAssignment: {
-				val FluidFrame sFrame = stmnt.toSimulationModel(context)
-				res.addReferencedFrame(sFrame)
-				res.instructions.add(new ArgumentedInstruction(callFrame, sFrame.id.toString))
-			}
-			case HDLVariableDeclaration: {
-				val HDLVariableDeclaration hvd = stmnt as HDLVariableDeclaration
-				for (HDLVariable hVar : hvd.variables) {
-					res.addWith(FullNameExtension::fullNameOf(hVar).toString,
-						HDLPrimitives::getWidth(TypeExtension::typeOf(hVar).get, context))
-				}
-			}
-		}
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLManip obj, HDLEvaluationContext context) {
@@ -235,7 +247,7 @@ class SimulationTransformationExtension {
 		val HDLDirection dir = hVar.get.direction
 		switch (dir) {
 			case INTERNAL:
-				res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
+				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
 			case dir == PARAMETER || dir == CONSTANT: {
 				val Optional<BigInteger> bVal = ConstantEvaluate::valueOf(obj, context)
 				if (!bVal.present)
@@ -244,27 +256,14 @@ class SimulationTransformationExtension {
 				res.instructions.add(new ArgumentedInstruction(loadConstant, refName))
 			}
 			case IN: {
-				res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
+				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
 			}
 			case dir == OUT || dir == INOUT: {
-				res.instructions.add(new ArgumentedInstruction(loadInternal2, arrBits))
+				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
 			}
 			default:
 				throw new IllegalArgumentException("Did not expect obj here" + dir)
 		}
-		return res
-	}
-
-	def dispatch FluidFrame toSimulationModel(HDLTernary obj, HDLEvaluationContext context) {
-		val FluidFrame res = new FluidFrame
-		res.setPredicate(true)
-		res.append(obj.ifExpr.toSimulationModel(context))
-		val FluidFrame thenFrame = obj.thenExpr.toSimulationModel(context)
-		thenFrame.addPredicate(res.id, true)
-		res.addReferencedFrame(thenFrame)
-		val FluidFrame elseFrame = obj.thenExpr.toSimulationModel(context)
-		elseFrame.addPredicate(res.id, false)
-		res.addReferencedFrame(elseFrame)
 		return res
 	}
 
@@ -282,6 +281,27 @@ class SimulationTransformationExtension {
 		return res
 	}
 
+	def dispatch FluidFrame toSimulationModel(HDLEqualityOp obj, HDLEvaluationContext context) {
+		val FluidFrame res = new FluidFrame
+		res.append(obj.left.toSimulationModel(context))
+		res.append(obj.right.toSimulationModel(context))
+		switch (obj.type){
+			case EQ:
+				res.add(eq)		
+			case NOT_EQ:
+				res.add(not_eq)		
+			case GREATER:
+				res.add(greater)		
+			case GREATER_EQ:
+				res.add(greater_eq)
+			case LESS:		
+				res.add(less)
+			case LESS_EQ:		
+				res.add(less_eq)
+		}
+		return res
+	}
+	
 	def dispatch FluidFrame toSimulationModel(HDLBitOp obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
 		res.append(obj.left.toSimulationModel(context))

@@ -44,7 +44,10 @@ import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLConcat;
+import org.pshdl.model.HDLEqualityOp;
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
@@ -58,7 +61,6 @@ import org.pshdl.model.HDLResolvedRef;
 import org.pshdl.model.HDLShiftOp;
 import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import org.pshdl.model.HDLStatement;
-import org.pshdl.model.HDLTernary;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLUnresolvedFragment;
@@ -88,13 +90,70 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLExpression obj, final HDLEvaluationContext context) {
-    RuntimeException _runtimeException = new RuntimeException("Not implemented!");
+    HDLClass _classType = obj.getClassType();
+    String _plus = ("Not implemented! " + _classType);
+    String _plus_1 = (_plus + " ");
+    String _plus_2 = (_plus_1 + obj);
+    RuntimeException _runtimeException = new RuntimeException(_plus_2);
     throw _runtimeException;
   }
   
   protected FluidFrame _toSimulationModel(final HDLStatement obj, final HDLEvaluationContext context) {
-    RuntimeException _runtimeException = new RuntimeException("Not implemented!");
+    HDLClass _classType = obj.getClassType();
+    String _plus = ("Not implemented! " + _classType);
+    String _plus_1 = (_plus + " ");
+    String _plus_2 = (_plus_1 + obj);
+    RuntimeException _runtimeException = new RuntimeException(_plus_2);
     throw _runtimeException;
+  }
+  
+  protected FluidFrame _toSimulationModel(final HDLVariableDeclaration obj, final HDLEvaluationContext context) {
+    FluidFrame _fluidFrame = new FluidFrame();
+    final FluidFrame res = _fluidFrame;
+    ArrayList<HDLVariable> _variables = obj.getVariables();
+    for (final HDLVariable hVar : _variables) {
+      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
+      String _string = _fullNameOf.toString();
+      Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(hVar);
+      HDLType _get = _typeOf.get();
+      Integer _width = HDLPrimitives.getWidth(_get, context);
+      res.addWith(_string, _width);
+    }
+    return res;
+  }
+  
+  protected FluidFrame _toSimulationModel(final HDLIfStatement obj, final HDLEvaluationContext context) {
+    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
+    final String name = _fullNameOf.toString();
+    HDLExpression _ifExp = obj.getIfExp();
+    final FluidFrame ifModel = this.toSimulationModel(_ifExp, context);
+    String _plus = ("$Pred_" + name);
+    ifModel.setName(_plus);
+    ArrayList<HDLStatement> _thenDo = obj.getThenDo();
+    for (final HDLStatement s : _thenDo) {
+      {
+        final FluidFrame thenDo = this.toSimulationModel(s, context);
+        boolean _hasInstructions = thenDo.hasInstructions();
+        if (_hasInstructions) {
+          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.posPredicate, name);
+          thenDo.instructions.addFirst(_argumentedInstruction);
+        }
+        ifModel.addReferencedFrame(thenDo);
+      }
+    }
+    ArrayList<HDLStatement> _elseDo = obj.getElseDo();
+    for (final HDLStatement s_1 : _elseDo) {
+      {
+        final FluidFrame elseDo = this.toSimulationModel(s_1, context);
+        boolean _hasInstructions = elseDo.hasInstructions();
+        if (_hasInstructions) {
+          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.negPredicate, name);
+          elseDo.instructions.addFirst(_argumentedInstruction);
+        }
+        ifModel.addReferencedFrame(elseDo);
+      }
+    }
+    return ifModel;
   }
   
   protected FluidFrame _toSimulationModel(final HDLAssignment obj, final HDLEvaluationContext context) {
@@ -126,10 +185,10 @@ public class SimulationTransformationExtension {
       HDLRegClockType _clockType = config.getClockType();
       boolean _equals = Objects.equal(_clockType, HDLRegClockType.RISING);
       if (_equals) {
-        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdgeInternal2, name);
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdgeInternal, name);
         res.add(_argumentedInstruction);
       } else {
-        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdgeInternal2, name);
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdgeInternal, name);
         res.add(_argumentedInstruction_1);
       }
     }
@@ -215,51 +274,15 @@ public class SimulationTransformationExtension {
     final FluidFrame res = _fluidFrame;
     ArrayList<HDLStatement> _inits = obj.getInits();
     for (final HDLStatement stmnt : _inits) {
-      this.handleStatement(context, res, stmnt);
+      FluidFrame _simulationModel = this.toSimulationModel(stmnt, context);
+      res.addReferencedFrame(_simulationModel);
     }
     ArrayList<HDLStatement> _statements = obj.getStatements();
     for (final HDLStatement stmnt_1 : _statements) {
-      this.handleStatement(context, res, stmnt_1);
+      FluidFrame _simulationModel_1 = this.toSimulationModel(stmnt_1, context);
+      res.addReferencedFrame(_simulationModel_1);
     }
     return res;
-  }
-  
-  private Boolean handleStatement(final HDLEvaluationContext context, final FluidFrame res, final HDLStatement stmnt) {
-    Boolean _switchResult = null;
-    HDLClass _classType = stmnt.getClassType();
-    final HDLClass _switchValue = _classType;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLAssignment)) {
-        _matched=true;
-        boolean _xblockexpression = false;
-        {
-          final FluidFrame sFrame = this.toSimulationModel(stmnt, context);
-          res.addReferencedFrame(sFrame);
-          String _string = Integer.valueOf(sFrame.id).toString();
-          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.callFrame, _string);
-          boolean _add = res.instructions.add(_argumentedInstruction);
-          _xblockexpression = (_add);
-        }
-        _switchResult = Boolean.valueOf(_xblockexpression);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLVariableDeclaration)) {
-        _matched=true;
-        final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) stmnt);
-        ArrayList<HDLVariable> _variables = hvd.getVariables();
-        for (final HDLVariable hVar : _variables) {
-          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
-          String _string = _fullNameOf.toString();
-          Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(hVar);
-          HDLType _get = _typeOf.get();
-          Integer _width = HDLPrimitives.getWidth(_get, context);
-          res.addWith(_string, _width);
-        }
-      }
-    }
-    return _switchResult;
   }
   
   protected FluidFrame _toSimulationModel(final HDLManip obj, final HDLEvaluationContext context) {
@@ -452,7 +475,7 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(dir,HDLDirection.INTERNAL)) {
         _matched=true;
-        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadInternal2, arrBits);
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadInternal, arrBits);
         res.instructions.add(_argumentedInstruction);
       }
     }
@@ -483,7 +506,7 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(dir,HDLDirection.IN)) {
         _matched=true;
-        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.loadInternal2, arrBits);
+        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.loadInternal, arrBits);
         res.instructions.add(_argumentedInstruction_2);
       }
     }
@@ -498,7 +521,7 @@ public class SimulationTransformationExtension {
       }
       if (_or_1) {
         _matched=true;
-        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.loadInternal2, arrBits);
+        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.loadInternal, arrBits);
         res.instructions.add(_argumentedInstruction_3);
       }
     }
@@ -507,24 +530,6 @@ public class SimulationTransformationExtension {
       IllegalArgumentException _illegalArgumentException_1 = new IllegalArgumentException(_plus_1);
       throw _illegalArgumentException_1;
     }
-    return res;
-  }
-  
-  protected FluidFrame _toSimulationModel(final HDLTernary obj, final HDLEvaluationContext context) {
-    FluidFrame _fluidFrame = new FluidFrame();
-    final FluidFrame res = _fluidFrame;
-    res.setPredicate(true);
-    HDLExpression _ifExpr = obj.getIfExpr();
-    FluidFrame _simulationModel = this.toSimulationModel(_ifExpr, context);
-    res.append(_simulationModel);
-    HDLExpression _thenExpr = obj.getThenExpr();
-    final FluidFrame thenFrame = this.toSimulationModel(_thenExpr, context);
-    thenFrame.addPredicate(res.id, true);
-    res.addReferencedFrame(thenFrame);
-    HDLExpression _thenExpr_1 = obj.getThenExpr();
-    final FluidFrame elseFrame = this.toSimulationModel(_thenExpr_1, context);
-    elseFrame.addPredicate(res.id, false);
-    res.addReferencedFrame(elseFrame);
     return res;
   }
   
@@ -541,6 +546,57 @@ public class SimulationTransformationExtension {
     res.constants.put(key, value);
     ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadConstant, key);
     res.instructions.add(_argumentedInstruction);
+    return res;
+  }
+  
+  protected FluidFrame _toSimulationModel(final HDLEqualityOp obj, final HDLEvaluationContext context) {
+    FluidFrame _fluidFrame = new FluidFrame();
+    final FluidFrame res = _fluidFrame;
+    HDLExpression _left = obj.getLeft();
+    FluidFrame _simulationModel = this.toSimulationModel(_left, context);
+    res.append(_simulationModel);
+    HDLExpression _right = obj.getRight();
+    FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context);
+    res.append(_simulationModel_1);
+    HDLEqualityOpType _type = obj.getType();
+    final HDLEqualityOpType _switchValue = _type;
+    boolean _matched = false;
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLEqualityOpType.EQ)) {
+        _matched=true;
+        res.add(Instruction.eq);
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLEqualityOpType.NOT_EQ)) {
+        _matched=true;
+        res.add(Instruction.not_eq);
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLEqualityOpType.GREATER)) {
+        _matched=true;
+        res.add(Instruction.greater);
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLEqualityOpType.GREATER_EQ)) {
+        _matched=true;
+        res.add(Instruction.greater_eq);
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLEqualityOpType.LESS)) {
+        _matched=true;
+        res.add(Instruction.less);
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLEqualityOpType.LESS_EQ)) {
+        _matched=true;
+        res.add(Instruction.less_eq);
+      }
+    }
     return res;
   }
   
@@ -682,8 +738,14 @@ public class SimulationTransformationExtension {
       return _toSimulationModel((HDLArithOp)obj, context);
     } else if (obj instanceof HDLBitOp) {
       return _toSimulationModel((HDLBitOp)obj, context);
+    } else if (obj instanceof HDLEqualityOp) {
+      return _toSimulationModel((HDLEqualityOp)obj, context);
+    } else if (obj instanceof HDLIfStatement) {
+      return _toSimulationModel((HDLIfStatement)obj, context);
     } else if (obj instanceof HDLShiftOp) {
       return _toSimulationModel((HDLShiftOp)obj, context);
+    } else if (obj instanceof HDLVariableDeclaration) {
+      return _toSimulationModel((HDLVariableDeclaration)obj, context);
     } else if (obj instanceof HDLAssignment) {
       return _toSimulationModel((HDLAssignment)obj, context);
     } else if (obj instanceof HDLConcat) {
@@ -692,8 +754,6 @@ public class SimulationTransformationExtension {
       return _toSimulationModel((HDLLiteral)obj, context);
     } else if (obj instanceof HDLManip) {
       return _toSimulationModel((HDLManip)obj, context);
-    } else if (obj instanceof HDLTernary) {
-      return _toSimulationModel((HDLTernary)obj, context);
     } else if (obj instanceof HDLUnit) {
       return _toSimulationModel((HDLUnit)obj, context);
     } else if (obj instanceof HDLExpression) {
