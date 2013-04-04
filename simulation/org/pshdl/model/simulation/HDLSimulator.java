@@ -381,4 +381,8 @@ public class HDLSimulator {
 		}
 		return ms.apply(unit);
 	}
+
+	public static void resetTempIDs() {
+		tempID.set(0);
+	}
 }
