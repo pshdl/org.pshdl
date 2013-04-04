@@ -127,7 +127,7 @@ public class SimulationTransformationExtension {
     final String name = _fullNameOf.toString();
     HDLExpression _ifExp = obj.getIfExp();
     final FluidFrame ifModel = this.toSimulationModel(_ifExp, context);
-    String _plus = ("$Pred_" + name);
+    String _plus = (FluidFrame.PRED_PREFIX + name);
     ifModel.setName(_plus);
     ArrayList<HDLStatement> _thenDo = obj.getThenDo();
     for (final HDLStatement s : _thenDo) {
@@ -165,7 +165,7 @@ public class SimulationTransformationExtension {
     if (_tripleNotEquals) {
       HDLReference _left = obj.getLeft();
       String _varName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true);
-      String _plus = (_varName + "$reg");
+      String _plus = (_varName + FluidFrame.REG_POSTFIX);
       FluidFrame _fluidFrame = new FluidFrame(_plus);
       res = _fluidFrame;
     } else {
@@ -185,10 +185,10 @@ public class SimulationTransformationExtension {
       HDLRegClockType _clockType = config.getClockType();
       boolean _equals = Objects.equal(_clockType, HDLRegClockType.RISING);
       if (_equals) {
-        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdgeInternal, name);
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.isRisingEdge, name);
         res.add(_argumentedInstruction);
       } else {
-        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdgeInternal, name);
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdge, name);
         res.add(_argumentedInstruction_1);
       }
     }
@@ -306,7 +306,7 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLManipType.LOGIC_NEG)) {
         _matched=true;
-        res.add(Instruction.logic_neg);
+        res.add(Instruction.logiNeg);
       }
     }
     if (!_matched) {
@@ -326,13 +326,13 @@ public class SimulationTransformationExtension {
         if (!_matched_1) {
           boolean _or = false;
           HDLPrimitiveType _type_2 = prim.getType();
-          boolean _equals = Objects.equal(_type_2, HDLPrimitiveType.INTEGER);
-          if (_equals) {
+          boolean _tripleEquals = (_type_2 == HDLPrimitiveType.INTEGER);
+          if (_tripleEquals) {
             _or = true;
           } else {
             HDLPrimitiveType _type_3 = prim.getType();
-            boolean _equals_1 = Objects.equal(_type_3, HDLPrimitiveType.INT);
-            _or = (_equals || _equals_1);
+            boolean _tripleEquals_1 = (_type_3 == HDLPrimitiveType.INT);
+            _or = (_tripleEquals || _tripleEquals_1);
           }
           if (_or) {
             _matched_1=true;
@@ -343,13 +343,13 @@ public class SimulationTransformationExtension {
         if (!_matched_1) {
           boolean _or_1 = false;
           HDLPrimitiveType _type_4 = prim.getType();
-          boolean _equals_2 = Objects.equal(_type_4, HDLPrimitiveType.UINT);
-          if (_equals_2) {
+          boolean _tripleEquals_2 = (_type_4 == HDLPrimitiveType.UINT);
+          if (_tripleEquals_2) {
             _or_1 = true;
           } else {
             HDLPrimitiveType _type_5 = prim.getType();
-            boolean _equals_3 = Objects.equal(_type_5, HDLPrimitiveType.NATURAL);
-            _or_1 = (_equals_2 || _equals_3);
+            boolean _tripleEquals_3 = (_type_5 == HDLPrimitiveType.NATURAL);
+            _or_1 = (_tripleEquals_2 || _tripleEquals_3);
           }
           if (_or_1) {
             _matched_1=true;
@@ -360,13 +360,13 @@ public class SimulationTransformationExtension {
         if (!_matched_1) {
           boolean _or_2 = false;
           HDLPrimitiveType _type_6 = prim.getType();
-          boolean _equals_4 = Objects.equal(_type_6, HDLPrimitiveType.BIT);
-          if (_equals_4) {
+          boolean _tripleEquals_4 = (_type_6 == HDLPrimitiveType.BIT);
+          if (_tripleEquals_4) {
             _or_2 = true;
           } else {
             HDLPrimitiveType _type_7 = prim.getType();
-            boolean _equals_5 = Objects.equal(_type_7, HDLPrimitiveType.BITVECTOR);
-            _or_2 = (_equals_4 || _equals_5);
+            boolean _tripleEquals_5 = (_type_7 == HDLPrimitiveType.BITVECTOR);
+            _or_2 = (_tripleEquals_4 || _tripleEquals_5);
           }
           if (_or_2) {
             _matched_1=true;
@@ -397,13 +397,13 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       boolean _or = false;
       HDLPrimitiveType _type_1 = current.getType();
-      boolean _equals = Objects.equal(_type_1, HDLPrimitiveType.INTEGER);
-      if (_equals) {
+      boolean _tripleEquals = (_type_1 == HDLPrimitiveType.INTEGER);
+      if (_tripleEquals) {
         _or = true;
       } else {
         HDLPrimitiveType _type_2 = current.getType();
-        boolean _equals_1 = Objects.equal(_type_2, HDLPrimitiveType.NATURAL);
-        _or = (_equals || _equals_1);
+        boolean _tripleEquals_1 = (_type_2 == HDLPrimitiveType.NATURAL);
+        _or = (_tripleEquals || _tripleEquals_1);
       }
       if (_or) {
         _matched=true;
@@ -414,20 +414,20 @@ public class SimulationTransformationExtension {
       boolean _or_1 = false;
       boolean _or_2 = false;
       HDLPrimitiveType _type_3 = current.getType();
-      boolean _equals_2 = Objects.equal(_type_3, HDLPrimitiveType.INT);
-      if (_equals_2) {
+      boolean _tripleEquals_2 = (_type_3 == HDLPrimitiveType.INT);
+      if (_tripleEquals_2) {
         _or_2 = true;
       } else {
         HDLPrimitiveType _type_4 = current.getType();
-        boolean _equals_3 = Objects.equal(_type_4, HDLPrimitiveType.UINT);
-        _or_2 = (_equals_2 || _equals_3);
+        boolean _tripleEquals_3 = (_type_4 == HDLPrimitiveType.UINT);
+        _or_2 = (_tripleEquals_2 || _tripleEquals_3);
       }
       if (_or_2) {
         _or_1 = true;
       } else {
         HDLPrimitiveType _type_5 = current.getType();
-        boolean _equals_4 = Objects.equal(_type_5, HDLPrimitiveType.BITVECTOR);
-        _or_1 = (_or_2 || _equals_4);
+        boolean _tripleEquals_4 = (_type_5 == HDLPrimitiveType.BITVECTOR);
+        _or_1 = (_or_2 || _tripleEquals_4);
       }
       if (_or_1) {
         _matched=true;
@@ -481,12 +481,12 @@ public class SimulationTransformationExtension {
     }
     if (!_matched) {
       boolean _or = false;
-      boolean _equals = Objects.equal(dir, HDLDirection.PARAMETER);
-      if (_equals) {
+      boolean _tripleEquals = (dir == HDLDirection.PARAMETER);
+      if (_tripleEquals) {
         _or = true;
       } else {
-        boolean _equals_1 = Objects.equal(dir, HDLDirection.CONSTANT);
-        _or = (_equals || _equals_1);
+        boolean _tripleEquals_1 = (dir == HDLDirection.CONSTANT);
+        _or = (_tripleEquals || _tripleEquals_1);
       }
       if (_or) {
         _matched=true;
@@ -512,12 +512,12 @@ public class SimulationTransformationExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
-      boolean _equals_2 = Objects.equal(dir, HDLDirection.OUT);
-      if (_equals_2) {
+      boolean _tripleEquals_2 = (dir == HDLDirection.OUT);
+      if (_tripleEquals_2) {
         _or_1 = true;
       } else {
-        boolean _equals_3 = Objects.equal(dir, HDLDirection.INOUT);
-        _or_1 = (_equals_2 || _equals_3);
+        boolean _tripleEquals_3 = (dir == HDLDirection.INOUT);
+        _or_1 = (_tripleEquals_2 || _tripleEquals_3);
       }
       if (_or_1) {
         _matched=true;

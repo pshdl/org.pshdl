@@ -100,7 +100,7 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLIfStatement obj, HDLEvaluationContext context) {
 		val name=FullNameExtension::fullNameOf(obj).toString
 		val ifModel=obj.ifExp.toSimulationModel(context)
-		ifModel.setName("$Pred_"+name)
+		ifModel.setName(FluidFrame::PRED_PREFIX+name)
 		for (s:obj.thenDo){
 			val thenDo=s.toSimulationModel(context)
 			if (thenDo.hasInstructions)
@@ -122,7 +122,7 @@ class SimulationTransformationExtension {
 		var HDLRegisterConfig config = hVar.registerConfig
 		var FluidFrame res
 		if (config !== null)
-			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + "$reg")
+			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + FluidFrame::REG_POSTFIX)
 		else
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true))
 		if (config !== null) {
@@ -130,9 +130,9 @@ class SimulationTransformationExtension {
 			val HDLVariable clk = config.resolveClk.get
 			val String name = FullNameExtension::fullNameOf(clk).toString
 			if (config.clockType == RISING)
-				res.add(new ArgumentedInstruction(isRisingEdgeInternal, name))
+				res.add(new ArgumentedInstruction(isRisingEdge, name))
 			else
-				res.add(new ArgumentedInstruction(isFallingEdgeInternal, name))
+				res.add(new ArgumentedInstruction(isFallingEdge, name))
 		}
 		res.append(obj.right.toSimulationModel(context))
 		var boolean hasBits = false
@@ -196,18 +196,18 @@ class SimulationTransformationExtension {
 			case BIT_NEG:
 				res.add(bit_neg)
 			case LOGIC_NEG:
-				res.add(logic_neg)
+				res.add(logiNeg)
 			case CAST: {
 				val HDLPrimitive prim = obj.castTo as HDLPrimitive
 				val HDLPrimitive current = TypeExtension::typeOf(obj.target).get as HDLPrimitive
 				val String currentWidth = getWidth(current, context)
 				val String primWidth = getWidth(prim, context)
 				switch (prim.type) {
-					case prim.type == INTEGER || prim.type == INT:
+					case prim.type === INTEGER || prim.type === INT:
 						res.instructions.add(new ArgumentedInstruction(cast_int, primWidth, currentWidth))
-					case prim.type == UINT || prim.type == NATURAL:
+					case prim.type === UINT || prim.type === NATURAL:
 						res.instructions.add(new ArgumentedInstruction(cast_uint, primWidth, currentWidth))
-					case prim.type == BIT || prim.type == BITVECTOR: {
+					case prim.type === BIT || prim.type === BITVECTOR: {
 					}
 					default:
 						throw new IllegalArgumentException("Cast to type:" + prim.type + " not supported")
@@ -221,9 +221,9 @@ class SimulationTransformationExtension {
 		switch (current.type) {
 			case BIT:
 				return "1"
-			case current.type == INTEGER || current.type == NATURAL:
+			case current.type === INTEGER || current.type === NATURAL:
 				return "32"
-			case current.type == INT || current.type == UINT || current.type == BITVECTOR: {
+			case current.type === INT || current.type === UINT || current.type === BITVECTOR: {
 				val res = ConstantEvaluate::valueOf(current.width, context)
 				if (res.present)
 					return res.get.toString
@@ -248,7 +248,7 @@ class SimulationTransformationExtension {
 		switch (dir) {
 			case INTERNAL:
 				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
-			case dir == PARAMETER || dir == CONSTANT: {
+			case dir === PARAMETER || dir === CONSTANT: {
 				val Optional<BigInteger> bVal = ConstantEvaluate::valueOf(obj, context)
 				if (!bVal.present)
 					throw new IllegalArgumentException("Const/param should be constant")
@@ -258,7 +258,7 @@ class SimulationTransformationExtension {
 			case IN: {
 				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
 			}
-			case dir == OUT || dir == INOUT: {
+			case dir === OUT || dir === INOUT: {
 				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
 			}
 			default:
