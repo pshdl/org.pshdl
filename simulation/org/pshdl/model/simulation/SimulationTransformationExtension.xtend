@@ -49,9 +49,9 @@ import org.pshdl.model.HDLVariableDeclaration$HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.evaluation.HDLEvaluationContext
-import org.pshdl.model.evaluation.ConstantEvaluate
-import org.pshdl.model.extensions.FullNameExtension
-import org.pshdl.model.extensions.TypeExtension
+import static org.pshdl.model.evaluation.ConstantEvaluate.*
+import static org.pshdl.model.extensions.FullNameExtension.*
+import static org.pshdl.model.extensions.TypeExtension.*
 import org.pshdl.model.types.builtIn.HDLPrimitives
 import java.math.BigInteger
 import java.util.ArrayList
@@ -73,6 +73,12 @@ import static org.pshdl.model.simulation.SimulationTransformationExtension.*
 import com.google.common.base.Optional
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLEqualityOp
+import org.pshdl.model.HDLSwitchStatement
+import org.pshdl.model.HDLSwitchCaseStatement
+import org.pshdl.model.HDLEnumRef
+import org.pshdl.model.HDLEnumDeclaration
+import org.pshdl.model.HDLInterfaceDeclaration
+import org.pshdl.model.evaluation.ConstantEvaluate
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -82,33 +88,90 @@ class SimulationTransformationExtension {
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLExpression obj, HDLEvaluationContext context) {
-		throw new RuntimeException("Not implemented! "+obj.classType+" "+obj)
+		throw new RuntimeException("Not implemented! " + obj.classType + " " + obj)
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLStatement obj, HDLEvaluationContext context) {
-		throw new RuntimeException("Not implemented! "+obj.classType+" "+obj)
+		throw new RuntimeException("Not implemented! " + obj.classType + " " + obj)
 	}
+
+	def dispatch FluidFrame toSimulationModel(HDLInterfaceDeclaration obj, HDLEvaluationContext context) {
+		return new FluidFrame
+	}
+
+	def dispatch FluidFrame toSimulationModel(HDLEnumDeclaration obj, HDLEvaluationContext context) {
+		return new FluidFrame
+	}
+
 	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context) {
-		val FluidFrame res=new FluidFrame
+		val FluidFrame res = new FluidFrame
+		val type = obj.resolveType.get
+		val width = if(type.classType === HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
 		for (HDLVariable hVar : obj.variables) {
-			res.addWith(FullNameExtension::fullNameOf(hVar).toString,
-				HDLPrimitives::getWidth(TypeExtension::typeOf(hVar).get, context))
+			res.addWith(fullNameOf(hVar).toString, width)
+		}
+		return res
+	}
+
+	def dispatch FluidFrame toSimulationModel(HDLSwitchStatement obj, HDLEvaluationContext context) {
+		val name= fullNameOf(obj).toString;
+		val res = obj.caseExp.toSimulationModel(context)
+		res.setName(name)
+		val type= typeOf(obj.caseExp).get
+		val width = if(type.classType === HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
+		res.addWith(name, width)
+		for (HDLSwitchCaseStatement c : obj.cases) {
+			val cName = fullNameOf(c).toString
+			val defaultFrame = new FluidFrame(FluidFrame::PRED_PREFIX + cName)
+			if (c.label == null) {
+				for (cSub : obj.cases) {
+					if (cSub != c)
+						defaultFrame.add(
+							new ArgumentedInstruction(negPredicate, fullNameOf(cSub).toString))
+				}
+				defaultFrame.add(const1)
+			} else {
+				val const = valueOf(c.label)
+				var int l
+				if (const.present)
+					l=const.get.intValue
+				else {
+					if (c.label.classType === HDLEnumRef) {
+						val HDLEnumRef ref = c.label as HDLEnumRef
+						val hEnum = ref.resolveHEnum.get
+						val hVar = ref.resolveVar.get
+						l = hEnum.enums.indexOf(hVar)
+					} else {
+						throw new IllegalArgumentException("Unsupported label type");
+					}
+				}
+				defaultFrame.add(new ArgumentedInstruction(loadInternal, name))
+				defaultFrame.addConstant("label", BigInteger::valueOf(l))
+				defaultFrame.add(eq)
+			}
+			for (d : c.dos) {
+				val subDo = d.toSimulationModel(context)
+				if (subDo.hasInstructions)
+					subDo.instructions.addFirst(new ArgumentedInstruction(posPredicate, cName))
+				defaultFrame.addReferencedFrame(subDo)
+			}
+			res.addReferencedFrame(defaultFrame)
 		}
 		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLIfStatement obj, HDLEvaluationContext context) {
-		val name=FullNameExtension::fullNameOf(obj).toString
-		val ifModel=obj.ifExp.toSimulationModel(context)
-		ifModel.setName(FluidFrame::PRED_PREFIX+name)
-		for (s:obj.thenDo){
-			val thenDo=s.toSimulationModel(context)
+		val name = fullNameOf(obj).toString
+		val ifModel = obj.ifExp.toSimulationModel(context)
+		ifModel.setName(FluidFrame::PRED_PREFIX + name)
+		for (s : obj.thenDo) {
+			val thenDo = s.toSimulationModel(context)
 			if (thenDo.hasInstructions)
 				thenDo.instructions.addFirst(new ArgumentedInstruction(posPredicate, name))
 			ifModel.addReferencedFrame(thenDo)
 		}
-		for (s:obj.elseDo){
-			val elseDo=s.toSimulationModel(context)
+		for (s : obj.elseDo) {
+			val elseDo = s.toSimulationModel(context)
 			if (elseDo.hasInstructions)
 				elseDo.instructions.addFirst(new ArgumentedInstruction(negPredicate, name))
 			ifModel.addReferencedFrame(elseDo)
@@ -128,7 +191,7 @@ class SimulationTransformationExtension {
 		if (config !== null) {
 			config = config.normalize
 			val HDLVariable clk = config.resolveClk.get
-			val String name = FullNameExtension::fullNameOf(clk).toString
+			val String name = fullNameOf(clk).toString
 			if (config.clockType == RISING)
 				res.add(new ArgumentedInstruction(isRisingEdge, name))
 			else
@@ -152,7 +215,7 @@ class SimulationTransformationExtension {
 
 	def static String getVarName(HDLVariableRef hVar, boolean withBits) {
 		val StringBuilder sb = new StringBuilder
-		sb.append(FullNameExtension::fullNameOf(hVar.resolveVar.get))
+		sb.append(fullNameOf(hVar.resolveVar.get))
 		for (HDLExpression exp : hVar.array) {
 			sb.append('[').append(exp).append(']')
 		}
@@ -171,7 +234,7 @@ class SimulationTransformationExtension {
 		while (iter.hasNext) {
 			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context))
-			val int width = HDLPrimitives::getWidth(TypeExtension::typeOf(exp).get, context)
+			val int width = HDLPrimitives::getWidth(typeOf(exp).get, context)
 			res.add(new ArgumentedInstruction(concat, width.toString))
 		}
 		return res
@@ -199,7 +262,7 @@ class SimulationTransformationExtension {
 				res.add(logiNeg)
 			case CAST: {
 				val HDLPrimitive prim = obj.castTo as HDLPrimitive
-				val HDLPrimitive current = TypeExtension::typeOf(obj.target).get as HDLPrimitive
+				val HDLPrimitive current = typeOf(obj.target).get as HDLPrimitive
 				val String currentWidth = getWidth(current, context)
 				val String primWidth = getWidth(prim, context)
 				switch (prim.type) {
@@ -224,12 +287,21 @@ class SimulationTransformationExtension {
 			case current.type === INTEGER || current.type === NATURAL:
 				return "32"
 			case current.type === INT || current.type === UINT || current.type === BITVECTOR: {
-				val res = ConstantEvaluate::valueOf(current.width, context)
+				val res = valueOf(current.width, context)
 				if (res.present)
 					return res.get.toString
 			}
 		}
 		throw new IllegalArgumentException(current + " is not a valid type");
+	}
+
+	def dispatch FluidFrame toSimulationModel(HDLEnumRef obj, HDLEvaluationContext context) {
+		val res = new FluidFrame
+		val hEnum = obj.resolveHEnum.get
+		val hVar = obj.resolveVar.get
+		val idx = hEnum.enums.indexOf(hVar)
+		res.addConstant(fullNameOf(hVar).toString, BigInteger::valueOf(idx))
+		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context) {
@@ -249,11 +321,10 @@ class SimulationTransformationExtension {
 			case INTERNAL:
 				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
 			case dir === PARAMETER || dir === CONSTANT: {
-				val Optional<BigInteger> bVal = ConstantEvaluate::valueOf(obj, context)
+				val Optional<BigInteger> bVal = valueOf(obj, context)
 				if (!bVal.present)
 					throw new IllegalArgumentException("Const/param should be constant")
-				res.constants.put(refName, bVal.get)
-				res.instructions.add(new ArgumentedInstruction(loadConstant, refName))
+				res.addConstant(refName, bVal.get)
 			}
 			case IN: {
 				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
@@ -271,13 +342,26 @@ class SimulationTransformationExtension {
 		val BigInteger value = obj.valueAsBigInt
 
 		val FluidFrame res = new FluidFrame
-		if (BigInteger::ZERO.equals(value)) {
+		if (0bi.equals(value)) {
 			res.add(const0)
 			return res
 		}
+		if (1bi.equals(value)) {
+			res.add(const1)
+			return res
+		}
+		if (2bi.equals(value)) {
+			res.add(const2)
+			return res
+		}
+
+		//		if (value.xor(value).equals(0bi)) {
+		//			res.add(new ArgumentedInstruction(constAll1, value.bitLength.toString))
+		//			return res
+		//		}
 		val String key = value.toString
 		res.constants.put(key, value)
-		res.instructions.add(new ArgumentedInstruction(loadConstant, key))
+		res.add(new ArgumentedInstruction(loadConstant, key))
 		return res
 	}
 
@@ -285,23 +369,23 @@ class SimulationTransformationExtension {
 		val FluidFrame res = new FluidFrame
 		res.append(obj.left.toSimulationModel(context))
 		res.append(obj.right.toSimulationModel(context))
-		switch (obj.type){
+		switch (obj.type) {
 			case EQ:
-				res.add(eq)		
+				res.add(eq)
 			case NOT_EQ:
-				res.add(not_eq)		
+				res.add(not_eq)
 			case GREATER:
-				res.add(greater)		
+				res.add(greater)
 			case GREATER_EQ:
 				res.add(greater_eq)
-			case LESS:		
+			case LESS:
 				res.add(less)
-			case LESS_EQ:		
+			case LESS_EQ:
 				res.add(less_eq)
 		}
 		return res
 	}
-	
+
 	def dispatch FluidFrame toSimulationModel(HDLBitOp obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
 		res.append(obj.left.toSimulationModel(context))

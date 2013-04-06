@@ -41,6 +41,7 @@ import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLConcat;
 import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLExpression;
@@ -308,6 +309,14 @@ public class TypeExtension {
     return TypeExtension.getWidth(_get);
   }
   
+  protected static HDLExpression _getWidth(final HDLEnum type) {
+    return null;
+  }
+  
+  protected static HDLExpression _getWidth(final HDLInterface type) {
+    return null;
+  }
+  
   protected static HDLExpression _getWidth(final HDLPrimitive type) {
     final HDLExpression width = type.getWidth();
     HDLPrimitiveType _type = type.getType();
@@ -316,6 +325,10 @@ public class TypeExtension {
       return HDLLiteral.get(1);
     }
     return width;
+  }
+  
+  protected Optional<? extends HDLType> _determineType(final HDLEnum ref) {
+    return Optional.<HDLEnum>of(ref);
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLEnumRef ref) {
@@ -475,7 +488,9 @@ public class TypeExtension {
   }
   
   public Optional<? extends HDLType> determineType(final IHDLObject ref) {
-    if (ref instanceof HDLEnumRef) {
+    if (ref instanceof HDLEnum) {
+      return _determineType((HDLEnum)ref);
+    } else if (ref instanceof HDLEnumRef) {
       return _determineType((HDLEnumRef)ref);
     } else if (ref instanceof HDLInlineFunction) {
       return _determineType((HDLInlineFunction)ref);
@@ -516,8 +531,12 @@ public class TypeExtension {
   }
   
   public static HDLExpression getWidth(final IHDLObject type) {
-    if (type instanceof HDLPrimitive) {
+    if (type instanceof HDLEnum) {
+      return _getWidth((HDLEnum)type);
+    } else if (type instanceof HDLPrimitive) {
       return _getWidth((HDLPrimitive)type);
+    } else if (type instanceof HDLInterface) {
+      return _getWidth((HDLInterface)type);
     } else if (type != null) {
       return _getWidth(type);
     } else {

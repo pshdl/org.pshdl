@@ -33,8 +33,8 @@ import java.util.Map.Entry;
 import org.pshdl.model.*;
 import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.services.*;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.*;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
@@ -59,7 +59,7 @@ import de.upb.hni.vmagic.output.*;
  * @author Karsten Becker
  * 
  */
-public class PStoVHDLCompiler {
+public class PStoVHDLCompiler implements IOutputProvider {
 
 	/**
 	 * Do not report any progress and proceed whenever possible
@@ -114,6 +114,7 @@ public class PStoVHDLCompiler {
 	private HDLLibrary lib;
 	private String libURI;
 	private Map<String, HDLPackage> parsedContent = Maps.newLinkedHashMap();
+	private Multimap<String, Problem> issues = LinkedHashMultimap.create();
 
 	private PStoVHDLCompiler(String libURI) {
 		lib = new HDLLibrary();
@@ -202,9 +203,13 @@ public class PStoVHDLCompiler {
 		}
 		List<CompileResult> res = Lists.newArrayListWithCapacity(parsedContent.size());
 		for (Entry<String, HDLPackage> e : parsedContent.entrySet()) {
-			Set<Problem> syntaxProblems = new HashSet<Problem>();
-			HDLPackage parse = e.getValue();
 			String src = e.getKey();
+			Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
+			HDLPackage parse = e.getValue();
+			if (parse == null) {
+				res.add(new CompileResult(syntaxProblems, null, "<ERROR>", null, src));
+				continue;
+			}
 			if (listener.startVHDL(src, parse)) {
 				parse = Insulin.resolveFragments(parse);
 				Set<Problem> validate = HDLValidator.validate(parse, null);
@@ -240,16 +245,13 @@ public class PStoVHDLCompiler {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		if (args.length == 0) {
-			System.out.println("Arguments are: outputDir <Files>");
-			return;
-		}
+	@Override
+	public String invoke(String[] args) throws IOException {
+		if (args.length == 1)
+			return "Invalid arguments. Try help " + getHookName();
 		Stopwatch sw = new Stopwatch().start();
 		HDLCore.defaultInit();
 		PStoVHDLCompiler compiler = setup("CMDLINE");
-		CompilerInformation information = HDLCore.getCompilerInformation();
-		System.out.println("PSHDLCompiler.main()" + information);
 		System.out.println("Init: " + sw);
 		File outDir = new File(args[0]);
 		if (!outDir.exists()) {
@@ -270,7 +272,7 @@ public class PStoVHDLCompiler {
 		}
 		if (hasSyntaxErrors) {
 			System.out.println("Exiting");
-			return;
+			return "Found synax errors";
 		}
 		System.out.println("Compiling files");
 		List<CompileResult> results = compiler.compileToVHDL(new ICompilationListener() {
@@ -301,6 +303,7 @@ public class PStoVHDLCompiler {
 			}
 		}
 		System.out.println("Done! Total time:" + sw);
+		return null;
 	}
 
 	public static void writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
@@ -375,10 +378,10 @@ public class PStoVHDLCompiler {
 	 */
 	public Set<Problem> add(String contents, String src) {
 		Set<Problem> problems = Sets.newHashSet();
+		issues.removeAll(src);
 		HDLPackage pkg = PSHDLParser.parseString(contents, libURI, problems, src);
-		if (pkg != null) {
-			parsedContent.put(src, pkg);
-		}
+		parsedContent.put(src, pkg);
+		issues.putAll(src, problems);
 		return problems;
 	}
 
@@ -428,4 +431,16 @@ public class PStoVHDLCompiler {
 	public void addVHDL(InputStream contents, String asSrc) {
 		VHDLImporter.importFile(HDLQualifiedName.create("VHDL", "work"), contents, lib, asSrc);
 	}
+
+	@Override
+	public String getHookName() {
+		return "vhdl";
+	}
+
+	@Override
+	public String[] getUsage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

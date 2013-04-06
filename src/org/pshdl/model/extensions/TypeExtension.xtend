@@ -68,6 +68,8 @@ import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.utils.HDLConfig
 import org.pshdl.model.HDLRegisterConfig
 import com.google.common.base.Optional
+import org.pshdl.model.HDLEnum
+import org.pshdl.model.HDLInterface
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
@@ -181,6 +183,12 @@ class TypeExtension {
 		return getWidth(type.get)
 	}
 
+	def static dispatch HDLExpression getWidth(HDLEnum type) {
+		return null
+	}
+	def static dispatch HDLExpression getWidth(HDLInterface type) {
+		return null
+	}
 	def static dispatch HDLExpression getWidth(HDLPrimitive type) {
 		val HDLExpression width = type.width
 		if (type.type == HDLPrimitive$HDLPrimitiveType::BIT)
@@ -188,6 +196,10 @@ class TypeExtension {
 		return width
 	}
 
+	def dispatch Optional<? extends HDLType> determineType(HDLEnum ref) {
+		return Optional::of(ref)
+	}
+	
 	def dispatch Optional<? extends HDLType> determineType(HDLEnumRef ref) {
 		return ref.resolveHEnum
 	}
