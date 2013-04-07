@@ -107,6 +107,7 @@ import org.pshdl.model.parser.PSHDLLangParser$PsStatementContext
 import org.pshdl.model.parser.PSHDLLangParser$PsAssignmentOrFuncContext
 import org.pshdl.model.parser.PSHDLLangParser$PsCompoundStatementContext
 import org.pshdl.model.parser.PSHDLLangParser$PsForStatementContext
+import org.pshdl.model.parser.PSHDLLangParser$PsFuncParamWithRWContext
 import org.pshdl.model.parser.PSHDLLangParser$PsFuncRecturnTypeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsAccessRangeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsVariableRefContext
@@ -542,37 +543,53 @@ class ParserToModelExtension {
 	def dispatch HDLFunctionParameter toHDL(PsFuncRecturnTypeContext context) {
 		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
 		res=res.setRw(HDLFunctionParameter$RWType::RETURN)
-		res=res.setDim(context.dims.size)
+		res=res.setDim(context.dims.map[if (it.psExpression!=null)it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
 		return res
 	}
 	def dispatch HDLFunctionParameter toHDL(PsFuncSpecContext context) {
-		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
+		var res=context.psFuncParamWithRW.toHDL as HDLFunctionParameter
 		res=res.setName(new HDLVariable().setName(context.RULE_ID.text))
-		res=res.setRw(HDLFunctionParameter$RWType::getOp(context.psFuncParamRWType.text))
-		res=res.setDim(context.dims.size)
+		res=res.setDim(context.dims.map[if (it.psExpression!=null)it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
+		return res
+	}
+	def dispatch HDLFunctionParameter toHDL(PsFuncParamWithRWContext context) {
+		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
+		if (context.psFuncParamRWType!==null)
+			res=res.setRw(HDLFunctionParameter$RWType::getOp(context.psFuncParamRWType.text))
+		else
+			res=res.setRw(HDLFunctionParameter$RWType::READ)
 		return res
 	}
 	def dispatch HDLFunctionParameter toHDL(PsFuncParamTypeContext context) {
 		var res=new HDLFunctionParameter
 		switch (x:context){
-			case x.ANY_INT_TYPE!=null: res=res.setType(Type::ANY_INT)
-			case x.ANY_UINT_TYPE!=null: res=res.setType(Type::ANY_UINT)
-			case x.ANY_BIT_TYPE!=null: res=res.setType(Type::ANY_BIT)
-			case x.ANY_IF!=null: res=res.setType(Type::ANY_IF)
-			case x.ANY_ENUM!=null: res=res.setType(Type::ANY_ENUM)
-			case x.IF_TYPE!=null: {
+			case x.ANY_INT!==null: res=res.setType(Type::ANY_INT)
+			case x.ANY_UINT!==null: res=res.setType(Type::ANY_UINT)
+			case x.ANY_BIT!==null: res=res.setType(Type::ANY_BIT)
+			case x.INT!==null: res=res.setType(Type::REG_INT)
+			case x.UINT!==null: res=res.setType(Type::REG_UINT)
+			case x.BIT!==null: res=res.setType(Type::REG_BIT)
+			case x.BOOL!==null: res=res.setType(Type::BOOL_TYPE)
+			case x.STRING!==null: res=res.setType(Type::STRING_TYPE)
+			case x.ANY_IF!==null: res=res.setType(Type::ANY_IF)
+			case x.ANY_ENUM!==null: res=res.setType(Type::ANY_ENUM)
+			case x.INTERFACE!==null: {
 				res=res.setType(^Type::^IF)
 				res=res.setIfSpec(x.psQualifiedName.toFQNName)
 			}
-			case x.ENUM_TYPE!=null: { 
+			case x.ENUM!==null: { 
 				res=res.setType(^Type::ENUM)
 				res=res.setEnumSpec(x.psQualifiedName.toFQNName)
 			}
-			case x.FUNCTION_TYPE!=null: {
+			case x.FUNCTION!==null: {
 				res=res.setType(^Type::FUNCTION)
-				res=res.setFuncSpec(x.psFuncParamType.map[toHDL as HDLFunctionParameter])
+				res=res.setFuncSpec(x.psFuncParamWithRW.map[toHDL as HDLFunctionParameter])
+				if (x.psFuncParamType!==null)
+					res=res.setFuncReturnSpec(x.psFuncParamType.toHDL as HDLFunctionParameter)
 			}
 		}
+		if (context.psWidth!=null)
+			res=res.setContainer(context.psWidth.toHDL as HDLExpression)
 		return res
 	}
 	

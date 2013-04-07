@@ -480,12 +480,19 @@ public class StringWriteExtension {
         final HDLStatement _hDLStatement = (HDLStatement)container;
         _matched=true;
         boolean _and = false;
+        boolean _and_1 = false;
         boolean _not = (!(_hDLStatement instanceof HDLAssignment));
         if (!_not) {
-          _and = false;
+          _and_1 = false;
         } else {
           boolean _not_1 = (!(_hDLStatement instanceof HDLFunctionCall));
-          _and = (_not && _not_1);
+          _and_1 = (_not && _not_1);
+        }
+        if (!_and_1) {
+          _and = false;
+        } else {
+          boolean _not_2 = (!(_hDLStatement instanceof HDLInlineFunction));
+          _and = (_and_1 && _not_2);
         }
         isStatement = _and;
       }
@@ -548,17 +555,100 @@ public class StringWriteExtension {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     RWType _rw = func.getRw();
-    sb.append(_rw);
+    boolean _tripleNotEquals = (_rw != RWType.READ);
+    if (_tripleNotEquals) {
+      RWType _rw_1 = func.getRw();
+      sb.append(_rw_1);
+    }
     Type _type = func.getType();
     sb.append(_type);
+    Type _type_1 = func.getType();
+    final Type _switchValue = _type_1;
+    boolean _matched = false;
+    if (!_matched) {
+      if (Objects.equal(_switchValue,Type.ENUM)) {
+        _matched=true;
+        StringBuilder _append = sb.append("<");
+        HDLQualifiedName _enumSpecRefName = func.getEnumSpecRefName();
+        String _string = _enumSpecRefName.toString();
+        String _enumRefType = highlight.enumRefType(_string);
+        StringBuilder _append_1 = _append.append(_enumRefType);
+        _append_1.append(">");
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,Type.IF)) {
+        _matched=true;
+        StringBuilder _append_2 = sb.append("<");
+        HDLQualifiedName _enumSpecRefName_1 = func.getEnumSpecRefName();
+        String _string_1 = _enumSpecRefName_1.toString();
+        String _enumRefType_1 = highlight.enumRefType(_string_1);
+        StringBuilder _append_3 = _append_2.append(_enumRefType_1);
+        _append_3.append(">");
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,Type.FUNCTION)) {
+        _matched=true;
+        StringConcatenation _builder = new StringConcatenation();
+        _builder.append("<");
+        {
+          ArrayList<HDLFunctionParameter> _funcSpec = func.getFuncSpec();
+          boolean _hasElements = false;
+          for(final HDLFunctionParameter p : _funcSpec) {
+            if (!_hasElements) {
+              _hasElements = true;
+            } else {
+              _builder.appendImmediate(",", "");
+            }
+            String _string_2 = this.toString(p, highlight);
+            _builder.append(_string_2, "");
+          }
+        }
+        sb.append(_builder);
+        HDLFunctionParameter _funcReturnSpec = func.getFuncReturnSpec();
+        boolean _notEquals = (!Objects.equal(_funcReturnSpec, null));
+        if (_notEquals) {
+          String _simpleSpace = highlight.simpleSpace();
+          StringBuilder _append_4 = sb.append(_simpleSpace);
+          StringBuilder _append_5 = _append_4.append("=>");
+          String _simpleSpace_1 = highlight.simpleSpace();
+          StringBuilder _append_6 = _append_5.append(_simpleSpace_1);
+          HDLFunctionParameter _funcReturnSpec_1 = func.getFuncReturnSpec();
+          String _string_3 = this.toString(_funcReturnSpec_1, highlight);
+          _append_6.append(_string_3);
+        }
+        sb.append(">");
+      }
+    }
     HDLVariable _name = func.getName();
-    boolean _notEquals = (!Objects.equal(_name, null));
-    if (_notEquals) {
-      String _simpleSpace = highlight.simpleSpace();
-      StringBuilder _append = sb.append(_simpleSpace);
+    boolean _notEquals_1 = (!Objects.equal(_name, null));
+    if (_notEquals_1) {
+      String _simpleSpace_2 = highlight.simpleSpace();
+      StringBuilder _append_7 = sb.append(_simpleSpace_2);
       HDLVariable _name_1 = func.getName();
       String _varName = highlight.varName(_name_1);
-      _append.append(_varName);
+      _append_7.append(_varName);
+    }
+    ArrayList<HDLExpression> _dim = func.getDim();
+    for (final HDLExpression d : _dim) {
+      boolean _matched_1 = false;
+      if (!_matched_1) {
+        if (d instanceof HDLLiteral) {
+          final HDLLiteral _hDLLiteral = (HDLLiteral)d;
+          Boolean _str = _hDLLiteral.getStr();
+          if (_str) {
+            _matched_1=true;
+            sb.append("[]");
+          }
+        }
+      }
+      if (!_matched_1) {
+        StringBuilder _append_8 = sb.append("[");
+        String _string_4 = this.toString(d, highlight);
+        StringBuilder _append_9 = _append_8.append(_string_4);
+        _append_9.append("]");
+      }
     }
     return sb.toString();
   }

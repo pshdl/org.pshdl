@@ -153,7 +153,7 @@ psNativeFunction :
 ;
 
 psFuncRecturnType :
-	psFuncParamType (dims+='[]')*
+	psFuncParamType dims+=psFuncOptArray*
 ;
 
 psFuncParam :
@@ -161,11 +161,13 @@ psFuncParam :
 ;
 
 psFuncSpec : 
-	(	
-		psFuncParamRWType psFuncParamType |
-		psFuncParamType {notifyErrorListeners("Missing read/write indicator. Use one of: '-' for read only, '+' write only or '*' for read-write");}
-	)
-	 RULE_ID? (dims+='[]')*
+	psFuncParamWithRW RULE_ID dims+=psFuncOptArray*
+;
+psFuncParamWithRW: 
+	psFuncParamRWType? psFuncParamType
+;
+psFuncOptArray:
+	('[' psExpression? ']')
 ;
 
 psFuncParamRWType:
@@ -173,11 +175,14 @@ psFuncParamRWType:
 ;
 
 psFuncParamType:
-	ANY_INT_TYPE | ANY_UINT_TYPE | ANY_BIT_TYPE | 
-	ANY_IF | ANY_ENUM | 
-	(IF_TYPE '<' psQualifiedName '>')|
-	(ENUM_TYPE '<' psQualifiedName '>' )|
-	(FUNCTION_TYPE '<' (psFuncParamType (',' psFuncParamType )* )? ('->' returnType=psFuncParamType)? '>')
+	ANY_INT | ANY_UINT | ANY_BIT | ANY_IF | ANY_ENUM | 
+	BOOL | STRING | 
+	(BIT  psWidth? )|
+	(UINT psWidth? )|
+	(INT  psWidth? )| 
+	(INTERFACE '<' psQualifiedName '>')|
+	(ENUM '<' psQualifiedName '>' )|
+	(FUNCTION '<' (psFuncParamWithRW (',' psFuncParamWithRW )* )? ('=>' returnType=psFuncParamType)? '>')
 ;
 
 psFunction :
@@ -349,14 +354,19 @@ SRA_ASSGN:'>>=';
 ARITH_NEG:'-';
 BIT_NEG:'~';
 LOGIC_NEG:'!';
-ANY_INT_TYPE:'int<>';
-ANY_UINT_TYPE:'uint<>';
-ANY_BIT_TYPE:'bit<>';
+ANY_INT:'int<>';
+ANY_UINT:'uint<>';
+ANY_BIT:'bit<>';
 ANY_IF:'interface<>';
 ANY_ENUM:'enum<>';
-IF_TYPE:'interface';
-ENUM_TYPE:'enum';
-FUNCTION_TYPE:'func';
+BIT:'bit';
+INT:'int';
+UINT:'uint';
+STRING:'string';
+BOOL:'bool';
+ENUM:'enum';
+INTERFACE:'interface';
+FUNCTION:'function';
 
 MODULE:'module';
 TESTBENCH:'testbench';

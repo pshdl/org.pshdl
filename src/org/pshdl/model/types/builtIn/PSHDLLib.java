@@ -53,8 +53,8 @@ public class PSHDLLib {
 	private static HDLInlineFunction createABS(Type type) {
 		return new HDLInlineFunction()
 				.setName("abs")
-				.setReturnType(new HDLFunctionParameter().setDim(0).setType(type).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")))
+				.setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
 				.setExpr(
 						new HDLTernary()
 								.setIfExpr(
@@ -70,9 +70,9 @@ public class PSHDLLib {
 	private static HDLInlineFunction createMIN(Type type) {
 		return new HDLInlineFunction()
 				.setName("min")
-				.setReturnType(new HDLFunctionParameter().setDim(0).setType(type).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")))
+				.setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")).setRw(RWType.READ))
 				.setExpr(
 						new HDLTernary()
 								.setIfExpr(
@@ -88,10 +88,9 @@ public class PSHDLLib {
 	private static HDLInlineFunction createMAX(Type type) {
 		return new HDLInlineFunction()
 				.setName("max")
-				.setReturnType(new HDLFunctionParameter().setDim(0).setType(type).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")))
-
+				.setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")).setRw(RWType.READ))
 				.setExpr(
 						new HDLTernary()
 								.setIfExpr(
@@ -107,7 +106,7 @@ public class PSHDLLib {
 
 	public static HDLPackage getLib() {
 		if (LIB == null) {
-			HDLPackage pkg = new HDLPackage().setPkg("pshdl");
+			HDLPackage pkg = new HDLPackage().setLibURI("PSHDLLib").setPkg("pshdl");
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(TIMEUNIT));
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(EDGE));
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
@@ -128,7 +127,9 @@ public class PSHDLLib {
 
 	public static void main(String[] args) {
 		HDLCore.init(new IServiceProvider.ServiceLoaderProvider());
-		System.out.println(getLib().toString());
+		HDLPackage lib2 = getLib();
+		System.out.println(lib2.toString());
+		lib2.validateAllFields(null, true);
 	}
 
 	public static String asString() {

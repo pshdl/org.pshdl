@@ -76,6 +76,7 @@ import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLUnresolvedFragmentFunction
 import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLFunctionParameter
+import org.pshdl.model.utils.HDLQualifiedName
 
 class StringWriteExtension {
 
@@ -186,7 +187,7 @@ class StringWriteExtension {
 	def dispatch String toString(HDLFunctionCall func, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
 		switch (container: func.container) {
-			HDLStatement: 	isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
+			HDLStatement: 	isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall) && !(container instanceof HDLInlineFunction)
 			HDLBlock: 		isStatement = true
 			HDLUnit: 		isStatement = true
 		}
@@ -203,10 +204,29 @@ class StringWriteExtension {
 
 	def dispatch String toString(HDLFunctionParameter func, SyntaxHighlighter highlight) {
 		val StringBuilder sb = new StringBuilder
-		sb.append(func.rw)
+		if (func.rw !== HDLFunctionParameter$RWType::READ)
+			sb.append(func.rw)
 		sb.append(func.type)
+		switch (func.type){
+			case HDLFunctionParameter$Type::ENUM:
+				sb.append('<').append(highlight.enumRefType(func.enumSpecRefName.toString)).append('>')
+			case HDLFunctionParameter$Type::^IF:
+				sb.append('<').append(highlight.enumRefType(func.enumSpecRefName.toString)).append('>')
+			case HDLFunctionParameter$Type::FUNCTION: {
+				sb.append('''<«FOR HDLFunctionParameter p : func.funcSpec SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
+				if (func.funcReturnSpec!=null)
+					sb.append(highlight.simpleSpace).append("=>").append(highlight.simpleSpace).append(func.funcReturnSpec.toString(highlight))
+				sb.append('>')
+			}
+		}
 		if (func.name!=null)
 			sb.append(highlight.simpleSpace).append(highlight.varName(func.name))
+		for (d:func.dim) {
+			switch (d) {
+				HDLLiteral case d.str: sb.append("[]")
+				default: sb.append('[').append(d.toString(highlight)).append(']')
+			}
+		}
 		return sb.toString
 	}
 	def dispatch String toString(HDLNativeFunction func, SyntaxHighlighter highlight) {

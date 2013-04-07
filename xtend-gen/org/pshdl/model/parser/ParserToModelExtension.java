@@ -122,9 +122,11 @@ import org.pshdl.model.parser.PSHDLLangParser.PsEqualityContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsExpressionContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsForStatementContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncArgsContext;
+import org.pshdl.model.parser.PSHDLLangParser.PsFuncOptArrayContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamRWTypeContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamTypeContext;
+import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamWithRWContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncRecturnTypeContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncSpecContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsFunctionContext;
@@ -1135,15 +1137,31 @@ public class ParserToModelExtension {
     HDLFunctionParameter res = ((HDLFunctionParameter) _hDL);
     HDLFunctionParameter _setRw = res.setRw(RWType.RETURN);
     res = _setRw;
-    int _size = context.dims.size();
-    HDLFunctionParameter _setDim = res.setDim(Integer.valueOf(_size));
+    final Function1<PsFuncOptArrayContext,HDLExpression> _function = new Function1<PsFuncOptArrayContext,HDLExpression>() {
+        public HDLExpression apply(final PsFuncOptArrayContext it) {
+          HDLExpression _xifexpression = null;
+          PsExpressionContext _psExpression = it.psExpression();
+          boolean _notEquals = (!Objects.equal(_psExpression, null));
+          if (_notEquals) {
+            PsExpressionContext _psExpression_1 = it.psExpression();
+            IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
+            _xifexpression = ((HDLExpression) _hDL);
+          } else {
+            HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
+            _xifexpression = _EMPTY_ARR;
+          }
+          return _xifexpression;
+        }
+      };
+    List<HDLExpression> _map = ListExtensions.<PsFuncOptArrayContext, HDLExpression>map(context.dims, _function);
+    HDLFunctionParameter _setDim = res.setDim(_map);
     res = _setDim;
     return res;
   }
   
   protected HDLFunctionParameter _toHDL(final PsFuncSpecContext context) {
-    PsFuncParamTypeContext _psFuncParamType = context.psFuncParamType();
-    IHDLObject _hDL = this.toHDL(_psFuncParamType);
+    PsFuncParamWithRWContext _psFuncParamWithRW = context.psFuncParamWithRW();
+    IHDLObject _hDL = this.toHDL(_psFuncParamWithRW);
     HDLFunctionParameter res = ((HDLFunctionParameter) _hDL);
     HDLVariable _hDLVariable = new HDLVariable();
     TerminalNode _RULE_ID = context.RULE_ID();
@@ -1151,14 +1169,44 @@ public class ParserToModelExtension {
     HDLVariable _setName = _hDLVariable.setName(_text);
     HDLFunctionParameter _setName_1 = res.setName(_setName);
     res = _setName_1;
-    PsFuncParamRWTypeContext _psFuncParamRWType = context.psFuncParamRWType();
-    String _text_1 = _psFuncParamRWType.getText();
-    RWType _op = RWType.getOp(_text_1);
-    HDLFunctionParameter _setRw = res.setRw(_op);
-    res = _setRw;
-    int _size = context.dims.size();
-    HDLFunctionParameter _setDim = res.setDim(Integer.valueOf(_size));
+    final Function1<PsFuncOptArrayContext,HDLExpression> _function = new Function1<PsFuncOptArrayContext,HDLExpression>() {
+        public HDLExpression apply(final PsFuncOptArrayContext it) {
+          HDLExpression _xifexpression = null;
+          PsExpressionContext _psExpression = it.psExpression();
+          boolean _notEquals = (!Objects.equal(_psExpression, null));
+          if (_notEquals) {
+            PsExpressionContext _psExpression_1 = it.psExpression();
+            IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
+            _xifexpression = ((HDLExpression) _hDL);
+          } else {
+            HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
+            _xifexpression = _EMPTY_ARR;
+          }
+          return _xifexpression;
+        }
+      };
+    List<HDLExpression> _map = ListExtensions.<PsFuncOptArrayContext, HDLExpression>map(context.dims, _function);
+    HDLFunctionParameter _setDim = res.setDim(_map);
     res = _setDim;
+    return res;
+  }
+  
+  protected HDLFunctionParameter _toHDL(final PsFuncParamWithRWContext context) {
+    PsFuncParamTypeContext _psFuncParamType = context.psFuncParamType();
+    IHDLObject _hDL = this.toHDL(_psFuncParamType);
+    HDLFunctionParameter res = ((HDLFunctionParameter) _hDL);
+    PsFuncParamRWTypeContext _psFuncParamRWType = context.psFuncParamRWType();
+    boolean _tripleNotEquals = (_psFuncParamRWType != null);
+    if (_tripleNotEquals) {
+      PsFuncParamRWTypeContext _psFuncParamRWType_1 = context.psFuncParamRWType();
+      String _text = _psFuncParamRWType_1.getText();
+      RWType _op = RWType.getOp(_text);
+      HDLFunctionParameter _setRw = res.setRw(_op);
+      res = _setRw;
+    } else {
+      HDLFunctionParameter _setRw_1 = res.setRw(RWType.READ);
+      res = _setRw_1;
+    }
     return res;
   }
   
@@ -1168,57 +1216,102 @@ public class ParserToModelExtension {
     final PsFuncParamTypeContext x = context;
     boolean _matched = false;
     if (!_matched) {
-      TerminalNode _ANY_INT_TYPE = x.ANY_INT_TYPE();
-      boolean _notEquals = (!Objects.equal(_ANY_INT_TYPE, null));
-      if (_notEquals) {
+      TerminalNode _ANY_INT = x.ANY_INT();
+      boolean _tripleNotEquals = (_ANY_INT != null);
+      if (_tripleNotEquals) {
         _matched=true;
         HDLFunctionParameter _setType = res.setType(Type.ANY_INT);
         res = _setType;
       }
     }
     if (!_matched) {
-      TerminalNode _ANY_UINT_TYPE = x.ANY_UINT_TYPE();
-      boolean _notEquals_1 = (!Objects.equal(_ANY_UINT_TYPE, null));
-      if (_notEquals_1) {
+      TerminalNode _ANY_UINT = x.ANY_UINT();
+      boolean _tripleNotEquals_1 = (_ANY_UINT != null);
+      if (_tripleNotEquals_1) {
         _matched=true;
         HDLFunctionParameter _setType_1 = res.setType(Type.ANY_UINT);
         res = _setType_1;
       }
     }
     if (!_matched) {
-      TerminalNode _ANY_BIT_TYPE = x.ANY_BIT_TYPE();
-      boolean _notEquals_2 = (!Objects.equal(_ANY_BIT_TYPE, null));
-      if (_notEquals_2) {
+      TerminalNode _ANY_BIT = x.ANY_BIT();
+      boolean _tripleNotEquals_2 = (_ANY_BIT != null);
+      if (_tripleNotEquals_2) {
         _matched=true;
         HDLFunctionParameter _setType_2 = res.setType(Type.ANY_BIT);
         res = _setType_2;
       }
     }
     if (!_matched) {
-      TerminalNode _ANY_IF = x.ANY_IF();
-      boolean _notEquals_3 = (!Objects.equal(_ANY_IF, null));
-      if (_notEquals_3) {
+      TerminalNode _INT = x.INT();
+      boolean _tripleNotEquals_3 = (_INT != null);
+      if (_tripleNotEquals_3) {
         _matched=true;
-        HDLFunctionParameter _setType_3 = res.setType(Type.ANY_IF);
+        HDLFunctionParameter _setType_3 = res.setType(Type.REG_INT);
         res = _setType_3;
       }
     }
     if (!_matched) {
-      TerminalNode _ANY_ENUM = x.ANY_ENUM();
-      boolean _notEquals_4 = (!Objects.equal(_ANY_ENUM, null));
-      if (_notEquals_4) {
+      TerminalNode _UINT = x.UINT();
+      boolean _tripleNotEquals_4 = (_UINT != null);
+      if (_tripleNotEquals_4) {
         _matched=true;
-        HDLFunctionParameter _setType_4 = res.setType(Type.ANY_ENUM);
+        HDLFunctionParameter _setType_4 = res.setType(Type.REG_UINT);
         res = _setType_4;
       }
     }
     if (!_matched) {
-      TerminalNode _IF_TYPE = x.IF_TYPE();
-      boolean _notEquals_5 = (!Objects.equal(_IF_TYPE, null));
-      if (_notEquals_5) {
+      TerminalNode _BIT = x.BIT();
+      boolean _tripleNotEquals_5 = (_BIT != null);
+      if (_tripleNotEquals_5) {
         _matched=true;
-        HDLFunctionParameter _setType_5 = res.setType(Type.IF);
+        HDLFunctionParameter _setType_5 = res.setType(Type.REG_BIT);
         res = _setType_5;
+      }
+    }
+    if (!_matched) {
+      TerminalNode _BOOL = x.BOOL();
+      boolean _tripleNotEquals_6 = (_BOOL != null);
+      if (_tripleNotEquals_6) {
+        _matched=true;
+        HDLFunctionParameter _setType_6 = res.setType(Type.BOOL_TYPE);
+        res = _setType_6;
+      }
+    }
+    if (!_matched) {
+      TerminalNode _STRING = x.STRING();
+      boolean _tripleNotEquals_7 = (_STRING != null);
+      if (_tripleNotEquals_7) {
+        _matched=true;
+        HDLFunctionParameter _setType_7 = res.setType(Type.STRING_TYPE);
+        res = _setType_7;
+      }
+    }
+    if (!_matched) {
+      TerminalNode _ANY_IF = x.ANY_IF();
+      boolean _tripleNotEquals_8 = (_ANY_IF != null);
+      if (_tripleNotEquals_8) {
+        _matched=true;
+        HDLFunctionParameter _setType_8 = res.setType(Type.ANY_IF);
+        res = _setType_8;
+      }
+    }
+    if (!_matched) {
+      TerminalNode _ANY_ENUM = x.ANY_ENUM();
+      boolean _tripleNotEquals_9 = (_ANY_ENUM != null);
+      if (_tripleNotEquals_9) {
+        _matched=true;
+        HDLFunctionParameter _setType_9 = res.setType(Type.ANY_ENUM);
+        res = _setType_9;
+      }
+    }
+    if (!_matched) {
+      TerminalNode _INTERFACE = x.INTERFACE();
+      boolean _tripleNotEquals_10 = (_INTERFACE != null);
+      if (_tripleNotEquals_10) {
+        _matched=true;
+        HDLFunctionParameter _setType_10 = res.setType(Type.IF);
+        res = _setType_10;
         PsQualifiedNameContext _psQualifiedName = x.psQualifiedName();
         HDLQualifiedName _fQNName = this.toFQNName(_psQualifiedName);
         HDLFunctionParameter _setIfSpec = res.setIfSpec(_fQNName);
@@ -1226,12 +1319,12 @@ public class ParserToModelExtension {
       }
     }
     if (!_matched) {
-      TerminalNode _ENUM_TYPE = x.ENUM_TYPE();
-      boolean _notEquals_6 = (!Objects.equal(_ENUM_TYPE, null));
-      if (_notEquals_6) {
+      TerminalNode _ENUM = x.ENUM();
+      boolean _tripleNotEquals_11 = (_ENUM != null);
+      if (_tripleNotEquals_11) {
         _matched=true;
-        HDLFunctionParameter _setType_6 = res.setType(Type.ENUM);
-        res = _setType_6;
+        HDLFunctionParameter _setType_11 = res.setType(Type.ENUM);
+        res = _setType_11;
         PsQualifiedNameContext _psQualifiedName_1 = x.psQualifiedName();
         HDLQualifiedName _fQNName_1 = this.toFQNName(_psQualifiedName_1);
         HDLFunctionParameter _setEnumSpec = res.setEnumSpec(_fQNName_1);
@@ -1239,23 +1332,39 @@ public class ParserToModelExtension {
       }
     }
     if (!_matched) {
-      TerminalNode _FUNCTION_TYPE = x.FUNCTION_TYPE();
-      boolean _notEquals_7 = (!Objects.equal(_FUNCTION_TYPE, null));
-      if (_notEquals_7) {
+      TerminalNode _FUNCTION = x.FUNCTION();
+      boolean _tripleNotEquals_12 = (_FUNCTION != null);
+      if (_tripleNotEquals_12) {
         _matched=true;
-        HDLFunctionParameter _setType_7 = res.setType(Type.FUNCTION);
-        res = _setType_7;
-        List<PsFuncParamTypeContext> _psFuncParamType = x.psFuncParamType();
-        final Function1<PsFuncParamTypeContext,HDLFunctionParameter> _function = new Function1<PsFuncParamTypeContext,HDLFunctionParameter>() {
-            public HDLFunctionParameter apply(final PsFuncParamTypeContext it) {
+        HDLFunctionParameter _setType_12 = res.setType(Type.FUNCTION);
+        res = _setType_12;
+        List<PsFuncParamWithRWContext> _psFuncParamWithRW = x.psFuncParamWithRW();
+        final Function1<PsFuncParamWithRWContext,HDLFunctionParameter> _function = new Function1<PsFuncParamWithRWContext,HDLFunctionParameter>() {
+            public HDLFunctionParameter apply(final PsFuncParamWithRWContext it) {
               IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
               return ((HDLFunctionParameter) _hDL);
             }
           };
-        List<HDLFunctionParameter> _map = ListExtensions.<PsFuncParamTypeContext, HDLFunctionParameter>map(_psFuncParamType, _function);
+        List<HDLFunctionParameter> _map = ListExtensions.<PsFuncParamWithRWContext, HDLFunctionParameter>map(_psFuncParamWithRW, _function);
         HDLFunctionParameter _setFuncSpec = res.setFuncSpec(_map);
         res = _setFuncSpec;
+        PsFuncParamTypeContext _psFuncParamType = x.psFuncParamType();
+        boolean _tripleNotEquals_13 = (_psFuncParamType != null);
+        if (_tripleNotEquals_13) {
+          PsFuncParamTypeContext _psFuncParamType_1 = x.psFuncParamType();
+          IHDLObject _hDL = this.toHDL(_psFuncParamType_1);
+          HDLFunctionParameter _setFuncReturnSpec = res.setFuncReturnSpec(((HDLFunctionParameter) _hDL));
+          res = _setFuncReturnSpec;
+        }
       }
+    }
+    PsWidthContext _psWidth = context.psWidth();
+    boolean _notEquals = (!Objects.equal(_psWidth, null));
+    if (_notEquals) {
+      PsWidthContext _psWidth_1 = context.psWidth();
+      IHDLObject _hDL_1 = this.toHDL(_psWidth_1);
+      HDLFunctionParameter _setContainer = res.setContainer(((HDLExpression) _hDL_1));
+      res = _setContainer;
     }
     return res;
   }
@@ -1775,6 +1884,8 @@ public class ParserToModelExtension {
       return _toHDL((PsForStatementContext)context);
     } else if (context instanceof PsFuncParamTypeContext) {
       return _toHDL((PsFuncParamTypeContext)context);
+    } else if (context instanceof PsFuncParamWithRWContext) {
+      return _toHDL((PsFuncParamWithRWContext)context);
     } else if (context instanceof PsFuncRecturnTypeContext) {
       return _toHDL((PsFuncRecturnTypeContext)context);
     } else if (context instanceof PsFuncSpecContext) {

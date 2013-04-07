@@ -49,7 +49,8 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param rw
-	 *            the value for rw. Can <b>not</b> be <code>null</code>.
+	 *            the value for rw. If <code>null</code>, {@link RWType#READ} is
+	 *            used as default.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param enumSpec
@@ -58,15 +59,20 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	 *            the value for ifSpec. Can be <code>null</code>.
 	 * @param funcSpec
 	 *            the value for funcSpec. Can be <code>null</code>.
+	 * @param funcReturnSpec
+	 *            the value for funcReturnSpec. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can be <code>null</code>.
+	 * @param width
+	 *            the value for width. Can be <code>null</code>.
 	 * @param dim
-	 *            the value for dim. Can <b>not</b> be <code>null</code>.
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLFunctionParameter(@Nullable IHDLObject container, @Nonnull RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec,
-			@Nullable HDLQualifiedName ifSpec, @Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLVariable name, @Nonnull Integer dim, boolean validate) {
+	public AbstractHDLFunctionParameter(@Nullable IHDLObject container, @Nullable RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec,
+			@Nullable HDLQualifiedName ifSpec, @Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLFunctionParameter funcReturnSpec, @Nullable HDLVariable name,
+			@Nullable HDLExpression width, @Nullable Iterable<HDLExpression> dim, boolean validate) {
 		super(container, validate);
 		if (validate) {
 			rw = validateRw(rw);
@@ -94,6 +100,14 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 			}
 		}
 		if (validate) {
+			funcReturnSpec = validateFuncReturnSpec(funcReturnSpec);
+		}
+		if (funcReturnSpec != null) {
+			this.funcReturnSpec = funcReturnSpec;
+		} else {
+			this.funcReturnSpec = null;
+		}
+		if (validate) {
 			name = validateName(name);
 		}
 		if (name != null) {
@@ -102,9 +116,22 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 			this.name = null;
 		}
 		if (validate) {
+			width = validateWidth(width);
+		}
+		if (width != null) {
+			this.width = width;
+		} else {
+			this.width = null;
+		}
+		if (validate) {
 			dim = validateDim(dim);
 		}
-		this.dim = dim;
+		this.dim = new ArrayList<HDLExpression>();
+		if (dim != null) {
+			for (HDLExpression newValue : dim) {
+				this.dim.add(newValue);
+			}
+		}
 	}
 
 	public AbstractHDLFunctionParameter() {
@@ -114,26 +141,27 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 		this.enumSpec = null;
 		this.ifSpec = null;
 		this.funcSpec = new ArrayList<HDLFunctionParameter>();
+		this.funcReturnSpec = null;
 		this.name = null;
-		this.dim = null;
+		this.width = null;
+		this.dim = new ArrayList<HDLExpression>();
 	}
 
 	protected final RWType rw;
 
 	/**
-	 * Get the rw field. Can <b>not</b> be <code>null</code>.
+	 * Get the rw field. If <code>null</code>, {@link RWType#READ} is used as
+	 * default.
 	 * 
 	 * @return the field
 	 */
 	@Nonnull
 	public RWType getRw() {
-		return rw;
+		return rw == null ? RWType.READ : rw;
 	}
 
 	protected RWType validateRw(RWType rw) {
-		if (rw == null)
-			throw new IllegalArgumentException("The field rw can not be null!");
-		return rw;
+		return rw == null ? RWType.READ : rw;
 	}
 
 	protected final Type type;
@@ -208,6 +236,23 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	}
 
 	@Visit
+	protected final HDLFunctionParameter funcReturnSpec;
+
+	/**
+	 * Get the funcReturnSpec field. Can be <code>null</code>.
+	 * 
+	 * @return the field
+	 */
+	@Nullable
+	public HDLFunctionParameter getFuncReturnSpec() {
+		return funcReturnSpec;
+	}
+
+	protected HDLFunctionParameter validateFuncReturnSpec(HDLFunctionParameter funcReturnSpec) {
+		return funcReturnSpec;
+	}
+
+	@Visit
 	protected final HDLVariable name;
 
 	/**
@@ -224,21 +269,39 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 		return name;
 	}
 
-	protected final Integer dim;
+	@Visit
+	protected final HDLExpression width;
 
 	/**
-	 * Get the dim field. Can <b>not</b> be <code>null</code>.
+	 * Get the width field. Can be <code>null</code>.
 	 * 
 	 * @return the field
 	 */
-	@Nonnull
-	public Integer getDim() {
-		return dim;
+	@Nullable
+	public HDLExpression getWidth() {
+		return width;
 	}
 
-	protected Integer validateDim(Integer dim) {
+	protected HDLExpression validateWidth(HDLExpression width) {
+		return width;
+	}
+
+	@Visit
+	protected final ArrayList<HDLExpression> dim;
+
+	/**
+	 * Get the dim field. Can be <code>null</code>.
+	 * 
+	 * @return a clone of the field. Will never return <code>null</code>.
+	 */
+	@Nonnull
+	public ArrayList<HDLExpression> getDim() {
+		return (ArrayList<HDLExpression>) dim.clone();
+	}
+
+	protected Iterable<HDLExpression> validateDim(Iterable<HDLExpression> dim) {
 		if (dim == null)
-			throw new IllegalArgumentException("The field dim can not be null!");
+			return new ArrayList<HDLExpression>();
 		return dim;
 	}
 
@@ -250,7 +313,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLFunctionParameter copy() {
-		HDLFunctionParameter newObject = new HDLFunctionParameter(null, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter newObject = new HDLFunctionParameter(null, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -268,10 +331,12 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 		HDLQualifiedName filteredenumSpec = filter.copyObject("enumSpec", this, enumSpec);
 		HDLQualifiedName filteredifSpec = filter.copyObject("ifSpec", this, ifSpec);
 		ArrayList<HDLFunctionParameter> filteredfuncSpec = filter.copyContainer("funcSpec", this, funcSpec);
+		HDLFunctionParameter filteredfuncReturnSpec = filter.copyObject("funcReturnSpec", this, funcReturnSpec);
 		HDLVariable filteredname = filter.copyObject("name", this, name);
-		Integer filtereddim = filter.copyObject("dim", this, dim);
+		HDLExpression filteredwidth = filter.copyObject("width", this, width);
+		ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
 		return filter.postFilter((HDLFunctionParameter) this, new HDLFunctionParameter(null, filteredrw, filteredtype, filteredenumSpec, filteredifSpec, filteredfuncSpec,
-				filteredname, filtereddim, false));
+				filteredfuncReturnSpec, filteredname, filteredwidth, filtereddim, false));
 	}
 
 	/**
@@ -306,15 +371,15 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	 * Setter for the field {@link #getRw()}.
 	 * 
 	 * @param rw
-	 *            sets the new rw of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new rw of this object. If <code>null</code>,
+	 *            {@link RWType#READ} is used as default.
 	 * @return a new instance of {@link HDLFunctionParameter} with the updated
 	 *         rw field.
 	 */
 	@Nonnull
-	public HDLFunctionParameter setRw(@Nonnull RWType rw) {
+	public HDLFunctionParameter setRw(@Nullable RWType rw) {
 		rw = validateRw(rw);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -330,7 +395,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	@Nonnull
 	public HDLFunctionParameter setType(@Nonnull Type type) {
 		type = validateType(type);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -346,7 +411,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	@Nonnull
 	public HDLFunctionParameter setEnumSpec(@Nullable HDLQualifiedName enumSpec) {
 		enumSpec = validateEnumSpec(enumSpec);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -361,7 +426,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	@Nonnull
 	public HDLFunctionParameter setIfSpec(@Nullable HDLQualifiedName ifSpec) {
 		ifSpec = validateIfSpec(ifSpec);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -377,7 +442,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	@Nonnull
 	public HDLFunctionParameter setFuncSpec(@Nullable Iterable<HDLFunctionParameter> funcSpec) {
 		funcSpec = validateFuncSpec(funcSpec);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -396,7 +461,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 			throw new IllegalArgumentException("Element of funcSpec can not be null!");
 		ArrayList<HDLFunctionParameter> funcSpec = (ArrayList<HDLFunctionParameter>) this.funcSpec.clone();
 		funcSpec.add(newFuncSpec);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -415,7 +480,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 			throw new IllegalArgumentException("Removed element of funcSpec can not be null!");
 		ArrayList<HDLFunctionParameter> funcSpec = (ArrayList<HDLFunctionParameter>) this.funcSpec.clone();
 		funcSpec.remove(newFuncSpec);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -432,7 +497,23 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	public HDLFunctionParameter removeFuncSpec(int idx) {
 		ArrayList<HDLFunctionParameter> funcSpec = (ArrayList<HDLFunctionParameter>) this.funcSpec.clone();
 		funcSpec.remove(idx);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getFuncReturnSpec()}.
+	 * 
+	 * @param funcReturnSpec
+	 *            sets the new funcReturnSpec of this object. Can be
+	 *            <code>null</code>.
+	 * @return a new instance of {@link HDLFunctionParameter} with the updated
+	 *         funcReturnSpec field.
+	 */
+	@Nonnull
+	public HDLFunctionParameter setFuncReturnSpec(@Nullable HDLFunctionParameter funcReturnSpec) {
+		funcReturnSpec = validateFuncReturnSpec(funcReturnSpec);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -447,7 +528,22 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	@Nonnull
 	public HDLFunctionParameter setName(@Nullable HDLVariable name) {
 		name = validateName(name);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getWidth()}.
+	 * 
+	 * @param width
+	 *            sets the new width of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLFunctionParameter} with the updated
+	 *         width field.
+	 */
+	@Nonnull
+	public HDLFunctionParameter setWidth(@Nullable HDLExpression width) {
+		width = validateWidth(width);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -455,15 +551,68 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	 * Setter for the field {@link #getDim()}.
 	 * 
 	 * @param dim
-	 *            sets the new dim of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new dim of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLFunctionParameter} with the updated
 	 *         dim field.
 	 */
 	@Nonnull
-	public HDLFunctionParameter setDim(@Nonnull Integer dim) {
+	public HDLFunctionParameter setDim(@Nullable Iterable<HDLExpression> dim) {
 		dim = validateDim(dim);
-		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, false);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
+		return res;
+	}
+
+	/**
+	 * Adds a new value to the field {@link #getDim()}.
+	 * 
+	 * @param newDim
+	 *            the value that should be added to the field {@link #getDim()}
+	 * @return a new instance of {@link HDLFunctionParameter} with the updated
+	 *         dim field.
+	 */
+	@Nonnull
+	public HDLFunctionParameter addDim(@Nullable HDLExpression newDim) {
+		if (newDim == null)
+			throw new IllegalArgumentException("Element of dim can not be null!");
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.add(newDim);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getDim()}.
+	 * 
+	 * @param newDim
+	 *            the value that should be removed from the field
+	 *            {@link #getDim()}
+	 * @return a new instance of {@link HDLFunctionParameter} with the updated
+	 *         dim field.
+	 */
+	@Nonnull
+	public HDLFunctionParameter removeDim(@Nullable HDLExpression newDim) {
+		if (newDim == null)
+			throw new IllegalArgumentException("Removed element of dim can not be null!");
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.remove(newDim);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getDim()}.
+	 * 
+	 * @param idx
+	 *            the index of the value that should be removed from the field
+	 *            {@link #getDim()}
+	 * @return a new instance of {@link HDLFunctionParameter} with the updated
+	 *         dim field.
+	 */
+	@Nonnull
+	public HDLFunctionParameter removeDim(int idx) {
+		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		dim.remove(idx);
+		HDLFunctionParameter res = new HDLFunctionParameter(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, false);
 		return res;
 	}
 
@@ -503,10 +652,20 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 				return false;
 		} else if (!funcSpec.equals(other.funcSpec))
 			return false;
+		if (funcReturnSpec == null) {
+			if (other.funcReturnSpec != null)
+				return false;
+		} else if (!funcReturnSpec.equals(other.funcReturnSpec))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (width == null) {
+			if (other.width != null)
+				return false;
+		} else if (!width.equals(other.width))
 			return false;
 		if (dim == null) {
 			if (other.dim != null)
@@ -529,7 +688,9 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 		result = (prime * result) + ((enumSpec == null) ? 0 : enumSpec.hashCode());
 		result = (prime * result) + ((ifSpec == null) ? 0 : ifSpec.hashCode());
 		result = (prime * result) + ((funcSpec == null) ? 0 : funcSpec.hashCode());
+		result = (prime * result) + ((funcReturnSpec == null) ? 0 : funcReturnSpec.hashCode());
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+		result = (prime * result) + ((width == null) ? 0 : width.hashCode());
 		result = (prime * result) + ((dim == null) ? 0 : dim.hashCode());
 		hashCache = result;
 		return result;
@@ -561,11 +722,23 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 				}
 			}
 		}
+		if (funcReturnSpec != null) {
+			sb.append(".setFuncReturnSpec(").append(funcReturnSpec.toConstructionString(spacing + "\t")).append(")");
+		}
 		if (name != null) {
 			sb.append(".setName(").append(name.toConstructionString(spacing + "\t")).append(")");
 		}
+		if (width != null) {
+			sb.append(".setWidth(").append(width.toConstructionString(spacing + "\t")).append(")");
+		}
 		if (dim != null) {
-			sb.append(".setDim(").append(dim).append(")");
+			if (dim.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLExpression o : dim) {
+					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
 		}
 		return sb.toString();
 	}
@@ -589,11 +762,24 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
+		validateFuncReturnSpec(getFuncReturnSpec());
+		if (getFuncReturnSpec() != null) {
+			getFuncReturnSpec().validateAllFields(this, checkResolve);
+		}
 		validateName(getName());
 		if (getName() != null) {
 			getName().validateAllFields(this, checkResolve);
 		}
+		validateWidth(getWidth());
+		if (getWidth() != null) {
+			getWidth().validateAllFields(this, checkResolve);
+		}
 		validateDim(getDim());
+		if (getDim() != null) {
+			for (HDLExpression o : getDim()) {
+				o.validateAllFields(this, checkResolve);
+			}
+		}
 	}
 
 	@Override

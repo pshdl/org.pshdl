@@ -38,13 +38,15 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLFunctionParameter contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>RWType rw. Can <b>not</b> be <code>null</code>.</li>
+ * <li>RWType rw. If <code>null</code>, {@link RWType#READ} is used as default.</li>
  * <li>Type type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName enumSpec. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName ifSpec. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLFunctionParameter> funcSpec. Can be <code>null</code>.</li>
+ * <li>HDLFunctionParameter funcReturnSpec. Can be <code>null</code>.</li>
  * <li>HDLVariable name. Can be <code>null</code>.</li>
- * <li>Integer dim. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression width. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
@@ -54,7 +56,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param rw
-	 *            the value for rw. Can <b>not</b> be <code>null</code>.
+	 *            the value for rw. If <code>null</code>, {@link RWType#READ} is
+	 *            used as default.
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param enumSpec
@@ -63,16 +66,21 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 *            the value for ifSpec. Can be <code>null</code>.
 	 * @param funcSpec
 	 *            the value for funcSpec. Can be <code>null</code>.
+	 * @param funcReturnSpec
+	 *            the value for funcReturnSpec. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can be <code>null</code>.
+	 * @param width
+	 *            the value for width. Can be <code>null</code>.
 	 * @param dim
-	 *            the value for dim. Can <b>not</b> be <code>null</code>.
+	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunctionParameter(@Nullable IHDLObject container, @Nonnull RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec, @Nullable HDLQualifiedName ifSpec,
-			@Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLVariable name, @Nonnull Integer dim, boolean validate) {
-		super(container, rw, type, enumSpec, ifSpec, funcSpec, name, dim, validate);
+	public HDLFunctionParameter(@Nullable IHDLObject container, @Nullable RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec, @Nullable HDLQualifiedName ifSpec,
+			@Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLFunctionParameter funcReturnSpec, @Nullable HDLVariable name, @Nullable HDLExpression width,
+			@Nullable Iterable<HDLExpression> dim, boolean validate) {
+		super(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, validate);
 	}
 
 	public HDLFunctionParameter() {
@@ -112,7 +120,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	}
 
 	public static enum Type {
-		ANY_INT("int<>"), ANY_UINT("uint<>"), ANY_BIT("bit<>"), ANY_IF("interface<>"), ANY_ENUM("enum<>"), IF("interface"), ENUM("enum"), FUNCTION("func");
+		ANY_INT("int<>"), ANY_UINT("uint<>"), ANY_BIT("bit<>"), ANY_IF("interface<>"), ANY_ENUM("enum<>"), IF("interface"), ENUM("enum"), FUNCTION("function"), REG_BIT("bit"), REG_UINT(
+				"uint"), REG_INT("int"), STRING_TYPE("string"), BOOL_TYPE("bool");
 		String str;
 
 		Type(String op) {
@@ -193,6 +202,18 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 		}
 	};
 	/**
+	 * The accessor for the field funcReturnSpec which is of type
+	 * HDLFunctionParameter.
+	 */
+	public static HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter> fFuncReturnSpec = new HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter>("funcReturnSpec") {
+		@Override
+		public HDLFunctionParameter getValue(HDLFunctionParameter obj) {
+			if (obj == null)
+				return null;
+			return obj.getFuncReturnSpec();
+		}
+	};
+	/**
 	 * The accessor for the field name which is of type HDLVariable.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, HDLVariable> fName = new HDLFieldAccess<HDLFunctionParameter, HDLVariable>("name") {
@@ -204,17 +225,32 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 		}
 	};
 	/**
-	 * The accessor for the field dim which is of type Integer.
+	 * The accessor for the field width which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, Integer> fDim = new HDLFieldAccess<HDLFunctionParameter, Integer>("dim") {
+	public static HDLFieldAccess<HDLFunctionParameter, HDLExpression> fWidth = new HDLFieldAccess<HDLFunctionParameter, HDLExpression>("width") {
 		@Override
-		public Integer getValue(HDLFunctionParameter obj) {
+		public HDLExpression getValue(HDLFunctionParameter obj) {
+			if (obj == null)
+				return null;
+			return obj.getWidth();
+		}
+	};
+	/**
+	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
+	 */
+	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>>("dim") {
+		@Override
+		public ArrayList<HDLExpression> getValue(HDLFunctionParameter obj) {
 			if (obj == null)
 				return null;
 			return obj.getDim();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+	public static final HDLExpression EMPTY_ARR() {
+		return new HDLLiteral().setStr(true).setVal("");
+	}
 	// $CONTENT-END$
 
 }
