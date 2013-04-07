@@ -69,6 +69,7 @@ public enum HDLClass {
 	HDLSwitchCaseStatement(HDLSwitchCaseStatement.class), // HDLSwitchCaseStatement
 	HDLBlock(HDLBlock.class), // HDLBlock
 	HDLRange(HDLRange.class), // HDLRange
+	HDLFunctionParameter(HDLFunctionParameter.class), // HDLFunctionParameter
 	HDLUnit(HDLUnit.class), // HDLUnit
 	HDLRegisterConfig(HDLRegisterConfig.class), // HDLRegisterConfig
 	HDLVariable(HDLVariable.class), // HDLVariable

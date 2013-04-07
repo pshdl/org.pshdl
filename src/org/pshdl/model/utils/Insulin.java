@@ -247,7 +247,7 @@ public class Insulin {
 			Optional<HDLVariable> variable = ScopingExtension.getVariable(enumType, uFrag.getFrag());
 			if (variable.isPresent()) {
 				HDLQualifiedName typeName = fullNameOf(enumType);
-				HDLEnumRef enumRef = new HDLEnumRef().setHEnum(enumType.asRef()).setVar(typeName.append(uFrag.getFrag()));
+				HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(uFrag.getFrag()));
 				return Optional.of(enumRef);
 			}
 		}

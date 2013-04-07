@@ -44,13 +44,18 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param args
+	 *            the value for args. Can be <code>null</code>.
+	 * @param returnType
+	 *            the value for returnType. Can be <code>null</code>.
 	 * @param simOnly
 	 *            the value for simOnly. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLNativeFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly, boolean validate) {
-		super(container, annotations, name, validate);
+	public AbstractHDLNativeFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
+			@Nullable Iterable<HDLFunctionParameter> args, @Nullable HDLFunctionParameter returnType, @Nonnull Boolean simOnly, boolean validate) {
+		super(container, annotations, name, args, returnType, validate);
 		if (validate) {
 			simOnly = validateSimOnly(simOnly);
 		}
@@ -88,7 +93,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLNativeFunction copy() {
-		HDLNativeFunction newObject = new HDLNativeFunction(null, annotations, name, simOnly, false);
+		HDLNativeFunction newObject = new HDLNativeFunction(null, annotations, name, args, returnType, simOnly, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -103,8 +108,11 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	public HDLNativeFunction copyFiltered(CopyFilter filter) {
 		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
 		String filteredname = filter.copyObject("name", this, name);
+		ArrayList<HDLFunctionParameter> filteredargs = filter.copyContainer("args", this, args);
+		HDLFunctionParameter filteredreturnType = filter.copyObject("returnType", this, returnType);
 		Boolean filteredsimOnly = filter.copyObject("simOnly", this, simOnly);
-		return filter.postFilter((HDLNativeFunction) this, new HDLNativeFunction(null, filteredannotations, filteredname, filteredsimOnly, false));
+		return filter
+				.postFilter((HDLNativeFunction) this, new HDLNativeFunction(null, filteredannotations, filteredname, filteredargs, filteredreturnType, filteredsimOnly, false));
 	}
 
 	/**
@@ -148,7 +156,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -168,7 +176,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -188,7 +196,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -205,7 +213,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	public HDLNativeFunction removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -222,7 +230,96 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getArgs()}.
+	 * 
+	 * @param args
+	 *            sets the new args of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args
+	 *         field.
+	 */
+	@Override
+	@Nonnull
+	public HDLNativeFunction setArgs(@Nullable Iterable<HDLFunctionParameter> args) {
+		args = validateArgs(args);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
+		return res;
+	}
+
+	/**
+	 * Adds a new value to the field {@link #getArgs()}.
+	 * 
+	 * @param newArgs
+	 *            the value that should be added to the field {@link #getArgs()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args
+	 *         field.
+	 */
+	@Override
+	@Nonnull
+	public HDLNativeFunction addArgs(@Nullable HDLFunctionParameter newArgs) {
+		if (newArgs == null)
+			throw new IllegalArgumentException("Element of args can not be null!");
+		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		args.add(newArgs);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getArgs()}.
+	 * 
+	 * @param newArgs
+	 *            the value that should be removed from the field
+	 *            {@link #getArgs()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args
+	 *         field.
+	 */
+	@Override
+	@Nonnull
+	public HDLNativeFunction removeArgs(@Nullable HDLFunctionParameter newArgs) {
+		if (newArgs == null)
+			throw new IllegalArgumentException("Removed element of args can not be null!");
+		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		args.remove(newArgs);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getArgs()}.
+	 * 
+	 * @param idx
+	 *            the index of the value that should be removed from the field
+	 *            {@link #getArgs()}
+	 * @return a new instance of {@link HDLNativeFunction} with the updated args
+	 *         field.
+	 */
+	@Nonnull
+	public HDLNativeFunction removeArgs(int idx) {
+		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		args.remove(idx);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getReturnType()}.
+	 * 
+	 * @param returnType
+	 *            sets the new returnType of this object. Can be
+	 *            <code>null</code>.
+	 * @return a new instance of {@link HDLNativeFunction} with the updated
+	 *         returnType field.
+	 */
+	@Override
+	@Nonnull
+	public HDLNativeFunction setReturnType(@Nullable HDLFunctionParameter returnType) {
+		returnType = validateReturnType(returnType);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -238,7 +335,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setSimOnly(@Nonnull Boolean simOnly) {
 		simOnly = validateSimOnly(simOnly);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -254,7 +351,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setSimOnly(boolean simOnly) {
 		simOnly = validateSimOnly(simOnly);
-		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, simOnly, false);
+		HDLNativeFunction res = new HDLNativeFunction(container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -306,6 +403,18 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 		}
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
+		}
+		if (args != null) {
+			if (args.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLFunctionParameter o : args) {
+					sb.append(".addArgs(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
+		}
+		if (returnType != null) {
+			sb.append(".setReturnType(").append(returnType.toConstructionString(spacing + "\t")).append(")");
 		}
 		if (simOnly != null) {
 			sb.append(".setSimOnly(").append(simOnly).append(")");

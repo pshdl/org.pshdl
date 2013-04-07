@@ -64,6 +64,7 @@ import java.util.List
 
 import static org.pshdl.model.extensions.ScopingExtension.*
 import com.google.common.base.Optional
+import org.pshdl.model.HDLNativeFunction
 
 /**
  * The ScopingExtension allows the resolution of Enums, Interface, Variables by name
@@ -185,13 +186,22 @@ class ScopingExtension {
 
 	def dispatch List<HDLVariable> doGetVariables(HDLInlineFunction obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		res.addAll(obj.args)
+		for (v:obj.args)
+			res.add(v.name)
 		return res
 	}
 
+	def dispatch List<HDLVariable> doGetVariables(HDLNativeFunction obj) {
+		val List<HDLVariable> res = new LinkedList<HDLVariable>
+		for (v:obj.args)
+			res.add(v.name)
+		return res
+	}
+	
 	def dispatch List<HDLVariable> doGetVariables(HDLSubstituteFunction obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		res.addAll(obj.args)
+		for (v:obj.args)
+			res.add(v.name)
 		return res
 	}
 

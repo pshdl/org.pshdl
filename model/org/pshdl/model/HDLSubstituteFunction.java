@@ -39,7 +39,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLVariable> args. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLFunctionParameter> args. Can be <code>null</code>.</li>
+ * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLStatement> stmnts. Can be <code>null</code>.</li>
  * </ul>
  */
@@ -55,14 +56,16 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
 	 * @param args
 	 *            the value for args. Can be <code>null</code>.
+	 * @param returnType
+	 *            the value for returnType. Can be <code>null</code>.
 	 * @param stmnts
 	 *            the value for stmnts. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLSubstituteFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLVariable> args,
-			@Nullable Iterable<HDLStatement> stmnts, boolean validate) {
-		super(container, annotations, name, args, stmnts, validate);
+	public HDLSubstituteFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
+			@Nullable Iterable<HDLFunctionParameter> args, @Nullable HDLFunctionParameter returnType, @Nullable Iterable<HDLStatement> stmnts, boolean validate) {
+		super(container, annotations, name, args, returnType, stmnts, validate);
 	}
 
 	public HDLSubstituteFunction() {
@@ -78,17 +81,6 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	}
 
 	/**
-	 * The accessor for the field args which is of type ArrayList<HDLVariable>.
-	 */
-	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>> fArgs = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLVariable>>("args") {
-		@Override
-		public ArrayList<HDLVariable> getValue(HDLSubstituteFunction obj) {
-			if (obj == null)
-				return null;
-			return obj.getArgs();
-		}
-	};
-	/**
 	 * The accessor for the field stmnts which is of type
 	 * ArrayList<HDLStatement>.
 	 */
@@ -103,14 +95,14 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 
 	// $CONTENT-BEGIN$
 	public HDLStatement[] getReplacementStatements(HDLFunctionCall hdi) {
-		ArrayList<HDLVariable> args = getArgs();
+		ArrayList<HDLFunctionParameter> args = getArgs();
 		ArrayList<HDLExpression> params = hdi.getParams();
 		return createStatements(args, params, hdi);
 	}
 
 	public static final String META = "INLINED_FROM";
 
-	private HDLStatement[] createStatements(Iterable<HDLVariable> args, Iterable<HDLExpression> params, IHDLObject origin) {
+	private HDLStatement[] createStatements(ArrayList<HDLFunctionParameter> args, Iterable<HDLExpression> params, IHDLObject origin) {
 		HDLStatement[] res = new HDLStatement[getStmnts().size()];
 		int pos = 0;
 		for (HDLStatement stmnt : getStmnts()) {

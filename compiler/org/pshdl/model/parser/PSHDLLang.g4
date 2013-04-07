@@ -117,7 +117,8 @@ psAccessRange :
 psVariableRef :
 	psRefPart ('.' psRefPart)* |
 	isClk='$clk' |
-	isRst='$rst'
+	isRst='$rst' |
+	isEna='$ena'
 ;
 
 psRefPart :
@@ -140,19 +141,43 @@ psFunctionDeclaration :
 ;
 
 psInlineFunction :
-	'inline' 'function' psFunction psFuncParam '->' '(' psExpression ')'
+	'inline' 'function' psFuncRecturnType psFunction psFuncParam '->' '(' psExpression ')'
 ;
 
 psSubstituteFunction :
-	'substitute' 'function' psFunction psFuncParam '{' psStatement* '}'
-;
-
-psFuncParam :
-	'(' ( psVariable ( ',' psVariable )* )? ')'
+	'substitute' 'function' psFuncRecturnType? psFunction psFuncParam '{' psStatement* '}'
 ;
 
 psNativeFunction :
-	isSim='simulation'? 'native' 'function' psFunction ';'
+	isSim='simulation'? 'native' 'function' psFuncRecturnType? psFunction psFuncParam';'
+;
+
+psFuncRecturnType :
+	psFuncParamType (dims+='[]')*
+;
+
+psFuncParam :
+	'(' ( psFuncSpec ( ',' psFuncSpec )* )? ')'
+;
+
+psFuncSpec : 
+	(	
+		psFuncParamRWType psFuncParamType |
+		psFuncParamType {notifyErrorListeners("Missing read/write indicator. Use one of: '-' for read only, '+' write only or '*' for read-write");}
+	)
+	 RULE_ID? (dims+='[]')*
+;
+
+psFuncParamRWType:
+	'-' | '+' | '*'
+;
+
+psFuncParamType:
+	ANY_INT_TYPE | ANY_UINT_TYPE | ANY_BIT_TYPE | 
+	ANY_IF | ANY_ENUM | 
+	(IF_TYPE '<' psQualifiedName '>')|
+	(ENUM_TYPE '<' psQualifiedName '>' )|
+	(FUNCTION_TYPE '<' (psFuncParamType (',' psFuncParamType )* )? ('->' returnType=psFuncParamType)? '>')
 ;
 
 psFunction :
@@ -324,6 +349,14 @@ SRA_ASSGN:'>>=';
 ARITH_NEG:'-';
 BIT_NEG:'~';
 LOGIC_NEG:'!';
+ANY_INT_TYPE:'int<>';
+ANY_UINT_TYPE:'uint<>';
+ANY_BIT_TYPE:'bit<>';
+ANY_IF:'interface<>';
+ANY_ENUM:'enum<>';
+IF_TYPE:'interface';
+ENUM_TYPE:'enum';
+FUNCTION_TYPE:'func';
 
 MODULE:'module';
 TESTBENCH:'testbench';

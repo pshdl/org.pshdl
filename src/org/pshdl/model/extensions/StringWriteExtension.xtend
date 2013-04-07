@@ -75,6 +75,7 @@ import static org.pshdl.model.extensions.StringWriteExtension.*
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLUnresolvedFragmentFunction
 import org.pshdl.model.HDLArrayInit
+import org.pshdl.model.HDLFunctionParameter
 
 class StringWriteExtension {
 
@@ -200,6 +201,14 @@ class StringWriteExtension {
 		return sb.toString
 	}
 
+	def dispatch String toString(HDLFunctionParameter func, SyntaxHighlighter highlight) {
+		val StringBuilder sb = new StringBuilder
+		sb.append(func.rw)
+		sb.append(func.type)
+		if (func.name!=null)
+			sb.append(highlight.simpleSpace).append(highlight.varName(func.name))
+		return sb.toString
+	}
 	def dispatch String toString(HDLNativeFunction func, SyntaxHighlighter highlight) {
 		val StringBuilder sb = new StringBuilder
 		sb.append(func.entering(highlight))
@@ -212,7 +221,11 @@ class StringWriteExtension {
 		sb.append(highlight.simpleSpace)
 		sb.append(highlight.keyword("function"))
 		sb.append(highlight.simpleSpace)
-		sb.append(highlight.functionDecl(func.name)).append(";").append(highlight.newLine)
+		if (func.returnType!=null)
+			sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
+		sb.append(highlight.functionDecl(func.name))
+		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')
+		sb.append(";").append(highlight.newLine)
 		sb.append(func.leaving(highlight))
 		return sb.toString
 	}
@@ -223,10 +236,11 @@ class StringWriteExtension {
 		for (HDLAnnotation anno : func.annotations) {
 			sb.append(anno.toString(highlight)).append(highlight.simpleSpace)
 		}
-		sb.append(highlight.keyword("inline")).append(highlight.simpleSpace).append(highlight.keyword("function")).
-			append(highlight.simpleSpace)
+		sb.append(highlight.keyword("inline")).append(highlight.simpleSpace).append(highlight.keyword("function"))
+		sb.append(highlight.simpleSpace)
+		sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
-		sb.append('''(«FOR HDLVariable hVar : func.args SEPARATOR ','»«highlight.varName(hVar)»«ENDFOR»)''')
+		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')
 		sb.append(highlight.simpleSpace).append("->").append(highlight.simpleSpace).append("(").append(
 			func.expr.toString(highlight)).append(")").append(highlight.newLine)
 		sb.append(func.leaving(highlight))
@@ -241,8 +255,10 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("substitute")).append(highlight.simpleSpace).append(highlight.keyword("function")).
 			append(highlight.simpleSpace)
+		if (func.returnType!=null)
+			sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
-		sb.append('''(«FOR HDLVariable hVar : func.args SEPARATOR ','»«highlight.varName(hVar)»«ENDFOR»)''')
+		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')
 		sb.append(highlight.simpleSpace).append("{").append(highlight.newLine)
 		highlight.incSpacing
 		for (HDLStatement string : func.stmnts) {
@@ -658,6 +674,8 @@ class StringWriteExtension {
 	def dispatch String toString(HDLDirectGeneration hdg, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		hdg.entering(highlight)
+		if (hdg.include)
+			sb.append("include").append(highlight.simpleSpace)
 		sb.append(highlight.interfaceName(hdg.HIf.name)).append(highlight.simpleSpace).append(
 			highlight.varName(hdg.^var)).append("=")
 		sb.append(highlight.simpleSpace).append(highlight.keyword("generate")).append(highlight.simpleSpace).

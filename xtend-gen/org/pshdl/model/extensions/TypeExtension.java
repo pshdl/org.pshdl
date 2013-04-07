@@ -93,8 +93,7 @@ public class TypeExtension {
     boolean _isPresent = res.isPresent();
     if (_isPresent) {
       HDLType _get = res.get();
-      HDLType _copyDeepFrozen = _get.copyDeepFrozen(obj);
-      return Optional.<HDLType>of(_copyDeepFrozen);
+      return Optional.<HDLType>of(_get);
     }
     return Optional.<HDLType>absent();
   }

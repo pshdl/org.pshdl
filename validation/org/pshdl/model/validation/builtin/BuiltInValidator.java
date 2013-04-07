@@ -108,7 +108,7 @@ public class BuiltInValidator implements IHDLValidator {
 			// TODO check for valid parameter
 			checkSwitchStatements(pkg, problems, hContext);
 			// TODO Type checking!
-			// TODO Check for combinatorical loop.
+			// TODO Check for combinatorial loop.
 			// TODO Check for multiple assignment in same Scope
 			// TODO No processes in Module
 			// TODO no I/O variables in block

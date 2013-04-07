@@ -84,6 +84,7 @@ import org.pshdl.model.parser.PSHDLLangParser$PsDeclarationTypeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitContext
 import org.pshdl.model.parser.PSHDLLangParser$PsAnnotationContext
 import org.pshdl.model.parser.PSHDLLangParser$PsFunctionDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser$PsFuncParamTypeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsTypeDeclarationContext
 import org.pshdl.model.parser.PSHDLLangParser$PsVariableDeclarationContext
 import org.pshdl.model.parser.PSHDLLangParser$PsEnumDeclarationContext
@@ -106,6 +107,7 @@ import org.pshdl.model.parser.PSHDLLangParser$PsStatementContext
 import org.pshdl.model.parser.PSHDLLangParser$PsAssignmentOrFuncContext
 import org.pshdl.model.parser.PSHDLLangParser$PsCompoundStatementContext
 import org.pshdl.model.parser.PSHDLLangParser$PsForStatementContext
+import org.pshdl.model.parser.PSHDLLangParser$PsFuncRecturnTypeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsAccessRangeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsVariableRefContext
 import org.pshdl.model.parser.PSHDLLangParser$PsRefPartContext
@@ -117,6 +119,7 @@ import org.pshdl.model.parser.PSHDLLangParser$PsBitLogAndContext
 import org.pshdl.model.parser.PSHDLLangParser$PsBitXorContext
 import org.pshdl.model.parser.PSHDLLangParser$PsBitOrContext
 import org.pshdl.model.parser.PSHDLLangParser$PsEqualityContext
+import org.pshdl.model.parser.PSHDLLangParser$PsFuncSpecContext
 import org.pshdl.model.parser.PSHDLLangParser$PsShiftContext
 import org.pshdl.model.parser.PSHDLLangParser$PsIfStatementContext
 import org.pshdl.model.parser.PSHDLLangParser$PsParensContext
@@ -140,6 +143,9 @@ import java.util.ArrayList
 import org.antlr.v4.runtime.BufferedTokenStream
 import org.antlr.v4.runtime.ParserRuleContext
 import org.pshdl.model.HDLFunction
+import org.pshdl.model.HDLFunctionParameter
+import org.pshdl.model.HDLFunctionParameter$RWType
+import org.pshdl.model.HDLFunctionParameter$Type
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -517,7 +523,9 @@ class ParserToModelExtension {
 		var func = new HDLSubstituteFunction
 		func = func.setName(context.psFunction.toName)
 		func = func.setStmnts(context.psStatement.map[toHDL as HDLStatement])
-		func = func.setArgs(context.psFuncParam.psVariable.map[toHDL as HDLVariable])
+		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL as HDLFunctionParameter])
+		if (context.psFuncRecturnType!==null)
+			func=func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
 		return func.attachContext(context)
 	}
 
@@ -525,14 +533,55 @@ class ParserToModelExtension {
 		var func = new HDLNativeFunction
 		func = func.setName(context.psFunction.toName)
 		func = func.setSimOnly(context.isSim !== null)
+		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL as HDLFunctionParameter])
+		if (context.psFuncRecturnType!==null)
+			func=func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
 		return func.attachContext(context)
 	}
 
+	def dispatch HDLFunctionParameter toHDL(PsFuncRecturnTypeContext context) {
+		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
+		res=res.setRw(HDLFunctionParameter$RWType::RETURN)
+		res=res.setDim(context.dims.size)
+		return res
+	}
+	def dispatch HDLFunctionParameter toHDL(PsFuncSpecContext context) {
+		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
+		res=res.setName(new HDLVariable().setName(context.RULE_ID.text))
+		res=res.setRw(HDLFunctionParameter$RWType::getOp(context.psFuncParamRWType.text))
+		res=res.setDim(context.dims.size)
+		return res
+	}
+	def dispatch HDLFunctionParameter toHDL(PsFuncParamTypeContext context) {
+		var res=new HDLFunctionParameter
+		switch (x:context){
+			case x.ANY_INT_TYPE!=null: res=res.setType(Type::ANY_INT)
+			case x.ANY_UINT_TYPE!=null: res=res.setType(Type::ANY_UINT)
+			case x.ANY_BIT_TYPE!=null: res=res.setType(Type::ANY_BIT)
+			case x.ANY_IF!=null: res=res.setType(Type::ANY_IF)
+			case x.ANY_ENUM!=null: res=res.setType(Type::ANY_ENUM)
+			case x.IF_TYPE!=null: {
+				res=res.setType(^Type::^IF)
+				res=res.setIfSpec(x.psQualifiedName.toFQNName)
+			}
+			case x.ENUM_TYPE!=null: { 
+				res=res.setType(^Type::ENUM)
+				res=res.setEnumSpec(x.psQualifiedName.toFQNName)
+			}
+			case x.FUNCTION_TYPE!=null: {
+				res=res.setType(^Type::FUNCTION)
+				res=res.setFuncSpec(x.psFuncParamType.map[toHDL as HDLFunctionParameter])
+			}
+		}
+		return res
+	}
+	
 	def dispatch HDLInlineFunction toHDL(PsInlineFunctionContext context) {
 		var func = new HDLInlineFunction
 		func = func.setName(context.psFunction.toName)
 		func = func.setExpr(context.psExpression.toHDL as HDLExpression)
-		func = func.setArgs(context.psFuncParam.psVariable.map[toHDL as HDLVariable])
+		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL as HDLFunctionParameter])
+		func=func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
 		return func.attachContext(context)
 	}
 

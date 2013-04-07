@@ -405,7 +405,7 @@ public class HDLPrimitives {
 				return leftW;
 			if ((leftW == null) && (rightW != null))
 				return rightW;
-			return PSHDLLib.MAX.getReplacementExpressionArgs(exp, leftW, rightW);
+			return PSHDLLib.MAX_UINT.getReplacementExpressionArgs(exp, leftW, rightW);
 			// return new HDLArithOp().setLeft(max).setType(PLUS).setRight(new
 			// HDLLiteral().setVal("1"));
 		case MUL:

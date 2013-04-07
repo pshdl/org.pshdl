@@ -40,6 +40,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLFunctionParameter> args. Can be <code>null</code>.</li>
+ * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * </ul>
  */
 public abstract class HDLFunction extends AbstractHDLFunction {
@@ -52,11 +54,16 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param args
+	 *            the value for args. Can be <code>null</code>.
+	 * @param returnType
+	 *            the value for returnType. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, boolean validate) {
-		super(container, annotations, name, validate);
+	public HDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
+			@Nullable HDLFunctionParameter returnType, boolean validate) {
+		super(container, annotations, name, args, returnType, validate);
 	}
 
 	public HDLFunction() {
@@ -82,22 +89,46 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			return obj.getName();
 		}
 	};
+	/**
+	 * The accessor for the field args which is of type
+	 * ArrayList<HDLFunctionParameter>.
+	 */
+	public static HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>> fArgs = new HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>>("args") {
+		@Override
+		public ArrayList<HDLFunctionParameter> getValue(HDLFunction obj) {
+			if (obj == null)
+				return null;
+			return obj.getArgs();
+		}
+	};
+	/**
+	 * The accessor for the field returnType which is of type
+	 * HDLFunctionParameter.
+	 */
+	public static HDLFieldAccess<HDLFunction, HDLFunctionParameter> fReturnType = new HDLFieldAccess<HDLFunction, HDLFunctionParameter>("returnType") {
+		@Override
+		public HDLFunctionParameter getValue(HDLFunction obj) {
+			if (obj == null)
+				return null;
+			return obj.getReturnType();
+		}
+	};
 	// $CONTENT-BEGIN$
 
 	public static final GenericMeta<IHDLObject> META = new GenericMeta<IHDLObject>("INLINED_FROM", true);
 
 	@Nonnull
-	public <T extends IHDLObject> T substitute(Iterable<HDLVariable> paraneter, Iterable<HDLExpression> arguments, T stmnt, IHDLObject origin) {
+	public <T extends IHDLObject> T substitute(Iterable<HDLFunctionParameter> paraneter, Iterable<HDLExpression> arguments, T stmnt, IHDLObject origin) {
 		ModificationSet msExp = new ModificationSet();
 		@SuppressWarnings("unchecked")
 		T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
 		Iterator<HDLExpression> argIter = arguments.iterator();
-		for (HDLVariable param : paraneter) {
+		for (HDLFunctionParameter param : args) {
 			if (!argIter.hasNext()) {
 				continue;
 			}
 			HDLExpression arg = argIter.next();
-			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
+			Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName().getName()).getAll();
 			for (HDLVariableRef argRef : allArgRefs) {
 				HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
@@ -105,10 +136,10 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 						HDLVariableRef ref = (HDLVariableRef) exp;
 						HDLVariableRef nref = ref;
 						for (HDLRange bit : argRef.getBits()) {
-							nref = nref.addBits(substitute(paraneter, arguments, bit, origin));
+							nref = nref.addBits(substitute(args, arguments, bit, origin));
 						}
 						for (HDLExpression aExp : argRef.getArray()) {
-							nref = nref.addArray(substitute(paraneter, arguments, aExp, origin));
+							nref = nref.addArray(substitute(args, arguments, aExp, origin));
 						}
 						msExp.replace(argRef, nref);
 					} else {

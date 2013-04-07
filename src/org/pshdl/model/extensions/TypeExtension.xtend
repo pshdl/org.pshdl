@@ -79,7 +79,7 @@ class TypeExtension {
 			throw new IllegalArgumentException("Target needs to be frozen")
 		var res = INST.determineType(obj)
 		if (res.present) {
-			return Optional::of(res.get.copyDeepFrozen(obj))
+			return Optional::of(res.get)
 		}
 		return Optional::absent
 	}

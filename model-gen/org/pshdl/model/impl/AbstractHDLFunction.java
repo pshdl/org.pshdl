@@ -32,6 +32,7 @@ import javax.annotation.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.HDLIterator.Visit;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLFunction extends HDLDeclaration {
@@ -44,20 +45,44 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param args
+	 *            the value for args. Can be <code>null</code>.
+	 * @param returnType
+	 *            the value for returnType. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, boolean validate) {
+	public AbstractHDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
+			@Nullable HDLFunctionParameter returnType, boolean validate) {
 		super(container, annotations, validate);
 		if (validate) {
 			name = validateName(name);
 		}
 		this.name = name;
+		if (validate) {
+			args = validateArgs(args);
+		}
+		this.args = new ArrayList<HDLFunctionParameter>();
+		if (args != null) {
+			for (HDLFunctionParameter newValue : args) {
+				this.args.add(newValue);
+			}
+		}
+		if (validate) {
+			returnType = validateReturnType(returnType);
+		}
+		if (returnType != null) {
+			this.returnType = returnType;
+		} else {
+			this.returnType = null;
+		}
 	}
 
 	public AbstractHDLFunction() {
 		super();
 		this.name = null;
+		this.args = new ArrayList<HDLFunctionParameter>();
+		this.returnType = null;
 	}
 
 	protected final String name;
@@ -78,8 +103,56 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		return name;
 	}
 
+	@Visit
+	protected final ArrayList<HDLFunctionParameter> args;
+
+	/**
+	 * Get the args field. Can be <code>null</code>.
+	 * 
+	 * @return a clone of the field. Will never return <code>null</code>.
+	 */
+	@Nonnull
+	public ArrayList<HDLFunctionParameter> getArgs() {
+		return (ArrayList<HDLFunctionParameter>) args.clone();
+	}
+
+	protected Iterable<HDLFunctionParameter> validateArgs(Iterable<HDLFunctionParameter> args) {
+		if (args == null)
+			return new ArrayList<HDLFunctionParameter>();
+		return args;
+	}
+
+	@Visit
+	protected final HDLFunctionParameter returnType;
+
+	/**
+	 * Get the returnType field. Can be <code>null</code>.
+	 * 
+	 * @return the field
+	 */
+	@Nullable
+	public HDLFunctionParameter getReturnType() {
+		return returnType;
+	}
+
+	protected HDLFunctionParameter validateReturnType(HDLFunctionParameter returnType) {
+		return returnType;
+	}
+
 	@Nonnull
 	public abstract HDLFunction setName(@Nonnull String name);
+
+	@Nonnull
+	public abstract HDLFunction setArgs(@Nullable Iterable<HDLFunctionParameter> args);
+
+	@Nonnull
+	public abstract HDLFunction addArgs(@Nullable HDLFunctionParameter args);
+
+	@Nonnull
+	public abstract HDLFunction removeArgs(@Nullable HDLFunctionParameter args);
+
+	@Nonnull
+	public abstract HDLFunction setReturnType(@Nullable HDLFunctionParameter returnType);
 
 	/**
 	 * Creates a copy of this class with the same fields.
@@ -124,6 +197,16 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (args == null) {
+			if (other.args != null)
+				return false;
+		} else if (!args.equals(other.args))
+			return false;
+		if (returnType == null) {
+			if (other.returnType != null)
+				return false;
+		} else if (!returnType.equals(other.returnType))
+			return false;
 		return true;
 	}
 
@@ -136,6 +219,8 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+		result = (prime * result) + ((args == null) ? 0 : args.hashCode());
+		result = (prime * result) + ((returnType == null) ? 0 : returnType.hashCode());
 		hashCache = result;
 		return result;
 	}
@@ -157,6 +242,18 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
 		}
+		if (args != null) {
+			if (args.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (HDLFunctionParameter o : args) {
+					sb.append(".addArgs(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
+		}
+		if (returnType != null) {
+			sb.append(".setReturnType(").append(returnType.toConstructionString(spacing + "\t")).append(")");
+		}
 		return sb.toString();
 	}
 
@@ -164,6 +261,16 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateName(getName());
+		validateArgs(getArgs());
+		if (getArgs() != null) {
+			for (HDLFunctionParameter o : getArgs()) {
+				o.validateAllFields(this, checkResolve);
+			}
+		}
+		validateReturnType(getReturnType());
+		if (getReturnType() != null) {
+			getReturnType().validateAllFields(this, checkResolve);
+		}
 	}
 
 	@Override

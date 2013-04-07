@@ -104,6 +104,14 @@ public class PSHDLLangBaseListener implements PSHDLLangListener {
 	}
 
 	@Override
+	public void enterPsFuncRecturnType(PSHDLLangParser.PsFuncRecturnTypeContext ctx) {
+	}
+
+	@Override
+	public void exitPsFuncRecturnType(PSHDLLangParser.PsFuncRecturnTypeContext ctx) {
+	}
+
+	@Override
 	public void enterPsBitXor(PSHDLLangParser.PsBitXorContext ctx) {
 	}
 
@@ -224,11 +232,11 @@ public class PSHDLLangBaseListener implements PSHDLLangListener {
 	}
 
 	@Override
-	public void enterPsStatement(PSHDLLangParser.PsStatementContext ctx) {
+	public void enterPsFuncParamType(PSHDLLangParser.PsFuncParamTypeContext ctx) {
 	}
 
 	@Override
-	public void exitPsStatement(PSHDLLangParser.PsStatementContext ctx) {
+	public void exitPsFuncParamType(PSHDLLangParser.PsFuncParamTypeContext ctx) {
 	}
 
 	@Override
@@ -237,6 +245,14 @@ public class PSHDLLangBaseListener implements PSHDLLangListener {
 
 	@Override
 	public void exitPsCompoundStatement(PSHDLLangParser.PsCompoundStatementContext ctx) {
+	}
+
+	@Override
+	public void enterPsStatement(PSHDLLangParser.PsStatementContext ctx) {
+	}
+
+	@Override
+	public void exitPsStatement(PSHDLLangParser.PsStatementContext ctx) {
 	}
 
 	@Override
@@ -512,6 +528,14 @@ public class PSHDLLangBaseListener implements PSHDLLangListener {
 	}
 
 	@Override
+	public void enterPsFuncSpec(PSHDLLangParser.PsFuncSpecContext ctx) {
+	}
+
+	@Override
+	public void exitPsFuncSpec(PSHDLLangParser.PsFuncSpecContext ctx) {
+	}
+
+	@Override
 	public void enterPsInterface(PSHDLLangParser.PsInterfaceContext ctx) {
 	}
 
@@ -597,6 +621,14 @@ public class PSHDLLangBaseListener implements PSHDLLangListener {
 
 	@Override
 	public void exitPsDeclaration(PSHDLLangParser.PsDeclarationContext ctx) {
+	}
+
+	@Override
+	public void enterPsFuncParamRWType(PSHDLLangParser.PsFuncParamRWTypeContext ctx) {
+	}
+
+	@Override
+	public void exitPsFuncParamRWType(PSHDLLangParser.PsFuncParamRWTypeContext ctx) {
 	}
 
 	@Override

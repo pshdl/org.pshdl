@@ -40,11 +40,13 @@ import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLInlineFunction;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLNativeFunction;
 import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLPackage;
@@ -245,16 +247,33 @@ public class ScopingExtension {
   protected List<HDLVariable> _doGetVariables(final HDLInlineFunction obj) {
     LinkedList<HDLVariable> _linkedList = new LinkedList<HDLVariable>();
     final List<HDLVariable> res = _linkedList;
-    ArrayList<HDLVariable> _args = obj.getArgs();
-    res.addAll(_args);
+    ArrayList<HDLFunctionParameter> _args = obj.getArgs();
+    for (final HDLFunctionParameter v : _args) {
+      HDLVariable _name = v.getName();
+      res.add(_name);
+    }
+    return res;
+  }
+  
+  protected List<HDLVariable> _doGetVariables(final HDLNativeFunction obj) {
+    LinkedList<HDLVariable> _linkedList = new LinkedList<HDLVariable>();
+    final List<HDLVariable> res = _linkedList;
+    ArrayList<HDLFunctionParameter> _args = obj.getArgs();
+    for (final HDLFunctionParameter v : _args) {
+      HDLVariable _name = v.getName();
+      res.add(_name);
+    }
     return res;
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLSubstituteFunction obj) {
     LinkedList<HDLVariable> _linkedList = new LinkedList<HDLVariable>();
     final List<HDLVariable> res = _linkedList;
-    ArrayList<HDLVariable> _args = obj.getArgs();
-    res.addAll(_args);
+    ArrayList<HDLFunctionParameter> _args = obj.getArgs();
+    for (final HDLFunctionParameter v : _args) {
+      HDLVariable _name = v.getName();
+      res.add(_name);
+    }
     return res;
   }
   
@@ -826,6 +845,8 @@ public class ScopingExtension {
   public List<HDLVariable> doGetVariables(final IHDLObject obj) {
     if (obj instanceof HDLInlineFunction) {
       return _doGetVariables((HDLInlineFunction)obj);
+    } else if (obj instanceof HDLNativeFunction) {
+      return _doGetVariables((HDLNativeFunction)obj);
     } else if (obj instanceof HDLSubstituteFunction) {
       return _doGetVariables((HDLSubstituteFunction)obj);
     } else if (obj instanceof HDLDirectGeneration) {

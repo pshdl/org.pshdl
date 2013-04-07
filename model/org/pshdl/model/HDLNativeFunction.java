@@ -37,6 +37,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>ArrayList<HDLFunctionParameter> args. Can be <code>null</code>.</li>
+ * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * <li>Boolean simOnly. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -50,13 +52,18 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param name
 	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param args
+	 *            the value for args. Can be <code>null</code>.
+	 * @param returnType
+	 *            the value for returnType. Can be <code>null</code>.
 	 * @param simOnly
 	 *            the value for simOnly. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the paramaters will be validated.
 	 */
-	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nonnull Boolean simOnly, boolean validate) {
-		super(container, annotations, name, simOnly, validate);
+	public HDLNativeFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
+			@Nullable HDLFunctionParameter returnType, @Nonnull Boolean simOnly, boolean validate) {
+		super(container, annotations, name, args, returnType, simOnly, validate);
 	}
 
 	public HDLNativeFunction() {

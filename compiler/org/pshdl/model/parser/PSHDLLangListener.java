@@ -66,6 +66,10 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	void exitPsVariableDeclaration(PSHDLLangParser.PsVariableDeclarationContext ctx);
 
+	void enterPsFuncRecturnType(PSHDLLangParser.PsFuncRecturnTypeContext ctx);
+
+	void exitPsFuncRecturnType(PSHDLLangParser.PsFuncRecturnTypeContext ctx);
+
 	void enterPsBitXor(PSHDLLangParser.PsBitXorContext ctx);
 
 	void exitPsBitXor(PSHDLLangParser.PsBitXorContext ctx);
@@ -126,13 +130,17 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	void exitPsBitAnd(PSHDLLangParser.PsBitAndContext ctx);
 
-	void enterPsStatement(PSHDLLangParser.PsStatementContext ctx);
+	void enterPsFuncParamType(PSHDLLangParser.PsFuncParamTypeContext ctx);
 
-	void exitPsStatement(PSHDLLangParser.PsStatementContext ctx);
+	void exitPsFuncParamType(PSHDLLangParser.PsFuncParamTypeContext ctx);
 
 	void enterPsCompoundStatement(PSHDLLangParser.PsCompoundStatementContext ctx);
 
 	void exitPsCompoundStatement(PSHDLLangParser.PsCompoundStatementContext ctx);
+
+	void enterPsStatement(PSHDLLangParser.PsStatementContext ctx);
+
+	void exitPsStatement(PSHDLLangParser.PsStatementContext ctx);
 
 	void enterPsValue(PSHDLLangParser.PsValueContext ctx);
 
@@ -270,6 +278,10 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	void exitPsArrayInitSub(PSHDLLangParser.PsArrayInitSubContext ctx);
 
+	void enterPsFuncSpec(PSHDLLangParser.PsFuncSpecContext ctx);
+
+	void exitPsFuncSpec(PSHDLLangParser.PsFuncSpecContext ctx);
+
 	void enterPsInterface(PSHDLLangParser.PsInterfaceContext ctx);
 
 	void exitPsInterface(PSHDLLangParser.PsInterfaceContext ctx);
@@ -313,6 +325,10 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	void enterPsDeclaration(PSHDLLangParser.PsDeclarationContext ctx);
 
 	void exitPsDeclaration(PSHDLLangParser.PsDeclarationContext ctx);
+
+	void enterPsFuncParamRWType(PSHDLLangParser.PsFuncParamRWTypeContext ctx);
+
+	void exitPsFuncParamRWType(PSHDLLangParser.PsFuncParamRWTypeContext ctx);
 
 	void enterPsIfStatement(PSHDLLangParser.PsIfStatementContext ctx);
 

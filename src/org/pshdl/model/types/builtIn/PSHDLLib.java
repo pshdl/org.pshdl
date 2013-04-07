@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 
 import org.pshdl.model.*;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLFunctionParameter.RWType;
+import org.pshdl.model.HDLFunctionParameter.Type;
 import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.*;
@@ -45,42 +47,61 @@ public class PSHDLLib {
 	public static final HDLEnum ACTIVE = new HDLEnum().setName("Active").addEnums(new HDLVariable().setName("LOW")).addEnums(new HDLVariable().setName("HIGH"));
 	public static final HDLEnum SYNC = new HDLEnum().setName("Sync").addEnums(new HDLVariable().setName("ASYNC")).addEnums(new HDLVariable().setName("SYNC"));
 
-	public static final HDLInlineFunction ABS = new HDLInlineFunction()
-			.setName("abs")
-			.addArgs(new HDLVariable().setName("a"))
-			.setExpr(
-					new HDLTernary()
-							.setIfExpr(
-									new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))).setRight(new HDLLiteral().setVal("0"))
-											.setType(HDLEqualityOpType.LESS))
-							.setThenExpr(new HDLManip().setType(HDLManipType.ARITH_NEG).setTarget(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))))
-							.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))));
+	public static final HDLInlineFunction ABS_UINT = createABS(Type.ANY_UINT);
+	public static final HDLInlineFunction ABS_INT = createABS(Type.ANY_INT);
 
-	public static final HDLInlineFunction MIN = new HDLInlineFunction()
-			.setName("min")
-			.addArgs(new HDLVariable().setName("a"))
-			.addArgs(new HDLVariable().setName("b"))
-			.setExpr(
-					new HDLTernary()
-							.setIfExpr(
-									new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.a")))
-											.setRight(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.b"))).setType(HDLEqualityOpType.LESS))
-							.setThenExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.a")))
-							.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.b"))));
+	private static HDLInlineFunction createABS(Type type) {
+		return new HDLInlineFunction()
+				.setName("abs")
+				.setReturnType(new HDLFunctionParameter().setDim(0).setType(type).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")))
+				.setExpr(
+						new HDLTernary()
+								.setIfExpr(
+										new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))).setRight(new HDLLiteral().setVal("0"))
+												.setType(HDLEqualityOpType.LESS))
+								.setThenExpr(new HDLManip().setType(HDLManipType.ARITH_NEG).setTarget(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))))
+								.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))));
+	}
 
-	public static final HDLInlineFunction MAX = new HDLInlineFunction()
-			.setName("max")
-			.addArgs(new HDLVariable().setName("a"))
-			.addArgs(new HDLVariable().setName("b"))
-			.setExpr(
-					new HDLTernary()
-							.setIfExpr(
-									new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.a")))
-											.setRight(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.b"))).setType(HDLEqualityOpType.GREATER))
-							.setThenExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.a")))
-							.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.b"))));
+	public static final HDLInlineFunction MIN_UINT = createMIN(Type.ANY_UINT);
+	public static final HDLInlineFunction MIN_INT = createMIN(Type.ANY_INT);
 
-	public static final HDLFunction[] FUNCTIONS = new HDLFunction[] { MIN, MAX, ABS };
+	private static HDLInlineFunction createMIN(Type type) {
+		return new HDLInlineFunction()
+				.setName("min")
+				.setReturnType(new HDLFunctionParameter().setDim(0).setType(type).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")))
+				.setExpr(
+						new HDLTernary()
+								.setIfExpr(
+										new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.a")))
+												.setRight(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.b"))).setType(HDLEqualityOpType.LESS))
+								.setThenExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.a")))
+								.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.min.b"))));
+	}
+
+	public static final HDLInlineFunction MAX_INT = createMAX(Type.ANY_INT);
+	public static final HDLInlineFunction MAX_UINT = createMAX(Type.ANY_UINT);
+
+	private static HDLInlineFunction createMAX(Type type) {
+		return new HDLInlineFunction()
+				.setName("max")
+				.setReturnType(new HDLFunctionParameter().setDim(0).setType(type).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")))
+				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")))
+
+				.setExpr(
+						new HDLTernary()
+								.setIfExpr(
+										new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.a")))
+												.setRight(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.b"))).setType(HDLEqualityOpType.GREATER))
+								.setThenExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.a")))
+								.setElseExpr(new HDLVariableRef().setVar(new HDLQualifiedName("pshdl.max.b"))));
+	}
+
+	public static final HDLFunction[] FUNCTIONS = new HDLFunction[] { MIN_UINT, MAX_UINT, ABS_UINT, MIN_INT, MAX_INT, ABS_INT };
 
 	private static HDLPackage LIB = null;
 
