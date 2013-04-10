@@ -37,6 +37,7 @@ import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
+import com.google.common.collect.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation {
@@ -316,5 +317,97 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLInterfaceInstantiation, HDLClass.HDLInstantiation, HDLClass.HDLStatement, HDLClass.HDLObject);
+	}
+
+	@Override
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if (var != null) {
+							current = var.deepIterator();
+						}
+						break;
+					case 1:
+						if ((arguments != null) && (arguments.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(arguments.size());
+							for (HDLArgument o : arguments) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	@Override
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if (var != null) {
+							current = Iterators.singletonIterator(var);
+						}
+						break;
+					case 1:
+						if ((arguments != null) && (arguments.size() != 0)) {
+							current = arguments.iterator();
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
 	}
 }

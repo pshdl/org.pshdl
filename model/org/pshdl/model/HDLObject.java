@@ -236,7 +236,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 		if (arrayClazzTypes == null) {
 			HDLClass[] clazzes = HDLClass.values();
 			arrayClazzTypes = new IHDLObject[clazzes.length][];
-			Iterator<IHDLObject> iterator = iterator(false);
+			Iterator<IHDLObject> iterator = iterator();
 			EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<HDLClass, List<IHDLObject[]>>(HDLClass.class);
 			addClazzArray(this, map);
 			while (iterator.hasNext()) {
@@ -319,21 +319,6 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			if (clazz.isInstance(container))
 				return (T) container;
 			return container.getContainer(clazz);
-		}
-		return null;
-	}
-
-	@Override
-	public Iterator<IHDLObject> iterator() {
-		return iterator(false);
-	}
-
-	@Override
-	public Iterator<IHDLObject> iterator(boolean deep) {
-		try {
-			return new HDLIterator(this, deep);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}

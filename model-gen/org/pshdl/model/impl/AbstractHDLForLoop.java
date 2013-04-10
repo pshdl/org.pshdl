@@ -32,7 +32,8 @@ import javax.annotation.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.Visit;
+
+import com.google.common.collect.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLForLoop extends HDLCompound {
@@ -89,7 +90,6 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		this.dos = new ArrayList<HDLStatement>();
 	}
 
-	@Visit
 	protected final ArrayList<HDLRange> range;
 
 	/**
@@ -111,7 +111,6 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		return range;
 	}
 
-	@Visit
 	protected final HDLVariable param;
 
 	/**
@@ -130,7 +129,6 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		return param;
 	}
 
-	@Visit
 	protected final ArrayList<HDLStatement> dos;
 
 	/**
@@ -459,5 +457,111 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLForLoop, HDLClass.HDLCompound, HDLClass.HDLStatement, HDLClass.HDLObject);
+	}
+
+	@Override
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((range != null) && (range.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(range.size());
+							for (HDLRange o : range) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
+						if (param != null) {
+							current = param.deepIterator();
+						}
+						break;
+					case 2:
+						if ((dos != null) && (dos.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dos.size());
+							for (HDLStatement o : dos) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	@Override
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((range != null) && (range.size() != 0)) {
+							current = range.iterator();
+						}
+						break;
+					case 1:
+						if (param != null) {
+							current = Iterators.singletonIterator(param);
+						}
+						break;
+					case 2:
+						if ((dos != null) && (dos.size() != 0)) {
+							current = dos.iterator();
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
 	}
 }

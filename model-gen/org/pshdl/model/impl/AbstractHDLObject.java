@@ -147,5 +147,71 @@ public abstract class AbstractHDLObject {
 		return EnumSet.of(HDLClass.HDLObject);
 	}
 
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
 	protected boolean frozen = false;
 }

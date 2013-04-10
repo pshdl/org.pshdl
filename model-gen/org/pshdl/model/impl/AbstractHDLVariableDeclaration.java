@@ -34,11 +34,11 @@ import org.pshdl.model.*;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.Visit;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
+import com.google.common.collect.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
@@ -111,7 +111,6 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		this.variables = new ArrayList<HDLVariable>();
 	}
 
-	@Visit
 	protected final HDLRegisterConfig register;
 
 	/**
@@ -164,7 +163,6 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		return type;
 	}
 
-	@Visit
 	protected final HDLPrimitive primitive;
 
 	/**
@@ -181,7 +179,6 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		return primitive;
 	}
 
-	@Visit
 	protected final ArrayList<HDLVariable> variables;
 
 	/**
@@ -593,5 +590,121 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLVariableDeclaration, HDLClass.HDLDeclaration, HDLClass.HDLStatement, HDLClass.HDLObject);
+	}
+
+	@Override
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (HDLAnnotation o : annotations) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
+						if (register != null) {
+							current = register.deepIterator();
+						}
+						break;
+					case 2:
+						if (primitive != null) {
+							current = primitive.deepIterator();
+						}
+						break;
+					case 3:
+						if ((variables != null) && (variables.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(variables.size());
+							for (HDLVariable o : variables) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	@Override
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							current = annotations.iterator();
+						}
+						break;
+					case 1:
+						if (register != null) {
+							current = Iterators.singletonIterator(register);
+						}
+						break;
+					case 2:
+						if (primitive != null) {
+							current = Iterators.singletonIterator(primitive);
+						}
+						break;
+					case 3:
+						if ((variables != null) && (variables.size() != 0)) {
+							current = variables.iterator();
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
 	}
 }

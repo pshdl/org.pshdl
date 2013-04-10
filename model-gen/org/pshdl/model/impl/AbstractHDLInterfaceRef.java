@@ -33,11 +33,11 @@ import javax.annotation.*;
 import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.Visit;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
+import com.google.common.collect.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
@@ -102,7 +102,6 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 		return hIf;
 	}
 
-	@Visit
 	protected final ArrayList<HDLExpression> ifArray;
 
 	/**
@@ -525,5 +524,115 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLInterfaceRef, HDLClass.HDLVariableRef, HDLClass.HDLResolvedRef, HDLClass.HDLReference, HDLClass.HDLExpression, HDLClass.HDLObject);
+	}
+
+	@Override
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((array != null) && (array.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(array.size());
+							for (HDLExpression o : array) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
+						if ((bits != null) && (bits.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(bits.size());
+							for (HDLRange o : bits) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 2:
+						if ((ifArray != null) && (ifArray.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(ifArray.size());
+							for (HDLExpression o : ifArray) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	@Override
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((array != null) && (array.size() != 0)) {
+							current = array.iterator();
+						}
+						break;
+					case 1:
+						if ((bits != null) && (bits.size() != 0)) {
+							current = bits.iterator();
+						}
+						break;
+					case 2:
+						if ((ifArray != null) && (ifArray.size() != 0)) {
+							current = ifArray.iterator();
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
 	}
 }

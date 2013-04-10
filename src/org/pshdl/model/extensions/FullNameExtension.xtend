@@ -72,7 +72,7 @@ class FullNameExtension {
 	private def static int countInstance(HDLObject obj) {
 		var int count = 0
 		if (obj.container !== null) {
-			val Iterator<IHDLObject> iterator = obj.container.iterator(false)
+			val Iterator<IHDLObject> iterator = obj.container.iterator()
 			while (iterator.hasNext) {
 				val IHDLObject hdlObject = iterator.next
 				if (hdlObject == obj)

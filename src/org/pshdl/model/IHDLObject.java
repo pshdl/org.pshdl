@@ -169,7 +169,7 @@ public interface IHDLObject {
 	 */
 	public Iterator<IHDLObject> iterator();
 
-	public Iterator<IHDLObject> iterator(boolean deep);
+	public Iterator<IHDLObject> deepIterator();
 
 	public IHDLObject getContainer();
 

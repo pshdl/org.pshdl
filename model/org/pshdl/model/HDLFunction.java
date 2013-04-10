@@ -151,7 +151,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			}
 		}
 		T newExp = msExp.apply(orig);
-		Iterator<IHDLObject> iterator = newExp.iterator(true);
+		Iterator<IHDLObject> iterator = newExp.deepIterator();
 		while (iterator.hasNext()) {
 			IHDLObject obj = iterator.next();
 			obj.addMeta(META, origin);

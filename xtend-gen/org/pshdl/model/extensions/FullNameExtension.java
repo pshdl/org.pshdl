@@ -97,7 +97,7 @@ public class FullNameExtension {
     boolean _tripleNotEquals = (_container != null);
     if (_tripleNotEquals) {
       IHDLObject _container_1 = obj.getContainer();
-      final Iterator<IHDLObject> iterator = _container_1.iterator(false);
+      final Iterator<IHDLObject> iterator = _container_1.iterator();
       boolean _hasNext = iterator.hasNext();
       boolean _while = _hasNext;
       while (_while) {

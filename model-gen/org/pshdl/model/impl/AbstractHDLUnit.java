@@ -33,11 +33,11 @@ import javax.annotation.*;
 import org.pshdl.model.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.Visit;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
+import com.google.common.collect.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLUnit extends HDLObject {
@@ -140,7 +140,6 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		this.extend = new ArrayList<HDLQualifiedName>();
 	}
 
-	@Visit
 	protected final ArrayList<HDLAnnotation> annotations;
 
 	/**
@@ -213,7 +212,6 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		return imports;
 	}
 
-	@Visit
 	protected final ArrayList<HDLStatement> inits;
 
 	/**
@@ -232,7 +230,6 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		return inits;
 	}
 
-	@Visit
 	protected final ArrayList<HDLStatement> statements;
 
 	/**
@@ -269,7 +266,6 @@ public abstract class AbstractHDLUnit extends HDLObject {
 		return simulation;
 	}
 
-	@Visit
 	protected final ArrayList<HDLQualifiedName> extend;
 
 	@Nullable
@@ -919,5 +915,115 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLUnit, HDLClass.HDLObject);
+	}
+
+	@Override
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (HDLAnnotation o : annotations) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
+						if ((inits != null) && (inits.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(inits.size());
+							for (HDLStatement o : inits) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 2:
+						if ((statements != null) && (statements.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(statements.size());
+							for (HDLStatement o : statements) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	@Override
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							current = annotations.iterator();
+						}
+						break;
+					case 1:
+						if ((inits != null) && (inits.size() != 0)) {
+							current = inits.iterator();
+						}
+						break;
+					case 2:
+						if ((statements != null) && (statements.size() != 0)) {
+							current = statements.iterator();
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
 	}
 }

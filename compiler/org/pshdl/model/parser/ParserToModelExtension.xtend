@@ -525,8 +525,8 @@ class ParserToModelExtension {
 		func = func.setName(context.psFunction.toName)
 		func = func.setStmnts(context.psStatement.map[toHDL as HDLStatement])
 		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL as HDLFunctionParameter])
-		if (context.psFuncRecturnType!==null)
-			func=func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
+		if (context.psFuncRecturnType !== null)
+			func = func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
 		return func.attachContext(context)
 	}
 
@@ -535,70 +535,87 @@ class ParserToModelExtension {
 		func = func.setName(context.psFunction.toName)
 		func = func.setSimOnly(context.isSim !== null)
 		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL as HDLFunctionParameter])
-		if (context.psFuncRecturnType!==null)
-			func=func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
+		if (context.psFuncRecturnType !== null)
+			func = func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
 		return func.attachContext(context)
 	}
 
 	def dispatch HDLFunctionParameter toHDL(PsFuncRecturnTypeContext context) {
-		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
-		res=res.setRw(HDLFunctionParameter$RWType::RETURN)
-		res=res.setDim(context.dims.map[if (it.psExpression!=null)it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
+		var res = context.psFuncParamType.toHDL as HDLFunctionParameter
+		res = res.setRw(HDLFunctionParameter$RWType::RETURN)
+		res = res.setDim(
+			context.dims.map[
+				if(it.psExpression != null) it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
 		return res
 	}
+
 	def dispatch HDLFunctionParameter toHDL(PsFuncSpecContext context) {
-		var res=context.psFuncParamWithRW.toHDL as HDLFunctionParameter
-		res=res.setName(new HDLVariable().setName(context.RULE_ID.text))
-		res=res.setDim(context.dims.map[if (it.psExpression!=null)it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
+		var res = context.psFuncParamWithRW.toHDL as HDLFunctionParameter
+		res = res.setName(new HDLVariable().setName(context.RULE_ID.text))
+		res = res.setDim(
+			context.dims.map[
+				if(it.psExpression != null) it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
 		return res
 	}
+
 	def dispatch HDLFunctionParameter toHDL(PsFuncParamWithRWContext context) {
-		var res=context.psFuncParamType.toHDL as HDLFunctionParameter
-		if (context.psFuncParamRWType!==null)
-			res=res.setRw(HDLFunctionParameter$RWType::getOp(context.psFuncParamRWType.text))
+		var res = context.psFuncParamType.toHDL as HDLFunctionParameter
+		if (context.psFuncParamRWType !== null)
+			res = res.setRw(HDLFunctionParameter$RWType::getOp(context.psFuncParamRWType.text))
 		else
-			res=res.setRw(HDLFunctionParameter$RWType::READ)
+			res = res.setRw(HDLFunctionParameter$RWType::READ)
 		return res
 	}
+
 	def dispatch HDLFunctionParameter toHDL(PsFuncParamTypeContext context) {
-		var res=new HDLFunctionParameter
-		switch (x:context){
-			case x.ANY_INT!==null: res=res.setType(Type::ANY_INT)
-			case x.ANY_UINT!==null: res=res.setType(Type::ANY_UINT)
-			case x.ANY_BIT!==null: res=res.setType(Type::ANY_BIT)
-			case x.INT!==null: res=res.setType(Type::REG_INT)
-			case x.UINT!==null: res=res.setType(Type::REG_UINT)
-			case x.BIT!==null: res=res.setType(Type::REG_BIT)
-			case x.BOOL!==null: res=res.setType(Type::BOOL_TYPE)
-			case x.STRING!==null: res=res.setType(Type::STRING_TYPE)
-			case x.ANY_IF!==null: res=res.setType(Type::ANY_IF)
-			case x.ANY_ENUM!==null: res=res.setType(Type::ANY_ENUM)
-			case x.INTERFACE!==null: {
-				res=res.setType(^Type::^IF)
-				res=res.setIfSpec(x.psQualifiedName.toFQNName)
+		var res = new HDLFunctionParameter
+		switch (x:context) {
+			case x.ANY_INT !== null:
+				res = res.setType(Type::ANY_INT)
+			case x.ANY_UINT !== null:
+				res = res.setType(Type::ANY_UINT)
+			case x.ANY_BIT !== null:
+				res = res.setType(Type::ANY_BIT)
+			case x.INT !== null:
+				res = res.setType(Type::REG_INT)
+			case x.UINT !== null:
+				res = res.setType(Type::REG_UINT)
+			case x.BIT !== null:
+				res = res.setType(Type::REG_BIT)
+			case x.BOOL !== null:
+				res = res.setType(Type::BOOL_TYPE)
+			case x.STRING !== null:
+				res = res.setType(Type::STRING_TYPE)
+			case x.ANY_IF !== null:
+				res = res.setType(Type::ANY_IF)
+			case x.ANY_ENUM !== null:
+				res = res.setType(Type::ANY_ENUM)
+			case x.INTERFACE !== null: {
+				res = res.setType(^Type::^IF)
+				res = res.setIfSpec(x.psQualifiedName.toFQNName)
 			}
-			case x.ENUM!==null: { 
-				res=res.setType(^Type::ENUM)
-				res=res.setEnumSpec(x.psQualifiedName.toFQNName)
+			case x.ENUM !== null: {
+				res = res.setType(^Type::ENUM)
+				res = res.setEnumSpec(x.psQualifiedName.toFQNName)
 			}
-			case x.FUNCTION!==null: {
-				res=res.setType(^Type::FUNCTION)
-				res=res.setFuncSpec(x.psFuncParamWithRW.map[toHDL as HDLFunctionParameter])
-				if (x.psFuncParamType!==null)
-					res=res.setFuncReturnSpec(x.psFuncParamType.toHDL as HDLFunctionParameter)
+			case x.FUNCTION !== null: {
+				res = res.setType(^Type::FUNCTION)
+				res = res.setFuncSpec(x.psFuncParamWithRW.map[toHDL as HDLFunctionParameter])
+				if (x.psFuncParamType !== null)
+					res = res.setFuncReturnSpec(x.psFuncParamType.toHDL as HDLFunctionParameter)
 			}
 		}
-		if (context.psWidth!=null)
-			res=res.setContainer(context.psWidth.toHDL as HDLExpression)
+		if (context.psWidth != null)
+			res = res.setContainer(context.psWidth.toHDL as HDLExpression)
 		return res
 	}
-	
+
 	def dispatch HDLInlineFunction toHDL(PsInlineFunctionContext context) {
 		var func = new HDLInlineFunction
 		func = func.setName(context.psFunction.toName)
 		func = func.setExpr(context.psExpression.toHDL as HDLExpression)
 		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL as HDLFunctionParameter])
-		func=func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
+		func = func.setReturnType(context.psFuncRecturnType.toHDL as HDLFunctionParameter)
 		return func.attachContext(context)
 	}
 

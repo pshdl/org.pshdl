@@ -32,7 +32,8 @@ import javax.annotation.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.HDLIterator.Visit;
+
+import com.google.common.collect.*;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLVariable extends HDLObject {
@@ -113,7 +114,6 @@ public abstract class AbstractHDLVariable extends HDLObject {
 		return name;
 	}
 
-	@Visit
 	protected final ArrayList<HDLExpression> dimensions;
 
 	/**
@@ -132,7 +132,6 @@ public abstract class AbstractHDLVariable extends HDLObject {
 		return dimensions;
 	}
 
-	@Visit
 	protected final HDLExpression defaultValue;
 
 	/**
@@ -149,7 +148,6 @@ public abstract class AbstractHDLVariable extends HDLObject {
 		return defaultValue;
 	}
 
-	@Visit
 	protected final ArrayList<HDLAnnotation> annotations;
 
 	/**
@@ -505,5 +503,111 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
 		return EnumSet.of(HDLClass.HDLVariable, HDLClass.HDLObject);
+	}
+
+	@Override
+	public Iterator<IHDLObject> deepIterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((dimensions != null) && (dimensions.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dimensions.size());
+							for (HDLExpression o : dimensions) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
+						if (defaultValue != null) {
+							current = defaultValue.deepIterator();
+						}
+						break;
+					case 2:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (HDLAnnotation o : annotations) {
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
+	}
+
+	@Override
+	public Iterator<IHDLObject> iterator() {
+		return new Iterator<IHDLObject>() {
+
+			private int pos = 0;
+			private Iterator<? extends IHDLObject> current;
+
+			@Override
+			public boolean hasNext() {
+				if ((current != null) && !current.hasNext()) {
+					current = null;
+				}
+				while (current == null) {
+					switch (pos++) {
+					case 0:
+						if ((dimensions != null) && (dimensions.size() != 0)) {
+							current = dimensions.iterator();
+						}
+						break;
+					case 1:
+						if (defaultValue != null) {
+							current = Iterators.singletonIterator(defaultValue);
+						}
+						break;
+					case 2:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							current = annotations.iterator();
+						}
+						break;
+					default:
+						return false;
+					}
+				}
+				return (current != null) && current.hasNext();
+			}
+
+			@Override
+			public IHDLObject next() {
+				return current.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new IllegalArgumentException("Not supported");
+			}
+
+		};
 	}
 }
