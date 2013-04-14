@@ -33,7 +33,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
@@ -65,6 +67,7 @@ import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.ProblemDescription;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.types.builtIn.HDLFunctions;
+import org.pshdl.model.types.builtIn.HDLPrimitives;
 import org.pshdl.model.utils.Insulin;
 
 /**
@@ -580,21 +583,60 @@ public class ConstantEvaluate {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SRL)) {
         _matched=true;
-        BigInteger _get_4 = leftVal.get();
-        BigInteger _get_5 = rightVal.get();
-        int _intValue_2 = _get_5.intValue();
-        final BigInteger shiftRight = _get_4.shiftRight(_intValue_2);
-        int _signum = shiftRight.signum();
+        final BigInteger l = leftVal.get();
+        int _signum = l.signum();
         boolean _lessThan = (_signum < 0);
         if (_lessThan) {
-          BigInteger _negate = shiftRight.negate();
-          return Optional.<BigInteger>of(_negate);
+          HDLExpression _left_1 = obj.getLeft();
+          final Optional<? extends HDLType> t = TypeExtension.typeOf(_left_1);
+          boolean _isPresent_2 = t.isPresent();
+          if (_isPresent_2) {
+            HDLType _get_4 = t.get();
+            final Integer width = HDLPrimitives.getWidth(_get_4, context);
+            boolean _tripleNotEquals = (width != null);
+            if (_tripleNotEquals) {
+              BigInteger _get_5 = rightVal.get();
+              final int shiftWidth = _get_5.intValue();
+              final BigInteger res = ConstantEvaluate.srl(l, width, shiftWidth);
+              return Optional.<BigInteger>of(res);
+            }
+          }
+          return Optional.<BigInteger>absent();
         }
-        return Optional.<BigInteger>of(shiftRight);
+        BigInteger _get_6 = rightVal.get();
+        int _intValue_2 = _get_6.intValue();
+        BigInteger _shiftRight_1 = l.shiftRight(_intValue_2);
+        return Optional.<BigInteger>of(_shiftRight_1);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
     throw _runtimeException;
+  }
+  
+  public static BigInteger srl(final BigInteger l, final Integer width, final int shiftWidth) {
+    BigInteger _xblockexpression = null;
+    {
+      int _plus = ((width).intValue() + 1);
+      final BigInteger opener = BigInteger.ONE.shiftLeft(_plus);
+      final BigInteger opened = l.subtract(opener);
+      BigInteger _subtract = opener.subtract(BigInteger.ONE);
+      int _plus_1 = (shiftWidth + 1);
+      final BigInteger mask = _subtract.shiftRight(_plus_1);
+      BigInteger _shiftRight = opened.shiftRight(shiftWidth);
+      final BigInteger res = _shiftRight.and(mask);
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("Opened: ");
+      _builder.append(opened, "");
+      _builder.append(" Width:");
+      _builder.append(width, "");
+      _builder.append(" Mask:");
+      _builder.append(mask, "");
+      _builder.append(" Res:");
+      _builder.append(res, "");
+      InputOutput.<String>println(_builder.toString());
+      _xblockexpression = (res);
+    }
+    return _xblockexpression;
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLFunctionCall obj, final HDLEvaluationContext context) {

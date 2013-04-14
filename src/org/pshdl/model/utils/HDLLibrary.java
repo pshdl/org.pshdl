@@ -399,4 +399,8 @@ public class HDLLibrary {
 		return (K) metaData.get(key);
 	}
 
+	public HDLUnit getUnit(HDLQualifiedName asRef) {
+		return units.get(asRef);
+	}
+
 }

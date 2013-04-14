@@ -163,6 +163,14 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		}
 	}
 
+	public HDLEvaluationContext getContext(HDLEvaluationContext defaultContext) {
+		Map<String, HDLExpression> map = defaultContext.getMap();
+		for (HDLArgument arg : getArguments()) {
+			map.put(arg.getName(), arg.getExpression());
+		}
+		return new HDLEvaluationContext(map);
+	}
+
 	// $CONTENT-END$
 
 }

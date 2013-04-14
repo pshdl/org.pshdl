@@ -118,4 +118,8 @@ public class HDLEvaluationContext {
 		return sb.toString();
 	}
 
+	public Map<String, HDLExpression> getMap() {
+		return new HashMap<String, HDLExpression>(context);
+	}
+
 }

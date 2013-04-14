@@ -62,6 +62,7 @@ import static org.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static org.pshdl.model.extensions.ProblemDescription.*
 import com.google.common.base.Optional
 import org.pshdl.model.HDLArrayInit
+import org.pshdl.model.types.builtIn.HDLPrimitives
 
 /**
  * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link org.pshdl.model.IHDLObject}. Of course
@@ -291,14 +292,32 @@ class ConstantEvaluate {
 			case SRA:
 				return Optional::of(leftVal.get.shiftRight(rightVal.get.intValue))
 			case SRL: {
-				val BigInteger shiftRight = leftVal.get.shiftRight(rightVal.get.intValue)
-				if (shiftRight.signum < 0)
-					//XXX This is incorrect. We have to know the width of the
-					return Optional::of(shiftRight.negate)
-				return Optional::of(shiftRight)
+				val l=leftVal.get
+				if (l.signum < 0) {
+					val t=TypeExtension::typeOf(obj.left)
+					if (t.present){
+						val width=HDLPrimitives::getWidth(t.get,context)
+						if (width!==null){
+							val shiftWidth=rightVal.get.intValue
+							val res = srl(l, width, shiftWidth)
+							return Optional::of(res)
+						}
+					}
+					return Optional::absent
+				}
+				return Optional::of(l.shiftRight(rightVal.get.intValue))
 			}
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
+	}
+
+	def static srl(BigInteger l, Integer width, int shiftWidth) {
+		val opener=1bi.shiftLeft(width+1)
+		val opened=l.subtract(opener)
+		val mask=opener.subtract(1bi).shiftRight(shiftWidth+1)
+		val res=opened.shiftRight(shiftWidth).and(mask)
+		println('''Opened: «opened» Width:«width» Mask:«mask» Res:«res»''')
+		res
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLFunctionCall obj, HDLEvaluationContext context) {

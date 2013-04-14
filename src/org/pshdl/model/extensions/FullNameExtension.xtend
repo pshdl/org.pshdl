@@ -45,6 +45,9 @@ import java.util.Iterator
 
 import static org.pshdl.model.extensions.FullNameExtension.*
 import javax.annotation.Nonnull
+import org.pshdl.model.HDLVariableRef
+import org.pshdl.model.HDLEnumDeclaration
+import org.pshdl.model.HDLEnumRef
 
 /**
  * The FullNameExtension provides a {@link HDLQualifiedName} for every IHDLObject. 
@@ -161,6 +164,18 @@ class FullNameExtension {
 		return fullName
 	}
 
+	def dispatch HDLQualifiedName getFullName(HDLEnumRef ref) {
+		if (ref.getMeta(FULLNAME) !== null)
+			return ref.getMeta(FULLNAME)
+		return ref.resolveVar.get.fullName
+	}
+	
+	def dispatch HDLQualifiedName getFullName(HDLVariableRef ref) {
+		if (ref.getMeta(FULLNAME) !== null)
+			return ref.getMeta(FULLNAME)
+		return ref.resolveVar.get.fullName
+	}
+	
 	def dispatch HDLQualifiedName getFullName(HDLVariable unit) {
 		if (unit.getMeta(FULLNAME) !== null)
 			return unit.getMeta(FULLNAME)

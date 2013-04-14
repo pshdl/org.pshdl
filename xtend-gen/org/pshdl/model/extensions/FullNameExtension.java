@@ -27,6 +27,7 @@
 package org.pshdl.model.extensions;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import java.util.Arrays;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
@@ -34,6 +35,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLIfStatement;
@@ -45,6 +47,7 @@ import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.HDLQualifiedName;
 
@@ -247,6 +250,28 @@ public class FullNameExtension {
     return fullName;
   }
   
+  protected HDLQualifiedName _getFullName(final HDLEnumRef ref) {
+    HDLQualifiedName _meta = ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
+      return ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    }
+    Optional<HDLVariable> _resolveVar = ref.resolveVar();
+    HDLVariable _get = _resolveVar.get();
+    return this.getFullName(_get);
+  }
+  
+  protected HDLQualifiedName _getFullName(final HDLVariableRef ref) {
+    HDLQualifiedName _meta = ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (_meta != null);
+    if (_tripleNotEquals) {
+      return ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    }
+    Optional<HDLVariable> _resolveVar = ref.resolveVar();
+    HDLVariable _get = _resolveVar.get();
+    return this.getFullName(_get);
+  }
+  
   protected HDLQualifiedName _getFullName(final HDLVariable unit) {
     HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
     boolean _tripleNotEquals = (_meta != null);
@@ -307,6 +332,10 @@ public class FullNameExtension {
   public HDLQualifiedName getFullName(final IHDLObject unit) {
     if (unit instanceof HDLEnum) {
       return _getFullName((HDLEnum)unit);
+    } else if (unit instanceof HDLEnumRef) {
+      return _getFullName((HDLEnumRef)unit);
+    } else if (unit instanceof HDLVariableRef) {
+      return _getFullName((HDLVariableRef)unit);
     } else if (unit instanceof HDLForLoop) {
       return _getFullName((HDLForLoop)unit);
     } else if (unit instanceof HDLFunction) {

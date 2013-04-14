@@ -2,3 +2,4 @@ bin
 src/de/tuhh/ict/pshdl/model/impl
 *._trace
 *.smap
+.clover

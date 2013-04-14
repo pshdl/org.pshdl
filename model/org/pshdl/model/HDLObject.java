@@ -38,8 +38,6 @@ import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import org.pshdl.model.utils.internal.*;
 
-import com.google.common.base.*;
-
 /**
  * The class HDLObject contains the following fields
  * <ul>
@@ -295,21 +293,6 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			}
 			list.add(new IHDLObject[] { hdlObject });
 		}
-	}
-
-	@Override
-	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, Predicate<K>... matcher) {
-		T[] allObjectsOf = getAllObjectsOf(clazz, true);
-		Set<T> list = new NonSameList<T>();
-		for (T t : allObjectsOf) {
-			K value = field.getValue(t);
-			for (Predicate<K> predicate : matcher)
-				if (predicate.apply(value)) {
-					list.add(t);
-					break;
-				}
-		}
-		return list;
 	}
 
 	@Override

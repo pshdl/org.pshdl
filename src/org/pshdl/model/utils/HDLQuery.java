@@ -29,6 +29,8 @@ package org.pshdl.model.utils;
 import java.util.*;
 
 import org.pshdl.model.*;
+import org.pshdl.model.extensions.*;
+import org.pshdl.model.utils.internal.*;
 
 import com.google.common.base.*;
 
@@ -84,6 +86,21 @@ public class HDLQuery {
 
 	}
 
+	private static class FullNameMatcher<K extends IHDLObject> implements Predicate<K> {
+
+		private HDLQualifiedName asRef;
+
+		public FullNameMatcher(HDLQualifiedName asRef) {
+			this.asRef = asRef;
+		}
+
+		@Override
+		public boolean apply(K input) {
+			return asRef.equals(FullNameExtension.fullNameOf(input));
+		}
+
+	}
+
 	private static class LastSegmentMatcher<T> implements Predicate<T> {
 		private HDLQualifiedName equalsTo;
 		private boolean matchLocally = false;
@@ -108,27 +125,47 @@ public class HDLQuery {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Result<T, K> {
 		private HDLFieldAccess<T, K> field;
 		private IHDLObject from;
 		private Class<T> clazz;
-		private Predicate<K> matcher;
+		private Predicate matcher;
 
-		public Result(IHDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, Predicate<K> matcher) {
+		public Result(IHDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, Predicate matcher) {
 			this.from = from;
 			this.clazz = clazz;
 			this.field = field;
 			this.matcher = matcher;
 		}
 
-		@SuppressWarnings("unchecked")
 		public Collection<T> getAll() {
-			return from.getAllObjectsOf(clazz, field, matcher);
+			return getAllMatchingObjects();
+		}
+
+		@SuppressWarnings("unchecked")
+		private Set<T> getAllMatchingObjects() {
+			T[] allObjectsOf = from.getAllObjectsOf(clazz, true);
+			Set<T> list = new NonSameList<T>();
+			if (field != null) {
+				for (T t : allObjectsOf) {
+					K value = field.getValue(t);
+					if (matcher.apply(value)) {
+						list.add(t);
+					}
+				}
+			} else {
+				for (T t : allObjectsOf) {
+					if (matcher.apply(t)) {
+						list.add(t);
+					}
+				}
+			}
+			return list;
 		}
 
 		public T getFirst() {
-			@SuppressWarnings("unchecked")
-			Collection<T> res = from.getAllObjectsOf(clazz, field, matcher);
+			Collection<T> res = getAllMatchingObjects();
 			if (res.isEmpty())
 				return null;
 			Iterator<T> iterator = res.iterator();
@@ -137,6 +174,7 @@ public class HDLQuery {
 			return null;
 		}
 
+		@SuppressWarnings("unchecked")
 		public Result<T, K> or(Predicate<K> value) {
 			return new Result<T, K>(from, clazz, field, Predicates.or(matcher, value));
 		}
@@ -178,6 +216,10 @@ public class HDLQuery {
 			return new Result<T, K>(from, clazz, field, predicate);
 		}
 
+		public <I extends IHDLObject> Result<T, I> fullNameIs(HDLQualifiedName asRef) {
+			return new Result<T, I>(from, clazz, null, new FullNameMatcher<I>(asRef));
+		}
+
 	}
 
 	public static class Selector<T extends IHDLObject> {
@@ -193,6 +235,11 @@ public class HDLQuery {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <K> FieldSelector<T, K> where(HDLFieldAccess<? super T, K> field) {
 			return new FieldSelector(clazz, from, field);
+		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		public <K> FieldSelector<T, K> whereObj() {
+			return new FieldSelector(clazz, from, null);
 		}
 	}
 
@@ -230,6 +277,23 @@ public class HDLQuery {
 
 	public static <K> Predicate<K> matchesLocally(HDLQualifiedName value) {
 		return new LastSegmentMatcher<K>(value, true);
+	}
+
+	public static Collection<HDLVariableRef> getVarRefs(IHDLObject from, HDLVariable hdlVariable) {
+		return HDLQuery.select(HDLVariableRef.class).from(from).whereObj().fullNameIs(hdlVariable.asRef()).getAll();
+	}
+
+	public static Collection<HDLInterfaceRef> getInterfaceRefs(IHDLObject obj, HDLVariable hdlVariable) {
+		HDLQualifiedName asRef = hdlVariable.asRef();
+		Collection<HDLInterfaceRef> refs = HDLQuery.select(HDLInterfaceRef.class).from(obj).where(HDLInterfaceRef.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll();
+		for (Iterator<HDLInterfaceRef> iterator = refs.iterator(); iterator.hasNext();) {
+			HDLInterfaceRef hir = iterator.next();
+			HDLQualifiedName fullNameOf = FullNameExtension.fullNameOf(hir.resolveHIf().get());
+			if (!asRef.equals(fullNameOf)) {
+				iterator.remove();
+			}
+		}
+		return refs;
 	}
 
 }

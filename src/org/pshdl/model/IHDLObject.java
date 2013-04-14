@@ -30,8 +30,6 @@ import java.util.*;
 
 import org.pshdl.model.utils.*;
 
-import com.google.common.base.*;
-
 public interface IHDLObject {
 	/**
 	 * Returns the most precise class that this {@link IHDLObject} implements
@@ -142,24 +140,6 @@ public interface IHDLObject {
 	 *         clazz. An empty array is returned if no instance could be found
 	 */
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep);
-
-	/**
-	 * Retrieves all instances of the given class and then queries them for
-	 * certain properties. The best way to use this API is to use it with
-	 * {@link HDLQuery}
-	 * 
-	 * @param clazz
-	 *            all instances of this class and its subclasses will be checked
-	 *            for matching fields
-	 * @param field
-	 *            the field to check
-	 * @param matcher
-	 *            if any of the {@link Predicate} evaluates to true the
-	 *            particular instance of the field will be returned
-	 * @return all instances that match the predicate of on the field of the
-	 *         given class
-	 */
-	public <T, K> Set<T> getAllObjectsOf(Class<T> clazz, HDLQuery.HDLFieldAccess<T, K> field, Predicate<K>... matcher);
 
 	/**
 	 * This iterator iterates over all children and their children in a depth
