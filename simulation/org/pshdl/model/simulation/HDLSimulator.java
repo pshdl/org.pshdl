@@ -49,6 +49,7 @@ public class HDLSimulator {
 
 	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src) {
 		HDLUnit insulin = Insulin.transform(unit, src);
+		insulin = flattenAll(context, insulin);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createMultiplexArrayWrite(context, insulin);
 		insulin = renameArrayAccess(context, insulin);
@@ -56,14 +57,12 @@ public class HDLSimulator {
 		insulin = literalBitRanges(context, insulin);
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
-		insulin = flattenAll(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 		// generate reset condition
 	}
 
 	private static HDLUnit flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
-		ModificationSet ms = new ModificationSet();
 		HDLInterfaceInstantiation[] hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		HDLLibrary library = insulin.getLibrary();
 		for (HDLInterfaceInstantiation hi : hii) {
@@ -73,9 +72,9 @@ public class HDLSimulator {
 				throw new IllegalArgumentException("Can not find unit for interface:" + asRef);
 			HDLEvaluationContext hiContext = hi.getContext(HDLEvaluationContext.createDefault(unit));
 			HDLUnit subUnit = flattenAll(hiContext, unit);
-
+			insulin = Refactoring.inlineUnit(insulin, hi, subUnit);
 		}
-		return ms.apply(insulin);
+		return insulin;
 	}
 
 	private static class InitTuple {

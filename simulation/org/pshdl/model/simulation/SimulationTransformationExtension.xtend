@@ -123,6 +123,7 @@ class SimulationTransformationExtension {
 		for (HDLSwitchCaseStatement c : obj.cases) {
 			val cName = fullNameOf(c).toString
 			val defaultFrame = new FluidFrame(FluidFrame::PRED_PREFIX + cName)
+			defaultFrame.addWith(FluidFrame::PRED_PREFIX + cName,1)			
 			if (c.label == null) {
 				for (cSub : obj.cases) {
 					if (cSub != c)
@@ -164,6 +165,7 @@ class SimulationTransformationExtension {
 		val name = fullNameOf(obj).toString
 		val ifModel = obj.ifExp.toSimulationModel(context)
 		ifModel.setName(FluidFrame::PRED_PREFIX + name)
+		ifModel.addWith(FluidFrame::PRED_PREFIX + name, 1)
 		for (s : obj.thenDo) {
 			val thenDo = s.toSimulationModel(context)
 			if (thenDo.hasInstructions)

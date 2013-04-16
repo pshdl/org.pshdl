@@ -175,6 +175,8 @@ public class SimulationTransformationExtension {
         String _plus = (FluidFrame.PRED_PREFIX + cName);
         FluidFrame _fluidFrame = new FluidFrame(_plus);
         final FluidFrame defaultFrame = _fluidFrame;
+        String _plus_1 = (FluidFrame.PRED_PREFIX + cName);
+        defaultFrame.addWith(_plus_1, Integer.valueOf(1));
         HDLExpression _label = c.getLabel();
         boolean _equals = Objects.equal(_label, null);
         if (_equals) {
@@ -248,6 +250,8 @@ public class SimulationTransformationExtension {
     final FluidFrame ifModel = this.toSimulationModel(_ifExp, context);
     String _plus = (FluidFrame.PRED_PREFIX + name);
     ifModel.setName(_plus);
+    String _plus_1 = (FluidFrame.PRED_PREFIX + name);
+    ifModel.addWith(_plus_1, Integer.valueOf(1));
     ArrayList<HDLStatement> _thenDo = obj.getThenDo();
     for (final HDLStatement s : _thenDo) {
       {
