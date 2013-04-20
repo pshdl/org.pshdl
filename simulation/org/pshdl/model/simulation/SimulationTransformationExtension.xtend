@@ -26,8 +26,8 @@
  ******************************************************************************/
 package org.pshdl.model.simulation
 
-import org.pshdl.interpreter.utils.FluidFrame
-import org.pshdl.interpreter.utils.FluidFrame$ArgumentedInstruction
+import org.pshdl.model.simulation.FluidFrame
+import org.pshdl.model.simulation.FluidFrame$ArgumentedInstruction
 import org.pshdl.model.HDLArithOp
 import org.pshdl.model.HDLAssignment
 import org.pshdl.model.HDLBitOp
@@ -59,7 +59,7 @@ import java.util.Iterator
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLResolvedRef
 
-import static org.pshdl.interpreter.utils.FluidFrame$Instruction.*
+import static org.pshdl.interpreter.utils.Instruction.*
 import static org.pshdl.model.HDLArithOp$HDLArithOpType.*
 import static org.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
 import static org.pshdl.model.HDLBitOp$HDLBitOpType.*
@@ -79,6 +79,11 @@ import org.pshdl.model.HDLEnumRef
 import org.pshdl.model.HDLEnumDeclaration
 import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.evaluation.ConstantEvaluate
+import org.pshdl.interpreter.VariableInformation
+import org.pshdl.interpreter.VariableInformation$Direction
+import org.pshdl.interpreter.VariableInformation$Type
+import java.util.LinkedList
+import org.pshdl.interpreter.InternalInformation
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -107,35 +112,55 @@ class SimulationTransformationExtension {
 		val FluidFrame res = new FluidFrame
 		val type = obj.resolveType.get
 		val width = if(type.classType === HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
+		val isReg = obj.register != null
 		for (HDLVariable hVar : obj.variables) {
-			res.addWith(fullNameOf(hVar).toString, width)
+			val varName = fullNameOf(hVar).toString
+			val dims = new LinkedList<Integer>()
+			for (HDLExpression dim : hVar.dimensions)
+				dims.add(valueOf(dim, context).get.intValue)
+			var Direction dir
+			switch (hVar.direction) {
+				case IN: dir = Direction::IN
+				case OUT: dir = Direction::OUT
+				case INOUT: dir = Direction::INOUT
+				default: dir = Direction::INTERNAL
+			}
+			var vType = Type::BIT
+			if (type.classType === HDLPrimitive) {
+				switch ((type as HDLPrimitive).type) {
+					case INT: vType = Type::INT
+					case INTEGER: vType = Type::INT
+					case UINT: vType = Type::UINT
+					case NATURAL: vType = Type::UINT
+				}
+			}
+			res.addVar(new VariableInformation(dir, varName, width, vType, isReg, dims))
 		}
 		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLSwitchStatement obj, HDLEvaluationContext context) {
-		val name= fullNameOf(obj).toString;
+		val name = fullNameOf(obj).toString;
 		val res = obj.caseExp.toSimulationModel(context)
 		res.setName(name)
-		val type= typeOf(obj.caseExp).get
+		val type = typeOf(obj.caseExp).get
 		val width = if(type.classType === HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
-		res.addWith(name, width)
+		res.addVar(new VariableInformation(Direction::INTERNAL, name, width, Type::BIT, false))
 		for (HDLSwitchCaseStatement c : obj.cases) {
 			val cName = fullNameOf(c).toString
-			val defaultFrame = new FluidFrame(FluidFrame::PRED_PREFIX + cName)
-			defaultFrame.addWith(FluidFrame::PRED_PREFIX + cName,1)			
+			val defaultFrame = new FluidFrame(InternalInformation::PRED_PREFIX + cName)
+			defaultFrame.createPredVar
 			if (c.label == null) {
 				for (cSub : obj.cases) {
 					if (cSub != c)
-						defaultFrame.add(
-							new ArgumentedInstruction(negPredicate, fullNameOf(cSub).toString))
+						defaultFrame.add(new ArgumentedInstruction(negPredicate, fullNameOf(cSub).toString))
 				}
 				defaultFrame.add(const1)
 			} else {
 				val const = valueOf(c.label)
 				var int l
 				if (const.present)
-					l=const.get.intValue
+					l = const.get.intValue
 				else {
 					if (c.label.classType === HDLEnumRef) {
 						val HDLEnumRef ref = c.label as HDLEnumRef
@@ -164,8 +189,8 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLIfStatement obj, HDLEvaluationContext context) {
 		val name = fullNameOf(obj).toString
 		val ifModel = obj.ifExp.toSimulationModel(context)
-		ifModel.setName(FluidFrame::PRED_PREFIX + name)
-		ifModel.addWith(FluidFrame::PRED_PREFIX + name, 1)
+		ifModel.setName(InternalInformation::PRED_PREFIX + name)
+		ifModel.createPredVar
 		for (s : obj.thenDo) {
 			val thenDo = s.toSimulationModel(context)
 			if (thenDo.hasInstructions)
@@ -187,7 +212,7 @@ class SimulationTransformationExtension {
 		var HDLRegisterConfig config = hVar.registerConfig
 		var FluidFrame res
 		if (config !== null)
-			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + FluidFrame::REG_POSTFIX)
+			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + InternalInformation::REG_POSTFIX)
 		else
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true))
 		if (config !== null) {
@@ -205,6 +230,15 @@ class SimulationTransformationExtension {
 			val HDLVariableRef variableRef = left as HDLVariableRef
 			if (!variableRef.bits.isEmpty)
 				hasBits = true
+			var fixedArray = true
+			for (HDLExpression idx : variableRef.array)
+				if (!valueOf(idx, context).present)
+					fixedArray = false
+			if (!fixedArray)
+				for (HDLExpression idx : variableRef.array) {
+					res.append(idx.toSimulationModel(context));
+					res.add(pushAddIndex)
+				}
 		}
 		return res
 	}
@@ -219,7 +253,12 @@ class SimulationTransformationExtension {
 		val StringBuilder sb = new StringBuilder
 		sb.append(fullNameOf(hVar.resolveVar.get))
 		for (HDLExpression exp : hVar.array) {
-			sb.append('[').append(exp).append(']')
+			val s = valueOf(exp)
+			if (s.present)
+				sb.append('[').append(s.get).append(']')
+			else
+				sb.append('[-1]')
+
 		}
 		if (withBits) {
 			for (HDLRange exp : hVar.bits) {
@@ -309,7 +348,16 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
 		var hVar = obj.resolveVar
-		val String refName = hVar.get.asRef.toString
+		val String refName = obj.getVarName(false)
+		var fixedArray = true
+		for (HDLExpression idx : obj.array)
+			if (!valueOf(idx, context).present)
+				fixedArray = false
+		if (!fixedArray)
+			for (HDLExpression idx : obj.array) {
+				res.append(idx.toSimulationModel(context));
+				res.add(pushAddIndex)
+			}
 		val bits = new ArrayList<String>(obj.bits.size + 1)
 		bits.add(refName)
 		if (!obj.bits.isEmpty) {
@@ -317,11 +365,10 @@ class SimulationTransformationExtension {
 				bits.add(r.toString)
 			}
 		}
-		val String[] arrBits = bits
 		val HDLDirection dir = hVar.get.direction
 		switch (dir) {
 			case INTERNAL:
-				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
+				res.add(new ArgumentedInstruction(loadInternal, bits))
 			case dir === PARAMETER || dir === CONSTANT: {
 				val Optional<BigInteger> bVal = valueOf(obj, context)
 				if (!bVal.present)
@@ -329,10 +376,10 @@ class SimulationTransformationExtension {
 				res.addConstant(refName, bVal.get)
 			}
 			case IN: {
-				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
+				res.add(new ArgumentedInstruction(loadInternal, bits))
 			}
 			case dir === OUT || dir === INOUT: {
-				res.instructions.add(new ArgumentedInstruction(loadInternal, arrBits))
+				res.add(new ArgumentedInstruction(loadInternal, bits))
 			}
 			default:
 				throw new IllegalArgumentException("Did not expect obj here" + dir)
@@ -357,8 +404,11 @@ class SimulationTransformationExtension {
 			return res
 		}
 
-		//		if (value.xor(value).equals(0bi)) {
-		//			res.add(new ArgumentedInstruction(constAll1, value.bitLength.toString))
+		//		val mask=1bi.shiftLeft(value.bitLength).subtract(1bi)
+		//		if (value.not.and(mask).equals(0bi)) {
+		//			val ai = new ArgumentedInstruction(constAll1, (value.bitLength).toString)
+		//			res.add(ai)
+		//			println('''«ai» for value «value»''')
 		//			return res
 		//		}
 		val String key = value.toString

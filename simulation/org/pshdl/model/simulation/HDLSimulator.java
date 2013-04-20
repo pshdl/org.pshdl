@@ -30,17 +30,12 @@ import java.math.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import javax.annotation.*;
-
 import org.pshdl.model.*;
-import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.simulation.RangeTool.RangeVal;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.builtin.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
@@ -51,8 +46,8 @@ public class HDLSimulator {
 		HDLUnit insulin = Insulin.transform(unit, src);
 		insulin = flattenAll(context, insulin);
 		insulin = unrollForLoops(context, insulin);
-		insulin = createMultiplexArrayWrite(context, insulin);
-		insulin = renameArrayAccess(context, insulin);
+		// insulin = createMultiplexArrayWrite(context, insulin);
+		// insulin = renameArrayAccess(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
 		insulin = convertTernary(context, insulin);
@@ -165,50 +160,6 @@ public class HDLSimulator {
 		return ms.apply(insulin);
 	}
 
-	private static HDLUnit renameArrayAccess(HDLEvaluationContext context, HDLUnit insulin) {
-		ModificationSet ms = new ModificationSet();
-		HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef variableRef : refs)
-			if (!variableRef.getArray().isEmpty()) {
-				HDLQualifiedName newName = variableRef.getVarRefName();
-				String lastSegment = newName.getLastSegment();
-				for (HDLExpression arr : variableRef.getArray()) {
-					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(arr, context);
-					if (valueOf.isPresent()) {
-						lastSegment += "[" + valueOf.get() + "]";
-					} else
-						throw new IllegalArgumentException(arr + " not constant");
-				}
-				newName = newName.skipLast(1).append(lastSegment);
-				ms.replace(variableRef, variableRef.setVar(newName).setArray(null));
-			}
-		HDLVariableDeclaration[] varDecls = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hvd : varDecls) {
-			for (HDLVariable var : hvd.getVariables()) {
-				ArrayList<HDLExpression> dim = var.getDimensions();
-				if (!dim.isEmpty()) {
-					List<HDLVariable> newVariables = new LinkedList<HDLVariable>();
-					newVariables = (createArrayVar(dim, 0, var.getName(), context));
-					ms.replace(var, newVariables.toArray(new HDLVariable[newVariables.size()]));
-				}
-			}
-		}
-		return ms.apply(insulin);
-	}
-
-	private static List<HDLVariable> createArrayVar(ArrayList<HDLExpression> dim, int idx, @Nonnull String name, HDLEvaluationContext context) {
-		if (idx >= dim.size())
-			return Collections.singletonList(new HDLVariable().setName(name));
-		Optional<BigInteger> size = ConstantEvaluate.valueOf(dim.get(idx), context);
-		if (!size.isPresent())
-			throw new IllegalArgumentException("The dimension " + dim.get(idx) + " is not constant.");
-		List<HDLVariable> res = new LinkedList<HDLVariable>();
-		for (int i = 0; i < size.get().intValue(); i++) {
-			res.addAll(createArrayVar(dim, i + 1, name + "[" + i + "]", context));
-		}
-		return res;
-	}
-
 	private static HDLUnit literalBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
 		ModificationSet ms = new ModificationSet();
 		HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
@@ -237,7 +188,10 @@ public class HDLSimulator {
 			if (ref.getContainer() instanceof HDLAssignment) {
 				HDLAssignment ass = (HDLAssignment) ref.getContainer();
 				if (ass.getLeft() == ref) {
-					HDLVariable resolveVar = ref.resolveVar().get();
+					Optional<HDLVariable> resolved = ref.resolveVar();
+					if (!resolved.isPresent())
+						throw new IllegalArgumentException("Can not resolve:" + ref.getVarRefName());
+					HDLVariable resolveVar = resolved.get();
 					if (resolveVar.getDirection() != HDLDirection.IN) {
 						HDLQualifiedName varRefName = ref.getVarRefName();
 						if (ref.getBits().size() > 0) {
@@ -315,51 +269,6 @@ public class HDLSimulator {
 		if (newRange.lowerEndpoint().equals(newRange.upperEndpoint()))
 			return new HDLRange().setTo(HDLLiteral.get(newRange.upperEndpoint()));
 		return new HDLRange().setTo(HDLLiteral.get(newRange.lowerEndpoint())).setFrom(HDLLiteral.get(newRange.upperEndpoint()));
-	}
-
-	private static HDLUnit createMultiplexArrayWrite(HDLEvaluationContext context, HDLUnit unit) {
-		ModificationSet ms = new ModificationSet();
-		HDLAssignment[] asss = unit.getAllObjectsOf(HDLAssignment.class, true);
-		for (HDLAssignment ass : asss)
-			if (ass.getLeft() instanceof HDLVariableRef) {
-				HDLVariableRef ref = (HDLVariableRef) ass.getLeft();
-				// XXX check for multi-dimensional arrays and create appropriate
-				// code
-				for (HDLExpression arr : ref.getArray()) {
-					// The range that potentially could be accessed
-					Optional<Range<BigInteger>> accessRangeRaw = RangeExtension.rangeOf(arr, context);
-					// The range that the array could be sized
-					if (!accessRangeRaw.isPresent())
-						throw new IllegalArgumentException("Can not determine Range of :" + arr);
-					Range<BigInteger> accessRange = accessRangeRaw.get();
-					Optional<Range<BigInteger>> dimensionRangeRaw = RangeExtension.rangeOf(ref.resolveVar().get().getDimensions().get(0), context);
-					if (!dimensionRangeRaw.isPresent())
-						throw new IllegalArgumentException("Can not determine Range of :" + arr);
-					Range<BigInteger> dimensionRange = dimensionRangeRaw.get();
-					// Take the maximum range as the upper boundary and 0 as
-					// lower
-					dimensionRange = Ranges.closed(BigInteger.ZERO, dimensionRange.upperEndpoint().subtract(BigInteger.ONE));
-					if (!accessRange.isConnected(dimensionRange))
-						throw new HDLProblemException(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr));
-					BigInteger counter = accessRange.lowerEndpoint();
-					List<HDLStatement> replacements = new ArrayList<HDLStatement>();
-					do {
-						HDLExpression ifExp = new HDLEqualityOp().setLeft(arr).setType(HDLEqualityOpType.EQ).setRight(HDLLiteral.get(counter)).setContainer(ass);
-						ifExp = ifExp.copyDeepFrozen(ass);
-						Optional<BigInteger> evaluate = ConstantEvaluate.valueOf(ifExp, context);
-						if (!evaluate.isPresent()) {
-							HDLVariableRef writeRef = ref.setArray(HDLObject.asList((HDLExpression) HDLLiteral.get(counter)));
-							HDLIfStatement ifStmnt = new HDLIfStatement().setIfExp(ifExp).addThenDo(ass.setLeft(writeRef));
-							replacements.add(ifStmnt);
-						} else {
-							replacements.add(ass);
-						}
-						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(accessRange.upperEndpoint()) <= 0);
-					ms.replace(ass, replacements.toArray(new HDLStatement[0]));
-				}
-			}
-		return ms.apply(unit);
 	}
 
 	/**

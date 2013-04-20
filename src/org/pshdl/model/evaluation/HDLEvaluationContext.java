@@ -122,4 +122,10 @@ public class HDLEvaluationContext {
 		return new HashMap<String, HDLExpression>(context);
 	}
 
+	public HDLEvaluationContext set(String key, HDLExpression val) {
+		Map<String, HDLExpression> map = getMap();
+		map.put(key, val);
+		return new HDLEvaluationContext(map);
+	}
+
 }

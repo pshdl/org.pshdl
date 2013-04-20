@@ -11,14 +11,12 @@ import com.google.common.collect.*;
 public class Refactoring {
 	public static <T extends IHDLObject> T renameVariable(HDLVariable var, String to, T obj) {
 		ModificationSet ms = new ModificationSet();
-		renameVariable(var, to, obj, ms);
+		renameVariable(var, var.asRef().skipLast(1).append(to), obj, ms);
 		return ms.apply(obj);
 	}
 
-	public static void renameVariable(HDLVariable hdlVariable, String to, IHDLObject obj, ModificationSet ms) {
-		HDLQualifiedName asRef = hdlVariable.asRef();
-		HDLQualifiedName newName = asRef.skipLast(1).append(to);
-		ms.replace(hdlVariable, hdlVariable.setName(to));
+	public static void renameVariable(HDLVariable hdlVariable, HDLQualifiedName newName, IHDLObject obj, ModificationSet ms) {
+		ms.replace(hdlVariable, hdlVariable.setName(newName.getLastSegment()));
 		if (hdlVariable.getContainer().getClassType() == HDLClass.HDLVariableDeclaration) {
 			Collection<HDLVariableRef> varRefs = HDLQuery.getVarRefs(obj, hdlVariable);
 			for (HDLVariableRef ref : varRefs) {
@@ -45,7 +43,7 @@ public class Refactoring {
 		ModificationSet res = new ModificationSet();
 		Collection<HDLInterfaceRef> ifRefs = HDLQuery.getInterfaceRefs(container, hiVar);
 		for (HDLInterfaceRef hir : ifRefs) {
-			HDLQualifiedName newName = hir.getHIfRefName().skipLast(1).append(prefix + "_" + hir.getVarRefName().getLastSegment());
+			HDLQualifiedName newName = HDLQualifiedName.create(prefix + "_" + hir.getVarRefName().getLastSegment());
 			ArrayList<HDLExpression> ifArray = hir.getIfArray();
 			ifArray.addAll(hir.getArray());
 			HDLVariableRef newRef = new HDLVariableRef().setVar(newName).setBits(hir.getBits()).setArray(ifArray);
@@ -136,7 +134,7 @@ public class Refactoring {
 		HDLVariable[] vars = subUnit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
 			String newName = prefix + "_" + hdlVariable.getName();
-			Refactoring.renameVariable(hdlVariable, newName, subUnit, subMS);
+			Refactoring.renameVariable(hdlVariable, HDLQualifiedName.create(newName), subUnit, subMS);
 		}
 		subUnit = subMS.apply(subUnit);
 		return subUnit;
