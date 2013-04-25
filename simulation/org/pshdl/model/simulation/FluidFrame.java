@@ -26,17 +26,15 @@
  ******************************************************************************/
 package org.pshdl.model.simulation;
 
+import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
 
 import org.pshdl.interpreter.*;
-import org.pshdl.interpreter.VariableInformation.*;
+import org.pshdl.interpreter.VariableInformation.Direction;
+import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.*;
-
-import java.math.BigInteger;
-
-import org.pshdl.interpreter.VariableInformation;
 
 public class FluidFrame {
 
@@ -158,7 +156,7 @@ public class FluidFrame {
 		InternalInformation[] internals = new InternalInformation[register.internalIds.size()];
 		for (Entry<String, Integer> e : register.internalIds.entrySet()) {
 			String name = e.getKey();
-			String basicName = InternalInformation.getBasicName(name, false, false);
+			String basicName = InternalInformation.getBaseName(name, false, false);
 			VariableInformation info = vars.get(basicName);
 			internals[e.getValue()] = new InternalInformation(name, info);
 		}
@@ -217,7 +215,7 @@ public class FluidFrame {
 			stackCount += ai.instruction.push;
 			stackCount -= ai.instruction.pop;
 			maxStackCount = Math.max(maxStackCount, stackCount);
-			instr.add((byte) (ai.instruction.ordinal() & 0xff));
+			instr.add((byte) (ai.instruction.toByte()));
 			switch (ai.instruction) {
 			case negPredicate: {
 				Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));

@@ -51,7 +51,7 @@ public class BusGenSideFiles {
 		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount));
 		res.add(paoFile(unitName, dirName, type, pCore));
 		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore));
-		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS));
+		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS, true));
 		return res;
 	}
 
@@ -152,7 +152,7 @@ public class BusGenSideFiles {
 		options.put("{GENERICS}", generics.toString());
 		options.put("{GENERICSMAP}", genericsMap.toString());
 		try {
-			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options));
+			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options), true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,7 +168,7 @@ public class BusGenSideFiles {
 		options.put("{WRAPPERNAME}", ipcoreName + WRAPPER_APPENDIX);
 		options.put("{DATE}", new Date().toString());
 		try {
-			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options));
+			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options), true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -247,7 +247,7 @@ public class BusGenSideFiles {
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
-			return new SideFile(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options));
+			return new SideFile(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options), true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

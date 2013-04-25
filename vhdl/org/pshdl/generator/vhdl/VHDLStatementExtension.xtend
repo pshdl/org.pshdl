@@ -136,6 +136,9 @@ class VHDLStatementExtension {
 
 	public static GenericMeta<Boolean> EXPORT = new GenericMeta<Boolean>("EXPORT", true)
 
+	def dispatch VHDLContext toVHDL(IHDLObject obj, int pid) {
+		throw new IllegalArgumentException("Not correctly implemented")
+	}
 	def dispatch VHDLContext toVHDL(HDLDirectGeneration obj, int pid) {
 		return new VHDLContext
 	}

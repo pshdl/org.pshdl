@@ -50,12 +50,12 @@ public class MemoryModelSideFiles {
 		String dirName = ipcorename + "_" + version;
 		String rootDir = "drivers/";
 		BusAccess ba = new BusAccess();
-		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows)));
-		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes(Charsets.UTF_8)));
-		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes(Charsets.UTF_8)));
-		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes(Charsets.UTF_8)));
-		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows).toString().getBytes(Charsets.UTF_8)));
-		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef().toString().getBytes(Charsets.UTF_8)));
+		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows), true));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef().toString().getBytes(Charsets.UTF_8), true));
 		return res;
 	}
 

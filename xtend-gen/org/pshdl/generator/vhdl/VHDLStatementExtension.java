@@ -171,6 +171,11 @@ public class VHDLStatementExtension {
     }
   }.apply();
   
+  protected VHDLContext _toVHDL(final IHDLObject obj, final int pid) {
+    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Not correctly implemented");
+    throw _illegalArgumentException;
+  }
+  
   protected VHDLContext _toVHDL(final HDLDirectGeneration obj, final int pid) {
     VHDLContext _vHDLContext = new VHDLContext();
     return _vHDLContext;
@@ -1149,6 +1154,8 @@ public class VHDLStatementExtension {
       return _toVHDL((HDLBlock)obj, pid);
     } else if (obj instanceof HDLFunctionCall) {
       return _toVHDL((HDLFunctionCall)obj, pid);
+    } else if (obj != null) {
+      return _toVHDL(obj, pid);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(obj, pid).toString());

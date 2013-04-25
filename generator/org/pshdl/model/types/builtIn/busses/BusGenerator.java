@@ -199,7 +199,7 @@ public class BusGenerator implements IHDLGenerator {
 		List<Row> rows = MemoryModel.buildRows(unit);
 		byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
 		List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
-		sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html));
+		sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html, true));
 		HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
 		sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {

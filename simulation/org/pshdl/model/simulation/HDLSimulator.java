@@ -46,8 +46,6 @@ public class HDLSimulator {
 		HDLUnit insulin = Insulin.transform(unit, src);
 		insulin = flattenAll(context, insulin);
 		insulin = unrollForLoops(context, insulin);
-		// insulin = createMultiplexArrayWrite(context, insulin);
-		// insulin = renameArrayAccess(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
 		insulin = convertTernary(context, insulin);

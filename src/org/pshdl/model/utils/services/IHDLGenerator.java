@@ -67,11 +67,13 @@ public interface IHDLGenerator {
 		 */
 		public final String relPath;
 		public final byte[] contents;
+		public final boolean isString;
 
-		public SideFile(String relPath, byte[] contents) {
+		public SideFile(String relPath, byte[] contents, boolean isString) {
 			super();
 			this.relPath = relPath;
 			this.contents = contents;
+			this.isString = isString;
 		}
 
 		@Override

@@ -306,17 +306,21 @@ public class PStoVHDLCompiler implements IOutputProvider {
 		return null;
 	}
 
-	public static void writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
+	public static File[] writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
 		if (result.hasError())
-			return;
+			return new File[0];
+		List<File> res = new LinkedList<File>();
 		String newName = new File(result.src).getName();
 		newName = newName.substring(0, newName.length() - 5) + "vhd";
-		FileOutputStream fos = new FileOutputStream(new File(outDir, newName));
+		File target = new File(outDir, newName);
+		res.add(target);
+		FileOutputStream fos = new FileOutputStream(target);
 		fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
 		fos.close();
 		if (result.sideFiles != null) {
 			for (SideFile sd : result.sideFiles) {
 				File file = new File(outDir + "/" + sd.relPath);
+				res.add(file);
 				File parentFile = file.getParentFile();
 				if ((parentFile != null) && !parentFile.exists()) {
 					parentFile.mkdirs();
@@ -330,6 +334,7 @@ public class PStoVHDLCompiler implements IOutputProvider {
 				fos.close();
 			}
 		}
+		return res.toArray(new File[res.size()]);
 	}
 
 	/**
