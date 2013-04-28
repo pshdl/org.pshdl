@@ -76,12 +76,12 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * @param extend
 	 *            the value for extend. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLUnit(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name, @Nullable Iterable<String> imports,
-			@Nullable Iterable<HDLStatement> inits, @Nullable Iterable<HDLStatement> statements, @Nonnull Boolean simulation, @Nullable Iterable<HDLQualifiedName> extend,
-			boolean validate) {
-		super(container, annotations, libURI, name, imports, inits, statements, simulation, extend, validate);
+	public HDLUnit(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String libURI, @Nonnull String name,
+			@Nullable Iterable<String> imports, @Nullable Iterable<HDLStatement> inits, @Nullable Iterable<HDLStatement> statements, @Nonnull Boolean simulation,
+			@Nullable Iterable<HDLQualifiedName> extend, boolean validate) {
+		super(id, container, annotations, libURI, name, imports, inits, statements, simulation, extend, validate);
 	}
 
 	public HDLUnit() {
@@ -262,6 +262,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			unitIF.freeze(this);
 		}
 		unitIF.addMeta(FULLNAME, fullName);
+		unitIF.setID(getID());
 		return unitIF;
 	}
 

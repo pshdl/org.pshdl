@@ -38,6 +38,8 @@ import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import org.pshdl.model.utils.internal.*;
 
+import com.google.common.collect.*;
+
 /**
  * The class HDLObject contains the following fields
  * <ul>
@@ -51,10 +53,10 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLObject(@Nullable IHDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLObject(int id, @Nullable IHDLObject container, boolean validate) {
+		super(id, container, validate);
 	}
 
 	public HDLObject() {
@@ -94,6 +96,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			if (all || entry.getKey().inherit()) {
 				targetMeta.put(entry.getKey(), entry.getValue());
 			}
+		target.setID(src.getID());
 	}
 
 	@Override
@@ -194,11 +197,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 
 	@Nonnull
 	public static <T> Iterable<T> asList(T... items) {
-		ArrayList<T> res = new ArrayList<T>();
-		for (T t : items) {
-			res.add(t);
-		}
-		return res;
+		return Lists.newArrayList(items);
 	}
 
 	@Override
@@ -307,8 +306,8 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	}
 
 	@Override
-	public @Nonnull
-	HDLObject setContainer(@Nullable IHDLObject container) {
+	@Nonnull
+	public HDLObject setContainer(@Nullable IHDLObject container) {
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (this.container != null)

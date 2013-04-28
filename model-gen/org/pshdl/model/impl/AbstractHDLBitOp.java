@@ -52,8 +52,8 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLBitOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLBitOpType type, boolean validate) {
-		super(container, left, right, validate);
+	public AbstractHDLBitOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLBitOpType type, boolean validate) {
+		super(id, container, left, right, validate);
 		if (validate) {
 			type = validateType(type);
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLBitOp copy() {
-		HDLBitOp newObject = new HDLBitOp(null, left, right, type, false);
+		HDLBitOp newObject = new HDLBitOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -108,7 +108,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
 		HDLExpression filteredright = filter.copyObject("right", this, right);
 		HDLBitOpType filteredtype = filter.copyObject("type", this, type);
-		return filter.postFilter((HDLBitOp) this, new HDLBitOp(null, filteredleft, filteredright, filteredtype, false));
+		return filter.postFilter((HDLBitOp) this, new HDLBitOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Nonnull
 	public HDLBitOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLBitOp res = new HDLBitOp(container, left, right, type, false);
+		HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -167,7 +167,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Nonnull
 	public HDLBitOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLBitOp res = new HDLBitOp(container, left, right, type, false);
+		HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -182,7 +182,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Nonnull
 	public HDLBitOp setType(@Nonnull HDLBitOpType type) {
 		type = validateType(type);
-		HDLBitOp res = new HDLBitOp(container, left, right, type, false);
+		HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -262,12 +262,12 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 					switch (pos++) {
 					case 0:
 						if (left != null) {
-							current = left.deepIterator();
+							current = Iterators.concat(Iterators.forArray(left), left.deepIterator());
 						}
 						break;
 					case 1:
 						if (right != null) {
-							current = right.deepIterator();
+							current = Iterators.concat(Iterators.forArray(right), right.deepIterator());
 						}
 						break;
 					default:

@@ -53,8 +53,9 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLAssignment(@Nullable IHDLObject container, @Nonnull HDLReference left, @Nullable HDLAssignmentType type, @Nonnull HDLExpression right, boolean validate) {
-		super(container, validate);
+	public AbstractHDLAssignment(int id, @Nullable IHDLObject container, @Nonnull HDLReference left, @Nullable HDLAssignmentType type, @Nonnull HDLExpression right,
+			boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			left = validateLeft(left);
 		}
@@ -145,7 +146,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Override
 	@Nonnull
 	public HDLAssignment copy() {
-		HDLAssignment newObject = new HDLAssignment(null, left, type, right, false);
+		HDLAssignment newObject = new HDLAssignment(id, null, left, type, right, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -161,7 +162,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 		HDLReference filteredleft = filter.copyObject("left", this, left);
 		HDLAssignmentType filteredtype = filter.copyObject("type", this, type);
 		HDLExpression filteredright = filter.copyObject("right", this, right);
-		return filter.postFilter((HDLAssignment) this, new HDLAssignment(null, filteredleft, filteredtype, filteredright, false));
+		return filter.postFilter((HDLAssignment) this, new HDLAssignment(id, null, filteredleft, filteredtype, filteredright, false));
 	}
 
 	/**
@@ -204,7 +205,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Nonnull
 	public HDLAssignment setLeft(@Nonnull HDLReference left) {
 		left = validateLeft(left);
-		HDLAssignment res = new HDLAssignment(container, left, type, right, false);
+		HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
 		return res;
 	}
 
@@ -220,7 +221,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Nonnull
 	public HDLAssignment setType(@Nullable HDLAssignmentType type) {
 		type = validateType(type);
-		HDLAssignment res = new HDLAssignment(container, left, type, right, false);
+		HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
 		return res;
 	}
 
@@ -236,7 +237,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Nonnull
 	public HDLAssignment setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLAssignment res = new HDLAssignment(container, left, type, right, false);
+		HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
 		return res;
 	}
 
@@ -336,12 +337,12 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 					switch (pos++) {
 					case 0:
 						if (left != null) {
-							current = left.deepIterator();
+							current = Iterators.concat(Iterators.forArray(left), left.deepIterator());
 						}
 						break;
 					case 1:
 						if (right != null) {
-							current = right.deepIterator();
+							current = Iterators.concat(Iterators.forArray(right), right.deepIterator());
 						}
 						break;
 					default:

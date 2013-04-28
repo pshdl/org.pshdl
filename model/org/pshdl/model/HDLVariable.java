@@ -61,11 +61,11 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * @param annotations
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLVariable(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+	public HDLVariable(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
 			@Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
-		super(container, name, dimensions, defaultValue, annotations, validate);
+		super(id, container, name, dimensions, defaultValue, annotations, validate);
 	}
 
 	public HDLVariable() {

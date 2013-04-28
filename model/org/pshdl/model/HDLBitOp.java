@@ -53,10 +53,10 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLBitOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLBitOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLBitOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLBitOpType type, boolean validate) {
+		super(id, container, left, right, type, validate);
 	}
 
 	public HDLBitOp() {

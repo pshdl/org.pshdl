@@ -51,9 +51,9 @@ public abstract class AbstractHDLInterface extends HDLType {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterface(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nullable Iterable<HDLVariableDeclaration> ports,
-			boolean validate) {
-		super(container, name, dim, validate);
+	public AbstractHDLInterface(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim,
+			@Nullable Iterable<HDLVariableDeclaration> ports, boolean validate) {
+		super(id, container, name, dim, validate);
 		if (validate) {
 			ports = validatePorts(ports);
 		}
@@ -96,7 +96,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Override
 	@Nonnull
 	public HDLInterface copy() {
-		HDLInterface newObject = new HDLInterface(null, name, dim, ports, false);
+		HDLInterface newObject = new HDLInterface(id, null, name, dim, ports, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -112,7 +112,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 		String filteredname = filter.copyObject("name", this, name);
 		ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
 		ArrayList<HDLVariableDeclaration> filteredports = filter.copyContainer("ports", this, ports);
-		return filter.postFilter((HDLInterface) this, new HDLInterface(null, filteredname, filtereddim, filteredports, false));
+		return filter.postFilter((HDLInterface) this, new HDLInterface(id, null, filteredname, filtereddim, filteredports, false));
 	}
 
 	/**
@@ -156,7 +156,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Nonnull
 	public HDLInterface setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -172,7 +172,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Nonnull
 	public HDLInterface setDim(@Nullable Iterable<HDLExpression> dim) {
 		dim = validateDim(dim);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -191,7 +191,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 			throw new IllegalArgumentException("Element of dim can not be null!");
 		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.add(newDim);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -211,7 +211,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 			throw new IllegalArgumentException("Removed element of dim can not be null!");
 		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(newDim);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -228,7 +228,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	public HDLInterface removeDim(int idx) {
 		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(idx);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -243,7 +243,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	@Nonnull
 	public HDLInterface setPorts(@Nullable Iterable<HDLVariableDeclaration> ports) {
 		ports = validatePorts(ports);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -262,7 +262,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 			throw new IllegalArgumentException("Element of ports can not be null!");
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.add(newPorts);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -281,7 +281,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 			throw new IllegalArgumentException("Removed element of ports can not be null!");
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.remove(newPorts);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -298,7 +298,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 	public HDLInterface removePorts(int idx) {
 		ArrayList<HDLVariableDeclaration> ports = (ArrayList<HDLVariableDeclaration>) this.ports.clone();
 		ports.remove(idx);
-		HDLInterface res = new HDLInterface(container, name, dim, ports, false);
+		HDLInterface res = new HDLInterface(id, container, name, dim, ports, false);
 		return res;
 	}
 
@@ -397,6 +397,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 						if ((dim != null) && (dim.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
 							for (HDLExpression o : dim) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -406,6 +407,7 @@ public abstract class AbstractHDLInterface extends HDLType {
 						if ((ports != null) && (ports.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(ports.size());
 							for (HDLVariableDeclaration o : ports) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

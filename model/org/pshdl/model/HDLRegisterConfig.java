@@ -65,11 +65,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLRegisterConfig(@Nullable IHDLObject container, @Nonnull HDLQualifiedName clk, @Nonnull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
+	public HDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName clk, @Nonnull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
 			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue, boolean validate) {
-		super(container, clk, rst, clockType, resetType, syncType, resetValue, validate);
+		super(id, container, clk, rst, clockType, resetType, syncType, resetValue, validate);
 	}
 
 	public HDLRegisterConfig() {

@@ -165,7 +165,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		MemoryModelParser parser = new MemoryModelParser(tokens);
 		parser.getErrorListeners().clear();
-		parser.addErrorListener(new PSHDLParser.SyntaxErrorCollector(problems));
+		parser.addErrorListener(new PSHDLParser.SyntaxErrorCollector(tokens, problems));
 		UnitContext unit = parser.unit();
 		if (problems.isEmpty()) {
 			MemoryModelAST modelAST = new MemoryModelAST();

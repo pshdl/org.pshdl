@@ -53,9 +53,9 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLVariable(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
+	public AbstractHDLVariable(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dimensions, @Nullable HDLExpression defaultValue,
 			@Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
-		super(container, validate);
+		super(id, container, validate);
 		if (validate) {
 			name = validateName(name);
 		}
@@ -174,7 +174,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLVariable copy() {
-		HDLVariable newObject = new HDLVariable(null, name, dimensions, defaultValue, annotations, false);
+		HDLVariable newObject = new HDLVariable(id, null, name, dimensions, defaultValue, annotations, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -191,7 +191,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 		ArrayList<HDLExpression> filtereddimensions = filter.copyContainer("dimensions", this, dimensions);
 		HDLExpression filtereddefaultValue = filter.copyObject("defaultValue", this, defaultValue);
 		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
-		return filter.postFilter((HDLVariable) this, new HDLVariable(null, filteredname, filtereddimensions, filtereddefaultValue, filteredannotations, false));
+		return filter.postFilter((HDLVariable) this, new HDLVariable(id, null, filteredname, filtereddimensions, filtereddefaultValue, filteredannotations, false));
 	}
 
 	/**
@@ -234,7 +234,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	@Nonnull
 	public HDLVariable setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -250,7 +250,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	@Nonnull
 	public HDLVariable setDimensions(@Nullable Iterable<HDLExpression> dimensions) {
 		dimensions = validateDimensions(dimensions);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -269,7 +269,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 			throw new IllegalArgumentException("Element of dimensions can not be null!");
 		ArrayList<HDLExpression> dimensions = (ArrayList<HDLExpression>) this.dimensions.clone();
 		dimensions.add(newDimensions);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -288,7 +288,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 			throw new IllegalArgumentException("Removed element of dimensions can not be null!");
 		ArrayList<HDLExpression> dimensions = (ArrayList<HDLExpression>) this.dimensions.clone();
 		dimensions.remove(newDimensions);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -305,7 +305,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	public HDLVariable removeDimensions(int idx) {
 		ArrayList<HDLExpression> dimensions = (ArrayList<HDLExpression>) this.dimensions.clone();
 		dimensions.remove(idx);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -321,7 +321,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	@Nonnull
 	public HDLVariable setDefaultValue(@Nullable HDLExpression defaultValue) {
 		defaultValue = validateDefaultValue(defaultValue);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -337,7 +337,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	@Nonnull
 	public HDLVariable setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -356,7 +356,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -375,7 +375,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -392,7 +392,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 	public HDLVariable removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLVariable res = new HDLVariable(container, name, dimensions, defaultValue, annotations, false);
+		HDLVariable res = new HDLVariable(id, container, name, dimensions, defaultValue, annotations, false);
 		return res;
 	}
 
@@ -523,6 +523,7 @@ public abstract class AbstractHDLVariable extends HDLObject {
 						if ((dimensions != null) && (dimensions.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dimensions.size());
 							for (HDLExpression o : dimensions) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -530,13 +531,14 @@ public abstract class AbstractHDLVariable extends HDLObject {
 						break;
 					case 1:
 						if (defaultValue != null) {
-							current = defaultValue.deepIterator();
+							current = Iterators.concat(Iterators.forArray(defaultValue), defaultValue.deepIterator());
 						}
 						break;
 					case 2:
 						if ((annotations != null) && (annotations.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
 							for (HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

@@ -50,10 +50,10 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	 * @param right
 	 *            the value for right. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLOpExpression(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, boolean validate) {
-		super(container, left, right, validate);
+	public HDLOpExpression(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, boolean validate) {
+		super(id, container, left, right, validate);
 	}
 
 	public HDLOpExpression() {

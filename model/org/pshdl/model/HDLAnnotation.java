@@ -50,10 +50,10 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	 * @param value
 	 *            the value for value. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLAnnotation(@Nullable IHDLObject container, @Nonnull String name, @Nullable String value, boolean validate) {
-		super(container, name, value, validate);
+	public HDLAnnotation(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable String value, boolean validate) {
+		super(id, container, name, value, validate);
 	}
 
 	public HDLAnnotation() {

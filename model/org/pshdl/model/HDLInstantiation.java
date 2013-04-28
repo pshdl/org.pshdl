@@ -52,10 +52,10 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param arguments
 	 *            the value for arguments. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
-		super(container, var, arguments, validate);
+	public HDLInstantiation(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
+		super(id, container, var, arguments, validate);
 	}
 
 	public HDLInstantiation() {

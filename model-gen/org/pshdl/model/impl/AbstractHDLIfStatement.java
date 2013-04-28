@@ -51,9 +51,9 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLIfStatement(@Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable Iterable<HDLStatement> thenDo, @Nullable Iterable<HDLStatement> elseDo,
-			boolean validate) {
-		super(container, validate);
+	public AbstractHDLIfStatement(int id, @Nullable IHDLObject container, @Nonnull HDLExpression ifExp, @Nullable Iterable<HDLStatement> thenDo,
+			@Nullable Iterable<HDLStatement> elseDo, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			ifExp = validateIfExp(ifExp);
 		}
@@ -151,7 +151,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	@Override
 	@Nonnull
 	public HDLIfStatement copy() {
-		HDLIfStatement newObject = new HDLIfStatement(null, ifExp, thenDo, elseDo, false);
+		HDLIfStatement newObject = new HDLIfStatement(id, null, ifExp, thenDo, elseDo, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -167,7 +167,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 		HDLExpression filteredifExp = filter.copyObject("ifExp", this, ifExp);
 		ArrayList<HDLStatement> filteredthenDo = filter.copyContainer("thenDo", this, thenDo);
 		ArrayList<HDLStatement> filteredelseDo = filter.copyContainer("elseDo", this, elseDo);
-		return filter.postFilter((HDLIfStatement) this, new HDLIfStatement(null, filteredifExp, filteredthenDo, filteredelseDo, false));
+		return filter.postFilter((HDLIfStatement) this, new HDLIfStatement(id, null, filteredifExp, filteredthenDo, filteredelseDo, false));
 	}
 
 	/**
@@ -210,7 +210,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	@Nonnull
 	public HDLIfStatement setIfExp(@Nonnull HDLExpression ifExp) {
 		ifExp = validateIfExp(ifExp);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -225,7 +225,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	@Nonnull
 	public HDLIfStatement setThenDo(@Nullable Iterable<HDLStatement> thenDo) {
 		thenDo = validateThenDo(thenDo);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -244,7 +244,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 			throw new IllegalArgumentException("Element of thenDo can not be null!");
 		ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
 		thenDo.add(newThenDo);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -263,7 +263,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 			throw new IllegalArgumentException("Removed element of thenDo can not be null!");
 		ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
 		thenDo.remove(newThenDo);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -280,7 +280,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	public HDLIfStatement removeThenDo(int idx) {
 		ArrayList<HDLStatement> thenDo = (ArrayList<HDLStatement>) this.thenDo.clone();
 		thenDo.remove(idx);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -295,7 +295,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	@Nonnull
 	public HDLIfStatement setElseDo(@Nullable Iterable<HDLStatement> elseDo) {
 		elseDo = validateElseDo(elseDo);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -314,7 +314,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 			throw new IllegalArgumentException("Element of elseDo can not be null!");
 		ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
 		elseDo.add(newElseDo);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -333,7 +333,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 			throw new IllegalArgumentException("Removed element of elseDo can not be null!");
 		ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
 		elseDo.remove(newElseDo);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -350,7 +350,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 	public HDLIfStatement removeElseDo(int idx) {
 		ArrayList<HDLStatement> elseDo = (ArrayList<HDLStatement>) this.elseDo.clone();
 		elseDo.remove(idx);
-		HDLIfStatement res = new HDLIfStatement(container, ifExp, thenDo, elseDo, false);
+		HDLIfStatement res = new HDLIfStatement(id, container, ifExp, thenDo, elseDo, false);
 		return res;
 	}
 
@@ -469,13 +469,14 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 					switch (pos++) {
 					case 0:
 						if (ifExp != null) {
-							current = ifExp.deepIterator();
+							current = Iterators.concat(Iterators.forArray(ifExp), ifExp.deepIterator());
 						}
 						break;
 					case 1:
 						if ((thenDo != null) && (thenDo.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(thenDo.size());
 							for (HDLStatement o : thenDo) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -485,6 +486,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 						if ((elseDo != null) && (elseDo.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(elseDo.size());
 							for (HDLStatement o : elseDo) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

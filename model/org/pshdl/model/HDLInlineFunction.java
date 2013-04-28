@@ -61,11 +61,11 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	 * @param expr
 	 *            the value for expr. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLInlineFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
-			@Nullable HDLFunctionParameter returnType, @Nonnull HDLExpression expr, boolean validate) {
-		super(container, annotations, name, args, returnType, expr, validate);
+	public HDLInlineFunction(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
+			@Nullable Iterable<HDLFunctionParameter> args, @Nullable HDLFunctionParameter returnType, @Nonnull HDLExpression expr, boolean validate) {
+		super(id, container, annotations, name, args, returnType, expr, validate);
 	}
 
 	public HDLInlineFunction() {

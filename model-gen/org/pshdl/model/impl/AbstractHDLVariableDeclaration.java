@@ -64,9 +64,9 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLVariableDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+	public AbstractHDLVariableDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
 			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull Iterable<HDLVariable> variables, boolean validate) {
-		super(container, annotations, validate);
+		super(id, container, annotations, validate);
 		if (validate) {
 			register = validateRegister(register);
 		}
@@ -208,7 +208,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Override
 	@Nonnull
 	public HDLVariableDeclaration copy() {
-		HDLVariableDeclaration newObject = new HDLVariableDeclaration(null, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration newObject = new HDLVariableDeclaration(id, null, annotations, register, direction, type, primitive, variables, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -227,7 +227,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 		HDLQualifiedName filteredtype = filter.copyObject("type", this, type);
 		HDLPrimitive filteredprimitive = filter.copyObject("primitive", this, primitive);
 		ArrayList<HDLVariable> filteredvariables = filter.copyContainer("variables", this, variables);
-		return filter.postFilter((HDLVariableDeclaration) this, new HDLVariableDeclaration(null, filteredannotations, filteredregister, filtereddirection, filteredtype,
+		return filter.postFilter((HDLVariableDeclaration) this, new HDLVariableDeclaration(id, null, filteredannotations, filteredregister, filtereddirection, filteredtype,
 				filteredprimitive, filteredvariables, false));
 	}
 
@@ -272,7 +272,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLVariableDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -292,7 +292,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -312,7 +312,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -329,7 +329,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	public HDLVariableDeclaration removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -345,7 +345,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLVariableDeclaration setRegister(@Nullable HDLRegisterConfig register) {
 		register = validateRegister(register);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -361,7 +361,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLVariableDeclaration setDirection(@Nullable HDLDirection direction) {
 		direction = validateDirection(direction);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -377,7 +377,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLVariableDeclaration setType(@Nonnull HDLQualifiedName type) {
 		type = validateType(type);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -393,7 +393,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLVariableDeclaration setPrimitive(@Nullable HDLPrimitive primitive) {
 		primitive = validatePrimitive(primitive);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -410,7 +410,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLVariableDeclaration setVariables(@Nonnull Iterable<HDLVariable> variables) {
 		variables = validateVariables(variables);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -429,7 +429,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 			throw new IllegalArgumentException("Element of variables can not be null!");
 		ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
 		variables.add(newVariables);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -448,7 +448,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 			throw new IllegalArgumentException("Removed element of variables can not be null!");
 		ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
 		variables.remove(newVariables);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -465,7 +465,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	public HDLVariableDeclaration removeVariables(int idx) {
 		ArrayList<HDLVariable> variables = (ArrayList<HDLVariable>) this.variables.clone();
 		variables.remove(idx);
-		HDLVariableDeclaration res = new HDLVariableDeclaration(container, annotations, register, direction, type, primitive, variables, false);
+		HDLVariableDeclaration res = new HDLVariableDeclaration(id, container, annotations, register, direction, type, primitive, variables, false);
 		return res;
 	}
 
@@ -610,6 +610,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 						if ((annotations != null) && (annotations.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
 							for (HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -617,18 +618,19 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 						break;
 					case 1:
 						if (register != null) {
-							current = register.deepIterator();
+							current = Iterators.concat(Iterators.forArray(register), register.deepIterator());
 						}
 						break;
 					case 2:
 						if (primitive != null) {
-							current = primitive.deepIterator();
+							current = Iterators.concat(Iterators.forArray(primitive), primitive.deepIterator());
 						}
 						break;
 					case 3:
 						if ((variables != null) && (variables.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(variables.size());
 							for (HDLVariable o : variables) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

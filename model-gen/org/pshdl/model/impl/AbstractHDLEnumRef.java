@@ -52,8 +52,8 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLEnumRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nonnull HDLQualifiedName hEnum, boolean validate) {
-		super(container, var, validate);
+	public AbstractHDLEnumRef(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nonnull HDLQualifiedName hEnum, boolean validate) {
+		super(id, container, var, validate);
 		if (validate) {
 			hEnum = validateHEnum(hEnum);
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLEnumRef copy() {
-		HDLEnumRef newObject = new HDLEnumRef(null, var, hEnum, false);
+		HDLEnumRef newObject = new HDLEnumRef(id, null, var, hEnum, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -107,7 +107,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	public HDLEnumRef copyFiltered(CopyFilter filter) {
 		HDLQualifiedName filteredvar = filter.copyObject("var", this, var);
 		HDLQualifiedName filteredhEnum = filter.copyObject("hEnum", this, hEnum);
-		return filter.postFilter((HDLEnumRef) this, new HDLEnumRef(null, filteredvar, filteredhEnum, false));
+		return filter.postFilter((HDLEnumRef) this, new HDLEnumRef(id, null, filteredvar, filteredhEnum, false));
 	}
 
 	/**
@@ -150,7 +150,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLEnumRef setVar(@Nonnull HDLQualifiedName var) {
 		var = validateVar(var);
-		HDLEnumRef res = new HDLEnumRef(container, var, hEnum, false);
+		HDLEnumRef res = new HDLEnumRef(id, container, var, hEnum, false);
 		return res;
 	}
 
@@ -166,7 +166,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLEnumRef setHEnum(@Nonnull HDLQualifiedName hEnum) {
 		hEnum = validateHEnum(hEnum);
-		HDLEnumRef res = new HDLEnumRef(container, var, hEnum, false);
+		HDLEnumRef res = new HDLEnumRef(id, container, var, hEnum, false);
 		return res;
 	}
 

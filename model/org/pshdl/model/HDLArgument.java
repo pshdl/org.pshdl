@@ -50,10 +50,10 @@ public class HDLArgument extends AbstractHDLArgument {
 	 * @param expression
 	 *            the value for expression. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLArgument(@Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLExpression expression, boolean validate) {
-		super(container, name, expression, validate);
+	public HDLArgument(int id, @Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLExpression expression, boolean validate) {
+		super(id, container, name, expression, validate);
 	}
 
 	public HDLArgument() {

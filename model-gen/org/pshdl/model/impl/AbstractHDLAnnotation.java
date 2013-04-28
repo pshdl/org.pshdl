@@ -47,8 +47,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLAnnotation(@Nullable IHDLObject container, @Nonnull String name, @Nullable String value, boolean validate) {
-		super(container, validate);
+	public AbstractHDLAnnotation(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable String value, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			name = validateName(name);
 		}
@@ -107,7 +107,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLAnnotation copy() {
-		HDLAnnotation newObject = new HDLAnnotation(null, name, value, false);
+		HDLAnnotation newObject = new HDLAnnotation(id, null, name, value, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -122,7 +122,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	public HDLAnnotation copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
 		String filteredvalue = filter.copyObject("value", this, value);
-		return filter.postFilter((HDLAnnotation) this, new HDLAnnotation(null, filteredname, filteredvalue, false));
+		return filter.postFilter((HDLAnnotation) this, new HDLAnnotation(id, null, filteredname, filteredvalue, false));
 	}
 
 	/**
@@ -165,7 +165,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Nonnull
 	public HDLAnnotation setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLAnnotation res = new HDLAnnotation(container, name, value, false);
+		HDLAnnotation res = new HDLAnnotation(id, container, name, value, false);
 		return res;
 	}
 
@@ -180,7 +180,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Nonnull
 	public HDLAnnotation setValue(@Nullable String value) {
 		value = validateValue(value);
-		HDLAnnotation res = new HDLAnnotation(container, name, value, false);
+		HDLAnnotation res = new HDLAnnotation(id, container, name, value, false);
 		return res;
 	}
 

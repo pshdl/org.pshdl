@@ -49,8 +49,8 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterfaceDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLInterface hIf, boolean validate) {
-		super(container, annotations, validate);
+	public AbstractHDLInterfaceDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLInterface hIf, boolean validate) {
+		super(id, container, annotations, validate);
 		if (validate) {
 			hIf = validateHIf(hIf);
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	@Override
 	@Nonnull
 	public HDLInterfaceDeclaration copy() {
-		HDLInterfaceDeclaration newObject = new HDLInterfaceDeclaration(null, annotations, hIf, false);
+		HDLInterfaceDeclaration newObject = new HDLInterfaceDeclaration(id, null, annotations, hIf, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -107,7 +107,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	public HDLInterfaceDeclaration copyFiltered(CopyFilter filter) {
 		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
 		HDLInterface filteredhIf = filter.copyObject("hIf", this, hIf);
-		return filter.postFilter((HDLInterfaceDeclaration) this, new HDLInterfaceDeclaration(null, filteredannotations, filteredhIf, false));
+		return filter.postFilter((HDLInterfaceDeclaration) this, new HDLInterfaceDeclaration(id, null, filteredannotations, filteredhIf, false));
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLInterfaceDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(container, annotations, hIf, false);
+		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
 		return res;
 	}
 
@@ -171,7 +171,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(container, annotations, hIf, false);
+		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
 		return res;
 	}
 
@@ -191,7 +191,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(container, annotations, hIf, false);
+		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
 		return res;
 	}
 
@@ -208,7 +208,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	public HDLInterfaceDeclaration removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(container, annotations, hIf, false);
+		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
 		return res;
 	}
 
@@ -224,7 +224,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLInterfaceDeclaration setHIf(@Nonnull HDLInterface hIf) {
 		hIf = validateHIf(hIf);
-		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(container, annotations, hIf, false);
+		HDLInterfaceDeclaration res = new HDLInterfaceDeclaration(id, container, annotations, hIf, false);
 		return res;
 	}
 
@@ -312,6 +312,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 						if ((annotations != null) && (annotations.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
 							for (HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -319,7 +320,7 @@ public abstract class AbstractHDLInterfaceDeclaration extends HDLDeclaration {
 						break;
 					case 1:
 						if (hIf != null) {
-							current = hIf.deepIterator();
+							current = Iterators.concat(Iterators.forArray(hIf), hIf.deepIterator());
 						}
 						break;
 					default:

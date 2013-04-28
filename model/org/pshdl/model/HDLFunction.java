@@ -59,11 +59,11 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 * @param returnType
 	 *            the value for returnType. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
+	public HDLFunction(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
 			@Nullable HDLFunctionParameter returnType, boolean validate) {
-		super(container, annotations, name, args, returnType, validate);
+		super(id, container, annotations, name, args, returnType, validate);
 	}
 
 	public HDLFunction() {

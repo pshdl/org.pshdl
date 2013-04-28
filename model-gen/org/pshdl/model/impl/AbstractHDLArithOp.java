@@ -52,8 +52,8 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLArithOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLArithOpType type, boolean validate) {
-		super(container, left, right, validate);
+	public AbstractHDLArithOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLArithOpType type, boolean validate) {
+		super(id, container, left, right, validate);
 		if (validate) {
 			type = validateType(type);
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLArithOp copy() {
-		HDLArithOp newObject = new HDLArithOp(null, left, right, type, false);
+		HDLArithOp newObject = new HDLArithOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -108,7 +108,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
 		HDLExpression filteredright = filter.copyObject("right", this, right);
 		HDLArithOpType filteredtype = filter.copyObject("type", this, type);
-		return filter.postFilter((HDLArithOp) this, new HDLArithOp(null, filteredleft, filteredright, filteredtype, false));
+		return filter.postFilter((HDLArithOp) this, new HDLArithOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Nonnull
 	public HDLArithOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLArithOp res = new HDLArithOp(container, left, right, type, false);
+		HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -168,7 +168,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Nonnull
 	public HDLArithOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLArithOp res = new HDLArithOp(container, left, right, type, false);
+		HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -183,7 +183,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Nonnull
 	public HDLArithOp setType(@Nonnull HDLArithOpType type) {
 		type = validateType(type);
-		HDLArithOp res = new HDLArithOp(container, left, right, type, false);
+		HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -263,12 +263,12 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 					switch (pos++) {
 					case 0:
 						if (left != null) {
-							current = left.deepIterator();
+							current = Iterators.concat(Iterators.forArray(left), left.deepIterator());
 						}
 						break;
 					case 1:
 						if (right != null) {
-							current = right.deepIterator();
+							current = Iterators.concat(Iterators.forArray(right), right.deepIterator());
 						}
 						break;
 					default:

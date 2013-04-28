@@ -53,10 +53,10 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLEqualityOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLEqualityOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLEqualityOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLEqualityOpType type, boolean validate) {
+		super(id, container, left, right, type, validate);
 	}
 
 	public HDLEqualityOp() {

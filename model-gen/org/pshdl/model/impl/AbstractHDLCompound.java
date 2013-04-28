@@ -43,8 +43,8 @@ public abstract class AbstractHDLCompound extends HDLObject implements HDLStatem
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLCompound(@Nullable IHDLObject container, boolean validate) {
-		super(container, validate);
+	public AbstractHDLCompound(int id, @Nullable IHDLObject container, boolean validate) {
+		super(id, container, validate);
 	}
 
 	public AbstractHDLCompound() {

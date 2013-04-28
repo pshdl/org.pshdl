@@ -50,10 +50,10 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	 * @param hIf
 	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLInterfaceDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLInterface hIf, boolean validate) {
-		super(container, annotations, hIf, validate);
+	public HDLInterfaceDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLInterface hIf, boolean validate) {
+		super(id, container, annotations, hIf, validate);
 	}
 
 	public HDLInterfaceDeclaration() {

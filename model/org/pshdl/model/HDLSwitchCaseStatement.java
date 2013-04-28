@@ -52,10 +52,10 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	 * @param dos
 	 *            the value for dos. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLSwitchCaseStatement(@Nullable IHDLObject container, @Nullable HDLExpression label, @Nullable Iterable<HDLStatement> dos, boolean validate) {
-		super(container, label, dos, validate);
+	public HDLSwitchCaseStatement(int id, @Nullable IHDLObject container, @Nullable HDLExpression label, @Nullable Iterable<HDLStatement> dos, boolean validate) {
+		super(id, container, label, dos, validate);
 	}
 
 	public HDLSwitchCaseStatement() {

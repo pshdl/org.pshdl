@@ -32,6 +32,10 @@ public static final int WHITESPACE = 1;
 public static final int COMMENTS = 2;
 }
 
+@parser::members {
+public static final String MISSING_SEMI="MISSING_SEMI";
+}
+
 psModel :
 	('package' psQualifiedName ';' )? (psUnit | psDeclaration )*
 ;
@@ -46,6 +50,7 @@ psExtends:
 
 psImports :
 	'import' psQualifiedNameImport ';'
+	|	'import' psQualifiedNameImport {notifyErrorListeners(MISSING_SEMI);}
 ;
 
 psQualifiedNameImport :
@@ -53,7 +58,7 @@ psQualifiedNameImport :
 ;
 
 psBlock :
-	psDeclaration | psStatement | psInstantiation
+	psDeclaration | psInstantiation | psStatement
 ;
 
 psProcess :
@@ -66,10 +71,12 @@ psInstantiation :
 
 psInterfaceInstantiation :
 	psQualifiedName psVariable psArray? psPassedArguments? ';'
+	| 	psQualifiedName psVariable psArray? psPassedArguments? {notifyErrorListeners(MISSING_SEMI);}
 ;
 
 psDirectGeneration :
 	isInclude='include'? psInterface psVariable '=' 'generate' RULE_ID psPassedArguments? RULE_GENERATOR_CONTENT? ';'
+	|	isInclude='include'? psInterface psVariable '=' 'generate' RULE_ID psPassedArguments? RULE_GENERATOR_CONTENT? {notifyErrorListeners(MISSING_SEMI);}
 ;
 
 psPassedArguments :
@@ -133,7 +140,7 @@ psVariable :
 ;
 
 psStatement :
-	psAssignmentOrFunc | psCompoundStatement | psProcess
+	psCompoundStatement | psProcess | psAssignmentOrFunc 
 ;
 
 psFunctionDeclaration :
@@ -195,6 +202,7 @@ psFuncArgs :
 
 psAssignmentOrFunc :
 	psVariableRef (psAssignmentOp psExpression )? ';'
+	|	psVariableRef (psAssignmentOp psExpression )? {notifyErrorListeners(MISSING_SEMI);}
 ;
 
 psAssignmentOp :
@@ -249,6 +257,7 @@ psEnum :
 
 psVariableDeclaration :
 	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* ';'
+	|	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_SEMI);}
 ;
 
 psDeclAssignment :

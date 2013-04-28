@@ -57,10 +57,10 @@ public class HDLEnum extends AbstractHDLEnum {
 	 *            the value for enums. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLEnum(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
-		super(container, name, dim, enums, validate);
+	public HDLEnum(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull Iterable<HDLVariable> enums, boolean validate) {
+		super(id, container, name, dim, enums, validate);
 	}
 
 	public HDLEnum() {

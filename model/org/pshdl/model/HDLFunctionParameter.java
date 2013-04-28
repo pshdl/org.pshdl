@@ -75,12 +75,12 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 * @param dim
 	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLFunctionParameter(@Nullable IHDLObject container, @Nullable RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec, @Nullable HDLQualifiedName ifSpec,
-			@Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLFunctionParameter funcReturnSpec, @Nullable HDLVariable name, @Nullable HDLExpression width,
-			@Nullable Iterable<HDLExpression> dim, boolean validate) {
-		super(container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, validate);
+	public HDLFunctionParameter(int id, @Nullable IHDLObject container, @Nullable RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec,
+			@Nullable HDLQualifiedName ifSpec, @Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLFunctionParameter funcReturnSpec, @Nullable HDLVariable name,
+			@Nullable HDLExpression width, @Nullable Iterable<HDLExpression> dim, boolean validate) {
+		super(id, container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, validate);
 	}
 
 	public HDLFunctionParameter() {

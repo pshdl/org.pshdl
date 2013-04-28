@@ -54,10 +54,10 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLEnumRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nonnull HDLQualifiedName hEnum, boolean validate) {
-		super(container, var, hEnum, validate);
+	public HDLEnumRef(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nonnull HDLQualifiedName hEnum, boolean validate) {
+		super(id, container, var, hEnum, validate);
 	}
 
 	public HDLEnumRef() {

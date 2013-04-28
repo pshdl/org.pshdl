@@ -61,11 +61,11 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * @param stmnts
 	 *            the value for stmnts. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLSubstituteFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
+	public HDLSubstituteFunction(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
 			@Nullable Iterable<HDLFunctionParameter> args, @Nullable HDLFunctionParameter returnType, @Nullable Iterable<HDLStatement> stmnts, boolean validate) {
-		super(container, annotations, name, args, returnType, stmnts, validate);
+		super(id, container, annotations, name, args, returnType, stmnts, validate);
 	}
 
 	public HDLSubstituteFunction() {

@@ -54,9 +54,9 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLPrimitive(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull HDLPrimitiveType type,
+	public AbstractHDLPrimitive(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull HDLPrimitiveType type,
 			@Nullable HDLExpression width, boolean validate) {
-		super(container, name, dim, validate);
+		super(id, container, name, dim, validate);
 		if (validate) {
 			type = validateType(type);
 		}
@@ -120,7 +120,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	@Override
 	@Nonnull
 	public HDLPrimitive copy() {
-		HDLPrimitive newObject = new HDLPrimitive(null, name, dim, type, width, false);
+		HDLPrimitive newObject = new HDLPrimitive(id, null, name, dim, type, width, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -137,7 +137,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 		ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
 		HDLPrimitiveType filteredtype = filter.copyObject("type", this, type);
 		HDLExpression filteredwidth = filter.copyObject("width", this, width);
-		return filter.postFilter((HDLPrimitive) this, new HDLPrimitive(null, filteredname, filtereddim, filteredtype, filteredwidth, false));
+		return filter.postFilter((HDLPrimitive) this, new HDLPrimitive(id, null, filteredname, filtereddim, filteredtype, filteredwidth, false));
 	}
 
 	/**
@@ -181,7 +181,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	@Nonnull
 	public HDLPrimitive setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -197,7 +197,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	@Nonnull
 	public HDLPrimitive setDim(@Nullable Iterable<HDLExpression> dim) {
 		dim = validateDim(dim);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -216,7 +216,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 			throw new IllegalArgumentException("Element of dim can not be null!");
 		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.add(newDim);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -236,7 +236,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 			throw new IllegalArgumentException("Removed element of dim can not be null!");
 		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(newDim);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -253,7 +253,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	public HDLPrimitive removeDim(int idx) {
 		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(idx);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -269,7 +269,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	@Nonnull
 	public HDLPrimitive setType(@Nonnull HDLPrimitiveType type) {
 		type = validateType(type);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -284,7 +284,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	@Nonnull
 	public HDLPrimitive setWidth(@Nullable HDLExpression width) {
 		width = validateWidth(width);
-		HDLPrimitive res = new HDLPrimitive(container, name, dim, type, width, false);
+		HDLPrimitive res = new HDLPrimitive(id, container, name, dim, type, width, false);
 		return res;
 	}
 
@@ -385,6 +385,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 						if ((dim != null) && (dim.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
 							for (HDLExpression o : dim) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -392,7 +393,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 						break;
 					case 1:
 						if (width != null) {
-							current = width.deepIterator();
+							current = Iterators.concat(Iterators.forArray(width), width.deepIterator());
 						}
 						break;
 					default:

@@ -270,8 +270,6 @@ public class HDLLibrary {
 	public Optional<? extends HDLType> resolve(Iterable<String> imports, HDLQualifiedName type) {
 		HDLType hdlType = types.get(type);
 		if (hdlType == null) {
-			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
-			// type + " @" + this);
 			for (String string : imports)
 				if (string.endsWith(type.toString()))
 					return Optional.fromNullable(types.get(new HDLQualifiedName(string)));

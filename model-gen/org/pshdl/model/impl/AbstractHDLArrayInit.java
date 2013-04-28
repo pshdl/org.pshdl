@@ -47,8 +47,8 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLArrayInit(@Nullable IHDLObject container, @Nullable Iterable<HDLExpression> exp, boolean validate) {
-		super(container, validate);
+	public AbstractHDLArrayInit(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLExpression> exp, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			exp = validateExp(exp);
 		}
@@ -91,7 +91,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	@Override
 	@Nonnull
 	public HDLArrayInit copy() {
-		HDLArrayInit newObject = new HDLArrayInit(null, exp, false);
+		HDLArrayInit newObject = new HDLArrayInit(id, null, exp, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -105,7 +105,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	@Nonnull
 	public HDLArrayInit copyFiltered(CopyFilter filter) {
 		ArrayList<HDLExpression> filteredexp = filter.copyContainer("exp", this, exp);
-		return filter.postFilter((HDLArrayInit) this, new HDLArrayInit(null, filteredexp, false));
+		return filter.postFilter((HDLArrayInit) this, new HDLArrayInit(id, null, filteredexp, false));
 	}
 
 	/**
@@ -147,7 +147,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	@Nonnull
 	public HDLArrayInit setExp(@Nullable Iterable<HDLExpression> exp) {
 		exp = validateExp(exp);
-		HDLArrayInit res = new HDLArrayInit(container, exp, false);
+		HDLArrayInit res = new HDLArrayInit(id, container, exp, false);
 		return res;
 	}
 
@@ -165,7 +165,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 			throw new IllegalArgumentException("Element of exp can not be null!");
 		ArrayList<HDLExpression> exp = (ArrayList<HDLExpression>) this.exp.clone();
 		exp.add(newExp);
-		HDLArrayInit res = new HDLArrayInit(container, exp, false);
+		HDLArrayInit res = new HDLArrayInit(id, container, exp, false);
 		return res;
 	}
 
@@ -184,7 +184,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 			throw new IllegalArgumentException("Removed element of exp can not be null!");
 		ArrayList<HDLExpression> exp = (ArrayList<HDLExpression>) this.exp.clone();
 		exp.remove(newExp);
-		HDLArrayInit res = new HDLArrayInit(container, exp, false);
+		HDLArrayInit res = new HDLArrayInit(id, container, exp, false);
 		return res;
 	}
 
@@ -201,7 +201,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 	public HDLArrayInit removeExp(int idx) {
 		ArrayList<HDLExpression> exp = (ArrayList<HDLExpression>) this.exp.clone();
 		exp.remove(idx);
-		HDLArrayInit res = new HDLArrayInit(container, exp, false);
+		HDLArrayInit res = new HDLArrayInit(id, container, exp, false);
 		return res;
 	}
 
@@ -288,6 +288,7 @@ public abstract class AbstractHDLArrayInit extends HDLObject implements HDLExpre
 						if ((exp != null) && (exp.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(exp.size());
 							for (HDLExpression o : exp) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

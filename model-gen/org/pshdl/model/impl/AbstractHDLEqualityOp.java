@@ -52,8 +52,9 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLEqualityOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLEqualityOpType type, boolean validate) {
-		super(container, left, right, validate);
+	public AbstractHDLEqualityOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLEqualityOpType type,
+			boolean validate) {
+		super(id, container, left, right, validate);
 		if (validate) {
 			type = validateType(type);
 		}
@@ -92,7 +93,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLEqualityOp copy() {
-		HDLEqualityOp newObject = new HDLEqualityOp(null, left, right, type, false);
+		HDLEqualityOp newObject = new HDLEqualityOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -108,7 +109,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
 		HDLExpression filteredright = filter.copyObject("right", this, right);
 		HDLEqualityOpType filteredtype = filter.copyObject("type", this, type);
-		return filter.postFilter((HDLEqualityOp) this, new HDLEqualityOp(null, filteredleft, filteredright, filteredtype, false));
+		return filter.postFilter((HDLEqualityOp) this, new HDLEqualityOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
 	/**
@@ -152,7 +153,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Nonnull
 	public HDLEqualityOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLEqualityOp res = new HDLEqualityOp(container, left, right, type, false);
+		HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -169,7 +170,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Nonnull
 	public HDLEqualityOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLEqualityOp res = new HDLEqualityOp(container, left, right, type, false);
+		HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -185,7 +186,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Nonnull
 	public HDLEqualityOp setType(@Nonnull HDLEqualityOpType type) {
 		type = validateType(type);
-		HDLEqualityOp res = new HDLEqualityOp(container, left, right, type, false);
+		HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -265,12 +266,12 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 					switch (pos++) {
 					case 0:
 						if (left != null) {
-							current = left.deepIterator();
+							current = Iterators.concat(Iterators.forArray(left), left.deepIterator());
 						}
 						break;
 					case 1:
 						if (right != null) {
-							current = right.deepIterator();
+							current = Iterators.concat(Iterators.forArray(right), right.deepIterator());
 						}
 						break;
 					default:

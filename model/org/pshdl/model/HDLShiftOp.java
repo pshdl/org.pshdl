@@ -53,10 +53,10 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	 * @param type
 	 *            the value for type. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLShiftOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLShiftOpType type, boolean validate) {
-		super(container, left, right, type, validate);
+	public HDLShiftOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLShiftOpType type, boolean validate) {
+		super(id, container, left, right, type, validate);
 	}
 
 	public HDLShiftOp() {

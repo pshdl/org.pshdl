@@ -59,11 +59,11 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * @param declarations
 	 *            the value for declarations. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLPackage(@Nullable IHDLObject container, @Nonnull String libURI, @Nullable String pkg, @Nullable Iterable<HDLUnit> units,
+	public HDLPackage(int id, @Nullable IHDLObject container, @Nonnull String libURI, @Nullable String pkg, @Nullable Iterable<HDLUnit> units,
 			@Nullable Iterable<HDLDeclaration> declarations, boolean validate) {
-		super(container, libURI, pkg, units, declarations, validate);
+		super(id, container, libURI, pkg, units, declarations, validate);
 	}
 
 	public HDLPackage() {

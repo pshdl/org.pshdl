@@ -49,8 +49,8 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLSwitchStatement(@Nullable IHDLObject container, @Nonnull HDLExpression caseExp, @Nullable Iterable<HDLSwitchCaseStatement> cases, boolean validate) {
-		super(container, validate);
+	public AbstractHDLSwitchStatement(int id, @Nullable IHDLObject container, @Nonnull HDLExpression caseExp, @Nullable Iterable<HDLSwitchCaseStatement> cases, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			caseExp = validateCaseExp(caseExp);
 		}
@@ -120,7 +120,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	@Override
 	@Nonnull
 	public HDLSwitchStatement copy() {
-		HDLSwitchStatement newObject = new HDLSwitchStatement(null, caseExp, cases, false);
+		HDLSwitchStatement newObject = new HDLSwitchStatement(id, null, caseExp, cases, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -135,7 +135,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	public HDLSwitchStatement copyFiltered(CopyFilter filter) {
 		HDLExpression filteredcaseExp = filter.copyObject("caseExp", this, caseExp);
 		ArrayList<HDLSwitchCaseStatement> filteredcases = filter.copyContainer("cases", this, cases);
-		return filter.postFilter((HDLSwitchStatement) this, new HDLSwitchStatement(null, filteredcaseExp, filteredcases, false));
+		return filter.postFilter((HDLSwitchStatement) this, new HDLSwitchStatement(id, null, filteredcaseExp, filteredcases, false));
 	}
 
 	/**
@@ -178,7 +178,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	@Nonnull
 	public HDLSwitchStatement setCaseExp(@Nonnull HDLExpression caseExp) {
 		caseExp = validateCaseExp(caseExp);
-		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
+		HDLSwitchStatement res = new HDLSwitchStatement(id, container, caseExp, cases, false);
 		return res;
 	}
 
@@ -193,7 +193,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	@Nonnull
 	public HDLSwitchStatement setCases(@Nullable Iterable<HDLSwitchCaseStatement> cases) {
 		cases = validateCases(cases);
-		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
+		HDLSwitchStatement res = new HDLSwitchStatement(id, container, caseExp, cases, false);
 		return res;
 	}
 
@@ -212,7 +212,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 			throw new IllegalArgumentException("Element of cases can not be null!");
 		ArrayList<HDLSwitchCaseStatement> cases = (ArrayList<HDLSwitchCaseStatement>) this.cases.clone();
 		cases.add(newCases);
-		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
+		HDLSwitchStatement res = new HDLSwitchStatement(id, container, caseExp, cases, false);
 		return res;
 	}
 
@@ -231,7 +231,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 			throw new IllegalArgumentException("Removed element of cases can not be null!");
 		ArrayList<HDLSwitchCaseStatement> cases = (ArrayList<HDLSwitchCaseStatement>) this.cases.clone();
 		cases.remove(newCases);
-		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
+		HDLSwitchStatement res = new HDLSwitchStatement(id, container, caseExp, cases, false);
 		return res;
 	}
 
@@ -248,7 +248,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	public HDLSwitchStatement removeCases(int idx) {
 		ArrayList<HDLSwitchCaseStatement> cases = (ArrayList<HDLSwitchCaseStatement>) this.cases.clone();
 		cases.remove(idx);
-		HDLSwitchStatement res = new HDLSwitchStatement(container, caseExp, cases, false);
+		HDLSwitchStatement res = new HDLSwitchStatement(id, container, caseExp, cases, false);
 		return res;
 	}
 
@@ -346,13 +346,14 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 					switch (pos++) {
 					case 0:
 						if (caseExp != null) {
-							current = caseExp.deepIterator();
+							current = Iterators.concat(Iterators.forArray(caseExp), caseExp.deepIterator());
 						}
 						break;
 					case 1:
 						if ((cases != null) && (cases.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(cases.size());
 							for (HDLSwitchCaseStatement o : cases) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

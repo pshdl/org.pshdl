@@ -43,8 +43,8 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLReference(@Nullable IHDLObject container, boolean validate) {
-		super(container, validate);
+	public AbstractHDLReference(int id, @Nullable IHDLObject container, boolean validate) {
+		super(id, container, validate);
 	}
 
 	public AbstractHDLReference() {

@@ -58,11 +58,11 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	 * @param width
 	 *            the value for width. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLPrimitive(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull HDLPrimitiveType type, @Nullable HDLExpression width,
-			boolean validate) {
-		super(container, name, dim, type, width, validate);
+	public HDLPrimitive(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, @Nonnull HDLPrimitiveType type,
+			@Nullable HDLExpression width, boolean validate) {
+		super(id, container, name, dim, type, width, validate);
 	}
 
 	public HDLPrimitive() {

@@ -316,7 +316,7 @@ class ConstantEvaluate {
 		val opened=l.subtract(opener)
 		val mask=opener.subtract(1bi).shiftRight(shiftWidth+1)
 		val res=opened.shiftRight(shiftWidth).and(mask)
-		println('''Opened: «opened» Width:«width» Mask:«mask» Res:«res»''')
+//		println('''Opened: «opened» Width:«width» Mask:«mask» Res:«res»''')
 		res
 	}
 

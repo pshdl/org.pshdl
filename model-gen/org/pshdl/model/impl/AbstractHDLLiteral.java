@@ -47,8 +47,8 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLLiteral(@Nullable IHDLObject container, @Nonnull String val, @Nullable Boolean str, boolean validate) {
-		super(container, validate);
+	public AbstractHDLLiteral(int id, @Nullable IHDLObject container, @Nonnull String val, @Nullable Boolean str, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			val = validateVal(val);
 		}
@@ -107,7 +107,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	@Override
 	@Nonnull
 	public HDLLiteral copy() {
-		HDLLiteral newObject = new HDLLiteral(null, val, str, false);
+		HDLLiteral newObject = new HDLLiteral(id, null, val, str, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -122,7 +122,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	public HDLLiteral copyFiltered(CopyFilter filter) {
 		String filteredval = filter.copyObject("val", this, val);
 		Boolean filteredstr = filter.copyObject("str", this, str);
-		return filter.postFilter((HDLLiteral) this, new HDLLiteral(null, filteredval, filteredstr, false));
+		return filter.postFilter((HDLLiteral) this, new HDLLiteral(id, null, filteredval, filteredstr, false));
 	}
 
 	/**
@@ -164,7 +164,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	@Nonnull
 	public HDLLiteral setVal(@Nonnull String val) {
 		val = validateVal(val);
-		HDLLiteral res = new HDLLiteral(container, val, str, false);
+		HDLLiteral res = new HDLLiteral(id, container, val, str, false);
 		return res;
 	}
 
@@ -178,7 +178,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	@Nonnull
 	public HDLLiteral setStr(@Nullable Boolean str) {
 		str = validateStr(str);
-		HDLLiteral res = new HDLLiteral(container, val, str, false);
+		HDLLiteral res = new HDLLiteral(id, container, val, str, false);
 		return res;
 	}
 
@@ -192,7 +192,7 @@ public abstract class AbstractHDLLiteral extends HDLObject implements HDLExpress
 	@Nonnull
 	public HDLLiteral setStr(boolean str) {
 		str = validateStr(str);
-		HDLLiteral res = new HDLLiteral(container, val, str, false);
+		HDLLiteral res = new HDLLiteral(id, container, val, str, false);
 		return res;
 	}
 

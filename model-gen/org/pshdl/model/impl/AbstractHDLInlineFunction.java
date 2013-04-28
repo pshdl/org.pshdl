@@ -55,9 +55,9 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInlineFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
+	public AbstractHDLInlineFunction(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
 			@Nullable Iterable<HDLFunctionParameter> args, @Nullable HDLFunctionParameter returnType, @Nonnull HDLExpression expr, boolean validate) {
-		super(container, annotations, name, args, returnType, validate);
+		super(id, container, annotations, name, args, returnType, validate);
 		if (validate) {
 			expr = validateExpr(expr);
 		}
@@ -99,7 +99,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLInlineFunction copy() {
-		HDLInlineFunction newObject = new HDLInlineFunction(null, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction newObject = new HDLInlineFunction(id, null, annotations, name, args, returnType, expr, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -117,7 +117,8 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 		ArrayList<HDLFunctionParameter> filteredargs = filter.copyContainer("args", this, args);
 		HDLFunctionParameter filteredreturnType = filter.copyObject("returnType", this, returnType);
 		HDLExpression filteredexpr = filter.copyObject("expr", this, expr);
-		return filter.postFilter((HDLInlineFunction) this, new HDLInlineFunction(null, filteredannotations, filteredname, filteredargs, filteredreturnType, filteredexpr, false));
+		return filter.postFilter((HDLInlineFunction) this,
+				new HDLInlineFunction(id, null, filteredannotations, filteredname, filteredargs, filteredreturnType, filteredexpr, false));
 	}
 
 	/**
@@ -161,7 +162,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	@Nonnull
 	public HDLInlineFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -181,7 +182,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 			throw new IllegalArgumentException("Element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -201,7 +202,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -218,7 +219,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	public HDLInlineFunction removeAnnotations(int idx) {
 		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -235,7 +236,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	@Nonnull
 	public HDLInlineFunction setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -251,7 +252,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	@Nonnull
 	public HDLInlineFunction setArgs(@Nullable Iterable<HDLFunctionParameter> args) {
 		args = validateArgs(args);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -270,7 +271,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 			throw new IllegalArgumentException("Element of args can not be null!");
 		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.add(newArgs);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -290,7 +291,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 			throw new IllegalArgumentException("Removed element of args can not be null!");
 		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(newArgs);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -307,7 +308,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	public HDLInlineFunction removeArgs(int idx) {
 		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(idx);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -324,7 +325,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	@Nonnull
 	public HDLInlineFunction setReturnType(@Nullable HDLFunctionParameter returnType) {
 		returnType = validateReturnType(returnType);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -340,7 +341,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 	@Nonnull
 	public HDLInlineFunction setExpr(@Nonnull HDLExpression expr) {
 		expr = validateExpr(expr);
-		HDLInlineFunction res = new HDLInlineFunction(container, annotations, name, args, returnType, expr, false);
+		HDLInlineFunction res = new HDLInlineFunction(id, container, annotations, name, args, returnType, expr, false);
 		return res;
 	}
 
@@ -443,6 +444,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 						if ((annotations != null) && (annotations.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
 							for (HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -452,6 +454,7 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 						if ((args != null) && (args.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
 							for (HDLFunctionParameter o : args) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -459,12 +462,12 @@ public abstract class AbstractHDLInlineFunction extends HDLFunction {
 						break;
 					case 2:
 						if (returnType != null) {
-							current = returnType.deepIterator();
+							current = Iterators.concat(Iterators.forArray(returnType), returnType.deepIterator());
 						}
 						break;
 					case 3:
 						if (expr != null) {
-							current = expr.deepIterator();
+							current = Iterators.concat(Iterators.forArray(expr), expr.deepIterator());
 						}
 						break;
 					default:

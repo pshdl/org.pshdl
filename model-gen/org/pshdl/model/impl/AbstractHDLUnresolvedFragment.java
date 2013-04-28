@@ -53,9 +53,9 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLUnresolvedFragment(@Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
+	public AbstractHDLUnresolvedFragment(int id, @Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			@Nullable HDLUnresolvedFragment sub, boolean validate) {
-		super(container, validate);
+		super(id, container, validate);
 		if (validate) {
 			frag = validateFrag(frag);
 		}
@@ -174,7 +174,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	@Override
 	@Nonnull
 	public HDLUnresolvedFragment copy() {
-		HDLUnresolvedFragment newObject = new HDLUnresolvedFragment(null, frag, array, bits, sub, false);
+		HDLUnresolvedFragment newObject = new HDLUnresolvedFragment(id, null, frag, array, bits, sub, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -191,7 +191,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 		ArrayList<HDLExpression> filteredarray = filter.copyContainer("array", this, array);
 		ArrayList<HDLRange> filteredbits = filter.copyContainer("bits", this, bits);
 		HDLUnresolvedFragment filteredsub = filter.copyObject("sub", this, sub);
-		return filter.postFilter((HDLUnresolvedFragment) this, new HDLUnresolvedFragment(null, filteredfrag, filteredarray, filteredbits, filteredsub, false));
+		return filter.postFilter((HDLUnresolvedFragment) this, new HDLUnresolvedFragment(id, null, filteredfrag, filteredarray, filteredbits, filteredsub, false));
 	}
 
 	/**
@@ -234,7 +234,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	@Nonnull
 	public HDLUnresolvedFragment setFrag(@Nonnull String frag) {
 		frag = validateFrag(frag);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -249,7 +249,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	@Nonnull
 	public HDLUnresolvedFragment setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -268,7 +268,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 			throw new IllegalArgumentException("Element of array can not be null!");
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.add(newArray);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -287,7 +287,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 			throw new IllegalArgumentException("Removed element of array can not be null!");
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(newArray);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -304,7 +304,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	public HDLUnresolvedFragment removeArray(int idx) {
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(idx);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -319,7 +319,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	@Nonnull
 	public HDLUnresolvedFragment setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -337,7 +337,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 			throw new IllegalArgumentException("Element of bits can not be null!");
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.add(newBits);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -356,7 +356,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 			throw new IllegalArgumentException("Removed element of bits can not be null!");
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(newBits);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -373,7 +373,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	public HDLUnresolvedFragment removeBits(int idx) {
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(idx);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -388,7 +388,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 	@Nonnull
 	public HDLUnresolvedFragment setSub(@Nullable HDLUnresolvedFragment sub) {
 		sub = validateSub(sub);
-		HDLUnresolvedFragment res = new HDLUnresolvedFragment(container, frag, array, bits, sub, false);
+		HDLUnresolvedFragment res = new HDLUnresolvedFragment(id, container, frag, array, bits, sub, false);
 		return res;
 	}
 
@@ -519,6 +519,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 						if ((array != null) && (array.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(array.size());
 							for (HDLExpression o : array) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -528,6 +529,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 						if ((bits != null) && (bits.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(bits.size());
 							for (HDLRange o : bits) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -535,7 +537,7 @@ public abstract class AbstractHDLUnresolvedFragment extends HDLReference {
 						break;
 					case 2:
 						if (sub != null) {
-							current = sub.deepIterator();
+							current = Iterators.concat(Iterators.forArray(sub), sub.deepIterator());
 						}
 						break;
 					default:

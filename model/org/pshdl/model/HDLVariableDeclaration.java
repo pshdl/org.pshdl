@@ -71,11 +71,11 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 *            the value for variables. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLVariableDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
+	public HDLVariableDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nullable HDLRegisterConfig register,
 			@Nullable HDLDirection direction, @Nonnull HDLQualifiedName type, @Nullable HDLPrimitive primitive, @Nonnull Iterable<HDLVariable> variables, boolean validate) {
-		super(container, annotations, register, direction, type, primitive, variables, validate);
+		super(id, container, annotations, register, direction, type, primitive, variables, validate);
 	}
 
 	public HDLVariableDeclaration() {

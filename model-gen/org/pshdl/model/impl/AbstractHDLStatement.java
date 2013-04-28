@@ -43,8 +43,8 @@ public abstract class AbstractHDLStatement extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLStatement(@Nullable IHDLObject container, boolean validate) {
-		super(container, validate);
+	public AbstractHDLStatement(int id, @Nullable IHDLObject container, boolean validate) {
+		super(id, container, validate);
 	}
 
 	public AbstractHDLStatement() {

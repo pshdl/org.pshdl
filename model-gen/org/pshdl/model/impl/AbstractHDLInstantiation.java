@@ -49,8 +49,8 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInstantiation(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
-		super(container, validate);
+	public AbstractHDLInstantiation(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			var = validateVar(var);
 		}
@@ -245,13 +245,14 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 					switch (pos++) {
 					case 0:
 						if (var != null) {
-							current = var.deepIterator();
+							current = Iterators.concat(Iterators.forArray(var), var.deepIterator());
 						}
 						break;
 					case 1:
 						if ((arguments != null) && (arguments.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(arguments.size());
 							for (HDLArgument o : arguments) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

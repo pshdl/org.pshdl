@@ -51,10 +51,10 @@ public class HDLConcat extends AbstractHDLConcat {
 	 *            the value for cats. Can <b>not</b> be <code>null</code>,
 	 *            additionally the collection must contain at least one element.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLConcat(@Nullable IHDLObject container, @Nonnull Iterable<HDLExpression> cats, boolean validate) {
-		super(container, cats, validate);
+	public HDLConcat(int id, @Nullable IHDLObject container, @Nonnull Iterable<HDLExpression> cats, boolean validate) {
+		super(id, container, cats, validate);
 	}
 
 	public HDLConcat() {

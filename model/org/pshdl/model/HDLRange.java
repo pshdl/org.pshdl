@@ -57,10 +57,10 @@ public class HDLRange extends AbstractHDLRange {
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLRange(@Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
-		super(container, from, to, validate);
+	public HDLRange(int id, @Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
+		super(id, container, from, to, validate);
 	}
 
 	public HDLRange() {

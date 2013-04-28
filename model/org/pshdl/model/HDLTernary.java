@@ -53,10 +53,10 @@ public class HDLTernary extends AbstractHDLTernary {
 	 * @param elseExpr
 	 *            the value for elseExpr. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLTernary(@Nullable IHDLObject container, @Nonnull HDLExpression ifExpr, @Nonnull HDLExpression thenExpr, @Nonnull HDLExpression elseExpr, boolean validate) {
-		super(container, ifExpr, thenExpr, elseExpr, validate);
+	public HDLTernary(int id, @Nullable IHDLObject container, @Nonnull HDLExpression ifExpr, @Nonnull HDLExpression thenExpr, @Nonnull HDLExpression elseExpr, boolean validate) {
+		super(id, container, ifExpr, thenExpr, elseExpr, validate);
 	}
 
 	public HDLTernary() {

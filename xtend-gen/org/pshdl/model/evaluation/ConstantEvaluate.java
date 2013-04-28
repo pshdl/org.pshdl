@@ -33,9 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
-import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
@@ -624,16 +622,6 @@ public class ConstantEvaluate {
       final BigInteger mask = _subtract.shiftRight(_plus_1);
       BigInteger _shiftRight = opened.shiftRight(shiftWidth);
       final BigInteger res = _shiftRight.and(mask);
-      StringConcatenation _builder = new StringConcatenation();
-      _builder.append("Opened: ");
-      _builder.append(opened, "");
-      _builder.append(" Width:");
-      _builder.append(width, "");
-      _builder.append(" Mask:");
-      _builder.append(mask, "");
-      _builder.append(" Res:");
-      _builder.append(res, "");
-      InputOutput.<String>println(_builder.toString());
       _xblockexpression = (res);
     }
     return _xblockexpression;

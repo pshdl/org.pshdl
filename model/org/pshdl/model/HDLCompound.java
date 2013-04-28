@@ -43,10 +43,10 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLCompound(@Nullable IHDLObject container, boolean validate) {
-		super(container, validate);
+	public HDLCompound(int id, @Nullable IHDLObject container, boolean validate) {
+		super(id, container, validate);
 	}
 
 	public HDLCompound() {

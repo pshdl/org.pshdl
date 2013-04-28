@@ -65,11 +65,11 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * @param ifArray
 	 *            the value for ifArray. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLInterfaceRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
+	public HDLInterfaceRef(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			@Nonnull HDLQualifiedName hIf, @Nullable Iterable<HDLExpression> ifArray, boolean validate) {
-		super(container, var, array, bits, hIf, ifArray, validate);
+		super(id, container, var, array, bits, hIf, ifArray, validate);
 	}
 
 	public HDLInterfaceRef() {

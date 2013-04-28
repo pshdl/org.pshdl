@@ -52,10 +52,10 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * @param str
 	 *            the value for str. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLLiteral(@Nullable IHDLObject container, @Nonnull String val, @Nullable Boolean str, boolean validate) {
-		super(container, val, str, validate);
+	public HDLLiteral(int id, @Nullable IHDLObject container, @Nonnull String val, @Nullable Boolean str, boolean validate) {
+		super(id, container, val, str, validate);
 	}
 
 	public HDLLiteral() {

@@ -49,8 +49,8 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLOpExpression(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, boolean validate) {
-		super(container, validate);
+	public AbstractHDLOpExpression(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			left = validateLeft(left);
 		}
@@ -230,12 +230,12 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 					switch (pos++) {
 					case 0:
 						if (left != null) {
-							current = left.deepIterator();
+							current = Iterators.concat(Iterators.forArray(left), left.deepIterator());
 						}
 						break;
 					case 1:
 						if (right != null) {
-							current = right.deepIterator();
+							current = Iterators.concat(Iterators.forArray(right), right.deepIterator());
 						}
 						break;
 					default:

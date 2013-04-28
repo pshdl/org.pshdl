@@ -91,7 +91,8 @@ public class BuiltInAdvisor {
 							+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
-			break;
+			return new HDLAdvise(problem, "The dimensions of assignment do not match", "When an array is assigned to another array, the size of the dimension need to match.",
+					"Check that the right handside of the array has the same dimension(s) as the left handside");
 		case BIT_ACCESS_NOT_POSSIBLE:
 			return new HDLAdvise(problem, "Can not access bits of this type",
 					"Only bits from primitive types with a known with can be access, that is either int<?>,uint<?>,bit<?>.", "cast type to a known width");
@@ -105,11 +106,15 @@ public class BuiltInAdvisor {
 		case CONSTANT_NEED_DEFAULTVALUE:
 			return new HDLAdvise(problem, "Constants need to have a value", "A constant without value is pretty pointless", "Assign a default value to the constant");
 		case EQUALITY_ALWAYS_FALSE:
-			break;
+			return new HDLAdvise(problem, "This equality is always false.", "This behaviour might be desired, but it might also indicate a programming error.");
 		case EQUALITY_ALWAYS_TRUE:
-			break;
+			return new HDLAdvise(problem, "This equality is always true.", "This behaviour might be desired, but it might also indicate a programming error.");
 		case FOR_LOOP_RANGE_NOT_CONSTANT:
-			break;
+			return new HDLAdvise(
+					problem,
+					"The range of this for loop can not be statically determined",
+					"A for loop need to have known boundaries. Those boundaries can be derived from parameters or constants. Variables however are not allowed as their value is not known statically.",
+					"Instead of using variables, use parameter and constants");
 		case GENERATOR_ERROR:
 			return new HDLAdvise(problem, "The generator contains an error", problem.info, "Read the documentation for the specific generator");
 		case GENERATOR_WARNING:
@@ -187,23 +192,32 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "Only one variable is allowed to be annotated with the @reset annotation",
 					"Declaring multiple variables as @reset does not make much sense as it is unclear which one should be used as subsitute for $rst",
 					"Remove one @reset annotation");
-		case OUT_PORT_NEVER_WRITTEN:
+		case OUT_PORT_NEVER_WRITTEN: {
 			HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The variable:" + var.getName() + " is read, but never written",
 					"Only reading an internal variable does not make much sense as it needs to be written as well", "Write to it", "Remove it");
-
-		case PARAMETER_OR_CONSTANT_NEVER_READ:
-			break;
-		case UNRESOLVED_ENUM:
-			break;
+		}
+		case PARAMETER_OR_CONSTANT_NEVER_READ: {
+			HDLVariable var = (HDLVariable) problem.node;
+			return new HDLAdvise(problem, "The constant:" + var.getName() + " is never read", "Declaring constants and not reading them is not very useful.", "Use it", "Remove it");
+		}
+		case UNRESOLVED_ENUM: {
+			return new HDLAdvise(problem, "The enum:" + problem.node + " can not be resolved",
+					"Either the referenced enum does not declare an enum with that name, or the referenced enum could not be found.", "Check that the name is correct",
+					"Check that the type is imported or fully referenced");
+		}
 		case UNRESOLVED_INTERFACE:
-			break;
+			return new HDLAdvise(problem, "The interface:" + problem.node + " can not be resolved", "An interface with that name can not be found",
+					"Check that the name is correct", "Check that the type is imported or fully referenced");
 		case UNRESOLVED_REFERENCE:
-			break;
+			return new HDLAdvise(problem, "The reference:" + problem.node + " can not be resolved", "A type/function/variable with that name can not be found",
+					"Check that the name is correct", "Check that the type is imported or fully referenced");
 		case UNRESOLVED_TYPE:
-			break;
+			return new HDLAdvise(problem, "The type:" + problem.node + " can not be resolved", "A type with that name can not be found", "Check that the name is correct",
+					"Check that the type is imported or fully referenced");
 		case UNRESOLVED_VARIABLE:
-			break;
+			return new HDLAdvise(problem, "The variable:" + problem.node + " can not be resolved", "A variable with that name can not be found", "Check that the name is correct",
+					"If it is a global constant, check that it is either imported, or fully qualified");
 		case UNRESOLVED_FRAGMENT: {
 			HDLUnresolvedFragment uf = (HDLUnresolvedFragment) problem.node;
 			Set<String> funcIDs = HDLCore.getCompilerInformation().registeredFunctions.keySet();
@@ -215,7 +229,8 @@ public class BuiltInAdvisor {
 					"If you want to reference a variable check that the spelling is correct and that the variable is visible in this scope", functionProposal);
 		}
 		case UNRESOLVED_FUNCTION:
-			break;
+			return new HDLAdvise(problem, "The function:" + problem.node + " can not be resolved", "A function with that name can not be found", "Check that the name is correct",
+					"Check that the function is imported or fully referenced");
 		case UNSUPPORTED_TYPE_FOR_OP:
 			switch (problem.node.getClassType()) {
 			case HDLArithOp:
@@ -223,7 +238,7 @@ public class BuiltInAdvisor {
 						"Cast either side to uint<?>/int<?>");
 			case HDLShiftOp:
 				return new HDLAdvise(problem, problem.info, "Shift operations require an interpretable value on the right hand side, they can not work on bit types",
-						"Cast the right hand-side to uint<?>/int<?>");
+						"Cast the right hand-side to uint");
 			case HDLEqualityOp:
 				return new HDLAdvise(problem, problem.info,
 						"Equality operations require an interpretable value when a greater/less than compare is used, they can not work on bit types",
@@ -302,8 +317,22 @@ public class BuiltInAdvisor {
 		case RANGE_NOT_UP:
 			break;
 		case RANGE_OVERLAP:
-			break;
+			return new HDLAdvise(
+					problem,
+					"The boundaries of the range expression can possibly overlap",
+					"The compiler can not guarantee that for all combinations of inputs for the range results in an appropriate direction. This may cause a compilation error when the module is instantiated with different parameters",
+					"Annotate the variable with @range to guarantee a certain input range");
 		case UNKNOWN_RANGE:
+			break;
+		case FUNCTION_SAME_NAME:
+			break;
+		case GLOBAL_NOT_CONSTANT:
+			break;
+		case GLOBAL_VAR_SAME_NAME:
+			break;
+		case SUBSTITUTE_FUNCTION_NO_TYPE:
+			break;
+		case TYPE_SAME_NAME:
 			break;
 		}
 		return null;

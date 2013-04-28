@@ -47,8 +47,8 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
-		super(container, validate);
+	public AbstractHDLDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			annotations = validateAnnotations(annotations);
 		}
@@ -202,6 +202,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 						if ((annotations != null) && (annotations.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
 							for (HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

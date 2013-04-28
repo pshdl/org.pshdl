@@ -167,4 +167,8 @@ public interface IHDLObject {
 
 	public EnumSet<HDLClass> getClassSet();
 
+	public int getID();
+
+	public void setID(int id);
+
 }

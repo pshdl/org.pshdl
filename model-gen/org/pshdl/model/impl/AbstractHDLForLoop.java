@@ -53,8 +53,9 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLForLoop(@Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nonnull Iterable<HDLStatement> dos, boolean validate) {
-		super(container, validate);
+	public AbstractHDLForLoop(int id, @Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nonnull Iterable<HDLStatement> dos,
+			boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			range = validateRange(range);
 		}
@@ -158,7 +159,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	@Override
 	@Nonnull
 	public HDLForLoop copy() {
-		HDLForLoop newObject = new HDLForLoop(null, range, param, dos, false);
+		HDLForLoop newObject = new HDLForLoop(id, null, range, param, dos, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -174,7 +175,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		ArrayList<HDLRange> filteredrange = filter.copyContainer("range", this, range);
 		HDLVariable filteredparam = filter.copyObject("param", this, param);
 		ArrayList<HDLStatement> filtereddos = filter.copyContainer("dos", this, dos);
-		return filter.postFilter((HDLForLoop) this, new HDLForLoop(null, filteredrange, filteredparam, filtereddos, false));
+		return filter.postFilter((HDLForLoop) this, new HDLForLoop(id, null, filteredrange, filteredparam, filtereddos, false));
 	}
 
 	/**
@@ -218,7 +219,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	@Nonnull
 	public HDLForLoop setRange(@Nonnull Iterable<HDLRange> range) {
 		range = validateRange(range);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -237,7 +238,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 			throw new IllegalArgumentException("Element of range can not be null!");
 		ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
 		range.add(newRange);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -256,7 +257,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 			throw new IllegalArgumentException("Removed element of range can not be null!");
 		ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
 		range.remove(newRange);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -273,7 +274,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	public HDLForLoop removeRange(int idx) {
 		ArrayList<HDLRange> range = (ArrayList<HDLRange>) this.range.clone();
 		range.remove(idx);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -289,7 +290,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	@Nonnull
 	public HDLForLoop setParam(@Nonnull HDLVariable param) {
 		param = validateParam(param);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -305,7 +306,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	@Nonnull
 	public HDLForLoop setDos(@Nonnull Iterable<HDLStatement> dos) {
 		dos = validateDos(dos);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -322,7 +323,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 			throw new IllegalArgumentException("Element of dos can not be null!");
 		ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.add(newDos);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -340,7 +341,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 			throw new IllegalArgumentException("Removed element of dos can not be null!");
 		ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.remove(newDos);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -356,7 +357,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	public HDLForLoop removeDos(int idx) {
 		ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
 		dos.remove(idx);
-		HDLForLoop res = new HDLForLoop(container, range, param, dos, false);
+		HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
 	}
 
@@ -477,6 +478,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 						if ((range != null) && (range.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(range.size());
 							for (HDLRange o : range) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -484,13 +486,14 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 						break;
 					case 1:
 						if (param != null) {
-							current = param.deepIterator();
+							current = Iterators.concat(Iterators.forArray(param), param.deepIterator());
 						}
 						break;
 					case 2:
 						if ((dos != null) && (dos.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dos.size());
 							for (HDLStatement o : dos) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

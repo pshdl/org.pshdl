@@ -49,8 +49,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLRange(@Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
-		super(container, validate);
+	public AbstractHDLRange(int id, @Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			from = validateFrom(from);
 		}
@@ -117,7 +117,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRange copy() {
-		HDLRange newObject = new HDLRange(null, from, to, false);
+		HDLRange newObject = new HDLRange(id, null, from, to, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -132,7 +132,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	public HDLRange copyFiltered(CopyFilter filter) {
 		HDLExpression filteredfrom = filter.copyObject("from", this, from);
 		HDLExpression filteredto = filter.copyObject("to", this, to);
-		return filter.postFilter((HDLRange) this, new HDLRange(null, filteredfrom, filteredto, false));
+		return filter.postFilter((HDLRange) this, new HDLRange(id, null, filteredfrom, filteredto, false));
 	}
 
 	/**
@@ -173,7 +173,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange setFrom(@Nullable HDLExpression from) {
 		from = validateFrom(from);
-		HDLRange res = new HDLRange(container, from, to, false);
+		HDLRange res = new HDLRange(id, container, from, to, false);
 		return res;
 	}
 
@@ -188,7 +188,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange setTo(@Nonnull HDLExpression to) {
 		to = validateTo(to);
-		HDLRange res = new HDLRange(container, from, to, false);
+		HDLRange res = new HDLRange(id, container, from, to, false);
 		return res;
 	}
 
@@ -278,12 +278,12 @@ public abstract class AbstractHDLRange extends HDLObject {
 					switch (pos++) {
 					case 0:
 						if (from != null) {
-							current = from.deepIterator();
+							current = Iterators.concat(Iterators.forArray(from), from.deepIterator());
 						}
 						break;
 					case 1:
 						if (to != null) {
-							current = to.deepIterator();
+							current = Iterators.concat(Iterators.forArray(to), to.deepIterator());
 						}
 						break;
 					default:

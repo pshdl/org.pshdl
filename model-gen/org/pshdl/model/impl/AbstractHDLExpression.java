@@ -43,8 +43,8 @@ public abstract class AbstractHDLExpression extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLExpression(@Nullable IHDLObject container, boolean validate) {
-		super(container, validate);
+	public AbstractHDLExpression(int id, @Nullable IHDLObject container, boolean validate) {
+		super(id, container, validate);
 	}
 
 	public AbstractHDLExpression() {

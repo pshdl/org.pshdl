@@ -49,8 +49,8 @@ public abstract class AbstractHDLValueType extends HDLType {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLValueType(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
-		super(container, name, dim, validate);
+	public AbstractHDLValueType(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
+		super(id, container, name, dim, validate);
 	}
 
 	public AbstractHDLValueType() {
@@ -158,6 +158,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 						if ((dim != null) && (dim.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
 							for (HDLExpression o : dim) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

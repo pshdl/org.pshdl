@@ -53,9 +53,9 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLFunction(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name, @Nullable Iterable<HDLFunctionParameter> args,
-			@Nullable HDLFunctionParameter returnType, boolean validate) {
-		super(container, annotations, validate);
+	public AbstractHDLFunction(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull String name,
+			@Nullable Iterable<HDLFunctionParameter> args, @Nullable HDLFunctionParameter returnType, boolean validate) {
+		super(id, container, annotations, validate);
 		if (validate) {
 			name = validateName(name);
 		}
@@ -295,6 +295,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 						if ((annotations != null) && (annotations.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
 							for (HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -304,6 +305,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 						if ((args != null) && (args.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
 							for (HDLFunctionParameter o : args) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -311,7 +313,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 						break;
 					case 2:
 						if (returnType != null) {
-							current = returnType.deepIterator();
+							current = Iterators.concat(Iterators.forArray(returnType), returnType.deepIterator());
 						}
 						break;
 					default:

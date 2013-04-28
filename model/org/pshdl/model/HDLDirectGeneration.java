@@ -65,11 +65,11 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param include
 	 *            the value for include. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLDirectGeneration(@Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf,
+	public HDLDirectGeneration(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf,
 			@Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include, boolean validate) {
-		super(container, var, arguments, hIf, generatorID, generatorContent, include, validate);
+		super(id, container, var, arguments, hIf, generatorID, generatorContent, include, validate);
 	}
 
 	public HDLDirectGeneration() {

@@ -58,11 +58,11 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * @param bits
 	 *            the value for bits. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLVariableRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
+	public HDLVariableRef(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
 			boolean validate) {
-		super(container, var, array, bits, validate);
+		super(id, container, var, array, bits, validate);
 	}
 
 	public HDLVariableRef() {

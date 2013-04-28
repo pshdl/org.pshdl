@@ -53,8 +53,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLFunctionCall(@Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable Iterable<HDLExpression> params, boolean validate) {
-		super(container, validate);
+	public AbstractHDLFunctionCall(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable Iterable<HDLExpression> params, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			name = validateName(name);
 		}
@@ -121,7 +121,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Override
 	@Nonnull
 	public HDLFunctionCall copy() {
-		HDLFunctionCall newObject = new HDLFunctionCall(null, name, params, false);
+		HDLFunctionCall newObject = new HDLFunctionCall(id, null, name, params, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -136,7 +136,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	public HDLFunctionCall copyFiltered(CopyFilter filter) {
 		HDLQualifiedName filteredname = filter.copyObject("name", this, name);
 		ArrayList<HDLExpression> filteredparams = filter.copyContainer("params", this, params);
-		return filter.postFilter((HDLFunctionCall) this, new HDLFunctionCall(null, filteredname, filteredparams, false));
+		return filter.postFilter((HDLFunctionCall) this, new HDLFunctionCall(id, null, filteredname, filteredparams, false));
 	}
 
 	/**
@@ -179,7 +179,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Nonnull
 	public HDLFunctionCall setName(@Nonnull HDLQualifiedName name) {
 		name = validateName(name);
-		HDLFunctionCall res = new HDLFunctionCall(container, name, params, false);
+		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -194,7 +194,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Nonnull
 	public HDLFunctionCall setParams(@Nullable Iterable<HDLExpression> params) {
 		params = validateParams(params);
-		HDLFunctionCall res = new HDLFunctionCall(container, name, params, false);
+		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -213,7 +213,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 			throw new IllegalArgumentException("Element of params can not be null!");
 		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.add(newParams);
-		HDLFunctionCall res = new HDLFunctionCall(container, name, params, false);
+		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -232,7 +232,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 			throw new IllegalArgumentException("Removed element of params can not be null!");
 		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(newParams);
-		HDLFunctionCall res = new HDLFunctionCall(container, name, params, false);
+		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -249,7 +249,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	public HDLFunctionCall removeParams(int idx) {
 		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(idx);
-		HDLFunctionCall res = new HDLFunctionCall(container, name, params, false);
+		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -349,6 +349,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 						if ((params != null) && (params.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(params.size());
 							for (HDLExpression o : params) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

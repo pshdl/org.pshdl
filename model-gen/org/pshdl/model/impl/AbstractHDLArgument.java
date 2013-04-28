@@ -49,8 +49,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLArgument(@Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLExpression expression, boolean validate) {
-		super(container, validate);
+	public AbstractHDLArgument(int id, @Nullable IHDLObject container, @Nonnull String name, @Nonnull HDLExpression expression, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			name = validateName(name);
 		}
@@ -115,7 +115,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLArgument copy() {
-		HDLArgument newObject = new HDLArgument(null, name, expression, false);
+		HDLArgument newObject = new HDLArgument(id, null, name, expression, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -130,7 +130,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	public HDLArgument copyFiltered(CopyFilter filter) {
 		String filteredname = filter.copyObject("name", this, name);
 		HDLExpression filteredexpression = filter.copyObject("expression", this, expression);
-		return filter.postFilter((HDLArgument) this, new HDLArgument(null, filteredname, filteredexpression, false));
+		return filter.postFilter((HDLArgument) this, new HDLArgument(id, null, filteredname, filteredexpression, false));
 	}
 
 	/**
@@ -173,7 +173,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Nonnull
 	public HDLArgument setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLArgument res = new HDLArgument(container, name, expression, false);
+		HDLArgument res = new HDLArgument(id, container, name, expression, false);
 		return res;
 	}
 
@@ -189,7 +189,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Nonnull
 	public HDLArgument setExpression(@Nonnull HDLExpression expression) {
 		expression = validateExpression(expression);
-		HDLArgument res = new HDLArgument(container, name, expression, false);
+		HDLArgument res = new HDLArgument(id, container, name, expression, false);
 		return res;
 	}
 
@@ -276,7 +276,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 					switch (pos++) {
 					case 0:
 						if (expression != null) {
-							current = expression.deepIterator();
+							current = Iterators.concat(Iterators.forArray(expression), expression.deepIterator());
 						}
 						break;
 					default:

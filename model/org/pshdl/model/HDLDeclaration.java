@@ -49,10 +49,10 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	 * @param annotations
 	 *            the value for annotations. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
-		super(container, annotations, validate);
+	public HDLDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, boolean validate) {
+		super(id, container, annotations, validate);
 	}
 
 	public HDLDeclaration() {

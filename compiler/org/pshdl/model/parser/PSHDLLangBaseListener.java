@@ -24,7 +24,6 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from PSHDLLang.g4 by ANTLR 4.0
 package org.pshdl.model.parser;
 
 import org.antlr.v4.runtime.*;

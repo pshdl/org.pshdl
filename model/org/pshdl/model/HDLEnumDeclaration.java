@@ -50,10 +50,10 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	 * @param hEnum
 	 *            the value for hEnum. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLEnumDeclaration(@Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLEnum hEnum, boolean validate) {
-		super(container, annotations, hEnum, validate);
+	public HDLEnumDeclaration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLEnum hEnum, boolean validate) {
+		super(id, container, annotations, hEnum, validate);
 	}
 
 	public HDLEnumDeclaration() {

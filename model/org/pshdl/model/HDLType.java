@@ -53,10 +53,10 @@ public abstract class HDLType extends AbstractHDLType {
 	 * @param dim
 	 *            the value for dim. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLType(@Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
-		super(container, name, dim, validate);
+	public HDLType(int id, @Nullable IHDLObject container, @Nonnull String name, @Nullable Iterable<HDLExpression> dim, boolean validate) {
+		super(id, container, name, dim, validate);
 	}
 
 	public HDLType() {

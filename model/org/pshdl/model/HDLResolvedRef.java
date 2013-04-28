@@ -48,10 +48,10 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLResolvedRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, boolean validate) {
-		super(container, var, validate);
+	public HDLResolvedRef(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName var, boolean validate) {
+		super(id, container, var, validate);
 	}
 
 	public HDLResolvedRef() {

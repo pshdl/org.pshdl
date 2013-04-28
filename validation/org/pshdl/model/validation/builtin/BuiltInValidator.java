@@ -28,6 +28,7 @@ package org.pshdl.model.validation.builtin;
 
 import static org.pshdl.model.extensions.FullNameExtension.*;
 import static org.pshdl.model.utils.HDLQuery.*;
+import static org.pshdl.model.validation.builtin.ErrorCode.*;
 
 import java.math.*;
 import java.util.*;
@@ -99,6 +100,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkGenerators(pkg, problems, hContext);
 			checkConstantPackageDeclarations(pkg, problems, hContext);
 			checkLiteralConcat(pkg, problems);
+			checkDuplicateType(pkg, problems);
 			// TODO Validate bitWidth mismatch
 			checkAssignments(pkg, problems, hContext);
 			// TODO Multi-bit Write only for Constants
@@ -126,6 +128,52 @@ public class BuiltInValidator implements IHDLValidator {
 		return true;
 	}
 
+	private void checkDuplicateType(HDLPackage pkg, Set<Problem> problems) {
+		checkType(problems, pkg.getAllObjectsOf(HDLUnit.class, true));
+		checkType(problems, pkg.getAllObjectsOf(HDLInterface.class, true));
+		checkType(problems, pkg.getAllObjectsOf(HDLEnum.class, true));
+		for (HDLObject hif : pkg.getAllObjectsOf(HDLFunction.class, true)) {
+			HDLQualifiedName fqn = fullNameOf(hif);
+			HDLLibrary library = hif.getLibrary();
+			Optional<HDLFunction> resolve = library.resolveFunction(Collections.<String> emptyList(), fqn);
+			if (resolve.isPresent()) {
+				HDLFunction type = resolve.get();
+				if (type.getID() != hif.getID()) {
+					problems.add(new Problem(FUNCTION_SAME_NAME, hif, type));
+				}
+			}
+		}
+		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
+		for (HDLVariableDeclaration hvd : hvds) {
+			for (HDLVariable hif : hvd.getVariables()) {
+
+				HDLQualifiedName fqn = fullNameOf(hif);
+				HDLLibrary library = hif.getLibrary();
+				Optional<HDLVariable> resolve = library.resolveVariable(Collections.<String> emptyList(), fqn);
+				if (resolve.isPresent()) {
+					HDLVariable type = resolve.get();
+					if (type.getID() != hif.getID()) {
+						problems.add(new Problem(GLOBAL_VAR_SAME_NAME, hif, hif));
+					}
+				}
+			}
+		}
+	}
+
+	public void checkType(Set<Problem> problems, HDLObject[] ifs) {
+		for (HDLObject hif : ifs) {
+			HDLQualifiedName fqn = fullNameOf(hif);
+			HDLLibrary library = hif.getLibrary();
+			Optional<? extends HDLType> resolve = library.resolve(Collections.<String> emptyList(), fqn);
+			if (resolve.isPresent()) {
+				HDLType type = resolve.get();
+				if (type.getID() != hif.getID()) {
+					problems.add(new Problem(TYPE_SAME_NAME, hif, type));
+				}
+			}
+		}
+	}
+
 	/**
 	 * Check that constants declared on the global scope are indeed constant and
 	 * not registers
@@ -135,18 +183,18 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
 		for (HDLVariableDeclaration hvd : hvds) {
 			if (hvd.getRegister() != null) {
-				problems.add(new Problem(ErrorCode.GLOBAL_CANT_REGISTER, hvd));
+				problems.add(new Problem(GLOBAL_CANT_REGISTER, hvd));
 			}
 			if (hvd.getDirection() != HDLDirection.CONSTANT) {
-				problems.add(new Problem(ErrorCode.GLOBAL_NOT_CONSTANT, hvd));
+				problems.add(new Problem(GLOBAL_NOT_CONSTANT, hvd));
 			}
 			for (HDLVariable var : hvd.getVariables()) {
 				if (var.getDefaultValue() == null) {
-					problems.add(new Problem(ErrorCode.GLOBAL_NOT_CONSTANT, var));
+					problems.add(new Problem(GLOBAL_NOT_CONSTANT, var));
 				} else {
 					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(var.getDefaultValue());
 					if (!valueOf.isPresent()) {
-						problems.add(new Problem(ErrorCode.GLOBAL_NOT_CONSTANT, var));
+						problems.add(new Problem(GLOBAL_NOT_CONSTANT, var));
 					}
 				}
 			}
@@ -163,10 +211,10 @@ public class BuiltInValidator implements IHDLValidator {
 				switch (hvd.getDirection()) {
 				case CONSTANT:
 				case PARAMETER:
-					problems.add(new Problem(ErrorCode.CONSTANT_PORT_CANT_REGISTER, hvd));
+					problems.add(new Problem(CONSTANT_PORT_CANT_REGISTER, hvd));
 					break;
 				case IN:
-					problems.add(new Problem(ErrorCode.IN_PORT_CANT_REGISTER, hvd));
+					problems.add(new Problem(IN_PORT_CANT_REGISTER, hvd));
 					break;
 				default:
 				}
@@ -192,25 +240,25 @@ public class BuiltInValidator implements IHDLValidator {
 			// For loop ranges are up to
 			Optional<Range<BigInteger>> fromRangeOf = RangeExtension.rangeOf(from, context);
 			if (!fromRangeOf.isPresent()) {
-				problems.add(new Problem(ErrorCode.UNKNOWN_RANGE, from));
+				problems.add(new Problem(UNKNOWN_RANGE, from));
 				continue;
 			}
 			HDLExpression to = hdlRange.getTo();
 			Optional<Range<BigInteger>> toRangeOf = RangeExtension.rangeOf(to, context);
 			if (!toRangeOf.isPresent()) {
-				problems.add(new Problem(ErrorCode.UNKNOWN_RANGE, to));
+				problems.add(new Problem(UNKNOWN_RANGE, to));
 				continue;
 			}
 			if (fromRangeOf.get().isConnected(toRangeOf.get())) {
-				problems.add(new Problem(ErrorCode.RANGE_OVERLAP, hdlRange));
+				problems.add(new Problem(RANGE_OVERLAP, hdlRange));
 				continue;
 			}
 			if (hdlRange.getContainer() instanceof HDLForLoop) {
 				if (fromRangeOf.get().upperEndpoint().compareTo(toRangeOf.get().lowerEndpoint()) > 0) {
-					problems.add(new Problem(ErrorCode.RANGE_NOT_UP, hdlRange));
+					problems.add(new Problem(RANGE_NOT_UP, hdlRange));
 				}
 			} else if (toRangeOf.get().lowerEndpoint().compareTo(fromRangeOf.get().upperEndpoint()) > 0) {
-				problems.add(new Problem(ErrorCode.RANGE_NOT_DOWN, hdlRange));
+				problems.add(new Problem(RANGE_NOT_DOWN, hdlRange));
 			}
 		}
 	}
@@ -228,7 +276,7 @@ public class BuiltInValidator implements IHDLValidator {
 					if (!varType.isPresent()) {
 						// Don't know type, do nothing then..
 					} else if (!(varType.get() instanceof HDLPrimitive)) {
-						problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType.get()));
+						problems.add(new Problem(BIT_ACCESS_NOT_POSSIBLE_ON_TYPE, ref, varType.get()));
 					} else {
 						HDLPrimitive primitive = (HDLPrimitive) varType.get();
 						switch (primitive.getType()) {
@@ -237,7 +285,7 @@ public class BuiltInValidator implements IHDLValidator {
 						case UINT:
 							break;
 						default:
-							problems.add(new Problem(ErrorCode.BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
+							problems.add(new Problem(BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
 						}
 					}
 				}
@@ -255,26 +303,26 @@ public class BuiltInValidator implements IHDLValidator {
 					continue;
 				}
 			}
-			problems.add(new Problem(ErrorCode.UNRESOLVED_FRAGMENT, fragment));
+			problems.add(new Problem(UNRESOLVED_FRAGMENT, fragment));
 		}
 		HDLResolvedRef[] refs = pkg.getAllObjectsOf(HDLResolvedRef.class, true);
 		for (HDLResolvedRef ref : refs) {
 			Optional<HDLVariable> resolveVar = ref.resolveVar();
 			if (!resolveVar.isPresent()) {
-				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, ref));
+				problems.add(new Problem(UNRESOLVED_VARIABLE, ref));
 			}
 			if (ref instanceof HDLEnumRef) {
 				HDLEnumRef enumRef = (HDLEnumRef) ref;
 				Optional<HDLEnum> resolveHEnum = enumRef.resolveHEnum();
 				if (!resolveHEnum.isPresent()) {
-					problems.add(new Problem(ErrorCode.UNRESOLVED_ENUM, ref));
+					problems.add(new Problem(UNRESOLVED_ENUM, ref));
 				}
 			}
 			if (ref instanceof HDLInterfaceRef) {
 				HDLInterfaceRef hir = (HDLInterfaceRef) ref;
 				Optional<HDLVariable> hIf = hir.resolveHIf();
 				if (!hIf.isPresent()) {
-					problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, ref));
+					problems.add(new Problem(UNRESOLVED_VARIABLE, ref));
 				}
 			}
 		}
@@ -282,30 +330,30 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLFunctionCall call : functionCalls) {
 			Optional<HDLFunction> function = call.resolveName();
 			if (!function.isPresent()) {
-				problems.add(new Problem(ErrorCode.UNRESOLVED_FUNCTION, call));
+				problems.add(new Problem(UNRESOLVED_FUNCTION, call));
 			}
 		}
 		HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (HDLVariableDeclaration hvd : hvds) {
 			Optional<? extends HDLType> type = hvd.resolveType();
 			if (!type.isPresent()) {
-				problems.add(new Problem(ErrorCode.UNRESOLVED_TYPE, hvd));
+				problems.add(new Problem(UNRESOLVED_TYPE, hvd));
 			}
 		}
 		HDLInterfaceInstantiation[] hiis = pkg.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (HDLInterfaceInstantiation hii : hiis) {
 			Optional<HDLInterface> type = hii.resolveHIf();
 			if (!type.isPresent()) {
-				problems.add(new Problem(ErrorCode.UNRESOLVED_INTERFACE, hii));
+				problems.add(new Problem(UNRESOLVED_INTERFACE, hii));
 			}
 		}
 		HDLRegisterConfig[] regs = pkg.getAllObjectsOf(HDLRegisterConfig.class, true);
 		for (HDLRegisterConfig reg : regs) {
 			if (reg.resolveClk() == null) {
-				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, reg));
+				problems.add(new Problem(UNRESOLVED_VARIABLE, reg));
 			}
 			if (reg.resolveRst() == null) {
-				problems.add(new Problem(ErrorCode.UNRESOLVED_VARIABLE, reg));
+				problems.add(new Problem(UNRESOLVED_VARIABLE, reg));
 			}
 		}
 	}
@@ -335,12 +383,12 @@ public class BuiltInValidator implements IHDLValidator {
 		switch (lType.get().getClassType()) {
 		case HDLEnum:
 			if (rType.get().getClassType() != HDLClass.HDLEnum) {
-				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_ENUM, obj));
+				problems.add(new Problem(ASSIGNMENT_NOT_ENUM, obj));
 			}
 			break;
 		case HDLPrimitive:
 			if (rType.get().getClassType() != HDLClass.HDLPrimitive) {
-				problems.add(new Problem(ErrorCode.ASSIGNMENT_NOT_PRIMITIVE, obj));
+				problems.add(new Problem(ASSIGNMENT_NOT_PRIMITIVE, obj));
 			} else {
 				HDLPrimitive left = (HDLPrimitive) lType.get();
 				HDLPrimitive right = (HDLPrimitive) rType.get();
@@ -350,7 +398,7 @@ public class BuiltInValidator implements IHDLValidator {
 						if (right.getWidth() != null) {
 							Optional<BigInteger> w = ConstantEvaluate.valueOf(right.getWidth(), context);
 							if (w.isPresent() && !w.get().equals(BigInteger.ONE)) {
-								problems.add(new Problem(ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
+								problems.add(new Problem(ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
 							}
 						}
 					break;
@@ -376,7 +424,7 @@ public class BuiltInValidator implements IHDLValidator {
 			break;
 		case HDLInterface:
 		default:
-			problems.add(new Problem(ErrorCode.ASSIGNEMENT_NOT_SUPPORTED, obj));
+			problems.add(new Problem(ASSIGNEMENT_NOT_SUPPORTED, obj));
 		}
 	}
 
@@ -399,11 +447,11 @@ public class BuiltInValidator implements IHDLValidator {
 						case INTEGER:
 						case NATURAL:
 						case STRING:
-							problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, prim));
+							problems.add(new Problem(CONCAT_TYPE_NOT_ALLOWED, exp, prim));
 							break;
 						}
 					} else {
-						problems.add(new Problem(ErrorCode.CONCAT_TYPE_NOT_ALLOWED, exp, type.get()));
+						problems.add(new Problem(CONCAT_TYPE_NOT_ALLOWED, exp, type.get()));
 					}
 			}
 		}
@@ -423,7 +471,7 @@ public class BuiltInValidator implements IHDLValidator {
 			if (type.get() instanceof HDLPrimitive) {
 				HDLPrimitive primitive = (HDLPrimitive) type.get();
 				if (primitive.getWidth() == null) {
-					problems.add(new Problem(ErrorCode.SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
+					problems.add(new Problem(SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
 				}
 			}
 			boolean isEnum = type.get() instanceof HDLEnum;
@@ -431,28 +479,28 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLExpression label = caseStatement.getLabel();
 				if (label == null) {
 					if (defaultFound) {
-						problems.add(new Problem(ErrorCode.SWITCH_MULTIPLE_DEFAULT, caseStatement));
+						problems.add(new Problem(SWITCH_MULTIPLE_DEFAULT, caseStatement));
 					}
 					defaultFound = true;
 				} else if (!isEnum) {
 					Optional<BigInteger> constant = ConstantEvaluate.valueOf(label, null);
 					if (!constant.isPresent()) {
-						problems.add(new Problem(ErrorCode.SWITCH_LABEL_NOT_CONSTANT, caseStatement));
+						problems.add(new Problem(SWITCH_LABEL_NOT_CONSTANT, caseStatement));
 					} else if (!values.add(constant.get())) {
-						problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
+						problems.add(new Problem(SWITCH_LABEL_DUPLICATE, caseStatement));
 					}
 				} else {
 					Optional<? extends HDLType> labelType = TypeExtension.typeOf(label);
 					if (labelType.isPresent() && !type.get().equals(labelType.get())) {
-						problems.add(new Problem(ErrorCode.SWITCH_LABEL_WRONG_ENUM, caseStatement));
+						problems.add(new Problem(SWITCH_LABEL_WRONG_ENUM, caseStatement));
 					}
 					if ((label instanceof HDLEnumRef) && !enums.add(((HDLEnumRef) label).getVarRefName())) {
-						problems.add(new Problem(ErrorCode.SWITCH_LABEL_DUPLICATE, caseStatement));
+						problems.add(new Problem(SWITCH_LABEL_DUPLICATE, caseStatement));
 					}
 				}
 			}
 			if (!defaultFound) {
-				problems.add(new Problem(ErrorCode.SWITCH_NO_DEFAULT, switchStatement));
+				problems.add(new Problem(SWITCH_NO_DEFAULT, switchStatement));
 			}
 		}
 	}
@@ -463,15 +511,15 @@ public class BuiltInValidator implements IHDLValidator {
 		for (HDLVariable hdlVariable : vars) {
 			HDLQualifiedName fullName = fullNameOf(hdlVariable);
 			if (keywordSet.contains(fullName.getLastSegment())) {
-				problems.add(new Problem(ErrorCode.VARIABLE_KEYWORD_NAME, hdlVariable));
+				problems.add(new Problem(VARIABLE_KEYWORD_NAME, hdlVariable));
 			}
 			HDLVariable put = nameMap.put(fullName.toString().toLowerCase(), hdlVariable);
 			if (put != null) {
 				HDLQualifiedName otherName = fullNameOf(put);
 				if (otherName.equals(fullName)) {
-					problems.add(new Problem(ErrorCode.VARIABLE_SAME_NAME, hdlVariable, put));
+					problems.add(new Problem(VARIABLE_SAME_NAME, hdlVariable, put));
 				} else {
-					problems.add(new Problem(ErrorCode.VARIABLE_SAME_NAME_DIFFERENT_CASE, hdlVariable, put));
+					problems.add(new Problem(VARIABLE_SAME_NAME_DIFFERENT_CASE, hdlVariable, put));
 				}
 			}
 		}
@@ -488,9 +536,9 @@ public class BuiltInValidator implements IHDLValidator {
 				if (otherVar != null) {
 					HDLQualifiedName otherName = fullNameOf(otherVar);
 					if (otherName.equals(newName)) {
-						problems.add(new Problem(ErrorCode.VARIABLE_SCOPE_SAME_NAME, var, otherVar));
+						problems.add(new Problem(VARIABLE_SCOPE_SAME_NAME, var, otherVar));
 					} else {
-						problems.add(new Problem(ErrorCode.VARIABLE_SCOPE_SAME_NAME_DIFFERENT_CASE, var, otherVar));
+						problems.add(new Problem(VARIABLE_SCOPE_SAME_NAME_DIFFERENT_CASE, var, otherVar));
 					}
 				}
 			}
@@ -517,13 +565,13 @@ public class BuiltInValidator implements IHDLValidator {
 			if (info == null) {
 				Optional<HDLFunction> f = function.resolveName();
 				if (!f.isPresent()) {
-					problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+					problems.add(new Problem(NO_SUCH_FUNCTION, function));
 				} else {
 					HDLFunction hdlFunction = f.get();
 					if (hdlFunction instanceof HDLSubstituteFunction) {
 						HDLSubstituteFunction sub = (HDLSubstituteFunction) hdlFunction;
 						if (sub.getArgs().size() != function.getParams().size()) {
-							problems.add(new Problem(ErrorCode.NO_SUCH_FUNCTION, function));
+							problems.add(new Problem(NO_SUCH_FUNCTION, function));
 						}
 					}
 				}
@@ -535,7 +583,7 @@ public class BuiltInValidator implements IHDLValidator {
 		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable var : vars)
 			if (var.hasMeta(RWValidation.BLOCK_META_CLASH)) {
-				problems.add(new Problem(ErrorCode.MULTI_PROCESS_WRITE, var));
+				problems.add(new Problem(MULTI_PROCESS_WRITE, var));
 			}
 	}
 
@@ -565,7 +613,7 @@ public class BuiltInValidator implements IHDLValidator {
 			if (info == null)
 				throw new IllegalArgumentException("Info should not be null");
 			if (info.error != null) {
-				problems.add(new Problem(ErrorCode.UNSUPPORTED_TYPE_FOR_OP, ope, info.error));
+				problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, ope, info.error));
 			}
 		}
 	}
@@ -594,7 +642,7 @@ public class BuiltInValidator implements IHDLValidator {
 					// are that the dev is trying something legal
 					continue;
 				}
-				problems.add(new Problem(ErrorCode.COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
+				problems.add(new Problem(COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
 			}
 		}
 	}
@@ -608,9 +656,9 @@ public class BuiltInValidator implements IHDLValidator {
 			Optional<BigInteger> res = ConstantEvaluate.valueOf(op, getContext(hContext, op));
 			if (res.isPresent())
 				if (res.get().equals(BigInteger.ONE)) {
-					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_TRUE, op));
+					problems.add(new Problem(EQUALITY_ALWAYS_TRUE, op));
 				} else {
-					problems.add(new Problem(ErrorCode.EQUALITY_ALWAYS_FALSE, op));
+					problems.add(new Problem(EQUALITY_ALWAYS_FALSE, op));
 				}
 		}
 	}
@@ -630,7 +678,7 @@ public class BuiltInValidator implements IHDLValidator {
 			for (HDLVariable var : hvd.getVariables()) {
 				HDLExpression def = var.getDefaultValue();
 				if (var.getDefaultValue() == null) {
-					problems.add(new Problem(ErrorCode.CONSTANT_NEED_DEFAULTVALUE, var));
+					problems.add(new Problem(CONSTANT_NEED_DEFAULTVALUE, var));
 				} else {
 					if (def instanceof HDLArrayInit) {
 						checkConstantsArrayInit(problems, (HDLArrayInit) def);
@@ -638,7 +686,7 @@ public class BuiltInValidator implements IHDLValidator {
 						Optional<BigInteger> constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
 						if (!constant.isPresent())
 							if (!(def instanceof HDLLiteral)) {
-								problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
+								problems.add(new Problem(CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
 							}
 					}
 				}
@@ -649,12 +697,12 @@ public class BuiltInValidator implements IHDLValidator {
 			for (HDLRange r : hdlForLoop.getRange()) {
 				Optional<BigInteger> evalTo = ConstantEvaluate.valueOf(r.getTo(), getContext(hContext, r));
 				if (!evalTo.isPresent()) {
-					problems.add(new Problem(ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT, r.getTo(), r, null));
+					problems.add(new Problem(FOR_LOOP_RANGE_NOT_CONSTANT, r.getTo(), r, null));
 				}
 				if (r.getFrom() != null) {
 					Optional<BigInteger> evalFrom = ConstantEvaluate.valueOf(r.getFrom(), getContext(hContext, r));
 					if (!evalFrom.isPresent()) {
-						problems.add(new Problem(ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT, r.getFrom(), r, null));
+						problems.add(new Problem(FOR_LOOP_RANGE_NOT_CONSTANT, r.getFrom(), r, null));
 					}
 				}
 			}
@@ -669,7 +717,7 @@ public class BuiltInValidator implements IHDLValidator {
 					HDLArrayInit hai = (HDLArrayInit) exp;
 					checkConstantsArrayInit(problems, hai);
 				} else {
-					problems.add(new Problem(ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, exp, arrayInit, null));
+					problems.add(new Problem(CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, exp, arrayInit, null));
 				}
 		}
 	}
@@ -682,7 +730,7 @@ public class BuiltInValidator implements IHDLValidator {
 				for (HDLExpression dim : var.getDimensions()) {
 					Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(dim);
 					if (!valueOf.isPresent()) {
-						problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, dim));
+						problems.add(new Problem(ARRAY_DIMENSIONS_NOT_CONSTANT, dim));
 					}
 				}
 			}
@@ -723,7 +771,7 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void compareBoundaries(Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext, HDLVariableRef ref, ArrayList<HDLExpression> dimensions,
 			ArrayList<HDLExpression> array) {
 		if (dimensions.size() < array.size()) {
-			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
+			problems.add(new Problem(ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
 			return;
 		} else if ((dimensions.size() > array.size())) {
 			// Check whether dimensions have been left out. This is only ok when
@@ -733,7 +781,7 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLAssignment ass = (HDLAssignment) container;
 				HDLReference left = ass.getLeft();
 				if (left.getClassType() == HDLClass.HDLEnumRef) {
-					problems.add(new Problem(ErrorCode.ASSIGNMENT_ENUM_NOT_WRITABLE, left));
+					problems.add(new Problem(ASSIGNMENT_ENUM_NOT_WRITABLE, left));
 				} else {
 					HDLVariableRef varRef = (HDLVariableRef) left;
 					Optional<HDLVariable> var = varRef.resolveVar();
@@ -742,7 +790,7 @@ public class BuiltInValidator implements IHDLValidator {
 						ArrayList<HDLExpression> targetDim = var.get().getDimensions();
 						for (int i = 0; i < varRef.getArray().size(); i++) {
 							if (targetDim.size() == 0) {
-								problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, varRef));
+								problems.add(new Problem(ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, varRef));
 								return;
 							}
 							targetDim.remove(0);
@@ -750,7 +798,7 @@ public class BuiltInValidator implements IHDLValidator {
 						if (left != ref) {
 							validateArrayAssignment(problems, context, ref, ass, left, targetDim);
 						} else if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
-							problems.add(new Problem(ErrorCode.ARRAY_WRITE_MULTI_DIMENSION, ass));
+							problems.add(new Problem(ARRAY_WRITE_MULTI_DIMENSION, ass));
 						}
 					}
 				}
@@ -759,7 +807,7 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLEvaluationContext context = getContext(hContext, var);
 				validateArrayAssignment(problems, context, ref, var, var, var.getDimensions());
 			} else {
-				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION, ref));
+				problems.add(new Problem(ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION, ref));
 			}
 		}
 		int dim = 0;
@@ -767,12 +815,12 @@ public class BuiltInValidator implements IHDLValidator {
 			HDLEvaluationContext context = getContext(hContext, arr);
 			Optional<Range<BigInteger>> accessRangeRaw = RangeExtension.rangeOf(arr, context);
 			if (!accessRangeRaw.isPresent()) {
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, arr));
+				problems.add(new Problem(ARRAY_INDEX_NO_RANGE, arr));
 				break;
 			}
 			Optional<Range<BigInteger>> arrayRangeRaw = RangeExtension.rangeOf(dimensions.get(dim), context);
 			if (!arrayRangeRaw.isPresent()) {
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
+				problems.add(new Problem(ARRAY_INDEX_NO_RANGE, dimensions.get(dim)));
 				break;
 			}
 			Range<BigInteger> accessRange = accessRangeRaw.get();
@@ -781,14 +829,14 @@ public class BuiltInValidator implements IHDLValidator {
 			arrayRange = Ranges.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
 			String info = "Expected value range:" + accessRange;
 			if (accessRange.upperEndpoint().signum() < 0) {
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
+				problems.add(new Problem(ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			} else if (accessRange.lowerEndpoint().signum() < 0) {
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
+				problems.add(new Problem(ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			}
 			if (!arrayRange.isConnected(accessRange)) {
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
+				problems.add(new Problem(ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			} else if (accessRange.upperEndpoint().compareTo(upperEndpoint) > 0) {
-				problems.add(new Problem(ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
+				problems.add(new Problem(ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
 			}
 
 			dim++;
@@ -803,13 +851,13 @@ public class BuiltInValidator implements IHDLValidator {
 		ArrayList<HDLExpression> sourceDim = right.get().getDimensions();
 		for (int i = 0; i < ref.getArray().size(); i++) {
 			if (sourceDim.size() == 0) {
-				problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
+				problems.add(new Problem(ARRAY_REFERENCE_TOO_MANY_DIMENSIONS, ref));
 				return;
 			}
 			sourceDim.remove(0);
 		}
 		if (targetDim.size() != sourceDim.size()) {
-			problems.add(new Problem(ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ass));
+			problems.add(new Problem(ARRAY_REFERENCE_NOT_SAME_DIMENSIONS, ass));
 		} else {
 			HDLDirection dir = right.get().getDirection();
 			if ((dir == HDLDirection.IN) || (dir == HDLDirection.INOUT) || (dir == HDLDirection.OUT)) {
@@ -819,16 +867,16 @@ public class BuiltInValidator implements IHDLValidator {
 				HDLExpression source = sourceDim.get(i);
 				Optional<BigInteger> s = ConstantEvaluate.valueOf(source, context);
 				if (!s.isPresent()) {
-					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, right.get()));
+					problems.add(new Problem(ARRAY_DIMENSIONS_NOT_CONSTANT, right.get()));
 				}
 				HDLExpression target = targetDim.get(i);
 				Optional<BigInteger> t = ConstantEvaluate.valueOf(target, context);
 				if (!t.isPresent()) {
-					problems.add(new Problem(ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT, left));
+					problems.add(new Problem(ARRAY_DIMENSIONS_NOT_CONSTANT, left));
 				}
 				if ((t != null) && (s != null))
 					if (!s.equals(t)) {
-						problems.add(new Problem(ErrorCode.ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS, ass));
+						problems.add(new Problem(ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS, ass));
 					}
 			}
 		}
@@ -846,13 +894,13 @@ public class BuiltInValidator implements IHDLValidator {
 		Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.clock.toString()).getAll();
 		if (clocks.size() > 1) {
 			for (HDLAnnotation anno : clocks) {
-				problems.add(new Problem(ErrorCode.ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
+				problems.add(new Problem(ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
 			}
 		}
 		Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.reset.toString()).getAll();
 		if (resets.size() > 1) {
 			for (HDLAnnotation anno : resets) {
-				problems.add(new Problem(ErrorCode.ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));
+				problems.add(new Problem(ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));
 			}
 		}
 	}

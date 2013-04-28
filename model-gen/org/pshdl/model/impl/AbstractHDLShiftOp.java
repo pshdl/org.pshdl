@@ -52,8 +52,8 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLShiftOp(@Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLShiftOpType type, boolean validate) {
-		super(container, left, right, validate);
+	public AbstractHDLShiftOp(int id, @Nullable IHDLObject container, @Nonnull HDLExpression left, @Nonnull HDLExpression right, @Nonnull HDLShiftOpType type, boolean validate) {
+		super(id, container, left, right, validate);
 		if (validate) {
 			type = validateType(type);
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLShiftOp copy() {
-		HDLShiftOp newObject = new HDLShiftOp(null, left, right, type, false);
+		HDLShiftOp newObject = new HDLShiftOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -108,7 +108,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 		HDLExpression filteredleft = filter.copyObject("left", this, left);
 		HDLExpression filteredright = filter.copyObject("right", this, right);
 		HDLShiftOpType filteredtype = filter.copyObject("type", this, type);
-		return filter.postFilter((HDLShiftOp) this, new HDLShiftOp(null, filteredleft, filteredright, filteredtype, false));
+		return filter.postFilter((HDLShiftOp) this, new HDLShiftOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Nonnull
 	public HDLShiftOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLShiftOp res = new HDLShiftOp(container, left, right, type, false);
+		HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -168,7 +168,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Nonnull
 	public HDLShiftOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLShiftOp res = new HDLShiftOp(container, left, right, type, false);
+		HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -183,7 +183,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Nonnull
 	public HDLShiftOp setType(@Nonnull HDLShiftOpType type) {
 		type = validateType(type);
-		HDLShiftOp res = new HDLShiftOp(container, left, right, type, false);
+		HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -263,12 +263,12 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 					switch (pos++) {
 					case 0:
 						if (left != null) {
-							current = left.deepIterator();
+							current = Iterators.concat(Iterators.forArray(left), left.deepIterator());
 						}
 						break;
 					case 1:
 						if (right != null) {
-							current = right.deepIterator();
+							current = Iterators.concat(Iterators.forArray(right), right.deepIterator());
 						}
 						break;
 					default:

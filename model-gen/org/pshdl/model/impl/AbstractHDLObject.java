@@ -27,6 +27,7 @@
 package org.pshdl.model.impl;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import javax.annotation.*;
 
@@ -43,7 +44,8 @@ public abstract class AbstractHDLObject {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLObject(@Nullable IHDLObject container, boolean validate) {
+	public AbstractHDLObject(int id, @Nullable IHDLObject container, boolean validate) {
+		this.id = id;
 		if (container == this)
 			throw new IllegalArgumentException("Object can not contain itself");
 		if (validate) {
@@ -54,6 +56,7 @@ public abstract class AbstractHDLObject {
 
 	public AbstractHDLObject() {
 		super();
+		this.id = gid.incrementAndGet();
 		this.container = null;
 	}
 
@@ -214,4 +217,14 @@ public abstract class AbstractHDLObject {
 	}
 
 	protected boolean frozen = false;
+	private static final AtomicInteger gid = new AtomicInteger();
+	protected int id;
+
+	public int getID() {
+		return id;
+	}
+
+	public void setID(int id) {
+		this.id = id;
+	}
 }

@@ -70,24 +70,38 @@ public class PSHDLParser {
 
 	public static final class SyntaxErrorCollector extends BaseErrorListener {
 		private final Set<Problem> syntaxProblems;
+		private final CommonTokenStream ts;
 
-		public SyntaxErrorCollector(Set<Problem> syntaxProblems) {
+		public SyntaxErrorCollector(CommonTokenStream ts, Set<Problem> syntaxProblems) {
 			this.syntaxProblems = syntaxProblems;
+			this.ts = ts;
 		}
 
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, String msg, @Nullable RecognitionException e) {
 			int length = -1;
 			int totalOffset = -1;
+			SyntaxErrors error = SyntaxErrors.OtherException;
+			if ((e == null) && PSHDLLangParser.MISSING_SEMI.equals(msg)) {
+				error = SyntaxErrors.MissingSemicolon;
+				msg = "Missing ';'";
+			}
 			if (offendingSymbol instanceof Token) {
 				Token t = (Token) offendingSymbol;
+				if (error == SyntaxErrors.MissingSemicolon) {
+					do {
+						t = ts.get(t.getTokenIndex() - 1);
+					} while (t.getChannel() != 0);
+					line = t.getLine();
+					charPositionInLine = t.getCharPositionInLine();
+					offendingSymbol = t;
+				}
 				totalOffset = t.getStartIndex();
 				String text = t.getText();
 				if (text != null) {
 					length = text.length();
 				}
 			}
-			SyntaxErrors error = SyntaxErrors.OtherException;
 			if (e instanceof NoViableAltException) {
 				NoViableAltException noVi = (NoViableAltException) e;
 				error = SyntaxErrors.NoViableAlternative;
@@ -109,12 +123,13 @@ public class PSHDLParser {
 			if (e instanceof FailedPredicateException) {
 				error = SyntaxErrors.FailedPredicate;
 			}
+
 			syntaxProblems.add(new Problem(error, msg, line, charPositionInLine, length, totalOffset));
 		}
 	}
 
 	public static enum SyntaxErrors implements IErrorCode {
-		FailedPredicate, NoViableAlternative, LexerNoViableAlternative, InputMismatch, OtherException;
+		FailedPredicate, NoViableAlternative, LexerNoViableAlternative, InputMismatch, OtherException, MissingSemicolon;
 
 		@Override
 		public ProblemSeverity getSeverity() {
@@ -175,7 +190,7 @@ public class PSHDLParser {
 		PSHDLLangLexer lexer = new PSHDLLangLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		PSHDLLangParser parser = new PSHDLLangParser(tokens);
-		ANTLRErrorListener listener = new SyntaxErrorCollector(syntaxProblems);
+		ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
 		parser.getErrorListeners().clear();
 		parser.addErrorListener(listener);
 		PsModelContext psModel = parser.psModel();

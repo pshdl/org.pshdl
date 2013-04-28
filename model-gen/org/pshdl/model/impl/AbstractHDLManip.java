@@ -52,8 +52,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLManip(@Nullable IHDLObject container, @Nonnull HDLManipType type, @Nonnull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
-		super(container, validate);
+	public AbstractHDLManip(int id, @Nullable IHDLObject container, @Nonnull HDLManipType type, @Nonnull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
+		super(id, container, validate);
 		if (validate) {
 			type = validateType(type);
 		}
@@ -143,7 +143,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Override
 	@Nonnull
 	public HDLManip copy() {
-		HDLManip newObject = new HDLManip(null, type, target, castTo, false);
+		HDLManip newObject = new HDLManip(id, null, type, target, castTo, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -159,7 +159,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 		HDLManipType filteredtype = filter.copyObject("type", this, type);
 		HDLExpression filteredtarget = filter.copyObject("target", this, target);
 		HDLType filteredcastTo = filter.copyObject("castTo", this, castTo);
-		return filter.postFilter((HDLManip) this, new HDLManip(null, filteredtype, filteredtarget, filteredcastTo, false));
+		return filter.postFilter((HDLManip) this, new HDLManip(id, null, filteredtype, filteredtarget, filteredcastTo, false));
 	}
 
 	/**
@@ -201,7 +201,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Nonnull
 	public HDLManip setType(@Nonnull HDLManipType type) {
 		type = validateType(type);
-		HDLManip res = new HDLManip(container, type, target, castTo, false);
+		HDLManip res = new HDLManip(id, container, type, target, castTo, false);
 		return res;
 	}
 
@@ -216,7 +216,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Nonnull
 	public HDLManip setTarget(@Nonnull HDLExpression target) {
 		target = validateTarget(target);
-		HDLManip res = new HDLManip(container, type, target, castTo, false);
+		HDLManip res = new HDLManip(id, container, type, target, castTo, false);
 		return res;
 	}
 
@@ -230,7 +230,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Nonnull
 	public HDLManip setCastTo(@Nullable HDLType castTo) {
 		castTo = validateCastTo(castTo);
-		HDLManip res = new HDLManip(container, type, target, castTo, false);
+		HDLManip res = new HDLManip(id, container, type, target, castTo, false);
 		return res;
 	}
 
@@ -330,12 +330,12 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 					switch (pos++) {
 					case 0:
 						if (target != null) {
-							current = target.deepIterator();
+							current = Iterators.concat(Iterators.forArray(target), target.deepIterator());
 						}
 						break;
 					case 1:
 						if (castTo != null) {
-							current = castTo.deepIterator();
+							current = Iterators.concat(Iterators.forArray(castTo), castTo.deepIterator());
 						}
 						break;
 					default:

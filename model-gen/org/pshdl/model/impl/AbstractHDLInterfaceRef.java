@@ -59,9 +59,9 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInterfaceRef(@Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
-			@Nonnull HDLQualifiedName hIf, @Nullable Iterable<HDLExpression> ifArray, boolean validate) {
-		super(container, var, array, bits, validate);
+	public AbstractHDLInterfaceRef(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName var, @Nullable Iterable<HDLExpression> array,
+			@Nullable Iterable<HDLRange> bits, @Nonnull HDLQualifiedName hIf, @Nullable Iterable<HDLExpression> ifArray, boolean validate) {
+		super(id, container, var, array, bits, validate);
 		if (validate) {
 			hIf = validateHIf(hIf);
 		}
@@ -128,7 +128,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Override
 	@Nonnull
 	public HDLInterfaceRef copy() {
-		HDLInterfaceRef newObject = new HDLInterfaceRef(null, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef newObject = new HDLInterfaceRef(id, null, var, array, bits, hIf, ifArray, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -146,7 +146,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 		ArrayList<HDLRange> filteredbits = filter.copyContainer("bits", this, bits);
 		HDLQualifiedName filteredhIf = filter.copyObject("hIf", this, hIf);
 		ArrayList<HDLExpression> filteredifArray = filter.copyContainer("ifArray", this, ifArray);
-		return filter.postFilter((HDLInterfaceRef) this, new HDLInterfaceRef(null, filteredvar, filteredarray, filteredbits, filteredhIf, filteredifArray, false));
+		return filter.postFilter((HDLInterfaceRef) this, new HDLInterfaceRef(id, null, filteredvar, filteredarray, filteredbits, filteredhIf, filteredifArray, false));
 	}
 
 	/**
@@ -190,7 +190,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Nonnull
 	public HDLInterfaceRef setVar(@Nonnull HDLQualifiedName var) {
 		var = validateVar(var);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -206,7 +206,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Nonnull
 	public HDLInterfaceRef setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -226,7 +226,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 			throw new IllegalArgumentException("Element of array can not be null!");
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.add(newArray);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -246,7 +246,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 			throw new IllegalArgumentException("Removed element of array can not be null!");
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(newArray);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -264,7 +264,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	public HDLInterfaceRef removeArray(int idx) {
 		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(idx);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -280,7 +280,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Nonnull
 	public HDLInterfaceRef setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -299,7 +299,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 			throw new IllegalArgumentException("Element of bits can not be null!");
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.add(newBits);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -319,7 +319,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 			throw new IllegalArgumentException("Removed element of bits can not be null!");
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(newBits);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -337,7 +337,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	public HDLInterfaceRef removeBits(int idx) {
 		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(idx);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -353,7 +353,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Nonnull
 	public HDLInterfaceRef setHIf(@Nonnull HDLQualifiedName hIf) {
 		hIf = validateHIf(hIf);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -368,7 +368,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	@Nonnull
 	public HDLInterfaceRef setIfArray(@Nullable Iterable<HDLExpression> ifArray) {
 		ifArray = validateIfArray(ifArray);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -387,7 +387,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 			throw new IllegalArgumentException("Element of ifArray can not be null!");
 		ArrayList<HDLExpression> ifArray = (ArrayList<HDLExpression>) this.ifArray.clone();
 		ifArray.add(newIfArray);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -406,7 +406,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 			throw new IllegalArgumentException("Removed element of ifArray can not be null!");
 		ArrayList<HDLExpression> ifArray = (ArrayList<HDLExpression>) this.ifArray.clone();
 		ifArray.remove(newIfArray);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -423,7 +423,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	public HDLInterfaceRef removeIfArray(int idx) {
 		ArrayList<HDLExpression> ifArray = (ArrayList<HDLExpression>) this.ifArray.clone();
 		ifArray.remove(idx);
-		HDLInterfaceRef res = new HDLInterfaceRef(container, var, array, bits, hIf, ifArray, false);
+		HDLInterfaceRef res = new HDLInterfaceRef(id, container, var, array, bits, hIf, ifArray, false);
 		return res;
 	}
 
@@ -544,6 +544,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 						if ((array != null) && (array.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(array.size());
 							for (HDLExpression o : array) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -553,6 +554,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 						if ((bits != null) && (bits.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(bits.size());
 							for (HDLRange o : bits) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());
@@ -562,6 +564,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 						if ((ifArray != null) && (ifArray.size() != 0)) {
 							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(ifArray.size());
 							for (HDLExpression o : ifArray) {
+								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
 							current = Iterators.concat(iters.iterator());

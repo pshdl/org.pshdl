@@ -53,10 +53,10 @@ public class HDLManip extends AbstractHDLManip {
 	 * @param castTo
 	 *            the value for castTo. Can be <code>null</code>.
 	 * @param validate
-	 *            if <code>true</code> the paramaters will be validated.
+	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLManip(@Nullable IHDLObject container, @Nonnull HDLManipType type, @Nonnull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
-		super(container, type, target, castTo, validate);
+	public HDLManip(int id, @Nullable IHDLObject container, @Nonnull HDLManipType type, @Nonnull HDLExpression target, @Nullable HDLType castTo, boolean validate) {
+		super(id, container, type, target, castTo, validate);
 	}
 
 	public HDLManip() {
