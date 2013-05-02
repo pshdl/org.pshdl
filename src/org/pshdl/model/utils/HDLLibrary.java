@@ -401,4 +401,12 @@ public class HDLLibrary {
 		return units.get(asRef);
 	}
 
+	public String getSrc(HDLQualifiedName asRef) {
+		for (Record r : objects.values()) {
+			if (r.ref.equals(asRef))
+				return r.src;
+		}
+		return null;
+	}
+
 }

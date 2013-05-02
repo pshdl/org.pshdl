@@ -474,9 +474,12 @@ public class SimulationTransformationExtension {
     final FluidFrame res = _fluidFrame;
     ArrayList<HDLExpression> _cats = obj.getCats();
     final Iterator<HDLExpression> iter = _cats.iterator();
-    HDLExpression _next = iter.next();
-    FluidFrame _simulationModel = this.toSimulationModel(_next, context);
+    final HDLExpression init = iter.next();
+    FluidFrame _simulationModel = this.toSimulationModel(init, context);
     res.append(_simulationModel);
+    Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(init);
+    HDLType _get = _typeOf.get();
+    int owidth = (HDLPrimitives.getWidth(_get, context)).intValue();
     boolean _hasNext = iter.hasNext();
     boolean _while = _hasNext;
     while (_while) {
@@ -484,12 +487,15 @@ public class SimulationTransformationExtension {
         final HDLExpression exp = iter.next();
         FluidFrame _simulationModel_1 = this.toSimulationModel(exp, context);
         res.append(_simulationModel_1);
-        Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(exp);
-        HDLType _get = _typeOf.get();
-        final int width = (HDLPrimitives.getWidth(_get, context)).intValue();
-        String _string = Integer.valueOf(width).toString();
-        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.concat, _string);
+        Optional<? extends HDLType> _typeOf_1 = TypeExtension.typeOf(exp);
+        HDLType _get_1 = _typeOf_1.get();
+        final int width = (HDLPrimitives.getWidth(_get_1, context)).intValue();
+        String _string = Integer.valueOf(owidth).toString();
+        String _string_1 = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.concat, _string, _string_1);
         res.add(_argumentedInstruction);
+        int _plus = (owidth + width);
+        owidth = _plus;
       }
       boolean _hasNext_1 = iter.hasNext();
       _while = _hasNext_1;

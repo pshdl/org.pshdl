@@ -63,6 +63,7 @@ public class HDLSimulator {
 			HDLUnit unit = library.getUnit(asRef);
 			if (unit == null)
 				throw new IllegalArgumentException("Can not find unit for interface:" + asRef);
+			unit = Insulin.transform(unit, library.getSrc(asRef));
 			HDLEvaluationContext hiContext = hi.getContext(HDLEvaluationContext.createDefault(unit));
 			HDLUnit subUnit = flattenAll(hiContext, unit);
 			insulin = Refactoring.inlineUnit(insulin, hi, subUnit);

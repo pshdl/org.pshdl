@@ -167,6 +167,12 @@ public class FluidFrame {
 			if (lID != null) {
 				frame.executionDep = lID;
 			}
+			int maxData = 0;
+			for (int i : frame.internalDependencies) {
+				maxData = Math.max(internals[i].actualWidth, maxData);
+			}
+			maxData = Math.max(ii.actualWidth, maxData);
+			frame.maxDataWidth = Math.max(frame.maxDataWidth, maxData);
 			lastID.put(ii.info.name, frame.uniqueID);
 		}
 		VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
@@ -293,6 +299,14 @@ public class FluidFrame {
 			case cast_int:
 				writeVarInt32(instr, Integer.parseInt(ai.args[0]));
 				writeVarInt32(instr, Integer.parseInt(ai.args[1]));
+				break;
+			case concat:
+				// System.out.println("FluidFrame.toFrame()" + ai);
+				int lWidth = Integer.parseInt(ai.args[0]);
+				writeVarInt32(instr, lWidth);
+				int rWidth = Integer.parseInt(ai.args[1]);
+				writeVarInt32(instr, rWidth);
+				maxDataWidth = Math.max(lWidth + rWidth, maxDataWidth);
 				break;
 			default:
 			}

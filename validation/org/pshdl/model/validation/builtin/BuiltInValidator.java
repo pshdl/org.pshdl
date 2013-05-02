@@ -890,17 +890,22 @@ public class BuiltInValidator implements IHDLValidator {
 		return hdlEvaluationContext;
 	}
 
-	private static void checkClockAndResetAnnotation(HDLPackage unit, Set<Problem> problems) {
-		Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.clock.toString()).getAll();
-		if (clocks.size() > 1) {
-			for (HDLAnnotation anno : clocks) {
-				problems.add(new Problem(ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
+	private static void checkClockAndResetAnnotation(HDLPackage pkg, Set<Problem> problems) {
+		ArrayList<HDLUnit> units = pkg.getUnits();
+		for (HDLUnit unit : units) {
+			Collection<HDLAnnotation> clocks = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.clock.toString())
+					.getAll();
+			if (clocks.size() > 1) {
+				for (HDLAnnotation anno : clocks) {
+					problems.add(new Problem(ONLY_ONE_CLOCK_ANNOTATION_ALLOWED, anno));
+				}
 			}
-		}
-		Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.reset.toString()).getAll();
-		if (resets.size() > 1) {
-			for (HDLAnnotation anno : resets) {
-				problems.add(new Problem(ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));
+			Collection<HDLAnnotation> resets = HDLQuery.select(HDLAnnotation.class).from(unit).where(HDLAnnotation.fName).isEqualTo(HDLBuiltInAnnotations.reset.toString())
+					.getAll();
+			if (resets.size() > 1) {
+				for (HDLAnnotation anno : resets) {
+					problems.add(new Problem(ONLY_ONE_RESET_ANNOTATION_ALLOWED, anno));
+				}
 			}
 		}
 	}

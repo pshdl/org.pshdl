@@ -271,12 +271,15 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLConcat obj, HDLEvaluationContext context) {
 		val FluidFrame res = new FluidFrame
 		val Iterator<HDLExpression> iter = obj.cats.iterator
-		res.append(iter.next.toSimulationModel(context))
+		val init=iter.next
+		res.append(init.toSimulationModel(context))
+		var int owidth = HDLPrimitives::getWidth(typeOf(init).get, context)
 		while (iter.hasNext) {
 			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context))
 			val int width = HDLPrimitives::getWidth(typeOf(exp).get, context)
-			res.add(new ArgumentedInstruction(concat, width.toString))
+			res.add(new ArgumentedInstruction(concat, owidth.toString, width.toString))
+			owidth=owidth+width
 		}
 		return res
 	}
