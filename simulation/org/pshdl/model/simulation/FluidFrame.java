@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
 
 import org.pshdl.interpreter.*;
+import org.pshdl.interpreter.Frame.*;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.*;
@@ -208,7 +209,6 @@ public class FluidFrame {
 	}
 
 	private List<Frame> toFrame(FrameRegister register) {
-		List<Byte> instr = new LinkedList<Byte>();
 		Set<Integer> internalDependencies = new LinkedHashSet<Integer>();
 		List<BigInteger> constants = new LinkedList<BigInteger>();
 		int stackCount = 0;
@@ -217,11 +217,13 @@ public class FluidFrame {
 		int constantIdCount = 0;
 		int posEdge = -1, negEdge = -1;
 		List<Integer> posPred = new LinkedList<Integer>(), negPred = new LinkedList<Integer>();
+		List<FastInstruction> instr = new LinkedList<FastInstruction>();
 		for (ArgumentedInstruction ai : instructions) {
 			stackCount += ai.instruction.push;
 			stackCount -= ai.instruction.pop;
 			maxStackCount = Math.max(maxStackCount, stackCount);
-			instr.add((byte) (ai.instruction.toByte()));
+			int arg1 = 0, arg2 = 0;
+			Instruction i = ai.instruction;
 			switch (ai.instruction) {
 			case negPredicate: {
 				Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
@@ -229,7 +231,7 @@ public class FluidFrame {
 					throw new IllegalArgumentException(ai.toString());
 				internalDependencies.add(internalId);
 				negPred.add(internalId);
-				writeVarInt32(instr, internalId);
+				arg1 = internalId;
 				maxDataWidth = Math.max(1, maxDataWidth);
 				break;
 			}
@@ -240,7 +242,7 @@ public class FluidFrame {
 				internalDependencies.add(internalId);
 				posPred.add(internalId);
 				maxDataWidth = Math.max(1, maxDataWidth);
-				writeVarInt32(instr, internalId);
+				arg1 = internalId;
 				break;
 			}
 			case isFallingEdge: {
@@ -250,7 +252,7 @@ public class FluidFrame {
 				internalDependencies.add(internalId);
 				negEdge = internalId;
 				maxDataWidth = Math.max(1, maxDataWidth);
-				writeVarInt32(instr, internalId);
+				arg1 = internalId;
 				break;
 			}
 			case isRisingEdge: {
@@ -260,14 +262,14 @@ public class FluidFrame {
 				internalDependencies.add(internalId);
 				posEdge = internalId;
 				maxDataWidth = Math.max(1, maxDataWidth);
-				writeVarInt32(instr, internalId);
+				arg1 = internalId;
 				break;
 			}
 			case loadInternal:
 				Integer internalId = register.getInternal(toFullRef(ai));
 				if (internalId != null) {
 					internalDependencies.add(internalId);
-					writeVarInt32(instr, internalId);
+					arg1 = internalId;
 				} else {
 					internalId = register.getInternal(ai.args[0]);
 					if (internalId == null) {
@@ -275,17 +277,19 @@ public class FluidFrame {
 						System.out.println("FluidFrame.toFrame() Registering suspected input:" + ai);
 					}
 					internalDependencies.add(internalId);
-					writeVarInt32(instr, internalId);
 					if (ai.args.length > 1) {
+						instr.add(new FastInstruction(ai.instruction, internalId, -1));
 						if (ai.args[1].indexOf(':') != -1) {
 							String[] split = ai.args[1].split(":");
-							instr.add((byte) (Instruction.bitAccessSingleRange.ordinal() & 0xFF));
-							writeVarInt32(instr, Integer.parseInt(split[0]));
-							writeVarInt32(instr, Integer.parseInt(split[1]));
+							i = Instruction.bitAccessSingleRange;
+							arg1 = Integer.parseInt(split[0]);
+							arg2 = Integer.parseInt(split[1]);
 						} else {
-							instr.add((byte) (Instruction.bitAccessSingle.ordinal() & 0xFF));
-							writeVarInt32(instr, Integer.parseInt(ai.args[1]));
+							i = Instruction.bitAccessSingle;
+							arg1 = Integer.parseInt(ai.args[1]);
 						}
+					} else {
+						arg1 = internalId;
 					}
 				}
 				break;
@@ -293,23 +297,24 @@ public class FluidFrame {
 				BigInteger c = this.constants.get(ai.args[0]);
 				maxDataWidth = Math.max(c.bitLength(), maxDataWidth);
 				constants.add(c);
-				writeVarInt32(instr, constantIdCount++);
+				arg1 = constantIdCount++;
 				break;
 			case cast_uint:
 			case cast_int:
-				writeVarInt32(instr, Integer.parseInt(ai.args[0]));
-				writeVarInt32(instr, Integer.parseInt(ai.args[1]));
+				arg1 = Integer.parseInt(ai.args[0]);
+				arg2 = Integer.parseInt(ai.args[1]);
 				break;
 			case concat:
 				// System.out.println("FluidFrame.toFrame()" + ai);
 				int lWidth = Integer.parseInt(ai.args[0]);
-				writeVarInt32(instr, lWidth);
+				arg1 = lWidth;
 				int rWidth = Integer.parseInt(ai.args[1]);
-				writeVarInt32(instr, rWidth);
+				arg2 = rWidth;
 				maxDataWidth = Math.max(lWidth + rWidth, maxDataWidth);
 				break;
 			default:
 			}
+			instr.add(new FastInstruction(i, arg1, arg2));
 		}
 		for (VariableInformation w : vars.values()) {
 			maxDataWidth = Math.max(w.width, maxDataWidth);
@@ -318,10 +323,10 @@ public class FluidFrame {
 		if (hasInstructions()) {
 			Integer outputId;
 			outputId = register.registerInternal(outputName);
-			byte[] instrRes = toByteArray(instr);
 			int[] internalDepRes = toIntArray(internalDependencies);
-			Frame frame = new Frame(instrRes, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount,
-					constants.toArray(new BigInteger[constants.size()]), id);
+			FastInstruction[] instArray = (FastInstruction[]) instr.toArray(new FastInstruction[instr.size()]);
+			BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
+			Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id);
 			for (FluidFrame ff : references) {
 				ff.toFrame(register);
 			}
@@ -331,18 +336,6 @@ public class FluidFrame {
 			res.addAll(sub.toFrame(register));
 		}
 		return res;
-	}
-
-	public static void writeVarInt32(List<Byte> instr, Integer internalId) {
-		int num = internalId;
-		int t = 0;
-		while (num > 127) {
-			t = 0x80 | (num & 0x7F);
-			instr.add((byte) t);
-			num >>= 7;
-		}
-		t = num & 0x7F;
-		instr.add((byte) t);
 	}
 
 	private String toFullRef(ArgumentedInstruction ai) {
