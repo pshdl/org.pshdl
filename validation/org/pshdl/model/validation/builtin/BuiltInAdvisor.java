@@ -258,7 +258,7 @@ public class BuiltInAdvisor {
 					"Assign it to a new internal variable", "Change the direction to inout");
 		case ARRAY_REFERENCE_TOO_MANY_DIMENSIONS:
 			break;
-		case ASSIGNEMENT_NOT_SUPPORTED:
+		case ASSIGNMENT_NOT_SUPPORTED:
 			break;
 		case ASSIGNMENT_CLIPPING_WILL_OCCUR:
 			break;

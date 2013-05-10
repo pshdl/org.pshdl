@@ -936,53 +936,59 @@ public class Insulin {
 		ModificationSet ms = new ModificationSet();
 		HDLAssignment[] loops = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment hdlAssignment : loops) {
-			HDLAssignmentType type = hdlAssignment.getType();
-			HDLOpExpression op = null;
-			switch (type) {
-			case DIV_ASSGN:
-				op = new HDLArithOp().setType(HDLArithOpType.DIV);
-				break;
-			case MOD_ASSGN:
-				op = new HDLArithOp().setType(HDLArithOpType.MOD);
-				break;
-			case MUL_ASSGN:
-				op = new HDLArithOp().setType(HDLArithOpType.MUL);
-				break;
-			case ADD_ASSGN:
-				op = new HDLArithOp().setType(HDLArithOpType.PLUS);
-				break;
-			case SUB_ASSGN:
-				op = new HDLArithOp().setType(HDLArithOpType.MINUS);
-				break;
-			case AND_ASSGN:
-				op = new HDLBitOp().setType(HDLBitOpType.AND);
-				break;
-			case OR_ASSGN:
-				op = new HDLBitOp().setType(HDLBitOpType.OR);
-				break;
-			case XOR_ASSGN:
-				op = new HDLBitOp().setType(HDLBitOpType.XOR);
-				break;
-			case SLL_ASSGN:
-				op = new HDLShiftOp().setType(HDLShiftOpType.SLL);
-				break;
-			case SRA_ASSGN:
-				op = new HDLShiftOp().setType(HDLShiftOpType.SRA);
-				break;
-			case SRL_ASSGN:
-				op = new HDLShiftOp().setType(HDLShiftOpType.SRL);
-				break;
-			case ASSGN:
+			HDLOpExpression op = toOpExpression(hdlAssignment);
+			if (op == null)
 				continue;
-			}
-			if (op == null) {
-				continue;
-			}
-			op = op.setLeft(hdlAssignment.getLeft()).setRight(hdlAssignment.getRight());
 			HDLAssignment newAss = new HDLAssignment().setLeft(hdlAssignment.getLeft()).setType(HDLAssignmentType.ASSGN).setRight(op);
 			ms.replace(hdlAssignment, newAss);
 		}
 		return ms.apply(apply);
+	}
+
+	public static HDLOpExpression toOpExpression(HDLAssignment hdlAssignment) {
+		HDLAssignmentType type = hdlAssignment.getType();
+		HDLOpExpression op = null;
+		switch (type) {
+		case DIV_ASSGN:
+			op = new HDLArithOp().setType(HDLArithOpType.DIV);
+			break;
+		case MOD_ASSGN:
+			op = new HDLArithOp().setType(HDLArithOpType.MOD);
+			break;
+		case MUL_ASSGN:
+			op = new HDLArithOp().setType(HDLArithOpType.MUL);
+			break;
+		case ADD_ASSGN:
+			op = new HDLArithOp().setType(HDLArithOpType.PLUS);
+			break;
+		case SUB_ASSGN:
+			op = new HDLArithOp().setType(HDLArithOpType.MINUS);
+			break;
+		case AND_ASSGN:
+			op = new HDLBitOp().setType(HDLBitOpType.AND);
+			break;
+		case OR_ASSGN:
+			op = new HDLBitOp().setType(HDLBitOpType.OR);
+			break;
+		case XOR_ASSGN:
+			op = new HDLBitOp().setType(HDLBitOpType.XOR);
+			break;
+		case SLL_ASSGN:
+			op = new HDLShiftOp().setType(HDLShiftOpType.SLL);
+			break;
+		case SRA_ASSGN:
+			op = new HDLShiftOp().setType(HDLShiftOpType.SRA);
+			break;
+		case SRL_ASSGN:
+			op = new HDLShiftOp().setType(HDLShiftOpType.SRL);
+			break;
+		case ASSGN:
+			return op;
+		}
+		if (op == null) {
+			return null;
+		}
+		return op.setLeft(hdlAssignment.getLeft()).setRight(hdlAssignment.getRight());
 	}
 
 	private static <T extends IHDLObject> T handleMultiForLoop(T apply) {

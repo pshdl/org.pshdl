@@ -367,6 +367,7 @@ public class BuiltInValidator implements IHDLValidator {
 			HDLEvaluationContext context = getContext(hContext, ass);
 			checkAss(ass, ass.getLeft(), ass.getRight(), problems, context);
 		}
+
 		HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars)
 			if (hdlVariable.getDefaultValue() != null) {
@@ -392,6 +393,9 @@ public class BuiltInValidator implements IHDLValidator {
 			} else {
 				HDLPrimitive left = (HDLPrimitive) lType.get();
 				HDLPrimitive right = (HDLPrimitive) rType.get();
+				if ((right.getType() == HDLPrimitiveType.STRING) && (left.getType() != HDLPrimitiveType.STRING)) {
+					problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Strings can only be assigned to other strings"));
+				}
 				switch (left.getType()) {
 				case BIT:
 					if (right.getType() != HDLPrimitiveType.BIT)
@@ -405,26 +409,27 @@ public class BuiltInValidator implements IHDLValidator {
 				case BITVECTOR:
 					break;
 				case BOOL:
+					// Anything but String can be assigned
 					break;
 				case INT:
-					break;
 				case INTEGER:
-					break;
 				case NATURAL:
+				case UINT:
+					if ((right.getType() == HDLPrimitiveType.BIT) || (right.getType() == HDLPrimitiveType.BITVECTOR)) {
+						problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Target needs to be numeric"));
+					}
 					break;
 				case STRING:
+					if (right.getType() != HDLPrimitiveType.STRING) {
+						problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Strings can only be assigned to other strings"));
+					}
 					break;
-				case UINT:
-					break;
-				default:
-					break;
-
 				}
 			}
 			break;
 		case HDLInterface:
 		default:
-			problems.add(new Problem(ASSIGNEMENT_NOT_SUPPORTED, obj));
+			problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj));
 		}
 	}
 
@@ -593,28 +598,32 @@ public class BuiltInValidator implements IHDLValidator {
 			if (skipExp(ope)) {
 				continue;
 			}
-			HDLTypeInferenceInfo info = null;
-			switch (ope.getClassType()) {
-			case HDLArithOp:
-				info = HDLPrimitives.getInstance().getArithOpType((HDLArithOp) ope);
-				break;
-			case HDLBitOp:
-				info = HDLPrimitives.getInstance().getBitOpType((HDLBitOp) ope);
-				break;
-			case HDLShiftOp:
-				info = HDLPrimitives.getInstance().getShiftOpType((HDLShiftOp) ope);
-				break;
-			case HDLEqualityOp:
-				info = HDLPrimitives.getInstance().getEqualityOpType((HDLEqualityOp) ope);
-				break;
-			default:
-				throw new IllegalArgumentException("Did not expect class:" + ope.getClassType());
-			}
-			if (info == null)
-				throw new IllegalArgumentException("Info should not be null");
-			if (info.error != null) {
-				problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, ope, info.error));
-			}
+			checkOpExpression(problems, ope, ope);
+		}
+	}
+
+	private static void checkOpExpression(Set<Problem> problems, HDLOpExpression ope, IHDLObject node) {
+		HDLTypeInferenceInfo info = null;
+		switch (ope.getClassType()) {
+		case HDLArithOp:
+			info = HDLPrimitives.getInstance().getArithOpType((HDLArithOp) ope);
+			break;
+		case HDLBitOp:
+			info = HDLPrimitives.getInstance().getBitOpType((HDLBitOp) ope);
+			break;
+		case HDLShiftOp:
+			info = HDLPrimitives.getInstance().getShiftOpType((HDLShiftOp) ope);
+			break;
+		case HDLEqualityOp:
+			info = HDLPrimitives.getInstance().getEqualityOpType((HDLEqualityOp) ope);
+			break;
+		default:
+			throw new IllegalArgumentException("Did not expect class:" + ope.getClassType());
+		}
+		if (info == null)
+			throw new IllegalArgumentException("Info should not be null");
+		if (info.error != null) {
+			problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, node, info.error));
 		}
 	}
 
@@ -634,6 +643,9 @@ public class BuiltInValidator implements IHDLValidator {
 			HDLReference ref = ass.getLeft();
 			if (ref instanceof HDLUnresolvedFragment)
 				return;
+			HDLOpExpression opExpression = Insulin.toOpExpression(ass);
+			IHDLObject freeze = opExpression.copyDeepFrozen(ass.getContainer());
+			checkOpExpression(problems, (HDLOpExpression) freeze, ass);
 			Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
 			if ((var.isPresent()) && (var.get().getRegisterConfig() == null)) {
 				HDLBlock container = ass.getContainer(HDLBlock.class);
