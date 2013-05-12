@@ -34,6 +34,7 @@ public static final int COMMENTS = 2;
 
 @parser::members {
 public static final String MISSING_SEMI="MISSING_SEMI";
+public static final String MISSING_NAME="MISSING_NAME";
 }
 
 psModel :
@@ -42,6 +43,7 @@ psModel :
 
 psUnit :
 	psAnnotation* unitType=( 'module' | 'testbench' ) psInterface psExtends? '{' psImports* psBlock* '}'
+	|	psAnnotation* unitType=( 'module' | 'testbench' ) psExtends? '{' psImports* psBlock* '}' {notifyErrorListeners(MISSING_NAME);}
 ;
 
 psExtends:

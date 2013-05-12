@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
 
 import org.pshdl.interpreter.*;
-import org.pshdl.interpreter.Frame.*;
+import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.*;
@@ -324,7 +324,7 @@ public class FluidFrame {
 			Integer outputId;
 			outputId = register.registerInternal(outputName);
 			int[] internalDepRes = toIntArray(internalDependencies);
-			FastInstruction[] instArray = (FastInstruction[]) instr.toArray(new FastInstruction[instr.size()]);
+			FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
 			BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
 			Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id);
 			for (FluidFrame ff : references) {

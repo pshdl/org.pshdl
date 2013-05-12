@@ -899,7 +899,7 @@ public class Insulin {
 			}
 			if (inferenceInfo != null) {
 				if (inferenceInfo.error != null)
-					throw new IllegalArgumentException("The expression has an error:" + inferenceInfo.error);
+					throw new IllegalArgumentException("The expression " + opExpression + " has an error:" + inferenceInfo.error);
 				fortify(ms, left, inferenceInfo.args[0]);
 				if (right != null) {
 					fortify(ms, right, inferenceInfo.args[1]);
@@ -937,8 +937,9 @@ public class Insulin {
 		HDLAssignment[] loops = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (HDLAssignment hdlAssignment : loops) {
 			HDLOpExpression op = toOpExpression(hdlAssignment);
-			if (op == null)
+			if (op == null) {
 				continue;
+			}
 			HDLAssignment newAss = new HDLAssignment().setLeft(hdlAssignment.getLeft()).setType(HDLAssignmentType.ASSGN).setRight(op);
 			ms.replace(hdlAssignment, newAss);
 		}
@@ -985,9 +986,8 @@ public class Insulin {
 		case ASSGN:
 			return op;
 		}
-		if (op == null) {
+		if (op == null)
 			return null;
-		}
 		return op.setLeft(hdlAssignment.getLeft()).setRight(hdlAssignment.getRight());
 	}
 
@@ -1121,7 +1121,7 @@ public class Insulin {
 					// Replace all read occourances with the new bar_outRead
 					HDLQualifiedName originalFQN = var.asRef();
 					HDLQualifiedName newFQN = outVar.asRef();
-					HDLVariableRef[] reads = orig.getAllObjectsOf(HDLVariableRef.class, true);
+					HDLVariableRef[] reads = hdv.getContainer().getAllObjectsOf(HDLVariableRef.class, true);
 					for (HDLVariableRef varRef : reads)
 						if (varRef.getVarRefName().equals(originalFQN)) {
 							ms.replace(varRef, varRef.setVar(newFQN));

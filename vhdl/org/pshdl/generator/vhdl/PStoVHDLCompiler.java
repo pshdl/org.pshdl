@@ -122,6 +122,10 @@ public class PStoVHDLCompiler implements IOutputProvider {
 		HDLLibrary.registerLibrary(libURI, lib);
 	}
 
+	public PStoVHDLCompiler() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * Call this method to get an instance of the compiler. It also checks
 	 * whether the {@link HDLCore} was correctly initialized
@@ -236,6 +240,10 @@ public class PStoVHDLCompiler implements IOutputProvider {
 			}
 		}
 		return res;
+	}
+
+	public static void main(String[] args) throws IOException {
+		new PStoVHDLCompiler().invoke(args);
 	}
 
 	/**
