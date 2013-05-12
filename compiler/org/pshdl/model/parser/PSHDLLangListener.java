@@ -24,6 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
+// Generated from PSHDLLang.g4 by ANTLR 4.0
 package org.pshdl.model.parser;
 
 import org.antlr.v4.runtime.tree.*;
@@ -125,6 +126,10 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	void exitPsAccessRange(PSHDLLangParser.PsAccessRangeContext ctx);
 
+	void enterPsArrayInitSubParens(PSHDLLangParser.PsArrayInitSubParensContext ctx);
+
+	void exitPsArrayInitSubParens(PSHDLLangParser.PsArrayInitSubParensContext ctx);
+
 	void enterPsInlineFunction(PSHDLLangParser.PsInlineFunctionContext ctx);
 
 	void exitPsInlineFunction(PSHDLLangParser.PsInlineFunctionContext ctx);
@@ -200,6 +205,10 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	void enterPsQualifiedName(PSHDLLangParser.PsQualifiedNameContext ctx);
 
 	void exitPsQualifiedName(PSHDLLangParser.PsQualifiedNameContext ctx);
+
+	void enterPsArrayInitExp(PSHDLLangParser.PsArrayInitExpContext ctx);
+
+	void exitPsArrayInitExp(PSHDLLangParser.PsArrayInitExpContext ctx);
 
 	void enterPsRefPart(PSHDLLangParser.PsRefPartContext ctx);
 

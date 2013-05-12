@@ -84,6 +84,7 @@ import org.pshdl.interpreter.VariableInformation$Direction
 import org.pshdl.interpreter.VariableInformation$Type
 import java.util.LinkedList
 import org.pshdl.interpreter.InternalInformation
+import org.pshdl.model.HDLArrayInit
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -92,6 +93,7 @@ class SimulationTransformationExtension {
 		return INST.toSimulationModel(obj, context)
 	}
 
+	
 	def dispatch FluidFrame toSimulationModel(HDLExpression obj, HDLEvaluationContext context) {
 		throw new RuntimeException("Not implemented! " + obj.classType + " " + obj)
 	}
@@ -106,6 +108,21 @@ class SimulationTransformationExtension {
 
 	def dispatch FluidFrame toSimulationModel(HDLEnumDeclaration obj, HDLEvaluationContext context) {
 		return new FluidFrame
+	}
+	
+	def dispatch FluidFrame toSimulationModel(HDLArrayInit obj, HDLEvaluationContext context) {
+		val FluidFrame res=new FluidFrame
+		var pos=0
+		val last=obj.exp.size
+		for (HDLExpression xp:obj.exp){
+			res.addConstant(pos.toString, BigInteger::valueOf(pos))
+			res.add(pushAddIndex)
+			res.append(xp.toSimulationModel(context))
+			pos=pos+1
+			if (pos!=last)
+				res.add(writeMemory)
+		}
+		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context) {

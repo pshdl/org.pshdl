@@ -31,6 +31,7 @@ import java.util.*;
 import org.pshdl.model.*;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import org.pshdl.model.extensions.*;
 
 import com.google.common.collect.*;
 
@@ -60,11 +61,12 @@ public class Refactoring {
 		HDLVariable hiVar = hi.getVar();
 		String prefix = hiVar.getName();
 		subUnit = prefixVariables(subUnit, prefix);
-		ArrayList<HDLExpression> outerDims = hiVar.getDimensions();
 		subUnit = extractDefaultValue(subUnit);
+		ArrayList<HDLExpression> outerDims = hiVar.getDimensions();
 		subUnit = addArrayReference(subUnit, outerDims);
 		subUnit = addNewDimensions(subUnit, outerDims);
 		subUnit = changeDirection(subUnit);
+		subUnit = dereferenceRefs(subUnit);
 
 		ModificationSet res = new ModificationSet();
 		Collection<HDLInterfaceRef> ifRefs = HDLQuery.getInterfaceRefs(container, hiVar);
@@ -77,6 +79,15 @@ public class Refactoring {
 		}
 		List<HDLStatement> allStatements = subUnit.getInits();
 		allStatements.addAll(subUnit.getStatements());
+		for (Iterator<HDLStatement> iterator = allStatements.iterator(); iterator.hasNext();) {
+			HDLStatement hdlStatement = iterator.next();
+			if (hdlStatement instanceof HDLVariableDeclaration) {
+				HDLVariableDeclaration hvd = (HDLVariableDeclaration) hdlStatement;
+				if (hvd.getDirection() == HDLDirection.PARAMETER) {
+					iterator.remove();
+				}
+			}
+		}
 		if (outerDims.size() == 0) {
 			res.replace(hi, allStatements.toArray(new HDLStatement[allStatements.size()]));
 		} else {
@@ -93,13 +104,31 @@ public class Refactoring {
 			loop = loop.setDos(allStatements);
 			res.replace(hi, loop);
 		}
-		return res.apply(container);
+		HDLUnit apply = res.apply(container);
+		apply.validateAllFields(container.getContainer(), true);
+		return apply;
+	}
+
+	private static HDLUnit dereferenceRefs(HDLUnit subUnit) {
+		String subUnitName = FullNameExtension.fullNameOf(subUnit).toString();
+		ModificationSet ms = new ModificationSet();
+		HDLVariableRef[] ref = subUnit.getAllObjectsOf(HDLVariableRef.class, true);
+		for (HDLVariableRef varRef : ref) {
+			String string = varRef.getVarRefName().toString();
+			if (string.startsWith(subUnitName)) {
+				ms.replace(varRef, varRef.setVar(varRef.getVarRefName().getLocalPart()));
+			}
+		}
+		return ms.apply(subUnit);
 	}
 
 	private static HDLUnit extractDefaultValue(HDLUnit subUnit) {
 		ModificationSet subMS = new ModificationSet();
 		HDLVariable[] vars = subUnit.getAllObjectsOf(HDLVariable.class, true);
 		for (HDLVariable hdlVariable : vars) {
+			if (hdlVariable.getDirection() == HDLDirection.CONSTANT) {
+				continue;
+			}
 			HDLExpression defaultValue = hdlVariable.getDefaultValue();
 			if (defaultValue != null) {
 				HDLAssignment ass = new HDLAssignment().setLeft(hdlVariable.asHDLRef()).setRight(defaultValue);

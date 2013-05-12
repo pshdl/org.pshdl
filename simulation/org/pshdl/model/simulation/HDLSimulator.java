@@ -56,9 +56,10 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
-		HDLInterfaceInstantiation[] hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
-		HDLLibrary library = insulin.getLibrary();
-		for (HDLInterfaceInstantiation hi : hii) {
+		HDLInterfaceInstantiation[] hii = null;
+		while ((hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true)).length > 0) {
+			HDLLibrary library = insulin.getLibrary();
+			HDLInterfaceInstantiation hi = hii[0];
 			HDLQualifiedName asRef = hi.resolveHIf().get().asRef();
 			HDLUnit unit = library.getUnit(asRef);
 			if (unit == null)

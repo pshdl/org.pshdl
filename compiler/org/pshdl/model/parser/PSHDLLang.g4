@@ -108,11 +108,12 @@ psExpression :
 	| psExpression '||' psExpression												#psBitLogOr
 	| psExpression '?' psExpression ':' psExpression								#psTernary
 	| psValue 																		#psValueExp
+	| psArrayInitSubParens 															#psArrayInitExp
 	| '(' psExpression ')'															#psParens
 ;
 
 psValue :
-	RULE_PS_LITERAL_TERMINAL | psVariableRef | RULE_STRING
+	RULE_PS_LITERAL_TERMINAL | psVariableRef | RULE_STRING 
 ;
 
 psBitAccess :
@@ -267,13 +268,15 @@ psDeclAssignment :
 ;
 
 psArrayInit :
-	   psExpression 	|
+	   psExpression | psArrayInitSubParens
+;
+
+psArrayInitSubParens:
 	'{' psArrayInitSub  (',' psArrayInitSub )* '}'
 ;
 
 psArrayInitSub :
-	   psExpression (',' psExpression)*	|
-	'{' psArrayInitSub  (',' psArrayInitSub )* '}'
+	   psExpression (',' psExpression)*	| psArrayInitSubParens
 ;
 
 

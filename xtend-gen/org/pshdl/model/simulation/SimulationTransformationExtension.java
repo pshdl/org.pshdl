@@ -42,6 +42,7 @@ import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
@@ -126,6 +127,32 @@ public class SimulationTransformationExtension {
   protected FluidFrame _toSimulationModel(final HDLEnumDeclaration obj, final HDLEvaluationContext context) {
     FluidFrame _fluidFrame = new FluidFrame();
     return _fluidFrame;
+  }
+  
+  protected FluidFrame _toSimulationModel(final HDLArrayInit obj, final HDLEvaluationContext context) {
+    FluidFrame _fluidFrame = new FluidFrame();
+    final FluidFrame res = _fluidFrame;
+    int pos = 0;
+    ArrayList<HDLExpression> _exp = obj.getExp();
+    final int last = _exp.size();
+    ArrayList<HDLExpression> _exp_1 = obj.getExp();
+    for (final HDLExpression xp : _exp_1) {
+      {
+        String _string = Integer.valueOf(pos).toString();
+        BigInteger _valueOf = BigInteger.valueOf(pos);
+        res.addConstant(_string, _valueOf);
+        res.add(Instruction.pushAddIndex);
+        FluidFrame _simulationModel = this.toSimulationModel(xp, context);
+        res.append(_simulationModel);
+        int _plus = (pos + 1);
+        pos = _plus;
+        boolean _notEquals = (pos != last);
+        if (_notEquals) {
+          res.add(Instruction.writeMemory);
+        }
+      }
+    }
+    return res;
   }
   
   protected FluidFrame _toSimulationModel(final HDLVariableDeclaration obj, final HDLEvaluationContext context) {
@@ -1030,6 +1057,8 @@ public class SimulationTransformationExtension {
       return _toSimulationModel((HDLSwitchStatement)obj, context);
     } else if (obj instanceof HDLVariableDeclaration) {
       return _toSimulationModel((HDLVariableDeclaration)obj, context);
+    } else if (obj instanceof HDLArrayInit) {
+      return _toSimulationModel((HDLArrayInit)obj, context);
     } else if (obj instanceof HDLAssignment) {
       return _toSimulationModel((HDLAssignment)obj, context);
     } else if (obj instanceof HDLConcat) {

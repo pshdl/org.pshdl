@@ -82,6 +82,8 @@ import org.pshdl.model.parser.PSHDLLangParser$PsUnitContext
 import org.pshdl.model.parser.PSHDLLangParser$PsDeclarationContext
 import org.pshdl.model.parser.PSHDLLangParser$PsDeclarationTypeContext
 import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitContext
+import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitSubParensContext
+import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitExpContext
 import org.pshdl.model.parser.PSHDLLangParser$PsAnnotationContext
 import org.pshdl.model.parser.PSHDLLangParser$PsFunctionDeclarationContext
 import org.pshdl.model.parser.PSHDLLangParser$PsFuncParamTypeContext
@@ -240,8 +242,10 @@ class ParserToModelExtension {
 		if (context.psExpression !== null) {
 			return context.psExpression.toHDL.attachContext(context)
 		}
-		val arr = new HDLArrayInit().setExp(context.psArrayInitSub.map[toHDL as HDLExpression])
-		return arr.attachContext(context)
+		return context.psArrayInitSubParens.toHDL
+	}
+	def dispatch IHDLObject toHDL(PsArrayInitExpContext context) {
+		return context.psArrayInitSubParens.toHDL
 	}
 
 	def dispatch IHDLObject toHDL(PsArrayInitSubContext context) {
@@ -251,8 +255,12 @@ class ParserToModelExtension {
 			val arr = new HDLArrayInit().setExp(context.psExpression.map[toHDL as HDLExpression])
 			return arr.attachContext(context)
 		}
-		val arr = new HDLArrayInit().setExp(context.psArrayInitSub.map[toHDL as HDLExpression])
-		return arr.attachContext(context)
+		return context.psArrayInitSubParens.toHDL
+	}
+	
+	def dispatch HDLArrayInit toHDL(PsArrayInitSubParensContext context){
+		val res=new HDLArrayInit().setExp(context.psArrayInitSub.map[toHDL as HDLExpression])
+		return res.attachContext(context)
 	}
 
 	def dispatch HDLType toHDL(PsPrimitiveContext context) {

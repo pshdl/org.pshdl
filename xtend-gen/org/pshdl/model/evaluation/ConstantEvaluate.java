@@ -286,6 +286,13 @@ public class ConstantEvaluate {
   }
   
   public Optional<BigInteger> subEvaluate(final HDLExpression container, final HDLExpression left, final HDLEvaluationContext context) {
+    boolean _equals = Objects.equal(left, null);
+    if (_equals) {
+      String _plus = ("Container:" + container);
+      String _plus_1 = (_plus + " has null left expression");
+      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_1);
+      throw _illegalArgumentException;
+    }
     final Optional<BigInteger> leftVal = this.constantEvaluate(left, context);
     boolean _isPresent = leftVal.isPresent();
     boolean _not = (!_isPresent);

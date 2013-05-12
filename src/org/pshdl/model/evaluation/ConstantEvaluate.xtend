@@ -194,6 +194,8 @@ class ConstantEvaluate {
 	}
 
 	def Optional<BigInteger> subEvaluate(HDLExpression container, HDLExpression left, HDLEvaluationContext context) {
+		if (left==null)
+			throw new IllegalArgumentException("Container:"+container+" has null left expression");
 		val Optional<BigInteger> leftVal = left.constantEvaluate(context)
 		if (!leftVal.present) {
 			container.addMeta(SOURCE, left)
