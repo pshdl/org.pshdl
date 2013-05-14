@@ -258,9 +258,8 @@ class ParserToModelExtension {
 		return context.psArrayInitSubParens.toHDL
 	}
 	
-	def dispatch HDLArrayInit toHDL(PsArrayInitSubParensContext context){
-		val res=new HDLArrayInit().setExp(context.psArrayInitSub.map[toHDL as HDLExpression])
-		return res.attachContext(context)
+	def dispatch IHDLObject toHDL(PsArrayInitSubParensContext context){
+		return context.psArrayInitSub.toHDL.attachContext(context)
 	}
 
 	def dispatch HDLType toHDL(PsPrimitiveContext context) {

@@ -139,6 +139,7 @@ class VHDLStatementExtension {
 	def dispatch VHDLContext toVHDL(IHDLObject obj, int pid) {
 		throw new IllegalArgumentException("Not correctly implemented")
 	}
+
 	def dispatch VHDLContext toVHDL(HDLDirectGeneration obj, int pid) {
 		return new VHDLContext
 	}
@@ -404,10 +405,14 @@ class VHDLStatementExtension {
 				if (hvar.defaultValue !== null)
 					constant.setDefaultValue(hvar.defaultValue.toVHDL)
 				if (noExplicitResetVar) {
-					var Aggregate assign = Aggregate::OTHERS(new CharacterLiteral('0'.charAt(0)))
-					for (HDLExpression exp : hvar.dimensions)
-						assign = Aggregate::OTHERS(assign)
-					s.setDefaultValue(assign)
+					if (resetValue instanceof HDLArrayInit) {
+						s.setDefaultValue(resetValue.toVHDL)
+					} else {
+						var Aggregate assign = Aggregate::OTHERS(resetValue.toVHDL)
+						for (HDLExpression exp : hvar.dimensions)
+							assign = Aggregate::OTHERS(assign)
+						s.setDefaultValue(assign)
+					}
 				}
 				switch (obj.direction) {
 					case IN: {

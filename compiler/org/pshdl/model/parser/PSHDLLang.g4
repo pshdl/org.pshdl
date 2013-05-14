@@ -272,7 +272,7 @@ psArrayInit :
 ;
 
 psArrayInitSubParens:
-	'{' psArrayInitSub  (',' psArrayInitSub )* '}'
+	'{' psArrayInitSub '}'
 ;
 
 psArrayInitSub :

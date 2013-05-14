@@ -31,8 +31,10 @@ import com.google.common.base.Optional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.interpreter.InternalInformation;
@@ -65,6 +67,8 @@ import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLRegisterConfig;
 import org.pshdl.model.HDLRegisterConfig.HDLRegClockType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
+import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 import org.pshdl.model.HDLResolvedRef;
 import org.pshdl.model.HDLShiftOp;
 import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
@@ -129,35 +133,37 @@ public class SimulationTransformationExtension {
     return _fluidFrame;
   }
   
-  protected FluidFrame _toSimulationModel(final HDLArrayInit obj, final HDLEvaluationContext context) {
+  protected FluidFrame _toSimulationModel(final HDLExpression obj, final HDLEvaluationContext context, final String varName) {
+    FluidFrame _fluidFrame = new FluidFrame();
+    final FluidFrame res = _fluidFrame;
+    FluidFrame _simulationModel = this.toSimulationModel(obj, context);
+    res.append(_simulationModel);
+    ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.writeInternal, varName);
+    res.add(_argumentedInstruction);
+    return res;
+  }
+  
+  protected FluidFrame _toSimulationModel(final HDLArrayInit obj, final HDLEvaluationContext context, final String varName) {
     FluidFrame _fluidFrame = new FluidFrame();
     final FluidFrame res = _fluidFrame;
     int pos = 0;
     ArrayList<HDLExpression> _exp = obj.getExp();
-    final int last = _exp.size();
-    ArrayList<HDLExpression> _exp_1 = obj.getExp();
-    for (final HDLExpression xp : _exp_1) {
+    for (final HDLExpression exp : _exp) {
       {
-        String _string = Integer.valueOf(pos).toString();
-        BigInteger _valueOf = BigInteger.valueOf(pos);
-        res.addConstant(_string, _valueOf);
-        res.add(Instruction.pushAddIndex);
-        FluidFrame _simulationModel = this.toSimulationModel(xp, context);
+        HDLLiteral _get = HDLLiteral.get(pos);
+        FluidFrame _simulationModel = this.toSimulationModel(_get, context);
         res.append(_simulationModel);
+        res.add(Instruction.pushAddIndex);
+        FluidFrame _simulationModel_1 = this.toSimulationModel(exp, context, varName);
+        res.append(_simulationModel_1);
         int _plus = (pos + 1);
         pos = _plus;
-        boolean _notEquals = (pos != last);
-        if (_notEquals) {
-          res.add(Instruction.writeMemory);
-        }
       }
     }
     return res;
   }
   
   protected FluidFrame _toSimulationModel(final HDLVariableDeclaration obj, final HDLEvaluationContext context) {
-    FluidFrame _fluidFrame = new FluidFrame();
-    final FluidFrame res = _fluidFrame;
     Optional<? extends HDLType> _resolveType = obj.resolveType();
     final HDLType type = _resolveType.get();
     Integer _xifexpression = null;
@@ -172,6 +178,35 @@ public class SimulationTransformationExtension {
     final Integer width = _xifexpression;
     HDLRegisterConfig _register = obj.getRegister();
     final boolean isReg = (!Objects.equal(_register, null));
+    FluidFrame _fluidFrame = new FluidFrame("#null", false);
+    final FluidFrame res = _fluidFrame;
+    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false);
+    res.addVar(_variableInformation);
+    Direction dir = null;
+    HDLDirection _direction = obj.getDirection();
+    final HDLDirection _switchValue = _direction;
+    boolean _matched = false;
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLDirection.IN)) {
+        _matched=true;
+        dir = Direction.IN;
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLDirection.OUT)) {
+        _matched=true;
+        dir = Direction.OUT;
+      }
+    }
+    if (!_matched) {
+      if (Objects.equal(_switchValue,HDLDirection.INOUT)) {
+        _matched=true;
+        dir = Direction.INOUT;
+      }
+    }
+    if (!_matched) {
+      dir = Direction.INTERNAL;
+    }
     ArrayList<HDLVariable> _variables = obj.getVariables();
     for (final HDLVariable hVar : _variables) {
       {
@@ -185,31 +220,6 @@ public class SimulationTransformationExtension {
           BigInteger _get = _valueOf.get();
           int _intValue = _get.intValue();
           dims.add(Integer.valueOf(_intValue));
-        }
-        Direction dir = null;
-        HDLDirection _direction = hVar.getDirection();
-        final HDLDirection _switchValue = _direction;
-        boolean _matched = false;
-        if (!_matched) {
-          if (Objects.equal(_switchValue,HDLDirection.IN)) {
-            _matched=true;
-            dir = Direction.IN;
-          }
-        }
-        if (!_matched) {
-          if (Objects.equal(_switchValue,HDLDirection.OUT)) {
-            _matched=true;
-            dir = Direction.OUT;
-          }
-        }
-        if (!_matched) {
-          if (Objects.equal(_switchValue,HDLDirection.INOUT)) {
-            _matched=true;
-            dir = Direction.INOUT;
-          }
-        }
-        if (!_matched) {
-          dir = Direction.INTERNAL;
         }
         Type vType = Type.BIT;
         HDLClass _classType_1 = type.getClassType();
@@ -243,9 +253,70 @@ public class SimulationTransformationExtension {
             }
           }
         }
-        VariableInformation _variableInformation = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, ((int[])Conversions.unwrapArray(dims, int.class)));
-        res.addVar(_variableInformation);
+        VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, ((int[])Conversions.unwrapArray(dims, int.class)));
+        res.addVar(_variableInformation_1);
       }
+    }
+    if (isReg) {
+      HDLRegisterConfig _register_1 = obj.getRegister();
+      final HDLRegisterConfig config = _register_1.normalize();
+      Optional<HDLVariable> _resolveRst = config.resolveRst();
+      final HDLVariable rst = _resolveRst.get();
+      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(rst);
+      final String rstName = _fullNameOf.toString();
+      HDLRegResetActiveType _resetType = config.getResetType();
+      boolean _tripleEquals_1 = (_resetType == HDLRegResetActiveType.HIGH);
+      if (_tripleEquals_1) {
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.posPredicate, rstName);
+        res.add(_argumentedInstruction);
+      } else {
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.negPredicate, rstName);
+        res.add(_argumentedInstruction_1);
+      }
+      HDLRegSyncType _syncType = config.getSyncType();
+      boolean _tripleEquals_2 = (_syncType == HDLRegSyncType.SYNC);
+      if (_tripleEquals_2) {
+        Optional<HDLVariable> _resolveClk = config.resolveClk();
+        final HDLVariable clk = _resolveClk.get();
+        HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(clk);
+        final String name = _fullNameOf_1.toString();
+        HDLRegClockType _clockType = config.getClockType();
+        boolean _equals = Objects.equal(_clockType, HDLRegClockType.RISING);
+        if (_equals) {
+          ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.isRisingEdge, name);
+          res.add(_argumentedInstruction_2);
+        } else {
+          ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.isFallingEdge, name);
+          res.add(_argumentedInstruction_3);
+        }
+      }
+      HDLExpression _resetValue = config.getResetValue();
+      if ((_resetValue instanceof HDLArrayInit)) {
+        ArrayList<HDLVariable> _variables_1 = obj.getVariables();
+        for (final HDLVariable hVar_1 : _variables_1) {
+          {
+            res.add(Instruction.const0);
+            HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(hVar_1);
+            String _string = _fullNameOf_2.toString();
+            ArgumentedInstruction _argumentedInstruction_4 = new ArgumentedInstruction(Instruction.writeInternal, _string);
+            res.add(_argumentedInstruction_4);
+            HDLExpression _resetValue_1 = config.getResetValue();
+            final HDLArrayInit arr = ((HDLArrayInit) _resetValue_1);
+            HDLQualifiedName _fullNameOf_3 = FullNameExtension.fullNameOf(hVar_1);
+            String _string_1 = _fullNameOf_3.toString();
+            FluidFrame _simulationModel = this.toSimulationModel(arr, context, _string_1);
+            res.append(_simulationModel);
+          }
+        }
+      } else {
+        HDLExpression _resetValue_1 = config.getResetValue();
+        final FluidFrame resetFrame = this.toSimulationModel(_resetValue_1, context);
+        ArrayList<HDLVariable> _variables_2 = obj.getVariables();
+        for (final HDLVariable hVar_2 : _variables_2) {
+          res.append(resetFrame);
+        }
+      }
+      res.add(Instruction.endFrame);
     }
     return res;
   }
@@ -277,7 +348,7 @@ public class SimulationTransformationExtension {
         HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(c);
         final String cName = _fullNameOf_1.toString();
         String _plus = (InternalInformation.PRED_PREFIX + cName);
-        FluidFrame _fluidFrame = new FluidFrame(_plus);
+        FluidFrame _fluidFrame = new FluidFrame(_plus, false);
         final FluidFrame defaultFrame = _fluidFrame;
         defaultFrame.createPredVar();
         HDLExpression _label = c.getLabel();
@@ -384,6 +455,8 @@ public class SimulationTransformationExtension {
   protected FluidFrame _toSimulationModel(final HDLAssignment obj, final HDLEvaluationContext context) {
     final HDLReference left = obj.getLeft();
     final HDLVariable hVar = this.resolveVar(left);
+    HDLDirection _direction = hVar.getDirection();
+    final boolean constant = (_direction == HDLDirection.CONSTANT);
     HDLRegisterConfig config = hVar.getRegisterConfig();
     FluidFrame res = null;
     boolean _tripleNotEquals = (config != null);
@@ -391,12 +464,12 @@ public class SimulationTransformationExtension {
       HDLReference _left = obj.getLeft();
       String _varName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true);
       String _plus = (_varName + InternalInformation.REG_POSTFIX);
-      FluidFrame _fluidFrame = new FluidFrame(_plus);
+      FluidFrame _fluidFrame = new FluidFrame(_plus, constant);
       res = _fluidFrame;
     } else {
       HDLReference _left_1 = obj.getLeft();
       String _varName_1 = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left_1), true);
-      FluidFrame _fluidFrame_1 = new FluidFrame(_varName_1);
+      FluidFrame _fluidFrame_1 = new FluidFrame(_varName_1, constant);
       res = _fluidFrame_1;
     }
     boolean _tripleNotEquals_1 = (config != null);
@@ -542,6 +615,31 @@ public class SimulationTransformationExtension {
     for (final HDLStatement stmnt_1 : _statements) {
       FluidFrame _simulationModel_1 = this.toSimulationModel(stmnt_1, context);
       res.addReferencedFrame(_simulationModel_1);
+    }
+    final HDLRegisterConfig[] regConfigs = obj.<HDLRegisterConfig>getAllObjectsOf(HDLRegisterConfig.class, true);
+    HashSet<String> _hashSet = new HashSet<String>();
+    final Set<String> lst = _hashSet;
+    for (final HDLRegisterConfig reg : regConfigs) {
+      {
+        Optional<HDLVariable> _resolveRst = reg.resolveRst();
+        final HDLVariable rstVar = _resolveRst.get();
+        String _name = rstVar.getName();
+        boolean _contains = lst.contains(_name);
+        boolean _not = (!_contains);
+        if (_not) {
+          String _name_1 = rstVar.getName();
+          lst.add(_name_1);
+          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(rstVar);
+          final String rstVarName = _fullNameOf.toString();
+          String _plus = (InternalInformation.PRED_PREFIX + rstVarName);
+          FluidFrame _fluidFrame_1 = new FluidFrame(_plus, false);
+          final FluidFrame rstFrame = _fluidFrame_1;
+          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadInternal, rstVarName);
+          rstFrame.add(_argumentedInstruction);
+          rstFrame.createPredVar();
+          res.addReferencedFrame(rstFrame);
+        }
+      }
     }
     return res;
   }
@@ -785,22 +883,28 @@ public class SimulationTransformationExtension {
       }
       if (_or) {
         _matched=true;
-        final Optional<BigInteger> bVal = ConstantEvaluate.valueOf(obj, context);
-        boolean _isPresent_1 = bVal.isPresent();
-        boolean _not_3 = (!_isPresent_1);
+        boolean _not_3 = (!fixedArray);
         if (_not_3) {
-          IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Const/param should be constant");
-          throw _illegalArgumentException;
+          ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
+          res.add(_argumentedInstruction_1);
+        } else {
+          final Optional<BigInteger> bVal = ConstantEvaluate.valueOf(obj, context);
+          boolean _isPresent_1 = bVal.isPresent();
+          boolean _not_4 = (!_isPresent_1);
+          if (_not_4) {
+            IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Const/param should be constant");
+            throw _illegalArgumentException;
+          }
+          BigInteger _get_1 = bVal.get();
+          res.addConstant(refName, _get_1);
         }
-        BigInteger _get_1 = bVal.get();
-        res.addConstant(refName, _get_1);
       }
     }
     if (!_matched) {
       if (Objects.equal(dir,HDLDirection.IN)) {
         _matched=true;
-        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
-        res.add(_argumentedInstruction_1);
+        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
+        res.add(_argumentedInstruction_2);
       }
     }
     if (!_matched) {
@@ -814,8 +918,8 @@ public class SimulationTransformationExtension {
       }
       if (_or_1) {
         _matched=true;
-        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
-        res.add(_argumentedInstruction_2);
+        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
+        res.add(_argumentedInstruction_3);
       }
     }
     if (!_matched) {
@@ -1057,8 +1161,6 @@ public class SimulationTransformationExtension {
       return _toSimulationModel((HDLSwitchStatement)obj, context);
     } else if (obj instanceof HDLVariableDeclaration) {
       return _toSimulationModel((HDLVariableDeclaration)obj, context);
-    } else if (obj instanceof HDLArrayInit) {
-      return _toSimulationModel((HDLArrayInit)obj, context);
     } else if (obj instanceof HDLAssignment) {
       return _toSimulationModel((HDLAssignment)obj, context);
     } else if (obj instanceof HDLConcat) {
@@ -1076,6 +1178,17 @@ public class SimulationTransformationExtension {
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(obj, context).toString());
+    }
+  }
+  
+  public FluidFrame toSimulationModel(final HDLExpression obj, final HDLEvaluationContext context, final String varName) {
+    if (obj instanceof HDLArrayInit) {
+      return _toSimulationModel((HDLArrayInit)obj, context, varName);
+    } else if (obj != null) {
+      return _toSimulationModel(obj, context, varName);
+    } else {
+      throw new IllegalArgumentException("Unhandled parameter types: " +
+        Arrays.<Object>asList(obj, context, varName).toString());
     }
   }
 }

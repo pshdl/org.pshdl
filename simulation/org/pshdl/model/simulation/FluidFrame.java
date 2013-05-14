@@ -106,21 +106,23 @@ public class FluidFrame {
 
 	public final LinkedList<ArgumentedInstruction> instructions = new LinkedList<ArgumentedInstruction>();
 	public String outputName;
+	public final boolean constant;
 
 	public final Set<FluidFrame> references = new LinkedHashSet<FluidFrame>();
 	public final Map<String, VariableInformation> vars = new HashMap<String, VariableInformation>();
 
 	public FluidFrame() {
-		this(null);
+		this(null, false);
 	}
 
-	public FluidFrame(String outputName) {
+	public FluidFrame(String outputName, boolean constant) {
 		this.id = gid.incrementAndGet();
 		if (outputName != null) {
 			this.outputName = outputName;
 		} else {
 			this.outputName = Integer.toString(id);
 		}
+		this.constant = constant;
 	}
 
 	public void add(ArgumentedInstruction argumentedInstruction) {
@@ -190,15 +192,6 @@ public class FluidFrame {
 		}
 	}
 
-	private byte[] toByteArray(Collection<Byte> instr) {
-		byte[] instrRes = new byte[instr.size()];
-		int pos = 0;
-		for (Byte i : instr) {
-			instrRes[pos++] = i;
-		}
-		return instrRes;
-	}
-
 	private int[] toIntArray(Collection<Integer> instr) {
 		int[] instrRes = new int[instr.size()];
 		int pos = 0;
@@ -265,6 +258,7 @@ public class FluidFrame {
 				arg1 = internalId;
 				break;
 			}
+			case writeInternal:
 			case loadInternal:
 				Integer internalId = register.getInternal(toFullRef(ai));
 				if (internalId != null) {
@@ -321,12 +315,12 @@ public class FluidFrame {
 		}
 		List<Frame> res = new LinkedList<Frame>();
 		if (hasInstructions()) {
-			Integer outputId;
-			outputId = register.registerInternal(outputName);
+			int outputId = register.registerInternal(outputName);
 			int[] internalDepRes = toIntArray(internalDependencies);
 			FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
 			BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
-			Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id);
+			Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id,
+					constant);
 			for (FluidFrame ff : references) {
 				ff.toFrame(register);
 			}
@@ -350,7 +344,7 @@ public class FluidFrame {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\nFrame: ").append(id).append('[').append(id).append("]\n");
+		sb.append("\nFrame: ").append(outputName).append('[').append(id).append("]\n");
 		if (constants.size() != 0) {
 			sb.append("Constants:\n");
 			for (Entry<String, BigInteger> entry : constants.entrySet()) {

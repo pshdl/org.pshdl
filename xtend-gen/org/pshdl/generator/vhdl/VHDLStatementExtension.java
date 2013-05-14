@@ -45,7 +45,6 @@ import de.upb.hni.vmagic.expression.Expression;
 import de.upb.hni.vmagic.expression.Literal;
 import de.upb.hni.vmagic.expression.TypeConversion;
 import de.upb.hni.vmagic.libraryunit.Entity;
-import de.upb.hni.vmagic.literal.CharacterLiteral;
 import de.upb.hni.vmagic.object.Constant;
 import de.upb.hni.vmagic.object.Signal;
 import de.upb.hni.vmagic.object.SignalAssignmentTarget;
@@ -88,6 +87,7 @@ import org.pshdl.generator.vhdl.libraries.VHDLCastsLibrary;
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
@@ -695,15 +695,19 @@ public class VHDLStatementExtension {
             constant.setDefaultValue(_vHDL);
           }
           if (noExplicitResetVar) {
-            char _charAt = "0".charAt(0);
-            CharacterLiteral _characterLiteral = new CharacterLiteral(_charAt);
-            Aggregate assign = Aggregate.OTHERS(_characterLiteral);
-            ArrayList<HDLExpression> _dimensions_4 = hvar.getDimensions();
-            for (final HDLExpression exp : _dimensions_4) {
-              Aggregate _OTHERS = Aggregate.OTHERS(assign);
-              assign = _OTHERS;
+            if ((resetValue instanceof HDLArrayInit)) {
+              Expression<? extends Object> _vHDL_1 = this.vee.toVHDL(resetValue);
+              s.setDefaultValue(_vHDL_1);
+            } else {
+              Expression<? extends Object> _vHDL_2 = this.vee.toVHDL(resetValue);
+              Aggregate assign = Aggregate.OTHERS(_vHDL_2);
+              ArrayList<HDLExpression> _dimensions_4 = hvar.getDimensions();
+              for (final HDLExpression exp : _dimensions_4) {
+                Aggregate _OTHERS = Aggregate.OTHERS(assign);
+                assign = _OTHERS;
+              }
+              s.setDefaultValue(assign);
             }
-            s.setDefaultValue(assign);
           }
           HDLDirection _direction = obj.getDirection();
           final HDLDirection _switchValue = _direction;

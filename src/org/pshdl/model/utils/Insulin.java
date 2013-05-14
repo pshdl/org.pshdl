@@ -782,7 +782,15 @@ public class Insulin {
 			HDLRegisterConfig reg = hvd.getRegister();
 			HDLType determineType = TypeExtension.typeOf(hvd).get();
 			if (reg != null) {
-				fortify(ms, reg.getResetValue(), determineType);
+				HDLExpression resetValue = reg.getResetValue();
+				if (!(resetValue instanceof HDLArrayInit)) {
+					if (resetValue != null) {
+						fortify(ms, resetValue, determineType);
+					}
+				} else {
+					HDLArrayInit hai = (HDLArrayInit) resetValue;
+					fortifyArrayInitExp(ms, determineType, hai);
+				}
 			}
 			for (HDLVariable var : hvd.getVariables()) {
 				HDLExpression defaultValue = var.getDefaultValue();

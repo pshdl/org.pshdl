@@ -45,6 +45,7 @@ public class HDLSimulator {
 	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src) {
 		HDLUnit insulin = Insulin.transform(unit, src);
 		insulin = flattenAll(context, insulin);
+		insulin = convertArrayInits(context, insulin);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
@@ -53,6 +54,52 @@ public class HDLSimulator {
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 		// generate reset condition
+	}
+
+	private static HDLUnit convertArrayInits(HDLEvaluationContext context, HDLUnit insulin) {
+		ModificationSet ms = new ModificationSet();
+		HDLArrayInit[] inits = insulin.getAllObjectsOf(HDLArrayInit.class, true);
+		for (HDLArrayInit arrayInit : inits) {
+			IHDLObject container = arrayInit.getContainer();
+			switch (container.getClassType()) {
+			case HDLArrayInit:
+				break;
+			case HDLAssignment:
+				HDLReference left = ((HDLAssignment) container).getLeft();
+				if (!(left instanceof HDLVariableRef))
+					throw new IllegalArgumentException("Unsupported assignment target for ArrayInit:" + left);
+				HDLVariableRef varRef = (HDLVariableRef) left;
+				addInit(varRef, arrayInit, container, ms);
+				ms.remove(container);
+				break;
+			case HDLVariable:
+				HDLVariable var = (HDLVariable) container;
+				addInit(var.asHDLRef(), arrayInit, var.getContainer(), ms);
+				ms.replace(var, var.setDefaultValue(null));
+				break;
+			case HDLRegisterConfig:
+				// resetValues are taken care of later
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported container for ArrayInit:" + container);
+			}
+		}
+		return ms.apply(insulin);
+	}
+
+	private static void addInit(HDLVariableRef varRef, HDLArrayInit arrayInit, IHDLObject container, ModificationSet ms) {
+		ArrayList<HDLExpression> exp = arrayInit.getExp();
+		for (int i = 0; i < exp.size(); i++) {
+			HDLExpression subExp = exp.get(i);
+			HDLVariableRef addArray = varRef.addArray(HDLLiteral.get(i));
+			if (subExp instanceof HDLArrayInit) {
+				HDLArrayInit subArray = (HDLArrayInit) subExp;
+				addInit(addArray, subArray, container, ms);
+			} else {
+				HDLAssignment ass = new HDLAssignment().setLeft(addArray).setRight(subExp);
+				ms.insertAfter(container, ass);
+			}
+		}
 	}
 
 	private static HDLUnit flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
