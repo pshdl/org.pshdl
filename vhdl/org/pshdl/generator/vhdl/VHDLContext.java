@@ -55,8 +55,9 @@ public class VHDLContext {
 	public LinkedList<ConstantDeclaration> constantsPkg = new LinkedList<ConstantDeclaration>();
 	public LinkedList<Constant> generics = new LinkedList<Constant>();
 	public LinkedList<DeclarativeItem> internals = new LinkedList<DeclarativeItem>();
-	public LinkedList<BlockDeclarativeItem> internalTypes = new LinkedList<BlockDeclarativeItem>();
-	public LinkedList<BlockDeclarativeItem> externalTypes = new LinkedList<BlockDeclarativeItem>();
+	public LinkedList<DeclarativeItemMarker> internalTypes = new LinkedList<DeclarativeItemMarker>();
+	public LinkedList<DeclarativeItemMarker> externalTypes = new LinkedList<DeclarativeItemMarker>();
+	public LinkedList<DeclarativeItemMarker> internalTypesConstants = new LinkedList<DeclarativeItemMarker>();
 	public Set<HDLQualifiedName> imports = new TreeSet<HDLQualifiedName>();
 
 	public void addClockedStatement(HDLRegisterConfig config, SequentialStatement sa) {
@@ -97,6 +98,7 @@ public class VHDLContext {
 		ports.addAll(vhdl.ports);
 		generics.addAll(vhdl.generics);
 		constants.addAll(vhdl.constants);
+		internalTypesConstants.addAll(vhdl.internalTypesConstants);
 		constantsPkg.addAll(vhdl.constantsPkg);
 		internals.addAll(vhdl.internals);
 		internalTypes.addAll(vhdl.internalTypes);
@@ -161,10 +163,6 @@ public class VHDLContext {
 		generics.add(sd);
 	}
 
-	public void addInternalTypeDeclaration(BlockDeclarativeItem type) {
-		internalTypes.add(type);
-	}
-
 	public void addResetValue(HDLRegisterConfig config, SequentialStatement sa) {
 		config = config.normalize();
 		LinkedList<SequentialStatement> list = resetStatements.get(config);
@@ -193,13 +191,15 @@ public class VHDLContext {
 
 	public void addConstantDeclaration(ConstantDeclaration cd) {
 		constants.add(cd);
+		internalTypesConstants.add(cd);
 	}
 
-	public void addTypeDeclaration(BlockDeclarativeItem type, boolean isExternal) {
+	public void addTypeDeclaration(DeclarativeItemMarker type, boolean isExternal) {
 		if (isExternal) {
 			externalTypes.add(type);
 		} else {
 			internalTypes.add(type);
+			internalTypesConstants.add(type);
 		}
 	}
 

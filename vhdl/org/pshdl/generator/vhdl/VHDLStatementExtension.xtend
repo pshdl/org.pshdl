@@ -189,7 +189,7 @@ class VHDLStatementExtension {
 			enums.add(hVar.name)
 		}
 		val String[] enumArr = enums
-		res.addInternalTypeDeclaration(new EnumerationType(hEnum.name, enumArr))
+		res.addTypeDeclaration(new EnumerationType(hEnum.name, enumArr), false)
 		return res.attachComment(obj)
 	}
 
@@ -384,7 +384,7 @@ class VHDLStatementExtension {
 						ranges.add(range)
 					}
 					val boolean external = obj.isExternal
-					val DiscreteRange[] arrRangs = ranges
+					val DiscreteRange<?>[] arrRangs = ranges
 					val ConstrainedArray arrType = new ConstrainedArray(getArrayRefName(hvar, external), type, arrRangs)
 					res.addTypeDeclaration(arrType, external)
 					varType = arrType
@@ -408,10 +408,12 @@ class VHDLStatementExtension {
 					if (resetValue instanceof HDLArrayInit) {
 						s.setDefaultValue(resetValue.toVHDL)
 					} else {
-						var Aggregate assign = Aggregate::OTHERS(resetValue.toVHDL)
-						for (HDLExpression exp : hvar.dimensions)
-							assign = Aggregate::OTHERS(assign)
-						s.setDefaultValue(assign)
+						if (resetValue!==null){
+							var Aggregate assign = Aggregate::OTHERS(resetValue.toVHDL)
+							for (HDLExpression exp : hvar.dimensions)
+								assign = Aggregate::OTHERS(assign)
+							s.setDefaultValue(assign)
+						}
 					}
 				}
 				switch (obj.direction) {

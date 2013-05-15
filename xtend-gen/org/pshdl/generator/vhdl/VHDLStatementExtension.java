@@ -274,7 +274,7 @@ public class VHDLStatementExtension {
     final String[] enumArr = ((String[])Conversions.unwrapArray(enums, String.class));
     String _name_1 = hEnum.getName();
     EnumerationType _enumerationType = new EnumerationType(_name_1, enumArr);
-    res.addInternalTypeDeclaration(_enumerationType);
+    res.addTypeDeclaration(_enumerationType, false);
     return this.attachComment(res, obj);
   }
   
@@ -644,7 +644,7 @@ public class VHDLStatementExtension {
               }
             }
             final boolean external = obj.isExternal();
-            final DiscreteRange[] arrRangs = ((DiscreteRange[])Conversions.unwrapArray(ranges, DiscreteRange.class));
+            final DiscreteRange<?>[] arrRangs = ((DiscreteRange<?>[])Conversions.unwrapArray(ranges, DiscreteRange.class));
             String _arrayRefName = VHDLStatementExtension.getArrayRefName(hvar, external);
             ConstrainedArray _constrainedArray = new ConstrainedArray(_arrayRefName, type, arrRangs);
             final ConstrainedArray arrType = _constrainedArray;
@@ -699,14 +699,17 @@ public class VHDLStatementExtension {
               Expression<? extends Object> _vHDL_1 = this.vee.toVHDL(resetValue);
               s.setDefaultValue(_vHDL_1);
             } else {
-              Expression<? extends Object> _vHDL_2 = this.vee.toVHDL(resetValue);
-              Aggregate assign = Aggregate.OTHERS(_vHDL_2);
-              ArrayList<HDLExpression> _dimensions_4 = hvar.getDimensions();
-              for (final HDLExpression exp : _dimensions_4) {
-                Aggregate _OTHERS = Aggregate.OTHERS(assign);
-                assign = _OTHERS;
+              boolean _tripleNotEquals_6 = (resetValue != null);
+              if (_tripleNotEquals_6) {
+                Expression<? extends Object> _vHDL_2 = this.vee.toVHDL(resetValue);
+                Aggregate assign = Aggregate.OTHERS(_vHDL_2);
+                ArrayList<HDLExpression> _dimensions_4 = hvar.getDimensions();
+                for (final HDLExpression exp : _dimensions_4) {
+                  Aggregate _OTHERS = Aggregate.OTHERS(assign);
+                  assign = _OTHERS;
+                }
+                s.setDefaultValue(assign);
               }
-              s.setDefaultValue(assign);
             }
           }
           HDLDirection _direction = obj.getDirection();

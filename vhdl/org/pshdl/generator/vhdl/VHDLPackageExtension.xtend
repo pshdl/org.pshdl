@@ -144,10 +144,9 @@ class VHDLPackageExtension {
 		}
 		e.port.addAll(unit.ports)
 		e.generic.addAll(unit.generics)
-		e.declarations.addAll(unit.constants)
+		e.declarations.addAll(unit.internalTypesConstants as List)
 		res.add(e)
 		val Architecture a = new Architecture("pshdlGenerated", e)
-		e.declarations.addAll(unit.internalTypes as List)
 		a.declarations.addAll(unit.internals as List)
 		a.statements.addAll(unit.concurrentStatements)
 		for (Map$Entry<Integer,LinkedList<SequentialStatement>> uc : unit.unclockedStatements.entrySet) {
