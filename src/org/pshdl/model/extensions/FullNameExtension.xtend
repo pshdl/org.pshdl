@@ -202,8 +202,20 @@ class FullNameExtension {
 	def HDLQualifiedName getSuperFullName(HDLObject obj) {
 		if (obj.getMeta(FULLNAME) !== null)
 			return obj.getMeta(FULLNAME)
-		if (obj.container !== null)
-			return getFullName(obj.container)
+		if (obj.container !== null){
+			val fn=getFullName(obj.container)
+			if (obj.container instanceof HDLIfStatement){
+				val HDLIfStatement ifStmnt=obj.container as HDLIfStatement
+				val side=ifStmnt.treeSide(obj)
+				switch (side){
+					case HDLIfStatement$TreeSide::thenTree: 
+						return new HDLQualifiedName(fn.toString+"p")
+					case HDLIfStatement$TreeSide::elseTree: 
+						return new HDLQualifiedName(fn.toString+"n")
+				}
+			}			
+			return fn
+		}
 		return HDLQualifiedName::EMPTY
 	}
 

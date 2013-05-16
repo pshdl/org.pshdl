@@ -33,6 +33,8 @@ import javax.annotation.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
+import com.google.common.collect.*;
+
 /**
  * The class HDLIfStatement contains the following fields
  * <ul>
@@ -109,7 +111,29 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			return obj.getElseDo();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+	public static enum TreeSide {
+		none, thenTree, elseTree
+	}
+
+	private Map<Integer, TreeSide> treeSides;
+
+	public TreeSide treeSide(IHDLObject stmnt) {
+		if (treeSides == null) {
+			treeSides = Maps.newHashMap();
+			for (HDLStatement t : thenDo) {
+				treeSides.put(t.getID(), TreeSide.thenTree);
+			}
+			for (HDLStatement t : elseDo) {
+				treeSides.put(t.getID(), TreeSide.elseTree);
+			}
+		}
+		TreeSide side = treeSides.get(stmnt.getID());
+		if (side != null)
+			return side;
+		return TreeSide.none;
+	}
 
 	// $CONTENT-END$
 

@@ -30,12 +30,15 @@ import java.math.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
+import java.util.regex.*;
 
 import org.pshdl.interpreter.*;
 import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.*;
+
+import com.google.common.collect.*;
 
 public class FluidFrame {
 
@@ -163,12 +166,29 @@ public class FluidFrame {
 			VariableInformation info = vars.get(basicName);
 			internals[e.getValue()] = new InternalInformation(name, info);
 		}
-		Map<String, Integer> lastID = new HashMap<String, Integer>();
+		Map<String, List<Frame>> lastID = Maps.newHashMap();
 		for (Frame frame : res) {
 			InternalInformation ii = internals[frame.outputId];
-			Integer lID = lastID.get(ii.info.name);
+			LinkedList<Frame> lID = (LinkedList<Frame>) lastID.get(ii.info.name);
 			if (lID != null) {
-				frame.executionDep = lID;
+				Iterator<Frame> iterator = lID.descendingIterator();
+				PredicateChain pred = getPredicate(internals, frame);
+				while (iterator.hasNext()) {
+					Frame previous = iterator.next();
+					PredicateChain predPrev = getPredicate(internals, previous);
+					if ((pred == null) || (predPrev == null) || pred.equals(predPrev)) {
+						frame.executionDep = previous.uniqueID;
+						break;
+					}
+					if (!predPrev.isMutual(pred)) {
+						frame.executionDep = previous.uniqueID;
+						break;
+					}
+					// System.out.println(pred + " -> \n" + predPrev);
+				}
+			} else {
+				lID = new LinkedList<Frame>();
+				lastID.put(ii.info.name, lID);
 			}
 			int maxData = 0;
 			for (int i : frame.internalDependencies) {
@@ -176,10 +196,107 @@ public class FluidFrame {
 			}
 			maxData = Math.max(ii.actualWidth, maxData);
 			frame.maxDataWidth = Math.max(frame.maxDataWidth, maxData);
-			lastID.put(ii.info.name, frame.uniqueID);
+			lID.add(frame);
 		}
 		VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
 		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars);
+	}
+
+	private static class PredicateChain {
+		private static final Pattern globalPattern = Pattern.compile("\\" + InternalInformation.PRED_PREFIX + "(.*?)(\\$.*)");
+		private static final Pattern partPattern = Pattern.compile("\\$([^\\$\\.]*?)(\\d+)([pn]?)\\.?");
+		public final String base;
+		public final LinkedList<Part> parts = Lists.newLinkedList();
+
+		public static enum PartType {
+			p, n, none
+		}
+
+		private static class Part {
+
+			public final String part;
+			public final int num;
+			public PartType type;
+
+			public Part(String part, int num, PartType type) {
+				super();
+				this.part = part;
+				this.num = num;
+				this.type = type;
+			}
+
+			@Override
+			public String toString() {
+				if (type != PartType.none)
+					return '$' + part + num + type;
+				return '$' + part + num;
+			}
+		}
+
+		public PredicateChain(String predicate, PartType last) {
+			Matcher matcher = globalPattern.matcher(predicate);
+			if (matcher.find()) {
+				base = matcher.group(1);
+				String part = matcher.group(2);
+				if (part != null) {
+					Matcher pMatch = partPattern.matcher(part);
+					while (pMatch.find()) {
+						int id = Integer.parseInt(pMatch.group(2));
+						PartType t = PartType.none;
+						if (!"".equals(pMatch.group(3)))
+							t = PartType.valueOf(pMatch.group(3));
+						parts.add(new Part(pMatch.group(1), id, t));
+					}
+					parts.getLast().type = last;
+				}
+			} else
+				base = predicate.substring(6);
+		}
+
+		public boolean isMutual(PredicateChain pred) {
+			Iterator<Part> piter = parts.iterator();
+			for (Iterator<Part> iterator = pred.parts.iterator(); iterator.hasNext();) {
+				if (!piter.hasNext())
+					// This is shorter, but has been the same so far, so it is a
+					// super statement
+					return false;
+				Part p = iterator.next();
+				Part s = piter.next();
+				if (!p.part.equals(s.part))
+					return false;
+				boolean isCase = "case".equals(p.part);
+				if (p.num != s.num)
+					if (isCase)
+						return isCase;
+				if (p.type != s.type)
+					return true;
+			}
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(base);
+			for (Part p : parts) {
+				sb.append(p);
+			}
+			return sb.toString();
+		}
+	}
+
+	public PredicateChain getPredicate(InternalInformation[] internals, Frame frame) {
+		if (frame.predNegDepRes.length != 0) {
+			int i = frame.predNegDepRes[frame.predNegDepRes.length - 1];
+			String fullName = internals[i].fullName;
+			return new PredicateChain(fullName, PredicateChain.PartType.n);
+		}
+		if (frame.predPosDepRes.length != 0) {
+			int i = frame.predPosDepRes[frame.predPosDepRes.length - 1];
+			String fullName = internals[i].fullName;
+			return new PredicateChain(fullName, PredicateChain.PartType.p);
+		}
+		return null;
 	}
 
 	private void registerFrame(FrameRegister register) {
