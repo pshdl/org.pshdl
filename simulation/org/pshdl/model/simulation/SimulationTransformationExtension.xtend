@@ -189,7 +189,7 @@ class SimulationTransformationExtension {
 					res.append(resetFrame)
 				}
 			}
-			res.add(endFrame)
+			res.add(const0)
 		}
 		return res
 	}

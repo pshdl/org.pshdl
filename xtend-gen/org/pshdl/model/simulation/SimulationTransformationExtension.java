@@ -316,7 +316,7 @@ public class SimulationTransformationExtension {
           res.append(resetFrame);
         }
       }
-      res.add(Instruction.endFrame);
+      res.add(Instruction.const0);
     }
     return res;
   }
