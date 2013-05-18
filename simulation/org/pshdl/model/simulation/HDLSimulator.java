@@ -50,7 +50,7 @@ public class HDLSimulator {
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
 		insulin = convertTernary(context, insulin);
-		insulin = removeDoubleAssignments(context, insulin);
+		// insulin = removeDoubleAssignments(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 		// generate reset condition
