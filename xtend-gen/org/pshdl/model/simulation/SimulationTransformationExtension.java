@@ -489,6 +489,19 @@ public class SimulationTransformationExtension {
         ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdge, name);
         res.add(_argumentedInstruction_1);
       }
+      Optional<HDLVariable> _resolveRst = config.resolveRst();
+      final HDLVariable rst = _resolveRst.get();
+      HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(rst);
+      final String rstName = _fullNameOf_1.toString();
+      HDLRegResetActiveType _resetType = config.getResetType();
+      boolean _tripleEquals = (_resetType == HDLRegResetActiveType.HIGH);
+      if (_tripleEquals) {
+        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.negPredicate, rstName);
+        res.add(_argumentedInstruction_2);
+      } else {
+        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.posPredicate, rstName);
+        res.add(_argumentedInstruction_3);
+      }
     }
     HDLExpression _right = obj.getRight();
     FluidFrame _simulationModel = this.toSimulationModel(_right, context);

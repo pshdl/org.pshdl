@@ -257,11 +257,6 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 	}
 
 	@Override
-	public void setPrinting(boolean b) {
-		interpreter.setPrinting(b);
-	}
-
-	@Override
 	public String getName(int idx) {
 		String name = idxName.get(idx);
 		if (name != null)
@@ -269,5 +264,10 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		name = interpreter.getName(idx);
 		idxName.put(idx, name);
 		return name;
+	}
+
+	@Override
+	public int getDeltaCycle() {
+		return interpreter.getDeltaCycle();
 	}
 }

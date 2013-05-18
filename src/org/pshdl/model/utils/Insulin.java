@@ -1085,7 +1085,15 @@ public class Insulin {
 				for (HDLRange r : bits) {
 					concat = concat.addCats(ref.setBits(HDLObject.asList(r)));
 				}
-				ms.replace(ref, concat);
+				HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(TypeExtension.typeOf(ref).get()).setTarget(concat);
+				if (ref.getContainer() instanceof HDLManip) {
+					HDLManip manip = (HDLManip) ref.getContainer();
+					if (manip.getType() == HDLManipType.CAST)
+						ms.replace(ref, concat);
+					else
+						ms.replace(ref, cast);
+				} else
+					ms.replace(ref, cast);
 			}
 		}
 		T tmp = ms.apply(apply);

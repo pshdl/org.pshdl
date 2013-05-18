@@ -280,6 +280,12 @@ class SimulationTransformationExtension {
 				res.add(new ArgumentedInstruction(isRisingEdge, name))
 			else
 				res.add(new ArgumentedInstruction(isFallingEdge, name))
+			val rst = config.resolveRst.get
+			val String rstName = fullNameOf(rst).toString
+			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType::HIGH)
+				res.add(new ArgumentedInstruction(negPredicate, rstName))
+			else
+				res.add(new ArgumentedInstruction(posPredicate, rstName))
 		}
 		res.append(obj.right.toSimulationModel(context))
 		var boolean hasBits = false
