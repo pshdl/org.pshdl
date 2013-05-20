@@ -211,6 +211,8 @@ class SimulationTransformationExtension {
 						defaultFrame.add(new ArgumentedInstruction(negPredicate, fullNameOf(cSub).toString))
 				}
 				defaultFrame.add(const1)
+				defaultFrame.add(const1)
+				defaultFrame.add(eq)
 			} else {
 				val const = valueOf(c.label)
 				var int l
@@ -364,6 +366,8 @@ class SimulationTransformationExtension {
 				val rstVarName=fullNameOf(rstVar).toString
 				val rstFrame=new FluidFrame(InternalInformation::PRED_PREFIX+rstVarName, false)
 				rstFrame.add(new ArgumentedInstruction(loadInternal, rstVarName))
+				rstFrame.add(const0)
+				rstFrame.add(not_eq)
 				rstFrame.createPredVar
 				res.addReferencedFrame(rstFrame)
 			}

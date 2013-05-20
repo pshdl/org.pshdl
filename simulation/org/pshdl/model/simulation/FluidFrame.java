@@ -243,24 +243,25 @@ public class FluidFrame {
 					while (pMatch.find()) {
 						int id = Integer.parseInt(pMatch.group(2));
 						PartType t = PartType.none;
-						if (!"".equals(pMatch.group(3)))
+						if (!"".equals(pMatch.group(3))) {
 							t = PartType.valueOf(pMatch.group(3));
+						}
 						parts.add(new Part(pMatch.group(1), id, t));
 					}
 					parts.getLast().type = last;
 				}
-			} else
+			} else {
 				base = predicate.substring(6);
+			}
 		}
 
 		public boolean isMutual(PredicateChain pred) {
 			Iterator<Part> piter = parts.iterator();
-			for (Iterator<Part> iterator = pred.parts.iterator(); iterator.hasNext();) {
+			for (Part p : pred.parts) {
 				if (!piter.hasNext())
 					// This is shorter, but has been the same so far, so it is a
 					// super statement
 					return false;
-				Part p = iterator.next();
 				Part s = piter.next();
 				if (!p.part.equals(s.part))
 					return false;

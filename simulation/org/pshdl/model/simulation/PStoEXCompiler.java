@@ -5,23 +5,24 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.pshdl.interpreter.*;
-import org.pshdl.interpreter.utils.*;
 import org.pshdl.interpreter.utils.Graph.CycleException;
+import org.pshdl.interpreter.utils.*;
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.*;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.Problem.*;
+import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.collect.*;
 
 public class PStoEXCompiler implements IOutputProvider {
 
 	public PStoEXCompiler() {
-		if (!HDLCore.isInitialized())
+		if (!HDLCore.isInitialized()) {
 			HDLCore.defaultInit();
+		}
 		HDLLibrary.registerLibrary("PSHDLSim", new HDLLibrary());
 	}
 
@@ -49,8 +50,9 @@ public class PStoEXCompiler implements IOutputProvider {
 		for (int i = 1; i < args.length; i++) {
 			File source = new File(args[i]);
 			System.out.println("\t" + source);
-			if (addFile(problems, source))
+			if (addFile(problems, source)) {
 				syntaxerror = true;
+			}
 		}
 		if (syntaxerror)
 			return "Exiting because of syntax errors in the input";
@@ -107,16 +109,18 @@ public class PStoEXCompiler implements IOutputProvider {
 		for (Entry<File, HDLPackage> e : pkgs.entrySet()) {
 			File source = e.getKey();
 			System.out.println("\t" + source);
-			if (validateFile(e.getValue(), problems))
+			if (validateFile(e.getValue(), problems)) {
 				validationError = true;
+			}
 		}
 		return validationError;
 	}
 
 	public static void main(String[] args) throws Exception {
 		String invoke = new PStoEXCompiler().invoke(args);
-		if (invoke != null)
+		if (invoke != null) {
 			System.err.println(invoke);
+		}
 	}
 
 	public boolean addFile(Set<Problem> syntaxProblems, File source) throws IOException, FileNotFoundException {
@@ -131,8 +135,9 @@ public class PStoEXCompiler implements IOutputProvider {
 			System.err.println("The following syntax problems where found:");
 			for (Problem problem : syntaxProblems) {
 				System.err.println(problem.line + ":" + problem);
-				if (problem.severity == ProblemSeverity.ERROR)
+				if (problem.severity == ProblemSeverity.ERROR) {
 					error = true;
+				}
 			}
 		}
 		return error;

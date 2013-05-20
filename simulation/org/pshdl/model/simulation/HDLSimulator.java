@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import org.pshdl.model.*;
+import org.pshdl.model.HDLIfStatement.TreeSide;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
@@ -50,10 +51,9 @@ public class HDLSimulator {
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
 		insulin = convertTernary(context, insulin);
-		// insulin = removeDoubleAssignments(context, insulin);
+		insulin = removeDoubleAssignments(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
-		// generate reset condition
 	}
 
 	private static HDLUnit convertArrayInits(HDLEvaluationContext context, HDLUnit insulin) {
@@ -170,11 +170,9 @@ public class HDLSimulator {
 			if (otherAss != null) {
 				if (container instanceof HDLIfStatement) {
 					HDLIfStatement hdlIfStatement = (HDLIfStatement) container;
-					ArrayList<HDLStatement> thenDo = hdlIfStatement.getThenDo();
-					ArrayList<HDLStatement> elseDo = hdlIfStatement.getThenDo();
-					if (thenDo.contains(otherAss) && thenDo.contains(hdlAssignment)) {
-						ms.remove(otherAss);
-					} else if (elseDo.contains(otherAss) && elseDo.contains(hdlAssignment)) {
+					TreeSide oSide = hdlIfStatement.treeSide(otherAss);
+					TreeSide tSide = hdlIfStatement.treeSide(hdlAssignment);
+					if (oSide == tSide) {
 						ms.remove(otherAss);
 					}
 				} else {

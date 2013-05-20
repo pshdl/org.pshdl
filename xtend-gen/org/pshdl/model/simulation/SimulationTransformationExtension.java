@@ -365,6 +365,8 @@ public class SimulationTransformationExtension {
             }
           }
           defaultFrame.add(Instruction.const1);
+          defaultFrame.add(Instruction.const1);
+          defaultFrame.add(Instruction.eq);
         } else {
           HDLExpression _label_1 = c.getLabel();
           final Optional<BigInteger> const_ = ConstantEvaluate.valueOf(_label_1);
@@ -649,6 +651,8 @@ public class SimulationTransformationExtension {
           final FluidFrame rstFrame = _fluidFrame_1;
           ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.loadInternal, rstVarName);
           rstFrame.add(_argumentedInstruction);
+          rstFrame.add(Instruction.const0);
+          rstFrame.add(Instruction.not_eq);
           rstFrame.createPredVar();
           res.addReferencedFrame(rstFrame);
         }

@@ -1088,12 +1088,14 @@ public class Insulin {
 				HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(TypeExtension.typeOf(ref).get()).setTarget(concat);
 				if (ref.getContainer() instanceof HDLManip) {
 					HDLManip manip = (HDLManip) ref.getContainer();
-					if (manip.getType() == HDLManipType.CAST)
+					if (manip.getType() == HDLManipType.CAST) {
 						ms.replace(ref, concat);
-					else
+					} else {
 						ms.replace(ref, cast);
-				} else
+					}
+				} else {
 					ms.replace(ref, cast);
+				}
 			}
 		}
 		T tmp = ms.apply(apply);

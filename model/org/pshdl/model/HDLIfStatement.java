@@ -114,7 +114,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 
 	// $CONTENT-BEGIN$
 	public static enum TreeSide {
-		none, thenTree, elseTree
+		none, thenTree, elseTree, idConflict
 	}
 
 	private Map<Integer, TreeSide> treeSides;
@@ -123,13 +123,29 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 		if (treeSides == null) {
 			treeSides = Maps.newHashMap();
 			for (HDLStatement t : thenDo) {
-				treeSides.put(t.getID(), TreeSide.thenTree);
+				int tid = t.getID();
+				TreeSide put = treeSides.put(tid, TreeSide.thenTree);
+				if (put != null) {
+					treeSides.put(tid, TreeSide.idConflict);
+				}
 			}
 			for (HDLStatement t : elseDo) {
-				treeSides.put(t.getID(), TreeSide.elseTree);
+				int tid = t.getID();
+				TreeSide put = treeSides.put(tid, TreeSide.elseTree);
+				if (put != null) {
+					treeSides.put(tid, TreeSide.idConflict);
+				}
 			}
 		}
 		TreeSide side = treeSides.get(stmnt.getID());
+		if (side == TreeSide.idConflict) {
+			for (HDLStatement t : thenDo)
+				if (t == stmnt)
+					return TreeSide.thenTree;
+			for (HDLStatement t : elseDo)
+				if (t == stmnt)
+					return TreeSide.elseTree;
+		}
 		if (side != null)
 			return side;
 		return TreeSide.none;
