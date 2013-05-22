@@ -150,9 +150,15 @@ class JavaCompiler {
 							«IF f.edgeNegDepRes===-1 && f.edgePosDepRes===-1 && f.predNegDepRes.length===0 && f.predPosDepRes.length===0»
 								frame«f.uniqueID»();
 							«ELSE»
-								«createNegEdge(f.edgeNegDepRes, handled)»
-								«createPosEdge(f.edgePosDepRes, handled)»
-								if («f.predicates(handled)»)
+								«f.edgeNegDepRes.createNegEdge(handled)»
+								«f.edgePosDepRes.createPosEdge(handled)»
+								«FOR p:f.predNegDepRes»
+									«p.createBooleanPred(handled)»
+								«ENDFOR»
+								«FOR p:f.predPosDepRes»
+									«p.createBooleanPred(handled)»
+								«ENDFOR»
+								if («f.predicates»)
 									frame«f.uniqueID»();
 							«ENDIF»
 						«ENDFOR»
@@ -173,7 +179,7 @@ class JavaCompiler {
 		'''
 	}
 	
-	def predicates(Frame f, Set<Integer> handled){
+	def predicates(Frame f){
 		val sb=new StringBuilder
 		var first=true;
 		if (f.edgeNegDepRes!==-1){
@@ -181,27 +187,38 @@ class JavaCompiler {
 			first=false
 		}
 		if (f.edgePosDepRes!==-1){
+			if (!first)
+				sb.append(' && ')
 			sb.append('''«f.edgePosDepRes.asInternal.javaName(false)»_isRising&& !«f.edgePosDepRes.asInternal.javaName(false)»_risingIsHandled''')
 			first=false
 		}
-		if (first)
-			sb.append('true')
+		for (p:f.predNegDepRes){
+			if (!first)
+				sb.append(' && ')
+			sb.append('''!p«p» && p«p»_fresh''')
+			first=false
+		}
+		for (p:f.predPosDepRes){
+			if (!first)
+				sb.append(' && ')
+			sb.append('''p«p» && p«p»_fresh''')
+			first=false
+		}
 		return sb.toString
 	}
 	
-	def createBooleanPred(int id){
+	def createBooleanPred(int id, Set<Integer> handled){
+		if (handled.contains(id))
+			return ''''''
+		handled.add(id)
 		'''
-		«id.asInternal.javaType» p«id»=«id.internal(-1, false, new LinkedList)»;
+		boolean p«id»=«id.internal(-1, false, new LinkedList)»;
+		boolean p«id»_fresh=true;
 		long up«id»=«id.asInternal.info.javaName(false)»_update;
 		if ((up«id»>>>16 != deltaCycle) || ((up«id»&0xFFFF) != epsCycle)){
 			if (listener!=null)
 			 	listener.skippingPredicateNotFresh(-1, em.internals[«id»], true, null);
-			return;
-		}
-		if (!p«id») {
-			if (listener!=null)
-				listener.skippingPredicateNotMet(-1, em.internals[«id»], true, p«id»?BigInteger.ONE:BigInteger.ZERO,null); 
-			return;
+			p«id»_fresh=false;
 		}
 		'''
 	}
@@ -654,38 +671,38 @@ class JavaCompiler {
 				sb.append('''boolean t«pos»=t«b» > t«a»;''')
 			case Instruction::greater_eq:
 				sb.append('''boolean t«pos»=t«b» >= t«a»;''')
-			case Instruction::negPredicate:
-				sb.append(
-					'''
-					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
-					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
-					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
-						if (listener!=null)
-						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], false, null);
-						return;
-					}
-					if (p«pos») {
-						if (listener!=null)
-							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], false, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
-						return;
-					}
-					''')
-			case Instruction::posPredicate:
-				sb.append(
-					'''
-					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
-					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
-					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
-						if (listener!=null)
-						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], true, null);
-						return;
-					}
-					if (!p«pos») {
-						if (listener!=null)
-							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], true, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
-						return;
-					}
-					''')
+//			case Instruction::negPredicate:
+//				sb.append(
+//					'''
+//					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
+//					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
+//					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
+//						if (listener!=null)
+//						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], false, null);
+//						return;
+//					}
+//					if (p«pos») {
+//						if (listener!=null)
+//							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], false, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
+//						return;
+//					}
+//					''')
+//			case Instruction::posPredicate:
+//				sb.append(
+//					'''
+//					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
+//					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
+//					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
+//						if (listener!=null)
+//						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], true, null);
+//						return;
+//					}
+//					if (!p«pos») {
+//						if (listener!=null)
+//							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], true, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
+//						return;
+//					}
+//					''')
 			case Instruction::isRisingEdge:
 				sb.append(
 					'''

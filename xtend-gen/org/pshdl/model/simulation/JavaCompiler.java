@@ -444,9 +444,25 @@ public class JavaCompiler {
               CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
               _builder.append(_createPosEdge, "			");
               _builder.newLineIfNotEmpty();
+              {
+                for(final int p : f_1.predNegDepRes) {
+                  _builder.append("\t\t\t");
+                  CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
+                  _builder.append(_createBooleanPred, "			");
+                  _builder.newLineIfNotEmpty();
+                }
+              }
+              {
+                for(final int p_1 : f_1.predPosDepRes) {
+                  _builder.append("\t\t\t");
+                  CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
+                  _builder.append(_createBooleanPred_1, "			");
+                  _builder.newLineIfNotEmpty();
+                }
+              }
               _builder.append("\t\t\t");
               _builder.append("if (");
-              String _predicates = this.predicates(f_1, handled);
+              String _predicates = this.predicates(f_1);
               _builder.append(_predicates, "			");
               _builder.append(")");
               _builder.newLineIfNotEmpty();
@@ -516,7 +532,7 @@ public class JavaCompiler {
     return _xblockexpression;
   }
   
-  public String predicates(final Frame f, final Set<Integer> handled) {
+  public String predicates(final Frame f) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
@@ -538,6 +554,10 @@ public class JavaCompiler {
     int _minus_1 = (-1);
     boolean _tripleNotEquals_1 = (Integer.valueOf(f.edgePosDepRes) != Integer.valueOf(_minus_1));
     if (_tripleNotEquals_1) {
+      boolean _not = (!first);
+      if (_not) {
+        sb.append(" && ");
+      }
       StringConcatenation _builder_1 = new StringConcatenation();
       InternalInformation _asInternal_2 = this.asInternal(f.edgePosDepRes);
       String _javaName_2 = this.javaName(_asInternal_2, false);
@@ -550,73 +570,96 @@ public class JavaCompiler {
       sb.append(_builder_1);
       first = false;
     }
-    if (first) {
-      sb.append("true");
+    for (final int p : f.predNegDepRes) {
+      {
+        boolean _not_1 = (!first);
+        if (_not_1) {
+          sb.append(" && ");
+        }
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("!p");
+        _builder_2.append(p, "");
+        _builder_2.append(" && p");
+        _builder_2.append(p, "");
+        _builder_2.append("_fresh");
+        sb.append(_builder_2);
+        first = false;
+      }
+    }
+    for (final int p_1 : f.predPosDepRes) {
+      {
+        boolean _not_1 = (!first);
+        if (_not_1) {
+          sb.append(" && ");
+        }
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("p");
+        _builder_2.append(p_1, "");
+        _builder_2.append(" && p");
+        _builder_2.append(p_1, "");
+        _builder_2.append("_fresh");
+        sb.append(_builder_2);
+        first = false;
+      }
     }
     return sb.toString();
   }
   
-  public CharSequence createBooleanPred(final int id) {
-    StringConcatenation _builder = new StringConcatenation();
-    InternalInformation _asInternal = this.asInternal(id);
-    String _javaType = this.getJavaType(_asInternal);
-    _builder.append(_javaType, "");
-    _builder.append(" p");
-    _builder.append(id, "");
-    _builder.append("=");
-    int _minus = (-1);
-    LinkedList<Integer> _linkedList = new LinkedList<Integer>();
-    String _internal = this.internal(id, _minus, false, _linkedList);
-    _builder.append(_internal, "");
-    _builder.append(";");
-    _builder.newLineIfNotEmpty();
-    _builder.append("long up");
-    _builder.append(id, "");
-    _builder.append("=");
-    InternalInformation _asInternal_1 = this.asInternal(id);
-    String _javaName = this.javaName(_asInternal_1.info, false);
-    _builder.append(_javaName, "");
-    _builder.append("_update;");
-    _builder.newLineIfNotEmpty();
-    _builder.append("if ((up");
-    _builder.append(id, "");
-    _builder.append(">>>16 != deltaCycle) || ((up");
-    _builder.append(id, "");
-    _builder.append("&0xFFFF) != epsCycle)){");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("if (listener!=null)");
-    _builder.newLine();
-    _builder.append("\t \t");
-    _builder.append("listener.skippingPredicateNotFresh(-1, em.internals[");
-    _builder.append(id, "	 	");
-    _builder.append("], true, null);");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("return;");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.append("if (!p");
-    _builder.append(id, "");
-    _builder.append(") {");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("if (listener!=null)");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("listener.skippingPredicateNotMet(-1, em.internals[");
-    _builder.append(id, "		");
-    _builder.append("], true, p");
-    _builder.append(id, "		");
-    _builder.append("?BigInteger.ONE:BigInteger.ZERO,null); ");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("return;");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    return _builder;
+  public CharSequence createBooleanPred(final int id, final Set<Integer> handled) {
+    CharSequence _xblockexpression = null;
+    {
+      boolean _contains = handled.contains(Integer.valueOf(id));
+      if (_contains) {
+        StringConcatenation _builder = new StringConcatenation();
+        return _builder.toString();
+      }
+      handled.add(Integer.valueOf(id));
+      StringConcatenation _builder_1 = new StringConcatenation();
+      _builder_1.append("boolean p");
+      _builder_1.append(id, "");
+      _builder_1.append("=");
+      int _minus = (-1);
+      LinkedList<Integer> _linkedList = new LinkedList<Integer>();
+      String _internal = this.internal(id, _minus, false, _linkedList);
+      _builder_1.append(_internal, "");
+      _builder_1.append(";");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("boolean p");
+      _builder_1.append(id, "");
+      _builder_1.append("_fresh=true;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("long up");
+      _builder_1.append(id, "");
+      _builder_1.append("=");
+      InternalInformation _asInternal = this.asInternal(id);
+      String _javaName = this.javaName(_asInternal.info, false);
+      _builder_1.append(_javaName, "");
+      _builder_1.append("_update;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("if ((up");
+      _builder_1.append(id, "");
+      _builder_1.append(">>>16 != deltaCycle) || ((up");
+      _builder_1.append(id, "");
+      _builder_1.append("&0xFFFF) != epsCycle)){");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      _builder_1.append("if (listener!=null)");
+      _builder_1.newLine();
+      _builder_1.append("\t \t");
+      _builder_1.append("listener.skippingPredicateNotFresh(-1, em.internals[");
+      _builder_1.append(id, "	 	");
+      _builder_1.append("], true, null);");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      _builder_1.append("p");
+      _builder_1.append(id, "	");
+      _builder_1.append("_fresh=false;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _xblockexpression = (_builder_1);
+    }
+    return _xblockexpression;
   }
   
   public CharSequence createPosEdge(final int id, final Set<Integer> handledEdges) {
@@ -2404,168 +2447,34 @@ public class JavaCompiler {
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.negPredicate)) {
+        if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
           _matched=true;
           StringConcatenation _builder_38 = new StringConcatenation();
           InternalInformation _asInternal_3 = this.asInternal(inst.arg1);
-          String _javaType_1 = this.getJavaType(_asInternal_3);
-          _builder_38.append(_javaType_1, "");
-          _builder_38.append(" p");
-          _builder_38.append(pos, "");
-          _builder_38.append("=");
-          String _internal_1 = this.internal(inst.arg1, f.uniqueID, false, arr);
-          _builder_38.append(_internal_1, "");
-          _builder_38.append(";");
-          _builder_38.newLineIfNotEmpty();
-          _builder_38.append("long up");
-          _builder_38.append(pos, "");
-          _builder_38.append("=");
-          InternalInformation _asInternal_4 = this.asInternal(inst.arg1);
-          String _javaName_2 = this.javaName(_asInternal_4.info, false);
+          String _javaName_2 = this.javaName(_asInternal_3.info, false);
           _builder_38.append(_javaName_2, "");
-          _builder_38.append("_update;");
+          _builder_38.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           _builder_38.newLineIfNotEmpty();
-          _builder_38.append("if ((up");
-          _builder_38.append(pos, "");
-          _builder_38.append(">>>16 != deltaCycle) || ((up");
-          _builder_38.append(pos, "");
-          _builder_38.append("&0xFFFF) != epsCycle)){");
-          _builder_38.newLineIfNotEmpty();
-          _builder_38.append("\t");
-          _builder_38.append("if (listener!=null)");
-          _builder_38.newLine();
-          _builder_38.append("\t \t");
-          _builder_38.append("listener.skippingPredicateNotFresh(");
-          _builder_38.append(f.uniqueID, "	 	");
-          _builder_38.append(", em.internals[");
-          _builder_38.append(inst.arg1, "	 	");
-          _builder_38.append("], false, null);");
-          _builder_38.newLineIfNotEmpty();
-          _builder_38.append("\t");
-          _builder_38.append("return;");
-          _builder_38.newLine();
-          _builder_38.append("}");
-          _builder_38.newLine();
-          _builder_38.append("if (p");
-          _builder_38.append(pos, "");
-          _builder_38.append(") {");
-          _builder_38.newLineIfNotEmpty();
-          _builder_38.append("\t");
-          _builder_38.append("if (listener!=null)");
-          _builder_38.newLine();
-          _builder_38.append("\t\t");
-          _builder_38.append("listener.skippingPredicateNotMet(");
-          _builder_38.append(f.uniqueID, "		");
-          _builder_38.append(", em.internals[");
-          _builder_38.append(inst.arg1, "		");
-          _builder_38.append("], false, p");
-          _builder_38.append(pos, "		");
-          _builder_38.append("?BigInteger.ONE:BigInteger.ZERO,null); ");
-          _builder_38.newLineIfNotEmpty();
-          _builder_38.append("\t");
-          _builder_38.append("return;");
-          _builder_38.newLine();
-          _builder_38.append("}");
-          _builder_38.newLine();
           sb.append(_builder_38);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.posPredicate)) {
-          _matched=true;
-          StringConcatenation _builder_39 = new StringConcatenation();
-          InternalInformation _asInternal_5 = this.asInternal(inst.arg1);
-          String _javaType_2 = this.getJavaType(_asInternal_5);
-          _builder_39.append(_javaType_2, "");
-          _builder_39.append(" p");
-          _builder_39.append(pos, "");
-          _builder_39.append("=");
-          String _internal_2 = this.internal(inst.arg1, f.uniqueID, false, arr);
-          _builder_39.append(_internal_2, "");
-          _builder_39.append(";");
-          _builder_39.newLineIfNotEmpty();
-          _builder_39.append("long up");
-          _builder_39.append(pos, "");
-          _builder_39.append("=");
-          InternalInformation _asInternal_6 = this.asInternal(inst.arg1);
-          String _javaName_3 = this.javaName(_asInternal_6.info, false);
-          _builder_39.append(_javaName_3, "");
-          _builder_39.append("_update;");
-          _builder_39.newLineIfNotEmpty();
-          _builder_39.append("if ((up");
-          _builder_39.append(pos, "");
-          _builder_39.append(">>>16 != deltaCycle) || ((up");
-          _builder_39.append(pos, "");
-          _builder_39.append("&0xFFFF) != epsCycle)){");
-          _builder_39.newLineIfNotEmpty();
-          _builder_39.append("\t");
-          _builder_39.append("if (listener!=null)");
-          _builder_39.newLine();
-          _builder_39.append("\t \t");
-          _builder_39.append("listener.skippingPredicateNotFresh(");
-          _builder_39.append(f.uniqueID, "	 	");
-          _builder_39.append(", em.internals[");
-          _builder_39.append(inst.arg1, "	 	");
-          _builder_39.append("], true, null);");
-          _builder_39.newLineIfNotEmpty();
-          _builder_39.append("\t");
-          _builder_39.append("return;");
-          _builder_39.newLine();
-          _builder_39.append("}");
-          _builder_39.newLine();
-          _builder_39.append("if (!p");
-          _builder_39.append(pos, "");
-          _builder_39.append(") {");
-          _builder_39.newLineIfNotEmpty();
-          _builder_39.append("\t");
-          _builder_39.append("if (listener!=null)");
-          _builder_39.newLine();
-          _builder_39.append("\t\t");
-          _builder_39.append("listener.skippingPredicateNotMet(");
-          _builder_39.append(f.uniqueID, "		");
-          _builder_39.append(", em.internals[");
-          _builder_39.append(inst.arg1, "		");
-          _builder_39.append("], true, p");
-          _builder_39.append(pos, "		");
-          _builder_39.append("?BigInteger.ONE:BigInteger.ZERO,null); ");
-          _builder_39.newLineIfNotEmpty();
-          _builder_39.append("\t");
-          _builder_39.append("return;");
-          _builder_39.newLine();
-          _builder_39.append("}");
-          _builder_39.newLine();
-          sb.append(_builder_39);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
-          _matched=true;
-          StringConcatenation _builder_40 = new StringConcatenation();
-          InternalInformation _asInternal_7 = this.asInternal(inst.arg1);
-          String _javaName_4 = this.javaName(_asInternal_7.info, false);
-          _builder_40.append(_javaName_4, "");
-          _builder_40.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
-          _builder_40.newLineIfNotEmpty();
-          sb.append(_builder_40);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
-          StringConcatenation _builder_41 = new StringConcatenation();
-          InternalInformation _asInternal_8 = this.asInternal(inst.arg1);
-          String _javaName_5 = this.javaName(_asInternal_8.info, false);
-          _builder_41.append(_javaName_5, "");
-          _builder_41.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
-          _builder_41.newLineIfNotEmpty();
-          sb.append(_builder_41);
+          StringConcatenation _builder_39 = new StringConcatenation();
+          InternalInformation _asInternal_4 = this.asInternal(inst.arg1);
+          String _javaName_3 = this.javaName(_asInternal_4.info, false);
+          _builder_39.append(_javaName_3, "");
+          _builder_39.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+          _builder_39.newLineIfNotEmpty();
+          sb.append(_builder_39);
         }
       }
-      StringConcatenation _builder_42 = new StringConcatenation();
-      _builder_42.append("//");
-      _builder_42.append(inst, "");
-      _builder_42.newLineIfNotEmpty();
-      StringBuilder _append = sb.append(_builder_42);
+      StringConcatenation _builder_40 = new StringConcatenation();
+      _builder_40.append("//");
+      _builder_40.append(inst, "");
+      _builder_40.newLineIfNotEmpty();
+      StringBuilder _append = sb.append(_builder_40);
       _xblockexpression = (_append);
     }
     return _xblockexpression;
