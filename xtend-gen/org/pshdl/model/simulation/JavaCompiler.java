@@ -892,224 +892,93 @@ public class JavaCompiler {
         _builder.append("]");
         sb.append(_builder);
       }
+      StringConcatenation _builder_1 = new StringConcatenation();
+      {
+        int _length = info.arrayIdx.length;
+        ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
+        boolean _hasElements = false;
+        for(final int i : _doubleDotLessThan) {
+          if (!_hasElements) {
+            _hasElements = true;
+            _builder_1.append("[", "");
+          } else {
+            _builder_1.appendImmediate("][", "");
+          }
+          _builder_1.append("a");
+          _builder_1.append(i, "");
+        }
+        if (_hasElements) {
+          _builder_1.append("]", "");
+        }
+      }
+      final String arrAcc = _builder_1.toString();
       CharSequence _xifexpression = null;
       if (info.fixedArray) {
-        StringConcatenation _builder_1 = new StringConcatenation();
-        _builder_1.append("public ");
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("public ");
         String _javaType = this.getJavaType(info);
-        _builder_1.append(_javaType, "");
-        _builder_1.append(" ");
+        _builder_2.append(_javaType, "");
+        _builder_2.append(" ");
         String _javaName = this.javaName(info, prev);
-        _builder_1.append(_javaName, "");
-        _builder_1.append("(int frameID){");
-        _builder_1.newLineIfNotEmpty();
+        _builder_2.append(_javaName, "");
+        _builder_2.append("(int frameID){");
+        _builder_2.newLineIfNotEmpty();
         {
           boolean _equals = (info.actualWidth == info.info.width);
           if (_equals) {
-            _builder_1.append("\t");
-            String _javaType_1 = this.getJavaType(info);
-            _builder_1.append(_javaType_1, "	");
-            _builder_1.append(" val=");
-            String _javaName_1 = this.javaName(info.info, prev);
-            _builder_1.append(_javaName_1, "	");
-            _builder_1.append(sb, "	");
-            _builder_1.append(";");
-            _builder_1.newLineIfNotEmpty();
-          } else {
-            boolean _equals_1 = (info.actualWidth == 1);
-            if (_equals_1) {
-              _builder_1.append("\t");
-              String _javaType_2 = this.getJavaType(info);
-              _builder_1.append(_javaType_2, "	");
-              _builder_1.append(" val=(");
-              String _javaName_2 = this.javaName(info.info, prev);
-              _builder_1.append(_javaName_2, "	");
-              _builder_1.append(sb, "	");
-              _builder_1.append(" >> ");
-              _builder_1.append(info.bitStart, "	");
-              _builder_1.append(") & 1;");
-              _builder_1.newLineIfNotEmpty();
-            } else {
-              _builder_1.append("\t");
-              String _javaType_3 = this.getJavaType(info);
-              _builder_1.append(_javaType_3, "	");
-              _builder_1.append(" val=(");
-              String _javaName_3 = this.javaName(info.info, prev);
-              _builder_1.append(_javaName_3, "	");
-              _builder_1.append(sb, "	");
-              _builder_1.append(" >> ");
-              _builder_1.append(info.bitEnd, "	");
-              _builder_1.append(") & ");
-              _builder_1.append(mask, "	");
-              _builder_1.append(";");
-              _builder_1.newLineIfNotEmpty();
-            }
-          }
-        }
-        {
-          int _length = info.arrayIdx.length;
-          int _length_1 = info.info.dimensions.length;
-          boolean _tripleEquals = (Integer.valueOf(_length) == Integer.valueOf(_length_1));
-          if (_tripleEquals) {
-            _builder_1.append("\t");
-            _builder_1.append("if (listener!=null)");
-            _builder_1.newLine();
-            _builder_1.append("\t");
-            _builder_1.append("\t");
-            _builder_1.append("listener.loadingInternal(frameID, em.internals[");
-            Integer _get = this.intIdx.get(info.fullName);
-            _builder_1.append(_get, "		");
-            _builder_1.append("], ");
-            {
-              if (info.isPred) {
-                _builder_1.append("val?BigInteger.ONE:BigInteger.ZERO");
-              } else {
-                _builder_1.append("BigInteger.valueOf(val)");
-              }
-            }
-            _builder_1.append(", null);");
-            _builder_1.newLineIfNotEmpty();
-          }
-        }
-        _builder_1.append("\t");
-        _builder_1.append("return val;");
-        _builder_1.newLine();
-        _builder_1.append("}");
-        _builder_1.newLine();
-        _xifexpression = _builder_1;
-      } else {
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("public ");
-        String _javaType_4 = this.getJavaType(info);
-        _builder_2.append(_javaType_4, "");
-        _builder_2.append(" ");
-        String _javaName_4 = this.javaName(info, prev);
-        _builder_2.append(_javaName_4, "");
-        _builder_2.append("(int frameID, ");
-        {
-          int _length_2 = info.arrayIdx.length;
-          ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length_2, true);
-          boolean _hasElements = false;
-          for(final int i : _doubleDotLessThan) {
-            if (!_hasElements) {
-              _hasElements = true;
-            } else {
-              _builder_2.appendImmediate(",", "");
-            }
-            _builder_2.append("int a");
-            _builder_2.append(i, "");
-          }
-        }
-        _builder_2.append("){");
-        _builder_2.newLineIfNotEmpty();
-        {
-          boolean _equals_2 = (info.actualWidth == info.info.width);
-          if (_equals_2) {
             _builder_2.append("\t");
-            String _javaType_5 = this.getJavaType(info);
-            _builder_2.append(_javaType_5, "	");
-            _builder_2.append(" val= ");
-            String _javaName_5 = this.javaName(info.info, prev);
-            _builder_2.append(_javaName_5, "	");
-            {
-              int _length_3 = info.arrayIdx.length;
-              ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _length_3, true);
-              boolean _hasElements_1 = false;
-              for(final int i_1 : _doubleDotLessThan_1) {
-                if (!_hasElements_1) {
-                  _hasElements_1 = true;
-                  _builder_2.append("[", "	");
-                } else {
-                  _builder_2.appendImmediate("][", "	");
-                }
-                _builder_2.append("a");
-                _builder_2.append(i_1, "	");
-              }
-              if (_hasElements_1) {
-                _builder_2.append("]", "	");
-              }
-            }
+            String _javaType_1 = this.getJavaType(info);
+            _builder_2.append(_javaType_1, "	");
+            _builder_2.append(" val=");
+            String _javaName_1 = this.javaName(info.info, prev);
+            _builder_2.append(_javaName_1, "	");
+            _builder_2.append(sb, "	");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
-            boolean _equals_3 = (info.actualWidth == 1);
-            if (_equals_3) {
+            boolean _equals_1 = (info.actualWidth == 1);
+            if (_equals_1) {
               _builder_2.append("\t");
-              String _javaType_6 = this.getJavaType(info);
-              _builder_2.append(_javaType_6, "	");
-              _builder_2.append(" val= (");
-              String _javaName_6 = this.javaName(info.info, prev);
-              _builder_2.append(_javaName_6, "	");
-              {
-                int _length_4 = info.arrayIdx.length;
-                ExclusiveRange _doubleDotLessThan_2 = new ExclusiveRange(0, _length_4, true);
-                boolean _hasElements_2 = false;
-                for(final int i_2 : _doubleDotLessThan_2) {
-                  if (!_hasElements_2) {
-                    _hasElements_2 = true;
-                    _builder_2.append("[", "	");
-                  } else {
-                    _builder_2.appendImmediate("][", "	");
-                  }
-                  _builder_2.append("a");
-                  _builder_2.append(i_2, "	");
-                }
-                if (_hasElements_2) {
-                  _builder_2.append("]", "	");
-                }
-              }
+              String _javaType_2 = this.getJavaType(info);
+              _builder_2.append(_javaType_2, "	");
+              _builder_2.append(" val=(");
+              String _javaName_2 = this.javaName(info.info, prev);
+              _builder_2.append(_javaName_2, "	");
+              _builder_2.append(sb, "	");
               _builder_2.append(" >> ");
               _builder_2.append(info.bitStart, "	");
               _builder_2.append(") & 1;");
               _builder_2.newLineIfNotEmpty();
             } else {
               _builder_2.append("\t");
-              String _javaType_7 = this.getJavaType(info);
-              _builder_2.append(_javaType_7, "	");
-              _builder_2.append(" val= (");
-              String _javaName_7 = this.javaName(info.info, prev);
-              _builder_2.append(_javaName_7, "	");
-              {
-                int _length_5 = info.arrayIdx.length;
-                ExclusiveRange _doubleDotLessThan_3 = new ExclusiveRange(0, _length_5, true);
-                boolean _hasElements_3 = false;
-                for(final int i_3 : _doubleDotLessThan_3) {
-                  if (!_hasElements_3) {
-                    _hasElements_3 = true;
-                    _builder_2.append("[", "	");
-                  } else {
-                    _builder_2.appendImmediate("][", "	");
-                  }
-                  _builder_2.append("a");
-                  _builder_2.append(i_3, "	");
-                }
-                if (_hasElements_3) {
-                  _builder_2.append("]", "	");
-                }
-              }
+              String _javaType_3 = this.getJavaType(info);
+              _builder_2.append(_javaType_3, "	");
+              _builder_2.append(" val=(");
+              String _javaName_3 = this.javaName(info.info, prev);
+              _builder_2.append(_javaName_3, "	");
+              _builder_2.append(sb, "	");
               _builder_2.append(" >> ");
               _builder_2.append(info.bitEnd, "	");
               _builder_2.append(") & ");
-              CharSequence _asMask = this.asMask(info.actualWidth);
-              _builder_2.append(_asMask, "	");
+              _builder_2.append(mask, "	");
               _builder_2.append(";");
               _builder_2.newLineIfNotEmpty();
             }
           }
         }
         {
-          int _length_6 = info.arrayIdx.length;
-          int _length_7 = info.info.dimensions.length;
-          boolean _tripleEquals_1 = (Integer.valueOf(_length_6) == Integer.valueOf(_length_7));
-          if (_tripleEquals_1) {
+          int _length_1 = info.arrayIdx.length;
+          int _length_2 = info.info.dimensions.length;
+          boolean _tripleEquals = (Integer.valueOf(_length_1) == Integer.valueOf(_length_2));
+          if (_tripleEquals) {
             _builder_2.append("\t");
             _builder_2.append("if (listener!=null)");
             _builder_2.newLine();
             _builder_2.append("\t");
             _builder_2.append("\t");
             _builder_2.append("listener.loadingInternal(frameID, em.internals[");
-            Integer _get_1 = this.intIdx.get(info.fullName);
-            _builder_2.append(_get_1, "		");
+            Integer _get = this.intIdx.get(info.fullName);
+            _builder_2.append(_get, "		");
             _builder_2.append("], ");
             {
               if (info.isPred) {
@@ -1125,11 +994,111 @@ public class JavaCompiler {
         _builder_2.append("\t");
         _builder_2.append("return val;");
         _builder_2.newLine();
-        _builder_2.append("\t");
-        _builder_2.newLine();
         _builder_2.append("}");
         _builder_2.newLine();
         _xifexpression = _builder_2;
+      } else {
+        StringConcatenation _builder_3 = new StringConcatenation();
+        _builder_3.append("public ");
+        String _javaType_4 = this.getJavaType(info);
+        _builder_3.append(_javaType_4, "");
+        _builder_3.append(" ");
+        String _javaName_4 = this.javaName(info, prev);
+        _builder_3.append(_javaName_4, "");
+        _builder_3.append("(int frameID, ");
+        {
+          int _length_3 = info.arrayIdx.length;
+          ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _length_3, true);
+          boolean _hasElements_1 = false;
+          for(final int i_1 : _doubleDotLessThan_1) {
+            if (!_hasElements_1) {
+              _hasElements_1 = true;
+            } else {
+              _builder_3.appendImmediate(",", "");
+            }
+            _builder_3.append("int a");
+            _builder_3.append(i_1, "");
+          }
+        }
+        _builder_3.append("){");
+        _builder_3.newLineIfNotEmpty();
+        {
+          boolean _equals_2 = (info.actualWidth == info.info.width);
+          if (_equals_2) {
+            _builder_3.append("\t");
+            String _javaType_5 = this.getJavaType(info);
+            _builder_3.append(_javaType_5, "	");
+            _builder_3.append(" val= ");
+            String _javaName_5 = this.javaName(info.info, prev);
+            _builder_3.append(_javaName_5, "	");
+            _builder_3.append(arrAcc, "	");
+            _builder_3.append(";");
+            _builder_3.newLineIfNotEmpty();
+          } else {
+            boolean _equals_3 = (info.actualWidth == 1);
+            if (_equals_3) {
+              _builder_3.append("\t");
+              String _javaType_6 = this.getJavaType(info);
+              _builder_3.append(_javaType_6, "	");
+              _builder_3.append(" val= (");
+              String _javaName_6 = this.javaName(info.info, prev);
+              _builder_3.append(_javaName_6, "	");
+              _builder_3.append(arrAcc, "	");
+              _builder_3.append(" >> ");
+              _builder_3.append(info.bitStart, "	");
+              _builder_3.append(") & 1;");
+              _builder_3.newLineIfNotEmpty();
+            } else {
+              _builder_3.append("\t");
+              String _javaType_7 = this.getJavaType(info);
+              _builder_3.append(_javaType_7, "	");
+              _builder_3.append(" val= (");
+              String _javaName_7 = this.javaName(info.info, prev);
+              _builder_3.append(_javaName_7, "	");
+              _builder_3.append(arrAcc, "	");
+              _builder_3.append(" >> ");
+              _builder_3.append(info.bitEnd, "	");
+              _builder_3.append(") & ");
+              CharSequence _asMask = this.asMask(info.actualWidth);
+              _builder_3.append(_asMask, "	");
+              _builder_3.append(";");
+              _builder_3.newLineIfNotEmpty();
+            }
+          }
+        }
+        {
+          int _length_4 = info.arrayIdx.length;
+          int _length_5 = info.info.dimensions.length;
+          boolean _tripleEquals_1 = (Integer.valueOf(_length_4) == Integer.valueOf(_length_5));
+          if (_tripleEquals_1) {
+            _builder_3.append("\t");
+            _builder_3.append("if (listener!=null)");
+            _builder_3.newLine();
+            _builder_3.append("\t");
+            _builder_3.append("\t");
+            _builder_3.append("listener.loadingInternal(frameID, em.internals[");
+            Integer _get_1 = this.intIdx.get(info.fullName);
+            _builder_3.append(_get_1, "		");
+            _builder_3.append("], ");
+            {
+              if (info.isPred) {
+                _builder_3.append("val?BigInteger.ONE:BigInteger.ZERO");
+              } else {
+                _builder_3.append("BigInteger.valueOf(val)");
+              }
+            }
+            _builder_3.append(", null);");
+            _builder_3.newLineIfNotEmpty();
+          }
+        }
+        _builder_3.append("\t");
+        _builder_3.append("return val;");
+        _builder_3.newLine();
+        _builder_3.append("\t");
+        _builder_3.newLine();
+        _builder_3.append("}");
+        _builder_3.newLine();
+        _xifexpression = _builder_3;
       }
       _xblockexpression = (_xifexpression);
     }
@@ -1180,13 +1149,17 @@ public class JavaCompiler {
           boolean _equals = (info.actualWidth == info.info.width);
           if (_equals) {
             _builder_2.append("\t");
-            String _javaType_1 = this.getJavaType(info.info);
-            _builder_2.append(_javaType_1, "	");
-            _builder_2.append(" current=");
-            String _javaName_1 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_1, "	");
-            _builder_2.append(fixedAccess, "	");
-            _builder_2.append(";");
+            {
+              if (info.isShadowReg) {
+                String _javaType_1 = this.getJavaType(info.info);
+                _builder_2.append(_javaType_1, "	");
+                _builder_2.append(" current=");
+                String _javaName_1 = this.javaName(info.info, false);
+                _builder_2.append(_javaName_1, "	");
+                _builder_2.append(fixedAccess, "	");
+                _builder_2.append(";");
+              }
+            }
             _builder_2.newLineIfNotEmpty();
             _builder_2.append("\t");
             String _javaName_2 = this.javaName(info.info, false);
@@ -1283,12 +1256,16 @@ public class JavaCompiler {
           boolean _equals_1 = (info.actualWidth == info.info.width);
           if (_equals_1) {
             _builder_3.append("\t");
-            String _javaType_4 = this.getJavaType(info.info);
-            _builder_3.append(_javaType_4, "	");
-            _builder_3.append(" current=");
-            String _javaName_7 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_7, "	");
-            _builder_3.append("[offset];");
+            {
+              if (info.isShadowReg) {
+                String _javaType_4 = this.getJavaType(info.info);
+                _builder_3.append(_javaType_4, "	");
+                _builder_3.append(" current=");
+                String _javaName_7 = this.javaName(info.info, false);
+                _builder_3.append(_javaName_7, "	");
+                _builder_3.append("[offset];");
+              }
+            }
             _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
             String _javaName_8 = this.javaName(info.info, false);

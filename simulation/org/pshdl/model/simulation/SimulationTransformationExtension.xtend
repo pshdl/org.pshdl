@@ -187,6 +187,7 @@ class SimulationTransformationExtension {
 				val resetFrame = config.resetValue.toSimulationModel(context)
 				for (HDLVariable hVar : obj.variables) {
 					res.append(resetFrame)
+					res.add(new ArgumentedInstruction(writeInternal, fullNameOf(hVar).toString))
 				}
 			}
 			res.add(const0)

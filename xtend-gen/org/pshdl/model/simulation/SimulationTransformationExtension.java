@@ -313,7 +313,13 @@ public class SimulationTransformationExtension {
         final FluidFrame resetFrame = this.toSimulationModel(_resetValue_1, context);
         ArrayList<HDLVariable> _variables_2 = obj.getVariables();
         for (final HDLVariable hVar_2 : _variables_2) {
-          res.append(resetFrame);
+          {
+            res.append(resetFrame);
+            HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(hVar_2);
+            String _string = _fullNameOf_2.toString();
+            ArgumentedInstruction _argumentedInstruction_4 = new ArgumentedInstruction(Instruction.writeInternal, _string);
+            res.add(_argumentedInstruction_4);
+          }
         }
       }
       res.add(Instruction.const0);

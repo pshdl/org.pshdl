@@ -294,6 +294,7 @@ class JavaCompiler {
 		val mask=info.actualWidth.asMask
 		for (arr : info.arrayIdx)
 			sb.append('''[«arr»]''')
+		val arrAcc='''«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR»'''
 		if (info.fixedArray) '''
 			public «info.javaType» «info.javaName(prev)»(int frameID){
 				«IF info.actualWidth == info.info.width»
@@ -312,11 +313,11 @@ class JavaCompiler {
 		''' else '''
 			public «info.javaType» «info.javaName(prev)»(int frameID, «FOR int i : (0 ..< info.arrayIdx.length) SEPARATOR ','»int a«i»«ENDFOR»){
 				«IF info.actualWidth == info.info.width»
-					«info.javaType» val= «info.info.javaName(prev)»«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR»;
+					«info.javaType» val= «info.info.javaName(prev)»«arrAcc»;
 				«ELSEIF info.actualWidth == 1»
-					«info.javaType» val= («info.info.javaName(prev)»«FOR int i:(0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR» >> «info.bitStart») & 1;
+					«info.javaType» val= («info.info.javaName(prev)»«arrAcc» >> «info.bitStart») & 1;
 				«ELSE»
-					«info.javaType» val= («info.info.javaName(prev)»«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR» >> «info.
+					«info.javaType» val= («info.info.javaName(prev)»«arrAcc» >> «info.
 				bitEnd») & «info.actualWidth.asMask»;
 				«ENDIF»
 				«IF info.arrayIdx.length===info.info.dimensions.length»
@@ -341,7 +342,7 @@ class JavaCompiler {
 		if (info.fixedArray) '''
 			public void «info.javaName(false)»(«info.info.javaType» value){
 				«IF info.actualWidth == info.info.width»
-					«info.info.javaType» current=«info.info.javaName(false)»«fixedAccess»;
+					«IF info.isShadowReg»«info.info.javaType» current=«info.info.javaName(false)»«fixedAccess»;«ENDIF»
 					«info.info.javaName(false)»«fixedAccess»=value;
 				«ELSE»
 					«info.info.javaType» current=«info.info.javaName(false)»«fixedAccess» & «writeMask»;
@@ -358,7 +359,7 @@ class JavaCompiler {
 			public void «info.javaName(false)»(«info.info.javaType» value,«FOR int i : (0 ..< info.arrayIdx.length) SEPARATOR ','»int a«i»«ENDFOR»){
 				int offset=(int)«varAccess»;
 				«IF info.actualWidth == info.info.width»
-					«info.info.javaType» current=«info.info.javaName(false)»[offset];
+					«IF info.isShadowReg»«info.info.javaType» current=«info.info.javaName(false)»[offset];«ENDIF»
 					«info.info.javaName(false)»[offset]=value;
 				«ELSE»
 					«info.info.javaType» current=«info.info.javaName(false)»[offset] & «writeMask»;
