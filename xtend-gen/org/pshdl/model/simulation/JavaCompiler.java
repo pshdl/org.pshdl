@@ -49,8 +49,11 @@ public class JavaCompiler {
     }
   }.apply();
   
-  public JavaCompiler(final ExecutableModel em) {
+  private boolean debug;
+  
+  public JavaCompiler(final ExecutableModel em, final boolean includeDebug) {
     this.em = em;
+    this.debug = includeDebug;
     int _length = em.variables.length;
     ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
     for (final Integer i : _doubleDotLessThan) {
@@ -81,8 +84,8 @@ public class JavaCompiler {
     }
   }
   
-  public static String doCompile(final ExecutableModel em, final String packageName, final String unitName) {
-    JavaCompiler _javaCompiler = new JavaCompiler(em);
+  public static String doCompile(final ExecutableModel em, final String packageName, final String unitName, final boolean includeDebugListener) {
+    JavaCompiler _javaCompiler = new JavaCompiler(em, includeDebugListener);
     CharSequence _compile = _javaCompiler.compile(packageName, unitName);
     return _compile.toString();
   }
@@ -234,12 +237,16 @@ public class JavaCompiler {
       _builder.append("\t");
       _builder.append("private Map<String, Integer> varIdx=new HashMap<String, Integer>();");
       _builder.newLine();
-      _builder.append("\t");
-      _builder.append("private final IDebugListener listener;");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("private final ExecutableModel em;");
-      _builder.newLine();
+      {
+        if (this.debug) {
+          _builder.append("\t");
+          _builder.append("private final IDebugListener listener;");
+          _builder.newLine();
+          _builder.append("\t");
+          _builder.append("private final ExecutableModel em;");
+          _builder.newLine();
+        }
+      }
       _builder.append("\t");
       _builder.append("private final boolean disableEdges;");
       _builder.newLine();
@@ -251,8 +258,14 @@ public class JavaCompiler {
       _builder.append("() {");
       _builder.newLineIfNotEmpty();
       _builder.append("\t\t");
-      _builder.append("this(false, null, null);");
-      _builder.newLine();
+      _builder.append("this(false");
+      {
+        if (this.debug) {
+          _builder.append(", null, null");
+        }
+      }
+      _builder.append(");");
+      _builder.newLineIfNotEmpty();
       _builder.append("\t");
       _builder.append("}");
       _builder.newLine();
@@ -261,17 +274,27 @@ public class JavaCompiler {
       _builder.append("\t");
       _builder.append("public ");
       _builder.append(unitName, "	");
-      _builder.append("(boolean disableEdges, IDebugListener listener, ExecutableModel em) {");
+      _builder.append("(boolean disableEdges");
+      {
+        if (this.debug) {
+          _builder.append(", IDebugListener listener, ExecutableModel em");
+        }
+      }
+      _builder.append(") {");
       _builder.newLineIfNotEmpty();
       _builder.append("\t\t");
       _builder.append("this.disableEdges=disableEdges;");
       _builder.newLine();
-      _builder.append("\t\t");
-      _builder.append("this.listener=listener;");
-      _builder.newLine();
-      _builder.append("\t\t");
-      _builder.append("this.em=em;");
-      _builder.newLine();
+      {
+        if (this.debug) {
+          _builder.append("\t\t");
+          _builder.append("this.listener=listener;");
+          _builder.newLine();
+          _builder.append("\t\t");
+          _builder.append("this.em=em;");
+          _builder.newLine();
+        }
+      }
       {
         Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
         for(final VariableInformation v_1 : _excludeNull_1) {
@@ -391,12 +414,17 @@ public class JavaCompiler {
       _builder.append("\t\t");
       _builder.append("do {");
       _builder.newLine();
-      _builder.append("\t\t\t");
-      _builder.append("if (listener!=null)");
-      _builder.newLine();
-      _builder.append("\t\t\t\t");
-      _builder.append("listener.startCycle(deltaCycle, epsCycle, this);");
-      _builder.newLine();
+      {
+        if (this.debug) {
+          _builder.append("\t\t\t");
+          _builder.append("if (listener!=null)");
+          _builder.newLine();
+          _builder.append("\t\t\t");
+          _builder.append("\t");
+          _builder.append("listener.startCycle(deltaCycle, epsCycle, this);");
+          _builder.newLine();
+        }
+      }
       _builder.append("\t\t\t");
       _builder.append("regUpdates.clear();");
       _builder.newLine();
@@ -479,12 +507,17 @@ public class JavaCompiler {
       _builder.append("\t\t\t");
       _builder.append("updateRegs();");
       _builder.newLine();
-      _builder.append("\t\t\t");
-      _builder.append("if (listener!=null && !regUpdates.isEmpty())");
-      _builder.newLine();
-      _builder.append("\t\t\t\t");
-      _builder.append("listener.copyingRegisterValues(this);");
-      _builder.newLine();
+      {
+        if (this.debug) {
+          _builder.append("\t\t\t");
+          _builder.append("if (listener!=null && !regUpdates.isEmpty())");
+          _builder.newLine();
+          _builder.append("\t\t\t");
+          _builder.append("\t");
+          _builder.append("listener.copyingRegisterValues(this);");
+          _builder.newLine();
+        }
+      }
       _builder.append("\t\t\t");
       _builder.append("epsCycle++;");
       _builder.newLine();
@@ -508,12 +541,17 @@ public class JavaCompiler {
           _builder.newLineIfNotEmpty();
         }
       }
-      _builder.append("\t\t");
-      _builder.append("if (listener!=null)");
-      _builder.newLine();
-      _builder.append("\t\t\t");
-      _builder.append("listener.doneCycle(deltaCycle, this);");
-      _builder.newLine();
+      {
+        if (this.debug) {
+          _builder.append("\t\t");
+          _builder.append("if (listener!=null)");
+          _builder.newLine();
+          _builder.append("\t\t");
+          _builder.append("\t");
+          _builder.append("listener.doneCycle(deltaCycle, this);");
+          _builder.newLine();
+        }
+      }
       _builder.append("\t");
       _builder.append("}");
       _builder.newLine();
@@ -642,14 +680,19 @@ public class JavaCompiler {
       _builder_1.append(id, "");
       _builder_1.append("&0xFFFF) != epsCycle)){");
       _builder_1.newLineIfNotEmpty();
-      _builder_1.append("\t");
-      _builder_1.append("if (listener!=null)");
-      _builder_1.newLine();
-      _builder_1.append("\t \t");
-      _builder_1.append("listener.skippingPredicateNotFresh(-1, em.internals[");
-      _builder_1.append(id, "	 	");
-      _builder_1.append("], true, null);");
-      _builder_1.newLineIfNotEmpty();
+      {
+        if (this.debug) {
+          _builder_1.append("\t");
+          _builder_1.append("if (listener!=null)");
+          _builder_1.newLine();
+          _builder_1.append("\t");
+          _builder_1.append(" \t");
+          _builder_1.append("listener.skippingPredicateNotFresh(-1, em.internals[");
+          _builder_1.append(id, "	 	");
+          _builder_1.append("], true, null);");
+          _builder_1.newLineIfNotEmpty();
+        }
+      }
       _builder_1.append("\t");
       _builder_1.append("p");
       _builder_1.append(id, "	");
@@ -698,14 +741,19 @@ public class JavaCompiler {
       _builder_1.append(_internal_1, "	");
       _builder_1.append("!=1)) {");
       _builder_1.newLineIfNotEmpty();
-      _builder_1.append("\t\t");
-      _builder_1.append("if (listener!=null)");
-      _builder_1.newLine();
-      _builder_1.append("\t\t \t");
-      _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
-      _builder_1.append(id, "		 	");
-      _builder_1.append("], true, null);");
-      _builder_1.newLineIfNotEmpty();
+      {
+        if (this.debug) {
+          _builder_1.append("\t\t");
+          _builder_1.append("if (listener!=null)");
+          _builder_1.newLine();
+          _builder_1.append("\t\t");
+          _builder_1.append("\t");
+          _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
+          _builder_1.append(id, "			");
+          _builder_1.append("], true, null);");
+          _builder_1.newLineIfNotEmpty();
+        }
+      }
       _builder_1.append("\t\t");
       String _javaName_2 = this.javaName(internal, false);
       _builder_1.append(_javaName_2, "		");
@@ -721,14 +769,19 @@ public class JavaCompiler {
       _builder_1.append(_javaName_3, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
-      _builder_1.append("\t");
-      _builder_1.append("if (listener!=null)");
-      _builder_1.newLine();
-      _builder_1.append("\t \t");
-      _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
-      _builder_1.append(id, "	 	");
-      _builder_1.append("], true, null);");
-      _builder_1.newLineIfNotEmpty();
+      {
+        if (this.debug) {
+          _builder_1.append("\t");
+          _builder_1.append("if (listener!=null)");
+          _builder_1.newLine();
+          _builder_1.append("\t");
+          _builder_1.append("\t");
+          _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
+          _builder_1.append(id, "		");
+          _builder_1.append("], true, null);");
+          _builder_1.newLineIfNotEmpty();
+        }
+      }
       _builder_1.append("\t");
       String _javaName_4 = this.javaName(internal, false);
       _builder_1.append(_javaName_4, "	");
@@ -777,14 +830,19 @@ public class JavaCompiler {
       _builder_1.append(_internal_1, "	");
       _builder_1.append("!=0)) {");
       _builder_1.newLineIfNotEmpty();
-      _builder_1.append("\t\t");
-      _builder_1.append("if (listener!=null)");
-      _builder_1.newLine();
-      _builder_1.append("\t\t \t");
-      _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
-      _builder_1.append(id, "		 	");
-      _builder_1.append("], false, null);");
-      _builder_1.newLineIfNotEmpty();
+      {
+        if (this.debug) {
+          _builder_1.append("\t\t");
+          _builder_1.append("if (listener!=null)");
+          _builder_1.newLine();
+          _builder_1.append("\t\t");
+          _builder_1.append(" \t");
+          _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
+          _builder_1.append(id, "		 	");
+          _builder_1.append("], false, null);");
+          _builder_1.newLineIfNotEmpty();
+        }
+      }
       _builder_1.append("\t\t");
       String _javaName_2 = this.javaName(internal, false);
       _builder_1.append(_javaName_2, "		");
@@ -800,14 +858,19 @@ public class JavaCompiler {
       _builder_1.append(_javaName_3, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
-      _builder_1.append("\t");
-      _builder_1.append("if (listener!=null)");
-      _builder_1.newLine();
-      _builder_1.append("\t \t");
-      _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
-      _builder_1.append(id, "	 	");
-      _builder_1.append("], false, null);");
-      _builder_1.newLineIfNotEmpty();
+      {
+        if (this.debug) {
+          _builder_1.append("\t");
+          _builder_1.append("if (listener!=null)");
+          _builder_1.newLine();
+          _builder_1.append("\t");
+          _builder_1.append(" \t");
+          _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
+          _builder_1.append(id, "	 	");
+          _builder_1.append("], false, null);");
+          _builder_1.newLineIfNotEmpty();
+        }
+      }
       _builder_1.append("\t");
       String _javaName_4 = this.javaName(internal, false);
       _builder_1.append(_javaName_4, "	");
@@ -1336,24 +1399,28 @@ public class JavaCompiler {
           int _length_2 = info.info.dimensions.length;
           boolean _tripleEquals = (Integer.valueOf(_length_1) == Integer.valueOf(_length_2));
           if (_tripleEquals) {
-            _builder_2.append("\t");
-            _builder_2.append("if (listener!=null)");
-            _builder_2.newLine();
-            _builder_2.append("\t");
-            _builder_2.append("\t");
-            _builder_2.append("listener.loadingInternal(frameID, em.internals[");
-            Integer _get = this.intIdx.get(info.fullName);
-            _builder_2.append(_get, "		");
-            _builder_2.append("], ");
             {
-              if (info.isPred) {
-                _builder_2.append("val?BigInteger.ONE:BigInteger.ZERO");
-              } else {
-                _builder_2.append("BigInteger.valueOf(val)");
+              if (this.debug) {
+                _builder_2.append("\t");
+                _builder_2.append("if (listener!=null)");
+                _builder_2.newLine();
+                _builder_2.append("\t");
+                _builder_2.append("\t");
+                _builder_2.append("listener.loadingInternal(frameID, em.internals[");
+                Integer _get = this.intIdx.get(info.fullName);
+                _builder_2.append(_get, "		");
+                _builder_2.append("], ");
+                {
+                  if (info.isPred) {
+                    _builder_2.append("val?BigInteger.ONE:BigInteger.ZERO");
+                  } else {
+                    _builder_2.append("BigInteger.valueOf(val)");
+                  }
+                }
+                _builder_2.append(", null);");
+                _builder_2.newLineIfNotEmpty();
               }
             }
-            _builder_2.append(", null);");
-            _builder_2.newLineIfNotEmpty();
           }
         }
         _builder_2.append("\t");
@@ -1436,24 +1503,28 @@ public class JavaCompiler {
           int _length_5 = info.info.dimensions.length;
           boolean _tripleEquals_1 = (Integer.valueOf(_length_4) == Integer.valueOf(_length_5));
           if (_tripleEquals_1) {
-            _builder_3.append("\t");
-            _builder_3.append("if (listener!=null)");
-            _builder_3.newLine();
-            _builder_3.append("\t");
-            _builder_3.append("\t");
-            _builder_3.append("listener.loadingInternal(frameID, em.internals[");
-            Integer _get_1 = this.intIdx.get(info.fullName);
-            _builder_3.append(_get_1, "		");
-            _builder_3.append("], ");
             {
-              if (info.isPred) {
-                _builder_3.append("val?BigInteger.ONE:BigInteger.ZERO");
-              } else {
-                _builder_3.append("BigInteger.valueOf(val)");
+              if (this.debug) {
+                _builder_3.append("\t");
+                _builder_3.append("if (listener!=null)");
+                _builder_3.newLine();
+                _builder_3.append("\t");
+                _builder_3.append("\t");
+                _builder_3.append("listener.loadingInternal(frameID, em.internals[");
+                Integer _get_1 = this.intIdx.get(info.fullName);
+                _builder_3.append(_get_1, "		");
+                _builder_3.append("], ");
+                {
+                  if (info.isPred) {
+                    _builder_3.append("val?BigInteger.ONE:BigInteger.ZERO");
+                  } else {
+                    _builder_3.append("BigInteger.valueOf(val)");
+                  }
+                }
+                _builder_3.append(", null);");
+                _builder_3.newLineIfNotEmpty();
               }
             }
-            _builder_3.append(", null);");
-            _builder_3.newLineIfNotEmpty();
           }
         }
         _builder_3.append("\t");
@@ -1802,14 +1873,19 @@ public class JavaCompiler {
     _builder.append(frame.uniqueID, "");
     _builder.append("() {");
     _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("if (listener!=null)");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("listener.startFrame(");
-    _builder.append(frame.uniqueID, "		");
-    _builder.append(", deltaCycle, epsCycle, null);");
-    _builder.newLineIfNotEmpty();
+    {
+      if (this.debug) {
+        _builder.append("\t");
+        _builder.append("if (listener!=null)");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("\t");
+        _builder.append("listener.startFrame(");
+        _builder.append(frame.uniqueID, "		");
+        _builder.append(", deltaCycle, epsCycle, null);");
+        _builder.newLineIfNotEmpty();
+      }
+    }
     sb.append(_builder);
     int pos = 0;
     int arrPos = 0;
@@ -1863,24 +1939,27 @@ public class JavaCompiler {
       sb.append(_builder_1);
     }
     StringConcatenation _builder_2 = new StringConcatenation();
-    _builder_2.append("if (listener!=null)");
-    _builder_2.newLine();
-    _builder_2.append("\t");
-    _builder_2.append("listener.writingResult(");
-    _builder_2.append(frame.uniqueID, "	");
-    _builder_2.append(", em.internals[");
-    _builder_2.append(frame.outputId, "	");
-    _builder_2.append("], BigInteger.valueOf(");
-    _builder_2.append(last, "	");
     {
-      InternalInformation _asInternal_1 = this.asInternal(frame.outputId);
-      if (_asInternal_1.isPred) {
-        _builder_2.append("?1:0");
+      if (this.debug) {
+        _builder_2.append("if (listener!=null)");
+        _builder_2.newLine();
+        _builder_2.append("\t");
+        _builder_2.append("listener.writingResult(");
+        _builder_2.append(frame.uniqueID, "	");
+        _builder_2.append(", em.internals[");
+        _builder_2.append(frame.outputId, "	");
+        _builder_2.append("], BigInteger.valueOf(");
+        _builder_2.append(last, "	");
+        {
+          InternalInformation _asInternal_1 = this.asInternal(frame.outputId);
+          if (_asInternal_1.isPred) {
+            _builder_2.append("?1:0");
+          }
+        }
+        _builder_2.append("), null);");
+        _builder_2.newLineIfNotEmpty();
       }
     }
-    _builder_2.append("), null);");
-    _builder_2.newLineIfNotEmpty();
-    _builder_2.append("\t");
     _builder_2.append("}");
     _builder_2.newLine();
     sb.append(_builder_2);

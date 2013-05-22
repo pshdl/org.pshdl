@@ -20,9 +20,11 @@ class JavaCompiler {
 	private Map<String,Integer> varIdx=new HashMap
 	private Map<String,Integer> intIdx=new HashMap
 	private Map<String, Boolean> prevMap = new HashMap
+	private boolean debug
 
-	new(ExecutableModel em) {
+	new(ExecutableModel em, boolean includeDebug) {
 		this.em = em
+		this.debug=includeDebug
 		for (i:0 ..< em.variables.length){
 			varIdx.put(em.variables.get(i).name,i)
 		}
@@ -37,8 +39,8 @@ class JavaCompiler {
 		}
 	}
 
-	def static String doCompile(ExecutableModel em, String packageName, String unitName) {
-		return new JavaCompiler(em).compile(packageName, unitName).toString
+	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener) {
+		return new JavaCompiler(em, includeDebugListener).compile(packageName, unitName).toString
 	}
 	
 	def InternalInformation asInternal(int id){
@@ -94,18 +96,22 @@ class JavaCompiler {
 				private int deltaCycle=0, epsCycle=0;
 				private Set<RegUpdate> regUpdates=new HashSet<RegUpdate>();
 				private Map<String, Integer> varIdx=new HashMap<String, Integer>();
+				«IF debug»
 				private final IDebugListener listener;
 				private final ExecutableModel em;
+				«ENDIF»
 				private final boolean disableEdges;
 				
 				public «unitName»() {
-					this(false, null, null);
+					this(false«IF debug», null, null«ENDIF»);
 				}
 				
-				public «unitName»(boolean disableEdges, IDebugListener listener, ExecutableModel em) {
+				public «unitName»(boolean disableEdges«IF debug», IDebugListener listener, ExecutableModel em«ENDIF») {
 					this.disableEdges=disableEdges;
+					«IF debug»
 					this.listener=listener;
 					this.em=em;
+					«ENDIF»
 					«FOR v : em.variables.excludeNull»
 						«v.init»
 						varIdx.put("«v.name»", «varIdx.get(v.name)»);
@@ -143,8 +149,10 @@ class JavaCompiler {
 					deltaCycle++;
 					epsCycle=0;
 					do {
+						«IF debug»
 						if (listener!=null)
 							listener.startCycle(deltaCycle, epsCycle, this);
+						«ENDIF»
 						regUpdates.clear();
 						«FOR f : em.frames»
 							«IF f.edgeNegDepRes===-1 && f.edgePosDepRes===-1 && f.predNegDepRes.length===0 && f.predPosDepRes.length===0»
@@ -163,15 +171,19 @@ class JavaCompiler {
 							«ENDIF»
 						«ENDFOR»
 						updateRegs();
+						«IF debug»
 						if (listener!=null && !regUpdates.isEmpty())
 							listener.copyingRegisterValues(this);
+						«ENDIF»
 						epsCycle++;
 					} while (!regUpdates.isEmpty());
 					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name)!=null]»
 						«v.copyPrev»
 					«ENDFOR»
+					«IF debug»
 					if (listener!=null)
 						listener.doneCycle(deltaCycle, this);
+					«ENDIF»
 				}
 				«copyRegs»
 				«hdlInterpreter»
@@ -216,8 +228,10 @@ class JavaCompiler {
 		boolean p«id»_fresh=true;
 		long up«id»=«id.asInternal.info.javaName(false)»_update;
 		if ((up«id»>>>16 != deltaCycle) || ((up«id»&0xFFFF) != epsCycle)){
+			«IF debug»
 			if (listener!=null)
 			 	listener.skippingPredicateNotFresh(-1, em.internals[«id»], true, null);
+			 «ENDIF»
 			p«id»_fresh=false;
 		}
 		'''
@@ -233,14 +247,18 @@ class JavaCompiler {
 		boolean «internal.javaName(false)»_risingIsHandled=false;
 		if (!disableEdges){
 			if ((«id.internal(-1, true, new LinkedList<Integer>)»!=0) || («id.internal(-1, false, new LinkedList<Integer>)»!=1)) {
+				«IF debug»
 				if (listener!=null)
-				 	listener.skippingNotAnEdge(-1, em.internals[«id»], true, null);
+					listener.skippingNotAnEdge(-1, em.internals[«id»], true, null);
+				«ENDIF»
 				«internal.javaName(false)»_isRising=false;
 			}
 		}
 		if (skipEdge(«internal.info.javaName(false)»_update)){
+			«IF debug»
 			if (listener!=null)
-			 	listener.skippingHandledEdge(-1, em.internals[«id»], true, null);
+				listener.skippingHandledEdge(-1, em.internals[«id»], true, null);
+			«ENDIF»
 			«internal.javaName(false)»_risingIsHandled=true;
 		}
 		'''
@@ -255,14 +273,18 @@ class JavaCompiler {
 		boolean «internal.javaName(false)»_fallingIsHandled=false;
 		if (!disableEdges){
 			if ((«id.internal(-1, true, new LinkedList<Integer>)»!=1) || («id.internal(-1, false, new LinkedList<Integer>)»!=0)) {
+				«IF debug»
 				if (listener!=null)
 				 	listener.skippingNotAnEdge(-1, em.internals[«id»], false, null);
+				«ENDIF»
 				«internal.javaName(false)»_isFalling=false;
 			}
 		}
 		if (skipEdge(«internal.info.javaName(false)»_update)){
+			«IF debug»
 			if (listener!=null)
 			 	listener.skippingHandledEdge(-1, em.internals[«id»], false, null);
+			«ENDIF»
 			«internal.javaName(false)»_fallingIsHandled=true;
 		}
 		'''
@@ -410,8 +432,10 @@ class JavaCompiler {
 					«info.javaType» val=(«info.info.javaName(prev)»«sb» >> «info.bitEnd») & «mask»;
 				«ENDIF»
 				«IF info.arrayIdx.length===info.info.dimensions.length»
-					if (listener!=null)
-						listener.loadingInternal(frameID, em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»val?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(val)«ENDIF», null);
+					«IF debug»
+						if (listener!=null)
+							listener.loadingInternal(frameID, em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»val?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(val)«ENDIF», null);
+					«ENDIF»
 				«ENDIF»
 				return val;
 			}
@@ -426,8 +450,10 @@ class JavaCompiler {
 				bitEnd») & «info.actualWidth.asMask»;
 				«ENDIF»
 				«IF info.arrayIdx.length===info.info.dimensions.length»
-					if (listener!=null)
-						listener.loadingInternal(frameID, em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»val?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(val)«ENDIF», null);
+					«IF debug»
+						if (listener!=null)
+							listener.loadingInternal(frameID, em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»val?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(val)«ENDIF», null);
+					«ENDIF»
 				«ENDIF»
 				return val;
 				
@@ -530,8 +556,10 @@ class JavaCompiler {
 		sb.append(
 			'''
 			private final void frame«frame.uniqueID»() {
+				«IF debug»
 				if (listener!=null)
 					listener.startFrame(«frame.uniqueID», deltaCycle, epsCycle, null);
+				«ENDIF»
 			''')
 
 		var pos = 0
@@ -563,9 +591,11 @@ class JavaCompiler {
 			''')
 		sb.append(
 		'''
+		«IF debug»
 			if (listener!=null)
 				listener.writingResult(«frame.uniqueID», em.internals[«frame.outputId»], BigInteger.valueOf(«last»«IF frame.outputId.asInternal.isPred»?1:0«ENDIF»), null);
-	}
+		«ENDIF»
+		}
 		''')
 		return sb.toString
 	}
