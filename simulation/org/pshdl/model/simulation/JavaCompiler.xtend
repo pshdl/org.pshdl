@@ -16,6 +16,7 @@ import java.util.ArrayList
 class JavaCompiler {
 	private ExecutableModel em
 	private Map<String,Integer> varIdx=new HashMap
+	private Map<String,Integer> intIdx=new HashMap
 	private Map<String, Boolean> prevMap = new HashMap
 
 	new(ExecutableModel em) {
@@ -23,16 +24,23 @@ class JavaCompiler {
 		for (i:0 ..< em.variables.length){
 			varIdx.put(em.variables.get(i).name,i)
 		}
+		for (i:0 ..< em.internals.length){
+			intIdx.put(em.internals.get(i).fullName,i)
+		}
 		for (f : em.frames) {
 			if (f.edgeNegDepRes != -1)
-				prevMap.put(em.internals.get(f.edgeNegDepRes).info.name, true)
+				prevMap.put(f.edgeNegDepRes.asInternal.info.name, true)
 			if (f.edgePosDepRes != -1)
-				prevMap.put(em.internals.get(f.edgePosDepRes).info.name, true)
+				prevMap.put(f.edgePosDepRes.asInternal.info.name, true)
 		}
 	}
 
 	def static String doCompile(ExecutableModel em, String packageName, String unitName) {
 		return new JavaCompiler(em).compile(packageName, unitName).toString
+	}
+	
+	def InternalInformation asInternal(int id){
+		return em.internals.get(id)
 	}
 
 	def compile(String packageName, String unitName) {
@@ -129,6 +137,8 @@ class JavaCompiler {
 				}
 				
 				public void run(){
+					deltaCycle++;
+					epsCycle=0;
 					do {
 						if (listener!=null)
 							listener.startCycle(deltaCycle, epsCycle, this);
@@ -142,15 +152,20 @@ class JavaCompiler {
 						updateRegs();
 						if (listener!=null && !regUpdates.isEmpty())
 							listener.copyingRegisterValues(this);
+						epsCycle++;
 					} while (!regUpdates.isEmpty());
 					if (listener!=null)
 						listener.doneCycle(deltaCycle, this);
-					deltaCycle++;
 				}
 				«copyRegs»
 				«hdlInterpreter»
 			}
 		'''
+	}
+	
+	def asMask(int width){
+		val mask=(1l<<width) - 1
+		return mask.toHexString
 	}
 	
 	def hdlInterpreter() '''
@@ -174,9 +189,15 @@ class JavaCompiler {
 		switch (idx) {
 			«FOR v:em.variables.excludeNull»
 				«IF v.dimensions.length==0»
-				case «varIdx.get(v.name)»: «v.javaName(false)»=value«IF v.predicate»==0?false:true«ENDIF»;break;
+				case «varIdx.get(v.name)»: 
+					«IF false&&v.width!=64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
+					«v.javaName(false)»=value«IF v.predicate»==0?false:true«ENDIF»;
+					break;
 				«ELSE»
-				case «varIdx.get(v.name)»: «v.javaName(false)»[«v.arrayAccessArrIdx»]=value;break;
+				case «varIdx.get(v.name)»: 
+					«IF false&&v.width!=64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
+					«v.javaName(false)»[«v.arrayAccessArrIdx»]=value;
+					break;
 				«ENDIF»
 			«ENDFOR»
 			default:
@@ -210,9 +231,9 @@ class JavaCompiler {
 		switch (idx) {
 			«FOR v:em.variables.excludeNull»
 				«IF v.dimensions.length==0»
-				case «varIdx.get(v.name)»: return «v.javaName(false)»«IF v.predicate»?1:0«ENDIF»;
+				case «varIdx.get(v.name)»: return «v.javaName(false)»«IF v.predicate»?1:0«ELSEIF false && v.width!=64» & «v.width.asMask»«ENDIF»;
 				«ELSE»
-				case «varIdx.get(v.name)»: return «v.javaName(false)»[«v.arrayAccessArrIdx»];
+				case «varIdx.get(v.name)»: return «v.javaName(false)»[«v.arrayAccessArrIdx»]«IF false && v.width!=64 && !v.predicate» & «v.width.asMask»«ENDIF»;
 				«ENDIF»
 			«ENDFOR»
 			default:
@@ -270,30 +291,40 @@ class JavaCompiler {
 
 	def getter(InternalInformation info, boolean prev) {
 		val sb = new StringBuilder
-		val mask=(1l << info.actualWidth) - 1
+		val mask=info.actualWidth.asMask
 		for (arr : info.arrayIdx)
 			sb.append('''[«arr»]''')
 		if (info.fixedArray) '''
-			//«info.fullName»
-			public «info.info.javaType» «info.javaName(prev)»(){
+			public «info.javaType» «info.javaName(prev)»(int frameID){
 				«IF info.actualWidth == info.info.width»
-					return «info.info.javaName(prev)»«sb»;
+					«info.javaType» val=«info.info.javaName(prev)»«sb»;
 				«ELSEIF info.actualWidth == 1»
-					return («info.info.javaName(prev)»«sb» >> «info.bitStart») & 1;
+					«info.javaType» val=(«info.info.javaName(prev)»«sb» >> «info.bitStart») & 1;
 				«ELSE»
-					return («info.info.javaName(prev)»«sb» >> «info.bitEnd») & «mask.toHexString»;
+					«info.javaType» val=(«info.info.javaName(prev)»«sb» >> «info.bitEnd») & «mask»;
 				«ENDIF»
+				«IF info.arrayIdx.length===info.info.dimensions.length»
+					if (listener!=null)
+						listener.loadingInternal(frameID, em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»val?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(val)«ENDIF», null);
+				«ENDIF»
+				return val;
 			}
 		''' else '''
-			public «info.info.javaType» «info.javaName(prev)»(«FOR int i : (0 ..< info.arrayIdx.length) SEPARATOR ','»int a«i»«ENDFOR»){
+			public «info.javaType» «info.javaName(prev)»(int frameID, «FOR int i : (0 ..< info.arrayIdx.length) SEPARATOR ','»int a«i»«ENDFOR»){
 				«IF info.actualWidth == info.info.width»
-					return «info.info.javaName(prev)»«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR»;
+					«info.javaType» val= «info.info.javaName(prev)»«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR»;
 				«ELSEIF info.actualWidth == 1»
-					return («info.info.javaName(prev)»«FOR int i:(0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR» >> «info.bitStart») & 1;
+					«info.javaType» val= («info.info.javaName(prev)»«FOR int i:(0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR» >> «info.bitStart») & 1;
 				«ELSE»
-					return («info.info.javaName(prev)»«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR» >> «info.
-				bitEnd») & «(1l << info.actualWidth) - 1»;
+					«info.javaType» val= («info.info.javaName(prev)»«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR» >> «info.
+				bitEnd») & «info.actualWidth.asMask»;
 				«ENDIF»
+				«IF info.arrayIdx.length===info.info.dimensions.length»
+					if (listener!=null)
+						listener.loadingInternal(frameID, em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»val?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(val)«ENDIF», null);
+				«ENDIF»
+				return val;
+				
 			}
 		'''
 	}
@@ -419,7 +450,7 @@ class JavaCompiler {
 				pos = pos + 1
 		}
 		val last="t" + stack.pop
-		if (em.internals.get(frame.outputId).info.name != "#null")
+		if (frame.outputId.asInternal.info.name != "#null")
 			sb.append(frame.outputId.setInternal(last, false, arr))
 		else
 			sb.append('''//Write to #null
@@ -427,7 +458,7 @@ class JavaCompiler {
 		sb.append(
 		'''
 			if (listener!=null)
-				listener.writingResult(«frame.uniqueID», em.internals[«frame.outputId»], BigInteger.valueOf(«last»«IF em.internals.get(frame.outputId).isPred»?1:0«ENDIF»), null);
+				listener.writingResult(«frame.uniqueID», em.internals[«frame.outputId»], BigInteger.valueOf(«last»«IF frame.outputId.asInternal.isPred»?1:0«ENDIF»), null);
 	}
 		''')
 		return sb.toString
@@ -438,6 +469,14 @@ class JavaCompiler {
 		switch (inst.inst) {
 			case Instruction::pushAddIndex:
 				sb.append('''int a«arr.last»=(int)t«a»;''')
+			case Instruction::writeInternal:{
+				if (arr.size<inst.arg1.asInternal.info.dimensions.length){
+					sb.append('''Arrays.fill(«inst.arg1.asInternal.javaName(false)», t«a»);''')
+				} else {
+					sb.append('''«inst.arg1.asInternal.javaName(false)»«FOR ai : arr BEFORE '[' SEPARATOR '][' AFTER ']'»a«ai»«ENDFOR»=t«a»;''')
+					arr.clear
+				}
+			}
 			case Instruction::noop:
 				sb.append("//Do nothing")
 			case Instruction::and:
@@ -451,8 +490,8 @@ class JavaCompiler {
 			case Instruction::bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
-				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
-				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask.toHexString»;''')
+				val mask = (highBit - lowBit).asMask
+				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask»;''')
 			}
 			case Instruction::cast_int: {
 				if (inst.arg1 != 64) {
@@ -467,8 +506,7 @@ class JavaCompiler {
 			}
 			case Instruction::cast_uint: {
 				if (inst.arg1 != 64) {
-					val long mask = (1l << (inst.arg1)) - 1;
-					sb.append('''long t«pos»=t«a» & «mask.toHexString»;''')
+					sb.append('''long t«pos»=t«a» & «inst.arg1.asMask»;''')
 				} else {
 					sb.append('''long t«pos»=t«a»;''')
 				}
@@ -485,21 +523,20 @@ class JavaCompiler {
 				sb.append('''long t«pos»=1;''')
 			case Instruction::const2:
 				sb.append('''long t«pos»=2;''')
+			case Instruction::constAll1:
+				sb.append('''long t«pos»=«inst.arg1.asMask»;''')
 			case Instruction::concat:
 				sb.append('''long t«pos»=(t«b» << «inst.arg2») | t«a»;''')
 			case Instruction::loadConstant:
 				sb.append('''long t«pos»=«inst.arg1.constant(f)»;''')
 			case Instruction::loadInternal:{
-				val internal=em.internals.get(inst.arg1)
-				sb.append(
-					'''
-					«internal.info.javaType» t«pos»=«inst.arg1.internal(false, arr)»;
-					if (listener!=null)
-						listener.loadingInternal(«f.uniqueID», em.internals[«inst.arg1»], BigInteger.valueOf(t«pos»), null);
-					''')
+				val internal=inst.arg1.asInternal
+				sb.append('''«internal.info.javaType» t«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;''')
 			}
 			case Instruction::and:
 				sb.append('''long t«pos»=t«b» & t«a»;''')
+			case Instruction::or:
+				sb.append('''long t«pos»=t«b» | t«a»;''')
 			case Instruction::xor:
 				sb.append('''long t«pos»=t«b» ^ t«a»;''')
 			case Instruction::plus:
@@ -531,30 +568,32 @@ class JavaCompiler {
 			case Instruction::negPredicate:
 				sb.append(
 					'''
-					if («inst.arg1.internal(false, arr)») {
-						if (listener!=null)
-							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], false, «inst.arg1.internal(false, arr)»?BigInteger.ONE:BigInteger.ZERO,null); 
-						return;
-					}
-					long p«pos»=«em.internals.get(inst.arg1).info.javaName(false)»_update;
-					if ((p«pos»>>>16 != deltaCycle) || ((p«pos»&0xFFFF) != epsCycle)){
+					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
+					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
+					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
 						if (listener!=null)
 						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], false, null);
+						return;
+					}
+					if (p«pos») {
+						if (listener!=null)
+							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], false, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
 						return;
 					}
 					''')			
 			case Instruction::posPredicate:
 				sb.append(
 					'''
-					if (!«inst.arg1.internal(false, arr)») {
-						if (listener!=null)
-							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], true, «inst.arg1.internal(false, arr)»?BigInteger.ONE:BigInteger.ZERO,null); 
-						return;
-					}
-					long p«pos»=«em.internals.get(inst.arg1).info.javaName(false)»_update;
-					if ((p«pos»>>>16 != deltaCycle) || ((p«pos»&0xFFFF) != epsCycle)){
+					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
+					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
+					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
 						if (listener!=null)
 						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], true, null);
+						return;
+					}
+					if (!p«pos») {
+						if (listener!=null)
+							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], true, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
 						return;
 					}
 					''')
@@ -562,37 +601,37 @@ class JavaCompiler {
 				sb.append(
 					'''
 					if (!disableEdges){
-						if ((«inst.arg1.internal(true, arr)»!=0) || («inst.arg1.internal(false, arr)»!=1)) {
+						if ((«inst.arg1.internal(f.uniqueID, true, arr)»!=0) || («inst.arg1.internal(f.uniqueID, false, arr)»!=1)) {
 							if (listener!=null)
 							 	listener.skippingNotAnEdge(«f.uniqueID», em.internals[«inst.arg1»], true, null);
 							return;
 						}
-						long p«pos»=«em.internals.get(inst.arg1).info.javaName(false)»_update;
+						long p«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
 						if (skipEdge(p«pos»)){
 							if (listener!=null)
 							 	listener.skippingHandledEdge(«f.uniqueID», em.internals[«inst.arg1»], true, null);
 							return;
 						}
 					}
-					«em.internals.get(inst.arg1).info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);
+					«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);
 					''')
 			case Instruction::isFallingEdge:
 				sb.append(
 					'''
 					if (!disableEdges){
-						if ((«inst.arg1.internal(true, arr)»!=1) || («inst.arg1.internal(false, arr)»!=0)) {
+						if ((«inst.arg1.internal(f.uniqueID, true, arr)»!=1) || («inst.arg1.internal(f.uniqueID, false, arr)»!=0)) {
 							if (listener!=null)
 							 	listener.skippingNotAnEdge(«f.uniqueID», em.internals[«inst.arg1»], false, null);
 							return;
 						}
-						long p«pos»=«em.internals.get(inst.arg1).info.javaName(false)»_update;
+						long p«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
 						if (skipEdge(p«pos»)){
 							if (listener!=null)
 							 	listener.skippingHandledEdge(«f.uniqueID», em.internals[«inst.arg1»], false, null);
 							return;
 						}
 					}
-					«em.internals.get(inst.arg1).info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);
+					«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);
 					''')
 		}
 		sb.append(
@@ -602,14 +641,14 @@ class JavaCompiler {
 
 	def constant(int id, Frame f) '''«f.constants.get(id).longValue.toHexString»'''
 
-	def internal(int id, boolean prev, List<Integer> arr) {
-		val res = '''«em.internals.get(id).javaName(prev)»(«FOR ai : arr SEPARATOR ','»a«ai»«ENDFOR»)'''
+	def internal(int id, int uniqueID, boolean prev, List<Integer> arr) {
+		val res = '''«id.asInternal.javaName(prev)»(«uniqueID»«FOR ai : arr BEFORE ',' SEPARATOR ','»a«ai»«ENDFOR»)'''
 		arr.clear
 		return res
 	}
 
 	def setInternal(int id, String value, boolean prev, List<Integer> arr) {
-		val res = '''«em.internals.get(id).javaName(prev)»(«value»«FOR ai : arr BEFORE ',' SEPARATOR ','»a«ai»«ENDFOR»);'''
+		val res = '''«id.asInternal.javaName(prev)»(«value»«FOR ai : arr BEFORE ',' SEPARATOR ','»a«ai»«ENDFOR»);'''
 		arr.clear
 		return res
 	}
@@ -627,6 +666,12 @@ class JavaCompiler {
 		'''
 	}
 
+	def getJavaType(InternalInformation ii) {
+		val jt=ii.info.javaType
+		if (ii.arrayIdx.length!=ii.info.dimensions.length)
+			return jt+"[]"
+		return jt
+	}
 	def getJavaType(VariableInformation information) {
 		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
 			return "boolean"
