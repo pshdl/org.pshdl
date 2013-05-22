@@ -190,12 +190,12 @@ class JavaCompiler {
 			«FOR v:em.variables.excludeNull»
 				«IF v.dimensions.length==0»
 				case «varIdx.get(v.name)»: 
-					«IF false&&v.width!=64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
+					«IF v.width!=64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
 					«v.javaName(false)»=value«IF v.predicate»==0?false:true«ENDIF»;
 					break;
 				«ELSE»
 				case «varIdx.get(v.name)»: 
-					«IF false&&v.width!=64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
+					«IF v.width!=64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
 					«v.javaName(false)»[«v.arrayAccessArrIdx»]=value;
 					break;
 				«ENDIF»
@@ -231,9 +231,9 @@ class JavaCompiler {
 		switch (idx) {
 			«FOR v:em.variables.excludeNull»
 				«IF v.dimensions.length==0»
-				case «varIdx.get(v.name)»: return «v.javaName(false)»«IF v.predicate»?1:0«ELSEIF false && v.width!=64» & «v.width.asMask»«ENDIF»;
+				case «varIdx.get(v.name)»: return «v.javaName(false)»«IF v.predicate»?1:0«ELSEIF v.width!=64» & «v.width.asMask»«ENDIF»;
 				«ELSE»
-				case «varIdx.get(v.name)»: return «v.javaName(false)»[«v.arrayAccessArrIdx»]«IF false && v.width!=64 && !v.predicate» & «v.width.asMask»«ENDIF»;
+				case «varIdx.get(v.name)»: return «v.javaName(false)»[«v.arrayAccessArrIdx»]«IF v.width!=64 && !v.predicate» & «v.width.asMask»«ENDIF»;
 				«ENDIF»
 			«ENDFOR»
 			default:
@@ -490,8 +490,8 @@ class JavaCompiler {
 			case Instruction::bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
-				val mask = (highBit - lowBit).asMask
-				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask»;''')
+				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
+				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask.toHexString»;''')
 			}
 			case Instruction::cast_int: {
 				if (inst.arg1 != 64) {

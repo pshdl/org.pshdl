@@ -517,19 +517,13 @@ public class JavaCompiler {
             _builder.append("\t");
             {
               boolean _and = false;
-              boolean _and_1 = false;
-              if (!false) {
-                _and_1 = false;
-              } else {
-                boolean _notEquals = (v.width != 64);
-                _and_1 = (false && _notEquals);
-              }
-              if (!_and_1) {
+              boolean _notEquals = (v.width != 64);
+              if (!_notEquals) {
                 _and = false;
               } else {
                 boolean _isPredicate = this.isPredicate(v);
                 boolean _not = (!_isPredicate);
-                _and = (_and_1 && _not);
+                _and = (_notEquals && _not);
               }
               if (_and) {
                 _builder.append("value&=");
@@ -566,22 +560,16 @@ public class JavaCompiler {
             _builder.append("\t\t");
             _builder.append("\t");
             {
-              boolean _and_2 = false;
-              boolean _and_3 = false;
-              if (!false) {
-                _and_3 = false;
-              } else {
-                boolean _notEquals_1 = (v.width != 64);
-                _and_3 = (false && _notEquals_1);
-              }
-              if (!_and_3) {
-                _and_2 = false;
+              boolean _and_1 = false;
+              boolean _notEquals_1 = (v.width != 64);
+              if (!_notEquals_1) {
+                _and_1 = false;
               } else {
                 boolean _isPredicate_2 = this.isPredicate(v);
                 boolean _not_1 = (!_isPredicate_2);
-                _and_2 = (_and_3 && _not_1);
+                _and_1 = (_notEquals_1 && _not_1);
               }
-              if (_and_2) {
+              if (_and_1) {
                 _builder.append("value&=");
                 CharSequence _asMask_1 = this.asMask(v.width);
                 _builder.append(_asMask_1, "			");
@@ -696,14 +684,8 @@ public class JavaCompiler {
               if (_isPredicate_3) {
                 _builder.append("?1:0");
               } else {
-                boolean _and_4 = false;
-                if (!false) {
-                  _and_4 = false;
-                } else {
-                  boolean _notEquals_2 = (v_2.width != 64);
-                  _and_4 = (false && _notEquals_2);
-                }
-                if (_and_4) {
+                boolean _notEquals_2 = (v_2.width != 64);
+                if (_notEquals_2) {
                   _builder.append(" & ");
                   CharSequence _asMask_2 = this.asMask(v_2.width);
                   _builder.append(_asMask_2, "		");
@@ -725,22 +707,16 @@ public class JavaCompiler {
             _builder.append(_arrayAccessArrIdx_1, "		");
             _builder.append("]");
             {
-              boolean _and_5 = false;
-              boolean _and_6 = false;
-              if (!false) {
-                _and_6 = false;
-              } else {
-                boolean _notEquals_3 = (v_2.width != 64);
-                _and_6 = (false && _notEquals_3);
-              }
-              if (!_and_6) {
-                _and_5 = false;
+              boolean _and_2 = false;
+              boolean _notEquals_3 = (v_2.width != 64);
+              if (!_notEquals_3) {
+                _and_2 = false;
               } else {
                 boolean _isPredicate_4 = this.isPredicate(v_2);
                 boolean _not_2 = (!_isPredicate_4);
-                _and_5 = (_and_6 && _not_2);
+                _and_2 = (_notEquals_3 && _not_2);
               }
-              if (_and_5) {
+              if (_and_2) {
                 _builder.append(" & ");
                 CharSequence _asMask_3 = this.asMask(v_2.width);
                 _builder.append(_asMask_3, "		");
@@ -1697,7 +1673,9 @@ public class JavaCompiler {
           final int highBit = inst.arg1;
           final int lowBit = inst.arg2;
           int _minus = (highBit - lowBit);
-          final CharSequence mask = this.asMask(_minus);
+          int _plus = (_minus + 1);
+          long _doubleLessThan = (1l << _plus);
+          final long mask = (_doubleLessThan - 1);
           StringConcatenation _builder_7 = new StringConcatenation();
           _builder_7.append("long t");
           _builder_7.append(pos, "");
@@ -1706,7 +1684,8 @@ public class JavaCompiler {
           _builder_7.append(" >> ");
           _builder_7.append(lowBit, "");
           _builder_7.append(") & ");
-          _builder_7.append(mask, "");
+          CharSequence _hexString = this.toHexString(mask);
+          _builder_7.append(_hexString, "");
           _builder_7.append(";");
           sb.append(_builder_7);
         }
