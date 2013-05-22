@@ -5,9 +5,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
@@ -90,369 +92,689 @@ public class JavaCompiler {
   }
   
   public CharSequence compile(final String packageName, final String unitName) {
-    StringConcatenation _builder = new StringConcatenation();
+    CharSequence _xblockexpression = null;
     {
-      boolean _notEquals = (!Objects.equal(packageName, null));
-      if (_notEquals) {
-        _builder.append("package ");
-        _builder.append(packageName, "");
-        _builder.append(";");
+      HashSet<Integer> _hashSet = new HashSet<Integer>();
+      final Set<Integer> handled = _hashSet;
+      int _minus = (-1);
+      handled.add(Integer.valueOf(_minus));
+      StringConcatenation _builder = new StringConcatenation();
+      {
+        boolean _notEquals = (!Objects.equal(packageName, null));
+        if (_notEquals) {
+          _builder.append("package ");
+          _builder.append(packageName, "");
+          _builder.append(";");
+        }
       }
-    }
-    _builder.newLineIfNotEmpty();
-    CharSequence _imports = this.getImports();
-    _builder.append(_imports, "");
-    _builder.newLineIfNotEmpty();
-    _builder.newLine();
-    _builder.append("public class ");
-    _builder.append(unitName, "");
-    _builder.append(" implements IHDLInterpreter{");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("private static class RegUpdate {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("public final int internalID;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("public final int offset;");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("public RegUpdate(int internalID, int offset) {");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("super();");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("this.internalID = internalID;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("this.offset = offset;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("public int hashCode() {");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("final int prime = 31;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("int result = 1;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("result = (prime * result) + internalID;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("result = (prime * result) + offset;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("return result;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("public boolean equals(Object obj) {");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (this == obj)");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("return true;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (obj == null)");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("return false;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (getClass() != obj.getClass())");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("return false;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("RegUpdate other = (RegUpdate) obj;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (internalID != other.internalID)");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("return false;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (offset != other.offset)");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("return false;");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("return true;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    {
-      Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-      for(final VariableInformation v : _excludeNull) {
-        _builder.append("\t");
-        Boolean _get = this.prevMap.get(v.name);
-        CharSequence _decl = this.decl(v, _get);
-        _builder.append(_decl, "	");
-        _builder.newLineIfNotEmpty();
+      _builder.newLineIfNotEmpty();
+      CharSequence _imports = this.getImports();
+      _builder.append(_imports, "");
+      _builder.newLineIfNotEmpty();
+      _builder.newLine();
+      _builder.append("public class ");
+      _builder.append(unitName, "");
+      _builder.append(" implements IHDLInterpreter{");
+      _builder.newLineIfNotEmpty();
+      _builder.append("\t");
+      _builder.append("private static class RegUpdate {");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("public final int internalID;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("public final int offset;");
+      _builder.newLine();
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("public RegUpdate(int internalID, int offset) {");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("super();");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("this.internalID = internalID;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("this.offset = offset;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("@Override");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("public int hashCode() {");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("final int prime = 31;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("int result = 1;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("result = (prime * result) + internalID;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("result = (prime * result) + offset;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("return result;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("@Override");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("public boolean equals(Object obj) {");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (this == obj)");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("return true;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (obj == null)");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("return false;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (getClass() != obj.getClass())");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("return false;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("RegUpdate other = (RegUpdate) obj;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (internalID != other.internalID)");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("return false;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (offset != other.offset)");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("return false;");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("return true;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      {
+        Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
+        for(final VariableInformation v : _excludeNull) {
+          _builder.append("\t");
+          Boolean _get = this.prevMap.get(v.name);
+          CharSequence _decl = this.decl(v, _get);
+          _builder.append(_decl, "	");
+          _builder.newLineIfNotEmpty();
+        }
       }
-    }
-    _builder.append("\t");
-    _builder.append("private int deltaCycle=0, epsCycle=0;");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("private Set<RegUpdate> regUpdates=new HashSet<RegUpdate>();");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("private Map<String, Integer> varIdx=new HashMap<String, Integer>();");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("private final IDebugListener listener;");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("private final ExecutableModel em;");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("private final boolean disableEdges;");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public ");
-    _builder.append(unitName, "	");
-    _builder.append("() {");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t\t");
-    _builder.append("this(false, null, null);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public ");
-    _builder.append(unitName, "	");
-    _builder.append("(boolean disableEdges, IDebugListener listener, ExecutableModel em) {");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t\t");
-    _builder.append("this.disableEdges=disableEdges;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("this.listener=listener;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("this.em=em;");
-    _builder.newLine();
-    {
-      Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
-      for(final VariableInformation v_1 : _excludeNull_1) {
-        _builder.append("\t\t");
-        CharSequence _init = this.init(v_1);
-        _builder.append(_init, "		");
-        _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
-        _builder.append("varIdx.put(\"");
-        _builder.append(v_1.name, "		");
-        _builder.append("\", ");
-        Integer _get_1 = this.varIdx.get(v_1.name);
-        _builder.append(_get_1, "		");
-        _builder.append(");");
-        _builder.newLineIfNotEmpty();
+      _builder.append("\t");
+      _builder.append("private int deltaCycle=0, epsCycle=0;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("private Set<RegUpdate> regUpdates=new HashSet<RegUpdate>();");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("private Map<String, Integer> varIdx=new HashMap<String, Integer>();");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("private final IDebugListener listener;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("private final ExecutableModel em;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("private final boolean disableEdges;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("public ");
+      _builder.append(unitName, "	");
+      _builder.append("() {");
+      _builder.newLineIfNotEmpty();
+      _builder.append("\t\t");
+      _builder.append("this(false, null, null);");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("public ");
+      _builder.append(unitName, "	");
+      _builder.append("(boolean disableEdges, IDebugListener listener, ExecutableModel em) {");
+      _builder.newLineIfNotEmpty();
+      _builder.append("\t\t");
+      _builder.append("this.disableEdges=disableEdges;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("this.listener=listener;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("this.em=em;");
+      _builder.newLine();
+      {
+        Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
+        for(final VariableInformation v_1 : _excludeNull_1) {
+          _builder.append("\t\t");
+          CharSequence _init = this.init(v_1);
+          _builder.append(_init, "		");
+          _builder.newLineIfNotEmpty();
+          _builder.append("\t\t");
+          _builder.append("varIdx.put(\"");
+          _builder.append(v_1.name, "		");
+          _builder.append("\", ");
+          Integer _get_1 = this.varIdx.get(v_1.name);
+          _builder.append(_get_1, "		");
+          _builder.append(");");
+          _builder.newLineIfNotEmpty();
+        }
       }
-    }
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    {
-      Iterable<InternalInformation> _excludeNull_2 = this.excludeNull(this.em.internals);
-      for(final InternalInformation i : _excludeNull_2) {
-        {
-          boolean _not = (!i.isShadowReg);
-          if (_not) {
-            {
-              Boolean _get_2 = this.prevMap.get(i.info.name);
-              boolean _tripleNotEquals = (_get_2 != null);
-              if (_tripleNotEquals) {
-                _builder.append("\t");
-                CharSequence _ter = this.getter(i, true);
-                _builder.append(_ter, "	");
-                _builder.newLineIfNotEmpty();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      {
+        Iterable<InternalInformation> _excludeNull_2 = this.excludeNull(this.em.internals);
+        for(final InternalInformation i : _excludeNull_2) {
+          {
+            boolean _not = (!i.isShadowReg);
+            if (_not) {
+              {
+                Boolean _get_2 = this.prevMap.get(i.info.name);
+                boolean _tripleNotEquals = (_get_2 != null);
+                if (_tripleNotEquals) {
+                  _builder.append("\t");
+                  CharSequence _ter = this.getter(i, true);
+                  _builder.append(_ter, "	");
+                  _builder.newLineIfNotEmpty();
+                }
               }
+              _builder.append("\t");
+              CharSequence _ter_1 = this.getter(i, false);
+              _builder.append(_ter_1, "	");
+              _builder.newLineIfNotEmpty();
             }
-            _builder.append("\t");
-            CharSequence _ter_1 = this.getter(i, false);
-            _builder.append(_ter_1, "	");
-            _builder.newLineIfNotEmpty();
           }
-        }
-        {
-          boolean _or = false;
-          boolean _not_1 = (!i.info.isRegister);
-          if (_not_1) {
-            _or = true;
-          } else {
-            _or = (_not_1 || i.isShadowReg);
-          }
-          if (_or) {
-            _builder.append("\t");
-            CharSequence _setter = this.setter(i);
-            _builder.append(_setter, "	");
-            _builder.newLineIfNotEmpty();
+          {
+            boolean _or = false;
+            boolean _not_1 = (!i.info.isRegister);
+            if (_not_1) {
+              _or = true;
+            } else {
+              _or = (_not_1 || i.isShadowReg);
+            }
+            if (_or) {
+              _builder.append("\t");
+              CharSequence _setter = this.setter(i);
+              _builder.append(_setter, "	");
+              _builder.newLineIfNotEmpty();
+            }
           }
         }
       }
-    }
-    {
-      for(final Frame f : this.em.frames) {
-        _builder.append("\t");
-        String _method = this.method(f);
-        _builder.append(_method, "	");
-        _builder.newLineIfNotEmpty();
+      {
+        for(final Frame f : this.em.frames) {
+          _builder.append("\t");
+          String _method = this.method(f);
+          _builder.append(_method, "	");
+          _builder.newLineIfNotEmpty();
+        }
       }
-    }
-    _builder.append("\t");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public boolean skipEdge(long local) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("long dc = local >>> 16l;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("// Register was updated in previous delta cylce, that is ok");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("if (dc < deltaCycle)");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("return false;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("// Register was updated in this delta cycle but it is the same eps,");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("// that is ok as well");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("if ((dc == deltaCycle) && ((local & 0xFFFF) == epsCycle))");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("return false;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("// Don\'t update");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("return true;");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public void run(){");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("deltaCycle++;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("epsCycle=0;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("do {");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (listener!=null)");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("listener.startCycle(deltaCycle, epsCycle, this);");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("regUpdates.clear();");
-    _builder.newLine();
-    {
-      for(final Frame f_1 : this.em.frames) {
-        _builder.append("\t\t\t");
-        _builder.append("frame");
-        _builder.append(f_1.uniqueID, "			");
-        _builder.append("();");
-        _builder.newLineIfNotEmpty();
-      }
-    }
-    {
-      Iterable<VariableInformation> _excludeNull_3 = this.excludeNull(this.em.variables);
-      final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            Boolean _get = JavaCompiler.this.prevMap.get(it.name);
-            boolean _notEquals = (!Objects.equal(_get, null));
-            return Boolean.valueOf(_notEquals);
+      _builder.append("\t");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("public boolean skipEdge(long local) {");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("long dc = local >>> 16l;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("// Register was updated in previous delta cylce, that is ok");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("if (dc < deltaCycle)");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("return false;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("// Register was updated in this delta cycle but it is the same eps,");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("// that is ok as well");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("if ((dc == deltaCycle) && ((local & 0xFFFF) == epsCycle))");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("return false;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("// Don\'t update");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("return true;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("public void run(){");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("deltaCycle++;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("epsCycle=0;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("do {");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (listener!=null)");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("listener.startCycle(deltaCycle, epsCycle, this);");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("regUpdates.clear();");
+      _builder.newLine();
+      {
+        for(final Frame f_1 : this.em.frames) {
+          {
+            boolean _and = false;
+            boolean _and_1 = false;
+            boolean _and_2 = false;
+            int _minus_1 = (-1);
+            boolean _tripleEquals = (Integer.valueOf(f_1.edgeNegDepRes) == Integer.valueOf(_minus_1));
+            if (!_tripleEquals) {
+              _and_2 = false;
+            } else {
+              int _minus_2 = (-1);
+              boolean _tripleEquals_1 = (Integer.valueOf(f_1.edgePosDepRes) == Integer.valueOf(_minus_2));
+              _and_2 = (_tripleEquals && _tripleEquals_1);
+            }
+            if (!_and_2) {
+              _and_1 = false;
+            } else {
+              int _length = f_1.predNegDepRes.length;
+              boolean _tripleEquals_2 = (Integer.valueOf(_length) == Integer.valueOf(0));
+              _and_1 = (_and_2 && _tripleEquals_2);
+            }
+            if (!_and_1) {
+              _and = false;
+            } else {
+              int _length_1 = f_1.predPosDepRes.length;
+              boolean _tripleEquals_3 = (Integer.valueOf(_length_1) == Integer.valueOf(0));
+              _and = (_and_1 && _tripleEquals_3);
+            }
+            if (_and) {
+              _builder.append("\t\t\t");
+              _builder.append("frame");
+              _builder.append(f_1.uniqueID, "			");
+              _builder.append("();");
+              _builder.newLineIfNotEmpty();
+            } else {
+              _builder.append("\t\t\t");
+              CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handled);
+              _builder.append(_createNegEdge, "			");
+              _builder.newLineIfNotEmpty();
+              _builder.append("\t\t\t");
+              CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
+              _builder.append(_createPosEdge, "			");
+              _builder.newLineIfNotEmpty();
+              _builder.append("\t\t\t");
+              _builder.append("if (");
+              String _predicates = this.predicates(f_1, handled);
+              _builder.append(_predicates, "			");
+              _builder.append(")");
+              _builder.newLineIfNotEmpty();
+              _builder.append("\t\t\t");
+              _builder.append("\t");
+              _builder.append("frame");
+              _builder.append(f_1.uniqueID, "				");
+              _builder.append("();");
+              _builder.newLineIfNotEmpty();
+            }
           }
-        };
-      Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull_3, _function);
-      for(final VariableInformation v_2 : _filter) {
-        _builder.append("\t\t\t");
-        String _copyPrev = this.copyPrev(v_2);
-        _builder.append(_copyPrev, "			");
-        _builder.newLineIfNotEmpty();
+        }
       }
+      _builder.append("\t\t\t");
+      _builder.append("updateRegs();");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("if (listener!=null && !regUpdates.isEmpty())");
+      _builder.newLine();
+      _builder.append("\t\t\t\t");
+      _builder.append("listener.copyingRegisterValues(this);");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("epsCycle++;");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("} while (!regUpdates.isEmpty());");
+      _builder.newLine();
+      {
+        Iterable<VariableInformation> _excludeNull_3 = this.excludeNull(this.em.variables);
+        final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
+            public Boolean apply(final VariableInformation it) {
+              Boolean _get = JavaCompiler.this.prevMap.get(it.name);
+              boolean _notEquals = (!Objects.equal(_get, null));
+              return Boolean.valueOf(_notEquals);
+            }
+          };
+        Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull_3, _function);
+        for(final VariableInformation v_2 : _filter) {
+          _builder.append("\t\t");
+          String _copyPrev = this.copyPrev(v_2);
+          _builder.append(_copyPrev, "		");
+          _builder.newLineIfNotEmpty();
+        }
+      }
+      _builder.append("\t\t");
+      _builder.append("if (listener!=null)");
+      _builder.newLine();
+      _builder.append("\t\t\t");
+      _builder.append("listener.doneCycle(deltaCycle, this);");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      CharSequence _copyRegs = this.copyRegs();
+      _builder.append(_copyRegs, "	");
+      _builder.newLineIfNotEmpty();
+      _builder.append("\t");
+      CharSequence _hdlInterpreter = this.hdlInterpreter();
+      _builder.append(_hdlInterpreter, "	");
+      _builder.newLineIfNotEmpty();
+      _builder.append("}");
+      _builder.newLine();
+      _xblockexpression = (_builder);
     }
-    _builder.append("\t\t\t");
-    _builder.append("updateRegs();");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("if (listener!=null && !regUpdates.isEmpty())");
-    _builder.newLine();
-    _builder.append("\t\t\t\t");
-    _builder.append("listener.copyingRegisterValues(this);");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("epsCycle++;");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("} while (!regUpdates.isEmpty());");
-    _builder.newLine();
-    _builder.append("\t\t");
+    return _xblockexpression;
+  }
+  
+  public String predicates(final Frame f, final Set<Integer> handled) {
+    StringBuilder _stringBuilder = new StringBuilder();
+    final StringBuilder sb = _stringBuilder;
+    boolean first = true;
+    int _minus = (-1);
+    boolean _tripleNotEquals = (Integer.valueOf(f.edgeNegDepRes) != Integer.valueOf(_minus));
+    if (_tripleNotEquals) {
+      StringConcatenation _builder = new StringConcatenation();
+      InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
+      String _javaName = this.javaName(_asInternal, false);
+      _builder.append(_javaName, "");
+      _builder.append("_isFalling && !");
+      InternalInformation _asInternal_1 = this.asInternal(f.edgeNegDepRes);
+      String _javaName_1 = this.javaName(_asInternal_1, false);
+      _builder.append(_javaName_1, "");
+      _builder.append("_fallingIsHandled");
+      sb.append(_builder);
+      first = false;
+    }
+    int _minus_1 = (-1);
+    boolean _tripleNotEquals_1 = (Integer.valueOf(f.edgePosDepRes) != Integer.valueOf(_minus_1));
+    if (_tripleNotEquals_1) {
+      StringConcatenation _builder_1 = new StringConcatenation();
+      InternalInformation _asInternal_2 = this.asInternal(f.edgePosDepRes);
+      String _javaName_2 = this.javaName(_asInternal_2, false);
+      _builder_1.append(_javaName_2, "");
+      _builder_1.append("_isRising&& !");
+      InternalInformation _asInternal_3 = this.asInternal(f.edgePosDepRes);
+      String _javaName_3 = this.javaName(_asInternal_3, false);
+      _builder_1.append(_javaName_3, "");
+      _builder_1.append("_risingIsHandled");
+      sb.append(_builder_1);
+      first = false;
+    }
+    if (first) {
+      sb.append("true");
+    }
+    return sb.toString();
+  }
+  
+  public CharSequence createBooleanPred(final int id) {
+    StringConcatenation _builder = new StringConcatenation();
+    InternalInformation _asInternal = this.asInternal(id);
+    String _javaType = this.getJavaType(_asInternal);
+    _builder.append(_javaType, "");
+    _builder.append(" p");
+    _builder.append(id, "");
+    _builder.append("=");
+    int _minus = (-1);
+    LinkedList<Integer> _linkedList = new LinkedList<Integer>();
+    String _internal = this.internal(id, _minus, false, _linkedList);
+    _builder.append(_internal, "");
+    _builder.append(";");
+    _builder.newLineIfNotEmpty();
+    _builder.append("long up");
+    _builder.append(id, "");
+    _builder.append("=");
+    InternalInformation _asInternal_1 = this.asInternal(id);
+    String _javaName = this.javaName(_asInternal_1.info, false);
+    _builder.append(_javaName, "");
+    _builder.append("_update;");
+    _builder.newLineIfNotEmpty();
+    _builder.append("if ((up");
+    _builder.append(id, "");
+    _builder.append(">>>16 != deltaCycle) || ((up");
+    _builder.append(id, "");
+    _builder.append("&0xFFFF) != epsCycle)){");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
     _builder.append("if (listener!=null)");
     _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("listener.doneCycle(deltaCycle, this);");
-    _builder.newLine();
+    _builder.append("\t \t");
+    _builder.append("listener.skippingPredicateNotFresh(-1, em.internals[");
+    _builder.append(id, "	 	");
+    _builder.append("], true, null);");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
+    _builder.append("return;");
+    _builder.newLine();
     _builder.append("}");
     _builder.newLine();
-    _builder.append("\t");
-    CharSequence _copyRegs = this.copyRegs();
-    _builder.append(_copyRegs, "	");
+    _builder.append("if (!p");
+    _builder.append(id, "");
+    _builder.append(") {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    CharSequence _hdlInterpreter = this.hdlInterpreter();
-    _builder.append(_hdlInterpreter, "	");
+    _builder.append("if (listener!=null)");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("listener.skippingPredicateNotMet(-1, em.internals[");
+    _builder.append(id, "		");
+    _builder.append("], true, p");
+    _builder.append(id, "		");
+    _builder.append("?BigInteger.ONE:BigInteger.ZERO,null); ");
     _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("return;");
+    _builder.newLine();
     _builder.append("}");
     _builder.newLine();
     return _builder;
+  }
+  
+  public CharSequence createPosEdge(final int id, final Set<Integer> handledEdges) {
+    CharSequence _xblockexpression = null;
+    {
+      boolean _contains = handledEdges.contains(Integer.valueOf(id));
+      if (_contains) {
+        StringConcatenation _builder = new StringConcatenation();
+        return _builder.toString();
+      }
+      handledEdges.add(Integer.valueOf(id));
+      final InternalInformation internal = this.asInternal(id);
+      StringConcatenation _builder_1 = new StringConcatenation();
+      _builder_1.append("boolean ");
+      String _javaName = this.javaName(internal, false);
+      _builder_1.append(_javaName, "");
+      _builder_1.append("_isRising=true;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("boolean ");
+      String _javaName_1 = this.javaName(internal, false);
+      _builder_1.append(_javaName_1, "");
+      _builder_1.append("_risingIsHandled=false;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("if (!disableEdges){");
+      _builder_1.newLine();
+      _builder_1.append("\t");
+      _builder_1.append("if ((");
+      int _minus = (-1);
+      LinkedList<Integer> _linkedList = new LinkedList<Integer>();
+      String _internal = this.internal(id, _minus, true, _linkedList);
+      _builder_1.append(_internal, "	");
+      _builder_1.append("!=0) || (");
+      int _minus_1 = (-1);
+      LinkedList<Integer> _linkedList_1 = new LinkedList<Integer>();
+      String _internal_1 = this.internal(id, _minus_1, false, _linkedList_1);
+      _builder_1.append(_internal_1, "	");
+      _builder_1.append("!=1)) {");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t\t");
+      _builder_1.append("if (listener!=null)");
+      _builder_1.newLine();
+      _builder_1.append("\t\t \t");
+      _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
+      _builder_1.append(id, "		 	");
+      _builder_1.append("], true, null);");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t\t");
+      String _javaName_2 = this.javaName(internal, false);
+      _builder_1.append(_javaName_2, "		");
+      _builder_1.append("_isRising=false;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _builder_1.append("if (skipEdge(");
+      String _javaName_3 = this.javaName(internal.info, false);
+      _builder_1.append(_javaName_3, "");
+      _builder_1.append("_update)){");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      _builder_1.append("if (listener!=null)");
+      _builder_1.newLine();
+      _builder_1.append("\t \t");
+      _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
+      _builder_1.append(id, "	 	");
+      _builder_1.append("], true, null);");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      String _javaName_4 = this.javaName(internal, false);
+      _builder_1.append(_javaName_4, "	");
+      _builder_1.append("_risingIsHandled=true;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _xblockexpression = (_builder_1);
+    }
+    return _xblockexpression;
+  }
+  
+  public CharSequence createNegEdge(final int id, final Set<Integer> handledEdges) {
+    CharSequence _xblockexpression = null;
+    {
+      boolean _contains = handledEdges.contains(Integer.valueOf(id));
+      if (_contains) {
+        StringConcatenation _builder = new StringConcatenation();
+        return _builder.toString();
+      }
+      handledEdges.add(Integer.valueOf(id));
+      final InternalInformation internal = this.asInternal(id);
+      StringConcatenation _builder_1 = new StringConcatenation();
+      _builder_1.append("boolean ");
+      String _javaName = this.javaName(internal, false);
+      _builder_1.append(_javaName, "");
+      _builder_1.append("_isFalling=true;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("boolean ");
+      String _javaName_1 = this.javaName(internal, false);
+      _builder_1.append(_javaName_1, "");
+      _builder_1.append("_fallingIsHandled=false;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("if (!disableEdges){");
+      _builder_1.newLine();
+      _builder_1.append("\t");
+      _builder_1.append("if ((");
+      int _minus = (-1);
+      LinkedList<Integer> _linkedList = new LinkedList<Integer>();
+      String _internal = this.internal(id, _minus, true, _linkedList);
+      _builder_1.append(_internal, "	");
+      _builder_1.append("!=1) || (");
+      int _minus_1 = (-1);
+      LinkedList<Integer> _linkedList_1 = new LinkedList<Integer>();
+      String _internal_1 = this.internal(id, _minus_1, false, _linkedList_1);
+      _builder_1.append(_internal_1, "	");
+      _builder_1.append("!=0)) {");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t\t");
+      _builder_1.append("if (listener!=null)");
+      _builder_1.newLine();
+      _builder_1.append("\t\t \t");
+      _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
+      _builder_1.append(id, "		 	");
+      _builder_1.append("], false, null);");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t\t");
+      String _javaName_2 = this.javaName(internal, false);
+      _builder_1.append(_javaName_2, "		");
+      _builder_1.append("_isFalling=false;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _builder_1.append("if (skipEdge(");
+      String _javaName_3 = this.javaName(internal.info, false);
+      _builder_1.append(_javaName_3, "");
+      _builder_1.append("_update)){");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      _builder_1.append("if (listener!=null)");
+      _builder_1.newLine();
+      _builder_1.append("\t \t");
+      _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
+      _builder_1.append(id, "	 	");
+      _builder_1.append("], false, null);");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      String _javaName_4 = this.javaName(internal, false);
+      _builder_1.append(_javaName_4, "	");
+      _builder_1.append("_fallingIsHandled=true;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("}");
+      _builder_1.newLine();
+      _xblockexpression = (_builder_1);
+    }
+    return _xblockexpression;
   }
   
   public CharSequence asMask(final int width) {
@@ -2219,68 +2541,9 @@ public class JavaCompiler {
         if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
           _matched=true;
           StringConcatenation _builder_40 = new StringConcatenation();
-          _builder_40.append("if (!disableEdges){");
-          _builder_40.newLine();
-          _builder_40.append("\t");
-          _builder_40.append("if ((");
-          String _internal_3 = this.internal(inst.arg1, f.uniqueID, true, arr);
-          _builder_40.append(_internal_3, "	");
-          _builder_40.append("!=0) || (");
-          String _internal_4 = this.internal(inst.arg1, f.uniqueID, false, arr);
-          _builder_40.append(_internal_4, "	");
-          _builder_40.append("!=1)) {");
-          _builder_40.newLineIfNotEmpty();
-          _builder_40.append("\t\t");
-          _builder_40.append("if (listener!=null)");
-          _builder_40.newLine();
-          _builder_40.append("\t\t \t");
-          _builder_40.append("listener.skippingNotAnEdge(");
-          _builder_40.append(f.uniqueID, "		 	");
-          _builder_40.append(", em.internals[");
-          _builder_40.append(inst.arg1, "		 	");
-          _builder_40.append("], true, null);");
-          _builder_40.newLineIfNotEmpty();
-          _builder_40.append("\t\t");
-          _builder_40.append("return;");
-          _builder_40.newLine();
-          _builder_40.append("\t");
-          _builder_40.append("}");
-          _builder_40.newLine();
-          _builder_40.append("\t");
-          _builder_40.append("long p");
-          _builder_40.append(pos, "	");
-          _builder_40.append("=");
           InternalInformation _asInternal_7 = this.asInternal(inst.arg1);
           String _javaName_4 = this.javaName(_asInternal_7.info, false);
-          _builder_40.append(_javaName_4, "	");
-          _builder_40.append("_update;");
-          _builder_40.newLineIfNotEmpty();
-          _builder_40.append("\t");
-          _builder_40.append("if (skipEdge(p");
-          _builder_40.append(pos, "	");
-          _builder_40.append(")){");
-          _builder_40.newLineIfNotEmpty();
-          _builder_40.append("\t\t");
-          _builder_40.append("if (listener!=null)");
-          _builder_40.newLine();
-          _builder_40.append("\t\t \t");
-          _builder_40.append("listener.skippingHandledEdge(");
-          _builder_40.append(f.uniqueID, "		 	");
-          _builder_40.append(", em.internals[");
-          _builder_40.append(inst.arg1, "		 	");
-          _builder_40.append("], true, null);");
-          _builder_40.newLineIfNotEmpty();
-          _builder_40.append("\t\t");
-          _builder_40.append("return;");
-          _builder_40.newLine();
-          _builder_40.append("\t");
-          _builder_40.append("}");
-          _builder_40.newLine();
-          _builder_40.append("}");
-          _builder_40.newLine();
-          InternalInformation _asInternal_8 = this.asInternal(inst.arg1);
-          String _javaName_5 = this.javaName(_asInternal_8.info, false);
-          _builder_40.append(_javaName_5, "");
+          _builder_40.append(_javaName_4, "");
           _builder_40.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           _builder_40.newLineIfNotEmpty();
           sb.append(_builder_40);
@@ -2290,68 +2553,9 @@ public class JavaCompiler {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
           StringConcatenation _builder_41 = new StringConcatenation();
-          _builder_41.append("if (!disableEdges){");
-          _builder_41.newLine();
-          _builder_41.append("\t");
-          _builder_41.append("if ((");
-          String _internal_5 = this.internal(inst.arg1, f.uniqueID, true, arr);
-          _builder_41.append(_internal_5, "	");
-          _builder_41.append("!=1) || (");
-          String _internal_6 = this.internal(inst.arg1, f.uniqueID, false, arr);
-          _builder_41.append(_internal_6, "	");
-          _builder_41.append("!=0)) {");
-          _builder_41.newLineIfNotEmpty();
-          _builder_41.append("\t\t");
-          _builder_41.append("if (listener!=null)");
-          _builder_41.newLine();
-          _builder_41.append("\t\t \t");
-          _builder_41.append("listener.skippingNotAnEdge(");
-          _builder_41.append(f.uniqueID, "		 	");
-          _builder_41.append(", em.internals[");
-          _builder_41.append(inst.arg1, "		 	");
-          _builder_41.append("], false, null);");
-          _builder_41.newLineIfNotEmpty();
-          _builder_41.append("\t\t");
-          _builder_41.append("return;");
-          _builder_41.newLine();
-          _builder_41.append("\t");
-          _builder_41.append("}");
-          _builder_41.newLine();
-          _builder_41.append("\t");
-          _builder_41.append("long p");
-          _builder_41.append(pos, "	");
-          _builder_41.append("=");
-          InternalInformation _asInternal_9 = this.asInternal(inst.arg1);
-          String _javaName_6 = this.javaName(_asInternal_9.info, false);
-          _builder_41.append(_javaName_6, "	");
-          _builder_41.append("_update;");
-          _builder_41.newLineIfNotEmpty();
-          _builder_41.append("\t");
-          _builder_41.append("if (skipEdge(p");
-          _builder_41.append(pos, "	");
-          _builder_41.append(")){");
-          _builder_41.newLineIfNotEmpty();
-          _builder_41.append("\t\t");
-          _builder_41.append("if (listener!=null)");
-          _builder_41.newLine();
-          _builder_41.append("\t\t \t");
-          _builder_41.append("listener.skippingHandledEdge(");
-          _builder_41.append(f.uniqueID, "		 	");
-          _builder_41.append(", em.internals[");
-          _builder_41.append(inst.arg1, "		 	");
-          _builder_41.append("], false, null);");
-          _builder_41.newLineIfNotEmpty();
-          _builder_41.append("\t\t");
-          _builder_41.append("return;");
-          _builder_41.newLine();
-          _builder_41.append("\t");
-          _builder_41.append("}");
-          _builder_41.newLine();
-          _builder_41.append("}");
-          _builder_41.newLine();
-          InternalInformation _asInternal_10 = this.asInternal(inst.arg1);
-          String _javaName_7 = this.javaName(_asInternal_10.info, false);
-          _builder_41.append(_javaName_7, "");
+          InternalInformation _asInternal_8 = this.asInternal(inst.arg1);
+          String _javaName_5 = this.javaName(_asInternal_8.info, false);
+          _builder_41.append(_javaName_5, "");
           _builder_41.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           _builder_41.newLineIfNotEmpty();
           sb.append(_builder_41);
