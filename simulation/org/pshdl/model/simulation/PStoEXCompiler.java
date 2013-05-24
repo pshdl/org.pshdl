@@ -50,7 +50,7 @@ public class PStoEXCompiler implements IOutputProvider {
 		for (int i = 1; i < args.length; i++) {
 			File source = new File(args[i]);
 			System.out.println("\t" + source);
-			if (addFile(problems, source)) {
+			if (addFile(source, problems)) {
 				syntaxerror = true;
 			}
 		}
@@ -123,7 +123,7 @@ public class PStoEXCompiler implements IOutputProvider {
 		}
 	}
 
-	public boolean addFile(Set<Problem> syntaxProblems, File source) throws IOException, FileNotFoundException {
+	public boolean addFile(File source, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
 		HDLPackage parse = PSHDLParser.parse(source, "PSHDLSim", syntaxProblems);
 		pkgs.put(source, parse);
 		return reportProblem(syntaxProblems);
@@ -147,6 +147,13 @@ public class PStoEXCompiler implements IOutputProvider {
 		Set<Problem> validate = HDLValidator.validate(parse, null);
 		problems.addAll(validate);
 		return reportProblem(validate);
+	}
+
+	public ExecutableModel createExecutable(HDLQualifiedName name, String src) throws CycleException {
+		HDLUnit findUnit = findUnit(name);
+		if (findUnit == null)
+			throw new IllegalArgumentException("No unit with name:" + name);
+		return createExecutable(findUnit, src);
 	}
 
 }

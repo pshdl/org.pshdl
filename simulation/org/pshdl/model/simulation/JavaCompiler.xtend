@@ -101,13 +101,18 @@ class JavaCompiler {
 				private final ExecutableModel em;
 				«ENDIF»
 				private final boolean disableEdges;
+				private final boolean disabledRegOutputlogic;
 				
+				/**
+				* Constructs an instance with no debugging and disabledEdge as well as disabledRegOutputlogic are false
+				*/
 				public «unitName»() {
-					this(false«IF debug», null, null«ENDIF»);
+					this(false, false«IF debug», null, null«ENDIF»);
 				}
 				
-				public «unitName»(boolean disableEdges«IF debug», IDebugListener listener, ExecutableModel em«ENDIF») {
+				public «unitName»(boolean disableEdges, boolean disabledRegOutputlogic«IF debug», IDebugListener listener, ExecutableModel em«ENDIF») {
 					this.disableEdges=disableEdges;
+					this.disabledRegOutputlogic=disabledRegOutputlogic;
 					«IF debug»
 					this.listener=listener;
 					this.em=em;
@@ -176,7 +181,7 @@ class JavaCompiler {
 							listener.copyingRegisterValues(this);
 						«ENDIF»
 						epsCycle++;
-					} while (!regUpdates.isEmpty());
+					} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);
 					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name)!=null]»
 						«v.copyPrev»
 					«ENDFOR»
@@ -468,8 +473,11 @@ class JavaCompiler {
 		val varAccess = info.info.arrayAccess
 		val off=info.arrayAccess
 		var fixedAccess = if (info.arrayIdx.length>0) '''[«off»]''' else ''''''
-		if (info.isShadowReg)
+		var regSuffix=''
+		if (info.isShadowReg){
 			fixedAccess="$reg"+fixedAccess
+			regSuffix="$reg"
+		}
 		if (info.fixedArray) '''
 			public void «info.javaName(false)»(«info.info.javaType» value){
 				«IF info.actualWidth == info.info.width»
@@ -490,12 +498,12 @@ class JavaCompiler {
 			public void «info.javaName(false)»(«info.info.javaType» value,«FOR int i : (0 ..< info.arrayIdx.length) SEPARATOR ','»int a«i»«ENDFOR»){
 				int offset=(int)«varAccess»;
 				«IF info.actualWidth == info.info.width»
-					«IF info.isShadowReg»«info.info.javaType» current=«info.info.javaName(false)»[offset];«ENDIF»
-					«info.info.javaName(false)»[offset]=value;
+					«IF info.isShadowReg»«info.info.javaType» current=«info.info.javaName(false)»«regSuffix»[offset];«ENDIF»
+					«info.info.javaName(false)»«regSuffix»[offset]=value;
 				«ELSE»
-					«info.info.javaType» current=«info.info.javaName(false)»[offset] & «writeMask»;
+					«info.info.javaType» current=«info.info.javaName(false)»«regSuffix»[offset] & «writeMask»;
 					value=((value & «maskString») << «info.bitEnd»;
-					«info.info.javaName(false)»[offset]=current|value);
+					«info.info.javaName(false)»«regSuffix»[offset]=current|value);
 				«ENDIF»
 				«IF info.isShadowReg»
 					if (current!=value)
