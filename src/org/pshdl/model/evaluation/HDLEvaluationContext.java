@@ -48,7 +48,7 @@ import org.pshdl.model.utils.*;
  */
 public class HDLEvaluationContext {
 
-	private Map<String, HDLExpression> context;
+	private final Map<String, HDLExpression> context;
 
 	public HDLEvaluationContext(Map<String, HDLExpression> context) {
 		this.context = context;
@@ -75,10 +75,10 @@ public class HDLEvaluationContext {
 	 * @return a HDLEvaluationContext with all parameters set to their default
 	 */
 	public static Map<HDLQualifiedName, HDLEvaluationContext> createDefault(HDLPackage pkg) {
-		Map<HDLQualifiedName, HDLEvaluationContext> res = new HashMap<HDLQualifiedName, HDLEvaluationContext>();
-		for (HDLUnit unit : pkg.getUnits()) {
-			HDLEvaluationContext hec = createDefault(unit);
-			HDLQualifiedName fullName = fullNameOf(unit);
+		final Map<HDLQualifiedName, HDLEvaluationContext> res = new HashMap<HDLQualifiedName, HDLEvaluationContext>();
+		for (final HDLUnit unit : pkg.getUnits()) {
+			final HDLEvaluationContext hec = createDefault(unit);
+			final HDLQualifiedName fullName = fullNameOf(unit);
 			res.put(fullName, hec);
 		}
 		return res;
@@ -93,14 +93,14 @@ public class HDLEvaluationContext {
 	 * @return a HDLEvaluationContext with all parameters set to their default
 	 */
 	public static HDLEvaluationContext createDefault(HDLUnit unit) {
-		Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
-		Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class)//
+		final Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
+		final Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class)//
 				.from(unit).where(HDLVariableDeclaration.fDirection)//
 				.matches(isEqualTo(HDLDirection.CONSTANT))//
 				.or(isEqualTo(HDLDirection.PARAMETER)) //
 				.getAll();
-		for (HDLVariableDeclaration hvd : constants) {
-			for (HDLVariable var : hvd.getVariables()) {
+		for (final HDLVariableDeclaration hvd : constants) {
+			for (final HDLVariable var : hvd.getVariables()) {
 				c.put(var.getName(), var.getDefaultValue());
 			}
 		}
@@ -109,9 +109,9 @@ public class HDLEvaluationContext {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		String spacer = "";
-		for (Entry<String, HDLExpression> unit : context.entrySet()) {
+		for (final Entry<String, HDLExpression> unit : context.entrySet()) {
 			sb.append(spacer).append(unit.getKey()).append(':').append(unit.getValue());
 			spacer = ",";
 		}
@@ -123,7 +123,7 @@ public class HDLEvaluationContext {
 	}
 
 	public HDLEvaluationContext set(String key, HDLExpression val) {
-		Map<String, HDLExpression> map = getMap();
+		final Map<String, HDLExpression> map = getMap();
 		map.put(key, val);
 		return new HDLEvaluationContext(map);
 	}

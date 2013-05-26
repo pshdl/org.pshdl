@@ -44,8 +44,8 @@ public class Unit {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (NamedElement dec : declarations.values()) {
+		final StringBuilder sb = new StringBuilder();
+		for (final NamedElement dec : declarations.values()) {
 			sb.append(dec).append('\n');
 		}
 		sb.append(memory).append('\n');
@@ -53,7 +53,7 @@ public class Unit {
 	}
 
 	public NamedElement resolve(Reference ref) {
-		NamedElement decl = declarations.get(ref.getName());
+		final NamedElement decl = declarations.get(ref.getName());
 		if (decl == null)
 			throw new IllegalArgumentException("Can not resolve reference:" + ref.name);
 		return decl;

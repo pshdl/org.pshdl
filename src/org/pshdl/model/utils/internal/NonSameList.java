@@ -29,7 +29,7 @@ package org.pshdl.model.utils.internal;
 import java.util.*;
 
 public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable {
-	private Map<Integer, T> map = new LinkedHashMap<Integer, T>();
+	private final Map<Integer, T> map = new LinkedHashMap<Integer, T>();
 
 	public NonSameList(Collection<T> value) {
 		super();
@@ -41,7 +41,7 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public boolean add(T item) {
-		T old = map.put(System.identityHashCode(item), item);
+		final T old = map.put(System.identityHashCode(item), item);
 		return old != item;
 	}
 

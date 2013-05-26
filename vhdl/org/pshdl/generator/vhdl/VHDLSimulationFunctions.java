@@ -57,7 +57,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	@Override
 	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
 		try {
-			SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
+			final SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
 			switch (func) {
 			case wait:
 				if (function.getParams().size() == 0)
@@ -76,7 +76,7 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
 				break;
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 		return null;
 	}
@@ -93,10 +93,10 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public String[] getFunctionNames() {
-		String[] res = new String[SimulationFunctions.values().length];
-		SimulationFunctions[] values = SimulationFunctions.values();
+		final String[] res = new String[SimulationFunctions.values().length];
+		final SimulationFunctions[] values = SimulationFunctions.values();
 		for (int i = 0; i < values.length; i++) {
-			SimulationFunctions bif = values[i];
+			final SimulationFunctions bif = values[i];
 			res[i] = bif.name();
 		}
 		return res;
@@ -104,32 +104,32 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public VHDLContext toVHDL(HDLFunctionCall function, int pid) {
-		SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
+		final SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
 		switch (func) {
 		case wait: {
-			VHDLContext res = new VHDLContext();
+			final VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
-			WaitStatement ws = new WaitStatement();
+			final WaitStatement ws = new WaitStatement();
 			res.addUnclockedStatement(pid, ws, function);
 			return res;
 		}
 		case waitFor: {
-			VHDLContext res = new VHDLContext();
+			final VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
-			HDLEnumRef ref = (HDLEnumRef) function.getParams().get(1);
-			Optional<BigInteger> hdlExpression = ConstantEvaluate.valueOf(function.getParams().get(0));
+			final HDLEnumRef ref = (HDLEnumRef) function.getParams().get(1);
+			final Optional<BigInteger> hdlExpression = ConstantEvaluate.valueOf(function.getParams().get(0));
 			if (!hdlExpression.isPresent())
 				throw new IllegalArgumentException(function.getParams().get(0) + " is not constant");
-			WaitStatement ws = new WaitStatement(new PhysicalLiteral(hdlExpression.get().toString(), ref.getVarRefName().getLastSegment()));
+			final WaitStatement ws = new WaitStatement(new PhysicalLiteral(hdlExpression.get().toString(), ref.getVarRefName().getLastSegment()));
 			res.addUnclockedStatement(pid, ws, function);
 			return res;
 		}
 		case pulse: {
-			ArrayList<HDLExpression> params = function.getParams();
-			HDLVariableRef ref = getVarRef(params.get(0));
-			VHDLContext res = new VHDLContext();
+			final ArrayList<HDLExpression> params = function.getParams();
+			final HDLVariableRef ref = getVarRef(params.get(0));
+			final VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
-			IHDLObject container = function.getContainer();
+			final IHDLObject container = function.getContainer();
 			HDLAssignment ass = setValue(ref, 0, container);
 			res.addUnclockedStatement(pid, VHDLStatementExtension.vhdlOf(ass, pid).getStatement(), ass);
 			HDLFunctionCall wait = new HDLFunctionCall().setName(SimulationFunctions.waitFor.getName()).addParams(params.get(1)).addParams(params.get(2)).copyDeepFrozen(container);
@@ -141,9 +141,9 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 			return res;
 		}
 		case waitUntil: {
-			VHDLContext res = new VHDLContext();
+			final VHDLContext res = new VHDLContext();
 			res.setNoSensitivity(pid);
-			WaitStatement ws = new WaitStatement(VHDLExpressionExtension.vhdlOf(function.getParams().get(0)), null);
+			final WaitStatement ws = new WaitStatement(VHDLExpressionExtension.vhdlOf(function.getParams().get(0)), null);
 			res.addUnclockedStatement(pid, ws, function);
 			return res;
 		}
@@ -152,17 +152,17 @@ public class VHDLSimulationFunctions implements IHDLFunctionResolver {
 	}
 
 	private HDLAssignment setValue(HDLVariableRef ref, int value, IHDLObject container) {
-		HDLManip val = new HDLManip().setCastTo(HDLPrimitive.getBit()).setType(HDLManipType.CAST).setTarget(HDLLiteral.get(value));
+		final HDLManip val = new HDLManip().setCastTo(HDLPrimitive.getBit()).setType(HDLManipType.CAST).setTarget(HDLLiteral.get(value));
 		return new HDLAssignment().setLeft(ref).setRight(val).copyDeepFrozen(container);
 	}
 
 	private HDLVariableRef getVarRef(HDLExpression hdlExpression) {
 		if (hdlExpression instanceof HDLVariableRef) {
-			HDLVariableRef ref = (HDLVariableRef) hdlExpression;
+			final HDLVariableRef ref = (HDLVariableRef) hdlExpression;
 			return ref;
 		}
 		if (hdlExpression instanceof HDLManip) {
-			HDLManip manip = (HDLManip) hdlExpression;
+			final HDLManip manip = (HDLManip) hdlExpression;
 			return getVarRef(manip.getTarget());
 		}
 		return null;

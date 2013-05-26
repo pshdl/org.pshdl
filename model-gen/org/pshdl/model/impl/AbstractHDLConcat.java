@@ -55,7 +55,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 		}
 		this.cats = new ArrayList<HDLExpression>();
 		if (cats != null) {
-			for (HDLExpression newValue : cats) {
+			for (final HDLExpression newValue : cats) {
 				this.cats.add(newValue);
 			}
 		}
@@ -95,7 +95,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	@Override
 	@Nonnull
 	public HDLConcat copy() {
-		HDLConcat newObject = new HDLConcat(id, null, cats, false);
+		final HDLConcat newObject = new HDLConcat(id, null, cats, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -108,7 +108,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	@Override
 	@Nonnull
 	public HDLConcat copyFiltered(CopyFilter filter) {
-		ArrayList<HDLExpression> filteredcats = filter.copyContainer("cats", this, cats);
+		final ArrayList<HDLExpression> filteredcats = filter.copyContainer("cats", this, cats);
 		return filter.postFilter((HDLConcat) this, new HDLConcat(id, null, filteredcats, false));
 	}
 
@@ -120,7 +120,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	@Override
 	@Nonnull
 	public HDLConcat copyDeepFrozen(IHDLObject container) {
-		HDLConcat copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLConcat copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -152,7 +152,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	@Nonnull
 	public HDLConcat setCats(@Nonnull Iterable<HDLExpression> cats) {
 		cats = validateCats(cats);
-		HDLConcat res = new HDLConcat(id, container, cats, false);
+		final HDLConcat res = new HDLConcat(id, container, cats, false);
 		return res;
 	}
 
@@ -167,9 +167,9 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	public HDLConcat addCats(@Nonnull HDLExpression newCats) {
 		if (newCats == null)
 			throw new IllegalArgumentException("Element of cats can not be null!");
-		ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
+		final ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
 		cats.add(newCats);
-		HDLConcat res = new HDLConcat(id, container, cats, false);
+		final HDLConcat res = new HDLConcat(id, container, cats, false);
 		return res;
 	}
 
@@ -185,9 +185,9 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	public HDLConcat removeCats(@Nonnull HDLExpression newCats) {
 		if (newCats == null)
 			throw new IllegalArgumentException("Removed element of cats can not be null!");
-		ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
+		final ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
 		cats.remove(newCats);
-		HDLConcat res = new HDLConcat(id, container, cats, false);
+		final HDLConcat res = new HDLConcat(id, container, cats, false);
 		return res;
 	}
 
@@ -201,9 +201,9 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 	 */
 	@Nonnull
 	public HDLConcat removeCats(int idx) {
-		ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
+		final ArrayList<HDLExpression> cats = (ArrayList<HDLExpression>) this.cats.clone();
 		cats.remove(idx);
-		HDLConcat res = new HDLConcat(id, container, cats, false);
+		final HDLConcat res = new HDLConcat(id, container, cats, false);
 		return res;
 	}
 
@@ -217,7 +217,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLConcat other = (AbstractHDLConcat) obj;
+		final AbstractHDLConcat other = (AbstractHDLConcat) obj;
 		if (cats == null) {
 			if (other.cats != null)
 				return false;
@@ -241,13 +241,13 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLConcat()");
 		if (cats != null) {
 			if (cats.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLExpression o : cats) {
+				for (final HDLExpression o : cats) {
 					sb.append(".addCats(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -261,7 +261,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 		super.validateAllFields(expectedParent, checkResolve);
 		validateCats(getCats());
 		if (getCats() != null) {
-			for (HDLExpression o : getCats()) {
+			for (final HDLExpression o : getCats()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -288,8 +288,8 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 					switch (pos++) {
 					case 0:
 						if ((cats != null) && (cats.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(cats.size());
-							for (HDLExpression o : cats) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(cats.size());
+							for (final HDLExpression o : cats) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

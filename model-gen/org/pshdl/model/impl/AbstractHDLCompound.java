@@ -88,7 +88,7 @@ public abstract class AbstractHDLCompound extends HDLObject implements HDLStatem
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLCompound other = (AbstractHDLCompound) obj;
+		final AbstractHDLCompound other = (AbstractHDLCompound) obj;
 		return true;
 	}
 
@@ -98,7 +98,7 @@ public abstract class AbstractHDLCompound extends HDLObject implements HDLStatem
 	public int hashCode() {
 		if (hashCache != null)
 			return hashCache;
-		int result = super.hashCode();
+		final int result = super.hashCode();
 		final int prime = 31;
 		hashCache = result;
 		return result;
@@ -106,8 +106,8 @@ public abstract class AbstractHDLCompound extends HDLObject implements HDLStatem
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLCompound()");
 		return sb.toString();
 	}

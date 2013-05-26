@@ -107,7 +107,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLAnnotation copy() {
-		HDLAnnotation newObject = new HDLAnnotation(id, null, name, value, false);
+		final HDLAnnotation newObject = new HDLAnnotation(id, null, name, value, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -120,8 +120,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLAnnotation copyFiltered(CopyFilter filter) {
-		String filteredname = filter.copyObject("name", this, name);
-		String filteredvalue = filter.copyObject("value", this, value);
+		final String filteredname = filter.copyObject("name", this, name);
+		final String filteredvalue = filter.copyObject("value", this, value);
 		return filter.postFilter((HDLAnnotation) this, new HDLAnnotation(id, null, filteredname, filteredvalue, false));
 	}
 
@@ -133,7 +133,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLAnnotation copyDeepFrozen(IHDLObject container) {
-		HDLAnnotation copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLAnnotation copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -165,7 +165,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Nonnull
 	public HDLAnnotation setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLAnnotation res = new HDLAnnotation(id, container, name, value, false);
+		final HDLAnnotation res = new HDLAnnotation(id, container, name, value, false);
 		return res;
 	}
 
@@ -180,7 +180,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 	@Nonnull
 	public HDLAnnotation setValue(@Nullable String value) {
 		value = validateValue(value);
-		HDLAnnotation res = new HDLAnnotation(id, container, name, value, false);
+		final HDLAnnotation res = new HDLAnnotation(id, container, name, value, false);
 		return res;
 	}
 
@@ -194,7 +194,7 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLAnnotation other = (AbstractHDLAnnotation) obj;
+		final AbstractHDLAnnotation other = (AbstractHDLAnnotation) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -224,8 +224,8 @@ public abstract class AbstractHDLAnnotation extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLAnnotation()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");

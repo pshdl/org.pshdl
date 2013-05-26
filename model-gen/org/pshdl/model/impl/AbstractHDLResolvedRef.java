@@ -122,7 +122,7 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLResolvedRef other = (AbstractHDLResolvedRef) obj;
+		final AbstractHDLResolvedRef other = (AbstractHDLResolvedRef) obj;
 		if (var == null) {
 			if (other.var != null)
 				return false;
@@ -146,8 +146,8 @@ public abstract class AbstractHDLResolvedRef extends HDLReference {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLResolvedRef()");
 		if (var != null) {
 			sb.append(".setVar(HDLQualifiedName.create(\"").append(var).append("\"))");

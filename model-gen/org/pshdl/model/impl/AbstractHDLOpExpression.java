@@ -154,7 +154,7 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLOpExpression other = (AbstractHDLOpExpression) obj;
+		final AbstractHDLOpExpression other = (AbstractHDLOpExpression) obj;
 		if (left == null) {
 			if (other.left != null)
 				return false;
@@ -184,8 +184,8 @@ public abstract class AbstractHDLOpExpression extends HDLObject implements HDLEx
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLOpExpression()");
 		if (left != null) {
 			sb.append(".setLeft(").append(left.toConstructionString(spacing + "\t")).append(")");

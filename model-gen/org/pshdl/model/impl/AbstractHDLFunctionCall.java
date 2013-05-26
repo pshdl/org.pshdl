@@ -64,7 +64,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 		}
 		this.params = new ArrayList<HDLExpression>();
 		if (params != null) {
-			for (HDLExpression newValue : params) {
+			for (final HDLExpression newValue : params) {
 				this.params.add(newValue);
 			}
 		}
@@ -121,7 +121,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Override
 	@Nonnull
 	public HDLFunctionCall copy() {
-		HDLFunctionCall newObject = new HDLFunctionCall(id, null, name, params, false);
+		final HDLFunctionCall newObject = new HDLFunctionCall(id, null, name, params, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -134,8 +134,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Override
 	@Nonnull
 	public HDLFunctionCall copyFiltered(CopyFilter filter) {
-		HDLQualifiedName filteredname = filter.copyObject("name", this, name);
-		ArrayList<HDLExpression> filteredparams = filter.copyContainer("params", this, params);
+		final HDLQualifiedName filteredname = filter.copyObject("name", this, name);
+		final ArrayList<HDLExpression> filteredparams = filter.copyContainer("params", this, params);
 		return filter.postFilter((HDLFunctionCall) this, new HDLFunctionCall(id, null, filteredname, filteredparams, false));
 	}
 
@@ -147,7 +147,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Override
 	@Nonnull
 	public HDLFunctionCall copyDeepFrozen(IHDLObject container) {
-		HDLFunctionCall copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLFunctionCall copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -179,7 +179,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Nonnull
 	public HDLFunctionCall setName(@Nonnull HDLQualifiedName name) {
 		name = validateName(name);
-		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
+		final HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -194,7 +194,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	@Nonnull
 	public HDLFunctionCall setParams(@Nullable Iterable<HDLExpression> params) {
 		params = validateParams(params);
-		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
+		final HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -211,9 +211,9 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	public HDLFunctionCall addParams(@Nullable HDLExpression newParams) {
 		if (newParams == null)
 			throw new IllegalArgumentException("Element of params can not be null!");
-		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
+		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.add(newParams);
-		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
+		final HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -230,9 +230,9 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	public HDLFunctionCall removeParams(@Nullable HDLExpression newParams) {
 		if (newParams == null)
 			throw new IllegalArgumentException("Removed element of params can not be null!");
-		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
+		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(newParams);
-		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
+		final HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -247,9 +247,9 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	 */
 	@Nonnull
 	public HDLFunctionCall removeParams(int idx) {
-		ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
+		final ArrayList<HDLExpression> params = (ArrayList<HDLExpression>) this.params.clone();
 		params.remove(idx);
-		HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
+		final HDLFunctionCall res = new HDLFunctionCall(id, container, name, params, false);
 		return res;
 	}
 
@@ -263,7 +263,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLFunctionCall other = (AbstractHDLFunctionCall) obj;
+		final AbstractHDLFunctionCall other = (AbstractHDLFunctionCall) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -293,8 +293,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLFunctionCall()");
 		if (name != null) {
 			sb.append(".setName(HDLQualifiedName.create(\"").append(name).append("\"))");
@@ -302,7 +302,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 		if (params != null) {
 			if (params.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLExpression o : params) {
+				for (final HDLExpression o : params) {
 					sb.append(".addParams(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -320,7 +320,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getNameRefName()));
 		validateParams(getParams());
 		if (getParams() != null) {
-			for (HDLExpression o : getParams()) {
+			for (final HDLExpression o : getParams()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -347,8 +347,8 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 					switch (pos++) {
 					case 0:
 						if ((params != null) && (params.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(params.size());
-							for (HDLExpression o : params) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(params.size());
+							for (final HDLExpression o : params) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

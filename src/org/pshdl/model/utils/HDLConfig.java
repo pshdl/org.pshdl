@@ -34,11 +34,11 @@ import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
 
 public class HDLConfig {
 	private HDLRegClockType defaultClockType = HDLRegClockType.RISING;
-	private Map<HDLQualifiedName, HDLRegClockType> unitClockType = new HashMap<HDLQualifiedName, HDLRegClockType>();
+	private final Map<HDLQualifiedName, HDLRegClockType> unitClockType = new HashMap<HDLQualifiedName, HDLRegClockType>();
 	private HDLRegResetActiveType defaultResetType = HDLRegResetActiveType.HIGH;
-	private Map<HDLQualifiedName, HDLRegResetActiveType> unitResetType = new HashMap<HDLQualifiedName, HDLRegResetActiveType>();
+	private final Map<HDLQualifiedName, HDLRegResetActiveType> unitResetType = new HashMap<HDLQualifiedName, HDLRegResetActiveType>();
 	private HDLRegSyncType defaultSyncType = HDLRegSyncType.SYNC;
-	private Map<HDLQualifiedName, HDLRegSyncType> unitSyncType = new HashMap<HDLQualifiedName, HDLRegSyncType>();
+	private final Map<HDLQualifiedName, HDLRegSyncType> unitSyncType = new HashMap<HDLQualifiedName, HDLRegSyncType>();
 
 	public HDLRegClockType getRegClockType(HDLQualifiedName name, HDLRegClockType actual) {
 		if (actual != null)

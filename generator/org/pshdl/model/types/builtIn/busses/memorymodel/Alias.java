@@ -37,7 +37,7 @@ public class Alias implements NamedElement {
 	public Alias(String name, NamedElement... definitions) {
 		super();
 		this.name = name;
-		for (NamedElement namedElement : definitions) {
+		for (final NamedElement namedElement : definitions) {
 			this.definitions.add(namedElement);
 		}
 	}
@@ -54,9 +54,9 @@ public class Alias implements NamedElement {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("alias ").append(name).append(" {\n");
-		for (NamedElement dec : definitions) {
+		for (final NamedElement dec : definitions) {
 			sb.append('\t').append(dec).append('\n');
 		}
 		sb.append('}');

@@ -85,18 +85,18 @@ public class VHDLCastsLibrary {
 			"newSize", Standard.NATURAL));
 	static {
 		PACKAGE = new PackageDeclaration("pshdl.Casts");
-		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
-		HDLPrimitiveType[] values = HDLPrimitiveType.values();
-		for (HDLPrimitiveType left : values) {
-			for (HDLPrimitiveType right : values) {
+		final List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
+		final HDLPrimitiveType[] values = HDLPrimitiveType.values();
+		for (final HDLPrimitiveType left : values) {
+			for (final HDLPrimitiveType right : values) {
 				if (right == left) {
 					continue;
 				}
-				String name = getCastName(left, right);
-				SubtypeIndication rt = getType(right);
-				SubtypeIndication lt = getType(left);
+				final String name = getCastName(left, right);
+				final SubtypeIndication rt = getType(right);
+				final SubtypeIndication lt = getType(left);
 				if ((lt != null) && (rt != null)) {
-					FunctionDeclaration fd = new FunctionDeclaration(name, rt, new Constant("arg", lt));
+					final FunctionDeclaration fd = new FunctionDeclaration(name, rt, new Constant("arg", lt));
 					declarations.add(fd);
 				}
 			}
@@ -143,7 +143,7 @@ public class VHDLCastsLibrary {
 	}
 
 	public static SubtypeIndication getType(HDLPrimitive left) {
-		HDLExpression width = left.getWidth();
+		final HDLExpression width = left.getWidth();
 		HDLRange range = null;
 		if (width != null) {
 			range = new HDLRange().setFrom(new HDLArithOp().setLeft(width).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1))).setTo(HDLLiteral.get(0));
@@ -189,14 +189,14 @@ public class VHDLCastsLibrary {
 
 	public static TargetType getResize(Expression<?> exp, HDLPrimitive actualType, HDLExpression tWidth) {
 		if (actualType.getWidth() != null) {
-			Optional<BigInteger> bt = ConstantEvaluate.valueOf(actualType.getWidth(), null);
+			final Optional<BigInteger> bt = ConstantEvaluate.valueOf(actualType.getWidth(), null);
 			if (bt.isPresent()) {
-				Optional<BigInteger> btw = ConstantEvaluate.valueOf(tWidth, null);
+				final Optional<BigInteger> btw = ConstantEvaluate.valueOf(tWidth, null);
 				if (btw.isPresent() && bt.get().equals(btw.get()))
 					return new TargetType(exp, actualType.getType());
 			}
 		}
-		Expression<?> width = VHDLExpressionExtension.vhdlOf(tWidth);
+		final Expression<?> width = VHDLExpressionExtension.vhdlOf(tWidth);
 		FunctionCall resize = null;
 		HDLPrimitiveType resType = actualType.getType();
 		switch (actualType.getType()) {
@@ -235,7 +235,7 @@ public class VHDLCastsLibrary {
 	public static Expression<?> handleLiteral(IHDLObject container, HDLLiteral lit, HDLPrimitive targetType, HDLExpression tWidth) {
 		if ((container != null) && (container.getClassType() == HDLClass.HDLArithOp))
 			return VHDLExpressionExtension.vhdlOf(lit);
-		BigInteger val = lit.getValueAsBigInt();
+		final BigInteger val = lit.getValueAsBigInt();
 		Optional<BigInteger> width = null;
 		if (tWidth != null) {
 			width = ConstantEvaluate.valueOf(tWidth, null);
@@ -257,7 +257,7 @@ public class VHDLCastsLibrary {
 				return Aggregate.OTHERS(new CharacterLiteral('0'));
 			if (width.isPresent())
 				return VHDLExpressionExtension.INST.toVHDL(lit, width.get().intValue(), true);
-			FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
+			final FunctionCall functionCall = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
 			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.INST.toVHDL(lit, val.bitLength(), true)));
 			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
 			return functionCall;
@@ -284,13 +284,13 @@ public class VHDLCastsLibrary {
 		if (val.bitLength() > 31) {
 			if (width.isPresent())
 				return VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, width.get().intValue(), true), HDLPrimitiveType.BITVECTOR, to);
-			FunctionCall functionCall = new FunctionCall(resize);
+			final FunctionCall functionCall = new FunctionCall(resize);
 			functionCall.getParameters().add(
 					new AssociationElement(VHDLCastsLibrary.cast(VHDLExpressionExtension.INST.toVHDL(lit, val.bitLength(), true), HDLPrimitiveType.BITVECTOR, to)));
 			functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
 			return functionCall;
 		}
-		FunctionCall functionCall = new FunctionCall(castFunc);
+		final FunctionCall functionCall = new FunctionCall(castFunc);
 		functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(lit)));
 		functionCall.getParameters().add(new AssociationElement(VHDLExpressionExtension.vhdlOf(tWidth)));
 		return functionCall;
@@ -299,16 +299,16 @@ public class VHDLCastsLibrary {
 	public static Expression<?> cast(Expression<?> vhdlExpr, HDLPrimitiveType from, HDLPrimitiveType to) {
 		if (from.equals(to))
 			return vhdlExpr;
-		String name = getCastName(from, to);
-		Function resolve = PACKAGE.getScope().resolve(name, Function.class);
-		FunctionCall call = new FunctionCall(resolve);
+		final String name = getCastName(from, to);
+		final Function resolve = PACKAGE.getScope().resolve(name, Function.class);
+		final FunctionCall call = new FunctionCall(resolve);
 		call.getParameters().add(new AssociationElement(vhdlExpr));
 		return call;
 	}
 
 	private static String getCastName(HDLPrimitiveType from, HDLPrimitiveType to) {
-		String rightName = to.name().charAt(0) + to.name().substring(1).toLowerCase();
-		String name = from.name().toLowerCase() + "To" + rightName;
+		final String rightName = to.name().charAt(0) + to.name().substring(1).toLowerCase();
+		final String name = from.name().toLowerCase() + "To" + rightName;
 		return name;
 	}
 

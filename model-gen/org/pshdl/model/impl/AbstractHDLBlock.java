@@ -60,7 +60,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 		}
 		this.statements = new ArrayList<HDLStatement>();
 		if (statements != null) {
-			for (HDLStatement newValue : statements) {
+			for (final HDLStatement newValue : statements) {
 				this.statements.add(newValue);
 			}
 		}
@@ -116,7 +116,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	@Override
 	@Nonnull
 	public HDLBlock copy() {
-		HDLBlock newObject = new HDLBlock(id, null, process, statements, false);
+		final HDLBlock newObject = new HDLBlock(id, null, process, statements, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -129,8 +129,8 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	@Override
 	@Nonnull
 	public HDLBlock copyFiltered(CopyFilter filter) {
-		Boolean filteredprocess = filter.copyObject("process", this, process);
-		ArrayList<HDLStatement> filteredstatements = filter.copyContainer("statements", this, statements);
+		final Boolean filteredprocess = filter.copyObject("process", this, process);
+		final ArrayList<HDLStatement> filteredstatements = filter.copyContainer("statements", this, statements);
 		return filter.postFilter((HDLBlock) this, new HDLBlock(id, null, filteredprocess, filteredstatements, false));
 	}
 
@@ -142,7 +142,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	@Override
 	@Nonnull
 	public HDLBlock copyDeepFrozen(IHDLObject container) {
-		HDLBlock copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLBlock copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -174,7 +174,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	@Nonnull
 	public HDLBlock setProcess(@Nonnull Boolean process) {
 		process = validateProcess(process);
-		HDLBlock res = new HDLBlock(id, container, process, statements, false);
+		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
 		return res;
 	}
 
@@ -190,7 +190,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	@Nonnull
 	public HDLBlock setProcess(boolean process) {
 		process = validateProcess(process);
-		HDLBlock res = new HDLBlock(id, container, process, statements, false);
+		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
 		return res;
 	}
 
@@ -206,7 +206,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	@Nonnull
 	public HDLBlock setStatements(@Nullable Iterable<HDLStatement> statements) {
 		statements = validateStatements(statements);
-		HDLBlock res = new HDLBlock(id, container, process, statements, false);
+		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
 		return res;
 	}
 
@@ -223,9 +223,9 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	public HDLBlock addStatements(@Nullable HDLStatement newStatements) {
 		if (newStatements == null)
 			throw new IllegalArgumentException("Element of statements can not be null!");
-		ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
+		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.add(newStatements);
-		HDLBlock res = new HDLBlock(id, container, process, statements, false);
+		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
 		return res;
 	}
 
@@ -242,9 +242,9 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	public HDLBlock removeStatements(@Nullable HDLStatement newStatements) {
 		if (newStatements == null)
 			throw new IllegalArgumentException("Removed element of statements can not be null!");
-		ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
+		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.remove(newStatements);
-		HDLBlock res = new HDLBlock(id, container, process, statements, false);
+		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
 		return res;
 	}
 
@@ -259,9 +259,9 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 	 */
 	@Nonnull
 	public HDLBlock removeStatements(int idx) {
-		ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
+		final ArrayList<HDLStatement> statements = (ArrayList<HDLStatement>) this.statements.clone();
 		statements.remove(idx);
-		HDLBlock res = new HDLBlock(id, container, process, statements, false);
+		final HDLBlock res = new HDLBlock(id, container, process, statements, false);
 		return res;
 	}
 
@@ -275,7 +275,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLBlock other = (AbstractHDLBlock) obj;
+		final AbstractHDLBlock other = (AbstractHDLBlock) obj;
 		if (process == null) {
 			if (other.process != null)
 				return false;
@@ -305,8 +305,8 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLBlock()");
 		if (process != null) {
 			sb.append(".setProcess(").append(process).append(")");
@@ -314,7 +314,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 		if (statements != null) {
 			if (statements.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLStatement o : statements) {
+				for (final HDLStatement o : statements) {
 					sb.append(".addStatements(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -329,7 +329,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 		validateProcess(getProcess());
 		validateStatements(getStatements());
 		if (getStatements() != null) {
-			for (HDLStatement o : getStatements()) {
+			for (final HDLStatement o : getStatements()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -356,8 +356,8 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 					switch (pos++) {
 					case 0:
 						if ((statements != null) && (statements.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(statements.size());
-							for (HDLStatement o : statements) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(statements.size());
+							for (final HDLStatement o : statements) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

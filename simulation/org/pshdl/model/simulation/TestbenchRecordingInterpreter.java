@@ -12,9 +12,9 @@ import com.google.common.collect.*;
 
 public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 	private final IHDLInterpreter interpreter;
-	private Map<Integer, BigInteger> lastVal = Maps.newHashMap();
-	private Map<Integer, String> idxName = Maps.newHashMap();
-	private Map<String, Integer> widths = Maps.newHashMap();
+	private final Map<Integer, BigInteger> lastVal = Maps.newHashMap();
+	private final Map<Integer, String> idxName = Maps.newHashMap();
+	private final Map<String, Integer> widths = Maps.newHashMap();
 	private final PrintStream printStream;
 	private final OutputType outputType;
 
@@ -27,7 +27,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		super();
 		this.interpreter = interpreter;
 		this.outputType = type;
-		for (VariableInformation vi : model.variables) {
+		for (final VariableInformation vi : model.variables) {
 			widths.put(vi.name, vi.width);
 		}
 		printStream = new PrintStream(fileName);
@@ -48,7 +48,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 					"entity " + tbName + " is\n" + //
 					"end;\n" + //
 					"architecture pshdlGenerated of " + tbName + " is\n");
-			for (VariableInformation vi : model.variables) {
+			for (final VariableInformation vi : model.variables) {
 				if (vi.dir == Direction.INTERNAL) {
 					continue;
 				}
@@ -80,7 +80,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 					"\t\tport map (\n", dutName.toString('_'));
 
 			boolean first = true;
-			for (VariableInformation vi : model.variables) {
+			for (final VariableInformation vi : model.variables) {
 				if (vi.dir == Direction.INTERNAL) {
 					continue;
 				}
@@ -95,12 +95,12 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 			printStream.print("\n        );\n" + //
 					"    process\n" + //
 					"    begin\n");
-			for (VariableInformation vi : model.variables) {
+			for (final VariableInformation vi : model.variables) {
 				if ((vi.dir == Direction.INTERNAL) || (vi.dir == Direction.OUT)) {
 					continue;
 				}
 				if (vi.dimensions.length != 0) {
-					for (int dim : vi.dimensions) {
+					for (final int dim : vi.dimensions) {
 						for (int j = 0; j < dim; j++) {
 							// TODO Support multiple dim
 							setVar(vi.name, BigInteger.ZERO, new int[] { j });
@@ -137,9 +137,9 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 	private void setVar(String name, BigInteger value, int[] arrayIdx) {
 		switch (outputType) {
 		case pshdl: {
-			StringBuilder array = new StringBuilder();
+			final StringBuilder array = new StringBuilder();
 			if ((arrayIdx != null) && (arrayIdx.length != 0)) {
-				for (int i : arrayIdx) {
+				for (final int i : arrayIdx) {
 					array.append('[').append(i).append(']');
 				}
 			}
@@ -147,9 +147,9 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 			break;
 		}
 		case vhdl: {
-			StringBuilder array = new StringBuilder();
+			final StringBuilder array = new StringBuilder();
 			if ((arrayIdx != null) && (arrayIdx.length != 0)) {
-				for (int i : arrayIdx) {
+				for (final int i : arrayIdx) {
 					array.append('(').append(i).append(')');
 				}
 			}
@@ -159,22 +159,22 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 	}
 
 	private String toBinString(BigInteger lit, String name) {
-		Integer widthInt = widths.get(name);
+		final Integer widthInt = widths.get(name);
 		if (widthInt == 1)
 			return "'" + lit.toString(2) + "'";
 		StringBuilder sb = new StringBuilder(widthInt);
 		if (lit.signum() < 0) {
-			BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
+			final BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
 			sb.append(lit.abs().and(mask).xor(mask).add(BigInteger.ONE).toString(2));
 		} else {
-			String binLit = lit.toString(2);
+			final String binLit = lit.toString(2);
 			sb = zeroFill(widthInt, binLit);
 		}
 		return "B\"" + sb.toString() + '"';
 	}
 
 	private static StringBuilder zeroFill(int widthInt, String binLit) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (int i = widthInt; i > binLit.length(); i--) {
 			sb.append('0');
 		}
@@ -192,7 +192,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 
 	@Override
 	public void setInput(int idx, BigInteger value, int... arrayIdx) {
-		String name = getName(idx);
+		final String name = getName(idx);
 		if (!value.equals(lastVal.get(name))) {
 			setVar(name, value, arrayIdx);
 		}
@@ -201,7 +201,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 
 	@Override
 	public void setInput(String name, long value, int... arrayIdx) {
-		BigInteger bVal = BigInteger.valueOf(value);
+		final BigInteger bVal = BigInteger.valueOf(value);
 		if (!bVal.equals(lastVal.get(name))) {
 			setVar(name, bVal, arrayIdx);
 		}
@@ -210,8 +210,8 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 
 	@Override
 	public void setInput(int idx, long value, int... arrayIdx) {
-		String name = getName(idx);
-		BigInteger bVal = BigInteger.valueOf(value);
+		final String name = getName(idx);
+		final BigInteger bVal = BigInteger.valueOf(value);
 		if (!bVal.equals(lastVal.get(name))) {
 			setVar(name, bVal, arrayIdx);
 		}

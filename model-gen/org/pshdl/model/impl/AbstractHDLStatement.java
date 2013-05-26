@@ -88,7 +88,7 @@ public abstract class AbstractHDLStatement extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLStatement other = (AbstractHDLStatement) obj;
+		final AbstractHDLStatement other = (AbstractHDLStatement) obj;
 		return true;
 	}
 
@@ -98,7 +98,7 @@ public abstract class AbstractHDLStatement extends HDLObject {
 	public int hashCode() {
 		if (hashCache != null)
 			return hashCache;
-		int result = super.hashCode();
+		final int result = super.hashCode();
 		final int prime = 31;
 		hashCache = result;
 		return result;
@@ -106,8 +106,8 @@ public abstract class AbstractHDLStatement extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLStatement()");
 		return sb.toString();
 	}

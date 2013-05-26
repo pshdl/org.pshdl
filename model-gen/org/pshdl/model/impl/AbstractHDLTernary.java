@@ -149,7 +149,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	@Override
 	@Nonnull
 	public HDLTernary copy() {
-		HDLTernary newObject = new HDLTernary(id, null, ifExpr, thenExpr, elseExpr, false);
+		final HDLTernary newObject = new HDLTernary(id, null, ifExpr, thenExpr, elseExpr, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -162,9 +162,9 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	@Override
 	@Nonnull
 	public HDLTernary copyFiltered(CopyFilter filter) {
-		HDLExpression filteredifExpr = filter.copyObject("ifExpr", this, ifExpr);
-		HDLExpression filteredthenExpr = filter.copyObject("thenExpr", this, thenExpr);
-		HDLExpression filteredelseExpr = filter.copyObject("elseExpr", this, elseExpr);
+		final HDLExpression filteredifExpr = filter.copyObject("ifExpr", this, ifExpr);
+		final HDLExpression filteredthenExpr = filter.copyObject("thenExpr", this, thenExpr);
+		final HDLExpression filteredelseExpr = filter.copyObject("elseExpr", this, elseExpr);
 		return filter.postFilter((HDLTernary) this, new HDLTernary(id, null, filteredifExpr, filteredthenExpr, filteredelseExpr, false));
 	}
 
@@ -176,7 +176,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	@Override
 	@Nonnull
 	public HDLTernary copyDeepFrozen(IHDLObject container) {
-		HDLTernary copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLTernary copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -208,7 +208,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	@Nonnull
 	public HDLTernary setIfExpr(@Nonnull HDLExpression ifExpr) {
 		ifExpr = validateIfExpr(ifExpr);
-		HDLTernary res = new HDLTernary(id, container, ifExpr, thenExpr, elseExpr, false);
+		final HDLTernary res = new HDLTernary(id, container, ifExpr, thenExpr, elseExpr, false);
 		return res;
 	}
 
@@ -224,7 +224,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	@Nonnull
 	public HDLTernary setThenExpr(@Nonnull HDLExpression thenExpr) {
 		thenExpr = validateThenExpr(thenExpr);
-		HDLTernary res = new HDLTernary(id, container, ifExpr, thenExpr, elseExpr, false);
+		final HDLTernary res = new HDLTernary(id, container, ifExpr, thenExpr, elseExpr, false);
 		return res;
 	}
 
@@ -240,7 +240,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 	@Nonnull
 	public HDLTernary setElseExpr(@Nonnull HDLExpression elseExpr) {
 		elseExpr = validateElseExpr(elseExpr);
-		HDLTernary res = new HDLTernary(id, container, ifExpr, thenExpr, elseExpr, false);
+		final HDLTernary res = new HDLTernary(id, container, ifExpr, thenExpr, elseExpr, false);
 		return res;
 	}
 
@@ -254,7 +254,7 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLTernary other = (AbstractHDLTernary) obj;
+		final AbstractHDLTernary other = (AbstractHDLTernary) obj;
 		if (ifExpr == null) {
 			if (other.ifExpr != null)
 				return false;
@@ -290,8 +290,8 @@ public abstract class AbstractHDLTernary extends HDLObject implements HDLExpress
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLTernary()");
 		if (ifExpr != null) {
 			sb.append(".setIfExpr(").append(ifExpr.toConstructionString(spacing + "\t")).append(")");

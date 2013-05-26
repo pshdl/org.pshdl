@@ -50,7 +50,7 @@ public class VHDLOutputValidator implements IHDLValidator {
 	public final static Set<String> keywordSet;
 	static {
 		keywordSet = new HashSet<String>();
-		for (String keyword : keywords) {
+		for (final String keyword : keywords) {
 			keywordSet.add(keyword);
 		}
 	}
@@ -78,9 +78,9 @@ public class VHDLOutputValidator implements IHDLValidator {
 
 	@Override
 	public HDLAdvise advise(Problem problem) {
-		IErrorCode code = problem.code;
+		final IErrorCode code = problem.code;
 		if (code instanceof VHDLErrorCode) {
-			VHDLErrorCode vCode = (VHDLErrorCode) code;
+			final VHDLErrorCode vCode = (VHDLErrorCode) code;
 			switch (vCode) {
 			case KEYWORD_NAME:
 				return new HDLAdvise(problem, "The used name is a keyword or an extended identifier in VHDL",
@@ -101,30 +101,30 @@ public class VHDLOutputValidator implements IHDLValidator {
 	}
 
 	private void checkNames(HDLPackage unit, Set<Problem> problems) {
-		HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
-		for (HDLVariable hdlVariable : vars) {
-			String varName = hdlVariable.getName();
+		final HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
+		for (final HDLVariable hdlVariable : vars) {
+			final String varName = hdlVariable.getName();
 			if (!getVHDLName(varName).equals(varName)) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_NAME, hdlVariable));
 			}
 		}
-		HDLUnit[] units = unit.getAllObjectsOf(HDLUnit.class, true);
-		for (HDLUnit hdlUnit : units) {
-			String name = fullNameOf(hdlUnit).toString('_');
+		final HDLUnit[] units = unit.getAllObjectsOf(HDLUnit.class, true);
+		for (final HDLUnit hdlUnit : units) {
+			final String name = fullNameOf(hdlUnit).toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
-		HDLInterface[] ifs = unit.getAllObjectsOf(HDLInterface.class, true);
-		for (HDLInterface hdlUnit : ifs) {
-			String name = fullNameOf(hdlUnit).toString('_');
+		final HDLInterface[] ifs = unit.getAllObjectsOf(HDLInterface.class, true);
+		for (final HDLInterface hdlUnit : ifs) {
+			final String name = fullNameOf(hdlUnit).toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
-		HDLEnum[] enums = unit.getAllObjectsOf(HDLEnum.class, true);
-		for (HDLEnum hdlUnit : enums) {
-			String name = fullNameOf(hdlUnit).toString('_');
+		final HDLEnum[] enums = unit.getAllObjectsOf(HDLEnum.class, true);
+		for (final HDLEnum hdlUnit : enums) {
+			final String name = fullNameOf(hdlUnit).toString('_');
 			if (keywordSet.contains(name.toLowerCase())) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}

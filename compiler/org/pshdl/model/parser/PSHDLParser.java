@@ -47,12 +47,12 @@ import com.google.common.base.*;
 public class PSHDLParser {
 
 	public static String[] getKeywords() throws Exception {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens")));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens")));
 		String line = null;
-		List<String> keywords = new ArrayList<String>();
+		final List<String> keywords = new ArrayList<String>();
 		while ((line = reader.readLine()) != null)
 			if (line.charAt(0) == '\'') {
-				String keyWord = line.substring(1, line.lastIndexOf('\''));
+				final String keyWord = line.substring(1, line.lastIndexOf('\''));
 				if (keyWord.matches("[a-z]+")) {
 					keywords.add(keyWord);
 				}
@@ -62,8 +62,8 @@ public class PSHDLParser {
 	}
 
 	public static HDLPackage parse(File file, String libURI, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
-		FileInputStream fis = new FileInputStream(file);
-		HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
+		final FileInputStream fis = new FileInputStream(file);
+		final HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
 		fis.close();
 		return hdl;
 	}
@@ -97,19 +97,19 @@ public class PSHDLParser {
 					offendingSymbol = t;
 				}
 				totalOffset = t.getStartIndex();
-				String text = t.getText();
+				final String text = t.getText();
 				if (text != null) {
 					length = text.length();
 				}
 			}
 			if (e instanceof NoViableAltException) {
-				NoViableAltException noVi = (NoViableAltException) e;
+				final NoViableAltException noVi = (NoViableAltException) e;
 				error = SyntaxErrors.NoViableAlternative;
-				Token t = noVi.getStartToken();
+				final Token t = noVi.getStartToken();
 				charPositionInLine = t.getCharPositionInLine();
 				line = t.getLine();
 				totalOffset = t.getStartIndex();
-				String text = t.getText();
+				final String text = t.getText();
 				if (text != null) {
 					length = text.length();
 				}
@@ -139,7 +139,7 @@ public class PSHDLParser {
 	}
 
 	public static class Rewriter extends PSHDLLangBaseListener {
-		private TokenStreamRewriter rewriter;
+		private final TokenStreamRewriter rewriter;
 
 		public Rewriter(TokenStream ts) {
 			rewriter = new TokenStreamRewriter(ts);
@@ -151,15 +151,15 @@ public class PSHDLParser {
 	}
 
 	public static String annotateUnit(String original, HDLUnit unit) {
-		for (HDLAnnotation anno : unit.getAnnotations()) {
+		for (final HDLAnnotation anno : unit.getAnnotations()) {
 			if (HDLBuiltInAnnotations.autoInterface.is(anno)) {
-				HDLInterface hif = unit.asInterface();
-				HDLQualifiedName fqn = FullNameExtension.fullNameOf(unit);
-				HDLQualifiedName lastFQN = fqn.skipLast(1).append("I" + fqn.getLastSegment());
-				Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(unit, lastFQN);
-				boolean needExtend = !unit.getExtendRefName().contains(lastFQN);
+				final HDLInterface hif = unit.asInterface();
+				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(unit);
+				final HDLQualifiedName lastFQN = fqn.skipLast(1).append("I" + fqn.getLastSegment());
+				final Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(unit, lastFQN);
+				final boolean needExtend = !unit.getExtendRefName().contains(lastFQN);
 				if (resolveInterface.isPresent()) {
-					SourceInfo info = resolveInterface.get().getMeta(SourceInfo.INFO);
+					final SourceInfo info = resolveInterface.get().getMeta(SourceInfo.INFO);
 
 				} else {
 				}
@@ -187,15 +187,15 @@ public class PSHDLParser {
 	}
 
 	private static HDLPackage parseStream(ANTLRInputStream input, String libURI, final Set<Problem> syntaxProblems, String src) {
-		PSHDLLangLexer lexer = new PSHDLLangLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		PSHDLLangParser parser = new PSHDLLangParser(tokens);
-		ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
+		final PSHDLLangLexer lexer = new PSHDLLangLexer(input);
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+		final PSHDLLangParser parser = new PSHDLLangParser(tokens);
+		final ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
 		parser.getErrorListeners().clear();
 		parser.addErrorListener(listener);
-		PsModelContext psModel = parser.psModel();
+		final PsModelContext psModel = parser.psModel();
 		if (syntaxProblems.size() == 0) {
-			HDLPackage hdl = ParserToModelExtension.toHDL(tokens, psModel, libURI, src);
+			final HDLPackage hdl = ParserToModelExtension.toHDL(tokens, psModel, libURI, src);
 			return hdl;
 		}
 		return null;

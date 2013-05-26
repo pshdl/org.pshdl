@@ -39,14 +39,14 @@ public class VHDLGenerator {
 	private final static String FS = System.getProperty("file.separator");
 
 	public static CharSequence generate(HDLPackage unit, String src) {
-		VhdlFile visitor = generateVHDL(unit, src);
-		String vhdlString = VhdlOutput.toVhdlString(visitor);
+		final VhdlFile visitor = generateVHDL(unit, src);
+		final String vhdlString = VhdlOutput.toVhdlString(visitor);
 		// System.out.println(vhdlString);
 		return vhdlString;
 	}
 
 	public static VhdlFile generate(HDLPackage unit, String targetDir, String src) {
-		VhdlFile visitor = generateVHDL(unit, src);
+		final VhdlFile visitor = generateVHDL(unit, src);
 		try {
 			VhdlOutput.print(visitor);
 			String name = unit.getPkg();
@@ -54,7 +54,7 @@ public class VHDLGenerator {
 				name = unit.getUnits().get(0).getName();
 			}
 			VhdlOutput.toFile(visitor, targetDir + FS + name + ".vhd");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return visitor;

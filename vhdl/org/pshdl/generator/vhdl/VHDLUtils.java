@@ -35,14 +35,14 @@ public class VHDLUtils {
 	public static Literal<?> toBinaryLiteral(int widthInt, BigInteger lit) {
 		StringBuilder sb = new StringBuilder(widthInt);
 		if (lit.signum() < 0) {
-			BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
+			final BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
 			sb.append(lit.abs().and(mask).xor(mask).add(BigInteger.ONE).toString(2));
 		} else {
-			String binLit = lit.toString(2);
+			final String binLit = lit.toString(2);
 			sb = zeroFill(widthInt, binLit);
 		}
 		// System.out.println("VHDLUtils.toBinaryLiteral()" + sb);
-		String string = sb.toString();
+		final String string = sb.toString();
 		return new BinaryLiteral(string);
 	}
 
@@ -51,7 +51,7 @@ public class VHDLUtils {
 		if ((widthInt % 4) != 0)
 			return toBinaryLiteral(widthInt, lit);
 		if (lit.signum() < 0) {
-			BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
+			final BigInteger mask = BigInteger.ONE.shiftLeft(widthInt).subtract(BigInteger.ONE);
 			sb.append(lit.abs().and(mask).xor(mask).add(BigInteger.ONE).toString(16));
 		} else {
 			sb = zeroFill(widthInt / 4, lit.toString(16));
@@ -61,7 +61,7 @@ public class VHDLUtils {
 	}
 
 	private static StringBuilder zeroFill(int widthInt, String binLit) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (int i = widthInt; i > binLit.length(); i--) {
 			sb.append('0');
 		}
@@ -74,11 +74,11 @@ public class VHDLUtils {
 	}
 
 	public static void main(String[] args) {
-		long a = -4373652435859253850L;
-		BigInteger lit = BigInteger.valueOf(a);
-		BigInteger litB = new BigInteger("-4373652435859253850");
+		final long a = -4373652435859253850L;
+		final BigInteger lit = BigInteger.valueOf(a);
+		final BigInteger litB = new BigInteger("-4373652435859253850");
 		System.out.println("VHDLUtils.main()" + lit.equals(litB));
-		BigInteger mask = BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
+		final BigInteger mask = BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
 		System.out.println("Long.toBinaryString(a)                             " + Long.toBinaryString(a));
 		System.out.println("Long.toBinaryString(lit.longValue())               " + Long.toBinaryString(lit.longValue()));
 		System.out.println("lit.xor(mask).toString(2)                         " + lit.xor(mask).toString(2));
@@ -90,8 +90,8 @@ public class VHDLUtils {
 		System.out.println("lit.abs().not().add(BigInteger.ONE).toString(2)     " + lit.abs().not().add(BigInteger.ONE).toString(2));
 		System.out.println("lit.abs()                                            " + lit.abs().toString(2));
 		System.out.print("byte array                                         ");
-		byte[] ba = lit.toByteArray();
-		for (byte b : ba) {
+		final byte[] ba = lit.toByteArray();
+		for (final byte b : ba) {
 			System.out.print(zeroFill(8, Integer.toBinaryString(b & 0xFF)));
 		}
 		System.out.println();

@@ -102,8 +102,8 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	}
 
 	public HDLExpression getReplacementExpression(HDLFunctionCall hdi) {
-		ArrayList<HDLFunctionParameter> args = getArgs();
-		ArrayList<HDLExpression> params = hdi.getParams();
+		final ArrayList<HDLFunctionParameter> args = getArgs();
+		final ArrayList<HDLExpression> params = hdi.getParams();
 		return createExpression(args, params, hdi);
 	}
 

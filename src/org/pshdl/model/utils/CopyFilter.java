@@ -79,7 +79,7 @@ public interface CopyFilter {
 		public <T extends IHDLObject> T copyObject(String feature, IHDLObject container, T object) {
 			if (object == null)
 				return null;
-			T copyFiltered = (T) object.copyFiltered(this);
+			final T copyFiltered = (T) object.copyFiltered(this);
 			return copyFiltered;
 		}
 
@@ -88,11 +88,11 @@ public interface CopyFilter {
 		public <T> ArrayList<T> copyContainer(String feature, HDLObject container, Iterable<T> object) {
 			if (object == null)
 				return null;
-			ArrayList<T> res = new ArrayList<T>();
-			for (T t : object)
+			final ArrayList<T> res = new ArrayList<T>();
+			for (final T t : object)
 				if (t instanceof HDLObject) {
-					IHDLObject obj = (IHDLObject) t;
-					T copyFiltered = (T) obj.copyFiltered(this);
+					final IHDLObject obj = (IHDLObject) t;
+					final T copyFiltered = (T) obj.copyFiltered(this);
 					res.add(copyFiltered);
 				} else {
 					res.add(t);

@@ -43,7 +43,7 @@ public class Column implements NamedElement {
 	public Column(String name, NamedElement... rows) {
 		super();
 		this.name = name;
-		for (NamedElement namedElement : rows) {
+		for (final NamedElement namedElement : rows) {
 			this.rows.add(namedElement);
 		}
 	}
@@ -55,9 +55,9 @@ public class Column implements NamedElement {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("column ").append(name).append(" {\n");
-		for (NamedElement dec : rows) {
+		for (final NamedElement dec : rows) {
 			sb.append('\t').append(dec).append('\n');
 		}
 		sb.append('}');

@@ -92,7 +92,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLArithOp copy() {
-		HDLArithOp newObject = new HDLArithOp(id, null, left, right, type, false);
+		final HDLArithOp newObject = new HDLArithOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -105,9 +105,9 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLArithOp copyFiltered(CopyFilter filter) {
-		HDLExpression filteredleft = filter.copyObject("left", this, left);
-		HDLExpression filteredright = filter.copyObject("right", this, right);
-		HDLArithOpType filteredtype = filter.copyObject("type", this, type);
+		final HDLExpression filteredleft = filter.copyObject("left", this, left);
+		final HDLExpression filteredright = filter.copyObject("right", this, right);
+		final HDLArithOpType filteredtype = filter.copyObject("type", this, type);
 		return filter.postFilter((HDLArithOp) this, new HDLArithOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
@@ -119,7 +119,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLArithOp copyDeepFrozen(IHDLObject container) {
-		HDLArithOp copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLArithOp copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -151,7 +151,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Nonnull
 	public HDLArithOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
+		final HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -168,7 +168,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Nonnull
 	public HDLArithOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
+		final HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -183,7 +183,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 	@Nonnull
 	public HDLArithOp setType(@Nonnull HDLArithOpType type) {
 		type = validateType(type);
-		HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
+		final HDLArithOp res = new HDLArithOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -197,7 +197,7 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLArithOp other = (AbstractHDLArithOp) obj;
+		final AbstractHDLArithOp other = (AbstractHDLArithOp) obj;
 		if (type == null) {
 			if (other.type != null)
 				return false;
@@ -221,8 +221,8 @@ public abstract class AbstractHDLArithOp extends HDLOpExpression {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLArithOp()");
 		if (left != null) {
 			sb.append(".setLeft(").append(left.toConstructionString(spacing + "\t")).append(")");

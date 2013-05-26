@@ -111,7 +111,7 @@ public abstract class AbstractHDLObject {
 			return false;
 		if (!(obj instanceof AbstractHDLObject))
 			return false;
-		AbstractHDLObject other = (AbstractHDLObject) obj;
+		final AbstractHDLObject other = (AbstractHDLObject) obj;
 		if (container == null) {
 			if (other.container != null)
 				return false;
@@ -134,8 +134,8 @@ public abstract class AbstractHDLObject {
 	}
 
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLObject()");
 		return sb.toString();
 	}

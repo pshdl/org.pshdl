@@ -41,7 +41,7 @@ public class Row implements NamedElement {
 		super();
 		this.name = name;
 		this.column = column;
-		for (NamedElement namedElement : definitions) {
+		for (final NamedElement namedElement : definitions) {
 			this.definitions.add(namedElement);
 		}
 	}
@@ -57,8 +57,8 @@ public class Row implements NamedElement {
 
 	public void updateInfo() {
 		int bitPos = 31;
-		for (NamedElement ne : definitions) {
-			Definition def = (Definition) ne;
+		for (final NamedElement ne : definitions) {
+			final Definition def = (Definition) ne;
 			def.bitPos = bitPos;
 			bitPos -= MemoryModel.getSize(def);
 			Integer integer = defCount.get(def.name);
@@ -83,9 +83,9 @@ public class Row implements NamedElement {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("row ").append(name).append(" {\n");
-		for (NamedElement dec : definitions) {
+		for (final NamedElement dec : definitions) {
 			sb.append('\t').append(dec).append('\n');
 		}
 		sb.append('}');

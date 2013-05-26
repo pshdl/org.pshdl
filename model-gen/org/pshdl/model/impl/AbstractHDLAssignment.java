@@ -146,7 +146,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Override
 	@Nonnull
 	public HDLAssignment copy() {
-		HDLAssignment newObject = new HDLAssignment(id, null, left, type, right, false);
+		final HDLAssignment newObject = new HDLAssignment(id, null, left, type, right, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -159,9 +159,9 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Override
 	@Nonnull
 	public HDLAssignment copyFiltered(CopyFilter filter) {
-		HDLReference filteredleft = filter.copyObject("left", this, left);
-		HDLAssignmentType filteredtype = filter.copyObject("type", this, type);
-		HDLExpression filteredright = filter.copyObject("right", this, right);
+		final HDLReference filteredleft = filter.copyObject("left", this, left);
+		final HDLAssignmentType filteredtype = filter.copyObject("type", this, type);
+		final HDLExpression filteredright = filter.copyObject("right", this, right);
 		return filter.postFilter((HDLAssignment) this, new HDLAssignment(id, null, filteredleft, filteredtype, filteredright, false));
 	}
 
@@ -173,7 +173,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Override
 	@Nonnull
 	public HDLAssignment copyDeepFrozen(IHDLObject container) {
-		HDLAssignment copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLAssignment copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -205,7 +205,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Nonnull
 	public HDLAssignment setLeft(@Nonnull HDLReference left) {
 		left = validateLeft(left);
-		HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
+		final HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
 		return res;
 	}
 
@@ -221,7 +221,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Nonnull
 	public HDLAssignment setType(@Nullable HDLAssignmentType type) {
 		type = validateType(type);
-		HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
+		final HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
 		return res;
 	}
 
@@ -237,7 +237,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 	@Nonnull
 	public HDLAssignment setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
+		final HDLAssignment res = new HDLAssignment(id, container, left, type, right, false);
 		return res;
 	}
 
@@ -251,7 +251,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLAssignment other = (AbstractHDLAssignment) obj;
+		final AbstractHDLAssignment other = (AbstractHDLAssignment) obj;
 		if (left == null) {
 			if (other.left != null)
 				return false;
@@ -287,8 +287,8 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLAssignment()");
 		if (left != null) {
 			sb.append(".setLeft(").append(left.toConstructionString(spacing + "\t")).append(")");

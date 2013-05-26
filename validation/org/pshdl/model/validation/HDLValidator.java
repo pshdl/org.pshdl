@@ -54,8 +54,8 @@ public class HDLValidator {
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
 		validators = new HashMap<Class<?>, IHDLValidator>();
-		for (IHDLValidator gen : sp.getAllValidators()) {
-			String name = gen.getName();
+		for (final IHDLValidator gen : sp.getAllValidators()) {
+			final String name = gen.getName();
 			validators.put(gen.getErrorClass(), gen);
 			info.registeredValidators.put(name, gen);
 		}
@@ -63,18 +63,18 @@ public class HDLValidator {
 
 	public static Set<Problem> validate(HDLPackage pkg, Map<HDLQualifiedName, HDLEvaluationContext> context) {
 		pkg = Insulin.resolveFragments(pkg);
-		Set<Problem> res = new LinkedHashSet<Problem>();
+		final Set<Problem> res = new LinkedHashSet<Problem>();
 		if (context == null) {
 			context = HDLEvaluationContext.createDefault(pkg);
 		}
-		for (IHDLValidator validator : validators.values()) {
+		for (final IHDLValidator validator : validators.values()) {
 			validator.check(pkg, res, context);
 		}
 		return res;
 	}
 
 	public static HDLAdvise advise(Problem problem) {
-		IHDLValidator validator = validators.get(problem.code.getClass());
+		final IHDLValidator validator = validators.get(problem.code.getClass());
 		if (validator == null)
 			return null;
 		return validator.advise(problem);

@@ -38,16 +38,16 @@ public class Memory implements NamedElement {
 
 	public Memory(Reference... references) {
 		super();
-		for (Reference reference : references) {
+		for (final Reference reference : references) {
 			this.references.add(reference);
 		}
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("memory {\n");
-		for (Reference ref : references) {
+		for (final Reference ref : references) {
 			sb.append('\t').append(ref).append('\n');
 		}
 		sb.append('}');

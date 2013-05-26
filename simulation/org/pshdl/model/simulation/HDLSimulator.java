@@ -57,23 +57,23 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit convertArrayInits(HDLEvaluationContext context, HDLUnit insulin) {
-		ModificationSet ms = new ModificationSet();
-		HDLArrayInit[] inits = insulin.getAllObjectsOf(HDLArrayInit.class, true);
-		for (HDLArrayInit arrayInit : inits) {
-			IHDLObject container = arrayInit.getContainer();
+		final ModificationSet ms = new ModificationSet();
+		final HDLArrayInit[] inits = insulin.getAllObjectsOf(HDLArrayInit.class, true);
+		for (final HDLArrayInit arrayInit : inits) {
+			final IHDLObject container = arrayInit.getContainer();
 			switch (container.getClassType()) {
 			case HDLArrayInit:
 				break;
 			case HDLAssignment:
-				HDLReference left = ((HDLAssignment) container).getLeft();
+				final HDLReference left = ((HDLAssignment) container).getLeft();
 				if (!(left instanceof HDLVariableRef))
 					throw new IllegalArgumentException("Unsupported assignment target for ArrayInit:" + left);
-				HDLVariableRef varRef = (HDLVariableRef) left;
+				final HDLVariableRef varRef = (HDLVariableRef) left;
 				addInit(varRef, arrayInit, container, ms);
 				ms.remove(container);
 				break;
 			case HDLVariable:
-				HDLVariable var = (HDLVariable) container;
+				final HDLVariable var = (HDLVariable) container;
 				addInit(var.asHDLRef(), arrayInit, var.getContainer(), ms);
 				ms.replace(var, var.setDefaultValue(null));
 				break;
@@ -88,15 +88,15 @@ public class HDLSimulator {
 	}
 
 	private static void addInit(HDLVariableRef varRef, HDLArrayInit arrayInit, IHDLObject container, ModificationSet ms) {
-		ArrayList<HDLExpression> exp = arrayInit.getExp();
+		final ArrayList<HDLExpression> exp = arrayInit.getExp();
 		for (int i = 0; i < exp.size(); i++) {
-			HDLExpression subExp = exp.get(i);
-			HDLVariableRef addArray = varRef.addArray(HDLLiteral.get(i));
+			final HDLExpression subExp = exp.get(i);
+			final HDLVariableRef addArray = varRef.addArray(HDLLiteral.get(i));
 			if (subExp instanceof HDLArrayInit) {
-				HDLArrayInit subArray = (HDLArrayInit) subExp;
+				final HDLArrayInit subArray = (HDLArrayInit) subExp;
 				addInit(addArray, subArray, container, ms);
 			} else {
-				HDLAssignment ass = new HDLAssignment().setLeft(addArray).setRight(subExp);
+				final HDLAssignment ass = new HDLAssignment().setLeft(addArray).setRight(subExp);
 				ms.insertAfter(container, ass);
 			}
 		}
@@ -105,15 +105,15 @@ public class HDLSimulator {
 	private static HDLUnit flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
 		HDLInterfaceInstantiation[] hii = null;
 		while ((hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true)).length > 0) {
-			HDLLibrary library = insulin.getLibrary();
-			HDLInterfaceInstantiation hi = hii[0];
-			HDLQualifiedName asRef = hi.resolveHIf().get().asRef();
+			final HDLLibrary library = insulin.getLibrary();
+			final HDLInterfaceInstantiation hi = hii[0];
+			final HDLQualifiedName asRef = hi.resolveHIf().get().asRef();
 			HDLUnit unit = library.getUnit(asRef);
 			if (unit == null)
 				throw new IllegalArgumentException("Can not find unit for interface:" + asRef);
 			unit = Insulin.transform(unit, library.getSrc(asRef));
-			HDLEvaluationContext hiContext = hi.getContext(HDLEvaluationContext.createDefault(unit));
-			HDLUnit subUnit = flattenAll(hiContext, unit);
+			final HDLEvaluationContext hiContext = hi.getContext(HDLEvaluationContext.createDefault(unit));
+			final HDLUnit subUnit = flattenAll(hiContext, unit);
 			insulin = Refactoring.inlineUnit(insulin, hi, subUnit);
 		}
 		return insulin;
@@ -146,7 +146,7 @@ public class HDLSimulator {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			InitTuple other = (InitTuple) obj;
+			final InitTuple other = (InitTuple) obj;
 			if (container != other.container)
 				return false;
 			if (ref == null) {
@@ -160,18 +160,18 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit removeDoubleAssignments(HDLEvaluationContext context, HDLUnit insulin) {
-		ModificationSet ms = new ModificationSet();
-		HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
-		Map<InitTuple, HDLAssignment> scopeWrites = new HashMap<InitTuple, HDLAssignment>();
-		for (HDLAssignment hdlAssignment : asss) {
-			IHDLObject container = hdlAssignment.getContainer();
-			InitTuple it = new InitTuple(hdlAssignment.getLeft(), container);
-			HDLAssignment otherAss = scopeWrites.get(it);
+		final ModificationSet ms = new ModificationSet();
+		final HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
+		final Map<InitTuple, HDLAssignment> scopeWrites = new HashMap<InitTuple, HDLAssignment>();
+		for (final HDLAssignment hdlAssignment : asss) {
+			final IHDLObject container = hdlAssignment.getContainer();
+			final InitTuple it = new InitTuple(hdlAssignment.getLeft(), container);
+			final HDLAssignment otherAss = scopeWrites.get(it);
 			if (otherAss != null) {
 				if (container instanceof HDLIfStatement) {
-					HDLIfStatement hdlIfStatement = (HDLIfStatement) container;
-					TreeSide oSide = hdlIfStatement.treeSide(otherAss);
-					TreeSide tSide = hdlIfStatement.treeSide(hdlAssignment);
+					final HDLIfStatement hdlIfStatement = (HDLIfStatement) container;
+					final TreeSide oSide = hdlIfStatement.treeSide(otherAss);
+					final TreeSide tSide = hdlIfStatement.treeSide(hdlAssignment);
 					if (oSide == tSide) {
 						ms.remove(otherAss);
 					}
@@ -187,15 +187,15 @@ public class HDLSimulator {
 	private static AtomicInteger tempID = new AtomicInteger();
 
 	private static HDLUnit convertTernary(HDLEvaluationContext context, HDLUnit insulin) {
-		ModificationSet ms = new ModificationSet();
-		HDLTernary[] ternaries = insulin.getAllObjectsOf(HDLTernary.class, true);
-		for (HDLTernary ternary : ternaries) {
-			Optional<? extends HDLType> typeOf = TypeExtension.typeOf(ternary);
-			String name = "$tmp_" + tempID.getAndIncrement();
-			HDLVariable var = new HDLVariable().setName(name);
-			HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(typeOf.get()).addVariables(var);
-			HDLAssignment newAss = new HDLAssignment().setLeft(var.asHDLRef());
-			HDLIfStatement ifStatement = new HDLIfStatement()//
+		final ModificationSet ms = new ModificationSet();
+		final HDLTernary[] ternaries = insulin.getAllObjectsOf(HDLTernary.class, true);
+		for (final HDLTernary ternary : ternaries) {
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(ternary);
+			final String name = "$tmp_" + tempID.getAndIncrement();
+			final HDLVariable var = new HDLVariable().setName(name);
+			final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(typeOf.get()).addVariables(var);
+			final HDLAssignment newAss = new HDLAssignment().setLeft(var.asHDLRef());
+			final HDLIfStatement ifStatement = new HDLIfStatement()//
 					.setIfExp(ternary.getIfExpr())//
 					.addThenDo(newAss.setRight(ternary.getThenExpr()))//
 					.addElseDo(newAss.setRight(ternary.getElseExpr()));
@@ -206,15 +206,15 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit literalBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
-		ModificationSet ms = new ModificationSet();
-		HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
-		for (HDLRange hdlRange : ranges) {
-			Optional<BigInteger> toBig = ConstantEvaluate.valueOf(hdlRange.getTo(), context);
+		final ModificationSet ms = new ModificationSet();
+		final HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
+		for (final HDLRange hdlRange : ranges) {
+			final Optional<BigInteger> toBig = ConstantEvaluate.valueOf(hdlRange.getTo(), context);
 			if (!toBig.isPresent())
 				throw new IllegalArgumentException("Given the context it should always be non null");
-			HDLExpression from = hdlRange.getFrom();
+			final HDLExpression from = hdlRange.getFrom();
 			if (from != null) {
-				Optional<BigInteger> fromBig = ConstantEvaluate.valueOf(from, context);
+				final Optional<BigInteger> fromBig = ConstantEvaluate.valueOf(from, context);
 				if (!fromBig.isPresent())
 					throw new IllegalArgumentException("Given the context it should always be non null");
 				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig.get())).setTo(HDLLiteral.get(toBig.get())));
@@ -226,36 +226,36 @@ public class HDLSimulator {
 	}
 
 	private static HDLUnit createBitRanges(HDLEvaluationContext context, HDLUnit insulin) {
-		HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
-		Map<HDLQualifiedName, List<RangeVal>> ranges = new LinkedHashMap<HDLQualifiedName, List<RangeVal>>();
-		Map<HDLQualifiedName, Range<BigInteger>> fullRanges = new LinkedHashMap<HDLQualifiedName, Range<BigInteger>>();
-		for (HDLVariableRef ref : refs)
+		final HDLVariableRef[] refs = insulin.getAllObjectsOf(HDLVariableRef.class, true);
+		final Map<HDLQualifiedName, List<RangeVal>> ranges = new LinkedHashMap<HDLQualifiedName, List<RangeVal>>();
+		final Map<HDLQualifiedName, Range<BigInteger>> fullRanges = new LinkedHashMap<HDLQualifiedName, Range<BigInteger>>();
+		for (final HDLVariableRef ref : refs)
 			if (ref.getContainer() instanceof HDLAssignment) {
-				HDLAssignment ass = (HDLAssignment) ref.getContainer();
+				final HDLAssignment ass = (HDLAssignment) ref.getContainer();
 				if (ass.getLeft() == ref) {
-					Optional<HDLVariable> resolved = ref.resolveVar();
+					final Optional<HDLVariable> resolved = ref.resolveVar();
 					if (!resolved.isPresent())
 						throw new IllegalArgumentException("Can not resolve:" + ref.getVarRefName());
-					HDLVariable resolveVar = resolved.get();
+					final HDLVariable resolveVar = resolved.get();
 					if (resolveVar.getDirection() != HDLDirection.IN) {
-						HDLQualifiedName varRefName = ref.getVarRefName();
+						final HDLQualifiedName varRefName = ref.getVarRefName();
 						if (ref.getBits().size() > 0) {
 							List<RangeVal> set = ranges.get(varRefName);
 							if (set == null) {
 								set = new LinkedList<RangeVal>();
 								ranges.put(varRefName, set);
 							}
-							for (HDLRange r : ref.getBits()) {
-								Optional<Range<BigInteger>> determineRange = RangeExtension.rangeOf(r, context);
+							for (final HDLRange r : ref.getBits()) {
+								final Optional<Range<BigInteger>> determineRange = RangeExtension.rangeOf(r, context);
 								if (!determineRange.isPresent())
 									throw new IllegalArgumentException("Can not determine Range for:" + r);
 								set.add(new RangeVal(determineRange.get().lowerEndpoint(), 1));
 								set.add(new RangeVal(determineRange.get().upperEndpoint(), -1));
 							}
 						} else {
-							HDLExpression width = TypeExtension.getWidth(resolveVar);
+							final HDLExpression width = TypeExtension.getWidth(resolveVar);
 							if (width != null) {
-								Optional<BigInteger> bWidth = ConstantEvaluate.valueOf(width, context);
+								final Optional<BigInteger> bWidth = ConstantEvaluate.valueOf(width, context);
 								if (!bWidth.isPresent())
 									throw new IllegalArgumentException("Given the context this should be constant");
 								fullRanges.put(varRefName, Ranges.closed(BigInteger.ZERO, bWidth.get().subtract(BigInteger.ONE)));
@@ -264,32 +264,32 @@ public class HDLSimulator {
 					}
 				}
 			}
-		ModificationSet ms = new ModificationSet();
-		Map<HDLQualifiedName, SortedSet<Range<BigInteger>>> splitRanges = new LinkedHashMap<HDLQualifiedName, SortedSet<Range<BigInteger>>>();
-		for (Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
-			List<RangeVal> value = entry.getValue();
-			HDLQualifiedName varName = entry.getKey();
+		final ModificationSet ms = new ModificationSet();
+		final Map<HDLQualifiedName, SortedSet<Range<BigInteger>>> splitRanges = new LinkedHashMap<HDLQualifiedName, SortedSet<Range<BigInteger>>>();
+		for (final Map.Entry<HDLQualifiedName, List<RangeVal>> entry : ranges.entrySet()) {
+			final List<RangeVal> value = entry.getValue();
+			final HDLQualifiedName varName = entry.getKey();
 			if (fullRanges.containsKey(varName)) {
-				Range<BigInteger> fullWidth = fullRanges.get(varName);
+				final Range<BigInteger> fullWidth = fullRanges.get(varName);
 				value.add(new RangeVal(fullWidth.lowerEndpoint(), 1));
 				value.add(new RangeVal(fullWidth.upperEndpoint(), -1));
 			}
-			SortedSet<Range<BigInteger>> split = RangeTool.split(value);
+			final SortedSet<Range<BigInteger>> split = RangeTool.split(value);
 			splitRanges.put(varName, split);
 		}
 		// Change bit access to broken down ranges
-		for (HDLVariableRef ref : refs) {
-			SortedSet<Range<BigInteger>> list = splitRanges.get(ref.getVarRefName());
+		for (final HDLVariableRef ref : refs) {
+			final SortedSet<Range<BigInteger>> list = splitRanges.get(ref.getVarRefName());
 			if (list != null) {
-				ArrayList<HDLRange> newRanges = new ArrayList<HDLRange>();
+				final ArrayList<HDLRange> newRanges = new ArrayList<HDLRange>();
 				if (!ref.getBits().isEmpty()) {
-					for (HDLRange bit : ref.getBits())
+					for (final HDLRange bit : ref.getBits())
 						if (bit.getFrom() != null) { // Singular ranges don't do
 														// anything
-							Optional<Range<BigInteger>> range = RangeExtension.rangeOf(bit, context);
+							final Optional<Range<BigInteger>> range = RangeExtension.rangeOf(bit, context);
 							if (!range.isPresent())
 								throw new IllegalArgumentException("Can not determine Range of:" + bit);
-							for (Range<BigInteger> newRange : list)
+							for (final Range<BigInteger> newRange : list)
 								if (range.get().isConnected(newRange)) {
 									newRanges.add(0, createRange(newRange));
 								}
@@ -297,7 +297,7 @@ public class HDLSimulator {
 							newRanges.add(0, bit);
 						}
 				} else {
-					for (Range<BigInteger> vRange : list) {
+					for (final Range<BigInteger> vRange : list) {
 						newRanges.add(0, createRange(vRange));
 					}
 				}
@@ -306,7 +306,7 @@ public class HDLSimulator {
 				}
 			}
 		}
-		HDLUnit apply = ms.apply(insulin);
+		final HDLUnit apply = ms.apply(insulin);
 		return Insulin.handleMultiBitAccess(apply, context);
 	}
 
@@ -325,21 +325,21 @@ public class HDLSimulator {
 	 * @return
 	 */
 	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit unit) {
-		HDLForLoop[] loops = unit.getAllObjectsOf(HDLForLoop.class, true);
-		ModificationSet ms = new ModificationSet();
-		for (HDLForLoop loop : loops) {
-			HDLVariable param = loop.getParam();
-			Optional<Range<BigInteger>> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
-			List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
-			for (HDLStatement stmnt : loop.getDos()) {
-				Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
+		final HDLForLoop[] loops = unit.getAllObjectsOf(HDLForLoop.class, true);
+		final ModificationSet ms = new ModificationSet();
+		for (final HDLForLoop loop : loops) {
+			final HDLVariable param = loop.getParam();
+			final Optional<Range<BigInteger>> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
+			final List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
+			for (final HDLStatement stmnt : loop.getDos()) {
+				final Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
 				if (refs.size() == 0) {
 					newStmnts.add(stmnt);
 				} else {
 					BigInteger counter = r.get().lowerEndpoint();
 					do {
-						ModificationSet stmntMs = new ModificationSet();
-						for (HDLVariableRef ref : refs) {
+						final ModificationSet stmntMs = new ModificationSet();
+						for (final HDLVariableRef ref : refs) {
 							stmntMs.replace(ref, HDLLiteral.get(counter));
 						}
 						newStmnts.add(stmntMs.apply(stmnt));

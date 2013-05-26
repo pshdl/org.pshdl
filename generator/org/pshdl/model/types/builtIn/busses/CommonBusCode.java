@@ -37,15 +37,15 @@ import org.pshdl.model.utils.*;
 public class CommonBusCode {
 	public static HDLSwitchCaseStatement createReadCase(Row row, int reg, Map<String, Integer> intPos, Map<String, Boolean> isArray, String dataPort, HDLLiteral labelValue) {
 		HDLSwitchCaseStatement label = new HDLSwitchCaseStatement().setLabel(labelValue);
-		HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(dataPort));
+		final HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(dataPort));
 		int bitPos = 31;
-		for (NamedElement ne : row.definitions) {
-			Definition def = (Definition) ne;
-			int size = MemoryModel.getSize(def);
+		for (final NamedElement ne : row.definitions) {
+			final Definition def = (Definition) ne;
+			final int size = MemoryModel.getSize(def);
 			if ((def.rw == RWType.rw) || (def.rw == RWType.r)) {
 				HDLVariableRef source = new HDLVariableRef().setVar(HDLQualifiedName.create(def.name));
 				source = createRef(intPos, isArray, def, source);
-				HDLRange range = getRange(bitPos, size);
+				final HDLRange range = getRange(bitPos, size);
 				label = label.addDos(new HDLAssignment().setLeft(target.addBits(range)).setType(HDLAssignmentType.ASSGN).setRight(source));
 			}
 			bitPos -= size;
@@ -74,8 +74,8 @@ public class CommonBusCode {
 	}
 
 	public static Map<String, Boolean> buildArrayMap(HDLInterface hdi) {
-		Map<String, Boolean> isArray = new HashMap<String, Boolean>();
-		for (HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true))
+		final Map<String, Boolean> isArray = new HashMap<String, Boolean>();
+		for (final HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true))
 			if (var.getDimensions().size() != 0) {
 				isArray.put(var.getName(), true);
 			} else {

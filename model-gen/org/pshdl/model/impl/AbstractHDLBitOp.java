@@ -92,7 +92,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLBitOp copy() {
-		HDLBitOp newObject = new HDLBitOp(id, null, left, right, type, false);
+		final HDLBitOp newObject = new HDLBitOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -105,9 +105,9 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLBitOp copyFiltered(CopyFilter filter) {
-		HDLExpression filteredleft = filter.copyObject("left", this, left);
-		HDLExpression filteredright = filter.copyObject("right", this, right);
-		HDLBitOpType filteredtype = filter.copyObject("type", this, type);
+		final HDLExpression filteredleft = filter.copyObject("left", this, left);
+		final HDLExpression filteredright = filter.copyObject("right", this, right);
+		final HDLBitOpType filteredtype = filter.copyObject("type", this, type);
 		return filter.postFilter((HDLBitOp) this, new HDLBitOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
@@ -119,7 +119,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLBitOp copyDeepFrozen(IHDLObject container) {
-		HDLBitOp copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLBitOp copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -151,7 +151,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Nonnull
 	public HDLBitOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
+		final HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -167,7 +167,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Nonnull
 	public HDLBitOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
+		final HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -182,7 +182,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 	@Nonnull
 	public HDLBitOp setType(@Nonnull HDLBitOpType type) {
 		type = validateType(type);
-		HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
+		final HDLBitOp res = new HDLBitOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -196,7 +196,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLBitOp other = (AbstractHDLBitOp) obj;
+		final AbstractHDLBitOp other = (AbstractHDLBitOp) obj;
 		if (type == null) {
 			if (other.type != null)
 				return false;
@@ -220,8 +220,8 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLBitOp()");
 		if (left != null) {
 			sb.append(".setLeft(").append(left.toConstructionString(spacing + "\t")).append(")");

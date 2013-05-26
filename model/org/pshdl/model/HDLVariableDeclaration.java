@@ -100,7 +100,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 
 		@Nullable
 		public static HDLDirection getOp(String op) {
-			for (HDLDirection ass : values()) {
+			for (final HDLDirection ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}
@@ -181,9 +181,9 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	}
 
 	public HDLVariableDeclaration setType(HDLType resolveType) {
-		HDLVariableDeclaration setType = super.setType(resolveType.asRef());
+		final HDLVariableDeclaration setType = super.setType(resolveType.asRef());
 		if (resolveType instanceof HDLPrimitive) {
-			HDLPrimitive prim = (HDLPrimitive) resolveType;
+			final HDLPrimitive prim = (HDLPrimitive) resolveType;
 			return setType.setPrimitive(prim);
 		}
 		return setType;

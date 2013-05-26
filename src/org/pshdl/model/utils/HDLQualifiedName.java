@@ -40,7 +40,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		if (qfn == null)
 			throw new IllegalArgumentException("Segments may not be null");
 		this.length = qfn.length;
-		for (String string : qfn) {
+		for (final String string : qfn) {
 			if (string == null)
 				throw new IllegalArgumentException("Segments may not be null");
 			if (string.contains("."))
@@ -75,7 +75,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		HDLQualifiedName other = (HDLQualifiedName) obj;
+		final HDLQualifiedName other = (HDLQualifiedName) obj;
 		if (!Arrays.equals(qfn, other.qfn))
 			return false;
 		return true;
@@ -83,7 +83,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Override
 	public String toString() {
-		char c = '.';
+		final char c = '.';
 		return toString(c);
 	}
 
@@ -99,10 +99,10 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName skipLast(int i) {
-		int len = qfn.length - i;
+		final int len = qfn.length - i;
 		if (len < 0)
 			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
-		String[] newQfn = new String[len];
+		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, 0, newQfn, 0, len);
 		return new HDLQualifiedName(newQfn);
 	}
@@ -122,8 +122,8 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	@Nonnull
 	public String toString(char c) {
 		boolean first = true;
-		StringBuilder sb = new StringBuilder();
-		for (String part : qfn) {
+		final StringBuilder sb = new StringBuilder();
+		for (final String part : qfn) {
 			if (!first) {
 				sb.append(c);
 			}
@@ -142,8 +142,8 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	 */
 	@Nonnull
 	public HDLQualifiedName append(String name) {
-		int len = length + 1;
-		String[] newQfn = new String[len];
+		final int len = length + 1;
+		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, 0, newQfn, 0, length);
 		newQfn[length] = name;
 		return new HDLQualifiedName(newQfn);
@@ -151,10 +151,10 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName skipFirst(int i) {
-		int len = qfn.length - i;
+		final int len = qfn.length - i;
 		if (len < 0)
 			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
-		String[] newQfn = new String[len];
+		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, i, newQfn, 0, len);
 		return new HDLQualifiedName(newQfn);
 	}
@@ -166,17 +166,17 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName toSegment(int i) {
-		int len = i;
+		final int len = i;
 		if ((len < 0) || (len >= qfn.length))
 			throw new IllegalArgumentException("Can not skip last:" + i + " of " + this);
-		String[] newQfn = new String[len];
+		final String[] newQfn = new String[len];
 		System.arraycopy(qfn, 0, newQfn, 0, len);
 		return new HDLQualifiedName(newQfn);
 	}
 
 	@Nonnull
 	public HDLQualifiedName append(HDLQualifiedName hdlQualifiedName) {
-		LinkedList<String> ll = new LinkedList<String>();
+		final LinkedList<String> ll = new LinkedList<String>();
 		ll.addAll(Arrays.asList(this.qfn));
 		ll.addAll(Arrays.asList(hdlQualifiedName.qfn));
 		return HDLQualifiedName.create(ll);
@@ -184,8 +184,8 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName getTypePart() {
-		List<String> res = new LinkedList<String>();
-		for (String segment : qfn)
+		final List<String> res = new LinkedList<String>();
+		for (final String segment : qfn)
 			if (segment.charAt(0) != '$') {
 				res.add(segment);
 			} else {
@@ -196,10 +196,10 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 
 	@Nonnull
 	public HDLQualifiedName getLocalPart() {
-		List<String> res = new LinkedList<String>();
+		final List<String> res = new LinkedList<String>();
 		if (qfn.length <= 1)
 			return this;
-		for (String segment : qfn)
+		for (final String segment : qfn)
 			if (segment.charAt(0) == '$') {
 				res.add(segment);
 			}

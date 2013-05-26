@@ -43,12 +43,12 @@ public class PStoEXCompiler implements IOutputProvider {
 	public String invoke(String[] args) throws Exception {
 		if (args.length == 0)
 			return "Not enough arguments, try help:" + getHookName();
-		HDLQualifiedName unitName = new HDLQualifiedName(args[0]);
+		final HDLQualifiedName unitName = new HDLQualifiedName(args[0]);
 		System.out.println("Parsing files:");
 		boolean syntaxerror = false;
-		Set<Problem> problems = new HashSet<Problem>();
+		final Set<Problem> problems = new HashSet<Problem>();
 		for (int i = 1; i < args.length; i++) {
-			File source = new File(args[i]);
+			final File source = new File(args[i]);
 			System.out.println("\t" + source);
 			if (addFile(source, problems)) {
 				syntaxerror = true;
@@ -62,29 +62,29 @@ public class PStoEXCompiler implements IOutputProvider {
 		findUnit(unitName);
 		if (unit == null)
 			return "Unit:" + unitName + " not found";
-		String src = unit.getLibrary().getSrc(unitName);
+		final String src = unit.getLibrary().getSrc(unitName);
 		try {
-			ExecutableModel em = createExecutable(unit, src);
+			final ExecutableModel em = createExecutable(unit, src);
 			IOUtil.writeExecutableModel(src, new Date().getTime(), em, new File("a.em"));
 			// System.out.println(JavaCompiler.doCompile(em, "bla"));
-		} catch (CycleException e) {
+		} catch (final CycleException e) {
 			e.explain(System.err);
 		}
 		return "Success";
 	}
 
 	public ExecutableModel createExecutable(HDLUnit unit, String src) throws CycleException {
-		HDLEvaluationContext context = HDLEvaluationContext.createDefault(unit);
-		HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src);
+		final HDLEvaluationContext context = HDLEvaluationContext.createDefault(unit);
+		final HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src);
 		// System.out.println("PStoEXCompiler.createExecutable()" +
 		// simulationModel);
 		// simulationModel.validateAllFields(simulationModel.getContainer(),
 		// true);
-		FluidFrame model = SimulationTransformationExtension.simulationModelOf(simulationModel, context);
-		ExecutableModel em = model.getExecutable();
+		final FluidFrame model = SimulationTransformationExtension.simulationModelOf(simulationModel, context);
+		final ExecutableModel em = model.getExecutable();
 		try {
 			em.sortTopological();
-		} catch (CycleException e) {
+		} catch (final CycleException e) {
 			e.model = em;
 			throw e;
 		}
@@ -93,9 +93,9 @@ public class PStoEXCompiler implements IOutputProvider {
 
 	public HDLUnit findUnit(HDLQualifiedName unitName) {
 		unit = null;
-		for (Entry<File, HDLPackage> e : pkgs.entrySet()) {
-			HDLPackage parse = e.getValue();
-			HDLUnit first = HDLQuery.select(HDLUnit.class).from(parse).whereObj().fullNameIs(unitName).getFirst();
+		for (final Entry<File, HDLPackage> e : pkgs.entrySet()) {
+			final HDLPackage parse = e.getValue();
+			final HDLUnit first = HDLQuery.select(HDLUnit.class).from(parse).whereObj().fullNameIs(unitName).getFirst();
 			if (first != null) {
 				unit = first;
 				return first;
@@ -106,8 +106,8 @@ public class PStoEXCompiler implements IOutputProvider {
 
 	public boolean validatePackages(Set<Problem> problems) throws IOException, FileNotFoundException {
 		boolean validationError = false;
-		for (Entry<File, HDLPackage> e : pkgs.entrySet()) {
-			File source = e.getKey();
+		for (final Entry<File, HDLPackage> e : pkgs.entrySet()) {
+			final File source = e.getKey();
 			System.out.println("\t" + source);
 			if (validateFile(e.getValue(), problems)) {
 				validationError = true;
@@ -117,14 +117,14 @@ public class PStoEXCompiler implements IOutputProvider {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String invoke = new PStoEXCompiler().invoke(args);
+		final String invoke = new PStoEXCompiler().invoke(args);
 		if (invoke != null) {
 			System.err.println(invoke);
 		}
 	}
 
 	public boolean addFile(File source, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
-		HDLPackage parse = PSHDLParser.parse(source, "PSHDLSim", syntaxProblems);
+		final HDLPackage parse = PSHDLParser.parse(source, "PSHDLSim", syntaxProblems);
 		pkgs.put(source, parse);
 		return reportProblem(syntaxProblems);
 	}
@@ -133,7 +133,7 @@ public class PStoEXCompiler implements IOutputProvider {
 		boolean error = false;
 		if (syntaxProblems.size() != 0) {
 			System.err.println("The following syntax problems where found:");
-			for (Problem problem : syntaxProblems) {
+			for (final Problem problem : syntaxProblems) {
 				System.err.println(problem.line + ":" + problem);
 				if (problem.severity == ProblemSeverity.ERROR) {
 					error = true;
@@ -144,13 +144,13 @@ public class PStoEXCompiler implements IOutputProvider {
 	}
 
 	public boolean validateFile(HDLPackage parse, Set<Problem> problems) throws IOException, FileNotFoundException {
-		Set<Problem> validate = HDLValidator.validate(parse, null);
+		final Set<Problem> validate = HDLValidator.validate(parse, null);
 		problems.addAll(validate);
 		return reportProblem(validate);
 	}
 
 	public ExecutableModel createExecutable(HDLQualifiedName name, String src) throws CycleException {
-		HDLUnit findUnit = findUnit(name);
+		final HDLUnit findUnit = findUnit(name);
 		if (findUnit == null)
 			throw new IllegalArgumentException("No unit with name:" + name);
 		return createExecutable(findUnit, src);

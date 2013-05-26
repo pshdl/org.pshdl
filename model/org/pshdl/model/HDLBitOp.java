@@ -81,7 +81,7 @@ public class HDLBitOp extends AbstractHDLBitOp {
 
 		@Nullable
 		public static HDLBitOpType getOp(String op) {
-			for (HDLBitOpType ass : values()) {
+			for (final HDLBitOpType ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}

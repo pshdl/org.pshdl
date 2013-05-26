@@ -108,7 +108,7 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	public Optional<HDLVariable> resolveVar() {
 		if (resolveVarCache != null)
 			return Optional.of(resolveVarCache);
-		Optional<HDLVariable> resolveVar = super.resolveVar();
+		final Optional<HDLVariable> resolveVar = super.resolveVar();
 		if ((resolveVar.isPresent()) && frozen) {
 			resolveVarCache = resolveVar.get();
 		}

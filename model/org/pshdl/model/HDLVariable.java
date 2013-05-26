@@ -131,7 +131,7 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	public HDLRegisterConfig getRegisterConfig() {
 		if (container instanceof HDLVariableDeclaration) {
-			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
+			final HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
 			return vhd.getRegister();
 		}
 		return null;
@@ -139,7 +139,7 @@ public class HDLVariable extends AbstractHDLVariable {
 
 	public HDLVariableDeclaration.HDLDirection getDirection() {
 		if (container instanceof HDLVariableDeclaration) {
-			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
+			final HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
 			return vhd.getDirection();
 		}
 		return null;
@@ -163,11 +163,11 @@ public class HDLVariable extends AbstractHDLVariable {
 	}
 
 	public HDLAnnotation getAnnotation(Enum<?> range) {
-		for (HDLAnnotation anno : getAnnotations())
+		for (final HDLAnnotation anno : getAnnotations())
 			if (anno.getName().equals(range.toString()))
 				return anno;
 		if (container instanceof HDLVariableDeclaration) {
-			HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
+			final HDLVariableDeclaration vhd = (HDLVariableDeclaration) container;
 			return vhd.getAnnotation(range);
 		}
 		return null;

@@ -41,10 +41,10 @@ public interface IServiceProvider {
 
 		@Override
 		public Collection<IHDLAnnotation> getAllAnnotations() {
-			ServiceLoader<IHDLAnnotationProvider> annos = ServiceLoader.load(IHDLAnnotationProvider.class);
-			List<IHDLAnnotation> res = new LinkedList<IHDLAnnotation>();
-			for (IHDLAnnotationProvider ap : annos) {
-				for (IHDLAnnotation anno : ap.getAnnotations()) {
+			final ServiceLoader<IHDLAnnotationProvider> annos = ServiceLoader.load(IHDLAnnotationProvider.class);
+			final List<IHDLAnnotation> res = new LinkedList<IHDLAnnotation>();
+			for (final IHDLAnnotationProvider ap : annos) {
+				for (final IHDLAnnotation anno : ap.getAnnotations()) {
 					res.add(anno);
 				}
 			}
@@ -53,9 +53,9 @@ public interface IServiceProvider {
 
 		@Override
 		public Collection<IHDLFunctionResolver> getAllFunctions() {
-			ServiceLoader<IHDLFunctionResolver> functions = ServiceLoader.load(IHDLFunctionResolver.class);
-			List<IHDLFunctionResolver> res = new LinkedList<IHDLFunctionResolver>();
-			for (IHDLFunctionResolver func : functions) {
+			final ServiceLoader<IHDLFunctionResolver> functions = ServiceLoader.load(IHDLFunctionResolver.class);
+			final List<IHDLFunctionResolver> res = new LinkedList<IHDLFunctionResolver>();
+			for (final IHDLFunctionResolver func : functions) {
 				res.add(func);
 			}
 			return res;
@@ -63,9 +63,9 @@ public interface IServiceProvider {
 
 		@Override
 		public Collection<IHDLGenerator> getAllGenerators() {
-			ServiceLoader<IHDLGenerator> generators = ServiceLoader.load(IHDLGenerator.class);
-			List<IHDLGenerator> res = new LinkedList<IHDLGenerator>();
-			for (IHDLGenerator gen : generators) {
+			final ServiceLoader<IHDLGenerator> generators = ServiceLoader.load(IHDLGenerator.class);
+			final List<IHDLGenerator> res = new LinkedList<IHDLGenerator>();
+			for (final IHDLGenerator gen : generators) {
 				res.add(gen);
 			}
 			return res;
@@ -73,9 +73,9 @@ public interface IServiceProvider {
 
 		@Override
 		public Collection<IHDLValidator> getAllValidators() {
-			ServiceLoader<IHDLValidator> generators = ServiceLoader.load(IHDLValidator.class);
-			List<IHDLValidator> res = new LinkedList<IHDLValidator>();
-			for (IHDLValidator gen : generators) {
+			final ServiceLoader<IHDLValidator> generators = ServiceLoader.load(IHDLValidator.class);
+			final List<IHDLValidator> res = new LinkedList<IHDLValidator>();
+			for (final IHDLValidator gen : generators) {
 				res.add(gen);
 			}
 			return res;

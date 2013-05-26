@@ -60,7 +60,7 @@ public abstract class AbstractHDLType extends HDLObject {
 		}
 		this.dim = new ArrayList<HDLExpression>();
 		if (dim != null) {
-			for (HDLExpression newValue : dim) {
+			for (final HDLExpression newValue : dim) {
 				this.dim.add(newValue);
 			}
 		}
@@ -157,7 +157,7 @@ public abstract class AbstractHDLType extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLType other = (AbstractHDLType) obj;
+		final AbstractHDLType other = (AbstractHDLType) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -187,8 +187,8 @@ public abstract class AbstractHDLType extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLType()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
@@ -196,7 +196,7 @@ public abstract class AbstractHDLType extends HDLObject {
 		if (dim != null) {
 			if (dim.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLExpression o : dim) {
+				for (final HDLExpression o : dim) {
 					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -211,7 +211,7 @@ public abstract class AbstractHDLType extends HDLObject {
 		validateName(getName());
 		validateDim(getDim());
 		if (getDim() != null) {
-			for (HDLExpression o : getDim()) {
+			for (final HDLExpression o : getDim()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -238,8 +238,8 @@ public abstract class AbstractHDLType extends HDLObject {
 					switch (pos++) {
 					case 0:
 						if ((dim != null) && (dim.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
-							for (HDLExpression o : dim) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
+							for (final HDLExpression o : dim) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

@@ -60,7 +60,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		}
 		this.enums = new ArrayList<HDLVariable>();
 		if (enums != null) {
-			for (HDLVariable newValue : enums) {
+			for (final HDLVariable newValue : enums) {
 				this.enums.add(newValue);
 			}
 		}
@@ -100,7 +100,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Override
 	@Nonnull
 	public HDLEnum copy() {
-		HDLEnum newObject = new HDLEnum(id, null, name, dim, enums, false);
+		final HDLEnum newObject = new HDLEnum(id, null, name, dim, enums, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -113,9 +113,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Override
 	@Nonnull
 	public HDLEnum copyFiltered(CopyFilter filter) {
-		String filteredname = filter.copyObject("name", this, name);
-		ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
-		ArrayList<HDLVariable> filteredenums = filter.copyContainer("enums", this, enums);
+		final String filteredname = filter.copyObject("name", this, name);
+		final ArrayList<HDLExpression> filtereddim = filter.copyContainer("dim", this, dim);
+		final ArrayList<HDLVariable> filteredenums = filter.copyContainer("enums", this, enums);
 		return filter.postFilter((HDLEnum) this, new HDLEnum(id, null, filteredname, filtereddim, filteredenums, false));
 	}
 
@@ -127,7 +127,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Override
 	@Nonnull
 	public HDLEnum copyDeepFrozen(IHDLObject container) {
-		HDLEnum copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLEnum copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -159,7 +159,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Nonnull
 	public HDLEnum setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -174,7 +174,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Nonnull
 	public HDLEnum setDim(@Nullable Iterable<HDLExpression> dim) {
 		dim = validateDim(dim);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -190,9 +190,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	public HDLEnum addDim(@Nullable HDLExpression newDim) {
 		if (newDim == null)
 			throw new IllegalArgumentException("Element of dim can not be null!");
-		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.add(newDim);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -209,9 +209,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	public HDLEnum removeDim(@Nullable HDLExpression newDim) {
 		if (newDim == null)
 			throw new IllegalArgumentException("Removed element of dim can not be null!");
-		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(newDim);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -225,9 +225,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 */
 	@Nonnull
 	public HDLEnum removeDim(int idx) {
-		ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
+		final ArrayList<HDLExpression> dim = (ArrayList<HDLExpression>) this.dim.clone();
 		dim.remove(idx);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -243,7 +243,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	@Nonnull
 	public HDLEnum setEnums(@Nonnull Iterable<HDLVariable> enums) {
 		enums = validateEnums(enums);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -259,9 +259,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	public HDLEnum addEnums(@Nonnull HDLVariable newEnums) {
 		if (newEnums == null)
 			throw new IllegalArgumentException("Element of enums can not be null!");
-		ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
+		final ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.add(newEnums);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -277,9 +277,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	public HDLEnum removeEnums(@Nonnull HDLVariable newEnums) {
 		if (newEnums == null)
 			throw new IllegalArgumentException("Removed element of enums can not be null!");
-		ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
+		final ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.remove(newEnums);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -293,9 +293,9 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	 */
 	@Nonnull
 	public HDLEnum removeEnums(int idx) {
-		ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
+		final ArrayList<HDLVariable> enums = (ArrayList<HDLVariable>) this.enums.clone();
 		enums.remove(idx);
-		HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
+		final HDLEnum res = new HDLEnum(id, container, name, dim, enums, false);
 		return res;
 	}
 
@@ -309,7 +309,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLEnum other = (AbstractHDLEnum) obj;
+		final AbstractHDLEnum other = (AbstractHDLEnum) obj;
 		if (enums == null) {
 			if (other.enums != null)
 				return false;
@@ -333,8 +333,8 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLEnum()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
@@ -342,7 +342,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		if (dim != null) {
 			if (dim.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLExpression o : dim) {
+				for (final HDLExpression o : dim) {
 					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -351,7 +351,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		if (enums != null) {
 			if (enums.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLVariable o : enums) {
+				for (final HDLVariable o : enums) {
 					sb.append(".addEnums(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -365,7 +365,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateEnums(getEnums());
 		if (getEnums() != null) {
-			for (HDLVariable o : getEnums()) {
+			for (final HDLVariable o : getEnums()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -392,8 +392,8 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 					switch (pos++) {
 					case 0:
 						if ((dim != null) && (dim.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
-							for (HDLExpression o : dim) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
+							for (final HDLExpression o : dim) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -402,8 +402,8 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 						break;
 					case 1:
 						if ((enums != null) && (enums.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(enums.size());
-							for (HDLVariable o : enums) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(enums.size());
+							for (final HDLVariable o : enums) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

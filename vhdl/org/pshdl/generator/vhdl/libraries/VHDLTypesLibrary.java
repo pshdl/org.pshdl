@@ -44,7 +44,7 @@ public class VHDLTypesLibrary {
 	public static final FunctionDeclaration TERNARY_SIGNED;
 	static {
 		PACKAGE = new PackageDeclaration("pshdl.Types");
-		List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
+		final List<PackageDeclarativeItem> declarations = PACKAGE.getDeclarations();
 		TERNARY_INTEGER = createTernaryOp(declarations, Standard.INTEGER);
 		TERNARY_SL = createTernaryOp(declarations, StdLogic1164.STD_LOGIC);
 		TERNARY_SLV = createTernaryOp(declarations, StdLogic1164.STD_LOGIC_VECTOR);
@@ -53,8 +53,8 @@ public class VHDLTypesLibrary {
 	}
 
 	private static FunctionDeclaration createTernaryOp(List<PackageDeclarativeItem> declarations, SubtypeIndication type) {
-		FunctionDeclaration fd = new FunctionDeclaration("ternaryOp", type, new Constant("condition", Standard.BOOLEAN), new Constant("thenValue", type), new Constant("elseValue",
-				type));
+		final FunctionDeclaration fd = new FunctionDeclaration("ternaryOp", type, new Constant("condition", Standard.BOOLEAN), new Constant("thenValue", type), new Constant(
+				"elseValue", type));
 		declarations.add(fd);
 		return fd;
 	}

@@ -26,7 +26,7 @@ public @interface RegEx {
 
 			try {
 				Pattern.compile((String) value);
-			} catch (PatternSyntaxException e) {
+			} catch (final PatternSyntaxException e) {
 				return When.NEVER;
 			}
 			return When.ALWAYS;

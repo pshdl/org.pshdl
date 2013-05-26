@@ -54,7 +54,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		}
 		this.annotations = new ArrayList<HDLAnnotation>();
 		if (annotations != null) {
-			for (HDLAnnotation newValue : annotations) {
+			for (final HDLAnnotation newValue : annotations) {
 				this.annotations.add(newValue);
 			}
 		}
@@ -129,7 +129,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLDeclaration other = (AbstractHDLDeclaration) obj;
+		final AbstractHDLDeclaration other = (AbstractHDLDeclaration) obj;
 		if (annotations == null) {
 			if (other.annotations != null)
 				return false;
@@ -153,13 +153,13 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLDeclaration()");
 		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLAnnotation o : annotations) {
+				for (final HDLAnnotation o : annotations) {
 					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -173,7 +173,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		super.validateAllFields(expectedParent, checkResolve);
 		validateAnnotations(getAnnotations());
 		if (getAnnotations() != null) {
-			for (HDLAnnotation o : getAnnotations()) {
+			for (final HDLAnnotation o : getAnnotations()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -200,8 +200,8 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 					switch (pos++) {
 					case 0:
 						if ((annotations != null) && (annotations.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
-							for (HDLAnnotation o : annotations) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

@@ -50,7 +50,7 @@ public class FluidFrame {
 			super();
 			this.instruction = instruction;
 			if (args != null) {
-				for (String string : args) {
+				for (final String string : args) {
 					if (string == null)
 						throw new IllegalArgumentException("Null is not a valid argument");
 				}
@@ -60,7 +60,7 @@ public class FluidFrame {
 
 		@Override
 		public String toString() {
-			StringBuilder builder = new StringBuilder();
+			final StringBuilder builder = new StringBuilder();
 			builder.append(instruction);
 			if (args.length != 0) {
 				builder.append(Arrays.toString(args));
@@ -154,28 +154,28 @@ public class FluidFrame {
 	}
 
 	public ExecutableModel getExecutable() {
-		FrameRegister register = new FrameRegister();
-		for (FluidFrame entry : references) {
+		final FrameRegister register = new FrameRegister();
+		for (final FluidFrame entry : references) {
 			entry.registerFrame(register);
 		}
-		List<Frame> res = toFrame(register);
-		InternalInformation[] internals = new InternalInformation[register.internalIds.size()];
-		for (Entry<String, Integer> e : register.internalIds.entrySet()) {
-			String name = e.getKey();
-			String basicName = InternalInformation.getBaseName(name, false, false);
-			VariableInformation info = vars.get(basicName);
+		final List<Frame> res = toFrame(register);
+		final InternalInformation[] internals = new InternalInformation[register.internalIds.size()];
+		for (final Entry<String, Integer> e : register.internalIds.entrySet()) {
+			final String name = e.getKey();
+			final String basicName = InternalInformation.getBaseName(name, false, false);
+			final VariableInformation info = vars.get(basicName);
 			internals[e.getValue()] = new InternalInformation(name, info);
 		}
-		Map<String, List<Frame>> lastID = Maps.newHashMap();
-		for (Frame frame : res) {
-			InternalInformation ii = internals[frame.outputId];
+		final Map<String, List<Frame>> lastID = Maps.newHashMap();
+		for (final Frame frame : res) {
+			final InternalInformation ii = internals[frame.outputId];
 			LinkedList<Frame> lID = (LinkedList<Frame>) lastID.get(ii.info.name);
 			if (lID != null) {
-				Iterator<Frame> iterator = lID.descendingIterator();
-				PredicateChain pred = getPredicate(internals, frame);
+				final Iterator<Frame> iterator = lID.descendingIterator();
+				final PredicateChain pred = getPredicate(internals, frame);
 				while (iterator.hasNext()) {
-					Frame previous = iterator.next();
-					PredicateChain predPrev = getPredicate(internals, previous);
+					final Frame previous = iterator.next();
+					final PredicateChain predPrev = getPredicate(internals, previous);
 					if ((pred == null) || (predPrev == null) || pred.equals(predPrev)) {
 						frame.executionDep = previous.uniqueID;
 						break;
@@ -191,14 +191,14 @@ public class FluidFrame {
 				lastID.put(ii.info.name, lID);
 			}
 			int maxData = 0;
-			for (int i : frame.internalDependencies) {
+			for (final int i : frame.internalDependencies) {
 				maxData = Math.max(internals[i].actualWidth, maxData);
 			}
 			maxData = Math.max(ii.actualWidth, maxData);
 			frame.maxDataWidth = Math.max(frame.maxDataWidth, maxData);
 			lID.add(frame);
 		}
-		VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
+		final VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
 		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars);
 	}
 
@@ -234,14 +234,14 @@ public class FluidFrame {
 		}
 
 		public PredicateChain(String predicate, PartType last) {
-			Matcher matcher = globalPattern.matcher(predicate);
+			final Matcher matcher = globalPattern.matcher(predicate);
 			if (matcher.find()) {
 				base = matcher.group(1);
-				String part = matcher.group(2);
+				final String part = matcher.group(2);
 				if (part != null) {
-					Matcher pMatch = partPattern.matcher(part);
+					final Matcher pMatch = partPattern.matcher(part);
 					while (pMatch.find()) {
-						int id = Integer.parseInt(pMatch.group(2));
+						final int id = Integer.parseInt(pMatch.group(2));
 						PartType t = PartType.none;
 						if (!"".equals(pMatch.group(3))) {
 							t = PartType.valueOf(pMatch.group(3));
@@ -256,16 +256,16 @@ public class FluidFrame {
 		}
 
 		public boolean isMutual(PredicateChain pred) {
-			Iterator<Part> piter = parts.iterator();
-			for (Part p : pred.parts) {
+			final Iterator<Part> piter = parts.iterator();
+			for (final Part p : pred.parts) {
 				if (!piter.hasNext())
 					// This is shorter, but has been the same so far, so it is a
 					// super statement
 					return false;
-				Part s = piter.next();
+				final Part s = piter.next();
 				if (!p.part.equals(s.part))
 					return false;
-				boolean isCase = "case".equals(p.part);
+				final boolean isCase = "case".equals(p.part);
 				if (p.num != s.num)
 					if (isCase)
 						return isCase;
@@ -277,9 +277,9 @@ public class FluidFrame {
 
 		@Override
 		public String toString() {
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 			sb.append(base);
-			for (Part p : parts) {
+			for (final Part p : parts) {
 				sb.append(p);
 			}
 			return sb.toString();
@@ -288,13 +288,13 @@ public class FluidFrame {
 
 	public PredicateChain getPredicate(InternalInformation[] internals, Frame frame) {
 		if (frame.predNegDepRes.length != 0) {
-			int i = frame.predNegDepRes[frame.predNegDepRes.length - 1];
-			String fullName = internals[i].fullName;
+			final int i = frame.predNegDepRes[frame.predNegDepRes.length - 1];
+			final String fullName = internals[i].fullName;
 			return new PredicateChain(fullName, PredicateChain.PartType.n);
 		}
 		if (frame.predPosDepRes.length != 0) {
-			int i = frame.predPosDepRes[frame.predPosDepRes.length - 1];
-			String fullName = internals[i].fullName;
+			final int i = frame.predPosDepRes[frame.predPosDepRes.length - 1];
+			final String fullName = internals[i].fullName;
 			return new PredicateChain(fullName, PredicateChain.PartType.p);
 		}
 		return null;
@@ -305,31 +305,31 @@ public class FluidFrame {
 			register.registerInternal(InternalInformation.stripReg(outputName));
 		}
 		register.registerInternal(outputName);
-		for (FluidFrame entry : references) {
+		for (final FluidFrame entry : references) {
 			entry.registerFrame(register);
 		}
 	}
 
 	private int[] toIntArray(Collection<Integer> instr) {
-		int[] instrRes = new int[instr.size()];
+		final int[] instrRes = new int[instr.size()];
 		int pos = 0;
-		for (int i : instr) {
+		for (final int i : instr) {
 			instrRes[pos++] = i;
 		}
 		return instrRes;
 	}
 
 	private List<Frame> toFrame(FrameRegister register) {
-		Set<Integer> internalDependencies = new LinkedHashSet<Integer>();
-		List<BigInteger> constants = new LinkedList<BigInteger>();
+		final Set<Integer> internalDependencies = new LinkedHashSet<Integer>();
+		final List<BigInteger> constants = new LinkedList<BigInteger>();
 		int stackCount = 0;
 		int maxStackCount = -1;
 		int maxDataWidth = 0;
 		int constantIdCount = 0;
 		int posEdge = -1, negEdge = -1;
-		List<Integer> posPred = new LinkedList<Integer>(), negPred = new LinkedList<Integer>();
-		List<FastInstruction> instr = new LinkedList<FastInstruction>();
-		for (ArgumentedInstruction ai : instructions) {
+		final List<Integer> posPred = new LinkedList<Integer>(), negPred = new LinkedList<Integer>();
+		final List<FastInstruction> instr = new LinkedList<FastInstruction>();
+		for (final ArgumentedInstruction ai : instructions) {
 			stackCount += ai.instruction.push;
 			stackCount -= ai.instruction.pop;
 			maxStackCount = Math.max(maxStackCount, stackCount);
@@ -337,7 +337,7 @@ public class FluidFrame {
 			Instruction i = ai.instruction;
 			switch (ai.instruction) {
 			case negPredicate: {
-				Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
+				final Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
 				if (internalId == null)
 					throw new IllegalArgumentException(ai.toString());
 				internalDependencies.add(internalId);
@@ -347,7 +347,7 @@ public class FluidFrame {
 				break;
 			}
 			case posPredicate: {
-				Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
+				final Integer internalId = register.registerInternal(InternalInformation.PRED_PREFIX + toFullRef(ai));
 				if (internalId == null)
 					throw new IllegalArgumentException(ai.toString());
 				internalDependencies.add(internalId);
@@ -357,7 +357,7 @@ public class FluidFrame {
 				break;
 			}
 			case isFallingEdge: {
-				Integer internalId = register.registerInternal(toFullRef(ai));
+				final Integer internalId = register.registerInternal(toFullRef(ai));
 				if (internalId == null)
 					throw new IllegalArgumentException(ai.toString());
 				internalDependencies.add(internalId);
@@ -367,7 +367,7 @@ public class FluidFrame {
 				break;
 			}
 			case isRisingEdge: {
-				Integer internalId = register.registerInternal(toFullRef(ai));
+				final Integer internalId = register.registerInternal(toFullRef(ai));
 				if (internalId == null)
 					throw new IllegalArgumentException(ai.toString());
 				internalDependencies.add(internalId);
@@ -392,7 +392,7 @@ public class FluidFrame {
 					if (ai.args.length > 1) {
 						instr.add(new FastInstruction(ai.instruction, internalId, -1));
 						if (ai.args[1].indexOf(':') != -1) {
-							String[] split = ai.args[1].split(":");
+							final String[] split = ai.args[1].split(":");
 							i = Instruction.bitAccessSingleRange;
 							arg1 = Integer.parseInt(split[0]);
 							arg2 = Integer.parseInt(split[1]);
@@ -406,7 +406,7 @@ public class FluidFrame {
 				}
 				break;
 			case loadConstant:
-				BigInteger c = this.constants.get(ai.args[0]);
+				final BigInteger c = this.constants.get(ai.args[0]);
 				maxDataWidth = Math.max(c.bitLength(), maxDataWidth);
 				constants.add(c);
 				arg1 = constantIdCount++;
@@ -418,9 +418,9 @@ public class FluidFrame {
 				break;
 			case concat:
 				// System.out.println("FluidFrame.toFrame()" + ai);
-				int lWidth = Integer.parseInt(ai.args[0]);
+				final int lWidth = Integer.parseInt(ai.args[0]);
 				arg1 = lWidth;
-				int rWidth = Integer.parseInt(ai.args[1]);
+				final int rWidth = Integer.parseInt(ai.args[1]);
 				arg2 = rWidth;
 				maxDataWidth = Math.max(lWidth + rWidth, maxDataWidth);
 				break;
@@ -428,30 +428,30 @@ public class FluidFrame {
 			}
 			instr.add(new FastInstruction(i, arg1, arg2));
 		}
-		for (VariableInformation w : vars.values()) {
+		for (final VariableInformation w : vars.values()) {
 			maxDataWidth = Math.max(w.width, maxDataWidth);
 		}
-		List<Frame> res = new LinkedList<Frame>();
+		final List<Frame> res = new LinkedList<Frame>();
 		if (hasInstructions()) {
-			int outputId = register.registerInternal(outputName);
-			int[] internalDepRes = toIntArray(internalDependencies);
-			FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
-			BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
-			Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id,
+			final int outputId = register.registerInternal(outputName);
+			final int[] internalDepRes = toIntArray(internalDependencies);
+			final FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
+			final BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
+			final Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id,
 					constant);
-			for (FluidFrame ff : references) {
+			for (final FluidFrame ff : references) {
 				ff.toFrame(register);
 			}
 			res.add(frame);
 		}
-		for (FluidFrame sub : references) {
+		for (final FluidFrame sub : references) {
 			res.addAll(sub.toFrame(register));
 		}
 		return res;
 	}
 
 	private String toFullRef(ArgumentedInstruction ai) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append(ai.args[0]);
 		for (int i = 1; i < ai.args.length; i++) {
 			sb.append('{').append(ai.args[i]).append('}');
@@ -461,19 +461,19 @@ public class FluidFrame {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("\nFrame: ").append(outputName).append('[').append(id).append("]\n");
 		if (constants.size() != 0) {
 			sb.append("Constants:\n");
-			for (Entry<String, BigInteger> entry : constants.entrySet()) {
+			for (final Entry<String, BigInteger> entry : constants.entrySet()) {
 				sb.append("\t").append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
 			}
 		}
 
-		for (ArgumentedInstruction ai : instructions) {
+		for (final ArgumentedInstruction ai : instructions) {
 			sb.append(ai).append('\n');
 		}
-		for (FluidFrame refs : references) {
+		for (final FluidFrame refs : references) {
 			sb.append(refs);
 		}
 		return sb.toString();
@@ -499,7 +499,7 @@ public class FluidFrame {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FluidFrame other = (FluidFrame) obj;
+		final FluidFrame other = (FluidFrame) obj;
 		if (id != other.id)
 			return false;
 		return true;

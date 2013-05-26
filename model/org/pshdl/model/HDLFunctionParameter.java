@@ -105,7 +105,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 
 		@Nullable
 		public static RWType getOp(String op) {
-			for (RWType ass : values()) {
+			for (final RWType ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}
@@ -130,7 +130,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 
 		@Nullable
 		public static Type getOp(String op) {
-			for (Type ass : values()) {
+			for (final Type ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}

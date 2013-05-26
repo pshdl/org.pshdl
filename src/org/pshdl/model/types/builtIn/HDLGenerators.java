@@ -43,8 +43,8 @@ public class HDLGenerators {
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
 		generators = new HashMap<String, IHDLGenerator>();
-		for (IHDLGenerator gen : sp.getAllGenerators()) {
-			for (String name : gen.getNames()) {
+		for (final IHDLGenerator gen : sp.getAllGenerators()) {
+			for (final String name : gen.getNames()) {
 				generators.put(name, gen);
 				info.registeredGenerators.put(name, gen.getGeneratorInfo(name));
 			}
@@ -52,11 +52,11 @@ public class HDLGenerators {
 	}
 
 	public static List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
-		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
+		final IHDLGenerator generator = generators.get(hdl.getGeneratorID());
 		if (generator != null) {
-			List<HDLVariableDeclaration> portAdditions = generator.getPortAdditions(hdl);
+			final List<HDLVariableDeclaration> portAdditions = generator.getPortAdditions(hdl);
 			if (portAdditions != null) {
-				for (HDLVariableDeclaration hvd : portAdditions) {
+				for (final HDLVariableDeclaration hvd : portAdditions) {
 					hvd.addAnnotations(HDLBuiltInAnnotations.genSignal.create(hdl.getGeneratorID()));
 				}
 			}
@@ -66,9 +66,9 @@ public class HDLGenerators {
 	}
 
 	public static Optional<HDLInterface> getInterface(HDLDirectGeneration hdl) {
-		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
+		final IHDLGenerator generator = generators.get(hdl.getGeneratorID());
 		if (generator != null) {
-			Optional<HDLInterface> hif = generator.getInterface(hdl);
+			final Optional<HDLInterface> hif = generator.getInterface(hdl);
 			if (hif.isPresent())
 				return Optional.of(hif.get().copyDeepFrozen(hdl));
 			return hif;
@@ -77,14 +77,14 @@ public class HDLGenerators {
 	}
 
 	public static Optional<HDLGenerationInfo> getImplementation(HDLDirectGeneration hdl) {
-		IHDLGenerator generator = generators.get(hdl.getGeneratorID());
+		final IHDLGenerator generator = generators.get(hdl.getGeneratorID());
 		if (generator != null)
 			return generator.getImplementation(hdl);
 		return Optional.absent();
 	}
 
 	public static void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
-		IHDLGenerator generator = generators.get(hdg.getGeneratorID());
+		final IHDLGenerator generator = generators.get(hdg.getGeneratorID());
 		if (generator != null) {
 			generator.validate(hdg, problems, context);
 		} else {

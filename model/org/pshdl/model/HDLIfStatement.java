@@ -122,27 +122,27 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	public TreeSide treeSide(IHDLObject stmnt) {
 		if (treeSides == null) {
 			treeSides = Maps.newHashMap();
-			for (HDLStatement t : thenDo) {
-				int tid = t.getID();
-				TreeSide put = treeSides.put(tid, TreeSide.thenTree);
+			for (final HDLStatement t : thenDo) {
+				final int tid = t.getID();
+				final TreeSide put = treeSides.put(tid, TreeSide.thenTree);
 				if (put != null) {
 					treeSides.put(tid, TreeSide.idConflict);
 				}
 			}
-			for (HDLStatement t : elseDo) {
-				int tid = t.getID();
-				TreeSide put = treeSides.put(tid, TreeSide.elseTree);
+			for (final HDLStatement t : elseDo) {
+				final int tid = t.getID();
+				final TreeSide put = treeSides.put(tid, TreeSide.elseTree);
 				if (put != null) {
 					treeSides.put(tid, TreeSide.idConflict);
 				}
 			}
 		}
-		TreeSide side = treeSides.get(stmnt.getID());
+		final TreeSide side = treeSides.get(stmnt.getID());
 		if (side == TreeSide.idConflict) {
-			for (HDLStatement t : thenDo)
+			for (final HDLStatement t : thenDo)
 				if (t == stmnt)
 					return TreeSide.thenTree;
-			for (HDLStatement t : elseDo)
+			for (final HDLStatement t : elseDo)
 				if (t == stmnt)
 					return TreeSide.elseTree;
 		}

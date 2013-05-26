@@ -63,7 +63,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 		}
 		this.stmnts = new ArrayList<HDLStatement>();
 		if (stmnts != null) {
-			for (HDLStatement newValue : stmnts) {
+			for (final HDLStatement newValue : stmnts) {
 				this.stmnts.add(newValue);
 			}
 		}
@@ -100,7 +100,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction copy() {
-		HDLSubstituteFunction newObject = new HDLSubstituteFunction(id, null, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction newObject = new HDLSubstituteFunction(id, null, annotations, name, args, returnType, stmnts, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -113,11 +113,11 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction copyFiltered(CopyFilter filter) {
-		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
-		String filteredname = filter.copyObject("name", this, name);
-		ArrayList<HDLFunctionParameter> filteredargs = filter.copyContainer("args", this, args);
-		HDLFunctionParameter filteredreturnType = filter.copyObject("returnType", this, returnType);
-		ArrayList<HDLStatement> filteredstmnts = filter.copyContainer("stmnts", this, stmnts);
+		final ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
+		final String filteredname = filter.copyObject("name", this, name);
+		final ArrayList<HDLFunctionParameter> filteredargs = filter.copyContainer("args", this, args);
+		final HDLFunctionParameter filteredreturnType = filter.copyObject("returnType", this, returnType);
+		final ArrayList<HDLStatement> filteredstmnts = filter.copyContainer("stmnts", this, stmnts);
 		return filter.postFilter((HDLSubstituteFunction) this, new HDLSubstituteFunction(id, null, filteredannotations, filteredname, filteredargs, filteredreturnType,
 				filteredstmnts, false));
 	}
@@ -130,7 +130,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLSubstituteFunction copyDeepFrozen(IHDLObject container) {
-		HDLSubstituteFunction copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLSubstituteFunction copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -163,7 +163,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Nonnull
 	public HDLSubstituteFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -181,9 +181,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	public HDLSubstituteFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Element of annotations can not be null!");
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -201,9 +201,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	public HDLSubstituteFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -218,9 +218,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeAnnotations(int idx) {
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -237,7 +237,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Nonnull
 	public HDLSubstituteFunction setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -253,7 +253,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Nonnull
 	public HDLSubstituteFunction setArgs(@Nullable Iterable<HDLFunctionParameter> args) {
 		args = validateArgs(args);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -270,9 +270,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	public HDLSubstituteFunction addArgs(@Nullable HDLFunctionParameter newArgs) {
 		if (newArgs == null)
 			throw new IllegalArgumentException("Element of args can not be null!");
-		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.add(newArgs);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -290,9 +290,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	public HDLSubstituteFunction removeArgs(@Nullable HDLFunctionParameter newArgs) {
 		if (newArgs == null)
 			throw new IllegalArgumentException("Removed element of args can not be null!");
-		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(newArgs);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -307,9 +307,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeArgs(int idx) {
-		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(idx);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -326,7 +326,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Nonnull
 	public HDLSubstituteFunction setReturnType(@Nullable HDLFunctionParameter returnType) {
 		returnType = validateReturnType(returnType);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -341,7 +341,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	@Nonnull
 	public HDLSubstituteFunction setStmnts(@Nullable Iterable<HDLStatement> stmnts) {
 		stmnts = validateStmnts(stmnts);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -358,9 +358,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	public HDLSubstituteFunction addStmnts(@Nullable HDLStatement newStmnts) {
 		if (newStmnts == null)
 			throw new IllegalArgumentException("Element of stmnts can not be null!");
-		ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
+		final ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
 		stmnts.add(newStmnts);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -377,9 +377,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	public HDLSubstituteFunction removeStmnts(@Nullable HDLStatement newStmnts) {
 		if (newStmnts == null)
 			throw new IllegalArgumentException("Removed element of stmnts can not be null!");
-		ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
+		final ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
 		stmnts.remove(newStmnts);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -394,9 +394,9 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 	 */
 	@Nonnull
 	public HDLSubstituteFunction removeStmnts(int idx) {
-		ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
+		final ArrayList<HDLStatement> stmnts = (ArrayList<HDLStatement>) this.stmnts.clone();
 		stmnts.remove(idx);
-		HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
+		final HDLSubstituteFunction res = new HDLSubstituteFunction(id, container, annotations, name, args, returnType, stmnts, false);
 		return res;
 	}
 
@@ -410,7 +410,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLSubstituteFunction other = (AbstractHDLSubstituteFunction) obj;
+		final AbstractHDLSubstituteFunction other = (AbstractHDLSubstituteFunction) obj;
 		if (stmnts == null) {
 			if (other.stmnts != null)
 				return false;
@@ -434,13 +434,13 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLSubstituteFunction()");
 		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLAnnotation o : annotations) {
+				for (final HDLAnnotation o : annotations) {
 					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -452,7 +452,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 		if (args != null) {
 			if (args.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLFunctionParameter o : args) {
+				for (final HDLFunctionParameter o : args) {
 					sb.append(".addArgs(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -464,7 +464,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 		if (stmnts != null) {
 			if (stmnts.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLStatement o : stmnts) {
+				for (final HDLStatement o : stmnts) {
 					sb.append(".addStmnts(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -478,7 +478,7 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateStmnts(getStmnts());
 		if (getStmnts() != null) {
-			for (HDLStatement o : getStmnts()) {
+			for (final HDLStatement o : getStmnts()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -505,8 +505,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 					switch (pos++) {
 					case 0:
 						if ((annotations != null) && (annotations.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
-							for (HDLAnnotation o : annotations) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -515,8 +515,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 						break;
 					case 1:
 						if ((args != null) && (args.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
-							for (HDLFunctionParameter o : args) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
+							for (final HDLFunctionParameter o : args) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -530,8 +530,8 @@ public abstract class AbstractHDLSubstituteFunction extends HDLFunction {
 						break;
 					case 3:
 						if ((stmnts != null) && (stmnts.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(stmnts.size());
-							for (HDLStatement o : stmnts) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(stmnts.size());
+							for (final HDLStatement o : stmnts) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

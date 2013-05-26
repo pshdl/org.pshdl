@@ -42,12 +42,12 @@ public class BusGenSideFiles {
 	public static final String WRAPPER_APPENDIX = "core";
 
 	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi) {
-		List<SideFile> res = new LinkedList<SideFile>();
-		String unitName = fullNameOf(unit).toString('_').toLowerCase();
-		String ipcorename = unitName + WRAPPER_APPENDIX;
-		String dirName = ipcorename + "_" + version;
-		String type = axi ? "axi" : "plb";
-		String pCore = "pcores/";
+		final List<SideFile> res = new LinkedList<SideFile>();
+		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
+		final String ipcorename = unitName + WRAPPER_APPENDIX;
+		final String dirName = ipcorename + "_" + version;
+		final String type = axi ? "axi" : "plb";
+		final String pCore = "pcores/";
 		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount));
 		res.add(paoFile(unitName, dirName, type, pCore));
 		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore));
@@ -56,18 +56,18 @@ public class BusGenSideFiles {
 	}
 
 	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir) {
-		String wrapperName = unitName + WRAPPER_APPENDIX;
-		String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
-		Map<String, String> options = new HashMap<String, String>();
+		final String wrapperName = unitName + WRAPPER_APPENDIX;
+		final String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
+		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", unitName);
 		options.put("{DIRNAME}", dirName);
 		options.put("{WRAPPERNAME}", wrapperName);
 		options.put("{VERSION}", version.replaceAll("_", "."));
 		options.put("{DATE}", new Date().toString());
 		options.put("{REGCOUNT}", Integer.toString(regCount));
-		StringBuilder memGenerics = new StringBuilder(); // {MEM_GENERICS}
-		StringBuilder memArray = new StringBuilder(); // {MEM_ARRAY}
-		StringBuilder memCes = new StringBuilder(); // {MEM_CES}
+		final StringBuilder memGenerics = new StringBuilder(); // {MEM_GENERICS}
+		final StringBuilder memArray = new StringBuilder(); // {MEM_ARRAY}
+		final StringBuilder memCes = new StringBuilder(); // {MEM_CES}
 		for (int i = 0; i < memCount; i++) {
 			memGenerics.append("    C_MEM" + i + "_BASEADDR                : std_logic_vector     := X\"FFFFFFFF\";\n");
 			memGenerics.append("    C_MEM" + i + "_HIGHADDR                : std_logic_vector     := X\"00000000\";");
@@ -87,18 +87,18 @@ public class BusGenSideFiles {
 			memPortMap = "";
 		}
 		options.put("{MEM_PORTMAP}", memPortMap);
-		HDLInterface asInterface = unit.asInterface();
-		StringBuilder generics = new StringBuilder();
-		StringBuilder genericsMap = new StringBuilder();
-		StringBuilder ports = new StringBuilder();
-		StringBuilder portMap = new StringBuilder();
-		for (HDLVariableDeclaration vhd : asInterface.getPorts()) {
+		final HDLInterface asInterface = unit.asInterface();
+		final StringBuilder generics = new StringBuilder();
+		final StringBuilder genericsMap = new StringBuilder();
+		final StringBuilder ports = new StringBuilder();
+		final StringBuilder portMap = new StringBuilder();
+		for (final HDLVariableDeclaration vhd : asInterface.getPorts()) {
 			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null) {
 				continue;
 			}
 			StringBuilder targetMap = null;
 			StringBuilder target = null;
-			HDLDirection direction = vhd.getDirection();
+			final HDLDirection direction = vhd.getDirection();
 			String dir = direction.toString();
 			switch (direction) {
 			case PARAMETER:
@@ -114,7 +114,7 @@ public class BusGenSideFiles {
 			default:
 				continue;
 			}
-			for (HDLVariable v : vhd.getVariables()) {
+			for (final HDLVariable v : vhd.getVariables()) {
 				target.append('\t').append(v.getName()).append("\t:\t").append(dir).append(" ");
 				switch (vhd.getPrimitive().getType()) {
 				case BIT:
@@ -153,15 +153,15 @@ public class BusGenSideFiles {
 		options.put("{GENERICSMAP}", genericsMap.toString());
 		try {
 			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options), true);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	private static SideFile paoFile(String ipcoreName, String dirName, String type, String rootDir) {
-		String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
-		Map<String, String> options = new HashMap<String, String>();
+		final String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
+		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
 		options.put("{TARGETFILE}", relPath);
 		options.put("{DIRNAME}", dirName);
@@ -169,23 +169,23 @@ public class BusGenSideFiles {
 		options.put("{DATE}", new Date().toString());
 		try {
 			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options), true);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type, String rootDir, int memCount) {
-		HDLInterface asInterface = unit.asInterface();
-		StringBuilder generics = new StringBuilder();
-		StringBuilder ports = new StringBuilder();
-		for (HDLVariableDeclaration vhd : asInterface.getPorts()) {
+		final HDLInterface asInterface = unit.asInterface();
+		final StringBuilder generics = new StringBuilder();
+		final StringBuilder ports = new StringBuilder();
+		for (final HDLVariableDeclaration vhd : asInterface.getPorts()) {
 			if (vhd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.genSignal) != null) {
 				continue;
 			}
 			if (vhd.getPrimitive() == null)
 				throw new IllegalArgumentException("Only primitive types are supported as in/out pins in a bus based unit");
-			StringBuilder type = new StringBuilder();
+			final StringBuilder type = new StringBuilder();
 			switch (vhd.getDirection()) {
 			case IN:
 				type.append(" = \"\", DIR= I");
@@ -225,9 +225,9 @@ public class BusGenSideFiles {
 			default:
 				throw new IllegalArgumentException("Direction:" + vhd.getDirection() + " not supported");
 			}
-			for (HDLVariable var : vhd.getVariables())
+			for (final HDLVariable var : vhd.getVariables())
 				if (vhd.getDirection() == HDLDirection.PARAMETER) {
-					HDLExpression defaultValue = var.getDefaultValue();
+					final HDLExpression defaultValue = var.getDefaultValue();
 					String init = "";
 					if (defaultValue != null) {
 						init = " = " + defaultValue;
@@ -241,14 +241,14 @@ public class BusGenSideFiles {
 			generics.append("PARAMETER C_MEM" + i + "_BASEADDR = 0xffffffff, DT = std_logic_vector, PAIR = C_MEM" + i + "_HIGHADDR, ADDRESS = BASE, BUS = SPLB");
 			generics.append("PARAMETER C_MEM" + i + "_HIGHADDR = 0x00000000, DT = std_logic_vector, PAIR = C_MEM" + i + "_BASEADDR, ADDRESS = HIGH, BUS = SPLB");
 		}
-		Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
 		options.put("{DATE}", new Date().toString());
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
 			return new SideFile(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options), true);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;

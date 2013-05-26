@@ -104,13 +104,13 @@ public class VHDLContext {
 		internalTypes.addAll(vhdl.internalTypes);
 		externalTypes.addAll(vhdl.externalTypes);
 		imports.addAll(vhdl.imports);
-		for (Map.Entry<Integer, Boolean> entry : vhdl.noSensitivity.entrySet()) {
+		for (final Map.Entry<Integer, Boolean> entry : vhdl.noSensitivity.entrySet()) {
 			noSensitivity.put(entry.getKey(), entry.getValue());
 		}
 	}
 
 	private <K, T> void mergeListMap(VHDLContext vhdl, Map<K, LinkedList<T>> map, Map<K, LinkedList<T>> local) {
-		for (Entry<K, LinkedList<T>> e : map.entrySet()) {
+		for (final Entry<K, LinkedList<T>> e : map.entrySet()) {
 			LinkedList<T> list = local.get(e.getKey());
 			if (list == null) {
 				list = new LinkedList<T>();
@@ -122,15 +122,15 @@ public class VHDLContext {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : clockedStatements.entrySet()) {
+		final StringBuilder sb = new StringBuilder();
+		for (final Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : clockedStatements.entrySet()) {
 			printList(sb, e.getValue(), "For clock config " + e.getKey() + ":");
 		}
-		for (Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : resetStatements.entrySet()) {
+		for (final Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : resetStatements.entrySet()) {
 			printList(sb, e.getValue(), "For clock config resets " + e.getKey() + ":");
 		}
 		printList(sb, concurrentStatements, "Concurrent Statements:");
-		for (Entry<Integer, LinkedList<SequentialStatement>> e : unclockedStatements.entrySet()) {
+		for (final Entry<Integer, LinkedList<SequentialStatement>> e : unclockedStatements.entrySet()) {
 			printList(sb, e.getValue(), "For unclocked process " + e.getKey() + ":");
 		}
 		printList(sb, ports, "Entity ports:");
@@ -145,7 +145,7 @@ public class VHDLContext {
 	private void printList(StringBuilder sb, LinkedList<?> list, String label) {
 		if (list.size() > 0) {
 			sb.append(label).append("\n");
-			for (Object decl : list) {
+			for (final Object decl : list) {
 				sb.append(VhdlOutput.toVhdlString((VhdlElement) decl)).append('\n');
 			}
 		}
@@ -176,12 +176,12 @@ public class VHDLContext {
 	public SequentialStatement getStatement() {
 		if ((clockedStatements.size() > 1) || (unclockedStatements.size() > 1))
 			throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
-		for (LinkedList<SequentialStatement> clkd : clockedStatements.values()) {
+		for (final LinkedList<SequentialStatement> clkd : clockedStatements.values()) {
 			if (clkd.size() > 1)
 				throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
 			return clkd.getFirst();
 		}
-		for (LinkedList<SequentialStatement> clkd : unclockedStatements.values()) {
+		for (final LinkedList<SequentialStatement> clkd : unclockedStatements.values()) {
 			if (clkd.size() > 1)
 				throw new IllegalArgumentException("Did not expect to find more than one statement:" + this);
 			return clkd.getFirst();

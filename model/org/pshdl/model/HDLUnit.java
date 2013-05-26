@@ -194,25 +194,25 @@ public class HDLUnit extends AbstractHDLUnit {
 	public HDLInterface asInterface() {
 		if (unitIF != null)
 			return unitIF;
-		HDLQualifiedName fullName = fullNameOf(this);
+		final HDLQualifiedName fullName = fullNameOf(this);
 		unitIF = new HDLInterface().setName(fullName.toString());
-		Collection<HDLVariableDeclaration> declarations = new LinkedList<HDLVariableDeclaration>();
-		HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (HDLVariableDeclaration hvd : hvds)
+		final Collection<HDLVariableDeclaration> declarations = new LinkedList<HDLVariableDeclaration>();
+		final HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (final HDLVariableDeclaration hvd : hvds)
 			if (hvd.getContainer(HDLInterface.class) == null) {
 				declarations.add(hvd);
 			}
-		HDLDirectGeneration[] generators = getAllObjectsOf(HDLDirectGeneration.class, true);
-		for (HDLDirectGeneration hdgi : generators)
+		final HDLDirectGeneration[] generators = getAllObjectsOf(HDLDirectGeneration.class, true);
+		for (final HDLDirectGeneration hdgi : generators)
 			if (hdgi.getInclude()) {
-				List<HDLVariableDeclaration> portAdditions = HDLGenerators.getPortAdditions(hdgi);
+				final List<HDLVariableDeclaration> portAdditions = HDLGenerators.getPortAdditions(hdgi);
 				if (portAdditions != null) {
 					declarations.addAll(portAdditions);
 				}
 			}
 		HDLVariable clk = null, rst = null;
 		boolean hasReg = false;
-		for (HDLVariableDeclaration hvd : declarations) {
+		for (final HDLVariableDeclaration hvd : declarations) {
 			switch (hvd.getDirection()) {
 			case PARAMETER:
 			case CONSTANT:
@@ -224,7 +224,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			default:
 				break;
 			}
-			for (HDLAnnotation hdla : hvd.getAnnotations()) {
+			for (final HDLAnnotation hdla : hvd.getAnnotations()) {
 				if (HDLBuiltInAnnotations.clock.is(hdla)) {
 					clk = hvd.getVariables().get(0);
 				}
@@ -232,7 +232,7 @@ public class HDLUnit extends AbstractHDLUnit {
 					rst = hvd.getVariables().get(0);
 				}
 			}
-			for (HDLVariable var : hvd.getVariables()) {
+			for (final HDLVariable var : hvd.getVariables()) {
 				if (var.getAnnotation(HDLBuiltInAnnotations.clock) != null) {
 					clk = var;
 				}
@@ -250,9 +250,9 @@ public class HDLUnit extends AbstractHDLUnit {
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
 						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
 			}
-		ModificationSet ms = new ModificationSet();
-		HDLVariableRef[] refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
-		for (HDLVariableRef ref : refs)
+		final ModificationSet ms = new ModificationSet();
+		final HDLVariableRef[] refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
+		for (final HDLVariableRef ref : refs)
 			if (ref.getVarRefName().length == 1) {
 				ms.replace(ref, ref.setVar(fullName.append(ref.getVarRefName().getLastSegment())));
 			}

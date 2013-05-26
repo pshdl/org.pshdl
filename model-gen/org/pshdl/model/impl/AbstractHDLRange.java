@@ -117,7 +117,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRange copy() {
-		HDLRange newObject = new HDLRange(id, null, from, to, false);
+		final HDLRange newObject = new HDLRange(id, null, from, to, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -130,8 +130,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRange copyFiltered(CopyFilter filter) {
-		HDLExpression filteredfrom = filter.copyObject("from", this, from);
-		HDLExpression filteredto = filter.copyObject("to", this, to);
+		final HDLExpression filteredfrom = filter.copyObject("from", this, from);
+		final HDLExpression filteredto = filter.copyObject("to", this, to);
 		return filter.postFilter((HDLRange) this, new HDLRange(id, null, filteredfrom, filteredto, false));
 	}
 
@@ -143,7 +143,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRange copyDeepFrozen(IHDLObject container) {
-		HDLRange copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLRange copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -173,7 +173,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange setFrom(@Nullable HDLExpression from) {
 		from = validateFrom(from);
-		HDLRange res = new HDLRange(id, container, from, to, false);
+		final HDLRange res = new HDLRange(id, container, from, to, false);
 		return res;
 	}
 
@@ -188,7 +188,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange setTo(@Nonnull HDLExpression to) {
 		to = validateTo(to);
-		HDLRange res = new HDLRange(id, container, from, to, false);
+		final HDLRange res = new HDLRange(id, container, from, to, false);
 		return res;
 	}
 
@@ -202,7 +202,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLRange other = (AbstractHDLRange) obj;
+		final AbstractHDLRange other = (AbstractHDLRange) obj;
 		if (from == null) {
 			if (other.from != null)
 				return false;
@@ -232,8 +232,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLRange()");
 		if (from != null) {
 			sb.append(".setFrom(").append(from.toConstructionString(spacing + "\t")).append(")");

@@ -182,9 +182,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nonnull
 	public static HDLRegisterConfig fromArgs(Iterable<HDLArgument> args) {
 		HDLRegisterConfig config = defaultConfig();
-		for (HDLArgument genArgs : args) {
-			String name = genArgs.getName();
-			HDLQualifiedName refName = getRefName(genArgs.getExpression());
+		for (final HDLArgument genArgs : args) {
+			final String name = genArgs.getName();
+			final HDLQualifiedName refName = getRefName(genArgs.getExpression());
 			if (RESET_PARAM.equals(name)) {
 				if (refName == null)
 					throw new IllegalArgumentException("Can not get a name for clk from:" + genArgs.getExpression());
@@ -196,7 +196,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				config = config.setClk(refName);
 			}
 			if (EDGE_PARAM.equals(name)) {
-				String value = getString(genArgs);
+				final String value = getString(genArgs);
 				if (value != null) {
 					config = config.setClockType(HDLRegClockType.valueOf(value.toUpperCase()));
 				} else {
@@ -206,7 +206,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				}
 			}
 			if (RESET_SYNC_PARAM.equals(name)) {
-				String value = getString(genArgs);
+				final String value = getString(genArgs);
 				if (value != null) {
 					config = config.setSyncType(HDLRegSyncType.valueOf(value.toUpperCase()));
 				} else {
@@ -216,7 +216,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				}
 			}
 			if (RESET_TYPE_PARAM.equals(name)) {
-				String value = getString(genArgs);
+				final String value = getString(genArgs);
 				if (value != null) {
 					config = config.setResetType(HDLRegResetActiveType.valueOf(value.toUpperCase()));
 				} else {
@@ -241,12 +241,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nullable
 	private static HDLQualifiedName getRefName(HDLExpression expression) {
 		if (expression instanceof HDLVariableRef) {
-			HDLResolvedRef rr = (HDLResolvedRef) expression;
+			final HDLResolvedRef rr = (HDLResolvedRef) expression;
 			return rr.getVarRefName();
 		}
 		if (expression instanceof HDLUnresolvedFragment) {
-			HDLUnresolvedFragment uf = (HDLUnresolvedFragment) expression;
-			HDLUnresolvedFragment sub = uf.getSub();
+			final HDLUnresolvedFragment uf = (HDLUnresolvedFragment) expression;
+			final HDLUnresolvedFragment sub = uf.getSub();
 			if (sub != null)
 				return new HDLQualifiedName(uf.getFrag()).append(sub.getFrag());
 			return new HDLQualifiedName(uf.getFrag());
@@ -257,7 +257,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nullable
 	private static String getString(HDLArgument genArgs) {
 		if (genArgs.getExpression() instanceof HDLLiteral) {
-			HDLLiteral lit = (HDLLiteral) genArgs.getExpression();
+			final HDLLiteral lit = (HDLLiteral) genArgs.getExpression();
 			if (lit.getStr())
 				return lit.getVal();
 		}
@@ -274,7 +274,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return false;
 		// if (!super.equals(obj))
 		// return false;
-		AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
+		final AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
 		if (clk == null) {
 			if (other.getClkRefName() != null)
 				return false;
@@ -325,12 +325,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 
 	public HDLRegisterConfig normalize() {
 		HDLRegisterConfig res = this;
-		HDLUnit unit = getContainer(HDLUnit.class);
+		final HDLUnit unit = getContainer(HDLUnit.class);
 		if (unit != null) {
-			HDLQualifiedName fullName = fullNameOf(unit);
-			HDLLibrary library = unit.getLibrary();
+			final HDLQualifiedName fullName = fullNameOf(unit);
+			final HDLLibrary library = unit.getLibrary();
 			if (library != null) {
-				HDLConfig config = library.getConfig();
+				final HDLConfig config = library.getConfig();
 				if (getResetType() == null) {
 					res = res.setResetType(config.getRegResetType(fullName, null));
 				}

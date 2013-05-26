@@ -64,7 +64,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		}
 		this.arguments = new ArrayList<HDLArgument>();
 		if (arguments != null) {
-			for (HDLArgument newValue : arguments) {
+			for (final HDLArgument newValue : arguments) {
 				this.arguments.add(newValue);
 			}
 		}
@@ -161,7 +161,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLInstantiation other = (AbstractHDLInstantiation) obj;
+		final AbstractHDLInstantiation other = (AbstractHDLInstantiation) obj;
 		if (var == null) {
 			if (other.var != null)
 				return false;
@@ -191,8 +191,8 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLInstantiation()");
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
@@ -200,7 +200,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		if (arguments != null) {
 			if (arguments.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLArgument o : arguments) {
+				for (final HDLArgument o : arguments) {
 					sb.append(".addArguments(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -218,7 +218,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		}
 		validateArguments(getArguments());
 		if (getArguments() != null) {
-			for (HDLArgument o : getArguments()) {
+			for (final HDLArgument o : getArguments()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -250,8 +250,8 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 						break;
 					case 1:
 						if ((arguments != null) && (arguments.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(arguments.size());
-							for (HDLArgument o : arguments) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(arguments.size());
+							for (final HDLArgument o : arguments) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

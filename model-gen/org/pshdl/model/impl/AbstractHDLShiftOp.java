@@ -92,7 +92,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLShiftOp copy() {
-		HDLShiftOp newObject = new HDLShiftOp(id, null, left, right, type, false);
+		final HDLShiftOp newObject = new HDLShiftOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -105,9 +105,9 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLShiftOp copyFiltered(CopyFilter filter) {
-		HDLExpression filteredleft = filter.copyObject("left", this, left);
-		HDLExpression filteredright = filter.copyObject("right", this, right);
-		HDLShiftOpType filteredtype = filter.copyObject("type", this, type);
+		final HDLExpression filteredleft = filter.copyObject("left", this, left);
+		final HDLExpression filteredright = filter.copyObject("right", this, right);
+		final HDLShiftOpType filteredtype = filter.copyObject("type", this, type);
 		return filter.postFilter((HDLShiftOp) this, new HDLShiftOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
@@ -119,7 +119,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLShiftOp copyDeepFrozen(IHDLObject container) {
-		HDLShiftOp copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLShiftOp copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -151,7 +151,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Nonnull
 	public HDLShiftOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
+		final HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -168,7 +168,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Nonnull
 	public HDLShiftOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
+		final HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -183,7 +183,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 	@Nonnull
 	public HDLShiftOp setType(@Nonnull HDLShiftOpType type) {
 		type = validateType(type);
-		HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
+		final HDLShiftOp res = new HDLShiftOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -197,7 +197,7 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLShiftOp other = (AbstractHDLShiftOp) obj;
+		final AbstractHDLShiftOp other = (AbstractHDLShiftOp) obj;
 		if (type == null) {
 			if (other.type != null)
 				return false;
@@ -221,8 +221,8 @@ public abstract class AbstractHDLShiftOp extends HDLOpExpression {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLShiftOp()");
 		if (left != null) {
 			sb.append(".setLeft(").append(left.toConstructionString(spacing + "\t")).append(")");

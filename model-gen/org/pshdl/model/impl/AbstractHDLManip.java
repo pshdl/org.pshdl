@@ -143,7 +143,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Override
 	@Nonnull
 	public HDLManip copy() {
-		HDLManip newObject = new HDLManip(id, null, type, target, castTo, false);
+		final HDLManip newObject = new HDLManip(id, null, type, target, castTo, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -156,9 +156,9 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Override
 	@Nonnull
 	public HDLManip copyFiltered(CopyFilter filter) {
-		HDLManipType filteredtype = filter.copyObject("type", this, type);
-		HDLExpression filteredtarget = filter.copyObject("target", this, target);
-		HDLType filteredcastTo = filter.copyObject("castTo", this, castTo);
+		final HDLManipType filteredtype = filter.copyObject("type", this, type);
+		final HDLExpression filteredtarget = filter.copyObject("target", this, target);
+		final HDLType filteredcastTo = filter.copyObject("castTo", this, castTo);
 		return filter.postFilter((HDLManip) this, new HDLManip(id, null, filteredtype, filteredtarget, filteredcastTo, false));
 	}
 
@@ -170,7 +170,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Override
 	@Nonnull
 	public HDLManip copyDeepFrozen(IHDLObject container) {
-		HDLManip copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLManip copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -201,7 +201,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Nonnull
 	public HDLManip setType(@Nonnull HDLManipType type) {
 		type = validateType(type);
-		HDLManip res = new HDLManip(id, container, type, target, castTo, false);
+		final HDLManip res = new HDLManip(id, container, type, target, castTo, false);
 		return res;
 	}
 
@@ -216,7 +216,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Nonnull
 	public HDLManip setTarget(@Nonnull HDLExpression target) {
 		target = validateTarget(target);
-		HDLManip res = new HDLManip(id, container, type, target, castTo, false);
+		final HDLManip res = new HDLManip(id, container, type, target, castTo, false);
 		return res;
 	}
 
@@ -230,7 +230,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 	@Nonnull
 	public HDLManip setCastTo(@Nullable HDLType castTo) {
 		castTo = validateCastTo(castTo);
-		HDLManip res = new HDLManip(id, container, type, target, castTo, false);
+		final HDLManip res = new HDLManip(id, container, type, target, castTo, false);
 		return res;
 	}
 
@@ -244,7 +244,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLManip other = (AbstractHDLManip) obj;
+		final AbstractHDLManip other = (AbstractHDLManip) obj;
 		if (type == null) {
 			if (other.type != null)
 				return false;
@@ -280,8 +280,8 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLManip()");
 		if (type != null) {
 			sb.append("\n").append(spacing + "\t").append(".setType(HDLManipType.").append(type.name() + ")");

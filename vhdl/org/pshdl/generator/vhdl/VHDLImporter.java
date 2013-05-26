@@ -65,32 +65,32 @@ public class VHDLImporter {
 	}
 
 	public static List<HDLInterface> importFile(HDLQualifiedName pkg, InputStream is, HDLLibrary lib, String src) {
-		Scopes scopes = getScopes(lib);
-		List<HDLInterface> res = new LinkedList<HDLInterface>();
+		final Scopes scopes = getScopes(lib);
+		final List<HDLInterface> res = new LinkedList<HDLInterface>();
 		try {
-			VhdlFile file = VhdlParser.parseStream(is, new VhdlParserSettings(), scopes.rootScope, scopes.workScope);
-			List<LibraryUnit> list = file.getElements();
-			for (LibraryUnit unit : list) {
+			final VhdlFile file = VhdlParser.parseStream(is, new VhdlParserSettings(), scopes.rootScope, scopes.workScope);
+			final List<LibraryUnit> list = file.getElements();
+			for (final LibraryUnit unit : list) {
 				if (unit instanceof Entity) {
-					Entity entity = (Entity) unit;
-					String id = entity.getIdentifier();
+					final Entity entity = (Entity) unit;
+					final String id = entity.getIdentifier();
 					HDLInterface vInterface = new HDLInterface().setName(pkg.append(id).toString());
-					List<VhdlObjectProvider<Signal>> ports = entity.getPort();
-					for (VhdlObjectProvider<Signal> port : ports) {
-						List<Signal> signals = port.getVhdlObjects();
-						for (Signal signal : signals) {
-							HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
-							HDLQualifiedName qfn = pkg.append(id).append(signal.getIdentifier());
-							HDLVariableDeclaration var = getVariable(null, signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>(), scopes);
+					final List<VhdlObjectProvider<Signal>> ports = entity.getPort();
+					for (final VhdlObjectProvider<Signal> port : ports) {
+						final List<Signal> signals = port.getVhdlObjects();
+						for (final Signal signal : signals) {
+							final HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
+							final HDLQualifiedName qfn = pkg.append(id).append(signal.getIdentifier());
+							final HDLVariableDeclaration var = getVariable(null, signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>(), scopes);
 							vInterface = vInterface.addPorts(var);
 						}
 					}
-					List<VhdlObjectProvider<Constant>> param = entity.getGeneric();
-					for (VhdlObjectProvider<Constant> port : param) {
-						List<Constant> signals = port.getVhdlObjects();
-						for (Constant signal : signals) {
-							HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
-							HDLQualifiedName qfn = pkg.append(id).append(signal.getIdentifier());
+					final List<VhdlObjectProvider<Constant>> param = entity.getGeneric();
+					for (final VhdlObjectProvider<Constant> port : param) {
+						final List<Constant> signals = port.getVhdlObjects();
+						for (final Constant signal : signals) {
+							final HDLDirection direction = HDLDirection.valueOf(signal.getMode().getUpperCase());
+							final HDLQualifiedName qfn = pkg.append(id).append(signal.getIdentifier());
 							HDLVariableDeclaration var = getVariable(signal.getDefaultValue(), signal.getType(), direction, qfn, null, new ArrayList<HDLExpression>(), scopes);
 							var = var.setDirection(HDLDirection.PARAMETER);
 							vInterface = vInterface.addPorts(var);
@@ -103,9 +103,9 @@ public class VHDLImporter {
 				getScopes(lib).workScope.getFiles().add(file);
 				// System.out.println("VHDLImporter.importFile()" + unit);
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
-		} catch (VhdlParserException e) {
+		} catch (final VhdlParserException e) {
 			e.printStackTrace();
 		}
 		return res;
@@ -117,8 +117,8 @@ public class VHDLImporter {
 		Scopes scopes = lib.getMeta(SCOPES);
 		if (scopes != null)
 			return scopes;
-		RootDeclarativeRegion rootScope = new RootDeclarativeRegion();
-		LibraryDeclarativeRegion workScope = new LibraryDeclarativeRegion("work");
+		final RootDeclarativeRegion rootScope = new RootDeclarativeRegion();
+		final LibraryDeclarativeRegion workScope = new LibraryDeclarativeRegion("work");
 		rootScope.getLibraries().add(workScope);
 		scopes = new Scopes(rootScope, workScope);
 		lib.addMeta(SCOPES, scopes);
@@ -128,13 +128,13 @@ public class VHDLImporter {
 	public static HDLVariableDeclaration getVariable(Expression<?> defaultValue, SubtypeIndication left, HDLDirection direction, HDLQualifiedName qfn, HDLExpression width,
 			ArrayList<HDLExpression> dimensions, Scopes scopes) {
 		if (left instanceof IndexSubtypeIndication) {
-			IndexSubtypeIndication isi = (IndexSubtypeIndication) left;
-			Range dr = (Range) isi.getRanges().get(0);
+			final IndexSubtypeIndication isi = (IndexSubtypeIndication) left;
+			final Range dr = (Range) isi.getRanges().get(0);
 			return getVariable(defaultValue, isi.getBaseType(), direction, qfn, convertRange(dr), dimensions, scopes);
 		}
 		if (StdLogic1164.STD_LOGIC.equals(left) || StdLogic1164.STD_ULOGIC.equals(left) || Standard.BIT.equals(left))
 			return createVar(defaultValue, direction, HDLPrimitiveType.BIT, qfn, width, dimensions);
-		boolean isBitVector = Standard.BIT_VECTOR.equals(left);
+		final boolean isBitVector = Standard.BIT_VECTOR.equals(left);
 		if (StdLogic1164.STD_LOGIC_VECTOR.equals(left) || StdLogic1164.STD_ULOGIC.equals(left) || isBitVector)
 			return createVar(defaultValue, direction, HDLPrimitiveType.BITVECTOR, qfn, width, dimensions);
 		if (NumericStd.SIGNED.equals(left))
@@ -150,11 +150,11 @@ public class VHDLImporter {
 		if (Standard.BOOLEAN.equals(left))
 			return createVar(defaultValue, direction, HDLPrimitiveType.BOOL, qfn, width, dimensions);
 		if (left instanceof ConstrainedArray) {
-			ConstrainedArray ca = (ConstrainedArray) left;
+			final ConstrainedArray ca = (ConstrainedArray) left;
 			@SuppressWarnings("rawtypes")
-			List<DiscreteRange> ranges = ca.getIndexRanges();
+			final List<DiscreteRange> ranges = ca.getIndexRanges();
 			scopes.workScope.getScope().resolve(ca.getIdentifier());
-			for (DiscreteRange<?> discreteRange : ranges) {
+			for (final DiscreteRange<?> discreteRange : ranges) {
 				dimensions.add(convertRange((Range) discreteRange));
 			}
 			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions, scopes);
@@ -162,7 +162,7 @@ public class VHDLImporter {
 			return var;
 		}
 		if (left instanceof UnconstrainedArray) {
-			UnconstrainedArray ca = (UnconstrainedArray) left;
+			final UnconstrainedArray ca = (UnconstrainedArray) left;
 			scopes.workScope.getScope().resolve(ca.getIdentifier());
 			dimensions.add(HDLLiteral.get(-20));
 			HDLVariableDeclaration var = getVariable(defaultValue, ca.getElementType(), direction, qfn, null, dimensions, scopes);
@@ -177,16 +177,16 @@ public class VHDLImporter {
 
 	private static String getFullName(String identifier, Scopes scopes) {
 		String pkg = null;
-		for (LibraryDeclarativeRegion lib : scopes.rootScope.getLibraries()) {
-			for (VhdlFile file : lib.getFiles()) {
-				for (LibraryUnit libraryUnit : file.getElements())
+		for (final LibraryDeclarativeRegion lib : scopes.rootScope.getLibraries()) {
+			for (final VhdlFile file : lib.getFiles()) {
+				for (final LibraryUnit libraryUnit : file.getElements())
 					if (libraryUnit instanceof PackageDeclaration) {
-						PackageDeclaration pd = (PackageDeclaration) libraryUnit;
+						final PackageDeclaration pd = (PackageDeclaration) libraryUnit;
 						pkg = pd.getIdentifier();
-						List<PackageDeclarativeItem> declarations = pd.getDeclarations();
-						for (PackageDeclarativeItem pdi : declarations)
+						final List<PackageDeclarativeItem> declarations = pd.getDeclarations();
+						for (final PackageDeclarativeItem pdi : declarations)
 							if (pdi instanceof Type) {
-								Type t = (Type) pdi;
+								final Type t = (Type) pdi;
 								if (t.getIdentifier().equalsIgnoreCase(identifier))
 									return "work." + pkg + "." + identifier;
 							}
@@ -197,8 +197,8 @@ public class VHDLImporter {
 	}
 
 	private static HDLExpression convertRange(Range dr) {
-		HDLExpression from = getExpression(dr.getFrom(), false);
-		HDLExpression to = getExpression(dr.getTo(), false);
+		final HDLExpression from = getExpression(dr.getFrom(), false);
+		final HDLExpression to = getExpression(dr.getTo(), false);
 		HDLExpression width;
 		if (dr.getDirection() == Direction.DOWNTO) {
 			width = subThenPlus1(from, to);
@@ -210,7 +210,7 @@ public class VHDLImporter {
 
 	private static HDLVariableDeclaration createVar(Expression<?> defaultValue, HDLDirection direction, HDLPrimitiveType pt, HDLQualifiedName name, HDLExpression width,
 			ArrayList<HDLExpression> dimensions) {
-		HDLPrimitive p = new HDLPrimitive().setType(pt).setWidth(width);
+		final HDLPrimitive p = new HDLPrimitive().setType(pt).setWidth(width);
 		HDLExpression hDefault = null;
 		if (defaultValue != null) {
 			hDefault = getExpression(defaultValue, pt == HDLPrimitiveType.STRING);
@@ -220,9 +220,9 @@ public class VHDLImporter {
 	}
 
 	private static HDLExpression subThenPlus1(HDLExpression from, HDLExpression to) {
-		HDLArithOp left = new HDLArithOp().setLeft(from).setType(HDLArithOpType.MINUS).setRight(to);
-		HDLArithOp op = new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1)).copyDeepFrozen(null);
-		Optional<BigInteger> constant = ConstantEvaluate.valueOf(op);
+		final HDLArithOp left = new HDLArithOp().setLeft(from).setType(HDLArithOpType.MINUS).setRight(to);
+		final HDLArithOp op = new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1)).copyDeepFrozen(null);
+		final Optional<BigInteger> constant = ConstantEvaluate.valueOf(op);
 		if (constant.isPresent())
 			return HDLLiteral.get(constant.get());
 		return op;
@@ -232,25 +232,25 @@ public class VHDLImporter {
 	private static HDLExpression getExpression(Expression<?> from, boolean canBeString) {
 		// TODO Support references to Generics
 		if ((from instanceof HexLiteral) || (from instanceof BinaryLiteral) || (from instanceof CharacterLiteral)) {
-			String hex = from.toString();
-			String hexValue = hex.substring(2, hex.length() - 1);
+			final String hex = from.toString();
+			final String hexValue = hex.substring(2, hex.length() - 1);
 			if (hexValue.length() != 0)
 				return HDLLiteral.get(new BigInteger(Integer.toString(Integer.parseInt(hexValue, 16))));
 			return HDLLiteral.get(0);
 		}
 		if (from instanceof DecimalLiteral) {
-			DecimalLiteral dl = (DecimalLiteral) from;
+			final DecimalLiteral dl = (DecimalLiteral) from;
 			return HDLLiteral.get(new BigInteger(dl.getValue()));
 		}
 		if (from instanceof StringLiteral) {
-			StringLiteral sl = (StringLiteral) from;
+			final StringLiteral sl = (StringLiteral) from;
 			return new HDLLiteral().setStr(canBeString).setVal(sl.getString());
 		}
 		if (from instanceof BinaryExpression<?>) {
-			BinaryExpression<?> bin = (BinaryExpression<?>) from;
-			HDLExpression left = getExpression(bin.getLeft(), false);
-			HDLExpression right = getExpression(bin.getRight(), false);
-			ExpressionKind kind = bin.getExpressionKind();
+			final BinaryExpression<?> bin = (BinaryExpression<?>) from;
+			final HDLExpression left = getExpression(bin.getLeft(), false);
+			final HDLExpression right = getExpression(bin.getRight(), false);
+			final ExpressionKind kind = bin.getExpressionKind();
 			switch (kind) {
 			case PLUS:
 				return new HDLArithOp().setLeft(left).setType(HDLArithOpType.PLUS).setRight(right);
@@ -267,7 +267,7 @@ public class VHDLImporter {
 			}
 		}
 		if (from instanceof Constant) {
-			Constant c = (Constant) from;
+			final Constant c = (Constant) from;
 			return getExpression(c.getDefaultValue(), true);
 		}
 		if (Standard.BOOLEAN_FALSE.equals(from))
@@ -275,37 +275,37 @@ public class VHDLImporter {
 		if (Standard.BOOLEAN_TRUE.equals(from))
 			return new HDLLiteral().setVal("true");
 		if (from instanceof Parentheses) {
-			Parentheses p = (Parentheses) from;
+			final Parentheses p = (Parentheses) from;
 			return getExpression(p.getExpression(), canBeString);
 		}
 		throw new IllegalArgumentException("Expression not yet supported:" + from);
 	}
 
 	public static void main(String[] args) throws IOException {
-		String targetPackage = args[0];
-		HDLLibrary lib = new HDLLibrary();
+		final String targetPackage = args[0];
+		final HDLLibrary lib = new HDLLibrary();
 		for (int i = 1; i < args.length; i++) {
-			String string = args[i];
-			File file = new File(string);
+			final String string = args[i];
+			final File file = new File(string);
 			if (file.isDirectory()) {
-				File[] files = file.listFiles(new FilenameFilter() {
+				final File[] files = file.listFiles(new FilenameFilter() {
 
 					@Override
 					public boolean accept(File arg0, String arg1) {
 						return arg1.endsWith("vhd");
 					}
 				});
-				for (File f : files) {
+				for (final File f : files) {
 					try {
 						importFile(f, lib, targetPackage);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 					}
 				}
 			} else {
 				try {
 					importFile(file, lib, targetPackage);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -313,9 +313,9 @@ public class VHDLImporter {
 	}
 
 	private static void importFile(File f, HDLLibrary lib, String targetPackage) throws IOException {
-		FileInputStream fis = new FileInputStream(f);
-		List<HDLInterface> hifs = importFile(new HDLQualifiedName(targetPackage), fis, lib, f.getAbsolutePath());
-		for (HDLInterface hdi : hifs) {
+		final FileInputStream fis = new FileInputStream(f);
+		final List<HDLInterface> hifs = importFile(new HDLQualifiedName(targetPackage), fis, lib, f.getAbsolutePath());
+		for (final HDLInterface hdi : hifs) {
 			System.out.println(hdi);
 		}
 		fis.close();

@@ -81,7 +81,7 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 
 		@Nullable
 		public static HDLEqualityOpType getOp(String op) {
-			for (HDLEqualityOpType ass : values()) {
+			for (final HDLEqualityOpType ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}

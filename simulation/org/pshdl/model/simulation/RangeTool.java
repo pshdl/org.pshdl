@@ -50,7 +50,7 @@ public class RangeTool {
 		@Override
 		public int compareTo(RangeVal o) {
 			// Sort by value first
-			int v = value.compareTo(o.value);
+			final int v = value.compareTo(o.value);
 			if (v != 0)
 				return v;
 			// Then sort Starts before ends
@@ -73,8 +73,8 @@ public class RangeTool {
 	public static void preSort(List<RangeVal> temp) {
 		Collections.sort(temp);
 		RangeVal last = null;
-		for (Iterator<RangeVal> iterator = temp.iterator(); iterator.hasNext();) {
-			RangeVal rangeVal = iterator.next();
+		for (final Iterator<RangeVal> iterator = temp.iterator(); iterator.hasNext();) {
+			final RangeVal rangeVal = iterator.next();
 			if ((last != null) && last.value.equals(rangeVal.value) && (last.isStart() == rangeVal.isStart())) {
 				iterator.remove();
 				last.count += rangeVal.count;
@@ -94,7 +94,7 @@ public class RangeTool {
 	 */
 	public static SortedSet<Range<BigInteger>> split(List<RangeVal> value) {
 		preSort(value);
-		SortedSet<Range<BigInteger>> res = new TreeSet<Range<BigInteger>>(new Comparator<Range<BigInteger>>() {
+		final SortedSet<Range<BigInteger>> res = new TreeSet<Range<BigInteger>>(new Comparator<Range<BigInteger>>() {
 			@Override
 			public int compare(Range<BigInteger> arg0, Range<BigInteger> arg1) {
 				return ComparisonChain.start() //
@@ -105,7 +105,7 @@ public class RangeTool {
 		});
 		int count = 0;
 		BigInteger start = null;
-		for (RangeVal rangeVal : value) {
+		for (final RangeVal rangeVal : value) {
 			count += rangeVal.count;
 			if (rangeVal.isStart()) {
 				if (start != null)
@@ -153,7 +153,7 @@ public class RangeTool {
 	}
 
 	private static List<RangeVal> createRanges(int... r) {
-		List<RangeVal> temp = new LinkedList<RangeVal>();
+		final List<RangeVal> temp = new LinkedList<RangeVal>();
 		for (int i = 0; i < r.length; i++) {
 			temp.add(new RangeVal(BigInteger.valueOf(r[i]), (i % 2) == 0 ? 1 : -1));
 		}

@@ -18,7 +18,7 @@ public @interface Nonnegative {
 			if (!(v instanceof Number))
 				return When.NEVER;
 			boolean isNegative;
-			Number value = (Number) v;
+			final Number value = (Number) v;
 			if (value instanceof Long) {
 				isNegative = value.longValue() < 0;
 			} else if (value instanceof Double) {

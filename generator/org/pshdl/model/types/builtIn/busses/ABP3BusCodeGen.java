@@ -50,9 +50,9 @@ import com.google.common.io.*;
 public class ABP3BusCodeGen extends CommonBusCode {
 
 	public static HDLUnit get(String name, Unit unit, List<Row> rows) {
-		HDLInterface hdi = MemoryModel.buildHDLInterface(unit, rows);
-		Map<String, Boolean> isArray = buildArrayMap(hdi);
-		int addrWidth = ((int) Math.ceil(Math.log10(rows.size() * 4) / Math.log10(2)));
+		final HDLInterface hdi = MemoryModel.buildHDLInterface(unit, rows);
+		final Map<String, Boolean> isArray = buildArrayMap(hdi);
+		final int addrWidth = ((int) Math.ceil(Math.log10(rows.size() * 4) / Math.log10(2)));
 		HDLUnit res = new HDLUnit()
 				.setName(name)
 				.addStatements(
@@ -122,7 +122,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 								.addElseDo(
 										new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PRDATA"))).setType(HDLAssignmentType.ASSGN)
 												.setRight(new HDLLiteral().setVal("0")))).setSimulation(false);
-		for (HDLVariableDeclaration port : hdi.getPorts()) {
+		for (final HDLVariableDeclaration port : hdi.getPorts()) {
 			res = res.addStatements(port.setDirection(HDLDirection.INTERNAL));
 		}
 		return res;
@@ -131,8 +131,8 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	private static HDLSwitchStatement createWriteSwitch(List<Row> rows, Map<String, Boolean> isArray) {
 		HDLSwitchStatement hsl = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("PADDR")));
 		int pos = 0;
-		Map<String, Integer> intPos = new HashMap<String, Integer>();
-		for (Row row : rows) {
+		final Map<String, Integer> intPos = new HashMap<String, Integer>();
+		for (final Row row : rows) {
 			hsl = hsl.addCases(createWriteCase(row, pos++, intPos, isArray));
 		}
 		hsl = hsl.addCases(new HDLSwitchCaseStatement().setLabel(null));
@@ -141,15 +141,15 @@ public class ABP3BusCodeGen extends CommonBusCode {
 
 	private static HDLSwitchCaseStatement createWriteCase(Row row, int pos, Map<String, Integer> intPos, Map<String, Boolean> isArray) {
 		HDLSwitchCaseStatement label = new HDLSwitchCaseStatement().setLabel(HDLLiteral.get(pos * 4));
-		HDLVariableRef busData = new HDLVariableRef().setVar(HDLQualifiedName.create("PWDATA"));
+		final HDLVariableRef busData = new HDLVariableRef().setVar(HDLQualifiedName.create("PWDATA"));
 		int bitPos = 31;
-		for (NamedElement ne : row.definitions) {
-			Definition def = (Definition) ne;
-			int size = MemoryModel.getSize(def);
+		for (final NamedElement ne : row.definitions) {
+			final Definition def = (Definition) ne;
+			final int size = MemoryModel.getSize(def);
 			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
 				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.name));
 				target = createRef(intPos, isArray, def, target);
-				HDLRange range = getRange(bitPos, size);
+				final HDLRange range = getRange(bitPos, size);
 				label = label.addDos(new HDLAssignment().setLeft(target).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(range)));
 			}
 			bitPos -= size;
@@ -160,9 +160,9 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	private static HDLSwitchStatement createReadSwitch(List<Row> rows, Map<String, Boolean> isArray) {
 		HDLSwitchStatement res = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("PADDR")));
 		int pos = 0;
-		Map<String, Integer> intPos = new HashMap<String, Integer>();
-		for (Row row : rows) {
-			int reg = pos++;
+		final Map<String, Integer> intPos = new HashMap<String, Integer>();
+		for (final Row row : rows) {
+			final int reg = pos++;
 			res = res.addCases(createReadCase(row, reg, intPos, isArray, "PRDATA", HDLLiteral.get(reg * 4)));
 		}
 		res = res.addCases(new HDLSwitchCaseStatement().addDos(new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PRDATA")))
@@ -171,7 +171,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, RecognitionException {
-		Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new HashSet<Problem>());
+		final Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new HashSet<Problem>());
 		System.out.println(unit);
 		System.out.println(get("Bla", unit, MemoryModel.buildRows(unit)));
 	}

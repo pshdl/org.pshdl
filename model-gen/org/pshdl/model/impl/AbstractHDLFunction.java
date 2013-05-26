@@ -65,7 +65,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		}
 		this.args = new ArrayList<HDLFunctionParameter>();
 		if (args != null) {
-			for (HDLFunctionParameter newValue : args) {
+			for (final HDLFunctionParameter newValue : args) {
 				this.args.add(newValue);
 			}
 		}
@@ -190,7 +190,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLFunction other = (AbstractHDLFunction) obj;
+		final AbstractHDLFunction other = (AbstractHDLFunction) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -226,13 +226,13 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLFunction()");
 		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLAnnotation o : annotations) {
+				for (final HDLAnnotation o : annotations) {
 					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -244,7 +244,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		if (args != null) {
 			if (args.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLFunctionParameter o : args) {
+				for (final HDLFunctionParameter o : args) {
 					sb.append(".addArgs(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -262,7 +262,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		validateName(getName());
 		validateArgs(getArgs());
 		if (getArgs() != null) {
-			for (HDLFunctionParameter o : getArgs()) {
+			for (final HDLFunctionParameter o : getArgs()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -293,8 +293,8 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 					switch (pos++) {
 					case 0:
 						if ((annotations != null) && (annotations.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
-							for (HDLAnnotation o : annotations) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -303,8 +303,8 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 						break;
 					case 1:
 						if ((args != null) && (args.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
-							for (HDLFunctionParameter o : args) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
+							for (final HDLFunctionParameter o : args) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

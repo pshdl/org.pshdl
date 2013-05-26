@@ -87,10 +87,10 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	// $CONTENT-BEGIN$
 	@Override
 	public Optional<HDLVariable> resolveVar() {
-		Optional<HDLEnum> resolveHEnum = resolveHEnum();
+		final Optional<HDLEnum> resolveHEnum = resolveHEnum();
 		if (!resolveHEnum.isPresent())
 			return Optional.absent();
-		Optional<HDLVariable> var = ScopingExtension.getVariable(resolveHEnum.get(), getVarRefName().getLastSegment());
+		final Optional<HDLVariable> var = ScopingExtension.getVariable(resolveHEnum.get(), getVarRefName().getLastSegment());
 		return var;
 	}
 

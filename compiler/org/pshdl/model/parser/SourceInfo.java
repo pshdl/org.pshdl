@@ -57,9 +57,9 @@ public class SourceInfo {
 		}
 		this.length = tokens.getText(context.getSourceInterval()).length();
 		if (tokens != null) {
-			List<Token> hidden = tokens.getHiddenTokensToLeft(context.start.getTokenIndex(), PSHDLLangLexer.COMMENTS);
+			final List<Token> hidden = tokens.getHiddenTokensToLeft(context.start.getTokenIndex(), PSHDLLangLexer.COMMENTS);
 			if (hidden != null) {
-				for (Token token : hidden) {
+				for (final Token token : hidden) {
 					comments.add(token.getText());
 				}
 			}

@@ -111,11 +111,11 @@ public class PSHDLLib {
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(EDGE));
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
 			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(SYNC));
-			for (HDLFunction func : FUNCTIONS) {
+			for (final HDLFunction func : FUNCTIONS) {
 				pkg = pkg.addDeclarations(func);
 			}
-			CompilerInformation info = HDLCore.getCompilerInformation();
-			for (Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet())
+			final CompilerInformation info = HDLCore.getCompilerInformation();
+			for (final Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet())
 				if (e.getValue().type == FunctionType.NATIVE) {
 					pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
 				}
@@ -127,7 +127,7 @@ public class PSHDLLib {
 
 	public static void main(String[] args) {
 		HDLCore.init(new IServiceProvider.ServiceLoaderProvider());
-		HDLPackage lib2 = getLib();
+		final HDLPackage lib2 = getLib();
 		System.out.println(lib2.toString());
 		lib2.validateAllFields(null, true);
 	}

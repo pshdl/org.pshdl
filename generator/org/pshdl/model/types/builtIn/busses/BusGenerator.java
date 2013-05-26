@@ -65,52 +65,52 @@ public class BusGenerator implements IHDLGenerator {
 
 	@Override
 	public Optional<HDLInterface> getInterface(HDLDirectGeneration hdl) {
-		String name = hdl.getIfName();
+		final String name = hdl.getIfName();
 		if (hdl.getGeneratorContent().length() != 0) {
 			try {
 				return createInterface(hdl, name);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new HDLProblemException("An unexpected exception occured while parsing the generator content:" + e, new Problem(ErrorCode.GENERATOR_ERROR, hdl));
 			}
 		}
 		try {
-			Unit unit = createDefaultUnit(getRegCount(hdl));
-			List<Row> rows = MemoryModel.buildRows(unit);
-			HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
+			final Unit unit = createDefaultUnit(getRegCount(hdl));
+			final List<Row> rows = MemoryModel.buildRows(unit);
+			final HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
 			return Optional.of(bId);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 		return Optional.absent();
 	}
 
 	private Optional<HDLInterface> createInterface(HDLDirectGeneration hdl, String name) {
-		Set<Problem> problems = Sets.newHashSet();
+		final Set<Problem> problems = Sets.newHashSet();
 		Unit unit;
 		try {
 			unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems);
 			if (!validate(unit, problems))
 				return Optional.absent();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			return Optional.absent();
 		}
-		List<Row> rows = MemoryModel.buildRows(unit);
-		HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
+		final List<Row> rows = MemoryModel.buildRows(unit);
+		final HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
 		return Optional.of(bId);
 	}
 
 	private boolean validate(Unit unit, Set<Problem> problems) {
 		if (unit == null)
 			return false;
-		for (Problem problem : problems)
+		for (final Problem problem : problems)
 			if (problem.severity == ProblemSeverity.ERROR)
 				return false;
 		boolean hasError = false;
-		for (Entry<String, NamedElement> entry : unit.declarations.entrySet())
+		for (final Entry<String, NamedElement> entry : unit.declarations.entrySet())
 			if (entry.getValue() instanceof Reference) {
-				Reference ref = (Reference) entry.getValue();
-				NamedElement decl = unit.declarations.get(ref.getName());
+				final Reference ref = (Reference) entry.getValue();
+				final NamedElement decl = unit.declarations.get(ref.getName());
 				if ((decl == null) && !"fill".equals(ref.name)) {
-					String message = "Can not resolve the reference to object:" + ref.name;
+					final String message = "Can not resolve the reference to object:" + ref.name;
 					problems.add(new Problem(BusErrors.invalid_reference, message, ref.token.getLine(), ref.token.getCharPositionInLine(), ref.token.getText().length(), ref.token
 							.getStartIndex()));
 					hasError = true;
@@ -120,28 +120,28 @@ public class BusGenerator implements IHDLGenerator {
 	}
 
 	private String getContentStream(HDLDirectGeneration hdl) {
-		String generatorContent = hdl.getGeneratorContent();
-		String substring = generatorContent.substring(2, generatorContent.length() - 2);
+		final String generatorContent = hdl.getGeneratorContent();
+		final String substring = generatorContent.substring(2, generatorContent.length() - 2);
 		return substring;
 	}
 
 	private int getMemCount(HDLDirectGeneration hdl) {
-		ArrayList<HDLArgument> args = hdl.getArguments();
+		final ArrayList<HDLArgument> args = hdl.getArguments();
 		int memCount = 0;
-		for (HDLArgument arg : args)
+		for (final HDLArgument arg : args)
 			if ("memCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
-				Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
+				final Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
 				if (regVal.isPresent()) {
 					memCount = regVal.get().intValue();
 				} else if (expression instanceof HDLLiteral) {
-					HDLLiteral lit = (HDLLiteral) expression;
+					final HDLLiteral lit = (HDLLiteral) expression;
 					// String literals are allowed as well...
 					if (lit.getStr()) {
 						try {
 							memCount = Integer.parseInt(lit.getVal());
-						} catch (NumberFormatException e) {
+						} catch (final NumberFormatException e) {
 							throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
 						}
 					}
@@ -152,22 +152,22 @@ public class BusGenerator implements IHDLGenerator {
 	}
 
 	private int getRegCount(HDLDirectGeneration hdl) {
-		ArrayList<HDLArgument> args = hdl.getArguments();
+		final ArrayList<HDLArgument> args = hdl.getArguments();
 		int regCount = -1;
-		for (HDLArgument arg : args)
+		for (final HDLArgument arg : args)
 			if ("regCount".equals(arg.getName())) {
 				HDLExpression expression = arg.getExpression();
 				expression = expression.copyDeepFrozen(expression.getContainer());
-				Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
+				final Optional<BigInteger> regVal = ConstantEvaluate.valueOf(expression);
 				if (regVal.isPresent()) {
 					regCount = regVal.get().intValue();
 				} else if (expression instanceof HDLLiteral) {
-					HDLLiteral lit = (HDLLiteral) expression;
+					final HDLLiteral lit = (HDLLiteral) expression;
 					// String literals are allowed as well...
 					if (lit.getStr()) {
 						try {
 							regCount = Integer.parseInt(lit.getVal());
-						} catch (NumberFormatException e) {
+						} catch (final NumberFormatException e) {
 							throw new IllegalArgumentException("The value of the parameter regCount is not valid! It is not a valid integer.");
 						}
 					}
@@ -182,40 +182,40 @@ public class BusGenerator implements IHDLGenerator {
 	@Override
 	public Optional<HDLGenerationInfo> getImplementation(HDLDirectGeneration hdl) {
 		Unit unit;
-		int memCount = getMemCount(hdl);
+		final int memCount = getMemCount(hdl);
 		if (hdl.getGeneratorContent().length() == 0) {
 			unit = createDefaultUnit(getRegCount(hdl));
 		} else {
 			try {
-				Set<Problem> problems = Sets.newHashSet();
+				final Set<Problem> problems = Sets.newHashSet();
 				unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems);
 				if (!validate(unit, problems))
 					return Optional.absent();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
 			}
 		}
-		String version = getVersion(hdl);
-		List<Row> rows = MemoryModel.buildRows(unit);
-		byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
-		List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
+		final String version = getVersion(hdl);
+		final List<Row> rows = MemoryModel.buildRows(unit);
+		final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
+		final List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
 		sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html, true));
-		HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
+		final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
 		sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
+			final HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
 			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
+			final HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
 			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
+			final HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
@@ -223,17 +223,17 @@ public class BusGenerator implements IHDLGenerator {
 	}
 
 	public static Unit createDefaultUnit(int regCount) {
-		Definition def = new Definition("regs", true, RWType.rw, Type.BIT, 32);
-		Row row = new Row("reg", null, def);
-		Memory mem = new Memory(new Reference("reg", regCount));
-		Unit unit = new Unit();
+		final Definition def = new Definition("regs", true, RWType.rw, Type.BIT, 32);
+		final Row row = new Row("reg", null, def);
+		final Memory mem = new Memory(new Reference("reg", regCount));
+		final Unit unit = new Unit();
 		unit.declarations.put("reg", row);
 		unit.memory = mem;
 		return unit;
 	}
 
 	private String getVersion(HDLDirectGeneration hdl) {
-		for (HDLArgument arg : hdl.getArguments())
+		for (final HDLArgument arg : hdl.getArguments())
 			if ("version".equals(arg.getName()))
 				return ((HDLLiteral) arg.getExpression()).getVal();
 		return "v1_00_a";
@@ -253,18 +253,18 @@ public class BusGenerator implements IHDLGenerator {
 		if (hdg.getGeneratorContent().length() == 0) {
 			try {
 				getRegCount(hdg);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
 			}
 		} else {
-			String name = fullNameOf(hdg).append(hdg.getIfName()).toString();
+			final String name = fullNameOf(hdg).append(hdg.getIfName()).toString();
 			try {
 				createInterface(hdg, name);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
 			}
 		}
-		String version = getVersion(hdg);
+		final String version = getVersion(hdg);
 		if (!version.matches("v\\d_\\d\\d_[a-z]")) {
 			problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "The version string:" + version + " is not valid. It has to be of the format v[0-9]_[0-9][0-9]_[a-z]"));
 		}
@@ -272,11 +272,11 @@ public class BusGenerator implements IHDLGenerator {
 
 	@Override
 	public List<HDLVariableDeclaration> getPortAdditions(HDLDirectGeneration hdl) {
-		Optional<HDLGenerationInfo> opt = getImplementation(hdl);
+		final Optional<HDLGenerationInfo> opt = getImplementation(hdl);
 		if (opt.isPresent()) {
-			List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
-			HDLVariableDeclaration[] hvd = opt.get().unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
-			for (HDLVariableDeclaration hdlVariableDeclaration : hvd) {
+			final List<HDLVariableDeclaration> res = new LinkedList<HDLVariableDeclaration>();
+			final HDLVariableDeclaration[] hvd = opt.get().unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+			for (final HDLVariableDeclaration hdlVariableDeclaration : hvd) {
 				switch (hdlVariableDeclaration.getDirection()) {
 				case CONSTANT:
 				case PARAMETER:
@@ -297,7 +297,7 @@ public class BusGenerator implements IHDLGenerator {
 
 	@Override
 	public GeneratorInformation getGeneratorInfo(String name) {
-		GeneratorInformation gi = new GeneratorInformation(BusGenerator.class.getSimpleName(), name, "Generate the infrastructure to create a pcore for the " + name
+		final GeneratorInformation gi = new GeneratorInformation(BusGenerator.class.getSimpleName(), name, "Generate the infrastructure to create a pcore for the " + name
 				+ " bus. This generator should always be included.");
 		gi.arguments.put("regCount",
 				"This parameter is mandatory. It indicates how many sw registers should be accessible in the ip core. The number can be a constant or a string");

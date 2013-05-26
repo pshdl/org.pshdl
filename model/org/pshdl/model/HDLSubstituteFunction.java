@@ -95,17 +95,17 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 
 	// $CONTENT-BEGIN$
 	public HDLStatement[] getReplacementStatements(HDLFunctionCall hdi) {
-		ArrayList<HDLFunctionParameter> args = getArgs();
-		ArrayList<HDLExpression> params = hdi.getParams();
+		final ArrayList<HDLFunctionParameter> args = getArgs();
+		final ArrayList<HDLExpression> params = hdi.getParams();
 		return createStatements(args, params, hdi);
 	}
 
 	public static final String META = "INLINED_FROM";
 
 	private HDLStatement[] createStatements(ArrayList<HDLFunctionParameter> args, Iterable<HDLExpression> params, IHDLObject origin) {
-		HDLStatement[] res = new HDLStatement[getStmnts().size()];
+		final HDLStatement[] res = new HDLStatement[getStmnts().size()];
 		int pos = 0;
-		for (HDLStatement stmnt : getStmnts()) {
+		for (final HDLStatement stmnt : getStmnts()) {
 			res[pos++] = substitute(args, params, stmnt, origin);
 		}
 		return res;

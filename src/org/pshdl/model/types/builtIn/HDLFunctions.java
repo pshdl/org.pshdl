@@ -52,9 +52,9 @@ public class HDLFunctions {
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
 		resolvers = new HashMap<String, List<IHDLFunctionResolver>>();
-		for (IHDLFunctionResolver resolver : sp.getAllFunctions()) {
-			String[] names = resolver.getFunctionNames();
-			for (String funcName : names) {
+		for (final IHDLFunctionResolver resolver : sp.getAllFunctions()) {
+			final String[] names = resolver.getFunctionNames();
+			for (final String funcName : names) {
 				List<IHDLFunctionResolver> list = resolvers.get(funcName);
 				if (list == null) {
 					list = new LinkedList<IHDLFunctionResolver>();
@@ -64,7 +64,7 @@ public class HDLFunctions {
 				list.add(resolver);
 			}
 		}
-		for (HDLFunction func : PSHDLLib.FUNCTIONS) {
+		for (final HDLFunction func : PSHDLLib.FUNCTIONS) {
 			FunctionType type;
 			switch (func.getClassType()) {
 			case HDLNativeFunction:
@@ -79,33 +79,33 @@ public class HDLFunctions {
 			default:
 				throw new IllegalArgumentException("Unknown type:" + func);
 			}
-			FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false, type);
+			final FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false, type);
 			info.registeredFunctions.put(func.getName(), fi);
 		}
 	}
 
 	public static HDLTypeInferenceInfo getInferenceInfo(HDLFunctionCall function) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
+		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
-			for (IHDLFunctionResolver resolver : list) {
-				HDLTypeInferenceInfo resolve = resolver.resolve(function);
+			for (final IHDLFunctionResolver resolver : list) {
+				final HDLTypeInferenceInfo resolve = resolver.resolve(function);
 				if (resolve != null)
 					return resolve;
 			}
 		}
-		Optional<HDLFunction> rFunc = function.resolveName();
+		final Optional<HDLFunction> rFunc = function.resolveName();
 		if (rFunc.isPresent())
 			if (rFunc.get() instanceof HDLInlineFunction) {
-				HDLInlineFunction hif = (HDLInlineFunction) rFunc.get();
-				HDLExpression expression = hif.getReplacementExpression(function);
+				final HDLInlineFunction hif = (HDLInlineFunction) rFunc.get();
+				final HDLExpression expression = hif.getReplacementExpression(function);
 				if (expression != null) {
-					Optional<? extends HDLType> type = TypeExtension.typeOf(expression);
+					final Optional<? extends HDLType> type = TypeExtension.typeOf(expression);
 					if (type.isPresent() && (type.get() instanceof HDLPrimitive)) {
-						HDLPrimitive result = (HDLPrimitive) type.get();
-						HDLType args[] = new HDLType[function.getParams().size()];
+						final HDLPrimitive result = (HDLPrimitive) type.get();
+						final HDLType args[] = new HDLType[function.getParams().size()];
 						int i = 0;
-						for (HDLExpression exp : function.getParams()) {
-							Optional<? extends HDLType> expType = TypeExtension.typeOf(exp);
+						for (final HDLExpression exp : function.getParams()) {
+							final Optional<? extends HDLType> expType = TypeExtension.typeOf(exp);
 							if (expType.isPresent()) {
 								args[i++] = expType.get();
 							} else
@@ -119,10 +119,10 @@ public class HDLFunctions {
 	}
 
 	public static Optional<BigInteger> constantEvaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
+		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
-			for (IHDLFunctionResolver resolver : list) {
-				Optional<BigInteger> eval = resolver.evaluate(function, args, context);
+			for (final IHDLFunctionResolver resolver : list) {
+				final Optional<BigInteger> eval = resolver.evaluate(function, args, context);
 				if (eval.isPresent())
 					return eval;
 			}
@@ -131,10 +131,10 @@ public class HDLFunctions {
 	}
 
 	public static Optional<Range<BigInteger>> determineRange(HDLFunctionCall function, HDLEvaluationContext context) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
+		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
-			for (IHDLFunctionResolver resolver : list) {
-				Range<BigInteger> eval = resolver.range(function, context);
+			for (final IHDLFunctionResolver resolver : list) {
+				final Range<BigInteger> eval = resolver.range(function, context);
 				if (eval != null)
 					return Optional.of(eval);
 			}
@@ -143,10 +143,10 @@ public class HDLFunctions {
 	}
 
 	public static VHDLContext toVHDL(HDLFunctionCall function, int pid) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
+		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
-			for (IHDLFunctionResolver resolver : list) {
-				VHDLContext eval = resolver.toVHDL(function, pid);
+			for (final IHDLFunctionResolver resolver : list) {
+				final VHDLContext eval = resolver.toVHDL(function, pid);
 				if (eval != null)
 					return eval;
 			}
@@ -155,10 +155,10 @@ public class HDLFunctions {
 	}
 
 	public static Expression<?> toVHDLExpression(HDLFunctionCall function) {
-		List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
+		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
-			for (IHDLFunctionResolver resolver : list) {
-				Expression<?> eval = resolver.toVHDLExpression(function);
+			for (final IHDLFunctionResolver resolver : list) {
+				final Expression<?> eval = resolver.toVHDLExpression(function);
 				if (eval != null)
 					return eval;
 			}

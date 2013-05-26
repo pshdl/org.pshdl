@@ -115,7 +115,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLArgument copy() {
-		HDLArgument newObject = new HDLArgument(id, null, name, expression, false);
+		final HDLArgument newObject = new HDLArgument(id, null, name, expression, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -128,8 +128,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLArgument copyFiltered(CopyFilter filter) {
-		String filteredname = filter.copyObject("name", this, name);
-		HDLExpression filteredexpression = filter.copyObject("expression", this, expression);
+		final String filteredname = filter.copyObject("name", this, name);
+		final HDLExpression filteredexpression = filter.copyObject("expression", this, expression);
 		return filter.postFilter((HDLArgument) this, new HDLArgument(id, null, filteredname, filteredexpression, false));
 	}
 
@@ -141,7 +141,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLArgument copyDeepFrozen(IHDLObject container) {
-		HDLArgument copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLArgument copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -173,7 +173,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Nonnull
 	public HDLArgument setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLArgument res = new HDLArgument(id, container, name, expression, false);
+		final HDLArgument res = new HDLArgument(id, container, name, expression, false);
 		return res;
 	}
 
@@ -189,7 +189,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 	@Nonnull
 	public HDLArgument setExpression(@Nonnull HDLExpression expression) {
 		expression = validateExpression(expression);
-		HDLArgument res = new HDLArgument(id, container, name, expression, false);
+		final HDLArgument res = new HDLArgument(id, container, name, expression, false);
 		return res;
 	}
 
@@ -203,7 +203,7 @@ public abstract class AbstractHDLArgument extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLArgument other = (AbstractHDLArgument) obj;
+		final AbstractHDLArgument other = (AbstractHDLArgument) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -233,8 +233,8 @@ public abstract class AbstractHDLArgument extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLArgument()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");

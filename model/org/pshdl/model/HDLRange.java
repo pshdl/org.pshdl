@@ -106,19 +106,19 @@ public class HDLRange extends AbstractHDLRange {
 	 * @return
 	 */
 	public HDLExpression getWidth() {
-		HDLExpression f = getFrom();
+		final HDLExpression f = getFrom();
 		if (f == null)
 			return new HDLLiteral().setVal("1");
 		if (getTo() != null) {
-			Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(getTo());
+			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(getTo());
 			if (valueOf.isPresent() && BigInteger.ZERO.equals(valueOf.get())) {
-				HDLArithOp simpleWith = new HDLArithOp().setLeft(f).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+				final HDLArithOp simpleWith = new HDLArithOp().setLeft(f).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 				return HDLPrimitives.simplifyWidth(this, simpleWith);
 			}
 		}
-		HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
-		HDLExpression absRange = PSHDLLib.ABS_UINT.getReplacementExpressionArgs(this, rangeDist);
-		HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+		final HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
+		final HDLExpression absRange = PSHDLLib.ABS_UINT.getReplacementExpressionArgs(this, rangeDist);
+		final HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);
 	}
 

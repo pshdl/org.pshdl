@@ -103,7 +103,7 @@ public class Problem {
 		if (context != null) {
 			context.addMeta(ProblemAccess.PROBLEM, this);
 		}
-		SourceInfo sInfo = findMeta(node);
+		final SourceInfo sInfo = findMeta(node);
 		if (sInfo != null) {
 			line = sInfo.startLine;
 			offsetInLine = sInfo.startPosInLine;
@@ -118,7 +118,7 @@ public class Problem {
 	}
 
 	private SourceInfo findMeta(IHDLObject node) {
-		SourceInfo sInfo = node.getMeta(SourceInfo.INFO);
+		final SourceInfo sInfo = node.getMeta(SourceInfo.INFO);
 		if ((sInfo == null) && (node.getContainer() != null))
 			return findMeta(node.getContainer());
 		return sInfo;
@@ -144,11 +144,11 @@ public class Problem {
 			return info;
 
 		String preText = "";
-		IHDLObject inlineType = checkInlineType(node);
+		final IHDLObject inlineType = checkInlineType(node);
 		if (inlineType != null) {
 			preText = "The inline function: " + inlineType + " caused the following issue: ";
 		}
-		HDLAdvise advise = HDLValidator.advise(this);
+		final HDLAdvise advise = HDLValidator.advise(this);
 		if (advise != null)
 			return preText + advise.message;
 		String string = preText + code.name().toLowerCase() + " for: " + node;
@@ -164,7 +164,7 @@ public class Problem {
 	private IHDLObject checkInlineType(IHDLObject node) {
 		if (node == null)
 			return null;
-		Object meta = node.getMeta(HDLFunction.META);
+		final Object meta = node.getMeta(HDLFunction.META);
 		if (meta != null)
 			return (IHDLObject) meta;
 		return checkInlineType(node.getContainer());
@@ -187,7 +187,7 @@ public class Problem {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Problem other = (Problem) obj;
+		final Problem other = (Problem) obj;
 		if (code != other.code)
 			return false;
 		if (context != other.context)

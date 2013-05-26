@@ -111,17 +111,17 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case range:
 				if (value == null)
 					return this + " expects an argument with the expected range of the variable. The format is from;to";
-				String[] split = value.split(";");
+				final String[] split = value.split(";");
 				if (split.length != 2)
 					return this + " expects an argument with the expected range of the variable. The given value:" + value + " is not valid. The format is from;to";
 				try {
 					new BigInteger(split[0]);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					return "The given from value:" + split[0] + " is not a valid number.";
 				}
 				try {
 					new BigInteger(split[1]);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					return "The given to value:" + split[1] + " is not a valid number.";
 				}
 				break;

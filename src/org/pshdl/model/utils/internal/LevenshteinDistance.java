@@ -34,7 +34,7 @@ public class LevenshteinDistance {
 	}
 
 	public static int computeLevenshteinDistance(CharSequence str1, CharSequence str2) {
-		int[][] distance = new int[str1.length() + 1][str2.length() + 1];
+		final int[][] distance = new int[str1.length() + 1][str2.length() + 1];
 
 		for (int i = 0; i <= str1.length(); i++) {
 			distance[i][0] = i;
@@ -64,7 +64,7 @@ public class LevenshteinDistance {
 
 		@Override
 		public int compareTo(Score o) {
-			int diff = distance - o.distance;
+			final int diff = distance - o.distance;
 			if (diff != 0)
 				return diff;
 			return string.compareTo(o.string);
@@ -87,7 +87,7 @@ public class LevenshteinDistance {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			Score other = (Score) obj;
+			final Score other = (Score) obj;
 			if (distance != other.distance)
 				return false;
 			if (string == null) {
@@ -105,10 +105,10 @@ public class LevenshteinDistance {
 	}
 
 	public static Score[] getTopMatches(String search, boolean ignoreCase, String... input) {
-		String s = ignoreCase ? search.toLowerCase() : search;
-		TreeSet<Score> res = new TreeSet<Score>();
-		for (String string : input) {
-			String t = ignoreCase ? string.toLowerCase() : string;
+		final String s = ignoreCase ? search.toLowerCase() : search;
+		final TreeSet<Score> res = new TreeSet<Score>();
+		for (final String string : input) {
+			final String t = ignoreCase ? string.toLowerCase() : string;
 			res.add(new Score(computeLevenshteinDistance(s, t), string));
 		}
 		return res.toArray(new Score[res.size()]);

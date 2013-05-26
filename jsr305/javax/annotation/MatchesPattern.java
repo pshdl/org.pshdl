@@ -17,7 +17,7 @@ public @interface MatchesPattern {
 	static class Checker implements TypeQualifierValidator<MatchesPattern> {
 		@Override
 		public When forConstantValue(MatchesPattern annotation, Object value) {
-			Pattern p = Pattern.compile(annotation.value(), annotation.flags());
+			final Pattern p = Pattern.compile(annotation.value(), annotation.flags());
 			if (p.matcher(((String) value)).matches())
 				return When.ALWAYS;
 			return When.NEVER;

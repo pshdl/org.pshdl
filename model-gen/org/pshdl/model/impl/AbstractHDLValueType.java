@@ -94,7 +94,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLValueType other = (AbstractHDLValueType) obj;
+		final AbstractHDLValueType other = (AbstractHDLValueType) obj;
 		return true;
 	}
 
@@ -104,7 +104,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 	public int hashCode() {
 		if (hashCache != null)
 			return hashCache;
-		int result = super.hashCode();
+		final int result = super.hashCode();
 		final int prime = 31;
 		hashCache = result;
 		return result;
@@ -112,8 +112,8 @@ public abstract class AbstractHDLValueType extends HDLType {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLValueType()");
 		if (name != null) {
 			sb.append(".setName(").append('"' + name + '"').append(")");
@@ -121,7 +121,7 @@ public abstract class AbstractHDLValueType extends HDLType {
 		if (dim != null) {
 			if (dim.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLExpression o : dim) {
+				for (final HDLExpression o : dim) {
 					sb.append(".addDim(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -156,8 +156,8 @@ public abstract class AbstractHDLValueType extends HDLType {
 					switch (pos++) {
 					case 0:
 						if ((dim != null) && (dim.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
-							for (HDLExpression o : dim) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(dim.size());
+							for (final HDLExpression o : dim) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

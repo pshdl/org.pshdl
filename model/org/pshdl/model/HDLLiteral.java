@@ -102,7 +102,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return bigIntegerVal;
 		if (getStr())
 			return null;
-		String string = getVal();
+		final String string = getVal();
 		if (TRUE.equals(string))
 			return null;
 		// bigIntegerVal = BigInteger.ONE;
@@ -111,10 +111,10 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return null;
 		// bigIntegerVal = BigInteger.ZERO;
 		// return bigIntegerVal;
-		char zeroChar = string.charAt(0);
+		final char zeroChar = string.charAt(0);
 		if (zeroChar == '0') {
 			if (string.length() > 1) {
-				String str = string.substring(2).replaceAll("_", "");
+				final String str = string.substring(2).replaceAll("_", "");
 				switch (string.charAt(1)) {
 				case 'x':
 					bigIntegerVal = new BigInteger(str, 16);
@@ -170,12 +170,12 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	public HDLLiteralPresentation getPresentation() {
 		if (getStr())
 			return HDLLiteralPresentation.STR;
-		String string = getVal();
+		final String string = getVal();
 		if (TRUE.equals(string))
 			return HDLLiteralPresentation.BOOL;
 		if (FALSE.equals(string))
 			return HDLLiteralPresentation.BOOL;
-		char zeroChar = string.charAt(0);
+		final char zeroChar = string.charAt(0);
 		if (zeroChar == '0')
 			if (string.length() > 1) {
 				switch (string.charAt(1)) {
@@ -202,9 +202,9 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return false;
 		if (!(obj instanceof AbstractHDLLiteral))
 			return false;
-		HDLLiteral other = (HDLLiteral) obj;
-		BigInteger bigVal = getValueAsBigInt();
-		BigInteger otherbigVal = other.getValueAsBigInt();
+		final HDLLiteral other = (HDLLiteral) obj;
+		final BigInteger bigVal = getValueAsBigInt();
+		final BigInteger otherbigVal = other.getValueAsBigInt();
 		if (bigVal != null)
 			return bigVal.equals(otherbigVal);
 		if (val == null) {
@@ -221,7 +221,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	public int hashCode() {
 		if (hashCache != null)
 			return hashCache;
-		BigInteger valueAsBigInt = getValueAsBigInt();
+		final BigInteger valueAsBigInt = getValueAsBigInt();
 		if (valueAsBigInt != null) {
 			hashCache = valueAsBigInt.hashCode();
 			return hashCache;

@@ -80,7 +80,7 @@ public class HDLPrimitives {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			HDLInferenceTriple other = (HDLInferenceTriple) obj;
+			final HDLInferenceTriple other = (HDLInferenceTriple) obj;
 			if (left != other.left)
 				return false;
 			if (right != other.right)
@@ -106,11 +106,11 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initEqualityResolution() {
-		Map<HDLInferenceTriple, HDLInferenceTriple> res = initArithResolution();
-		for (HDLInferenceTriple result : res.values()) {
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = initArithResolution();
+		for (final HDLInferenceTriple result : res.values()) {
 			result.result = BOOL;
 		}
-		for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
+		for (final HDLPrimitiveType right : HDLPrimitiveType.values()) {
 			if (right == BOOL) {
 				continue;
 			}
@@ -127,15 +127,15 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initBitResolution() {
-		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
-		for (HDLPrimitiveType left : HDLPrimitiveType.values()) {
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
+		for (final HDLPrimitiveType left : HDLPrimitiveType.values()) {
 			if (left == BOOL) {
 				continue;
 			}
 			if (left == STRING) {
 				continue;
 			}
-			for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
+			for (final HDLPrimitiveType right : HDLPrimitiveType.values()) {
 				if (right == BOOL) {
 					continue;
 				}
@@ -150,7 +150,7 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initArithResolution() {
-		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, INTEGER, null), new HDLInferenceTriple(INT, INTEGER, INT));
@@ -174,7 +174,7 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initShiftResolution() {
-		Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, INTEGER, null), new HDLInferenceTriple(INT, NATURAL, INT));
@@ -219,7 +219,7 @@ public class HDLPrimitives {
 		System.out.println(uintRange(BigInteger.valueOf(9)));
 		System.out.println(uintRange(BigInteger.valueOf(32)));
 		try {
-			StringBuilder sb = new StringBuilder("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"cast.css\" /></head><body>\n");
+			final StringBuilder sb = new StringBuilder("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"cast.css\" /></head><body>\n");
 			sb.append("<p>Arithmetic operation conversion/result table</p>");
 			printTable(sb, arithResolutionTable);
 			sb.append("<p>Shift operation conversion/result table</p>");
@@ -230,10 +230,10 @@ public class HDLPrimitives {
 			printTable(sb, bitResolutionTable);
 			sb.append("</body></html>");
 			System.out.println(sb);
-			FileOutputStream fos = new FileOutputStream("castTable.html");
+			final FileOutputStream fos = new FileOutputStream("castTable.html");
 			fos.write(sb.toString().getBytes(Charsets.UTF_8));
 			fos.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -241,14 +241,14 @@ public class HDLPrimitives {
 	private static void printTable(StringBuilder sb, Map<HDLInferenceTriple, HDLInferenceTriple> map) {
 		sb.append("<table>\n");
 		sb.append("<tr><td>left \\ right</td>");
-		for (HDLPrimitiveType left : HDLPrimitiveType.values()) {
+		for (final HDLPrimitiveType left : HDLPrimitiveType.values()) {
 			sb.append("<td colspan='3'>").append(left.name().toLowerCase()).append("</td>");
 		}
 		sb.append("</tr>");
-		for (HDLPrimitiveType left : HDLPrimitiveType.values()) {
+		for (final HDLPrimitiveType left : HDLPrimitiveType.values()) {
 			sb.append("\n<tr><td>").append(left.name().toLowerCase()).append("</td>");
-			for (HDLPrimitiveType right : HDLPrimitiveType.values()) {
-				HDLInferenceTriple triple = map.get(new HDLInferenceTriple(left, right, null));
+			for (final HDLPrimitiveType right : HDLPrimitiveType.values()) {
+				final HDLInferenceTriple triple = map.get(new HDLInferenceTriple(left, right, null));
 				if (triple != null) {
 					sb.append("<td>");
 					if (triple.left != left) {
@@ -281,15 +281,15 @@ public class HDLPrimitives {
 	 * .tuhh.ict.pshdl.model.HDLArithOp)
 	 */
 	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {
-		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
+		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
 		if (!typeOfLeft.isPresent())
 			return createError("left");
 		HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
-		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
+		final Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
 		if (!typeOfRight.isPresent())
 			return createError("right");
 		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
-		HDLArithOpType type = op.getType();
+		final HDLArithOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType))
 			if (HDLPrimitive.isTargetMatching(rType)) {
 				lType = rType;
@@ -297,9 +297,9 @@ public class HDLPrimitives {
 		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
 		}
-		HDLInferenceTriple triple = arithResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
+		final HDLInferenceTriple triple = arithResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
-			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+			final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 			hdi.error = "The operation " + type + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 			return hdi;
 		}
@@ -309,15 +309,15 @@ public class HDLPrimitives {
 		HDLPrimitive newLType = lType.setType(triple.left);
 		HDLPrimitive newRType = rType.setType(triple.right);
 		if ((triple.left == INT) && (triple.right == UINT)) {
-			HDLExpression rTypeWidth = checkNotNull(newRType.getWidth(), "The type should have been Integer or natural if width equals null");
+			final HDLExpression rTypeWidth = checkNotNull(newRType.getWidth(), "The type should have been Integer or natural if width equals null");
 			newRType = newRType.setWidth(new HDLArithOp().setLeft(rTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
 		if ((triple.left == UINT) && (triple.right == INT)) {
-			HDLExpression lTypeWidth = checkNotNull(newLType.getWidth(), "The type should have been Integer or natural if width equals null");
+			final HDLExpression lTypeWidth = checkNotNull(newLType.getWidth(), "The type should have been Integer or natural if width equals null");
 			newLType = newLType.setWidth(new HDLArithOp().setLeft(lTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
-		HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
+		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
+		final HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
 		info.result = new HDLPrimitive().setType(triple.result).setWidth(width);
 		return normalize(info, op);
 	}
@@ -326,7 +326,7 @@ public class HDLPrimitives {
 		if (width == null)
 			return null;
 		width = width.copyDeepFrozen(container);
-		Optional<BigInteger> newW = ConstantEvaluate.valueOf(width, null);
+		final Optional<BigInteger> newW = ConstantEvaluate.valueOf(width, null);
 		if (newW.isPresent()) {
 			width = new HDLLiteral().setVal(newW.get().toString());
 		}
@@ -422,22 +422,22 @@ public class HDLPrimitives {
 	}
 
 	public HDLTypeInferenceInfo getShiftOpType(HDLShiftOp op) {
-		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
+		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
 		if (!typeOfLeft.isPresent())
 			return createError("left");
-		HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
-		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
+		final HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
+		final Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
 		if (!typeOfRight.isPresent())
 			return createError("right");
-		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
-		HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
+		final HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
+		final HDLInferenceTriple triple = shiftResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
-			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+			final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 			hdi.error = "The operation " + op.getType() + " is not defined for the type of the right-handside: " + rType;
 			return hdi;
 		}
-		HDLExpression width = lType.getWidth();
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType, new HDLPrimitive().setType(triple.right));
+		final HDLExpression width = lType.getWidth();
+		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width), lType, new HDLPrimitive().setType(triple.right));
 		return normalize(info, op);
 	}
 
@@ -445,14 +445,14 @@ public class HDLPrimitives {
 	EnumSet<HDLEqualityOpType> nonOrderCompType = EnumSet.of(HDLEqualityOpType.EQ, HDLEqualityOpType.NOT_EQ);
 
 	public HDLTypeInferenceInfo getEqualityOpType(HDLEqualityOp op) {
-		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
+		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
 		if (!typeOfLeft.isPresent())
 			return createError("left");
-		HDLType determineTypeL = typeOfLeft.get();
-		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
+		final HDLType determineTypeL = typeOfLeft.get();
+		final Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
 		if (!typeOfRight.isPresent())
 			return createError("right");
-		HDLType determineTypeR = typeOfRight.get();
+		final HDLType determineTypeR = typeOfRight.get();
 		if ((determineTypeL instanceof HDLPrimitive) && (determineTypeR instanceof HDLPrimitive)) {
 			HDLPrimitive lType = (HDLPrimitive) determineTypeL;
 			HDLPrimitive rType = (HDLPrimitive) determineTypeR;
@@ -465,31 +465,31 @@ public class HDLPrimitives {
 			}
 			if (nonOrderType.contains(lType.getType()) || nonOrderType.contains(rType.getType()))
 				if (!nonOrderCompType.contains(op.getType())) {
-					HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+					final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 					hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 					return hdi;
 				}
-			HDLInferenceTriple triple = equalityResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
+			final HDLInferenceTriple triple = equalityResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 			if (triple == null) {
-				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+				final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 				hdi.error = "The operation " + op.getType() + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 				return hdi;
 			}
-			HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result), lType.setType(triple.left), lType.setType(triple.right));
+			final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result), lType.setType(triple.left), lType.setType(triple.right));
 			return normalize(info, op);
 		}
 		return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), determineTypeL, determineTypeR);
 	}
 
 	public HDLTypeInferenceInfo getBitOpType(HDLBitOp op) {
-		HDLBitOpType type = op.getType();
+		final HDLBitOpType type = op.getType();
 		if ((type == HDLBitOpType.LOGI_AND) || (type == HDLBitOpType.LOGI_OR))
 			return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool(), HDLPrimitive.getBool());
-		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
+		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
 		if (!typeOfLeft.isPresent())
 			return createError("left");
 		HDLPrimitive lType = (HDLPrimitive) typeOfLeft.get();
-		Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
+		final Optional<? extends HDLType> typeOfRight = TypeExtension.typeOf(op.getRight());
 		if (!typeOfRight.isPresent())
 			return createError("right");
 		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
@@ -500,9 +500,9 @@ public class HDLPrimitives {
 		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
 		}
-		HDLInferenceTriple triple = bitResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
+		final HDLInferenceTriple triple = bitResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		if (triple == null) {
-			HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
+			final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 			hdi.error = "The operation " + type + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
 			return hdi;
 		}
@@ -510,18 +510,18 @@ public class HDLPrimitives {
 		if ((width == null) && (rType.getWidth() != null)) {
 			width = rType.getWidth();
 		}
-		HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width == null ? null : width), lType.setType(triple.left),
+		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width == null ? null : width), lType.setType(triple.left),
 				lType.setType(triple.right));
 		return normalize(info, op);
 	}
 
 	public HDLTypeInferenceInfo getManipOpType(HDLManip manip) {
-		HDLExpression target = manip.getTarget();
-		HDLType castTo = manip.getCastTo();
-		Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(target);
+		final HDLExpression target = manip.getTarget();
+		final HDLType castTo = manip.getCastTo();
+		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(target);
 		if (!typeOfLeft.isPresent())
 			return createError("left");
-		HDLPrimitive determineType = (HDLPrimitive) typeOfLeft.get();
+		final HDLPrimitive determineType = (HDLPrimitive) typeOfLeft.get();
 		switch (manip.getType()) {
 		case CAST:
 			// XXX If there ever happens to be another cast, this has to be
@@ -540,7 +540,7 @@ public class HDLPrimitives {
 			case BITVECTOR:
 			case BOOL:
 			case STRING:
-				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
+				final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
 				hdi.error = "Arithmetic negation does not support bit/boolean/string operands";
 				return hdi;
 			}
@@ -556,7 +556,7 @@ public class HDLPrimitives {
 				return new HDLTypeInferenceInfo(determineType, determineType);
 			case BOOL:
 			case STRING:
-				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
+				final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
 				hdi.error = "Bit negation does not support boolean/string operands";
 				return hdi;
 			}
@@ -569,7 +569,7 @@ public class HDLPrimitives {
 			case NATURAL:
 			case BITVECTOR:
 			case STRING:
-				HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
+				final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
 				hdi.error = "Logic negation does not support bit/string operands";
 				return hdi;
 			case BIT:
@@ -582,7 +582,7 @@ public class HDLPrimitives {
 	}
 
 	protected HDLTypeInferenceInfo createError(String side) {
-		HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, null, null);
+		final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, null, null);
 		hdi.error = "The type of the " + side + " hand side can not be determined";
 		return hdi;
 	}
@@ -595,7 +595,7 @@ public class HDLPrimitives {
 		case STRING:
 			return Optional.absent();
 		case INT: {
-			Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
+			final Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
 				return null;
 			return Optional.of(intRange(bitWidth.get()));
@@ -603,7 +603,7 @@ public class HDLPrimitives {
 		case INTEGER:
 			return Optional.of(intRange(BigInteger.valueOf(32)));
 		case UINT: {
-			Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
+			final Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
 				return null;
 			return Optional.of(uintRange(bitWidth.get()));
@@ -615,20 +615,20 @@ public class HDLPrimitives {
 	}
 
 	private static Range<BigInteger> intRange(BigInteger bitWidth) {
-		BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
-		BigInteger min = max.negate().subtract(BigInteger.ONE);
+		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
+		final BigInteger min = max.negate().subtract(BigInteger.ONE);
 		return Ranges.closed(min, max);
 	}
 
 	private static Range<BigInteger> uintRange(BigInteger bitWidth) {
-		BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
-		BigInteger min = BigInteger.ZERO;
+		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
+		final BigInteger min = BigInteger.ZERO;
 		return Ranges.closed(min, max);
 	}
 
 	public static Integer getWidth(HDLType type, HDLEvaluationContext context) {
 		if (type.getClassType() == HDLClass.HDLPrimitive) {
-			HDLPrimitive determineType = (HDLPrimitive) type;
+			final HDLPrimitive determineType = (HDLPrimitive) type;
 			BigInteger width = null;
 			switch (determineType.getType()) {
 			case BIT:

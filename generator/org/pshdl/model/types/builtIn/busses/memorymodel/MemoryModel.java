@@ -42,12 +42,12 @@ import com.google.common.io.*;
 public class MemoryModel {
 
 	public static void main(String[] args) throws Exception {
-		File file = new File(args[0]);
-		Set<Problem> problems = Sets.newHashSet();
-		Unit unit = MemoryModelAST.parseUnit(Files.toString(file, Charsets.UTF_8), problems);
+		final File file = new File(args[0]);
+		final Set<Problem> problems = Sets.newHashSet();
+		final Unit unit = MemoryModelAST.parseUnit(Files.toString(file, Charsets.UTF_8), problems);
 		System.out.println(unit);
-		List<Row> rows = buildRows(unit);
-		byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
+		final List<Row> rows = buildRows(unit);
+		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
 		System.out.println(new BusAccess().generateAccessC(rows));
 		System.out.println(new BusAccess().generateAccessH(unit, rows));
 		// // SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
@@ -55,25 +55,25 @@ public class MemoryModel {
 		// System.out.println(sideFile.relPath);
 		// System.out.println(new String(sideFile.contents));
 		// }
-		FileOutputStream ps = new FileOutputStream(args[0] + "Map.html");
+		final FileOutputStream ps = new FileOutputStream(args[0] + "Map.html");
 		ps.write(builtHTML);
 		ps.close();
-		HDLInterface hdi = buildHDLInterface(unit, rows);
+		final HDLInterface hdi = buildHDLInterface(unit, rows);
 		System.out.println(hdi);
 	}
 
 	public static HDLInterface buildHDLInterface(Unit unit, List<Row> rows) {
-		Map<String, Definition> definitions = new HashMap<String, Definition>();
-		Map<String, Integer> defDimension = new HashMap<String, Integer>();
-		for (Row row : rows) {
-			for (NamedElement ne : row.definitions) {
-				Definition def = (Definition) ne;
-				String name = def.name;
-				Definition stockDef = definitions.get(name);
+		final Map<String, Definition> definitions = new HashMap<String, Definition>();
+		final Map<String, Integer> defDimension = new HashMap<String, Integer>();
+		for (final Row row : rows) {
+			for (final NamedElement ne : row.definitions) {
+				final Definition def = (Definition) ne;
+				final String name = def.name;
+				final Definition stockDef = definitions.get(name);
 				if ((stockDef != null) && !def.equals(stockDef) && (def.type != Type.UNUSED))
 					throw new IllegalArgumentException("Two definitions with same name exist, but their type differs:" + def + " vs " + stockDef);
 				definitions.put(name, def);
-				Integer val = defDimension.get(name);
+				final Integer val = defDimension.get(name);
 				if (val == null) {
 					defDimension.put(name, 1);
 				} else {
@@ -83,7 +83,7 @@ public class MemoryModel {
 			}
 		}
 		HDLInterface hdi = new HDLInterface();
-		for (Definition def : definitions.values()) {
+		for (final Definition def : definitions.values()) {
 			HDLPrimitive type = null;
 			switch (def.type) {
 			case BIT:
@@ -126,7 +126,7 @@ public class MemoryModel {
 				break;
 			}
 			HDLVariable var = new HDLVariable().setName(def.name);
-			Integer dim = defDimension.get(def.name);
+			final Integer dim = defDimension.get(def.name);
 			if (dim != 1) {
 				var = var.addDimensions(HDLLiteral.get(dim));
 			}
@@ -137,11 +137,11 @@ public class MemoryModel {
 	}
 
 	public static List<Row> buildRows(Unit unit) {
-		List<Row> rows = new LinkedList<Row>();
-		for (Reference ref : unit.memory.references) {
-			NamedElement declaration = unit.resolve(ref);
+		final List<Row> rows = new LinkedList<Row>();
+		for (final Reference ref : unit.memory.references) {
+			final NamedElement declaration = unit.resolve(ref);
 			if (ref.dimensions.size() != 0) {
-				for (Integer num : ref.dimensions) {
+				for (final Integer num : ref.dimensions) {
 					for (int i = 0; i < num; i++) {
 						addDeclarations(unit, rows, declaration, null, i);
 					}
@@ -150,7 +150,7 @@ public class MemoryModel {
 				addDeclarations(unit, rows, declaration, null, 0);
 			}
 		}
-		for (Row row : rows) {
+		for (final Row row : rows) {
 			row.updateInfo();
 		}
 		return rows;
@@ -158,25 +158,25 @@ public class MemoryModel {
 
 	private static void addDeclarations(Unit unit, List<Row> rows, NamedElement declaration, Column parent, int colIndex) {
 		if (declaration instanceof Column) {
-			Column col = (Column) declaration;
-			for (NamedElement row : col.rows) {
+			final Column col = (Column) declaration;
+			for (final NamedElement row : col.rows) {
 				addDeclarations(unit, rows, row, col, colIndex);
 			}
 			return;
 		}
 		if (declaration instanceof Row) {
-			Row row = (Row) declaration;
-			Row normalize = normalize(unit, row);
+			final Row row = (Row) declaration;
+			final Row normalize = normalize(unit, row);
 			normalize.column = parent;
 			normalize.colIndex = colIndex;
 			rows.add(normalize);
 			return;
 		}
 		if (declaration instanceof Reference) {
-			Reference ref = (Reference) declaration;
-			NamedElement decl = unit.resolve(ref);
+			final Reference ref = (Reference) declaration;
+			final NamedElement decl = unit.resolve(ref);
 			if (ref.dimensions.size() != 0) {
-				for (Integer num : ref.dimensions) {
+				for (final Integer num : ref.dimensions) {
 					for (int i = 0; i < num; i++) {
 						addDeclarations(unit, rows, decl, parent, colIndex);
 					}
@@ -193,13 +193,13 @@ public class MemoryModel {
 	private static Row normalize(Unit unit, Row row) {
 		int usedSize = 0;
 		boolean fillFound = false;
-		Row res = new Row(row.name);
-		List<Definition> definitions = new LinkedList<Definition>();
-		Definition unusedFill = new Definition();
+		final Row res = new Row(row.name);
+		final List<Definition> definitions = new LinkedList<Definition>();
+		final Definition unusedFill = new Definition();
 		unusedFill.name = "unused";
 		for (NamedElement decl : row.definitions) {
 			if (decl instanceof Reference) {
-				Reference ref = (Reference) decl;
+				final Reference ref = (Reference) decl;
 				if ("fill".equals(ref.name)) {
 					if (fillFound)
 						throw new IllegalArgumentException("Can not have more than one fill");
@@ -210,11 +210,11 @@ public class MemoryModel {
 				decl = unit.resolve(ref);
 			}
 			if (decl instanceof Alias) {
-				Alias alias = (Alias) decl;
+				final Alias alias = (Alias) decl;
 				usedSize += addDeclarations(unit, definitions, alias.definitions);
 			}
 			if (decl instanceof Definition) {
-				Definition def = (Definition) decl;
+				final Definition def = (Definition) decl;
 				usedSize += handleDefinition(definitions, def);
 			}
 		}
@@ -226,7 +226,7 @@ public class MemoryModel {
 			definitions.remove(unusedFill);
 		}
 		unusedFill.width = Unit.rowWidth - usedSize;
-		for (Definition definition : definitions) {
+		for (final Definition definition : definitions) {
 			res.definitions.add(definition);
 		}
 		return res;
@@ -236,17 +236,17 @@ public class MemoryModel {
 		int usedSize = 0;
 		for (NamedElement declaration : values) {
 			if (declaration instanceof Reference) {
-				Reference ref = (Reference) declaration;
+				final Reference ref = (Reference) declaration;
 				if ("fill".equals(ref.name))
 					throw new IllegalArgumentException("Fill not allowed in reference");
 				declaration = unit.resolve(ref);
 			}
 			if (declaration instanceof Alias) {
-				Alias alias = (Alias) declaration;
+				final Alias alias = (Alias) declaration;
 				usedSize += addDeclarations(unit, definitions, alias.definitions);
 			}
 			if (declaration instanceof Definition) {
-				Definition def = (Definition) declaration;
+				final Definition def = (Definition) declaration;
 				usedSize += handleDefinition(definitions, def);
 			}
 		}
@@ -256,10 +256,10 @@ public class MemoryModel {
 	private static int handleDefinition(List<Definition> definitions, Definition def) {
 		int usedSize = 0;
 		if (def.dimensions.size() != 0) {
-			for (Integer dim : def.dimensions) {
+			for (final Integer dim : def.dimensions) {
 				for (int i = 0; i < dim; i++) {
 					usedSize += getSize(def);
-					Definition withoutDim = def.withoutDim();
+					final Definition withoutDim = def.withoutDim();
 					definitions.add(withoutDim);
 				}
 			}

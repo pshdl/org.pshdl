@@ -69,7 +69,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		}
 		this.units = new ArrayList<HDLUnit>();
 		if (units != null) {
-			for (HDLUnit newValue : units) {
+			for (final HDLUnit newValue : units) {
 				this.units.add(newValue);
 			}
 		}
@@ -78,7 +78,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		}
 		this.declarations = new ArrayList<HDLDeclaration>();
 		if (declarations != null) {
-			for (HDLDeclaration newValue : declarations) {
+			for (final HDLDeclaration newValue : declarations) {
 				this.declarations.add(newValue);
 			}
 		}
@@ -170,7 +170,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLPackage copy() {
-		HDLPackage newObject = new HDLPackage(id, null, libURI, pkg, units, declarations, false);
+		final HDLPackage newObject = new HDLPackage(id, null, libURI, pkg, units, declarations, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -183,10 +183,10 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLPackage copyFiltered(CopyFilter filter) {
-		String filteredlibURI = filter.copyObject("libURI", this, libURI);
-		String filteredpkg = filter.copyObject("pkg", this, pkg);
-		ArrayList<HDLUnit> filteredunits = filter.copyContainer("units", this, units);
-		ArrayList<HDLDeclaration> filtereddeclarations = filter.copyContainer("declarations", this, declarations);
+		final String filteredlibURI = filter.copyObject("libURI", this, libURI);
+		final String filteredpkg = filter.copyObject("pkg", this, pkg);
+		final ArrayList<HDLUnit> filteredunits = filter.copyContainer("units", this, units);
+		final ArrayList<HDLDeclaration> filtereddeclarations = filter.copyContainer("declarations", this, declarations);
 		return filter.postFilter((HDLPackage) this, new HDLPackage(id, null, filteredlibURI, filteredpkg, filteredunits, filtereddeclarations, false));
 	}
 
@@ -198,7 +198,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLPackage copyDeepFrozen(IHDLObject container) {
-		HDLPackage copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLPackage copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -230,7 +230,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Nonnull
 	public HDLPackage setLibURI(@Nonnull String libURI) {
 		libURI = validateLibURI(libURI);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -244,7 +244,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Nonnull
 	public HDLPackage setPkg(@Nullable String pkg) {
 		pkg = validatePkg(pkg);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -259,7 +259,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Nonnull
 	public HDLPackage setUnits(@Nullable Iterable<HDLUnit> units) {
 		units = validateUnits(units);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -276,9 +276,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	public HDLPackage addUnits(@Nullable HDLUnit newUnits) {
 		if (newUnits == null)
 			throw new IllegalArgumentException("Element of units can not be null!");
-		ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
+		final ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
 		units.add(newUnits);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -295,9 +295,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	public HDLPackage removeUnits(@Nullable HDLUnit newUnits) {
 		if (newUnits == null)
 			throw new IllegalArgumentException("Removed element of units can not be null!");
-		ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
+		final ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
 		units.remove(newUnits);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -312,9 +312,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 */
 	@Nonnull
 	public HDLPackage removeUnits(int idx) {
-		ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
+		final ArrayList<HDLUnit> units = (ArrayList<HDLUnit>) this.units.clone();
 		units.remove(idx);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -330,7 +330,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	@Nonnull
 	public HDLPackage setDeclarations(@Nullable Iterable<HDLDeclaration> declarations) {
 		declarations = validateDeclarations(declarations);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -347,9 +347,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	public HDLPackage addDeclarations(@Nullable HDLDeclaration newDeclarations) {
 		if (newDeclarations == null)
 			throw new IllegalArgumentException("Element of declarations can not be null!");
-		ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
+		final ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
 		declarations.add(newDeclarations);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -366,9 +366,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	public HDLPackage removeDeclarations(@Nullable HDLDeclaration newDeclarations) {
 		if (newDeclarations == null)
 			throw new IllegalArgumentException("Removed element of declarations can not be null!");
-		ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
+		final ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
 		declarations.remove(newDeclarations);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -383,9 +383,9 @@ public abstract class AbstractHDLPackage extends HDLObject {
 	 */
 	@Nonnull
 	public HDLPackage removeDeclarations(int idx) {
-		ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
+		final ArrayList<HDLDeclaration> declarations = (ArrayList<HDLDeclaration>) this.declarations.clone();
 		declarations.remove(idx);
-		HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
+		final HDLPackage res = new HDLPackage(id, container, libURI, pkg, units, declarations, false);
 		return res;
 	}
 
@@ -399,7 +399,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLPackage other = (AbstractHDLPackage) obj;
+		final AbstractHDLPackage other = (AbstractHDLPackage) obj;
 		if (pkg == null) {
 			if (other.pkg != null)
 				return false;
@@ -435,8 +435,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLPackage()");
 		if (libURI != null) {
 			sb.append(".setLibURI(").append('"' + libURI + '"').append(")");
@@ -447,7 +447,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		if (units != null) {
 			if (units.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLUnit o : units) {
+				for (final HDLUnit o : units) {
 					sb.append(".addUnits(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -456,7 +456,7 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		if (declarations != null) {
 			if (declarations.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLDeclaration o : declarations) {
+				for (final HDLDeclaration o : declarations) {
 					sb.append(".addDeclarations(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -472,13 +472,13 @@ public abstract class AbstractHDLPackage extends HDLObject {
 		validatePkg(getPkg());
 		validateUnits(getUnits());
 		if (getUnits() != null) {
-			for (HDLUnit o : getUnits()) {
+			for (final HDLUnit o : getUnits()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
 		validateDeclarations(getDeclarations());
 		if (getDeclarations() != null) {
-			for (HDLDeclaration o : getDeclarations()) {
+			for (final HDLDeclaration o : getDeclarations()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -505,8 +505,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 					switch (pos++) {
 					case 0:
 						if ((units != null) && (units.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(units.size());
-							for (HDLUnit o : units) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(units.size());
+							for (final HDLUnit o : units) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -515,8 +515,8 @@ public abstract class AbstractHDLPackage extends HDLObject {
 						break;
 					case 1:
 						if ((declarations != null) && (declarations.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(declarations.size());
-							for (HDLDeclaration o : declarations) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(declarations.size());
+							for (final HDLDeclaration o : declarations) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

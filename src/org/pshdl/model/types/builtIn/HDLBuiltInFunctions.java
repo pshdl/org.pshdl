@@ -51,16 +51,16 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
-		String name = function.getNameRefName().getLastSegment();
+		final String name = function.getNameRefName().getLastSegment();
 		try {
-			BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+			final BuiltInFunctions func = BuiltInFunctions.valueOf(name);
 			switch (func) {
 			case highZ:
 				if (function.getParams().size() == 1)
 					return new HDLTypeInferenceInfo(HDLPrimitive.getBit(), HDLPrimitive.getNatural());
 				return new HDLTypeInferenceInfo(HDLPrimitive.getBit());
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 		return null;
 	}
@@ -75,8 +75,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	}
 
 	private BuiltInFunctions getFuncEnum(HDLFunctionCall function) {
-		String name = function.getNameRefName().getLastSegment();
-		BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+		final String name = function.getNameRefName().getLastSegment();
+		final BuiltInFunctions func = BuiltInFunctions.valueOf(name);
 		return func;
 	}
 
@@ -91,10 +91,10 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public String[] getFunctionNames() {
-		String[] res = new String[BuiltInFunctions.values().length];
-		BuiltInFunctions[] values = BuiltInFunctions.values();
+		final String[] res = new String[BuiltInFunctions.values().length];
+		final BuiltInFunctions[] values = BuiltInFunctions.values();
 		for (int i = 0; i < values.length; i++) {
-			BuiltInFunctions bif = values[i];
+			final BuiltInFunctions bif = values[i];
 			res[i] = bif.name();
 		}
 		return res;
@@ -112,8 +112,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 			if (function.getParams().size() == 0)
 				return new CharacterLiteral('Z');
 
-			Aggregate aggregate = new Aggregate();
-			HDLRange range = new HDLRange().setFrom(HDLLiteral.get(1)).setTo(function.getParams().get(0));
+			final Aggregate aggregate = new Aggregate();
+			final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(1)).setTo(function.getParams().get(0));
 			aggregate.createAssociation(new CharacterLiteral('Z'), VHDLExpressionExtension.INST.toVHDL(range, Direction.TO));
 			return aggregate;
 		}
@@ -124,7 +124,7 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	public FunctionInformation getFunctionInfo(String funcName) {
 		switch (BuiltInFunctions.valueOf(funcName)) {
 		case highZ: {
-			FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
 					"Returns a high Z. This is useful for tri-state busses, high z however is not supported in PSHDL as computational value.", "highZ", false, FunctionType.NATIVE);
 			return fi;
 		}

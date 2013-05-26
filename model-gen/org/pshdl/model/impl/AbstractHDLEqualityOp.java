@@ -93,7 +93,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLEqualityOp copy() {
-		HDLEqualityOp newObject = new HDLEqualityOp(id, null, left, right, type, false);
+		final HDLEqualityOp newObject = new HDLEqualityOp(id, null, left, right, type, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -106,9 +106,9 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLEqualityOp copyFiltered(CopyFilter filter) {
-		HDLExpression filteredleft = filter.copyObject("left", this, left);
-		HDLExpression filteredright = filter.copyObject("right", this, right);
-		HDLEqualityOpType filteredtype = filter.copyObject("type", this, type);
+		final HDLExpression filteredleft = filter.copyObject("left", this, left);
+		final HDLExpression filteredright = filter.copyObject("right", this, right);
+		final HDLEqualityOpType filteredtype = filter.copyObject("type", this, type);
 		return filter.postFilter((HDLEqualityOp) this, new HDLEqualityOp(id, null, filteredleft, filteredright, filteredtype, false));
 	}
 
@@ -120,7 +120,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Override
 	@Nonnull
 	public HDLEqualityOp copyDeepFrozen(IHDLObject container) {
-		HDLEqualityOp copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLEqualityOp copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -153,7 +153,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Nonnull
 	public HDLEqualityOp setLeft(@Nonnull HDLExpression left) {
 		left = validateLeft(left);
-		HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
+		final HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -170,7 +170,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Nonnull
 	public HDLEqualityOp setRight(@Nonnull HDLExpression right) {
 		right = validateRight(right);
-		HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
+		final HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -186,7 +186,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 	@Nonnull
 	public HDLEqualityOp setType(@Nonnull HDLEqualityOpType type) {
 		type = validateType(type);
-		HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
+		final HDLEqualityOp res = new HDLEqualityOp(id, container, left, right, type, false);
 		return res;
 	}
 
@@ -200,7 +200,7 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLEqualityOp other = (AbstractHDLEqualityOp) obj;
+		final AbstractHDLEqualityOp other = (AbstractHDLEqualityOp) obj;
 		if (type == null) {
 			if (other.type != null)
 				return false;
@@ -224,8 +224,8 @@ public abstract class AbstractHDLEqualityOp extends HDLOpExpression {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLEqualityOp()");
 		if (left != null) {
 			sb.append(".setLeft(").append(left.toConstructionString(spacing + "\t")).append(")");

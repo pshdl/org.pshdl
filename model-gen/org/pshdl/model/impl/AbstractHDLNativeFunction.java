@@ -95,7 +95,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLNativeFunction copy() {
-		HDLNativeFunction newObject = new HDLNativeFunction(id, null, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction newObject = new HDLNativeFunction(id, null, annotations, name, args, returnType, simOnly, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -108,11 +108,11 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLNativeFunction copyFiltered(CopyFilter filter) {
-		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
-		String filteredname = filter.copyObject("name", this, name);
-		ArrayList<HDLFunctionParameter> filteredargs = filter.copyContainer("args", this, args);
-		HDLFunctionParameter filteredreturnType = filter.copyObject("returnType", this, returnType);
-		Boolean filteredsimOnly = filter.copyObject("simOnly", this, simOnly);
+		final ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
+		final String filteredname = filter.copyObject("name", this, name);
+		final ArrayList<HDLFunctionParameter> filteredargs = filter.copyContainer("args", this, args);
+		final HDLFunctionParameter filteredreturnType = filter.copyObject("returnType", this, returnType);
+		final Boolean filteredsimOnly = filter.copyObject("simOnly", this, simOnly);
 		return filter.postFilter((HDLNativeFunction) this, new HDLNativeFunction(id, null, filteredannotations, filteredname, filteredargs, filteredreturnType, filteredsimOnly,
 				false));
 	}
@@ -125,7 +125,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Override
 	@Nonnull
 	public HDLNativeFunction copyDeepFrozen(IHDLObject container) {
-		HDLNativeFunction copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLNativeFunction copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -158,7 +158,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -176,9 +176,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	public HDLNativeFunction addAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Element of annotations can not be null!");
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -196,9 +196,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	public HDLNativeFunction removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -213,9 +213,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 */
 	@Nonnull
 	public HDLNativeFunction removeAnnotations(int idx) {
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -232,7 +232,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setName(@Nonnull String name) {
 		name = validateName(name);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -248,7 +248,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setArgs(@Nullable Iterable<HDLFunctionParameter> args) {
 		args = validateArgs(args);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -265,9 +265,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	public HDLNativeFunction addArgs(@Nullable HDLFunctionParameter newArgs) {
 		if (newArgs == null)
 			throw new IllegalArgumentException("Element of args can not be null!");
-		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.add(newArgs);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -285,9 +285,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	public HDLNativeFunction removeArgs(@Nullable HDLFunctionParameter newArgs) {
 		if (newArgs == null)
 			throw new IllegalArgumentException("Removed element of args can not be null!");
-		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(newArgs);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -302,9 +302,9 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	 */
 	@Nonnull
 	public HDLNativeFunction removeArgs(int idx) {
-		ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
+		final ArrayList<HDLFunctionParameter> args = (ArrayList<HDLFunctionParameter>) this.args.clone();
 		args.remove(idx);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -321,7 +321,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setReturnType(@Nullable HDLFunctionParameter returnType) {
 		returnType = validateReturnType(returnType);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -337,7 +337,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setSimOnly(@Nonnull Boolean simOnly) {
 		simOnly = validateSimOnly(simOnly);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -353,7 +353,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 	@Nonnull
 	public HDLNativeFunction setSimOnly(boolean simOnly) {
 		simOnly = validateSimOnly(simOnly);
-		HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
+		final HDLNativeFunction res = new HDLNativeFunction(id, container, annotations, name, args, returnType, simOnly, false);
 		return res;
 	}
 
@@ -367,7 +367,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLNativeFunction other = (AbstractHDLNativeFunction) obj;
+		final AbstractHDLNativeFunction other = (AbstractHDLNativeFunction) obj;
 		if (simOnly == null) {
 			if (other.simOnly != null)
 				return false;
@@ -391,13 +391,13 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLNativeFunction()");
 		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLAnnotation o : annotations) {
+				for (final HDLAnnotation o : annotations) {
 					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -409,7 +409,7 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 		if (args != null) {
 			if (args.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLFunctionParameter o : args) {
+				for (final HDLFunctionParameter o : args) {
 					sb.append(".addArgs(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -451,8 +451,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 					switch (pos++) {
 					case 0:
 						if ((annotations != null) && (annotations.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
-							for (HDLAnnotation o : annotations) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -461,8 +461,8 @@ public abstract class AbstractHDLNativeFunction extends HDLFunction {
 						break;
 					case 1:
 						if ((args != null) && (args.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
-							for (HDLFunctionParameter o : args) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(args.size());
+							for (final HDLFunctionParameter o : args) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

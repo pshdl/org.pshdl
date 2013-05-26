@@ -90,9 +90,9 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	}
 
 	public static void copyMetaData(IHDLObject src, IHDLObject target, boolean all) {
-		Map<MetaAccess<?>, Object> srcMeta = ((HDLObject) src).metaData;
-		Map<MetaAccess<?>, Object> targetMeta = ((HDLObject) target).metaData;
-		for (Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet())
+		final Map<MetaAccess<?>, Object> srcMeta = ((HDLObject) src).metaData;
+		final Map<MetaAccess<?>, Object> targetMeta = ((HDLObject) target).metaData;
+		for (final Entry<MetaAccess<?>, Object> entry : srcMeta.entrySet())
 			if (all || entry.getKey().inherit()) {
 				targetMeta.put(entry.getKey(), entry.getValue());
 			}
@@ -106,7 +106,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	@Override
 	@Nonnull
 	public IHDLObject copyDeepFrozen(IHDLObject container) {
-		IHDLObject copy = copyFiltered(CopyFilter.DEEP_META);
+		final IHDLObject copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -115,8 +115,8 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 
 	public static class GenericMeta<T> implements MetaAccess<T> {
 
-		private boolean inherit;
-		private String name;
+		private final boolean inherit;
+		private final String name;
 
 		public GenericMeta(String name, boolean inherit) {
 			this.name = name;
@@ -146,7 +146,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			GenericMeta other = (GenericMeta) obj;
+			final GenericMeta other = (GenericMeta) obj;
 			if (inherit != other.inherit)
 				return false;
 			if (name == null) {
@@ -220,7 +220,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 
 	@Override
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep) {
-		HDLClass classFor = HDLClass.getClassFor(clazz);
+		final HDLClass classFor = HDLClass.getClassFor(clazz);
 		if (classFor == null)
 			throw new IllegalArgumentException("Unkown class:" + clazz);
 		return getAllObjectsOf(classFor, clazz, deep);
@@ -231,20 +231,20 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	@SuppressWarnings("unchecked")
 	public <T> T[] getAllObjectsOf(HDLClass clazz, Class<? extends T> type, boolean deep) {
 		if (arrayClazzTypes == null) {
-			HDLClass[] clazzes = HDLClass.values();
+			final HDLClass[] clazzes = HDLClass.values();
 			arrayClazzTypes = new IHDLObject[clazzes.length][];
-			Iterator<IHDLObject> iterator = iterator();
-			EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<HDLClass, List<IHDLObject[]>>(HDLClass.class);
+			final Iterator<IHDLObject> iterator = iterator();
+			final EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<HDLClass, List<IHDLObject[]>>(HDLClass.class);
 			addClazzArray(this, map);
 			while (iterator.hasNext()) {
-				HDLObject c = (HDLObject) iterator.next();
+				final HDLObject c = (HDLObject) iterator.next();
 				addClazzArray(c, map);
 				c.getAllObjectsOf(clazz, type, deep);
 				for (int i = 0; i < c.arrayClazzTypes.length; i++) {
-					IHDLObject[] array = c.arrayClazzTypes[i];
+					final IHDLObject[] array = c.arrayClazzTypes[i];
 					if (array != null) {
-						HDLClass hdlClass = clazzes[i];
-						List<IHDLObject[]> list = map.get(hdlClass);
+						final HDLClass hdlClass = clazzes[i];
+						final List<IHDLObject[]> list = map.get(hdlClass);
 						if (list == null) {
 							map.put(hdlClass, new LinkedList<IHDLObject[]>(Collections.singleton(array)));
 						} else {
@@ -253,12 +253,12 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 					}
 				}
 			}
-			for (HDLClass hClass : clazzes) {
-				List<IHDLObject[]> set = map.get(hClass);
+			for (final HDLClass hClass : clazzes) {
+				final List<IHDLObject[]> set = map.get(hClass);
 				if (set != null) {
-					NonSameList<IHDLObject> list = new NonSameList<IHDLObject>();
-					for (IHDLObject[] ihdlObjects : set) {
-						for (IHDLObject ihdlObject : ihdlObjects) {
+					final NonSameList<IHDLObject> list = new NonSameList<IHDLObject>();
+					for (final IHDLObject[] ihdlObjects : set) {
+						for (final IHDLObject ihdlObject : ihdlObjects) {
 							list.add(ihdlObject);
 						}
 					}
@@ -266,12 +266,12 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 				}
 			}
 		}
-		IHDLObject[] list = arrayClazzTypes[clazz.ordinal()];
+		final IHDLObject[] list = arrayClazzTypes[clazz.ordinal()];
 		if (list == null)
 			return (T[]) Array.newInstance(clazz.clazz, 0);
 		if (deep == false) {
-			LinkedList<IHDLObject> res = new LinkedList<IHDLObject>();
-			for (IHDLObject ihdlObject : list)
+			final LinkedList<IHDLObject> res = new LinkedList<IHDLObject>();
+			for (final IHDLObject ihdlObject : list)
 				if (ihdlObject.getContainer() == this) {
 					res.add(ihdlObject);
 				}
@@ -283,8 +283,8 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	}
 
 	private void addClazzArray(IHDLObject hdlObject, EnumMap<HDLClass, List<IHDLObject[]>> map) {
-		EnumSet<HDLClass> set = hdlObject.getClassSet();
-		for (HDLClass hdlClass : set) {
+		final EnumSet<HDLClass> set = hdlObject.getClassSet();
+		for (final HDLClass hdlClass : set) {
 			List<IHDLObject[]> list = map.get(hdlClass);
 			if (list == null) {
 				list = new LinkedList<IHDLObject[]>();
@@ -319,10 +319,10 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	}
 
 	public HDLLibrary getLibrary() {
-		HDLUnit hdlUnit = getContainer(HDLUnit.class);
+		final HDLUnit hdlUnit = getContainer(HDLUnit.class);
 		if (hdlUnit != null)
 			return hdlUnit.getLibrary();
-		HDLPackage hdlPackage = getContainer(HDLPackage.class);
+		final HDLPackage hdlPackage = getContainer(HDLPackage.class);
 		if (hdlPackage != null)
 			return hdlPackage.getLibrary();
 		return null;
@@ -332,9 +332,9 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	public IHDLObject freeze(IHDLObject container) {
 		setContainer(container);
 		frozen = true;
-		Iterator<IHDLObject> iterator = iterator();
+		final Iterator<IHDLObject> iterator = iterator();
 		while (iterator.hasNext()) {
-			IHDLObject hdlObject = iterator.next();
+			final IHDLObject hdlObject = iterator.next();
 			hdlObject.freeze(this);
 		}
 		return this;

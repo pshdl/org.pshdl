@@ -92,7 +92,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLEnumRef copy() {
-		HDLEnumRef newObject = new HDLEnumRef(id, null, var, hEnum, false);
+		final HDLEnumRef newObject = new HDLEnumRef(id, null, var, hEnum, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -105,8 +105,8 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLEnumRef copyFiltered(CopyFilter filter) {
-		HDLQualifiedName filteredvar = filter.copyObject("var", this, var);
-		HDLQualifiedName filteredhEnum = filter.copyObject("hEnum", this, hEnum);
+		final HDLQualifiedName filteredvar = filter.copyObject("var", this, var);
+		final HDLQualifiedName filteredhEnum = filter.copyObject("hEnum", this, hEnum);
 		return filter.postFilter((HDLEnumRef) this, new HDLEnumRef(id, null, filteredvar, filteredhEnum, false));
 	}
 
@@ -118,7 +118,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLEnumRef copyDeepFrozen(IHDLObject container) {
-		HDLEnumRef copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLEnumRef copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -150,7 +150,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLEnumRef setVar(@Nonnull HDLQualifiedName var) {
 		var = validateVar(var);
-		HDLEnumRef res = new HDLEnumRef(id, container, var, hEnum, false);
+		final HDLEnumRef res = new HDLEnumRef(id, container, var, hEnum, false);
 		return res;
 	}
 
@@ -166,7 +166,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLEnumRef setHEnum(@Nonnull HDLQualifiedName hEnum) {
 		hEnum = validateHEnum(hEnum);
-		HDLEnumRef res = new HDLEnumRef(id, container, var, hEnum, false);
+		final HDLEnumRef res = new HDLEnumRef(id, container, var, hEnum, false);
 		return res;
 	}
 
@@ -180,7 +180,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLEnumRef other = (AbstractHDLEnumRef) obj;
+		final AbstractHDLEnumRef other = (AbstractHDLEnumRef) obj;
 		if (hEnum == null) {
 			if (other.hEnum != null)
 				return false;
@@ -204,8 +204,8 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLEnumRef()");
 		if (var != null) {
 			sb.append(".setVar(HDLQualifiedName.create(\"").append(var).append("\"))");

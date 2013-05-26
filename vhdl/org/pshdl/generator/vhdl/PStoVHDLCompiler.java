@@ -113,8 +113,8 @@ public class PStoVHDLCompiler implements IOutputProvider {
 
 	private HDLLibrary lib;
 	private String libURI;
-	private Map<String, HDLPackage> parsedContent = Maps.newLinkedHashMap();
-	private Multimap<String, Problem> issues = LinkedHashMultimap.create();
+	private final Map<String, HDLPackage> parsedContent = Maps.newLinkedHashMap();
+	private final Multimap<String, Problem> issues = LinkedHashMultimap.create();
 
 	private PStoVHDLCompiler(String libURI) {
 		lib = new HDLLibrary();
@@ -205,10 +205,10 @@ public class PStoVHDLCompiler implements IOutputProvider {
 		if (listener == null) {
 			listener = new NullListener();
 		}
-		List<CompileResult> res = Lists.newArrayListWithCapacity(parsedContent.size());
-		for (Entry<String, HDLPackage> e : parsedContent.entrySet()) {
-			String src = e.getKey();
-			Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
+		final List<CompileResult> res = Lists.newArrayListWithCapacity(parsedContent.size());
+		for (final Entry<String, HDLPackage> e : parsedContent.entrySet()) {
+			final String src = e.getKey();
+			final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
 			HDLPackage parse = e.getValue();
 			if (parse == null) {
 				res.add(new CompileResult(syntaxProblems, null, "<ERROR>", null, src));
@@ -216,9 +216,9 @@ public class PStoVHDLCompiler implements IOutputProvider {
 			}
 			if (listener.startVHDL(src, parse)) {
 				parse = Insulin.resolveFragments(parse);
-				Set<Problem> validate = HDLValidator.validate(parse, null);
+				final Set<Problem> validate = HDLValidator.validate(parse, null);
 				boolean hasValidationError = false;
-				for (Problem issue : validate) {
+				for (final Problem issue : validate) {
 					if (issue.severity == ProblemSeverity.ERROR) {
 						hasValidationError = true;
 					}
@@ -228,9 +228,9 @@ public class PStoVHDLCompiler implements IOutputProvider {
 					res.add(new CompileResult(syntaxProblems, null, "<ERROR>", null, src));
 					continue;
 				}
-				HDLPackage hdlPackage = Insulin.transform(parse, src);
-				String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(hdlPackage));
-				HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
+				final HDLPackage hdlPackage = Insulin.transform(parse, src);
+				final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(hdlPackage));
+				final HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
 				String name = "<emptyFile>";
 				if (units.length != 0) {
 					name = units[0].getName();
@@ -257,24 +257,24 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	public String invoke(String[] args) throws IOException {
 		if (args.length == 1)
 			return "Invalid arguments. Try help " + getHookName();
-		Stopwatch sw = new Stopwatch().start();
+		final Stopwatch sw = new Stopwatch().start();
 		HDLCore.defaultInit();
-		PStoVHDLCompiler compiler = setup("CMDLINE");
+		final PStoVHDLCompiler compiler = setup("CMDLINE");
 		System.out.println("Init: " + sw);
-		File outDir = new File(args[0]);
+		final File outDir = new File(args[0]);
 		if (!outDir.exists()) {
 			outDir.mkdirs();
 		}
 		boolean hasSyntaxErrors = false;
 		for (int i = 1; i < args.length; i++) {
-			File f = new File(args[i]);
+			final File f = new File(args[i]);
 			System.out.println("Adding file:" + f);
-			Set<Problem> problems = compiler.add(f);
+			final Set<Problem> problems = compiler.add(f);
 			if (!problems.isEmpty()) {
 				System.out.println("Found the following syntax problems in file " + f.getName() + ":");
 				hasSyntaxErrors = true;
 			}
-			for (Problem problem : problems) {
+			for (final Problem problem : problems) {
 				System.out.println("\t" + problem);
 			}
 		}
@@ -283,7 +283,7 @@ public class PStoVHDLCompiler implements IOutputProvider {
 			return "Found synax errors";
 		}
 		System.out.println("Compiling files");
-		List<CompileResult> results = compiler.compileToVHDL(new ICompilationListener() {
+		final List<CompileResult> results = compiler.compileToVHDL(new ICompilationListener() {
 
 			@Override
 			public boolean startVHDL(String src, HDLPackage parse) {
@@ -293,17 +293,17 @@ public class PStoVHDLCompiler implements IOutputProvider {
 
 			@Override
 			public boolean continueWith(String src, HDLPackage parse, Set<Problem> syntaxProblems) {
-				String newName = new File(src).getName();
+				final String newName = new File(src).getName();
 				if (!syntaxProblems.isEmpty()) {
 					System.out.println("Found the following problems in file " + newName + ":");
 				}
-				for (Problem p : syntaxProblems) {
+				for (final Problem p : syntaxProblems) {
 					System.out.println("\t" + p.toString());
 				}
 				return true;
 			}
 		});
-		for (CompileResult result : results) {
+		for (final CompileResult result : results) {
 			if (result.vhdlCode != null) {
 				writeFiles(outDir, result);
 			} else {
@@ -317,19 +317,19 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	public static File[] writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
 		if (result.hasError())
 			return new File[0];
-		List<File> res = new LinkedList<File>();
+		final List<File> res = new LinkedList<File>();
 		String newName = new File(result.src).getName();
 		newName = newName.substring(0, newName.length() - 5) + "vhd";
-		File target = new File(outDir, newName);
+		final File target = new File(outDir, newName);
 		res.add(target);
 		FileOutputStream fos = new FileOutputStream(target);
 		fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
 		fos.close();
 		if (result.sideFiles != null) {
-			for (SideFile sd : result.sideFiles) {
-				File file = new File(outDir + "/" + sd.relPath);
+			for (final SideFile sd : result.sideFiles) {
+				final File file = new File(outDir + "/" + sd.relPath);
 				res.add(file);
-				File parentFile = file.getParentFile();
+				final File parentFile = file.getParentFile();
 				if ((parentFile != null) && !parentFile.exists()) {
 					parentFile.mkdirs();
 				}
@@ -372,8 +372,8 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	 * @throws IOException
 	 */
 	public Set<Problem> add(InputStream contents, String src) throws IOException {
-		InputStreamReader r = new InputStreamReader(contents, Charsets.UTF_8);
-		String text = CharStreams.toString(r);
+		final InputStreamReader r = new InputStreamReader(contents, Charsets.UTF_8);
+		final String text = CharStreams.toString(r);
 		r.close();
 		return add(text, src);
 	}
@@ -390,9 +390,9 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	 *            syntax errors will be added to this Set when encountered
 	 */
 	public Set<Problem> add(String contents, String src) {
-		Set<Problem> problems = Sets.newHashSet();
+		final Set<Problem> problems = Sets.newHashSet();
 		issues.removeAll(src);
-		HDLPackage pkg = PSHDLParser.parseString(contents, libURI, problems, src);
+		final HDLPackage pkg = PSHDLParser.parseString(contents, libURI, problems, src);
 		parsedContent.put(src, pkg);
 		issues.putAll(src, problems);
 		return problems;
@@ -427,7 +427,7 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	 * @throws IOException
 	 */
 	public void addVHDL(File file) throws IOException {
-		FileInputStream fis = new FileInputStream(file);
+		final FileInputStream fis = new FileInputStream(file);
 		addVHDL(fis, file.getAbsolutePath());
 		fis.close();
 	}

@@ -44,12 +44,12 @@ import com.google.common.base.*;
 public class MemoryModelSideFiles {
 
 	public static List<SideFile> getSideFiles(HDLUnit unit, Unit memUnit, List<Row> rows, String version) {
-		List<SideFile> res = new LinkedList<SideFile>();
-		String unitName = fullNameOf(unit).toString('_').toLowerCase();
-		String ipcorename = unitName + BusGenSideFiles.WRAPPER_APPENDIX;
-		String dirName = ipcorename + "_" + version;
-		String rootDir = "drivers/";
-		BusAccess ba = new BusAccess();
+		final List<SideFile> res = new LinkedList<SideFile>();
+		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
+		final String ipcorename = unitName + BusGenSideFiles.WRAPPER_APPENDIX;
+		final String dirName = ipcorename + "_" + version;
+		final String rootDir = "drivers/";
+		final BusAccess ba = new BusAccess();
 		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows), true));
 		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes(Charsets.UTF_8), true));
 		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
@@ -60,7 +60,7 @@ public class MemoryModelSideFiles {
 	}
 
 	public static byte[] builtHTML(Unit unit, List<Row> rows) {
-		Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{TITLE}", "Register Overview");
 		options.put("{DATE}", new Date().toString());
 		Formatter ps = new Formatter();
@@ -72,13 +72,13 @@ public class MemoryModelSideFiles {
 		options.put("{HEADER}", ps.toString());
 		ps.close();
 		ps = new Formatter();
-		int mul = Unit.rowWidth / 8;
+		final int mul = Unit.rowWidth / 8;
 		int pos = 0;
 		Column current = null;
 		int colIndex = -1;
-		Map<String, Integer> defIndex = new HashMap<String, Integer>();
-		Map<String, Integer> rowIndex = new HashMap<String, Integer>();
-		for (Row row : rows) {
+		final Map<String, Integer> defIndex = new HashMap<String, Integer>();
+		final Map<String, Integer> rowIndex = new HashMap<String, Integer>();
+		for (final Row row : rows) {
 			if ((row.column != current) || (row.colIndex != colIndex))
 				if (row.column == null) {
 					current = null;
@@ -91,12 +91,12 @@ public class MemoryModelSideFiles {
 				}
 			ps.format("<tr>");
 			ps.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
-			for (NamedElement dec : row.definitions) {
-				Definition def = (Definition) dec;
-				Integer integer = getAndInc(defIndex, def.name);
-				int size = MemoryModel.getSize(def);
+			for (final NamedElement dec : row.definitions) {
+				final Definition def = (Definition) dec;
+				final Integer integer = getAndInc(defIndex, def.name);
+				final int size = MemoryModel.getSize(def);
 				if (def.type != Type.UNUSED) {
-					String toolTip = String.format(
+					final String toolTip = String.format(
 							"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
 							(def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
 					ps.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name, integer);
@@ -105,7 +105,7 @@ public class MemoryModelSideFiles {
 				}
 
 			}
-			Integer integer = getAndInc(rowIndex, row.name);
+			final Integer integer = getAndInc(rowIndex, row.name);
 			ps.format("<td class='rowInfo'>%s [%d]</td></tr>\n", row.name, integer);
 			pos++;
 		}
@@ -114,7 +114,7 @@ public class MemoryModelSideFiles {
 		ps.close();
 		try {
 			return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;

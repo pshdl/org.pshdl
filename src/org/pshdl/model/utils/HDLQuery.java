@@ -46,8 +46,8 @@ public class HDLQuery {
 	}
 
 	private static class EqualsMatcher<T> implements Predicate<T> {
-		private Object equalsTo;
-		private boolean invert;
+		private final Object equalsTo;
+		private final boolean invert;
 
 		public EqualsMatcher(Object equalsTo, boolean invert) {
 			this.equalsTo = equalsTo;
@@ -57,12 +57,12 @@ public class HDLQuery {
 		@Override
 		public boolean apply(T obj) {
 			if (equalsTo == null) {
-				boolean b = obj == null ? true : false;
+				final boolean b = obj == null ? true : false;
 				if (invert)
 					return !b;
 				return b;
 			}
-			boolean equals = equalsTo.equals(obj);
+			final boolean equals = equalsTo.equals(obj);
 			if (invert)
 				return !equals;
 			return equals;
@@ -71,7 +71,7 @@ public class HDLQuery {
 	}
 
 	private static class StartsWithMatcher<T> implements Predicate<T> {
-		private T equalsTo;
+		private final T equalsTo;
 
 		public StartsWithMatcher(T equalsTo) {
 			this.equalsTo = equalsTo;
@@ -88,7 +88,7 @@ public class HDLQuery {
 
 	private static class FullNameMatcher<K extends IHDLObject> implements Predicate<K> {
 
-		private HDLQualifiedName asRef;
+		private final HDLQualifiedName asRef;
 
 		public FullNameMatcher(HDLQualifiedName asRef) {
 			this.asRef = asRef;
@@ -102,7 +102,7 @@ public class HDLQuery {
 	}
 
 	private static class LastSegmentMatcher<T> implements Predicate<T> {
-		private HDLQualifiedName equalsTo;
+		private final HDLQualifiedName equalsTo;
 		private boolean matchLocally = false;
 
 		public LastSegmentMatcher(String equalsTo) {
@@ -127,10 +127,10 @@ public class HDLQuery {
 
 	@SuppressWarnings("rawtypes")
 	public static class Result<T, K> {
-		private HDLFieldAccess<T, K> field;
-		private IHDLObject from;
-		private Class<T> clazz;
-		private Predicate matcher;
+		private final HDLFieldAccess<T, K> field;
+		private final IHDLObject from;
+		private final Class<T> clazz;
+		private final Predicate matcher;
 
 		public Result(IHDLObject from, Class<T> clazz, HDLFieldAccess<T, K> field, Predicate matcher) {
 			this.from = from;
@@ -145,17 +145,17 @@ public class HDLQuery {
 
 		@SuppressWarnings("unchecked")
 		private Set<T> getAllMatchingObjects() {
-			T[] allObjectsOf = from.getAllObjectsOf(clazz, true);
-			Set<T> list = new NonSameList<T>();
+			final T[] allObjectsOf = from.getAllObjectsOf(clazz, true);
+			final Set<T> list = new NonSameList<T>();
 			if (field != null) {
-				for (T t : allObjectsOf) {
-					K value = field.getValue(t);
+				for (final T t : allObjectsOf) {
+					final K value = field.getValue(t);
 					if (matcher.apply(value)) {
 						list.add(t);
 					}
 				}
 			} else {
-				for (T t : allObjectsOf) {
+				for (final T t : allObjectsOf) {
 					if (matcher.apply(t)) {
 						list.add(t);
 					}
@@ -165,10 +165,10 @@ public class HDLQuery {
 		}
 
 		public T getFirst() {
-			Collection<T> res = getAllMatchingObjects();
+			final Collection<T> res = getAllMatchingObjects();
 			if (res.isEmpty())
 				return null;
-			Iterator<T> iterator = res.iterator();
+			final Iterator<T> iterator = res.iterator();
 			if (iterator.hasNext())
 				return iterator.next();
 			return null;
@@ -182,9 +182,9 @@ public class HDLQuery {
 	}
 
 	public static class FieldSelector<T, K> {
-		private HDLFieldAccess<T, K> field;
-		private IHDLObject from;
-		private Class<T> clazz;
+		private final HDLFieldAccess<T, K> field;
+		private final IHDLObject from;
+		private final Class<T> clazz;
 
 		public FieldSelector(Class<T> clazz, IHDLObject from, HDLFieldAccess<T, K> field) {
 			this.clazz = clazz;
@@ -224,8 +224,8 @@ public class HDLQuery {
 
 	public static class Selector<T extends IHDLObject> {
 
-		private IHDLObject from;
-		private Class<T> clazz;
+		private final IHDLObject from;
+		private final Class<T> clazz;
 
 		public Selector(Class<T> clazz, IHDLObject obj) {
 			this.clazz = clazz;
@@ -244,7 +244,7 @@ public class HDLQuery {
 	}
 
 	public static class Source<T extends IHDLObject> {
-		private Class<T> clazz;
+		private final Class<T> clazz;
 
 		public Source(Class<T> clazz) {
 			this.clazz = clazz;
@@ -284,11 +284,11 @@ public class HDLQuery {
 	}
 
 	public static Collection<HDLInterfaceRef> getInterfaceRefs(IHDLObject obj, HDLVariable hdlVariable) {
-		HDLQualifiedName asRef = hdlVariable.asRef();
-		Collection<HDLInterfaceRef> refs = HDLQuery.select(HDLInterfaceRef.class).from(obj).where(HDLInterfaceRef.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll();
-		for (Iterator<HDLInterfaceRef> iterator = refs.iterator(); iterator.hasNext();) {
-			HDLInterfaceRef hir = iterator.next();
-			HDLQualifiedName fullNameOf = FullNameExtension.fullNameOf(hir.resolveHIf().get());
+		final HDLQualifiedName asRef = hdlVariable.asRef();
+		final Collection<HDLInterfaceRef> refs = HDLQuery.select(HDLInterfaceRef.class).from(obj).where(HDLInterfaceRef.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll();
+		for (final Iterator<HDLInterfaceRef> iterator = refs.iterator(); iterator.hasNext();) {
+			final HDLInterfaceRef hir = iterator.next();
+			final HDLQualifiedName fullNameOf = FullNameExtension.fullNameOf(hir.resolveHIf().get());
 			if (!asRef.equals(fullNameOf)) {
 				iterator.remove();
 			}

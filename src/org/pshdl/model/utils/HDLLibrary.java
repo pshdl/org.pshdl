@@ -72,7 +72,7 @@ public class HDLLibrary {
 		libs.remove(libURI);
 	}
 
-	private HDLConfig config = new HDLConfig();
+	private final HDLConfig config = new HDLConfig();
 	public final Map<HDLQualifiedName, HDLFunction> functions = new ConcurrentHashMap<HDLQualifiedName, HDLFunction>();
 	public final Multimap<String, Record> objects = LinkedListMultimap.create();
 
@@ -96,7 +96,7 @@ public class HDLLibrary {
 	 */
 	public void addEnum(HDLEnum hEnum, String src) {
 		checkFrozen(hEnum);
-		HDLQualifiedName fqn = fullNameOf(hEnum);
+		final HDLQualifiedName fqn = fullNameOf(hEnum);
 		types.put(fqn, hEnum);
 		objects.put(src, new Record(src, Record.RecordType.type, fqn));
 	}
@@ -109,7 +109,7 @@ public class HDLLibrary {
 	 */
 	public void addFunction(HDLFunction func, String src) {
 		checkFrozen(func);
-		HDLQualifiedName fqn = fullNameOf(func);
+		final HDLQualifiedName fqn = fullNameOf(func);
 		functions.put(fqn, func);
 		objects.put(src, new Record(src, Record.RecordType.function, fqn));
 	}
@@ -122,7 +122,7 @@ public class HDLLibrary {
 	 */
 	public void addInterface(HDLInterface hIf, String src) {
 		checkFrozen(hIf);
-		HDLQualifiedName fqn = fullNameOf(hIf);
+		final HDLQualifiedName fqn = fullNameOf(hIf);
 		types.put(fqn, hIf);
 		objects.put(src, new Record(src, Record.RecordType.type, fqn));
 	}
@@ -137,43 +137,43 @@ public class HDLLibrary {
 	 */
 	public void addPkg(HDLPackage pkg, String src) {
 		checkFrozen(pkg);
-		for (HDLUnit unit : pkg.getUnits()) {
-			HDLQualifiedName uq = fullNameOf(unit);
+		for (final HDLUnit unit : pkg.getUnits()) {
+			final HDLQualifiedName uq = fullNameOf(unit);
 			objects.put(src, new Record(src, Record.RecordType.unit, uq));
 			units.put(uq, unit);
 			addInterface(unit.asInterface(), uq.toString());
-			HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
-			for (HDLInterface hdlInterface : list) {
+			final HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
+			for (final HDLInterface hdlInterface : list) {
 				addInterface(hdlInterface, src);
 			}
-			HDLEnum[] elist = unit.getAllObjectsOf(HDLEnum.class, true);
-			for (HDLEnum hdlEnum : elist) {
+			final HDLEnum[] elist = unit.getAllObjectsOf(HDLEnum.class, true);
+			for (final HDLEnum hdlEnum : elist) {
 				addEnum(hdlEnum, src);
 			}
-			HDLFunction[] functions = unit.getAllObjectsOf(HDLFunction.class, true);
-			for (HDLFunction hdlFunction : functions) {
+			final HDLFunction[] functions = unit.getAllObjectsOf(HDLFunction.class, true);
+			for (final HDLFunction hdlFunction : functions) {
 				addFunction(hdlFunction, src);
 			}
 		}
-		for (HDLDeclaration decl : pkg.getDeclarations()) {
+		for (final HDLDeclaration decl : pkg.getDeclarations()) {
 			switch (decl.getClassType()) {
 			case HDLEnumDeclaration:
-				HDLEnumDeclaration ed = (HDLEnumDeclaration) decl;
+				final HDLEnumDeclaration ed = (HDLEnumDeclaration) decl;
 				addEnum(ed.getHEnum(), src);
 				break;
 			case HDLInterfaceDeclaration:
-				HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) decl;
+				final HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) decl;
 				addInterface(hid.getHIf(), src);
 				break;
 			case HDLVariableDeclaration:
-				HDLVariableDeclaration hvd = (HDLVariableDeclaration) decl;
-				for (HDLVariable var : hvd.getVariables()) {
+				final HDLVariableDeclaration hvd = (HDLVariableDeclaration) decl;
+				for (final HDLVariable var : hvd.getVariables()) {
 					addVariable(var, src);
 				}
 				break;
 			default:
 				if (decl instanceof HDLFunction) {
-					HDLFunction func = (HDLFunction) decl;
+					final HDLFunction func = (HDLFunction) decl;
 					addFunction(func, src);
 				} else
 					throw new IllegalArgumentException("Did not handle:" + decl);
@@ -199,7 +199,7 @@ public class HDLLibrary {
 	 */
 	public void addVariable(HDLVariable var, String src) {
 		checkFrozen(var);
-		HDLQualifiedName fqn = fullNameOf(var);
+		final HDLQualifiedName fqn = fullNameOf(var);
 		variables.put(fqn, var);
 		objects.put(src, new Record(src, Record.RecordType.variable, fqn));
 	}
@@ -210,8 +210,8 @@ public class HDLLibrary {
 	}
 
 	private <T extends IHDLObject> Optional<T> checkGenericImport(HDLQualifiedName type, String string, Map<HDLQualifiedName, T> map) {
-		HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
-		T newType = map.get(newTypeName);
+		final HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
+		final T newType = map.get(newTypeName);
 		if (newType != null)
 			return Optional.of(Insulin.resolveFragments(newType));
 		return Optional.absent();
@@ -235,8 +235,8 @@ public class HDLLibrary {
 	 * @param src
 	 */
 	public void removeAllSrc(String src) {
-		Collection<Record> collection = objects.get(src);
-		for (Record record : collection) {
+		final Collection<Record> collection = objects.get(src);
+		for (final Record record : collection) {
 			switch (record.type) {
 			case function:
 				functions.remove(record.ref);
@@ -268,15 +268,15 @@ public class HDLLibrary {
 	 * @return the type if found
 	 */
 	public Optional<? extends HDLType> resolve(Iterable<String> imports, HDLQualifiedName type) {
-		HDLType hdlType = types.get(type);
+		final HDLType hdlType = types.get(type);
 		if (hdlType == null) {
-			for (String string : imports)
+			for (final String string : imports)
 				if (string.endsWith(type.toString()))
 					return Optional.fromNullable(types.get(new HDLQualifiedName(string)));
 			Optional<HDLType> genericImport = checkGenericImport(type, "pshdl.*", types);
 			if (genericImport.isPresent())
 				return genericImport;
-			for (String string : imports)
+			for (final String string : imports)
 				if (string.endsWith(".*")) {
 					genericImport = checkGenericImport(type, string, types);
 					if (genericImport.isPresent())
@@ -304,7 +304,7 @@ public class HDLLibrary {
 		if (hdlFunction == null) {
 			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
 			// type + " @" + this);
-			for (String string : imports)
+			for (final String string : imports)
 				if (string.endsWith(type.toString())) {
 					hdlFunction = functions.get(new HDLQualifiedName(string));
 					if (hdlFunction != null)
@@ -313,7 +313,7 @@ public class HDLLibrary {
 			Optional<HDLFunction> genericImport = checkGenericImport(type, "pshdl.*", functions);
 			if (genericImport.isPresent())
 				return genericImport;
-			for (String string : imports)
+			for (final String string : imports)
 				if (string.endsWith(".*")) {
 					genericImport = checkGenericImport(type, string, functions);
 					if (genericImport.isPresent())
@@ -339,7 +339,7 @@ public class HDLLibrary {
 	public Optional<HDLVariable> resolveVariable(Iterable<String> imports, HDLQualifiedName type) {
 		HDLVariable hdlVariable = variables.get(type);
 		if (hdlVariable == null) {
-			for (String string : imports)
+			for (final String string : imports)
 				if (string.endsWith(type.toString())) {
 					hdlVariable = variables.get(new HDLQualifiedName(string));
 					if (hdlVariable != null)
@@ -348,7 +348,7 @@ public class HDLLibrary {
 			Optional<HDLVariable> genericImport = checkGenericImport(type, "pshdl.*", variables);
 			if (genericImport.isPresent())
 				return genericImport;
-			for (String string : imports)
+			for (final String string : imports)
 				if (string.endsWith(".*")) {
 					genericImport = checkGenericImport(type, string, variables);
 					if (genericImport.isPresent())
@@ -361,9 +361,9 @@ public class HDLLibrary {
 	}
 
 	public void unregister() {
-		Iterator<Entry<String, HDLLibrary>> iter = libs.entrySet().iterator();
+		final Iterator<Entry<String, HDLLibrary>> iter = libs.entrySet().iterator();
 		while (iter.hasNext()) {
-			Entry<String, HDLLibrary> e = iter.next();
+			final Entry<String, HDLLibrary> e = iter.next();
 			if (e.getValue() == this) {
 				iter.remove();
 			}
@@ -402,7 +402,7 @@ public class HDLLibrary {
 	}
 
 	public String getSrc(HDLQualifiedName asRef) {
-		for (Record r : objects.values()) {
+		for (final Record r : objects.values()) {
 			if (r.ref.equals(asRef))
 				return r.src;
 		}

@@ -37,7 +37,7 @@ public class Reference implements NamedElement {
 	public Reference(String name, Integer... dimensions) {
 		super();
 		this.name = name;
-		for (Integer integer : dimensions) {
+		for (final Integer integer : dimensions) {
 			this.dimensions.add(integer);
 		}
 	}
@@ -54,8 +54,8 @@ public class Reference implements NamedElement {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (Integer arr : dimensions) {
+		final StringBuilder sb = new StringBuilder();
+		for (final Integer arr : dimensions) {
 			sb.append('[').append(arr).append(']');
 		}
 		return name + sb;

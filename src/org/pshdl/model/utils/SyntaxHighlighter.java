@@ -33,7 +33,7 @@ import org.pshdl.model.parser.*;
 
 public class SyntaxHighlighter {
 
-	private boolean includeComments;
+	private final boolean includeComments;
 
 	public SyntaxHighlighter() {
 		this(false);
@@ -47,12 +47,12 @@ public class SyntaxHighlighter {
 		HDLPackage, HDLUnit, HDLStatement, HDLExpression, HDLInterface;
 	}
 
-	private Stack<Context> context = new Stack<SyntaxHighlighter.Context>();
+	private final Stack<Context> context = new Stack<SyntaxHighlighter.Context>();
 
 	protected int spacing = 0;
 
 	public StringBuilder getSpacing() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (int i = spacing; i > 0; i--) {
 			sb.append('\t');
 		}
@@ -81,10 +81,10 @@ public class SyntaxHighlighter {
 
 	public String entering(IHDLObject obj) {
 		if (includeComments) {
-			SourceInfo meta = obj.getMeta(SourceInfo.INFO);
+			final SourceInfo meta = obj.getMeta(SourceInfo.INFO);
 			if ((meta != null) && !meta.comments.isEmpty()) {
-				StringBuilder sb = new StringBuilder();
-				for (String comment : meta.comments) {
+				final StringBuilder sb = new StringBuilder();
+				for (final String comment : meta.comments) {
 					sb.append(comment);
 				}
 				return sb.toString();

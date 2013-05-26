@@ -81,7 +81,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 
 		@Nullable
 		public static HDLArithOpType getOp(String op) {
-			for (HDLArithOpType ass : values()) {
+			for (final HDLArithOpType ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}

@@ -87,7 +87,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 		@Nullable
 		public static HDLPrimitiveType getOp(String op) {
-			for (HDLPrimitiveType ass : values()) {
+			for (final HDLPrimitiveType ass : values()) {
 				if (ass.str.equals(op))
 					return ass;
 			}
@@ -137,17 +137,17 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	public static HDLPrimitive target(boolean positive) {
 		if (positive) {
-			HDLPrimitive natural = getNatural();
+			final HDLPrimitive natural = getNatural();
 			natural.addMeta(TargetMeta.TARGET, true);
 			return natural;
 		}
-		HDLPrimitive integer = getInteger();
+		final HDLPrimitive integer = getInteger();
 		integer.addMeta(TargetMeta.TARGET, true);
 		return integer;
 	}
 
 	public static boolean isTargetMatching(HDLPrimitive prim) {
-		Boolean meta = prim.getMeta(TargetMeta.TARGET);
+		final Boolean meta = prim.getMeta(TargetMeta.TARGET);
 		return meta == null ? false : meta;
 	}
 
@@ -200,7 +200,7 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			return false;
 		if (!(obj instanceof AbstractHDLPrimitive))
 			return false;
-		AbstractHDLPrimitive other = (AbstractHDLPrimitive) obj;
+		final AbstractHDLPrimitive other = (AbstractHDLPrimitive) obj;
 		if (type == null) {
 			if (other.getType() != null)
 				return false;

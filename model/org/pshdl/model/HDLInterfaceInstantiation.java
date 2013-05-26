@@ -96,24 +96,25 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 
 	@Override
 	public Optional<HDLInterface> resolveHIf() {
-		Optional<HDLInterface> resolveHIf = super.resolveHIf();
+		final Optional<HDLInterface> resolveHIf = super.resolveHIf();
 		if (!resolveHIf.isPresent())
 			return Optional.absent();
-		ModificationSet ms = new ModificationSet();
-		HDLInterface getInterface = resolveHIf.get();
-		ArrayList<HDLVariableDeclaration> ports = getInterface.getPorts();
-		String prefix = getVar().getName();
-		for (HDLVariableDeclaration hvd : ports) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLInterface getInterface = resolveHIf.get();
+		final ArrayList<HDLVariableDeclaration> ports = getInterface.getPorts();
+		final String prefix = getVar().getName();
+		for (final HDLVariableDeclaration hvd : ports) {
 			switch (hvd.getDirection()) {
 			case PARAMETER: {
-				ArrayList<HDLVariable> variables = hvd.getVariables();
-				for (HDLVariable hdlVariable : variables) {
-					String newName = prefix + "_" + hdlVariable.getName();
-					HDLVariable newVar = hdlVariable.setName(newName);
+				final ArrayList<HDLVariable> variables = hvd.getVariables();
+				for (final HDLVariable hdlVariable : variables) {
+					final String newName = prefix + "_" + hdlVariable.getName();
+					final HDLVariable newVar = hdlVariable.setName(newName);
 					newVar.addMeta(ORIG_NAME, hdlVariable.getName());
 					ms.replace(hdlVariable, newVar);
-					Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef()).getAll();
-					for (HDLVariableRef ref : refs) {
+					final Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef())
+							.getAll();
+					for (final HDLVariableRef ref : refs) {
 						// Make local only so that it is resolved locally first
 						ms.replace(ref, ref.setVar(HDLQualifiedName.create(newName)));
 					}
@@ -121,19 +122,19 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 				break;
 			}
 			case CONSTANT: {
-				ArrayList<HDLVariable> variables = hvd.getVariables();
-				for (HDLVariable hdlVariable : variables) {
-					Optional<BigInteger> constant = ConstantEvaluate.valueOf(hdlVariable.getDefaultValue());
+				final ArrayList<HDLVariable> variables = hvd.getVariables();
+				for (final HDLVariable hdlVariable : variables) {
+					final Optional<BigInteger> constant = ConstantEvaluate.valueOf(hdlVariable.getDefaultValue());
 					if (!constant.isPresent()) {
 						if (hdlVariable.getDefaultValue() instanceof HDLArrayInit) {
-							HDLArrayInit hdlArrayInit = (HDLArrayInit) hdlVariable.getDefaultValue();
+							final HDLArrayInit hdlArrayInit = (HDLArrayInit) hdlVariable.getDefaultValue();
 							inlineConstants(ms, hdlArrayInit);
 						} else
 							throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", hdlVariable));
 					} else {
-						Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef())
+						final Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(getInterface).where(HDLResolvedRef.fVar).isEqualTo(hdlVariable.asRef())
 								.getAll();
-						for (HDLVariableRef ref : refs) {
+						for (final HDLVariableRef ref : refs) {
 							ms.replace(ref, HDLLiteral.get(constant.get()));
 						}
 					}
@@ -149,13 +150,13 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	}
 
 	private void inlineConstants(ModificationSet ms, HDLArrayInit hdlArrayInit) {
-		for (HDLExpression exp : hdlArrayInit.getExp()) {
-			Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(exp);
+		for (final HDLExpression exp : hdlArrayInit.getExp()) {
+			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(exp);
 			if (valueOf.isPresent()) {
 				ms.replace(exp, HDLLiteral.get(valueOf.get()));
 			} else {
 				if (exp instanceof HDLArrayInit) {
-					HDLArrayInit hai = (HDLArrayInit) exp;
+					final HDLArrayInit hai = (HDLArrayInit) exp;
 					inlineConstants(ms, hai);
 				} else
 					throw new IllegalArgumentException(String.format("The evaluation of a constant should always return a constant. The constant was:%s", exp));
@@ -164,8 +165,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	}
 
 	public HDLEvaluationContext getContext(HDLEvaluationContext defaultContext) {
-		Map<String, HDLExpression> map = defaultContext.getMap();
-		for (HDLArgument arg : getArguments()) {
+		final Map<String, HDLExpression> map = defaultContext.getMap();
+		for (final HDLArgument arg : getArguments()) {
 			map.put(arg.getName(), arg.getExpression());
 		}
 		return new HDLEvaluationContext(map);

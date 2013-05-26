@@ -27,7 +27,7 @@
 package org.pshdl.model.utils;
 
 public class HTMLHighlighter extends SyntaxHighlighter {
-	private boolean preContext;
+	private final boolean preContext;
 
 	public HTMLHighlighter(boolean preContext) {
 		this.preContext = preContext;
@@ -35,7 +35,7 @@ public class HTMLHighlighter extends SyntaxHighlighter {
 
 	@Override
 	public StringBuilder getSpacing() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (int i = spacing; i > 0; i--) {
 			sb.append("&#160;&#160;&#160;");
 		}

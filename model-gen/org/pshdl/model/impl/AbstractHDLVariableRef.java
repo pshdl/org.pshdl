@@ -59,7 +59,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		}
 		this.array = new ArrayList<HDLExpression>();
 		if (array != null) {
-			for (HDLExpression newValue : array) {
+			for (final HDLExpression newValue : array) {
 				this.array.add(newValue);
 			}
 		}
@@ -68,7 +68,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		}
 		this.bits = new ArrayList<HDLRange>();
 		if (bits != null) {
-			for (HDLRange newValue : bits) {
+			for (final HDLRange newValue : bits) {
 				this.bits.add(newValue);
 			}
 		}
@@ -124,7 +124,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLVariableRef copy() {
-		HDLVariableRef newObject = new HDLVariableRef(id, null, var, array, bits, false);
+		final HDLVariableRef newObject = new HDLVariableRef(id, null, var, array, bits, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -137,9 +137,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLVariableRef copyFiltered(CopyFilter filter) {
-		HDLQualifiedName filteredvar = filter.copyObject("var", this, var);
-		ArrayList<HDLExpression> filteredarray = filter.copyContainer("array", this, array);
-		ArrayList<HDLRange> filteredbits = filter.copyContainer("bits", this, bits);
+		final HDLQualifiedName filteredvar = filter.copyObject("var", this, var);
+		final ArrayList<HDLExpression> filteredarray = filter.copyContainer("array", this, array);
+		final ArrayList<HDLRange> filteredbits = filter.copyContainer("bits", this, bits);
 		return filter.postFilter((HDLVariableRef) this, new HDLVariableRef(id, null, filteredvar, filteredarray, filteredbits, false));
 	}
 
@@ -151,7 +151,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	@Override
 	@Nonnull
 	public HDLVariableRef copyDeepFrozen(IHDLObject container) {
-		HDLVariableRef copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLVariableRef copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -184,7 +184,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLVariableRef setVar(@Nonnull HDLQualifiedName var) {
 		var = validateVar(var);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -199,7 +199,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLVariableRef setArray(@Nullable Iterable<HDLExpression> array) {
 		array = validateArray(array);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -216,9 +216,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	public HDLVariableRef addArray(@Nullable HDLExpression newArray) {
 		if (newArray == null)
 			throw new IllegalArgumentException("Element of array can not be null!");
-		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
+		final ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.add(newArray);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -235,9 +235,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	public HDLVariableRef removeArray(@Nullable HDLExpression newArray) {
 		if (newArray == null)
 			throw new IllegalArgumentException("Removed element of array can not be null!");
-		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
+		final ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(newArray);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -252,9 +252,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 */
 	@Nonnull
 	public HDLVariableRef removeArray(int idx) {
-		ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
+		final ArrayList<HDLExpression> array = (ArrayList<HDLExpression>) this.array.clone();
 		array.remove(idx);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -269,7 +269,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	@Nonnull
 	public HDLVariableRef setBits(@Nullable Iterable<HDLRange> bits) {
 		bits = validateBits(bits);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -285,9 +285,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	public HDLVariableRef addBits(@Nullable HDLRange newBits) {
 		if (newBits == null)
 			throw new IllegalArgumentException("Element of bits can not be null!");
-		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
+		final ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.add(newBits);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -304,9 +304,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	public HDLVariableRef removeBits(@Nullable HDLRange newBits) {
 		if (newBits == null)
 			throw new IllegalArgumentException("Removed element of bits can not be null!");
-		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
+		final ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(newBits);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -321,9 +321,9 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	 */
 	@Nonnull
 	public HDLVariableRef removeBits(int idx) {
-		ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
+		final ArrayList<HDLRange> bits = (ArrayList<HDLRange>) this.bits.clone();
 		bits.remove(idx);
-		HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
+		final HDLVariableRef res = new HDLVariableRef(id, container, var, array, bits, false);
 		return res;
 	}
 
@@ -337,7 +337,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLVariableRef other = (AbstractHDLVariableRef) obj;
+		final AbstractHDLVariableRef other = (AbstractHDLVariableRef) obj;
 		if (array == null) {
 			if (other.array != null)
 				return false;
@@ -367,8 +367,8 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLVariableRef()");
 		if (var != null) {
 			sb.append(".setVar(HDLQualifiedName.create(\"").append(var).append("\"))");
@@ -376,7 +376,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		if (array != null) {
 			if (array.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLExpression o : array) {
+				for (final HDLExpression o : array) {
 					sb.append(".addArray(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -385,7 +385,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		if (bits != null) {
 			if (bits.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLRange o : bits) {
+				for (final HDLRange o : bits) {
 					sb.append(".addBits(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -399,13 +399,13 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		super.validateAllFields(expectedParent, checkResolve);
 		validateArray(getArray());
 		if (getArray() != null) {
-			for (HDLExpression o : getArray()) {
+			for (final HDLExpression o : getArray()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
 		validateBits(getBits());
 		if (getBits() != null) {
-			for (HDLRange o : getBits()) {
+			for (final HDLRange o : getBits()) {
 				o.validateAllFields(this, checkResolve);
 			}
 		}
@@ -432,8 +432,8 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 					switch (pos++) {
 					case 0:
 						if ((array != null) && (array.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(array.size());
-							for (HDLExpression o : array) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(array.size());
+							for (final HDLExpression o : array) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
@@ -442,8 +442,8 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 						break;
 					case 1:
 						if ((bits != null) && (bits.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(bits.size());
-							for (HDLRange o : bits) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(bits.size());
+							for (final HDLRange o : bits) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}

@@ -84,7 +84,7 @@ public class Definition implements NamedElement {
 
 	public Definition(String name, boolean register, RWType rw, Type type, int width, int... dimensions) {
 		super();
-		for (int dim : dimensions) {
+		for (final int dim : dimensions) {
 			this.dimensions.add(dim);
 		}
 		this.name = name;
@@ -102,7 +102,7 @@ public class Definition implements NamedElement {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Definition other = (Definition) obj;
+		final Definition other = (Definition) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -141,19 +141,19 @@ public class Definition implements NamedElement {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (Integer arr : dimensions) {
+		final StringBuilder sb = new StringBuilder();
+		for (final Integer arr : dimensions) {
 			sb.append('[').append(arr).append(']');
 		}
-		String reg = register ? "register " : "";
-		String w = width != -1 ? "<" + width + ">" : "";
-		String lowerCase = type.name().toLowerCase();
-		String rwString = rw != null ? rw + " " : "";
+		final String reg = register ? "register " : "";
+		final String w = width != -1 ? "<" + width + ">" : "";
+		final String lowerCase = type.name().toLowerCase();
+		final String rwString = rw != null ? rw + " " : "";
 		return rwString + reg + lowerCase + w + " " + name + sb + " " + warn + ";";
 	}
 
 	public Definition withoutDim() {
-		Definition res = new Definition();
+		final Definition res = new Definition();
 		res.type = type;
 		res.width = width;
 		res.name = name;

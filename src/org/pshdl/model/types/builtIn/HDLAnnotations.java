@@ -39,9 +39,9 @@ public class HDLAnnotations {
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
 		annotations = new HashMap<String, IHDLAnnotation>();
-		for (IHDLAnnotation anno : sp.getAllAnnotations()) {
+		for (final IHDLAnnotation anno : sp.getAllAnnotations()) {
 			annotations.put(anno.name(), anno);
-			AnnotationInformation annoInfo = anno.getAnnotationInformation();
+			final AnnotationInformation annoInfo = anno.getAnnotationInformation();
 			if (annoInfo == null)
 				throw new IllegalArgumentException(anno.name() + " does not provide annotation info!");
 			info.registeredAnnotations.put(anno.name(), annoInfo);
@@ -49,10 +49,10 @@ public class HDLAnnotations {
 	}
 
 	public static Problem[] validate(HDLAnnotation hdlAnnotation) {
-		IHDLAnnotation iAnno = annotations.get(hdlAnnotation.getName().substring(1));
+		final IHDLAnnotation iAnno = annotations.get(hdlAnnotation.getName().substring(1));
 		if (iAnno == null)
 			return new Problem[] { new Problem(ErrorCode.ANNOTATION_UNKNOWN, hdlAnnotation) };
-		String valid = iAnno.validate(hdlAnnotation.getValue());
+		final String valid = iAnno.validate(hdlAnnotation.getValue());
 		if (valid != null)
 			return new Problem[] { new Problem(ErrorCode.ANNOTATION_INVALID, hdlAnnotation, valid) };
 		return new Problem[0];

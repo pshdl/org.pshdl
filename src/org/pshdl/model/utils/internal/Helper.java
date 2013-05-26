@@ -34,11 +34,11 @@ import com.google.common.base.*;
 
 public class Helper {
 	public static byte[] processFile(Class<?> clazz, String string, Map<String, String> options) throws IOException {
-		InputStream stream = clazz.getResourceAsStream(string);
-		StringBuilder sb = new StringBuilder();
+		final InputStream stream = clazz.getResourceAsStream(string);
+		final StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		boolean first = true;
-		for (String key : options.keySet()) {
+		for (final String key : options.keySet()) {
 			if (!first) {
 				sb.append('|');
 			}
@@ -46,17 +46,17 @@ public class Helper {
 			first = false;
 		}
 		sb.append(")");
-		Pattern p = Pattern.compile(sb.toString());
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		final Pattern p = Pattern.compile(sb.toString());
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		String line = null;
-		StringBuilder res = new StringBuilder();
+		final StringBuilder res = new StringBuilder();
 		while ((line = reader.readLine()) != null) {
-			Matcher matcher = p.matcher(line);
+			final Matcher matcher = p.matcher(line);
 			int offset = 0;
 			while (matcher.find()) {
 				res.append(line.substring(offset, matcher.start()));
-				String group = matcher.group(1);
-				String replacement = options.get(group);
+				final String group = matcher.group(1);
+				final String replacement = options.get(group);
 				res.append(replacement);
 				offset = matcher.end();
 			}

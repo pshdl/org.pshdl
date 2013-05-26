@@ -117,7 +117,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final UnitContext unit() throws RecognitionException {
-		UnitContext _localctx = new UnitContext(_ctx, getState());
+		final UnitContext _localctx = new UnitContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_unit);
 		int _la;
 		try {
@@ -142,7 +142,7 @@ public class MemoryModelParser extends Parser {
 					memory();
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -198,7 +198,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final DeclarationContext declaration() throws RecognitionException {
-		DeclarationContext _localctx = new DeclarationContext(_ctx, getState());
+		final DeclarationContext _localctx = new DeclarationContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_declaration);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -230,7 +230,7 @@ public class MemoryModelParser extends Parser {
 					throw new NoViableAltException(this);
 				}
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -294,7 +294,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final RowContext row() throws RecognitionException {
-		RowContext _localctx = new RowContext(_ctx, getState());
+		final RowContext _localctx = new RowContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_row);
 		int _la;
 		try {
@@ -340,7 +340,7 @@ public class MemoryModelParser extends Parser {
 				setState(47);
 				match(20);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -396,7 +396,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final ColumnContext column() throws RecognitionException {
-		ColumnContext _localctx = new ColumnContext(_ctx, getState());
+		final ColumnContext _localctx = new ColumnContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_column);
 		int _la;
 		try {
@@ -425,7 +425,7 @@ public class MemoryModelParser extends Parser {
 				setState(58);
 				match(20);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -489,7 +489,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final AliasContext alias() throws RecognitionException {
-		AliasContext _localctx = new AliasContext(_ctx, getState());
+		final AliasContext _localctx = new AliasContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_alias);
 		int _la;
 		try {
@@ -535,7 +535,7 @@ public class MemoryModelParser extends Parser {
 				setState(70);
 				match(20);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -587,7 +587,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final MemoryContext memory() throws RecognitionException {
-		MemoryContext _localctx = new MemoryContext(_ctx, getState());
+		final MemoryContext _localctx = new MemoryContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_memory);
 		int _la;
 		try {
@@ -614,7 +614,7 @@ public class MemoryModelParser extends Parser {
 				setState(80);
 				match(20);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -688,7 +688,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final DefinitionContext definition() throws RecognitionException {
-		DefinitionContext _localctx = new DefinitionContext(_ctx, getState());
+		final DefinitionContext _localctx = new DefinitionContext(_ctx, getState());
 		enterRule(_localctx, 12, RULE_definition);
 		int _la;
 		try {
@@ -746,7 +746,7 @@ public class MemoryModelParser extends Parser {
 				setState(105);
 				match(15);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -793,7 +793,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final WarnTypeContext warnType() throws RecognitionException {
-		WarnTypeContext _localctx = new WarnTypeContext(_ctx, getState());
+		final WarnTypeContext _localctx = new WarnTypeContext(_ctx, getState());
 		enterRule(_localctx, 14, RULE_warnType);
 		int _la;
 		try {
@@ -814,7 +814,7 @@ public class MemoryModelParser extends Parser {
 				}
 				consume();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -858,7 +858,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final RwStatusContext rwStatus() throws RecognitionException {
-		RwStatusContext _localctx = new RwStatusContext(_ctx, getState());
+		final RwStatusContext _localctx = new RwStatusContext(_ctx, getState());
 		enterRule(_localctx, 16, RULE_rwStatus);
 		int _la;
 		try {
@@ -871,7 +871,7 @@ public class MemoryModelParser extends Parser {
 				}
 				consume();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -919,7 +919,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final WidthContext width() throws RecognitionException {
-		WidthContext _localctx = new WidthContext(_ctx, getState());
+		final WidthContext _localctx = new WidthContext(_ctx, getState());
 		enterRule(_localctx, 18, RULE_width);
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -927,7 +927,7 @@ public class MemoryModelParser extends Parser {
 				setState(114);
 				match(INT);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -971,7 +971,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final TypeContext type() throws RecognitionException {
-		TypeContext _localctx = new TypeContext(_ctx, getState());
+		final TypeContext _localctx = new TypeContext(_ctx, getState());
 		enterRule(_localctx, 20, RULE_type);
 		int _la;
 		try {
@@ -984,7 +984,7 @@ public class MemoryModelParser extends Parser {
 				}
 				consume();
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);
@@ -1040,7 +1040,7 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public final ReferenceContext reference() throws RecognitionException {
-		ReferenceContext _localctx = new ReferenceContext(_ctx, getState());
+		final ReferenceContext _localctx = new ReferenceContext(_ctx, getState());
 		enterRule(_localctx, 22, RULE_reference);
 		int _la;
 		try {
@@ -1069,7 +1069,7 @@ public class MemoryModelParser extends Parser {
 				setState(127);
 				match(15);
 			}
-		} catch (RecognitionException re) {
+		} catch (final RecognitionException re) {
 			_localctx.exception = re;
 			_errHandler.reportError(this, re);
 			_errHandler.recover(this, re);

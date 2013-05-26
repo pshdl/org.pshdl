@@ -92,7 +92,7 @@ public interface IHDLGenerator {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			SideFile other = (SideFile) obj;
+			final SideFile other = (SideFile) obj;
 			if (relPath == null) {
 				if (other.relPath != null)
 					return false;

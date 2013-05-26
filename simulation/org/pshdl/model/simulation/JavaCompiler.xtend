@@ -21,6 +21,7 @@ class JavaCompiler {
 	private Map<String,Integer> intIdx=new HashMap
 	private Map<String, Boolean> prevMap = new HashMap
 	private boolean debug
+	private boolean hasClock
 
 	new(ExecutableModel em, boolean includeDebug) {
 		this.em = em
@@ -37,6 +38,7 @@ class JavaCompiler {
 			if (f.edgePosDepRes != -1)
 				prevMap.put(f.edgePosDepRes.asInternal.info.name, true)
 		}
+		this.hasClock=!prevMap.empty
 	}
 
 	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener) {
@@ -55,64 +57,71 @@ class JavaCompiler {
 			«imports»
 			
 			public class «unitName» implements IHDLInterpreter{
-				private static class RegUpdate {
-					public final int internalID;
-					public final int offset;
-			
-					public RegUpdate(int internalID, int offset) {
-						super();
-						this.internalID = internalID;
-						this.offset = offset;
-					}
-			
-					@Override
-					public int hashCode() {
-						final int prime = 31;
-						int result = 1;
-						result = (prime * result) + internalID;
-						result = (prime * result) + offset;
-						return result;
-					}
-			
-					@Override
-					public boolean equals(Object obj) {
-						if (this == obj)
+				«IF hasClock»
+					private static class RegUpdate {
+						public final int internalID;
+						public final int offset;
+						
+						public RegUpdate(int internalID, int offset) {
+							super();
+							this.internalID = internalID;
+							this.offset = offset;
+						}
+						
+						@Override
+						public int hashCode() {
+							final int prime = 31;
+							int result = 1;
+							result = (prime * result) + internalID;
+							result = (prime * result) + offset;
+							return result;
+						}
+						
+						@Override
+						public boolean equals(Object obj) {
+							if (this == obj)
+								return true;
+							if (obj == null)
+								return false;
+							if (getClass() != obj.getClass())
+								return false;
+							RegUpdate other = (RegUpdate) obj;
+							if (internalID != other.internalID)
+								return false;
+							if (offset != other.offset)
+								return false;
 							return true;
-						if (obj == null)
-							return false;
-						if (getClass() != obj.getClass())
-							return false;
-						RegUpdate other = (RegUpdate) obj;
-						if (internalID != other.internalID)
-							return false;
-						if (offset != other.offset)
-							return false;
-						return true;
+						}
 					}
-				}
+					
+					private Set<RegUpdate> regUpdates=new HashSet<RegUpdate>();
+					private final boolean disableEdges;
+					private final boolean disabledRegOutputlogic;
+				«ENDIF»
 				«FOR v : em.variables.excludeNull»
 					«v.decl(prevMap.get(v.name))»
 				«ENDFOR»
-				private int deltaCycle=0, epsCycle=0;
-				private Set<RegUpdate> regUpdates=new HashSet<RegUpdate>();
+				private int epsCycle=0;
+				private int deltaCycle=0;
 				private Map<String, Integer> varIdx=new HashMap<String, Integer>();
 				«IF debug»
 				private final IDebugListener listener;
 				private final ExecutableModel em;
 				«ENDIF»
-				private final boolean disableEdges;
-				private final boolean disabledRegOutputlogic;
-				
+				«IF hasClock || debug»
 				/**
 				* Constructs an instance with no debugging and disabledEdge as well as disabledRegOutputlogic are false
 				*/
 				public «unitName»() {
-					this(false, false«IF debug», null, null«ENDIF»);
+					this(«IF hasClock»false, false«ENDIF»«IF hasClock && debug»,«ENDIF»«IF debug» null, null«ENDIF»);
 				}
+				«ENDIF»
 				
-				public «unitName»(boolean disableEdges, boolean disabledRegOutputlogic«IF debug», IDebugListener listener, ExecutableModel em«ENDIF») {
+				public «unitName»(«IF hasClock»boolean disableEdges, boolean disabledRegOutputlogic«ENDIF»«IF hasClock && debug»,«ENDIF»«IF debug» IDebugListener listener, ExecutableModel em«ENDIF») {
+					«IF hasClock»
 					this.disableEdges=disableEdges;
 					this.disabledRegOutputlogic=disabledRegOutputlogic;
+					«ENDIF»
 					«IF debug»
 					this.listener=listener;
 					this.em=em;
@@ -136,7 +145,7 @@ class JavaCompiler {
 				«FOR f : em.frames»
 					«f.method»
 				«ENDFOR»
-				
+				«IF hasClock»
 				public boolean skipEdge(long local) {
 					long dc = local >>> 16l;
 					// Register was updated in previous delta cylce, that is ok
@@ -149,16 +158,18 @@ class JavaCompiler {
 					// Don't update
 					return true;
 				}
-				
+				«ENDIF»
 				public void run(){
 					deltaCycle++;
+					«IF hasClock»
 					epsCycle=0;
 					do {
+						regUpdates.clear();
+					«ENDIF»
 						«IF debug»
 						if (listener!=null)
 							listener.startCycle(deltaCycle, epsCycle, this);
 						«ENDIF»
-						regUpdates.clear();
 						«FOR f : em.frames»
 							«IF f.edgeNegDepRes===-1 && f.edgePosDepRes===-1 && f.predNegDepRes.length===0 && f.predPosDepRes.length===0»
 								frame«f.uniqueID»();
@@ -175,6 +186,7 @@ class JavaCompiler {
 									frame«f.uniqueID»();
 							«ENDIF»
 						«ENDFOR»
+					«IF hasClock»
 						updateRegs();
 						«IF debug»
 						if (listener!=null && !regUpdates.isEmpty())
@@ -182,6 +194,7 @@ class JavaCompiler {
 						«ENDIF»
 						epsCycle++;
 					} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);
+					«ENDIF»
 					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name)!=null]»
 						«v.copyPrev»
 					«ENDFOR»
@@ -190,7 +203,9 @@ class JavaCompiler {
 						listener.doneCycle(deltaCycle, this);
 					«ENDIF»
 				}
+				«IF hasClock»
 				«copyRegs»
+				«ENDIF»
 				«hdlInterpreter»
 			}
 		'''
@@ -709,74 +724,10 @@ class JavaCompiler {
 				sb.append('''boolean t«pos»=t«b» > t«a»;''')
 			case Instruction::greater_eq:
 				sb.append('''boolean t«pos»=t«b» >= t«a»;''')
-//			case Instruction::negPredicate:
-//				sb.append(
-//					'''
-//					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
-//					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
-//					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
-//						if (listener!=null)
-//						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], false, null);
-//						return;
-//					}
-//					if (p«pos») {
-//						if (listener!=null)
-//							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], false, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
-//						return;
-//					}
-//					''')
-//			case Instruction::posPredicate:
-//				sb.append(
-//					'''
-//					«inst.arg1.asInternal.javaType» p«pos»=«inst.arg1.internal(f.uniqueID, false, arr)»;
-//					long up«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
-//					if ((up«pos»>>>16 != deltaCycle) || ((up«pos»&0xFFFF) != epsCycle)){
-//						if (listener!=null)
-//						 	listener.skippingPredicateNotFresh(«f.uniqueID», em.internals[«inst.arg1»], true, null);
-//						return;
-//					}
-//					if (!p«pos») {
-//						if (listener!=null)
-//							listener.skippingPredicateNotMet(«f.uniqueID», em.internals[«inst.arg1»], true, p«pos»?BigInteger.ONE:BigInteger.ZERO,null); 
-//						return;
-//					}
-//					''')
 			case Instruction::isRisingEdge:
-				sb.append(
-					'''
-«««					if (!disableEdges){
-«««						if ((«inst.arg1.internal(f.uniqueID, true, arr)»!=0) || («inst.arg1.internal(f.uniqueID, false, arr)»!=1)) {
-«««							if (listener!=null)
-«««							 	listener.skippingNotAnEdge(«f.uniqueID», em.internals[«inst.arg1»], true, null);
-«««							return;
-«««						}
-«««						long p«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
-«««						if (skipEdge(p«pos»)){
-«««							if (listener!=null)
-«««							 	listener.skippingHandledEdge(«f.uniqueID», em.internals[«inst.arg1»], true, null);
-«««							return;
-«««						}
-«««					}
-					«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);
-					''')
+				sb.append('''«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
 			case Instruction::isFallingEdge:
-				sb.append(
-					'''
-«««					if (!disableEdges){
-«««						if ((«inst.arg1.internal(f.uniqueID, true, arr)»!=1) || («inst.arg1.internal(f.uniqueID, false, arr)»!=0)) {
-«««							if (listener!=null)
-«««							 	listener.skippingNotAnEdge(«f.uniqueID», em.internals[«inst.arg1»], false, null);
-«««							return;
-«««						}
-«««						long p«pos»=«inst.arg1.asInternal.info.javaName(false)»_update;
-«««						if (skipEdge(p«pos»)){
-«««							if (listener!=null)
-«««							 	listener.skippingHandledEdge(«f.uniqueID», em.internals[«inst.arg1»], false, null);
-«««							return;
-«««						}
-«««					}
-					«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);
-					''')
+				sb.append('''«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
 		}
 		sb.append(
 			'''//«inst»
@@ -856,7 +807,9 @@ class JavaCompiler {
 	import java.util.*;
 	import java.math.*;
 	import org.pshdl.interpreter.*;
+	«IF debug»
 	import org.pshdl.interpreter.frames.*;
+	«ENDIF»
 	'''
 
 }

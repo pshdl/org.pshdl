@@ -219,7 +219,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRegisterConfig copy() {
-		HDLRegisterConfig newObject = new HDLRegisterConfig(id, null, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig newObject = new HDLRegisterConfig(id, null, clk, rst, clockType, resetType, syncType, resetValue, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -232,12 +232,12 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRegisterConfig copyFiltered(CopyFilter filter) {
-		HDLQualifiedName filteredclk = filter.copyObject("clk", this, clk);
-		HDLQualifiedName filteredrst = filter.copyObject("rst", this, rst);
-		HDLRegClockType filteredclockType = filter.copyObject("clockType", this, clockType);
-		HDLRegResetActiveType filteredresetType = filter.copyObject("resetType", this, resetType);
-		HDLRegSyncType filteredsyncType = filter.copyObject("syncType", this, syncType);
-		HDLExpression filteredresetValue = filter.copyObject("resetValue", this, resetValue);
+		final HDLQualifiedName filteredclk = filter.copyObject("clk", this, clk);
+		final HDLQualifiedName filteredrst = filter.copyObject("rst", this, rst);
+		final HDLRegClockType filteredclockType = filter.copyObject("clockType", this, clockType);
+		final HDLRegResetActiveType filteredresetType = filter.copyObject("resetType", this, resetType);
+		final HDLRegSyncType filteredsyncType = filter.copyObject("syncType", this, syncType);
+		final HDLExpression filteredresetValue = filter.copyObject("resetValue", this, resetValue);
 		return filter.postFilter((HDLRegisterConfig) this, new HDLRegisterConfig(id, null, filteredclk, filteredrst, filteredclockType, filteredresetType, filteredsyncType,
 				filteredresetValue, false));
 	}
@@ -250,7 +250,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRegisterConfig copyDeepFrozen(IHDLObject container) {
-		HDLRegisterConfig copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLRegisterConfig copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -282,7 +282,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setClk(@Nonnull HDLQualifiedName clk) {
 		clk = validateClk(clk);
-		HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
 	}
 
@@ -298,7 +298,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setRst(@Nonnull HDLQualifiedName rst) {
 		rst = validateRst(rst);
-		HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
 	}
 
@@ -314,7 +314,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setClockType(@Nullable HDLRegClockType clockType) {
 		clockType = validateClockType(clockType);
-		HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
 	}
 
@@ -330,7 +330,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setResetType(@Nullable HDLRegResetActiveType resetType) {
 		resetType = validateResetType(resetType);
-		HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
 	}
 
@@ -346,7 +346,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setSyncType(@Nullable HDLRegSyncType syncType) {
 		syncType = validateSyncType(syncType);
-		HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
 	}
 
@@ -362,7 +362,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setResetValue(@Nonnull HDLExpression resetValue) {
 		resetValue = validateResetValue(resetValue);
-		HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
 		return res;
 	}
 
@@ -376,7 +376,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
+		final AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
 		if (clk == null) {
 			if (other.clk != null)
 				return false;
@@ -430,8 +430,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLRegisterConfig()");
 		if (clk != null) {
 			sb.append(".setClk(HDLQualifiedName.create(\"").append(clk).append("\"))");

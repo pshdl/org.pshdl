@@ -43,16 +43,16 @@ public class BuiltInAdvisor {
 	public static HDLAdvise advise(Problem problem) {
 		switch ((ErrorCode) problem.code) {
 		case ANNOTATION_INVALID:
-			String annoName = ((HDLAnnotation) problem.node).getName();
+			final String annoName = ((HDLAnnotation) problem.node).getName();
 			return new HDLAdvise(
 					problem,
 					"The String you provided is incorrect for this annotation: " + problem.info,
 					"Some annotations can have additional information. Those are stated as a String in double quotes. The interpretation of this String is depending on the Annotation. The String you provided however was not correct.",
 					"Check the message for information what might be incorrect", "Check the documentation for the " + annoName + " Annotation");
 		case ANNOTATION_UNKNOWN: {
-			String lastName = ((HDLAnnotation) problem.node).getName();
-			Set<String> knownAnnotations = HDLCore.getCompilerInformation().registeredAnnotations.keySet();
-			String annoProposal = getMatchProposal(knownAnnotations, "Generators", lastName);
+			final String lastName = ((HDLAnnotation) problem.node).getName();
+			final Set<String> knownAnnotations = HDLCore.getCompilerInformation().registeredAnnotations.keySet();
+			final String annoProposal = getMatchProposal(knownAnnotations, "Generators", lastName);
 			return new HDLAdvise(problem, "The annotation: " + lastName + " is not known",
 					"The annotation you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", annoProposal,
 					"Check the installed libraries of the compiler");
@@ -61,14 +61,14 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The index of the array can only be negative",
 					"When an array is accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
 		case ARRAY_INDEX_OUT_OF_BOUNDS: {
-			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
-			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
+			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			return new HDLAdvise(problem, "The array index exceeds its capacity", "Valid access index for the array are: " + arrayRange + " while the index has a range of: "
 					+ accessRange + ". These don't overlap which means that the index will never be valid");
 		}
 		case ARRAY_INDEX_POSSIBLY_NEGATIVE: {
-			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
-			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
+			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			String[] solutions;
 			if (!arrayRange.isConnected(accessRange)) {
 				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
@@ -82,9 +82,9 @@ public class BuiltInAdvisor {
 					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
-			Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
-			Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
-			Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
+			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
+			final Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
 					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
 					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
@@ -122,47 +122,47 @@ public class BuiltInAdvisor {
 		case GENERATOR_INFO:
 			return new HDLAdvise(problem, "The generator contains an information", problem.info);
 		case GENERATOR_NOT_KNOWN: {
-			String genName = ((HDLDirectGeneration) problem.node).getGeneratorID();
-			Set<String> genIDs = HDLCore.getCompilerInformation().registeredGenerators.keySet();
-			String generatorProposal = getMatchProposal(genIDs, "Generators", genName);
+			final String genName = ((HDLDirectGeneration) problem.node).getGeneratorID();
+			final Set<String> genIDs = HDLCore.getCompilerInformation().registeredGenerators.keySet();
+			final String generatorProposal = getMatchProposal(genIDs, "Generators", genName);
 			return new HDLAdvise(problem, "The generator with the id: " + genName + " is not known",
 					"The generator you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", generatorProposal,
 					"Check the installed generators of the compiler");
 		}
 		case INTERFACE_IN_PORT_NEVER_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
+			final HDLVariable var = (HDLVariable) problem.context;
+			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName()
 							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
 					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
 		}
 		case INTERFACE_OUT_PORT_NEVER_READ: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
+			final HDLVariable var = (HDLVariable) problem.context;
+			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No read access to the out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName() + " is never read, altough it is marked as out port", "Do something with the port");
 		}
 		case INTERFACE_OUT_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
+			final HDLVariable var = (HDLVariable) problem.context;
+			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "The out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is written", "It appears that the port "
 					+ var.getName() + " is written to, altough it is marked as out port", "Remove the write access");
 		}
 		case INTERFACE_UNUSED_PORT: {
-			HDLVariable var = (HDLVariable) problem.context;
-			HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
+			final HDLVariable var = (HDLVariable) problem.context;
+			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "The port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is never read or written", "It appears that the port "
 					+ var.getName() + " is neither read, nor written to. You might want to check wether this is intentional", "Remove the port if it is not necessary",
 					"Do something useful with it");
 		}
 		case INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.node;
+			final HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The variable:" + var.getName() + " is read, but never written",
 					"Only reading an internal variable does not make much sense as it needs to be written as well", "Write to it", "Remove it");
 		}
 		case INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ: {
-			HDLVariable var = (HDLVariable) problem.node;
+			final HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The variable:" + var.getName() + " is written, but never read",
 					"Only writing an internal variable does not make much sense as it needs to be read as well", "Read from it", "Remove it");
 		}
@@ -170,7 +170,7 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "A variable of direction in can not be declared a register",
 					"It does not make much sense to declare a incoming variable as register as the data is directly coming from the outside", "Revmoed the register keyword");
 		case IN_PORT_NEVER_READ: {
-			HDLVariable var = (HDLVariable) problem.node;
+			final HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The variable:" + var.getName() + " is declared with direction in, but never read",
 					"A variable with direction in should be used otherwise it is rather useless", "Remove it");
 		}
@@ -180,7 +180,7 @@ public class BuiltInAdvisor {
 					"Merge all write access to one process");
 		}
 		case NO_SUCH_FUNCTION: {
-			HDLQualifiedName genName = ((HDLFunctionCall) problem.node).getNameRefName();
+			final HDLQualifiedName genName = ((HDLFunctionCall) problem.node).getNameRefName();
 			return new HDLAdvise(problem, "The function:" + genName + " can not be found", "The function could not be found, maybe you misspelled it.", "Double check the name",
 					"Check your imports");
 		}
@@ -193,12 +193,12 @@ public class BuiltInAdvisor {
 					"Declaring multiple variables as @reset does not make much sense as it is unclear which one should be used as subsitute for $rst",
 					"Remove one @reset annotation");
 		case OUT_PORT_NEVER_WRITTEN: {
-			HDLVariable var = (HDLVariable) problem.node;
+			final HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The variable:" + var.getName() + " is read, but never written",
 					"Only reading an internal variable does not make much sense as it needs to be written as well", "Write to it", "Remove it");
 		}
 		case PARAMETER_OR_CONSTANT_NEVER_READ: {
-			HDLVariable var = (HDLVariable) problem.node;
+			final HDLVariable var = (HDLVariable) problem.node;
 			return new HDLAdvise(problem, "The constant:" + var.getName() + " is never read", "Declaring constants and not reading them is not very useful.", "Use it", "Remove it");
 		}
 		case UNRESOLVED_ENUM: {
@@ -219,9 +219,9 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The variable:" + problem.node + " can not be resolved", "A variable with that name can not be found", "Check that the name is correct",
 					"If it is a global constant, check that it is either imported, or fully qualified");
 		case UNRESOLVED_FRAGMENT: {
-			HDLUnresolvedFragment uf = (HDLUnresolvedFragment) problem.node;
-			Set<String> funcIDs = HDLCore.getCompilerInformation().registeredFunctions.keySet();
-			String functionProposal = getMatchProposal(funcIDs, "Functions", uf.getFrag());
+			final HDLUnresolvedFragment uf = (HDLUnresolvedFragment) problem.node;
+			final Set<String> funcIDs = HDLCore.getCompilerInformation().registeredFunctions.keySet();
+			final String functionProposal = getMatchProposal(funcIDs, "Functions", uf.getFrag());
 			return new HDLAdvise(
 					problem,
 					"The fragment:" + problem.node + " can not be resolved",
@@ -339,17 +339,17 @@ public class BuiltInAdvisor {
 	}
 
 	private static String getMatchProposal(Set<String> funcIDs, String type, String name) {
-		Score[] topMatches = LevenshteinDistance.getTopMatches(name, true, funcIDs.toArray(new String[funcIDs.size()]));
-		StringBuilder matchSolution = new StringBuilder();
+		final Score[] topMatches = LevenshteinDistance.getTopMatches(name, true, funcIDs.toArray(new String[funcIDs.size()]));
+		final StringBuilder matchSolution = new StringBuilder();
 		matchSolution.append(type + " that you might have meant: ");
 		for (int i = 0; i < Math.min(3, topMatches.length); i++) {
-			Score score = topMatches[i];
+			final Score score = topMatches[i];
 			if (i != 0) {
 				matchSolution.append(", ");
 			}
 			matchSolution.append('@').append(score.string);
 		}
-		String functionProposal = matchSolution.toString();
+		final String functionProposal = matchSolution.toString();
 		return functionProposal;
 	}
 

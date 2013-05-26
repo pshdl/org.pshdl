@@ -92,7 +92,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	@Override
 	@Nonnull
 	public HDLEnumDeclaration copy() {
-		HDLEnumDeclaration newObject = new HDLEnumDeclaration(id, null, annotations, hEnum, false);
+		final HDLEnumDeclaration newObject = new HDLEnumDeclaration(id, null, annotations, hEnum, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -105,8 +105,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	@Override
 	@Nonnull
 	public HDLEnumDeclaration copyFiltered(CopyFilter filter) {
-		ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
-		HDLEnum filteredhEnum = filter.copyObject("hEnum", this, hEnum);
+		final ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
+		final HDLEnum filteredhEnum = filter.copyObject("hEnum", this, hEnum);
 		return filter.postFilter((HDLEnumDeclaration) this, new HDLEnumDeclaration(id, null, filteredannotations, filteredhEnum, false));
 	}
 
@@ -118,7 +118,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	@Override
 	@Nonnull
 	public HDLEnumDeclaration copyDeepFrozen(IHDLObject container) {
-		HDLEnumDeclaration copy = copyFiltered(CopyFilter.DEEP_META);
+		final HDLEnumDeclaration copy = copyFiltered(CopyFilter.DEEP_META);
 		copy.freeze(container);
 		return copy;
 	}
@@ -151,7 +151,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLEnumDeclaration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
 		annotations = validateAnnotations(annotations);
-		HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
+		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
 		return res;
 	}
 
@@ -169,9 +169,9 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	public HDLEnumDeclaration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Element of annotations can not be null!");
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.add(newAnnotations);
-		HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
+		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
 		return res;
 	}
 
@@ -189,9 +189,9 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	public HDLEnumDeclaration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
 		if (newAnnotations == null)
 			throw new IllegalArgumentException("Removed element of annotations can not be null!");
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(newAnnotations);
-		HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
+		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
 		return res;
 	}
 
@@ -206,9 +206,9 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	 */
 	@Nonnull
 	public HDLEnumDeclaration removeAnnotations(int idx) {
-		ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
 		annotations.remove(idx);
-		HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
+		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
 		return res;
 	}
 
@@ -224,7 +224,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 	@Nonnull
 	public HDLEnumDeclaration setHEnum(@Nonnull HDLEnum hEnum) {
 		hEnum = validateHEnum(hEnum);
-		HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
+		final HDLEnumDeclaration res = new HDLEnumDeclaration(id, container, annotations, hEnum, false);
 		return res;
 	}
 
@@ -238,7 +238,7 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 			return false;
 		if (!super.equals(obj))
 			return false;
-		AbstractHDLEnumDeclaration other = (AbstractHDLEnumDeclaration) obj;
+		final AbstractHDLEnumDeclaration other = (AbstractHDLEnumDeclaration) obj;
 		if (hEnum == null) {
 			if (other.hEnum != null)
 				return false;
@@ -262,13 +262,13 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 
 	@Override
 	public String toConstructionString(String spacing) {
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
+		final boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLEnumDeclaration()");
 		if (annotations != null) {
 			if (annotations.size() > 0) {
 				sb.append('\n').append(spacing);
-				for (HDLAnnotation o : annotations) {
+				for (final HDLAnnotation o : annotations) {
 					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
 					sb.append('\n').append(spacing).append(")");
 				}
@@ -310,8 +310,8 @@ public abstract class AbstractHDLEnumDeclaration extends HDLDeclaration {
 					switch (pos++) {
 					case 0:
 						if ((annotations != null) && (annotations.size() != 0)) {
-							List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
-							for (HDLAnnotation o : annotations) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
 								iters.add(Iterators.forArray(o));
 								iters.add(o.deepIterator());
 							}
