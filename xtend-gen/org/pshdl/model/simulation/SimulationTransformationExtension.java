@@ -1149,7 +1149,25 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SRA)) {
         _matched=true;
-        res.add(Instruction.sra);
+        HDLExpression _left_1 = obj.getLeft();
+        final Optional<? extends HDLType> type = TypeExtension.typeOf(_left_1);
+        HDLType _get = type.get();
+        final HDLPrimitive prim = ((HDLPrimitive) _get);
+        boolean _or = false;
+        HDLPrimitiveType _type_1 = prim.getType();
+        boolean _tripleEquals = (_type_1 == HDLPrimitiveType.INTEGER);
+        if (_tripleEquals) {
+          _or = true;
+        } else {
+          HDLPrimitiveType _type_2 = prim.getType();
+          boolean _tripleEquals_1 = (_type_2 == HDLPrimitiveType.INT);
+          _or = (_tripleEquals || _tripleEquals_1);
+        }
+        if (_or) {
+          res.add(Instruction.sra);
+        } else {
+          res.add(Instruction.srl);
+        }
       }
     }
     if (!_matched) {

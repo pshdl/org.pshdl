@@ -43,7 +43,6 @@ import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
-import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.*;
 
 import com.google.common.base.*;
@@ -289,7 +288,6 @@ public class HDLPrimitives {
 		if (!typeOfRight.isPresent())
 			return createError("right");
 		HDLPrimitive rType = (HDLPrimitive) typeOfRight.get();
-		final HDLArithOpType type = op.getType();
 		if (HDLPrimitive.isTargetMatching(lType))
 			if (HDLPrimitive.isTargetMatching(rType)) {
 				lType = rType;
@@ -298,6 +296,7 @@ public class HDLPrimitives {
 			rType = lType;
 		}
 		final HDLInferenceTriple triple = arithResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
+		final HDLArithOpType type = op.getType();
 		if (triple == null) {
 			final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, lType, rType);
 			hdi.error = "The operation " + type + " is not defined for left-handside:" + lType + " and right-handside:" + rType;
@@ -316,6 +315,7 @@ public class HDLPrimitives {
 			final HDLExpression lTypeWidth = checkNotNull(newLType.getWidth(), "The type should have been Integer or natural if width equals null");
 			newLType = newLType.setWidth(new HDLArithOp().setLeft(lTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
 		}
+
 		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
 		final HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
 		info.result = new HDLPrimitive().setType(triple.result).setWidth(width);
@@ -369,14 +369,8 @@ public class HDLPrimitives {
 	}
 
 	private HDLExpression getWidth(IHDLObject exp, HDLArithOpType type, HDLTypeInferenceInfo info) {
-		HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
-		if (leftW != null) {
-			leftW = leftW.copyFiltered(CopyFilter.DEEP_META); // XXX Remove
-		}
-		HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
-		if (rightW != null) {
-			rightW = rightW.copyFiltered(CopyFilter.DEEP_META); // XXX Remove
-		}
+		final HDLExpression leftW = ((HDLPrimitive) info.args[0]).getWidth();
+		final HDLExpression rightW = ((HDLPrimitive) info.args[1]).getWidth();
 		switch (type) {
 		case POW:
 			// The result type of pow can only be natural
@@ -406,8 +400,6 @@ public class HDLPrimitives {
 			if ((leftW == null) && (rightW != null))
 				return rightW;
 			return PSHDLLib.MAX_UINT.getReplacementExpressionArgs(exp, leftW, rightW);
-			// return new HDLArithOp().setLeft(max).setType(PLUS).setRight(new
-			// HDLLiteral().setVal("1"));
 		case MUL:
 			if ((leftW == null) && (rightW == null))
 				return null;

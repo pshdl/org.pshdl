@@ -573,8 +573,14 @@ class SimulationTransformationExtension {
 		switch (obj.type) {
 			case SLL:
 				res.add(sll)
-			case SRA:
-				res.add(sra)
+			case SRA:{
+				val type=typeOf(obj.left)
+				val prim=type.get as HDLPrimitive
+				if (prim.type===INTEGER || prim.type===INT)
+					res.add(sra)
+				else
+					res.add(srl)
+			}
 			case SRL:
 				res.add(srl)
 		}
