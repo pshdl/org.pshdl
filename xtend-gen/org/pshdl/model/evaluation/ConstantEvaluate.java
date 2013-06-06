@@ -101,6 +101,10 @@ public class ConstantEvaluate {
    * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
    */
   public static Optional<BigInteger> valueOf(final HDLExpression exp, final HDLEvaluationContext context) {
+    boolean _equals = Objects.equal(exp, null);
+    if (_equals) {
+      return Optional.<BigInteger>absent();
+    }
     return ConstantEvaluate.INST.constantEvaluate(exp, context);
   }
   

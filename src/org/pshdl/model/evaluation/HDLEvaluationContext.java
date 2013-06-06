@@ -63,7 +63,10 @@ public class HDLEvaluationContext {
 	 *         be found
 	 */
 	public HDLExpression get(HDLVariable ref) {
-		return context.get(ref.getName());
+		final HDLExpression hdlExpression = context.get(ref.getName());
+		if (hdlExpression != null)
+			return hdlExpression;
+		return ref.getDefaultValue();
 	}
 
 	/**
@@ -93,6 +96,10 @@ public class HDLEvaluationContext {
 	 * @return a HDLEvaluationContext with all parameters set to their default
 	 */
 	public static HDLEvaluationContext createDefault(HDLUnit unit) {
+		return createDefaultFromObj(unit);
+	}
+
+	private static HDLEvaluationContext createDefaultFromObj(IHDLObject unit) {
 		final Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
 		final Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class)//
 				.from(unit).where(HDLVariableDeclaration.fDirection)//
@@ -105,6 +112,10 @@ public class HDLEvaluationContext {
 			}
 		}
 		return new HDLEvaluationContext(c);
+	}
+
+	public static HDLEvaluationContext createDefault(HDLInterface hdlInterface) {
+		return createDefaultFromObj(hdlInterface);
 	}
 
 	@Override

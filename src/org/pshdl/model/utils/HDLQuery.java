@@ -35,7 +35,7 @@ import org.pshdl.model.utils.internal.*;
 import com.google.common.base.*;
 
 public class HDLQuery {
-	public static abstract class HDLFieldAccess<T, K> {
+	public static abstract class HDLFieldAccess<T extends IHDLObject, K> {
 		public final String fieldName;
 
 		protected HDLFieldAccess(String fieldName) {
@@ -126,7 +126,7 @@ public class HDLQuery {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static class Result<T, K> {
+	public static class Result<T extends IHDLObject, K> {
 		private final HDLFieldAccess<T, K> field;
 		private final IHDLObject from;
 		private final Class<T> clazz;
@@ -181,7 +181,7 @@ public class HDLQuery {
 
 	}
 
-	public static class FieldSelector<T, K> {
+	public static class FieldSelector<T extends IHDLObject, K> {
 		private final HDLFieldAccess<T, K> field;
 		private final IHDLObject from;
 		private final Class<T> clazz;
@@ -218,6 +218,17 @@ public class HDLQuery {
 
 		public <I extends IHDLObject> Result<T, I> fullNameIs(HDLQualifiedName asRef) {
 			return new Result<T, I>(from, clazz, null, new FullNameMatcher<I>(asRef));
+		}
+
+		public Result<T, K> isType(final HDLClass clazz) {
+			final Predicate<K> matcher = new Predicate<K>() {
+
+				@Override
+				public boolean apply(K input) {
+					return ((IHDLObject) input).getClassSet().contains(clazz);
+				}
+			};
+			return matches(matcher);
 		}
 
 	}
@@ -277,6 +288,10 @@ public class HDLQuery {
 
 	public static <K> Predicate<K> matchesLocally(HDLQualifiedName value) {
 		return new LastSegmentMatcher<K>(value, true);
+	}
+
+	public static Collection<HDLEnumRef> getEnumRefs(IHDLObject from, HDLVariable hdlVariable) {
+		return HDLQuery.select(HDLEnumRef.class).from(from).whereObj().fullNameIs(hdlVariable.asRef()).getAll();
 	}
 
 	public static Collection<HDLVariableRef> getVarRefs(IHDLObject from, HDLVariable hdlVariable) {

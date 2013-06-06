@@ -102,6 +102,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkLiteralConcat(pkg, problems);
 			checkDuplicateType(pkg, problems);
 			// TODO Validate bitWidth mismatch
+			checkBitWidthMismatch(pkg, problems, hContext);
 			checkAssignments(pkg, problems, hContext);
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
@@ -128,7 +129,62 @@ public class BuiltInValidator implements IHDLValidator {
 		return true;
 	}
 
-	private void checkDuplicateType(HDLPackage pkg, Set<Problem> problems) {
+	private static void checkBitWidthMismatch(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		for (final HDLOpExpression ope : pkg.getAllObjectsOf(HDLOpExpression.class, true)) {
+			final HDLExpression left = ope.getLeft();
+			final Optional<? extends HDLType> leftType = TypeExtension.typeOf(left);
+			if (!leftType.isPresent()) {
+				continue;
+			}
+			final HDLExpression right = ope.getRight();
+			final Optional<? extends HDLType> rightType = TypeExtension.typeOf(right);
+			if (!rightType.isPresent()) {
+				continue;
+			}
+			final HDLType rType = rightType.get();
+			if (rType.getClassType() != HDLClass.HDLPrimitive) {
+				continue;
+			}
+			final HDLPrimitive rpType = (HDLPrimitive) rType;
+			if ((rpType.getType() == HDLPrimitiveType.STRING) || (rpType.getType() == HDLPrimitiveType.BOOL)) {
+				continue;
+			}
+			final HDLType lType = leftType.get();
+			if (lType.getClassType() != HDLClass.HDLPrimitive) {
+				continue;
+			}
+			final HDLPrimitive lpType = (HDLPrimitive) lType;
+			if ((lpType.getType() == HDLPrimitiveType.STRING) || (lpType.getType() == HDLPrimitiveType.BOOL)) {
+				continue;
+			}
+			final HDLEvaluationContext lcontext = getContext(hContext, left);
+			final Integer lw = HDLPrimitives.getWidth(lType, lcontext);
+			if (lw == null) {
+				continue;
+			}
+			final HDLEvaluationContext rcontext = getContext(hContext, right);
+			final Integer rw = HDLPrimitives.getWidth(lType, rcontext);
+			if (rw == null) {
+				continue;
+			}
+			final Optional<BigInteger> lValue = ConstantEvaluate.valueOf(left, lcontext);
+			if (lValue.isPresent()) {
+				final BigInteger val = lValue.get();
+				if (rw < val.bitLength()) {
+					problems.add(new Problem(CONSTANT_WIDTH_MISMATCH, left));
+				}
+			}
+			final Optional<BigInteger> rValue = ConstantEvaluate.valueOf(right, rcontext);
+			if (rValue.isPresent()) {
+				final BigInteger val = rValue.get();
+				if (lw < val.bitLength()) {
+					problems.add(new Problem(CONSTANT_WIDTH_MISMATCH, right));
+				}
+			}
+		}
+	}
+
+	private static void checkDuplicateType(HDLPackage pkg, Set<Problem> problems) {
 		checkType(problems, pkg.getAllObjectsOf(HDLUnit.class, true));
 		checkType(problems, pkg.getAllObjectsOf(HDLInterface.class, true));
 		checkType(problems, pkg.getAllObjectsOf(HDLEnum.class, true));
@@ -160,7 +216,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	public void checkType(Set<Problem> problems, HDLObject[] ifs) {
+	public static void checkType(Set<Problem> problems, HDLObject[] ifs) {
 		for (final HDLObject hif : ifs) {
 			final HDLQualifiedName fqn = fullNameOf(hif);
 			final HDLLibrary library = hif.getLibrary();
@@ -179,7 +235,7 @@ public class BuiltInValidator implements IHDLValidator {
 	 * not registers
 	 * 
 	 */
-	private void checkConstantPackageDeclarations(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkConstantPackageDeclarations(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
 		for (final HDLVariableDeclaration hvd : hvds) {
 			if (hvd.getRegister() != null) {
@@ -204,7 +260,7 @@ public class BuiltInValidator implements IHDLValidator {
 	/**
 	 * Check that registers are neither constants nor in ports
 	 */
-	private void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (final HDLVariableDeclaration hvd : hvds)
 			if (hvd.getRegister() != null) {
@@ -225,7 +281,7 @@ public class BuiltInValidator implements IHDLValidator {
 	 * Check that the from range is of the right correction. That is from>to for
 	 * variables and to>from for loops
 	 */
-	private void checkRangeDirections(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkRangeDirections(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
 		for (final HDLRange hdlRange : ranges) {
 			// If it is a single range, there is no direction :)
@@ -263,7 +319,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkBitAcces(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkBitAcces(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLVariableRef[] refs = pkg.getAllObjectsOf(HDLVariableRef.class, true);
 		for (final HDLVariableRef ref : refs) {
 			if (skipExp(ref)) {
@@ -293,7 +349,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkUnresolved(HDLPackage pkg, Set<Problem> problems) {
+	private static void checkUnresolved(HDLPackage pkg, Set<Problem> problems) {
 		final HDLUnresolvedFragment[] fragments = pkg.getAllObjectsOf(HDLUnresolvedFragment.class, true);
 		for (final HDLUnresolvedFragment fragment : fragments) {
 			final IHDLObject container = fragment.getContainer();
@@ -358,7 +414,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLAssignment[] asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
 		for (final HDLAssignment ass : asss) {
 			if (skipExp(ass)) {
@@ -376,7 +432,7 @@ public class BuiltInValidator implements IHDLValidator {
 			}
 	}
 
-	private void checkAss(IHDLObject obj, IHDLObject leftRef, HDLExpression rightExp, Set<Problem> problems, HDLEvaluationContext context) {
+	private static void checkAss(IHDLObject obj, IHDLObject leftRef, HDLExpression rightExp, Set<Problem> problems, HDLEvaluationContext context) {
 		final Optional<? extends HDLType> lType = TypeExtension.typeOf(leftRef);
 		final Optional<? extends HDLType> rType = TypeExtension.typeOf(rightExp);
 		if ((!lType.isPresent()) || (!rType.isPresent()))
@@ -433,7 +489,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkLiteralConcat(HDLPackage pkg, Set<Problem> problems) {
+	private static void checkLiteralConcat(HDLPackage pkg, Set<Problem> problems) {
 		final HDLConcat[] concats = pkg.getAllObjectsOf(HDLConcat.class, true);
 		for (final HDLConcat hdlConcat : concats) {
 			final ArrayList<HDLExpression> cats = hdlConcat.getCats();
@@ -462,7 +518,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkSwitchStatements(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkSwitchStatements(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLSwitchStatement[] switches = pkg.getAllObjectsOf(HDLSwitchStatement.class, true);
 		for (final HDLSwitchStatement switchStatement : switches) {
 			boolean defaultFound = false;
@@ -510,7 +566,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private void checkVariableNaming(HDLPackage pkg, Set<Problem> problems) {
+	private static void checkVariableNaming(HDLPackage pkg, Set<Problem> problems) {
 		final HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
 		final Map<String, HDLVariable> nameMap = new HashMap<String, HDLVariable>();
 		for (final HDLVariable hdlVariable : vars) {
@@ -899,6 +955,25 @@ public class BuiltInValidator implements IHDLValidator {
 		final HDLUnit container = var.getContainer(HDLUnit.class);
 		if (container == null)
 			return null;
+		if (var.getClassType() == HDLClass.HDLInterfaceRef) {
+			final HDLInterfaceRef hir = (HDLInterfaceRef) var;
+			final HDLInterfaceInstantiation hii = HDLQuery.select(HDLInterfaceInstantiation.class).from(container).where(HDLInstantiation.fVar)
+					.lastSegmentIs(hir.getHIfRefName().getLastSegment()).getFirst();
+			if (hii != null) {
+				final Optional<HDLInterface> resolveHIf = hii.resolveHIf();
+				if (resolveHIf.isPresent()) {
+					final HDLInterface hdlInterface = resolveHIf.get();
+					final HDLUnit unit = container.getLibrary().getUnit(hdlInterface.asRef());
+					HDLEvaluationContext defaultContext;
+					if (unit != null) {
+						defaultContext = HDLEvaluationContext.createDefault(unit);
+					} else {
+						defaultContext = HDLEvaluationContext.createDefault(hdlInterface);
+					}
+					return hii.getContext(defaultContext);
+				}
+			}
+		}
 		final HDLEvaluationContext hdlEvaluationContext = hContext.get(fullNameOf(container));
 		return hdlEvaluationContext;
 	}

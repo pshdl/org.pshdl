@@ -91,6 +91,8 @@ class ConstantEvaluate {
 	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
 	 */  
 	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
+		if (exp==null)
+			return Optional::absent
 		return INST.constantEvaluate(exp, context)
 	}
 

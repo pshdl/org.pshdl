@@ -36,24 +36,50 @@ import org.pshdl.model.extensions.*;
 import com.google.common.collect.*;
 
 public class Refactoring {
+	/**
+	 * Rename a variable
+	 * 
+	 * @param var
+	 *            the variable to rename
+	 * @param to
+	 *            a new name
+	 * @param obj
+	 *            the obj in which to search for the variable
+	 * @return the obj with the variable renamed
+	 */
 	public static <T extends IHDLObject> T renameVariable(HDLVariable var, String to, T obj) {
 		final ModificationSet ms = new ModificationSet();
 		renameVariable(var, var.asRef().skipLast(1).append(to), obj, ms);
 		return ms.apply(obj);
 	}
 
-	public static void renameVariable(HDLVariable hdlVariable, HDLQualifiedName newName, IHDLObject obj, ModificationSet ms) {
+	public static <T extends IHDLObject> void renameVariable(HDLVariable hdlVariable, HDLQualifiedName newName, T obj, ModificationSet ms) {
 		ms.replace(hdlVariable, hdlVariable.setName(newName.getLastSegment()));
-		if (hdlVariable.getContainer().getClassType() == HDLClass.HDLVariableDeclaration) {
+		final HDLClass classType = hdlVariable.getContainer().getClassType();
+		switch (classType) {
+		case HDLEnum:
+			final Collection<HDLEnumRef> enumRefs = HDLQuery.getEnumRefs(obj, hdlVariable);
+			for (final HDLEnumRef ref : enumRefs) {
+				ms.replace(ref, ref.setVar(newName));
+			}
+			break;
+		case HDLVariableDeclaration:
+		case HDLFunctionParameter:
+		case HDLForLoop:
 			final Collection<HDLVariableRef> varRefs = HDLQuery.getVarRefs(obj, hdlVariable);
 			for (final HDLVariableRef ref : varRefs) {
 				ms.replace(ref, ref.setVar(newName));
 			}
-		} else if (hdlVariable.getContainer().getClassType() == HDLClass.HDLInterfaceInstantiation) {
+			break;
+		case HDLDirectGeneration:
+		case HDLInterfaceInstantiation:
 			final Collection<HDLInterfaceRef> ifRefs = HDLQuery.getInterfaceRefs(obj, hdlVariable);
 			for (final HDLInterfaceRef hir : ifRefs) {
 				ms.replace(hir, hir.setHIf(newName));
 			}
+			break;
+		default:
+			throw new RuntimeException("Did not expect a container of type:" + classType);
 		}
 	}
 
