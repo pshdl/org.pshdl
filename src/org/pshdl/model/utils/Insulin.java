@@ -77,7 +77,6 @@ public class Insulin {
 		apply = generateInitializations(apply);
 		apply = fixDoubleNegate(apply);
 		apply = fortifyType(apply);
-		// apply = simplifyExpressions(apply);
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
@@ -600,7 +599,7 @@ public class Insulin {
 	 * @param unit
 	 * @return
 	 */
-	private static <T extends IHDLObject> T generateClkAndReset(T apply) {
+	public static <T extends IHDLObject> T generateClkAndReset(T apply) {
 		final ModificationSet ms = new ModificationSet();
 		final HDLUnit[] units = apply.getAllObjectsOf(HDLUnit.class, true);
 		for (final HDLUnit unit : units) {

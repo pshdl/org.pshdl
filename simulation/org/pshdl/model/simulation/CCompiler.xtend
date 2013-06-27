@@ -635,8 +635,12 @@ class CCompiler {
 	}
 
 	def javaName(String name, boolean prev) {
-		val res = name.replaceAll("\\.", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
+		var res = name.replaceAll("\\.", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
 			replaceAll('\\[', 'arr').replaceAll('\\]', '')
+		if (res.startsWith("$"))
+			res=res.substring(1)
+		if (res.startsWith("#"))
+			res=res.substring(1)
 		if (prev)
 			return res + '_prev'
 		return res

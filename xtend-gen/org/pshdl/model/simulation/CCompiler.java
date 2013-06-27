@@ -2142,7 +2142,17 @@ public class CCompiler {
     String _replaceAll_2 = _replaceAll_1.replaceAll("\\}", "");
     String _replaceAll_3 = _replaceAll_2.replaceAll(":", "to");
     String _replaceAll_4 = _replaceAll_3.replaceAll("\\[", "arr");
-    final String res = _replaceAll_4.replaceAll("\\]", "");
+    String res = _replaceAll_4.replaceAll("\\]", "");
+    boolean _startsWith = res.startsWith("$");
+    if (_startsWith) {
+      String _substring = res.substring(1);
+      res = _substring;
+    }
+    boolean _startsWith_1 = res.startsWith("#");
+    if (_startsWith_1) {
+      String _substring_1 = res.substring(1);
+      res = _substring_1;
+    }
     if (prev) {
       return (res + "_prev");
     }

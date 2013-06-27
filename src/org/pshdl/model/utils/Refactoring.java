@@ -93,6 +93,7 @@ public class Refactoring {
 		subUnit = addNewDimensions(subUnit, outerDims);
 		subUnit = changeDirection(subUnit);
 		subUnit = dereferenceRefs(subUnit);
+		subUnit = Insulin.generateClkAndReset(subUnit);
 
 		final ModificationSet res = new ModificationSet();
 		final Collection<HDLInterfaceRef> ifRefs = HDLQuery.getInterfaceRefs(container, hiVar);

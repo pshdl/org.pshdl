@@ -44,6 +44,8 @@ import com.google.common.collect.*;
 public class HDLSimulator {
 
 	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src) {
+		if ((unit.getSimulation() != null) && unit.getSimulation())
+			throw new IllegalArgumentException("Testbenches are not supported");
 		HDLUnit insulin = Insulin.transform(unit, src);
 		insulin = flattenAll(context, insulin);
 		insulin = convertArrayInits(context, insulin);
@@ -52,6 +54,7 @@ public class HDLSimulator {
 		insulin = literalBitRanges(context, insulin);
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
+		// TODO Rewrite highZ function
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 	}
