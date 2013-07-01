@@ -454,8 +454,11 @@ public class ParserToModelExtension {
     String _text = _psPrimitiveType.getText();
     String _upperCase = _text.toUpperCase();
     final HDLPrimitiveType pt = HDLPrimitiveType.valueOf(_upperCase);
+    IHDLObject _hDL = null;
     PsWidthContext _psWidth = context.psWidth();
-    IHDLObject _hDL = _psWidth==null?(IHDLObject)null:this.toHDL(_psWidth);
+    if (_psWidth!=null) {
+      _hDL=this.toHDL(_psWidth);
+    }
     final HDLExpression width = ((HDLExpression) _hDL);
     HDLPrimitive _hDLPrimitive = new HDLPrimitive();
     HDLPrimitiveType _resultingType = this.getResultingType(pt, width);
@@ -759,8 +762,11 @@ public class ParserToModelExtension {
     String _text = _psPrimitiveType.getText();
     String _upperCase = _text.toUpperCase();
     final HDLPrimitiveType pt = HDLPrimitiveType.valueOf(_upperCase);
+    IHDLObject _hDL = null;
     PsWidthContext _psWidth = context.psWidth();
-    IHDLObject _hDL = _psWidth==null?(IHDLObject)null:this.toHDL(_psWidth);
+    if (_psWidth!=null) {
+      _hDL=this.toHDL(_psWidth);
+    }
     final HDLExpression width = ((HDLExpression) _hDL);
     HDLPrimitive _hDLPrimitive = new HDLPrimitive();
     HDLPrimitiveType _resultingType = this.getResultingType(pt, width);

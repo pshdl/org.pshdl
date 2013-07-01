@@ -52,6 +52,14 @@ public class HDLValidator {
 
 	private static Map<Class<?>, IHDLValidator> validators;
 
+	/**
+	 * Initializes the {@link HDLValidator} with all validators using the
+	 * {@link IServiceProvider}. Also registers those validators withe the
+	 * {@link CompilerInformation}
+	 * 
+	 * @param info
+	 * @param sp
+	 */
 	public static void init(CompilerInformation info, IServiceProvider sp) {
 		validators = new HashMap<Class<?>, IHDLValidator>();
 		for (final IHDLValidator gen : sp.getAllValidators()) {
@@ -61,6 +69,16 @@ public class HDLValidator {
 		}
 	}
 
+	/**
+	 * Validates the given {@link HDLPackage} with the given
+	 * {@link HDLEvaluationContext}s.
+	 * 
+	 * @param pkg
+	 *            the package to validate
+	 * @param context
+	 *            the contexts to use. Can be <code>null</code>
+	 * @return a list of problems that were found during validation
+	 */
 	public static Set<Problem> validate(HDLPackage pkg, Map<HDLQualifiedName, HDLEvaluationContext> context) {
 		pkg = Insulin.resolveFragments(pkg);
 		final Set<Problem> res = new LinkedHashSet<Problem>();
@@ -73,6 +91,13 @@ public class HDLValidator {
 		return res;
 	}
 
+	/**
+	 * Check if an {@link HDLAdvise} is available for the given problem
+	 * 
+	 * @param problem
+	 *            the problem to check
+	 * @return <code>null</code> if no advise found, the advise otherwise
+	 */
 	public static HDLAdvise advise(Problem problem) {
 		final IHDLValidator validator = validators.get(problem.code.getClass());
 		if (validator == null)

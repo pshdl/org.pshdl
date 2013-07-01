@@ -519,7 +519,7 @@ public class FluidFrame {
 	}
 
 	public void createPredVar() {
-		vars.put(outputName, new VariableInformation(Direction.INTERNAL, outputName, 1, Type.BIT, false));
+		vars.put(outputName, new VariableInformation(Direction.INTERNAL, outputName, 1, Type.BIT, false, false, false));
 	}
 
 	public void addVar(VariableInformation information) {

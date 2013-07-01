@@ -88,6 +88,7 @@ import org.pshdl.model.HDLClass
 import java.util.List
 import java.util.Set
 import java.util.HashSet
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -136,7 +137,7 @@ class SimulationTransformationExtension {
 		val width = if(type.classType === HDLClass::HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
 		val isReg = obj.register != null
 		val FluidFrame res = new FluidFrame("#null", false)
-		res.addVar(new VariableInformation(Direction::INTERNAL, "#null", 1, Type::BIT, false))
+		res.addVar(new VariableInformation(Direction::INTERNAL, "#null", 1, Type::BIT, false, false, false))
 		var Direction dir
 		switch (obj.direction) {
 			case IN: dir = Direction::IN
@@ -145,6 +146,8 @@ class SimulationTransformationExtension {
 			default: dir = Direction::INTERNAL
 		}
 		for (HDLVariable hVar : obj.variables) {
+			var clock=hVar.getAnnotation(HDLBuiltInAnnotations::clock)!=null
+			var reset=hVar.getAnnotation(HDLBuiltInAnnotations::reset)!=null
 			val varName = fullNameOf(hVar).toString
 			val dims = new LinkedList<Integer>()
 			for (HDLExpression dim : hVar.dimensions)
@@ -158,7 +161,7 @@ class SimulationTransformationExtension {
 					case NATURAL: vType = Type::UINT
 				}
 			}
-			res.addVar(new VariableInformation(dir, varName, width, vType, isReg, dims))
+			res.addVar(new VariableInformation(dir, varName, width, vType, isReg, clock, reset, dims))
 		}
 		if (isReg) {
 			val config = obj.register.normalize
@@ -201,7 +204,7 @@ class SimulationTransformationExtension {
 		res.setName(name)
 		val type = typeOf(obj.caseExp).get
 		val width = if(type.classType === HDLClass::HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
-		res.addVar(new VariableInformation(Direction::INTERNAL, name, width, Type::BIT, false))
+		res.addVar(new VariableInformation(Direction::INTERNAL, name, width, Type::BIT, false, false, false))
 		for (HDLSwitchCaseStatement c : obj.cases) {
 			val cName = fullNameOf(c).toString
 			val defaultFrame = new FluidFrame(InternalInformation::PRED_PREFIX + cName, false)

@@ -42,6 +42,7 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
@@ -89,6 +90,7 @@ import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.FluidFrame;
 import org.pshdl.model.simulation.FluidFrame.ArgumentedInstruction;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.HDLPrimitives;
 import org.pshdl.model.utils.HDLQualifiedName;
 
@@ -180,7 +182,7 @@ public class SimulationTransformationExtension {
     final boolean isReg = (!Objects.equal(_register, null));
     FluidFrame _fluidFrame = new FluidFrame("#null", false);
     final FluidFrame res = _fluidFrame;
-    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false);
+    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false);
     res.addVar(_variableInformation);
     Direction dir = null;
     HDLDirection _direction = obj.getDirection();
@@ -210,6 +212,10 @@ public class SimulationTransformationExtension {
     ArrayList<HDLVariable> _variables = obj.getVariables();
     for (final HDLVariable hVar : _variables) {
       {
+        HDLAnnotation _annotation = hVar.getAnnotation(HDLBuiltInAnnotations.clock);
+        boolean clock = (!Objects.equal(_annotation, null));
+        HDLAnnotation _annotation_1 = hVar.getAnnotation(HDLBuiltInAnnotations.reset);
+        boolean reset = (!Objects.equal(_annotation_1, null));
         HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
         final String varName = _fullNameOf.toString();
         LinkedList<Integer> _linkedList = new LinkedList<Integer>();
@@ -253,7 +259,7 @@ public class SimulationTransformationExtension {
             }
           }
         }
-        VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, ((int[])Conversions.unwrapArray(dims, int.class)));
+        VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, clock, reset, ((int[])Conversions.unwrapArray(dims, int.class)));
         res.addVar(_variableInformation_1);
       }
     }
@@ -346,7 +352,7 @@ public class SimulationTransformationExtension {
       _xifexpression = Integer.valueOf(32);
     }
     final Integer width = _xifexpression;
-    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, name, (width).intValue(), Type.BIT, false);
+    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, name, (width).intValue(), Type.BIT, false, false, false);
     res.addVar(_variableInformation);
     ArrayList<HDLSwitchCaseStatement> _cases = obj.getCases();
     for (final HDLSwitchCaseStatement c : _cases) {
