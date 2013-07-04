@@ -35,7 +35,7 @@ import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.type.*;
 
 public class VHDLTypesLibrary {
-	public static final UseClause USE_CLAUSE = new UseClause("pshdl.Types.ALL");
+	public static final UseClause USE_CLAUSE = new UseClause("work.Types.ALL");
 	public static final PackageDeclaration PACKAGE;
 	public static final FunctionDeclaration TERNARY_INTEGER;
 	public static final FunctionDeclaration TERNARY_SL;

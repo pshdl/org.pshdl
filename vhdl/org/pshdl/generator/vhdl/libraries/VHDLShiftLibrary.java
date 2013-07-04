@@ -40,7 +40,7 @@ import de.upb.hni.vmagic.object.*;
 import de.upb.hni.vmagic.type.*;
 
 public class VHDLShiftLibrary {
-	public static final UseClause USE_CLAUSE = new UseClause("pshdl.ShiftOps.ALL");
+	public static final UseClause USE_CLAUSE = new UseClause("work.ShiftOps.ALL");
 	public static final PackageDeclaration PACKAGE;
 	static {
 		PACKAGE = new PackageDeclaration("pshdl.ShiftOps");

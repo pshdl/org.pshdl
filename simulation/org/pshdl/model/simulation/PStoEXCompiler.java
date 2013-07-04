@@ -156,4 +156,13 @@ public class PStoEXCompiler implements IOutputProvider {
 		return createExecutable(findUnit, src);
 	}
 
+	public HDLUnit takeFirstUnit() {
+		final HDLPackage pkg = pkgs.values().iterator().next();
+		for (final HDLUnit unit : pkg.getUnits()) {
+			if (!unit.getSimulation())
+				return unit;
+		}
+		return null;
+	}
+
 }

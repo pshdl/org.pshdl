@@ -87,6 +87,7 @@ import static org.pshdl.model.extensions.FullNameExtension.*
 import org.pshdl.model.HDLReference
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLResolvedRef
+import org.pshdl.generator.vhdl.libraries.VHDLTypesLibrary
 
 class VHDLPackageExtension {
 
@@ -188,12 +189,12 @@ class VHDLPackageExtension {
 		res.add(new LibraryClause("ieee"))
 		res.add(StdLogic1164::USE_CLAUSE)
 		res.add(NumericStd::USE_CLAUSE)
-		res.add(new LibraryClause("pshdl"))
+		//res.add(new LibraryClause("pshdl"))
 		res.add(VHDLCastsLibrary::USE_CLAUSE)
 		res.add(VHDLShiftLibrary::USE_CLAUSE)
-		res.add(new UseClause("pshdl.types.all"))
+		res.add(VHDLTypesLibrary::USE_CLAUSE)
 		val Set<String> usedLibs = new HashSet<String>
-		usedLibs.add("pshdl")
+//		usedLibs.add("pshdl")
 		usedLibs.add("ieee")
 		usedLibs.add("work")
 		for (HDLQualifiedName i : unit.imports) {

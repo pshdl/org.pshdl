@@ -714,7 +714,22 @@ public class Insulin {
 		foritfyArrays(apply, ms);
 		foritfyFunctions(apply, ms);
 		foritfyConcats(apply, ms);
+		fortifyTernaryOp(apply, ms);
 		return ms.apply(apply);
+	}
+
+	private static void fortifyTernaryOp(IHDLObject apply, ModificationSet ms) {
+		final HDLTernary[] ternaries = apply.getAllObjectsOf(HDLTernary.class, true);
+		for (final HDLTernary hdlTernary : ternaries) {
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(hdlTernary.getThenExpr());
+			if (typeOf.isPresent()) {
+				final HDLType type = typeOf.get();
+				if (type instanceof HDLPrimitive) {
+					final HDLPrimitive pt = (HDLPrimitive) type;
+					fortify(ms, hdlTernary.getElseExpr(), pt);
+				}
+			}
+		}
 	}
 
 	private static void foritfyConcats(IHDLObject apply, ModificationSet ms) {

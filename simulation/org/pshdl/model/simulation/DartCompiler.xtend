@@ -55,8 +55,11 @@ class DartCompiler {
 		'''
 			«imports»
 			void main(){
-			  «unitName» object=new «unitName»();
-			  handleReceive(object);
+			  «IF hasClock»
+			  	handleReceive((e,l) => new «unitName»(e,l));
+			  «ELSE»
+			  	handleReceive((e,l) => new «unitName»());
+			  «ENDIF»
 			}
 			«IF hasClock»
 				class RegUpdate {
@@ -100,9 +103,9 @@ class DartCompiler {
 				int _deltaCycle=0;
 				int get updateStamp=>(_deltaCycle << 16) | (_epsCycle & 0xFFFF);
 				Map<String, int> _varIdx={
-				«FOR v : em.variables SEPARATOR ','»
-					"«v.name.replaceAll("[\\$]","\\\\\\$")»": «varIdx.get(v.name)»
-				«ENDFOR»
+					«FOR v : em.variables SEPARATOR ','»
+						"«v.name.replaceAll("[\\$]","\\\\\\$")»": «varIdx.get(v.name)»
+					«ENDFOR»
 				};
 				
 				List<String> get names=>_varIdx.keys.toList();
@@ -363,7 +366,7 @@ class DartCompiler {
 	def asPort(VariableInformation v) {
 		var dims=""
 		if (v.dimensions.length!=0){
-			dims=''', dimensions: [«FOR i:v.dimensions SEPARATOR ','»i«ENDFOR»]'''
+			dims=''', dimensions: [«FOR i:v.dimensions SEPARATOR ','»«i»«ENDFOR»]'''
 		}
 		val clock=if (v.isClock)", clock:true" else ""
 		val reset=if (v.isReset)", reset:true" else ""
@@ -613,7 +616,7 @@ class DartCompiler {
 				val targetWidth = inst.arg1;
 				val currWidth = inst.arg2;
 				if (targetWidth >= currWidth) {
-					// Do nothing
+					sb.append('''int t«pos»=t«a»;''')
 				} else {
 					val mask = BigInteger.ONE.shiftLeft(targetWidth).subtract(BigInteger.ONE);
 					sb.append(
@@ -761,7 +764,7 @@ class DartCompiler {
 
 	def getImports() '''
 import 'dart:collection';
-import 'simulation_comm.dart';
+import '../simulation_comm.dart';
 	'''
 
 }

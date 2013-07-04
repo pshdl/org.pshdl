@@ -75,6 +75,7 @@ import org.pshdl.generator.vhdl.VHDLOutputValidator;
 import org.pshdl.generator.vhdl.VHDLStatementExtension;
 import org.pshdl.generator.vhdl.libraries.VHDLCastsLibrary;
 import org.pshdl.generator.vhdl.libraries.VHDLShiftLibrary;
+import org.pshdl.generator.vhdl.libraries.VHDLTypesLibrary;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLDeclaration;
@@ -328,15 +329,11 @@ public class VHDLPackageExtension {
     res.add(_libraryClause);
     res.add(StdLogic1164.USE_CLAUSE);
     res.add(NumericStd.USE_CLAUSE);
-    LibraryClause _libraryClause_1 = new LibraryClause("pshdl");
-    res.add(_libraryClause_1);
     res.add(VHDLCastsLibrary.USE_CLAUSE);
     res.add(VHDLShiftLibrary.USE_CLAUSE);
-    UseClause _useClause = new UseClause("pshdl.types.all");
-    res.add(_useClause);
+    res.add(VHDLTypesLibrary.USE_CLAUSE);
     HashSet<String> _hashSet = new HashSet<String>();
     final Set<String> usedLibs = _hashSet;
-    usedLibs.add("pshdl");
     usedLibs.add("ieee");
     usedLibs.add("work");
     for (final HDLQualifiedName i : unit.imports) {
@@ -345,14 +342,14 @@ public class VHDLPackageExtension {
         boolean _contains = usedLibs.contains(lib);
         boolean _not = (!_contains);
         if (_not) {
-          LibraryClause _libraryClause_2 = new LibraryClause(lib);
-          res.add(_libraryClause_2);
+          LibraryClause _libraryClause_1 = new LibraryClause(lib);
+          res.add(_libraryClause_1);
           usedLibs.add(lib);
         }
         HDLQualifiedName _append = i.append("all");
         String _string = _append.toString();
-        UseClause _useClause_1 = new UseClause(_string);
-        res.add(_useClause_1);
+        UseClause _useClause = new UseClause(_string);
+        res.add(_useClause);
       }
     }
   }

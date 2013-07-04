@@ -69,7 +69,7 @@ public class VHDLCastsLibrary {
 			new Constant("beginRange", Standard.NATURAL), new Constant("endRange", Standard.NATURAL));
 	public static final FunctionDeclaration ACCESS_BITS_SIGNED = new FunctionDeclaration("accessBits", StdLogic1164.STD_LOGIC_VECTOR, new Constant("s", NumericStd.SIGNED),
 			new Constant("beginRange", Standard.NATURAL), new Constant("endRange", Standard.NATURAL));
-	public static final UseClause USE_CLAUSE = new UseClause("pshdl.Casts.ALL");
+	public static final UseClause USE_CLAUSE = new UseClause("work.Casts.ALL");
 	public static final PackageDeclaration PACKAGE;
 	public static final FunctionDeclaration RESIZE_SLV = new FunctionDeclaration("resizeSLV", StdLogic1164.STD_LOGIC_VECTOR, new Constant("s", StdLogic1164.STD_LOGIC_VECTOR),
 			new Constant("newSize", Standard.NATURAL));

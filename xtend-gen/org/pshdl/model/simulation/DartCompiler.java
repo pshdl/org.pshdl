@@ -110,15 +110,21 @@ public class DartCompiler {
       _builder.newLineIfNotEmpty();
       _builder.append("void main(){");
       _builder.newLine();
-      _builder.append("  ");
-      _builder.append(unitName, "  ");
-      _builder.append(" object=new ");
-      _builder.append(unitName, "  ");
-      _builder.append("();");
-      _builder.newLineIfNotEmpty();
-      _builder.append("  ");
-      _builder.append("handleReceive(object);");
-      _builder.newLine();
+      {
+        if (this.hasClock) {
+          _builder.append("  ");
+          _builder.append("handleReceive((e,l) => new ");
+          _builder.append(unitName, "  ");
+          _builder.append("(e,l));");
+          _builder.newLineIfNotEmpty();
+        } else {
+          _builder.append("  ");
+          _builder.append("handleReceive((e,l) => new ");
+          _builder.append(unitName, "  ");
+          _builder.append("());");
+          _builder.newLineIfNotEmpty();
+        }
+      }
       _builder.append("}");
       _builder.newLine();
       {
@@ -244,15 +250,15 @@ public class DartCompiler {
           if (!_hasElements) {
             _hasElements = true;
           } else {
-            _builder.appendImmediate(",", "	");
+            _builder.appendImmediate(",", "		");
           }
-          _builder.append("\t");
+          _builder.append("\t\t");
           _builder.append("\"");
           String _replaceAll = v_1.name.replaceAll("[\\$]", "\\\\\\$");
-          _builder.append(_replaceAll, "	");
+          _builder.append(_replaceAll, "		");
           _builder.append("\": ");
           Integer _get_1 = this.varIdx.get(v_1.name);
-          _builder.append(_get_1, "	");
+          _builder.append(_get_1, "		");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -1213,7 +1219,7 @@ public class DartCompiler {
             } else {
               _builder.appendImmediate(",", "");
             }
-            _builder.append("i");
+            _builder.append(i, "");
           }
         }
         _builder.append("]");
@@ -2050,196 +2056,203 @@ public class DartCompiler {
           final int currWidth = inst.arg2;
           boolean _greaterEqualsThan = (targetWidth >= currWidth);
           if (_greaterEqualsThan) {
+            StringConcatenation _builder_8 = new StringConcatenation();
+            _builder_8.append("int t");
+            _builder_8.append(pos, "");
+            _builder_8.append("=t");
+            _builder_8.append(a, "");
+            _builder_8.append(";");
+            sb.append(_builder_8);
           } else {
             BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(targetWidth);
             final BigInteger mask_1 = _shiftLeft.subtract(BigInteger.ONE);
-            StringConcatenation _builder_8 = new StringConcatenation();
-            _builder_8.append("int u");
-            _builder_8.append(pos, "");
-            _builder_8.append(" = t");
-            _builder_8.append(a, "");
-            _builder_8.append(" & ");
-            _builder_8.append(mask_1, "");
-            _builder_8.append(";");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("if ((u");
-            _builder_8.append(pos, "");
-            _builder_8.append(" & ");
+            StringConcatenation _builder_9 = new StringConcatenation();
+            _builder_9.append("int u");
+            _builder_9.append(pos, "");
+            _builder_9.append(" = t");
+            _builder_9.append(a, "");
+            _builder_9.append(" & ");
+            _builder_9.append(mask_1, "");
+            _builder_9.append(";");
+            _builder_9.newLineIfNotEmpty();
+            _builder_9.append("if ((u");
+            _builder_9.append(pos, "");
+            _builder_9.append(" & ");
             int _minus_1 = (targetWidth - 1);
             BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(_minus_1);
             CharSequence _hexString = this.toHexString(_shiftLeft_1);
-            _builder_8.append(_hexString, "");
-            _builder_8.append(") != 0)) { // MSB is set");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("\t");
-            _builder_8.append("if (u");
-            _builder_8.append(pos, "	");
-            _builder_8.append(" > 0) {");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("\t\t");
-            _builder_8.append("u");
-            _builder_8.append(pos, "		");
-            _builder_8.append(" = -u");
-            _builder_8.append(pos, "		");
-            _builder_8.append(";");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("\t");
-            _builder_8.append("}");
-            _builder_8.newLine();
-            _builder_8.append("} else {");
-            _builder_8.newLine();
-            _builder_8.append("\t");
-            _builder_8.append("if (u");
-            _builder_8.append(pos, "	");
-            _builder_8.append(" < 0) {");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("\t\t");
-            _builder_8.append("u");
-            _builder_8.append(pos, "		");
-            _builder_8.append(" = -u");
-            _builder_8.append(pos, "		");
-            _builder_8.append(";");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("\t");
-            _builder_8.append("}");
-            _builder_8.newLine();
-            _builder_8.append("}");
-            _builder_8.newLine();
-            _builder_8.append("t");
-            _builder_8.append(pos, "");
-            _builder_8.append(" = u");
-            _builder_8.append(pos, "");
-            _builder_8.append(";");
-            _builder_8.newLineIfNotEmpty();
-            sb.append(_builder_8);
+            _builder_9.append(_hexString, "");
+            _builder_9.append(") != 0)) { // MSB is set");
+            _builder_9.newLineIfNotEmpty();
+            _builder_9.append("\t");
+            _builder_9.append("if (u");
+            _builder_9.append(pos, "	");
+            _builder_9.append(" > 0) {");
+            _builder_9.newLineIfNotEmpty();
+            _builder_9.append("\t\t");
+            _builder_9.append("u");
+            _builder_9.append(pos, "		");
+            _builder_9.append(" = -u");
+            _builder_9.append(pos, "		");
+            _builder_9.append(";");
+            _builder_9.newLineIfNotEmpty();
+            _builder_9.append("\t");
+            _builder_9.append("}");
+            _builder_9.newLine();
+            _builder_9.append("} else {");
+            _builder_9.newLine();
+            _builder_9.append("\t");
+            _builder_9.append("if (u");
+            _builder_9.append(pos, "	");
+            _builder_9.append(" < 0) {");
+            _builder_9.newLineIfNotEmpty();
+            _builder_9.append("\t\t");
+            _builder_9.append("u");
+            _builder_9.append(pos, "		");
+            _builder_9.append(" = -u");
+            _builder_9.append(pos, "		");
+            _builder_9.append(";");
+            _builder_9.newLineIfNotEmpty();
+            _builder_9.append("\t");
+            _builder_9.append("}");
+            _builder_9.newLine();
+            _builder_9.append("}");
+            _builder_9.newLine();
+            _builder_9.append("t");
+            _builder_9.append(pos, "");
+            _builder_9.append(" = u");
+            _builder_9.append(pos, "");
+            _builder_9.append(";");
+            _builder_9.newLineIfNotEmpty();
+            sb.append(_builder_9);
           }
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.cast_uint)) {
           _matched=true;
-          StringConcatenation _builder_9 = new StringConcatenation();
-          _builder_9.append("int t");
-          _builder_9.append(pos, "");
-          _builder_9.append("=t");
-          _builder_9.append(a, "");
-          _builder_9.append(" & ");
-          CharSequence _asMask = this.asMask(inst.arg1);
-          _builder_9.append(_asMask, "");
-          _builder_9.append(";");
-          sb.append(_builder_9);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.logiNeg)) {
-          _matched=true;
           StringConcatenation _builder_10 = new StringConcatenation();
-          _builder_10.append("bool t");
+          _builder_10.append("int t");
           _builder_10.append(pos, "");
-          _builder_10.append("=!t");
+          _builder_10.append("=t");
           _builder_10.append(a, "");
+          _builder_10.append(" & ");
+          CharSequence _asMask = this.asMask(inst.arg1);
+          _builder_10.append(_asMask, "");
           _builder_10.append(";");
           sb.append(_builder_10);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.logiAnd)) {
+        if (Objects.equal(_switchValue,Instruction.logiNeg)) {
           _matched=true;
           StringConcatenation _builder_11 = new StringConcatenation();
           _builder_11.append("bool t");
           _builder_11.append(pos, "");
-          _builder_11.append("=t");
+          _builder_11.append("=!t");
           _builder_11.append(a, "");
-          _builder_11.append(" && t");
-          _builder_11.append(b, "");
           _builder_11.append(";");
           sb.append(_builder_11);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.logiOr)) {
+        if (Objects.equal(_switchValue,Instruction.logiAnd)) {
           _matched=true;
           StringConcatenation _builder_12 = new StringConcatenation();
           _builder_12.append("bool t");
           _builder_12.append(pos, "");
           _builder_12.append("=t");
           _builder_12.append(a, "");
-          _builder_12.append(" || t");
+          _builder_12.append(" && t");
           _builder_12.append(b, "");
           _builder_12.append(";");
           sb.append(_builder_12);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.const0)) {
+        if (Objects.equal(_switchValue,Instruction.logiOr)) {
           _matched=true;
           StringConcatenation _builder_13 = new StringConcatenation();
-          _builder_13.append("int t");
+          _builder_13.append("bool t");
           _builder_13.append(pos, "");
-          _builder_13.append("=0;");
+          _builder_13.append("=t");
+          _builder_13.append(a, "");
+          _builder_13.append(" || t");
+          _builder_13.append(b, "");
+          _builder_13.append(";");
           sb.append(_builder_13);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.const0)) {
+          _matched=true;
+          StringConcatenation _builder_14 = new StringConcatenation();
+          _builder_14.append("int t");
+          _builder_14.append(pos, "");
+          _builder_14.append("=0;");
+          sb.append(_builder_14);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const1)) {
           _matched=true;
-          StringConcatenation _builder_14 = new StringConcatenation();
-          _builder_14.append("int t");
-          _builder_14.append(pos, "");
-          _builder_14.append("=1;");
-          sb.append(_builder_14);
+          StringConcatenation _builder_15 = new StringConcatenation();
+          _builder_15.append("int t");
+          _builder_15.append(pos, "");
+          _builder_15.append("=1;");
+          sb.append(_builder_15);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const2)) {
           _matched=true;
-          StringConcatenation _builder_15 = new StringConcatenation();
-          _builder_15.append("int t");
-          _builder_15.append(pos, "");
-          _builder_15.append("=2;");
-          sb.append(_builder_15);
+          StringConcatenation _builder_16 = new StringConcatenation();
+          _builder_16.append("int t");
+          _builder_16.append(pos, "");
+          _builder_16.append("=2;");
+          sb.append(_builder_16);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.constAll1)) {
           _matched=true;
-          StringConcatenation _builder_16 = new StringConcatenation();
-          _builder_16.append("int t");
-          _builder_16.append(pos, "");
-          _builder_16.append("=");
-          CharSequence _asMask_1 = this.asMask(inst.arg1);
-          _builder_16.append(_asMask_1, "");
-          _builder_16.append(";");
-          sb.append(_builder_16);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.concat)) {
-          _matched=true;
           StringConcatenation _builder_17 = new StringConcatenation();
           _builder_17.append("int t");
           _builder_17.append(pos, "");
-          _builder_17.append("=(t");
-          _builder_17.append(b, "");
-          _builder_17.append(" << ");
-          _builder_17.append(inst.arg2, "");
-          _builder_17.append(") | t");
-          _builder_17.append(a, "");
+          _builder_17.append("=");
+          CharSequence _asMask_1 = this.asMask(inst.arg1);
+          _builder_17.append(_asMask_1, "");
           _builder_17.append(";");
           sb.append(_builder_17);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.loadConstant)) {
+        if (Objects.equal(_switchValue,Instruction.concat)) {
           _matched=true;
           StringConcatenation _builder_18 = new StringConcatenation();
           _builder_18.append("int t");
           _builder_18.append(pos, "");
-          _builder_18.append("=");
-          CharSequence _constant = this.constant(inst.arg1, f);
-          _builder_18.append(_constant, "");
+          _builder_18.append("=(t");
+          _builder_18.append(b, "");
+          _builder_18.append(" << ");
+          _builder_18.append(inst.arg2, "");
+          _builder_18.append(") | t");
+          _builder_18.append(a, "");
           _builder_18.append(";");
           sb.append(_builder_18);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.loadConstant)) {
+          _matched=true;
+          StringConcatenation _builder_19 = new StringConcatenation();
+          _builder_19.append("int t");
+          _builder_19.append(pos, "");
+          _builder_19.append("=");
+          CharSequence _constant = this.constant(inst.arg1, f);
+          _builder_19.append(_constant, "");
+          _builder_19.append(";");
+          sb.append(_builder_19);
         }
       }
       if (!_matched) {
@@ -2254,254 +2267,254 @@ public class DartCompiler {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.and)) {
           _matched=true;
-          StringConcatenation _builder_19 = new StringConcatenation();
-          _builder_19.append("int t");
-          _builder_19.append(pos, "");
-          _builder_19.append("=t");
-          _builder_19.append(b, "");
-          _builder_19.append(" & t");
-          _builder_19.append(a, "");
-          _builder_19.append(";");
-          sb.append(_builder_19);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.or)) {
-          _matched=true;
           StringConcatenation _builder_20 = new StringConcatenation();
           _builder_20.append("int t");
           _builder_20.append(pos, "");
           _builder_20.append("=t");
           _builder_20.append(b, "");
-          _builder_20.append(" | t");
+          _builder_20.append(" & t");
           _builder_20.append(a, "");
           _builder_20.append(";");
           sb.append(_builder_20);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.xor)) {
+        if (Objects.equal(_switchValue,Instruction.or)) {
           _matched=true;
           StringConcatenation _builder_21 = new StringConcatenation();
           _builder_21.append("int t");
           _builder_21.append(pos, "");
           _builder_21.append("=t");
           _builder_21.append(b, "");
-          _builder_21.append(" ^ t");
+          _builder_21.append(" | t");
           _builder_21.append(a, "");
           _builder_21.append(";");
           sb.append(_builder_21);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.plus)) {
+        if (Objects.equal(_switchValue,Instruction.xor)) {
           _matched=true;
           StringConcatenation _builder_22 = new StringConcatenation();
           _builder_22.append("int t");
           _builder_22.append(pos, "");
           _builder_22.append("=t");
           _builder_22.append(b, "");
-          _builder_22.append(" + t");
+          _builder_22.append(" ^ t");
           _builder_22.append(a, "");
           _builder_22.append(";");
           sb.append(_builder_22);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.minus)) {
+        if (Objects.equal(_switchValue,Instruction.plus)) {
           _matched=true;
           StringConcatenation _builder_23 = new StringConcatenation();
           _builder_23.append("int t");
           _builder_23.append(pos, "");
           _builder_23.append("=t");
           _builder_23.append(b, "");
-          _builder_23.append(" - t");
+          _builder_23.append(" + t");
           _builder_23.append(a, "");
           _builder_23.append(";");
           sb.append(_builder_23);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.mul)) {
+        if (Objects.equal(_switchValue,Instruction.minus)) {
           _matched=true;
           StringConcatenation _builder_24 = new StringConcatenation();
           _builder_24.append("int t");
           _builder_24.append(pos, "");
           _builder_24.append("=t");
           _builder_24.append(b, "");
-          _builder_24.append(" * t");
+          _builder_24.append(" - t");
           _builder_24.append(a, "");
           _builder_24.append(";");
           sb.append(_builder_24);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.div)) {
+        if (Objects.equal(_switchValue,Instruction.mul)) {
           _matched=true;
           StringConcatenation _builder_25 = new StringConcatenation();
           _builder_25.append("int t");
           _builder_25.append(pos, "");
           _builder_25.append("=t");
           _builder_25.append(b, "");
-          _builder_25.append(" / t");
+          _builder_25.append(" * t");
           _builder_25.append(a, "");
           _builder_25.append(";");
           sb.append(_builder_25);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sll)) {
+        if (Objects.equal(_switchValue,Instruction.div)) {
           _matched=true;
           StringConcatenation _builder_26 = new StringConcatenation();
           _builder_26.append("int t");
           _builder_26.append(pos, "");
           _builder_26.append("=t");
           _builder_26.append(b, "");
-          _builder_26.append(" << t");
+          _builder_26.append(" / t");
           _builder_26.append(a, "");
           _builder_26.append(";");
           sb.append(_builder_26);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.srl)) {
+        if (Objects.equal(_switchValue,Instruction.sll)) {
           _matched=true;
           StringConcatenation _builder_27 = new StringConcatenation();
           _builder_27.append("int t");
           _builder_27.append(pos, "");
           _builder_27.append("=t");
           _builder_27.append(b, "");
-          _builder_27.append(" >>> t");
+          _builder_27.append(" << t");
           _builder_27.append(a, "");
           _builder_27.append(";");
           sb.append(_builder_27);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sra)) {
+        if (Objects.equal(_switchValue,Instruction.srl)) {
           _matched=true;
           StringConcatenation _builder_28 = new StringConcatenation();
           _builder_28.append("int t");
           _builder_28.append(pos, "");
           _builder_28.append("=t");
           _builder_28.append(b, "");
-          _builder_28.append(" >> t");
+          _builder_28.append(" >>> t");
           _builder_28.append(a, "");
           _builder_28.append(";");
           sb.append(_builder_28);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.eq)) {
+        if (Objects.equal(_switchValue,Instruction.sra)) {
           _matched=true;
           StringConcatenation _builder_29 = new StringConcatenation();
-          _builder_29.append("bool t");
+          _builder_29.append("int t");
           _builder_29.append(pos, "");
           _builder_29.append("=t");
           _builder_29.append(b, "");
-          _builder_29.append(" == t");
+          _builder_29.append(" >> t");
           _builder_29.append(a, "");
           _builder_29.append(";");
           sb.append(_builder_29);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.not_eq)) {
+        if (Objects.equal(_switchValue,Instruction.eq)) {
           _matched=true;
           StringConcatenation _builder_30 = new StringConcatenation();
           _builder_30.append("bool t");
           _builder_30.append(pos, "");
           _builder_30.append("=t");
           _builder_30.append(b, "");
-          _builder_30.append(" != t");
+          _builder_30.append(" == t");
           _builder_30.append(a, "");
           _builder_30.append(";");
           sb.append(_builder_30);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less)) {
+        if (Objects.equal(_switchValue,Instruction.not_eq)) {
           _matched=true;
           StringConcatenation _builder_31 = new StringConcatenation();
           _builder_31.append("bool t");
           _builder_31.append(pos, "");
           _builder_31.append("=t");
           _builder_31.append(b, "");
-          _builder_31.append(" < t");
+          _builder_31.append(" != t");
           _builder_31.append(a, "");
           _builder_31.append(";");
           sb.append(_builder_31);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less_eq)) {
+        if (Objects.equal(_switchValue,Instruction.less)) {
           _matched=true;
           StringConcatenation _builder_32 = new StringConcatenation();
           _builder_32.append("bool t");
           _builder_32.append(pos, "");
           _builder_32.append("=t");
           _builder_32.append(b, "");
-          _builder_32.append(" <= t");
+          _builder_32.append(" < t");
           _builder_32.append(a, "");
           _builder_32.append(";");
           sb.append(_builder_32);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater)) {
+        if (Objects.equal(_switchValue,Instruction.less_eq)) {
           _matched=true;
           StringConcatenation _builder_33 = new StringConcatenation();
           _builder_33.append("bool t");
           _builder_33.append(pos, "");
           _builder_33.append("=t");
           _builder_33.append(b, "");
-          _builder_33.append(" > t");
+          _builder_33.append(" <= t");
           _builder_33.append(a, "");
           _builder_33.append(";");
           sb.append(_builder_33);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater_eq)) {
+        if (Objects.equal(_switchValue,Instruction.greater)) {
           _matched=true;
           StringConcatenation _builder_34 = new StringConcatenation();
           _builder_34.append("bool t");
           _builder_34.append(pos, "");
           _builder_34.append("=t");
           _builder_34.append(b, "");
-          _builder_34.append(" >= t");
+          _builder_34.append(" > t");
           _builder_34.append(a, "");
           _builder_34.append(";");
           sb.append(_builder_34);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
+        if (Objects.equal(_switchValue,Instruction.greater_eq)) {
           _matched=true;
           StringConcatenation _builder_35 = new StringConcatenation();
+          _builder_35.append("bool t");
+          _builder_35.append(pos, "");
+          _builder_35.append("=t");
+          _builder_35.append(b, "");
+          _builder_35.append(" >= t");
+          _builder_35.append(a, "");
+          _builder_35.append(";");
+          sb.append(_builder_35);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
+          _matched=true;
+          StringConcatenation _builder_36 = new StringConcatenation();
           InternalInformation _asInternal_3 = this.asInternal(inst.arg1);
           String _javaName_1 = this.javaName(_asInternal_3.info, false);
-          _builder_35.append(_javaName_1, "");
-          _builder_35.append("_update=updateStamp;");
-          sb.append(_builder_35);
+          _builder_36.append(_javaName_1, "");
+          _builder_36.append("_update=updateStamp;");
+          sb.append(_builder_36);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
-          StringConcatenation _builder_36 = new StringConcatenation();
+          StringConcatenation _builder_37 = new StringConcatenation();
           InternalInformation _asInternal_4 = this.asInternal(inst.arg1);
           String _javaName_2 = this.javaName(_asInternal_4.info, false);
-          _builder_36.append(_javaName_2, "");
-          _builder_36.append("_update=updateStamp;");
-          sb.append(_builder_36);
+          _builder_37.append(_javaName_2, "");
+          _builder_37.append("_update=updateStamp;");
+          sb.append(_builder_37);
         }
       }
-      StringConcatenation _builder_37 = new StringConcatenation();
-      _builder_37.append("//");
-      _builder_37.append(inst, "");
-      _builder_37.newLineIfNotEmpty();
-      StringBuilder _append = sb.append(_builder_37);
+      StringConcatenation _builder_38 = new StringConcatenation();
+      _builder_38.append("//");
+      _builder_38.append(inst, "");
+      _builder_38.newLineIfNotEmpty();
+      StringBuilder _append = sb.append(_builder_38);
       _xblockexpression = (_append);
     }
     return _xblockexpression;
@@ -2682,7 +2695,7 @@ public class DartCompiler {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("import \'dart:collection\';");
     _builder.newLine();
-    _builder.append("import \'simulation_comm.dart\';");
+    _builder.append("import \'../simulation_comm.dart\';");
     _builder.newLine();
     return _builder;
   }
