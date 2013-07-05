@@ -1,3 +1,29 @@
+/**
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ * 
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ */
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
@@ -1621,52 +1647,56 @@ public class CCompiler {
           _matched=true;
           boolean _notEquals = (inst.arg1 != 64);
           if (_notEquals) {
+            int currentSize = inst.arg2;
+            int targetSize = inst.arg1;
+            long _doubleLessThan_1 = (1l << targetSize);
+            long _minus_1 = (_doubleLessThan_1 - 1);
+            long orMask = (~_minus_1);
             StringConcatenation _builder_8 = new StringConcatenation();
-            _builder_8.append("uint64_t c");
+            _builder_8.append("//Target size ");
+            _builder_8.append(targetSize, "");
+            _builder_8.append(" currentSize ");
+            _builder_8.append(currentSize, "");
+            _builder_8.newLineIfNotEmpty();
+            _builder_8.append("int64_t c");
             _builder_8.append(pos, "");
             _builder_8.append("=t");
             _builder_8.append(a, "");
             _builder_8.append(" << ");
-            int _minus_1 = (64 - inst.arg1);
-            _builder_8.append(_minus_1, "");
-            _builder_8.append(";");
-            _builder_8.newLineIfNotEmpty();
-            _builder_8.append("uint64_t t");
-            _builder_8.append(pos, "");
-            _builder_8.append("=c");
-            _builder_8.append(pos, "");
-            _builder_8.append(" >> ");
-            int _minus_2 = (64 - inst.arg1);
+            int _minus_2 = (64 - currentSize);
             _builder_8.append(_minus_2, "");
             _builder_8.append(";");
             _builder_8.newLineIfNotEmpty();
             sb.append(_builder_8);
-          } else {
-            StringConcatenation _builder_9 = new StringConcatenation();
-            _builder_9.append("uint64_t t");
-            _builder_9.append(pos, "");
-            _builder_9.append("=t");
-            _builder_9.append(a, "");
-            _builder_9.append(";");
-            sb.append(_builder_9);
-          }
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.cast_uint)) {
-          _matched=true;
-          boolean _notEquals_1 = (inst.arg1 != 64);
-          if (_notEquals_1) {
-            StringConcatenation _builder_10 = new StringConcatenation();
-            _builder_10.append("uint64_t t");
-            _builder_10.append(pos, "");
-            _builder_10.append("=t");
-            _builder_10.append(a, "");
-            _builder_10.append(" & ");
-            CharSequence _asMask = this.asMask(inst.arg1);
-            _builder_10.append(_asMask, "");
-            _builder_10.append(";");
-            sb.append(_builder_10);
+            boolean _lessThan_1 = (targetSize < currentSize);
+            if (_lessThan_1) {
+              StringConcatenation _builder_9 = new StringConcatenation();
+              _builder_9.append("uint64_t t");
+              _builder_9.append(pos, "");
+              _builder_9.append("=(c");
+              _builder_9.append(pos, "");
+              _builder_9.append(" >> ");
+              int _minus_3 = (64 - currentSize);
+              _builder_9.append(_minus_3, "");
+              _builder_9.append(") | ");
+              CharSequence _hexString_1 = this.toHexString(orMask);
+              _builder_9.append(_hexString_1, "");
+              _builder_9.append(";");
+              _builder_9.newLineIfNotEmpty();
+              sb.append(_builder_9);
+            } else {
+              StringConcatenation _builder_10 = new StringConcatenation();
+              _builder_10.append("uint64_t t");
+              _builder_10.append(pos, "");
+              _builder_10.append("=c");
+              _builder_10.append(pos, "");
+              _builder_10.append(" >> ");
+              int _minus_4 = (64 - currentSize);
+              _builder_10.append(_minus_4, "");
+              _builder_10.append(";");
+              _builder_10.newLineIfNotEmpty();
+              sb.append(_builder_10);
+            }
           } else {
             StringConcatenation _builder_11 = new StringConcatenation();
             _builder_11.append("uint64_t t");
@@ -1679,115 +1709,141 @@ public class CCompiler {
         }
       }
       if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.cast_uint)) {
+          _matched=true;
+          boolean _notEquals_1 = (inst.arg1 != 64);
+          if (_notEquals_1) {
+            StringConcatenation _builder_12 = new StringConcatenation();
+            _builder_12.append("uint64_t t");
+            _builder_12.append(pos, "");
+            _builder_12.append("=t");
+            _builder_12.append(a, "");
+            _builder_12.append(" & ");
+            CharSequence _asMask = this.asMask(inst.arg1);
+            _builder_12.append(_asMask, "");
+            _builder_12.append(";");
+            sb.append(_builder_12);
+          } else {
+            StringConcatenation _builder_13 = new StringConcatenation();
+            _builder_13.append("uint64_t t");
+            _builder_13.append(pos, "");
+            _builder_13.append("=t");
+            _builder_13.append(a, "");
+            _builder_13.append(";");
+            sb.append(_builder_13);
+          }
+        }
+      }
+      if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.logiNeg)) {
-          _matched=true;
-          StringConcatenation _builder_12 = new StringConcatenation();
-          _builder_12.append("bool t");
-          _builder_12.append(pos, "");
-          _builder_12.append("=!t");
-          _builder_12.append(a, "");
-          _builder_12.append(";");
-          sb.append(_builder_12);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.logiAnd)) {
-          _matched=true;
-          StringConcatenation _builder_13 = new StringConcatenation();
-          _builder_13.append("bool t");
-          _builder_13.append(pos, "");
-          _builder_13.append("=t");
-          _builder_13.append(a, "");
-          _builder_13.append(" && t");
-          _builder_13.append(b, "");
-          _builder_13.append(";");
-          sb.append(_builder_13);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.logiOr)) {
           _matched=true;
           StringConcatenation _builder_14 = new StringConcatenation();
           _builder_14.append("bool t");
           _builder_14.append(pos, "");
-          _builder_14.append("=t");
+          _builder_14.append("=!t");
           _builder_14.append(a, "");
-          _builder_14.append(" || t");
-          _builder_14.append(b, "");
           _builder_14.append(";");
           sb.append(_builder_14);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.const0)) {
+        if (Objects.equal(_switchValue,Instruction.logiAnd)) {
           _matched=true;
           StringConcatenation _builder_15 = new StringConcatenation();
-          _builder_15.append("uint64_t t");
+          _builder_15.append("bool t");
           _builder_15.append(pos, "");
-          _builder_15.append("=0;");
+          _builder_15.append("=t");
+          _builder_15.append(a, "");
+          _builder_15.append(" && t");
+          _builder_15.append(b, "");
+          _builder_15.append(";");
           sb.append(_builder_15);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.logiOr)) {
+          _matched=true;
+          StringConcatenation _builder_16 = new StringConcatenation();
+          _builder_16.append("bool t");
+          _builder_16.append(pos, "");
+          _builder_16.append("=t");
+          _builder_16.append(a, "");
+          _builder_16.append(" || t");
+          _builder_16.append(b, "");
+          _builder_16.append(";");
+          sb.append(_builder_16);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.const0)) {
+          _matched=true;
+          StringConcatenation _builder_17 = new StringConcatenation();
+          _builder_17.append("uint64_t t");
+          _builder_17.append(pos, "");
+          _builder_17.append("=0;");
+          sb.append(_builder_17);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const1)) {
           _matched=true;
-          StringConcatenation _builder_16 = new StringConcatenation();
-          _builder_16.append("uint64_t t");
-          _builder_16.append(pos, "");
-          _builder_16.append("=1;");
-          sb.append(_builder_16);
+          StringConcatenation _builder_18 = new StringConcatenation();
+          _builder_18.append("uint64_t t");
+          _builder_18.append(pos, "");
+          _builder_18.append("=1;");
+          sb.append(_builder_18);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const2)) {
           _matched=true;
-          StringConcatenation _builder_17 = new StringConcatenation();
-          _builder_17.append("uint64_t t");
-          _builder_17.append(pos, "");
-          _builder_17.append("=2;");
-          sb.append(_builder_17);
+          StringConcatenation _builder_19 = new StringConcatenation();
+          _builder_19.append("uint64_t t");
+          _builder_19.append(pos, "");
+          _builder_19.append("=2;");
+          sb.append(_builder_19);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.constAll1)) {
           _matched=true;
-          StringConcatenation _builder_18 = new StringConcatenation();
-          _builder_18.append("uint64_t t");
-          _builder_18.append(pos, "");
-          _builder_18.append("=");
+          StringConcatenation _builder_20 = new StringConcatenation();
+          _builder_20.append("uint64_t t");
+          _builder_20.append(pos, "");
+          _builder_20.append("=");
           CharSequence _asMask_1 = this.asMask(inst.arg1);
-          _builder_18.append(_asMask_1, "");
-          _builder_18.append(";");
-          sb.append(_builder_18);
+          _builder_20.append(_asMask_1, "");
+          _builder_20.append(";");
+          sb.append(_builder_20);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.concat)) {
           _matched=true;
-          StringConcatenation _builder_19 = new StringConcatenation();
-          _builder_19.append("uint64_t t");
-          _builder_19.append(pos, "");
-          _builder_19.append("=(t");
-          _builder_19.append(b, "");
-          _builder_19.append(" << ");
-          _builder_19.append(inst.arg2, "");
-          _builder_19.append(") | t");
-          _builder_19.append(a, "");
-          _builder_19.append(";");
-          sb.append(_builder_19);
+          StringConcatenation _builder_21 = new StringConcatenation();
+          _builder_21.append("uint64_t t");
+          _builder_21.append(pos, "");
+          _builder_21.append("=(t");
+          _builder_21.append(b, "");
+          _builder_21.append(" << ");
+          _builder_21.append(inst.arg2, "");
+          _builder_21.append(") | t");
+          _builder_21.append(a, "");
+          _builder_21.append(";");
+          sb.append(_builder_21);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.loadConstant)) {
           _matched=true;
-          StringConcatenation _builder_20 = new StringConcatenation();
-          _builder_20.append("uint64_t t");
-          _builder_20.append(pos, "");
-          _builder_20.append("=");
+          StringConcatenation _builder_22 = new StringConcatenation();
+          _builder_22.append("uint64_t t");
+          _builder_22.append(pos, "");
+          _builder_22.append("=");
           CharSequence _constant = this.constant(inst.arg1, f);
-          _builder_20.append(_constant, "");
-          _builder_20.append(";");
-          sb.append(_builder_20);
+          _builder_22.append(_constant, "");
+          _builder_22.append(";");
+          sb.append(_builder_22);
         }
       }
       if (!_matched) {
@@ -1802,254 +1858,254 @@ public class CCompiler {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.and)) {
           _matched=true;
-          StringConcatenation _builder_21 = new StringConcatenation();
-          _builder_21.append("uint64_t t");
-          _builder_21.append(pos, "");
-          _builder_21.append("=t");
-          _builder_21.append(b, "");
-          _builder_21.append(" & t");
-          _builder_21.append(a, "");
-          _builder_21.append(";");
-          sb.append(_builder_21);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.or)) {
-          _matched=true;
-          StringConcatenation _builder_22 = new StringConcatenation();
-          _builder_22.append("uint64_t t");
-          _builder_22.append(pos, "");
-          _builder_22.append("=t");
-          _builder_22.append(b, "");
-          _builder_22.append(" | t");
-          _builder_22.append(a, "");
-          _builder_22.append(";");
-          sb.append(_builder_22);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.xor)) {
-          _matched=true;
           StringConcatenation _builder_23 = new StringConcatenation();
           _builder_23.append("uint64_t t");
           _builder_23.append(pos, "");
           _builder_23.append("=t");
           _builder_23.append(b, "");
-          _builder_23.append(" ^ t");
+          _builder_23.append(" & t");
           _builder_23.append(a, "");
           _builder_23.append(";");
           sb.append(_builder_23);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.plus)) {
+        if (Objects.equal(_switchValue,Instruction.or)) {
           _matched=true;
           StringConcatenation _builder_24 = new StringConcatenation();
           _builder_24.append("uint64_t t");
           _builder_24.append(pos, "");
           _builder_24.append("=t");
           _builder_24.append(b, "");
-          _builder_24.append(" + t");
+          _builder_24.append(" | t");
           _builder_24.append(a, "");
           _builder_24.append(";");
           sb.append(_builder_24);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.minus)) {
+        if (Objects.equal(_switchValue,Instruction.xor)) {
           _matched=true;
           StringConcatenation _builder_25 = new StringConcatenation();
           _builder_25.append("uint64_t t");
           _builder_25.append(pos, "");
           _builder_25.append("=t");
           _builder_25.append(b, "");
-          _builder_25.append(" - t");
+          _builder_25.append(" ^ t");
           _builder_25.append(a, "");
           _builder_25.append(";");
           sb.append(_builder_25);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.mul)) {
+        if (Objects.equal(_switchValue,Instruction.plus)) {
           _matched=true;
           StringConcatenation _builder_26 = new StringConcatenation();
           _builder_26.append("uint64_t t");
           _builder_26.append(pos, "");
           _builder_26.append("=t");
           _builder_26.append(b, "");
-          _builder_26.append(" * t");
+          _builder_26.append(" + t");
           _builder_26.append(a, "");
           _builder_26.append(";");
           sb.append(_builder_26);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.div)) {
+        if (Objects.equal(_switchValue,Instruction.minus)) {
           _matched=true;
           StringConcatenation _builder_27 = new StringConcatenation();
           _builder_27.append("uint64_t t");
           _builder_27.append(pos, "");
           _builder_27.append("=t");
           _builder_27.append(b, "");
-          _builder_27.append(" / t");
+          _builder_27.append(" - t");
           _builder_27.append(a, "");
           _builder_27.append(";");
           sb.append(_builder_27);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sll)) {
+        if (Objects.equal(_switchValue,Instruction.mul)) {
           _matched=true;
           StringConcatenation _builder_28 = new StringConcatenation();
           _builder_28.append("uint64_t t");
           _builder_28.append(pos, "");
           _builder_28.append("=t");
           _builder_28.append(b, "");
-          _builder_28.append(" << t");
+          _builder_28.append(" * t");
           _builder_28.append(a, "");
           _builder_28.append(";");
           sb.append(_builder_28);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.srl)) {
+        if (Objects.equal(_switchValue,Instruction.div)) {
           _matched=true;
           StringConcatenation _builder_29 = new StringConcatenation();
           _builder_29.append("uint64_t t");
           _builder_29.append(pos, "");
           _builder_29.append("=t");
           _builder_29.append(b, "");
-          _builder_29.append(" >> t");
+          _builder_29.append(" / t");
           _builder_29.append(a, "");
           _builder_29.append(";");
           sb.append(_builder_29);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sra)) {
+        if (Objects.equal(_switchValue,Instruction.sll)) {
           _matched=true;
           StringConcatenation _builder_30 = new StringConcatenation();
           _builder_30.append("uint64_t t");
           _builder_30.append(pos, "");
-          _builder_30.append("=((int64_t)t");
+          _builder_30.append("=t");
           _builder_30.append(b, "");
-          _builder_30.append(") >> t");
+          _builder_30.append(" << t");
           _builder_30.append(a, "");
           _builder_30.append(";");
           sb.append(_builder_30);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.eq)) {
+        if (Objects.equal(_switchValue,Instruction.srl)) {
           _matched=true;
           StringConcatenation _builder_31 = new StringConcatenation();
-          _builder_31.append("bool t");
+          _builder_31.append("uint64_t t");
           _builder_31.append(pos, "");
           _builder_31.append("=t");
           _builder_31.append(b, "");
-          _builder_31.append(" == t");
+          _builder_31.append(" >> t");
           _builder_31.append(a, "");
           _builder_31.append(";");
           sb.append(_builder_31);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.not_eq)) {
+        if (Objects.equal(_switchValue,Instruction.sra)) {
           _matched=true;
           StringConcatenation _builder_32 = new StringConcatenation();
-          _builder_32.append("bool t");
+          _builder_32.append("uint64_t t");
           _builder_32.append(pos, "");
-          _builder_32.append("=t");
+          _builder_32.append("=((int64_t)t");
           _builder_32.append(b, "");
-          _builder_32.append(" != t");
+          _builder_32.append(") >> t");
           _builder_32.append(a, "");
           _builder_32.append(";");
           sb.append(_builder_32);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less)) {
+        if (Objects.equal(_switchValue,Instruction.eq)) {
           _matched=true;
           StringConcatenation _builder_33 = new StringConcatenation();
           _builder_33.append("bool t");
           _builder_33.append(pos, "");
           _builder_33.append("=t");
           _builder_33.append(b, "");
-          _builder_33.append(" < t");
+          _builder_33.append(" == t");
           _builder_33.append(a, "");
           _builder_33.append(";");
           sb.append(_builder_33);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less_eq)) {
+        if (Objects.equal(_switchValue,Instruction.not_eq)) {
           _matched=true;
           StringConcatenation _builder_34 = new StringConcatenation();
           _builder_34.append("bool t");
           _builder_34.append(pos, "");
           _builder_34.append("=t");
           _builder_34.append(b, "");
-          _builder_34.append(" <= t");
+          _builder_34.append(" != t");
           _builder_34.append(a, "");
           _builder_34.append(";");
           sb.append(_builder_34);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater)) {
+        if (Objects.equal(_switchValue,Instruction.less)) {
           _matched=true;
           StringConcatenation _builder_35 = new StringConcatenation();
           _builder_35.append("bool t");
           _builder_35.append(pos, "");
           _builder_35.append("=t");
           _builder_35.append(b, "");
-          _builder_35.append(" > t");
+          _builder_35.append(" < t");
           _builder_35.append(a, "");
           _builder_35.append(";");
           sb.append(_builder_35);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater_eq)) {
+        if (Objects.equal(_switchValue,Instruction.less_eq)) {
           _matched=true;
           StringConcatenation _builder_36 = new StringConcatenation();
           _builder_36.append("bool t");
           _builder_36.append(pos, "");
           _builder_36.append("=t");
           _builder_36.append(b, "");
-          _builder_36.append(" >= t");
+          _builder_36.append(" <= t");
           _builder_36.append(a, "");
           _builder_36.append(";");
           sb.append(_builder_36);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
+        if (Objects.equal(_switchValue,Instruction.greater)) {
           _matched=true;
           StringConcatenation _builder_37 = new StringConcatenation();
+          _builder_37.append("bool t");
+          _builder_37.append(pos, "");
+          _builder_37.append("=t");
+          _builder_37.append(b, "");
+          _builder_37.append(" > t");
+          _builder_37.append(a, "");
+          _builder_37.append(";");
+          sb.append(_builder_37);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.greater_eq)) {
+          _matched=true;
+          StringConcatenation _builder_38 = new StringConcatenation();
+          _builder_38.append("bool t");
+          _builder_38.append(pos, "");
+          _builder_38.append("=t");
+          _builder_38.append(b, "");
+          _builder_38.append(" >= t");
+          _builder_38.append(a, "");
+          _builder_38.append(";");
+          sb.append(_builder_38);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
+          _matched=true;
+          StringConcatenation _builder_39 = new StringConcatenation();
           InternalInformation _asInternal_4 = this.asInternal(inst.arg1);
           String _javaName_2 = this.javaName(_asInternal_4.info, false);
-          _builder_37.append(_javaName_2, "");
-          _builder_37.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
-          sb.append(_builder_37);
+          _builder_39.append(_javaName_2, "");
+          _builder_39.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+          sb.append(_builder_39);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
-          StringConcatenation _builder_38 = new StringConcatenation();
+          StringConcatenation _builder_40 = new StringConcatenation();
           InternalInformation _asInternal_5 = this.asInternal(inst.arg1);
           String _javaName_3 = this.javaName(_asInternal_5.info, false);
-          _builder_38.append(_javaName_3, "");
-          _builder_38.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
-          sb.append(_builder_38);
+          _builder_40.append(_javaName_3, "");
+          _builder_40.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+          sb.append(_builder_40);
         }
       }
-      StringConcatenation _builder_39 = new StringConcatenation();
-      _builder_39.append("//");
-      _builder_39.append(inst, "");
-      _builder_39.newLineIfNotEmpty();
-      StringBuilder _append = sb.append(_builder_39);
+      StringConcatenation _builder_41 = new StringConcatenation();
+      _builder_41.append("//");
+      _builder_41.append(inst, "");
+      _builder_41.newLineIfNotEmpty();
+      StringBuilder _append = sb.append(_builder_41);
       _xblockexpression = (_append);
     }
     return _xblockexpression;
