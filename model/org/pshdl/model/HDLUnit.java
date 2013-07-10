@@ -244,12 +244,23 @@ public class HDLUnit extends AbstractHDLUnit {
 				hasReg = true;
 			}
 		}
-		if (hasReg)
-			if ((clk == null) && (rst == null)) {
-				unitIF = unitIF.addPorts(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
-						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_CLK.substring(1)))//
-						.addVariables(new HDLVariable().setName(HDLRegisterConfig.DEF_RST.substring(1))));
+		if (hasReg) {
+			if (clk == null) {
+				addSignal(HDLRegisterConfig.DEF_CLK, HDLBuiltInAnnotations.clock);
 			}
+			if (rst == null) {
+				addSignal(HDLRegisterConfig.DEF_RST, HDLBuiltInAnnotations.reset);
+			}
+		} else {
+			final boolean hasClkRef = HDLQuery.select(HDLVariableRef.class).from(this).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getFirst() != null;
+			if (hasClkRef && (clk == null)) {
+				addSignal(HDLRegisterConfig.DEF_CLK, HDLBuiltInAnnotations.clock);
+			}
+			final boolean hasRstRef = HDLQuery.select(HDLVariableRef.class).from(this).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getFirst() != null;
+			if (hasRstRef && (rst == null)) {
+				addSignal(HDLRegisterConfig.DEF_RST, HDLBuiltInAnnotations.reset);
+			}
+		}
 		final ModificationSet ms = new ModificationSet();
 		final HDLVariableRef[] refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
 		for (final HDLVariableRef ref : refs)
@@ -264,6 +275,11 @@ public class HDLUnit extends AbstractHDLUnit {
 		unitIF.addMeta(FULLNAME, fullName);
 		unitIF.setID(getID());
 		return unitIF;
+	}
+
+	private void addSignal(String sigName, HDLBuiltInAnnotations annotation) {
+		unitIF = unitIF.addPorts(new HDLVariableDeclaration().addAnnotations(annotation.create(null)).setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()) //
+				.addVariables(new HDLVariable().setName(sigName.substring(1))));
 	}
 
 	@Override

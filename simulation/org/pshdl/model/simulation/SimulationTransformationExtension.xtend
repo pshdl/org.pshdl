@@ -89,6 +89,7 @@ import java.util.List
 import java.util.Set
 import java.util.HashSet
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
+import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -179,23 +180,35 @@ class SimulationTransformationExtension {
 				else
 					res.add(new ArgumentedInstruction(isFallingEdge, name))
 			}
-			if (config.resetValue instanceof HDLArrayInit) {
-				for (HDLVariable hVar : obj.variables) {
-					res.add(const0)
-					res.add(new ArgumentedInstruction(writeInternal, fullNameOf(hVar).toString))
-					val HDLArrayInit arr = config.resetValue as HDLArrayInit
-					res.append(arr.toSimulationModel(context, fullNameOf(hVar).toString))
-				}
-			} else {
-				val resetFrame = config.resetValue.toSimulationModel(context)
-				for (HDLVariable hVar : obj.variables) {
-					res.append(resetFrame)
-					res.add(new ArgumentedInstruction(writeInternal, fullNameOf(hVar).toString))
-				}
-			}
+			createInit(config, obj, context, res, true);
+			if (config.resetType==HDLRegSyncType::ASYNC)
+				createInit(config, obj, context, res, false);
 			res.add(const0)
 		}
 		return res
+	}
+	
+	def void createInit(HDLRegisterConfig config,HDLVariableDeclaration obj, HDLEvaluationContext context, FluidFrame res, boolean toReg){
+		if (config.resetValue instanceof HDLArrayInit) {
+			for (HDLVariable hVar : obj.variables) {
+				res.add(const0)
+				var varName = fullNameOf(hVar).toString
+				if (toReg)
+					varName=varName+InternalInformation::REG_POSTFIX
+				res.add(new ArgumentedInstruction(writeInternal, varName))
+				val HDLArrayInit arr = config.resetValue as HDLArrayInit
+				res.append(arr.toSimulationModel(context, varName))
+			}
+		} else {
+			val resetFrame = config.resetValue.toSimulationModel(context)
+			for (HDLVariable hVar : obj.variables) {
+				var varName = fullNameOf(hVar).toString
+				if (toReg)
+					varName=varName+InternalInformation::REG_POSTFIX
+				res.append(resetFrame)
+				res.add(new ArgumentedInstruction(writeInternal, varName))
+			}
+		}
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLSwitchStatement obj, HDLEvaluationContext context) {

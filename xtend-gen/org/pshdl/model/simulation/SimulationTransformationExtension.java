@@ -296,41 +296,56 @@ public class SimulationTransformationExtension {
           res.add(_argumentedInstruction_3);
         }
       }
-      HDLExpression _resetValue = config.getResetValue();
-      if ((_resetValue instanceof HDLArrayInit)) {
-        ArrayList<HDLVariable> _variables_1 = obj.getVariables();
-        for (final HDLVariable hVar_1 : _variables_1) {
-          {
-            res.add(Instruction.const0);
-            HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(hVar_1);
-            String _string = _fullNameOf_2.toString();
-            ArgumentedInstruction _argumentedInstruction_4 = new ArgumentedInstruction(Instruction.writeInternal, _string);
-            res.add(_argumentedInstruction_4);
-            HDLExpression _resetValue_1 = config.getResetValue();
-            final HDLArrayInit arr = ((HDLArrayInit) _resetValue_1);
-            HDLQualifiedName _fullNameOf_3 = FullNameExtension.fullNameOf(hVar_1);
-            String _string_1 = _fullNameOf_3.toString();
-            FluidFrame _simulationModel = this.toSimulationModel(arr, context, _string_1);
-            res.append(_simulationModel);
-          }
-        }
-      } else {
-        HDLExpression _resetValue_1 = config.getResetValue();
-        final FluidFrame resetFrame = this.toSimulationModel(_resetValue_1, context);
-        ArrayList<HDLVariable> _variables_2 = obj.getVariables();
-        for (final HDLVariable hVar_2 : _variables_2) {
-          {
-            res.append(resetFrame);
-            HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(hVar_2);
-            String _string = _fullNameOf_2.toString();
-            ArgumentedInstruction _argumentedInstruction_4 = new ArgumentedInstruction(Instruction.writeInternal, _string);
-            res.add(_argumentedInstruction_4);
-          }
-        }
+      this.createInit(config, obj, context, res, true);
+      HDLRegResetActiveType _resetType_1 = config.getResetType();
+      boolean _equals_1 = Objects.equal(_resetType_1, HDLRegSyncType.ASYNC);
+      if (_equals_1) {
+        this.createInit(config, obj, context, res, false);
       }
       res.add(Instruction.const0);
     }
     return res;
+  }
+  
+  public void createInit(final HDLRegisterConfig config, final HDLVariableDeclaration obj, final HDLEvaluationContext context, final FluidFrame res, final boolean toReg) {
+    HDLExpression _resetValue = config.getResetValue();
+    if ((_resetValue instanceof HDLArrayInit)) {
+      ArrayList<HDLVariable> _variables = obj.getVariables();
+      for (final HDLVariable hVar : _variables) {
+        {
+          res.add(Instruction.const0);
+          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
+          String varName = _fullNameOf.toString();
+          if (toReg) {
+            String _plus = (varName + InternalInformation.REG_POSTFIX);
+            varName = _plus;
+          }
+          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.writeInternal, varName);
+          res.add(_argumentedInstruction);
+          HDLExpression _resetValue_1 = config.getResetValue();
+          final HDLArrayInit arr = ((HDLArrayInit) _resetValue_1);
+          FluidFrame _simulationModel = this.toSimulationModel(arr, context, varName);
+          res.append(_simulationModel);
+        }
+      }
+    } else {
+      HDLExpression _resetValue_1 = config.getResetValue();
+      final FluidFrame resetFrame = this.toSimulationModel(_resetValue_1, context);
+      ArrayList<HDLVariable> _variables_1 = obj.getVariables();
+      for (final HDLVariable hVar_1 : _variables_1) {
+        {
+          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar_1);
+          String varName = _fullNameOf.toString();
+          if (toReg) {
+            String _plus = (varName + InternalInformation.REG_POSTFIX);
+            varName = _plus;
+          }
+          res.append(resetFrame);
+          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.writeInternal, varName);
+          res.add(_argumentedInstruction);
+        }
+      }
+    }
   }
   
   protected FluidFrame _toSimulationModel(final HDLSwitchStatement obj, final HDLEvaluationContext context) {

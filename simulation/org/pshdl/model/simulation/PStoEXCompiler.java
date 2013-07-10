@@ -182,7 +182,19 @@ public class PStoEXCompiler implements IOutputProvider {
 		return createExecutable(findUnit, src);
 	}
 
-	public HDLUnit takeFirstUnit() {
+	public HDLUnit takeFirstUnit(String file) {
+		if (file != null) {
+			for (final Entry<File, HDLPackage> e : pkgs.entrySet()) {
+				if (e.getKey().getName().equals(file)) {
+					final ArrayList<HDLUnit> units = e.getValue().getUnits();
+					for (final HDLUnit hdlUnit : units) {
+						if (!hdlUnit.getSimulation())
+							return hdlUnit;
+					}
+				}
+			}
+			throw new IllegalArgumentException("No modules found for: " + file);
+		}
 		final HDLPackage pkg = pkgs.values().iterator().next();
 		for (final HDLUnit unit : pkg.getUnits()) {
 			if (!unit.getSimulation())
@@ -190,5 +202,4 @@ public class PStoEXCompiler implements IOutputProvider {
 		}
 		return null;
 	}
-
 }

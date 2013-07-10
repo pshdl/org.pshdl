@@ -699,22 +699,12 @@ class JavaCompiler {
 			}
 			case Instruction::cast_int: {
 				if (inst.arg1 != 64) {
-					var currentSize=inst.arg2;
-					var targetSize=inst.arg1;
-					var orMask=((1l<<targetSize)-1).bitwiseNot;
+					val shiftWidth=64-Math::min(inst.arg1, inst.arg2);
 					sb.append(
 						'''
-							//Target size «targetSize» currentSize «currentSize»
-							long c«pos»=t«a» << «64 - currentSize»;
+						long c«pos»=t«a» << «shiftWidth»;
+						long t«pos»=c«pos» >> «shiftWidth»;
 						''')
-					if (targetSize<currentSize)
-						sb.append(
-							'''long t«pos»=(c«pos» >> «64 - currentSize») | «orMask.toHexString»;
-							''')
-					else
-						sb.append(
-							'''long t«pos»=c«pos» >> «64 - currentSize»;
-							''')
 				} else {
 					sb.append('''long t«pos»=t«a»;''')
 				}
