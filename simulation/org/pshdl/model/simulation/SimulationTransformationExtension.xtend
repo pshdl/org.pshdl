@@ -419,15 +419,15 @@ class SimulationTransformationExtension {
 			case CAST: {
 				val HDLPrimitive prim = obj.castTo as HDLPrimitive
 				val HDLPrimitive current = typeOf(obj.target).get as HDLPrimitive
-				val String currentWidth = getWidth(current, context)
-				val String primWidth = getWidth(prim, context)
+				val int currentWidth = getWidth(current, context)
+				var int primWidth = getWidth(prim, context)
 				switch (prim.type) {
-					case prim.type === INTEGER || prim.type === INT:
-						res.instructions.add(new ArgumentedInstruction(cast_int, primWidth, currentWidth))
-					case prim.type === UINT || prim.type === NATURAL:
-						res.instructions.add(new ArgumentedInstruction(cast_uint, primWidth, currentWidth))
-					case prim.type === BIT || prim.type === BITVECTOR: {
-					}
+					case current.type === INTEGER || current.type === INT:
+						res.instructions.add(new ArgumentedInstruction(cast_int, primWidth.toString, currentWidth.toString))
+					case current.type === BIT || current.type === BITVECTOR: 
+						res.instructions.add(new ArgumentedInstruction(cast_uint, primWidth.toString, currentWidth.toString))
+					case current.type === UINT || current.type === NATURAL:
+						res.instructions.add(new ArgumentedInstruction(cast_uint, primWidth.toString, currentWidth.toString))
 					default:
 						throw new IllegalArgumentException("Cast to type:" + prim.type + " not supported")
 				}
@@ -436,16 +436,16 @@ class SimulationTransformationExtension {
 		return res
 	}
 
-	def private String getWidth(HDLPrimitive current, HDLEvaluationContext context) {
+	def private int getWidth(HDLPrimitive current, HDLEvaluationContext context) {
 		switch (current.type) {
 			case BIT:
-				return "1"
+				return 1
 			case current.type === INTEGER || current.type === NATURAL:
-				return "32"
+				return 32
 			case current.type === INT || current.type === UINT || current.type === BITVECTOR: {
 				val res = valueOf(current.width, context)
 				if (res.present)
-					return res.get.toString
+					return res.get.intValue
 			}
 		}
 		throw new IllegalArgumentException(current + " is not a valid type");

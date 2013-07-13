@@ -733,58 +733,66 @@ public class SimulationTransformationExtension {
         Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(_target_1);
         HDLType _get = _typeOf.get();
         final HDLPrimitive current = ((HDLPrimitive) _get);
-        final String currentWidth = this.getWidth(current, context);
-        final String primWidth = this.getWidth(prim, context);
+        final int currentWidth = this.getWidth(current, context);
+        int primWidth = this.getWidth(prim, context);
         HDLPrimitiveType _type_1 = prim.getType();
         final HDLPrimitiveType _switchValue_1 = _type_1;
         boolean _matched_1 = false;
         if (!_matched_1) {
           boolean _or = false;
-          HDLPrimitiveType _type_2 = prim.getType();
+          HDLPrimitiveType _type_2 = current.getType();
           boolean _tripleEquals = (_type_2 == HDLPrimitiveType.INTEGER);
           if (_tripleEquals) {
             _or = true;
           } else {
-            HDLPrimitiveType _type_3 = prim.getType();
+            HDLPrimitiveType _type_3 = current.getType();
             boolean _tripleEquals_1 = (_type_3 == HDLPrimitiveType.INT);
             _or = (_tripleEquals || _tripleEquals_1);
           }
           if (_or) {
             _matched_1=true;
-            ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.cast_int, primWidth, currentWidth);
+            String _string_2 = Integer.valueOf(primWidth).toString();
+            String _string_3 = Integer.valueOf(currentWidth).toString();
+            ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.cast_int, _string_2, _string_3);
             res.instructions.add(_argumentedInstruction_2);
           }
         }
         if (!_matched_1) {
           boolean _or_1 = false;
-          HDLPrimitiveType _type_4 = prim.getType();
-          boolean _tripleEquals_2 = (_type_4 == HDLPrimitiveType.UINT);
+          HDLPrimitiveType _type_4 = current.getType();
+          boolean _tripleEquals_2 = (_type_4 == HDLPrimitiveType.BIT);
           if (_tripleEquals_2) {
             _or_1 = true;
           } else {
-            HDLPrimitiveType _type_5 = prim.getType();
-            boolean _tripleEquals_3 = (_type_5 == HDLPrimitiveType.NATURAL);
+            HDLPrimitiveType _type_5 = current.getType();
+            boolean _tripleEquals_3 = (_type_5 == HDLPrimitiveType.BITVECTOR);
             _or_1 = (_tripleEquals_2 || _tripleEquals_3);
           }
           if (_or_1) {
             _matched_1=true;
-            ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.cast_uint, primWidth, currentWidth);
+            String _string_4 = Integer.valueOf(primWidth).toString();
+            String _string_5 = Integer.valueOf(currentWidth).toString();
+            ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.cast_uint, _string_4, _string_5);
             res.instructions.add(_argumentedInstruction_3);
           }
         }
         if (!_matched_1) {
           boolean _or_2 = false;
-          HDLPrimitiveType _type_6 = prim.getType();
-          boolean _tripleEquals_4 = (_type_6 == HDLPrimitiveType.BIT);
+          HDLPrimitiveType _type_6 = current.getType();
+          boolean _tripleEquals_4 = (_type_6 == HDLPrimitiveType.UINT);
           if (_tripleEquals_4) {
             _or_2 = true;
           } else {
-            HDLPrimitiveType _type_7 = prim.getType();
-            boolean _tripleEquals_5 = (_type_7 == HDLPrimitiveType.BITVECTOR);
+            HDLPrimitiveType _type_7 = current.getType();
+            boolean _tripleEquals_5 = (_type_7 == HDLPrimitiveType.NATURAL);
             _or_2 = (_tripleEquals_4 || _tripleEquals_5);
           }
           if (_or_2) {
             _matched_1=true;
+            String _string_6 = Integer.valueOf(primWidth).toString();
+            String _string_7 = Integer.valueOf(currentWidth).toString();
+            ArgumentedInstruction _argumentedInstruction_4 = new ArgumentedInstruction(Instruction.cast_uint, _string_6, _string_7);
+            res.instructions.add(_argumentedInstruction_4);
           }
         }
         if (!_matched_1) {
@@ -799,14 +807,14 @@ public class SimulationTransformationExtension {
     return res;
   }
   
-  private String getWidth(final HDLPrimitive current, final HDLEvaluationContext context) {
+  private int getWidth(final HDLPrimitive current, final HDLEvaluationContext context) {
     HDLPrimitiveType _type = current.getType();
     final HDLPrimitiveType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLPrimitiveType.BIT)) {
         _matched=true;
-        return "1";
+        return 1;
       }
     }
     if (!_matched) {
@@ -822,7 +830,7 @@ public class SimulationTransformationExtension {
       }
       if (_or) {
         _matched=true;
-        return "32";
+        return 32;
       }
     }
     if (!_matched) {
@@ -851,7 +859,7 @@ public class SimulationTransformationExtension {
         boolean _isPresent = res.isPresent();
         if (_isPresent) {
           BigInteger _get = res.get();
-          return _get.toString();
+          return _get.intValue();
         }
       }
     }

@@ -216,10 +216,10 @@ public class VHDLCastsLibrary {
 			resType = HDLPrimitiveType.INT;
 			break;
 		case INT:
-			resize = new FunctionCall(RESIZE_INT);
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_INT);
 			break;
 		case UINT:
-			resize = new FunctionCall(RESIZE_UINT);
+			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_UINT);
 			break;
 		case BITVECTOR:
 			resize = new FunctionCall(VHDLCastsLibrary.RESIZE_SLV);
