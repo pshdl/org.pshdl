@@ -27,20 +27,14 @@
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
-import org.eclipse.xtext.xbase.lib.ExclusiveRange;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
@@ -49,77 +43,22 @@ import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
+import org.pshdl.model.simulation.CommonCompilerExtension;
 
 @SuppressWarnings("all")
 public class CCompiler {
-  private ExecutableModel em;
-  
-  private Map<String,Integer> varIdx = new Function0<Map<String,Integer>>() {
-    public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String,Integer>();
-      return _hashMap;
-    }
-  }.apply();
-  
-  private Map<String,Integer> intIdx = new Function0<Map<String,Integer>>() {
-    public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String,Integer>();
-      return _hashMap;
-    }
-  }.apply();
-  
-  private Map<String,Boolean> prevMap = new Function0<Map<String,Boolean>>() {
-    public Map<String,Boolean> apply() {
-      HashMap<String,Boolean> _hashMap = new HashMap<String,Boolean>();
-      return _hashMap;
-    }
-  }.apply();
-  
-  private boolean hasClock;
+  @Extension
+  private CommonCompilerExtension cce;
   
   public CCompiler(final ExecutableModel em, final boolean includeDebug) {
-    this.em = em;
-    int _length = em.variables.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      VariableInformation _get = em.variables[(i).intValue()];
-      this.varIdx.put(_get.name, i);
-    }
-    int _length_1 = em.internals.length;
-    ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _length_1, true);
-    for (final Integer i_1 : _doubleDotLessThan_1) {
-      InternalInformation _get_1 = em.internals[(i_1).intValue()];
-      this.intIdx.put(_get_1.fullName, i_1);
-    }
-    for (final Frame f : em.frames) {
-      {
-        int _minus = (-1);
-        boolean _notEquals = (f.edgeNegDepRes != _minus);
-        if (_notEquals) {
-          InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
-          this.prevMap.put(_asInternal.info.name, Boolean.valueOf(true));
-        }
-        int _minus_1 = (-1);
-        boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
-        if (_notEquals_1) {
-          InternalInformation _asInternal_1 = this.asInternal(f.edgePosDepRes);
-          this.prevMap.put(_asInternal_1.info.name, Boolean.valueOf(true));
-        }
-      }
-    }
-    boolean _isEmpty = this.prevMap.isEmpty();
-    boolean _not = (!_isEmpty);
-    this.hasClock = _not;
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
+    this.cce = _commonCompilerExtension;
   }
   
   public static String doCompile(final ExecutableModel em, final boolean includeDebugListener) {
     CCompiler _cCompiler = new CCompiler(em, includeDebugListener);
     CharSequence _compile = _cCompiler.compile();
     return _compile.toString();
-  }
-  
-  public InternalInformation asInternal(final int id) {
-    return this.em.internals[id];
   }
   
   public CharSequence compile() {
@@ -135,7 +74,7 @@ public class CCompiler {
       _builder.newLineIfNotEmpty();
       _builder.newLine();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t");
           _builder.append("typedef struct regUpdate {");
           _builder.newLine();
@@ -154,7 +93,7 @@ public class CCompiler {
           _builder.newLine();
           _builder.append("\t");
           _builder.append("regUpdate_t regUpdates[");
-          int _maxRegUpdates = this.maxRegUpdates(this.em);
+          int _maxRegUpdates = this.cce.maxRegUpdates(this.cce.em);
           _builder.append(_maxRegUpdates, "	");
           _builder.append("];");
           _builder.newLineIfNotEmpty();
@@ -170,10 +109,10 @@ public class CCompiler {
         }
       }
       {
-        Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
+        Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
         for(final VariableInformation v : _excludeNull) {
           _builder.append("\t");
-          Boolean _get = this.prevMap.get(v.name);
+          Boolean _get = this.cce.prevMap.get(v.name);
           CharSequence _decl = this.decl(v, _get);
           _builder.append(_decl, "	");
           _builder.newLineIfNotEmpty();
@@ -186,7 +125,7 @@ public class CCompiler {
       _builder.append("int deltaCycle=0;");
       _builder.newLine();
       {
-        for(final Frame f : this.em.frames) {
+        for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
           CharSequence _method = this.method(f);
           _builder.append(_method, "	");
@@ -194,7 +133,7 @@ public class CCompiler {
         }
       }
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t");
           _builder.append("bool skipEdge(uint64_t local) {");
           _builder.newLine();
@@ -244,7 +183,7 @@ public class CCompiler {
         }
       }
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t");
           CharSequence _copyRegs = this.copyRegs();
           _builder.append(_copyRegs, "	");
@@ -258,7 +197,7 @@ public class CCompiler {
       _builder.append("deltaCycle++;");
       _builder.newLine();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t\t");
           _builder.append("epsCycle=0;");
           _builder.newLine();
@@ -272,7 +211,7 @@ public class CCompiler {
         }
       }
       {
-        for(final Frame f_1 : this.em.frames) {
+        for(final Frame f_1 : this.cce.em.frames) {
           {
             boolean _and = false;
             boolean _and_1 = false;
@@ -302,7 +241,7 @@ public class CCompiler {
             }
             if (_and) {
               _builder.append("\t\t");
-              CharSequence _frameName = this.getFrameName(f_1);
+              CharSequence _frameName = this.cce.getFrameName(f_1);
               _builder.append(_frameName, "		");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
@@ -339,7 +278,7 @@ public class CCompiler {
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               _builder.append("\t");
-              CharSequence _frameName_1 = this.getFrameName(f_1);
+              CharSequence _frameName_1 = this.cce.getFrameName(f_1);
               _builder.append(_frameName_1, "			");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
@@ -348,7 +287,7 @@ public class CCompiler {
         }
       }
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t\t");
           _builder.append("updateRegs();");
           _builder.newLine();
@@ -361,10 +300,10 @@ public class CCompiler {
         }
       }
       {
-        Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
+        Iterable<VariableInformation> _excludeNull_1 = this.cce.excludeNull(this.cce.em.variables);
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
             public Boolean apply(final VariableInformation it) {
-              Boolean _get = CCompiler.this.prevMap.get(it.name);
+              Boolean _get = CCompiler.this.cce.prevMap.get(it.name);
               boolean _notEquals = (!Objects.equal(_get, null));
               return Boolean.valueOf(_notEquals);
             }
@@ -386,35 +325,6 @@ public class CCompiler {
     return _xblockexpression;
   }
   
-  public int maxRegUpdates(final ExecutableModel em) {
-    int maxUpdates = 0;
-    for (final Frame f : em.frames) {
-      {
-        final InternalInformation oi = this.asInternal(f.outputId);
-        boolean _isNotNull = this.isNotNull(oi.info);
-        boolean _not = (!_isNotNull);
-        if (_not) {
-          for (final FastInstruction inst : f.instructions) {
-            boolean _tripleEquals = (inst.inst == Instruction.writeInternal);
-            if (_tripleEquals) {
-              InternalInformation _asInternal = this.asInternal(inst.arg1);
-              if (_asInternal.isShadowReg) {
-                int _plus = (maxUpdates + 1);
-                maxUpdates = _plus;
-              }
-            }
-          }
-        } else {
-          if (oi.isShadowReg) {
-            int _plus_1 = (maxUpdates + 1);
-            maxUpdates = _plus_1;
-          }
-        }
-      }
-    }
-    return maxUpdates;
-  }
-  
   public String predicates(final Frame f) {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
@@ -423,13 +333,13 @@ public class CCompiler {
     boolean _tripleNotEquals = (Integer.valueOf(f.edgeNegDepRes) != Integer.valueOf(_minus));
     if (_tripleNotEquals) {
       StringConcatenation _builder = new StringConcatenation();
-      InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
-      String _javaName = this.javaName(_asInternal, false);
-      _builder.append(_javaName, "");
+      InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
+      String _idName = this.cce.idName(_asInternal, false, false);
+      _builder.append(_idName, "");
       _builder.append("_isFalling && !");
-      InternalInformation _asInternal_1 = this.asInternal(f.edgeNegDepRes);
-      String _javaName_1 = this.javaName(_asInternal_1, false);
-      _builder.append(_javaName_1, "");
+      InternalInformation _asInternal_1 = this.cce.asInternal(f.edgeNegDepRes);
+      String _idName_1 = this.cce.idName(_asInternal_1, false, false);
+      _builder.append(_idName_1, "");
       _builder.append("_fallingIsHandled");
       sb.append(_builder);
       first = false;
@@ -442,13 +352,13 @@ public class CCompiler {
         sb.append(" && ");
       }
       StringConcatenation _builder_1 = new StringConcatenation();
-      InternalInformation _asInternal_2 = this.asInternal(f.edgePosDepRes);
-      String _javaName_2 = this.javaName(_asInternal_2, false);
-      _builder_1.append(_javaName_2, "");
+      InternalInformation _asInternal_2 = this.cce.asInternal(f.edgePosDepRes);
+      String _idName_2 = this.cce.idName(_asInternal_2, false, false);
+      _builder_1.append(_idName_2, "");
       _builder_1.append("_isRising&& !");
-      InternalInformation _asInternal_3 = this.asInternal(f.edgePosDepRes);
-      String _javaName_3 = this.javaName(_asInternal_3, false);
-      _builder_1.append(_javaName_3, "");
+      InternalInformation _asInternal_3 = this.cce.asInternal(f.edgePosDepRes);
+      String _idName_3 = this.cce.idName(_asInternal_3, false, false);
+      _builder_1.append(_idName_3, "");
       _builder_1.append("_risingIsHandled");
       sb.append(_builder_1);
       first = false;
@@ -498,7 +408,7 @@ public class CCompiler {
       }
       handled.add(Integer.valueOf(id));
       StringConcatenation _builder_1 = new StringConcatenation();
-      InternalInformation _asInternal = this.asInternal(id);
+      InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "");
@@ -510,9 +420,9 @@ public class CCompiler {
       _builder_1.append("uint64_t up");
       _builder_1.append(id, "");
       _builder_1.append("=");
-      InternalInformation _asInternal_1 = this.asInternal(id);
-      String _javaName = this.javaName(_asInternal_1.info, false);
-      _builder_1.append(_javaName, "");
+      InternalInformation _asInternal_1 = this.cce.asInternal(id);
+      String _idName = this.cce.idName(_asInternal_1.info, false, false);
+      _builder_1.append(_idName, "");
       _builder_1.append("_update;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if ((up");
@@ -542,28 +452,28 @@ public class CCompiler {
         return _builder.toString();
       }
       handledEdges.add(Integer.valueOf(id));
-      final InternalInformation internal = this.asInternal(id);
+      final InternalInformation internal = this.cce.asInternal(id);
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("bool ");
-      String _javaName = this.javaName(internal, false);
-      _builder_1.append(_javaName, "");
+      String _idName = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName, "");
       _builder_1.append("_isRising=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("bool ");
-      String _javaName_1 = this.javaName(internal, false);
-      _builder_1.append(_javaName_1, "");
+      String _idName_1 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_1, "");
       _builder_1.append("_risingIsHandled=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if (!disableEdges){");
       _builder_1.newLine();
       _builder_1.append("\t");
-      InternalInformation _asInternal = this.asInternal(id);
+      InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      InternalInformation _asInternal_1 = this.asInternal(id);
+      InternalInformation _asInternal_1 = this.cce.asInternal(id);
       int _minus_1 = (-1);
       CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
       _builder_1.append(_ter_1, "	");
@@ -576,8 +486,8 @@ public class CCompiler {
       _builder_1.append("!=1)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
-      String _javaName_2 = this.javaName(internal, false);
-      _builder_1.append(_javaName_2, "		");
+      String _idName_2 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isRising=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -586,13 +496,13 @@ public class CCompiler {
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _javaName_3 = this.javaName(internal.info, false);
-      _builder_1.append(_javaName_3, "");
+      String _idName_3 = this.cce.idName(internal.info, false, false);
+      _builder_1.append(_idName_3, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      String _javaName_4 = this.javaName(internal, false);
-      _builder_1.append(_javaName_4, "	");
+      String _idName_4 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_4, "	");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -611,28 +521,28 @@ public class CCompiler {
         return _builder.toString();
       }
       handledEdges.add(Integer.valueOf(id));
-      final InternalInformation internal = this.asInternal(id);
+      final InternalInformation internal = this.cce.asInternal(id);
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("bool ");
-      String _javaName = this.javaName(internal, false);
-      _builder_1.append(_javaName, "");
+      String _idName = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName, "");
       _builder_1.append("_isFalling=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("bool ");
-      String _javaName_1 = this.javaName(internal, false);
-      _builder_1.append(_javaName_1, "");
+      String _idName_1 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_1, "");
       _builder_1.append("_fallingIsHandled=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if (!disableEdges){");
       _builder_1.newLine();
       _builder_1.append("\t");
-      InternalInformation _asInternal = this.asInternal(id);
+      InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      InternalInformation _asInternal_1 = this.asInternal(id);
+      InternalInformation _asInternal_1 = this.cce.asInternal(id);
       int _minus_1 = (-1);
       CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
       _builder_1.append(_ter_1, "	");
@@ -645,8 +555,8 @@ public class CCompiler {
       _builder_1.append("!=0)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
-      String _javaName_2 = this.javaName(internal, false);
-      _builder_1.append(_javaName_2, "		");
+      String _idName_2 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isFalling=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -655,13 +565,13 @@ public class CCompiler {
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _javaName_3 = this.javaName(internal.info, false);
-      _builder_1.append(_javaName_3, "");
+      String _idName_3 = this.cce.idName(internal.info, false, false);
+      _builder_1.append(_idName_3, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      String _javaName_4 = this.javaName(internal, false);
-      _builder_1.append(_javaName_4, "	");
+      String _idName_4 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_4, "	");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -669,43 +579,6 @@ public class CCompiler {
       _xblockexpression = (_builder_1);
     }
     return _xblockexpression;
-  }
-  
-  public CharSequence asMask(final int width) {
-    long _doubleLessThan = (1l << width);
-    final long mask = (_doubleLessThan - 1);
-    boolean _equals = (width == 64);
-    if (_equals) {
-      return "0xFFFFFFFFFFFFFFFFl";
-    }
-    return this.toHexString(mask);
-  }
-  
-  public Iterable<VariableInformation> excludeNull(final VariableInformation[] vars) {
-    final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-        public Boolean apply(final VariableInformation it) {
-          boolean _isNotNull = CCompiler.this.isNotNull(it);
-          return Boolean.valueOf(_isNotNull);
-        }
-      };
-    Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(vars)), _function);
-    return _filter;
-  }
-  
-  public boolean isNotNull(final VariableInformation it) {
-    boolean _notEquals = (!Objects.equal(it.name, "#null"));
-    return _notEquals;
-  }
-  
-  public Iterable<InternalInformation> excludeNull(final InternalInformation[] vars) {
-    final Function1<InternalInformation,Boolean> _function = new Function1<InternalInformation,Boolean>() {
-        public Boolean apply(final InternalInformation it) {
-          boolean _isNotNull = CCompiler.this.isNotNull(it.info);
-          return Boolean.valueOf(_isNotNull);
-        }
-      };
-    Iterable<InternalInformation> _filter = IterableExtensions.<InternalInformation>filter(((Iterable<InternalInformation>)Conversions.doWrapArray(vars)), _function);
-    return _filter;
   }
   
   public CharSequence copyRegs() {
@@ -725,12 +598,12 @@ public class CCompiler {
     _builder.append("switch (reg.internal) {");
     _builder.newLine();
     {
-      for(final VariableInformation v : this.em.variables) {
+      for(final VariableInformation v : this.cce.em.variables) {
         {
           if (v.isRegister) {
             _builder.append("\t\t\t");
             _builder.append("case ");
-            Integer _get = this.varIdx.get(v.name);
+            Integer _get = this.cce.varIdx.get(v.name);
             _builder.append(_get, "			");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
@@ -739,11 +612,11 @@ public class CCompiler {
               boolean _equals = (_length == 0);
               if (_equals) {
                 _builder.append("\t\t\t");
-                String _javaName = this.javaName(v, false);
-                _builder.append(_javaName, "			");
+                String _idName = this.cce.idName(v, false, false);
+                _builder.append(_idName, "			");
                 _builder.append(" = ");
-                String _javaName_1 = this.javaName(v, false);
-                _builder.append(_javaName_1, "			");
+                String _idName_1 = this.cce.idName(v, false, false);
+                _builder.append(_idName_1, "			");
                 _builder.append("$reg; break;");
                 _builder.newLineIfNotEmpty();
               } else {
@@ -753,14 +626,14 @@ public class CCompiler {
                 _builder.append("\t\t\t");
                 _builder.append("\t");
                 _builder.append("memcpy(");
-                String _javaName_2 = this.javaName(v, false);
-                _builder.append(_javaName_2, "				");
+                String _idName_2 = this.cce.idName(v, false, false);
+                _builder.append(_idName_2, "				");
                 _builder.append(", ");
-                String _javaName_3 = this.javaName(v, false);
-                _builder.append(_javaName_3, "				");
+                String _idName_3 = this.cce.idName(v, false, false);
+                _builder.append(_idName_3, "				");
                 _builder.append("$reg, ");
-                int _totalSize = this.getTotalSize(v);
-                _builder.append(_totalSize, "				");
+                int _talSize = this.cce.totalSize(v);
+                _builder.append(_talSize, "				");
                 _builder.append(");");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
@@ -768,11 +641,11 @@ public class CCompiler {
                 _builder.newLine();
                 _builder.append("\t\t\t");
                 _builder.append("\t");
-                String _javaName_4 = this.javaName(v, false);
-                _builder.append(_javaName_4, "				");
+                String _idName_4 = this.cce.idName(v, false, false);
+                _builder.append(_idName_4, "				");
                 _builder.append("[reg.offset] = ");
-                String _javaName_5 = this.javaName(v, false);
-                _builder.append(_javaName_5, "				");
+                String _idName_5 = this.cce.idName(v, false, false);
+                _builder.append(_idName_5, "				");
                 _builder.append("$reg[reg.offset]; break;");
                 _builder.newLineIfNotEmpty();
               }
@@ -797,24 +670,24 @@ public class CCompiler {
     boolean _equals = (_length == 0);
     if (_equals) {
       StringConcatenation _builder = new StringConcatenation();
-      String _javaName = this.javaName(info, true);
-      _builder.append(_javaName, "");
+      String _idName = this.cce.idName(info, true, false);
+      _builder.append(_idName, "");
       _builder.append("=");
-      String _javaName_1 = this.javaName(info, false);
-      _builder.append(_javaName_1, "");
+      String _idName_1 = this.cce.idName(info, false, false);
+      _builder.append(_idName_1, "");
       _builder.append(";");
       return _builder.toString();
     }
     StringConcatenation _builder_1 = new StringConcatenation();
     _builder_1.append("System.arraycopy(");
-    String _javaName_2 = this.javaName(info, false);
-    _builder_1.append(_javaName_2, "");
+    String _idName_2 = this.cce.idName(info, false, false);
+    _builder_1.append(_idName_2, "");
     _builder_1.append(",0,");
-    String _javaName_3 = this.javaName(info, true);
-    _builder_1.append(_javaName_3, "");
+    String _idName_3 = this.cce.idName(info, true, false);
+    _builder_1.append(_idName_3, "");
     _builder_1.append(", 0, ");
-    String _javaName_4 = this.javaName(info, false);
-    _builder_1.append(_javaName_4, "");
+    String _idName_4 = this.cce.idName(info, false, false);
+    _builder_1.append(_idName_4, "");
     _builder_1.append(".length);");
     return _builder_1.toString();
   }
@@ -824,7 +697,7 @@ public class CCompiler {
     {
       StringBuilder _stringBuilder = new StringBuilder();
       final StringBuilder sb = _stringBuilder;
-      final CharSequence mask = this.asMask(info.actualWidth);
+      final CharSequence mask = this.cce.asMaskL(info.actualWidth);
       for (final int arr : info.arrayIdx) {
         StringConcatenation _builder = new StringConcatenation();
         _builder.append("[");
@@ -840,12 +713,12 @@ public class CCompiler {
       } else {
         StringConcatenation _builder_1 = new StringConcatenation();
         _builder_1.append("[");
-        StringBuilder _arrayAccess = this.arrayAccess(info.info, null);
+        StringBuilder _arrayAccess = this.cce.arrayAccess(info.info, null);
         _builder_1.append(_arrayAccess, "");
         _builder_1.append(" & ");
-        long _dimMask = this.dimMask(info);
-        CharSequence _hexString = this.toHexString(_dimMask);
-        _builder_1.append(_hexString, "");
+        long _dimMask = this.cce.dimMask(info);
+        CharSequence _hexStringL = this.cce.toHexStringL(_dimMask);
+        _builder_1.append(_hexStringL, "");
         _builder_1.append("]");
         _xifexpression = _builder_1.toString();
       }
@@ -865,39 +738,39 @@ public class CCompiler {
         {
           boolean _equals_1 = (info.actualWidth == info.info.width);
           if (_equals_1) {
-            String _javaType = this.getJavaType(info);
-            _builder_2.append(_javaType, "");
+            String _cType = this.cType(info);
+            _builder_2.append(_cType, "");
             _builder_2.append(" ");
             _builder_2.append(varName, "");
             _builder_2.append("=");
-            String _javaName = this.javaName(info.info, prev);
-            _builder_2.append(_javaName, "");
+            String _idName = this.cce.idName(info.info, prev, false);
+            _builder_2.append(_idName, "");
             _builder_2.append(sb, "");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
             boolean _equals_2 = (info.actualWidth == 1);
             if (_equals_2) {
-              String _javaType_1 = this.getJavaType(info);
-              _builder_2.append(_javaType_1, "");
+              String _cType_1 = this.cType(info);
+              _builder_2.append(_cType_1, "");
               _builder_2.append(" ");
               _builder_2.append(varName, "");
               _builder_2.append("=(");
-              String _javaName_1 = this.javaName(info.info, prev);
-              _builder_2.append(_javaName_1, "");
+              String _idName_1 = this.cce.idName(info.info, prev, false);
+              _builder_2.append(_idName_1, "");
               _builder_2.append(sb, "");
               _builder_2.append(" >> ");
               _builder_2.append(info.bitStart, "");
               _builder_2.append(") & 1;");
               _builder_2.newLineIfNotEmpty();
             } else {
-              String _javaType_2 = this.getJavaType(info);
-              _builder_2.append(_javaType_2, "");
+              String _cType_2 = this.cType(info);
+              _builder_2.append(_cType_2, "");
               _builder_2.append(" ");
               _builder_2.append(varName, "");
               _builder_2.append("=(");
-              String _javaName_2 = this.javaName(info.info, prev);
-              _builder_2.append(_javaName_2, "");
+              String _idName_2 = this.cce.idName(info.info, prev, false);
+              _builder_2.append(_idName_2, "");
               _builder_2.append(sb, "");
               _builder_2.append(" >> ");
               _builder_2.append(info.bitEnd, "");
@@ -914,45 +787,45 @@ public class CCompiler {
         {
           boolean _equals_3 = (info.actualWidth == info.info.width);
           if (_equals_3) {
-            String _javaType_3 = this.getJavaType(info);
-            _builder_3.append(_javaType_3, "");
+            String _cType_3 = this.cType(info);
+            _builder_3.append(_cType_3, "");
             _builder_3.append(" ");
             _builder_3.append(varName, "");
             _builder_3.append("= ");
-            String _javaName_3 = this.javaName(info.info, prev);
-            _builder_3.append(_javaName_3, "");
+            String _idName_3 = this.cce.idName(info.info, prev, false);
+            _builder_3.append(_idName_3, "");
             _builder_3.append(arrAcc, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
             boolean _equals_4 = (info.actualWidth == 1);
             if (_equals_4) {
-              String _javaType_4 = this.getJavaType(info);
-              _builder_3.append(_javaType_4, "");
+              String _cType_4 = this.cType(info);
+              _builder_3.append(_cType_4, "");
               _builder_3.append(" ");
               _builder_3.append(varName, "");
               _builder_3.append("= (");
-              String _javaName_4 = this.javaName(info.info, prev);
-              _builder_3.append(_javaName_4, "");
+              String _idName_4 = this.cce.idName(info.info, prev, false);
+              _builder_3.append(_idName_4, "");
               _builder_3.append(arrAcc, "");
               _builder_3.append(" >> ");
               _builder_3.append(info.bitStart, "");
               _builder_3.append(") & 1;");
               _builder_3.newLineIfNotEmpty();
             } else {
-              String _javaType_5 = this.getJavaType(info);
-              _builder_3.append(_javaType_5, "");
+              String _cType_5 = this.cType(info);
+              _builder_3.append(_cType_5, "");
               _builder_3.append(" ");
               _builder_3.append(varName, "");
               _builder_3.append("= (");
-              String _javaName_5 = this.javaName(info.info, prev);
-              _builder_3.append(_javaName_5, "");
+              String _idName_5 = this.cce.idName(info.info, prev, false);
+              _builder_3.append(_idName_5, "");
               _builder_3.append(arrAcc, "");
               _builder_3.append(" >> ");
               _builder_3.append(info.bitEnd, "");
               _builder_3.append(") & ");
-              CharSequence _asMask = this.asMask(info.actualWidth);
-              _builder_3.append(_asMask, "");
+              CharSequence _asMaskL = this.cce.asMaskL(info.actualWidth);
+              _builder_3.append(_asMaskL, "");
               _builder_3.append(";");
               _builder_3.newLineIfNotEmpty();
             }
@@ -970,12 +843,12 @@ public class CCompiler {
     {
       long _doubleLessThan = (1l << info.actualWidth);
       final long mask = (_doubleLessThan - 1);
-      final CharSequence maskString = this.toHexString(mask);
+      final CharSequence maskString = this.cce.toHexStringL(mask);
       long _doubleLessThan_1 = (mask << info.bitEnd);
       long _bitwiseNot = (~_doubleLessThan_1);
-      final CharSequence writeMask = this.toHexString(_bitwiseNot);
-      final StringBuilder varAccess = this.arrayAccess(info.info, null);
-      final int off = this.arrayAccess(info);
+      final CharSequence writeMask = this.cce.toHexStringL(_bitwiseNot);
+      final StringBuilder varAccess = this.cce.arrayAccess(info.info, null);
+      final int off = this.cce.arrayFixedOffset(info);
       String _xifexpression = null;
       int _length = info.arrayIdx.length;
       boolean _greaterThan = (_length > 0);
@@ -1004,29 +877,29 @@ public class CCompiler {
           if (_equals) {
             {
               if (info.isShadowReg) {
-                String _javaType = this.getJavaType(info.info);
-                _builder_2.append(_javaType, "");
+                String _cType = this.cType(info.info);
+                _builder_2.append(_cType, "");
                 _builder_2.append(" current=");
-                String _javaName = this.javaName(info.info, false);
-                _builder_2.append(_javaName, "");
+                String _idName = this.cce.idName(info.info, false, false);
+                _builder_2.append(_idName, "");
                 _builder_2.append(fixedAccess, "");
                 _builder_2.append(";");
               }
             }
             _builder_2.newLineIfNotEmpty();
-            String _javaName_1 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_1, "");
+            String _idName_1 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_1, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append("=");
             _builder_2.append(value, "");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
-            String _javaType_1 = this.getJavaType(info.info);
-            _builder_2.append(_javaType_1, "");
+            String _cType_1 = this.cType(info.info);
+            _builder_2.append(_cType_1, "");
             _builder_2.append(" current=");
-            String _javaName_2 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_2, "");
+            String _idName_2 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_2, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append(" & ");
             _builder_2.append(writeMask, "");
@@ -1041,8 +914,8 @@ public class CCompiler {
             _builder_2.append(info.bitEnd, "");
             _builder_2.append(");");
             _builder_2.newLineIfNotEmpty();
-            String _javaName_3 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_3, "");
+            String _idName_3 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_3, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append("=current|");
             _builder_2.append(value, "");
@@ -1060,7 +933,7 @@ public class CCompiler {
             _builder_2.newLineIfNotEmpty();
             _builder_2.append("\t");
             _builder_2.append("reg.internal=");
-            Integer _get = this.varIdx.get(info.info.name);
+            Integer _get = this.cce.varIdx.get(info.info.name);
             _builder_2.append(_get, "	");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
@@ -1078,8 +951,8 @@ public class CCompiler {
         }
         {
           if (info.isPred) {
-            String _javaName_4 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_4, "");
+            String _idName_4 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_4, "");
             _builder_2.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           }
         }
@@ -1092,9 +965,9 @@ public class CCompiler {
         _builder_3.append(";");
         _builder_3.newLineIfNotEmpty();
         _builder_3.append("offset&=");
-        long _dimMask = this.dimMask(info);
-        CharSequence _hexString = this.toHexString(_dimMask);
-        _builder_3.append(_hexString, "");
+        long _dimMask = this.cce.dimMask(info);
+        CharSequence _hexStringL = this.cce.toHexStringL(_dimMask);
+        _builder_3.append(_hexStringL, "");
         _builder_3.append(";");
         _builder_3.newLineIfNotEmpty();
         {
@@ -1102,29 +975,29 @@ public class CCompiler {
           if (_equals_1) {
             {
               if (info.isShadowReg) {
-                String _javaType_2 = this.getJavaType(info.info);
-                _builder_3.append(_javaType_2, "");
+                String _cType_2 = this.cType(info.info);
+                _builder_3.append(_cType_2, "");
                 _builder_3.append(" current=");
-                String _javaName_5 = this.javaName(info.info, false);
-                _builder_3.append(_javaName_5, "");
+                String _idName_5 = this.cce.idName(info.info, false, false);
+                _builder_3.append(_idName_5, "");
                 _builder_3.append(regSuffix, "");
                 _builder_3.append("[offset];");
               }
             }
             _builder_3.newLineIfNotEmpty();
-            String _javaName_6 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_6, "");
+            String _idName_6 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_6, "");
             _builder_3.append(regSuffix, "");
             _builder_3.append("[offset]=");
             _builder_3.append(value, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            String _javaType_3 = this.getJavaType(info.info);
-            _builder_3.append(_javaType_3, "");
+            String _cType_3 = this.cType(info.info);
+            _builder_3.append(_cType_3, "");
             _builder_3.append(" current=");
-            String _javaName_7 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_7, "");
+            String _idName_7 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_7, "");
             _builder_3.append(regSuffix, "");
             _builder_3.append("[offset] & ");
             _builder_3.append(writeMask, "");
@@ -1139,8 +1012,8 @@ public class CCompiler {
             _builder_3.append(info.bitEnd, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
-            String _javaName_8 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_8, "");
+            String _idName_8 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_8, "");
             _builder_3.append(regSuffix, "");
             _builder_3.append("[offset]=current|");
             _builder_3.append(value, "");
@@ -1158,7 +1031,7 @@ public class CCompiler {
             _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
             _builder_3.append("reg.internal=");
-            Integer _get_1 = this.varIdx.get(info.info.name);
+            Integer _get_1 = this.cce.varIdx.get(info.info.name);
             _builder_3.append(_get_1, "	");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
@@ -1174,8 +1047,8 @@ public class CCompiler {
         }
         {
           if (info.isPred) {
-            String _javaName_9 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_9, "");
+            String _idName_9 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_9, "");
             _builder_3.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           }
         }
@@ -1185,130 +1058,6 @@ public class CCompiler {
       _xblockexpression = (_xifexpression_1);
     }
     return _xblockexpression;
-  }
-  
-  public long dimMask(final InternalInformation info) {
-    final int size = this.getTotalSize(info.info);
-    final long res = Long.highestOneBit(size);
-    boolean _equals = (res == size);
-    if (_equals) {
-      return (res - 1);
-    }
-    long _doubleLessThan = (res << 1);
-    return (_doubleLessThan - 1);
-  }
-  
-  public int arrayAccess(final InternalInformation v) {
-    final ArrayList<Integer> dims = this.dimsLastOne(v.info);
-    int off = 0;
-    int _length = v.arrayIdx.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        final int arr = v.arrayIdx[(i).intValue()];
-        final Integer dim = dims.get((i).intValue());
-        int _multiply = (arr * (dim).intValue());
-        int _plus = (off + _multiply);
-        off = _plus;
-      }
-    }
-    return off;
-  }
-  
-  public StringBuilder arrayAccessArrIdx(final VariableInformation v) {
-    StringBuilder _stringBuilder = new StringBuilder();
-    final StringBuilder varAccess = _stringBuilder;
-    final ArrayList<Integer> dims = this.dimsLastOne(v);
-    int _length = v.dimensions.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        final Integer dim = dims.get((i).intValue());
-        boolean _notEquals = ((dim).intValue() != 1);
-        if (_notEquals) {
-          StringConcatenation _builder = new StringConcatenation();
-          _builder.append("arrayIdx[");
-          _builder.append(i, "");
-          _builder.append("]*");
-          _builder.append(dim, "");
-          varAccess.append(_builder);
-        } else {
-          StringConcatenation _builder_1 = new StringConcatenation();
-          _builder_1.append("arrayIdx[");
-          _builder_1.append(i, "");
-          _builder_1.append("]");
-          varAccess.append(_builder_1);
-        }
-      }
-    }
-    return varAccess;
-  }
-  
-  public ArrayList<Integer> dimsLastOne(final VariableInformation v) {
-    ArrayList<Integer> _xblockexpression = null;
-    {
-      ArrayList<Integer> _arrayList = new ArrayList<Integer>(((Collection<? extends Integer>)Conversions.doWrapArray(v.dimensions)));
-      final ArrayList<Integer> dims = _arrayList;
-      int _size = dims.size();
-      boolean _greaterThan = (_size > 0);
-      if (_greaterThan) {
-        int _size_1 = dims.size();
-        int _minus = (_size_1 - 1);
-        dims.set(_minus, Integer.valueOf(1));
-      }
-      _xblockexpression = (dims);
-    }
-    return _xblockexpression;
-  }
-  
-  public StringBuilder arrayAccess(final VariableInformation v, final List<Integer> arr) {
-    StringBuilder _stringBuilder = new StringBuilder();
-    final StringBuilder varAccess = _stringBuilder;
-    final ArrayList<Integer> dims = this.dimsLastOne(v);
-    int _length = v.dimensions.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        final Integer dim = dims.get((i).intValue());
-        boolean _notEquals = ((i).intValue() != 0);
-        if (_notEquals) {
-          varAccess.append("+");
-        }
-        Integer _xifexpression = null;
-        boolean _equals = Objects.equal(arr, null);
-        if (_equals) {
-          _xifexpression = i;
-        } else {
-          Integer _get = arr.get((i).intValue());
-          _xifexpression = _get;
-        }
-        final Integer idx = _xifexpression;
-        boolean _notEquals_1 = ((dim).intValue() != 1);
-        if (_notEquals_1) {
-          StringConcatenation _builder = new StringConcatenation();
-          _builder.append("a");
-          _builder.append(idx, "");
-          _builder.append("*");
-          _builder.append(dim, "");
-          varAccess.append(_builder);
-        } else {
-          StringConcatenation _builder_1 = new StringConcatenation();
-          _builder_1.append("a");
-          _builder_1.append(idx, "");
-          varAccess.append(_builder_1);
-        }
-      }
-    }
-    return varAccess;
-  }
-  
-  public CharSequence toHexString(final long value) {
-    StringConcatenation _builder = new StringConcatenation();
-    _builder.append("0x");
-    String _hexString = Long.toHexString(value);
-    _builder.append(_hexString, "");
-    _builder.append("l");
-    return _builder;
   }
   
   public CharSequence method(final Frame frame) {
@@ -1358,7 +1107,7 @@ public class CCompiler {
       final String last = ("t" + _pop);
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("void ");
-      CharSequence _frameName = this.getFrameName(frame);
+      CharSequence _frameName = this.cce.getFrameName(frame);
       _builder.append(_frameName, "");
       _builder.append("() {");
       _builder.newLineIfNotEmpty();
@@ -1366,11 +1115,11 @@ public class CCompiler {
       _builder.append(func, "	");
       _builder.newLineIfNotEmpty();
       {
-        InternalInformation _asInternal = this.asInternal(frame.outputId);
+        InternalInformation _asInternal = this.cce.asInternal(frame.outputId);
         boolean _notEquals = (!Objects.equal(_asInternal.info.name, "#null"));
         if (_notEquals) {
           _builder.append("\t");
-          InternalInformation _asInternal_1 = this.asInternal(frame.outputId);
+          InternalInformation _asInternal_1 = this.cce.asInternal(frame.outputId);
           CharSequence _setter = this.setter(_asInternal_1, last);
           _builder.append(_setter, "	");
           _builder.newLineIfNotEmpty();
@@ -1390,14 +1139,6 @@ public class CCompiler {
       _xblockexpression = (_builder);
     }
     return _xblockexpression;
-  }
-  
-  public CharSequence getFrameName(final Frame f) {
-    StringConcatenation _builder = new StringConcatenation();
-    _builder.append("frame");
-    String _hexString = Integer.toHexString(f.uniqueID);
-    _builder.append(_hexString, "");
-    return _builder;
   }
   
   public StringBuilder toExpression(final FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
@@ -1421,7 +1162,7 @@ public class CCompiler {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.writeInternal)) {
           _matched=true;
-          final InternalInformation internal = this.asInternal(inst.arg1);
+          final InternalInformation internal = this.cce.asInternal(inst.arg1);
           final VariableInformation info = internal.info;
           int _size = arr.size();
           int _length = info.dimensions.length;
@@ -1429,25 +1170,25 @@ public class CCompiler {
           if (isDynMem) {
             StringConcatenation _builder_1 = new StringConcatenation();
             _builder_1.append("memset(");
-            String _javaName = this.javaName(internal, false);
-            _builder_1.append(_javaName, "");
+            String _idName = this.cce.idName(internal, false, false);
+            _builder_1.append(_idName, "");
             _builder_1.append(", t");
             _builder_1.append(a, "");
             _builder_1.append(", ");
-            int _totalSize = this.getTotalSize(info);
-            _builder_1.append(_totalSize, "");
+            int _talSize = this.cce.totalSize(info);
+            _builder_1.append(_talSize, "");
             _builder_1.append(");");
             sb.append(_builder_1);
           } else {
             StringConcatenation _builder_2 = new StringConcatenation();
-            String _javaName_1 = this.javaName(internal, false);
-            _builder_2.append(_javaName_1, "");
+            String _idName_1 = this.cce.idName(internal, false, false);
+            _builder_2.append(_idName_1, "");
             {
               int _length_1 = info.dimensions.length;
               boolean _greaterThan = (_length_1 > 0);
               if (_greaterThan) {
                 _builder_2.append("[");
-                StringBuilder _arrayAccess = this.arrayAccess(info, arr);
+                StringBuilder _arrayAccess = this.cce.arrayAccess(info, arr);
                 _builder_2.append(_arrayAccess, "");
                 _builder_2.append("]");
               }
@@ -1467,7 +1208,7 @@ public class CCompiler {
             _builder_3.newLine();
             _builder_3.append("\t");
             _builder_3.append("reg.internal=");
-            Integer _get = this.varIdx.get(info.name);
+            Integer _get = this.cce.varIdx.get(info.name);
             _builder_3.append(_get, "	");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
@@ -1475,8 +1216,8 @@ public class CCompiler {
             _builder_3.append("reg.offset=");
             {
               if (isDynMem) {
-                int _arrayAccess_1 = this.arrayAccess(internal);
-                _builder_3.append(_arrayAccess_1, "	");
+                int _arrayFixedOffset = this.cce.arrayFixedOffset(internal);
+                _builder_3.append(_arrayFixedOffset, "	");
               } else {
                 _builder_3.append("-1");
               }
@@ -1500,55 +1241,17 @@ public class CCompiler {
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.and)) {
+        if (Objects.equal(_switchValue,Instruction.bitAccessSingle)) {
           _matched=true;
           StringConcatenation _builder_4 = new StringConcatenation();
           _builder_4.append("uint64_t t");
           _builder_4.append(pos, "");
-          _builder_4.append("=t");
-          _builder_4.append(b, "");
-          _builder_4.append(" & t");
+          _builder_4.append("=(t");
           _builder_4.append(a, "");
-          _builder_4.append(";");
+          _builder_4.append(" >> ");
+          _builder_4.append(inst.arg1, "");
+          _builder_4.append(") & 1;");
           sb.append(_builder_4);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.arith_neg)) {
-          _matched=true;
-          StringConcatenation _builder_5 = new StringConcatenation();
-          _builder_5.append("uint64_t t");
-          _builder_5.append(pos, "");
-          _builder_5.append("=-t");
-          _builder_5.append(a, "");
-          _builder_5.append(";");
-          sb.append(_builder_5);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.bit_neg)) {
-          _matched=true;
-          StringConcatenation _builder_6 = new StringConcatenation();
-          _builder_6.append("uint64_t t");
-          _builder_6.append(pos, "");
-          _builder_6.append("=~t");
-          _builder_6.append(a, "");
-          _builder_6.append(";");
-          sb.append(_builder_6);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.bitAccessSingle)) {
-          _matched=true;
-          StringConcatenation _builder_7 = new StringConcatenation();
-          _builder_7.append("uint64_t t");
-          _builder_7.append(pos, "");
-          _builder_7.append("=(t");
-          _builder_7.append(a, "");
-          _builder_7.append(" >> ");
-          _builder_7.append(inst.arg1, "");
-          _builder_7.append(") & 1;");
-          sb.append(_builder_7);
         }
       }
       if (!_matched) {
@@ -1560,18 +1263,18 @@ public class CCompiler {
           int _plus_1 = (_minus + 1);
           long _doubleLessThan = (1l << _plus_1);
           final long mask = (_doubleLessThan - 1);
-          StringConcatenation _builder_8 = new StringConcatenation();
-          _builder_8.append("uint64_t t");
-          _builder_8.append(pos, "");
-          _builder_8.append("=(t");
-          _builder_8.append(a, "");
-          _builder_8.append(" >> ");
-          _builder_8.append(lowBit, "");
-          _builder_8.append(") & ");
-          CharSequence _hexString = this.toHexString(mask);
-          _builder_8.append(_hexString, "");
-          _builder_8.append(";");
-          sb.append(_builder_8);
+          StringConcatenation _builder_5 = new StringConcatenation();
+          _builder_5.append("uint64_t t");
+          _builder_5.append(pos, "");
+          _builder_5.append("=(t");
+          _builder_5.append(a, "");
+          _builder_5.append(" >> ");
+          _builder_5.append(lowBit, "");
+          _builder_5.append(") & ");
+          CharSequence _hexStringL = this.cce.toHexStringL(mask);
+          _builder_5.append(_hexStringL, "");
+          _builder_5.append(";");
+          sb.append(_builder_5);
         }
       }
       if (!_matched) {
@@ -1581,32 +1284,32 @@ public class CCompiler {
           if (_notEquals) {
             int _min = Math.min(inst.arg1, inst.arg2);
             final int shiftWidth = (64 - _min);
-            StringConcatenation _builder_9 = new StringConcatenation();
-            _builder_9.append("int64_t c");
-            _builder_9.append(pos, "");
-            _builder_9.append("=t");
-            _builder_9.append(a, "");
-            _builder_9.append(" << ");
-            _builder_9.append(shiftWidth, "");
-            _builder_9.append(";");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("uint64_t t");
-            _builder_9.append(pos, "");
-            _builder_9.append("=c");
-            _builder_9.append(pos, "");
-            _builder_9.append(" >> ");
-            _builder_9.append(shiftWidth, "");
-            _builder_9.append(";");
-            _builder_9.newLineIfNotEmpty();
-            sb.append(_builder_9);
+            StringConcatenation _builder_6 = new StringConcatenation();
+            _builder_6.append("int64_t c");
+            _builder_6.append(pos, "");
+            _builder_6.append("=t");
+            _builder_6.append(a, "");
+            _builder_6.append(" << ");
+            _builder_6.append(shiftWidth, "");
+            _builder_6.append(";");
+            _builder_6.newLineIfNotEmpty();
+            _builder_6.append("uint64_t t");
+            _builder_6.append(pos, "");
+            _builder_6.append("=c");
+            _builder_6.append(pos, "");
+            _builder_6.append(" >> ");
+            _builder_6.append(shiftWidth, "");
+            _builder_6.append(";");
+            _builder_6.newLineIfNotEmpty();
+            sb.append(_builder_6);
           } else {
-            StringConcatenation _builder_10 = new StringConcatenation();
-            _builder_10.append("uint64_t t");
-            _builder_10.append(pos, "");
-            _builder_10.append("=t");
-            _builder_10.append(a, "");
-            _builder_10.append(";");
-            sb.append(_builder_10);
+            StringConcatenation _builder_7 = new StringConcatenation();
+            _builder_7.append("uint64_t t");
+            _builder_7.append(pos, "");
+            _builder_7.append("=t");
+            _builder_7.append(a, "");
+            _builder_7.append(";");
+            sb.append(_builder_7);
           }
         }
       }
@@ -1615,411 +1318,399 @@ public class CCompiler {
           _matched=true;
           boolean _notEquals_1 = (inst.arg1 != 64);
           if (_notEquals_1) {
-            StringConcatenation _builder_11 = new StringConcatenation();
-            _builder_11.append("uint64_t t");
-            _builder_11.append(pos, "");
-            _builder_11.append("=t");
-            _builder_11.append(a, "");
-            _builder_11.append(" & ");
-            CharSequence _asMask = this.asMask(inst.arg1);
-            _builder_11.append(_asMask, "");
-            _builder_11.append(";");
-            sb.append(_builder_11);
+            StringConcatenation _builder_8 = new StringConcatenation();
+            _builder_8.append("uint64_t t");
+            _builder_8.append(pos, "");
+            _builder_8.append("=t");
+            _builder_8.append(a, "");
+            _builder_8.append(" & ");
+            CharSequence _asMaskL = this.cce.asMaskL(inst.arg1);
+            _builder_8.append(_asMaskL, "");
+            _builder_8.append(";");
+            sb.append(_builder_8);
           } else {
-            StringConcatenation _builder_12 = new StringConcatenation();
-            _builder_12.append("uint64_t t");
-            _builder_12.append(pos, "");
-            _builder_12.append("=t");
-            _builder_12.append(a, "");
-            _builder_12.append(";");
-            sb.append(_builder_12);
+            StringConcatenation _builder_9 = new StringConcatenation();
+            _builder_9.append("uint64_t t");
+            _builder_9.append(pos, "");
+            _builder_9.append("=t");
+            _builder_9.append(a, "");
+            _builder_9.append(";");
+            sb.append(_builder_9);
           }
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.logiNeg)) {
           _matched=true;
-          StringConcatenation _builder_13 = new StringConcatenation();
-          _builder_13.append("bool t");
-          _builder_13.append(pos, "");
-          _builder_13.append("=!t");
-          _builder_13.append(a, "");
-          _builder_13.append(";");
-          sb.append(_builder_13);
+          StringConcatenation _builder_10 = new StringConcatenation();
+          _builder_10.append("bool t");
+          _builder_10.append(pos, "");
+          _builder_10.append("=!t");
+          _builder_10.append(a, "");
+          _builder_10.append(";");
+          sb.append(_builder_10);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.logiAnd)) {
           _matched=true;
-          StringConcatenation _builder_14 = new StringConcatenation();
-          _builder_14.append("bool t");
-          _builder_14.append(pos, "");
-          _builder_14.append("=t");
-          _builder_14.append(a, "");
-          _builder_14.append(" && t");
-          _builder_14.append(b, "");
-          _builder_14.append(";");
-          sb.append(_builder_14);
+          StringConcatenation _builder_11 = new StringConcatenation();
+          _builder_11.append("bool t");
+          _builder_11.append(pos, "");
+          _builder_11.append("=t");
+          _builder_11.append(a, "");
+          _builder_11.append(" && t");
+          _builder_11.append(b, "");
+          _builder_11.append(";");
+          sb.append(_builder_11);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.logiOr)) {
           _matched=true;
-          StringConcatenation _builder_15 = new StringConcatenation();
-          _builder_15.append("bool t");
-          _builder_15.append(pos, "");
-          _builder_15.append("=t");
-          _builder_15.append(a, "");
-          _builder_15.append(" || t");
-          _builder_15.append(b, "");
-          _builder_15.append(";");
-          sb.append(_builder_15);
+          StringConcatenation _builder_12 = new StringConcatenation();
+          _builder_12.append("bool t");
+          _builder_12.append(pos, "");
+          _builder_12.append("=t");
+          _builder_12.append(a, "");
+          _builder_12.append(" || t");
+          _builder_12.append(b, "");
+          _builder_12.append(";");
+          sb.append(_builder_12);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const0)) {
           _matched=true;
-          StringConcatenation _builder_16 = new StringConcatenation();
-          _builder_16.append("uint64_t t");
-          _builder_16.append(pos, "");
-          _builder_16.append("=0;");
-          sb.append(_builder_16);
+          StringConcatenation _builder_13 = new StringConcatenation();
+          _builder_13.append("uint64_t t");
+          _builder_13.append(pos, "");
+          _builder_13.append("=0;");
+          sb.append(_builder_13);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const1)) {
           _matched=true;
-          StringConcatenation _builder_17 = new StringConcatenation();
-          _builder_17.append("uint64_t t");
-          _builder_17.append(pos, "");
-          _builder_17.append("=1;");
-          sb.append(_builder_17);
+          StringConcatenation _builder_14 = new StringConcatenation();
+          _builder_14.append("uint64_t t");
+          _builder_14.append(pos, "");
+          _builder_14.append("=1;");
+          sb.append(_builder_14);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.const2)) {
           _matched=true;
-          StringConcatenation _builder_18 = new StringConcatenation();
-          _builder_18.append("uint64_t t");
-          _builder_18.append(pos, "");
-          _builder_18.append("=2;");
-          sb.append(_builder_18);
+          StringConcatenation _builder_15 = new StringConcatenation();
+          _builder_15.append("uint64_t t");
+          _builder_15.append(pos, "");
+          _builder_15.append("=2;");
+          sb.append(_builder_15);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.constAll1)) {
           _matched=true;
-          StringConcatenation _builder_19 = new StringConcatenation();
-          _builder_19.append("uint64_t t");
-          _builder_19.append(pos, "");
-          _builder_19.append("=");
-          CharSequence _asMask_1 = this.asMask(inst.arg1);
-          _builder_19.append(_asMask_1, "");
-          _builder_19.append(";");
-          sb.append(_builder_19);
+          StringConcatenation _builder_16 = new StringConcatenation();
+          _builder_16.append("uint64_t t");
+          _builder_16.append(pos, "");
+          _builder_16.append("=");
+          CharSequence _asMaskL_1 = this.cce.asMaskL(inst.arg1);
+          _builder_16.append(_asMaskL_1, "");
+          _builder_16.append(";");
+          sb.append(_builder_16);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.concat)) {
           _matched=true;
-          StringConcatenation _builder_20 = new StringConcatenation();
-          _builder_20.append("uint64_t t");
-          _builder_20.append(pos, "");
-          _builder_20.append("=(t");
-          _builder_20.append(b, "");
-          _builder_20.append(" << ");
-          _builder_20.append(inst.arg2, "");
-          _builder_20.append(") | t");
-          _builder_20.append(a, "");
-          _builder_20.append(";");
-          sb.append(_builder_20);
+          StringConcatenation _builder_17 = new StringConcatenation();
+          _builder_17.append("uint64_t t");
+          _builder_17.append(pos, "");
+          _builder_17.append("=(t");
+          _builder_17.append(b, "");
+          _builder_17.append(" << ");
+          _builder_17.append(inst.arg2, "");
+          _builder_17.append(") | t");
+          _builder_17.append(a, "");
+          _builder_17.append(";");
+          sb.append(_builder_17);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.loadConstant)) {
           _matched=true;
-          StringConcatenation _builder_21 = new StringConcatenation();
-          _builder_21.append("uint64_t t");
-          _builder_21.append(pos, "");
-          _builder_21.append("=");
-          CharSequence _constant = this.constant(inst.arg1, f);
-          _builder_21.append(_constant, "");
-          _builder_21.append(";");
-          sb.append(_builder_21);
+          StringConcatenation _builder_18 = new StringConcatenation();
+          _builder_18.append("uint64_t t");
+          _builder_18.append(pos, "");
+          _builder_18.append("=");
+          CharSequence _constant = this.cce.constant(inst.arg1, f);
+          _builder_18.append(_constant, "");
+          _builder_18.append(";");
+          sb.append(_builder_18);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.loadInternal)) {
           _matched=true;
-          final InternalInformation internal_1 = this.asInternal(inst.arg1);
+          final InternalInformation internal_1 = this.cce.asInternal(inst.arg1);
           CharSequence _ter = this.getter(internal_1, false, pos, f.uniqueID);
           sb.append(_ter);
           arr.clear();
         }
       }
       if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.arith_neg)) {
+          _matched=true;
+          StringConcatenation _builder_19 = new StringConcatenation();
+          _builder_19.append("uint64_t t");
+          _builder_19.append(pos, "");
+          _builder_19.append("=");
+          CharSequence _singleOpValue = this.cce.singleOpValue("-", "(int64_t)", a, inst.arg1);
+          _builder_19.append(_singleOpValue, "");
+          _builder_19.append(";");
+          sb.append(_builder_19);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.bit_neg)) {
+          _matched=true;
+          StringConcatenation _builder_20 = new StringConcatenation();
+          _builder_20.append("uint64_t t");
+          _builder_20.append(pos, "");
+          _builder_20.append("=");
+          CharSequence _singleOpValue_1 = this.cce.singleOpValue("~", "(int64_t)", a, inst.arg1);
+          _builder_20.append(_singleOpValue_1, "");
+          _builder_20.append(";");
+          sb.append(_builder_20);
+        }
+      }
+      if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.and)) {
           _matched=true;
+          String _twoOp = this.twoOp("&", inst.arg1, pos, a, b);
+          sb.append(_twoOp);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.or)) {
+          _matched=true;
+          String _twoOp_1 = this.twoOp("|", inst.arg1, pos, a, b);
+          sb.append(_twoOp_1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.xor)) {
+          _matched=true;
+          String _twoOp_2 = this.twoOp("^", inst.arg1, pos, a, b);
+          sb.append(_twoOp_2);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.plus)) {
+          _matched=true;
+          String _twoOp_3 = this.twoOp("+", inst.arg1, pos, a, b);
+          sb.append(_twoOp_3);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.minus)) {
+          _matched=true;
+          String _twoOp_4 = this.twoOp("-", inst.arg1, pos, a, b);
+          sb.append(_twoOp_4);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.mul)) {
+          _matched=true;
+          String _twoOp_5 = this.twoOp("*", inst.arg1, pos, a, b);
+          sb.append(_twoOp_5);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.div)) {
+          _matched=true;
+          String _twoOp_6 = this.twoOp("/", inst.arg1, pos, a, b);
+          sb.append(_twoOp_6);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.sll)) {
+          _matched=true;
+          String _twoOp_7 = this.twoOp("<<", inst.arg1, pos, a, b);
+          sb.append(_twoOp_7);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.srl)) {
+          _matched=true;
+          String _twoOp_8 = this.twoOp(">>", inst.arg1, pos, a, b);
+          sb.append(_twoOp_8);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.sra)) {
+          _matched=true;
+          StringConcatenation _builder_21 = new StringConcatenation();
+          _builder_21.append("uint64_t t");
+          _builder_21.append(pos, "");
+          _builder_21.append("=");
+          CharSequence _sra = this.sra(inst.arg1, a, b);
+          _builder_21.append(_sra, "");
+          _builder_21.append(";");
+          sb.append(_builder_21);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.eq)) {
+          _matched=true;
           StringConcatenation _builder_22 = new StringConcatenation();
-          _builder_22.append("uint64_t t");
+          _builder_22.append("bool t");
           _builder_22.append(pos, "");
           _builder_22.append("=t");
           _builder_22.append(b, "");
-          _builder_22.append(" & t");
+          _builder_22.append(" == t");
           _builder_22.append(a, "");
           _builder_22.append(";");
           sb.append(_builder_22);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.or)) {
+        if (Objects.equal(_switchValue,Instruction.not_eq)) {
           _matched=true;
           StringConcatenation _builder_23 = new StringConcatenation();
-          _builder_23.append("uint64_t t");
+          _builder_23.append("bool t");
           _builder_23.append(pos, "");
           _builder_23.append("=t");
           _builder_23.append(b, "");
-          _builder_23.append(" | t");
+          _builder_23.append(" != t");
           _builder_23.append(a, "");
           _builder_23.append(";");
           sb.append(_builder_23);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.xor)) {
+        if (Objects.equal(_switchValue,Instruction.less)) {
           _matched=true;
           StringConcatenation _builder_24 = new StringConcatenation();
-          _builder_24.append("uint64_t t");
+          _builder_24.append("bool t");
           _builder_24.append(pos, "");
           _builder_24.append("=t");
           _builder_24.append(b, "");
-          _builder_24.append(" ^ t");
+          _builder_24.append(" < t");
           _builder_24.append(a, "");
           _builder_24.append(";");
           sb.append(_builder_24);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.plus)) {
+        if (Objects.equal(_switchValue,Instruction.less_eq)) {
           _matched=true;
           StringConcatenation _builder_25 = new StringConcatenation();
-          _builder_25.append("uint64_t t");
+          _builder_25.append("bool t");
           _builder_25.append(pos, "");
           _builder_25.append("=t");
           _builder_25.append(b, "");
-          _builder_25.append(" + t");
+          _builder_25.append(" <= t");
           _builder_25.append(a, "");
           _builder_25.append(";");
           sb.append(_builder_25);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.minus)) {
+        if (Objects.equal(_switchValue,Instruction.greater)) {
           _matched=true;
           StringConcatenation _builder_26 = new StringConcatenation();
-          _builder_26.append("uint64_t t");
+          _builder_26.append("bool t");
           _builder_26.append(pos, "");
           _builder_26.append("=t");
           _builder_26.append(b, "");
-          _builder_26.append(" - t");
+          _builder_26.append(" > t");
           _builder_26.append(a, "");
           _builder_26.append(";");
           sb.append(_builder_26);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.mul)) {
+        if (Objects.equal(_switchValue,Instruction.greater_eq)) {
           _matched=true;
           StringConcatenation _builder_27 = new StringConcatenation();
-          _builder_27.append("uint64_t t");
+          _builder_27.append("bool t");
           _builder_27.append(pos, "");
           _builder_27.append("=t");
           _builder_27.append(b, "");
-          _builder_27.append(" * t");
+          _builder_27.append(" >= t");
           _builder_27.append(a, "");
           _builder_27.append(";");
           sb.append(_builder_27);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.div)) {
-          _matched=true;
-          StringConcatenation _builder_28 = new StringConcatenation();
-          _builder_28.append("uint64_t t");
-          _builder_28.append(pos, "");
-          _builder_28.append("=t");
-          _builder_28.append(b, "");
-          _builder_28.append(" / t");
-          _builder_28.append(a, "");
-          _builder_28.append(";");
-          sb.append(_builder_28);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sll)) {
-          _matched=true;
-          StringConcatenation _builder_29 = new StringConcatenation();
-          _builder_29.append("uint64_t t");
-          _builder_29.append(pos, "");
-          _builder_29.append("=t");
-          _builder_29.append(b, "");
-          _builder_29.append(" << t");
-          _builder_29.append(a, "");
-          _builder_29.append(";");
-          sb.append(_builder_29);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.srl)) {
-          _matched=true;
-          StringConcatenation _builder_30 = new StringConcatenation();
-          _builder_30.append("uint64_t t");
-          _builder_30.append(pos, "");
-          _builder_30.append("=t");
-          _builder_30.append(b, "");
-          _builder_30.append(" >> t");
-          _builder_30.append(a, "");
-          _builder_30.append(";");
-          sb.append(_builder_30);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sra)) {
-          _matched=true;
-          StringConcatenation _builder_31 = new StringConcatenation();
-          _builder_31.append("uint64_t t");
-          _builder_31.append(pos, "");
-          _builder_31.append("=((int64_t)t");
-          _builder_31.append(b, "");
-          _builder_31.append(") >> t");
-          _builder_31.append(a, "");
-          _builder_31.append(";");
-          sb.append(_builder_31);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.eq)) {
-          _matched=true;
-          StringConcatenation _builder_32 = new StringConcatenation();
-          _builder_32.append("bool t");
-          _builder_32.append(pos, "");
-          _builder_32.append("=t");
-          _builder_32.append(b, "");
-          _builder_32.append(" == t");
-          _builder_32.append(a, "");
-          _builder_32.append(";");
-          sb.append(_builder_32);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.not_eq)) {
-          _matched=true;
-          StringConcatenation _builder_33 = new StringConcatenation();
-          _builder_33.append("bool t");
-          _builder_33.append(pos, "");
-          _builder_33.append("=t");
-          _builder_33.append(b, "");
-          _builder_33.append(" != t");
-          _builder_33.append(a, "");
-          _builder_33.append(";");
-          sb.append(_builder_33);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less)) {
-          _matched=true;
-          StringConcatenation _builder_34 = new StringConcatenation();
-          _builder_34.append("bool t");
-          _builder_34.append(pos, "");
-          _builder_34.append("=t");
-          _builder_34.append(b, "");
-          _builder_34.append(" < t");
-          _builder_34.append(a, "");
-          _builder_34.append(";");
-          sb.append(_builder_34);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less_eq)) {
-          _matched=true;
-          StringConcatenation _builder_35 = new StringConcatenation();
-          _builder_35.append("bool t");
-          _builder_35.append(pos, "");
-          _builder_35.append("=t");
-          _builder_35.append(b, "");
-          _builder_35.append(" <= t");
-          _builder_35.append(a, "");
-          _builder_35.append(";");
-          sb.append(_builder_35);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater)) {
-          _matched=true;
-          StringConcatenation _builder_36 = new StringConcatenation();
-          _builder_36.append("bool t");
-          _builder_36.append(pos, "");
-          _builder_36.append("=t");
-          _builder_36.append(b, "");
-          _builder_36.append(" > t");
-          _builder_36.append(a, "");
-          _builder_36.append(";");
-          sb.append(_builder_36);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater_eq)) {
-          _matched=true;
-          StringConcatenation _builder_37 = new StringConcatenation();
-          _builder_37.append("bool t");
-          _builder_37.append(pos, "");
-          _builder_37.append("=t");
-          _builder_37.append(b, "");
-          _builder_37.append(" >= t");
-          _builder_37.append(a, "");
-          _builder_37.append(";");
-          sb.append(_builder_37);
-        }
-      }
-      if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
           _matched=true;
-          StringConcatenation _builder_38 = new StringConcatenation();
-          InternalInformation _asInternal = this.asInternal(inst.arg1);
-          String _javaName_2 = this.javaName(_asInternal.info, false);
-          _builder_38.append(_javaName_2, "");
-          _builder_38.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
-          sb.append(_builder_38);
+          StringConcatenation _builder_28 = new StringConcatenation();
+          InternalInformation _asInternal = this.cce.asInternal(inst.arg1);
+          String _idName_2 = this.cce.idName(_asInternal.info, false, false);
+          _builder_28.append(_idName_2, "");
+          _builder_28.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+          sb.append(_builder_28);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
-          StringConcatenation _builder_39 = new StringConcatenation();
-          InternalInformation _asInternal_1 = this.asInternal(inst.arg1);
-          String _javaName_3 = this.javaName(_asInternal_1.info, false);
-          _builder_39.append(_javaName_3, "");
-          _builder_39.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
-          sb.append(_builder_39);
+          StringConcatenation _builder_29 = new StringConcatenation();
+          InternalInformation _asInternal_1 = this.cce.asInternal(inst.arg1);
+          String _idName_3 = this.cce.idName(_asInternal_1.info, false, false);
+          _builder_29.append(_idName_3, "");
+          _builder_29.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+          sb.append(_builder_29);
         }
       }
-      StringConcatenation _builder_40 = new StringConcatenation();
-      _builder_40.append("//");
-      _builder_40.append(inst, "");
-      _builder_40.newLineIfNotEmpty();
-      StringBuilder _append = sb.append(_builder_40);
+      StringConcatenation _builder_30 = new StringConcatenation();
+      _builder_30.append("//");
+      _builder_30.append(inst, "");
+      _builder_30.newLineIfNotEmpty();
+      StringBuilder _append = sb.append(_builder_30);
       _xblockexpression = (_append);
     }
     return _xblockexpression;
   }
   
-  public CharSequence constant(final int id, final Frame f) {
+  public CharSequence sra(final int targetSizeWithType, final int a, final int b) {
+    final int targetSize = (targetSizeWithType >> 1);
+    final int shift = (64 - targetSize);
+    int _bitwiseAnd = (targetSizeWithType & 1);
+    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
+    if (_tripleEquals) {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("((int64_t)t");
+      _builder.append(a, "");
+      _builder.append(") >> t");
+      _builder.append(b, "");
+      return this.cce.signExtend(_builder.toString(), "(int64_t)", shift);
+    }
+    StringConcatenation _builder_1 = new StringConcatenation();
+    _builder_1.append("(((int64_t)t");
+    _builder_1.append(a, "");
+    _builder_1.append(") >> t");
+    _builder_1.append(b, "");
+    _builder_1.append(") & ");
+    CharSequence _asMaskL = this.cce.asMaskL(targetSize);
+    _builder_1.append(_asMaskL, "");
+    return _builder_1.toString();
+  }
+  
+  public String twoOp(final String op, final int targetSizeWithType, final int pos, final int a, final int b) {
     StringConcatenation _builder = new StringConcatenation();
-    BigInteger _get = f.constants[id];
-    long _longValue = _get.longValue();
-    CharSequence _hexString = this.toHexString(_longValue);
-    _builder.append(_hexString, "");
-    return _builder;
+    _builder.append("uint64_t t");
+    _builder.append(pos, "");
+    _builder.append("=");
+    CharSequence _twoOpValue = this.cce.twoOpValue(op, "(int64_t)", a, b, targetSizeWithType);
+    _builder.append(_twoOpValue, "");
+    _builder.append(";");
+    return _builder.toString();
   }
   
   public CharSequence init(final VariableInformation info) {
@@ -2037,22 +1728,22 @@ public class CCompiler {
         size = _multiply;
       }
       StringConcatenation _builder_1 = new StringConcatenation();
-      String _javaName = this.javaName(info, false);
-      _builder_1.append(_javaName, "");
+      String _idName = this.cce.idName(info, false, false);
+      _builder_1.append(_idName, "");
       _builder_1.append("=new ");
-      String _javaType = this.getJavaType(info);
-      _builder_1.append(_javaType, "");
+      String _cType = this.cType(info);
+      _builder_1.append(_cType, "");
       _builder_1.append("[");
       _builder_1.append(size, "");
       _builder_1.append("];");
       _builder_1.newLineIfNotEmpty();
       {
         if (info.isRegister) {
-          String _javaName_1 = this.javaName(info, false);
-          _builder_1.append(_javaName_1, "");
+          String _idName_1 = this.cce.idName(info, false, false);
+          _builder_1.append(_idName_1, "");
           _builder_1.append("$reg=new ");
-          String _javaType_1 = this.getJavaType(info);
-          _builder_1.append(_javaType_1, "");
+          String _cType_1 = this.cType(info);
+          _builder_1.append(_cType_1, "");
           _builder_1.append("[");
           _builder_1.append(size, "");
           _builder_1.append("];");
@@ -2064,8 +1755,8 @@ public class CCompiler {
     return _xblockexpression;
   }
   
-  public String getJavaType(final InternalInformation ii) {
-    final String jt = this.getJavaType(ii.info);
+  public String cType(final InternalInformation ii) {
+    final String jt = this.cType(ii.info);
     int _length = ii.arrayIdx.length;
     int _length_1 = ii.info.dimensions.length;
     boolean _notEquals = (_length != _length_1);
@@ -2075,7 +1766,7 @@ public class CCompiler {
     return jt;
   }
   
-  public String getJavaType(final VariableInformation information) {
+  public String cType(final VariableInformation information) {
     boolean _startsWith = information.name.startsWith(InternalInformation.PRED_PREFIX);
     if (_startsWith) {
       return "bool";
@@ -2083,79 +1774,46 @@ public class CCompiler {
     return "uint64_t";
   }
   
-  public String javaName(final VariableInformation information, final boolean prev) {
-    return this.javaName(information.name, prev);
-  }
-  
-  public String javaName(final InternalInformation ii, final boolean prev) {
-    if (ii.fixedArray) {
-      return this.javaName(ii.fullName, prev);
-    }
-    return this.javaName(ii.info, prev);
-  }
-  
-  public String javaName(final String name, final boolean prev) {
-    String _replaceAll = name.replaceAll("\\.", "_");
-    String _replaceAll_1 = _replaceAll.replaceAll("\\{", "Bit");
-    String _replaceAll_2 = _replaceAll_1.replaceAll("\\}", "");
-    String _replaceAll_3 = _replaceAll_2.replaceAll(":", "to");
-    String _replaceAll_4 = _replaceAll_3.replaceAll("\\[", "arr");
-    String res = _replaceAll_4.replaceAll("\\]", "");
-    boolean _startsWith = res.startsWith("$");
-    if (_startsWith) {
-      String _substring = res.substring(1);
-      res = _substring;
-    }
-    boolean _startsWith_1 = res.startsWith("#");
-    if (_startsWith_1) {
-      String _substring_1 = res.substring(1);
-      res = _substring_1;
-    }
-    if (prev) {
-      return (res + "_prev");
-    }
-    return res;
-  }
-  
   public CharSequence decl(final VariableInformation info, final Boolean includePrev) {
     StringConcatenation _builder = new StringConcatenation();
     {
       boolean _or = false;
-      boolean _isPredicate = this.isPredicate(info);
+      boolean _isPredicate = this.cce.isPredicate(info);
       if (_isPredicate) {
         _or = true;
       } else {
         boolean _and = false;
-        Boolean _get = this.prevMap.get(info.name);
+        Boolean _get = this.cce.prevMap.get(info.name);
         boolean _notEquals = (!Objects.equal(_get, null));
         if (!_notEquals) {
           _and = false;
         } else {
-          Boolean _get_1 = this.prevMap.get(info.name);
+          Boolean _get_1 = this.cce.prevMap.get(info.name);
           _and = (_notEquals && (_get_1).booleanValue());
         }
         _or = (_isPredicate || _and);
       }
       if (_or) {
         _builder.append("uint64_t ");
-        String _javaName = this.javaName(info, false);
-        _builder.append(_javaName, "");
+        String _idName = this.cce.idName(info, false, 
+          false);
+        _builder.append(_idName, "");
         _builder.append("_update=0;");
       }
     }
     _builder.newLineIfNotEmpty();
-    String _javaType = this.getJavaType(info);
-    _builder.append(_javaType, "");
+    String _cType = this.cType(info);
+    _builder.append(_cType, "");
     _builder.append(" ");
-    String _javaName_1 = this.javaName(info, false);
-    _builder.append(_javaName_1, "");
+    String _idName_1 = this.cce.idName(info, false, false);
+    _builder.append(_idName_1, "");
     {
       boolean _isEmpty = IterableExtensions.isEmpty(((Iterable<? extends Object>)Conversions.doWrapArray(info.dimensions)));
       boolean _not = (!_isEmpty);
       if (_not) {
         _builder.append("[");
-        int _totalSize = this.getTotalSize(info);
-        _builder.append(_totalSize, "");
+        int _talSize = this.cce.totalSize(info);
+        _builder.append(_talSize, "");
         _builder.append("]");
       }
     }
@@ -2170,18 +1828,18 @@ public class CCompiler {
         _and_1 = (_notEquals_1 && (includePrev).booleanValue());
       }
       if (_and_1) {
-        String _javaType_1 = this.getJavaType(info);
-        _builder.append(_javaType_1, "");
+        String _cType_1 = this.cType(info);
+        _builder.append(_cType_1, "");
         _builder.append(" ");
-        String _javaName_2 = this.javaName(info, true);
-        _builder.append(_javaName_2, "");
+        String _idName_2 = this.cce.idName(info, true, false);
+        _builder.append(_idName_2, "");
         {
           boolean _isEmpty_1 = IterableExtensions.isEmpty(((Iterable<? extends Object>)Conversions.doWrapArray(info.dimensions)));
           boolean _not_1 = (!_isEmpty_1);
           if (_not_1) {
             _builder.append("[");
-            int _totalSize_1 = this.getTotalSize(info);
-            _builder.append(_totalSize_1, "");
+            int _talSize_1 = this.cce.totalSize(info);
+            _builder.append(_talSize_1, "");
             _builder.append("]");
           }
         }
@@ -2191,19 +1849,19 @@ public class CCompiler {
     _builder.newLineIfNotEmpty();
     {
       if (info.isRegister) {
-        String _javaType_2 = this.getJavaType(info);
-        _builder.append(_javaType_2, "");
+        String _cType_2 = this.cType(info);
+        _builder.append(_cType_2, "");
         _builder.append(" ");
-        String _javaName_3 = this.javaName(info, false);
-        _builder.append(_javaName_3, "");
+        String _idName_3 = this.cce.idName(info, false, false);
+        _builder.append(_idName_3, "");
         _builder.append("$reg");
         {
           boolean _isEmpty_2 = IterableExtensions.isEmpty(((Iterable<? extends Object>)Conversions.doWrapArray(info.dimensions)));
           boolean _not_2 = (!_isEmpty_2);
           if (_not_2) {
             _builder.append("[");
-            int _totalSize_2 = this.getTotalSize(info);
-            _builder.append(_totalSize_2, "");
+            int _talSize_2 = this.cce.totalSize(info);
+            _builder.append(_talSize_2, "");
             _builder.append("]");
           }
         }
@@ -2212,20 +1870,6 @@ public class CCompiler {
     }
     _builder.newLineIfNotEmpty();
     return _builder;
-  }
-  
-  public int getTotalSize(final VariableInformation info) {
-    int size = 1;
-    for (final int d : info.dimensions) {
-      int _multiply = (size * d);
-      size = _multiply;
-    }
-    return size;
-  }
-  
-  public boolean isPredicate(final VariableInformation info) {
-    boolean _startsWith = info.name.startsWith(InternalInformation.PRED_PREFIX);
-    return _startsWith;
   }
   
   public CharSequence getImports() {

@@ -333,7 +333,7 @@ public class FluidFrame {
 			stackCount += ai.instruction.push;
 			stackCount -= ai.instruction.pop;
 			maxStackCount = Math.max(maxStackCount, stackCount);
-			int arg1 = 0, arg2 = 0;
+			Integer arg1 = 0, arg2 = 0;
 			Instruction i = ai.instruction;
 			switch (ai.instruction) {
 			case negPredicate: {
@@ -415,6 +415,8 @@ public class FluidFrame {
 			case cast_int:
 				arg1 = Integer.parseInt(ai.args[0]);
 				arg2 = Integer.parseInt(ai.args[1]);
+				maxDataWidth = Math.max(maxDataWidth, arg1);
+				maxDataWidth = Math.max(maxDataWidth, arg2);
 				break;
 			case concat:
 				// System.out.println("FluidFrame.toFrame()" + ai);
@@ -424,8 +426,39 @@ public class FluidFrame {
 				arg2 = rWidth;
 				maxDataWidth = Math.max(lWidth + rWidth, maxDataWidth);
 				break;
+			case bitAccessSingle:
+				arg1 = Integer.parseInt(ai.args[0]);
+				break;
+			case bitAccessSingleRange:
+				arg1 = Integer.parseInt(ai.args[0]);
+				arg2 = Integer.parseInt(ai.args[1]);
+				break;
+			case constAll1:
+				arg1 = Integer.parseInt(ai.args[0]);
+				break;
+			case and:
+			case arith_neg:
+			case bit_neg:
+			case div:
+			case minus:
+			case mul:
+			case or:
+			case plus:
+			case sll:
+			case sra:
+			case srl:
+			case xor:
+				if (ai.args.length == 0)
+					throw new IllegalArgumentException("missing targetSizeWithType for:" + ai);
+				arg1 = Integer.parseInt(ai.args[0]);
+				break;
 			default:
+				break;
 			}
+			if ((i.argCount > 0) && (arg1 == null))
+				throw new IllegalArgumentException("Missing argument 1 in instruction:" + i + " from instruction:" + ai);
+			if ((i.argCount > 1) && (arg2 == null))
+				throw new IllegalArgumentException("Missing argument 2 in instruction:" + i + " from instruction:" + ai);
 			instr.add(new FastInstruction(i, arg1, arg2));
 		}
 		for (final VariableInformation w : vars.values()) {

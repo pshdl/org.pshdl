@@ -125,6 +125,15 @@ public class SimulationTransformationExtension {
     throw _runtimeException;
   }
   
+  protected FluidFrame _toSimulationModelPred(final HDLStatement obj, final ArgumentedInstruction predicate, final HDLEvaluationContext context) {
+    FluidFrame res = this.toSimulationModel(obj, context);
+    boolean _hasInstructions = res.hasInstructions();
+    if (_hasInstructions) {
+      res.instructions.addFirst(predicate);
+    }
+    return res;
+  }
+  
   protected FluidFrame _toSimulationModel(final HDLInterfaceDeclaration obj, final HDLEvaluationContext context) {
     FluidFrame _fluidFrame = new FluidFrame();
     return _fluidFrame;
@@ -349,6 +358,11 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLSwitchStatement obj, final HDLEvaluationContext context) {
+    FluidFrame _simulationModelPred = this.toSimulationModelPred(obj, null, context);
+    return _simulationModelPred;
+  }
+  
+  protected FluidFrame _toSimulationModelPred(final HDLSwitchStatement obj, final ArgumentedInstruction predicate, final HDLEvaluationContext context) {
     HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
     final String name = _fullNameOf.toString();
     HDLExpression _caseExp = obj.getCaseExp();
@@ -376,24 +390,28 @@ public class SimulationTransformationExtension {
         final String cName = _fullNameOf_1.toString();
         String _plus = (InternalInformation.PRED_PREFIX + cName);
         FluidFrame _fluidFrame = new FluidFrame(_plus, false);
-        final FluidFrame defaultFrame = _fluidFrame;
-        defaultFrame.createPredVar();
+        final FluidFrame caseFrame = _fluidFrame;
+        boolean _notEquals = (!Objects.equal(predicate, null));
+        if (_notEquals) {
+          caseFrame.add(predicate);
+        }
+        caseFrame.createPredVar();
         HDLExpression _label = c.getLabel();
         boolean _equals = Objects.equal(_label, null);
         if (_equals) {
           ArrayList<HDLSwitchCaseStatement> _cases_1 = obj.getCases();
           for (final HDLSwitchCaseStatement cSub : _cases_1) {
-            boolean _notEquals = (!Objects.equal(cSub, c));
-            if (_notEquals) {
+            boolean _notEquals_1 = (!Objects.equal(cSub, c));
+            if (_notEquals_1) {
               HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(cSub);
               String _string = _fullNameOf_2.toString();
               ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.negPredicate, _string);
-              defaultFrame.add(_argumentedInstruction);
+              caseFrame.add(_argumentedInstruction);
             }
           }
-          defaultFrame.add(Instruction.const1);
-          defaultFrame.add(Instruction.const1);
-          defaultFrame.add(Instruction.eq);
+          caseFrame.add(Instruction.const1);
+          caseFrame.add(Instruction.const1);
+          caseFrame.add(Instruction.eq);
         } else {
           HDLExpression _label_1 = c.getLabel();
           final Optional<BigInteger> const_ = ConstantEvaluate.valueOf(_label_1);
@@ -423,24 +441,20 @@ public class SimulationTransformationExtension {
             }
           }
           ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.loadInternal, name);
-          defaultFrame.add(_argumentedInstruction_1);
+          caseFrame.add(_argumentedInstruction_1);
           BigInteger _valueOf = BigInteger.valueOf(l);
-          defaultFrame.addConstant("label", _valueOf);
-          defaultFrame.add(Instruction.eq);
+          caseFrame.addConstant("label", _valueOf);
+          caseFrame.add(Instruction.eq);
         }
         ArrayList<HDLStatement> _dos = c.getDos();
         for (final HDLStatement d : _dos) {
           {
-            final FluidFrame subDo = this.toSimulationModel(d, context);
-            boolean _hasInstructions = subDo.hasInstructions();
-            if (_hasInstructions) {
-              ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.posPredicate, cName);
-              subDo.instructions.addFirst(_argumentedInstruction_2);
-            }
-            defaultFrame.addReferencedFrame(subDo);
+            ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.posPredicate, cName);
+            final FluidFrame subDo = this.toSimulationModelPred(d, _argumentedInstruction_2, context);
+            caseFrame.addReferencedFrame(subDo);
           }
         }
-        res.addReferencedFrame(defaultFrame);
+        res.addReferencedFrame(caseFrame);
       }
     }
     return res;
@@ -457,24 +471,16 @@ public class SimulationTransformationExtension {
     ArrayList<HDLStatement> _thenDo = obj.getThenDo();
     for (final HDLStatement s : _thenDo) {
       {
-        final FluidFrame thenDo = this.toSimulationModel(s, context);
-        boolean _hasInstructions = thenDo.hasInstructions();
-        if (_hasInstructions) {
-          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.posPredicate, name);
-          thenDo.instructions.addFirst(_argumentedInstruction);
-        }
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.posPredicate, name);
+        final FluidFrame thenDo = this.toSimulationModelPred(s, _argumentedInstruction, context);
         ifModel.addReferencedFrame(thenDo);
       }
     }
     ArrayList<HDLStatement> _elseDo = obj.getElseDo();
     for (final HDLStatement s_1 : _elseDo) {
       {
-        final FluidFrame elseDo = this.toSimulationModel(s_1, context);
-        boolean _hasInstructions = elseDo.hasInstructions();
-        if (_hasInstructions) {
-          ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.negPredicate, name);
-          elseDo.instructions.addFirst(_argumentedInstruction);
-        }
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.negPredicate, name);
+        final FluidFrame elseDo = this.toSimulationModelPred(s_1, _argumentedInstruction, context);
         ifModel.addReferencedFrame(elseDo);
       }
     }
@@ -697,13 +703,19 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLManipType.ARITH_NEG)) {
         _matched=true;
-        res.add(Instruction.arith_neg);
+        final int width = this.targetSizeWithType(obj, context);
+        String _string = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.arith_neg, _string);
+        res.add(_argumentedInstruction);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLManipType.BIT_NEG)) {
         _matched=true;
-        res.add(Instruction.bit_neg);
+        final int width_1 = this.targetSizeWithType(obj, context);
+        String _string_1 = Integer.valueOf(width_1).toString();
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.bit_neg, _string_1);
+        res.add(_argumentedInstruction_1);
       }
     }
     if (!_matched) {
@@ -739,8 +751,8 @@ public class SimulationTransformationExtension {
           }
           if (_or) {
             _matched_1=true;
-            ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.cast_int, primWidth, currentWidth);
-            res.instructions.add(_argumentedInstruction);
+            ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.cast_int, primWidth, currentWidth);
+            res.instructions.add(_argumentedInstruction_2);
           }
         }
         if (!_matched_1) {
@@ -756,8 +768,8 @@ public class SimulationTransformationExtension {
           }
           if (_or_1) {
             _matched_1=true;
-            ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.cast_uint, primWidth, currentWidth);
-            res.instructions.add(_argumentedInstruction_1);
+            ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.cast_uint, primWidth, currentWidth);
+            res.instructions.add(_argumentedInstruction_3);
           }
         }
         if (!_matched_1) {
@@ -1066,7 +1078,10 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLBitOpType.AND)) {
         _matched=true;
-        res.add(Instruction.and);
+        final int width = this.targetSizeWithType(obj, context);
+        String _string = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.and, _string);
+        res.add(_argumentedInstruction);
       }
     }
     if (!_matched) {
@@ -1078,7 +1093,10 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLBitOpType.OR)) {
         _matched=true;
-        res.add(Instruction.or);
+        final int width_1 = this.targetSizeWithType(obj, context);
+        String _string_1 = Integer.valueOf(width_1).toString();
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.or, _string_1);
+        res.add(_argumentedInstruction_1);
       }
     }
     if (!_matched) {
@@ -1090,7 +1108,10 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLBitOpType.XOR)) {
         _matched=true;
-        res.add(Instruction.xor);
+        final int width_2 = this.targetSizeWithType(obj, context);
+        String _string_2 = Integer.valueOf(width_2).toString();
+        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.xor, _string_2);
+        res.add(_argumentedInstruction_2);
       }
     }
     return res;
@@ -1105,19 +1126,24 @@ public class SimulationTransformationExtension {
     HDLExpression _right = obj.getRight();
     FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context);
     res.append(_simulationModel_1);
+    final int width = this.targetSizeWithType(obj, context);
     HDLArithOpType _type = obj.getType();
     final HDLArithOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.DIV)) {
         _matched=true;
-        res.add(Instruction.div);
+        String _string = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.div, _string);
+        res.add(_argumentedInstruction);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.MINUS)) {
         _matched=true;
-        res.add(Instruction.minus);
+        String _string_1 = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.minus, _string_1);
+        res.add(_argumentedInstruction_1);
       }
     }
     if (!_matched) {
@@ -1130,13 +1156,17 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.MUL)) {
         _matched=true;
-        res.add(Instruction.mul);
+        String _string_2 = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.mul, _string_2);
+        res.add(_argumentedInstruction_2);
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLArithOpType.PLUS)) {
         _matched=true;
-        res.add(Instruction.plus);
+        String _string_3 = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.plus, _string_3);
+        res.add(_argumentedInstruction_3);
       }
     }
     if (!_matched) {
@@ -1158,13 +1188,16 @@ public class SimulationTransformationExtension {
     HDLExpression _right = obj.getRight();
     FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context);
     res.append(_simulationModel_1);
+    final int width = this.targetSizeWithType(obj, context);
     HDLShiftOpType _type = obj.getType();
     final HDLShiftOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SLL)) {
         _matched=true;
-        res.add(Instruction.sll);
+        String _string = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.sll, _string);
+        res.add(_argumentedInstruction);
       }
     }
     if (!_matched) {
@@ -1185,19 +1218,49 @@ public class SimulationTransformationExtension {
           _or = (_tripleEquals || _tripleEquals_1);
         }
         if (_or) {
-          res.add(Instruction.sra);
+          String _string_1 = Integer.valueOf(width).toString();
+          ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.sra, _string_1);
+          res.add(_argumentedInstruction_1);
         } else {
-          res.add(Instruction.srl);
+          String _string_2 = Integer.valueOf(width).toString();
+          ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.srl, _string_2);
+          res.add(_argumentedInstruction_2);
         }
       }
     }
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLShiftOpType.SRL)) {
         _matched=true;
-        res.add(Instruction.srl);
+        String _string_3 = Integer.valueOf(width).toString();
+        ArgumentedInstruction _argumentedInstruction_3 = new ArgumentedInstruction(Instruction.srl, _string_3);
+        res.add(_argumentedInstruction_3);
       }
     }
     return res;
+  }
+  
+  public int targetSizeWithType(final HDLExpression op, final HDLEvaluationContext context) {
+    Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(op);
+    HDLType _get = _typeOf.get();
+    final HDLPrimitive type = ((HDLPrimitive) _get);
+    Optional<? extends HDLType> _typeOf_1 = TypeExtension.typeOf(op);
+    HDLType _get_1 = _typeOf_1.get();
+    final Integer width = HDLPrimitives.getWidth(_get_1, context);
+    boolean _or = false;
+    HDLPrimitiveType _type = type.getType();
+    boolean _tripleEquals = (_type == HDLPrimitiveType.INT);
+    if (_tripleEquals) {
+      _or = true;
+    } else {
+      HDLPrimitiveType _type_1 = type.getType();
+      boolean _tripleEquals_1 = (_type_1 == HDLPrimitiveType.INTEGER);
+      _or = (_tripleEquals || _tripleEquals_1);
+    }
+    if (_or) {
+      int _doubleLessThan = ((width).intValue() << 1);
+      return (_doubleLessThan | 1);
+    }
+    return ((width).intValue() << 1);
   }
   
   public FluidFrame toSimulationModel(final IHDLObject obj, final HDLEvaluationContext context) {
@@ -1240,6 +1303,17 @@ public class SimulationTransformationExtension {
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(obj, context).toString());
+    }
+  }
+  
+  public FluidFrame toSimulationModelPred(final HDLStatement obj, final ArgumentedInstruction predicate, final HDLEvaluationContext context) {
+    if (obj instanceof HDLSwitchStatement) {
+      return _toSimulationModelPred((HDLSwitchStatement)obj, predicate, context);
+    } else if (obj != null) {
+      return _toSimulationModelPred(obj, predicate, context);
+    } else {
+      throw new IllegalArgumentException("Unhandled parameter types: " +
+        Arrays.<Object>asList(obj, predicate, context).toString());
     }
   }
   

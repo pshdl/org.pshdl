@@ -42,37 +42,17 @@ import java.util.ArrayList
 import java.util.HashSet
 
 class JavaCompiler {
-	private ExecutableModel em
-	private Map<String, Integer> varIdx = new HashMap
-	private Map<String, Integer> intIdx = new HashMap
-	private Map<String, Boolean> prevMap = new HashMap
 	private boolean debug
-	private boolean hasClock
+
+	private extension CommonCompilerExtension cce
 
 	new(ExecutableModel em, boolean includeDebug) {
-		this.em = em
+		this.cce = new CommonCompilerExtension(em)
 		this.debug = includeDebug
-		for (i : 0 ..< em.variables.length) {
-			varIdx.put(em.variables.get(i).name, i)
-		}
-		for (i : 0 ..< em.internals.length) {
-			intIdx.put(em.internals.get(i).fullName, i)
-		}
-		for (f : em.frames) {
-			if (f.edgeNegDepRes != -1)
-				prevMap.put(f.edgeNegDepRes.asInternal.info.name, true)
-			if (f.edgePosDepRes != -1)
-				prevMap.put(f.edgePosDepRes.asInternal.info.name, true)
-		}
-		this.hasClock = !prevMap.empty
 	}
 
 	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener) {
 		return new JavaCompiler(em, includeDebugListener).compile(packageName, unitName).toString
-	}
-
-	def InternalInformation asInternal(int id) {
-		return em.internals.get(id)
 	}
 
 	def compile(String packageName, String unitName) {
@@ -158,22 +138,22 @@ class JavaCompiler {
 					«ENDFOR»
 				}
 				«FOR v : em.variables.filter[dir !== VariableInformation$Direction::INTERNAL]»
-					«IF v.dimensions.size==0»
-					public void set«v.javaName(false).toFirstUpper»(«v.javaType» value) {
-						«v.javaName(false)»=value & «v.width.asMask»;
-					}
-					
-					public «v.javaType» get«v.javaName(false).toFirstUpper»() {
-						return «v.javaName(false)» & «v.width.asMask»;
-					}
+					«IF v.dimensions.size == 0»
+						public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value) {
+							«v.idName(false, false)»=value & «v.width.asMaskL»;
+						}
+						
+						public «v.javaType» get«v.idName(false, false).toFirstUpper»() {
+							return «v.idName(false, false)» & «v.width.asMaskL»;
+						}
 					«ELSE»
-					public void set«v.javaName(false).toFirstUpper»(«v.javaType» value«FOR i:(0..<v.dimensions.size)», int a«i»«ENDFOR») {
-						«v.javaName(false)»[«v.arrayAccess»]=value & «v.width.asMask»;
-					}
-					
-					public «v.javaType» get«v.javaName(false).toFirstUpper»(«FOR i:(0..<v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
-						return «v.javaName(false)»[«v.arrayAccess»] & «v.width.asMask»;
-					}
+						public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value«FOR i : (0 ..< v.dimensions.size)», int a«i»«ENDFOR») {
+							«v.idName(false, false)»[«v.arrayAccess»]=value & «v.width.asMaskL»;
+						}
+						
+						public «v.javaType» get«v.idName(false, false).toFirstUpper»(«FOR i : (0 ..< v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
+							return «v.idName(false, false)»[«v.arrayAccess»] & «v.width.asMaskL»;
+						}
 					«ENDIF»
 				«ENDFOR»
 				«FOR f : em.frames»
@@ -207,7 +187,7 @@ class JavaCompiler {
 					«FOR f : em.frames»
 						«IF f.edgeNegDepRes === -1 && f.edgePosDepRes === -1 && f.predNegDepRes.length === 0 &&
 				f.predPosDepRes.length === 0»
-							frame«f.uniqueID»();
+							«f.frameName»();
 						«ELSE»
 							«f.edgeNegDepRes.createNegEdge(handled)»
 							«f.edgePosDepRes.createPosEdge(handled)»
@@ -218,7 +198,7 @@ class JavaCompiler {
 								«p.createBooleanPred(handled)»
 							«ENDFOR»
 							if («f.predicates»)
-								frame«f.uniqueID»();
+								«f.frameName»();
 						«ENDIF»
 					«ENDFOR»
 					«IF hasClock»
@@ -251,15 +231,16 @@ class JavaCompiler {
 		var first = true;
 		if (f.edgeNegDepRes !== -1) {
 			sb.append(
-				'''«f.edgeNegDepRes.asInternal.javaName(false)»_isFalling && !«f.edgeNegDepRes.asInternal.
-					javaName(false)»_fallingIsHandled''')
+				'''«f.edgeNegDepRes.asInternal.idName(false, false)»_isFalling && !«f.edgeNegDepRes.asInternal.
+					idName(false, false)»_fallingIsHandled''')
 			first = false
 		}
 		if (f.edgePosDepRes !== -1) {
 			if (!first)
 				sb.append(' && ')
 			sb.append(
-				'''«f.edgePosDepRes.asInternal.javaName(false)»_isRising&& !«f.edgePosDepRes.asInternal.javaName(false)»_risingIsHandled''')
+				'''«f.edgePosDepRes.asInternal.idName(false, false)»_isRising&& !«f.edgePosDepRes.asInternal.
+					idName(false, false)»_risingIsHandled''')
 			first = false
 		}
 		for (p : f.predNegDepRes) {
@@ -284,7 +265,7 @@ class JavaCompiler {
 		'''
 			«id.asInternal.getter(false, id, -1)»
 			boolean p«id»_fresh=true;
-			long up«id»=«id.asInternal.info.javaName(false)»_update;
+			long up«id»=«id.asInternal.info.idName(false, false)»_update;
 			if ((up«id»>>>16 != deltaCycle) || ((up«id»&0xFFFF) != epsCycle)){
 				«IF debug»
 					if (listener!=null)
@@ -301,8 +282,8 @@ class JavaCompiler {
 		handledEdges.add(id)
 		val internal = id.asInternal
 		'''
-			boolean «internal.javaName(false)»_isRising=true;
-			boolean «internal.javaName(false)»_risingIsHandled=false;
+			boolean «internal.idName(false, false)»_isRising=true;
+			boolean «internal.idName(false, false)»_risingIsHandled=false;
 			if (!disableEdges){
 				«id.asInternal.getter(false, id, -1)»
 				«id.asInternal.getter(true, id, -1)»
@@ -311,15 +292,15 @@ class JavaCompiler {
 						if (listener!=null)
 							listener.skippingNotAnEdge(-1, em.internals[«id»], true, null);
 					«ENDIF»
-					«internal.javaName(false)»_isRising=false;
+					«internal.idName(false, false)»_isRising=false;
 				}
 			}
-			if (skipEdge(«internal.info.javaName(false)»_update)){
+			if (skipEdge(«internal.info.idName(false, false)»_update)){
 				«IF debug»
 					if (listener!=null)
 						listener.skippingHandledEdge(-1, em.internals[«id»], true, null);
 				«ENDIF»
-				«internal.javaName(false)»_risingIsHandled=true;
+				«internal.idName(false, false)»_risingIsHandled=true;
 			}
 		'''
 	}
@@ -330,8 +311,8 @@ class JavaCompiler {
 		handledEdges.add(id)
 		val internal = id.asInternal
 		'''
-			boolean «internal.javaName(false)»_isFalling=true;
-			boolean «internal.javaName(false)»_fallingIsHandled=false;
+			boolean «internal.idName(false, false)»_isFalling=true;
+			boolean «internal.idName(false, false)»_fallingIsHandled=false;
 			if (!disableEdges){
 				«id.asInternal.getter(false, id, -1)»
 				«id.asInternal.getter(true, id, -1)»
@@ -340,24 +321,17 @@ class JavaCompiler {
 						if (listener!=null)
 						 	listener.skippingNotAnEdge(-1, em.internals[«id»], false, null);
 					«ENDIF»
-					«internal.javaName(false)»_isFalling=false;
+					«internal.idName(false, false)»_isFalling=false;
 				}
 			}
-			if (skipEdge(«internal.info.javaName(false)»_update)){
+			if (skipEdge(«internal.info.idName(false, false)»_update)){
 				«IF debug»
 					if (listener!=null)
 					 	listener.skippingHandledEdge(-1, em.internals[«id»], false, null);
 				«ENDIF»
-				«internal.javaName(false)»_fallingIsHandled=true;
+				«internal.idName(false, false)»_fallingIsHandled=true;
 			}
 		'''
-	}
-
-	def asMask(int width) {
-		val mask = (1l << width) - 1
-		if (width == 64)
-			return "0xFFFFFFFFFFFFFFFFl";
-		return mask.toHexString
 	}
 
 	def hdlInterpreter() '''
@@ -382,13 +356,13 @@ class JavaCompiler {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
 						case «varIdx.get(v.name)»: 
-							«IF v.width != 64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
-							«v.javaName(false)»=value«IF v.predicate»==0?false:true«ENDIF»;
+							«IF v.width != 64 && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+							«v.idName(false, false)»=value«IF v.predicate»==0?false:true«ENDIF»;
 							break;
 					«ELSE»
 						case «varIdx.get(v.name)»: 
-							«IF v.width != 64 && !v.predicate»value&=«v.width.asMask»;«ENDIF»
-							«v.javaName(false)»[«v.arrayAccessArrIdx»]=value;
+							«IF v.width != 64 && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+							«v.idName(false, false)»[«v.arrayAccessArrIdx»]=value;
 							break;
 					«ENDIF»
 				«ENDFOR»
@@ -423,10 +397,10 @@ class JavaCompiler {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: return «v.javaName(false)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.asMask»«ENDIF»;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.asMaskL»«ENDIF»;
 					«ELSE»
-						case «varIdx.get(v.name)»: return «v.javaName(false)»[«v.arrayAccessArrIdx»]«IF v.width != 64 && !v.predicate» & «v.
-			width.asMask»«ENDIF»;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»[«v.arrayAccessArrIdx»]«IF v.width != 64 &&
+			!v.predicate» & «v.width.asMaskL»«ENDIF»;
 					«ENDIF»
 				«ENDFOR»
 				default:
@@ -450,14 +424,6 @@ class JavaCompiler {
 		}
 	'''
 
-	def excludeNull(VariableInformation[] vars) {
-		vars.filter[name != '#null']
-	}
-
-	def excludeNull(InternalInformation[] vars) {
-		vars.filter[info.name != '#null']
-	}
-
 	def copyRegs() '''
 		private void updateRegs() {
 			for (RegUpdate reg : regUpdates) {
@@ -466,9 +432,9 @@ class JavaCompiler {
 						«IF v.isRegister»
 							case «varIdx.get(v.name)»: 
 							«IF v.dimensions.length == 0»
-								«v.javaName(false)» = «v.javaName(false)»$reg; break;
+								«v.idName(false, false)» = «v.idName(false, false)»$reg; break;
 							«ELSE»
-								«v.javaName(false)»[reg.offset] = «v.javaName(false)»$reg[reg.offset]; break;
+								«v.idName(false, false)»[reg.offset] = «v.idName(false, false)»$reg[reg.offset]; break;
 							«ENDIF»
 						«ENDIF»
 					«ENDFOR»
@@ -479,13 +445,14 @@ class JavaCompiler {
 
 	def copyPrev(VariableInformation info) {
 		if (info.dimensions.length == 0)
-			return '''«info.javaName(true)»=«info.javaName(false)»;'''
-		return '''System.arraycopy(«info.javaName(false)»,0,«info.javaName(true)», 0, «info.javaName(false)».length);'''
+			return '''«info.idName(true, false)»=«info.idName(false, false)»;'''
+		return '''System.arraycopy(«info.idName(false, false)»,0,«info.idName(true, false)», 0, «info.
+			idName(false, false)».length);'''
 	}
 
 	def getter(InternalInformation info, boolean prev, int pos, int frameID) {
 		val sb = new StringBuilder
-		val mask = info.actualWidth.asMask
+		val mask = info.actualWidth.asMaskL
 		for (arr : info.arrayIdx)
 			sb.append('''[«arr»]''')
 		val arrAcc = '''«FOR int i : (0 ..< info.arrayIdx.length) BEFORE '[' SEPARATOR '][' AFTER ']'»a«i»«ENDFOR»'''
@@ -496,11 +463,11 @@ class JavaCompiler {
 			varName = varName + "_prev"
 		if (info.fixedArray) '''
 			«IF info.actualWidth == info.info.width»
-				«info.javaType» «varName»=«info.info.javaName(prev)»«sb»;
+				«info.javaType» «varName»=«info.info.idName(prev, false)»«sb»;
 			«ELSEIF info.actualWidth == 1»
-				«info.javaType» «varName»=(«info.info.javaName(prev)»«sb» >> «info.bitStart») & 1;
+				«info.javaType» «varName»=(«info.info.idName(prev, false)»«sb» >> «info.bitStart») & 1;
 			«ELSE»
-				«info.javaType» «varName»=(«info.info.javaName(prev)»«sb» >> «info.bitEnd») & «mask»;
+				«info.javaType» «varName»=(«info.info.idName(prev, false)»«sb» >> «info.bitEnd») & «mask»;
 			«ENDIF»
 			«IF info.arrayIdx.length === info.info.dimensions.length»
 				«IF debug»
@@ -510,11 +477,11 @@ class JavaCompiler {
 			«ENDIF»
 		''' else '''
 			«IF info.actualWidth == info.info.width»
-				«info.javaType» «varName»= «info.info.javaName(prev)»«arrAcc»;
+				«info.javaType» «varName»= «info.info.idName(prev, false)»«arrAcc»;
 			«ELSEIF info.actualWidth == 1»
-				«info.javaType» «varName»= («info.info.javaName(prev)»«arrAcc» >> «info.bitStart») & 1;
+				«info.javaType» «varName»= («info.info.idName(prev, false)»«arrAcc» >> «info.bitStart») & 1;
 			«ELSE»
-				«info.javaType» «varName»= («info.info.javaName(prev)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMask»;
+				«info.javaType» «varName»= («info.info.idName(prev, false)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMaskL»;
 			«ENDIF»
 			«IF info.arrayIdx.length === info.info.dimensions.length»
 				«IF debug»
@@ -527,10 +494,10 @@ class JavaCompiler {
 
 	def setter(InternalInformation info, String value) {
 		val mask = ((1l << info.actualWidth) - 1)
-		val maskString = mask.toHexString
-		val writeMask = (mask << (info.bitEnd)).bitwiseNot.toHexString
+		val maskString = mask.toHexStringL
+		val writeMask = (mask << (info.bitEnd)).bitwiseNot.toHexStringL
 		val varAccess = info.info.arrayAccess
-		val off = info.arrayAccess
+		val off = info.arrayFixedOffset
 		var fixedAccess = if (info.arrayIdx.length > 0) '''[«off»]''' else ''''''
 		var regSuffix = ''
 		if (info.isShadowReg) {
@@ -539,88 +506,41 @@ class JavaCompiler {
 		}
 		if (info.fixedArray) '''
 			«IF info.actualWidth == info.info.width»
-				«IF info.isShadowReg»«info.info.javaType» current=«info.info.javaName(false)»«fixedAccess»;«ENDIF»
-				«info.info.javaName(false)»«fixedAccess»=«value»;
+				«IF info.isShadowReg»«info.info.javaType» current=«info.info.idName(false, false)»«fixedAccess»;«ENDIF»
+				«info.info.idName(false, false)»«fixedAccess»=«value»;
 			«ELSE»
-				«info.info.javaType» current=«info.info.javaName(false)»«fixedAccess» & «writeMask»;
+				«info.info.javaType» current=«info.info.idName(false, false)»«fixedAccess» & «writeMask»;
 				«value»=((«value» & «maskString») << «info.bitEnd»);
-				«info.info.javaName(false)»«fixedAccess»=current|«value»;
+				«info.info.idName(false, false)»«fixedAccess»=current|«value»;
 			«ENDIF»
 			«IF info.isShadowReg»
 				if (current!=«value»)
 					regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», «off»));
 			«ENDIF»
-			«IF info.isPred»«info.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
+			«IF info.isPred»«info.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
 		''' else '''
 			int offset=(int)«varAccess»;
 			«IF info.actualWidth == info.info.width»
-				«IF info.isShadowReg»«info.info.javaType» current=«info.info.javaName(false)»«regSuffix»[offset];«ENDIF»
-				«info.info.javaName(false)»«regSuffix»[offset]=«value»;
+				«IF info.isShadowReg»«info.info.javaType» current=«info.info.idName(false, false)»«regSuffix»[offset];«ENDIF»
+				«info.info.idName(false, false)»«regSuffix»[offset]=«value»;
 			«ELSE»
-				«info.info.javaType» current=«info.info.javaName(false)»«regSuffix»[offset] & «writeMask»;
+				«info.info.javaType» current=«info.info.idName(false, false)»«regSuffix»[offset] & «writeMask»;
 				«value»=((«value» & «maskString») << «info.bitEnd»;
-				«info.info.javaName(false)»«regSuffix»[offset]=current|«value»);
+				«info.info.idName(false, false)»«regSuffix»[offset]=current|«value»);
 			«ENDIF»
 			«IF info.isShadowReg»
 				if (current!=«value»)
 					regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», offset));
 			«ENDIF»
-			«IF info.isPred»«info.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
+			«IF info.isPred»«info.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
 		'''
 	}
-
-	def arrayAccess(InternalInformation v) {
-		val dims = dimsLastOne(v.info)
-		var off = 0;
-		for (i : (0 ..< v.arrayIdx.length)) {
-			val arr = v.arrayIdx.get(i)
-			val dim = dims.get(i)
-			off = off + (arr * dim)
-		}
-		return off
-	}
-
-	def arrayAccessArrIdx(VariableInformation v) {
-		val varAccess = new StringBuilder
-		val dims = dimsLastOne(v)
-		for (i : (0 ..< v.dimensions.length)) {
-			val dim = dims.get(i)
-			if (dim != 1)
-				varAccess.append('''arrayIdx[«i»]*«dim»''')
-			else
-				varAccess.append('''arrayIdx[«i»]''')
-		}
-		return varAccess
-	}
-
-	def dimsLastOne(VariableInformation v) {
-		val dims = new ArrayList(v.dimensions)
-		if (dims.size > 0) {
-			dims.set(dims.size - 1, 1);
-		}
-		dims
-	}
-
-	def arrayAccess(VariableInformation v) {
-		val varAccess = new StringBuilder
-		val dims = dimsLastOne(v)
-		for (i : (0 ..< v.dimensions.length)) {
-			val dim = dims.get(i)
-			if (dim != 1)
-				varAccess.append('''a«i»*«dim»''')
-			else
-				varAccess.append('''a«i»''')
-		}
-		return varAccess
-	}
-
-	def toHexString(long value) '''0x«Long::toHexString(value)»l'''
 
 	def method(Frame frame) {
 		val StringBuilder sb = new StringBuilder
 		sb.append(
 			'''
-				private final void frame«frame.uniqueID»() {
+				private final void «frame.frameName»() {
 					«IF debug»
 						if (listener!=null)
 							listener.startFrame(«frame.uniqueID», deltaCycle, epsCycle, null);
@@ -674,44 +594,30 @@ class JavaCompiler {
 				sb.append('''int a«arr.last»=(int)t«a»;''')
 			case Instruction::writeInternal: {
 				if (arr.size < inst.arg1.asInternal.info.dimensions.length) {
-					sb.append('''Arrays.fill(«inst.arg1.asInternal.javaName(false)», t«a»);''')
+					sb.append('''Arrays.fill(«inst.arg1.asInternal.idName(false, false)», t«a»);''')
 				} else {
 					sb.append(
-						'''«inst.arg1.asInternal.javaName(false)»«FOR ai : arr BEFORE '[' SEPARATOR '][' AFTER ']'»a«ai»«ENDFOR»=t«a»;''')
+						'''«inst.arg1.asInternal.idName(false, false)»«FOR ai : arr BEFORE '[' SEPARATOR '][' AFTER ']'»a«ai»«ENDFOR»=t«a»;''')
 					arr.clear
 				}
 			}
 			case Instruction::noop:
 				sb.append("//Do nothing")
-			case Instruction::and:
-				sb.append('''long t«pos»=t«b» & t«a»;''')
-			case Instruction::arith_neg:
-				sb.append('''long t«pos»=-t«a»;''')
-			case Instruction::bit_neg:
-				sb.append('''long t«pos»=~t«a»;''')
 			case Instruction::bitAccessSingle:
 				sb.append('''long t«pos»=(t«a» >> «inst.arg1») & 1;''')
 			case Instruction::bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
 				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
-				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask.toHexString»;''')
+				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask.toHexStringL»;''')
 			}
 			case Instruction::cast_int: {
-				if (inst.arg1 != 64) {
-					val shiftWidth=64-Math::min(inst.arg1, inst.arg2);
-					sb.append(
-						'''
-						long c«pos»=t«a» << «shiftWidth»;
-						long t«pos»=c«pos» >> «shiftWidth»;
-						''')
-				} else {
-					sb.append('''long t«pos»=t«a»;''')
-				}
+				val shiftWidth = 64 - Math::min(inst.arg1, inst.arg2);
+				sb.append('''long t«pos»=«signExtend('''t«a»''', null, shiftWidth)»;''')
 			}
 			case Instruction::cast_uint: {
 				if (inst.arg1 != 64) {
-					sb.append('''long t«pos»=t«a» & «inst.arg1.asMask»;''')
+					sb.append('''long t«pos»=t«a» & «inst.arg1.asMaskL»;''')
 				} else {
 					sb.append('''long t«pos»=t«a»;''')
 				}
@@ -729,7 +635,7 @@ class JavaCompiler {
 			case Instruction::const2:
 				sb.append('''long t«pos»=2;''')
 			case Instruction::constAll1:
-				sb.append('''long t«pos»=«inst.arg1.asMask»;''')
+				sb.append('''long t«pos»=«inst.arg1.asMaskL»;''')
 			case Instruction::concat:
 				sb.append('''long t«pos»=(t«b» << «inst.arg2») | t«a»;''')
 			case Instruction::loadConstant:
@@ -739,26 +645,30 @@ class JavaCompiler {
 				sb.append(internal.getter(false, pos, f.uniqueID))
 				arr.clear
 			}
+			case Instruction::arith_neg:
+				sb.append('''long t«pos»=«singleOpValue('-', null, a, inst.arg1)»;''')
+			case Instruction::bit_neg:
+				sb.append('''long t«pos»=«singleOpValue('~', null, a, inst.arg1)»;''')
 			case Instruction::and:
-				sb.append('''long t«pos»=t«b» & t«a»;''')
+				sb.append(twoOp('&', inst.arg1, pos, a, b))
 			case Instruction::or:
-				sb.append('''long t«pos»=t«b» | t«a»;''')
+				sb.append(twoOp('|', inst.arg1, pos, a, b))
 			case Instruction::xor:
-				sb.append('''long t«pos»=t«b» ^ t«a»;''')
+				sb.append(twoOp('^', inst.arg1, pos, a, b))
 			case Instruction::plus:
-				sb.append('''long t«pos»=t«b» + t«a»;''')
+				sb.append(twoOp('+', inst.arg1, pos, a, b))
 			case Instruction::minus:
-				sb.append('''long t«pos»=t«b» - t«a»;''')
+				sb.append(twoOp('-', inst.arg1, pos, a, b))
 			case Instruction::mul:
-				sb.append('''long t«pos»=t«b» * t«a»;''')
+				sb.append(twoOp('*', inst.arg1, pos, a, b))
 			case Instruction::div:
-				sb.append('''long t«pos»=t«b» / t«a»;''')
+				sb.append(twoOp('/', inst.arg1, pos, a, b))
 			case Instruction::sll:
-				sb.append('''long t«pos»=t«b» << t«a»;''')
+				sb.append(twoOp('<<', inst.arg1, pos, a, b))
 			case Instruction::srl:
-				sb.append('''long t«pos»=t«b» >>> t«a»;''')
+				sb.append(twoOp('>>>', inst.arg1, pos, a, b))
 			case Instruction::sra:
-				sb.append('''long t«pos»=t«b» >> t«a»;''')
+				sb.append(twoOp('>>', inst.arg1, pos, a, b))
 			case Instruction::eq:
 				sb.append('''boolean t«pos»=t«b» == t«a»;''')
 			case Instruction::not_eq:
@@ -773,17 +683,18 @@ class JavaCompiler {
 				sb.append('''boolean t«pos»=t«b» >= t«a»;''')
 			case Instruction::isRisingEdge:
 				sb.append(
-					'''«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
+					'''«inst.arg1.asInternal.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
 			case Instruction::isFallingEdge:
 				sb.append(
-					'''«inst.arg1.asInternal.info.javaName(false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
+					'''«inst.arg1.asInternal.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
 		}
 		sb.append(
 			'''//«inst»
 				''')
 	}
 
-	def constant(int id, Frame f) '''«f.constants.get(id).longValue.toHexString»'''
+	def String twoOp(String op, int targetSizeWithType, int pos, int a, int b) '''long t«pos»=«twoOpValue(op, null, a, b,
+		targetSizeWithType)»;'''
 
 	def init(VariableInformation info) {
 		if (info.dimensions.length == 0)
@@ -793,8 +704,8 @@ class JavaCompiler {
 			size = size * d
 		}
 		'''
-			«info.javaName(false)»=new «info.javaType»[«size»];
-			«IF info.isRegister»«info.javaName(false)»$reg=new «info.javaType»[«size»];«ENDIF»
+			«info.idName(false, false)»=new «info.javaType»[«size»];
+			«IF info.isRegister»«info.idName(false, false)»$reg=new «info.javaType»[«size»];«ENDIF»
 		'''
 	}
 
@@ -811,35 +722,14 @@ class JavaCompiler {
 		return "long"
 	}
 
-	def javaName(VariableInformation information, boolean prev) {
-		return information.name.javaName(prev)
-	}
-
-	def javaName(InternalInformation ii, boolean prev) {
-		if (ii.fixedArray)
-			return ii.fullName.javaName(prev)
-		return ii.info.javaName(prev)
-	}
-
-	def javaName(String name, boolean prev) {
-		val res = name.replaceAll("\\.", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
-			replaceAll('\\[', 'arr').replaceAll('\\]', '')
-		if (prev)
-			return res + '_prev'
-		return res
-	}
-
 	def decl(VariableInformation info, Boolean includePrev) '''
-		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»private long «info.javaName(false)»_update=0;«ENDIF»
-		public «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.javaName(false)»;
+		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»private long «info.
+			idName(false, false)»_update=0;«ENDIF»
+		public «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»;
 		«IF includePrev != null && includePrev»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.
-			javaName(true)»;«ENDIF»
-		«IF info.isRegister»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.javaName(false)»$reg;«ENDIF»
+			idName(true, false)»;«ENDIF»
+		«IF info.isRegister»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»$reg;«ENDIF»
 	'''
-
-	def isPredicate(VariableInformation info) {
-		info.name.startsWith(InternalInformation::PRED_PREFIX)
-	}
 
 	def getImports() '''
 		import java.util.*;

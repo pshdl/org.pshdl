@@ -28,19 +28,15 @@ package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.ExclusiveRange;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
@@ -50,77 +46,22 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.utils.Instruction;
+import org.pshdl.model.simulation.CommonCompilerExtension;
 
 @SuppressWarnings("all")
 public class DartCompiler {
-  private ExecutableModel em;
-  
-  private Map<String,Integer> varIdx = new Function0<Map<String,Integer>>() {
-    public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String,Integer>();
-      return _hashMap;
-    }
-  }.apply();
-  
-  private Map<String,Integer> intIdx = new Function0<Map<String,Integer>>() {
-    public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String,Integer>();
-      return _hashMap;
-    }
-  }.apply();
-  
-  private Map<String,Boolean> prevMap = new Function0<Map<String,Boolean>>() {
-    public Map<String,Boolean> apply() {
-      HashMap<String,Boolean> _hashMap = new HashMap<String,Boolean>();
-      return _hashMap;
-    }
-  }.apply();
-  
-  private boolean hasClock;
+  @Extension
+  private CommonCompilerExtension cce;
   
   public DartCompiler(final ExecutableModel em) {
-    this.em = em;
-    int _length = em.variables.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      VariableInformation _get = em.variables[(i).intValue()];
-      this.varIdx.put(_get.name, i);
-    }
-    int _length_1 = em.internals.length;
-    ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _length_1, true);
-    for (final Integer i_1 : _doubleDotLessThan_1) {
-      InternalInformation _get_1 = em.internals[(i_1).intValue()];
-      this.intIdx.put(_get_1.fullName, i_1);
-    }
-    for (final Frame f : em.frames) {
-      {
-        int _minus = (-1);
-        boolean _notEquals = (f.edgeNegDepRes != _minus);
-        if (_notEquals) {
-          InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
-          this.prevMap.put(_asInternal.info.name, Boolean.valueOf(true));
-        }
-        int _minus_1 = (-1);
-        boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
-        if (_notEquals_1) {
-          InternalInformation _asInternal_1 = this.asInternal(f.edgePosDepRes);
-          this.prevMap.put(_asInternal_1.info.name, Boolean.valueOf(true));
-        }
-      }
-    }
-    boolean _isEmpty = this.prevMap.isEmpty();
-    boolean _not = (!_isEmpty);
-    this.hasClock = _not;
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
+    this.cce = _commonCompilerExtension;
   }
   
   public static String doCompile(final ExecutableModel em, final String unitName) {
     DartCompiler _dartCompiler = new DartCompiler(em);
     CharSequence _compile = _dartCompiler.compile(unitName);
     return _compile.toString();
-  }
-  
-  public InternalInformation asInternal(final int id) {
-    return this.em.internals[id];
   }
   
   public CharSequence compile(final String unitName) {
@@ -137,7 +78,7 @@ public class DartCompiler {
       _builder.append("void main(){");
       _builder.newLine();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("  ");
           _builder.append("handleReceive((e,l) => new ");
           _builder.append(unitName, "  ");
@@ -154,7 +95,7 @@ public class DartCompiler {
       _builder.append("}");
       _builder.newLine();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("class RegUpdate {");
           _builder.newLine();
           _builder.append("\t");
@@ -236,7 +177,7 @@ public class DartCompiler {
       _builder.append(" implements DartInterpreter{");
       _builder.newLineIfNotEmpty();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t");
           _builder.append("Set<RegUpdate> _regUpdates=new HashSet<RegUpdate>();");
           _builder.newLine();
@@ -249,10 +190,10 @@ public class DartCompiler {
         }
       }
       {
-        Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
+        Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
         for(final VariableInformation v : _excludeNull) {
           _builder.append("\t");
-          Boolean _get = this.prevMap.get(v.name);
+          Boolean _get = this.cce.prevMap.get(v.name);
           CharSequence _decl = this.decl(v, _get);
           _builder.append(_decl, "	");
           _builder.newLineIfNotEmpty();
@@ -272,7 +213,7 @@ public class DartCompiler {
       _builder.newLine();
       {
         boolean _hasElements = false;
-        for(final VariableInformation v_1 : this.em.variables) {
+        for(final VariableInformation v_1 : this.cce.em.variables) {
           if (!_hasElements) {
             _hasElements = true;
           } else {
@@ -283,7 +224,7 @@ public class DartCompiler {
           String _replaceAll = v_1.name.replaceAll("[\\$]", "\\\\\\$");
           _builder.append(_replaceAll, "		");
           _builder.append("\": ");
-          Integer _get_1 = this.varIdx.get(v_1.name);
+          Integer _get_1 = this.cce.varIdx.get(v_1.name);
           _builder.append(_get_1, "		");
           _builder.newLineIfNotEmpty();
         }
@@ -302,7 +243,7 @@ public class DartCompiler {
       _builder.append(unitName, "	");
       _builder.append("(");
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("this._disableEdges, this._disabledRegOutputlogic");
         }
       }
@@ -311,37 +252,36 @@ public class DartCompiler {
       _builder.append("\t");
       _builder.newLine();
       {
-        Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
+        Iterable<VariableInformation> _excludeNull_1 = this.cce.excludeNull(this.cce.em.variables);
         for(final VariableInformation v_2 : _excludeNull_1) {
           _builder.append("\t");
           _builder.append("set ");
-          String _javaName = this.javaName(v_2, false);
-          String _substring = _javaName.substring(1);
-          _builder.append(_substring, "	");
+          String _idName = this.cce.idName(v_2, false, false);
+          _builder.append(_idName, "	");
           _builder.append("(");
-          String _javaType = this.getJavaType(v_2, true);
-          _builder.append(_javaType, "	");
+          String _dartType = this.dartType(v_2, true);
+          _builder.append(_dartType, "	");
           _builder.append(" value) =>");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t");
-          String _javaName_1 = this.javaName(v_2, false);
-          _builder.append(_javaName_1, "		");
+          String _idName_1 = this.cce.idName(v_2, false, true);
+          _builder.append(_idName_1, "		");
           _builder.append("=value ");
           {
             boolean _and = false;
-            boolean _isPredicate = this.isPredicate(v_2);
+            boolean _isPredicate = this.cce.isPredicate(v_2);
             boolean _not = (!_isPredicate);
             if (!_not) {
               _and = false;
             } else {
-              int _length = v_2.dimensions.length;
-              boolean _equals = (_length == 0);
-              _and = (_not && _equals);
+              boolean _isArray = this.cce.isArray(v_2);
+              boolean _not_1 = (!_isArray);
+              _and = (_not && _not_1);
             }
             if (_and) {
               _builder.append("& ");
-              CharSequence _asMask = this.asMask(v_2.width);
+              CharSequence _asMask = this.cce.asMask(v_2.width);
               _builder.append(_asMask, "		");
             }
           }
@@ -350,33 +290,32 @@ public class DartCompiler {
           _builder.append("\t");
           _builder.newLine();
           _builder.append("\t");
-          String _javaType_1 = this.getJavaType(v_2, true);
-          _builder.append(_javaType_1, "	");
+          String _dartType_1 = this.dartType(v_2, true);
+          _builder.append(_dartType_1, "	");
           _builder.append(" get ");
-          String _javaName_2 = this.javaName(v_2, false);
-          String _substring_1 = _javaName_2.substring(1);
-          _builder.append(_substring_1, "	");
+          String _idName_2 = this.cce.idName(v_2, false, false);
+          _builder.append(_idName_2, "	");
           _builder.append(" =>");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t");
-          String _javaName_3 = this.javaName(v_2, false);
-          _builder.append(_javaName_3, "		");
+          String _idName_3 = this.cce.idName(v_2, false, true);
+          _builder.append(_idName_3, "		");
           _builder.append(" ");
           {
             boolean _and_1 = false;
-            boolean _isPredicate_1 = this.isPredicate(v_2);
-            boolean _not_1 = (!_isPredicate_1);
-            if (!_not_1) {
+            boolean _isPredicate_1 = this.cce.isPredicate(v_2);
+            boolean _not_2 = (!_isPredicate_1);
+            if (!_not_2) {
               _and_1 = false;
             } else {
-              int _length_1 = v_2.dimensions.length;
-              boolean _equals_1 = (_length_1 == 0);
-              _and_1 = (_not_1 && _equals_1);
+              boolean _isArray_1 = this.cce.isArray(v_2);
+              boolean _not_3 = (!_isArray_1);
+              _and_1 = (_not_2 && _not_3);
             }
             if (_and_1) {
               _builder.append("& ");
-              CharSequence _asMask_1 = this.asMask(v_2.width);
+              CharSequence _asMask_1 = this.cce.asMask(v_2.width);
               _builder.append(_asMask_1, "		");
             }
           }
@@ -385,21 +324,19 @@ public class DartCompiler {
           _builder.append("\t");
           _builder.newLine();
           {
-            int _size = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
-            boolean _notEquals = (_size != 0);
-            if (_notEquals) {
+            boolean _isArray_2 = this.cce.isArray(v_2);
+            if (_isArray_2) {
               _builder.append("\t");
-              _builder.append("void set");
-              String _javaName_4 = this.javaName(v_2, false);
-              String _substring_2 = _javaName_4.substring(1);
-              _builder.append(_substring_2, "	");
+              _builder.append("void set ");
+              String _idName_4 = this.cce.idName(v_2, false, false);
+              _builder.append(_idName_4, "	");
               _builder.append("(");
-              String _javaType_2 = this.getJavaType(v_2, false);
-              _builder.append(_javaType_2, "	");
+              String _dartType_2 = this.dartType(v_2, false);
+              _builder.append(_dartType_2, "	");
               _builder.append(" value");
               {
-                int _size_1 = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
-                ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _size_1, true);
+                int _size = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
+                ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _size, true);
                 for(final Integer i : _doubleDotLessThan) {
                   _builder.append(", int a");
                   _builder.append(i, "	");
@@ -409,13 +346,12 @@ public class DartCompiler {
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
               _builder.append("\t");
-              String _javaName_5 = this.javaName(v_2, false);
-              _builder.append(_javaName_5, "		");
-              _builder.append("[");
-              StringBuilder _arrayAccess = this.arrayAccess(v_2);
-              _builder.append(_arrayAccess, "		");
-              _builder.append("]=value & ");
-              CharSequence _asMask_2 = this.asMask(v_2.width);
+              String _idName_5 = this.cce.idName(v_2, false, true);
+              _builder.append(_idName_5, "		");
+              String _arrayAccessBracket = this.cce.arrayAccessBracket(v_2, null);
+              _builder.append(_arrayAccessBracket, "		");
+              _builder.append("=value & ");
+              CharSequence _asMask_2 = this.cce.asMask(v_2.width);
               _builder.append(_asMask_2, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
@@ -425,16 +361,15 @@ public class DartCompiler {
               _builder.append("\t");
               _builder.newLine();
               _builder.append("\t");
-              String _javaType_3 = this.getJavaType(v_2, false);
-              _builder.append(_javaType_3, "	");
-              _builder.append(" get");
-              String _javaName_6 = this.javaName(v_2, false);
-              String _substring_3 = _javaName_6.substring(1);
-              _builder.append(_substring_3, "	");
+              String _dartType_3 = this.dartType(v_2, false);
+              _builder.append(_dartType_3, "	");
+              _builder.append(" get ");
+              String _idName_6 = this.cce.idName(v_2, false, false);
+              _builder.append(_idName_6, "	");
               _builder.append("(");
               {
-                int _size_2 = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
-                ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _size_2, true);
+                int _size_1 = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
+                ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _size_1, true);
                 boolean _hasElements_1 = false;
                 for(final Integer i_1 : _doubleDotLessThan_1) {
                   if (!_hasElements_1) {
@@ -451,13 +386,12 @@ public class DartCompiler {
               _builder.append("\t");
               _builder.append("\t");
               _builder.append("return ");
-              String _javaName_7 = this.javaName(v_2, false);
-              _builder.append(_javaName_7, "		");
-              _builder.append("[");
-              StringBuilder _arrayAccess_1 = this.arrayAccess(v_2);
-              _builder.append(_arrayAccess_1, "		");
-              _builder.append("] & ");
-              CharSequence _asMask_3 = this.asMask(v_2.width);
+              String _idName_7 = this.cce.idName(v_2, false, true);
+              _builder.append(_idName_7, "		");
+              String _arrayAccessBracket_1 = this.cce.arrayAccessBracket(v_2, null);
+              _builder.append(_arrayAccessBracket_1, "		");
+              _builder.append(" & ");
+              CharSequence _asMask_3 = this.cce.asMask(v_2.width);
               _builder.append(_asMask_3, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
@@ -471,7 +405,7 @@ public class DartCompiler {
         }
       }
       {
-        for(final Frame f : this.em.frames) {
+        for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
           String _method = this.method(f);
           _builder.append(_method, "	");
@@ -479,7 +413,7 @@ public class DartCompiler {
         }
       }
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t");
           _builder.append("bool skipEdge(int local) {");
           _builder.newLine();
@@ -535,7 +469,7 @@ public class DartCompiler {
       _builder.append("_deltaCycle++;");
       _builder.newLine();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t\t");
           _builder.append("_epsCycle=0;");
           _builder.newLine();
@@ -549,7 +483,7 @@ public class DartCompiler {
         }
       }
       {
-        for(final Frame f_1 : this.em.frames) {
+        for(final Frame f_1 : this.cce.em.frames) {
           {
             boolean _and_2 = false;
             boolean _and_3 = false;
@@ -566,15 +500,15 @@ public class DartCompiler {
             if (!_and_4) {
               _and_3 = false;
             } else {
-              int _length_2 = f_1.predNegDepRes.length;
-              boolean _tripleEquals_2 = (Integer.valueOf(_length_2) == Integer.valueOf(0));
+              int _length = f_1.predNegDepRes.length;
+              boolean _tripleEquals_2 = (Integer.valueOf(_length) == Integer.valueOf(0));
               _and_3 = (_and_4 && _tripleEquals_2);
             }
             if (!_and_3) {
               _and_2 = false;
             } else {
-              int _length_3 = f_1.predPosDepRes.length;
-              boolean _tripleEquals_3 = (Integer.valueOf(_length_3) == Integer.valueOf(0));
+              int _length_1 = f_1.predPosDepRes.length;
+              boolean _tripleEquals_3 = (Integer.valueOf(_length_1) == Integer.valueOf(0));
               _and_2 = (_and_3 && _tripleEquals_3);
             }
             if (_and_2) {
@@ -625,7 +559,7 @@ public class DartCompiler {
         }
       }
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t\t");
           _builder.append("_updateRegs();");
           _builder.newLine();
@@ -638,10 +572,10 @@ public class DartCompiler {
         }
       }
       {
-        Iterable<VariableInformation> _excludeNull_2 = this.excludeNull(this.em.variables);
+        Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
             public Boolean apply(final VariableInformation it) {
-              Boolean _get = DartCompiler.this.prevMap.get(it.name);
+              Boolean _get = DartCompiler.this.cce.prevMap.get(it.name);
               boolean _notEquals = (!Objects.equal(_get, null));
               return Boolean.valueOf(_notEquals);
             }
@@ -658,7 +592,7 @@ public class DartCompiler {
       _builder.append("}");
       _builder.newLine();
       {
-        if (this.hasClock) {
+        if (this.cce.hasClock) {
           _builder.append("\t");
           CharSequence _copyRegs = this.copyRegs();
           _builder.append(_copyRegs, "	");
@@ -684,13 +618,13 @@ public class DartCompiler {
     boolean _tripleNotEquals = (Integer.valueOf(f.edgeNegDepRes) != Integer.valueOf(_minus));
     if (_tripleNotEquals) {
       StringConcatenation _builder = new StringConcatenation();
-      InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
-      String _javaName = this.javaName(_asInternal, false);
-      _builder.append(_javaName, "");
+      InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
+      String _idName = this.cce.idName(_asInternal, false, true);
+      _builder.append(_idName, "");
       _builder.append("_isFalling && !");
-      InternalInformation _asInternal_1 = this.asInternal(f.edgeNegDepRes);
-      String _javaName_1 = this.javaName(_asInternal_1, false);
-      _builder.append(_javaName_1, "");
+      InternalInformation _asInternal_1 = this.cce.asInternal(f.edgeNegDepRes);
+      String _idName_1 = this.cce.idName(_asInternal_1, false, true);
+      _builder.append(_idName_1, "");
       _builder.append("_fallingIsHandled");
       sb.append(_builder);
       first = false;
@@ -703,13 +637,13 @@ public class DartCompiler {
         sb.append(" && ");
       }
       StringConcatenation _builder_1 = new StringConcatenation();
-      InternalInformation _asInternal_2 = this.asInternal(f.edgePosDepRes);
-      String _javaName_2 = this.javaName(_asInternal_2, false);
-      _builder_1.append(_javaName_2, "");
+      InternalInformation _asInternal_2 = this.cce.asInternal(f.edgePosDepRes);
+      String _idName_2 = this.cce.idName(_asInternal_2, false, true);
+      _builder_1.append(_idName_2, "");
       _builder_1.append("_isRising&& !");
-      InternalInformation _asInternal_3 = this.asInternal(f.edgePosDepRes);
-      String _javaName_3 = this.javaName(_asInternal_3, false);
-      _builder_1.append(_javaName_3, "");
+      InternalInformation _asInternal_3 = this.cce.asInternal(f.edgePosDepRes);
+      String _idName_3 = this.cce.idName(_asInternal_3, false, true);
+      _builder_1.append(_idName_3, "");
       _builder_1.append("_risingIsHandled");
       sb.append(_builder_1);
       first = false;
@@ -759,7 +693,7 @@ public class DartCompiler {
       }
       handled.add(Integer.valueOf(id));
       StringConcatenation _builder_1 = new StringConcatenation();
-      InternalInformation _asInternal = this.asInternal(id);
+      InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "");
@@ -771,9 +705,9 @@ public class DartCompiler {
       _builder_1.append("int up");
       _builder_1.append(id, "");
       _builder_1.append("=");
-      InternalInformation _asInternal_1 = this.asInternal(id);
-      String _javaName = this.javaName(_asInternal_1.info, false);
-      _builder_1.append(_javaName, "");
+      InternalInformation _asInternal_1 = this.cce.asInternal(id);
+      String _idName = this.cce.idName(_asInternal_1.info, false, true);
+      _builder_1.append(_idName, "");
       _builder_1.append("_update;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if ((up");
@@ -803,28 +737,28 @@ public class DartCompiler {
         return _builder.toString();
       }
       handledEdges.add(Integer.valueOf(id));
-      final InternalInformation internal = this.asInternal(id);
+      final InternalInformation internal = this.cce.asInternal(id);
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("bool ");
-      String _javaName = this.javaName(internal, false);
-      _builder_1.append(_javaName, "");
+      String _idName = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName, "");
       _builder_1.append("_isRising=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("bool ");
-      String _javaName_1 = this.javaName(internal, false);
-      _builder_1.append(_javaName_1, "");
+      String _idName_1 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_1, "");
       _builder_1.append("_risingIsHandled=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if (!_disableEdges){");
       _builder_1.newLine();
       _builder_1.append("\t");
-      InternalInformation _asInternal = this.asInternal(id);
+      InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      InternalInformation _asInternal_1 = this.asInternal(id);
+      InternalInformation _asInternal_1 = this.cce.asInternal(id);
       int _minus_1 = (-1);
       CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
       _builder_1.append(_ter_1, "	");
@@ -837,8 +771,8 @@ public class DartCompiler {
       _builder_1.append("!=1)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
-      String _javaName_2 = this.javaName(internal, false);
-      _builder_1.append(_javaName_2, "		");
+      String _idName_2 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isRising=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -847,13 +781,13 @@ public class DartCompiler {
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _javaName_3 = this.javaName(internal.info, false);
-      _builder_1.append(_javaName_3, "");
+      String _idName_3 = this.cce.idName(internal.info, false, true);
+      _builder_1.append(_idName_3, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      String _javaName_4 = this.javaName(internal, false);
-      _builder_1.append(_javaName_4, "	");
+      String _idName_4 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_4, "	");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -872,28 +806,28 @@ public class DartCompiler {
         return _builder.toString();
       }
       handledEdges.add(Integer.valueOf(id));
-      final InternalInformation internal = this.asInternal(id);
+      final InternalInformation internal = this.cce.asInternal(id);
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("bool ");
-      String _javaName = this.javaName(internal, false);
-      _builder_1.append(_javaName, "");
+      String _idName = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName, "");
       _builder_1.append("_isFalling=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("bool ");
-      String _javaName_1 = this.javaName(internal, false);
-      _builder_1.append(_javaName_1, "");
+      String _idName_1 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_1, "");
       _builder_1.append("_fallingIsHandled=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if (!_disableEdges){");
       _builder_1.newLine();
       _builder_1.append("\t");
-      InternalInformation _asInternal = this.asInternal(id);
+      InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      InternalInformation _asInternal_1 = this.asInternal(id);
+      InternalInformation _asInternal_1 = this.cce.asInternal(id);
       int _minus_1 = (-1);
       CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
       _builder_1.append(_ter_1, "	");
@@ -906,8 +840,8 @@ public class DartCompiler {
       _builder_1.append("!=0)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
-      String _javaName_2 = this.javaName(internal, false);
-      _builder_1.append(_javaName_2, "		");
+      String _idName_2 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isFalling=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -916,13 +850,13 @@ public class DartCompiler {
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _javaName_3 = this.javaName(internal.info, false);
-      _builder_1.append(_javaName_3, "");
+      String _idName_3 = this.cce.idName(internal.info, false, true);
+      _builder_1.append(_idName_3, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      String _javaName_4 = this.javaName(internal, false);
-      _builder_1.append(_javaName_4, "	");
+      String _idName_4 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_4, "	");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -930,12 +864,6 @@ public class DartCompiler {
       _xblockexpression = (_builder_1);
     }
     return _xblockexpression;
-  }
-  
-  public CharSequence asMask(final int width) {
-    BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(width);
-    final BigInteger mask = _shiftLeft.subtract(BigInteger.ONE);
-    return this.toHexString(mask);
   }
   
   public CharSequence hdlInterpreter() {
@@ -947,25 +875,24 @@ public class DartCompiler {
     _builder.append("switch (idx) {");
     _builder.newLine();
     {
-      for(final VariableInformation v : this.em.variables) {
+      for(final VariableInformation v : this.cce.em.variables) {
         {
-          boolean _isNull = this.isNull(v);
+          boolean _isNull = this.cce.isNull(v);
           boolean _not = (!_isNull);
           if (_not) {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get = this.varIdx.get(v.name);
+            Integer _get = this.cce.varIdx.get(v.name);
             _builder.append(_get, "		");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
             _builder.append("\t");
-            String _javaName = this.javaName(v, false);
-            String _substring = _javaName.substring(1);
-            _builder.append(_substring, "			");
+            String _idName = this.cce.idName(v, false, false);
+            _builder.append(_idName, "			");
             _builder.append("=value");
             {
-              boolean _isPredicate = this.isPredicate(v);
+              boolean _isPredicate = this.cce.isPredicate(v);
               if (_isPredicate) {
                 _builder.append("==0?false:true");
               }
@@ -979,7 +906,7 @@ public class DartCompiler {
           } else {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get_1 = this.varIdx.get(v.name);
+            Integer _get_1 = this.cce.varIdx.get(v.name);
             _builder.append(_get_1, "		");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
@@ -1017,10 +944,10 @@ public class DartCompiler {
     _builder.append("switch (idx) {");
     _builder.newLine();
     {
-      for(final VariableInformation v_1 : this.em.variables) {
+      for(final VariableInformation v_1 : this.cce.em.variables) {
         _builder.append("\t\t");
         _builder.append("case ");
-        Integer _get_2 = this.varIdx.get(v_1.name);
+        Integer _get_2 = this.cce.varIdx.get(v_1.name);
         _builder.append(_get_2, "		");
         _builder.append(": return \"");
         String _replaceAll = v_1.name.replaceAll("[\\$]", "\\\\\\$");
@@ -1047,38 +974,36 @@ public class DartCompiler {
     _builder.append("switch (idx) {");
     _builder.newLine();
     {
-      for(final VariableInformation v_2 : this.em.variables) {
+      for(final VariableInformation v_2 : this.cce.em.variables) {
         {
-          boolean _isPredicate_1 = this.isPredicate(v_2);
+          boolean _isPredicate_1 = this.cce.isPredicate(v_2);
           if (_isPredicate_1) {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get_3 = this.varIdx.get(v_2.name);
+            Integer _get_3 = this.cce.varIdx.get(v_2.name);
             _builder.append(_get_3, "		");
             _builder.append(": return ");
-            String _javaName_1 = this.javaName(v_2, false);
-            String _substring_1 = _javaName_1.substring(1);
-            _builder.append(_substring_1, "		");
+            String _idName_1 = this.cce.idName(v_2, false, false);
+            _builder.append(_idName_1, "		");
             _builder.append("?1:0;");
             _builder.newLineIfNotEmpty();
           } else {
-            boolean _isNull_1 = this.isNull(v_2);
+            boolean _isNull_1 = this.cce.isNull(v_2);
             if (_isNull_1) {
               _builder.append("\t\t");
               _builder.append("case ");
-              Integer _get_4 = this.varIdx.get(v_2.name);
+              Integer _get_4 = this.cce.varIdx.get(v_2.name);
               _builder.append(_get_4, "		");
               _builder.append(": return 0;");
               _builder.newLineIfNotEmpty();
             } else {
               _builder.append("\t\t");
               _builder.append("case ");
-              Integer _get_5 = this.varIdx.get(v_2.name);
+              Integer _get_5 = this.cce.varIdx.get(v_2.name);
               _builder.append(_get_5, "		");
               _builder.append(": return ");
-              String _javaName_2 = this.javaName(v_2, false);
-              String _substring_2 = _javaName_2.substring(1);
-              _builder.append(_substring_2, "		");
+              String _idName_2 = this.cce.idName(v_2, false, false);
+              _builder.append(_idName_2, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
             }
@@ -1102,7 +1027,7 @@ public class DartCompiler {
     _builder.newLine();
     _builder.newLine();
     _builder.append("int get varNum => ");
-    int _size = this.varIdx.size();
+    int _size = this.cce.varIdx.size();
     _builder.append(_size, "");
     _builder.append(";");
     _builder.newLineIfNotEmpty();
@@ -1127,7 +1052,7 @@ public class DartCompiler {
             return Boolean.valueOf(_tripleEquals);
           }
         };
-      Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
+      Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function);
       boolean _hasElements = false;
       for(final VariableInformation v : _filter) {
         if (!_hasElements) {
@@ -1154,7 +1079,7 @@ public class DartCompiler {
             return Boolean.valueOf(_tripleEquals);
           }
         };
-      Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_1);
+      Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function_1);
       boolean _hasElements_1 = false;
       for(final VariableInformation v_1 : _filter_1) {
         if (!_hasElements_1) {
@@ -1181,7 +1106,7 @@ public class DartCompiler {
             return Boolean.valueOf(_tripleEquals);
           }
         };
-      Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_2);
+      Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function_2);
       boolean _hasElements_2 = false;
       for(final VariableInformation v_2 : _filter_2) {
         if (!_hasElements_2) {
@@ -1208,7 +1133,7 @@ public class DartCompiler {
             return Boolean.valueOf(_tripleEquals);
           }
         };
-      Iterable<VariableInformation> _filter_3 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_3);
+      Iterable<VariableInformation> _filter_3 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function_3);
       boolean _hasElements_3 = false;
       for(final VariableInformation v_3 : _filter_3) {
         if (!_hasElements_3) {
@@ -1232,9 +1157,8 @@ public class DartCompiler {
     CharSequence _xblockexpression = null;
     {
       String dims = "";
-      int _length = v.dimensions.length;
-      boolean _notEquals = (_length != 0);
-      if (_notEquals) {
+      boolean _isArray = this.cce.isArray(v);
+      if (_isArray) {
         StringConcatenation _builder = new StringConcatenation();
         _builder.append(", dimensions: [");
         {
@@ -1267,7 +1191,7 @@ public class DartCompiler {
       final String reset = _xifexpression_1;
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("new Port(");
-      Integer _get = this.varIdx.get(v.name);
+      Integer _get = this.cce.varIdx.get(v.name);
       _builder_1.append(_get, "");
       _builder_1.append(", \"");
       String _replaceAll = v.name.replaceAll("[\\$]", "\\\\\\$");
@@ -1283,35 +1207,6 @@ public class DartCompiler {
     return _xblockexpression;
   }
   
-  public boolean isNull(final VariableInformation information) {
-    boolean _equals = Objects.equal(information.name, "#null");
-    return _equals;
-  }
-  
-  public Iterable<VariableInformation> excludeNull(final VariableInformation[] vars) {
-    final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-        public Boolean apply(final VariableInformation it) {
-          boolean _isNull = DartCompiler.this.isNull(it);
-          boolean _not = (!_isNull);
-          return Boolean.valueOf(_not);
-        }
-      };
-    Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(vars)), _function);
-    return _filter;
-  }
-  
-  public Iterable<InternalInformation> excludeNull(final InternalInformation[] vars) {
-    final Function1<InternalInformation,Boolean> _function = new Function1<InternalInformation,Boolean>() {
-        public Boolean apply(final InternalInformation it) {
-          boolean _isNull = DartCompiler.this.isNull(it.info);
-          boolean _not = (!_isNull);
-          return Boolean.valueOf(_not);
-        }
-      };
-    Iterable<InternalInformation> _filter = IterableExtensions.<InternalInformation>filter(((Iterable<InternalInformation>)Conversions.doWrapArray(vars)), _function);
-    return _filter;
-  }
-  
   public CharSequence copyRegs() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("void _updateRegs() {");
@@ -1323,34 +1218,34 @@ public class DartCompiler {
     _builder.append("switch (reg.internalID) {");
     _builder.newLine();
     {
-      for(final VariableInformation v : this.em.variables) {
+      for(final VariableInformation v : this.cce.em.variables) {
         {
           if (v.isRegister) {
             _builder.append("\t\t\t");
             _builder.append("case ");
-            Integer _get = this.varIdx.get(v.name);
+            Integer _get = this.cce.varIdx.get(v.name);
             _builder.append(_get, "			");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             {
-              int _length = v.dimensions.length;
-              boolean _equals = (_length == 0);
-              if (_equals) {
+              boolean _isArray = this.cce.isArray(v);
+              boolean _not = (!_isArray);
+              if (_not) {
                 _builder.append("\t\t\t");
-                String _javaName = this.javaName(v, false);
-                _builder.append(_javaName, "			");
+                String _idName = this.cce.idName(v, false, true);
+                _builder.append(_idName, "			");
                 _builder.append(" = ");
-                String _javaName_1 = this.javaName(v, false);
-                _builder.append(_javaName_1, "			");
+                String _idName_1 = this.cce.idName(v, false, true);
+                _builder.append(_idName_1, "			");
                 _builder.append("$reg; break;");
                 _builder.newLineIfNotEmpty();
               } else {
                 _builder.append("\t\t\t");
-                String _javaName_2 = this.javaName(v, false);
-                _builder.append(_javaName_2, "			");
+                String _idName_2 = this.cce.idName(v, false, true);
+                _builder.append(_idName_2, "			");
                 _builder.append("[reg.offset] = ");
-                String _javaName_3 = this.javaName(v, false);
-                _builder.append(_javaName_3, "			");
+                String _idName_3 = this.cce.idName(v, false, true);
+                _builder.append(_idName_3, "			");
                 _builder.append("$reg[reg.offset]; break;");
                 _builder.newLineIfNotEmpty();
               }
@@ -1371,28 +1266,29 @@ public class DartCompiler {
   }
   
   public String copyPrev(final VariableInformation info) {
-    int _length = info.dimensions.length;
-    boolean _equals = (_length == 0);
-    if (_equals) {
+    boolean _isArray = this.cce.isArray(info);
+    boolean _not = (!_isArray);
+    if (_not) {
       StringConcatenation _builder = new StringConcatenation();
-      String _javaName = this.javaName(info, true);
-      _builder.append(_javaName, "");
+      String _idName = this.cce.idName(info, true, true);
+      _builder.append(_idName, "");
       _builder.append("=");
-      String _javaName_1 = this.javaName(info, false);
-      _builder.append(_javaName_1, "");
+      String _idName_1 = this.cce.idName(info, false, true);
+      _builder.append(_idName_1, "");
       _builder.append(";");
       return _builder.toString();
     }
     StringConcatenation _builder_1 = new StringConcatenation();
     _builder_1.append("System.arraycopy(");
-    String _javaName_2 = this.javaName(info, false);
-    _builder_1.append(_javaName_2, "");
+    String _idName_2 = this.cce.idName(info, false, true);
+    _builder_1.append(_idName_2, "");
     _builder_1.append(",0,");
-    String _javaName_3 = this.javaName(info, true);
-    _builder_1.append(_javaName_3, "");
+    String _idName_3 = this.cce.idName(info, true, true);
+    _builder_1.append(_idName_3, "");
     _builder_1.append(", 0, ");
-    String _javaName_4 = this.javaName(info, false);
-    _builder_1.append(_javaName_4, "");
+    String _idName_4 = this.cce.idName(info, false, 
+      true);
+    _builder_1.append(_idName_4, "");
     _builder_1.append(".length);");
     return _builder_1.toString();
   }
@@ -1402,7 +1298,7 @@ public class DartCompiler {
     {
       StringBuilder _stringBuilder = new StringBuilder();
       final StringBuilder sb = _stringBuilder;
-      final CharSequence mask = this.asMask(info.actualWidth);
+      final CharSequence mask = this.cce.asMask(info.actualWidth);
       for (final int arr : info.arrayIdx) {
         StringConcatenation _builder = new StringConcatenation();
         _builder.append("[");
@@ -1445,39 +1341,39 @@ public class DartCompiler {
         {
           boolean _equals = (info.actualWidth == info.info.width);
           if (_equals) {
-            String _javaType = this.getJavaType(info);
-            _builder_2.append(_javaType, "");
+            String _dartType = this.dartType(info);
+            _builder_2.append(_dartType, "");
             _builder_2.append(" ");
             _builder_2.append(varName, "");
             _builder_2.append("=");
-            String _javaName = this.javaName(info.info, prev);
-            _builder_2.append(_javaName, "");
+            String _idName = this.cce.idName(info.info, prev, true);
+            _builder_2.append(_idName, "");
             _builder_2.append(sb, "");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
             boolean _equals_1 = (info.actualWidth == 1);
             if (_equals_1) {
-              String _javaType_1 = this.getJavaType(info);
-              _builder_2.append(_javaType_1, "");
+              String _dartType_1 = this.dartType(info);
+              _builder_2.append(_dartType_1, "");
               _builder_2.append(" ");
               _builder_2.append(varName, "");
               _builder_2.append("=(");
-              String _javaName_1 = this.javaName(info.info, prev);
-              _builder_2.append(_javaName_1, "");
+              String _idName_1 = this.cce.idName(info.info, prev, true);
+              _builder_2.append(_idName_1, "");
               _builder_2.append(sb, "");
               _builder_2.append(" >> ");
               _builder_2.append(info.bitStart, "");
               _builder_2.append(") & 1;");
               _builder_2.newLineIfNotEmpty();
             } else {
-              String _javaType_2 = this.getJavaType(info);
-              _builder_2.append(_javaType_2, "");
+              String _dartType_2 = this.dartType(info);
+              _builder_2.append(_dartType_2, "");
               _builder_2.append(" ");
               _builder_2.append(varName, "");
               _builder_2.append("=(");
-              String _javaName_2 = this.javaName(info.info, prev);
-              _builder_2.append(_javaName_2, "");
+              String _idName_2 = this.cce.idName(info.info, prev, true);
+              _builder_2.append(_idName_2, "");
               _builder_2.append(sb, "");
               _builder_2.append(" >> ");
               _builder_2.append(info.bitEnd, "");
@@ -1494,44 +1390,44 @@ public class DartCompiler {
         {
           boolean _equals_2 = (info.actualWidth == info.info.width);
           if (_equals_2) {
-            String _javaType_3 = this.getJavaType(info);
-            _builder_3.append(_javaType_3, "");
+            String _dartType_3 = this.dartType(info);
+            _builder_3.append(_dartType_3, "");
             _builder_3.append(" ");
             _builder_3.append(varName, "");
             _builder_3.append("= ");
-            String _javaName_3 = this.javaName(info.info, prev);
-            _builder_3.append(_javaName_3, "");
+            String _idName_3 = this.cce.idName(info.info, prev, true);
+            _builder_3.append(_idName_3, "");
             _builder_3.append(arrAcc, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
             boolean _equals_3 = (info.actualWidth == 1);
             if (_equals_3) {
-              String _javaType_4 = this.getJavaType(info);
-              _builder_3.append(_javaType_4, "");
+              String _dartType_4 = this.dartType(info);
+              _builder_3.append(_dartType_4, "");
               _builder_3.append(" ");
               _builder_3.append(varName, "");
               _builder_3.append("= (");
-              String _javaName_4 = this.javaName(info.info, prev);
-              _builder_3.append(_javaName_4, "");
+              String _idName_4 = this.cce.idName(info.info, prev, true);
+              _builder_3.append(_idName_4, "");
               _builder_3.append(arrAcc, "");
               _builder_3.append(" >> ");
               _builder_3.append(info.bitStart, "");
               _builder_3.append(") & 1;");
               _builder_3.newLineIfNotEmpty();
             } else {
-              String _javaType_5 = this.getJavaType(info);
-              _builder_3.append(_javaType_5, "");
+              String _dartType_5 = this.dartType(info);
+              _builder_3.append(_dartType_5, "");
               _builder_3.append(" ");
               _builder_3.append(varName, "");
               _builder_3.append("= (");
-              String _javaName_5 = this.javaName(info.info, prev);
-              _builder_3.append(_javaName_5, "");
+              String _idName_5 = this.cce.idName(info.info, prev, true);
+              _builder_3.append(_idName_5, "");
               _builder_3.append(arrAcc, "");
               _builder_3.append(" >> ");
               _builder_3.append(info.bitEnd, "");
               _builder_3.append(") & ");
-              CharSequence _asMask = this.asMask(info.actualWidth);
+              CharSequence _asMask = this.cce.asMask(info.actualWidth);
               _builder_3.append(_asMask, "");
               _builder_3.append(";");
               _builder_3.newLineIfNotEmpty();
@@ -1550,14 +1446,13 @@ public class DartCompiler {
     {
       BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(info.actualWidth);
       final BigInteger mask = _shiftLeft.subtract(BigInteger.ONE);
-      final CharSequence maskString = this.toHexString(mask);
+      final CharSequence maskString = this.cce.toHexString(mask);
       final BigInteger subMask = mask.shiftLeft(info.bitEnd);
       BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(info.info.width);
       final BigInteger fullMask = _shiftLeft_1.subtract(BigInteger.ONE);
       BigInteger _xor = fullMask.xor(subMask);
-      final CharSequence writeMask = this.toHexString(_xor);
-      final StringBuilder varAccess = this.arrayAccess(info.info);
-      final int off = this.arrayAccess(info);
+      final CharSequence writeMask = this.cce.toHexString(_xor);
+      final int off = this.cce.arrayFixedOffset(info);
       String _xifexpression = null;
       int _length = info.arrayIdx.length;
       boolean _greaterThan = (_length > 0);
@@ -1581,45 +1476,34 @@ public class DartCompiler {
       CharSequence _xifexpression_1 = null;
       if (info.fixedArray) {
         StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("//Actual Width: ");
-        _builder_2.append(info.actualWidth, "");
-        _builder_2.append(" Bit End: ");
-        _builder_2.append(info.bitEnd, "");
-        _builder_2.append(" subMask: ");
-        CharSequence _hexString = this.toHexString(subMask);
-        _builder_2.append(_hexString, "");
-        _builder_2.append(" fullMask: ");
-        CharSequence _hexString_1 = this.toHexString(fullMask);
-        _builder_2.append(_hexString_1, "");
-        _builder_2.newLineIfNotEmpty();
         {
           boolean _equals = (info.actualWidth == info.info.width);
           if (_equals) {
             {
               if (info.isShadowReg) {
-                String _javaType = this.getJavaType(info.info, false);
-                _builder_2.append(_javaType, "");
+                String _dartType = this.dartType(info.info, false);
+                _builder_2.append(_dartType, "");
                 _builder_2.append(" current=");
-                String _javaName = this.javaName(info.info, false);
-                _builder_2.append(_javaName, "");
+                String _idName = this.cce.idName(info.info, false, true);
+                _builder_2.append(_idName, "");
                 _builder_2.append(fixedAccess, "");
                 _builder_2.append(";");
               }
             }
             _builder_2.newLineIfNotEmpty();
-            String _javaName_1 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_1, "");
+            String _idName_1 = this.cce.idName(info.info, false, true);
+            _builder_2.append(_idName_1, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append("=");
             _builder_2.append(value, "");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
-            String _javaType_1 = this.getJavaType(info.info, false);
-            _builder_2.append(_javaType_1, "");
+            String _dartType_1 = this.dartType(info.info, false);
+            _builder_2.append(_dartType_1, "");
             _builder_2.append(" current=");
-            String _javaName_2 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_2, "");
+            String _idName_2 = this.cce.idName(info.info, false, true);
+            _builder_2.append(_idName_2, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append(" & ");
             _builder_2.append(writeMask, "");
@@ -1634,8 +1518,8 @@ public class DartCompiler {
             _builder_2.append(info.bitEnd, "");
             _builder_2.append(");");
             _builder_2.newLineIfNotEmpty();
-            String _javaName_3 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_3, "");
+            String _idName_3 = this.cce.idName(info.info, false, true);
+            _builder_2.append(_idName_3, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append("=current|");
             _builder_2.append(value, "");
@@ -1651,7 +1535,7 @@ public class DartCompiler {
             _builder_2.newLineIfNotEmpty();
             _builder_2.append("\t");
             _builder_2.append("_regUpdates.add(new RegUpdate(");
-            Integer _get = this.varIdx.get(info.info.name);
+            Integer _get = this.cce.varIdx.get(info.info.name);
             _builder_2.append(_get, "	");
             _builder_2.append(", ");
             _builder_2.append(off, "	");
@@ -1661,8 +1545,8 @@ public class DartCompiler {
         }
         {
           if (info.isPred) {
-            String _javaName_4 = this.javaName(info.info, false);
-            _builder_2.append(_javaName_4, "");
+            String _idName_4 = this.cce.idName(info.info, false, true);
+            _builder_2.append(_idName_4, "");
             _builder_2.append("_update=updateStamp;");
           }
         }
@@ -1670,40 +1554,42 @@ public class DartCompiler {
         _xifexpression_1 = _builder_2;
       } else {
         StringConcatenation _builder_3 = new StringConcatenation();
-        _builder_3.append("int offset=");
-        _builder_3.append(varAccess, "");
-        _builder_3.append(";");
-        _builder_3.newLineIfNotEmpty();
         {
           boolean _equals_1 = (info.actualWidth == info.info.width);
           if (_equals_1) {
             {
               if (info.isShadowReg) {
-                String _javaType_2 = this.getJavaType(info.info, false);
-                _builder_3.append(_javaType_2, "");
+                String _dartType_2 = this.dartType(info.info, false);
+                _builder_3.append(_dartType_2, "");
                 _builder_3.append(" current=");
-                String _javaName_5 = this.javaName(info.info, false);
-                _builder_3.append(_javaName_5, "");
+                String _idName_5 = this.cce.idName(info.info, false, true);
+                _builder_3.append(_idName_5, "");
                 _builder_3.append(regSuffix, "");
-                _builder_3.append("[offset];");
+                String _arrayAccessBracket = this.cce.arrayAccessBracket(info.info, null);
+                _builder_3.append(_arrayAccessBracket, "");
+                _builder_3.append(";");
               }
             }
             _builder_3.newLineIfNotEmpty();
-            String _javaName_6 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_6, "");
+            String _idName_6 = this.cce.idName(info.info, false, true);
+            _builder_3.append(_idName_6, "");
             _builder_3.append(regSuffix, "");
-            _builder_3.append("[offset]=");
+            String _arrayAccessBracket_1 = this.cce.arrayAccessBracket(info.info, null);
+            _builder_3.append(_arrayAccessBracket_1, "");
+            _builder_3.append("=");
             _builder_3.append(value, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            String _javaType_3 = this.getJavaType(info.info, false);
-            _builder_3.append(_javaType_3, "");
+            String _dartType_3 = this.dartType(info.info, false);
+            _builder_3.append(_dartType_3, "");
             _builder_3.append(" current=");
-            String _javaName_7 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_7, "");
+            String _idName_7 = this.cce.idName(info.info, false, true);
+            _builder_3.append(_idName_7, "");
             _builder_3.append(regSuffix, "");
-            _builder_3.append("[offset] & ");
+            String _arrayAccessBracket_2 = this.cce.arrayAccessBracket(info.info, null);
+            _builder_3.append(_arrayAccessBracket_2, "");
+            _builder_3.append(" & ");
             _builder_3.append(writeMask, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
@@ -1716,10 +1602,12 @@ public class DartCompiler {
             _builder_3.append(info.bitEnd, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
-            String _javaName_8 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_8, "");
+            String _idName_8 = this.cce.idName(info.info, false, true);
+            _builder_3.append(_idName_8, "");
             _builder_3.append(regSuffix, "");
-            _builder_3.append("[offset]=current|");
+            String _arrayAccessBracket_3 = this.cce.arrayAccessBracket(info.info, null);
+            _builder_3.append(_arrayAccessBracket_3, "");
+            _builder_3.append("=current|");
             _builder_3.append(value, "");
             _builder_3.append(");");
             _builder_3.newLineIfNotEmpty();
@@ -1733,16 +1621,19 @@ public class DartCompiler {
             _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
             _builder_3.append("_regUpdates.add(new RegUpdate(");
-            Integer _get_1 = this.varIdx.get(info.info.name);
+            Integer _get_1 = this.cce.varIdx.get(info.info.name);
             _builder_3.append(_get_1, "	");
-            _builder_3.append(", offset));");
+            _builder_3.append(", ");
+            StringBuilder _arrayAccess = this.cce.arrayAccess(info.info, null);
+            _builder_3.append(_arrayAccess, "	");
+            _builder_3.append("));");
             _builder_3.newLineIfNotEmpty();
           }
         }
         {
           if (info.isPred) {
-            String _javaName_9 = this.javaName(info.info, false);
-            _builder_3.append(_javaName_9, "");
+            String _idName_9 = this.cce.idName(info.info, false, true);
+            _builder_3.append(_idName_9, "");
             _builder_3.append("_update=updateStamp;");
           }
         }
@@ -1750,115 +1641,6 @@ public class DartCompiler {
         _xifexpression_1 = _builder_3;
       }
       _xblockexpression = (_xifexpression_1);
-    }
-    return _xblockexpression;
-  }
-  
-  public int arrayAccess(final InternalInformation v) {
-    final ArrayList<Integer> dims = this.dimsLastOne(v.info);
-    int off = 0;
-    int _length = v.arrayIdx.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        final int arr = v.arrayIdx[(i).intValue()];
-        final Integer dim = dims.get((i).intValue());
-        int _multiply = (arr * (dim).intValue());
-        int _plus = (off + _multiply);
-        off = _plus;
-      }
-    }
-    return off;
-  }
-  
-  public StringBuilder arrayAccessArrIdx(final VariableInformation v) {
-    StringBuilder _stringBuilder = new StringBuilder();
-    final StringBuilder varAccess = _stringBuilder;
-    final ArrayList<Integer> dims = this.dimsLastOne(v);
-    int _length = v.dimensions.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        final Integer dim = dims.get((i).intValue());
-        boolean _notEquals = ((dim).intValue() != 1);
-        if (_notEquals) {
-          StringConcatenation _builder = new StringConcatenation();
-          _builder.append("arrayIdx[");
-          _builder.append(i, "");
-          _builder.append("]*");
-          _builder.append(dim, "");
-          varAccess.append(_builder);
-        } else {
-          StringConcatenation _builder_1 = new StringConcatenation();
-          _builder_1.append("arrayIdx[");
-          _builder_1.append(i, "");
-          _builder_1.append("]");
-          varAccess.append(_builder_1);
-        }
-      }
-    }
-    return varAccess;
-  }
-  
-  public ArrayList<Integer> dimsLastOne(final VariableInformation v) {
-    ArrayList<Integer> _xblockexpression = null;
-    {
-      ArrayList<Integer> _arrayList = new ArrayList<Integer>(((Collection<? extends Integer>)Conversions.doWrapArray(v.dimensions)));
-      final ArrayList<Integer> dims = _arrayList;
-      int _size = dims.size();
-      boolean _greaterThan = (_size > 0);
-      if (_greaterThan) {
-        int _size_1 = dims.size();
-        int _minus = (_size_1 - 1);
-        dims.set(_minus, Integer.valueOf(1));
-      }
-      _xblockexpression = (dims);
-    }
-    return _xblockexpression;
-  }
-  
-  public StringBuilder arrayAccess(final VariableInformation v) {
-    StringBuilder _stringBuilder = new StringBuilder();
-    final StringBuilder varAccess = _stringBuilder;
-    final ArrayList<Integer> dims = this.dimsLastOne(v);
-    int _length = v.dimensions.length;
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        final Integer dim = dims.get((i).intValue());
-        boolean _notEquals = ((dim).intValue() != 1);
-        if (_notEquals) {
-          StringConcatenation _builder = new StringConcatenation();
-          _builder.append("a");
-          _builder.append(i, "");
-          _builder.append("*");
-          _builder.append(dim, "");
-          varAccess.append(_builder);
-        } else {
-          StringConcatenation _builder_1 = new StringConcatenation();
-          _builder_1.append("a");
-          _builder_1.append(i, "");
-          varAccess.append(_builder_1);
-        }
-      }
-    }
-    return varAccess;
-  }
-  
-  public CharSequence toHexString(final BigInteger value) {
-    CharSequence _xblockexpression = null;
-    {
-      int _signum = value.signum();
-      boolean _lessThan = (_signum < 0);
-      if (_lessThan) {
-        IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Mask can not be negative");
-        throw _illegalArgumentException;
-      }
-      StringConcatenation _builder = new StringConcatenation();
-      _builder.append("0x");
-      String _string = value.toString(16);
-      _builder.append(_string, "");
-      _xblockexpression = (_builder);
     }
     return _xblockexpression;
   }
@@ -1912,10 +1694,10 @@ public class DartCompiler {
     }
     Integer _pop = stack.pop();
     final String last = ("t" + _pop);
-    InternalInformation _asInternal = this.asInternal(frame.outputId);
+    InternalInformation _asInternal = this.cce.asInternal(frame.outputId);
     boolean _notEquals = (!Objects.equal(_asInternal.info.name, "#null"));
     if (_notEquals) {
-      InternalInformation _asInternal_1 = this.asInternal(frame.outputId);
+      InternalInformation _asInternal_1 = this.cce.asInternal(frame.outputId);
       CharSequence _setter = this.setter(_asInternal_1, last);
       sb.append(_setter);
     } else {
@@ -1952,13 +1734,13 @@ public class DartCompiler {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.writeInternal)) {
           _matched=true;
+          final InternalInformation internal = this.cce.asInternal(inst.arg1);
+          String name = this.cce.idName(internal, false, true);
           int _size = arr.size();
-          InternalInformation _asInternal = this.asInternal(inst.arg1);
+          InternalInformation _asInternal = this.cce.asInternal(inst.arg1);
           int _length = _asInternal.info.dimensions.length;
           boolean _lessThan = (_size < _length);
           if (_lessThan) {
-            InternalInformation _asInternal_1 = this.asInternal(inst.arg1);
-            String name = this.javaName(_asInternal_1, false);
             StringConcatenation _builder_1 = new StringConcatenation();
             _builder_1.append(name, "");
             _builder_1.append(".fillRange(0, ");
@@ -1966,31 +1748,30 @@ public class DartCompiler {
             _builder_1.append(".length, t");
             _builder_1.append(a, "");
             _builder_1.append(");");
+            _builder_1.newLineIfNotEmpty();
+            _builder_1.append("_regUpdates.add(new RegUpdate(");
+            Integer _get = this.cce.varIdx.get(internal.info.name);
+            _builder_1.append(_get, "");
+            _builder_1.append(", -1));");
+            _builder_1.newLineIfNotEmpty();
             sb.append(_builder_1);
           } else {
             StringConcatenation _builder_2 = new StringConcatenation();
-            InternalInformation _asInternal_2 = this.asInternal(inst.arg1);
-            String _javaName = this.javaName(_asInternal_2, false);
-            _builder_2.append(_javaName, "");
-            {
-              boolean _hasElements = false;
-              for(final Integer ai : arr) {
-                if (!_hasElements) {
-                  _hasElements = true;
-                  _builder_2.append("[", "");
-                } else {
-                  _builder_2.appendImmediate("][", "");
-                }
-                _builder_2.append("a");
-                _builder_2.append(ai, "");
-              }
-              if (_hasElements) {
-                _builder_2.append("]", "");
-              }
-            }
+            _builder_2.append(name, "");
+            String _arrayAccessBracket = this.cce.arrayAccessBracket(internal.info, arr);
+            _builder_2.append(_arrayAccessBracket, "");
             _builder_2.append("=t");
             _builder_2.append(a, "");
             _builder_2.append(";");
+            _builder_2.newLineIfNotEmpty();
+            _builder_2.append("_regUpdates.add(new RegUpdate(");
+            Integer _get_1 = this.cce.varIdx.get(internal.info.name);
+            _builder_2.append(_get_1, "");
+            _builder_2.append(", ");
+            StringBuilder _arrayAccess = this.cce.arrayAccess(internal.info, arr);
+            _builder_2.append(_arrayAccess, "");
+            _builder_2.append("));");
+            _builder_2.newLineIfNotEmpty();
             sb.append(_builder_2);
             arr.clear();
           }
@@ -2061,7 +1842,7 @@ public class DartCompiler {
           final int lowBit = inst.arg2;
           int _minus = (highBit - lowBit);
           int _plus = (_minus + 1);
-          final CharSequence mask = this.asMask(_plus);
+          final CharSequence mask = this.cce.asMask(_plus);
           StringConcatenation _builder_7 = new StringConcatenation();
           _builder_7.append("int t");
           _builder_7.append(pos, "");
@@ -2106,7 +1887,7 @@ public class DartCompiler {
             _builder_9.append(" & ");
             int _minus_1 = (targetWidth - 1);
             BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(_minus_1);
-            CharSequence _hexString = this.toHexString(_shiftLeft_1);
+            CharSequence _hexString = this.cce.toHexString(_shiftLeft_1);
             _builder_9.append(_hexString, "");
             _builder_9.append(") != 0)) { // MSB is set");
             _builder_9.newLineIfNotEmpty();
@@ -2163,7 +1944,7 @@ public class DartCompiler {
           _builder_10.append("=t");
           _builder_10.append(a, "");
           _builder_10.append(" & ");
-          CharSequence _asMask = this.asMask(inst.arg1);
+          CharSequence _asMask = this.cce.asMask(inst.arg1);
           _builder_10.append(_asMask, "");
           _builder_10.append(";");
           sb.append(_builder_10);
@@ -2246,7 +2027,7 @@ public class DartCompiler {
           _builder_17.append("int t");
           _builder_17.append(pos, "");
           _builder_17.append("=");
-          CharSequence _asMask_1 = this.asMask(inst.arg1);
+          CharSequence _asMask_1 = this.cce.asMask(inst.arg1);
           _builder_17.append(_asMask_1, "");
           _builder_17.append(";");
           sb.append(_builder_17);
@@ -2284,8 +2065,8 @@ public class DartCompiler {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.loadInternal)) {
           _matched=true;
-          final InternalInformation internal = this.asInternal(inst.arg1);
-          CharSequence _ter = this.getter(internal, false, pos, f.uniqueID);
+          final InternalInformation internal_1 = this.cce.asInternal(inst.arg1);
+          CharSequence _ter = this.getter(internal_1, false, pos, f.uniqueID);
           sb.append(_ter);
           arr.clear();
         }
@@ -2518,9 +2299,9 @@ public class DartCompiler {
         if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
           _matched=true;
           StringConcatenation _builder_36 = new StringConcatenation();
-          InternalInformation _asInternal_3 = this.asInternal(inst.arg1);
-          String _javaName_1 = this.javaName(_asInternal_3.info, false);
-          _builder_36.append(_javaName_1, "");
+          InternalInformation _asInternal_1 = this.cce.asInternal(inst.arg1);
+          String _idName = this.cce.idName(_asInternal_1.info, false, true);
+          _builder_36.append(_idName, "");
           _builder_36.append("_update=updateStamp;");
           sb.append(_builder_36);
         }
@@ -2529,9 +2310,9 @@ public class DartCompiler {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
           StringConcatenation _builder_37 = new StringConcatenation();
-          InternalInformation _asInternal_4 = this.asInternal(inst.arg1);
-          String _javaName_2 = this.javaName(_asInternal_4.info, false);
-          _builder_37.append(_javaName_2, "");
+          InternalInformation _asInternal_2 = this.cce.asInternal(inst.arg1);
+          String _idName_1 = this.cce.idName(_asInternal_2.info, false, true);
+          _builder_37.append(_idName_1, "");
           _builder_37.append("_update=updateStamp;");
           sb.append(_builder_37);
         }
@@ -2549,37 +2330,27 @@ public class DartCompiler {
   public CharSequence constant(final int id, final Frame f) {
     StringConcatenation _builder = new StringConcatenation();
     BigInteger _get = f.constants[id];
-    CharSequence _hexString = this.toHexString(_get);
+    CharSequence _hexString = this.cce.toHexString(_get);
     _builder.append(_hexString, "");
     return _builder;
   }
   
-  public int calcSize(final VariableInformation info) {
-    int size = 1;
-    for (final int d : info.dimensions) {
-      int _multiply = (size * d);
-      size = _multiply;
-    }
-    return size;
+  public String dartType(final InternalInformation ii) {
+    return this.dartType(ii.info, false);
   }
   
-  public String getJavaType(final InternalInformation ii) {
-    return this.getJavaType(ii.info, false);
-  }
-  
-  public String getJavaType(final VariableInformation information, final boolean withArray) {
+  public String dartType(final VariableInformation information, final boolean withArray) {
     String jt = "int";
     boolean _startsWith = information.name.startsWith(InternalInformation.PRED_PREFIX);
     if (_startsWith) {
       jt = "bool";
     }
     boolean _and = false;
-    int _length = information.dimensions.length;
-    boolean _notEquals = (_length != 0);
-    if (!_notEquals) {
+    boolean _isArray = this.cce.isArray(information);
+    if (!_isArray) {
       _and = false;
     } else {
-      _and = (_notEquals && withArray);
+      _and = (_isArray && withArray);
     }
     if (_and) {
       StringConcatenation _builder = new StringConcatenation();
@@ -2591,63 +2362,38 @@ public class DartCompiler {
     return jt;
   }
   
-  public String javaName(final VariableInformation information, final boolean prev) {
-    return this.javaName(information.name, prev);
-  }
-  
-  public String javaName(final InternalInformation ii, final boolean prev) {
-    if (ii.fixedArray) {
-      return this.javaName(ii.fullName, prev);
-    }
-    return this.javaName(ii.info, prev);
-  }
-  
-  public String javaName(final String name, final boolean prev) {
-    String _replaceAll = name.replaceAll("\\.", "_");
-    String _replaceAll_1 = _replaceAll.replaceAll("\\{", "Bit");
-    String _replaceAll_2 = _replaceAll_1.replaceAll("\\}", "");
-    String _replaceAll_3 = _replaceAll_2.replaceAll(":", "to");
-    String _replaceAll_4 = _replaceAll_3.replaceAll("\\[", "arr");
-    final String res = _replaceAll_4.replaceAll("\\]", "");
-    if (prev) {
-      String _plus = ("_" + res);
-      return (_plus + "_prev");
-    }
-    return ("_" + res);
-  }
-  
   public CharSequence decl(final VariableInformation info, final Boolean includePrev) {
     StringConcatenation _builder = new StringConcatenation();
     {
       boolean _or = false;
-      boolean _isPredicate = this.isPredicate(info);
+      boolean _isPredicate = this.cce.isPredicate(info);
       if (_isPredicate) {
         _or = true;
       } else {
         boolean _and = false;
-        Boolean _get = this.prevMap.get(info.name);
+        Boolean _get = this.cce.prevMap.get(info.name);
         boolean _notEquals = (!Objects.equal(_get, null));
         if (!_notEquals) {
           _and = false;
         } else {
-          Boolean _get_1 = this.prevMap.get(info.name);
+          Boolean _get_1 = this.cce.prevMap.get(info.name);
           _and = (_notEquals && (_get_1).booleanValue());
         }
         _or = (_isPredicate || _and);
       }
       if (_or) {
         _builder.append("int ");
-        String _javaName = this.javaName(info, false);
-        _builder.append(_javaName, "");
+        String _idName = this.cce.idName(info, false, true);
+        _builder.append(_idName, "");
         _builder.append("_update=0;");
       }
     }
     _builder.newLineIfNotEmpty();
-    String _javaType = this.getJavaType(info, true);
-    _builder.append(_javaType, "");
+    String _dartType = this.dartType(info, true);
+    _builder.append(_dartType, "");
     _builder.append(" ");
-    String _javaName_1 = this.javaName(info, false);
-    _builder.append(_javaName_1, "");
+    String _idName_1 = this.cce.idName(info, false, true);
+    _builder.append(_idName_1, "");
     _builder.append("=");
     CharSequence _initValue = this.initValue(info);
     _builder.append(_initValue, "");
@@ -2661,22 +2407,22 @@ public class DartCompiler {
         _and_1 = (_notEquals_1 && (includePrev).booleanValue());
       }
       if (_and_1) {
-        String _javaType_1 = this.getJavaType(info, true);
-        _builder.append(_javaType_1, "");
+        String _dartType_1 = this.dartType(info, true);
+        _builder.append(_dartType_1, "");
         _builder.append(" ");
-        String _javaName_2 = this.javaName(info, true);
-        _builder.append(_javaName_2, "");
+        String _idName_2 = this.cce.idName(info, true, true);
+        _builder.append(_idName_2, "");
         _builder.append("=0;");
       }
     }
     _builder.newLineIfNotEmpty();
     {
       if (info.isRegister) {
-        String _javaType_2 = this.getJavaType(info, true);
-        _builder.append(_javaType_2, "");
+        String _dartType_2 = this.dartType(info, true);
+        _builder.append(_dartType_2, "");
         _builder.append(" ");
-        String _javaName_3 = this.javaName(info, false);
-        _builder.append(_javaName_3, "");
+        String _idName_3 = this.cce.idName(info, false, true);
+        _builder.append(_idName_3, "");
         _builder.append("$reg=");
         CharSequence _initValue_1 = this.initValue(info);
         _builder.append(_initValue_1, "");
@@ -2689,19 +2435,18 @@ public class DartCompiler {
   public CharSequence initValue(final VariableInformation info) {
     StringConcatenation _builder = new StringConcatenation();
     {
-      boolean _isPredicate = this.isPredicate(info);
+      boolean _isPredicate = this.cce.isPredicate(info);
       if (_isPredicate) {
         _builder.append("false");
       } else {
-        int _length = info.dimensions.length;
-        boolean _notEquals = (_length != 0);
-        if (_notEquals) {
+        boolean _isArray = this.cce.isArray(info);
+        if (_isArray) {
           _builder.append("new ");
-          String _javaType = this.getJavaType(info, true);
-          _builder.append(_javaType, "");
+          String _dartType = this.dartType(info, true);
+          _builder.append(_dartType, "");
           _builder.append("(");
-          int _calcSize = this.calcSize(info);
-          _builder.append(_calcSize, "");
+          int _talSize = this.cce.totalSize(info);
+          _builder.append(_talSize, "");
           _builder.append(")");
         } else {
           _builder.append("0");
@@ -2710,11 +2455,6 @@ public class DartCompiler {
     }
     _builder.append(";");
     return _builder;
-  }
-  
-  public boolean isPredicate(final VariableInformation info) {
-    boolean _startsWith = info.name.startsWith(InternalInformation.PRED_PREFIX);
-    return _startsWith;
   }
   
   public CharSequence getImports() {

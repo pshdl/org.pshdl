@@ -44,35 +44,15 @@ import java.util.HashSet
 import java.math.BigInteger
 
 class DartCompiler {
-	private ExecutableModel em
-	private Map<String, Integer> varIdx = new HashMap
-	private Map<String, Integer> intIdx = new HashMap
-	private Map<String, Boolean> prevMap = new HashMap
-	private boolean hasClock
+
+	private extension CommonCompilerExtension cce
 
 	new(ExecutableModel em) {
-		this.em = em
-		for (i : 0 ..< em.variables.length) {
-			varIdx.put(em.variables.get(i).name, i)
-		}
-		for (i : 0 ..< em.internals.length) {
-			intIdx.put(em.internals.get(i).fullName, i)
-		}
-		for (f : em.frames) {
-			if (f.edgeNegDepRes != -1)
-				prevMap.put(f.edgeNegDepRes.asInternal.info.name, true)
-			if (f.edgePosDepRes != -1)
-				prevMap.put(f.edgePosDepRes.asInternal.info.name, true)
-		}
-		this.hasClock = !prevMap.empty
+		this.cce = new CommonCompilerExtension(em)
 	}
 
 	def static String doCompile(ExecutableModel em, String unitName) {
 		return new DartCompiler(em).compile(unitName).toString
-	}
-
-	def InternalInformation asInternal(int id) {
-		return em.internals.get(id)
 	}
 
 	def compile(String unitName) {
@@ -118,9 +98,9 @@ class DartCompiler {
 			«ENDIF»
 			class «unitName» implements DartInterpreter{
 				«IF hasClock»
-				Set<RegUpdate> _regUpdates=new HashSet<RegUpdate>();
-				final bool _disableEdges;
-				final bool _disabledRegOutputlogic;
+					Set<RegUpdate> _regUpdates=new HashSet<RegUpdate>();
+					final bool _disableEdges;
+					final bool _disabledRegOutputlogic;
 				«ENDIF»
 				«FOR v : em.variables.excludeNull»
 					«v.decl(prevMap.get(v.name))»
@@ -130,7 +110,7 @@ class DartCompiler {
 				int get updateStamp=>(_deltaCycle << 16) | (_epsCycle & 0xFFFF);
 				Map<String, int> _varIdx={
 					«FOR v : em.variables SEPARATOR ','»
-						"«v.name.replaceAll("[\\$]","\\\\\\$")»": «varIdx.get(v.name)»
+						"«v.name.replaceAll("[\\$]", "\\\\\\$")»": «varIdx.get(v.name)»
 					«ENDFOR»
 				};
 				
@@ -139,21 +119,21 @@ class DartCompiler {
 				«unitName»(«IF hasClock»this._disableEdges, this._disabledRegOutputlogic«ENDIF»);
 				
 				«FOR v : em.variables.excludeNull»
-					set «v.javaName(false).substring(1)»(«v.getJavaType(true)» value) =>
-						«v.javaName(false)»=value «IF !v.predicate && v.dimensions.length==0»& «v.width.asMask»«ENDIF»;
+					set «v.idName(false, false)»(«v.dartType(true)» value) =>
+						«v.idName(false, true)»=value «IF !v.predicate && !v.array»& «v.width.asMask»«ENDIF»;
 					
-					«v.getJavaType(true)» get «v.javaName(false).substring(1)» =>
-						«v.javaName(false)» «IF !v.predicate && v.dimensions.length==0»& «v.width.asMask»«ENDIF»;
+					«v.dartType(true)» get «v.idName(false, false)» =>
+						«v.idName(false, true)» «IF !v.predicate && !v.array»& «v.width.asMask»«ENDIF»;
 					
-					«IF v.dimensions.size!=0»
-					void set«v.javaName(false).substring(1)»(«v.getJavaType(false)» value«FOR i:(0..<v.dimensions.size)», int a«i»«ENDFOR») {
-						«v.javaName(false)»[«v.arrayAccess»]=value & «v.width.asMask»;
-					}
-					
-					«v.getJavaType(false)» get«v.javaName(false).substring(1)»(«FOR i:(0..<v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
-						return «v.javaName(false)»[«v.arrayAccess»] & «v.width.asMask»;
-					}
-					
+					«IF v.array»
+						void set «v.idName(false, false)»(«v.dartType(false)» value«FOR i : (0 ..< v.dimensions.size)», int a«i»«ENDFOR») {
+							«v.idName(false, true)»«v.arrayAccessBracket(null)»=value & «v.width.asMask»;
+						}
+						
+						«v.dartType(false)» get «v.idName(false, false)»(«FOR i : (0 ..< v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
+							return «v.idName(false, true)»«v.arrayAccessBracket(null)» & «v.width.asMask»;
+						}
+						
 					«ENDIF»
 				«ENDFOR»
 				«FOR f : em.frames»
@@ -219,15 +199,16 @@ class DartCompiler {
 		var first = true;
 		if (f.edgeNegDepRes !== -1) {
 			sb.append(
-				'''«f.edgeNegDepRes.asInternal.javaName(false)»_isFalling && !«f.edgeNegDepRes.asInternal.
-					javaName(false)»_fallingIsHandled''')
+				'''«f.edgeNegDepRes.asInternal.idName(false, true)»_isFalling && !«f.edgeNegDepRes.asInternal.
+					idName(false, true)»_fallingIsHandled''')
 			first = false
 		}
 		if (f.edgePosDepRes !== -1) {
 			if (!first)
 				sb.append(' && ')
 			sb.append(
-				'''«f.edgePosDepRes.asInternal.javaName(false)»_isRising&& !«f.edgePosDepRes.asInternal.javaName(false)»_risingIsHandled''')
+				'''«f.edgePosDepRes.asInternal.idName(false, true)»_isRising&& !«f.edgePosDepRes.asInternal.
+					idName(false, true)»_risingIsHandled''')
 			first = false
 		}
 		for (p : f.predNegDepRes) {
@@ -252,7 +233,7 @@ class DartCompiler {
 		'''
 			«id.asInternal.getter(false, id, -1)»
 			bool p«id»_fresh=true;
-			int up«id»=«id.asInternal.info.javaName(false)»_update;
+			int up«id»=«id.asInternal.info.idName(false, true)»_update;
 			if ((up«id»>>16 != _deltaCycle) || ((up«id»&0xFFFF) != _epsCycle)){
 				p«id»_fresh=false;
 			}
@@ -265,17 +246,17 @@ class DartCompiler {
 		handledEdges.add(id)
 		val internal = id.asInternal
 		'''
-			bool «internal.javaName(false)»_isRising=true;
-			bool «internal.javaName(false)»_risingIsHandled=false;
+			bool «internal.idName(false, true)»_isRising=true;
+			bool «internal.idName(false, true)»_risingIsHandled=false;
 			if (!_disableEdges){
 				«id.asInternal.getter(false, id, -1)»
 				«id.asInternal.getter(true, id, -1)»
 				if ((t«id»_prev!=0) || (t«id»!=1)) {
-					«internal.javaName(false)»_isRising=false;
+					«internal.idName(false, true)»_isRising=false;
 				}
 			}
-			if (skipEdge(«internal.info.javaName(false)»_update)){
-				«internal.javaName(false)»_risingIsHandled=true;
+			if (skipEdge(«internal.info.idName(false, true)»_update)){
+				«internal.idName(false, true)»_risingIsHandled=true;
 			}
 		'''
 	}
@@ -286,24 +267,19 @@ class DartCompiler {
 		handledEdges.add(id)
 		val internal = id.asInternal
 		'''
-			bool «internal.javaName(false)»_isFalling=true;
-			bool «internal.javaName(false)»_fallingIsHandled=false;
+			bool «internal.idName(false, true)»_isFalling=true;
+			bool «internal.idName(false, true)»_fallingIsHandled=false;
 			if (!_disableEdges){
 				«id.asInternal.getter(false, id, -1)»
 				«id.asInternal.getter(true, id, -1)»
 				if ((t«id»_prev!=1) || (t«id»!=0)) {
-					«internal.javaName(false)»_isFalling=false;
+					«internal.idName(false, true)»_isFalling=false;
 				}
 			}
-			if (skipEdge(«internal.info.javaName(false)»_update)){
-				«internal.javaName(false)»_fallingIsHandled=true;
+			if (skipEdge(«internal.info.idName(false, true)»_update)){
+				«internal.idName(false, true)»_fallingIsHandled=true;
 			}
 		'''
-	}
-
-	def asMask(int width) {
-		val mask = 1bi.shiftLeft(width) - 1bi
-		return mask.toHexString
 	}
 
 	def hdlInterpreter() '''
@@ -313,7 +289,7 @@ class DartCompiler {
 				«FOR v : em.variables»
 					«IF !v.^null»
 						case «varIdx.get(v.name)»: 
-							«v.javaName(false).substring(1)»=value«IF v.predicate»==0?false:true«ENDIF»;
+							«v.idName(false, false)»=value«IF v.predicate»==0?false:true«ENDIF»;
 							break;
 					«ELSE»
 						case «varIdx.get(v.name)»: 
@@ -332,7 +308,7 @@ class DartCompiler {
 		String getName(int idx) {
 			switch (idx) {
 				«FOR v : em.variables»
-					case «varIdx.get(v.name)»: return "«v.name.replaceAll("[\\$]","\\\\\\$")»";
+					case «varIdx.get(v.name)»: return "«v.name.replaceAll("[\\$]", "\\\\\\$")»";
 				«ENDFOR»
 				default:
 					throw new ArgumentError("Not a valid index: $idx");
@@ -343,11 +319,11 @@ class DartCompiler {
 			switch (idx) {
 				«FOR v : em.variables»
 					«IF v.predicate»
-						case «varIdx.get(v.name)»: return «v.javaName(false).substring(1)»?1:0;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»?1:0;
 					«ELSEIF v.isNull»
 						case «varIdx.get(v.name)»: return 0;
 					«ELSE»
-						case «varIdx.get(v.name)»: return «v.javaName(false).substring(1)»;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»;
 					«ENDIF»
 				«ENDFOR»
 				default:
@@ -361,54 +337,42 @@ class DartCompiler {
 		
 		«description»
 	'''
-	
+
 	def getDescription() {
-	
-	'''
-	Description get description=>new Description(
-		[
-		«FOR v:em.variables.filter[dir===Direction::IN] SEPARATOR ','»
-			«v.asPort»
-		«ENDFOR»
-		],
-		[
-		«FOR v:em.variables.filter[dir===Direction::INOUT] SEPARATOR ','»
-			«v.asPort»
-		«ENDFOR»
-		],
-		[
-		«FOR v:em.variables.filter[dir===Direction::OUT] SEPARATOR ','»
-			«v.asPort»
-		«ENDFOR»
-		],
-		[
-		«FOR v:em.variables.filter[dir===Direction::INTERNAL] SEPARATOR ','»
-			«v.asPort»
-		«ENDFOR»
-		], _varIdx);
-	'''	
+
+		'''
+			Description get description=>new Description(
+				[
+				«FOR v : em.variables.filter[dir === Direction::IN] SEPARATOR ','»
+					«v.asPort»
+				«ENDFOR»
+				],
+				[
+				«FOR v : em.variables.filter[dir === Direction::INOUT] SEPARATOR ','»
+					«v.asPort»
+				«ENDFOR»
+				],
+				[
+				«FOR v : em.variables.filter[dir === Direction::OUT] SEPARATOR ','»
+					«v.asPort»
+				«ENDFOR»
+				],
+				[
+				«FOR v : em.variables.filter[dir === Direction::INTERNAL] SEPARATOR ','»
+					«v.asPort»
+				«ENDFOR»
+				], _varIdx);
+		'''
 	}
-	
+
 	def asPort(VariableInformation v) {
-		var dims=""
-		if (v.dimensions.length!=0){
-			dims=''', dimensions: [«FOR i:v.dimensions SEPARATOR ','»«i»«ENDFOR»]'''
+		var dims = ""
+		if (v.array) {
+			dims = ''', dimensions: [«FOR i : v.dimensions SEPARATOR ','»«i»«ENDFOR»]'''
 		}
-		val clock=if (v.isClock)", clock:true" else ""
-		val reset=if (v.isReset)", reset:true" else ""
-		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]","\\\\\\$")»", «v.width»«dims»«clock»«reset»)'''
-	}
-	
-	def isNull(VariableInformation information) {
-		information.name=='#null'
-	}
-
-	def excludeNull(VariableInformation[] vars) {
-		vars.filter[!isNull]
-	}
-
-	def excludeNull(InternalInformation[] vars) {
-		vars.filter[!info.isNull]
+		val clock = if(v.isClock) ", clock:true" else ""
+		val reset = if(v.isReset) ", reset:true" else ""
+		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]", "\\\\\\$")»", «v.width»«dims»«clock»«reset»)'''
 	}
 
 	def copyRegs() '''
@@ -418,10 +382,10 @@ class DartCompiler {
 					«FOR v : em.variables»
 						«IF v.isRegister»
 							case «varIdx.get(v.name)»: 
-							«IF v.dimensions.length == 0»
-								«v.javaName(false)» = «v.javaName(false)»$reg; break;
+							«IF !v.array»
+								«v.idName(false, true)» = «v.idName(false, true)»$reg; break;
 							«ELSE»
-								«v.javaName(false)»[reg.offset] = «v.javaName(false)»$reg[reg.offset]; break;
+								«v.idName(false, true)»[reg.offset] = «v.idName(false, true)»$reg[reg.offset]; break;
 							«ENDIF»
 						«ENDIF»
 					«ENDFOR»
@@ -431,9 +395,10 @@ class DartCompiler {
 	'''
 
 	def copyPrev(VariableInformation info) {
-		if (info.dimensions.length == 0)
-			return '''«info.javaName(true)»=«info.javaName(false)»;'''
-		return '''System.arraycopy(«info.javaName(false)»,0,«info.javaName(true)», 0, «info.javaName(false)».length);'''
+		if (!info.array)
+			return '''«info.idName(true, true)»=«info.idName(false, true)»;'''
+		return '''System.arraycopy(«info.idName(false, true)»,0,«info.idName(true, true)», 0, «info.idName(false,
+			true)».length);'''
 	}
 
 	def getter(InternalInformation info, boolean prev, int pos, int frameID) {
@@ -449,32 +414,32 @@ class DartCompiler {
 			varName = varName + "_prev"
 		if (info.fixedArray) '''
 			«IF info.actualWidth == info.info.width»
-				«info.javaType» «varName»=«info.info.javaName(prev)»«sb»;
+				«info.dartType» «varName»=«info.info.idName(prev, true)»«sb»;
 			«ELSEIF info.actualWidth == 1»
-				«info.javaType» «varName»=(«info.info.javaName(prev)»«sb» >> «info.bitStart») & 1;
+				«info.dartType» «varName»=(«info.info.idName(prev,true)»«sb» >> «info.bitStart») & 1;
 			«ELSE»
-				«info.javaType» «varName»=(«info.info.javaName(prev)»«sb» >> «info.bitEnd») & «mask»;
+				«info.dartType» «varName»=(«info.info.idName(prev, true)»«sb» >> «info.bitEnd») & «mask»;
 			«ENDIF»
 		''' else '''
 			«IF info.actualWidth == info.info.width»
-				«info.javaType» «varName»= «info.info.javaName(prev)»«arrAcc»;
+				«info.dartType» «varName»= «info.info.idName(prev, true)»«arrAcc»;
 			«ELSEIF info.actualWidth == 1»
-				«info.javaType» «varName»= («info.info.javaName(prev)»«arrAcc» >> «info.bitStart») & 1;
+				«info.dartType» «varName»= («info.info.idName(prev,true)»«arrAcc» >> «info.bitStart») & 1;
 			«ELSE»
-				«info.javaType» «varName»= («info.info.javaName(prev)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMask»;
+				«info.dartType» «varName»= («info.info.idName(prev, true)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMask»;
 			«ENDIF»
 		'''
 	}
 
 	def setter(InternalInformation info, String value) {
+
 		//TODO Fix this!
 		val mask = ((1bi.shiftLeft(info.actualWidth)) - 1bi)
 		val maskString = mask.toHexString
-		val subMask=mask.shiftLeft(info.bitEnd);
-		val fullMask=((1bi.shiftLeft(info.info.width)) - 1bi)
+		val subMask = mask.shiftLeft(info.bitEnd);
+		val fullMask = ((1bi.shiftLeft(info.info.width)) - 1bi)
 		val writeMask = fullMask.xor(subMask).toHexString
-		val varAccess = info.info.arrayAccess
-		val off = info.arrayAccess
+		val off = info.arrayFixedOffset
 		var fixedAccess = if (info.arrayIdx.length > 0) '''[«off»]''' else ''''''
 		var regSuffix = ''
 		if (info.isShadowReg) {
@@ -482,87 +447,36 @@ class DartCompiler {
 			regSuffix = "$reg"
 		}
 		if (info.fixedArray) '''
-			//Actual Width: «info.actualWidth» Bit End: «info.bitEnd» subMask: «subMask.toHexString» fullMask: «fullMask.toHexString»
 			«IF info.actualWidth == info.info.width»
-				«IF info.isShadowReg»«info.info.getJavaType(false)» current=«info.info.javaName(false)»«fixedAccess»;«ENDIF»
-				«info.info.javaName(false)»«fixedAccess»=«value»;
+				«IF info.isShadowReg»«info.info.dartType(false)» current=«info.info.idName(false, true)»«fixedAccess»;«ENDIF»
+				«info.info.idName(false, true)»«fixedAccess»=«value»;
 			«ELSE»
-				«info.info.getJavaType(false)» current=«info.info.javaName(false)»«fixedAccess» & «writeMask»;
+				«info.info.dartType(false)» current=«info.info.idName(false, true)»«fixedAccess» & «writeMask»;
 				«value»=((«value» & «maskString») << «info.bitEnd»);
-				«info.info.javaName(false)»«fixedAccess»=current|«value»;
+				«info.info.idName(false, true)»«fixedAccess»=current|«value»;
 			«ENDIF»
 			«IF info.isShadowReg»
 				if (current!=«value»)
 					_regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», «off»));
 			«ENDIF»
-			«IF info.isPred»«info.info.javaName(false)»_update=updateStamp;«ENDIF»
+			«IF info.isPred»«info.info.idName(false, true)»_update=updateStamp;«ENDIF»
 		''' else '''
-			int offset=«varAccess»;
 			«IF info.actualWidth == info.info.width»
-				«IF info.isShadowReg»«info.info.getJavaType(false)» current=«info.info.javaName(false)»«regSuffix»[offset];«ENDIF»
-				«info.info.javaName(false)»«regSuffix»[offset]=«value»;
+				«IF info.isShadowReg»«info.info.dartType(false)» current=«info.info.idName(false, true)»«regSuffix»«info.info.
+				arrayAccessBracket(null)»;«ENDIF»
+				«info.info.idName(false, true)»«regSuffix»«info.info.arrayAccessBracket(null)»=«value»;
 			«ELSE»
-				«info.info.getJavaType(false)» current=«info.info.javaName(false)»«regSuffix»[offset] & «writeMask»;
+				«info.info.dartType(false)» current=«info.info.idName(false, true)»«regSuffix»«info.info.
+				arrayAccessBracket(null)» & «writeMask»;
 				«value»=((«value» & «maskString») << «info.bitEnd»;
-				«info.info.javaName(false)»«regSuffix»[offset]=current|«value»);
+				«info.info.idName(false, true)»«regSuffix»«info.info.arrayAccessBracket(null)»=current|«value»);
 			«ENDIF»
 			«IF info.isShadowReg»
 				if (current!=«value»)
-					_regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», offset));
+					_regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», «info.info.arrayAccess(null)»));
 			«ENDIF»
-			«IF info.isPred»«info.info.javaName(false)»_update=updateStamp;«ENDIF»
+			«IF info.isPred»«info.info.idName(false, true)»_update=updateStamp;«ENDIF»
 		'''
-	}
-
-	def arrayAccess(InternalInformation v) {
-		val dims = dimsLastOne(v.info)
-		var off = 0;
-		for (i : (0 ..< v.arrayIdx.length)) {
-			val arr = v.arrayIdx.get(i)
-			val dim = dims.get(i)
-			off = off + (arr * dim)
-		}
-		return off
-	}
-
-	def arrayAccessArrIdx(VariableInformation v) {
-		val varAccess = new StringBuilder
-		val dims = dimsLastOne(v)
-		for (i : (0 ..< v.dimensions.length)) {
-			val dim = dims.get(i)
-			if (dim != 1)
-				varAccess.append('''arrayIdx[«i»]*«dim»''')
-			else
-				varAccess.append('''arrayIdx[«i»]''')
-		}
-		return varAccess
-	}
-
-	def dimsLastOne(VariableInformation v) {
-		val dims = new ArrayList(v.dimensions)
-		if (dims.size > 0) {
-			dims.set(dims.size - 1, 1);
-		}
-		dims
-	}
-
-	def arrayAccess(VariableInformation v) {
-		val varAccess = new StringBuilder
-		val dims = dimsLastOne(v)
-		for (i : (0 ..< v.dimensions.length)) {
-			val dim = dims.get(i)
-			if (dim != 1)
-				varAccess.append('''a«i»*«dim»''')
-			else
-				varAccess.append('''a«i»''')
-		}
-		return varAccess
-	}
-
-	def toHexString(BigInteger value) {
-		if (value.signum<0)
-			throw new IllegalArgumentException("Mask can not be negative")
-		'''0x«value.toString(16)»'''
 	}
 
 	def method(Frame frame) {
@@ -613,12 +527,20 @@ class DartCompiler {
 			case Instruction::pushAddIndex:
 				sb.append('''int a«arr.last»=t«a»;''')
 			case Instruction::writeInternal: {
+				val internal = inst.arg1.asInternal
+				var name = (internal).idName(false, true);
 				if (arr.size < inst.arg1.asInternal.info.dimensions.length) {
-					var name=inst.arg1.asInternal.javaName(false);
-					sb.append('''«name».fillRange(0, «name».length, t«a»);''')
+					sb.append(
+						'''
+							«name».fillRange(0, «name».length, t«a»);
+							_regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», -1));
+						''')
 				} else {
 					sb.append(
-						'''«inst.arg1.asInternal.javaName(false)»«FOR ai : arr BEFORE '[' SEPARATOR '][' AFTER ']'»a«ai»«ENDFOR»=t«a»;''')
+						'''
+							«name»«internal.info.arrayAccessBracket(arr)»=t«a»;
+							_regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», «internal.info.arrayAccess(arr)»));
+						''')
 					arr.clear
 				}
 			}
@@ -646,19 +568,19 @@ class DartCompiler {
 				} else {
 					val mask = BigInteger.ONE.shiftLeft(targetWidth).subtract(BigInteger.ONE);
 					sb.append(
-				'''
-				int u«pos» = t«a» & «mask»;
-				if ((u«pos» & «1bi.shiftLeft(targetWidth-1).toHexString») != 0)) { // MSB is set
-					if (u«pos» > 0) {
-						u«pos» = -u«pos»;
-					}
-				} else {
-					if (u«pos» < 0) {
-						u«pos» = -u«pos»;
-					}
-				}
-				t«pos» = u«pos»;
-				''')
+						'''
+							int u«pos» = t«a» & «mask»;
+							if ((u«pos» & «1bi.shiftLeft(targetWidth - 1).toHexString») != 0)) { // MSB is set
+								if (u«pos» > 0) {
+									u«pos» = -u«pos»;
+								}
+							} else {
+								if (u«pos» < 0) {
+									u«pos» = -u«pos»;
+								}
+							}
+							t«pos» = u«pos»;
+						''')
 				}
 			}
 			case Instruction::cast_uint: {
@@ -720,11 +642,9 @@ class DartCompiler {
 			case Instruction::greater_eq:
 				sb.append('''bool t«pos»=t«b» >= t«a»;''')
 			case Instruction::isRisingEdge:
-				sb.append(
-					'''«inst.arg1.asInternal.info.javaName(false)»_update=updateStamp;''')
+				sb.append('''«inst.arg1.asInternal.info.idName(false, true)»_update=updateStamp;''')
 			case Instruction::isFallingEdge:
-				sb.append(
-					'''«inst.arg1.asInternal.info.javaName(false)»_update=updateStamp;''')
+				sb.append('''«inst.arg1.asInternal.info.idName(false, true)»_update=updateStamp;''')
 		}
 		sb.append(
 			'''//«inst»
@@ -732,60 +652,31 @@ class DartCompiler {
 	}
 
 	def constant(int id, Frame f) '''«f.constants.get(id).toHexString»'''
-	
-	def calcSize(VariableInformation info) {
-		var size = 1
-		for (d : info.dimensions) {
-			size = size * d
-		}
-		return size
+
+	def dartType(InternalInformation ii) {
+		return ii.info.dartType(false)
 	}
 
-	def getJavaType(InternalInformation ii) {
-		return ii.info.getJavaType(false)
-	}
-
-	def getJavaType(VariableInformation information, boolean withArray) {
-		var jt="int"
+	def dartType(VariableInformation information, boolean withArray) {
+		var jt = "int"
 		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
-			jt="bool"
-		if (information.dimensions.length!=0 && withArray)
+			jt = "bool"
+		if (information.array && withArray)
 			return '''List<«jt»>'''
 		return jt
 	}
 
-	def javaName(VariableInformation information, boolean prev) {
-		return information.name.javaName(prev)
-	}
-
-	def javaName(InternalInformation ii, boolean prev) {
-		if (ii.fixedArray)
-			return ii.fullName.javaName(prev)
-		return ii.info.javaName(prev)
-	}
-
-	def javaName(String name, boolean prev) {
-		val res = name.replaceAll("\\.", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
-			replaceAll('\\[', 'arr').replaceAll('\\]', '')
-		if (prev)
-			return '_'+res + '_prev'
-		return '_'+res
-	}
-
 	def decl(VariableInformation info, Boolean includePrev) {
-	'''
-		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»int «info.javaName(false)»_update=0;«ENDIF»
-		«info.getJavaType(true)» «info.javaName(false)»=«initValue(info)»
-		«IF includePrev != null && includePrev»«info.getJavaType(true)» «info.javaName(true)»=0;«ENDIF»
-		«IF info.isRegister»«info.getJavaType(true)» «info.javaName(false)»$reg=«initValue(info)»«ENDIF»
-	'''}
+		'''
+			«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»int «info.idName(false, true)»_update=0;«ENDIF»
+			«info.dartType(true)» «info.idName(false, true)»=«initValue(info)»
+			«IF includePrev != null && includePrev»«info.dartType(true)» «info.idName(true, true)»=0;«ENDIF»
+			«IF info.isRegister»«info.dartType(true)» «info.idName(false, true)»$reg=«initValue(info)»«ENDIF»
+		'''
+	}
 
 	def initValue(VariableInformation info) {
-		'''«IF info.predicate»false«ELSEIF info.dimensions.length!=0»new «info.getJavaType(true)»(«info.calcSize»)«ELSE»0«ENDIF»;'''
-	}
-
-	def isPredicate(VariableInformation info) {
-		info.name.startsWith(InternalInformation::PRED_PREFIX)
+		'''«IF info.predicate»false«ELSEIF info.array»new «info.dartType(true)»(«info.totalSize»)«ELSE»0«ENDIF»;'''
 	}
 
 	def getImports() '''
