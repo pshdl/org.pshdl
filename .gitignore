@@ -3,3 +3,4 @@ src/de/tuhh/ict/pshdl/model/impl
 *._trace
 *.smap
 .clover
+PSHDLCompiler.jar

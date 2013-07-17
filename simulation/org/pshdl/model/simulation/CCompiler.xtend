@@ -257,7 +257,7 @@ class CCompiler {
 			sb.append('''[«arr»]''')
 		val arrAcc = if (info.info.dimensions.length == 0)
 				''
-			else '''[«info.info.arrayAccess(null)» & «info.dimMask.toHexStringL»]'''
+			else '''[«info.info.arrayAccess(null)» & «info.dimMask.toHexStringL»l]'''
 		var varName = 't' + pos
 		if (info.isPred)
 			varName = 'p' + pos
@@ -277,7 +277,7 @@ class CCompiler {
 			«ELSEIF info.actualWidth == 1»
 				«info.cType» «varName»= («info.info.idName(prev, false)»«arrAcc» >> «info.bitStart») & 1;
 			«ELSE»
-				«info.cType» «varName»= («info.info.idName(prev, false)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMaskL»;
+				«info.cType» «varName»= («info.info.idName(prev, false)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMaskL»l;
 			«ENDIF»
 		'''
 	}
@@ -311,10 +311,10 @@ class CCompiler {
 					regUpdates[regUpdatePos++]=reg;
 				}
 			«ENDIF»
-			«IF info.isPred»«info.info.idName(false, false)»_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
+			«IF info.isPred»«info.info.idName(false, false)»_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);«ENDIF»
 		''' else '''
 			int offset=(int)«varAccess»;
-			offset&=«dimMask(info).toHexStringL»;
+			offset&=«dimMask(info).toHexStringL»l;
 			«IF info.actualWidth == info.info.width»
 				«IF info.isShadowReg»«info.info.cType» current=«info.info.idName(false, false)»«regSuffix»[offset];«ENDIF»
 				«info.info.idName(false, false)»«regSuffix»[offset]=«value»;
@@ -331,7 +331,7 @@ class CCompiler {
 					regUpdates[regUpdatePos++]=reg;
 				}
 			«ENDIF»
-			«IF info.isPred»«info.info.idName(false, false)»_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
+			«IF info.isPred»«info.info.idName(false, false)»_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);«ENDIF»
 		'''
 	}
 
@@ -408,7 +408,7 @@ class CCompiler {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
 				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
-				sb.append('''uint64_t t«pos»=(t«a» >> «lowBit») & «mask.toHexStringL»;''')
+				sb.append('''uint64_t t«pos»=(t«a» >> «lowBit») & «mask.toHexStringL»l;''')
 			}
 			case Instruction::cast_int: {
 				if (inst.arg1 != 64) {
@@ -424,7 +424,7 @@ class CCompiler {
 			}
 			case Instruction::cast_uint: {
 				if (inst.arg1 != 64) {
-					sb.append('''uint64_t t«pos»=t«a» & «inst.arg1.asMaskL»;''')
+					sb.append('''uint64_t t«pos»=t«a» & «inst.arg1.asMaskL»l;''')
 				} else {
 					sb.append('''uint64_t t«pos»=t«a»;''')
 				}
@@ -442,11 +442,11 @@ class CCompiler {
 			case Instruction::const2:
 				sb.append('''uint64_t t«pos»=2;''')
 			case Instruction::constAll1:
-				sb.append('''uint64_t t«pos»=«inst.arg1.asMaskL»;''')
+				sb.append('''uint64_t t«pos»=«inst.arg1.asMaskL»l;''')
 			case Instruction::concat:
 				sb.append('''uint64_t t«pos»=(t«b» << «inst.arg2») | t«a»;''')
 			case Instruction::loadConstant:
-				sb.append('''uint64_t t«pos»=«inst.arg1.constant(f)»;''')
+				sb.append('''uint64_t t«pos»=«inst.arg1.constant(f)»l;''')
 			case Instruction::loadInternal: {
 				val internal = inst.arg1.asInternal
 				sb.append(internal.getter(false, pos, f.uniqueID))
@@ -504,8 +504,8 @@ class CCompiler {
 		val targetSize=(targetSizeWithType>>1)
 		val shift=64-targetSize
 		if ((targetSizeWithType.bitwiseAnd(1))===1)
-			return signExtend('''((int64_t)t«a») >> t«b»''',  "(int64_t)", shift)
-		return '''(((int64_t)t«a») >> t«b») & «targetSize.asMaskL»'''
+			return signExtend('''((int64_t)t«b») >> t«a»''',  "(int64_t)", shift)
+		return '''(((int64_t)t«b») >> t«a») & «targetSize.asMaskL»l'''
 	}
 	
 	def String twoOp(String op, int targetSizeWithType, int pos, int a, int b) '''uint64_t t«pos»=«twoOpValue(op,  "(int64_t)", a, b, targetSizeWithType)»;'''

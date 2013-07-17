@@ -719,7 +719,7 @@ public class CCompiler {
         long _dimMask = this.cce.dimMask(info);
         CharSequence _hexStringL = this.cce.toHexStringL(_dimMask);
         _builder_1.append(_hexStringL, "");
-        _builder_1.append("]");
+        _builder_1.append("l]");
         _xifexpression = _builder_1.toString();
       }
       final String arrAcc = _xifexpression;
@@ -826,7 +826,7 @@ public class CCompiler {
               _builder_3.append(") & ");
               CharSequence _asMaskL = this.cce.asMaskL(info.actualWidth);
               _builder_3.append(_asMaskL, "");
-              _builder_3.append(";");
+              _builder_3.append("l;");
               _builder_3.newLineIfNotEmpty();
             }
           }
@@ -953,7 +953,7 @@ public class CCompiler {
           if (info.isPred) {
             String _idName_4 = this.cce.idName(info.info, false, false);
             _builder_2.append(_idName_4, "");
-            _builder_2.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+            _builder_2.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
           }
         }
         _builder_2.newLineIfNotEmpty();
@@ -968,7 +968,7 @@ public class CCompiler {
         long _dimMask = this.cce.dimMask(info);
         CharSequence _hexStringL = this.cce.toHexStringL(_dimMask);
         _builder_3.append(_hexStringL, "");
-        _builder_3.append(";");
+        _builder_3.append("l;");
         _builder_3.newLineIfNotEmpty();
         {
           boolean _equals_1 = (info.actualWidth == info.info.width);
@@ -1049,7 +1049,7 @@ public class CCompiler {
           if (info.isPred) {
             String _idName_9 = this.cce.idName(info.info, false, false);
             _builder_3.append(_idName_9, "");
-            _builder_3.append("_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+            _builder_3.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
           }
         }
         _builder_3.newLineIfNotEmpty();
@@ -1273,7 +1273,7 @@ public class CCompiler {
           _builder_5.append(") & ");
           CharSequence _hexStringL = this.cce.toHexStringL(mask);
           _builder_5.append(_hexStringL, "");
-          _builder_5.append(";");
+          _builder_5.append("l;");
           sb.append(_builder_5);
         }
       }
@@ -1326,7 +1326,7 @@ public class CCompiler {
             _builder_8.append(" & ");
             CharSequence _asMaskL = this.cce.asMaskL(inst.arg1);
             _builder_8.append(_asMaskL, "");
-            _builder_8.append(";");
+            _builder_8.append("l;");
             sb.append(_builder_8);
           } else {
             StringConcatenation _builder_9 = new StringConcatenation();
@@ -1418,7 +1418,7 @@ public class CCompiler {
           _builder_16.append("=");
           CharSequence _asMaskL_1 = this.cce.asMaskL(inst.arg1);
           _builder_16.append(_asMaskL_1, "");
-          _builder_16.append(";");
+          _builder_16.append("l;");
           sb.append(_builder_16);
         }
       }
@@ -1447,7 +1447,7 @@ public class CCompiler {
           _builder_18.append("=");
           CharSequence _constant = this.cce.constant(inst.arg1, f);
           _builder_18.append(_constant, "");
-          _builder_18.append(";");
+          _builder_18.append("l;");
           sb.append(_builder_18);
         }
       }
@@ -1686,19 +1686,20 @@ public class CCompiler {
     if (_tripleEquals) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("((int64_t)t");
-      _builder.append(a, "");
-      _builder.append(") >> t");
       _builder.append(b, "");
+      _builder.append(") >> t");
+      _builder.append(a, "");
       return this.cce.signExtend(_builder.toString(), "(int64_t)", shift);
     }
     StringConcatenation _builder_1 = new StringConcatenation();
     _builder_1.append("(((int64_t)t");
-    _builder_1.append(a, "");
-    _builder_1.append(") >> t");
     _builder_1.append(b, "");
+    _builder_1.append(") >> t");
+    _builder_1.append(a, "");
     _builder_1.append(") & ");
     CharSequence _asMaskL = this.cce.asMaskL(targetSize);
     _builder_1.append(_asMaskL, "");
+    _builder_1.append("l");
     return _builder_1.toString();
   }
   
