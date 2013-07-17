@@ -26,12 +26,16 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
+import java.io.*;
 import java.util.*;
 
 import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.services.*;
 import org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider;
 import org.pshdl.model.validation.*;
+
+import com.google.common.base.*;
+import com.google.common.io.*;
 
 /**
  * HDLCore is the central place to register custom services like
@@ -45,7 +49,8 @@ import org.pshdl.model.validation.*;
  * 
  */
 public class HDLCore {
-	private static final CompilerInformation info = new CompilerInformation("0.1b");
+	public static final String VERSION = getVersion();
+	private static final CompilerInformation info = new CompilerInformation(VERSION);
 	private static boolean initialized = false;
 
 	/**
@@ -66,6 +71,21 @@ public class HDLCore {
 		HDLGenerators.init(info, serviceProvider);
 		HDLValidator.init(info, serviceProvider);
 		initialized = true;
+	}
+
+	private static String getVersion() {
+		final InputStream versionStream = HDLCore.class.getResourceAsStream("/version");
+		if (versionStream == null) {
+			System.err.println("Failed to read version");
+			System.exit(-1);
+		}
+		try {
+			return new String(ByteStreams.toByteArray(versionStream), Charsets.UTF_8);
+		} catch (final IOException e) {
+			System.err.println("Failed to read version");
+			System.exit(-1);
+		}
+		throw new RuntimeException("Can not read version");
 	}
 
 	/**
@@ -97,4 +117,5 @@ public class HDLCore {
 	public static boolean isInitialized() {
 		return initialized;
 	}
+
 }

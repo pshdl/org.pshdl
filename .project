@@ -32,4 +32,11 @@
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 		<nature>com.sigasi.hdt.vhdl.ui.vhdlNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/version</name>
+			<type>1</type>
+			<location>/Users/karstenbecker/Dropbox/PSHDL/version</location>
+		</link>
+	</linkedResources>
 </projectDescription>
