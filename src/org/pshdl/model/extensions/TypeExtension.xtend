@@ -70,18 +70,30 @@ import org.pshdl.model.HDLRegisterConfig
 import com.google.common.base.Optional
 import org.pshdl.model.HDLEnum
 import org.pshdl.model.HDLInterface
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
+	private static Cache<IHDLObject, Optional<? extends HDLType>> cache= CacheBuilder::newBuilder.maximumSize(100000).weakKeys.build(CacheLoader::from([IHDLObject obj|
+		return INST.determineType(obj)
+	]));
 
 	def static Optional<? extends HDLType> typeOf(IHDLObject obj) {
 		if (!obj.isFrozen)
 			throw new IllegalArgumentException("Target needs to be frozen")
-		var res = INST.determineType(obj)
-		if (res.present) {
-			return Optional::of(res.get)
+		cachedType(obj)
+	}
+
+	def static cachedType(IHDLObject obj) {
+		if(obj.frozen){
+			val res = cache.get(obj)
+			if (!res.present)
+				cache.invalidate(obj)
+			return res
 		}
-		return Optional::absent
+		return INST.determineType(obj)
 	}
 
 	/**
@@ -101,7 +113,7 @@ class TypeExtension {
 			return Optional::absent
 		switch (container.classType) {
 			case HDLClass::HDLVariableDeclaration:
-				return (container as HDLVariableDeclaration).determineType
+				return (container as HDLVariableDeclaration).cachedType
 			case HDLClass::HDLDirectGeneration:
 				return Optional::fromNullable((container as HDLDirectGeneration).HIf)
 			case HDLClass::HDLInterfaceInstantiation:
@@ -124,10 +136,10 @@ class TypeExtension {
 
 	def dispatch Optional<? extends HDLType> determineType(HDLArrayInit ai) {
 		if (ai.exp.size == 1)
-			return ai.exp.get(0).determineType
+			return ai.exp.get(0).cachedType
 		var res = HDLPrimitive::natural
 		for (exp : ai.exp) {
-			val sub = exp.determineType
+			val sub = exp.cachedType
 			if (sub.present && !sub.get.equals(res))
 				return sub
 		}
@@ -148,12 +160,12 @@ class TypeExtension {
 		var resolved = Insulin::resolveFragment(cat)
 		if (!resolved.present)
 			return Optional::absent
-		return resolved.get.copyDeepFrozen(cat.container).determineType
+		return resolved.get.copyDeepFrozen(cat.container).cachedType
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLConcat cat) {
 		val Iterator<HDLExpression> iter = cat.cats.iterator
-		val nextType = iter.next.determineType;
+		val nextType = iter.next.cachedType;
 		if (!nextType.present)
 			return Optional::absent
 		var HDLType type = nextType.get
@@ -164,7 +176,7 @@ class TypeExtension {
 			if (width === null)
 				//This can happen when we have invalid concatenations
 				return Optional::absent
-			val nextCatType = iter.next.determineType
+			val nextCatType = iter.next.cachedType
 			if (!nextCatType.present)
 				return Optional::absent
 			type = nextCatType.get
@@ -233,7 +245,7 @@ class TypeExtension {
 		if (bits.size == 0) {
 			var res = ref.resolveVar
 			if (res.present)
-				return res.get.determineType
+				return res.get.cachedType
 			else
 				return Optional::absent
 		}
@@ -248,7 +260,7 @@ class TypeExtension {
 		val hVar = ref.resolveVar
 		if (!hVar.present)
 			return Optional::absent
-		val type = hVar.get.determineType;
+		val type = hVar.get.cachedType;
 		if (!type.present)
 			return Optional::absent
 		return Optional::of((type.get as HDLPrimitive).setWidth(width))
@@ -271,7 +283,7 @@ class TypeExtension {
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLTernary tern) {
-		return tern.thenExpr.determineType
+		return tern.thenExpr.cachedType
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLInlineFunction func) {

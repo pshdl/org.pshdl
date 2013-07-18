@@ -55,8 +55,36 @@ public class HDLSimulator {
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
 		// TODO Rewrite highZ function
+		insulin = removeDeadLeaves(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
+	}
+
+	private static HDLUnit removeDeadLeaves(HDLEvaluationContext context, HDLUnit insulin) {
+		final HDLIfStatement[] ifs = insulin.getAllObjectsOf(HDLIfStatement.class, true);
+		final ModificationSet ms = new ModificationSet();
+		for (final HDLIfStatement hif : ifs) {
+			final HDLExpression ifExp = hif.getIfExp();
+			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(ifExp, context);
+			if (valueOf.isPresent()) {
+				if (valueOf.get().equals(BigInteger.ZERO)) {
+					final HDLIfStatement emptyThen = hif.setThenDo(Collections.<HDLStatement> emptyList());
+					if (emptyThen.getElseDo().isEmpty()) {
+						ms.remove(hif);
+					} else {
+						ms.replace(hif, emptyThen);
+					}
+				} else {
+					final HDLIfStatement emptyElse = hif.setElseDo(Collections.<HDLStatement> emptyList());
+					if (emptyElse.getThenDo().isEmpty()) {
+						ms.remove(hif);
+					} else {
+						ms.replace(hif, emptyElse);
+					}
+				}
+			}
+		}
+		return ms.apply(insulin);
 	}
 
 	private static HDLUnit convertArrayInits(HDLEvaluationContext context, HDLUnit insulin) {

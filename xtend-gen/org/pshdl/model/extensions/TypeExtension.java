@@ -26,13 +26,18 @@
  */
 package org.pshdl.model.extensions;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -82,20 +87,53 @@ public class TypeExtension {
     }
   }.apply();
   
+  private static Cache<IHDLObject,Optional<? extends HDLType>> cache = new Function0<Cache<IHDLObject,Optional<? extends HDLType>>>() {
+    public Cache<IHDLObject,Optional<? extends HDLType>> apply() {
+      CacheBuilder<Object,Object> _newBuilder = CacheBuilder.newBuilder();
+      CacheBuilder<Object,Object> _maximumSize = _newBuilder.maximumSize(100000);
+      CacheBuilder<Object,Object> _weakKeys = _maximumSize.weakKeys();
+      final Function<IHDLObject,Optional<? extends HDLType>> _function = new Function<IHDLObject,Optional<? extends HDLType>>() {
+          public Optional<? extends HDLType> apply(final IHDLObject obj) {
+            return TypeExtension.INST.determineType(obj);
+          }
+        };
+      CacheLoader<IHDLObject,Optional<? extends HDLType>> _from = CacheLoader.<IHDLObject, Optional<? extends HDLType>>from(_function);
+      Cache<IHDLObject,Optional<? extends HDLType>> _build = _weakKeys.<IHDLObject, Optional<? extends HDLType>>build(_from);
+      return _build;
+    }
+  }.apply();
+  
   public static Optional<? extends HDLType> typeOf(final IHDLObject obj) {
-    boolean _isFrozen = obj.isFrozen();
-    boolean _not = (!_isFrozen);
-    if (_not) {
-      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Target needs to be frozen");
-      throw _illegalArgumentException;
+    Optional<? extends HDLType> _xblockexpression = null;
+    {
+      boolean _isFrozen = obj.isFrozen();
+      boolean _not = (!_isFrozen);
+      if (_not) {
+        IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Target needs to be frozen");
+        throw _illegalArgumentException;
+      }
+      Optional<? extends HDLType> _cachedType = TypeExtension.cachedType(obj);
+      _xblockexpression = (_cachedType);
     }
-    Optional<? extends HDLType> res = TypeExtension.INST.determineType(obj);
-    boolean _isPresent = res.isPresent();
-    if (_isPresent) {
-      HDLType _get = res.get();
-      return Optional.<HDLType>of(_get);
+    return _xblockexpression;
+  }
+  
+  public static Optional<? extends HDLType> cachedType(final IHDLObject obj) {
+    try {
+      boolean _isFrozen = obj.isFrozen();
+      if (_isFrozen) {
+        final Optional<? extends HDLType> res = TypeExtension.cache.get(obj);
+        boolean _isPresent = res.isPresent();
+        boolean _not = (!_isPresent);
+        if (_not) {
+          TypeExtension.cache.invalidate(obj);
+        }
+        return res;
+      }
+      return TypeExtension.INST.determineType(obj);
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
     }
-    return Optional.<HDLType>absent();
   }
   
   /**
@@ -129,7 +167,7 @@ public class TypeExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLClass.HDLVariableDeclaration)) {
         _matched=true;
-        return this.determineType(((HDLVariableDeclaration) container));
+        return TypeExtension.cachedType(((HDLVariableDeclaration) container));
       }
     }
     if (!_matched) {
@@ -184,13 +222,13 @@ public class TypeExtension {
     if (_equals) {
       ArrayList<HDLExpression> _exp_1 = ai.getExp();
       HDLExpression _get = _exp_1.get(0);
-      return this.determineType(_get);
+      return TypeExtension.cachedType(_get);
     }
     HDLPrimitive res = HDLPrimitive.getNatural();
     ArrayList<HDLExpression> _exp_2 = ai.getExp();
     for (final HDLExpression exp : _exp_2) {
       {
-        final Optional<? extends HDLType> sub = this.determineType(exp);
+        final Optional<? extends HDLType> sub = TypeExtension.cachedType(exp);
         boolean _and = false;
         boolean _isPresent = sub.isPresent();
         if (!_isPresent) {
@@ -239,14 +277,14 @@ public class TypeExtension {
     IHDLObject _get = resolved.get();
     IHDLObject _container = cat.getContainer();
     IHDLObject _copyDeepFrozen = _get.copyDeepFrozen(_container);
-    return this.determineType(_copyDeepFrozen);
+    return TypeExtension.cachedType(_copyDeepFrozen);
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLConcat cat) {
     ArrayList<HDLExpression> _cats = cat.getCats();
     final Iterator<HDLExpression> iter = _cats.iterator();
     HDLExpression _next = iter.next();
-    final Optional<? extends HDLType> nextType = this.determineType(_next);
+    final Optional<? extends HDLType> nextType = TypeExtension.cachedType(_next);
     boolean _isPresent = nextType.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
@@ -267,7 +305,7 @@ public class TypeExtension {
           return Optional.<HDLType>absent();
         }
         HDLExpression _next_1 = iter.next();
-        final Optional<? extends HDLType> nextCatType = this.determineType(_next_1);
+        final Optional<? extends HDLType> nextCatType = TypeExtension.cachedType(_next_1);
         boolean _isPresent_1 = nextCatType.isPresent();
         boolean _not_2 = (!_isPresent_1);
         if (_not_2) {
@@ -391,7 +429,7 @@ public class TypeExtension {
       boolean _isPresent = res.isPresent();
       if (_isPresent) {
         HDLVariable _get = res.get();
-        return this.determineType(_get);
+        return TypeExtension.cachedType(_get);
       } else {
         return Optional.<HDLType>absent();
       }
@@ -439,7 +477,7 @@ public class TypeExtension {
       return Optional.<HDLType>absent();
     }
     HDLVariable _get_2 = hVar.get();
-    final Optional<? extends HDLType> type = this.determineType(_get_2);
+    final Optional<? extends HDLType> type = TypeExtension.cachedType(_get_2);
     boolean _isPresent_2 = type.isPresent();
     boolean _not_1 = (!_isPresent_2);
     if (_not_1) {
@@ -476,7 +514,7 @@ public class TypeExtension {
   
   protected Optional<? extends HDLType> _determineType(final HDLTernary tern) {
     HDLExpression _thenExpr = tern.getThenExpr();
-    return this.determineType(_thenExpr);
+    return TypeExtension.cachedType(_thenExpr);
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLInlineFunction func) {
