@@ -86,7 +86,7 @@ class TypeExtension {
 		cachedType(obj)
 	}
 
-	def static cachedType(IHDLObject obj) {
+	private def static cachedType(IHDLObject obj) {
 		if(obj.frozen){
 			val res = cache.get(obj)
 			if (!res.present)

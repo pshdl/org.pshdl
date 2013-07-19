@@ -118,7 +118,7 @@ public class TypeExtension {
     return _xblockexpression;
   }
   
-  public static Optional<? extends HDLType> cachedType(final IHDLObject obj) {
+  private static Optional<? extends HDLType> cachedType(final IHDLObject obj) {
     try {
       boolean _isFrozen = obj.isFrozen();
       if (_isFrozen) {
