@@ -154,7 +154,8 @@ public class Refactoring {
 		final ModificationSet subMS = new ModificationSet();
 		final HDLVariable[] vars = subUnit.getAllObjectsOf(HDLVariable.class, true);
 		for (final HDLVariable hdlVariable : vars) {
-			if (hdlVariable.getDirection() == HDLDirection.CONSTANT) {
+			final HDLDirection dir = hdlVariable.getDirection();
+			if ((dir == HDLDirection.CONSTANT) || (dir == HDLDirection.PARAMETER)) {
 				continue;
 			}
 			final HDLExpression defaultValue = hdlVariable.getDefaultValue();
