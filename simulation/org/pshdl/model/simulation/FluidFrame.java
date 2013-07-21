@@ -386,7 +386,6 @@ public class FluidFrame {
 					internalId = register.getInternal(ai.args[0]);
 					if (internalId == null) {
 						internalId = register.registerInput(ai.args[0]);
-						System.out.println("FluidFrame.toFrame() Registering suspected input:" + ai);
 					}
 					internalDependencies.add(internalId);
 					if (ai.args.length > 1) {

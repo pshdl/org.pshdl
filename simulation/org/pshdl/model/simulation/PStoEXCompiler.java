@@ -102,10 +102,6 @@ public class PStoEXCompiler implements IOutputProvider {
 	public ExecutableModel createExecutable(HDLUnit unit, String src) throws CycleException {
 		final HDLEvaluationContext context = HDLEvaluationContext.createDefault(unit);
 		final HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src);
-		// System.out.println("PStoEXCompiler.createExecutable()" +
-		// simulationModel);
-		// simulationModel.validateAllFields(simulationModel.getContainer(),
-		// true);
 		final FluidFrame model = SimulationTransformationExtension.simulationModelOf(simulationModel, context);
 		final ExecutableModel em = model.getExecutable();
 		try {
@@ -133,8 +129,6 @@ public class PStoEXCompiler implements IOutputProvider {
 	public boolean validatePackages(Set<Problem> problems) throws IOException, FileNotFoundException {
 		boolean validationError = false;
 		for (final Entry<File, HDLPackage> e : pkgs.entrySet()) {
-			final File source = e.getKey();
-			System.out.println("\t" + source);
 			if (validateFile(e.getValue(), problems)) {
 				validationError = true;
 			}
@@ -158,9 +152,7 @@ public class PStoEXCompiler implements IOutputProvider {
 	public boolean reportProblem(Set<Problem> syntaxProblems) {
 		boolean error = false;
 		if (syntaxProblems.size() != 0) {
-			System.err.println("The following syntax problems where found:");
 			for (final Problem problem : syntaxProblems) {
-				System.err.println(problem.line + ":" + problem);
 				if (problem.severity == ProblemSeverity.ERROR) {
 					error = true;
 				}
