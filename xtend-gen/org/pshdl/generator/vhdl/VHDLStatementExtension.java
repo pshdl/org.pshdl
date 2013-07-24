@@ -701,8 +701,7 @@ public class VHDLStatementExtension {
             } else {
               boolean _tripleNotEquals_6 = (resetValue != null);
               if (_tripleNotEquals_6) {
-                Expression<? extends Object> _vHDL_2 = this.vee.toVHDL(resetValue);
-                Aggregate assign = Aggregate.OTHERS(_vHDL_2);
+                Expression<?> assign = this.vee.toVHDL(resetValue);
                 ArrayList<HDLExpression> _dimensions_4 = hvar.getDimensions();
                 for (final HDLExpression exp : _dimensions_4) {
                   Aggregate _OTHERS = Aggregate.OTHERS(assign);

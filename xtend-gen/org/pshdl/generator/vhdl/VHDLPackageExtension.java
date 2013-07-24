@@ -503,50 +503,6 @@ public class VHDLPackageExtension {
   public VhdlFile toVHDL(final HDLPackage obj) {
     VhdlFile _vhdlFile = new VhdlFile();
     final VhdlFile res = _vhdlFile;
-    ArrayList<HDLUnit> _units = obj.getUnits();
-    for (final HDLUnit unit : _units) {
-      {
-        ModificationSet _modificationSet = new ModificationSet();
-        final ModificationSet ms = _modificationSet;
-        final HDLVariableDeclaration[] hvds = unit.<HDLVariableDeclaration>getAllObjectsOf(HDLVariableDeclaration.class, true);
-        for (final HDLVariableDeclaration hvd : hvds) {
-          ArrayList<HDLVariable> _variables = hvd.getVariables();
-          for (final HDLVariable hvar : _variables) {
-            {
-              final HDLVariableRef[] refs = hvar.<HDLVariableRef>getAllObjectsOf(HDLVariableRef.class, true);
-              for (final HDLVariableRef ref : refs) {
-                Optional<HDLVariable> _resolveVar = ref.resolveVar();
-                HDLVariable _get = _resolveVar.get();
-                _get.setMeta(VHDLStatementExtension.EXPORT);
-              }
-              final String origName = hvar.getName();
-              final String name = VHDLOutputValidator.getVHDLName(origName);
-              boolean _equals = origName.equals(name);
-              boolean _not = (!_equals);
-              if (_not) {
-                final HDLVariable newVar = hvar.setName(name);
-                ms.replace(hvar, newVar);
-                Source<HDLVariableRef> _select = HDLQuery.<HDLVariableRef>select(HDLVariableRef.class);
-                Selector<HDLVariableRef> _from = _select.from(obj);
-                FieldSelector<HDLVariableRef,HDLQualifiedName> _where = _from.<HDLQualifiedName>where(HDLVariableRef.fVar);
-                HDLQualifiedName _asRef = hvar.asRef();
-                Result<HDLVariableRef,HDLQualifiedName> _isEqualTo = _where.isEqualTo(_asRef);
-                final Collection<HDLVariableRef> varRefs = _isEqualTo.getAll();
-                final HDLQualifiedName newVarRef = newVar.asRef();
-                for (final HDLVariableRef ref_1 : varRefs) {
-                  HDLVariableRef _setVar = ref_1.setVar(newVarRef);
-                  ms.replace(ref_1, _setVar);
-                }
-              }
-            }
-          }
-        }
-        final HDLUnit newUnit = ms.<HDLUnit>apply(unit);
-        List<LibraryUnit> _elements = res.getElements();
-        List<LibraryUnit> _vHDL = this.toVHDL(newUnit);
-        _elements.addAll(_vHDL);
-      }
-    }
     PackageDeclaration pd = null;
     ArrayList<HDLDeclaration> _declarations = obj.getDeclarations();
     for (final HDLDeclaration decl : _declarations) {
@@ -602,6 +558,50 @@ public class VHDLPackageExtension {
           List<PackageDeclarativeItem> _declarations_2 = enumPd.getDeclarations();
           _declarations_2.add(first_1);
         }
+      }
+    }
+    ArrayList<HDLUnit> _units = obj.getUnits();
+    for (final HDLUnit unit : _units) {
+      {
+        ModificationSet _modificationSet = new ModificationSet();
+        final ModificationSet ms = _modificationSet;
+        final HDLVariableDeclaration[] hvds = unit.<HDLVariableDeclaration>getAllObjectsOf(HDLVariableDeclaration.class, true);
+        for (final HDLVariableDeclaration hvd : hvds) {
+          ArrayList<HDLVariable> _variables = hvd.getVariables();
+          for (final HDLVariable hvar : _variables) {
+            {
+              final HDLVariableRef[] refs = hvar.<HDLVariableRef>getAllObjectsOf(HDLVariableRef.class, true);
+              for (final HDLVariableRef ref : refs) {
+                Optional<HDLVariable> _resolveVar = ref.resolveVar();
+                HDLVariable _get = _resolveVar.get();
+                _get.setMeta(VHDLStatementExtension.EXPORT);
+              }
+              final String origName = hvar.getName();
+              final String name = VHDLOutputValidator.getVHDLName(origName);
+              boolean _equals = origName.equals(name);
+              boolean _not = (!_equals);
+              if (_not) {
+                final HDLVariable newVar = hvar.setName(name);
+                ms.replace(hvar, newVar);
+                Source<HDLVariableRef> _select = HDLQuery.<HDLVariableRef>select(HDLVariableRef.class);
+                Selector<HDLVariableRef> _from = _select.from(obj);
+                FieldSelector<HDLVariableRef,HDLQualifiedName> _where = _from.<HDLQualifiedName>where(HDLVariableRef.fVar);
+                HDLQualifiedName _asRef = hvar.asRef();
+                Result<HDLVariableRef,HDLQualifiedName> _isEqualTo = _where.isEqualTo(_asRef);
+                final Collection<HDLVariableRef> varRefs = _isEqualTo.getAll();
+                final HDLQualifiedName newVarRef = newVar.asRef();
+                for (final HDLVariableRef ref_1 : varRefs) {
+                  HDLVariableRef _setVar = ref_1.setVar(newVarRef);
+                  ms.replace(ref_1, _setVar);
+                }
+              }
+            }
+          }
+        }
+        final HDLUnit newUnit = ms.<HDLUnit>apply(unit);
+        List<LibraryUnit> _elements = res.getElements();
+        List<LibraryUnit> _vHDL = this.toVHDL(newUnit);
+        _elements.addAll(_vHDL);
       }
     }
     return res;

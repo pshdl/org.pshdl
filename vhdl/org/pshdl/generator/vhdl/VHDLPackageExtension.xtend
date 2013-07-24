@@ -282,34 +282,6 @@ class VHDLPackageExtension {
 
 	def VhdlFile toVHDL(HDLPackage obj) {
 		val VhdlFile res = new VhdlFile
-		for (HDLUnit unit : obj.units) {
-			val ModificationSet ms = new ModificationSet
-			val HDLVariableDeclaration[] hvds = unit.getAllObjectsOf(typeof(HDLVariableDeclaration), true)
-			for (HDLVariableDeclaration hvd : hvds) {
-				for (HDLVariable hvar : hvd.variables) {
-					val HDLVariableRef[] refs = hvar.getAllObjectsOf(typeof(HDLVariableRef), true)
-					for (HDLVariableRef ref : refs) {
-
-						//Check which variable declaration contains references and mark those references as the ones that should be declared in a package
-						ref.resolveVar.get.setMeta(VHDLStatementExtension::EXPORT)
-					}
-					val String origName = hvar.name
-					val String name = VHDLOutputValidator::getVHDLName(origName)
-					if (!origName.equals(name)) {
-						val HDLVariable newVar = hvar.setName(name)
-						ms.replace(hvar, newVar)
-						val Collection<HDLVariableRef> varRefs = HDLQuery::select(typeof(HDLVariableRef)).from(obj).
-							where(HDLVariableRef::fVar).isEqualTo(hvar.asRef).all
-						val HDLQualifiedName newVarRef = newVar.asRef
-						for (HDLVariableRef ref : varRefs) {
-							ms.replace(ref, ref.setVar(newVarRef))
-						}
-					}
-				}
-			}
-			val HDLUnit newUnit = ms.apply(unit)
-			res.elements.addAll(newUnit.toVHDL)
-		}
 		var PackageDeclaration pd = null
 		for (HDLDeclaration decl : obj.declarations) {
 			if (decl.classType == HDLClass::HDLVariableDeclaration) {
@@ -337,6 +309,34 @@ class VHDLPackageExtension {
 					throw new IllegalArgumentException("Expected enum type declaration but found none!")
 				enumPd.declarations.add(first)
 			}
+		}
+		for (HDLUnit unit : obj.units) {
+			val ModificationSet ms = new ModificationSet
+			val HDLVariableDeclaration[] hvds = unit.getAllObjectsOf(typeof(HDLVariableDeclaration), true)
+			for (HDLVariableDeclaration hvd : hvds) {
+				for (HDLVariable hvar : hvd.variables) {
+					val HDLVariableRef[] refs = hvar.getAllObjectsOf(typeof(HDLVariableRef), true)
+					for (HDLVariableRef ref : refs) {
+
+						//Check which variable declaration contains references and mark those references as the ones that should be declared in a package
+						ref.resolveVar.get.setMeta(VHDLStatementExtension::EXPORT)
+					}
+					val String origName = hvar.name
+					val String name = VHDLOutputValidator::getVHDLName(origName)
+					if (!origName.equals(name)) {
+						val HDLVariable newVar = hvar.setName(name)
+						ms.replace(hvar, newVar)
+						val Collection<HDLVariableRef> varRefs = HDLQuery::select(typeof(HDLVariableRef)).from(obj).
+							where(HDLVariableRef::fVar).isEqualTo(hvar.asRef).all
+						val HDLQualifiedName newVarRef = newVar.asRef
+						for (HDLVariableRef ref : varRefs) {
+							ms.replace(ref, ref.setVar(newVarRef))
+						}
+					}
+				}
+			}
+			val HDLUnit newUnit = ms.apply(unit)
+			res.elements.addAll(newUnit.toVHDL)
 		}
 		return res
 	}

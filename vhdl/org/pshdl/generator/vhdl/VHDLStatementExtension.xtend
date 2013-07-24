@@ -409,7 +409,7 @@ class VHDLStatementExtension {
 						s.setDefaultValue(resetValue.toVHDL)
 					} else {
 						if (resetValue!==null){
-							var Aggregate assign = Aggregate::OTHERS(resetValue.toVHDL)
+							var Expression<?> assign = resetValue.toVHDL
 							for (HDLExpression exp : hvar.dimensions)
 								assign = Aggregate::OTHERS(assign)
 							s.setDefaultValue(assign)
