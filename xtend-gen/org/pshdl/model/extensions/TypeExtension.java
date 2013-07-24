@@ -26,18 +26,13 @@
  */
 package org.pshdl.model.extensions;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -87,22 +82,6 @@ public class TypeExtension {
     }
   }.apply();
   
-  private static Cache<IHDLObject,Optional<? extends HDLType>> cache = new Function0<Cache<IHDLObject,Optional<? extends HDLType>>>() {
-    public Cache<IHDLObject,Optional<? extends HDLType>> apply() {
-      CacheBuilder<Object,Object> _newBuilder = CacheBuilder.newBuilder();
-      CacheBuilder<Object,Object> _maximumSize = _newBuilder.maximumSize(100000);
-      CacheBuilder<Object,Object> _weakKeys = _maximumSize.weakKeys();
-      final Function<IHDLObject,Optional<? extends HDLType>> _function = new Function<IHDLObject,Optional<? extends HDLType>>() {
-          public Optional<? extends HDLType> apply(final IHDLObject obj) {
-            return TypeExtension.INST.determineType(obj);
-          }
-        };
-      CacheLoader<IHDLObject,Optional<? extends HDLType>> _from = CacheLoader.<IHDLObject, Optional<? extends HDLType>>from(_function);
-      Cache<IHDLObject,Optional<? extends HDLType>> _build = _weakKeys.<IHDLObject, Optional<? extends HDLType>>build(_from);
-      return _build;
-    }
-  }.apply();
-  
   public static Optional<? extends HDLType> typeOf(final IHDLObject obj) {
     Optional<? extends HDLType> _xblockexpression = null;
     {
@@ -119,21 +98,7 @@ public class TypeExtension {
   }
   
   private static Optional<? extends HDLType> cachedType(final IHDLObject obj) {
-    try {
-      boolean _isFrozen = obj.isFrozen();
-      if (_isFrozen) {
-        final Optional<? extends HDLType> res = TypeExtension.cache.get(obj);
-        boolean _isPresent = res.isPresent();
-        boolean _not = (!_isPresent);
-        if (_not) {
-          TypeExtension.cache.invalidate(obj);
-        }
-        return res;
-      }
-      return TypeExtension.INST.determineType(obj);
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
-    }
+    return TypeExtension.INST.determineType(obj);
   }
   
   /**

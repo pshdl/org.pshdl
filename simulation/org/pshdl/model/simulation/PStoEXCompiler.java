@@ -45,11 +45,15 @@ import com.google.common.collect.*;
 
 public class PStoEXCompiler implements IOutputProvider {
 
+	private final String uri;
+
 	public PStoEXCompiler() {
 		if (!HDLCore.isInitialized()) {
 			HDLCore.defaultInit();
 		}
-		HDLLibrary.registerLibrary("PSHDLSim", new HDLLibrary());
+		final Random r = new Random();
+		uri = "PSHDLSim" + r.nextLong();
+		HDLLibrary.registerLibrary(uri, new HDLLibrary());
 	}
 
 	@Override
@@ -96,6 +100,7 @@ public class PStoEXCompiler implements IOutputProvider {
 		} catch (final CycleException e) {
 			e.explain(System.err);
 		}
+		close();
 		return "Success";
 	}
 
@@ -144,7 +149,7 @@ public class PStoEXCompiler implements IOutputProvider {
 	}
 
 	public boolean addFile(File source, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
-		final HDLPackage parse = PSHDLParser.parse(source, "PSHDLSim", syntaxProblems);
+		final HDLPackage parse = PSHDLParser.parse(source, uri, syntaxProblems);
 		pkgs.put(source, parse);
 		return reportProblem(syntaxProblems);
 	}
@@ -193,5 +198,9 @@ public class PStoEXCompiler implements IOutputProvider {
 				return unit;
 		}
 		return null;
+	}
+
+	public void close() {
+		HDLLibrary.unregister(uri);
 	}
 }

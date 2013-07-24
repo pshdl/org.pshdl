@@ -226,13 +226,13 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 		return getAllObjectsOf(classFor, clazz, deep);
 	}
 
-	private IHDLObject[][] arrayClazzTypes;
+	private EnumMap<HDLClass, IHDLObject[]> arrayClazzTypes;
 
 	@SuppressWarnings("unchecked")
 	public <T> T[] getAllObjectsOf(HDLClass clazz, Class<? extends T> type, boolean deep) {
 		if (arrayClazzTypes == null) {
 			final HDLClass[] clazzes = HDLClass.values();
-			arrayClazzTypes = new IHDLObject[clazzes.length][];
+			arrayClazzTypes = new EnumMap<HDLClass, IHDLObject[]>(HDLClass.class);
 			final Iterator<IHDLObject> iterator = iterator();
 			final EnumMap<HDLClass, List<IHDLObject[]>> map = new EnumMap<HDLClass, List<IHDLObject[]>>(HDLClass.class);
 			addClazzArray(this, map);
@@ -240,16 +240,12 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 				final HDLObject c = (HDLObject) iterator.next();
 				addClazzArray(c, map);
 				c.getAllObjectsOf(clazz, type, deep);
-				for (int i = 0; i < c.arrayClazzTypes.length; i++) {
-					final IHDLObject[] array = c.arrayClazzTypes[i];
-					if (array != null) {
-						final HDLClass hdlClass = clazzes[i];
-						final List<IHDLObject[]> list = map.get(hdlClass);
-						if (list == null) {
-							map.put(hdlClass, new LinkedList<IHDLObject[]>(Collections.singleton(array)));
-						} else {
-							list.add(array);
-						}
+				for (final Entry<HDLClass, IHDLObject[]> e : c.arrayClazzTypes.entrySet()) {
+					final List<IHDLObject[]> list = map.get(e.getKey());
+					if (list == null) {
+						map.put(e.getKey(), new LinkedList<IHDLObject[]>(Collections.singleton(e.getValue())));
+					} else {
+						list.add(e.getValue());
 					}
 				}
 			}
@@ -262,11 +258,11 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 							list.add(ihdlObject);
 						}
 					}
-					arrayClazzTypes[hClass.ordinal()] = list.toArray((IHDLObject[]) Array.newInstance(hClass.clazz, list.size()));
+					arrayClazzTypes.put(hClass, list.toArray((IHDLObject[]) Array.newInstance(hClass.clazz, list.size())));
 				}
 			}
 		}
-		final IHDLObject[] list = arrayClazzTypes[clazz.ordinal()];
+		final IHDLObject[] list = arrayClazzTypes.get(clazz);
 		if (list == null)
 			return (T[]) Array.newInstance(clazz.clazz, 0);
 		if (deep == false) {

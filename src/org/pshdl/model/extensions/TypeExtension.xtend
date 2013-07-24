@@ -76,9 +76,9 @@ import com.google.common.cache.CacheLoader
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
-	private static Cache<IHDLObject, Optional<? extends HDLType>> cache= CacheBuilder::newBuilder.maximumSize(100000).weakKeys.build(CacheLoader::from([IHDLObject obj|
-		return INST.determineType(obj)
-	]));
+//	private static Cache<IHDLObject, Optional<? extends HDLType>> cache= CacheBuilder::newBuilder.maximumSize(100000).weakKeys.build(CacheLoader::from([IHDLObject obj|
+//		return INST.determineType(obj)
+//	]));
 
 	def static Optional<? extends HDLType> typeOf(IHDLObject obj) {
 		if (!obj.isFrozen)
@@ -87,12 +87,6 @@ class TypeExtension {
 	}
 
 	private def static cachedType(IHDLObject obj) {
-		if(obj.frozen){
-			val res = cache.get(obj)
-			if (!res.present)
-				cache.invalidate(obj)
-			return res
-		}
 		return INST.determineType(obj)
 	}
 
