@@ -65,6 +65,7 @@ import static java.math.BigInteger.*
 import java.math.BigDecimal
 import com.google.common.base.Optional
 import org.pshdl.model.HDLUnresolvedFragment
+import org.pshdl.interpreter.frames.BigIntegerFrame
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -235,10 +236,7 @@ class RangeExtension {
 	}
 
 	def private static BigInteger srl(BigInteger a, BigInteger b) {
-		val BigInteger res = a.shiftRight(b.intValue)
-		if (res.signum < 0)
-			return res.negate
-		return res
+		BigIntegerFrame::srl(a, 1024, b.intValue);
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLBitOp obj, HDLEvaluationContext context) {

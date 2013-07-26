@@ -287,8 +287,16 @@ public class CommonCompilerExtension {
   
   public CharSequence toHexString(final BigInteger value) {
     StringConcatenation _builder = new StringConcatenation();
+    {
+      int _signum = value.signum();
+      boolean _lessThan = (_signum < 0);
+      if (_lessThan) {
+        _builder.append("-");
+      }
+    }
     _builder.append("0x");
-    String _string = value.toString(16);
+    BigInteger _abs = value.abs();
+    String _string = _abs.toString(16);
     _builder.append(_string, "");
     return _builder;
   }

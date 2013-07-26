@@ -327,7 +327,7 @@ public class DartCompiler {
             boolean _isArray_2 = this.cce.isArray(v_2);
             if (_isArray_2) {
               _builder.append("\t");
-              _builder.append("void set ");
+              _builder.append("void set");
               String _idName_4 = this.cce.idName(v_2, false, false);
               _builder.append(_idName_4, "	");
               _builder.append("(");
@@ -363,7 +363,7 @@ public class DartCompiler {
               _builder.append("\t");
               String _dartType_3 = this.dartType(v_2, false);
               _builder.append(_dartType_3, "	");
-              _builder.append(" get ");
+              _builder.append(" get");
               String _idName_6 = this.cce.idName(v_2, false, false);
               _builder.append(_idName_6, "	");
               _builder.append("(");
@@ -599,6 +599,31 @@ public class DartCompiler {
           _builder.newLineIfNotEmpty();
         }
       }
+      _builder.append("\t");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("int _srl(int val, int shiftBy, int width){");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("if (val>=0)");
+      _builder.newLine();
+      _builder.append("\t    ");
+      _builder.append("return val>>shiftBy;");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("int opener=1<<(width);");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("int opened=(val - opener) & (opener - 1);");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("return (opened>>shiftBy);");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.newLine();
       _builder.append("\t");
       CharSequence _hdlInterpreter = this.hdlInterpreter();
       _builder.append(_hdlInterpreter, "	");
@@ -1768,8 +1793,15 @@ public class DartCompiler {
             Integer _get_1 = this.cce.varIdx.get(internal.info.name);
             _builder_2.append(_get_1, "");
             _builder_2.append(", ");
-            StringBuilder _arrayAccess = this.cce.arrayAccess(internal.info, arr);
-            _builder_2.append(_arrayAccess, "");
+            {
+              boolean _isArray = this.cce.isArray(internal.info);
+              if (_isArray) {
+                StringBuilder _arrayAccess = this.cce.arrayAccess(internal.info, arr);
+                _builder_2.append(_arrayAccess, "");
+              } else {
+                _builder_2.append("-1");
+              }
+            }
             _builder_2.append("));");
             _builder_2.newLineIfNotEmpty();
             sb.append(_builder_2);
@@ -1889,7 +1921,7 @@ public class DartCompiler {
             BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(_minus_1);
             CharSequence _hexString = this.cce.toHexString(_shiftLeft_1);
             _builder_9.append(_hexString, "");
-            _builder_9.append(") != 0)) { // MSB is set");
+            _builder_9.append(") != 0) { // MSB is set");
             _builder_9.newLineIfNotEmpty();
             _builder_9.append("\t");
             _builder_9.append("if (u");
@@ -1925,7 +1957,7 @@ public class DartCompiler {
             _builder_9.newLine();
             _builder_9.append("}");
             _builder_9.newLine();
-            _builder_9.append("t");
+            _builder_9.append("int t");
             _builder_9.append(pos, "");
             _builder_9.append(" = u");
             _builder_9.append(pos, "");
@@ -2189,11 +2221,13 @@ public class DartCompiler {
           StringConcatenation _builder_28 = new StringConcatenation();
           _builder_28.append("int t");
           _builder_28.append(pos, "");
-          _builder_28.append("=t");
+          _builder_28.append("=_srl(t");
           _builder_28.append(b, "");
-          _builder_28.append(" >>> t");
+          _builder_28.append(", t");
           _builder_28.append(a, "");
-          _builder_28.append(";");
+          _builder_28.append(", ");
+          _builder_28.append(inst.arg1, "");
+          _builder_28.append(");");
           sb.append(_builder_28);
         }
       }

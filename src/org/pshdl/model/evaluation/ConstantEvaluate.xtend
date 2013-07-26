@@ -63,6 +63,7 @@ import static org.pshdl.model.extensions.ProblemDescription.*
 import com.google.common.base.Optional
 import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.interpreter.frames.BigIntegerFrame
 
 /**
  * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link org.pshdl.model.IHDLObject}. Of course
@@ -303,7 +304,7 @@ class ConstantEvaluate {
 						val width=HDLPrimitives::getWidth(t.get,context)
 						if (width!==null){
 							val shiftWidth=rightVal.get.intValue
-							val res = srl(l, width, shiftWidth)
+							val res = BigIntegerFrame::srl(l, width, shiftWidth)
 							return Optional::of(res)
 						}
 					}
@@ -313,15 +314,6 @@ class ConstantEvaluate {
 			}
 		}
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
-	}
-
-	def static srl(BigInteger l, Integer width, int shiftWidth) {
-		val opener=1bi.shiftLeft(width+1)
-		val opened=l.subtract(opener)
-		val mask=opener.subtract(1bi).shiftRight(shiftWidth+1)
-		val res=opened.shiftRight(shiftWidth).and(mask)
-//		println('''Opened: «opened» Width:«width» Mask:«mask» Res:«res»''')
-		res
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLFunctionCall obj, HDLEvaluationContext context) {

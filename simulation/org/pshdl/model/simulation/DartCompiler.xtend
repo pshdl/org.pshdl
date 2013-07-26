@@ -126,11 +126,11 @@ class DartCompiler {
 						«v.idName(false, true)» «IF !v.predicate && !v.array»& «v.width.asMask»«ENDIF»;
 					
 					«IF v.array»
-						void set «v.idName(false, false)»(«v.dartType(false)» value«FOR i : (0 ..< v.dimensions.size)», int a«i»«ENDFOR») {
+						void set«v.idName(false, false)»(«v.dartType(false)» value«FOR i : (0 ..< v.dimensions.size)», int a«i»«ENDFOR») {
 							«v.idName(false, true)»«v.arrayAccessBracket(null)»=value & «v.width.asMask»;
 						}
 						
-						«v.dartType(false)» get «v.idName(false, false)»(«FOR i : (0 ..< v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
+						«v.dartType(false)» get«v.idName(false, false)»(«FOR i : (0 ..< v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
 							return «v.idName(false, true)»«v.arrayAccessBracket(null)» & «v.width.asMask»;
 						}
 						
@@ -189,6 +189,15 @@ class DartCompiler {
 				«IF hasClock»
 					«copyRegs»
 				«ENDIF»
+				
+				int _srl(int val, int shiftBy, int width){
+				  if (val>=0)
+				    return val>>shiftBy;
+				  int opener=1<<(width);
+				  int opened=(val - opener) & (opener - 1);
+				  return (opened>>shiftBy);
+				}
+				
 				«hdlInterpreter»
 			}
 		'''
@@ -539,7 +548,7 @@ class DartCompiler {
 					sb.append(
 						'''
 							«name»«internal.info.arrayAccessBracket(arr)»=t«a»;
-							_regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», «internal.info.arrayAccess(arr)»));
+							_regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», «IF internal.info.array»«internal.info.arrayAccess(arr)»«ELSE»-1«ENDIF»));
 						''')
 					arr.clear
 				}
@@ -570,7 +579,7 @@ class DartCompiler {
 					sb.append(
 						'''
 							int u«pos» = t«a» & «mask»;
-							if ((u«pos» & «1bi.shiftLeft(targetWidth - 1).toHexString») != 0)) { // MSB is set
+							if ((u«pos» & «1bi.shiftLeft(targetWidth - 1).toHexString») != 0) { // MSB is set
 								if (u«pos» > 0) {
 									u«pos» = -u«pos»;
 								}
@@ -579,7 +588,7 @@ class DartCompiler {
 									u«pos» = -u«pos»;
 								}
 							}
-							t«pos» = u«pos»;
+							int t«pos» = u«pos»;
 						''')
 				}
 			}
@@ -626,7 +635,7 @@ class DartCompiler {
 			case Instruction::sll:
 				sb.append('''int t«pos»=t«b» << t«a»;''')
 			case Instruction::srl:
-				sb.append('''int t«pos»=t«b» >>> t«a»;''')
+				sb.append('''int t«pos»=_srl(t«b», t«a», «inst.arg1»);''')
 			case Instruction::sra:
 				sb.append('''int t«pos»=t«b» >> t«a»;''')
 			case Instruction::eq:

@@ -35,6 +35,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -431,13 +432,8 @@ public class RangeExtension {
   
   private static BigInteger srl(final BigInteger a, final BigInteger b) {
     int _intValue = b.intValue();
-    final BigInteger res = a.shiftRight(_intValue);
-    int _signum = res.signum();
-    boolean _lessThan = (_signum < 0);
-    if (_lessThan) {
-      return res.negate();
-    }
-    return res;
+    BigInteger _srl = BigIntegerFrame.srl(a, 1024, _intValue);
+    return _srl;
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLBitOp obj, final HDLEvaluationContext context) {

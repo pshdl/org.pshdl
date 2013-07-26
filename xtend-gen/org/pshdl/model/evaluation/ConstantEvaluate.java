@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
@@ -606,7 +607,7 @@ public class ConstantEvaluate {
             if (_tripleNotEquals) {
               BigInteger _get_5 = rightVal.get();
               final int shiftWidth = _get_5.intValue();
-              final BigInteger res = ConstantEvaluate.srl(l, width, shiftWidth);
+              final BigInteger res = BigIntegerFrame.srl(l, (width).intValue(), shiftWidth);
               return Optional.<BigInteger>of(res);
             }
           }
@@ -620,22 +621,6 @@ public class ConstantEvaluate {
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
     throw _runtimeException;
-  }
-  
-  public static BigInteger srl(final BigInteger l, final Integer width, final int shiftWidth) {
-    BigInteger _xblockexpression = null;
-    {
-      int _plus = ((width).intValue() + 1);
-      final BigInteger opener = BigInteger.ONE.shiftLeft(_plus);
-      final BigInteger opened = l.subtract(opener);
-      BigInteger _subtract = opener.subtract(BigInteger.ONE);
-      int _plus_1 = (shiftWidth + 1);
-      final BigInteger mask = _subtract.shiftRight(_plus_1);
-      BigInteger _shiftRight = opened.shiftRight(shiftWidth);
-      final BigInteger res = _shiftRight.and(mask);
-      _xblockexpression = (res);
-    }
-    return _xblockexpression;
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLFunctionCall obj, final HDLEvaluationContext context) {

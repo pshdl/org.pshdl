@@ -144,7 +144,7 @@ class CommonCompilerExtension {
 		return varAccess
 	}
 
-	def toHexString(BigInteger value) '''0x«value.toString(16)»'''
+	def toHexString(BigInteger value) '''«IF value.signum<0»-«ENDIF»0x«value.abs.toString(16)»'''
 
 	def toHexStringL(long value) '''0x«Long::toHexString(value)»l'''
 
