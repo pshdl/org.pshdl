@@ -112,7 +112,7 @@ public class FluidFrame {
 	public final boolean constant;
 
 	public final Set<FluidFrame> references = new LinkedHashSet<FluidFrame>();
-	public final Map<String, VariableInformation> vars = new HashMap<String, VariableInformation>();
+	public final Map<String, VariableInformation> vars = new TreeMap<String, VariableInformation>();
 
 	public FluidFrame() {
 		this(null, false);
