@@ -1198,7 +1198,6 @@ public class CCompiler {
             _builder_2.append(";");
             sb.append(_builder_2);
           }
-          arr.clear();
           if (internal.isShadowReg) {
             StringConcatenation _builder_3 = new StringConcatenation();
             _builder_3.append("{");
@@ -1215,9 +1214,17 @@ public class CCompiler {
             _builder_3.append("\t");
             _builder_3.append("reg.offset=");
             {
-              if (isDynMem) {
-                int _arrayFixedOffset = this.cce.arrayFixedOffset(internal);
-                _builder_3.append(_arrayFixedOffset, "	");
+              boolean _and = false;
+              boolean _not = (!isDynMem);
+              if (!_not) {
+                _and = false;
+              } else {
+                boolean _isArray = this.cce.isArray(internal.info);
+                _and = (_not && _isArray);
+              }
+              if (_and) {
+                StringBuilder _arrayAccess_1 = this.cce.arrayAccess(internal.info, arr);
+                _builder_3.append(_arrayAccess_1, "	");
               } else {
                 _builder_3.append("-1");
               }
@@ -1232,6 +1239,7 @@ public class CCompiler {
             String _plus = ("\n" + _builder_3);
             sb.append(_plus);
           }
+          arr.clear();
         }
       }
       if (!_matched) {

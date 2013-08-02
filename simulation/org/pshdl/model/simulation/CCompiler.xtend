@@ -387,18 +387,18 @@ class CCompiler {
 					sb.append(
 						'''«internal.idName(false, false)»«IF info.dimensions.length > 0»[«info.arrayAccess(arr)»]«ENDIF»=t«a»;''')
 				}
-				arr.clear
 				if (internal.isShadowReg) {
 					sb.append(
 						'\n' + '''
 							{
 								static regUpdate_t reg;
 								reg.internal=«varIdx.get(info.name)»;
-								reg.offset=«IF isDynMem»«internal.arrayFixedOffset»«ELSE»-1«ENDIF»;
+								reg.offset=«IF !isDynMem && internal.info.array»«internal.info.arrayAccess(arr)»«ELSE»-1«ENDIF»;
 								regUpdates[regUpdatePos++]=reg;
 							}
 						''')
 				}
+				arr.clear
 			}
 			case Instruction::noop:
 				sb.append("//Do nothing")

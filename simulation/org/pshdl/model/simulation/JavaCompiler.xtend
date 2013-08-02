@@ -100,7 +100,7 @@ class JavaCompiler {
 						}
 					}
 					
-					private Set<RegUpdate> regUpdates=new HashSet<RegUpdate>();
+					private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();
 					private final boolean disableEdges;
 					private final boolean disabledRegOutputlogic;
 				«ENDIF»
@@ -434,7 +434,11 @@ class JavaCompiler {
 							«IF v.dimensions.length == 0»
 								«v.idName(false, false)» = «v.idName(false, false)»$reg; break;
 							«ELSE»
-								«v.idName(false, false)»[reg.offset] = «v.idName(false, false)»$reg[reg.offset]; break;
+								if (reg.offset!=-1)
+									«v.idName(false, false)»[reg.offset] = «v.idName(false, false)»$reg[reg.offset];
+								else
+									Arrays.fill(«v.idName(false, false)», «v.idName(false, false)»$reg[0]); 
+								break;
 							«ENDIF»
 						«ENDIF»
 					«ENDFOR»
@@ -446,8 +450,8 @@ class JavaCompiler {
 	def copyPrev(VariableInformation info) {
 		if (info.dimensions.length == 0)
 			return '''«info.idName(true, false)»=«info.idName(false, false)»;'''
-		return '''System.arraycopy(«info.idName(false, false)»,0,«info.idName(true, false)», 0, «info.
-			idName(false, false)».length);'''
+		return '''System.arraycopy(«info.idName(false, false)»,0,«info.idName(true, false)», 0, «info.idName(false,
+			false)».length);'''
 	}
 
 	def getter(InternalInformation info, boolean prev, int pos, int frameID) {
@@ -593,13 +597,20 @@ class JavaCompiler {
 			case Instruction::pushAddIndex:
 				sb.append('''int a«arr.last»=(int)t«a»;''')
 			case Instruction::writeInternal: {
-				if (arr.size < inst.arg1.asInternal.info.dimensions.length) {
-					sb.append('''Arrays.fill(«inst.arg1.asInternal.idName(false, false)», t«a»);''')
+				val internal = inst.arg1.asInternal
+				val isDynMem = arr.size < internal.info.dimensions.length
+				if (isDynMem) {
+					sb.append('''Arrays.fill(«internal.idName(false, false)», t«a»);''')
 				} else {
 					sb.append(
-						'''«inst.arg1.asInternal.idName(false, false)»«FOR ai : arr BEFORE '[' SEPARATOR '][' AFTER ']'»a«ai»«ENDFOR»=t«a»;''')
-					arr.clear
+						'''«internal.idName(false, false)»«IF internal.info.dimensions.length > 0»[«internal.info.
+							arrayAccess(arr)»]«ENDIF»=t«a»;''')
 				}
+				if (internal.isShadowReg)
+					sb.append(
+						'''regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», «IF !isDynMem &&
+							internal.info.array»«internal.info.arrayAccess(arr)»«ELSE»-1«ENDIF»));''')
+				arr.clear
 			}
 			case Instruction::noop:
 				sb.append("//Do nothing")
@@ -723,11 +734,11 @@ class JavaCompiler {
 	}
 
 	def decl(VariableInformation info, Boolean includePrev) '''
-		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»private long «info.
-			idName(false, false)»_update=0;«ENDIF»
+		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»private long «info.idName(false,
+			false)»_update=0;«ENDIF»
 		public «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»;
-		«IF includePrev != null && includePrev»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.
-			idName(true, false)»;«ENDIF»
+		«IF includePrev != null && includePrev»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(true,
+			false)»;«ENDIF»
 		«IF info.isRegister»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»$reg;«ENDIF»
 	'''
 
