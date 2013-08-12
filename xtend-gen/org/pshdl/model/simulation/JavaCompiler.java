@@ -52,17 +52,20 @@ import org.pshdl.model.simulation.CommonCompilerExtension;
 public class JavaCompiler {
   private boolean debug;
   
+  private int cores;
+  
   @Extension
   private CommonCompilerExtension cce;
   
-  public JavaCompiler(final ExecutableModel em, final boolean includeDebug) {
+  public JavaCompiler(final ExecutableModel em, final boolean includeDebug, final int cores) {
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
     this.cce = _commonCompilerExtension;
     this.debug = includeDebug;
+    this.cores = cores;
   }
   
-  public static String doCompile(final ExecutableModel em, final String packageName, final String unitName, final boolean includeDebugListener) {
-    JavaCompiler _javaCompiler = new JavaCompiler(em, includeDebugListener);
+  public static String doCompile(final ExecutableModel em, final String packageName, final String unitName, final boolean includeDebugListener, final int cores) {
+    JavaCompiler _javaCompiler = new JavaCompiler(em, includeDebugListener, cores);
     CharSequence _compile = _javaCompiler.compile(packageName, unitName);
     return _compile.toString();
   }

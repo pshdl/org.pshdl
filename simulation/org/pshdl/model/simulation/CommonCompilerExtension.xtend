@@ -148,7 +148,7 @@ class CommonCompilerExtension {
 
 	def toHexStringL(long value) '''0x«Long::toHexString(value)»l'''
 
-	def getFrameName(Frame f) '''frame«Integer.toHexString(f.uniqueID)»'''
+	def getFrameName(Frame f) '''s«String::format("%03d",Math::max(f.scheduleStage,0))»frame«String::format("%04X",f.uniqueID)»'''
 
 	def constant(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
 

@@ -169,6 +169,9 @@ public class FluidFrame {
 		final Map<String, List<Frame>> lastID = Maps.newHashMap();
 		for (final Frame frame : res) {
 			final InternalInformation ii = internals[frame.outputId];
+			if ("#null".equals(ii.info.name)) {
+				continue;
+			}
 			LinkedList<Frame> lID = (LinkedList<Frame>) lastID.get(ii.info.name);
 			if (lID != null) {
 				final Iterator<Frame> iterator = lID.descendingIterator();
@@ -470,7 +473,7 @@ public class FluidFrame {
 			final FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
 			final BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
 			final Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id,
-					constant);
+					constant, -1);
 			for (final FluidFrame ff : references) {
 				ff.toFrame(register);
 			}

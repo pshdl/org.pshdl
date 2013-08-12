@@ -29,6 +29,8 @@ package org.pshdl.model.validation;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import javax.xml.bind.annotation.*;
+
 import org.pshdl.model.*;
 import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.*;
@@ -45,6 +47,7 @@ public class Problem {
 		}
 	}
 
+	@XmlEnum(String.class)
 	public static enum ProblemSeverity {
 		INFO, WARNING, ERROR;
 	}

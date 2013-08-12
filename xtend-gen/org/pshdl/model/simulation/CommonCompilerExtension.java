@@ -312,9 +312,13 @@ public class CommonCompilerExtension {
   
   public CharSequence getFrameName(final Frame f) {
     StringConcatenation _builder = new StringConcatenation();
+    _builder.append("s");
+    int _max = Math.max(f.scheduleStage, 0);
+    String _format = String.format("%03d", Integer.valueOf(_max));
+    _builder.append(_format, "");
     _builder.append("frame");
-    String _hexString = Integer.toHexString(f.uniqueID);
-    _builder.append(_hexString, "");
+    String _format_1 = String.format("%04X", Integer.valueOf(f.uniqueID));
+    _builder.append(_format_1, "");
     return _builder;
   }
   

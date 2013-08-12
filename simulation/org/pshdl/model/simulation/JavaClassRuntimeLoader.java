@@ -3,7 +3,6 @@ package org.pshdl.model.simulation;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
-import java.nio.file.*;
 
 import javax.tools.*;
 import javax.tools.JavaCompiler;
@@ -13,7 +12,8 @@ import org.pshdl.interpreter.*;
 public class JavaClassRuntimeLoader {
 
 	public static IHDLInterpreter compileAndLoad(String name, String source, boolean disableEdge, boolean disableOutputLogic) throws Exception {
-		final File tempDir = Files.createTempDirectory("pshdl2java").toFile();
+		final File tempDir = new File("pshdl2java");
+		tempDir.mkdir();
 		tempDir.deleteOnExit();
 		final String pathName = name.replace('.', File.separatorChar) + ".java";
 		final File sourceFile = new File(tempDir, pathName);

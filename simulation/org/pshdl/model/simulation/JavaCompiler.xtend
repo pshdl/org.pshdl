@@ -43,16 +43,18 @@ import java.util.HashSet
 
 class JavaCompiler {
 	private boolean debug
+	private int cores
 
 	private extension CommonCompilerExtension cce
 
-	new(ExecutableModel em, boolean includeDebug) {
+	new(ExecutableModel em, boolean includeDebug, int cores) {
 		this.cce = new CommonCompilerExtension(em)
 		this.debug = includeDebug
+		this.cores = cores;
 	}
 
-	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener) {
-		return new JavaCompiler(em, includeDebugListener).compile(packageName, unitName).toString
+	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener, int cores) {
+		return new JavaCompiler(em, includeDebugListener, cores).compile(packageName, unitName).toString
 	}
 
 	def compile(String packageName, String unitName) {
