@@ -6,14 +6,14 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="model"/>
+	<classpathentry including="**/*.java" kind="src" path="model"/>
 	<classpathentry including="**/*.java" kind="src" path="generator"/>
 	<classpathentry including="**/*.java" kind="src" path="vhdl"/>
 	<classpathentry including="**/*.java" kind="src" path="simulation"/>
 	<classpathentry including="**/*.java" kind="src" path="compiler"/>
-	<classpathentry kind="src" path="validation"/>
+	<classpathentry including="**/*.java" kind="src" path="validation"/>
 	<classpathentry including="**/*.java" kind="src" path="xtend-gen"/>
-	<classpathentry kind="src" path="model-gen"/>
+	<classpathentry including="**/*.java" kind="src" path="model-gen"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
