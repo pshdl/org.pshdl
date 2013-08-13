@@ -609,13 +609,13 @@ public class HDLPrimitives {
 	private static Range<BigInteger> intRange(BigInteger bitWidth) {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
 		final BigInteger min = max.negate().subtract(BigInteger.ONE);
-		return Ranges.closed(min, max);
+		return Range.closed(min, max);
 	}
 
 	private static Range<BigInteger> uintRange(BigInteger bitWidth) {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
 		final BigInteger min = BigInteger.ZERO;
-		return Ranges.closed(min, max);
+		return Range.closed(min, max);
 	}
 
 	public static Integer getWidth(HDLType type, HDLEvaluationContext context) {
