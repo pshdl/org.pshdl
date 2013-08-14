@@ -289,7 +289,7 @@ public class HDLSimulator {
 								final Optional<BigInteger> bWidth = ConstantEvaluate.valueOf(width, context);
 								if (!bWidth.isPresent())
 									throw new IllegalArgumentException("Given the context this should be constant");
-								fullRanges.put(varRefName, Ranges.closed(BigInteger.ZERO, bWidth.get().subtract(BigInteger.ONE)));
+								fullRanges.put(varRefName, Range.closed(BigInteger.ZERO, bWidth.get().subtract(BigInteger.ONE)));
 							}
 						}
 					}

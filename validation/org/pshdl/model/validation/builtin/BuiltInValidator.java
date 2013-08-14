@@ -895,7 +895,7 @@ public class BuiltInValidator implements IHDLValidator {
 			final Range<BigInteger> accessRange = accessRangeRaw.get();
 			Range<BigInteger> arrayRange = arrayRangeRaw.get();
 			final BigInteger upperEndpoint = arrayRange.upperEndpoint();
-			arrayRange = Ranges.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
+			arrayRange = Range.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
 			final String info = "Expected value range:" + accessRange;
 			if (accessRange.upperEndpoint().signum() < 0) {
 				problems.add(new Problem(ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));

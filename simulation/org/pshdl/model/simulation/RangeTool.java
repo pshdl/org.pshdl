@@ -112,11 +112,11 @@ public class RangeTool {
 					// If there was an unended start, then we have to end it
 					if (start.equals(rangeVal.value)) {
 						// Or at the same location
-						res.add(Ranges.closed(start, rangeVal.value));
+						res.add(Range.closed(start, rangeVal.value));
 						// res.add(new ValueRange(start, rangeVal.value));
 					} else {
 						// just one before the new start
-						res.add(Ranges.closed(start, rangeVal.value.subtract(BigInteger.ONE)));
+						res.add(Range.closed(start, rangeVal.value.subtract(BigInteger.ONE)));
 					}
 				// res.add(new ValueRange(start,
 				// rangeVal.value.subtract(BigInteger.ONE)));
@@ -124,7 +124,7 @@ public class RangeTool {
 				start = rangeVal.value;
 			} else {
 				// End the current range at this Element
-				res.add(Ranges.closed(start, rangeVal.value));
+				res.add(Range.closed(start, rangeVal.value));
 				if (count > 0) {
 					// If we expect another end later, the element following
 					// this will have to start one after
