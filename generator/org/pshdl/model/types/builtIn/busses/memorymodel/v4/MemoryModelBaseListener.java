@@ -24,122 +24,198 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from MemoryModel.g4 by ANTLR 4.0
+// Generated from MemoryModel.g4 by ANTLR 4.1
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
+/**
+ * This class provides an empty implementation of {@link MemoryModelListener},
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
 public class MemoryModelBaseListener implements MemoryModelListener {
-	@Override
-	public void enterUnit(MemoryModelParser.UnitContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterUnit(@NotNull MemoryModelParser.UnitContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitUnit(@NotNull MemoryModelParser.UnitContext ctx) { }
 
-	@Override
-	public void exitUnit(MemoryModelParser.UnitContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) { }
 
-	@Override
-	public void enterWarnType(MemoryModelParser.WarnTypeContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) { }
 
-	@Override
-	public void exitWarnType(MemoryModelParser.WarnTypeContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterDefinition(@NotNull MemoryModelParser.DefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitDefinition(@NotNull MemoryModelParser.DefinitionContext ctx) { }
 
-	@Override
-	public void enterDeclaration(MemoryModelParser.DeclarationContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterAlias(@NotNull MemoryModelParser.AliasContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitAlias(@NotNull MemoryModelParser.AliasContext ctx) { }
 
-	@Override
-	public void exitDeclaration(MemoryModelParser.DeclarationContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterWidth(@NotNull MemoryModelParser.WidthContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitWidth(@NotNull MemoryModelParser.WidthContext ctx) { }
 
-	@Override
-	public void enterDefinition(MemoryModelParser.DefinitionContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterColumn(@NotNull MemoryModelParser.ColumnContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitColumn(@NotNull MemoryModelParser.ColumnContext ctx) { }
 
-	@Override
-	public void exitDefinition(MemoryModelParser.DefinitionContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) { }
 
-	@Override
-	public void enterAlias(MemoryModelParser.AliasContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterType(@NotNull MemoryModelParser.TypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitType(@NotNull MemoryModelParser.TypeContext ctx) { }
 
-	@Override
-	public void exitAlias(MemoryModelParser.AliasContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterReference(@NotNull MemoryModelParser.ReferenceContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitReference(@NotNull MemoryModelParser.ReferenceContext ctx) { }
 
-	@Override
-	public void enterWidth(MemoryModelParser.WidthContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterMemory(@NotNull MemoryModelParser.MemoryContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitMemory(@NotNull MemoryModelParser.MemoryContext ctx) { }
 
-	@Override
-	public void exitWidth(MemoryModelParser.WidthContext ctx) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterRow(@NotNull MemoryModelParser.RowContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitRow(@NotNull MemoryModelParser.RowContext ctx) { }
 
-	@Override
-	public void enterColumn(MemoryModelParser.ColumnContext ctx) {
-	}
-
-	@Override
-	public void exitColumn(MemoryModelParser.ColumnContext ctx) {
-	}
-
-	@Override
-	public void enterRwStatus(MemoryModelParser.RwStatusContext ctx) {
-	}
-
-	@Override
-	public void exitRwStatus(MemoryModelParser.RwStatusContext ctx) {
-	}
-
-	@Override
-	public void enterType(MemoryModelParser.TypeContext ctx) {
-	}
-
-	@Override
-	public void exitType(MemoryModelParser.TypeContext ctx) {
-	}
-
-	@Override
-	public void enterReference(MemoryModelParser.ReferenceContext ctx) {
-	}
-
-	@Override
-	public void exitReference(MemoryModelParser.ReferenceContext ctx) {
-	}
-
-	@Override
-	public void enterMemory(MemoryModelParser.MemoryContext ctx) {
-	}
-
-	@Override
-	public void exitMemory(MemoryModelParser.MemoryContext ctx) {
-	}
-
-	@Override
-	public void enterRow(MemoryModelParser.RowContext ctx) {
-	}
-
-	@Override
-	public void exitRow(MemoryModelParser.RowContext ctx) {
-	}
-
-	@Override
-	public void enterEveryRule(ParserRuleContext ctx) {
-	}
-
-	@Override
-	public void exitEveryRule(ParserRuleContext ctx) {
-	}
-
-	@Override
-	public void visitTerminal(TerminalNode node) {
-	}
-
-	@Override
-	public void visitErrorNode(ErrorNode node) {
-	}
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void visitTerminal(@NotNull TerminalNode node) { }
+	/**
+	 * {@inheritDoc}
+	 * <p/>
+	 * The default implementation does nothing.
+	 */
+	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
