@@ -47,7 +47,8 @@ public class HDLSimulator {
 		if ((unit.getSimulation() != null) && unit.getSimulation())
 			throw new IllegalArgumentException("Testbenches are not supported");
 		HDLUnit insulin = Insulin.transform(unit, src);
-		insulin = flattenAll(context, insulin);
+		final HDLPackage pkg = flattenAll(context, insulin);
+		insulin = getSingleUnit(pkg);
 		insulin = convertArrayInits(context, insulin);
 		insulin = unrollForLoops(context, insulin);
 		insulin = createBitRanges(context, insulin);
@@ -58,6 +59,13 @@ public class HDLSimulator {
 		insulin = removeDeadLeaves(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
+	}
+
+	private static HDLUnit getSingleUnit(final HDLPackage pkg) {
+		final ArrayList<HDLUnit> units = pkg.getUnits();
+		if (units.size() != 1)
+			throw new IllegalArgumentException("Something went wrong, found more or less than 1 HDLUnit");
+		return units.get(0);
 	}
 
 	private static HDLUnit removeDeadLeaves(HDLEvaluationContext context, HDLUnit insulin) {
@@ -133,8 +141,9 @@ public class HDLSimulator {
 		}
 	}
 
-	private static HDLUnit flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
+	private static HDLPackage flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
 		HDLInterfaceInstantiation[] hii = null;
+		HDLPackage res = new HDLPackage();
 		while ((hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true)).length > 0) {
 			final HDLLibrary library = insulin.getLibrary();
 			final HDLInterfaceInstantiation hi = hii[0];
@@ -144,10 +153,18 @@ public class HDLSimulator {
 				throw new IllegalArgumentException("Can not find unit for interface:" + asRef);
 			unit = Insulin.transform(unit, library.getSrc(asRef));
 			final HDLEvaluationContext hiContext = hi.getContext(HDLEvaluationContext.createDefault(unit));
-			final HDLUnit subUnit = flattenAll(hiContext, unit);
-			insulin = Refactoring.inlineUnit(insulin, hi, subUnit);
+			final HDLPackage subUnit = flattenAll(hiContext, unit);
+			for (final HDLDeclaration decl : subUnit.getDeclarations()) {
+				res = res.addDeclarations(decl);
+			}
+			final HDLPackage iuRes = Refactoring.inlineUnit(insulin, hi, getSingleUnit(subUnit));
+			for (final HDLDeclaration decl : iuRes.getDeclarations()) {
+				res = res.addDeclarations(decl);
+			}
+			insulin = getSingleUnit(iuRes);
 		}
-		return insulin;
+		res = res.addUnits(insulin);
+		return res;
 	}
 
 	private static class InitTuple {

@@ -26,6 +26,7 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
+import java.io.*;
 import java.util.*;
 
 import org.pshdl.model.*;
@@ -33,9 +34,12 @@ import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.extensions.*;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
+import com.google.common.io.*;
 
 public class Refactoring {
+
 	/**
 	 * Rename a variable
 	 * 
@@ -83,9 +87,12 @@ public class Refactoring {
 		}
 	}
 
-	public static HDLUnit inlineUnit(HDLUnit container, HDLInterfaceInstantiation hi, HDLUnit subUnit) {
+	public static HDLPackage inlineUnit(HDLUnit container, HDLInterfaceInstantiation hi, HDLUnit subUnit) {
 		final HDLVariable hiVar = hi.getVar();
 		final String prefix = hiVar.getName();
+		final ModificationSet ms = new ModificationSet();
+		HDLPackage pkg = createHDLPackage(subUnit, ms);
+		subUnit = ms.apply(subUnit);
 		subUnit = prefixVariables(subUnit, prefix);
 		subUnit = extractDefaultValue(subUnit);
 		final ArrayList<HDLExpression> outerDims = hiVar.getDimensions();
@@ -133,8 +140,68 @@ public class Refactoring {
 			res.replace(hi, loop);
 		}
 		final HDLUnit apply = res.apply(container);
-		apply.validateAllFields(container.getContainer(), true);
-		return apply;
+		pkg = pkg.addUnits(apply);
+		try {
+			apply.validateAllFields(container.getContainer(), true);
+		} catch (final RuntimeException e) {
+			try {
+				Files.write(apply.toString().getBytes(Charsets.UTF_8), new File("CrashedUnit.pshdl"));
+			} catch (final IOException e1) {
+				e1.printStackTrace();
+			}
+			throw e;
+		}
+		return pkg;
+	}
+
+	private static HDLPackage createHDLPackage(HDLUnit subUnit, final ModificationSet ms) {
+		HDLPackage pkg = new HDLPackage();
+		final HDLDeclaration[] decls = subUnit.getAllObjectsOf(HDLDeclaration.class, true);
+		for (final HDLDeclaration decl : decls) {
+			if (decl instanceof HDLVariableDeclaration) {
+				continue;
+			}
+			if (decl instanceof HDLEnumDeclaration) {
+				final HDLEnumDeclaration hde = (HDLEnumDeclaration) decl;
+				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(hde.getHEnum());
+				final String newName = fqn.toString();
+				pkg = pkg.addDeclarations(hde.setHEnum(hde.getHEnum().setName(newName)));
+				final HDLQualifiedName sqfn = HDLQualifiedName.create(fqn.getLastSegment());
+				final Collection<HDLEnumRef> allRefs = HDLQuery.select(HDLEnumRef.class).from(subUnit).where(HDLEnumRef.fHEnum).isEqualTo(sqfn).getAll();
+				for (final HDLEnumRef ref : allRefs) {
+					ms.replace(ref, ref.setHEnum(fqn));
+				}
+				final Collection<HDLVariableDeclaration> allVars = HDLQuery.select(HDLVariableDeclaration.class).from(subUnit).where(HDLVariableDeclaration.fType).isEqualTo(sqfn)
+						.getAll();
+				for (final HDLVariableDeclaration hvd : allVars) {
+					ms.replace(hvd, hvd.setType(fqn));
+				}
+			}
+			if (decl instanceof HDLFunction) {
+				final HDLFunction hdf = (HDLFunction) decl;
+				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(hdf);
+				pkg = pkg.addDeclarations(hdf.setName(fqn.toString()));
+				final HDLQualifiedName sqfn = HDLQualifiedName.create(fqn.getLastSegment());
+				final Collection<HDLFunctionCall> allRefs = HDLQuery.select(HDLFunctionCall.class).from(subUnit).where(HDLFunctionCall.fName).isEqualTo(sqfn).getAll();
+				for (final HDLFunctionCall ref : allRefs) {
+					ms.replace(ref, ref.setName(fqn));
+				}
+			}
+			if (decl instanceof HDLInterfaceDeclaration) {
+				final HDLInterfaceDeclaration hid = (HDLInterfaceDeclaration) decl;
+				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(hid.getHIf());
+				final String newName = fqn.toString();
+				pkg = pkg.addDeclarations(hid.setHIf(hid.getHIf().setName(newName)));
+				final HDLQualifiedName sfqn = HDLQualifiedName.create(fqn.getLastSegment());
+				final Collection<HDLInterfaceInstantiation> allRefs = HDLQuery.select(HDLInterfaceInstantiation.class).from(subUnit).where(HDLInterfaceInstantiation.fHIf)
+						.isEqualTo(sfqn).getAll();
+				for (final HDLInterfaceInstantiation hii : allRefs) {
+					ms.replace(hii, hii.setHIf(fqn));
+				}
+			}
+			ms.remove(decl);
+		}
+		return pkg;
 	}
 
 	private static HDLUnit dereferenceRefs(HDLUnit subUnit) {
