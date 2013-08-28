@@ -45,6 +45,7 @@ import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
+import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 
@@ -53,9 +54,15 @@ public class DartCompiler {
   @Extension
   private CommonCompilerExtension cce;
   
+  private int epsWidth;
+  
   public DartCompiler(final ExecutableModel em) {
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
     this.cce = _commonCompilerExtension;
+    int _size = this.cce.prevMap.size();
+    int _highestOneBit = Integer.highestOneBit(_size);
+    int _plus = (_highestOneBit + 1);
+    this.epsWidth = _plus;
   }
   
   public static String doCompile(final ExecutableModel em, final String unitName) {
@@ -206,8 +213,13 @@ public class DartCompiler {
       _builder.append("int _deltaCycle=0;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("int get updateStamp=>(_deltaCycle << 16) | (_epsCycle & 0xFFFF);");
-      _builder.newLine();
+      _builder.append("int get updateStamp=>(_deltaCycle << ");
+      _builder.append(this.epsWidth, "	");
+      _builder.append(") | (_epsCycle & ");
+      CharSequence _asMask = this.cce.asMask(this.epsWidth);
+      _builder.append(_asMask, "	");
+      _builder.append(");");
+      _builder.newLineIfNotEmpty();
       _builder.append("\t");
       _builder.append("Map<String, int> _varIdx={");
       _builder.newLine();
@@ -281,8 +293,8 @@ public class DartCompiler {
             }
             if (_and) {
               _builder.append("& ");
-              CharSequence _asMask = this.cce.asMask(v_2.width);
-              _builder.append(_asMask, "		");
+              CharSequence _asMask_1 = this.cce.asMask(v_2.width);
+              _builder.append(_asMask_1, "		");
             }
           }
           _builder.append(";");
@@ -315,8 +327,8 @@ public class DartCompiler {
             }
             if (_and_1) {
               _builder.append("& ");
-              CharSequence _asMask_1 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_1, "		");
+              CharSequence _asMask_2 = this.cce.asMask(v_2.width);
+              _builder.append(_asMask_2, "		");
             }
           }
           _builder.append(";");
@@ -351,8 +363,8 @@ public class DartCompiler {
               String _arrayAccessBracket = this.cce.arrayAccessBracket(v_2, null);
               _builder.append(_arrayAccessBracket, "		");
               _builder.append("=value & ");
-              CharSequence _asMask_2 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_2, "		");
+              CharSequence _asMask_3 = this.cce.asMask(v_2.width);
+              _builder.append(_asMask_3, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -391,8 +403,8 @@ public class DartCompiler {
               String _arrayAccessBracket_1 = this.cce.arrayAccessBracket(v_2, null);
               _builder.append(_arrayAccessBracket_1, "		");
               _builder.append(" & ");
-              CharSequence _asMask_3 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_3, "		");
+              CharSequence _asMask_4 = this.cce.asMask(v_2.width);
+              _builder.append(_asMask_4, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -419,8 +431,10 @@ public class DartCompiler {
           _builder.newLine();
           _builder.append("\t");
           _builder.append("\t");
-          _builder.append("int dc = local >> 16;");
-          _builder.newLine();
+          _builder.append("int dc = local >> ");
+          _builder.append(this.epsWidth, "		");
+          _builder.append(";");
+          _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t");
           _builder.append("// Register was updated in previous delta cylce, that is ok");
@@ -443,8 +457,11 @@ public class DartCompiler {
           _builder.newLine();
           _builder.append("\t");
           _builder.append("\t");
-          _builder.append("if ((dc == _deltaCycle) && ((local & 0xFFFF) == _epsCycle))");
-          _builder.newLine();
+          _builder.append("if ((dc == _deltaCycle) && ((local & ");
+          CharSequence _asMask_5 = this.cce.asMask(this.epsWidth);
+          _builder.append(_asMask_5, "		");
+          _builder.append(") == _epsCycle))");
+          _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t\t");
           _builder.append("return false;");
@@ -737,9 +754,14 @@ public class DartCompiler {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("if ((up");
       _builder_1.append(id, "");
-      _builder_1.append(">>16 != _deltaCycle) || ((up");
+      _builder_1.append(">>");
+      _builder_1.append(this.epsWidth, "");
+      _builder_1.append(" != _deltaCycle) || ((up");
       _builder_1.append(id, "");
-      _builder_1.append("&0xFFFF) != _epsCycle)){");
+      _builder_1.append("&");
+      CharSequence _asMask = this.cce.asMask(this.epsWidth);
+      _builder_1.append(_asMask, "");
+      _builder_1.append(") != _epsCycle)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("p");
@@ -803,7 +825,7 @@ public class DartCompiler {
       _builder_1.append("\t");
       _builder_1.append("}");
       _builder_1.newLine();
-      _builder_1.append("}");
+      _builder_1.append("} ");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
       String _idName_3 = this.cce.idName(internal.info, false, true);
@@ -1214,6 +1236,27 @@ public class DartCompiler {
         _xifexpression_1 = "";
       }
       final String reset = _xifexpression_1;
+      String type = "INVALID";
+      final Type _switchValue = v.type;
+      boolean _matched = false;
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Type.BIT)) {
+          _matched=true;
+          type = "Port.TYPE_BIT";
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Type.INT)) {
+          _matched=true;
+          type = "Port.TYPE_INT";
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Type.UINT)) {
+          _matched=true;
+          type = "Port.TYPE_UINT";
+        }
+      }
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("new Port(");
       Integer _get = this.cce.varIdx.get(v.name);
@@ -1223,6 +1266,8 @@ public class DartCompiler {
       _builder_1.append(_replaceAll, "");
       _builder_1.append("\", ");
       _builder_1.append(v.width, "");
+      _builder_1.append(", ");
+      _builder_1.append(type, "");
       _builder_1.append(dims, "");
       _builder_1.append(clock, "");
       _builder_1.append(reset, "");
@@ -2493,8 +2538,12 @@ public class DartCompiler {
   
   public CharSequence getImports() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("import \'dart:collection\';");
-    _builder.newLine();
+    {
+      if (this.cce.hasClock) {
+        _builder.append("import \'dart:collection\';");
+        _builder.newLine();
+      }
+    }
     _builder.append("import \'../simulation_comm.dart\';");
     _builder.newLine();
     return _builder;

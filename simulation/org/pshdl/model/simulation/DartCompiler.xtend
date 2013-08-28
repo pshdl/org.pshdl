@@ -46,9 +46,11 @@ import java.math.BigInteger
 class DartCompiler {
 
 	private extension CommonCompilerExtension cce
+	private int epsWidth
 
 	new(ExecutableModel em) {
 		this.cce = new CommonCompilerExtension(em)
+		epsWidth=Integer::highestOneBit(prevMap.size)+1
 	}
 
 	def static String doCompile(ExecutableModel em, String unitName) {
@@ -107,7 +109,7 @@ class DartCompiler {
 				«ENDFOR»
 				int _epsCycle=0;
 				int _deltaCycle=0;
-				int get updateStamp=>(_deltaCycle << 16) | (_epsCycle & 0xFFFF);
+				int get updateStamp=>(_deltaCycle << «epsWidth») | (_epsCycle & «epsWidth.asMask»);
 				Map<String, int> _varIdx={
 					«FOR v : em.variables SEPARATOR ','»
 						"«v.name.replaceAll("[\\$]", "\\\\\\$")»": «varIdx.get(v.name)»
@@ -141,13 +143,13 @@ class DartCompiler {
 				«ENDFOR»
 				«IF hasClock»
 					bool skipEdge(int local) {
-						int dc = local >> 16;
+						int dc = local >> «epsWidth»;
 						// Register was updated in previous delta cylce, that is ok
 						if (dc < deltaCycle)
 							return false;
 						// Register was updated in this delta cycle but it is the same eps,
 						// that is ok as well
-						if ((dc == _deltaCycle) && ((local & 0xFFFF) == _epsCycle))
+						if ((dc == _deltaCycle) && ((local & «epsWidth.asMask») == _epsCycle))
 							return false;
 						// Don't update
 						return true;
@@ -243,7 +245,7 @@ class DartCompiler {
 			«id.asInternal.getter(false, id, -1)»
 			bool p«id»_fresh=true;
 			int up«id»=«id.asInternal.info.idName(false, true)»_update;
-			if ((up«id»>>16 != _deltaCycle) || ((up«id»&0xFFFF) != _epsCycle)){
+			if ((up«id»>>«epsWidth» != _deltaCycle) || ((up«id»&«epsWidth.asMask») != _epsCycle)){
 				p«id»_fresh=false;
 			}
 		'''
@@ -263,7 +265,11 @@ class DartCompiler {
 				if ((t«id»_prev!=0) || (t«id»!=1)) {
 					«internal.idName(false, true)»_isRising=false;
 				}
-			}
+			} 
+«««			else {
+«««				«id.asInternal.getter(false, id, -1)»
+«««				«internal.idName(false, true)»_isRising=t«id»==1;
+«««			}
 			if (skipEdge(«internal.info.idName(false, true)»_update)){
 				«internal.idName(false, true)»_risingIsHandled=true;
 			}
@@ -285,6 +291,10 @@ class DartCompiler {
 					«internal.idName(false, true)»_isFalling=false;
 				}
 			}
+«««			else {
+«««				«id.asInternal.getter(false, id, -1)»
+«««				«internal.idName(false, true)»_isRising=t«id»==0;
+«««			}
 			if (skipEdge(«internal.info.idName(false, true)»_update)){
 				«internal.idName(false, true)»_fallingIsHandled=true;
 			}
@@ -381,7 +391,13 @@ class DartCompiler {
 		}
 		val clock = if(v.isClock) ", clock:true" else ""
 		val reset = if(v.isReset) ", reset:true" else ""
-		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]", "\\\\\\$")»", «v.width»«dims»«clock»«reset»)'''
+		var type="INVALID"
+		switch (v.type){
+			case VariableInformation$Type::BIT: type="Port.TYPE_BIT"
+			case VariableInformation$Type::INT: type="Port.TYPE_INT"
+			case VariableInformation$Type::UINT: type="Port.TYPE_UINT"
+		}
+		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]", "\\\\\\$")»", «v.width», «type»«dims»«clock»«reset»)'''
 	}
 
 	def copyRegs() '''
@@ -689,7 +705,9 @@ class DartCompiler {
 	}
 
 	def getImports() '''
+«IF hasClock»	
 import 'dart:collection';
+«ENDIF»
 import '../simulation_comm.dart';
 	'''
 
