@@ -640,6 +640,48 @@ public class DartCompiler {
       _builder.append("}");
       _builder.newLine();
       _builder.append("\t");
+      _builder.append("int signExtend(int val, int width) {");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("var msb=(1<<(width-1));");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("var mask=(1<<width)-1;");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("var twoComplement = -val;");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("if ((val&msb)==0){");
+      _builder.newLine();
+      _builder.append("\t    ");
+      _builder.append("//The MSB is not set, but the stored sign is negative");
+      _builder.newLine();
+      _builder.append("\t    ");
+      _builder.append("if (val>=0)");
+      _builder.newLine();
+      _builder.append("\t      ");
+      _builder.append("return val;");
+      _builder.newLine();
+      _builder.append("\t    ");
+      _builder.append("return twoComplement&mask;");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("if (val<0)");
+      _builder.newLine();
+      _builder.append("\t    ");
+      _builder.append("return val;");
+      _builder.newLine();
+      _builder.append("\t  ");
+      _builder.append("return -(twoComplement&mask);");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
       _builder.newLine();
       _builder.append("\t");
       CharSequence _hdlInterpreter = this.hdlInterpreter();
@@ -825,16 +867,31 @@ public class DartCompiler {
       _builder_1.append("\t");
       _builder_1.append("}");
       _builder_1.newLine();
-      _builder_1.append("} ");
+      _builder_1.append("} else {");
+      _builder_1.newLine();
+      _builder_1.append("\t");
+      InternalInformation _asInternal_2 = this.cce.asInternal(id);
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      String _idName_3 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_3, "	");
+      _builder_1.append("_isRising=t");
+      _builder_1.append(id, "	");
+      _builder_1.append("==1;");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _idName_3 = this.cce.idName(internal.info, false, true);
-      _builder_1.append(_idName_3, "");
+      String _idName_4 = this.cce.idName(internal.info, false, true);
+      _builder_1.append(_idName_4, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      String _idName_4 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_4, "	");
+      String _idName_5 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -894,16 +951,31 @@ public class DartCompiler {
       _builder_1.append("\t");
       _builder_1.append("}");
       _builder_1.newLine();
+      _builder_1.append("} else {");
+      _builder_1.newLine();
+      _builder_1.append("\t");
+      InternalInformation _asInternal_2 = this.cce.asInternal(id);
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      String _idName_3 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_3, "	");
+      _builder_1.append("_isFalling=t");
+      _builder_1.append(id, "	");
+      _builder_1.append("==0;");
+      _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _idName_3 = this.cce.idName(internal.info, false, true);
-      _builder_1.append(_idName_3, "");
+      String _idName_4 = this.cce.idName(internal.info, false, true);
+      _builder_1.append(_idName_4, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
-      String _idName_4 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_4, "	");
+      String _idName_5 = this.cce.idName(internal, false, true);
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -1311,13 +1383,35 @@ public class DartCompiler {
                 _builder.newLineIfNotEmpty();
               } else {
                 _builder.append("\t\t\t");
+                _builder.append("if (reg.offset==-1)");
+                _builder.newLine();
+                _builder.append("\t\t\t");
+                _builder.append("\t");
                 String _idName_2 = this.cce.idName(v, false, true);
-                _builder.append(_idName_2, "			");
-                _builder.append("[reg.offset] = ");
+                _builder.append(_idName_2, "				");
+                _builder.append(".fillRange(0, ");
+                int _talSize = this.cce.totalSize(v);
+                _builder.append(_talSize, "				");
+                _builder.append(", ");
                 String _idName_3 = this.cce.idName(v, false, true);
-                _builder.append(_idName_3, "			");
-                _builder.append("$reg[reg.offset]; break;");
+                _builder.append(_idName_3, "				");
+                _builder.append("$reg[0]);");
                 _builder.newLineIfNotEmpty();
+                _builder.append("\t\t\t");
+                _builder.append("else");
+                _builder.newLine();
+                _builder.append("\t\t\t");
+                _builder.append("\t");
+                String _idName_4 = this.cce.idName(v, false, true);
+                _builder.append(_idName_4, "				");
+                _builder.append("[reg.offset] = ");
+                String _idName_5 = this.cce.idName(v, false, true);
+                _builder.append(_idName_5, "				");
+                _builder.append("$reg[reg.offset]; ");
+                _builder.newLineIfNotEmpty();
+                _builder.append("\t\t\t");
+                _builder.append("break;");
+                _builder.newLine();
               }
             }
           }
@@ -1938,78 +2032,18 @@ public class DartCompiler {
           _matched=true;
           final int targetWidth = inst.arg1;
           final int currWidth = inst.arg2;
-          boolean _greaterEqualsThan = (targetWidth >= currWidth);
-          if (_greaterEqualsThan) {
-            StringConcatenation _builder_8 = new StringConcatenation();
-            _builder_8.append("int t");
-            _builder_8.append(pos, "");
-            _builder_8.append("=t");
-            _builder_8.append(a, "");
-            _builder_8.append(";");
-            sb.append(_builder_8);
-          } else {
-            BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(targetWidth);
-            final BigInteger mask_1 = _shiftLeft.subtract(BigInteger.ONE);
-            StringConcatenation _builder_9 = new StringConcatenation();
-            _builder_9.append("int u");
-            _builder_9.append(pos, "");
-            _builder_9.append(" = t");
-            _builder_9.append(a, "");
-            _builder_9.append(" & ");
-            _builder_9.append(mask_1, "");
-            _builder_9.append(";");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("if ((u");
-            _builder_9.append(pos, "");
-            _builder_9.append(" & ");
-            int _minus_1 = (targetWidth - 1);
-            BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(_minus_1);
-            CharSequence _hexString = this.cce.toHexString(_shiftLeft_1);
-            _builder_9.append(_hexString, "");
-            _builder_9.append(") != 0) { // MSB is set");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("\t");
-            _builder_9.append("if (u");
-            _builder_9.append(pos, "	");
-            _builder_9.append(" > 0) {");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("\t\t");
-            _builder_9.append("u");
-            _builder_9.append(pos, "		");
-            _builder_9.append(" = -u");
-            _builder_9.append(pos, "		");
-            _builder_9.append(";");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("\t");
-            _builder_9.append("}");
-            _builder_9.newLine();
-            _builder_9.append("} else {");
-            _builder_9.newLine();
-            _builder_9.append("\t");
-            _builder_9.append("if (u");
-            _builder_9.append(pos, "	");
-            _builder_9.append(" < 0) {");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("\t\t");
-            _builder_9.append("u");
-            _builder_9.append(pos, "		");
-            _builder_9.append(" = -u");
-            _builder_9.append(pos, "		");
-            _builder_9.append(";");
-            _builder_9.newLineIfNotEmpty();
-            _builder_9.append("\t");
-            _builder_9.append("}");
-            _builder_9.newLine();
-            _builder_9.append("}");
-            _builder_9.newLine();
-            _builder_9.append("int t");
-            _builder_9.append(pos, "");
-            _builder_9.append(" = u");
-            _builder_9.append(pos, "");
-            _builder_9.append(";");
-            _builder_9.newLineIfNotEmpty();
-            sb.append(_builder_9);
-          }
+          StringConcatenation _builder_8 = new StringConcatenation();
+          _builder_8.append("int t");
+          _builder_8.append(pos, "");
+          _builder_8.append("=");
+          StringConcatenation _builder_9 = new StringConcatenation();
+          _builder_9.append("t");
+          _builder_9.append(a, "");
+          int _min = Math.min(targetWidth, currWidth);
+          CharSequence _signExtend = this.signExtend(_builder_9, _min);
+          _builder_8.append(_signExtend, "");
+          _builder_8.append(";");
+          sb.append(_builder_8);
         }
       }
       if (!_matched) {
@@ -2151,259 +2185,283 @@ public class DartCompiler {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.and)) {
           _matched=true;
-          StringConcatenation _builder_20 = new StringConcatenation();
-          _builder_20.append("int t");
-          _builder_20.append(pos, "");
-          _builder_20.append("=t");
-          _builder_20.append(b, "");
-          _builder_20.append(" & t");
-          _builder_20.append(a, "");
-          _builder_20.append(";");
-          sb.append(_builder_20);
+          this.twoOp(sb, pos, "&", a, b, inst.arg1);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.or)) {
           _matched=true;
-          StringConcatenation _builder_21 = new StringConcatenation();
-          _builder_21.append("int t");
-          _builder_21.append(pos, "");
-          _builder_21.append("=t");
-          _builder_21.append(b, "");
-          _builder_21.append(" | t");
-          _builder_21.append(a, "");
-          _builder_21.append(";");
-          sb.append(_builder_21);
+          this.twoOp(sb, pos, "|", a, b, inst.arg1);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.xor)) {
           _matched=true;
-          StringConcatenation _builder_22 = new StringConcatenation();
-          _builder_22.append("int t");
-          _builder_22.append(pos, "");
-          _builder_22.append("=t");
-          _builder_22.append(b, "");
-          _builder_22.append(" ^ t");
-          _builder_22.append(a, "");
-          _builder_22.append(";");
-          sb.append(_builder_22);
+          this.twoOp(sb, pos, "^", a, b, inst.arg1);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.plus)) {
           _matched=true;
+          this.twoOp(sb, pos, "+", a, b, inst.arg1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.minus)) {
+          _matched=true;
+          this.twoOp(sb, pos, "-", a, b, inst.arg1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.mul)) {
+          _matched=true;
+          this.twoOp(sb, pos, "*", a, b, inst.arg1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.div)) {
+          _matched=true;
+          this.twoOp(sb, pos, "/", a, b, inst.arg1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.sll)) {
+          _matched=true;
+          this.twoOp(sb, pos, "<<", a, b, inst.arg1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.srl)) {
+          _matched=true;
+          final int targetSize = (inst.arg1 >> 1);
+          int _bitwiseAnd = (inst.arg1 & 1);
+          boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
+          if (_tripleEquals) {
+            StringConcatenation _builder_20 = new StringConcatenation();
+            _builder_20.append("int t");
+            _builder_20.append(pos, "");
+            _builder_20.append("=");
+            StringConcatenation _builder_21 = new StringConcatenation();
+            _builder_21.append("_srl(t");
+            _builder_21.append(b, "");
+            _builder_21.append(", t");
+            _builder_21.append(a, "");
+            _builder_21.append(", ");
+            _builder_21.append(inst.arg1, "");
+            _builder_21.append(")");
+            CharSequence _signExtend_1 = this.signExtend(_builder_21, targetSize);
+            _builder_20.append(_signExtend_1, "");
+            _builder_20.append(";");
+            sb.append(_builder_20);
+          } else {
+            StringConcatenation _builder_22 = new StringConcatenation();
+            _builder_22.append("int t");
+            _builder_22.append(pos, "");
+            _builder_22.append("=(_srl(t");
+            _builder_22.append(b, "");
+            _builder_22.append(", t");
+            _builder_22.append(a, "");
+            _builder_22.append(", ");
+            _builder_22.append(inst.arg1, "");
+            _builder_22.append(")) & ");
+            CharSequence _asMask_2 = this.cce.asMask(targetSize);
+            _builder_22.append(_asMask_2, "");
+            _builder_22.append(";");
+            sb.append(_builder_22);
+          }
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.sra)) {
+          _matched=true;
+          this.twoOp(sb, pos, ">>", a, b, inst.arg1);
+        }
+      }
+      if (!_matched) {
+        if (Objects.equal(_switchValue,Instruction.eq)) {
+          _matched=true;
           StringConcatenation _builder_23 = new StringConcatenation();
-          _builder_23.append("int t");
+          _builder_23.append("bool t");
           _builder_23.append(pos, "");
           _builder_23.append("=t");
           _builder_23.append(b, "");
-          _builder_23.append(" + t");
+          _builder_23.append(" == t");
           _builder_23.append(a, "");
           _builder_23.append(";");
           sb.append(_builder_23);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.minus)) {
+        if (Objects.equal(_switchValue,Instruction.not_eq)) {
           _matched=true;
           StringConcatenation _builder_24 = new StringConcatenation();
-          _builder_24.append("int t");
+          _builder_24.append("bool t");
           _builder_24.append(pos, "");
           _builder_24.append("=t");
           _builder_24.append(b, "");
-          _builder_24.append(" - t");
+          _builder_24.append(" != t");
           _builder_24.append(a, "");
           _builder_24.append(";");
           sb.append(_builder_24);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.mul)) {
+        if (Objects.equal(_switchValue,Instruction.less)) {
           _matched=true;
           StringConcatenation _builder_25 = new StringConcatenation();
-          _builder_25.append("int t");
+          _builder_25.append("bool t");
           _builder_25.append(pos, "");
           _builder_25.append("=t");
           _builder_25.append(b, "");
-          _builder_25.append(" * t");
+          _builder_25.append(" < t");
           _builder_25.append(a, "");
           _builder_25.append(";");
           sb.append(_builder_25);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.div)) {
+        if (Objects.equal(_switchValue,Instruction.less_eq)) {
           _matched=true;
           StringConcatenation _builder_26 = new StringConcatenation();
-          _builder_26.append("int t");
+          _builder_26.append("bool t");
           _builder_26.append(pos, "");
           _builder_26.append("=t");
           _builder_26.append(b, "");
-          _builder_26.append(" / t");
+          _builder_26.append(" <= t");
           _builder_26.append(a, "");
           _builder_26.append(";");
           sb.append(_builder_26);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sll)) {
+        if (Objects.equal(_switchValue,Instruction.greater)) {
           _matched=true;
           StringConcatenation _builder_27 = new StringConcatenation();
-          _builder_27.append("int t");
+          _builder_27.append("bool t");
           _builder_27.append(pos, "");
           _builder_27.append("=t");
           _builder_27.append(b, "");
-          _builder_27.append(" << t");
+          _builder_27.append(" > t");
           _builder_27.append(a, "");
           _builder_27.append(";");
           sb.append(_builder_27);
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.srl)) {
-          _matched=true;
-          StringConcatenation _builder_28 = new StringConcatenation();
-          _builder_28.append("int t");
-          _builder_28.append(pos, "");
-          _builder_28.append("=_srl(t");
-          _builder_28.append(b, "");
-          _builder_28.append(", t");
-          _builder_28.append(a, "");
-          _builder_28.append(", ");
-          _builder_28.append(inst.arg1, "");
-          _builder_28.append(");");
-          sb.append(_builder_28);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.sra)) {
-          _matched=true;
-          StringConcatenation _builder_29 = new StringConcatenation();
-          _builder_29.append("int t");
-          _builder_29.append(pos, "");
-          _builder_29.append("=t");
-          _builder_29.append(b, "");
-          _builder_29.append(" >> t");
-          _builder_29.append(a, "");
-          _builder_29.append(";");
-          sb.append(_builder_29);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.eq)) {
-          _matched=true;
-          StringConcatenation _builder_30 = new StringConcatenation();
-          _builder_30.append("bool t");
-          _builder_30.append(pos, "");
-          _builder_30.append("=t");
-          _builder_30.append(b, "");
-          _builder_30.append(" == t");
-          _builder_30.append(a, "");
-          _builder_30.append(";");
-          sb.append(_builder_30);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.not_eq)) {
-          _matched=true;
-          StringConcatenation _builder_31 = new StringConcatenation();
-          _builder_31.append("bool t");
-          _builder_31.append(pos, "");
-          _builder_31.append("=t");
-          _builder_31.append(b, "");
-          _builder_31.append(" != t");
-          _builder_31.append(a, "");
-          _builder_31.append(";");
-          sb.append(_builder_31);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less)) {
-          _matched=true;
-          StringConcatenation _builder_32 = new StringConcatenation();
-          _builder_32.append("bool t");
-          _builder_32.append(pos, "");
-          _builder_32.append("=t");
-          _builder_32.append(b, "");
-          _builder_32.append(" < t");
-          _builder_32.append(a, "");
-          _builder_32.append(";");
-          sb.append(_builder_32);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.less_eq)) {
-          _matched=true;
-          StringConcatenation _builder_33 = new StringConcatenation();
-          _builder_33.append("bool t");
-          _builder_33.append(pos, "");
-          _builder_33.append("=t");
-          _builder_33.append(b, "");
-          _builder_33.append(" <= t");
-          _builder_33.append(a, "");
-          _builder_33.append(";");
-          sb.append(_builder_33);
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,Instruction.greater)) {
-          _matched=true;
-          StringConcatenation _builder_34 = new StringConcatenation();
-          _builder_34.append("bool t");
-          _builder_34.append(pos, "");
-          _builder_34.append("=t");
-          _builder_34.append(b, "");
-          _builder_34.append(" > t");
-          _builder_34.append(a, "");
-          _builder_34.append(";");
-          sb.append(_builder_34);
-        }
-      }
-      if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.greater_eq)) {
           _matched=true;
-          StringConcatenation _builder_35 = new StringConcatenation();
-          _builder_35.append("bool t");
-          _builder_35.append(pos, "");
-          _builder_35.append("=t");
-          _builder_35.append(b, "");
-          _builder_35.append(" >= t");
-          _builder_35.append(a, "");
-          _builder_35.append(";");
-          sb.append(_builder_35);
+          StringConcatenation _builder_28 = new StringConcatenation();
+          _builder_28.append("bool t");
+          _builder_28.append(pos, "");
+          _builder_28.append("=t");
+          _builder_28.append(b, "");
+          _builder_28.append(" >= t");
+          _builder_28.append(a, "");
+          _builder_28.append(";");
+          sb.append(_builder_28);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isRisingEdge)) {
           _matched=true;
-          StringConcatenation _builder_36 = new StringConcatenation();
+          StringConcatenation _builder_29 = new StringConcatenation();
           InternalInformation _asInternal_1 = this.cce.asInternal(inst.arg1);
           String _idName = this.cce.idName(_asInternal_1.info, false, true);
-          _builder_36.append(_idName, "");
-          _builder_36.append("_update=updateStamp;");
-          sb.append(_builder_36);
+          _builder_29.append(_idName, "");
+          _builder_29.append("_update=updateStamp;");
+          sb.append(_builder_29);
         }
       }
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.isFallingEdge)) {
           _matched=true;
-          StringConcatenation _builder_37 = new StringConcatenation();
+          StringConcatenation _builder_30 = new StringConcatenation();
           InternalInformation _asInternal_2 = this.cce.asInternal(inst.arg1);
           String _idName_1 = this.cce.idName(_asInternal_2.info, false, true);
-          _builder_37.append(_idName_1, "");
-          _builder_37.append("_update=updateStamp;");
-          sb.append(_builder_37);
+          _builder_30.append(_idName_1, "");
+          _builder_30.append("_update=updateStamp;");
+          sb.append(_builder_30);
         }
       }
-      StringConcatenation _builder_38 = new StringConcatenation();
-      _builder_38.append("//");
-      _builder_38.append(inst, "");
-      _builder_38.newLineIfNotEmpty();
-      StringBuilder _append = sb.append(_builder_38);
+      StringConcatenation _builder_31 = new StringConcatenation();
+      _builder_31.append("//");
+      _builder_31.append(inst, "");
+      _builder_31.newLineIfNotEmpty();
+      StringBuilder _append = sb.append(_builder_31);
       _xblockexpression = (_append);
     }
     return _xblockexpression;
+  }
+  
+  public StringBuilder twoOp(final StringBuilder sb, final int pos, final String op, final int a, final int b, final int targetSizeWithType) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("int t");
+    _builder.append(pos, "");
+    _builder.append("=");
+    CharSequence _twoOpValue = this.twoOpValue(op, a, b, targetSizeWithType);
+    _builder.append(_twoOpValue, "");
+    _builder.append(";");
+    StringBuilder _append = sb.append(_builder);
+    return _append;
+  }
+  
+  public CharSequence twoOpValue(final String op, final int a, final int b, final int targetSizeWithType) {
+    final int targetSize = (targetSizeWithType >> 1);
+    int _bitwiseAnd = (targetSizeWithType & 1);
+    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
+    if (_tripleEquals) {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("t");
+      _builder.append(b, "");
+      _builder.append(" ");
+      _builder.append(op, "");
+      _builder.append(" t");
+      _builder.append(a, "");
+      return this.signExtend(_builder, targetSize);
+    }
+    StringConcatenation _builder_1 = new StringConcatenation();
+    _builder_1.append("(t");
+    _builder_1.append(b, "");
+    _builder_1.append(" ");
+    _builder_1.append(op, "");
+    _builder_1.append(" t");
+    _builder_1.append(a, "");
+    _builder_1.append(") & ");
+    CharSequence _asMask = this.cce.asMask(targetSize);
+    _builder_1.append(_asMask, "");
+    return _builder_1.toString();
+  }
+  
+  public CharSequence singleOpValue(final String op, final String cast, final int a, final int targetSizeWithType) {
+    final int targetSize = (targetSizeWithType >> 1);
+    int _bitwiseAnd = (targetSizeWithType & 1);
+    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
+    if (_tripleEquals) {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append(op, "");
+      _builder.append(" t");
+      _builder.append(a, "");
+      return this.signExtend(_builder, targetSize);
+    }
+    StringConcatenation _builder_1 = new StringConcatenation();
+    _builder_1.append("(");
+    _builder_1.append(op, "");
+    _builder_1.append(" t");
+    _builder_1.append(a, "");
+    _builder_1.append(") & ");
+    CharSequence _asMask = this.cce.asMask(targetSize);
+    _builder_1.append(_asMask, "");
+    return _builder_1.toString();
+  }
+  
+  public CharSequence signExtend(final CharSequence op, final int size) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("signExtend(");
+    _builder.append(op, "");
+    _builder.append(", ");
+    _builder.append(size, "");
+    _builder.append(")");
+    return _builder;
   }
   
   public CharSequence constant(final int id, final Frame f) {
@@ -2432,11 +2490,95 @@ public class DartCompiler {
       _and = (_isArray && withArray);
     }
     if (_and) {
-      StringConcatenation _builder = new StringConcatenation();
-      _builder.append("List<");
-      _builder.append(jt, "");
-      _builder.append(">");
-      return _builder.toString();
+      boolean _equals = Objects.equal(jt, "bool");
+      if (_equals) {
+        StringConcatenation _builder = new StringConcatenation();
+        _builder.append("List<");
+        _builder.append(jt, "");
+        _builder.append(">");
+        return _builder.toString();
+      }
+      boolean _and_1 = false;
+      boolean _lessEqualsThan = (information.width <= 8);
+      if (!_lessEqualsThan) {
+        _and_1 = false;
+      } else {
+        boolean _tripleEquals = (information.type == Type.INT);
+        _and_1 = (_lessEqualsThan && _tripleEquals);
+      }
+      if (_and_1) {
+        StringConcatenation _builder_1 = new StringConcatenation();
+        _builder_1.append("Int8List");
+        return _builder_1.toString();
+      }
+      boolean _lessEqualsThan_1 = (information.width <= 8);
+      if (_lessEqualsThan_1) {
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("Uint8List");
+        return _builder_2.toString();
+      }
+      boolean _and_2 = false;
+      boolean _lessEqualsThan_2 = (information.width <= 16);
+      if (!_lessEqualsThan_2) {
+        _and_2 = false;
+      } else {
+        boolean _tripleEquals_1 = (information.type == Type.INT);
+        _and_2 = (_lessEqualsThan_2 && _tripleEquals_1);
+      }
+      if (_and_2) {
+        StringConcatenation _builder_3 = new StringConcatenation();
+        _builder_3.append("Int16List");
+        return _builder_3.toString();
+      }
+      boolean _lessEqualsThan_3 = (information.width <= 16);
+      if (_lessEqualsThan_3) {
+        StringConcatenation _builder_4 = new StringConcatenation();
+        _builder_4.append("Uint16List");
+        return _builder_4.toString();
+      }
+      boolean _and_3 = false;
+      boolean _lessEqualsThan_4 = (information.width <= 32);
+      if (!_lessEqualsThan_4) {
+        _and_3 = false;
+      } else {
+        boolean _tripleEquals_2 = (information.type == Type.INT);
+        _and_3 = (_lessEqualsThan_4 && _tripleEquals_2);
+      }
+      if (_and_3) {
+        StringConcatenation _builder_5 = new StringConcatenation();
+        _builder_5.append("Int32List");
+        return _builder_5.toString();
+      }
+      boolean _lessEqualsThan_5 = (information.width <= 32);
+      if (_lessEqualsThan_5) {
+        StringConcatenation _builder_6 = new StringConcatenation();
+        _builder_6.append("Uint32List");
+        return _builder_6.toString();
+      }
+      boolean _and_4 = false;
+      boolean _lessEqualsThan_6 = (information.width <= 64);
+      if (!_lessEqualsThan_6) {
+        _and_4 = false;
+      } else {
+        boolean _tripleEquals_3 = (information.type == Type.INT);
+        _and_4 = (_lessEqualsThan_6 && _tripleEquals_3);
+      }
+      if (_and_4) {
+        StringConcatenation _builder_7 = new StringConcatenation();
+        _builder_7.append("Int64List");
+        return _builder_7.toString();
+      }
+      boolean _lessEqualsThan_7 = (information.width <= 64);
+      if (_lessEqualsThan_7) {
+        StringConcatenation _builder_8 = new StringConcatenation();
+        _builder_8.append("Uint64List");
+        return _builder_8.toString();
+      }
+      StringConcatenation _builder_9 = new StringConcatenation();
+      _builder_9.append("List<");
+      _builder_9.append(jt, "");
+      _builder_9.append(">");
+      return _builder_9.toString();
     }
     return jt;
   }
@@ -2544,6 +2686,8 @@ public class DartCompiler {
         _builder.newLine();
       }
     }
+    _builder.append("import \'dart:typed_data\';");
+    _builder.newLine();
     _builder.append("import \'../simulation_comm.dart\';");
     _builder.newLine();
     return _builder;

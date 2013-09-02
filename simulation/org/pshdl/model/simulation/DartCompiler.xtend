@@ -199,6 +199,20 @@ class DartCompiler {
 				  int opened=(val - opener) & (opener - 1);
 				  return (opened>>shiftBy);
 				}
+				int signExtend(int val, int width) {
+				  var msb=(1<<(width-1));
+				  var mask=(1<<width)-1;
+				  var twoComplement = -val;
+				  if ((val&msb)==0){
+				    //The MSB is not set, but the stored sign is negative
+				    if (val>=0)
+				      return val;
+				    return twoComplement&mask;
+				  }
+				  if (val<0)
+				    return val;
+				  return -(twoComplement&mask);
+				}
 				
 				«hdlInterpreter»
 			}
@@ -265,11 +279,10 @@ class DartCompiler {
 				if ((t«id»_prev!=0) || (t«id»!=1)) {
 					«internal.idName(false, true)»_isRising=false;
 				}
-			} 
-«««			else {
-«««				«id.asInternal.getter(false, id, -1)»
-«««				«internal.idName(false, true)»_isRising=t«id»==1;
-«««			}
+			} else {
+				«id.asInternal.getter(false, id, -1)»
+				«internal.idName(false, true)»_isRising=t«id»==1;
+			}
 			if (skipEdge(«internal.info.idName(false, true)»_update)){
 				«internal.idName(false, true)»_risingIsHandled=true;
 			}
@@ -290,11 +303,10 @@ class DartCompiler {
 				if ((t«id»_prev!=1) || (t«id»!=0)) {
 					«internal.idName(false, true)»_isFalling=false;
 				}
+			} else {
+				«id.asInternal.getter(false, id, -1)»
+				«internal.idName(false, true)»_isFalling=t«id»==0;
 			}
-«««			else {
-«««				«id.asInternal.getter(false, id, -1)»
-«««				«internal.idName(false, true)»_isRising=t«id»==0;
-«««			}
 			if (skipEdge(«internal.info.idName(false, true)»_update)){
 				«internal.idName(false, true)»_fallingIsHandled=true;
 			}
@@ -410,7 +422,11 @@ class DartCompiler {
 							«IF !v.array»
 								«v.idName(false, true)» = «v.idName(false, true)»$reg; break;
 							«ELSE»
-								«v.idName(false, true)»[reg.offset] = «v.idName(false, true)»$reg[reg.offset]; break;
+								if (reg.offset==-1)
+									«v.idName(false, true)».fillRange(0, «v.totalSize», «v.idName(false, true)»$reg[0]);
+								else
+									«v.idName(false, true)»[reg.offset] = «v.idName(false, true)»$reg[reg.offset]; 
+								break;
 							«ENDIF»
 						«ENDIF»
 					«ENDFOR»
@@ -588,25 +604,7 @@ class DartCompiler {
 			case Instruction::cast_int: {
 				val targetWidth = inst.arg1;
 				val currWidth = inst.arg2;
-				if (targetWidth >= currWidth) {
-					sb.append('''int t«pos»=t«a»;''')
-				} else {
-					val mask = BigInteger.ONE.shiftLeft(targetWidth).subtract(BigInteger.ONE);
-					sb.append(
-						'''
-							int u«pos» = t«a» & «mask»;
-							if ((u«pos» & «1bi.shiftLeft(targetWidth - 1).toHexString») != 0) { // MSB is set
-								if (u«pos» > 0) {
-									u«pos» = -u«pos»;
-								}
-							} else {
-								if (u«pos» < 0) {
-									u«pos» = -u«pos»;
-								}
-							}
-							int t«pos» = u«pos»;
-						''')
-				}
+				sb.append('''int t«pos»=«signExtend('''t«a»''',Math::min(targetWidth, currWidth))»;''')
 			}
 			case Instruction::cast_uint: {
 				sb.append('''int t«pos»=t«a» & «inst.arg1.asMask»;''')
@@ -635,25 +633,30 @@ class DartCompiler {
 				arr.clear
 			}
 			case Instruction::and:
-				sb.append('''int t«pos»=t«b» & t«a»;''')
+				twoOp(sb, pos, "&", a, b, inst.arg1)
 			case Instruction::or:
-				sb.append('''int t«pos»=t«b» | t«a»;''')
+				twoOp(sb, pos, "|", a, b, inst.arg1)
 			case Instruction::xor:
-				sb.append('''int t«pos»=t«b» ^ t«a»;''')
+				twoOp(sb, pos, "^", a, b, inst.arg1)
 			case Instruction::plus:
-				sb.append('''int t«pos»=t«b» + t«a»;''')
+				twoOp(sb, pos, "+", a, b, inst.arg1)
 			case Instruction::minus:
-				sb.append('''int t«pos»=t«b» - t«a»;''')
+				twoOp(sb, pos, "-", a, b, inst.arg1)
 			case Instruction::mul:
-				sb.append('''int t«pos»=t«b» * t«a»;''')
+				twoOp(sb, pos, "*", a, b, inst.arg1)
 			case Instruction::div:
-				sb.append('''int t«pos»=t«b» / t«a»;''')
+				twoOp(sb, pos, "/", a, b, inst.arg1)
 			case Instruction::sll:
-				sb.append('''int t«pos»=t«b» << t«a»;''')
-			case Instruction::srl:
-				sb.append('''int t«pos»=_srl(t«b», t«a», «inst.arg1»);''')
-			case Instruction::sra:
-				sb.append('''int t«pos»=t«b» >> t«a»;''')
+				twoOp(sb, pos, "<<", a, b, inst.arg1)
+			case Instruction::srl:{
+				val targetSize=inst.arg1>>1;
+				if ((inst.arg1.bitwiseAnd(1))===1)
+					sb.append('''int t«pos»=«signExtend('''_srl(t«b», t«a», «inst.arg1»)''', targetSize)»;''')
+				else
+					sb.append('''int t«pos»=(_srl(t«b», t«a», «inst.arg1»)) & «targetSize.asMask»;''')
+			}
+			case Instruction::sra: 
+				twoOp(sb, pos, ">>", a, b, inst.arg1)
 			case Instruction::eq:
 				sb.append('''bool t«pos»=t«b» == t«a»;''')
 			case Instruction::not_eq:
@@ -675,6 +678,26 @@ class DartCompiler {
 			'''//«inst»
 				''')
 	}
+	
+	def twoOp(StringBuilder sb, int pos, String op, int a, int b, int targetSizeWithType) {
+		sb.append('''int t«pos»=«twoOpValue(op, a, b, targetSizeWithType)»;''')
+	}
+	
+	def twoOpValue(String op, int a,int b, int targetSizeWithType) {
+		val targetSize=(targetSizeWithType>>1)
+		if ((targetSizeWithType.bitwiseAnd(1))===1)
+			return signExtend('''t«b» «op» t«a»''', targetSize)
+		return '''(t«b» «op» t«a») & «targetSize.asMask»'''
+	}
+	
+	def singleOpValue(String op, String cast, int a,int targetSizeWithType) {
+		val targetSize=(targetSizeWithType>>1)
+		if ((targetSizeWithType.bitwiseAnd(1))===1)
+			return signExtend('''«op» t«a»''', targetSize)
+		return '''(«op» t«a») & «targetSize.asMask»'''
+	}
+	
+	def signExtend(CharSequence op, int size) '''signExtend(«op», «size»)'''
 
 	def constant(int id, Frame f) '''«f.constants.get(id).toHexString»'''
 
@@ -686,8 +709,27 @@ class DartCompiler {
 		var jt = "int"
 		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
 			jt = "bool"
-		if (information.array && withArray)
+		if (information.array && withArray){
+			if (jt=="bool")
+				return '''List<«jt»>'''
+			if (information.width<=8 && information.type===VariableInformation$Type::INT)
+				return '''Int8List'''
+			if (information.width<=8)
+				return '''Uint8List'''
+			if (information.width<=16 && information.type===VariableInformation$Type::INT)
+				return '''Int16List'''
+			if (information.width<=16)
+				return '''Uint16List'''
+			if (information.width<=32 && information.type===VariableInformation$Type::INT)
+				return '''Int32List'''
+			if (information.width<=32)
+				return '''Uint32List'''
+			if (information.width<=64 && information.type===VariableInformation$Type::INT)
+				return '''Int64List'''
+			if (information.width<=64)
+				return '''Uint64List'''
 			return '''List<«jt»>'''
+		}
 		return jt
 	}
 
@@ -708,6 +750,7 @@ class DartCompiler {
 «IF hasClock»	
 import 'dart:collection';
 «ENDIF»
+import 'dart:typed_data';
 import '../simulation_comm.dart';
 	'''
 

@@ -296,6 +296,9 @@ class JavaCompiler {
 					«ENDIF»
 					«internal.idName(false, false)»_isRising=false;
 				}
+			} else {
+				«id.asInternal.getter(false, id, -1)»
+				«internal.idName(false, false)»_isRising=t«id»==1;
 			}
 			if (skipEdge(«internal.info.idName(false, false)»_update)){
 				«IF debug»
@@ -325,6 +328,9 @@ class JavaCompiler {
 					«ENDIF»
 					«internal.idName(false, false)»_isFalling=false;
 				}
+			} else {
+				«id.asInternal.getter(false, id, -1)»
+				«internal.idName(false, false)»_isFalling=t«id»==0;
 			}
 			if (skipEdge(«internal.info.idName(false, false)»_update)){
 				«IF debug»
@@ -652,7 +658,7 @@ class JavaCompiler {
 			case Instruction::concat:
 				sb.append('''long t«pos»=(t«b» << «inst.arg2») | t«a»;''')
 			case Instruction::loadConstant:
-				sb.append('''long t«pos»=«inst.arg1.constant(f)»;''')
+				sb.append('''long t«pos»=«inst.arg1.constantL(f)»;''')
 			case Instruction::loadInternal: {
 				val internal = inst.arg1.asInternal
 				sb.append(internal.getter(false, pos, f.uniqueID))

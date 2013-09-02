@@ -310,6 +310,14 @@ public class CommonCompilerExtension {
     return _builder;
   }
   
+  public CharSequence toHexStringI(final Integer value) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("0x");
+    String _hexString = Integer.toHexString((value).intValue());
+    _builder.append(_hexString, "");
+    return _builder;
+  }
+  
   public CharSequence getFrameName(final Frame f) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("s");
@@ -322,12 +330,21 @@ public class CommonCompilerExtension {
     return _builder;
   }
   
-  public CharSequence constant(final int id, final Frame f) {
+  public CharSequence constantL(final int id, final Frame f) {
     StringConcatenation _builder = new StringConcatenation();
     BigInteger _get = f.constants[id];
     long _longValue = _get.longValue();
     CharSequence _hexStringL = this.toHexStringL(_longValue);
     _builder.append(_hexStringL, "");
+    return _builder;
+  }
+  
+  public CharSequence constantI(final int id, final Frame f) {
+    StringConcatenation _builder = new StringConcatenation();
+    BigInteger _get = f.constants[id];
+    int _intValue = _get.intValue();
+    CharSequence _hexStringI = this.toHexStringI(Integer.valueOf(_intValue));
+    _builder.append(_hexStringI, "");
     return _builder;
   }
   
@@ -425,7 +442,7 @@ public class CommonCompilerExtension {
       _builder.append(op, "");
       _builder.append(" t");
       _builder.append(a, "");
-      return this.signExtend(_builder.toString(), cast, shift);
+      return this.signExtend(_builder, cast, shift);
     }
     StringConcatenation _builder_1 = new StringConcatenation();
     _builder_1.append("(t");
@@ -450,7 +467,7 @@ public class CommonCompilerExtension {
       _builder.append(op, "");
       _builder.append(" t");
       _builder.append(a, "");
-      return this.signExtend(_builder.toString(), cast, shift);
+      return this.signExtend(_builder, cast, shift);
     }
     StringConcatenation _builder_1 = new StringConcatenation();
     _builder_1.append("(");
@@ -463,7 +480,7 @@ public class CommonCompilerExtension {
     return _builder_1.toString();
   }
   
-  public CharSequence signExtend(final String op, final String cast, final int shift) {
+  public CharSequence signExtend(final CharSequence op, final CharSequence cast, final int shift) {
     CharSequence _xblockexpression = null;
     {
       boolean _equals = (shift == 0);

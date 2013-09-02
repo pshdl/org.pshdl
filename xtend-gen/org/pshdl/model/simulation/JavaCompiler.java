@@ -971,11 +971,26 @@ public class JavaCompiler {
       _builder_1.append("\t");
       _builder_1.append("}");
       _builder_1.newLine();
+      _builder_1.append("} else {");
+      _builder_1.newLine();
+      _builder_1.append("\t");
+      InternalInformation _asInternal_2 = this.cce.asInternal(id);
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      String _idName_3 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_3, "	");
+      _builder_1.append("_isRising=t");
+      _builder_1.append(id, "	");
+      _builder_1.append("==1;");
+      _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _idName_3 = this.cce.idName(internal.info, false, false);
-      _builder_1.append(_idName_3, "");
+      String _idName_4 = this.cce.idName(internal.info, false, false);
+      _builder_1.append(_idName_4, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       {
@@ -992,8 +1007,8 @@ public class JavaCompiler {
         }
       }
       _builder_1.append("\t");
-      String _idName_4 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_4, "	");
+      String _idName_5 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -1066,11 +1081,26 @@ public class JavaCompiler {
       _builder_1.append("\t");
       _builder_1.append("}");
       _builder_1.newLine();
+      _builder_1.append("} else {");
+      _builder_1.newLine();
+      _builder_1.append("\t");
+      InternalInformation _asInternal_2 = this.cce.asInternal(id);
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
+      _builder_1.newLineIfNotEmpty();
+      _builder_1.append("\t");
+      String _idName_3 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_3, "	");
+      _builder_1.append("_isFalling=t");
+      _builder_1.append(id, "	");
+      _builder_1.append("==0;");
+      _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
       _builder_1.newLine();
       _builder_1.append("if (skipEdge(");
-      String _idName_3 = this.cce.idName(internal.info, false, false);
-      _builder_1.append(_idName_3, "");
+      String _idName_4 = this.cce.idName(internal.info, false, false);
+      _builder_1.append(_idName_4, "");
       _builder_1.append("_update)){");
       _builder_1.newLineIfNotEmpty();
       {
@@ -1087,8 +1117,8 @@ public class JavaCompiler {
         }
       }
       _builder_1.append("\t");
-      String _idName_4 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_4, "	");
+      String _idName_5 = this.cce.idName(internal, false, false);
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -2162,7 +2192,7 @@ public class JavaCompiler {
           StringConcatenation _builder_7 = new StringConcatenation();
           _builder_7.append("t");
           _builder_7.append(a, "");
-          CharSequence _signExtend = this.cce.signExtend(_builder_7.toString(), null, shiftWidth);
+          CharSequence _signExtend = this.cce.signExtend(_builder_7, null, shiftWidth);
           _builder_6.append(_signExtend, "");
           _builder_6.append(";");
           sb.append(_builder_6);
@@ -2300,8 +2330,8 @@ public class JavaCompiler {
           _builder_18.append("long t");
           _builder_18.append(pos, "");
           _builder_18.append("=");
-          CharSequence _constant = this.cce.constant(inst.arg1, f);
-          _builder_18.append(_constant, "");
+          CharSequence _constantL = this.cce.constantL(inst.arg1, f);
+          _builder_18.append(_constantL, "");
           _builder_18.append(";");
           sb.append(_builder_18);
         }

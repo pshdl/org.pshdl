@@ -147,10 +147,12 @@ class CommonCompilerExtension {
 	def toHexString(BigInteger value) '''«IF value.signum<0»-«ENDIF»0x«value.abs.toString(16)»'''
 
 	def toHexStringL(long value) '''0x«Long::toHexString(value)»l'''
+	def toHexStringI(Integer value) '''0x«Integer::toHexString(value)»'''
 
 	def getFrameName(Frame f) '''s«String::format("%03d",Math::max(f.scheduleStage,0))»frame«String::format("%04X",f.uniqueID)»'''
 
-	def constant(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
+	def constantL(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
+	def constantI(int id, Frame f) '''«f.constants.get(id).intValue.toHexStringI»'''
 
 	def totalSize(VariableInformation info) {
 		var size = 1
@@ -223,7 +225,7 @@ class CommonCompilerExtension {
 		return '''(«op» t«a») & «targetSize.asMaskL»'''
 	}
 	
-	def signExtend(String op, String cast, int shift) {
+	def signExtend(CharSequence op, CharSequence cast, int shift) {
 		if (shift==0)
 			return op
 		if (cast!==null && cast!="")

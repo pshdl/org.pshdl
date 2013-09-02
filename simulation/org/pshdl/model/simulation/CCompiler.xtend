@@ -43,9 +43,15 @@ import java.util.HashSet
 
 class CCompiler {
 	private extension CommonCompilerExtension cce
+	private final int bitWidth;
 
 	new(ExecutableModel em, boolean includeDebug) {
 		this.cce = new CommonCompilerExtension(em)
+		if (em.maxDataWidth<=32) {
+			bitWidth=32;
+		} else {
+			bitWidth=64;
+		} 
 	}
 
 	def static String doCompile(ExecutableModel em, boolean includeDebugListener) {
@@ -191,6 +197,9 @@ class CCompiler {
 				if ((t«id»_prev!=0) || (t«id»!=1)) {
 					«internal.idName(false, false)»_isRising=false;
 				}
+			} else {
+				«id.asInternal.getter(false, id, -1)»
+				«internal.idName(false, false)»_isRising=t«id»==1;
 			}
 			if (skipEdge(«internal.info.idName(false, false)»_update)){
 				«internal.idName(false, false)»_risingIsHandled=true;
@@ -212,6 +221,9 @@ class CCompiler {
 				if ((t«id»_prev!=1) || (t«id»!=0)) {
 					«internal.idName(false, false)»_isFalling=false;
 				}
+			} else {
+				«id.asInternal.getter(false, id, -1)»
+				«internal.idName(false, false)»_isFalling=t«id»==0;
 			}
 			if (skipEdge(«internal.info.idName(false, false)»_update)){
 				«internal.idName(false, false)»_fallingIsHandled=true;
@@ -403,30 +415,30 @@ class CCompiler {
 			case Instruction::noop:
 				sb.append("//Do nothing")
 			case Instruction::bitAccessSingle:
-				sb.append('''uint64_t t«pos»=(t«a» >> «inst.arg1») & 1;''')
+				sb.append('''«pos.uTemp('t')»=(t«a» >> «inst.arg1») & 1;''')
 			case Instruction::bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
 				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
-				sb.append('''uint64_t t«pos»=(t«a» >> «lowBit») & «mask.toHexStringL»l;''')
+				sb.append('''«pos.uTemp('t')»=(t«a» >> «lowBit») & «mask.toHexStringL»l;''')
 			}
 			case Instruction::cast_int: {
-				if (inst.arg1 != 64) {
-					val shiftWidth = 64 - Math::min(inst.arg1, inst.arg2);
+				if (inst.arg1 != bitWidth) {
+					val shiftWidth = bitWidth - Math::min(inst.arg1, inst.arg2);
 					sb.append(
 						'''
-							int64_t c«pos»=t«a» << «shiftWidth»;
-							uint64_t t«pos»=c«pos» >> «shiftWidth»;
+							«pos.sTemp('c')»=t«a» << «shiftWidth»;
+							«pos.uTemp('t')»=c«pos» >> «shiftWidth»;
 						''')
 				} else {
-					sb.append('''uint64_t t«pos»=t«a»;''')
+					sb.append('''«pos.uTemp('t')»=t«a»;''')
 				}
 			}
 			case Instruction::cast_uint: {
-				if (inst.arg1 != 64) {
-					sb.append('''uint64_t t«pos»=t«a» & «inst.arg1.asMaskL»l;''')
+				if (inst.arg1 != bitWidth) {
+					sb.append('''«pos.uTemp('t')»=t«a» & «inst.arg1.asMaskL»l;''')
 				} else {
-					sb.append('''uint64_t t«pos»=t«a»;''')
+					sb.append('''«pos.uTemp('t')»=t«a»;''')
 				}
 			}
 			case Instruction::logiNeg:
@@ -436,26 +448,29 @@ class CCompiler {
 			case Instruction::logiOr:
 				sb.append('''bool t«pos»=t«a» || t«b»;''')
 			case Instruction::const0:
-				sb.append('''uint64_t t«pos»=0;''')
+				sb.append('''«pos.uTemp('t')»=0;''')
 			case Instruction::const1:
-				sb.append('''uint64_t t«pos»=1;''')
+				sb.append('''«pos.uTemp('t')»=1;''')
 			case Instruction::const2:
-				sb.append('''uint64_t t«pos»=2;''')
+				sb.append('''«pos.uTemp('t')»=2;''')
 			case Instruction::constAll1:
-				sb.append('''uint64_t t«pos»=«inst.arg1.asMaskL»l;''')
+				sb.append('''«pos.uTemp('t')»=«inst.arg1.asMaskL»l;''')
 			case Instruction::concat:
-				sb.append('''uint64_t t«pos»=(t«b» << «inst.arg2») | t«a»;''')
+				sb.append('''«pos.uTemp('t')»=(t«b» << «inst.arg2») | t«a»;''')
 			case Instruction::loadConstant:
-				sb.append('''uint64_t t«pos»=«inst.arg1.constant(f)»l;''')
+				if (bitWidth==32)
+					sb.append('''«pos.uTemp('t')»=«inst.arg1.constantI(f)»;''')
+				else
+					sb.append('''«pos.uTemp('t')»=«inst.arg1.constantL(f)»l;''')
 			case Instruction::loadInternal: {
 				val internal = inst.arg1.asInternal
 				sb.append(internal.getter(false, pos, f.uniqueID))
 				arr.clear
 			}
 			case Instruction::arith_neg:
-				sb.append('''uint64_t t«pos»=«singleOpValue('-', "(int64_t)", a,inst.arg1)»;''')
+				sb.append('''«pos.uTemp('t')»=«singleOpValue('-', '''(«int_t()»)''', a,inst.arg1)»;''')
 			case Instruction::bit_neg:
-				sb.append('''uint64_t t«pos»=«singleOpValue('~', "(int64_t)", a,inst.arg1)»;''')
+				sb.append('''«pos.uTemp('t')»=«singleOpValue('~', '''(«int_t()»)''', a,inst.arg1)»;''')
 			case Instruction::and:
 				sb.append(twoOp('&', inst.arg1, pos, a, b))
 			case Instruction::or:
@@ -475,7 +490,7 @@ class CCompiler {
 			case Instruction::srl:
 				sb.append(twoOp('>>', inst.arg1, pos, a, b))
 			case Instruction::sra:
-				sb.append('''uint64_t t«pos»=«sra(inst.arg1, a,b)»;''')
+				sb.append('''«pos.uTemp('t')»=«sra(inst.arg1, a,b)»;''')
 			case Instruction::eq:
 				sb.append('''bool t«pos»=t«b» == t«a»;''')
 			case Instruction::not_eq:
@@ -500,15 +515,21 @@ class CCompiler {
 				''')
 	}
 	
+	def uTemp(int pos, String name) '''«uint_t()» «name»«pos»'''
+	def sTemp(int pos, String name) '''«int_t()» «name»«pos»'''
+	def uint_t() '''uint«bitWidth»_t'''
+	def int_t() '''int«bitWidth»_t'''
+	
 	def sra(int targetSizeWithType, int a, int b) {
 		val targetSize=(targetSizeWithType>>1)
-		val shift=64-targetSize
+		val shift=bitWidth-targetSize
 		if ((targetSizeWithType.bitwiseAnd(1))===1)
-			return signExtend('''((int64_t)t«b») >> t«a»''',  "(int64_t)", shift)
-		return '''(((int64_t)t«b») >> t«a») & «targetSize.asMaskL»l'''
+			return signExtend('''((«int_t()»)t«b») >> t«a»''',  '''(«int_t()»)''', shift)
+		return '''(((«int_t»)t«b») >> t«a») & «targetSize.asMaskL»l'''
 	}
 	
-	def String twoOp(String op, int targetSizeWithType, int pos, int a, int b) '''uint64_t t«pos»=«twoOpValue(op,  "(int64_t)", a, b, targetSizeWithType)»;'''
+	def String twoOp(String op, int targetSizeWithType, int pos, int a, int b) 
+		'''«pos.uTemp('t')»=«twoOpValue(op,  '''(«int_t()»)''', a, b, targetSizeWithType)»;'''
 
 	def init(VariableInformation info) {
 		if (info.dimensions.length == 0)
@@ -533,7 +554,7 @@ class CCompiler {
 	def cType(VariableInformation information) {
 		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
 			return "bool"
-		return "uint64_t"
+		return uint_t()
 	}
 
 	def decl(VariableInformation info, Boolean includePrev) '''
