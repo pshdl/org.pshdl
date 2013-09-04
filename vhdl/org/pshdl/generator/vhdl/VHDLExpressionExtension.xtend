@@ -196,14 +196,14 @@ class VHDLExpressionExtension {
 		switch (type:obj.type) {
 			case ARITH_NEG:
 				return new Minus(obj.target.toVHDL)
-			case type == LOGIC_NEG || type == BIT_NEG:
+			case type === LOGIC_NEG || type === BIT_NEG:
 				return new Not(obj.target.toVHDL)
 			case CAST: {
 				val HDLPrimitive targetType = obj.castTo as HDLPrimitive
-				if (targetType == HDLPrimitiveType::STRING)
+				if (targetType.type === HDLPrimitiveType::STRING)
 					return obj.target.toVHDL
 				val HDLExpression tWidth = targetType.getWidth
-				if (obj.target.classType == HDLClass::HDLLiteral) {
+				if (obj.target.classType === HDLClass::HDLLiteral) {
 					return VHDLCastsLibrary::handleLiteral(obj.container, obj.target as HDLLiteral, targetType, tWidth)
 				}
 				val HDLPrimitive t = TypeExtension::typeOf(obj.target).get as HDLPrimitive
@@ -289,9 +289,9 @@ class VHDLExpressionExtension {
 
 	def dispatch Expression<?> toVHDL(HDLBitOp obj) {
 		switch (type:obj.type) {
-			case type == AND || type == LOGI_AND:
+			case type === AND || type === LOGI_AND:
 				return new Parentheses(new And(obj.left.toVHDL, obj.right.toVHDL))
-			case type == OR || type == LOGI_OR:
+			case type === OR || type === LOGI_OR:
 				return new Parentheses(new Or(obj.left.toVHDL, obj.right.toVHDL))
 			case XOR:
 				return new Parentheses(new Xor(obj.left.toVHDL, obj.right.toVHDL))

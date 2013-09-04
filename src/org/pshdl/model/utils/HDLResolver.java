@@ -136,7 +136,12 @@ public class HDLResolver {
 				final List<HDLInterface> ifDecl = ScopingExtension.INST.doGetInterfaceDeclarations(resolveTo);
 				ifCache = new HashMap<HDLQualifiedName, HDLInterface>();
 				for (final HDLInterface hdlIfDeclaration : ifDecl) {
-					ifCache.put(fullNameOf(hdlIfDeclaration), hdlIfDeclaration);
+					final HDLQualifiedName fqn = fullNameOf(hdlIfDeclaration);
+					// Usually this should not happen, but when the interface
+					// can not be resolved, it might happen.
+					if (fqn != null) {
+						ifCache.put(fqn, hdlIfDeclaration);
+					}
 				}
 			}
 		}

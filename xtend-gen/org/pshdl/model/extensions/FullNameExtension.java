@@ -86,8 +86,7 @@ public class FullNameExtension {
     {
       boolean _tripleEquals = (obj == null);
       if (_tripleEquals) {
-        NullPointerException _nullPointerException = new NullPointerException("Can not get a name for null");
-        throw _nullPointerException;
+        return null;
       }
       HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
       _xblockexpression = (_fullName);

@@ -656,6 +656,50 @@ public class BuiltInValidator implements IHDLValidator {
 			}
 			checkOpExpression(problems, ope, ope);
 		}
+		final HDLManip[] manips = unit.getAllObjectsOf(HDLManip.class, true);
+		for (final HDLManip manip : manips) {
+			if (skipExp(manip)) {
+				continue;
+			}
+			final Optional<? extends HDLType> targetType = TypeExtension.typeOf(manip.getTarget());
+			if (targetType.isPresent()) {
+				final HDLType tt = targetType.get();
+				switch (manip.getType()) {
+				case ARITH_NEG:
+					if (tt instanceof HDLPrimitive) {
+						final HDLPrimitive primitive = (HDLPrimitive) tt;
+						if (!primitive.isNumber()) {
+							problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use arithmetic negate on a non-number"));
+						}
+					} else {
+						problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use arithmetic negate on a non-number"));
+					}
+					break;
+				case BIT_NEG:
+					if (tt instanceof HDLPrimitive) {
+						final HDLPrimitive primitive = (HDLPrimitive) tt;
+						if (!primitive.isBits()) {
+							problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use binary negate on a non-bits"));
+						}
+					} else {
+						problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use binary negate on a non-bits"));
+					}
+					break;
+				case LOGIC_NEG:
+					if (tt instanceof HDLPrimitive) {
+						final HDLPrimitive primitive = (HDLPrimitive) tt;
+						if (!primitive.isBits() && (primitive.getType() != HDLPrimitiveType.BOOL)) {
+							problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use logic negate on a non boolean/number"));
+						}
+					} else {
+						problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use logic negate on a non boolean"));
+					}
+					break;
+				case CAST:
+					break;
+				}
+			}
+		}
 	}
 
 	private static void checkOpExpression(Set<Problem> problems, HDLOpExpression ope, IHDLObject node) {

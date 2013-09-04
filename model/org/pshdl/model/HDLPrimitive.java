@@ -26,6 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model;
 
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.*;
+
+import java.util.*;
+
 import javax.annotation.*;
 
 import org.pshdl.model.extensions.*;
@@ -212,6 +216,18 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		} else if (!width.equals(other.getWidth()))
 			return false;
 		return true;
+	}
+
+	private static final EnumSet<HDLPrimitiveType> numbers = EnumSet.of(INT, INTEGER, UINT, NATURAL);
+
+	public boolean isNumber() {
+		return numbers.contains(getType());
+	}
+
+	private static final EnumSet<HDLPrimitiveType> bits = EnumSet.of(INT, INTEGER, UINT, NATURAL, BIT, BITVECTOR);
+
+	public boolean isBits() {
+		return bits.contains(getType());
 	}
 
 	// $CONTENT-END$
