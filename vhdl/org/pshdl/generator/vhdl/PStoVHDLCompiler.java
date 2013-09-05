@@ -35,7 +35,6 @@ import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.utils.services.*;
 import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
@@ -200,27 +199,14 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
 			final String src = e.getKey();
 			final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
-			HDLPackage parse = e.getValue();
-			if (parse == null) {
-				res.add(new CompileResult(syntaxProblems, null, "<ERROR>", null, src));
-				continue;
-			}
+			final HDLPackage parse = e.getValue();
 			if (listener.startVHDL(src, parse)) {
-				parse = Insulin.resolveFragments(parse);
-				final Set<Problem> validate = HDLValidator.validate(parse, null);
-				boolean hasValidationError = false;
-				for (final Problem issue : validate) {
-					if (issue.severity == ProblemSeverity.ERROR) {
-						hasValidationError = true;
-					}
-					syntaxProblems.add(issue);
+				final HDLPackage transform = Insulin.transform(parse, src);
+				final HDLUnresolvedFragment[] fragments = transform.getAllObjectsOf(HDLUnresolvedFragment.class, true);
+				if (fragments.length > 0) {
+					System.out.println("PStoVHDLCompiler.compileToVHDL()Fragments found:" + fragments);
 				}
-				if (hasValidationError || !listener.continueWith(src, parse, validate)) {
-					res.add(new CompileResult(syntaxProblems, null, "<ERROR>", null, src));
-					continue;
-				}
-				final HDLPackage hdlPackage = Insulin.transform(parse, src);
-				final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(hdlPackage));
+				final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(transform));
 				final HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
 				String name = "<emptyFile>";
 				if (units.length != 0) {

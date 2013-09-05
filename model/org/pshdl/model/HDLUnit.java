@@ -33,11 +33,14 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import org.pshdl.model.evaluation.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+
+import com.google.common.collect.*;
 
 /**
  * The class HDLUnit contains the following fields
@@ -219,7 +222,7 @@ public class HDLUnit extends AbstractHDLUnit {
 			case IN:
 			case INOUT:
 			case OUT:
-				unitIF = unitIF.addPorts(hvd.copyFiltered(CopyFilter.DEEP_META));
+				unitIF = unitIF.addPorts(cleanedVariables(hvd));
 				break;
 			default:
 				break;
@@ -270,11 +273,51 @@ public class HDLUnit extends AbstractHDLUnit {
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);
 		if (!unitIF.isFrozen()) {
-			unitIF.freeze(this);
+			unitIF = unitIF.copyDeepFrozen(this);
 		}
 		unitIF.addMeta(FULLNAME, fullName);
 		unitIF.setID(getID());
 		return unitIF;
+	}
+
+	public HDLVariableDeclaration cleanedVariables(HDLVariableDeclaration hvd) {
+		switch (hvd.getDirection()) {
+		case CONSTANT:
+		case PARAMETER:
+			hvd = hvd.setVariables(withConstantValue(hvd.getVariables()));
+			break;
+		case IN:
+		case INOUT:
+		case INTERNAL:
+		case OUT:
+			hvd = hvd.setVariables(withNullValue(hvd.getVariables()));
+			break;
+		default:
+			break;
+		}
+		return hvd;
+	}
+
+	private Iterable<HDLVariable> withNullValue(ArrayList<HDLVariable> variables) {
+		final List<HDLVariable> res = Lists.newArrayListWithCapacity(variables.size());
+		for (HDLVariable var : variables) {
+			if (var.getDefaultValue() != null) {
+				var = var.setDefaultValue(null);
+			}
+			res.add(var);
+		}
+		return res;
+	}
+
+	private Iterable<HDLVariable> withConstantValue(ArrayList<HDLVariable> variables) {
+		final List<HDLVariable> res = Lists.newArrayListWithCapacity(variables.size());
+		for (HDLVariable var : variables) {
+			if (var.getDefaultValue() != null) {
+				var = var.setDefaultValue(HDLLiteral.get(ConstantEvaluate.valueOf(var.getDefaultValue()).get()));
+			}
+			res.add(var);
+		}
+		return res;
 	}
 
 	private void addSignal(String sigName, HDLBuiltInAnnotations annotation) {

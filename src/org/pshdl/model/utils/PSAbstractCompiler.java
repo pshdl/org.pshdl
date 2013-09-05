@@ -18,7 +18,7 @@ public class PSAbstractCompiler {
 
 	protected final String uri;
 	protected final HDLLibrary lib;
-	protected final Map<String, HDLPackage> pkgs = Maps.newConcurrentMap();
+	protected final ConcurrentMap<String, HDLPackage> pkgs = Maps.newConcurrentMap();
 	protected final Multimap<String, Problem> issues = Multimaps.synchronizedMultimap(LinkedHashMultimap.<String, Problem> create());
 
 	public PSAbstractCompiler() {
