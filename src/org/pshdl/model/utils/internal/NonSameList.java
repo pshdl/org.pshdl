@@ -26,10 +26,15 @@
  ******************************************************************************/
 package org.pshdl.model.utils.internal;
 
+import gnu.trove.set.hash.*;
+
 import java.util.*;
 
+import com.google.common.collect.*;
+
 public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable {
-	private final Map<Integer, T> map = new LinkedHashMap<Integer, T>();
+	private final TIntHashSet index = new TIntHashSet();
+	private final List<T> data = Lists.newLinkedList();
 
 	public NonSameList(Collection<T> value) {
 		super();
@@ -41,23 +46,27 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public boolean add(T item) {
-		final T old = map.put(System.identityHashCode(item), item);
-		return old != item;
+		final boolean add = index.add(System.identityHashCode(item));
+		if (add) {
+			data.add(item);
+		}
+		return add;
 	}
 
 	@Override
 	public void clear() {
-		map.clear();
+		index.clear();
+		data.clear();
 	}
 
 	@Override
 	public boolean contains(Object arg0) {
-		return map.containsKey(System.identityHashCode(arg0));
+		return index.contains(System.identityHashCode(arg0));
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return map.isEmpty();
+		return data.isEmpty();
 	}
 
 	@Override
@@ -67,17 +76,21 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public Iterator<T> iterator() {
-		return map.values().iterator();
+		return data.iterator();
 	}
 
 	@Override
 	public boolean remove(Object arg0) {
-		return map.remove(System.identityHashCode(arg0)) != null;
+		final boolean remove = index.remove(System.identityHashCode(arg0));
+		if (remove) {
+			data.remove(arg0);
+		}
+		return remove;
 	}
 
 	@Override
 	public int size() {
-		return map.size();
+		return index.size();
 	}
 
 }

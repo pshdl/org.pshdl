@@ -34,19 +34,22 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
 	private final String[] qfn;
 	public final int length;
+	private static final boolean validate = false;
 
 	public HDLQualifiedName(String[] qfn) {
 		this.qfn = qfn;
 		if (qfn == null)
 			throw new IllegalArgumentException("Segments may not be null");
 		this.length = qfn.length;
-		for (final String string : qfn) {
-			if (string == null)
-				throw new IllegalArgumentException("Segments may not be null");
-			if (string.contains("."))
-				throw new IllegalArgumentException("Segments may not contain dots");
-			if (string.isEmpty())
-				throw new IllegalArgumentException("Segments may not be empty");
+		if (validate) {
+			for (final String string : qfn) {
+				if (string == null)
+					throw new IllegalArgumentException("Segments may not be null");
+				if (string.contains("."))
+					throw new IllegalArgumentException("Segments may not contain dots");
+				if (string.isEmpty())
+					throw new IllegalArgumentException("Segments may not be empty");
+			}
 		}
 	}
 

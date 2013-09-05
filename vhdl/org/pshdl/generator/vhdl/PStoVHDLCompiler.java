@@ -234,7 +234,7 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 	public String invoke(String[] args) throws IOException {
 		if (args.length == 1)
 			return "Invalid arguments. Try help " + getHookName();
-		final Stopwatch sw = Stopwatch.createStarted();
+		final Stopwatch sw = new Stopwatch().start();
 		HDLCore.defaultInit();
 		final PStoVHDLCompiler compiler = setup("CMDLINE");
 		System.out.println("Init: " + sw);

@@ -88,6 +88,11 @@ public class FullNameExtension {
       if (_tripleEquals) {
         return null;
       }
+      final HDLQualifiedName cached = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      boolean _tripleNotEquals = (cached != null);
+      if (_tripleNotEquals) {
+        return cached;
+      }
       HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
       _xblockexpression = (_fullName);
     }
@@ -106,14 +111,14 @@ public class FullNameExtension {
       while (_while) {
         {
           final IHDLObject hdlObject = iterator.next();
-          boolean _equals = Objects.equal(hdlObject, obj);
-          if (_equals) {
+          boolean _tripleEquals = (hdlObject == obj);
+          if (_tripleEquals) {
             return count;
           }
           HDLClass _classType = hdlObject.getClassType();
           HDLClass _classType_1 = obj.getClassType();
-          boolean _equals_1 = Objects.equal(_classType, _classType_1);
-          if (_equals_1) {
+          boolean _tripleEquals_1 = (_classType == _classType_1);
+          if (_tripleEquals_1) {
             int _plus = (count + 1);
             count = _plus;
           }
@@ -126,10 +131,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLForLoop loop) {
-    HDLQualifiedName _meta = loop.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = loop.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return loop.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(loop);
     final int count = FullNameExtension.countInstance(loop);
@@ -138,10 +143,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLBlock block) {
-    HDLQualifiedName _meta = block.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = block.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return block.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(block);
     final int count = FullNameExtension.countInstance(block);
@@ -150,10 +155,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLIfStatement ifStamnt) {
-    HDLQualifiedName _meta = ifStamnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = ifStamnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return ifStamnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(ifStamnt);
     final int count = FullNameExtension.countInstance(ifStamnt);
@@ -162,10 +167,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLSwitchStatement stmnt) {
-    HDLQualifiedName _meta = stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(stmnt);
     final int count = FullNameExtension.countInstance(stmnt);
@@ -174,10 +179,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLSwitchCaseStatement stmnt) {
-    HDLQualifiedName _meta = stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return stmnt.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(stmnt);
     final int count = FullNameExtension.countInstance(stmnt);
@@ -186,10 +191,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLUnit unit) {
-    HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
     String _name = unit.getName();
@@ -198,10 +203,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLInterface unit) {
-    HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
     String _name = unit.getName();
@@ -210,10 +215,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLEnum unit) {
-    HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
     String _name = unit.getName();
@@ -222,10 +227,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLFunction unit) {
-    HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
     String _name = unit.getName();
@@ -234,10 +239,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLPackage pkg) {
-    HDLQualifiedName _meta = pkg.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = pkg.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return pkg.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(pkg);
     String _pkg = pkg.getPkg();
@@ -251,10 +256,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLEnumRef ref) {
-    HDLQualifiedName _meta = ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     Optional<HDLVariable> _resolveVar = ref.resolveVar();
     HDLVariable _get = _resolveVar.get();
@@ -262,10 +267,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLVariableRef ref) {
-    HDLQualifiedName _meta = ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return ref.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     Optional<HDLVariable> _resolveVar = ref.resolveVar();
     HDLVariable _get = _resolveVar.get();
@@ -273,10 +278,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLVariable unit) {
-    HDLQualifiedName _meta = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return unit.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     final HDLQualifiedName fullName = this.getSuperFullName(unit);
     String _name = unit.getName();
@@ -285,10 +290,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final IHDLObject obj) {
-    HDLQualifiedName _meta = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals_1 = (_container != null);
@@ -300,10 +305,10 @@ public class FullNameExtension {
   }
   
   protected HDLQualifiedName _getFullName(final HDLObject obj) {
-    HDLQualifiedName _meta = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals_1 = (_container != null);
@@ -315,10 +320,10 @@ public class FullNameExtension {
   }
   
   public HDLQualifiedName getSuperFullName(final HDLObject obj) {
-    HDLQualifiedName _meta = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
-    boolean _tripleNotEquals = (_meta != null);
+    final HDLQualifiedName cached = obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+    boolean _tripleNotEquals = (cached != null);
     if (_tripleNotEquals) {
-      return obj.<HDLQualifiedName>getMeta(FullNameExtension.FULLNAME);
+      return cached;
     }
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals_1 = (_container != null);
