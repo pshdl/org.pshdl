@@ -159,7 +159,9 @@ public class PSAbstractCompiler {
 		final Set<Problem> problems = Sets.newHashSet();
 		issues.removeAll(src);
 		final HDLPackage pkg = PSHDLParser.parseString(contents, uri, problems, src);
-		pkgs.put(src, pkg);
+		if (pkg != null) {
+			pkgs.put(src, pkg);
+		}
 		issues.putAll(src, problems);
 		return problems;
 	}
