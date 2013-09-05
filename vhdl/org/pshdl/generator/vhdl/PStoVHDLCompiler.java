@@ -31,7 +31,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.pshdl.model.*;
-import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.utils.services.*;
@@ -40,7 +39,6 @@ import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-import com.google.common.io.*;
 
 import de.upb.hni.vmagic.output.*;
 
@@ -59,7 +57,7 @@ import de.upb.hni.vmagic.output.*;
  * @author Karsten Becker
  * 
  */
-public class PStoVHDLCompiler implements IOutputProvider {
+public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvider {
 
 	/**
 	 * Do not report any progress and proceed whenever possible
@@ -111,19 +109,12 @@ public class PStoVHDLCompiler implements IOutputProvider {
 
 	}
 
-	private HDLLibrary lib;
-	private String libURI;
-	private final Map<String, HDLPackage> parsedContent = Maps.newLinkedHashMap();
-	private final Multimap<String, Problem> issues = LinkedHashMultimap.create();
-
-	private PStoVHDLCompiler(String libURI) {
-		lib = new HDLLibrary();
-		this.libURI = libURI;
-		HDLLibrary.registerLibrary(libURI, lib);
+	public PStoVHDLCompiler() {
+		super();
 	}
 
-	public PStoVHDLCompiler() {
-		// TODO Auto-generated constructor stub
+	public PStoVHDLCompiler(String uri) {
+		super(uri);
 	}
 
 	/**
@@ -205,8 +196,8 @@ public class PStoVHDLCompiler implements IOutputProvider {
 		if (listener == null) {
 			listener = new NullListener();
 		}
-		final List<CompileResult> res = Lists.newArrayListWithCapacity(parsedContent.size());
-		for (final Entry<String, HDLPackage> e : parsedContent.entrySet()) {
+		final List<CompileResult> res = Lists.newArrayListWithCapacity(pkgs.size());
+		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
 			final String src = e.getKey();
 			final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
 			HDLPackage parse = e.getValue();
@@ -257,7 +248,7 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	public String invoke(String[] args) throws IOException {
 		if (args.length == 1)
 			return "Invalid arguments. Try help " + getHookName();
-		final Stopwatch sw = new Stopwatch().start();
+		final Stopwatch sw = Stopwatch.createStarted();
 		HDLCore.defaultInit();
 		final PStoVHDLCompiler compiler = setup("CMDLINE");
 		System.out.println("Init: " + sw);
@@ -346,79 +337,6 @@ public class PStoVHDLCompiler implements IOutputProvider {
 	}
 
 	/**
-	 * Parse and add a unit to the HDLLibrary so that all references can be
-	 * resolved later
-	 * 
-	 * @param contents
-	 *            the PSHDL module to add
-	 * @param absolutePath
-	 *            a source file name for this module
-	 * @throws IOException
-	 */
-	public Set<Problem> add(File f) throws IOException {
-		return add(Files.toString(f, Charsets.UTF_8), f.getAbsolutePath());
-	}
-
-	/**
-	 * Parse and add a unit to the HDLLibrary so that all references can be
-	 * resolved later
-	 * 
-	 * @param contents
-	 *            the PSHDL module to add
-	 * @param src
-	 *            a source file name for this module
-	 * @param problems
-	 *            syntax errors will be added to this Set when encountered
-	 * @throws IOException
-	 */
-	public Set<Problem> add(InputStream contents, String src) throws IOException {
-		final InputStreamReader r = new InputStreamReader(contents, Charsets.UTF_8);
-		final String text = CharStreams.toString(r);
-		r.close();
-		return add(text, src);
-	}
-
-	/**
-	 * Parse and add a unit to the HDLLibrary so that all references can be
-	 * resolved later
-	 * 
-	 * @param contents
-	 *            the PSHDL module to add
-	 * @param src
-	 *            a source file name for this module
-	 * @param problems
-	 *            syntax errors will be added to this Set when encountered
-	 */
-	public Set<Problem> add(String contents, String src) {
-		final Set<Problem> problems = Sets.newHashSet();
-		issues.removeAll(src);
-		final HDLPackage pkg = PSHDLParser.parseString(contents, libURI, problems, src);
-		parsedContent.put(src, pkg);
-		issues.putAll(src, problems);
-		return problems;
-	}
-
-	/**
-	 * Removes all resources related to this src. This can be important for
-	 * incremental compilation.
-	 * 
-	 * @param src
-	 *            the src name that was used to register a added input
-	 */
-	public void remove(String src) {
-		lib.removeAllSrc(src);
-		parsedContent.remove(src);
-	}
-
-	/**
-	 * Removes the generated HDLLibrary
-	 */
-	public void close() {
-		lib.unregister();
-		lib = null;
-	}
-
-	/**
 	 * Adds a VHDL file to the {@link HDLLibrary} so that interfaces can be
 	 * resolved
 	 * 
@@ -452,7 +370,6 @@ public class PStoVHDLCompiler implements IOutputProvider {
 
 	@Override
 	public String[] getUsage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

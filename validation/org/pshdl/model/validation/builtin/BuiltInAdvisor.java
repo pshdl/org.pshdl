@@ -277,9 +277,11 @@ public class BuiltInAdvisor {
 		case SWITCH_LABEL_NOT_CONSTANT:
 			break;
 		case SWITCH_MULTIPLE_DEFAULT:
-			break;
+			return new HDLAdvise(problem, "Switch case does not contain more than one default case", "All switch statements require exactly one default case.",
+					"Remove one default case");
 		case SWITCH_NO_DEFAULT:
-			break;
+			return new HDLAdvise(problem, "Switch case does not contain a default case",
+					"All switch statements require a default case. This is to avoid missed cases which lead to an incomplete description", "Add a default case");
 		case VARIABLE_KEYWORD_NAME:
 			break;
 		case VARIABLE_SAME_NAME:
@@ -324,16 +326,22 @@ public class BuiltInAdvisor {
 					"Annotate the variable with @range to guarantee a certain input range");
 		case UNKNOWN_RANGE:
 			break;
-		case FUNCTION_SAME_NAME:
-			break;
-		case GLOBAL_NOT_CONSTANT:
-			break;
-		case GLOBAL_VAR_SAME_NAME:
-			break;
 		case SUBSTITUTE_FUNCTION_NO_TYPE:
 			break;
+		case GLOBAL_NOT_CONSTANT:
+			return new HDLAdvise(problem, "Constant have to be constant", "The default value of this global constant is not constant");
+		case FUNCTION_SAME_NAME:
+			return new HDLAdvise(problem, "A function with this name already exists", "Function names have to be unique", "Rename this function or the other");
+		case GLOBAL_VAR_SAME_NAME:
+			return new HDLAdvise(problem, "A global variable with this name already exists", "Global variables have to have a unique name", "Rename this variable or the other");
 		case TYPE_SAME_NAME:
-			break;
+			return new HDLAdvise(problem, "A type with this name already exists", "Type names have to be unique", "Rename this type or the other");
+		case CONSTANT_WIDTH_MISMATCH:
+			return new HDLAdvise(
+					problem,
+					"Constant expression is losing bits",
+					"In most operations the type is determined from the left operand. The expression is cast to this type, which is smaller than the constant given. The result is a loss of information",
+					"Cast the left-handside to a sufficently large type");
 		}
 		return null;
 	}

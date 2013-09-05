@@ -71,10 +71,16 @@ public class PSHDLParser {
 	public static final class SyntaxErrorCollector extends BaseErrorListener {
 		private final Set<Problem> syntaxProblems;
 		private final CommonTokenStream ts;
+		private int lineOffset = 0;
 
 		public SyntaxErrorCollector(CommonTokenStream ts, Set<Problem> syntaxProblems) {
 			this.syntaxProblems = syntaxProblems;
 			this.ts = ts;
+		}
+
+		public SyntaxErrorCollector(CommonTokenStream tokens, Set<Problem> problems, int lineOffset) {
+			this(tokens, problems);
+			this.lineOffset = lineOffset;
 		}
 
 		@Override
@@ -123,7 +129,7 @@ public class PSHDLParser {
 			if (e instanceof FailedPredicateException) {
 				error = SyntaxErrors.FailedPredicate;
 			}
-
+			line += lineOffset;
 			syntaxProblems.add(new Problem(error, msg, line, charPositionInLine, length, totalOffset));
 		}
 	}

@@ -26,6 +26,7 @@
  */
 package org.pshdl.model.extensions;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -236,7 +237,12 @@ public class ScopingExtension {
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLDirectGeneration gen) {
     HDLInterface _hIf = gen.getHIf();
-    return Collections.<HDLInterface>singletonList(_hIf);
+    boolean _equals = Objects.equal(_hIf, null);
+    if (_equals) {
+      return Collections.<HDLInterface>emptyList();
+    }
+    HDLInterface _hIf_1 = gen.getHIf();
+    return Collections.<HDLInterface>singletonList(_hIf_1);
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLDirectGeneration gen) {

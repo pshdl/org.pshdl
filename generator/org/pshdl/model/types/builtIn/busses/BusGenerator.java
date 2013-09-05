@@ -35,6 +35,7 @@ import java.util.Map.Entry;
 
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
+import org.pshdl.model.parser.*;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.busses.memorymodel.*;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
@@ -84,21 +85,39 @@ public class BusGenerator implements IHDLGenerator {
 	}
 
 	private Optional<HDLInterface> createInterface(HDLDirectGeneration hdl, String name) {
-		final Set<Problem> problems = Sets.newHashSet();
+		final Optional<Unit> unitOpt = parse(hdl, Sets.<Problem> newHashSet());
+		if (unitOpt.isPresent()) {
+			final Unit unit = unitOpt.get();
+			final List<Row> rows = MemoryModel.buildRows(unit);
+			final HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
+			return Optional.of(bId);
+		}
+		return Optional.absent();
+	}
+
+	private Optional<Unit> parse(HDLDirectGeneration hdl, final Set<Problem> problems) {
 		Unit unit;
+		final int lineOffset = getLineOffset(hdl);
 		try {
-			unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems);
-			if (!validate(unit, problems))
+			unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, lineOffset);
+			if (!validate(unit, problems, lineOffset))
 				return Optional.absent();
 		} catch (final IOException e) {
 			return Optional.absent();
 		}
-		final List<Row> rows = MemoryModel.buildRows(unit);
-		final HDLInterface bId = MemoryModel.buildHDLInterface(unit, rows).setContainer(hdl).setName(name);
-		return Optional.of(bId);
+		return Optional.of(unit);
 	}
 
-	private boolean validate(Unit unit, Set<Problem> problems) {
+	private int getLineOffset(HDLDirectGeneration hdl) {
+		int lineOffset = 0;
+		final SourceInfo si = Problem.findMeta(hdl);
+		if (si != null) {
+			lineOffset = si.startLine;
+		}
+		return lineOffset;
+	}
+
+	private boolean validate(Unit unit, Set<Problem> problems, int lineOffset) {
 		if (unit == null)
 			return false;
 		for (final Problem problem : problems)
@@ -111,8 +130,8 @@ public class BusGenerator implements IHDLGenerator {
 				final NamedElement decl = unit.declarations.get(ref.getName());
 				if ((decl == null) && !"fill".equals(ref.name)) {
 					final String message = "Can not resolve the reference to object:" + ref.name;
-					problems.add(new Problem(BusErrors.invalid_reference, message, ref.token.getLine(), ref.token.getCharPositionInLine(), ref.token.getText().length(), ref.token
-							.getStartIndex()));
+					problems.add(new Problem(BusErrors.invalid_reference, message, ref.token.getLine() + lineOffset, ref.token.getCharPositionInLine(), ref.token.getText()
+							.length(), ref.token.getStartIndex()));
 					hasError = true;
 				}
 			}
@@ -188,8 +207,8 @@ public class BusGenerator implements IHDLGenerator {
 		} else {
 			try {
 				final Set<Problem> problems = Sets.newHashSet();
-				unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems);
-				if (!validate(unit, problems))
+				unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, 0);
+				if (!validate(unit, problems, 0))
 					return Optional.absent();
 			} catch (final Exception e) {
 				throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
@@ -257,11 +276,17 @@ public class BusGenerator implements IHDLGenerator {
 				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
 			}
 		} else {
-			final String name = fullNameOf(hdg).append(hdg.getIfName()).toString();
-			try {
-				createInterface(hdg, name);
-			} catch (final Exception e) {
-				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+			parse(hdg, problems);
+			if (problems.size() == 0) {
+				final String name = fullNameOf(hdg).append(hdg.getIfName()).toString();
+				try {
+					final Optional<HDLInterface> intf = createInterface(hdg, name);
+					if (!intf.isPresent()) {
+						problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "Failed to generate interface from description"));
+					}
+				} catch (final Exception e) {
+					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+				}
 			}
 		}
 		final String version = getVersion(hdg);

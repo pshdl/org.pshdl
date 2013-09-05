@@ -159,13 +159,13 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		obj.setLocation(ctx.start);
 	}
 
-	public static Unit parseUnit(String string, Set<Problem> problems) throws IOException {
+	public static Unit parseUnit(String string, Set<Problem> problems, int lineOffset) throws IOException {
 		final ANTLRInputStream input = new ANTLRInputStream(string);
 		final MemoryModelLexer lexer = new MemoryModelLexer(input);
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
 		final MemoryModelParser parser = new MemoryModelParser(tokens);
 		parser.getErrorListeners().clear();
-		parser.addErrorListener(new PSHDLParser.SyntaxErrorCollector(tokens, problems));
+		parser.addErrorListener(new PSHDLParser.SyntaxErrorCollector(tokens, problems, lineOffset));
 		final UnitContext unit = parser.unit();
 		if (problems.isEmpty()) {
 			final MemoryModelAST modelAST = new MemoryModelAST();
@@ -179,7 +179,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 	public static void main(String[] args) throws FileNotFoundException, RecognitionException, IOException {
 		final Set<Problem> problems = Sets.newHashSet();
 		final String string = Files.toString(new File("/Users/karstenbecker/Dropbox/PSHDL/Test/adderTest.txt"), Charsets.UTF_8);
-		final Unit parseUnit = parseUnit(string, problems);
+		final Unit parseUnit = parseUnit(string, problems, 0);
 		for (final Problem problem : problems) {
 			System.err.println("MemoryModelAST.main()" + problem);
 		}

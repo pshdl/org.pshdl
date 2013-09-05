@@ -120,7 +120,7 @@ public class Problem {
 		}
 	}
 
-	private SourceInfo findMeta(IHDLObject node) {
+	public static SourceInfo findMeta(IHDLObject node) {
 		final SourceInfo sInfo = node.getMeta(SourceInfo.INFO);
 		if ((sInfo == null) && (node.getContainer() != null))
 			return findMeta(node.getContainer());

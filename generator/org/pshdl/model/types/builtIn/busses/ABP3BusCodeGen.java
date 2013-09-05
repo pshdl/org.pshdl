@@ -171,7 +171,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, RecognitionException {
-		final Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new HashSet<Problem>());
+		final Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new HashSet<Problem>(), 0);
 		System.out.println(unit);
 		System.out.println(get("Bla", unit, MemoryModel.buildRows(unit)));
 	}

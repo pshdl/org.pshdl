@@ -161,27 +161,29 @@ class ScopingExtension {
 	}
 
 	def dispatch  List<HDLEnumDeclaration> doGetEnumDeclarations(IHDLObject gen) {
-		return Collections::emptyList;
+		return Collections::emptyList
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(IHDLObject gen) {
-		return Collections::emptyList;
+		return Collections::emptyList
 	}
 
 	def dispatch  List<HDLVariable> doGetVariables(IHDLObject gen) {
-		return Collections::emptyList;
+		return Collections::emptyList
 	}
 
 	def dispatch  List<HDLEnumDeclaration> doGetEnumDeclarations(HDLDirectGeneration gen) {
-		return Collections::emptyList;
+		return Collections::emptyList
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(HDLDirectGeneration gen) {
-		return Collections::singletonList(gen.getHIf);
+		if (gen.getHIf==null)
+			return Collections::emptyList
+		return Collections::singletonList(gen.getHIf)
 	}
 
 	def dispatch  List<HDLVariable> doGetVariables(HDLDirectGeneration gen) {
-		return Collections::singletonList(gen.getVar);
+		return Collections::singletonList(gen.getVar)
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLInlineFunction obj) {
@@ -423,40 +425,39 @@ class ScopingExtension {
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLInterface hIf, HDLQualifiedName hVar) {
-		val HDLVariable resolved = getVariable(hIf, hVar.getLastSegment);
+		val HDLVariable resolved = getVariable(hIf, hVar.getLastSegment)
 		if (resolved !== null) {
 			if (hVar.length == 1) {
-				return Optional::of(resolved);
+				return Optional::of(resolved)
 			}
 			if (FullNameExtension::fullNameOf(hIf).equals(hVar.skipLast(1))) {
-				return Optional::of(resolved);
+				return Optional::of(resolved)
 			}
 		}
-		return resolveVariableDefault(hIf, hVar);
+		return resolveVariableDefault(hIf, hVar)
 	}
 
 	def private static HDLVariable getVariable(HDLInterface hIf, String lastSegment) {
-		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).
-			getFirst;
+		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).first
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLEnum hEnum, HDLQualifiedName hVar) {
 		if (hVar.length == 1) {
-			return getVariable(hEnum, hVar.getLastSegment);
+			return getVariable(hEnum, hVar.getLastSegment)
 		}
 		if (FullNameExtension::fullNameOf(hEnum).equals(hVar.skipLast(1))) {
-			return getVariable(hEnum, hVar.getLastSegment);
+			return getVariable(hEnum, hVar.getLastSegment)
 		}
-		return resolveVariable(hEnum, hVar);
+		return resolveVariable(hEnum, hVar)
 	}
 
 	def public static Optional<HDLVariable> getVariable(HDLEnum hEnum, String lastSegment) {
 		for (HDLVariable hVar : hEnum.getEnums) {
 			if (hVar.name.equals(lastSegment)) {
-				return Optional::of(hVar);
+				return Optional::of(hVar)
 			}
 		}
-		return Optional::absent;
+		return Optional::absent
 	}
 
 }

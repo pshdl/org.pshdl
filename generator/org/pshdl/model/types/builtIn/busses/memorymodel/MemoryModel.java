@@ -44,7 +44,7 @@ public class MemoryModel {
 	public static void main(String[] args) throws Exception {
 		final File file = new File(args[0]);
 		final Set<Problem> problems = Sets.newHashSet();
-		final Unit unit = MemoryModelAST.parseUnit(Files.toString(file, Charsets.UTF_8), problems);
+		final Unit unit = MemoryModelAST.parseUnit(Files.toString(file, Charsets.UTF_8), problems, 0);
 		System.out.println(unit);
 		final List<Row> rows = buildRows(unit);
 		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
