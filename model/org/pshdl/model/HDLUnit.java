@@ -28,6 +28,7 @@ package org.pshdl.model;
 
 import static org.pshdl.model.extensions.FullNameExtension.*;
 
+import java.math.*;
 import java.util.*;
 
 import javax.annotation.*;
@@ -40,6 +41,7 @@ import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
+import com.google.common.base.*;
 import com.google.common.collect.*;
 
 /**
@@ -313,7 +315,10 @@ public class HDLUnit extends AbstractHDLUnit {
 		final List<HDLVariable> res = Lists.newArrayListWithCapacity(variables.size());
 		for (HDLVariable var : variables) {
 			if (var.getDefaultValue() != null) {
-				var = var.setDefaultValue(HDLLiteral.get(ConstantEvaluate.valueOf(var.getDefaultValue()).get()));
+				final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(var.getDefaultValue());
+				if (valueOf.isPresent()) {
+					var = var.setDefaultValue(HDLLiteral.get(valueOf.get()));
+				}
 			}
 			res.add(var);
 		}

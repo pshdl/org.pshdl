@@ -202,10 +202,6 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 			final HDLPackage parse = e.getValue();
 			if (listener.startVHDL(src, parse)) {
 				final HDLPackage transform = Insulin.transform(parse, src);
-				final HDLUnresolvedFragment[] fragments = transform.getAllObjectsOf(HDLUnresolvedFragment.class, true);
-				if (fragments.length > 0) {
-					System.out.println("PStoVHDLCompiler.compileToVHDL()Fragments found:" + fragments);
-				}
 				final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(transform));
 				final HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
 				String name = "<emptyFile>";
