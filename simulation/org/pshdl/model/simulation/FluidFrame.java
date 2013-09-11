@@ -153,7 +153,7 @@ public class FluidFrame {
 		return this;
 	}
 
-	public ExecutableModel getExecutable() {
+	public ExecutableModel getExecutable(String moduleName, String source) {
 		final FrameRegister register = new FrameRegister();
 		for (final FluidFrame entry : references) {
 			entry.registerFrame(register);
@@ -202,7 +202,7 @@ public class FluidFrame {
 			lID.add(frame);
 		}
 		final VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
-		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars);
+		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars, moduleName, source);
 	}
 
 	private static class PredicateChain {

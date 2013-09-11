@@ -27,11 +27,15 @@
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Extension;
@@ -44,15 +48,25 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
+import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
+import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class CCompiler {
+public class CCompiler implements ITypeOuptutProvider {
   @Extension
   private CommonCompilerExtension cce;
   
   private final int bitWidth;
   
-  public CCompiler(final ExecutableModel em, final boolean includeDebug) {
+  public CCompiler() {
+    int _minus = (-1);
+    this.bitWidth = _minus;
+  }
+  
+  public CCompiler(final ExecutableModel em) {
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
     this.cce = _commonCompilerExtension;
     boolean _lessEqualsThan = (em.maxDataWidth <= 32);
@@ -63,8 +77,8 @@ public class CCompiler {
     }
   }
   
-  public static String doCompile(final ExecutableModel em, final boolean includeDebugListener) {
-    CCompiler _cCompiler = new CCompiler(em, includeDebugListener);
+  public static String doCompile(final ExecutableModel em) {
+    CCompiler _cCompiler = new CCompiler(em);
     CharSequence _compile = _cCompiler.compile();
     return _compile.toString();
   }
@@ -724,7 +738,8 @@ public class CCompiler {
     String _idName_3 = this.cce.idName(info, true, false);
     _builder_1.append(_idName_3, "");
     _builder_1.append(", 0, ");
-    String _idName_4 = this.cce.idName(info, false, false);
+    String _idName_4 = this.cce.idName(info, false, 
+      false);
     _builder_1.append(_idName_4, "");
     _builder_1.append(".length);");
     return _builder_1.toString();
@@ -2008,5 +2023,24 @@ public class CCompiler {
     _builder.append("#include <stdlib.h>");
     _builder.newLine();
     return _builder;
+  }
+  
+  public String getHookName() {
+    return "C";
+  }
+  
+  public MultiOption getUsage() {
+    Options _options = new Options();
+    final Options options = _options;
+    MultiOption _multiOption = new MultiOption(null, null, options);
+    return _multiOption;
+  }
+  
+  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    String _doCompile = CCompiler.doCompile(em);
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
+    String _hookName = this.getHookName();
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, em.moduleName, _emptyList, em.source, _hookName);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
 }

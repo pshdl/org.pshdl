@@ -27,11 +27,15 @@
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.ExclusiveRange;
@@ -47,15 +51,23 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
+import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
+import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class JavaCompiler {
+public class JavaCompiler implements ITypeOuptutProvider {
   private boolean debug;
   
   private int cores;
   
   @Extension
   private CommonCompilerExtension cce;
+  
+  public JavaCompiler() {
+  }
   
   public JavaCompiler(final ExecutableModel em, final boolean includeDebug, final int cores) {
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
@@ -2730,5 +2742,49 @@ public class JavaCompiler {
       }
     }
     return _builder;
+  }
+  
+  public String getHookName() {
+    return "Java";
+  }
+  
+  public MultiOption getUsage() {
+    Options _options = new Options();
+    final Options options = _options;
+    options.addOption("p", "pkg", true, "The package the generated source will use. If non is specified the package from the module is used");
+    options.addOption("d", "debug", false, "If debug is specified, the source will contain support for a IDebugListener");
+    String _hookName = this.getHookName();
+    String _plus = ("Options for the " + _hookName);
+    String _plus_1 = (_plus + " type:");
+    MultiOption _multiOption = new MultiOption(_plus_1, null, options);
+    return _multiOption;
+  }
+  
+  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    final String moduleName = em.moduleName;
+    final int li = moduleName.lastIndexOf(".");
+    String pkg = null;
+    final String optionPkg = cli.getOptionValue("pkg");
+    boolean debug = cli.hasOption("debug");
+    boolean _notEquals = (!Objects.equal(optionPkg, null));
+    if (_notEquals) {
+      pkg = optionPkg;
+    } else {
+      int _minus = (-1);
+      boolean _tripleNotEquals = (Integer.valueOf(li) != Integer.valueOf(_minus));
+      if (_tripleNotEquals) {
+        int _minus_1 = (li - 1);
+        String _substring = moduleName.substring(0, _minus_1);
+        pkg = _substring;
+      }
+    }
+    int _plus = (li + 1);
+    int _length = moduleName.length();
+    final String unitName = moduleName.substring(_plus, _length);
+    String _doCompile = JavaCompiler.doCompile(em, pkg, unitName, debug, 1);
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
+    String _hookName = this.getHookName();
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
 }

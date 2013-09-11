@@ -42,11 +42,20 @@ import java.util.Map
 import java.util.ArrayList
 import java.util.HashSet
 import java.math.BigInteger
+import org.apache.commons.cli.Options
+import org.apache.commons.cli.CommandLine
+import org.pshdl.model.validation.Problem
+import com.google.common.collect.Lists
+import java.util.Collections
+import org.pshdl.model.utils.PSAbstractCompiler
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 
-class DartCompiler {
+class DartCompiler implements ITypeOuptutProvider {
 
 	private extension CommonCompilerExtension cce
 	private int epsWidth
+
+	new(){}
 
 	new(ExecutableModel em) {
 		this.cce = new CommonCompilerExtension(em)
@@ -754,4 +763,20 @@ import 'dart:typed_data';
 import '../simulation_comm.dart';
 	'''
 
+	override getHookName() {
+		return "Dart"
+	}
+
+	override getUsage() {
+		val options = new Options;
+		return new MultiOption(null, null, options)
+	}
+
+	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		val moduleName = em.moduleName
+		val unitName=moduleName.substring(moduleName.lastIndexOf('.')+1, moduleName.length-1);
+		return Lists::newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, unitName), moduleName, Collections::emptyList, em.source, hookName));
+	}
+	
 }

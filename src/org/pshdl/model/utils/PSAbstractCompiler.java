@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.parser.*;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
@@ -16,113 +17,156 @@ import com.google.common.io.*;
 
 public class PSAbstractCompiler {
 
+	/**
+	 * Do not report any progress and proceed whenever possible
+	 * 
+	 * @author Karsten Becker
+	 * 
+	 */
+	public static final class NullListener implements ICompilationListener {
+		@Override
+		public boolean startModule(String src, HDLPackage parse) {
+			return true;
+		}
+
+		@Override
+		public boolean useSource(String src, Collection<Problem> collection, boolean hasError) {
+			return !hasError;
+		}
+
+	}
+
+	public interface ICompilationListener {
+
+		/**
+		 * Check whether you want to continue compiling this source
+		 * 
+		 * @param src
+		 *            the src location of this file
+		 * @param parse
+		 *            the model before running {@link Insulin}
+		 * @return <code>true</code> to continue with the compilation,
+		 *         <code>false</code> otherwise
+		 */
+		boolean startModule(String src, HDLPackage parse);
+
+		boolean useSource(String src, Collection<Problem> collection, boolean hasError);
+
+	}
+
+	/**
+	 * A container for the results of the compilation
+	 * 
+	 * @author Karsten Becker
+	 * 
+	 */
+	public static class CompileResult {
+		/**
+		 * Problems that occurred during validation
+		 */
+		public final Set<Problem> syntaxProblems;
+		/**
+		 * The generated code if the compilation was successful,
+		 * <code>null</code> otherwise
+		 */
+		public final String code;
+
+		public final String codeType;
+
+		/**
+		 * The name of the first module encountered for display purposes. Will
+		 * be &lt;ERROR&gt; if not successful
+		 */
+		public final String entityName;
+		/**
+		 * All additional files that have been generated
+		 */
+		public final Set<SideFile> sideFiles;
+		/**
+		 * The src for which this code was generated
+		 */
+		public final String src;
+
+		public CompileResult(Set<Problem> syntaxProblems, String code, String entityName, Collection<SideFile> sideFiles, String src, String codeType) {
+			super();
+			this.syntaxProblems = syntaxProblems;
+			this.code = code;
+			this.entityName = entityName;
+			this.src = src;
+			if (sideFiles != null) {
+				this.sideFiles = new HashSet<SideFile>(sideFiles);
+			} else {
+				this.sideFiles = new HashSet<SideFile>();
+			}
+			this.codeType = codeType;
+		}
+
+		public boolean hasError() {
+			return code == null;
+		}
+
+	}
+
+	public static File[] writeFiles(File outDir, CompileResult result, boolean unitName) throws FileNotFoundException, IOException {
+		if (result.hasError())
+			return new File[0];
+		final List<File> res = new LinkedList<File>();
+		String newName = new File(result.src).getName();
+		if (unitName) {
+			newName = result.entityName + "." + result.codeType.toLowerCase();
+		} else {
+			newName = newName.substring(0, newName.length() - 5) + result.codeType.toLowerCase();
+		}
+		final File target = new File(outDir, newName);
+		res.add(target);
+		FileOutputStream fos = new FileOutputStream(target);
+		fos.write(result.code.getBytes(Charsets.UTF_8));
+		fos.close();
+		if (result.sideFiles != null) {
+			for (final SideFile sd : result.sideFiles) {
+				final File file = new File(outDir + "/" + sd.relPath);
+				res.add(file);
+				final File parentFile = file.getParentFile();
+				if ((parentFile != null) && !parentFile.exists()) {
+					parentFile.mkdirs();
+				}
+				fos = new FileOutputStream(file);
+				if (sd.contents == SideFile.THIS) {
+					fos.write(result.code.getBytes(Charsets.UTF_8));
+				} else {
+					fos.write(sd.contents);
+				}
+				fos.close();
+			}
+		}
+		return res.toArray(new File[res.size()]);
+	}
+
 	protected final String uri;
 	protected final HDLLibrary lib;
 	protected final ConcurrentMap<String, HDLPackage> pkgs = Maps.newConcurrentMap();
-	protected final Multimap<String, Problem> issues = Multimaps.synchronizedMultimap(LinkedHashMultimap.<String, Problem> create());
+	protected final ConcurrentMap<String, Set<Problem>> issues = Maps.newConcurrentMap();
+	protected final Set<String> srcs = Collections.synchronizedSet(Sets.<String> newLinkedHashSet());
+	protected boolean validated = false;
+	private final ExecutorService service;
 
 	public PSAbstractCompiler() {
-		this("PSHDLLib" + new Random().nextLong());
+		this("PSHDLLib" + new Random().nextLong(), null);
 	}
 
-	public PSAbstractCompiler(String uri) {
+	public PSAbstractCompiler(String uri, ExecutorService service) {
 		super();
 		if (!HDLCore.isInitialized()) {
 			HDLCore.defaultInit();
 		}
 		this.uri = uri;
+		this.service = service;
 		lib = new HDLLibrary();
 		HDLLibrary.registerLibrary(uri, lib);
 	}
 
-	public HDLUnit findUnit(HDLQualifiedName unitName) {
-		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
-			final HDLPackage parse = e.getValue();
-			final HDLUnit first = HDLQuery.select(HDLUnit.class).from(parse).whereObj().fullNameIs(unitName).getFirst();
-			if (first != null)
-				return first;
-		}
-		return null;
-	}
-
-	public boolean validatePackages(Set<Problem> problems) throws IOException, FileNotFoundException {
-		boolean validationError = false;
-		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
-			if (validateFile(e.getValue(), problems)) {
-				validationError = true;
-			}
-		}
-		return validationError;
-	}
-
-	public boolean addFilesMultiThreaded(Collection<File> files, final ConcurrentMap<String, Set<Problem>> problems, ExecutorService service) throws InterruptedException,
-			ExecutionException {
-		final List<Future<Boolean>> futures = Lists.newArrayListWithCapacity(files.size());
-		for (final File file : files) {
-			final Future<Boolean> future = service.submit(new Callable<Boolean>() {
-
-				@Override
-				public Boolean call() throws Exception {
-					final Set<Problem> localProblems = Sets.newHashSet();
-					final boolean error = add(file, localProblems);
-					problems.put(getSourceName(file), localProblems);
-					return error;
-				}
-			});
-			futures.add(future);
-		}
-		return collectResults(futures);
-	}
-
-	private boolean collectResults(final List<Future<Boolean>> futures) throws InterruptedException, ExecutionException {
-		boolean validationError = false;
-		for (final Future<Boolean> future : futures) {
-			final Boolean b = future.get();
-			if (b) {
-				validationError = true;
-			}
-		}
-		return validationError;
-	}
-
-	public boolean validatePackagesMultiThreaded(final ConcurrentMap<String, Set<Problem>> problems, ExecutorService service) throws IOException, FileNotFoundException,
-			InterruptedException, ExecutionException {
-		final List<Future<Boolean>> futures = Lists.newArrayListWithCapacity(pkgs.size());
-		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
-			final Future<Boolean> future = service.submit(new Callable<Boolean>() {
-
-				@Override
-				public Boolean call() throws Exception {
-					final Set<Problem> localProblems = Sets.newHashSet();
-					final boolean error = validateFile(e.getValue(), localProblems);
-					problems.put(e.getKey(), localProblems);
-					return error;
-				}
-
-			});
-			futures.add(future);
-		}
-		return collectResults(futures);
-	}
-
-	public boolean add(File source, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
-		final Set<Problem> problems = add(source);
-		syntaxProblems.addAll(problems);
-		return reportProblem(problems);
-	}
-
-	/**
-	 * Parse and add a unit to the HDLLibrary so that all references can be
-	 * resolved later
-	 * 
-	 * @param contents
-	 *            the PSHDL module to add
-	 * @param absolutePath
-	 *            a source file name for this module
-	 * @throws IOException
-	 */
-	public Set<Problem> add(File f) throws IOException {
-		return add(Files.toString(f, Charsets.UTF_8), getSourceName(f));
+	public boolean add(File source) throws Exception {
+		return singleAdd(source);
 	}
 
 	/**
@@ -133,11 +177,9 @@ public class PSAbstractCompiler {
 	 *            the PSHDL module to add
 	 * @param src
 	 *            a source file name for this module
-	 * @param problems
-	 *            syntax errors will be added to this Set when encountered
 	 * @throws IOException
 	 */
-	public Set<Problem> add(InputStream contents, String src) throws IOException {
+	public boolean add(InputStream contents, String src) throws IOException {
 		final InputStreamReader r = new InputStreamReader(contents, Charsets.UTF_8);
 		final String text = CharStreams.toString(r);
 		r.close();
@@ -152,18 +194,129 @@ public class PSAbstractCompiler {
 	 *            the PSHDL module to add
 	 * @param src
 	 *            a source file name for this module
-	 * @param problems
-	 *            syntax errors will be added to this Set when encountered
+	 * @return <code>true</code> if the source contains errors
 	 */
-	public Set<Problem> add(String contents, String src) {
+	public boolean add(String contents, String src) {
+		validated = false;
+		srcs.add(src);
 		final Set<Problem> problems = Sets.newHashSet();
-		issues.removeAll(src);
+		issues.remove(src);
 		final HDLPackage pkg = PSHDLParser.parseString(contents, uri, problems, src);
 		if (pkg != null) {
 			pkgs.put(src, pkg);
 		}
-		issues.putAll(src, problems);
-		return problems;
+		issues.put(src, problems);
+		return hasError(problems);
+	}
+
+	public boolean addFiles(Collection<File> files) throws Exception {
+		if (service != null)
+			return addFilesMultiThreaded(files);
+		boolean syntaxError = false;
+		for (final File file : files) {
+			if (singleAdd(file)) {
+				syntaxError = true;
+			}
+		}
+		return syntaxError;
+	}
+
+	protected boolean addFilesMultiThreaded(Collection<File> files) throws Exception {
+		final List<Future<Void>> futures = Lists.newArrayListWithCapacity(files.size());
+		for (final File file : files) {
+			final Future<Void> future = service.submit(new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+					singleAdd(file);
+					return null;
+				}
+			});
+			futures.add(future);
+		}
+		for (final Future<Void> future : futures) {
+			future.get();
+		}
+		for (final File file : files) {
+			final Set<Problem> syntaxProblems = getProblems(file);
+			for (final Problem problem : syntaxProblems) {
+				if (problem.isSyntax && (problem.severity == ProblemSeverity.ERROR))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public void close() {
+		HDLLibrary.unregister(uri);
+	}
+
+	protected static ExecutorService createExecutor() {
+		return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	}
+
+	public void resetErrors() {
+		validated = false;
+	}
+
+	public List<CompileResult> compile(ICompilationListener listener) throws Exception {
+		if (!validated) {
+			validatePackages();
+		}
+		if (listener == null) {
+			listener = new NullListener();
+		}
+		final List<CompileResult> res = Lists.newArrayListWithCapacity(pkgs.size());
+		synchronized (srcs) {
+			for (final String src : srcs) {
+				final Collection<Problem> issue = issues.get(src);
+				if (listener.useSource(src, issue, hasError(issue))) {
+					final HDLPackage parse = pkgs.get(src);
+					if (listener.startModule(src, parse)) {
+						res.add(doCompile(src, parse));
+					} else {
+						res.add(createResult(src, null, null));
+					}
+				} else {
+					res.add(createResult(src, null, null));
+				}
+			}
+		}
+		return res;
+	}
+
+	protected CompileResult createResult(final String src, final String code, String codeType) {
+		final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
+		String name = "<ERROR>";
+		final HDLPackage hdlPackage = pkgs.get(src);
+		if (hdlPackage != null) {
+			final HDLUnit[] units = hdlPackage.getAllObjectsOf(HDLUnit.class, false);
+			name = "<emptyFile>";
+			if (units.length != 0) {
+				name = units[0].getName();
+			}
+		}
+		final CompileResult cr = new CompileResult(syntaxProblems, code, name, lib.sideFiles.values(), src, codeType);
+		lib.sideFiles.clear();
+		return cr;
+	}
+
+	protected CompileResult doCompile(final String src, final HDLPackage parse) {
+		throw new RuntimeException("Not implemented");
+	}
+
+	public HDLUnit findUnit(HDLQualifiedName unitName) {
+		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
+			final HDLPackage parse = e.getValue();
+			final HDLUnit first = HDLQuery.select(HDLUnit.class).from(parse).whereObj().fullNameIs(unitName).getFirst();
+			if (first != null)
+				return first;
+		}
+		return null;
+	}
+
+	public String getSourceName(final File file) {
+		return file.getAbsolutePath();
 	}
 
 	/**
@@ -174,12 +327,23 @@ public class PSAbstractCompiler {
 	 *            the src name that was used to register a added input
 	 */
 	public void remove(String src) {
+		validated = false;
+		srcs.remove(src);
 		lib.removeAllSrc(src);
 		pkgs.remove(src);
-		issues.removeAll(src);
+		issues.remove(src);
 	}
 
-	public boolean reportProblem(Set<Problem> syntaxProblems) {
+	protected void printErrors() {
+		for (final Entry<String, Set<Problem>> e : issues.entrySet()) {
+			System.out.println("File:" + e.getKey());
+			for (final Problem p : e.getValue()) {
+				System.out.println("\t" + p.toString());
+			}
+		}
+	}
+
+	public boolean hasError(Collection<Problem> syntaxProblems) {
 		boolean error = false;
 		if (syntaxProblems.size() != 0) {
 			for (final Problem problem : syntaxProblems) {
@@ -189,12 +353,6 @@ public class PSAbstractCompiler {
 			}
 		}
 		return error;
-	}
-
-	public boolean validateFile(HDLPackage parse, Set<Problem> problems) throws IOException, FileNotFoundException {
-		final Set<Problem> validate = HDLValidator.validate(parse, null);
-		problems.addAll(validate);
-		return reportProblem(validate);
 	}
 
 	public HDLUnit takeFirstUnit(String file) {
@@ -218,12 +376,79 @@ public class PSAbstractCompiler {
 		return null;
 	}
 
-	public void close() {
-		HDLLibrary.unregister(uri);
+	public boolean validateFile(HDLPackage parse, Set<Problem> problems) throws Exception {
+		final Set<Problem> validate = HDLValidator.validate(parse, null);
+		problems.addAll(validate);
+		return hasError(validate);
 	}
 
-	public String getSourceName(final File file) {
-		return file.getAbsolutePath();
+	public boolean validatePackages() throws Exception {
+		validated = true;
+		boolean validationError = false;
+		if (service != null)
+			return validatePackagesMultiThreaded();
+		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
+			if (singleValidate(e)) {
+				validationError = true;
+			}
+		}
+		return validationError;
 	}
 
+	private boolean singleValidate(final Entry<String, HDLPackage> e) throws Exception {
+		final Set<Problem> localProblems = Sets.newHashSet();
+		final boolean error = validateFile(e.getValue(), localProblems);
+		final String src = e.getKey();
+		final Set<Problem> set = issues.get(src);
+		if (set != null) {
+			final Iterator<Problem> iterator = set.iterator();
+			while (iterator.hasNext()) {
+				final Problem problem = iterator.next();
+				if (!problem.isSyntax) {
+					iterator.remove();
+				}
+			}
+			set.addAll(localProblems);
+		} else {
+			issues.put(src, localProblems);
+		}
+		return error;
+	}
+
+	protected boolean validatePackagesMultiThreaded() throws Exception {
+		final List<Future<Void>> futures = Lists.newArrayListWithCapacity(pkgs.size());
+		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
+			futures.add(service.submit(new Callable<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+					singleValidate(e);
+					return null;
+				}
+
+			}));
+		}
+		for (final Future<Void> future : futures) {
+			future.get();
+		}
+		for (final Set<Problem> p : issues.values()) {
+			for (final Problem problem : p) {
+				if (problem.severity == ProblemSeverity.ERROR)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean singleAdd(final File file) throws Exception {
+		return add(new FileInputStream(file), getSourceName(file));
+	}
+
+	public Set<Problem> getProblems(File file) {
+		return issues.get(getSourceName(file));
+	}
+
+	public Map<String, Set<Problem>> getAllProblems() {
+		return issues;
+	}
 }

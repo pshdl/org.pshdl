@@ -27,12 +27,16 @@
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.ExclusiveRange;
@@ -48,13 +52,21 @@ import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
+import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
+import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class DartCompiler {
+public class DartCompiler implements ITypeOuptutProvider {
   @Extension
   private CommonCompilerExtension cce;
   
   private int epsWidth;
+  
+  public DartCompiler() {
+  }
   
   public DartCompiler(final ExecutableModel em) {
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
@@ -2691,5 +2703,30 @@ public class DartCompiler {
     _builder.append("import \'../simulation_comm.dart\';");
     _builder.newLine();
     return _builder;
+  }
+  
+  public String getHookName() {
+    return "Dart";
+  }
+  
+  public MultiOption getUsage() {
+    Options _options = new Options();
+    final Options options = _options;
+    MultiOption _multiOption = new MultiOption(null, null, options);
+    return _multiOption;
+  }
+  
+  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    final String moduleName = em.moduleName;
+    int _lastIndexOf = moduleName.lastIndexOf(".");
+    int _plus = (_lastIndexOf + 1);
+    int _length = moduleName.length();
+    int _minus = (_length - 1);
+    final String unitName = moduleName.substring(_plus, _minus);
+    String _doCompile = DartCompiler.doCompile(em, unitName);
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
+    String _hookName = this.getHookName();
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
 }

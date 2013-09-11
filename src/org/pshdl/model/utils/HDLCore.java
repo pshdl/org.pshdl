@@ -52,6 +52,7 @@ public class HDLCore {
 	public static final String VERSION = getVersion();
 	private static final CompilerInformation info = new CompilerInformation(VERSION);
 	private static boolean initialized = false;
+	private static IServiceProvider serviceProvider;
 
 	/**
 	 * Initializes the PSHDL Compiler infrastructure with the annotations,
@@ -71,6 +72,7 @@ public class HDLCore {
 		HDLGenerators.init(info, serviceProvider);
 		HDLValidator.init(info, serviceProvider);
 		initialized = true;
+		HDLCore.serviceProvider = serviceProvider;
 	}
 
 	private static String getVersion() {
@@ -116,6 +118,10 @@ public class HDLCore {
 	 */
 	public static boolean isInitialized() {
 		return initialized;
+	}
+
+	public static <T> Collection<T> getAllImplementations(Class<T> clazz) {
+		return serviceProvider.getAllImplementations(clazz);
 	}
 
 }

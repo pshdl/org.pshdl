@@ -1,0 +1,2 @@
+org.pshdl.generator.vhdl.PStoVHDLCompiler
+org.pshdl.model.simulation.PStoEXCompiler

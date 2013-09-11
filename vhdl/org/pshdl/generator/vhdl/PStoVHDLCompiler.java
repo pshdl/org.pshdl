@@ -29,14 +29,14 @@ package org.pshdl.generator.vhdl;
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
+import org.apache.commons.cli.*;
 import org.pshdl.model.*;
 import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.utils.services.*;
 import org.pshdl.model.validation.*;
 
-import com.google.common.base.*;
 import com.google.common.collect.*;
 
 import de.upb.hni.vmagic.output.*;
@@ -48,8 +48,8 @@ import de.upb.hni.vmagic.output.*;
  * <ol>
  * <li>{@link #setup(String)}</li>
  * <li>{@link #add(File)} Add as many files as you want. You can also add VHDL
- * files with {@link #addVHDL(InputStream, String, HashSet)}</li>
- * <li>{@link #compileToVHDL(ICompilationListener)} generates all VHDL code and
+ * files with {@link #addVHDL(File)}</li>
+ * <li>{@link #doCompile(ICompilationListener)} generates all VHDL code and
  * auxiliary files</li>
  * </ol>
  * 
@@ -58,165 +58,25 @@ import de.upb.hni.vmagic.output.*;
  */
 public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvider {
 
-	/**
-	 * Do not report any progress and proceed whenever possible
-	 * 
-	 * @author Karsten Becker
-	 * 
-	 */
-	public static final class NullListener implements ICompilationListener {
-		@Override
-		public boolean startVHDL(String src, HDLPackage parse) {
-			return true;
-		}
-
-		@Override
-		public boolean continueWith(String src, HDLPackage parse, Set<Problem> validate) {
-			return true;
-		}
-	}
-
-	public interface ICompilationListener {
-
-		/**
-		 * Check whether you want to continue compiling this source
-		 * 
-		 * @param src
-		 *            the src location of this file
-		 * @param parse
-		 *            the model before running {@link Insulin}
-		 * @return <code>true</code> to continue with the compilation,
-		 *         <code>false</code> otherwise
-		 */
-		boolean startVHDL(String src, HDLPackage parse);
-
-		/**
-		 * Check whether you want to continue compiling this source.
-		 * <b>Note:</b> if there are errors reported, compilation will not
-		 * continue and this method will not be called
-		 * 
-		 * @param src
-		 *            the src location of this file
-		 * @param parse
-		 *            the model after {@link Insulin}
-		 * @param validate
-		 *            the problems that the validators reported
-		 * @return <code>true</code> to continue with the compilation,
-		 *         <code>false</code> otherwise
-		 */
-		boolean continueWith(String src, HDLPackage parse, Set<Problem> validate);
-
-	}
-
-	public PStoVHDLCompiler() {
+	public PStoVHDLCompiler(ExecutorService service) {
 		super();
 	}
 
-	public PStoVHDLCompiler(String uri) {
-		super(uri);
+	public PStoVHDLCompiler(String uri, ExecutorService service) {
+		super(uri, service);
 	}
 
-	/**
-	 * Call this method to get an instance of the compiler. It also checks
-	 * whether the {@link HDLCore} was correctly initialized
-	 * 
-	 * @param libURI
-	 *            a unique libURI for registering the {@link HDLLibrary}
-	 * @return the {@link PStoVHDLCompiler}
-	 */
-	public static PStoVHDLCompiler setup(String libURI) {
-		if (!HDLCore.isInitialized())
-			throw new RuntimeException("The HDLCore needs to be initialized first!");
-		return new PStoVHDLCompiler(libURI);
+	@Override
+	protected CompileResult doCompile(final String src, final HDLPackage parse) {
+		final HDLPackage transform = Insulin.transform(parse, src);
+		final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(transform));
+		return createResult(src, vhdlCode, getHookName());
 	}
 
-	/**
-	 * A container for the results of the compilation
-	 * 
-	 * @author Karsten Becker
-	 * 
-	 */
-	public static class CompileResult {
-		/**
-		 * Problems that occurred during validation
-		 */
-		public final Set<Problem> syntaxProblems;
-		/**
-		 * The generated VHDL code if the compilation was successful,
-		 * <code>null</code> otherwise
-		 */
-		public final String vhdlCode;
-		/**
-		 * The name of the first entity encountered for display purposes. Will
-		 * be &lt;ERROR&gt; if not successful
-		 */
-		public final String entityName;
-		/**
-		 * All additional files that have been generated
-		 */
-		public final Set<SideFile> sideFiles;
-		/**
-		 * The src for which this code was generated
-		 */
-		public final String src;
-
-		public CompileResult(Set<Problem> syntaxProblems, String vhdlCode, String entityName, Collection<SideFile> sideFiles, String src) {
-			super();
-			this.syntaxProblems = syntaxProblems;
-			this.vhdlCode = vhdlCode;
-			this.entityName = entityName;
-			this.src = src;
-			if (sideFiles != null) {
-				this.sideFiles = new HashSet<SideFile>(sideFiles);
-			} else {
-				this.sideFiles = new HashSet<SideFile>();
-			}
-		}
-
-		public boolean hasError() {
-			return vhdlCode == null;
-		}
-
-	}
-
-	/**
-	 * Compiles all added files. Files that had syntax errors are ignored. When
-	 * a validator is detecting an error, that file will produce an empty error
-	 * {@link CompileResult}
-	 * 
-	 * @param listener
-	 *            a call back interface for reporting progress on the
-	 *            compilation. If <code>null</code> {@link NullListener} will be
-	 *            used.
-	 * @return a list of {@link CompileResult}s. If a file contained an error,
-	 *         the field VHDLCode will be <code>null</code>
-	 */
-	public List<CompileResult> compileToVHDL(ICompilationListener listener) {
-		if (listener == null) {
-			listener = new NullListener();
-		}
-		final List<CompileResult> res = Lists.newArrayListWithCapacity(pkgs.size());
-		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
-			final String src = e.getKey();
-			final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
-			final HDLPackage parse = e.getValue();
-			if (listener.startVHDL(src, parse)) {
-				final HDLPackage transform = Insulin.transform(parse, src);
-				final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(transform));
-				final HDLUnit[] units = parse.getAllObjectsOf(HDLUnit.class, false);
-				String name = "<emptyFile>";
-				if (units.length != 0) {
-					name = units[0].getName();
-				}
-				res.add(new CompileResult(syntaxProblems, vhdlCode, name, lib.sideFiles.values(), src));
-				lib.sideFiles.clear();
-			}
-		}
-		return res;
-	}
-
-	public static void main(String[] args) throws IOException {
-		new PStoVHDLCompiler().invoke(args);
+	public static void main(String[] args) throws Exception {
+		final PStoVHDLCompiler compiler = new PStoVHDLCompiler(createExecutor());
+		compiler.invoke(compiler.getUsage().parse(args));
+		System.exit(0);
 	}
 
 	/**
@@ -227,95 +87,71 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 	 * @throws IOException
 	 */
 	@Override
-	public String invoke(String[] args) throws IOException {
-		if (args.length == 1)
-			return "Invalid arguments. Try help " + getHookName();
-		final Stopwatch sw = new Stopwatch().start();
-		HDLCore.defaultInit();
-		final PStoVHDLCompiler compiler = setup("CMDLINE");
-		System.out.println("Init: " + sw);
-		final File outDir = new File(args[0]);
+	public String invoke(CommandLine cli) throws IOException {
+		final List<String> argList = cli.getArgList();
+		if (argList.size() == 0)
+			return "Missing file arguments, try help " + getHookName();
+		final File outDir = new File(argList.get(0));
 		if (!outDir.exists()) {
 			outDir.mkdirs();
 		}
-		boolean hasSyntaxErrors = false;
-		for (int i = 1; i < args.length; i++) {
-			final File f = new File(args[i]);
-			System.out.println("Adding file:" + f);
-			final Set<Problem> problems = compiler.add(f);
-			if (!problems.isEmpty()) {
-				System.out.println("Found the following syntax problems in file " + f.getName() + ":");
-				hasSyntaxErrors = true;
-			}
-			for (final Problem problem : problems) {
-				System.out.println("\t" + problem);
-			}
+		final List<File> files = Lists.newArrayListWithCapacity(argList.size());
+		for (final String string : argList) {
+			final File file = new File(string);
+			if (!file.exists())
+				return "File: " + file + " does not exist";
+			files.add(file);
 		}
-		if (hasSyntaxErrors) {
-			System.out.println("Exiting");
-			return "Found synax errors";
+		try {
+			if (addFiles(files)) {
+				printErrors();
+				return "Found syntax errors";
+			}
+		} catch (final Exception e1) {
+			e1.printStackTrace();
+			return "An exception occured during file parsing, this should not happen";
 		}
 		System.out.println("Compiling files");
-		final List<CompileResult> results = compiler.compileToVHDL(new ICompilationListener() {
+		try {
+			validatePackages();
+			printErrors();
+		} catch (final Exception e) {
+			e.printStackTrace();
+			return "An exception occured during validation, this should not happen";
+		}
+		final List<CompileResult> res = Lists.newArrayListWithCapacity(pkgs.size());
+		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
+			final String src1 = e.getKey();
+			final HDLPackage parse1 = e.getValue();
+			if (new ICompilationListener() {
 
-			@Override
-			public boolean startVHDL(String src, HDLPackage parse) {
-				System.out.println("Compiling:" + new File(src).getName());
-				return true;
-			}
+				@Override
+				public boolean startModule(String src, HDLPackage parse) {
+					System.out.println("Compiling:" + new File(src).getName());
+					return true;
+				}
 
-			@Override
-			public boolean continueWith(String src, HDLPackage parse, Set<Problem> syntaxProblems) {
-				final String newName = new File(src).getName();
-				if (!syntaxProblems.isEmpty()) {
-					System.out.println("Found the following problems in file " + newName + ":");
+				@Override
+				public boolean useSource(String src, Collection<Problem> collection, boolean hasError) {
+					if (hasError) {
+						System.out.println("Skipping " + src + " because it has errors");
+					}
+					return hasError;
 				}
-				for (final Problem p : syntaxProblems) {
-					System.out.println("\t" + p.toString());
-				}
-				return true;
+
+			}.startModule(src1, parse1)) {
+				res.add(doCompile(src1, parse1));
 			}
-		});
+		}
+		final List<CompileResult> results = res;
 		for (final CompileResult result : results) {
-			if (result.vhdlCode != null) {
-				writeFiles(outDir, result);
+			if (!result.hasError()) {
+				writeFiles(outDir, result, false);
 			} else {
 				System.out.println("Failed to generate code for:" + result.src);
 			}
 		}
-		System.out.println("Done! Total time:" + sw);
 		return null;
-	}
-
-	public static File[] writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
-		if (result.hasError())
-			return new File[0];
-		final List<File> res = new LinkedList<File>();
-		String newName = new File(result.src).getName();
-		newName = newName.substring(0, newName.length() - 5) + "vhd";
-		final File target = new File(outDir, newName);
-		res.add(target);
-		FileOutputStream fos = new FileOutputStream(target);
-		fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
-		fos.close();
-		if (result.sideFiles != null) {
-			for (final SideFile sd : result.sideFiles) {
-				final File file = new File(outDir + "/" + sd.relPath);
-				res.add(file);
-				final File parentFile = file.getParentFile();
-				if ((parentFile != null) && !parentFile.exists()) {
-					parentFile.mkdirs();
-				}
-				fos = new FileOutputStream(file);
-				if (sd.contents == SideFile.THIS) {
-					fos.write(result.vhdlCode.getBytes(Charsets.UTF_8));
-				} else {
-					fos.write(sd.contents);
-				}
-				fos.close();
-			}
-		}
-		return res.toArray(new File[res.size()]);
 	}
 
 	/**
@@ -342,6 +178,7 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 	 *            a src id under which to register the {@link HDLInterface}
 	 */
 	public void addVHDL(InputStream contents, String asSrc) {
+		validated = false;
 		VHDLImporter.importFile(HDLQualifiedName.create("VHDL", "work"), contents, lib, asSrc);
 	}
 
@@ -351,8 +188,14 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 	}
 
 	@Override
-	public String[] getUsage() {
-		return null;
+	public MultiOption getUsage() {
+		final Options options = new Options();
+		options.addOption(new Option("o", "outputDir", true, "Specify the directory to which the files will be written, default is: src-gen"));
+		return new MultiOption(getHookName() + " usage: [OPTIONS] <files>", null, options);
+	}
+
+	public static PStoVHDLCompiler setup(String uri) {
+		return new PStoVHDLCompiler(uri, null);
 	}
 
 }

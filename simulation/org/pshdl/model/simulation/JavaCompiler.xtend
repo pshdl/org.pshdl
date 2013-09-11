@@ -40,12 +40,21 @@ import java.util.HashMap
 import java.util.Map
 import java.util.ArrayList
 import java.util.HashSet
+import org.apache.commons.cli.Options
+import org.apache.commons.cli.CommandLine
+import org.pshdl.model.validation.Problem
+import com.google.common.collect.Lists
+import java.util.Collections
+import org.pshdl.model.utils.PSAbstractCompiler
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 
-class JavaCompiler {
+class JavaCompiler implements ITypeOuptutProvider {
 	private boolean debug
 	private int cores
 
 	private extension CommonCompilerExtension cce
+
+	new(){}
 
 	new(ExecutableModel em, boolean includeDebug, int cores) {
 		this.cce = new CommonCompilerExtension(em)
@@ -758,5 +767,33 @@ class JavaCompiler {
 			import org.pshdl.interpreter.frames.*;
 		«ENDIF»
 	'''
+	
+	override getHookName() {
+		return "Java"
+	}
 
+	override getUsage() {
+		val options = new Options;
+		options.addOption('p',"pkg",true, "The package the generated source will use. If non is specified the package from the module is used")
+		options.addOption('d',"debug",false, "If debug is specified, the source will contain support for a IDebugListener")
+		return new MultiOption("Options for the "+hookName+" type:", null, options)
+	}
+
+	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		val moduleName = em.moduleName
+		val li = moduleName.lastIndexOf('.')
+		var String pkg = null
+		val optionPkg=cli.getOptionValue("pkg")
+		var boolean debug=cli.hasOption("debug")
+		if (optionPkg!=null){
+			pkg=optionPkg
+		} else if (li!==-1){
+			pkg=moduleName.substring(0,li-1)
+		}
+		val unitName = moduleName.substring(li+1, moduleName.length);
+		return Lists::newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, pkg, unitName, debug, 1), moduleName, Collections::emptyList, em.source, hookName));
+	}
+	
+	
 }

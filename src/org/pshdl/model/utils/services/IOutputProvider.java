@@ -26,7 +26,72 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
+import java.io.*;
+import java.util.*;
+
+import org.apache.commons.cli.*;
+
+import com.google.common.collect.*;
+
 public interface IOutputProvider {
+	public static class MultiOption {
+		public final String before, after;
+		public final Options options;
+		public final List<MultiOption> subs = Lists.newLinkedList();
+
+		public MultiOption(String before, String after, Options options, MultiOption... sub) {
+			super();
+			this.before = before;
+			this.after = after;
+			this.options = options;
+			if (sub != null) {
+				subs.addAll(Arrays.asList(sub));
+			}
+		}
+
+		public void printHelp(PrintStream out) {
+			final PrintWriter pw = new PrintWriter(out);
+			printHelp(pw);
+			pw.close();
+		}
+
+		private void printHelp(final PrintWriter pw) {
+			final HelpFormatter hlp = new HelpFormatter();
+			if (before != null) {
+				hlp.printWrapped(pw, HelpFormatter.DEFAULT_WIDTH, before);
+			}
+			if (!options.getOptions().isEmpty()) {
+				hlp.printOptions(pw, HelpFormatter.DEFAULT_WIDTH, options, HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD);
+			}
+			if (after != null) {
+				hlp.printWrapped(pw, HelpFormatter.DEFAULT_WIDTH, after);
+			}
+			for (final MultiOption sub : subs) {
+				sub.printHelp(pw);
+			}
+		}
+
+		public Options allOptions() {
+			final Options opt = new Options();
+			addOptions(opt);
+			return opt;
+		}
+
+		private void addOptions(Options opt) {
+			for (final Object o : options.getOptions()) {
+				opt.addOption((Option) o);
+			}
+			for (final MultiOption mo : subs) {
+				mo.addOptions(opt);
+			}
+		}
+
+		public CommandLine parse(String[] args) throws ParseException {
+			final PosixParser pp = new PosixParser();
+			return pp.parse(allOptions(), args);
+		}
+	}
+
 	/**
 	 * The hook under which this {@link IOutputProvider} is activated
 	 * 
@@ -41,7 +106,7 @@ public interface IOutputProvider {
 	 * @return multiple strings, each explaining one option. The first one is
 	 *         some general information
 	 */
-	public String[] getUsage();
+	public MultiOption getUsage();
 
 	/**
 	 * Invokes this {@link IOutputProvider} and passes the given arguments to
@@ -52,5 +117,5 @@ public interface IOutputProvider {
 	 * @return an explanation of what went wrong or <code>null</code> if it was
 	 *         successful
 	 */
-	public String invoke(String args[]) throws Exception;
+	public String invoke(CommandLine cli) throws Exception;
 }

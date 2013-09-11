@@ -28,6 +28,8 @@ package org.pshdl.model.utils.services;
 
 import java.util.*;
 
+import com.google.common.collect.*;
+
 public interface IServiceProvider {
 	public Collection<IHDLAnnotation> getAllAnnotations();
 
@@ -36,6 +38,8 @@ public interface IServiceProvider {
 	public Collection<IHDLGenerator> getAllGenerators();
 
 	public Collection<IHDLValidator> getAllValidators();
+
+	public <T> Collection<T> getAllImplementations(Class<T> clazz);
 
 	public static class ServiceLoaderProvider implements IServiceProvider {
 
@@ -79,6 +83,12 @@ public interface IServiceProvider {
 				res.add(gen);
 			}
 			return res;
+		}
+
+		@Override
+		public <T> Collection<T> getAllImplementations(Class<T> clazz) {
+			final ServiceLoader<T> load = ServiceLoader.load(clazz);
+			return Lists.newLinkedList(load);
 		}
 
 	}
