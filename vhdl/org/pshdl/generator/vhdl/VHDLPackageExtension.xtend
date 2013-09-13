@@ -46,7 +46,6 @@ import org.pshdl.model.HDLVariableDeclaration
 import org.pshdl.model.HDLVariableDeclaration$HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
-import org.pshdl.model.utils.HDLConfig
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
 import org.pshdl.model.utils.HDLQuery
@@ -88,6 +87,7 @@ import org.pshdl.model.HDLReference
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLResolvedRef
 import org.pshdl.generator.vhdl.libraries.VHDLTypesLibrary
+import org.pshdl.model.utils.Refactoring
 
 class VHDLPackageExtension {
 
@@ -247,14 +247,14 @@ class VHDLPackageExtension {
 		return (reference as HDLResolvedRef).resolveVar.get
 	}
 
-	def private SequentialStatement createIfStatement(HDLUnit hUnit, ProcessStatement ps, HDLRegisterConfig key,
+	def private SequentialStatement createIfStatement(HDLUnit hUnit, ProcessStatement ps, HDLRegisterConfig config,
 		LinkedList<SequentialStatement> value, VHDLContext unit) {
+		val key=config.normalize
 		var Signal clk = new HDLVariableRef().setVar(key.clkRefName).toVHDL as Signal
 		var Signal rst = new HDLVariableRef().setVar(key.rstRefName).toVHDL as Signal
-		val HDLConfig config = HDLLibrary::getLibrary(hUnit.getLibURI).config
 		ps.sensitivityList.add(clk)
 		var EnumerationLiteral activeRst
-		if (config.getRegResetType(fullNameOf(hUnit), key.resetType) == HDLRegisterConfig$HDLRegResetActiveType::HIGH)
+		if (key.resetType === HDLRegisterConfig$HDLRegResetActiveType::HIGH)
 			activeRst = StdLogic1164::STD_LOGIC_1
 		else
 			activeRst = StdLogic1164::STD_LOGIC_0
@@ -263,12 +263,12 @@ class VHDLPackageExtension {
 		if (resets !== null)
 			rstIfStmnt.statements.addAll(resets)
 		var FunctionCall edge
-		if (config.getRegClockType(fullNameOf(hUnit), key.clockType) == HDLRegisterConfig$HDLRegClockType::RISING)
+		if (key.clockType === HDLRegisterConfig$HDLRegClockType::RISING)
 			edge = new FunctionCall(StdLogic1164::RISING_EDGE)
 		else
 			edge = new FunctionCall(StdLogic1164::FALLING_EDGE)
 		edge.parameters.add(new AssociationElement(clk))
-		if (config.getRegSyncType(fullNameOf(hUnit), key.syncType) == HDLRegisterConfig$HDLRegSyncType::ASYNC) {
+		if (key.syncType === HDLRegisterConfig$HDLRegSyncType::ASYNC) {
 			ps.sensitivityList.add(rst)
 			val ElsifPart elsifPart = rstIfStmnt.createElsifPart(edge)
 			elsifPart.statements.addAll(value)
@@ -322,17 +322,8 @@ class VHDLPackageExtension {
 						ref.resolveVar.get.setMeta(VHDLStatementExtension::EXPORT)
 					}
 					val String origName = hvar.name
-					val String name = VHDLOutputValidator::getVHDLName(origName)
-					if (!origName.equals(name)) {
-						val HDLVariable newVar = hvar.setName(name)
-						ms.replace(hvar, newVar)
-						val Collection<HDLVariableRef> varRefs = HDLQuery::select(typeof(HDLVariableRef)).from(obj).
-							where(HDLVariableRef::fVar).isEqualTo(hvar.asRef).all
-						val HDLQualifiedName newVarRef = newVar.asRef
-						for (HDLVariableRef ref : varRefs) {
-							ms.replace(ref, ref.setVar(newVarRef))
-						}
-					}
+					val String name = VHDLUtils::getVHDLName(origName)
+					Refactoring::renameVariable(hvar,hvar.asRef().skipLast(1).append(name), unit, ms)
 				}
 			}
 			val HDLUnit newUnit = ms.apply(unit)

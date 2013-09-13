@@ -33,16 +33,12 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.misc.*;
 import org.pshdl.model.*;
-import org.pshdl.model.extensions.*;
 import org.pshdl.model.parser.PSHDLLangParser.PsExtendsContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
-
-import com.google.common.base.*;
 
 public class PSHDLParser {
 
@@ -157,20 +153,24 @@ public class PSHDLParser {
 	}
 
 	public static String annotateUnit(String original, HDLUnit unit) {
-		for (final HDLAnnotation anno : unit.getAnnotations()) {
-			if (HDLBuiltInAnnotations.autoInterface.is(anno)) {
-				final HDLInterface hif = unit.asInterface();
-				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(unit);
-				final HDLQualifiedName lastFQN = fqn.skipLast(1).append("I" + fqn.getLastSegment());
-				final Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(unit, lastFQN);
-				final boolean needExtend = !unit.getExtendRefName().contains(lastFQN);
-				if (resolveInterface.isPresent()) {
-					final SourceInfo info = resolveInterface.get().getMeta(SourceInfo.INFO);
-
-				} else {
-				}
-			}
-		}
+		// for (final HDLAnnotation anno : unit.getAnnotations()) {
+		// if (HDLBuiltInAnnotations.autoInterface.is(anno)) {
+		// final HDLInterface hif = unit.asInterface();
+		// final HDLQualifiedName fqn = FullNameExtension.fullNameOf(unit);
+		// final HDLQualifiedName lastFQN = fqn.skipLast(1).append("I" +
+		// fqn.getLastSegment());
+		// final Optional<HDLInterface> resolveInterface =
+		// ScopingExtension.INST.resolveInterface(unit, lastFQN);
+		// final boolean needExtend =
+		// !unit.getExtendRefName().contains(lastFQN);
+		// if (resolveInterface.isPresent()) {
+		// final SourceInfo info =
+		// resolveInterface.get().getMeta(SourceInfo.INFO);
+		//
+		// } else {
+		// }
+		// }
+		// }
 		return original;
 	}
 

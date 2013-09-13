@@ -71,8 +71,8 @@ import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.generator.vhdl.VHDLContext;
 import org.pshdl.generator.vhdl.VHDLExpressionExtension;
-import org.pshdl.generator.vhdl.VHDLOutputValidator;
 import org.pshdl.generator.vhdl.VHDLStatementExtension;
+import org.pshdl.generator.vhdl.VHDLUtils;
 import org.pshdl.generator.vhdl.libraries.VHDLCastsLibrary;
 import org.pshdl.generator.vhdl.libraries.VHDLShiftLibrary;
 import org.pshdl.generator.vhdl.libraries.VHDLTypesLibrary;
@@ -98,15 +98,9 @@ import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.extensions.FullNameExtension;
-import org.pshdl.model.utils.HDLConfig;
-import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
-import org.pshdl.model.utils.HDLQuery;
-import org.pshdl.model.utils.HDLQuery.FieldSelector;
-import org.pshdl.model.utils.HDLQuery.Result;
-import org.pshdl.model.utils.HDLQuery.Selector;
-import org.pshdl.model.utils.HDLQuery.Source;
 import org.pshdl.model.utils.ModificationSet;
+import org.pshdl.model.utils.Refactoring;
 
 @SuppressWarnings("all")
 public class VHDLPackageExtension {
@@ -429,7 +423,8 @@ public class VHDLPackageExtension {
     return _resolveVar.get();
   }
   
-  private SequentialStatement createIfStatement(final HDLUnit hUnit, final ProcessStatement ps, final HDLRegisterConfig key, final LinkedList<SequentialStatement> value, final VHDLContext unit) {
+  private SequentialStatement createIfStatement(final HDLUnit hUnit, final ProcessStatement ps, final HDLRegisterConfig config, final LinkedList<SequentialStatement> value, final VHDLContext unit) {
+    final HDLRegisterConfig key = config.normalize();
     HDLVariableRef _hDLVariableRef = new HDLVariableRef();
     HDLQualifiedName _clkRefName = key.getClkRefName();
     HDLVariableRef _setVar = _hDLVariableRef.setVar(_clkRefName);
@@ -440,23 +435,18 @@ public class VHDLPackageExtension {
     HDLVariableRef _setVar_1 = _hDLVariableRef_1.setVar(_rstRefName);
     Expression<? extends Object> _vHDL_1 = this.vee.toVHDL(_setVar_1);
     Signal rst = ((Signal) _vHDL_1);
-    String _libURI = hUnit.getLibURI();
-    HDLLibrary _library = HDLLibrary.getLibrary(_libURI);
-    final HDLConfig config = _library.getConfig();
     List<Signal> _sensitivityList = ps.getSensitivityList();
     _sensitivityList.add(clk);
     EnumerationLiteral activeRst = null;
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hUnit);
     HDLRegResetActiveType _resetType = key.getResetType();
-    HDLRegResetActiveType _regResetType = config.getRegResetType(_fullNameOf, _resetType);
-    boolean _equals = Objects.equal(_regResetType, HDLRegResetActiveType.HIGH);
-    if (_equals) {
+    boolean _tripleEquals = (_resetType == HDLRegResetActiveType.HIGH);
+    if (_tripleEquals) {
       activeRst = StdLogic1164.STD_LOGIC_1;
     } else {
       activeRst = StdLogic1164.STD_LOGIC_0;
     }
-    Equals _equals_1 = new Equals(rst, activeRst);
-    IfStatement _ifStatement = new IfStatement(_equals_1);
+    Equals _equals = new Equals(rst, activeRst);
+    IfStatement _ifStatement = new IfStatement(_equals);
     IfStatement rstIfStmnt = _ifStatement;
     final LinkedList<SequentialStatement> resets = unit.resetStatements.get(key);
     boolean _tripleNotEquals = (resets != null);
@@ -465,11 +455,9 @@ public class VHDLPackageExtension {
       _statements.addAll(resets);
     }
     FunctionCall edge = null;
-    HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(hUnit);
     HDLRegClockType _clockType = key.getClockType();
-    HDLRegClockType _regClockType = config.getRegClockType(_fullNameOf_1, _clockType);
-    boolean _equals_2 = Objects.equal(_regClockType, HDLRegClockType.RISING);
-    if (_equals_2) {
+    boolean _tripleEquals_1 = (_clockType == HDLRegClockType.RISING);
+    if (_tripleEquals_1) {
       FunctionCall _functionCall = new FunctionCall(StdLogic1164.RISING_EDGE);
       edge = _functionCall;
     } else {
@@ -479,11 +467,9 @@ public class VHDLPackageExtension {
     List<AssociationElement> _parameters = edge.getParameters();
     AssociationElement _associationElement = new AssociationElement(clk);
     _parameters.add(_associationElement);
-    HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(hUnit);
     HDLRegSyncType _syncType = key.getSyncType();
-    HDLRegSyncType _regSyncType = config.getRegSyncType(_fullNameOf_2, _syncType);
-    boolean _equals_3 = Objects.equal(_regSyncType, HDLRegSyncType.ASYNC);
-    if (_equals_3) {
+    boolean _tripleEquals_2 = (_syncType == HDLRegSyncType.ASYNC);
+    if (_tripleEquals_2) {
       List<Signal> _sensitivityList_1 = ps.getSensitivityList();
       _sensitivityList_1.add(rst);
       final ElsifPart elsifPart = rstIfStmnt.createElsifPart(edge);
@@ -577,24 +563,11 @@ public class VHDLPackageExtension {
                 _get.setMeta(VHDLStatementExtension.EXPORT);
               }
               final String origName = hvar.getName();
-              final String name = VHDLOutputValidator.getVHDLName(origName);
-              boolean _equals = origName.equals(name);
-              boolean _not = (!_equals);
-              if (_not) {
-                final HDLVariable newVar = hvar.setName(name);
-                ms.replace(hvar, newVar);
-                Source<HDLVariableRef> _select = HDLQuery.<HDLVariableRef>select(HDLVariableRef.class);
-                Selector<HDLVariableRef> _from = _select.from(obj);
-                FieldSelector<HDLVariableRef,HDLQualifiedName> _where = _from.<HDLQualifiedName>where(HDLVariableRef.fVar);
-                HDLQualifiedName _asRef = hvar.asRef();
-                Result<HDLVariableRef,HDLQualifiedName> _isEqualTo = _where.isEqualTo(_asRef);
-                final Collection<HDLVariableRef> varRefs = _isEqualTo.getAll();
-                final HDLQualifiedName newVarRef = newVar.asRef();
-                for (final HDLVariableRef ref_1 : varRefs) {
-                  HDLVariableRef _setVar = ref_1.setVar(newVarRef);
-                  ms.replace(ref_1, _setVar);
-                }
-              }
+              final String name = VHDLUtils.getVHDLName(origName);
+              HDLQualifiedName _asRef = hvar.asRef();
+              HDLQualifiedName _skipLast = _asRef.skipLast(1);
+              HDLQualifiedName _append = _skipLast.append(name);
+              Refactoring.<HDLUnit>renameVariable(hvar, _append, unit, ms);
             }
           }
         }

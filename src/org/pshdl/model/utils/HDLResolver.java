@@ -211,9 +211,11 @@ public class HDLResolver {
 			}
 		}
 		if (HDLRegisterConfig.DEF_CLK.equals(var.getLastSegment()))
-			return Optional.of(HDLRegisterConfig.defaultClk());
+			return Optional.of(HDLRegisterConfig.defaultClk(true));
 		if (HDLRegisterConfig.DEF_RST.equals(var.getLastSegment()))
-			return Optional.of(HDLRegisterConfig.defaultRst());
+			return Optional.of(HDLRegisterConfig.defaultRst(true));
+		if (HDLRegisterConfig.DEF_ENABLE.equals(var.getLastSegment()))
+			return Optional.of(HDLRegisterConfig.defaultEnable(true));
 		final IHDLObject container = resolveContainer;
 		if ((container == null) || !descent)
 			return Optional.absent();

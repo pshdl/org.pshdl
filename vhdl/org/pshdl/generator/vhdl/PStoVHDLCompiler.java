@@ -70,7 +70,7 @@ public class PStoVHDLCompiler extends PSAbstractCompiler implements IOutputProvi
 	protected CompileResult doCompile(final String src, final HDLPackage parse) {
 		final HDLPackage transform = Insulin.transform(parse, src);
 		final String vhdlCode = VhdlOutput.toVhdlString(VHDLPackageExtension.INST.toVHDL(transform));
-		return createResult(src, vhdlCode, getHookName());
+		return createResult(src, vhdlCode, getHookName(), false);
 	}
 
 	public static void main(String[] args) throws Exception {

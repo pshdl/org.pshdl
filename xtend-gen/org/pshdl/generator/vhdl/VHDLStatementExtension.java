@@ -80,7 +80,6 @@ import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.generator.vhdl.VHDLContext;
 import org.pshdl.generator.vhdl.VHDLExpressionExtension;
-import org.pshdl.generator.vhdl.VHDLOutputValidator;
 import org.pshdl.generator.vhdl.VHDLPackageExtension;
 import org.pshdl.generator.vhdl.VHDLUtils;
 import org.pshdl.generator.vhdl.libraries.VHDLCastsLibrary;
@@ -387,10 +386,9 @@ public class VHDLStatementExtension {
         ArrayList<HDLVariable> _variables = hvd.getVariables();
         for (final HDLVariable hvar : _variables) {
           {
-            String _plus = (ifName + "_");
             String _name = hvar.getName();
-            String _plus_1 = (_plus + _name);
-            HDLVariable sigVar = hvar.setName(_plus_1);
+            String _mapName = VHDLUtils.mapName(ifName, _name);
+            HDLVariable sigVar = hvar.setName(_mapName);
             HDLVariableRef ref = sigVar.asHDLRef();
             int i = 0;
             ArrayList<HDLExpression> _dimensions = hVar.getDimensions();
@@ -402,8 +400,8 @@ public class VHDLStatementExtension {
                 HDLVariableRef _setVar = _hDLVariableRef.setVar(_create);
                 HDLVariableRef _addArray = ref.addArray(_setVar);
                 ref = _addArray;
-                int _plus_2 = (i + 1);
-                i = _plus_2;
+                int _plus = (i + 1);
+                i = _plus;
               }
             }
             ArrayList<HDLExpression> _dimensions_1 = hVar.getDimensions();
@@ -449,7 +447,7 @@ public class VHDLStatementExtension {
               res.merge(_vHDL_3, false);
             }
             String _name_1 = hvar.getName();
-            String _vHDLName = VHDLOutputValidator.getVHDLName(_name_1);
+            String _vHDLName = VHDLUtils.getVHDLName(_name_1);
             Expression<? extends Object> _vHDL_4 = this.vee.toVHDL(ref);
             AssociationElement _associationElement = new AssociationElement(_vHDLName, _vHDL_4);
             portMap.add(_associationElement);
@@ -539,6 +537,7 @@ public class VHDLStatementExtension {
   }
   
   public static String getArrayRefName(final HDLVariable hvar, final boolean external) {
+    String res = null;
     if (external) {
       HDLQualifiedName fullName = null;
       HDLQualifiedName _meta = hvar.<HDLQualifiedName>getMeta(VHDLStatementExtension.ORIGINAL_FULLNAME);
@@ -550,12 +549,15 @@ public class VHDLStatementExtension {
         HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hvar);
         fullName = _fullNameOf;
       }
-      char _charAt = "_".charAt(0);
-      String _string = fullName.toString(_charAt);
-      return (_string + "_array");
+      String _string = fullName.toString('_');
+      res = _string;
+    } else {
+      String _name = hvar.getName();
+      res = _name;
     }
-    String _name = hvar.getName();
-    return (_name + "_array");
+    String _unescapeVHDLName = VHDLUtils.unescapeVHDLName(res);
+    String _plus = (_unescapeVHDLName + "_array");
+    return VHDLUtils.getVHDLName(_plus);
   }
   
   protected VHDLContext _toVHDL(final HDLVariableDeclaration obj, final int pid) {
@@ -1018,10 +1020,11 @@ public class VHDLStatementExtension {
       {
         HDLVariable _param = obj.getParam();
         String _name = _param.getName();
+        String _vHDLName = VHDLUtils.getVHDLName(_name);
         ArrayList<HDLRange> _range = obj.getRange();
         HDLRange _get = _range.get(0);
         Range _vHDL_1 = this.vee.toVHDL(_get, Direction.TO);
-        ForStatement _forStatement = new ForStatement(_name, _vHDL_1);
+        ForStatement _forStatement = new ForStatement(_vHDLName, _vHDL_1);
         final ForStatement fStmnt = _forStatement;
         List<SequentialStatement> _statements = fStmnt.getStatements();
         LinkedList<SequentialStatement> _value = e.getValue();
@@ -1035,10 +1038,11 @@ public class VHDLStatementExtension {
     if (_tripleNotEquals) {
       HDLVariable _param = obj.getParam();
       String _name = _param.getName();
+      String _vHDLName = VHDLUtils.getVHDLName(_name);
       ArrayList<HDLRange> _range = obj.getRange();
       HDLRange _get_1 = _range.get(0);
       Range _vHDL_1 = this.vee.toVHDL(_get_1, Direction.TO);
-      ForStatement _forStatement = new ForStatement(_name, _vHDL_1);
+      ForStatement _forStatement = new ForStatement(_vHDLName, _vHDL_1);
       final ForStatement fStmnt = _forStatement;
       List<SequentialStatement> _statements = fStmnt.getStatements();
       LinkedList<SequentialStatement> _get_2 = context.unclockedStatements.get(Integer.valueOf(pid));

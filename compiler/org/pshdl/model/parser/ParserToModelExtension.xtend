@@ -657,9 +657,11 @@ class ParserToModelExtension {
 
 	def dispatch HDLReference toHDL(PsVariableRefContext context) {
 		if (context.isClk !== null)
-			return HDLRegisterConfig::defaultClk.asHDLRef.attachContext(context)
+			return HDLRegisterConfig::defaultClk(true).asHDLRef.attachContext(context)
 		if (context.isRst !== null)
-			return HDLRegisterConfig::defaultRst.asHDLRef.attachContext(context)
+			return HDLRegisterConfig::defaultRst(true).asHDLRef.attachContext(context)
+		if (context.isEna !== null)
+			return HDLRegisterConfig::defaultEnable(true).asHDLRef.attachContext(context)
 		var HDLUnresolvedFragment current = null
 		for (sub : context.psRefPart.reverseView) {
 			var frag = sub.toHDL as HDLUnresolvedFragment

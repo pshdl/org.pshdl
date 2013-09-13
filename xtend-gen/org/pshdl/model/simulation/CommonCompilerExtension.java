@@ -374,21 +374,16 @@ public class CommonCompilerExtension {
   }
   
   public String idName(final String name, final boolean prev, final boolean field) {
-    String _replaceAll = name.replaceAll("\\.", "_");
+    String _replaceAll = name.replaceAll("[\\.\\$\\@]+", "_");
     String _replaceAll_1 = _replaceAll.replaceAll("\\{", "Bit");
     String _replaceAll_2 = _replaceAll_1.replaceAll("\\}", "");
     String _replaceAll_3 = _replaceAll_2.replaceAll(":", "to");
     String _replaceAll_4 = _replaceAll_3.replaceAll("\\[", "arr");
     String res = _replaceAll_4.replaceAll("\\]", "");
-    boolean _startsWith = res.startsWith("$");
+    boolean _startsWith = res.startsWith("#");
     if (_startsWith) {
       String _substring = res.substring(1);
       res = _substring;
-    }
-    boolean _startsWith_1 = res.startsWith("#");
-    if (_startsWith_1) {
-      String _substring_1 = res.substring(1);
-      res = _substring_1;
     }
     if (field) {
       String _plus = ("_" + res);

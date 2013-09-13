@@ -72,7 +72,6 @@ public class HDLLibrary {
 		libs.remove(libURI);
 	}
 
-	private final HDLConfig config = new HDLConfig();
 	public final Map<HDLQualifiedName, HDLFunction> functions = new ConcurrentHashMap<HDLQualifiedName, HDLFunction>();
 	public final Multimap<String, Record> objects = LinkedListMultimap.create();
 
@@ -215,17 +214,6 @@ public class HDLLibrary {
 		if (newType != null)
 			return Optional.of(Insulin.resolveFragments(newType));
 		return Optional.absent();
-	}
-
-	/**
-	 * A library can be associated with a {@link HDLConfig}. This HDLConfig
-	 * defines what is considered a default for, for example the
-	 * {@link HDLRegisterConfig}.
-	 * 
-	 * @return
-	 */
-	public HDLConfig getConfig() {
-		return config;
 	}
 
 	/**

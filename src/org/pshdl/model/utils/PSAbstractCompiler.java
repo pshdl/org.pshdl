@@ -78,6 +78,8 @@ public class PSAbstractCompiler {
 		 * be &lt;ERROR&gt; if not successful
 		 */
 		public final String entityName;
+
+		public final String fileName;
 		/**
 		 * All additional files that have been generated
 		 */
@@ -87,7 +89,7 @@ public class PSAbstractCompiler {
 		 */
 		public final String src;
 
-		public CompileResult(Set<Problem> syntaxProblems, String code, String entityName, Collection<SideFile> sideFiles, String src, String codeType) {
+		public CompileResult(Set<Problem> syntaxProblems, String code, String entityName, Collection<SideFile> sideFiles, String src, String codeType, boolean unitName) {
 			super();
 			this.syntaxProblems = syntaxProblems;
 			this.code = code;
@@ -99,10 +101,24 @@ public class PSAbstractCompiler {
 				this.sideFiles = new HashSet<SideFile>();
 			}
 			this.codeType = codeType;
+			this.fileName = getFileName(src, codeType, unitName);
 		}
 
 		public boolean hasError() {
 			return code == null;
+		}
+
+		private String getFileName(String src, String codeType, boolean unitName) {
+			String newName = new File(src).getName();
+			if (codeType == null) {
+				codeType = "";
+			}
+			if (unitName) {
+				newName = entityName + "." + codeType.toLowerCase();
+			} else {
+				newName = newName.substring(0, newName.length() - 5) + codeType.toLowerCase();
+			}
+			return newName;
 		}
 
 	}
@@ -111,13 +127,7 @@ public class PSAbstractCompiler {
 		if (result.hasError())
 			return new File[0];
 		final List<File> res = new LinkedList<File>();
-		String newName = new File(result.src).getName();
-		if (unitName) {
-			newName = result.entityName + "." + result.codeType.toLowerCase();
-		} else {
-			newName = newName.substring(0, newName.length() - 5) + result.codeType.toLowerCase();
-		}
-		final File target = new File(outDir, newName);
+		final File target = new File(outDir, result.fileName);
 		res.add(target);
 		FileOutputStream fos = new FileOutputStream(target);
 		fos.write(result.code.getBytes(Charsets.UTF_8));
@@ -275,17 +285,17 @@ public class PSAbstractCompiler {
 					if (listener.startModule(src, parse)) {
 						res.add(doCompile(src, parse));
 					} else {
-						res.add(createResult(src, null, null));
+						res.add(createResult(src, null, null, false));
 					}
 				} else {
-					res.add(createResult(src, null, null));
+					res.add(createResult(src, null, null, false));
 				}
 			}
 		}
 		return res;
 	}
 
-	protected CompileResult createResult(final String src, final String code, String codeType) {
+	protected CompileResult createResult(final String src, final String code, String codeType, boolean unitName) {
 		final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
 		String name = "<ERROR>";
 		final HDLPackage hdlPackage = pkgs.get(src);
@@ -296,7 +306,7 @@ public class PSAbstractCompiler {
 				name = units[0].getName();
 			}
 		}
-		final CompileResult cr = new CompileResult(syntaxProblems, code, name, lib.sideFiles.values(), src, codeType);
+		final CompileResult cr = new CompileResult(syntaxProblems, code, name, lib.sideFiles.values(), src, codeType, unitName);
 		lib.sideFiles.clear();
 		return cr;
 	}

@@ -776,7 +776,7 @@ import '../simulation_comm.dart';
 		val moduleName = em.moduleName
 		val unitName=moduleName.substring(moduleName.lastIndexOf('.')+1, moduleName.length-1);
 		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, unitName), moduleName, Collections::emptyList, em.source, hookName));
+			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, unitName), moduleName, Collections::emptyList, em.source, hookName, true));
 	}
 	
 }

@@ -40,20 +40,6 @@ import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 public class VHDLOutputValidator implements IHDLValidator {
-	public final static String[] keywords = { "abs", "if", "access", "impure", "after", "in", "alias", "inertial", "all", "inout", "and", "is", "architecture", "label", "array",
-			"library", "assert", "linkage", "attribute", "literal", "begin", "loop", "block", "map", "body", "mod", "buffer", "nand", "bus", "new", "case", "next", "component",
-			"nor", "configuration", "not", "constant", "null", "disconnect", "of", "downto", "on", "else", "open", "elsif", "or", "end", "others", "entity", "out", "exit",
-			"package", "file", "port", "for", "postponed", "function", "procedure", "generate", "process", "generic", "pure", "group", "range", "guarded", "record", "register",
-			"reject", "rem", "report", "return", "rol", "ror", "select", "severity", "signal", "shared", "sla", "sll", "sra", "srl", "subtype", "then", "to", "transport", "type",
-			"unaffected", "units", "until", "use", "variable", "wait", "when", "while", "with", "xnor", "xor" };
-
-	public final static Set<String> keywordSet;
-	static {
-		keywordSet = new HashSet<String>();
-		for (final String keyword : keywords) {
-			keywordSet.add(keyword);
-		}
-	}
 
 	public static enum VHDLErrorCode implements IErrorCode {
 		KEYWORD_NAME(WARNING), KEYWORD_TYPE(ERROR);
@@ -104,28 +90,28 @@ public class VHDLOutputValidator implements IHDLValidator {
 		final HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (final HDLVariable hdlVariable : vars) {
 			final String varName = hdlVariable.getName();
-			if (!getVHDLName(varName).equals(varName)) {
+			if (!VHDLUtils.getVHDLName(varName).equals(varName)) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_NAME, hdlVariable));
 			}
 		}
 		final HDLUnit[] units = unit.getAllObjectsOf(HDLUnit.class, true);
 		for (final HDLUnit hdlUnit : units) {
 			final String name = fullNameOf(hdlUnit).toString('_');
-			if (keywordSet.contains(name.toLowerCase())) {
+			if (VHDLUtils.isKeyword(name)) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
 		final HDLInterface[] ifs = unit.getAllObjectsOf(HDLInterface.class, true);
 		for (final HDLInterface hdlUnit : ifs) {
 			final String name = fullNameOf(hdlUnit).toString('_');
-			if (keywordSet.contains(name.toLowerCase())) {
+			if (VHDLUtils.isKeyword(name)) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
 		final HDLEnum[] enums = unit.getAllObjectsOf(HDLEnum.class, true);
 		for (final HDLEnum hdlUnit : enums) {
 			final String name = fullNameOf(hdlUnit).toString('_');
-			if (keywordSet.contains(name.toLowerCase())) {
+			if (VHDLUtils.isKeyword(name)) {
 				problems.add(new Problem(VHDLErrorCode.KEYWORD_TYPE, hdlUnit));
 			}
 		}
@@ -136,11 +122,4 @@ public class VHDLOutputValidator implements IHDLValidator {
 		return "VHDL Validator";
 	}
 
-	public static String getVHDLName(String name) {
-		if (keywordSet.contains(name))
-			return "\\" + name + "\\";
-		if (name.startsWith("_") || name.endsWith("_"))
-			return "\\" + name + "\\";
-		return name;
-	}
 }

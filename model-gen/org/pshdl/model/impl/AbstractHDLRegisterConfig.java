@@ -53,6 +53,8 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 *            the value for clk. Can <b>not</b> be <code>null</code>.
 	 * @param rst
 	 *            the value for rst. Can <b>not</b> be <code>null</code>.
+	 * @param enable
+	 *            the value for enable. Can be <code>null</code>.
 	 * @param clockType
 	 *            the value for clockType. Can be <code>null</code>.
 	 * @param resetType
@@ -61,11 +63,14 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	 *            the value for syncType. Can be <code>null</code>.
 	 * @param resetValue
 	 *            the value for resetValue. Can <b>not</b> be <code>null</code>.
+	 * @param delay
+	 *            the value for delay. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName clk, @Nonnull HDLQualifiedName rst, @Nullable HDLRegClockType clockType,
-			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue, boolean validate) {
+	public AbstractHDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName clk, @Nonnull HDLQualifiedName rst, @Nullable HDLQualifiedName enable,
+			@Nullable HDLRegClockType clockType, @Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue,
+			@Nullable HDLExpression delay, boolean validate) {
 		super(id, container, validate);
 		if (validate) {
 			clk = validateClk(clk);
@@ -75,6 +80,10 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 			rst = validateRst(rst);
 		}
 		this.rst = rst;
+		if (validate) {
+			enable = validateEnable(enable);
+		}
+		this.enable = enable;
 		if (validate) {
 			clockType = validateClockType(clockType);
 		}
@@ -95,16 +104,26 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		} else {
 			this.resetValue = null;
 		}
+		if (validate) {
+			delay = validateDelay(delay);
+		}
+		if (delay != null) {
+			this.delay = delay;
+		} else {
+			this.delay = null;
+		}
 	}
 
 	public AbstractHDLRegisterConfig() {
 		super();
 		this.clk = null;
 		this.rst = null;
+		this.enable = null;
 		this.clockType = null;
 		this.resetType = null;
 		this.syncType = null;
 		this.resetValue = null;
+		this.delay = null;
 	}
 
 	protected final HDLQualifiedName clk;
@@ -143,6 +162,23 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		if (rst == null)
 			throw new IllegalArgumentException("The field rst can not be null!");
 		return rst;
+	}
+
+	protected final HDLQualifiedName enable;
+
+	@Nullable
+	public Optional<HDLVariable> resolveEnable() {
+		if (!frozen)
+			throw new IllegalArgumentException("Object not frozen");
+		return ScopingExtension.INST.resolveVariable(this, enable);
+	}
+
+	public HDLQualifiedName getEnableRefName() {
+		return enable;
+	}
+
+	protected HDLQualifiedName validateEnable(HDLQualifiedName enable) {
+		return enable;
 	}
 
 	protected final HDLRegClockType clockType;
@@ -211,6 +247,22 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		return resetValue;
 	}
 
+	protected final HDLExpression delay;
+
+	/**
+	 * Get the delay field. Can be <code>null</code>.
+	 * 
+	 * @return the field
+	 */
+	@Nullable
+	public HDLExpression getDelay() {
+		return delay;
+	}
+
+	protected HDLExpression validateDelay(HDLExpression delay) {
+		return delay;
+	}
+
 	/**
 	 * Creates a copy of this class with the same fields.
 	 * 
@@ -219,7 +271,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRegisterConfig copy() {
-		final HDLRegisterConfig newObject = new HDLRegisterConfig(id, null, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig newObject = new HDLRegisterConfig(id, null, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -234,12 +286,14 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	public HDLRegisterConfig copyFiltered(CopyFilter filter) {
 		final HDLQualifiedName filteredclk = filter.copyObject("clk", this, clk);
 		final HDLQualifiedName filteredrst = filter.copyObject("rst", this, rst);
+		final HDLQualifiedName filteredenable = filter.copyObject("enable", this, enable);
 		final HDLRegClockType filteredclockType = filter.copyObject("clockType", this, clockType);
 		final HDLRegResetActiveType filteredresetType = filter.copyObject("resetType", this, resetType);
 		final HDLRegSyncType filteredsyncType = filter.copyObject("syncType", this, syncType);
 		final HDLExpression filteredresetValue = filter.copyObject("resetValue", this, resetValue);
-		return filter.postFilter((HDLRegisterConfig) this, new HDLRegisterConfig(id, null, filteredclk, filteredrst, filteredclockType, filteredresetType, filteredsyncType,
-				filteredresetValue, false));
+		final HDLExpression filtereddelay = filter.copyObject("delay", this, delay);
+		return filter.postFilter((HDLRegisterConfig) this, new HDLRegisterConfig(id, null, filteredclk, filteredrst, filteredenable, filteredclockType, filteredresetType,
+				filteredsyncType, filteredresetValue, filtereddelay, false));
 	}
 
 	/**
@@ -282,7 +336,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setClk(@Nonnull HDLQualifiedName clk) {
 		clk = validateClk(clk);
-		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		return res;
 	}
 
@@ -298,7 +352,22 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setRst(@Nonnull HDLQualifiedName rst) {
 		rst = validateRst(rst);
-		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getEnable()}.
+	 * 
+	 * @param enable
+	 *            sets the new enable of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated
+	 *         enable field.
+	 */
+	@Nonnull
+	public HDLRegisterConfig setEnable(@Nullable HDLQualifiedName enable) {
+		enable = validateEnable(enable);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		return res;
 	}
 
@@ -314,7 +383,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setClockType(@Nullable HDLRegClockType clockType) {
 		clockType = validateClockType(clockType);
-		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		return res;
 	}
 
@@ -330,7 +399,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setResetType(@Nullable HDLRegResetActiveType resetType) {
 		resetType = validateResetType(resetType);
-		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		return res;
 	}
 
@@ -346,7 +415,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setSyncType(@Nullable HDLRegSyncType syncType) {
 		syncType = validateSyncType(syncType);
-		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		return res;
 	}
 
@@ -362,7 +431,22 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	@Nonnull
 	public HDLRegisterConfig setResetValue(@Nonnull HDLExpression resetValue) {
 		resetValue = validateResetValue(resetValue);
-		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, clockType, resetType, syncType, resetValue, false);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getDelay()}.
+	 * 
+	 * @param delay
+	 *            sets the new delay of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRegisterConfig} with the updated
+	 *         delay field.
+	 */
+	@Nonnull
+	public HDLRegisterConfig setDelay(@Nullable HDLExpression delay) {
+		delay = validateDelay(delay);
+		final HDLRegisterConfig res = new HDLRegisterConfig(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, false);
 		return res;
 	}
 
@@ -387,6 +471,11 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 				return false;
 		} else if (!rst.equals(other.rst))
 			return false;
+		if (enable == null) {
+			if (other.enable != null)
+				return false;
+		} else if (!enable.equals(other.enable))
+			return false;
 		if (clockType == null) {
 			if (other.clockType != null)
 				return false;
@@ -407,6 +496,11 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 				return false;
 		} else if (!resetValue.equals(other.resetValue))
 			return false;
+		if (delay == null) {
+			if (other.delay != null)
+				return false;
+		} else if (!delay.equals(other.delay))
+			return false;
 		return true;
 	}
 
@@ -420,10 +514,12 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		final int prime = 31;
 		result = (prime * result) + ((clk == null) ? 0 : clk.hashCode());
 		result = (prime * result) + ((rst == null) ? 0 : rst.hashCode());
+		result = (prime * result) + ((enable == null) ? 0 : enable.hashCode());
 		result = (prime * result) + ((clockType == null) ? 0 : clockType.hashCode());
 		result = (prime * result) + ((resetType == null) ? 0 : resetType.hashCode());
 		result = (prime * result) + ((syncType == null) ? 0 : syncType.hashCode());
 		result = (prime * result) + ((resetValue == null) ? 0 : resetValue.hashCode());
+		result = (prime * result) + ((delay == null) ? 0 : delay.hashCode());
 		hashCache = result;
 		return result;
 	}
@@ -439,6 +535,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		if (rst != null) {
 			sb.append(".setRst(HDLQualifiedName.create(\"").append(rst).append("\"))");
 		}
+		if (enable != null) {
+			sb.append(".setEnable(HDLQualifiedName.create(\"").append(enable).append("\"))");
+		}
 		if (clockType != null) {
 			sb.append("\n").append(spacing + "\t").append(".setClockType(HDLRegClockType.").append(clockType.name() + ")");
 		}
@@ -450,6 +549,9 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		}
 		if (resetValue != null) {
 			sb.append(".setResetValue(").append(resetValue.toConstructionString(spacing + "\t")).append(")");
+		}
+		if (delay != null) {
+			sb.append(".setDelay(").append(delay.toConstructionString(spacing + "\t")).append(")");
 		}
 		return sb.toString();
 	}
@@ -465,12 +567,20 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 		if (checkResolve && (getRstRefName() != null))
 			if (!resolveRst().isPresent())
 				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getRstRefName()));
+		validateEnable(getEnableRefName());
+		if (checkResolve && (getEnableRefName() != null))
+			if (!resolveEnable().isPresent())
+				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getEnableRefName()));
 		validateClockType(getClockType());
 		validateResetType(getResetType());
 		validateSyncType(getSyncType());
 		validateResetValue(getResetValue());
 		if (getResetValue() != null) {
 			getResetValue().validateAllFields(this, checkResolve);
+		}
+		validateDelay(getDelay());
+		if (getDelay() != null) {
+			getDelay().validateAllFields(this, checkResolve);
 		}
 	}
 
@@ -496,6 +606,11 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 					case 0:
 						if (resetValue != null) {
 							current = Iterators.concat(Iterators.forArray(resetValue), resetValue.deepIterator());
+						}
+						break;
+					case 1:
+						if (delay != null) {
+							current = Iterators.concat(Iterators.forArray(delay), delay.deepIterator());
 						}
 						break;
 					default:
@@ -535,6 +650,11 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 					case 0:
 						if (resetValue != null) {
 							current = Iterators.singletonIterator(resetValue);
+						}
+						break;
+					case 1:
+						if (delay != null) {
+							current = Iterators.singletonIterator(delay);
 						}
 						break;
 					default:

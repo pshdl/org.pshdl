@@ -65,7 +65,6 @@ import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.utils.Insulin
 import org.pshdl.model.HDLObject$GenericMeta
 import org.pshdl.model.HDLArrayInit
-import org.pshdl.model.utils.HDLConfig
 import org.pshdl.model.HDLRegisterConfig
 import com.google.common.base.Optional
 import org.pshdl.model.HDLEnum
@@ -76,9 +75,6 @@ import com.google.common.cache.CacheLoader
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
-//	private static Cache<IHDLObject, Optional<? extends HDLType>> cache= CacheBuilder::newBuilder.maximumSize(100000).weakKeys.build(CacheLoader::from([IHDLObject obj|
-//		return INST.determineType(obj)
-//	]));
 
 	def static Optional<? extends HDLType> typeOf(IHDLObject obj) {
 		if (!obj.isFrozen)

@@ -177,10 +177,8 @@ class CommonCompilerExtension {
 	}
 
 	def idName(String name, boolean prev, boolean field) {
-		var res = name.replaceAll("\\.", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
+		var res = name.replaceAll("[\\.\\$\\@]+", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
 			replaceAll('\\[', 'arr').replaceAll('\\]', '')
-		if (res.startsWith("$"))
-			res = res.substring(1)
 		if (res.startsWith("#"))
 			res = res.substring(1)
 		if (field)

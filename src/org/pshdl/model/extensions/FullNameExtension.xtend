@@ -96,7 +96,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = loop.superFullName
 		val count = countInstance(loop)
-		return fullName.append("$for" + count)
+		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"for" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLBlock block) {
@@ -105,7 +105,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = block.superFullName
 		val count = countInstance(block)
-		return fullName.append("$block" + count)
+		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"block" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLIfStatement ifStamnt) {
@@ -114,7 +114,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = ifStamnt.superFullName
 		val count = countInstance(ifStamnt)
-		return fullName.append("$if" + count)
+		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"if" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLSwitchStatement stmnt) {
@@ -123,7 +123,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = stmnt.superFullName
 		val count = countInstance(stmnt)
-		return fullName.append("$switch" + count)
+		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"switch" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLSwitchCaseStatement stmnt) {
@@ -132,7 +132,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = stmnt.superFullName
 		val count = countInstance(stmnt)
-		return fullName.append("$case" + count)
+		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"case" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLUnit unit) {

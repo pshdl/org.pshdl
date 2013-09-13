@@ -553,44 +553,58 @@ class StringWriteExtension {
 		val StringBuilder params = new StringBuilder
 		params.append('(')
 		var boolean first = true
-		if (!reg.clkRefName.equals(defaultReg.clkRefName)) {
+		if (reg.clkRefName != defaultReg.clkRefName) {
 			params.append(highlight.param(HDLRegisterConfig::CLOCK_PARAM)).append('=').append(
 				highlight.variableRefName(reg.clkRefName))
 			first = false
 		}
-		if (!reg.rstRefName.equals(defaultReg.rstRefName)) {
+		if (reg.rstRefName!=defaultReg.rstRefName) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_PARAM)).append('=').append(
 				highlight.variableRefName(reg.rstRefName))
 			first = false
 		}
-		if (reg.clockType !== null && !reg.clockType.equals(defaultReg.clockType)) {
+		if (reg.enableRefName!=defaultReg.enableRefName) {
+			if (!first)
+				params.append(", ")
+			params.append(highlight.param(HDLRegisterConfig::ENABLE_PARAM)).append('=').append(
+				highlight.variableRefName(reg.enableRefName))
+			first = false
+		}
+		if (reg.clockType !== null && reg.clockType!==defaultReg.clockType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::EDGE_PARAM)).append('=').append(
 				highlight.enumRefType("Edge")).append('.').append(highlight.enumRefVar(reg.clockType.toString))
 			first = false
 		}
-		if (reg.syncType !== null && !reg.syncType.equals(defaultReg.syncType)) {
+		if (reg.syncType !== null && reg.syncType!==defaultReg.syncType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_SYNC_PARAM)).append('=').append(
 				highlight.enumRefType("Sync")).append('.').append(highlight.enumRefVar(reg.syncType.toString))
 			first = false
 		}
-		if (reg.resetType !== null && !reg.resetType.equals(defaultReg.resetType)) {
+		if (reg.resetType !== null && reg.resetType!==defaultReg.resetType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_TYPE_PARAM)).append('=').append(
 				highlight.enumRefType("Active")).append('.').append(highlight.enumRefVar(reg.resetType.toString))
 			first = false
 		}
-		if (!reg.resetValue.equals(defaultReg.resetValue)) {
+		if (reg.resetValue!=defaultReg.resetValue) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_VALUE_PARAM)).append('=').append(
 				reg.resetValue.toString(highlight))
+			first = false
+		}
+		if (reg.delay!=defaultReg.delay) {
+			if (!first)
+				params.append(", ")
+			params.append(highlight.param(HDLRegisterConfig::DELAY_PARAM)).append('=').append(
+				reg.delay.toString(highlight))
 			first = false
 		}
 		params.append(')')

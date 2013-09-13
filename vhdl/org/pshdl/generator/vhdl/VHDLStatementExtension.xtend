@@ -251,7 +251,7 @@ class VHDLStatementExtension {
 				val Collection<HDLAnnotation> typeAnno = HDLQuery::select(typeof(HDLAnnotation)).from(hvd).where(
 					HDLAnnotation::fName).isEqualTo(VHDLType.toString).all
 				for (HDLVariable hvar : hvd.variables) {
-					var HDLVariable sigVar = hvar.setName(ifName + "_" + hvar.name)
+					var HDLVariable sigVar = hvar.setName(VHDLUtils::mapName(ifName, hvar.name))
 					var HDLVariableRef ref = sigVar.asHDLRef
 					var i = 0
 					for (HDLExpression exp : hVar.dimensions) {
@@ -284,7 +284,7 @@ class VHDLStatementExtension {
 							setVariables(HDLObject::asList(sigVar)).copyDeepFrozen(obj)
 						res.merge(newHVD.toVHDL(pid), false)
 					}
-					portMap.add(new AssociationElement(VHDLOutputValidator::getVHDLName(hvar.name), ref.toVHDL))
+					portMap.add(new AssociationElement(VHDLUtils::getVHDLName(hvar.name), ref.toVHDL))
 				}
 			} else {
 
@@ -332,15 +332,17 @@ class VHDLStatementExtension {
 	}
 
 	def static String getArrayRefName(HDLVariable hvar, boolean external) {
+		var String res
 		if (external) {
 			var HDLQualifiedName fullName
 			if (hvar.getMeta(ORIGINAL_FULLNAME) !== null)
 				fullName = hvar.getMeta(ORIGINAL_FULLNAME)
 			else
 				fullName = FullNameExtension::fullNameOf(hvar)
-			return fullName.toString('_'.charAt(0)) + "_array"
-		}
-		return hvar.name + "_array"
+			res=fullName.toString('_')
+		} else
+			res=hvar.name
+		return VHDLUtils::getVHDLName(VHDLUtils::unescapeVHDLName(res) + "_array")
 	}
 
 	def dispatch VHDLContext toVHDL(HDLVariableDeclaration obj, int pid) {
@@ -408,7 +410,7 @@ class VHDLStatementExtension {
 					if (resetValue instanceof HDLArrayInit) {
 						s.setDefaultValue(resetValue.toVHDL)
 					} else {
-						if (resetValue!==null){
+						if (resetValue !== null) {
 							var Expression<?> assign = resetValue.toVHDL
 							for (HDLExpression exp : hvar.dimensions)
 								assign = Aggregate::OTHERS(assign)
@@ -572,12 +574,14 @@ class VHDLStatementExtension {
 			val VHDLContext res = new VHDLContext
 			res.merge(context, true)
 			for (Map$Entry<HDLRegisterConfig, LinkedList<SequentialStatement>> e : context.clockedStatements.entrySet) {
-				val ForStatement fStmnt = new ForStatement(obj.param.name, obj.range.get(0).toVHDL(Range$Direction::TO))
+				val ForStatement fStmnt = new ForStatement(VHDLUtils::getVHDLName(obj.param.name),
+					obj.range.get(0).toVHDL(Range$Direction::TO))
 				fStmnt.statements.addAll(e.value)
 				res.addClockedStatement(e.key, fStmnt)
 			}
 			if (context.unclockedStatements.get(pid) !== null) {
-				val ForStatement fStmnt = new ForStatement(obj.param.name, obj.range.get(0).toVHDL(Range$Direction::TO))
+				val ForStatement fStmnt = new ForStatement(VHDLUtils::getVHDLName(obj.param.name),
+					obj.range.get(0).toVHDL(Range$Direction::TO))
 				fStmnt.statements.addAll(context.unclockedStatements.get(pid))
 				res.addUnclockedStatement(pid, fStmnt, obj)
 			}

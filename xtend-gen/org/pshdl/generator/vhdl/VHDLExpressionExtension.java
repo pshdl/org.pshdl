@@ -141,16 +141,12 @@ public class VHDLExpressionExtension {
   
   protected String _getVHDLName(final HDLVariableRef obj) {
     HDLQualifiedName _varRefName = obj.getVarRefName();
-    return _varRefName.getLastSegment();
+    String _lastSegment = _varRefName.getLastSegment();
+    return VHDLUtils.getVHDLName(_lastSegment);
   }
   
   protected String _getVHDLName(final HDLInterfaceRef obj) {
-    HDLQualifiedName _hIfRefName = obj.getHIfRefName();
-    String _lastSegment = _hIfRefName.getLastSegment();
-    String _plus = (_lastSegment + "_");
-    HDLQualifiedName _varRefName = obj.getVarRefName();
-    String _lastSegment_1 = _varRefName.getLastSegment();
-    return (_plus + _lastSegment_1);
+    return VHDLUtils.mapName(obj);
   }
   
   protected Name<? extends Object> _toVHDL(final HDLVariableRef obj) {
@@ -418,7 +414,15 @@ public class VHDLExpressionExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLLiteralPresentation.HEX)) {
         _matched=true;
+        boolean _or = false;
         if (asString) {
+          _or = true;
+        } else {
+          int _bitLength = dec.bitLength();
+          boolean _greaterThan = (_bitLength > 32);
+          _or = (asString || _greaterThan);
+        }
+        if (_or) {
           return VHDLUtils.toHexLiteral(l, dec);
         }
         String _substring = sVal.substring(2);
@@ -431,7 +435,15 @@ public class VHDLExpressionExtension {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLLiteralPresentation.BIN)) {
         _matched=true;
+        boolean _or_1 = false;
         if (asString) {
+          _or_1 = true;
+        } else {
+          int _bitLength_1 = dec.bitLength();
+          boolean _greaterThan_1 = (_bitLength_1 > 32);
+          _or_1 = (asString || _greaterThan_1);
+        }
+        if (_or_1) {
           return VHDLUtils.toBinaryLiteral(l, dec);
         }
         String _substring_1 = sVal.substring(2);
@@ -441,15 +453,15 @@ public class VHDLExpressionExtension {
         return _basedLiteral_1;
       }
     }
-    boolean _or = false;
-    int _bitLength = dec.bitLength();
-    boolean _greaterThan = (_bitLength > 31);
-    if (_greaterThan) {
-      _or = true;
+    boolean _or_2 = false;
+    int _bitLength_2 = dec.bitLength();
+    boolean _greaterThan_2 = (_bitLength_2 > 31);
+    if (_greaterThan_2) {
+      _or_2 = true;
     } else {
-      _or = (_greaterThan || asString);
+      _or_2 = (_greaterThan_2 || asString);
     }
-    if (_or) {
+    if (_or_2) {
       return VHDLUtils.toBinaryLiteral(l, dec);
     }
     DecimalLiteral _decimalLiteral = new DecimalLiteral(sVal);

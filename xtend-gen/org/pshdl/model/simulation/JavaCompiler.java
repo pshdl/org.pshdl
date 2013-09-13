@@ -2784,7 +2784,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     String _doCompile = JavaCompiler.doCompile(em, pkg, unitName, debug, 1);
     List<SideFile> _emptyList = Collections.<SideFile>emptyList();
     String _hookName = this.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName, true);
     return Lists.<CompileResult>newArrayList(_compileResult);
   }
 }

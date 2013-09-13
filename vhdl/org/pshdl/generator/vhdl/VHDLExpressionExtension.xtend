@@ -101,6 +101,7 @@ import de.upb.hni.vmagic.expression.Aggregate
 import java.util.ArrayList
 import de.upb.hni.vmagic.Choices
 import de.upb.hni.vmagic.literal.CharacterLiteral
+import org.pshdl.model.utils.Insulin
 
 class VHDLExpressionExtension {
 
@@ -119,11 +120,11 @@ class VHDLExpressionExtension {
 	}
 
 	def dispatch String getVHDLName(HDLVariableRef obj) {
-		return obj.varRefName.lastSegment
+		return VHDLUtils::getVHDLName(obj.varRefName.lastSegment)
 	}
 
 	def dispatch String getVHDLName(HDLInterfaceRef obj) {
-		return obj.HIfRefName.lastSegment + "_" + obj.varRefName.lastSegment
+		return VHDLUtils::mapName(obj)
 	}
 
 	def dispatch Name<?> toVHDL(HDLVariableRef obj) {
@@ -249,12 +250,12 @@ class VHDLExpressionExtension {
 				return Standard::BOOLEAN_FALSE
 			}
 			case HEX: {
-				if (asString)
+				if (asString || dec.bitLength>32)
 					return VHDLUtils::toHexLiteral(l, dec)
 				return new BasedLiteral("16#" + sVal.substring(2) + "#")
 			}
 			case BIN: {
-				if (asString)
+				if (asString || dec.bitLength>32)
 					return VHDLUtils::toBinaryLiteral(l, dec)
 				return new BasedLiteral("2#" + sVal.substring(2) + "#")
 			}

@@ -571,8 +571,12 @@ public class BuiltInValidator implements IHDLValidator {
 		final Map<String, HDLVariable> nameMap = new HashMap<String, HDLVariable>();
 		for (final HDLVariable hdlVariable : vars) {
 			final HDLQualifiedName fullName = fullNameOf(hdlVariable);
-			if (keywordSet.contains(fullName.getLastSegment())) {
+			final String lastSegment = fullName.getLastSegment();
+			if (keywordSet.contains(lastSegment)) {
 				problems.add(new Problem(VARIABLE_KEYWORD_NAME, hdlVariable));
+			}
+			if (lastSegment.charAt(0) == '$') {
+				problems.add(new Problem(VARIABLE_NAME_NOT_RECOMMENDED, hdlVariable));
 			}
 			final HDLVariable put = nameMap.put(fullName.toString().toLowerCase(), hdlVariable);
 			if (put != null) {
@@ -910,8 +914,11 @@ public class BuiltInValidator implements IHDLValidator {
 						}
 						if (left != ref) {
 							validateArrayAssignment(problems, context, ref, ass, left, targetDim);
-						} else if (ass.getRight().getClassType() != HDLClass.HDLVariableRef) {
-							problems.add(new Problem(ARRAY_WRITE_MULTI_DIMENSION, ass));
+						} else {
+							final HDLClass classType = ass.getRight().getClassType();
+							if ((classType != HDLClass.HDLVariableRef) && (classType != HDLClass.HDLArrayInit)) {
+								problems.add(new Problem(ARRAY_WRITE_MULTI_DIMENSION, ass));
+							}
 						}
 					}
 				}

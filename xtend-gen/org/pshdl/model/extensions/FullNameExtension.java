@@ -138,8 +138,9 @@ public class FullNameExtension {
     }
     final HDLQualifiedName fullName = this.getSuperFullName(loop);
     final int count = FullNameExtension.countInstance(loop);
-    String _plus = ("$for" + Integer.valueOf(count));
-    return fullName.append(_plus);
+    String _plus = (Character.valueOf(HDLQualifiedName.LOCAL_TYPE_SEP) + "for");
+    String _plus_1 = (_plus + Integer.valueOf(count));
+    return fullName.append(_plus_1);
   }
   
   protected HDLQualifiedName _getFullName(final HDLBlock block) {
@@ -150,8 +151,9 @@ public class FullNameExtension {
     }
     final HDLQualifiedName fullName = this.getSuperFullName(block);
     final int count = FullNameExtension.countInstance(block);
-    String _plus = ("$block" + Integer.valueOf(count));
-    return fullName.append(_plus);
+    String _plus = (Character.valueOf(HDLQualifiedName.LOCAL_TYPE_SEP) + "block");
+    String _plus_1 = (_plus + Integer.valueOf(count));
+    return fullName.append(_plus_1);
   }
   
   protected HDLQualifiedName _getFullName(final HDLIfStatement ifStamnt) {
@@ -162,8 +164,9 @@ public class FullNameExtension {
     }
     final HDLQualifiedName fullName = this.getSuperFullName(ifStamnt);
     final int count = FullNameExtension.countInstance(ifStamnt);
-    String _plus = ("$if" + Integer.valueOf(count));
-    return fullName.append(_plus);
+    String _plus = (Character.valueOf(HDLQualifiedName.LOCAL_TYPE_SEP) + "if");
+    String _plus_1 = (_plus + Integer.valueOf(count));
+    return fullName.append(_plus_1);
   }
   
   protected HDLQualifiedName _getFullName(final HDLSwitchStatement stmnt) {
@@ -174,8 +177,9 @@ public class FullNameExtension {
     }
     final HDLQualifiedName fullName = this.getSuperFullName(stmnt);
     final int count = FullNameExtension.countInstance(stmnt);
-    String _plus = ("$switch" + Integer.valueOf(count));
-    return fullName.append(_plus);
+    String _plus = (Character.valueOf(HDLQualifiedName.LOCAL_TYPE_SEP) + "switch");
+    String _plus_1 = (_plus + Integer.valueOf(count));
+    return fullName.append(_plus_1);
   }
   
   protected HDLQualifiedName _getFullName(final HDLSwitchCaseStatement stmnt) {
@@ -186,8 +190,9 @@ public class FullNameExtension {
     }
     final HDLQualifiedName fullName = this.getSuperFullName(stmnt);
     final int count = FullNameExtension.countInstance(stmnt);
-    String _plus = ("$case" + Integer.valueOf(count));
-    return fullName.append(_plus);
+    String _plus = (Character.valueOf(HDLQualifiedName.LOCAL_TYPE_SEP) + "case");
+    String _plus_1 = (_plus + Integer.valueOf(count));
+    return fullName.append(_plus_1);
   }
   
   protected HDLQualifiedName _getFullName(final HDLUnit unit) {

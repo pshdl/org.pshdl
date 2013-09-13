@@ -395,7 +395,7 @@ RULE_PS_LITERAL_TERMINAL :
 ;
 
 fragment
-    IDCHARFIRST : 'a' .. 'z' | 'A' .. 'Z';
+    IDCHARFIRST : '$' | 'a' .. 'z' | 'A' .. 'Z';
 fragment
     IDCHAR : IDCHARFIRST | '_' | '0' .. '9';
 

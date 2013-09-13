@@ -2726,7 +2726,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     String _doCompile = DartCompiler.doCompile(em, unitName);
     List<SideFile> _emptyList = Collections.<SideFile>emptyList();
     String _hookName = this.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName, true);
     return Lists.<CompileResult>newArrayList(_compileResult);
   }
 }

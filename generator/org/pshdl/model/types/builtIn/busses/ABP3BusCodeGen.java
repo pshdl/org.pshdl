@@ -87,10 +87,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
 								.addVariables(new HDLVariable().setName("PWDATA")))
 				.addStatements(
-						new HDLVariableDeclaration()
-								.setRegister(
-										new HDLRegisterConfig().setClk(HDLQualifiedName.create("$clk")).setRst(HDLQualifiedName.create("$rst"))
-												.setClockType(HDLRegClockType.FALLING).setResetValue(new HDLLiteral().setVal("0"))).setDirection(HDLDirection.OUT)
+						new HDLVariableDeclaration().setRegister(HDLRegisterConfig.defaultConfig().setClockType(HDLRegClockType.FALLING)).setDirection(HDLDirection.OUT)
 								.setType(HDLQualifiedName.create("#bit<32>"))
 								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
 								.addVariables(new HDLVariable().setName("PRDATA")))

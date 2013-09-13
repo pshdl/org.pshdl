@@ -600,7 +600,7 @@ class CCompiler implements ITypeOuptutProvider {
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
 		return Lists::newArrayList(
-			new CompileResult(syntaxProblems, doCompile(em), em.moduleName, Collections::emptyList, em.source, hookName));
+			new CompileResult(syntaxProblems, doCompile(em), em.moduleName, Collections::emptyList, em.source, hookName, true));
 	}
 	
 }

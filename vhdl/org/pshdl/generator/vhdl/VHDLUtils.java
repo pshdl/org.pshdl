@@ -27,6 +27,10 @@
 package org.pshdl.generator.vhdl;
 
 import java.math.*;
+import java.util.*;
+import java.util.regex.*;
+
+import org.pshdl.model.*;
 
 import de.upb.hni.vmagic.expression.*;
 import de.upb.hni.vmagic.literal.*;
@@ -73,6 +77,33 @@ public class VHDLUtils {
 		return sb;
 	}
 
+	public final static String[] keywords = { "abs", "if", "access", "impure", "after", "in", "alias", "inertial", "all", "inout", "and", "is", "architecture", "label", "array",
+			"library", "assert", "linkage", "attribute", "literal", "begin", "loop", "block", "map", "body", "mod", "buffer", "nand", "bus", "new", "case", "next", "component",
+			"nor", "configuration", "not", "constant", "null", "disconnect", "of", "downto", "on", "else", "open", "elsif", "or", "end", "others", "entity", "out", "exit",
+			"package", "file", "port", "for", "postponed", "function", "procedure", "generate", "process", "generic", "pure", "group", "range", "guarded", "record", "register",
+			"reject", "rem", "report", "return", "rol", "ror", "select", "severity", "signal", "shared", "sla", "sll", "sra", "srl", "subtype", "then", "to", "transport", "type",
+			"unaffected", "units", "until", "use", "variable", "wait", "when", "while", "with", "xnor", "xor" };
+
+	public final static Set<String> keywordSet;
+	static {
+		keywordSet = new HashSet<String>();
+		for (final String keyword : keywords) {
+			keywordSet.add(keyword);
+		}
+	}
+
+	private static final Pattern vhdlName = Pattern.compile("[a-zA-Z]\\w*");
+
+	public static String getVHDLName(String name) {
+		if ((name.charAt(0) == '\\') && (name.charAt(name.length() - 1) == '\\'))
+			return name;
+		if (keywordSet.contains(name))
+			return "\\" + name + "\\";
+		if (vhdlName.matcher(name).matches())
+			return name;
+		return "\\" + name + "\\";
+	}
+
 	public static void main(String[] args) {
 		final long a = -4373652435859253850L;
 		final BigInteger lit = BigInteger.valueOf(a);
@@ -99,5 +130,25 @@ public class VHDLUtils {
 		System.out.println(toBinaryLiteral(64, lit));
 		System.out.println(toBinaryLiteral(32, lit));
 		// toBinaryLiteral(3, BigInteger.TEN);
+	}
+
+	public static boolean isKeyword(String name) {
+		return keywordSet.contains(name.toLowerCase());
+	}
+
+	public static String mapName(HDLInterfaceRef ref) {
+		final String hIf = ref.getHIfRefName().getLastSegment();
+		final String hVar = ref.getVarRefName().getLastSegment();
+		return mapName(hIf, hVar);
+	}
+
+	public static String mapName(String hIf, String hVar) {
+		return getVHDLName("$map_" + hIf + "_" + hVar);
+	}
+
+	public static String unescapeVHDLName(String string) {
+		if (string.charAt(0) == '\\')
+			return string.substring(1, string.length() - 1);
+		return string;
 	}
 }

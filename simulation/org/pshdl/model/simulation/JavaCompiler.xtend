@@ -792,7 +792,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		}
 		val unitName = moduleName.substring(li+1, moduleName.length);
 		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, pkg, unitName, debug, 1), moduleName, Collections::emptyList, em.source, hookName));
+			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, pkg, unitName, debug, 1), moduleName, Collections::emptyList, em.source, hookName, true));
 	}
 	
 	

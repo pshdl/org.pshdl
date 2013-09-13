@@ -32,6 +32,7 @@ import javax.annotation.*;
 
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.*;
 
 /**
  * The class HDLForLoop contains the following fields
@@ -110,7 +111,13 @@ public class HDLForLoop extends AbstractHDLForLoop {
 			return obj.getDos();
 		}
 	};
+
 	// $CONTENT-BEGIN$
+	public static HDLForLoop tempLoop(HDLExpression lower, HDLExpression upper) {
+		HDLForLoop loop = new HDLForLoop();
+		loop = loop.setParam(new HDLVariable().setName(Insulin.getTempName("loop", null)));
+		return loop.addRange(new HDLRange().setFrom(lower).setTo(upper));
+	}
 
 	// $CONTENT-END$
 

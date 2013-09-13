@@ -1495,15 +1495,21 @@ public class ParserToModelExtension {
   protected HDLReference _toHDL(final PsVariableRefContext context) {
     boolean _tripleNotEquals = (context.isClk != null);
     if (_tripleNotEquals) {
-      HDLVariable _defaultClk = HDLRegisterConfig.defaultClk();
+      HDLVariable _defaultClk = HDLRegisterConfig.defaultClk(true);
       HDLVariableRef _asHDLRef = _defaultClk.asHDLRef();
       return this.<HDLVariableRef>attachContext(_asHDLRef, context);
     }
     boolean _tripleNotEquals_1 = (context.isRst != null);
     if (_tripleNotEquals_1) {
-      HDLVariable _defaultRst = HDLRegisterConfig.defaultRst();
+      HDLVariable _defaultRst = HDLRegisterConfig.defaultRst(true);
       HDLVariableRef _asHDLRef_1 = _defaultRst.asHDLRef();
       return this.<HDLVariableRef>attachContext(_asHDLRef_1, context);
+    }
+    boolean _tripleNotEquals_2 = (context.isEna != null);
+    if (_tripleNotEquals_2) {
+      HDLVariable _defaultEnable = HDLRegisterConfig.defaultEnable(true);
+      HDLVariableRef _asHDLRef_2 = _defaultEnable.asHDLRef();
+      return this.<HDLVariableRef>attachContext(_asHDLRef_2, context);
     }
     HDLUnresolvedFragment current = null;
     List<PsRefPartContext> _psRefPart = context.psRefPart();
@@ -1512,8 +1518,8 @@ public class ParserToModelExtension {
       {
         IHDLObject _hDL = this.toHDL(sub);
         HDLUnresolvedFragment frag = ((HDLUnresolvedFragment) _hDL);
-        boolean _tripleNotEquals_2 = (current != null);
-        if (_tripleNotEquals_2) {
+        boolean _tripleNotEquals_3 = (current != null);
+        if (_tripleNotEquals_3) {
           HDLUnresolvedFragment _setSub = frag.setSub(current);
           frag = _setSub;
         }

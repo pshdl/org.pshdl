@@ -31,6 +31,7 @@ import java.util.*;
 import javax.annotation.*;
 
 public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
+	public static final char LOCAL_TYPE_SEP = '@';
 	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
 	private final String[] qfn;
 	public final int length;
@@ -189,7 +190,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	public HDLQualifiedName getTypePart() {
 		final List<String> res = new LinkedList<String>();
 		for (final String segment : qfn)
-			if (segment.charAt(0) != '$') {
+			if (segment.charAt(0) != LOCAL_TYPE_SEP) {
 				res.add(segment);
 			} else {
 				break;
@@ -203,7 +204,7 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 		if (qfn.length <= 1)
 			return this;
 		for (final String segment : qfn)
-			if (segment.charAt(0) == '$') {
+			if (segment.charAt(0) == LOCAL_TYPE_SEP) {
 				res.add(segment);
 			}
 		res.add(getLastSegment());
