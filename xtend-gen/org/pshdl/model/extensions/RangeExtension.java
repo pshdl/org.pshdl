@@ -685,12 +685,12 @@ public class RangeExtension {
       if (Objects.equal(_switchValue,HDLArithOpType.MOD)) {
         _matched=true;
         Range<BigInteger> _get_27 = rightRange.get();
-        BigInteger _upperEndpoint_16 = _get_27.upperEndpoint();
-        BigInteger _subtract_2 = _upperEndpoint_16.subtract(BigInteger.ONE);
-        Range<BigInteger> _get_28 = leftRange.get();
-        BigInteger _upperEndpoint_17 = _get_28.upperEndpoint();
-        BigInteger _min_6 = _subtract_2.min(_upperEndpoint_17);
-        Range<BigInteger> _closed_4 = Range.<BigInteger>closed(BigInteger.ZERO, _min_6);
+        final BigInteger rle = _get_27.lowerEndpoint();
+        final BigInteger leftBound = rle.min(BigInteger.ZERO);
+        Range<BigInteger> _get_28 = rightRange.get();
+        final BigInteger rue = _get_28.upperEndpoint();
+        final BigInteger rightBound = rue.max(BigInteger.ZERO);
+        Range<BigInteger> _closed_4 = Range.<BigInteger>closed(leftBound, rightBound);
         return Optional.<Range<BigInteger>>of(_closed_4);
       }
     }
@@ -706,28 +706,28 @@ public class RangeExtension {
         Range<BigInteger> _get_31 = leftRange.get();
         BigInteger _lowerEndpoint_17 = _get_31.lowerEndpoint();
         Range<BigInteger> _get_32 = rightRange.get();
-        BigInteger _upperEndpoint_18 = _get_32.upperEndpoint();
-        int _intValue_1 = _upperEndpoint_18.intValue();
+        BigInteger _upperEndpoint_16 = _get_32.upperEndpoint();
+        int _intValue_1 = _upperEndpoint_16.intValue();
         final BigInteger ft_2 = _lowerEndpoint_17.pow(_intValue_1);
         Range<BigInteger> _get_33 = leftRange.get();
-        BigInteger _upperEndpoint_19 = _get_33.upperEndpoint();
+        BigInteger _upperEndpoint_17 = _get_33.upperEndpoint();
         Range<BigInteger> _get_34 = rightRange.get();
         BigInteger _lowerEndpoint_18 = _get_34.lowerEndpoint();
         int _intValue_2 = _lowerEndpoint_18.intValue();
-        final BigInteger tf_2 = _upperEndpoint_19.pow(_intValue_2);
+        final BigInteger tf_2 = _upperEndpoint_17.pow(_intValue_2);
         Range<BigInteger> _get_35 = leftRange.get();
-        BigInteger _upperEndpoint_20 = _get_35.upperEndpoint();
+        BigInteger _upperEndpoint_18 = _get_35.upperEndpoint();
         Range<BigInteger> _get_36 = rightRange.get();
-        BigInteger _upperEndpoint_21 = _get_36.upperEndpoint();
-        int _intValue_3 = _upperEndpoint_21.intValue();
-        final BigInteger tt_2 = _upperEndpoint_20.pow(_intValue_3);
-        BigInteger _min_7 = ff_2.min(ft_2);
-        BigInteger _min_8 = _min_7.min(tf_2);
-        BigInteger _min_9 = _min_8.min(tt_2);
+        BigInteger _upperEndpoint_19 = _get_36.upperEndpoint();
+        int _intValue_3 = _upperEndpoint_19.intValue();
+        final BigInteger tt_2 = _upperEndpoint_18.pow(_intValue_3);
+        BigInteger _min_6 = ff_2.min(ft_2);
+        BigInteger _min_7 = _min_6.min(tf_2);
+        BigInteger _min_8 = _min_7.min(tt_2);
         BigInteger _max_6 = ff_2.max(ft_2);
         BigInteger _max_7 = _max_6.max(tf_2);
         BigInteger _max_8 = _max_7.max(tt_2);
-        Range<BigInteger> _closed_5 = Range.<BigInteger>closed(_min_9, _max_8);
+        Range<BigInteger> _closed_5 = Range.<BigInteger>closed(_min_8, _max_8);
         return Optional.<Range<BigInteger>>of(_closed_5);
       }
     }

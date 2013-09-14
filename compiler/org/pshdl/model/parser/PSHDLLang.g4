@@ -127,8 +127,7 @@ psAccessRange :
 psVariableRef :
 	psRefPart ('.' psRefPart)* |
 	isClk='$clk' |
-	isRst='$rst' |
-	isEna='$ena'
+	isRst='$rst'
 ;
 
 psRefPart :

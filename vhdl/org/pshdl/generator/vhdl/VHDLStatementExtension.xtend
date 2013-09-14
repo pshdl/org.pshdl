@@ -121,6 +121,7 @@ import de.upb.hni.vmagic.util.Comments
 import com.google.common.base.Optional
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.HDLArrayInit
+import java.util.Collections
 
 class VHDLStatementExtension {
 	public static VHDLStatementExtension INST = new VHDLStatementExtension
@@ -397,7 +398,7 @@ class VHDLStatementExtension {
 						val HDLVariableRef ref = resetValue as HDLVariableRef
 						synchedArray = ref.resolveVar.get.dimensions.size != 0
 					}
-					val HDLStatement initLoop = Insulin::createArrayForLoop(hvar.dimensions, 0, resetValue,
+					val HDLStatement initLoop = Insulin::createArrayForLoop(Collections::emptyList, hvar.dimensions, 0, resetValue,
 						new HDLVariableRef().setVar(hvar.asRef), synchedArray).copyDeepFrozen(obj)
 					val VHDLContext vhdl = initLoop.toVHDL(pid)
 					res.addResetValue(obj.register, vhdl.statement)

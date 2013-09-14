@@ -84,6 +84,7 @@ public abstract class AbstractHDLPrimitive extends HDLValueType {
 	 * 
 	 * @return the field
 	 */
+	@Override
 	@Nonnull
 	public HDLPrimitiveType getType() {
 		return type;

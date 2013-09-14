@@ -72,6 +72,7 @@ import org.pshdl.model.HDLInterface
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
+import java.util.ArrayList
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
@@ -103,11 +104,11 @@ class TypeExtension {
 			return Optional::absent
 		switch (container.classType) {
 			case HDLClass::HDLVariableDeclaration:
-				return (container as HDLVariableDeclaration).cachedType
+				return (container as HDLVariableDeclaration).cachedType.attachDim(hVar.dimensions)
 			case HDLClass::HDLDirectGeneration:
-				return Optional::fromNullable((container as HDLDirectGeneration).HIf)
+				return Optional::fromNullable((container as HDLDirectGeneration).HIf).attachDim(hVar.dimensions)
 			case HDLClass::HDLInterfaceInstantiation:
-				return (container as HDLInterfaceInstantiation).resolveHIf
+				return (container as HDLInterfaceInstantiation).resolveHIf.attachDim(hVar.dimensions)
 			case HDLClass::HDLForLoop:
 				return Optional::of(HDLPrimitive::natural)
 			case HDLClass::HDLInlineFunction:
@@ -116,6 +117,13 @@ class TypeExtension {
 				return Optional::absent
 		}
 		return Optional::absent
+	}
+	
+	def Optional<? extends HDLType> attachDim(Optional<? extends HDLType> optional, ArrayList<HDLExpression> expressions){
+		if (optional.present){
+			return Optional::of(optional.get.setDim(expressions))
+		}
+		return optional
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableDeclaration hvd) {
@@ -234,8 +242,18 @@ class TypeExtension {
 		val List<HDLRange> bits = ref.bits
 		if (bits.size == 0) {
 			var res = ref.resolveVar
-			if (res.present)
-				return res.get.cachedType
+			val arr=ref.array
+			if (res.present){
+				val opType=res.get.cachedType
+				if (opType.present){
+					val type=opType.get
+					val dim=type.dim
+					if (arr.length>dim.length)
+						return opType
+					return Optional::of(type.setDim(dim.subList(arr.length,dim.length)))
+				}
+				return Optional::absent
+			}
 			else
 				return Optional::absent
 		}

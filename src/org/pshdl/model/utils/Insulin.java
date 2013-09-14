@@ -65,6 +65,7 @@ public class Insulin {
 		T apply = resolveFragments(orig);
 		RWValidation.annotateReadCount(apply);
 		RWValidation.annotateWriteCount(apply);
+		apply = inlineConstants(apply);
 		apply = handleDelayedSignals(apply);
 		apply = handleOutPortRead(apply);
 		apply = includeGenerators(apply, src);
@@ -81,6 +82,45 @@ public class Insulin {
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	public static <T extends IHDLObject> T inlineConstants(T pkg) {
+		final ModificationSet ms = new ModificationSet();
+		final Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(pkg).where(HDLVariableDeclaration.fDirection)
+				.isEqualTo(HDLDirection.CONSTANT).getAll();
+		for (final HDLVariableDeclaration hvd : constants) {
+			final Set<HDLVariable> remove = Sets.newHashSet();
+			final ArrayList<HDLVariable> variables = hvd.getVariables();
+			for (final HDLVariable var : variables) {
+				final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(var.getDefaultValue());
+				if (constVal.isPresent()) {
+					final Collection<HDLVariableRef> refs = HDLQuery.getVarRefs(pkg, var);
+					boolean allRefUsed = true;
+					for (final HDLVariableRef ref : refs) {
+						final Optional<BigInteger> refVal = ConstantEvaluate.valueOf(ref);
+						if (refVal.isPresent()) {
+							ms.replace(ref, HDLLiteral.get(refVal.get()));
+						} else {
+							allRefUsed = false;
+						}
+					}
+					if (allRefUsed) {
+						remove.add(var);
+					}
+				}
+			}
+			// Don't remove global constants
+			if (hvd.getContainer(HDLUnit.class) == null) {
+				continue;
+			}
+			variables.removeAll(remove);
+			if (variables.isEmpty()) {
+				ms.remove(hvd);
+			} else {
+				ms.replace(hvd, hvd.setVariables(variables));
+			}
+		}
+		return ms.apply(pkg);
 	}
 
 	public static <T extends IHDLObject> T handleDelayedSignals(T pkg) {
@@ -500,11 +540,13 @@ public class Insulin {
 					final HDLExpression defaultValue = getDefaultValue(hvd, register, var);
 					if ((defaultValue != null) && (hvd.getContainer(HDLInterface.class) == null)) {
 						final HDLVariableRef setVar = new HDLVariableRef().setVar(var.asRef());
-						generateInit(var.getDimensions(), ms, var, var, defaultValue, setVar);
+						generateInit(Collections.<HDLExpression> emptyList(), var.getDimensions(), ms, var, var, defaultValue, setVar);
 					}
 
 				}
 			}
+		// Initialize all Interface instantiations by assigning the default
+		// value to each Port
 		final HDLInterfaceInstantiation[] hii = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (final HDLInterfaceInstantiation hi : hii) {
 			final HDLUnit unit = hi.getContainer(HDLUnit.class);
@@ -512,8 +554,13 @@ public class Insulin {
 				continue;
 			}
 			Set<String> meta = hi.getVar().getMeta(Init.full);
-			final ArrayList<HDLExpression> dimensions = hi.getVar().getDimensions();
-			if ((meta == null) || (dimensions.size() != 0)) {
+			final ArrayList<HDLExpression> ifDim = hi.getVar().getDimensions();
+			// Either no port is fully initialized, or we do have multiple
+			// dimensions.
+			// In the case that we do have multiple dimensions we ensure that
+			// each dimensions is initialized. Because it might be possible that
+			// we don't write each dimension
+			if ((meta == null) || !ifDim.isEmpty()) {
 				meta = new HashSet<String>();
 			}
 			final Optional<HDLInterface> hIf = hi.resolveHIf();
@@ -522,19 +569,19 @@ public class Insulin {
 			}
 			for (final HDLVariableDeclaration hvd : hIf.get().getPorts()) {
 				final HDLDirection direction = hvd.getDirection();
+				// Only ports of direction IN need to be initialized
 				if ((direction == HDLDirection.IN) || (direction == HDLDirection.INOUT)) {
 					for (final HDLVariable var : hvd.getVariables()) {
+						// If this port has a full assignment, we don't need to
+						// initialize it.
 						if (meta.contains(var.getName())) {
 							continue;
 						}
 						final ArrayList<HDLExpression> varDim = var.getDimensions();
-						@SuppressWarnings("unchecked")
-						final ArrayList<HDLExpression> cloneDim = (ArrayList<HDLExpression>) dimensions.clone();
-						cloneDim.addAll(varDim);
 						final HDLExpression defaultValue = getDefaultValue(hvd, null, var);
 						if (defaultValue != null) {
 							final HDLVariableRef setVar = new HDLInterfaceRef().setHIf(hi.getVar().asRef()).setVar(var.asRef());
-							generateInit(cloneDim, ms, var, hi.getContainer(HDLUnit.class), defaultValue, setVar);
+							generateInit(ifDim, varDim, ms, var, hi.getContainer(HDLUnit.class), defaultValue, setVar);
 						}
 					}
 				}
@@ -543,7 +590,7 @@ public class Insulin {
 		return ms.apply(apply);
 	}
 
-	private static void generateInit(ArrayList<HDLExpression> dimensions, ModificationSet ms, HDLVariable var, IHDLObject container, HDLExpression defaultValue,
+	private static void generateInit(List<HDLExpression> ifDim, List<HDLExpression> varDim, ModificationSet ms, HDLVariable var, IHDLObject container, HDLExpression defaultValue,
 			HDLVariableRef setVar) {
 		boolean synchedArray = false;
 		if (defaultValue instanceof HDLVariableRef) {
@@ -555,7 +602,7 @@ public class Insulin {
 			final HDLArrayInit hai = (HDLArrayInit) defaultValue;
 			init = new HDLAssignment().setLeft(setVar).setRight(hai);
 		} else {
-			init = createArrayForLoop(dimensions, 0, defaultValue, setVar, synchedArray);
+			init = createArrayForLoop(ifDim, varDim, 0, defaultValue, setVar, synchedArray);
 		}
 		final HDLBlock obj = var.getMeta(RWValidation.BLOCK_META);
 		if ((obj != null) && (obj != RWValidation.UNIT_BLOCK)) {
@@ -568,6 +615,10 @@ public class Insulin {
 		}
 	}
 
+	/**
+	 * Returns the defaultvalue for the given Variable, taken the Type into
+	 * consideration. For Enums the first enum is returned.
+	 */
 	private static HDLExpression getDefaultValue(HDLVariableDeclaration hvd, HDLRegisterConfig register, HDLVariable var) {
 		final HDLExpression defaultValue = var.getDefaultValue();
 		if ((defaultValue == null) && (register == null))
@@ -600,26 +651,46 @@ public class Insulin {
 	/**
 	 * Generate the code to initialize an array with the given default value.
 	 * 
-	 * @param dimensions
+	 * @param varDim
+	 *            all dimensions that need to be filled
 	 * @param i
+	 *            the current depth
 	 * @param defaultValue
+	 *            the defaultValue to assign to each dimension
 	 * @param ref
+	 *            the reference which will be used for writing
 	 * @param synchedArray
+	 *            if <code>true</code> the defaultValue will become the same
+	 *            dimension accesses as the variable
+	 * @param interfaceDim
+	 *            if <code>true</code> the ref parameter will be treated as
+	 *            HDLIinterfaceRef and gets the interface array filled
 	 * @return
 	 */
-	public static HDLStatement createArrayForLoop(ArrayList<HDLExpression> dimensions, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
-		if (i == dimensions.size())
+	public static HDLStatement createArrayForLoop(List<HDLExpression> ifDim, List<HDLExpression> varDim, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
+		final boolean interfaceDim = i < ifDim.size();
+		if (i == (varDim.size() + ifDim.size()))
 			return new HDLAssignment().setLeft(ref).setRight(defaultValue);
-		final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(
-				new HDLArithOp().setLeft(dimensions.get(i)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
+		final HDLExpression dim = interfaceDim ? ifDim.get(i) : varDim.get(i);
+		final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(dim).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
 		final HDLVariable param = new HDLVariable().setName(getTempName("init", null));
 		final HDLForLoop loop = new HDLForLoop().setRange(HDLObject.asList(range)).setParam(param);
 		final HDLVariableRef paramRef = new HDLVariableRef().setVar(param.asRef());
 		if (synchedArray) {
 			final HDLVariableRef defRef = (HDLVariableRef) defaultValue;
-			defaultValue = defRef.addArray(paramRef);
+			if (interfaceDim) {
+				defaultValue = ((HDLInterfaceRef) defRef).addIfArray(paramRef);
+			} else {
+				defaultValue = defRef.addArray(paramRef);
+			}
 		}
-		return loop.addDos(createArrayForLoop(dimensions, i + 1, defaultValue, ref.addArray(paramRef), synchedArray));
+		HDLVariableRef subRef;
+		if (interfaceDim) {
+			subRef = ((HDLInterfaceRef) ref).addIfArray(paramRef);
+		} else {
+			subRef = ref.addArray(paramRef);
+		}
+		return loop.addDos(createArrayForLoop(ifDim, varDim, i + 1, defaultValue, subRef, synchedArray));
 	}
 
 	private static void insertFirstStatement(ModificationSet ms, IHDLObject container, HDLStatement stmnt) {
@@ -658,8 +729,7 @@ public class Insulin {
 		for (final HDLUnit unit : units) {
 			HDLVariable defClkVar = HDLRegisterConfig.defaultClk(false).addAnnotations(HDLBuiltInAnnotations.clock.create(null));
 			HDLVariable defRstVar = HDLRegisterConfig.defaultRst(false).addAnnotations(HDLBuiltInAnnotations.reset.create(null));
-			HDLVariable defEnaVar = HDLRegisterConfig.defaultEnable(false).addAnnotations(HDLBuiltInAnnotations.enable.create(null));
-			boolean customClk = false, customRst = false, customEnable = false;
+			boolean customClk = false, customRst = false;
 			// Find all clock annotated Signals
 			HDLVariable newVar = extractVar(unit, HDLBuiltInAnnotations.clock);
 			if (newVar != null) {
@@ -670,11 +740,6 @@ public class Insulin {
 			if (newVar != null) {
 				defRstVar = newVar;
 				customRst = true;
-			}
-			newVar = extractVar(unit, HDLBuiltInAnnotations.enable);
-			if (newVar != null) {
-				defEnaVar = newVar;
-				customEnable = true;
 			}
 			boolean hasRegister = false;
 			// Replace all $clk and $rst with the clock in HDLRegisters
@@ -698,17 +763,8 @@ public class Insulin {
 					insertSig(ms, orig.getContainer(), defRstVar, SignalInserted.RstInserted);
 				}
 			}
-			final Collection<HDLRegisterConfig> enaRefs = HDLQuery.select(HDLRegisterConfig.class).from(unit).where(HDLRegisterConfig.fEnable)
-					.lastSegmentIs(HDLRegisterConfig.DEF_ENABLE).getAll();
-			for (HDLRegisterConfig reg : enaRefs) {
-				final HDLRegisterConfig orig = reg;
-				reg = ms.getReplacement(reg);
-				ms.replacePrune(orig, reg.setEnable(HDLQualifiedName.create(defEnaVar.getName())));
-				if (!customEnable) {
-					insertSig(ms, orig.getContainer(), defEnaVar, SignalInserted.EnaInserted);
-				}
-			}
-			boolean hasClkRef = false, hasRstRef = false, hasEnaRef = false;
+
+			boolean hasClkRef = false, hasRstRef = false;
 			// Replace all $clk, $rst, $ena VariableRefs
 			final Collection<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(unit).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK)
 					.getAll();
@@ -722,19 +778,10 @@ public class Insulin {
 				ms.replace(rstRef, defRstVar.asHDLRef());
 				hasRstRef = true;
 			}
-			final Collection<HDLVariableRef> enaVarRefs = HDLQuery.select(HDLVariableRef.class).from(unit).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_ENABLE)
-					.getAll();
-			for (final HDLVariableRef enaRef : enaVarRefs) {
-				ms.replace(enaRef, defEnaVar.asHDLRef());
-				hasEnaRef = true;
-			}
 			if (hasClkRef && !hasRegister) {
 				insertSig(ms, unit, defClkVar, SignalInserted.ClkInserted);
 			}
-			if (hasEnaRef && !hasRegister) {
-				insertSig(ms, unit, defEnaVar, SignalInserted.EnaInserted);
-			}
-			if (hasRstRef) {
+			if (hasRstRef && !hasRegister) {
 				insertSig(ms, unit, defRstVar, SignalInserted.RstInserted);
 			}
 		}
@@ -755,7 +802,7 @@ public class Insulin {
 	}
 
 	public static enum SignalInserted implements MetaAccess<Boolean> {
-		EnaInserted, ClkInserted, RstInserted;
+		ClkInserted, RstInserted;
 
 		@Override
 		public boolean inherit() {
@@ -792,7 +839,23 @@ public class Insulin {
 		foritfyFunctions(apply, ms);
 		foritfyConcats(apply, ms);
 		fortifyTernaryOp(apply, ms);
+		rewriteBoolCasts(apply, ms);
 		return ms.apply(apply);
+	}
+
+	private static void rewriteBoolCasts(IHDLObject apply, ModificationSet ms) {
+		final Collection<HDLManip> casts = HDLQuery.select(HDLManip.class).from(apply).where(HDLManip.fType).isEqualTo(HDLManipType.CAST).getAll();
+		for (final HDLManip manip : casts) {
+			final HDLExpression target = manip.getTarget();
+			final Optional<? extends HDLType> tt = TypeExtension.typeOf(target);
+			if (tt.isPresent()) {
+				if ((tt.get().getType() == HDLPrimitiveType.BOOL) && (manip.getCastTo().getType() != HDLPrimitiveType.BOOL)) {
+					final HDLTernary tern = new HDLTernary().setIfExpr(manip.getTarget()).setThenExpr(HDLLiteral.get(1)).setElseExpr(HDLLiteral.get(0));
+					ms.replace(manip, manip.setTarget(tern));
+				}
+			}
+		}
+
 	}
 
 	private static void fortifyTernaryOp(IHDLObject apply, ModificationSet ms) {
@@ -942,16 +1005,15 @@ public class Insulin {
 			if (BuiltInValidator.skipExp(assignment)) {
 				continue;
 			}
-			final HDLType leftType = TypeExtension.typeOf(assignment.getLeft()).get();
+			final Optional<? extends HDLType> opLeft = TypeExtension.typeOf(assignment.getLeft());
+			final HDLType leftType = opLeft.get();
 			final HDLExpression exp = assignment.getRight();
+			final HDLType rightType = TypeExtension.typeOf(exp).get();
 			if (exp.getClassType() == HDLClass.HDLArrayInit) {
 				fortifyArrayInitExp(ms, leftType, (HDLArrayInit) exp);
-			} else if (exp.getClassType() == HDLClass.HDLEqualityOp) {
-				final HDLIfStatement newIf = new HDLIfStatement().setIfExp(exp)
-						.addThenDo(assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(HDLLiteral.get(1))))
-						.addElseDo(assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(HDLLiteral.get(0))));
-				newIf.setContainer(assignment.getContainer());
-				ms.replace(assignment, newIf);
+			} else if ((rightType.getType() == HDLPrimitiveType.BOOL) && (leftType.getType() != HDLPrimitiveType.BOOL)) {
+				final HDLTernary newIf = new HDLTernary().setIfExpr(exp).setThenExpr(HDLLiteral.get(1)).setElseExpr(HDLLiteral.get(0));
+				ms.replace(assignment, assignment.setRight(new HDLManip().setType(HDLManipType.CAST).setCastTo(leftType).setTarget(newIf)));
 			} else if (leftType instanceof HDLPrimitive) {
 				final HDLPrimitive pt = (HDLPrimitive) leftType;
 				fortify(ms, exp, pt);

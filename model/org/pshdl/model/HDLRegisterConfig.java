@@ -202,7 +202,6 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String RESET_VALUE_PARAM = "resetValue";
 	public static final String DEF_RST = "$rst";
 	public static final String DEF_CLK = "$clk";
-	public static final String DEF_ENABLE = "$ena";
 
 	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
@@ -368,12 +367,6 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		if (internalName)
 			return new HDLVariable().setName(DEF_RST);
 		return new HDLVariable().setName(DEF_RST.substring(1));
-	}
-
-	public static HDLVariable defaultEnable(boolean internalName) {
-		if (internalName)
-			return new HDLVariable().setName(DEF_ENABLE);
-		return new HDLVariable().setName(DEF_ENABLE.substring(1));
 	}
 
 	public HDLRegisterConfig normalize() {

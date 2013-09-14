@@ -65,6 +65,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -672,11 +673,12 @@ public class VHDLStatementExtension {
               boolean _notEquals_1 = (_size_1 != 0);
               synchedArray = _notEquals_1;
             }
+            List<HDLExpression> _emptyList = Collections.<HDLExpression>emptyList();
             ArrayList<HDLExpression> _dimensions_3 = hvar.getDimensions();
             HDLVariableRef _hDLVariableRef = new HDLVariableRef();
             HDLQualifiedName _asRef_2 = hvar.asRef();
             HDLVariableRef _setVar_1 = _hDLVariableRef.setVar(_asRef_2);
-            HDLStatement _createArrayForLoop = Insulin.createArrayForLoop(_dimensions_3, 0, resetValue, _setVar_1, synchedArray);
+            HDLStatement _createArrayForLoop = Insulin.createArrayForLoop(_emptyList, _dimensions_3, 0, resetValue, _setVar_1, synchedArray);
             final HDLStatement initLoop = _createArrayForLoop.copyDeepFrozen(obj);
             final VHDLContext vhdl = this.toVHDL(initLoop, pid);
             HDLRegisterConfig _register_2 = obj.getRegister();

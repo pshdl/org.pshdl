@@ -30,6 +30,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -102,6 +103,10 @@ public abstract class HDLType extends AbstractHDLType {
 
 	public HDLExpression getWidth() {
 		throw new IllegalArgumentException("Not implemented for this type:" + this);
+	}
+
+	public HDLPrimitiveType getType() {
+		return null;
 	}
 	// $CONTENT-END$
 

@@ -313,9 +313,14 @@ class RangeExtension {
 				val BigInteger tt = leftRange.get.upperEndpoint.multiply(rightRange.get.upperEndpoint)
 				return Optional::of(Range::closed(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
-			case MOD:
-				return Optional::of(
-					Range::closed(0bi, rightRange.get.upperEndpoint.subtract(1bi).min(leftRange.get.upperEndpoint)))
+			case MOD: {
+				val rle=rightRange.get.lowerEndpoint
+				val leftBound=rle.min(0bi)
+				val rue=rightRange.get.upperEndpoint
+				val rightBound=rue.max(0bi)
+				return Optional::of(Range::closed(leftBound, rightBound))
+			}
+				
 			case POW: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.pow(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger ft = leftRange.get.lowerEndpoint.pow(rightRange.get.upperEndpoint.intValue)
