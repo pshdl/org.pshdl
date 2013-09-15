@@ -77,6 +77,7 @@ public class Insulin {
 		apply = handleMultiForLoop(apply);
 		apply = handlePostfixOp(apply);
 		apply = generateInitializations(apply);
+		apply = fixMultiDimAssignments(apply);
 		apply = fixDoubleNegate(apply);
 		apply = fortifyType(apply);
 		apply.validateAllFields(orig.getContainer(), false);
@@ -84,6 +85,68 @@ public class Insulin {
 		return apply;
 	}
 
+	public static <T extends IHDLObject> T fixMultiDimAssignments(T pkg) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLAssignment[] asses = pkg.getAllObjectsOf(HDLAssignment.class, true);
+		for (final HDLAssignment ass : asses) {
+			if (BuiltInValidator.skipExp(ass)) {
+				continue;
+			}
+			final HDLReference left = ass.getLeft();
+			if (left.getClassType() == HDLClass.HDLVariableRef) {
+				final HDLExpression right = ass.getRight();
+				final HDLVariableRef lRef = (HDLVariableRef) left;
+				final HDLType lRefType = TypeExtension.typeOf(lRef).get();
+				// Generate loop for each assigned dimension
+				if (right.getClassType() == HDLClass.HDLVariableRef) {
+					final HDLVariableRef rRef = (HDLVariableRef) right;
+					final HDLType rRefType = TypeExtension.typeOf(rRef).get();
+					if (!lRefType.getDim().isEmpty() || !rRefType.getDim().isEmpty()) {
+						final HDLStatement initLoop = createArrayForLoop(Collections.<HDLExpression> emptyList(), lRef.resolveVar().get().getDimensions(), lRef.getArray().size(),
+								rRef, lRef, true);
+						ms.replace(ass, initLoop);
+					}
+				}
+				// Generate 0 fill then assign each value in a single assigment
+				if (right.getClassType() == HDLClass.HDLArrayInit) {
+					final HDLStatement initLoop = createArrayForLoop(Collections.<HDLExpression> emptyList(), lRef.resolveVar().get().getDimensions(), lRef.getArray().size(),
+							HDLLiteral.get(0), lRef, false);
+					final HDLArrayInit arr = (HDLArrayInit) right;
+					final List<HDLStatement> assignments = Lists.newLinkedList();
+					assignments.add(initLoop);
+					final LinkedList<HDLLiteral> depth = Lists.newLinkedList();
+					generateStaticAssignments(lRef, arr, depth, assignments);
+					ms.replace(ass, assignments.toArray(new HDLStatement[assignments.size()]));
+
+				}
+			}
+		}
+		return ms.apply(pkg);
+	}
+
+	private static void generateStaticAssignments(HDLVariableRef lRef, HDLArrayInit arr, LinkedList<HDLLiteral> depth, List<HDLStatement> assignments) {
+		final ArrayList<HDLExpression> exp = arr.getExp();
+		for (int i = 0; i < exp.size(); i++) {
+			final HDLExpression expression = exp.get(i);
+			if (expression.getClassType() == HDLClass.HDLArrayInit) {
+				@SuppressWarnings("unchecked")
+				final LinkedList<HDLLiteral> clone = (LinkedList<HDLLiteral>) depth.clone();
+				clone.add(HDLLiteral.get(i));
+				generateStaticAssignments(lRef, (HDLArrayInit) expression, clone, assignments);
+			} else {
+				final ArrayList<HDLExpression> array = lRef.getArray();
+				@SuppressWarnings("unchecked")
+				final LinkedList<HDLLiteral> clone = (LinkedList<HDLLiteral>) depth.clone();
+				clone.add(HDLLiteral.get(i));
+				array.addAll(clone);
+				assignments.add(new HDLAssignment().setLeft(lRef.setArray(array)).setRight(expression));
+			}
+		}
+	}
+
+	/**
+	 * Find all constants and inline them
+	 */
 	public static <T extends IHDLObject> T inlineConstants(T pkg) {
 		final ModificationSet ms = new ModificationSet();
 		final Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class).from(pkg).where(HDLVariableDeclaration.fDirection)
@@ -123,6 +186,10 @@ public class Insulin {
 		return ms.apply(pkg);
 	}
 
+	/**
+	 * Finds all register config with delays in them and replaces them with a
+	 * non delay version and a fifo
+	 */
 	public static <T extends IHDLObject> T handleDelayedSignals(T pkg) {
 		final ModificationSet ms = new ModificationSet();
 		final Collection<HDLRegisterConfig> delayRegs = HDLQuery.select(HDLRegisterConfig.class).from(pkg).where(HDLRegisterConfig.fDelay).isNotEqualTo(null).getAll();
@@ -144,25 +211,44 @@ public class Insulin {
 				final String dlyName = Insulin.getTempName(var.getName(), "dlyd");
 				final HDLQualifiedName fqnDelay = HDLQualifiedName.create(dlyName);
 				final HDLVariable dlyVar = var.setName(dlyName).setDefaultValue(null);
-				ms.insertAfter(hvd, hvd.setDirection(HDLDirection.INTERNAL).setRegister(undelayedReg).setVariables(HDLObject.asList(dlyVar.addDimensions(delayPlusOne))));
+
+				// Insert dimension as first dimension. Rewrite all existing
+				// references to the new delayed signal.
+				final ArrayList<HDLExpression> dimensions = dlyVar.getDimensions();
+				dimensions.add(0, delayPlusOne);
+				ms.insertAfter(hvd, hvd.setDirection(HDLDirection.INTERNAL).setRegister(undelayedReg).setVariables(HDLObject.asList(dlyVar.setDimensions(dimensions))));
 				final Collection<HDLVariableRef> varRefs = HDLQuery.getVarRefs(pkg, var);
 				for (final HDLVariableRef ref : varRefs) {
 					if (ref.getContainer().getClassType() == HDLClass.HDLAssignment) {
 						final HDLAssignment ass = (HDLAssignment) ref.getContainer();
-						ms.replace(ass, ass.setLeft(ref.setVar(fqnDelay).addArray(delay)));
+						final ArrayList<HDLExpression> array = ref.getArray();
+						array.add(0, delay);
+						ms.replace(ass, ass.setLeft(ref.setVar(fqnDelay).setArray(array)));
 					} else {
-						ms.replace(ref, ref.setVar(fqnDelay).addArray(HDLLiteral.get(0)));
+						final ArrayList<HDLExpression> array = ref.getArray();
+						array.add(0, HDLLiteral.get(0));
+						ms.replace(ref, ref.setVar(fqnDelay).setArray(array));
 					}
 				}
 				final HDLExpression defaultValue = var.getDefaultValue();
 				final HDLVariableRef dlyRef = dlyVar.asHDLRef();
 				if (defaultValue != null) {
-					ms.insertAfter(hvd, new HDLAssignment().setLeft(dlyRef.addArray(delay)).setRight(defaultValue));
+					final ArrayList<HDLExpression> array = dlyRef.getArray();
+					array.add(0, delay);
+					ms.insertAfter(hvd, new HDLAssignment().setLeft(dlyRef.setArray(array)).setRight(defaultValue));
 				}
-				ms.insertAfter(hvd, new HDLAssignment().setLeft(var.asHDLRef()).setRight(dlyRef.addArray(HDLLiteral.get(0))));
+				final ArrayList<HDLExpression> arrayZero = dlyRef.getArray();
+				arrayZero.add(0, HDLLiteral.get(0));
+				ms.insertAfter(hvd, new HDLAssignment().setLeft(var.asHDLRef()).setRight(dlyRef.setArray(arrayZero)));
 				final HDLVariableRef dim = loop.getParam().asHDLRef();
 				final HDLArithOp dimMinusOne = new HDLArithOp().setLeft(dim).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-				loop = loop.addDos(new HDLAssignment().setLeft(dlyRef.addArray(dimMinusOne)).setRight(dlyRef.addArray(dim)));
+				final ArrayList<HDLExpression> arrayDimMinOne = dlyRef.getArray();
+				arrayDimMinOne.add(0, dimMinusOne);
+				final ArrayList<HDLExpression> arrayDim = dlyRef.getArray();
+				arrayDim.add(0, dim);
+				loop = loop.addDos(new HDLAssignment().setLeft(dlyRef.setArray(arrayDimMinOne)).setRight(dlyRef.setArray(arrayDim)));
+				// Replace original hvd without registers
+				ms.replace(hvd, hvd.setRegister(null));
 			}
 			if (delayValue.isPresent()) {
 				ms.insertAfter(hvd, loop);
@@ -366,9 +452,6 @@ public class Insulin {
 	 * Finds cases where a either a ARITH_NEG contains another ARITH_NEG, or
 	 * where an ARITH_NEG contains a negative literal
 	 * 
-	 * @param pkg
-	 *            the IHDLObject to transform
-	 * @return the new object without the double negate
 	 */
 	public static <T extends IHDLObject> T fixDoubleNegate(T pkg) {
 		final ModificationSet ms = new ModificationSet();
@@ -471,9 +554,6 @@ public class Insulin {
 	 * Checks for HDLDirectGenerations and calls the generators. If they are
 	 * includes, it will be included and the references resolved
 	 * 
-	 * @param apply
-	 * @param src
-	 * @return
 	 */
 	private static <T extends IHDLObject> T includeGenerators(T apply, String src) {
 		final ModificationSet ms = new ModificationSet();
@@ -522,9 +602,6 @@ public class Insulin {
 	/**
 	 * Generate the default initialization code for Arrays, Enums and Non
 	 * registers
-	 * 
-	 * @param apply
-	 * @return
 	 */
 	private static <T extends IHDLObject> T generateInitializations(T apply) {
 		final ModificationSet ms = new ModificationSet();
@@ -999,6 +1076,10 @@ public class Insulin {
 		}
 	}
 
+	/**
+	 * Ensures that the right hand-side can be assigned to the left hand-side.
+	 * This includes converting booleans to ternary operators.
+	 */
 	private static void fortifyAssignments(IHDLObject apply, ModificationSet ms) {
 		final HDLAssignment[] assignments = apply.getAllObjectsOf(HDLAssignment.class, true);
 		for (final HDLAssignment assignment : assignments) {

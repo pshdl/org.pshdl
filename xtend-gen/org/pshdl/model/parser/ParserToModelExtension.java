@@ -409,24 +409,15 @@ public class ParserToModelExtension {
     List<PsExpressionContext> _psExpression = context.psExpression();
     boolean _tripleNotEquals = (_psExpression != null);
     if (_tripleNotEquals) {
-      List<PsExpressionContext> _psExpression_1 = context.psExpression();
-      int _size = _psExpression_1.size();
-      boolean _equals = (_size == 1);
-      if (_equals) {
-        List<PsExpressionContext> _psExpression_2 = context.psExpression();
-        PsExpressionContext _get = _psExpression_2.get(0);
-        IHDLObject _hDL = this.toHDL(_get);
-        return this.<IHDLObject>attachContext(_hDL, context);
-      }
       HDLArrayInit _hDLArrayInit = new HDLArrayInit();
-      List<PsExpressionContext> _psExpression_3 = context.psExpression();
+      List<PsExpressionContext> _psExpression_1 = context.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function = new Function1<PsExpressionContext,HDLExpression>() {
           public HDLExpression apply(final PsExpressionContext it) {
             IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
             return ((HDLExpression) _hDL);
           }
         };
-      List<HDLExpression> _map = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression_3, _function);
+      List<HDLExpression> _map = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression_1, _function);
       final HDLArrayInit arr = _hDLArrayInit.setExp(_map);
       return this.<HDLArrayInit>attachContext(arr, context);
     }

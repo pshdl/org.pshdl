@@ -133,38 +133,26 @@ public class StringWriteExtension {
   }
   
   protected String _toString(final HDLArrayInit array, final SyntaxHighlighter highlight) {
-    ArrayList<HDLExpression> _exp = array.getExp();
-    int _size = _exp.size();
-    boolean _equals = (_size == 1);
-    if (_equals) {
-      String _entering = this.entering(array, highlight);
-      ArrayList<HDLExpression> _exp_1 = array.getExp();
-      HDLExpression _get = _exp_1.get(0);
-      String _string = this.toString(_get, highlight);
-      String _plus = (_entering + _string);
-      String _leaving = this.leaving(array, highlight);
-      return (_plus + _leaving);
-    }
     StringConcatenation _builder = new StringConcatenation();
-    String _entering_1 = this.entering(array, highlight);
-    _builder.append(_entering_1, "");
+    String _entering = this.entering(array, highlight);
+    _builder.append(_entering, "");
     _builder.append("{");
     {
-      ArrayList<HDLExpression> _exp_2 = array.getExp();
+      ArrayList<HDLExpression> _exp = array.getExp();
       boolean _hasElements = false;
-      for(final HDLExpression e : _exp_2) {
+      for(final HDLExpression e : _exp) {
         if (!_hasElements) {
           _hasElements = true;
         } else {
           _builder.appendImmediate(",", "");
         }
-        String _string_1 = this.toString(e, highlight);
-        _builder.append(_string_1, "");
+        String _string = this.toString(e, highlight);
+        _builder.append(_string, "");
       }
     }
     _builder.append("}");
-    String _leaving_1 = this.leaving(array, highlight);
-    _builder.append(_leaving_1, "");
+    String _leaving = this.leaving(array, highlight);
+    _builder.append(_leaving, "");
     return _builder.toString();
   }
   

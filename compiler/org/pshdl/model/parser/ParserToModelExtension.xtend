@@ -250,8 +250,8 @@ class ParserToModelExtension {
 
 	def dispatch IHDLObject toHDL(PsArrayInitSubContext context) {
 		if (context.psExpression !== null) {
-			if (context.psExpression.size == 1)
-				return context.psExpression.get(0).toHDL.attachContext(context)
+//			if (context.psExpression.size == 1)
+//				return context.psExpression.get(0).toHDL.attachContext(context)
 			val arr = new HDLArrayInit().setExp(context.psExpression.map[toHDL as HDLExpression])
 			return arr.attachContext(context)
 		}
