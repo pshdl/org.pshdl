@@ -177,12 +177,18 @@ class CommonCompilerExtension {
 	}
 
 	def idName(String name, boolean prev, boolean field) {
-		var res = name.replaceAll("[\\.\\$\\@]+", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
+		var res=name;
+		val isReg=name.endsWith("$reg")
+		if (isReg)
+			res=name.substring(0,name.length-4)
+		res = res.replaceAll("[\\.\\$\\@]+", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
 			replaceAll('\\[', 'arr').replaceAll('\\]', '')
 		if (res.startsWith("#"))
 			res = res.substring(1)
 		if (field)
 			res = "_" + res
+		if (isReg)
+			res=res+"$reg"
 		if (prev)
 			return res + '_prev'
 		return res
