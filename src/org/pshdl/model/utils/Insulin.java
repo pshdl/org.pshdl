@@ -66,6 +66,7 @@ public class Insulin {
 		RWValidation.annotateReadCount(apply);
 		RWValidation.annotateWriteCount(apply);
 		apply = inlineConstants(apply);
+		apply = handlePostfixOp(apply);
 		apply = handleDelayedSignals(apply);
 		apply = handleOutPortRead(apply);
 		apply = includeGenerators(apply, src);
@@ -75,7 +76,6 @@ public class Insulin {
 		apply = generateClkAndReset(apply);
 		apply = handleMultiBitAccess(apply, null);
 		apply = handleMultiForLoop(apply);
-		apply = handlePostfixOp(apply);
 		apply = generateInitializations(apply);
 		apply = fixMultiDimAssignments(apply);
 		apply = fixDoubleNegate(apply);
@@ -217,13 +217,19 @@ public class Insulin {
 				final ArrayList<HDLExpression> dimensions = dlyVar.getDimensions();
 				dimensions.add(0, delayPlusOne);
 				ms.insertAfter(hvd, hvd.setDirection(HDLDirection.INTERNAL).setRegister(undelayedReg).setVariables(HDLObject.asList(dlyVar.setDimensions(dimensions))));
-				final Collection<HDLVariableRef> varRefs = HDLQuery.getVarRefs(pkg, var);
+				final Collection<HDLVariableRef> varRefs = HDLQuery.getVarRefs(var.getContainer(HDLUnit.class), var);
 				for (final HDLVariableRef ref : varRefs) {
 					if (ref.getContainer().getClassType() == HDLClass.HDLAssignment) {
 						final HDLAssignment ass = (HDLAssignment) ref.getContainer();
-						final ArrayList<HDLExpression> array = ref.getArray();
-						array.add(0, delay);
-						ms.replace(ass, ass.setLeft(ref.setVar(fqnDelay).setArray(array)));
+						if (ass.getLeft() == ref) {
+							final ArrayList<HDLExpression> array = ref.getArray();
+							array.add(0, delay);
+							ms.replace(ass, ass.setLeft(ref.setVar(fqnDelay).setArray(array)));
+						} else {
+							final ArrayList<HDLExpression> array = ref.getArray();
+							array.add(0, HDLLiteral.get(0));
+							ms.replace(ref, ref.setVar(fqnDelay).setArray(array));
+						}
 					} else {
 						final ArrayList<HDLExpression> array = ref.getArray();
 						array.add(0, HDLLiteral.get(0));
@@ -248,8 +254,8 @@ public class Insulin {
 				arrayDim.add(0, dim);
 				loop = loop.addDos(new HDLAssignment().setLeft(dlyRef.setArray(arrayDimMinOne)).setRight(dlyRef.setArray(arrayDim)));
 				// Replace original hvd without registers
-				ms.replace(hvd, hvd.setRegister(null));
 			}
+			ms.replace(hvd, hvd.setRegister(null));
 			if (delayValue.isPresent()) {
 				ms.insertAfter(hvd, loop);
 			} else {
