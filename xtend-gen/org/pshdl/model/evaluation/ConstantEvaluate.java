@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
-import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
@@ -54,7 +53,6 @@ import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLShiftOp;
-import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import org.pshdl.model.HDLTernary;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnresolvedFragment;
@@ -66,7 +64,6 @@ import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.ProblemDescription;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.types.builtIn.HDLFunctions;
-import org.pshdl.model.types.builtIn.HDLPrimitives;
 import org.pshdl.model.utils.Insulin;
 
 /**
@@ -553,74 +550,9 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLShiftOp obj, final HDLEvaluationContext context) {
-    HDLExpression _left = obj.getLeft();
-    final Optional<BigInteger> leftVal = this.subEvaluate(obj, _left, context);
-    boolean _isPresent = leftVal.isPresent();
-    boolean _not = (!_isPresent);
-    if (_not) {
-      return Optional.<BigInteger>absent();
-    }
-    HDLExpression _right = obj.getRight();
-    final Optional<BigInteger> rightVal = this.subEvaluate(obj, _right, context);
-    boolean _isPresent_1 = rightVal.isPresent();
-    boolean _not_1 = (!_isPresent_1);
-    if (_not_1) {
-      return Optional.<BigInteger>absent();
-    }
-    HDLShiftOpType _type = obj.getType();
-    final HDLShiftOpType _switchValue = _type;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SLL)) {
-        _matched=true;
-        BigInteger _get = leftVal.get();
-        BigInteger _get_1 = rightVal.get();
-        int _intValue = _get_1.intValue();
-        BigInteger _shiftLeft = _get.shiftLeft(_intValue);
-        return Optional.<BigInteger>of(_shiftLeft);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SRA)) {
-        _matched=true;
-        BigInteger _get_2 = leftVal.get();
-        BigInteger _get_3 = rightVal.get();
-        int _intValue_1 = _get_3.intValue();
-        BigInteger _shiftRight = _get_2.shiftRight(_intValue_1);
-        return Optional.<BigInteger>of(_shiftRight);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SRL)) {
-        _matched=true;
-        final BigInteger l = leftVal.get();
-        int _signum = l.signum();
-        boolean _lessThan = (_signum < 0);
-        if (_lessThan) {
-          HDLExpression _left_1 = obj.getLeft();
-          final Optional<? extends HDLType> t = TypeExtension.typeOf(_left_1);
-          boolean _isPresent_2 = t.isPresent();
-          if (_isPresent_2) {
-            HDLType _get_4 = t.get();
-            final Integer width = HDLPrimitives.getWidth(_get_4, context);
-            boolean _tripleNotEquals = (width != null);
-            if (_tripleNotEquals) {
-              BigInteger _get_5 = rightVal.get();
-              final int shiftWidth = _get_5.intValue();
-              final BigInteger res = BigIntegerFrame.srl(l, (width).intValue(), shiftWidth);
-              return Optional.<BigInteger>of(res);
-            }
-          }
-          return Optional.<BigInteger>absent();
-        }
-        BigInteger _get_6 = rightVal.get();
-        int _intValue_2 = _get_6.intValue();
-        BigInteger _shiftRight_1 = l.shiftRight(_intValue_2);
-        return Optional.<BigInteger>of(_shiftRight_1);
-      }
-    }
-    RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
-    throw _runtimeException;
+    throw new Error("Unresolved compilation problems:"
+      + "\nBigIntegerFrame cannot be resolved to a type."
+      + "\nsrl cannot be resolved");
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLFunctionCall obj, final HDLEvaluationContext context) {
