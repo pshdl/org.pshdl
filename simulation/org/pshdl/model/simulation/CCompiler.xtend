@@ -730,8 +730,6 @@ class CCompiler implements ITypeOuptutProvider {
 		var res = '''
 //  BusAccessSim.c
 //
-//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
-//
 
 #include <stdint.h>
 #include <stdbool.h>
