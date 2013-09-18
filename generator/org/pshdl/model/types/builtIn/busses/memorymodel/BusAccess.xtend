@@ -34,11 +34,11 @@ import java.util.List
 
 class BusAccess {
 
-	def generateStdDef() '''
+	def generateStdDef(boolean withDate) '''
 //
 //  BusStdDefinitions.h
 //
-//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
+//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #ifndef BusStdDefinitions_h
@@ -63,10 +63,10 @@ void setWarn(warnFunc_p warnFunction);
 #endif	
 '''
 
-	def generatePrintC(Unit unit, List<Row> rows) '''//
+	def generatePrintC(Unit unit, List<Row> rows, boolean withDate) '''//
 //  BusPrint.c
 //
-//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
+//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #include <stdio.h>
@@ -90,10 +90,10 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 «generatePrint(rows)»
 '''
 
-	def generatePrintH(Unit unit, List<Row> rows) '''//
+	def generatePrintH(Unit unit, List<Row> rows, boolean withDate) '''//
 //  BusPrint.h
 //
-//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
+//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #ifndef BusPrint_h
@@ -137,10 +137,10 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 		return res;
 	}
 
-	def generateAccessH(Unit unit, List<Row> rows) '''//
+	def generateAccessH(Unit unit, List<Row> rows, boolean withDate) '''//
 //  BusDefinitions.h
 //
-//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
+//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #ifndef BusDefinitions_h
@@ -200,10 +200,10 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 		return res
 	}
 
-	def generateAccessC(List<Row> rows) '''//
+	def generateAccessC(List<Row> rows, boolean withDate) '''//
 //  BusAcces.c
 //
-//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
+//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #include <stdint.h>

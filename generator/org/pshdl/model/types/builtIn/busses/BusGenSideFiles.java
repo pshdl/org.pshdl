@@ -43,16 +43,16 @@ public class BusGenSideFiles {
 
 	public static final String WRAPPER_APPENDIX = "core";
 
-	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi) {
+	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi, boolean withDate) {
 		final List<SideFile> res = new LinkedList<SideFile>();
 		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		final String ipcorename = unitName + WRAPPER_APPENDIX;
 		final String dirName = ipcorename + "_" + version;
 		final String type = axi ? "axi" : "plb";
 		final String pCore = "pcores/";
-		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount));
-		res.add(paoFile(unitName, dirName, type, pCore));
-		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore));
+		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount, withDate));
+		res.add(paoFile(unitName, dirName, type, pCore, withDate));
+		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore, withDate));
 		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS, true));
 		try {
 			res.add(new SideFile(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(BusGenSideFiles.class.getResourceAsStream("/pshdl_pkg.vhd")), true));
@@ -62,7 +62,7 @@ public class BusGenSideFiles {
 		return res;
 	}
 
-	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir) {
+	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir, boolean withDate) {
 		final String wrapperName = unitName + WRAPPER_APPENDIX;
 		final String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
 		final Map<String, String> options = new HashMap<String, String>();
@@ -70,7 +70,9 @@ public class BusGenSideFiles {
 		options.put("{DIRNAME}", dirName);
 		options.put("{WRAPPERNAME}", wrapperName);
 		options.put("{VERSION}", version.replaceAll("_", "."));
-		options.put("{DATE}", new Date().toString());
+		if (withDate) {
+			options.put("{DATE}", new Date().toString());
+		}
 		options.put("{REGCOUNT}", Integer.toString(regCount));
 		final StringBuilder memGenerics = new StringBuilder(); // {MEM_GENERICS}
 		final StringBuilder memArray = new StringBuilder(); // {MEM_ARRAY}
@@ -166,14 +168,16 @@ public class BusGenSideFiles {
 		return null;
 	}
 
-	private static SideFile paoFile(String ipcoreName, String dirName, String type, String rootDir) {
+	private static SideFile paoFile(String ipcoreName, String dirName, String type, String rootDir, boolean withDate) {
 		final String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
 		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
 		options.put("{TARGETFILE}", relPath);
 		options.put("{DIRNAME}", dirName);
 		options.put("{WRAPPERNAME}", ipcoreName + WRAPPER_APPENDIX);
-		options.put("{DATE}", new Date().toString());
+		if (withDate) {
+			options.put("{DATE}", new Date().toString());
+		}
 		try {
 			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options), true);
 		} catch (final IOException e) {
@@ -182,7 +186,7 @@ public class BusGenSideFiles {
 		return null;
 	}
 
-	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type, String rootDir, int memCount) {
+	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type, String rootDir, int memCount, boolean withDate) {
 		final HDLInterface asInterface = unit.asInterface();
 		final StringBuilder generics = new StringBuilder();
 		final StringBuilder ports = new StringBuilder();
@@ -250,7 +254,9 @@ public class BusGenSideFiles {
 		}
 		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
-		options.put("{DATE}", new Date().toString());
+		if (withDate) {
+			options.put("{DATE}", new Date().toString());
+		}
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {

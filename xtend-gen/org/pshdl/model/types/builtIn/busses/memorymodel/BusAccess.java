@@ -51,7 +51,7 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 
 @SuppressWarnings("all")
 public class BusAccess {
-  public CharSequence generateStdDef() {
+  public CharSequence generateStdDef(final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("//");
     _builder.newLine();
@@ -60,10 +60,14 @@ public class BusAccess {
     _builder.append("//");
     _builder.newLine();
     _builder.append("//  Automatically generated on ");
-    DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-    Date _date = new Date();
-    String _format = _dateTimeInstance.format(_date);
-    _builder.append(_format, "");
+    {
+      if (withDate) {
+        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+        Date _date = new Date();
+        String _format = _dateTimeInstance.format(_date);
+        _builder.append(_format, "");
+      }
+    }
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append("//");
@@ -117,7 +121,7 @@ public class BusAccess {
     return _builder;
   }
   
-  public CharSequence generatePrintC(final Unit unit, final List<Row> rows) {
+  public CharSequence generatePrintC(final Unit unit, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("//");
     _builder.newLine();
@@ -126,10 +130,14 @@ public class BusAccess {
     _builder.append("//");
     _builder.newLine();
     _builder.append("//  Automatically generated on ");
-    DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-    Date _date = new Date();
-    String _format = _dateTimeInstance.format(_date);
-    _builder.append(_format, "");
+    {
+      if (withDate) {
+        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+        Date _date = new Date();
+        String _format = _dateTimeInstance.format(_date);
+        _builder.append(_format, "");
+      }
+    }
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append("//");
@@ -188,7 +196,7 @@ public class BusAccess {
     return _builder;
   }
   
-  public CharSequence generatePrintH(final Unit unit, final List<Row> rows) {
+  public CharSequence generatePrintH(final Unit unit, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("//");
     _builder.newLine();
@@ -197,10 +205,14 @@ public class BusAccess {
     _builder.append("//");
     _builder.newLine();
     _builder.append("//  Automatically generated on ");
-    DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-    Date _date = new Date();
-    String _format = _dateTimeInstance.format(_date);
-    _builder.append(_format, "");
+    {
+      if (withDate) {
+        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+        Date _date = new Date();
+        String _format = _dateTimeInstance.format(_date);
+        _builder.append(_format, "");
+      }
+    }
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append("//");
@@ -311,7 +323,7 @@ public class BusAccess {
     return res;
   }
   
-  public CharSequence generateAccessH(final Unit unit, final List<Row> rows) {
+  public CharSequence generateAccessH(final Unit unit, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("//");
     _builder.newLine();
@@ -320,10 +332,14 @@ public class BusAccess {
     _builder.append("//");
     _builder.newLine();
     _builder.append("//  Automatically generated on ");
-    DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-    Date _date = new Date();
-    String _format = _dateTimeInstance.format(_date);
-    _builder.append(_format, "");
+    {
+      if (withDate) {
+        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+        Date _date = new Date();
+        String _format = _dateTimeInstance.format(_date);
+        _builder.append(_format, "");
+      }
+    }
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append("//");
@@ -489,7 +505,7 @@ public class BusAccess {
     return res;
   }
   
-  public CharSequence generateAccessC(final List<Row> rows) {
+  public CharSequence generateAccessC(final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("//");
     _builder.newLine();
@@ -498,10 +514,14 @@ public class BusAccess {
     _builder.append("//");
     _builder.newLine();
     _builder.append("//  Automatically generated on ");
-    DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-    Date _date = new Date();
-    String _format = _dateTimeInstance.format(_date);
-    _builder.append(_format, "");
+    {
+      if (withDate) {
+        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+        Date _date = new Date();
+        String _format = _dateTimeInstance.format(_date);
+        _builder.append(_format, "");
+      }
+    }
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append("//");

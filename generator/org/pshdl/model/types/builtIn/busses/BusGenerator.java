@@ -234,22 +234,22 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 		}
 		final String version = getVersion(hdl);
 		final List<Row> rows = MemoryModel.buildRows(unit);
-		final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows);
+		final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
 		final List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
 		sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html, true));
 		final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
-		sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version));
+		sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, true));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
 			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
 			hdgi = annotateSignals(hdgi, unit);
-			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false));
+			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false, true));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
 			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
 			hdgi = annotateSignals(hdgi, unit);
-			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true));
+			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true, true));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}

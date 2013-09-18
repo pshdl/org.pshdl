@@ -47,9 +47,9 @@ public class MemoryModel {
 		final Unit unit = MemoryModelAST.parseUnit(Files.toString(file, Charsets.UTF_8), problems, 0);
 		System.out.println(unit);
 		final List<Row> rows = buildRows(unit);
-		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows);
-		System.out.println(new BusAccess().generateAccessC(rows));
-		System.out.println(new BusAccess().generateAccessH(unit, rows));
+		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows, true);
+		System.out.println(new BusAccess().generateAccessC(rows, true));
+		System.out.println(new BusAccess().generateAccessH(unit, rows, true));
 		// // SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
 		// for (SideFile sideFile : cFiles) {
 		// System.out.println(sideFile.relPath);

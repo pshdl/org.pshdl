@@ -43,26 +43,28 @@ import com.google.common.base.*;
 
 public class MemoryModelSideFiles {
 
-	public static List<SideFile> getSideFiles(HDLUnit unit, Unit memUnit, List<Row> rows, String version) {
+	public static List<SideFile> getSideFiles(HDLUnit unit, Unit memUnit, List<Row> rows, String version, boolean withDate) {
 		final List<SideFile> res = new LinkedList<SideFile>();
 		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		final String ipcorename = unitName + BusGenSideFiles.WRAPPER_APPENDIX;
 		final String dirName = ipcorename + "_" + version;
 		final String rootDir = "drivers/";
 		final BusAccess ba = new BusAccess();
-		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows), true));
-		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows).toString().getBytes(Charsets.UTF_8), true));
-		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
-		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
-		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows).toString().getBytes(Charsets.UTF_8), true));
-		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef().toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows, withDate), true));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.c", ba.generateAccessC(rows, withDate).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusAccess.h", ba.generateAccessH(memUnit, rows, withDate).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.c", ba.generatePrintC(memUnit, rows, withDate).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusPrint.h", ba.generatePrintH(memUnit, rows, withDate).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new SideFile(rootDir + dirName + "/BusStdDefinitions.h", ba.generateStdDef(withDate).toString().getBytes(Charsets.UTF_8), true));
 		return res;
 	}
 
-	public static byte[] builtHTML(Unit unit, List<Row> rows) {
+	public static byte[] builtHTML(Unit unit, List<Row> rows, boolean withDate) {
 		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{TITLE}", "Register Overview");
-		options.put("{DATE}", new Date().toString());
+		if (withDate) {
+			options.put("{DATE}", new Date().toString());
+		}
 		Formatter ps = new Formatter();
 		ps.format("<tr><td>Offset</td>");
 		for (int i = 0; i < Unit.rowWidth; i++) {
