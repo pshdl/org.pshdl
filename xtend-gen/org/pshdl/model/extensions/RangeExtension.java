@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
@@ -429,9 +430,9 @@ public class RangeExtension {
   }
   
   private static BigInteger srl(final BigInteger a, final BigInteger b) {
-    throw new Error("Unresolved compilation problems:"
-      + "\nBigIntegerFrame cannot be resolved to a type."
-      + "\nsrl cannot be resolved");
+    int _intValue = b.intValue();
+    BigInteger _srl = BigIntegerFrame.srl(a, 1024, _intValue);
+    return _srl;
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLBitOp obj, final HDLEvaluationContext context) {
