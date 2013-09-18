@@ -4,7 +4,7 @@
 ## Date:              {DATE} (by PSHDL)
 ##############################################################################
 
-lib pshdl pshdl_pkg vhdl
+lib {DIRNAME} pshdl_pkg vhdl
 lib proc_common_v3_00_a  all 
 lib plbv46_slave_single_v1_01_a  all 
 lib {DIRNAME} {NAME} vhdl

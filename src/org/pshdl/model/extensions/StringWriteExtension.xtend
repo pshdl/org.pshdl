@@ -101,9 +101,11 @@ class StringWriteExtension {
 	}
 
 	def dispatch String toString(HDLArrayInit array, SyntaxHighlighter highlight) {
-//		if (array.exp.size == 1)
-//			return array.entering(highlight) + array.exp.get(0).toString(highlight) + array.leaving(highlight)
-		return '''«array.entering(highlight)»{«FOR e : array.exp SEPARATOR ','»«e.toString(highlight)»«ENDFOR»}«array.leaving(highlight)»'''
+
+		//		if (array.exp.size == 1)
+		//			return array.entering(highlight) + array.exp.get(0).toString(highlight) + array.leaving(highlight)
+		return '''«array.entering(highlight)»{«FOR e : array.exp SEPARATOR ','»«e.toString(highlight)»«ENDFOR»}«array.
+			leaving(highlight)»'''
 	}
 
 	def String leaving(IHDLObject init, SyntaxHighlighter highlighter) {
@@ -138,9 +140,9 @@ class StringWriteExtension {
 	def dispatch String toString(HDLUnresolvedFragmentFunction frag, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
 		switch (container: frag.container) {
-			HDLStatement: 	isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
-			HDLBlock: 		isStatement = true
-			HDLUnit: 		isStatement = true
+			HDLStatement: isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
+			HDLBlock: isStatement = true
+			HDLUnit: isStatement = true
 		}
 		val String sb = if(isStatement) highlight.spacing.toString else ""
 		var res = sb + frag.entering(highlight) + toStringFrag(frag, highlight) +
@@ -187,9 +189,10 @@ class StringWriteExtension {
 	def dispatch String toString(HDLFunctionCall func, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
 		switch (container: func.container) {
-			HDLStatement: 	isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall) && !(container instanceof HDLInlineFunction)
-			HDLBlock: 		isStatement = true
-			HDLUnit: 		isStatement = true
+			HDLStatement: isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall) &&
+				!(container instanceof HDLInlineFunction)
+			HDLBlock: isStatement = true
+			HDLUnit: isStatement = true
 		}
 		val StringBuilder sb = if(isStatement) highlight.spacing else new StringBuilder
 		sb.append(func.entering(highlight))
@@ -207,21 +210,23 @@ class StringWriteExtension {
 		if (func.rw !== HDLFunctionParameter$RWType::READ)
 			sb.append(func.rw)
 		sb.append(func.type)
-		switch (func.type){
+		switch (func.type) {
 			case HDLFunctionParameter$Type::ENUM:
 				sb.append('<').append(highlight.enumRefType(func.enumSpecRefName.toString)).append('>')
 			case HDLFunctionParameter$Type::^IF:
 				sb.append('<').append(highlight.enumRefType(func.enumSpecRefName.toString)).append('>')
 			case HDLFunctionParameter$Type::FUNCTION: {
-				sb.append('''<«FOR HDLFunctionParameter p : func.funcSpec SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
-				if (func.funcReturnSpec!=null)
-					sb.append(highlight.simpleSpace).append("=>").append(highlight.simpleSpace).append(func.funcReturnSpec.toString(highlight))
+				sb.append(
+					'''<«FOR HDLFunctionParameter p : func.funcSpec SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
+				if (func.funcReturnSpec != null)
+					sb.append(highlight.simpleSpace).append("=>").append(highlight.simpleSpace).append(
+						func.funcReturnSpec.toString(highlight))
 				sb.append('>')
 			}
 		}
-		if (func.name!=null)
+		if (func.name != null)
 			sb.append(highlight.simpleSpace).append(highlight.varName(func.name))
-		for (d:func.dim) {
+		for (d : func.dim) {
 			switch (d) {
 				HDLLiteral case d.str: sb.append("[]")
 				default: sb.append('[').append(d.toString(highlight)).append(']')
@@ -229,6 +234,7 @@ class StringWriteExtension {
 		}
 		return sb.toString
 	}
+
 	def dispatch String toString(HDLNativeFunction func, SyntaxHighlighter highlight) {
 		val StringBuilder sb = new StringBuilder
 		sb.append(func.entering(highlight))
@@ -241,7 +247,7 @@ class StringWriteExtension {
 		sb.append(highlight.simpleSpace)
 		sb.append(highlight.keyword("function"))
 		sb.append(highlight.simpleSpace)
-		if (func.returnType!=null)
+		if (func.returnType != null)
 			sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
 		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')
@@ -275,7 +281,7 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("substitute")).append(highlight.simpleSpace).append(highlight.keyword("function")).
 			append(highlight.simpleSpace)
-		if (func.returnType!=null)
+		if (func.returnType != null)
 			sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
 		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')
@@ -336,7 +342,8 @@ class StringWriteExtension {
 			case HDLManip$HDLManipType::CAST: {
 				val HDLPrimitive type = manip.castTo as HDLPrimitive
 				val entering = manip.entering(highlight)
-				val String width = if(type.width !== null) highlight.width("<" + type.width.toString(highlight) + ">") else ""
+				val String width = if(type.width !== null) highlight.width(
+						"<" + type.width.toString(highlight) + ">") else ""
 				return entering + "(" + highlight.keyword(type.type.toString.toLowerCase) + width + ")" +
 					manip.target.toString(highlight) + manip.leaving(highlight)
 			}
@@ -439,7 +446,8 @@ class StringWriteExtension {
 			sb.append(highlight.keyword("case")).append(highlight.simpleSpace).append(
 				caseStmnt.label.toString(highlight)).append(':').append(highlight.simpleSpace).append(highlight.newLine)
 		highlight.incSpacing
-		sb.append('''«FOR HDLStatement stmnt : caseStmnt.dos SEPARATOR highlight.newLine»«stmnt.toString(highlight)»«ENDFOR»''')
+		sb.append(
+			'''«FOR HDLStatement stmnt : caseStmnt.dos SEPARATOR highlight.newLine»«stmnt.toString(highlight)»«ENDFOR»''')
 		highlight.decSpacing
 		sb.append(caseStmnt.leaving(highlight))
 		return sb.toString
@@ -539,7 +547,8 @@ class StringWriteExtension {
 		sb.append(highlight.enumName(decl.HEnum.name))
 		sb.append(highlight.simpleSpace).append("=").append(highlight.simpleSpace)
 		sb.append(
-			'''{«FOR HDLVariable henum : decl.HEnum.enums SEPARATOR ',' + highlight.simpleSpace»«henum.toString(highlight)»«ENDFOR»}''')
+			'''{«FOR HDLVariable henum : decl.HEnum.enums SEPARATOR ',' + highlight.simpleSpace»«henum.toString(
+				highlight)»«ENDFOR»}''')
 		sb.append(highlight.newLine)
 		sb.append(decl.leaving(highlight))
 		return sb.toString
@@ -558,49 +567,49 @@ class StringWriteExtension {
 				highlight.variableRefName(reg.clkRefName))
 			first = false
 		}
-		if (reg.rstRefName!=defaultReg.rstRefName) {
+		if (reg.rstRefName != defaultReg.rstRefName) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_PARAM)).append('=').append(
 				highlight.variableRefName(reg.rstRefName))
 			first = false
 		}
-		if (reg.enableRefName!=defaultReg.enableRefName) {
+		if (reg.enableRefName != defaultReg.enableRefName) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::ENABLE_PARAM)).append('=').append(
 				highlight.variableRefName(reg.enableRefName))
 			first = false
 		}
-		if (reg.clockType !== null && reg.clockType!==defaultReg.clockType) {
+		if (reg.clockType !== null && reg.clockType !== defaultReg.clockType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::EDGE_PARAM)).append('=').append(
 				highlight.enumRefType("Edge")).append('.').append(highlight.enumRefVar(reg.clockType.toString))
 			first = false
 		}
-		if (reg.syncType !== null && reg.syncType!==defaultReg.syncType) {
+		if (reg.syncType !== null && reg.syncType !== defaultReg.syncType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_SYNC_PARAM)).append('=').append(
 				highlight.enumRefType("Sync")).append('.').append(highlight.enumRefVar(reg.syncType.toString))
 			first = false
 		}
-		if (reg.resetType !== null && reg.resetType!==defaultReg.resetType) {
+		if (reg.resetType !== null && reg.resetType !== defaultReg.resetType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_TYPE_PARAM)).append('=').append(
 				highlight.enumRefType("Active")).append('.').append(highlight.enumRefVar(reg.resetType.toString))
 			first = false
 		}
-		if (reg.resetValue!=defaultReg.resetValue) {
+		if (reg.resetValue != defaultReg.resetValue) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::RESET_VALUE_PARAM)).append('=').append(
 				reg.resetValue.toString(highlight))
 			first = false
 		}
-		if (reg.delay!=defaultReg.delay) {
+		if (reg.delay != defaultReg.delay) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig::DELAY_PARAM)).append('=').append(
@@ -637,6 +646,9 @@ class StringWriteExtension {
 		val StringBuilder sb = new StringBuilder
 		highlight.pushContext(SyntaxHighlighter$Context::HDLUnit)
 		sb.append(unit.entering(highlight))
+		for (HDLAnnotation anno : unit.annotations){
+			sb.append(anno.toString(highlight)).append(highlight.newLine)
+		}
 		if (!unit.simulation)
 			sb.append(highlight.keyword("module")).append(highlight.simpleSpace)
 		else

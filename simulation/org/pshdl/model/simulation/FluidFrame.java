@@ -114,6 +114,8 @@ public class FluidFrame {
 	public final Set<FluidFrame> references = new LinkedHashSet<FluidFrame>();
 	public final Map<String, VariableInformation> vars = new TreeMap<String, VariableInformation>();
 
+	public String[] annotations;
+
 	public FluidFrame() {
 		this(null, false);
 	}
@@ -202,7 +204,7 @@ public class FluidFrame {
 			lID.add(frame);
 		}
 		final VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
-		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars, moduleName, source);
+		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars, moduleName, source, annotations);
 	}
 
 	private static class PredicateChain {
@@ -554,7 +556,7 @@ public class FluidFrame {
 	}
 
 	public void createPredVar() {
-		vars.put(outputName, new VariableInformation(Direction.INTERNAL, outputName, 1, Type.BIT, false, false, false));
+		vars.put(outputName, new VariableInformation(Direction.INTERNAL, outputName, 1, Type.BIT, false, false, false, null));
 	}
 
 	public void addVar(VariableInformation information) {

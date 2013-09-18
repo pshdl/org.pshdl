@@ -28,6 +28,7 @@ package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +38,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
@@ -102,6 +105,8 @@ public class SimulationTransformationExtension {
       return _simulationTransformationExtension;
     }
   }.apply();
+  
+  public final static char ANNO_VALUE_SEP = '|';
   
   public static FluidFrame simulationModelOf(final IHDLObject obj, final HDLEvaluationContext context) {
     return SimulationTransformationExtension.INST.toSimulationModel(obj, context);
@@ -191,7 +196,7 @@ public class SimulationTransformationExtension {
     final boolean isReg = (!Objects.equal(_register, null));
     FluidFrame _fluidFrame = new FluidFrame("#null", false);
     final FluidFrame res = _fluidFrame;
-    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false);
+    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null);
     res.addVar(_variableInformation);
     Direction dir = null;
     HDLDirection _direction = obj.getDirection();
@@ -268,7 +273,11 @@ public class SimulationTransformationExtension {
             }
           }
         }
-        VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, clock, reset, ((int[])Conversions.unwrapArray(dims, int.class)));
+        ArrayList<HDLAnnotation> _annotations = hVar.getAnnotations();
+        ArrayList<HDLAnnotation> _annotations_1 = obj.getAnnotations();
+        final Iterable<HDLAnnotation> allAnnos = Iterables.<HDLAnnotation>concat(_annotations, _annotations_1);
+        String[] _annoString = this.toAnnoString(allAnnos);
+        VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, clock, reset, _annoString, ((int[])Conversions.unwrapArray(dims, int.class)));
         res.addVar(_variableInformation_1);
       }
     }
@@ -314,6 +323,31 @@ public class SimulationTransformationExtension {
       res.add(Instruction.const0);
     }
     return res;
+  }
+  
+  public String[] toAnnoString(final Iterable<HDLAnnotation> annotations) {
+    final Function1<HDLAnnotation,String> _function = new Function1<HDLAnnotation,String>() {
+        public String apply(final HDLAnnotation it) {
+          String _xifexpression = null;
+          String _value = it.getValue();
+          boolean _equals = Objects.equal(_value, null);
+          if (_equals) {
+            String _name = it.getName();
+            String _substring = _name.substring(1);
+            _xifexpression = _substring;
+          } else {
+            String _name_1 = it.getName();
+            String _substring_1 = _name_1.substring(1);
+            String _plus = (_substring_1 + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
+            String _value_1 = it.getValue();
+            String _plus_1 = (_plus + _value_1);
+            _xifexpression = _plus_1;
+          }
+          return _xifexpression;
+        }
+      };
+    Iterable<String> _map = IterableExtensions.<HDLAnnotation, String>map(annotations, _function);
+    return ((String[])Conversions.unwrapArray(_map, String.class));
   }
   
   public void createInit(final HDLRegisterConfig config, final HDLVariableDeclaration obj, final HDLEvaluationContext context, final FluidFrame res, final boolean toReg) {
@@ -381,7 +415,7 @@ public class SimulationTransformationExtension {
       _xifexpression = Integer.valueOf(32);
     }
     final Integer width = _xifexpression;
-    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, name, (width).intValue(), Type.BIT, false, false, false);
+    VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, name, (width).intValue(), Type.BIT, false, false, false, null);
     res.addVar(_variableInformation);
     ArrayList<HDLSwitchCaseStatement> _cases = obj.getCases();
     for (final HDLSwitchCaseStatement c : _cases) {
@@ -664,6 +698,9 @@ public class SimulationTransformationExtension {
       FluidFrame _simulationModel_1 = this.toSimulationModel(stmnt_1, context);
       res.addReferencedFrame(_simulationModel_1);
     }
+    ArrayList<HDLAnnotation> _annotations = obj.getAnnotations();
+    String[] _annoString = this.toAnnoString(_annotations);
+    res.annotations = _annoString;
     final HDLRegisterConfig[] regConfigs = obj.<HDLRegisterConfig>getAllObjectsOf(HDLRegisterConfig.class, true);
     HashSet<String> _hashSet = new HashSet<String>();
     final Set<String> lst = _hashSet;

@@ -47,6 +47,22 @@ import com.google.common.collect.Lists
 import java.util.Collections
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile
+import com.google.common.base.Charsets
+import com.google.common.collect.LinkedHashMultimap
+import com.google.common.base.Joiner
+import com.google.common.base.Splitter
+import org.pshdl.model.types.builtIn.busses.BusGenerator
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST
+import org.pshdl.model.types.builtIn.busses.memorymodel.Unit
+import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement
+import org.pshdl.model.types.builtIn.busses.memorymodel.Column
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row
+import java.text.SimpleDateFormat
+import java.util.Date
+import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess
 
 class CCompiler implements ITypeOuptutProvider {
 	private extension CommonCompilerExtension cce
@@ -65,7 +81,7 @@ class CCompiler implements ITypeOuptutProvider {
 		}
 	}
 
-	def static String doCompile(ExecutableModel em) {
+	def static String doCompileMainC(ExecutableModel em) {
 		return new CCompiler(em).compile.toString
 	}
 
@@ -91,6 +107,7 @@ class CCompiler implements ITypeOuptutProvider {
 				«ENDFOR»
 				int epsCycle=0;
 				int deltaCycle=0;
+				
 				«FOR f : em.frames»
 					«f.method»
 				«ENDFOR»
@@ -111,7 +128,7 @@ class CCompiler implements ITypeOuptutProvider {
 				«IF hasClock»
 					«copyRegs»
 				«ENDIF»
-				void run(){
+				void pshdl_sim_run(){
 					deltaCycle++;
 					«IF hasClock»
 						epsCycle=0;
@@ -144,8 +161,83 @@ class CCompiler implements ITypeOuptutProvider {
 						«v.copyPrev»
 					«ENDFOR»
 				}
-			
+			«helperMethods»
 		'''
+	}
+
+	def helperMethods() '''
+		void pshdl_sim_setInput(int idx, long value, ...) {
+			va_list va_arrayIdx;
+			(void)va_arrayIdx;
+			switch (idx) {
+				«FOR v : em.variables.excludeNull»
+					«IF v.dimensions.length == 0»
+						case «varIdx.get(v.name)»: 
+							«IF v.width != 64 && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+							«v.idName(false, false)»=value«IF v.predicate»==0?false:true«ENDIF»;
+							break;
+					«ELSE»
+						case «varIdx.get(v.name)»: 
+							«IF v.width != 64 && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+							va_start(va_arrayIdx, value);
+							«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]=value;
+							va_end(va_arrayIdx);
+							break;
+					«ENDIF»
+				«ENDFOR»
+			}
+		}
+		
+		char* pshdl_sim_getName(int idx) {
+			switch (idx) {
+				«FOR v : em.variables.excludeNull»
+					case «varIdx.get(v.name)»: return "«v.name»";
+				«ENDFOR»
+			}
+			return 0;
+		}
+		
+		static int varIdx[]={«FOR v : em.variables.excludeNull SEPARATOR ','»«varIdx.get(v.name)»«ENDFOR»};
+		int* pshdl_sim_getAvailableVarIdx(int *numElements){
+			*numElements=«em.variables.length - 1»;
+			return varIdx;
+		}
+		
+		«uint_t» pshdl_sim_getOutput(int idx, ...) {
+			va_list va_arrayIdx;
+			(void)va_arrayIdx;
+			switch (idx) {
+				«FOR v : em.variables.excludeNull»
+					«IF v.dimensions.length == 0»
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.asMaskL»«ENDIF»;
+					«ELSE»
+						case «varIdx.get(v.name)»: {
+							va_start(va_arrayIdx, idx);
+							«uint_t» res=«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]«IF v.width != 64 && !v.predicate» & «v.width.
+			asMaskL»«ENDIF»;
+							va_end(va_arrayIdx);
+							return res;
+						}
+					«ENDIF»
+				«ENDFOR»
+			}
+			return 0;
+		}	
+	'''
+
+	def arrayVarArgAccessArrIdx(VariableInformation v) {
+		val varAccess = new StringBuilder
+		val dims = dimsLastOne(v)
+		for (i : (0 ..< v.dimensions.length)) {
+			val dim = dims.get(i)
+			if (i != 0)
+				varAccess.append('+')
+			if (dim != 1)
+				varAccess.append('''va_arg(va_arrayIdx, int) *«dim»''')
+			else
+				varAccess.append('''va_arg(va_arrayIdx, int)''')
+		}
+		return varAccess
 	}
 
 	def predicates(Frame f) {
@@ -587,6 +679,7 @@ class CCompiler implements ITypeOuptutProvider {
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdarg.h>
 	'''
 
 	override getHookName() {
@@ -599,8 +692,126 @@ class CCompiler implements ITypeOuptutProvider {
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		val comp = new CCompiler(em)
+		val List<SideFile> sideFiles = Lists.newLinkedList
+		val simFile = generateSimEncapsuation
+		if (simFile != null)
+			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets::UTF_8), true));
 		return Lists::newArrayList(
-			new CompileResult(syntaxProblems, doCompile(em), em.moduleName, Collections::emptyList, em.source, hookName, true));
+			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, hookName, true));
 	}
-	
+
+	def String generateSimEncapsuation() {
+		val Unit unit = getUnit(em)
+		if (unit == null)
+			return null
+		return generateSimEncapsuation(unit, MemoryModel::buildRows(unit))
+	}
+
+	def getUnit(ExecutableModel model) {
+		var Unit unit
+		val annoSplitter = Splitter::on(SimulationTransformationExtension::ANNO_VALUE_SEP);
+		if (em.annotations !== null) {
+			for (a : em.annotations) {
+				if (a.startsWith("busDescription")) {
+					val value = annoSplitter.limit(2).splitToList(a).get(1)
+					unit = MemoryModelAST.parseUnit(value, new HashSet, 0)
+				}
+			}
+		}
+		return unit
+	}
+
+	extension BusAccess ba = new BusAccess
+
+	private def generateSimEncapsuation(Unit unit, Iterable<Row> rows) {
+		val Set<String> varNames = new HashSet
+		rows.forEach[it.allDefs.filter[it.type !== Definition::Type::UNUSED].forEach[varNames.add(it.getName)]]
+		var res = '''
+//  BusAccessSim.c
+//
+//  Automatically generated on «SimpleDateFormat::dateTimeInstance.format(new Date)».
+//
+
+#include <stdint.h>
+#include <stdbool.h>
+#include "BusAccess.h"
+#include "BusStdDefinitions.h"
+
+static void defaultWarn(warningType_t t, int value, char *def, char *row, char *msg){
+}
+
+warnFunc_p warn=defaultWarn;
+
+void setWarn(warnFunc_p warnFunction){
+    warn=warnFunction;
+}
+
+extern uint64_t pshdl_sim_getOutput(int idx, ...);
+extern void pshdl_sim_setInput(int idx, long value, ...);
+extern void pshdl_sim_run();
+extern bool disableEdges;
+
+«FOR v : varNames»
+#define «v.defineName» «varIdx.get(em.moduleName + "." + v)»
+«ENDFOR»
+#define «"Bus2IP_Clk".defineName» «varIdx.get(em.moduleName + ".Bus2IP_Clk")»
+
+'''
+		val checkedRows = new HashSet<String>()
+		for (Row row : rows) {
+			if (!checkedRows.contains(row.name)) {
+				if (row.hasWriteDefs)
+					res = res + row.simSetter
+				res = res + row.simGetter
+				checkedRows.add(row.name)
+			}
+		}
+		return res
+	}
+
+	def getDefineName(String v) {
+		(em.moduleName + "." + v).idName(false, false)
+	}
+
+	def simGetter(Row row) '''
+//Getter
+int get«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition definition : row.allDefs»«getParameter(
+		row, definition, true)»«ENDFOR»){
+	«FOR Definition d : row.allDefs»
+	*«row.getVarName(d)»=pshdl_sim_getOutput(«d.name.defineName», index);
+	«ENDFOR»
+	return 1;
+}
+
+int get«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *result){
+	return get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.getVarNameIndex(d)»«ENDFOR»);
+}
+'''
+
+	def simSetter(Row row) '''
+// Setter
+int set«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition definition : row.writeDefs»«getParameter(
+		row, definition, false)»«ENDFOR»){
+	«FOR Definition ne : row.writeDefs»
+		«row.generateConditions(ne)»
+	«ENDFOR»
+	«FOR Definition d : row.writeDefs»
+	pshdl_sim_setInput(«d.name.defineName», «d.name», index);
+	«ENDFOR»
+	if (disableEdges) {
+		pshdl_sim_setInput(«"Bus2IP_Clk".defineName», 0, 0);
+		pshdl_sim_run();
+	}
+	pshdl_sim_setInput(«"Bus2IP_Clk".defineName», 1, 0);
+	pshdl_sim_run();
+	//warn(invalidIndex, index, "", "«row.name»", "");
+	return 0;
+}
+
+int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newVal) {
+	return set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.getVarNameIndex(d)»«ENDFOR»);
+}
+'''
+
 }

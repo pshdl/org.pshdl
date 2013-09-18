@@ -1728,58 +1728,65 @@ public class StringWriteExtension {
     highlight.pushContext(Context.HDLUnit);
     String _entering = this.entering(unit, highlight);
     sb.append(_entering);
+    ArrayList<HDLAnnotation> _annotations = unit.getAnnotations();
+    for (final HDLAnnotation anno : _annotations) {
+      String _string = this.toString(anno, highlight);
+      StringBuilder _append = sb.append(_string);
+      String _newLine = highlight.newLine();
+      _append.append(_newLine);
+    }
     Boolean _simulation = unit.getSimulation();
     boolean _not = (!(_simulation).booleanValue());
     if (_not) {
       String _keyword = highlight.keyword("module");
-      StringBuilder _append = sb.append(_keyword);
+      StringBuilder _append_1 = sb.append(_keyword);
       String _simpleSpace = highlight.simpleSpace();
-      _append.append(_simpleSpace);
+      _append_1.append(_simpleSpace);
     } else {
       String _keyword_1 = highlight.keyword("testbench");
-      StringBuilder _append_1 = sb.append(_keyword_1);
+      StringBuilder _append_2 = sb.append(_keyword_1);
       String _simpleSpace_1 = highlight.simpleSpace();
-      _append_1.append(_simpleSpace_1);
+      _append_2.append(_simpleSpace_1);
     }
     String _name = unit.getName();
     String _unitName = highlight.unitName(_name);
-    StringBuilder _append_2 = sb.append(_unitName);
-    StringBuilder _append_3 = _append_2.append("{");
-    String _newLine = highlight.newLine();
-    _append_3.append(_newLine);
+    StringBuilder _append_3 = sb.append(_unitName);
+    StringBuilder _append_4 = _append_3.append("{");
+    String _newLine_1 = highlight.newLine();
+    _append_4.append(_newLine_1);
     highlight.incSpacing();
     ArrayList<String> _imports = unit.getImports();
     for (final String imports : _imports) {
       StringBuilder _spacing = highlight.getSpacing();
-      StringBuilder _append_4 = sb.append(_spacing);
+      StringBuilder _append_5 = sb.append(_spacing);
       String _keyword_2 = highlight.keyword("import");
-      StringBuilder _append_5 = _append_4.append(_keyword_2);
+      StringBuilder _append_6 = _append_5.append(_keyword_2);
       String _simpleSpace_2 = highlight.simpleSpace();
-      StringBuilder _append_6 = _append_5.append(_simpleSpace_2);
+      StringBuilder _append_7 = _append_6.append(_simpleSpace_2);
       String _importName = highlight.importName(imports);
-      StringBuilder _append_7 = _append_6.append(_importName);
-      StringBuilder _append_8 = _append_7.append(";");
-      String _newLine_1 = highlight.newLine();
-      _append_8.append(_newLine_1);
-    }
-    ArrayList<HDLStatement> _inits = unit.getInits();
-    for (final HDLStatement stmnt : _inits) {
-      String _string = this.toString(stmnt, highlight);
-      StringBuilder _append_9 = sb.append(_string);
+      StringBuilder _append_8 = _append_7.append(_importName);
+      StringBuilder _append_9 = _append_8.append(";");
       String _newLine_2 = highlight.newLine();
       _append_9.append(_newLine_2);
     }
-    ArrayList<HDLStatement> _statements = unit.getStatements();
-    for (final HDLStatement stmnt_1 : _statements) {
-      String _string_1 = this.toString(stmnt_1, highlight);
+    ArrayList<HDLStatement> _inits = unit.getInits();
+    for (final HDLStatement stmnt : _inits) {
+      String _string_1 = this.toString(stmnt, highlight);
       StringBuilder _append_10 = sb.append(_string_1);
       String _newLine_3 = highlight.newLine();
       _append_10.append(_newLine_3);
     }
+    ArrayList<HDLStatement> _statements = unit.getStatements();
+    for (final HDLStatement stmnt_1 : _statements) {
+      String _string_2 = this.toString(stmnt_1, highlight);
+      StringBuilder _append_11 = sb.append(_string_2);
+      String _newLine_4 = highlight.newLine();
+      _append_11.append(_newLine_4);
+    }
     highlight.decSpacing();
-    StringBuilder _append_11 = sb.append("}");
-    String _newLine_4 = highlight.newLine();
-    _append_11.append(_newLine_4);
+    StringBuilder _append_12 = sb.append("}");
+    String _newLine_5 = highlight.newLine();
+    _append_12.append(_newLine_5);
     String _leaving = this.leaving(unit, highlight);
     sb.append(_leaving);
     highlight.popContext();

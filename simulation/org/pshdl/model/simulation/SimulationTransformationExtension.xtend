@@ -91,9 +91,12 @@ import java.util.HashSet
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
 import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
+import org.pshdl.model.HDLAnnotation
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
+	
+	public static final char ANNO_VALUE_SEP='|'
 
 	def static FluidFrame simulationModelOf(IHDLObject obj, HDLEvaluationContext context) {
 		return INST.toSimulationModel(obj, context)
@@ -147,7 +150,7 @@ class SimulationTransformationExtension {
 		val width = if(type.classType === HDLClass::HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
 		val isReg = obj.register != null
 		val FluidFrame res = new FluidFrame("#null", false)
-		res.addVar(new VariableInformation(Direction::INTERNAL, "#null", 1, Type::BIT, false, false, false))
+		res.addVar(new VariableInformation(Direction::INTERNAL, "#null", 1, Type::BIT, false, false, false, null))
 		var Direction dir
 		switch (obj.direction) {
 			case IN: dir = Direction::IN
@@ -171,7 +174,8 @@ class SimulationTransformationExtension {
 					case NATURAL: vType = Type::UINT
 				}
 			}
-			res.addVar(new VariableInformation(dir, varName, width, vType, isReg, clock, reset, dims))
+			val allAnnos=hVar.annotations+obj.annotations
+			res.addVar(new VariableInformation(dir, varName, width, vType, isReg, clock, reset, allAnnos.toAnnoString, dims))
 		}
 		if (isReg) {
 			val config = obj.register.normalize
@@ -195,6 +199,12 @@ class SimulationTransformationExtension {
 			res.add(const0)
 		}
 		return res
+	}
+	
+	def String[] toAnnoString(Iterable<HDLAnnotation> annotations){
+		annotations.map[
+				if (it.value==null) it.name.substring(1) else it.name.substring(1)+ANNO_VALUE_SEP+it.value
+			]
 	}
 
 	def void createInit(HDLRegisterConfig config, HDLVariableDeclaration obj, HDLEvaluationContext context,
@@ -232,7 +242,7 @@ class SimulationTransformationExtension {
 		res.setName(name)
 		val type = typeOf(obj.caseExp).get
 		val width = if(type.classType === HDLClass::HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
-		res.addVar(new VariableInformation(Direction::INTERNAL, name, width, Type::BIT, false, false, false))
+		res.addVar(new VariableInformation(Direction::INTERNAL, name, width, Type::BIT, false, false, false, null))
 		for (HDLSwitchCaseStatement c : obj.cases) {
 			val cName = fullNameOf(c).toString
 			val caseFrame = new FluidFrame(InternalInformation::PRED_PREFIX + cName, false)
@@ -385,6 +395,7 @@ class SimulationTransformationExtension {
 		for (HDLStatement stmnt : obj.statements) {
 			res.addReferencedFrame(stmnt.toSimulationModel(context))
 		}
+		res.annotations=obj.annotations.toAnnoString
 		val regConfigs = obj.getAllObjectsOf(typeof(HDLRegisterConfig), true)
 		val Set<String> lst = new HashSet
 		for (HDLRegisterConfig reg : regConfigs) {

@@ -87,13 +87,13 @@ public class Refactoring {
 		}
 	}
 
-	public static HDLPackage inlineUnit(HDLUnit container, HDLInterfaceInstantiation hi, HDLUnit subUnit) {
+	public static HDLPackage inlineUnit(HDLUnit container, HDLInterfaceInstantiation hi, HDLUnit subUnit, char separator) {
 		final HDLVariable hiVar = hi.getVar();
 		final String prefix = hiVar.getName();
 		final ModificationSet ms = new ModificationSet();
 		HDLPackage pkg = createHDLPackage(subUnit, ms);
 		subUnit = ms.apply(subUnit);
-		subUnit = prefixVariables(subUnit, prefix);
+		subUnit = prefixVariables(subUnit, prefix, separator);
 		subUnit = extractDefaultValue(subUnit);
 		final ArrayList<HDLExpression> outerDims = hiVar.getDimensions();
 		subUnit = addArrayReference(subUnit, outerDims);
@@ -105,7 +105,7 @@ public class Refactoring {
 		final ModificationSet res = new ModificationSet();
 		final Collection<HDLInterfaceRef> ifRefs = HDLQuery.getInterfaceRefs(container, hiVar);
 		for (final HDLInterfaceRef hir : ifRefs) {
-			final HDLQualifiedName newName = HDLQualifiedName.create(prefix + "_" + hir.getVarRefName().getLastSegment());
+			final HDLQualifiedName newName = HDLQualifiedName.create(prefix + separator + hir.getVarRefName().getLastSegment());
 			final ArrayList<HDLExpression> ifArray = hir.getIfArray();
 			ifArray.addAll(hir.getArray());
 			final HDLVariableRef newRef = new HDLVariableRef().setVar(newName).setBits(hir.getBits()).setArray(ifArray);
@@ -280,11 +280,11 @@ public class Refactoring {
 		return subUnit;
 	}
 
-	private static HDLUnit prefixVariables(HDLUnit subUnit, String prefix) {
+	private static HDLUnit prefixVariables(HDLUnit subUnit, String prefix, char separator) {
 		final ModificationSet subMS = new ModificationSet();
 		final HDLVariable[] vars = subUnit.getAllObjectsOf(HDLVariable.class, true);
 		for (final HDLVariable hdlVariable : vars) {
-			final String newName = prefix + "_" + hdlVariable.getName();
+			final String newName = prefix + separator + hdlVariable.getName();
 			Refactoring.renameVariable(hdlVariable, HDLQualifiedName.create(newName), subUnit, subMS);
 		}
 		subUnit = subMS.apply(subUnit);

@@ -43,11 +43,11 @@ import com.google.common.collect.*;
 
 public class HDLSimulator {
 
-	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src) {
+	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
 		if ((unit.getSimulation() != null) && unit.getSimulation())
 			throw new IllegalArgumentException("Testbenches are not supported");
 		HDLUnit insulin = Insulin.transform(unit, src);
-		final HDLPackage pkg = flattenAll(context, insulin);
+		final HDLPackage pkg = flattenAll(context, insulin, separator);
 		insulin = getSingleUnit(pkg);
 		insulin = convertArrayInits(context, insulin);
 		insulin = unrollForLoops(context, insulin);
@@ -141,7 +141,7 @@ public class HDLSimulator {
 		}
 	}
 
-	private static HDLPackage flattenAll(HDLEvaluationContext context, HDLUnit insulin) {
+	private static HDLPackage flattenAll(HDLEvaluationContext context, HDLUnit insulin, char separator) {
 		HDLInterfaceInstantiation[] hii = null;
 		HDLPackage res = new HDLPackage();
 		while ((hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true)).length > 0) {
@@ -153,11 +153,11 @@ public class HDLSimulator {
 				throw new IllegalArgumentException("Can not find unit for interface:" + asRef);
 			unit = Insulin.transform(unit, library.getSrc(asRef));
 			final HDLEvaluationContext hiContext = hi.getContext(HDLEvaluationContext.createDefault(unit));
-			final HDLPackage subUnit = flattenAll(hiContext, unit);
+			final HDLPackage subUnit = flattenAll(hiContext, unit, separator);
 			for (final HDLDeclaration decl : subUnit.getDeclarations()) {
 				res = res.addDeclarations(decl);
 			}
-			final HDLPackage iuRes = Refactoring.inlineUnit(insulin, hi, getSingleUnit(subUnit));
+			final HDLPackage iuRes = Refactoring.inlineUnit(insulin, hi, getSingleUnit(subUnit), separator);
 			for (final HDLDeclaration decl : iuRes.getDeclarations()) {
 				res = res.addDeclarations(decl);
 			}

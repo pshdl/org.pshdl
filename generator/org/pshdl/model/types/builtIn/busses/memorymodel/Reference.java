@@ -58,7 +58,7 @@ public class Reference implements NamedElement {
 		for (final Integer arr : dimensions) {
 			sb.append('[').append(arr).append(']');
 		}
-		return name + sb;
+		return name + sb + ";";
 	}
 
 	public Token token;

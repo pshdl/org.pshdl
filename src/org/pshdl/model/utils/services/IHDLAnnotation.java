@@ -26,9 +26,40 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
+import org.pshdl.model.*;
 import org.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
 
 public interface IHDLAnnotation {
+	public abstract static class AbstractAnnotation implements IHDLAnnotation {
+
+		private final String name;
+		private final AnnotationInformation info;
+
+		public AbstractAnnotation(String name, Class<?> provider, String summary, String arguments) {
+			if (name.charAt(0) != '@') {
+				this.name = '@' + name;
+			} else {
+				this.name = name;
+			}
+			info = new AnnotationInformation(provider.getName(), name, summary, arguments);
+		}
+
+		@Override
+		public String name() {
+			return name;
+		}
+
+		@Override
+		public AnnotationInformation getAnnotationInformation() {
+			return info;
+		}
+
+		public HDLAnnotation create(String arg) {
+			return new HDLAnnotation().setName(name).setValue(arg);
+		}
+
+	}
+
 	/**
 	 * Returns the name of the annotation without the @ symbol
 	 * 

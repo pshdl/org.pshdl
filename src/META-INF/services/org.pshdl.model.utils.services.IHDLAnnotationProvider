@@ -1,1 +1,2 @@
 org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider
+org.pshdl.model.types.builtIn.busses.BusGenerator

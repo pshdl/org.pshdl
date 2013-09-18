@@ -52,6 +52,11 @@ public class Unit {
 		return sb.toString();
 	}
 
+	public String toCompactString() {
+		final String fullString = toString();
+		return fullString.replaceAll("\\s+", " ").replaceAll("\\s*([\\{\\};])\\s*", "$1");
+	}
+
 	public NamedElement resolve(Reference ref) {
 		final NamedElement decl = declarations.get(ref.getName());
 		if (decl == null)

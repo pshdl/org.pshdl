@@ -37,6 +37,8 @@ import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.internal.*;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
+import com.google.common.io.*;
+
 public class BusGenSideFiles {
 
 	public static final String WRAPPER_APPENDIX = "core";
@@ -52,6 +54,11 @@ public class BusGenSideFiles {
 		res.add(paoFile(unitName, dirName, type, pCore));
 		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore));
 		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS, true));
+		try {
+			res.add(new SideFile(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(BusGenSideFiles.class.getResourceAsStream("/pshdl_pkg.vhd")), true));
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 		return res;
 	}
 

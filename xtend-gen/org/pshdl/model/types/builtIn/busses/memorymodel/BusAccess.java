@@ -35,7 +35,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IntegerRange;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Column;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
@@ -1194,23 +1196,25 @@ public class BusAccess {
   }
   
   public boolean hasWriteDefs(final Row row) {
-    for (final NamedElement ne : row.definitions) {
-      boolean _hasWrite = this.hasWrite(ne);
-      if (_hasWrite) {
-        return true;
-      }
-    }
-    return false;
+    final Function1<NamedElement,Boolean> _function = new Function1<NamedElement,Boolean>() {
+        public Boolean apply(final NamedElement it) {
+          boolean _hasWrite = BusAccess.this.hasWrite(it);
+          return Boolean.valueOf(_hasWrite);
+        }
+      };
+    NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(row.definitions, _function);
+    boolean _notEquals = (!Objects.equal(_findFirst, null));
+    return _notEquals;
   }
   
   public boolean hasWrite(final NamedElement ne) {
     boolean _and = false;
-    boolean _notEquals = (!Objects.equal(((Definition) ne).rw, RWType.r));
-    if (!_notEquals) {
+    boolean _tripleNotEquals = (((Definition) ne).rw != RWType.r);
+    if (!_tripleNotEquals) {
       _and = false;
     } else {
-      boolean _notEquals_1 = (!Objects.equal(((Definition) ne).type, Type.UNUSED));
-      _and = (_notEquals && _notEquals_1);
+      boolean _tripleNotEquals_1 = (((Definition) ne).type != Type.UNUSED);
+      _and = (_tripleNotEquals && _tripleNotEquals_1);
     }
     return _and;
   }

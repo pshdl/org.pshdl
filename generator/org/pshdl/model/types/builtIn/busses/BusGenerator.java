@@ -52,7 +52,25 @@ import org.pshdl.model.validation.builtin.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 
-public class BusGenerator implements IHDLGenerator {
+public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
+
+	public static final char ROW_SEPARTOR = ';';
+	private static final IHDLAnnotation.AbstractAnnotation busTagetSignal = new IHDLAnnotation.AbstractAnnotation("busTargetSignal", BusGenerator.class,
+			"Annotation used by the Busgenerator to annotate variables that can be modified", "A list of rows that use this signal separated by:'" + ROW_SEPARTOR + "'") {
+
+		@Override
+		public String validate(String value) {
+			return null;
+		}
+	};
+	private static final IHDLAnnotation.AbstractAnnotation busDescription = new IHDLAnnotation.AbstractAnnotation("busDescription", BusGenerator.class,
+			"Annotation used by the Busgenerator to give a full representation of the bus system", "A list of rows that use this signal separated by:'" + ROW_SEPARTOR + "'") {
+
+		@Override
+		public String validate(String value) {
+			return null;
+		}
+	};
 
 	public static enum BusErrors implements IErrorCode {
 		invalid_reference, underfilled_row, overfilled_row;
@@ -222,23 +240,54 @@ public class BusGenerator implements IHDLGenerator {
 		final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
 		sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version));
 		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			final HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
+			hdgi = annotateSignals(hdgi, unit);
 			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
-			final HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
+			hdgi = annotateSignals(hdgi, unit);
 			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true));
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
 		if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
-			final HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
+			HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
+			hdgi = annotateSignals(hdgi, unit);
 			hdgi.files.addAll(sideFiles);
 			return Optional.of(hdgi);
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
+	}
+
+	private HDLGenerationInfo annotateSignals(HDLGenerationInfo hdgi, Unit unit) {
+		final HDLUnit hdlUnit = hdgi.unit;
+		final ModificationSet ms = new ModificationSet();
+		ms.addTo(hdlUnit, HDLUnit.fAnnotations, busDescription.create(unit.toCompactString()));
+		final Multimap<String, String> mm = TreeMultimap.create();
+		for (final Entry<String, NamedElement> e : unit.declarations.entrySet()) {
+			final NamedElement value = e.getValue();
+			if (value instanceof Row) {
+				final Row row = (Row) value;
+				for (final NamedElement def : row.definitions) {
+					final String dName = def.getName();
+					mm.put(dName, row.name);
+				}
+			}
+		}
+		for (final Entry<String, Collection<String>> e : mm.asMap().entrySet()) {
+			final String dName = e.getKey();
+			final String row = Joiner.on(ROW_SEPARTOR).join(e.getValue());
+			final Collection<HDLVariable> lastSegmentIs = HDLQuery.select(HDLVariable.class).from(hdlUnit).where(HDLVariable.fName).lastSegmentIs(dName).getAll();
+			for (final HDLVariable hdlVariable : lastSegmentIs) {
+				ms.replace(hdlVariable, hdlVariable.addAnnotations(busTagetSignal.create(row)));
+			}
+		}
+		final HDLGenerationInfo hdgiRef = new HDLGenerationInfo(ms.apply(hdlUnit));
+		hdgiRef.files = hdgi.files;
+		return hdgiRef;
 	}
 
 	public static Unit createDefaultUnit(int regCount) {
@@ -328,6 +377,11 @@ public class BusGenerator implements IHDLGenerator {
 				"This parameter is mandatory. It indicates how many sw registers should be accessible in the ip core. The number can be a constant or a string");
 		gi.arguments.put("version", "The version ID to use for the generated pcore");
 		return gi;
+	}
+
+	@Override
+	public IHDLAnnotation[] getAnnotations() {
+		return new IHDLAnnotation[] { busTagetSignal };
 	}
 
 }

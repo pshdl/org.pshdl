@@ -26,9 +26,14 @@
  */
 package org.pshdl.model.simulation;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import java.util.Collections;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +43,14 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Exceptions;
+import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Extension;
+import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
+import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.Frame.FastInstruction;
@@ -49,6 +59,14 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.simulation.SimulationTransformationExtension;
+import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
 import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
@@ -77,7 +95,7 @@ public class CCompiler implements ITypeOuptutProvider {
     }
   }
   
-  public static String doCompile(final ExecutableModel em) {
+  public static String doCompileMainC(final ExecutableModel em) {
     CCompiler _cCompiler = new CCompiler(em);
     CharSequence _compile = _cCompiler.compile();
     return _compile.toString();
@@ -146,6 +164,8 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder.append("\t");
       _builder.append("int deltaCycle=0;");
       _builder.newLine();
+      _builder.append("\t");
+      _builder.newLine();
       {
         for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
@@ -213,7 +233,7 @@ public class CCompiler implements ITypeOuptutProvider {
         }
       }
       _builder.append("\t");
-      _builder.append("void run(){");
+      _builder.append("void pshdl_sim_run(){");
       _builder.newLine();
       _builder.append("\t\t");
       _builder.append("deltaCycle++;");
@@ -341,10 +361,328 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder.append("\t");
       _builder.append("}");
       _builder.newLine();
-      _builder.newLine();
+      CharSequence _helperMethods = this.helperMethods();
+      _builder.append(_helperMethods, "");
+      _builder.newLineIfNotEmpty();
       _xblockexpression = (_builder);
     }
     return _xblockexpression;
+  }
+  
+  public CharSequence helperMethods() {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("void pshdl_sim_setInput(int idx, long value, ...) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("va_list va_arrayIdx;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("(void)va_arrayIdx;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("switch (idx) {");
+    _builder.newLine();
+    {
+      Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation v : _excludeNull) {
+        {
+          int _length = v.dimensions.length;
+          boolean _equals = (_length == 0);
+          if (_equals) {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get = this.cce.varIdx.get(v.name);
+            _builder.append(_get, "		");
+            _builder.append(": ");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            {
+              boolean _and = false;
+              boolean _notEquals = (v.width != 64);
+              if (!_notEquals) {
+                _and = false;
+              } else {
+                boolean _isPredicate = this.cce.isPredicate(v);
+                boolean _not = (!_isPredicate);
+                _and = (_notEquals && _not);
+              }
+              if (_and) {
+                _builder.append("value&=");
+                CharSequence _asMaskL = this.cce.asMaskL(v.width);
+                _builder.append(_asMaskL, "			");
+                _builder.append(";");
+              }
+            }
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            String _idName = this.cce.idName(v, false, false);
+            _builder.append(_idName, "			");
+            _builder.append("=value");
+            {
+              boolean _isPredicate_1 = this.cce.isPredicate(v);
+              if (_isPredicate_1) {
+                _builder.append("==0?false:true");
+              }
+            }
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("break;");
+            _builder.newLine();
+          } else {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get_1 = this.cce.varIdx.get(v.name);
+            _builder.append(_get_1, "		");
+            _builder.append(": ");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            {
+              boolean _and_1 = false;
+              boolean _notEquals_1 = (v.width != 64);
+              if (!_notEquals_1) {
+                _and_1 = false;
+              } else {
+                boolean _isPredicate_2 = this.cce.isPredicate(v);
+                boolean _not_1 = (!_isPredicate_2);
+                _and_1 = (_notEquals_1 && _not_1);
+              }
+              if (_and_1) {
+                _builder.append("value&=");
+                CharSequence _asMaskL_1 = this.cce.asMaskL(v.width);
+                _builder.append(_asMaskL_1, "			");
+                _builder.append(";");
+              }
+            }
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("va_start(va_arrayIdx, value);");
+            _builder.newLine();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            String _idName_1 = this.cce.idName(v, false, false);
+            _builder.append(_idName_1, "			");
+            _builder.append("[");
+            StringBuilder _arrayVarArgAccessArrIdx = this.arrayVarArgAccessArrIdx(v);
+            _builder.append(_arrayVarArgAccessArrIdx, "			");
+            _builder.append("]=value;");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("va_end(va_arrayIdx);");
+            _builder.newLine();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("break;");
+            _builder.newLine();
+          }
+        }
+      }
+    }
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("char* pshdl_sim_getName(int idx) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("switch (idx) {");
+    _builder.newLine();
+    {
+      Iterable<VariableInformation> _excludeNull_1 = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation v_1 : _excludeNull_1) {
+        _builder.append("\t\t");
+        _builder.append("case ");
+        Integer _get_2 = this.cce.varIdx.get(v_1.name);
+        _builder.append(_get_2, "		");
+        _builder.append(": return \"");
+        _builder.append(v_1.name, "		");
+        _builder.append("\";");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return 0;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("static int varIdx[]={");
+    {
+      Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
+      boolean _hasElements = false;
+      for(final VariableInformation v_2 : _excludeNull_2) {
+        if (!_hasElements) {
+          _hasElements = true;
+        } else {
+          _builder.appendImmediate(",", "");
+        }
+        Integer _get_3 = this.cce.varIdx.get(v_2.name);
+        _builder.append(_get_3, "");
+      }
+    }
+    _builder.append("};");
+    _builder.newLineIfNotEmpty();
+    _builder.append("int* pshdl_sim_getAvailableVarIdx(int *numElements){");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("*numElements=");
+    int _length_1 = this.cce.em.variables.length;
+    int _minus = (_length_1 - 1);
+    _builder.append(_minus, "	");
+    _builder.append(";");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("return varIdx;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    CharSequence _uint_t = this.uint_t();
+    _builder.append(_uint_t, "");
+    _builder.append(" pshdl_sim_getOutput(int idx, ...) {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("va_list va_arrayIdx;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("(void)va_arrayIdx;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("switch (idx) {");
+    _builder.newLine();
+    {
+      Iterable<VariableInformation> _excludeNull_3 = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation v_3 : _excludeNull_3) {
+        {
+          int _length_2 = v_3.dimensions.length;
+          boolean _equals_1 = (_length_2 == 0);
+          if (_equals_1) {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get_4 = this.cce.varIdx.get(v_3.name);
+            _builder.append(_get_4, "		");
+            _builder.append(": return ");
+            String _idName_2 = this.cce.idName(v_3, false, false);
+            _builder.append(_idName_2, "		");
+            {
+              boolean _isPredicate_3 = this.cce.isPredicate(v_3);
+              if (_isPredicate_3) {
+                _builder.append("?1:0");
+              } else {
+                boolean _notEquals_2 = (v_3.width != 64);
+                if (_notEquals_2) {
+                  _builder.append(" & ");
+                  CharSequence _asMaskL_2 = this.cce.asMaskL(v_3.width);
+                  _builder.append(_asMaskL_2, "		");
+                }
+              }
+            }
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+          } else {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get_5 = this.cce.varIdx.get(v_3.name);
+            _builder.append(_get_5, "		");
+            _builder.append(": {");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("va_start(va_arrayIdx, idx);");
+            _builder.newLine();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            CharSequence _uint_t_1 = this.uint_t();
+            _builder.append(_uint_t_1, "			");
+            _builder.append(" res=");
+            String _idName_3 = this.cce.idName(v_3, false, false);
+            _builder.append(_idName_3, "			");
+            _builder.append("[");
+            StringBuilder _arrayVarArgAccessArrIdx_1 = this.arrayVarArgAccessArrIdx(v_3);
+            _builder.append(_arrayVarArgAccessArrIdx_1, "			");
+            _builder.append("]");
+            {
+              boolean _and_2 = false;
+              boolean _notEquals_3 = (v_3.width != 64);
+              if (!_notEquals_3) {
+                _and_2 = false;
+              } else {
+                boolean _isPredicate_4 = this.cce.isPredicate(v_3);
+                boolean _not_2 = (!_isPredicate_4);
+                _and_2 = (_notEquals_3 && _not_2);
+              }
+              if (_and_2) {
+                _builder.append(" & ");
+                CharSequence _asMaskL_3 = this.cce.asMaskL(v_3.width);
+                _builder.append(_asMaskL_3, "			");
+              }
+            }
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("va_end(va_arrayIdx);");
+            _builder.newLine();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("return res;");
+            _builder.newLine();
+            _builder.append("\t\t");
+            _builder.append("}");
+            _builder.newLine();
+          }
+        }
+      }
+    }
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return 0;");
+    _builder.newLine();
+    _builder.append("}\t");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public StringBuilder arrayVarArgAccessArrIdx(final VariableInformation v) {
+    StringBuilder _stringBuilder = new StringBuilder();
+    final StringBuilder varAccess = _stringBuilder;
+    final ArrayList<Integer> dims = this.cce.dimsLastOne(v);
+    int _length = v.dimensions.length;
+    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
+    for (final Integer i : _doubleDotLessThan) {
+      {
+        final Integer dim = dims.get((i).intValue());
+        boolean _notEquals = ((i).intValue() != 0);
+        if (_notEquals) {
+          varAccess.append("+");
+        }
+        boolean _notEquals_1 = ((dim).intValue() != 1);
+        if (_notEquals_1) {
+          StringConcatenation _builder = new StringConcatenation();
+          _builder.append("va_arg(va_arrayIdx, int) *");
+          _builder.append(dim, "");
+          varAccess.append(_builder);
+        } else {
+          StringConcatenation _builder_1 = new StringConcatenation();
+          _builder_1.append("va_arg(va_arrayIdx, int)");
+          varAccess.append(_builder_1);
+        }
+      }
+    }
+    return varAccess;
   }
   
   public String predicates(final Frame f) {
@@ -2022,6 +2360,8 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("#include <stdlib.h>");
     _builder.newLine();
+    _builder.append("#include <stdarg.h>");
+    _builder.newLine();
     return _builder;
   }
   
@@ -2037,10 +2377,350 @@ public class CCompiler implements ITypeOuptutProvider {
   }
   
   public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    String _doCompile = CCompiler.doCompile(em);
-    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
+    CCompiler _cCompiler = new CCompiler(em);
+    final CCompiler comp = _cCompiler;
+    final List<SideFile> sideFiles = Lists.<SideFile>newLinkedList();
+    final String simFile = this.generateSimEncapsuation();
+    boolean _notEquals = (!Objects.equal(simFile, null));
+    if (_notEquals) {
+      byte[] _bytes = simFile.getBytes(Charsets.UTF_8);
+      SideFile _sideFile = new SideFile("simEncapsulation.c", _bytes, true);
+      sideFiles.add(_sideFile);
+    }
+    CharSequence _compile = comp.compile();
+    String _string = _compile.toString();
     String _hookName = this.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, em.moduleName, _emptyList, em.source, _hookName, true);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, true);
     return Lists.<CompileResult>newArrayList(_compileResult);
+  }
+  
+  public String generateSimEncapsuation() {
+    final Unit unit = this.getUnit(this.cce.em);
+    boolean _equals = Objects.equal(unit, null);
+    if (_equals) {
+      return null;
+    }
+    List<Row> _buildRows = MemoryModel.buildRows(unit);
+    return this.generateSimEncapsuation(unit, _buildRows);
+  }
+  
+  public Unit getUnit(final ExecutableModel model) {
+    try {
+      Unit unit = null;
+      final Splitter annoSplitter = Splitter.on(SimulationTransformationExtension.ANNO_VALUE_SEP);
+      boolean _tripleNotEquals = (this.cce.em.annotations != null);
+      if (_tripleNotEquals) {
+        for (final String a : this.cce.em.annotations) {
+          boolean _startsWith = a.startsWith("busDescription");
+          if (_startsWith) {
+            Splitter _limit = annoSplitter.limit(2);
+            List<String> _splitToList = _limit.splitToList(a);
+            final String value = _splitToList.get(1);
+            HashSet<Problem> _hashSet = new HashSet<Problem>();
+            Unit _parseUnit = MemoryModelAST.parseUnit(value, _hashSet, 0);
+            unit = _parseUnit;
+          }
+        }
+      }
+      return unit;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Extension
+  private BusAccess ba = new Function0<BusAccess>() {
+    public BusAccess apply() {
+      BusAccess _busAccess = new BusAccess();
+      return _busAccess;
+    }
+  }.apply();
+  
+  private String generateSimEncapsuation(final Unit unit, final Iterable<Row> rows) {
+    HashSet<String> _hashSet = new HashSet<String>();
+    final Set<String> varNames = _hashSet;
+    final Procedure1<Row> _function = new Procedure1<Row>() {
+        public void apply(final Row it) {
+          List<Definition> _allDefs = CCompiler.this.ba.allDefs(it);
+          final Function1<Definition,Boolean> _function = new Function1<Definition,Boolean>() {
+              public Boolean apply(final Definition it) {
+                boolean _tripleNotEquals = (it.type != Type.UNUSED);
+                return Boolean.valueOf(_tripleNotEquals);
+              }
+            };
+          Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
+          final Procedure1<Definition> _function_1 = new Procedure1<Definition>() {
+              public void apply(final Definition it) {
+                String _name = it.getName();
+                varNames.add(_name);
+              }
+            };
+          IterableExtensions.<Definition>forEach(_filter, _function_1);
+        }
+      };
+    IterableExtensions.<Row>forEach(rows, _function);
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("//  BusAccessSim.c");
+    _builder.newLine();
+    _builder.append("//");
+    _builder.newLine();
+    _builder.append("//  Automatically generated on ");
+    DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+    Date _date = new Date();
+    String _format = _dateTimeInstance.format(_date);
+    _builder.append(_format, "");
+    _builder.append(".");
+    _builder.newLineIfNotEmpty();
+    _builder.append("//");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("#include <stdint.h>");
+    _builder.newLine();
+    _builder.append("#include <stdbool.h>");
+    _builder.newLine();
+    _builder.append("#include \"BusAccess.h\"");
+    _builder.newLine();
+    _builder.append("#include \"BusStdDefinitions.h\"");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("static void defaultWarn(warningType_t t, int value, char *def, char *row, char *msg){");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("warnFunc_p warn=defaultWarn;");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("void setWarn(warnFunc_p warnFunction){");
+    _builder.newLine();
+    _builder.append("    ");
+    _builder.append("warn=warnFunction;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("extern uint64_t pshdl_sim_getOutput(int idx, ...);");
+    _builder.newLine();
+    _builder.append("extern void pshdl_sim_setInput(int idx, long value, ...);");
+    _builder.newLine();
+    _builder.append("extern void pshdl_sim_run();");
+    _builder.newLine();
+    _builder.append("extern bool disableEdges;");
+    _builder.newLine();
+    _builder.newLine();
+    {
+      for(final String v : varNames) {
+        _builder.append("#define ");
+        String _defineName = this.getDefineName(v);
+        _builder.append(_defineName, "");
+        _builder.append(" ");
+        String _plus = (this.cce.em.moduleName + ".");
+        String _plus_1 = (_plus + v);
+        Integer _get = this.cce.varIdx.get(_plus_1);
+        _builder.append(_get, "");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("#define ");
+    String _defineName_1 = this.getDefineName("Bus2IP_Clk");
+    _builder.append(_defineName_1, "");
+    _builder.append(" ");
+    String _plus_2 = (this.cce.em.moduleName + ".Bus2IP_Clk");
+    Integer _get_1 = this.cce.varIdx.get(_plus_2);
+    _builder.append(_get_1, "");
+    _builder.newLineIfNotEmpty();
+    _builder.newLine();
+    String res = _builder.toString();
+    HashSet<String> _hashSet_1 = new HashSet<String>();
+    final HashSet<String> checkedRows = _hashSet_1;
+    for (final Row row : rows) {
+      boolean _contains = checkedRows.contains(row.name);
+      boolean _not = (!_contains);
+      if (_not) {
+        boolean _hasWriteDefs = this.ba.hasWriteDefs(row);
+        if (_hasWriteDefs) {
+          CharSequence _simSetter = this.simSetter(row);
+          String _plus_3 = (res + _simSetter);
+          res = _plus_3;
+        }
+        CharSequence _simGetter = this.simGetter(row);
+        String _plus_4 = (res + _simGetter);
+        res = _plus_4;
+        checkedRows.add(row.name);
+      }
+    }
+    return res;
+  }
+  
+  public String getDefineName(final String v) {
+    String _plus = (this.cce.em.moduleName + ".");
+    String _plus_1 = (_plus + v);
+    String _idName = this.cce.idName(_plus_1, false, false);
+    return _idName;
+  }
+  
+  public CharSequence simGetter(final Row row) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("//Getter");
+    _builder.newLine();
+    _builder.append("int get");
+    String _firstUpper = StringExtensions.toFirstUpper(row.name);
+    _builder.append(_firstUpper, "");
+    _builder.append("Direct(uint32_t *base, int index");
+    {
+      List<Definition> _allDefs = this.ba.allDefs(row);
+      for(final Definition definition : _allDefs) {
+        String _parameter = this.ba.getParameter(row, definition, true);
+        _builder.append(_parameter, "");
+      }
+    }
+    _builder.append("){");
+    _builder.newLineIfNotEmpty();
+    {
+      List<Definition> _allDefs_1 = this.ba.allDefs(row);
+      for(final Definition d : _allDefs_1) {
+        _builder.append("\t");
+        _builder.append("*");
+        String _varName = this.ba.getVarName(row, d);
+        _builder.append(_varName, "	");
+        _builder.append("=pshdl_sim_getOutput(");
+        String _defineName = this.getDefineName(d.name);
+        _builder.append(_defineName, "	");
+        _builder.append(", index);");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t");
+    _builder.append("return 1;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("int get");
+    String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+    _builder.append(_firstUpper_1, "");
+    _builder.append("(uint32_t *base, int index, ");
+    _builder.append(row.name, "");
+    _builder.append("_t *result){");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("return get");
+    String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+    _builder.append(_firstUpper_2, "	");
+    _builder.append("Direct(base, index");
+    {
+      List<Definition> _allDefs_2 = this.ba.allDefs(row);
+      for(final Definition d_1 : _allDefs_2) {
+        _builder.append(", &result->");
+        String _varNameIndex = this.ba.getVarNameIndex(row, d_1);
+        _builder.append(_varNameIndex, "	");
+      }
+    }
+    _builder.append(");");
+    _builder.newLineIfNotEmpty();
+    _builder.append("}");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public CharSequence simSetter(final Row row) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("// Setter");
+    _builder.newLine();
+    _builder.append("int set");
+    String _firstUpper = StringExtensions.toFirstUpper(row.name);
+    _builder.append(_firstUpper, "");
+    _builder.append("Direct(uint32_t *base, int index");
+    {
+      List<Definition> _writeDefs = this.ba.writeDefs(row);
+      for(final Definition definition : _writeDefs) {
+        String _parameter = this.ba.getParameter(row, definition, false);
+        _builder.append(_parameter, "");
+      }
+    }
+    _builder.append("){");
+    _builder.newLineIfNotEmpty();
+    {
+      List<Definition> _writeDefs_1 = this.ba.writeDefs(row);
+      for(final Definition ne : _writeDefs_1) {
+        _builder.append("\t");
+        CharSequence _generateConditions = this.ba.generateConditions(row, ne);
+        _builder.append(_generateConditions, "	");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    {
+      List<Definition> _writeDefs_2 = this.ba.writeDefs(row);
+      for(final Definition d : _writeDefs_2) {
+        _builder.append("\t");
+        _builder.append("pshdl_sim_setInput(");
+        String _defineName = this.getDefineName(d.name);
+        _builder.append(_defineName, "	");
+        _builder.append(", ");
+        _builder.append(d.name, "	");
+        _builder.append(", index);");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t");
+    _builder.append("if (disableEdges) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("pshdl_sim_setInput(");
+    String _defineName_1 = this.getDefineName("Bus2IP_Clk");
+    _builder.append(_defineName_1, "		");
+    _builder.append(", 0, 0);");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t\t");
+    _builder.append("pshdl_sim_run();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("pshdl_sim_setInput(");
+    String _defineName_2 = this.getDefineName("Bus2IP_Clk");
+    _builder.append(_defineName_2, "	");
+    _builder.append(", 1, 0);");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("pshdl_sim_run();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("//warn(invalidIndex, index, \"\", \"");
+    _builder.append(row.name, "	");
+    _builder.append("\", \"\");");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("return 0;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("int set");
+    String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+    _builder.append(_firstUpper_1, "");
+    _builder.append("(uint32_t *base, int index, ");
+    _builder.append(row.name, "");
+    _builder.append("_t *newVal) {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("return set");
+    String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+    _builder.append(_firstUpper_2, "	");
+    _builder.append("Direct(base, index");
+    {
+      List<Definition> _writeDefs_3 = this.ba.writeDefs(row);
+      for(final Definition d_1 : _writeDefs_3) {
+        _builder.append(", newVal->");
+        String _varNameIndex = this.ba.getVarNameIndex(row, d_1);
+        _builder.append(_varNameIndex, "	");
+      }
+    }
+    _builder.append(");");
+    _builder.newLineIfNotEmpty();
+    _builder.append("}");
+    _builder.newLine();
+    return _builder;
   }
 }

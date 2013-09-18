@@ -250,8 +250,7 @@ int get«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition
 	return 1;
 }
 int get«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *result){
-	return get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.
-		getVarNameIndex(d)»«ENDFOR»);
+	return get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.getVarNameIndex(d)»«ENDFOR»);
 }
 '''
 
@@ -285,8 +284,7 @@ int set«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition
 	return 0;
 }
 int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newVal) {
-	return set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.
-		getVarNameIndex(d)»«ENDFOR»);
+	return set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.getVarNameIndex(d)»«ENDFOR»);
 }
 '''
 
@@ -319,167 +317,162 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 		var rIdx = 0
 		var res = '''switch (index) {
 			'''
-			for (Row r : rows) {
-				if (r.name.equals(row.name)) {
-					res = res + '''
-						case «rIdx»: val=base[«idx»]; break;
-					'''
-					rIdx = rIdx + 1
-				}
-				idx = idx + 1
+		for (Row r : rows) {
+			if (r.name.equals(row.name)) {
+				res = res + '''
+					case «rIdx»: val=base[«idx»]; break;
+				'''
+				rIdx = rIdx + 1
 			}
-			res = res + '''
-				default:
-					warn(invalidIndex, index, "", "«row.name»", ""); 
+			idx = idx + 1
+		}
+		res = res + '''
+			default:
+				warn(invalidIndex, index, "", "«row.name»", ""); 
+				return 0;
+			}
+		'''
+		return res
+	}
+
+	def generateAddressSwitch(Row row, List<Row> rows) {
+		var idx = 0
+		var rIdx = 0
+		var res = '''switch (index) {
+			'''
+		for (Row r : rows) {
+			if (r.name.equals(row.name)) {
+				res = res + '''
+					case «rIdx»: base[«idx»]=newVal; return 1;
+				'''
+				rIdx = rIdx + 1
+			}
+			idx = idx + 1
+		}
+		res = res + '''}
+			'''
+		return res
+	}
+
+	def generateConditions(Row row, Definition d) '''
+		«IF d.warn == Definition$WarnType::silentLimit»
+			if («row.getVarName(d)» > «d.maxValueHex») {
+				«row.getVarName(d)»=«d.maxValueHex»;
+			}
+			«IF d.type == Definition$Type::INT»
+				if («row.getVarName(d)» < «d.maxValueNegHex») {
+					«row.getVarName(d)»=«d.maxValueNegHex»;
+				}
+			«ENDIF»
+		«ELSEIF d.warn == Definition$WarnType::limit»
+			if («row.getVarName(d)» > «d.maxValueHex») {
+				warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueHex»");
+				«row.getVarName(d)»=«d.maxValueHex»;
+			}
+			«IF d.type == Definition$Type::INT»
+				if («row.getVarName(d)» < «d.maxValueNegHex») {
+					warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueNegHex»");
+					«row.getVarName(d)»=«d.maxValueNegHex»;
+				}
+			«ENDIF»
+		«ELSEIF d.warn == Definition$WarnType::silentMask»
+			if («row.getVarName(d)» > «d.maxValueHex») {
+				«row.getVarName(d)»&=«d.maxValueHex»;
+			}
+			«IF d.type == Definition$Type::INT»
+				if («row.getVarName(d)» < «d.maxValueNegHex») {
+					«row.getVarName(d)»&=«d.maxValueNegHex»;
+				}
+			«ENDIF»
+		«ELSEIF d.warn == Definition$WarnType::mask»
+			if («row.getVarName(d)» > «d.maxValueHex») {
+				warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueHex»");
+				«row.getVarName(d)»&=«d.maxValueHex»;
+			}
+			«IF d.type == Definition$Type::INT»
+				if («row.getVarName(d)» < «d.maxValueNegHex») {
+					warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueNegHex»");
+					«row.getVarName(d)»&=«d.maxValueNegHex»;
+				}
+			«ENDIF»
+		«ELSEIF d.warn == Definition$WarnType::silentError»
+			if («row.getVarName(d)» > «d.maxValueHex») {
+				return 0;
+			}
+			«IF d.type == Definition$Type::INT»
+				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					return 0;
 				}
-			'''
-			return res
-		}
-
-		def generateAddressSwitch(Row row, List<Row> rows) {
-			var idx = 0
-			var rIdx = 0
-			var res = '''switch (index) {
-				'''
-				for (Row r : rows) {
-					if (r.name.equals(row.name)) {
-						res = res + '''
-							case «rIdx»: base[«idx»]=newVal; return 1;
-						'''
-						rIdx = rIdx + 1
-					}
-					idx = idx + 1
-				}
-				res = res + '''}
-					'''
-					return res
-				}
-
-				def generateConditions(Row row, Definition d) '''
-					«IF d.warn == Definition$WarnType::silentLimit»
-						if («row.getVarName(d)» > «d.maxValueHex») {
-							«row.getVarName(d)»=«d.maxValueHex»;
-						}
-						«IF d.type == Definition$Type::INT»
-							if («row.getVarName(d)» < «d.maxValueNegHex») {
-								«row.getVarName(d)»=«d.maxValueNegHex»;
-							}
-						«ENDIF»
-					«ELSEIF d.warn == Definition$WarnType::limit»
-						if («row.getVarName(d)» > «d.maxValueHex») {
-							warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueHex»");
-							«row.getVarName(d)»=«d.maxValueHex»;
-						}
-						«IF d.type == Definition$Type::INT»
-							if («row.getVarName(d)» < «d.maxValueNegHex») {
-								warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueNegHex»");
-								«row.getVarName(d)»=«d.maxValueNegHex»;
-							}
-						«ENDIF»
-					«ELSEIF d.warn == Definition$WarnType::silentMask»
-						if («row.getVarName(d)» > «d.maxValueHex») {
-							«row.getVarName(d)»&=«d.maxValueHex»;
-						}
-						«IF d.type == Definition$Type::INT»
-							if («row.getVarName(d)» < «d.maxValueNegHex») {
-								«row.getVarName(d)»&=«d.maxValueNegHex»;
-							}
-						«ENDIF»
-					«ELSEIF d.warn == Definition$WarnType::mask»
-						if («row.getVarName(d)» > «d.maxValueHex») {
-							warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueHex»");
-							«row.getVarName(d)»&=«d.maxValueHex»;
-						}
-						«IF d.type == Definition$Type::INT»
-							if («row.getVarName(d)» < «d.maxValueNegHex») {
-								warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueNegHex»");
-								«row.getVarName(d)»&=«d.maxValueNegHex»;
-							}
-						«ENDIF»
-					«ELSEIF d.warn == Definition$WarnType::silentError»
-						if («row.getVarName(d)» > «d.maxValueHex») {
-							return 0;
-						}
-						«IF d.type == Definition$Type::INT»
-							if («row.getVarName(d)» < «d.maxValueNegHex») {
-								return 0;
-							}
-						«ENDIF»
-					«ELSEIF d.warn == Definition$WarnType::error»
-						if («row.getVarName(d)» > «d.maxValueHex») {
-							warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
-							return 0;
-						}
-						«IF d.type == Definition$Type::INT»
-							if («row.getVarName(d)» < «d.maxValueNegHex») {
-								warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
-								return 0;
-							}
-						«ENDIF»
-					«ENDIF»
-				'''
-
-				def boolean hasWriteDefs(Row row) {
-					for (NamedElement ne : row.definitions) {
-						if (ne.hasWrite)
-							return true
-					}
-					return false
-				}
-
-				def boolean hasWrite(NamedElement ne) {
-					(ne as Definition).rw != Definition$RWType::r && (ne as Definition).type != Definition$Type::UNUSED
-				}
-
-				def getMaxValueHex(Definition d) {
-					"0x" + Integer::toHexString(d.maxValue)
-				}
-
-				def getMaxValueNegHex(Definition d) {
-					"0x" + Integer::toHexString(-d.maxValue - 1)
-				}
-
-				def getMaxValue(Definition d) {
-					if (d.type != Definition$Type::INT) {
-						return (1 << MemoryModel::getSize(d)) - 1
-					} else {
-						return (1 << (MemoryModel::getSize(d) - 1)) - 1
-					}
-				}
-
-				def getParameter(Row row, Definition d, boolean pointer) {
-					return ''', «d.busType» «IF pointer»*«ENDIF»«row.getVarName(d)»'''
-				}
-
-				def getVarName(Row row, Definition d) {
-					val dim = row.defCount.get(d.name)
-					if (dim == 1) {
-						return d.name
-					} else {
-						return d.name + d.arrayIndex
-					}
-				}
-
-				def getVarNameIndex(Row row, Definition d) {
-					val dim = row.defCount.get(d.name)
-					if (dim == 1) {
-						return d.name
-					} else {
-						return d.name + '[' + d.arrayIndex + ']'
-					}
-				}
-
-				def getVarNameArray(Row row, Definition d) {
-					val dim = row.defCount.get(d.name)
-					if (dim == 1) {
-						return d.name
-					} else {
-						return d.name + '[' + dim + ']'
-					}
-				}
-
-				def getBusType(Definition d) '''bus_«d.type.toString.toLowerCase»«MemoryModel::getSize(d)»_t'''
-
+			«ENDIF»
+		«ELSEIF d.warn == Definition$WarnType::error»
+			if («row.getVarName(d)» > «d.maxValueHex») {
+				warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
+				return 0;
 			}
-			
+			«IF d.type == Definition$Type::INT»
+				if («row.getVarName(d)» < «d.maxValueNegHex») {
+					warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
+					return 0;
+				}
+			«ENDIF»
+		«ENDIF»
+	'''
+
+	def boolean hasWriteDefs(Row row) {
+		row.definitions.findFirst[it.hasWrite] != null
+	}
+
+	def boolean hasWrite(NamedElement ne) {
+		(ne as Definition).rw !== Definition$RWType::r && (ne as Definition).type !== Definition$Type::UNUSED
+	}
+
+	def getMaxValueHex(Definition d) {
+		"0x" + Integer::toHexString(d.maxValue)
+	}
+
+	def getMaxValueNegHex(Definition d) {
+		"0x" + Integer::toHexString(-d.maxValue - 1)
+	}
+
+	def getMaxValue(Definition d) {
+		if (d.type != Definition$Type::INT) {
+			return (1 << MemoryModel::getSize(d)) - 1
+		} else {
+			return (1 << (MemoryModel::getSize(d) - 1)) - 1
+		}
+	}
+
+	def getParameter(Row row, Definition d, boolean pointer) {
+		return ''', «d.busType» «IF pointer»*«ENDIF»«row.getVarName(d)»'''
+	}
+
+	def getVarName(Row row, Definition d) {
+		val dim = row.defCount.get(d.name)
+		if (dim == 1) {
+			return d.name
+		} else {
+			return d.name + d.arrayIndex
+		}
+	}
+
+	def getVarNameIndex(Row row, Definition d) {
+		val dim = row.defCount.get(d.name)
+		if (dim == 1) {
+			return d.name
+		} else {
+			return d.name + '[' + d.arrayIndex + ']'
+		}
+	}
+
+	def getVarNameArray(Row row, Definition d) {
+		val dim = row.defCount.get(d.name)
+		if (dim == 1) {
+			return d.name
+		} else {
+			return d.name + '[' + dim + ']'
+		}
+	}
+
+	def getBusType(Definition d) '''bus_«d.type.toString.toLowerCase»«MemoryModel::getSize(d)»_t'''
+
+}

@@ -140,7 +140,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 
 	public ExecutableModel createExecutable(HDLUnit unit, String src) throws CycleException {
 		final HDLEvaluationContext context = HDLEvaluationContext.createDefault(unit);
-		final HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src);
+		final HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src, '_');
 		final FluidFrame model = SimulationTransformationExtension.simulationModelOf(simulationModel, context);
 		final HDLQualifiedName fqn = FullNameExtension.fullNameOf(simulationModel);
 		final ExecutableModel em = model.getExecutable(fqn.toString(), src);

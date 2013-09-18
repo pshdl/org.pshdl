@@ -571,8 +571,9 @@ public class Insulin {
 				if (generation.getInclude()) {
 					final HDLQualifiedName ifRef = generation.getHIf().asRef();
 					final HDLQualifiedName fullName = fullNameOf(generation);
-					final HDLStatement[] stmnts = generationInfo.unit.getStatements().toArray(new HDLStatement[0]);
-					final HDLStatement[] inits = generationInfo.unit.getInits().toArray(new HDLStatement[0]);
+					final HDLUnit unit = generationInfo.unit;
+					final HDLStatement[] stmnts = unit.getStatements().toArray(new HDLStatement[0]);
+					final HDLStatement[] inits = unit.getInits().toArray(new HDLStatement[0]);
 					final ArrayList<HDLStatement> allStmnt = new ArrayList<HDLStatement>();
 					allStmnt.addAll(Arrays.asList(stmnts));
 					allStmnt.addAll(Arrays.asList(inits));
@@ -583,6 +584,13 @@ public class Insulin {
 							final HDLQualifiedName newName = fullName.append(hdI.getVarRefName().getLastSegment());
 							ms.replace(hdI, new HDLVariableRef().setVar(newName).setArray(hdI.getArray()).setBits(hdI.getBits()));
 						}
+					final HDLUnit container = generation.getContainer(HDLUnit.class);
+					if (!unit.getExtendRefName().isEmpty()) {
+						ms.addTo(container, HDLUnit.fExtend, unit.getExtendRefName().toArray(new HDLQualifiedName[0]));
+					}
+					if (!unit.getAnnotations().isEmpty()) {
+						ms.addTo(container, HDLUnit.fAnnotations, unit.getAnnotations().toArray(new HDLAnnotation[0]));
+					}
 				}
 				String libURI = null;
 				switch (apply.getClassType()) {

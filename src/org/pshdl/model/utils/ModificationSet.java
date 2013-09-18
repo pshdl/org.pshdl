@@ -60,7 +60,7 @@ public class ModificationSet {
 						if (modification.with.size() > 1)
 							throw new IllegalArgumentException("Can not replace with more than one object into a single node for feature:" + feature + " of "
 									+ container.getClass());
-						final IHDLObject replacement = modification.with.get(0);
+						final IHDLObject replacement = (IHDLObject) modification.with.get(0);
 						original.addMeta(ModID.id, id);
 						final T copyFiltered = (T) replacement.copyFiltered(this);
 						return copyFiltered;
@@ -173,7 +173,7 @@ public class ModificationSet {
 	private static class Modification {
 		public final IHDLObject subject;
 		public final String feature;
-		public final List<IHDLObject> with;
+		public final List<Object> with;
 		public final ModificationType type;
 
 		@Override
@@ -181,14 +181,10 @@ public class ModificationSet {
 			return "Modification [subject=" + subject + ", with=" + with + ", type=" + type + "]";
 		}
 
-		public Modification(IHDLObject subject, ModificationType type, String feature, IHDLObject... with) {
+		public Modification(IHDLObject subject, ModificationType type, String feature, Object... with) {
 			super();
-			final List<IHDLObject> with1 = Arrays.asList(with);
 			this.subject = subject;
-			for (int i = 0; i < with1.size(); i++) {
-				with1.set(i, with1.get(i));
-			}
-			this.with = with1;
+			this.with = Arrays.asList(with);
 			this.type = type;
 			this.feature = feature;
 		}
@@ -226,17 +222,17 @@ public class ModificationSet {
 	}
 
 	public void replace(IHDLObject subject, IHDLObject... with) {
-		final Modification mod = new Modification(subject, ModificationType.REPLACE, null, with);
+		final Modification mod = new Modification(subject, ModificationType.REPLACE, null, (Object[]) with);
 		insert(subject, mod);
 	}
 
 	public void insertAfter(IHDLObject subject, IHDLObject... with) {
-		final Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, null, with);
+		final Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, null, (Object[]) with);
 		insert(subject, mod);
 	}
 
 	public void insertBefore(IHDLObject subject, IHDLObject... with) {
-		final Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, null, with);
+		final Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, null, (Object[]) with);
 		insert(subject, mod);
 	}
 
@@ -249,7 +245,7 @@ public class ModificationSet {
 		replacements.put(getHash(subject), list);
 	}
 
-	public void addTo(IHDLObject subject, HDLFieldAccess<?, ?> field, IHDLObject... add) {
+	public <T> void addTo(IHDLObject subject, HDLFieldAccess<?, ArrayList<T>> field, T... add) {
 		final Modification mod = new Modification(subject, ModificationType.ADD, field.fieldName, add);
 		insert(subject, mod);
 	}
