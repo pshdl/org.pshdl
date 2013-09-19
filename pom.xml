@@ -136,11 +136,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
-			<artifactId>antlr-runtime</artifactId>
-			<version>3.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
 			<version>4.1</version>
 		</dependency>
@@ -153,11 +148,6 @@
 			<groupId>org.pshdl</groupId>
 			<artifactId>interpreter</artifactId>
 			<version>0.1.28</version>
-		</dependency>
-		<dependency>
-			<groupId>org.pshdl</groupId>
-			<artifactId>de.upb.hni.vmagic</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>

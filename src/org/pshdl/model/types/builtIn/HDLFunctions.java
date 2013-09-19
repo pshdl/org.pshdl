@@ -29,7 +29,6 @@ package org.pshdl.model.types.builtIn;
 import java.math.*;
 import java.util.*;
 
-import org.pshdl.generator.vhdl.*;
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
@@ -39,8 +38,6 @@ import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.Fu
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-
-import de.upb.hni.vmagic.expression.*;
 
 public class HDLFunctions {
 
@@ -142,27 +139,4 @@ public class HDLFunctions {
 		return Optional.absent();
 	}
 
-	public static VHDLContext toVHDL(HDLFunctionCall function, int pid) {
-		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null) {
-			for (final IHDLFunctionResolver resolver : list) {
-				final VHDLContext eval = resolver.toVHDL(function, pid);
-				if (eval != null)
-					return eval;
-			}
-		}
-		return null;
-	}
-
-	public static Expression<?> toVHDLExpression(HDLFunctionCall function) {
-		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null) {
-			for (final IHDLFunctionResolver resolver : list) {
-				final Expression<?> eval = resolver.toVHDLExpression(function);
-				if (eval != null)
-					return eval;
-			}
-		}
-		return null;
-	}
 }

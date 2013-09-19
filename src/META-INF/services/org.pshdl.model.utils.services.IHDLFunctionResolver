@@ -1,2 +1,2 @@
 org.pshdl.model.types.builtIn.HDLBuiltInFunctions
-org.pshdl.generator.vhdl.VHDLSimulationFunctions
+org.pshdl.model.types.builtIn.TestbenchFunctions

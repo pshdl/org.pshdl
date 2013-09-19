@@ -31,6 +31,8 @@ import java.util.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
+import org.pshdl.model.types.builtIn.*;
+import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import org.pshdl.model.utils.services.*;
@@ -38,22 +40,36 @@ import org.pshdl.model.utils.services.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 
-public class HDLBuiltInFunctions implements IHDLFunctionResolver {
+public class TestbenchFunctions implements IHDLFunctionResolver {
 
-	public static enum BuiltInFunctions {
-		highZ
+	public static enum SimulationFunctions {
+		waitFor, waitUntil, wait, pulse;
+		public HDLQualifiedName getName() {
+			return HDLQualifiedName.create("pshdl", name());
+		}
 	}
 
 	@Override
 	public HDLTypeInferenceInfo resolve(HDLFunctionCall function) {
-		final String name = function.getNameRefName().getLastSegment();
 		try {
-			final BuiltInFunctions func = BuiltInFunctions.valueOf(name);
+			final SimulationFunctions func = SimulationFunctions.valueOf(function.getNameRefName().getLastSegment());
 			switch (func) {
-			case highZ:
+			case wait:
+				if (function.getParams().size() == 0)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool());
+				break;
+			case waitFor:
+				if (function.getParams().size() == 2)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+				break;
+			case waitUntil:
 				if (function.getParams().size() == 1)
-					return new HDLTypeInferenceInfo(HDLPrimitive.getBit(), HDLPrimitive.getNatural());
-				return new HDLTypeInferenceInfo(HDLPrimitive.getBit());
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBool());
+				break;
+			case pulse:
+				if (function.getParams().size() == 3)
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+				break;
 			}
 		} catch (final Exception e) {
 		}
@@ -62,34 +78,20 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public Optional<BigInteger> evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
-		switch (getFuncEnum(function)) {
-		case highZ:
-			return Optional.absent();
-		}
 		return Optional.absent();
-	}
-
-	public static BuiltInFunctions getFuncEnum(HDLFunctionCall function) {
-		final String name = function.getNameRefName().getLastSegment();
-		final BuiltInFunctions func = BuiltInFunctions.valueOf(name);
-		return func;
 	}
 
 	@Override
 	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context) {
-		switch (getFuncEnum(function)) {
-		case highZ:
-			return null;
-		}
 		return null;
 	}
 
 	@Override
 	public String[] getFunctionNames() {
-		final String[] res = new String[BuiltInFunctions.values().length];
-		final BuiltInFunctions[] values = BuiltInFunctions.values();
+		final String[] res = new String[SimulationFunctions.values().length];
+		final SimulationFunctions[] values = SimulationFunctions.values();
 		for (int i = 0; i < values.length; i++) {
-			final BuiltInFunctions bif = values[i];
+			final SimulationFunctions bif = values[i];
 			res[i] = bif.name();
 		}
 		return res;
@@ -97,13 +99,7 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public FunctionInformation getFunctionInfo(String funcName) {
-		switch (BuiltInFunctions.valueOf(funcName)) {
-		case highZ: {
-			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
-					"Returns a high Z. This is useful for tri-state busses, high z however is not supported in PSHDL as computational value.", "highZ", false, FunctionType.NATIVE);
-			return fi;
-		}
-		}
-		return null;
+		return new FunctionInformation(funcName, TestbenchFunctions.class.getSimpleName(), "", "does not return", true, FunctionType.NATIVE);
 	}
+
 }
