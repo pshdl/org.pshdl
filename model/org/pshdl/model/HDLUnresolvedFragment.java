@@ -87,6 +87,13 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 				return null;
 			return obj.getFrag();
 		}
+
+		@Override
+		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setFrag(value);
+		}
 	};
 	/**
 	 * The accessor for the field array which is of type
@@ -99,6 +106,13 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 				return null;
 			return obj.getArray();
 		}
+
+		@Override
+		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setArray(value);
+		}
 	};
 	/**
 	 * The accessor for the field bits which is of type ArrayList<HDLRange>.
@@ -110,6 +124,13 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 				return null;
 			return obj.getBits();
 		}
+
+		@Override
+		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, ArrayList<HDLRange> value) {
+			if (obj == null)
+				return null;
+			return obj.setBits(value);
+		}
 	};
 	/**
 	 * The accessor for the field sub which is of type HDLUnresolvedFragment.
@@ -120,6 +141,13 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 			if (obj == null)
 				return null;
 			return obj.getSub();
+		}
+
+		@Override
+		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, HDLUnresolvedFragment value) {
+			if (obj == null)
+				return null;
+			return obj.setSub(value);
 		}
 	};
 	// $CONTENT-BEGIN$

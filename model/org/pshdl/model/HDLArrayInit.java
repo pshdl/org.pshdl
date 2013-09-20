@@ -77,6 +77,13 @@ public class HDLArrayInit extends AbstractHDLArrayInit {
 				return null;
 			return obj.getExp();
 		}
+
+		@Override
+		public HDLArrayInit setValue(HDLArrayInit obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setExp(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

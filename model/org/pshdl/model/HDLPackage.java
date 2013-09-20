@@ -88,6 +88,13 @@ public class HDLPackage extends AbstractHDLPackage {
 				return null;
 			return obj.getLibURI();
 		}
+
+		@Override
+		public HDLPackage setValue(HDLPackage obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setLibURI(value);
+		}
 	};
 	/**
 	 * The accessor for the field pkg which is of type String.
@@ -98,6 +105,13 @@ public class HDLPackage extends AbstractHDLPackage {
 			if (obj == null)
 				return null;
 			return obj.getPkg();
+		}
+
+		@Override
+		public HDLPackage setValue(HDLPackage obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setPkg(value);
 		}
 	};
 	/**
@@ -110,6 +124,13 @@ public class HDLPackage extends AbstractHDLPackage {
 				return null;
 			return obj.getUnits();
 		}
+
+		@Override
+		public HDLPackage setValue(HDLPackage obj, ArrayList<HDLUnit> value) {
+			if (obj == null)
+				return null;
+			return obj.setUnits(value);
+		}
 	};
 	/**
 	 * The accessor for the field declarations which is of type
@@ -121,6 +142,13 @@ public class HDLPackage extends AbstractHDLPackage {
 			if (obj == null)
 				return null;
 			return obj.getDeclarations();
+		}
+
+		@Override
+		public HDLPackage setValue(HDLPackage obj, ArrayList<HDLDeclaration> value) {
+			if (obj == null)
+				return null;
+			return obj.setDeclarations(value);
 		}
 	};
 

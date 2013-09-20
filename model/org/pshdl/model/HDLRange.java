@@ -85,6 +85,13 @@ public class HDLRange extends AbstractHDLRange {
 				return null;
 			return obj.getFrom();
 		}
+
+		@Override
+		public HDLRange setValue(HDLRange obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setFrom(value);
+		}
 	};
 	/**
 	 * The accessor for the field to which is of type HDLExpression.
@@ -95,6 +102,13 @@ public class HDLRange extends AbstractHDLRange {
 			if (obj == null)
 				return null;
 			return obj.getTo();
+		}
+
+		@Override
+		public HDLRange setValue(HDLRange obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setTo(value);
 		}
 	};
 

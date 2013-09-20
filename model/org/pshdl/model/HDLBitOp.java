@@ -105,6 +105,13 @@ public class HDLBitOp extends AbstractHDLBitOp {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLBitOp setValue(HDLBitOp obj, HDLBitOpType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

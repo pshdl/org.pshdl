@@ -43,6 +43,8 @@ public class HDLQuery {
 		}
 
 		public abstract K getValue(T obj);
+
+		public abstract T setValue(T obj, K value);
 	}
 
 	private static class EqualsMatcher<T> implements Predicate<T> {

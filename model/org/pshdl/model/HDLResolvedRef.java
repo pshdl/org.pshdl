@@ -76,6 +76,13 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 				return null;
 			return obj.getVarRefName();
 		}
+
+		@Override
+		public HDLResolvedRef setValue(HDLResolvedRef obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setVar(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

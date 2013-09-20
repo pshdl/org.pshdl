@@ -80,6 +80,13 @@ public class HDLBlock extends AbstractHDLBlock {
 				return null;
 			return obj.getProcess();
 		}
+
+		@Override
+		public HDLBlock setValue(HDLBlock obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setProcess(value);
+		}
 	};
 	/**
 	 * The accessor for the field statements which is of type
@@ -91,6 +98,13 @@ public class HDLBlock extends AbstractHDLBlock {
 			if (obj == null)
 				return null;
 			return obj.getStatements();
+		}
+
+		@Override
+		public HDLBlock setValue(HDLBlock obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setStatements(value);
 		}
 	};
 	// $CONTENT-BEGIN$

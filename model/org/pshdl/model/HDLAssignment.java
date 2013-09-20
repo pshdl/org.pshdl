@@ -108,6 +108,13 @@ public class HDLAssignment extends AbstractHDLAssignment {
 				return null;
 			return obj.getLeft();
 		}
+
+		@Override
+		public HDLAssignment setValue(HDLAssignment obj, HDLReference value) {
+			if (obj == null)
+				return null;
+			return obj.setLeft(value);
+		}
 	};
 	/**
 	 * The accessor for the field type which is of type HDLAssignmentType.
@@ -119,6 +126,13 @@ public class HDLAssignment extends AbstractHDLAssignment {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLAssignment setValue(HDLAssignment obj, HDLAssignmentType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	/**
 	 * The accessor for the field right which is of type HDLExpression.
@@ -129,6 +143,13 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			if (obj == null)
 				return null;
 			return obj.getRight();
+		}
+
+		@Override
+		public HDLAssignment setValue(HDLAssignment obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setRight(value);
 		}
 	};
 	// $CONTENT-BEGIN$

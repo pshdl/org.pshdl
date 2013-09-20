@@ -78,6 +78,13 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 				return null;
 			return obj.getHEnum();
 		}
+
+		@Override
+		public HDLEnumDeclaration setValue(HDLEnumDeclaration obj, HDLEnum value) {
+			if (obj == null)
+				return null;
+			return obj.setHEnum(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 

@@ -90,6 +90,13 @@ public class HDLVariable extends AbstractHDLVariable {
 				return null;
 			return obj.getName();
 		}
+
+		@Override
+		public HDLVariable setValue(HDLVariable obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field dimensions which is of type
@@ -102,6 +109,13 @@ public class HDLVariable extends AbstractHDLVariable {
 				return null;
 			return obj.getDimensions();
 		}
+
+		@Override
+		public HDLVariable setValue(HDLVariable obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setDimensions(value);
+		}
 	};
 	/**
 	 * The accessor for the field defaultValue which is of type HDLExpression.
@@ -112,6 +126,13 @@ public class HDLVariable extends AbstractHDLVariable {
 			if (obj == null)
 				return null;
 			return obj.getDefaultValue();
+		}
+
+		@Override
+		public HDLVariable setValue(HDLVariable obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setDefaultValue(value);
 		}
 	};
 	/**
@@ -124,6 +145,13 @@ public class HDLVariable extends AbstractHDLVariable {
 			if (obj == null)
 				return null;
 			return obj.getAnnotations();
+		}
+
+		@Override
+		public HDLVariable setValue(HDLVariable obj, ArrayList<HDLAnnotation> value) {
+			if (obj == null)
+				return null;
+			return obj.setAnnotations(value);
 		}
 	};
 

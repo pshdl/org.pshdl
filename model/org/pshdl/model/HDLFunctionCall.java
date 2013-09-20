@@ -81,6 +81,13 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 				return null;
 			return obj.getNameRefName();
 		}
+
+		@Override
+		public HDLFunctionCall setValue(HDLFunctionCall obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field params which is of type
@@ -92,6 +99,13 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 			if (obj == null)
 				return null;
 			return obj.getParams();
+		}
+
+		@Override
+		public HDLFunctionCall setValue(HDLFunctionCall obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setParams(value);
 		}
 	};
 	// $CONTENT-BEGIN$

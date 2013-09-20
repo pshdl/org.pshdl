@@ -111,6 +111,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				return null;
 			return obj.getClkRefName();
 		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setClk(value);
+		}
 	};
 	/**
 	 * The accessor for the field rst which is of type HDLQualifiedName.
@@ -121,6 +128,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (obj == null)
 				return null;
 			return obj.getRstRefName();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setRst(value);
 		}
 	};
 	/**
@@ -133,6 +147,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				return null;
 			return obj.getEnableRefName();
 		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setEnable(value);
+		}
 	};
 	/**
 	 * The accessor for the field clockType which is of type HDLRegClockType.
@@ -143,6 +164,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (obj == null)
 				return null;
 			return obj.getClockType();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLRegClockType value) {
+			if (obj == null)
+				return null;
+			return obj.setClockType(value);
 		}
 	};
 	/**
@@ -156,6 +184,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				return null;
 			return obj.getResetType();
 		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLRegResetActiveType value) {
+			if (obj == null)
+				return null;
+			return obj.setResetType(value);
+		}
 	};
 	/**
 	 * The accessor for the field syncType which is of type HDLRegSyncType.
@@ -166,6 +201,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (obj == null)
 				return null;
 			return obj.getSyncType();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLRegSyncType value) {
+			if (obj == null)
+				return null;
+			return obj.setSyncType(value);
 		}
 	};
 	/**
@@ -178,6 +220,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				return null;
 			return obj.getResetValue();
 		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setResetValue(value);
+		}
 	};
 	/**
 	 * The accessor for the field delay which is of type HDLExpression.
@@ -188,6 +237,13 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (obj == null)
 				return null;
 			return obj.getDelay();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setDelay(value);
 		}
 	};
 	// $CONTENT-BEGIN$

@@ -105,6 +105,13 @@ public class HDLEqualityOp extends AbstractHDLEqualityOp {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLEqualityOp setValue(HDLEqualityOp obj, HDLEqualityOpType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

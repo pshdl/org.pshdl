@@ -78,6 +78,13 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 				return null;
 			return obj.getName();
 		}
+
+		@Override
+		public HDLAnnotation setValue(HDLAnnotation obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field value which is of type String.
@@ -88,6 +95,13 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 			if (obj == null)
 				return null;
 			return obj.getValue();
+		}
+
+		@Override
+		public HDLAnnotation setValue(HDLAnnotation obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setValue(value);
 		}
 	};
 	// $CONTENT-BEGIN$

@@ -82,6 +82,13 @@ public abstract class HDLType extends AbstractHDLType {
 				return null;
 			return obj.getName();
 		}
+
+		@Override
+		public HDLType setValue(HDLType obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
@@ -92,6 +99,13 @@ public abstract class HDLType extends AbstractHDLType {
 			if (obj == null)
 				return null;
 			return obj.getDim();
+		}
+
+		@Override
+		public HDLType setValue(HDLType obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setDim(value);
 		}
 	};
 

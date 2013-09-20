@@ -88,6 +88,13 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 				return null;
 			return obj.getSimOnly();
 		}
+
+		@Override
+		public HDLNativeFunction setValue(HDLNativeFunction obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setSimOnly(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

@@ -91,6 +91,13 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 				return null;
 			return obj.getStmnts();
 		}
+
+		@Override
+		public HDLSubstituteFunction setValue(HDLSubstituteFunction obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setStmnts(value);
+		}
 	};
 
 	// $CONTENT-BEGIN$

@@ -85,6 +85,13 @@ public class HDLManip extends AbstractHDLManip {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLManip setValue(HDLManip obj, HDLManipType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	/**
 	 * The accessor for the field target which is of type HDLExpression.
@@ -96,6 +103,13 @@ public class HDLManip extends AbstractHDLManip {
 				return null;
 			return obj.getTarget();
 		}
+
+		@Override
+		public HDLManip setValue(HDLManip obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setTarget(value);
+		}
 	};
 	/**
 	 * The accessor for the field castTo which is of type HDLType.
@@ -106,6 +120,13 @@ public class HDLManip extends AbstractHDLManip {
 			if (obj == null)
 				return null;
 			return obj.getCastTo();
+		}
+
+		@Override
+		public HDLManip setValue(HDLManip obj, HDLType value) {
+			if (obj == null)
+				return null;
+			return obj.setCastTo(value);
 		}
 	};
 	// $CONTENT-BEGIN$

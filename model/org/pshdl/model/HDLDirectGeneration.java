@@ -94,6 +94,13 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 				return null;
 			return obj.getHIf();
 		}
+
+		@Override
+		public HDLDirectGeneration setValue(HDLDirectGeneration obj, HDLInterface value) {
+			if (obj == null)
+				return null;
+			return obj.setHIf(value);
+		}
 	};
 	/**
 	 * The accessor for the field generatorID which is of type String.
@@ -104,6 +111,13 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			if (obj == null)
 				return null;
 			return obj.getGeneratorID();
+		}
+
+		@Override
+		public HDLDirectGeneration setValue(HDLDirectGeneration obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setGeneratorID(value);
 		}
 	};
 	/**
@@ -116,6 +130,13 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 				return null;
 			return obj.getGeneratorContent();
 		}
+
+		@Override
+		public HDLDirectGeneration setValue(HDLDirectGeneration obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setGeneratorContent(value);
+		}
 	};
 	/**
 	 * The accessor for the field include which is of type Boolean.
@@ -126,6 +147,13 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			if (obj == null)
 				return null;
 			return obj.getInclude();
+		}
+
+		@Override
+		public HDLDirectGeneration setValue(HDLDirectGeneration obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setInclude(value);
 		}
 	};
 	// $CONTENT-BEGIN$

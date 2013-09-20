@@ -105,6 +105,13 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLShiftOp setValue(HDLShiftOp obj, HDLShiftOpType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

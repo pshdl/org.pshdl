@@ -31,7 +31,6 @@ import java.util.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
-import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;

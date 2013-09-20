@@ -81,6 +81,13 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 				return null;
 			return obj.getContainer();
 		}
+
+		@Override
+		public HDLObject setValue(HDLObject obj, IHDLObject value) {
+			if (obj == null)
+				return null;
+			return obj.setContainer(value);
+		}
 	};
 
 	// $CONTENT-BEGIN$

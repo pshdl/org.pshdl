@@ -94,6 +94,13 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 				return null;
 			return obj.getHIfRefName();
 		}
+
+		@Override
+		public HDLInterfaceRef setValue(HDLInterfaceRef obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setHIf(value);
+		}
 	};
 	/**
 	 * The accessor for the field ifArray which is of type
@@ -105,6 +112,13 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 			if (obj == null)
 				return null;
 			return obj.getIfArray();
+		}
+
+		@Override
+		public HDLInterfaceRef setValue(HDLInterfaceRef obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setIfArray(value);
 		}
 	};
 

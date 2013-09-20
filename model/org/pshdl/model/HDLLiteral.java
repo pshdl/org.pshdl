@@ -80,6 +80,13 @@ public class HDLLiteral extends AbstractHDLLiteral {
 				return null;
 			return obj.getVal();
 		}
+
+		@Override
+		public HDLLiteral setValue(HDLLiteral obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setVal(value);
+		}
 	};
 	/**
 	 * The accessor for the field str which is of type Boolean.
@@ -90,6 +97,13 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			if (obj == null)
 				return null;
 			return obj.getStr();
+		}
+
+		@Override
+		public HDLLiteral setValue(HDLLiteral obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setStr(value);
 		}
 	};
 	// $CONTENT-BEGIN$

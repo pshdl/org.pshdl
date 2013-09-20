@@ -89,6 +89,13 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 				return null;
 			return obj.getHIfRefName();
 		}
+
+		@Override
+		public HDLInterfaceInstantiation setValue(HDLInterfaceInstantiation obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setHIf(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 

@@ -82,6 +82,13 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 				return null;
 			return obj.getHEnumRefName();
 		}
+
+		@Override
+		public HDLEnumRef setValue(HDLEnumRef obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setHEnum(value);
+		}
 	};
 
 	// $CONTENT-BEGIN$

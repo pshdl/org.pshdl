@@ -81,6 +81,13 @@ public class HDLTernary extends AbstractHDLTernary {
 				return null;
 			return obj.getIfExpr();
 		}
+
+		@Override
+		public HDLTernary setValue(HDLTernary obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setIfExpr(value);
+		}
 	};
 	/**
 	 * The accessor for the field thenExpr which is of type HDLExpression.
@@ -92,6 +99,13 @@ public class HDLTernary extends AbstractHDLTernary {
 				return null;
 			return obj.getThenExpr();
 		}
+
+		@Override
+		public HDLTernary setValue(HDLTernary obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setThenExpr(value);
+		}
 	};
 	/**
 	 * The accessor for the field elseExpr which is of type HDLExpression.
@@ -102,6 +116,13 @@ public class HDLTernary extends AbstractHDLTernary {
 			if (obj == null)
 				return null;
 			return obj.getElseExpr();
+		}
+
+		@Override
+		public HDLTernary setValue(HDLTernary obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setElseExpr(value);
 		}
 	};
 	// $CONTENT-BEGIN$

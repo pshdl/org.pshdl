@@ -80,6 +80,13 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 				return null;
 			return obj.getCaseExp();
 		}
+
+		@Override
+		public HDLSwitchStatement setValue(HDLSwitchStatement obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setCaseExp(value);
+		}
 	};
 	/**
 	 * The accessor for the field cases which is of type
@@ -91,6 +98,13 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 			if (obj == null)
 				return null;
 			return obj.getCases();
+		}
+
+		@Override
+		public HDLSwitchStatement setValue(HDLSwitchStatement obj, ArrayList<HDLSwitchCaseStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setCases(value);
 		}
 	};
 	// $CONTENT-BEGIN$

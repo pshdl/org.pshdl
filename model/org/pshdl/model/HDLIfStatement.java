@@ -86,6 +86,13 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 				return null;
 			return obj.getIfExp();
 		}
+
+		@Override
+		public HDLIfStatement setValue(HDLIfStatement obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setIfExp(value);
+		}
 	};
 	/**
 	 * The accessor for the field thenDo which is of type
@@ -98,6 +105,13 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 				return null;
 			return obj.getThenDo();
 		}
+
+		@Override
+		public HDLIfStatement setValue(HDLIfStatement obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setThenDo(value);
+		}
 	};
 	/**
 	 * The accessor for the field elseDo which is of type
@@ -109,6 +123,13 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			if (obj == null)
 				return null;
 			return obj.getElseDo();
+		}
+
+		@Override
+		public HDLIfStatement setValue(HDLIfStatement obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setElseDo(value);
 		}
 	};
 

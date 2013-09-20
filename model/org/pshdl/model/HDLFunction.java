@@ -88,6 +88,13 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 				return null;
 			return obj.getName();
 		}
+
+		@Override
+		public HDLFunction setValue(HDLFunction obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field args which is of type
@@ -100,6 +107,13 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 				return null;
 			return obj.getArgs();
 		}
+
+		@Override
+		public HDLFunction setValue(HDLFunction obj, ArrayList<HDLFunctionParameter> value) {
+			if (obj == null)
+				return null;
+			return obj.setArgs(value);
+		}
 	};
 	/**
 	 * The accessor for the field returnType which is of type
@@ -111,6 +125,13 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			if (obj == null)
 				return null;
 			return obj.getReturnType();
+		}
+
+		@Override
+		public HDLFunction setValue(HDLFunction obj, HDLFunctionParameter value) {
+			if (obj == null)
+				return null;
+			return obj.setReturnType(value);
 		}
 	};
 	// $CONTENT-BEGIN$

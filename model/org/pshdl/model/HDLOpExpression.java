@@ -78,6 +78,13 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 				return null;
 			return obj.getLeft();
 		}
+
+		@Override
+		public HDLOpExpression setValue(HDLOpExpression obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setLeft(value);
+		}
 	};
 	/**
 	 * The accessor for the field right which is of type HDLExpression.
@@ -88,6 +95,13 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 			if (obj == null)
 				return null;
 			return obj.getRight();
+		}
+
+		@Override
+		public HDLOpExpression setValue(HDLOpExpression obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setRight(value);
 		}
 	};
 

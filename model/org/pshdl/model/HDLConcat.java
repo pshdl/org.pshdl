@@ -80,6 +80,13 @@ public class HDLConcat extends AbstractHDLConcat {
 				return null;
 			return obj.getCats();
 		}
+
+		@Override
+		public HDLConcat setValue(HDLConcat obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setCats(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

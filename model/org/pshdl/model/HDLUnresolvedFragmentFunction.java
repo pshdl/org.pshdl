@@ -92,6 +92,13 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 				return null;
 			return obj.getParams();
 		}
+
+		@Override
+		public HDLUnresolvedFragmentFunction setValue(HDLUnresolvedFragmentFunction obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setParams(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

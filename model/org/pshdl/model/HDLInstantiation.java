@@ -80,6 +80,13 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 				return null;
 			return obj.getVar();
 		}
+
+		@Override
+		public HDLInstantiation setValue(HDLInstantiation obj, HDLVariable value) {
+			if (obj == null)
+				return null;
+			return obj.setVar(value);
+		}
 	};
 	/**
 	 * The accessor for the field arguments which is of type
@@ -91,6 +98,13 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 			if (obj == null)
 				return null;
 			return obj.getArguments();
+		}
+
+		@Override
+		public HDLInstantiation setValue(HDLInstantiation obj, ArrayList<HDLArgument> value) {
+			if (obj == null)
+				return null;
+			return obj.setArguments(value);
 		}
 	};
 	// $CONTENT-BEGIN$

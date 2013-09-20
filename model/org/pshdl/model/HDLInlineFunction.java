@@ -90,6 +90,13 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 				return null;
 			return obj.getExpr();
 		}
+
+		@Override
+		public HDLInlineFunction setValue(HDLInlineFunction obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setExpr(value);
+		}
 	};
 
 	// $CONTENT-BEGIN$

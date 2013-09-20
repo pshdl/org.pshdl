@@ -112,7 +112,7 @@ public class MemoryModelSideFiles {
 			pos++;
 		}
 		options.put("{TABLE}", ps.toString());
-		options.put("{HDLINTERFACE}", StringWriteExtension.asString(MemoryModel.buildHDLInterface(unit, rows).setName("Bus"), new HTMLHighlighter(true)));
+		options.put("{HDLINTERFACE}", StringWriteExtension.asString(MemoryModel.buildHDLInterface(unit, rows).setName("Bus"), new SyntaxHighlighter.HTMLHighlighter(true)));
 		ps.close();
 		try {
 			return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);

@@ -78,6 +78,13 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 				return null;
 			return obj.getHIf();
 		}
+
+		@Override
+		public HDLInterfaceDeclaration setValue(HDLInterfaceDeclaration obj, HDLInterface value) {
+			if (obj == null)
+				return null;
+			return obj.setHIf(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 

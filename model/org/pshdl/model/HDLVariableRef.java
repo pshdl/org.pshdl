@@ -88,6 +88,13 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 				return null;
 			return obj.getArray();
 		}
+
+		@Override
+		public HDLVariableRef setValue(HDLVariableRef obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setArray(value);
+		}
 	};
 	/**
 	 * The accessor for the field bits which is of type ArrayList<HDLRange>.
@@ -98,6 +105,13 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 			if (obj == null)
 				return null;
 			return obj.getBits();
+		}
+
+		@Override
+		public HDLVariableRef setValue(HDLVariableRef obj, ArrayList<HDLRange> value) {
+			if (obj == null)
+				return null;
+			return obj.setBits(value);
 		}
 	};
 	// $CONTENT-BEGIN$

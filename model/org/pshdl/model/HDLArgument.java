@@ -78,6 +78,13 @@ public class HDLArgument extends AbstractHDLArgument {
 				return null;
 			return obj.getName();
 		}
+
+		@Override
+		public HDLArgument setValue(HDLArgument obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field expression which is of type HDLExpression.
@@ -88,6 +95,13 @@ public class HDLArgument extends AbstractHDLArgument {
 			if (obj == null)
 				return null;
 			return obj.getExpression();
+		}
+
+		@Override
+		public HDLArgument setValue(HDLArgument obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setExpression(value);
 		}
 	};
 	// $CONTENT-BEGIN$

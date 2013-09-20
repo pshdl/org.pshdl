@@ -115,6 +115,13 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLPrimitive setValue(HDLPrimitive obj, HDLPrimitiveType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	/**
 	 * The accessor for the field width which is of type HDLExpression.
@@ -125,6 +132,13 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			if (obj == null)
 				return null;
 			return obj.getWidth();
+		}
+
+		@Override
+		public HDLPrimitive setValue(HDLPrimitive obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setWidth(value);
 		}
 	};
 

@@ -78,6 +78,13 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 				return null;
 			return obj.getAnnotations();
 		}
+
+		@Override
+		public HDLDeclaration setValue(HDLDeclaration obj, ArrayList<HDLAnnotation> value) {
+			if (obj == null)
+				return null;
+			return obj.setAnnotations(value);
+		}
 	};
 
 	// $CONTENT-BEGIN$

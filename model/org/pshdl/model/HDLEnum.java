@@ -85,6 +85,13 @@ public class HDLEnum extends AbstractHDLEnum {
 				return null;
 			return obj.getEnums();
 		}
+
+		@Override
+		public HDLEnum setValue(HDLEnum obj, ArrayList<HDLVariable> value) {
+			if (obj == null)
+				return null;
+			return obj.setEnums(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 

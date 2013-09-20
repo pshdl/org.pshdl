@@ -154,6 +154,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 				return null;
 			return obj.getRw();
 		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, RWType value) {
+			if (obj == null)
+				return null;
+			return obj.setRw(value);
+		}
 	};
 	/**
 	 * The accessor for the field type which is of type Type.
@@ -164,6 +171,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			if (obj == null)
 				return null;
 			return obj.getType();
+		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, Type value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
 		}
 	};
 	/**
@@ -176,6 +190,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 				return null;
 			return obj.getEnumSpecRefName();
 		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setEnumSpec(value);
+		}
 	};
 	/**
 	 * The accessor for the field ifSpec which is of type HDLQualifiedName.
@@ -186,6 +207,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			if (obj == null)
 				return null;
 			return obj.getIfSpecRefName();
+		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setIfSpec(value);
 		}
 	};
 	/**
@@ -200,6 +228,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 				return null;
 			return obj.getFuncSpec();
 		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, ArrayList<HDLFunctionParameter> value) {
+			if (obj == null)
+				return null;
+			return obj.setFuncSpec(value);
+		}
 	};
 	/**
 	 * The accessor for the field funcReturnSpec which is of type
@@ -212,6 +247,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 				return null;
 			return obj.getFuncReturnSpec();
 		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLFunctionParameter value) {
+			if (obj == null)
+				return null;
+			return obj.setFuncReturnSpec(value);
+		}
 	};
 	/**
 	 * The accessor for the field name which is of type HDLVariable.
@@ -222,6 +264,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			if (obj == null)
 				return null;
 			return obj.getName();
+		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLVariable value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
 		}
 	};
 	/**
@@ -234,6 +283,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 				return null;
 			return obj.getWidth();
 		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setWidth(value);
+		}
 	};
 	/**
 	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
@@ -244,6 +300,13 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			if (obj == null)
 				return null;
 			return obj.getDim();
+		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, ArrayList<HDLExpression> value) {
+			if (obj == null)
+				return null;
+			return obj.setDim(value);
 		}
 	};
 

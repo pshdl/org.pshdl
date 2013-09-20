@@ -88,6 +88,13 @@ public class HDLForLoop extends AbstractHDLForLoop {
 				return null;
 			return obj.getRange();
 		}
+
+		@Override
+		public HDLForLoop setValue(HDLForLoop obj, ArrayList<HDLRange> value) {
+			if (obj == null)
+				return null;
+			return obj.setRange(value);
+		}
 	};
 	/**
 	 * The accessor for the field param which is of type HDLVariable.
@@ -99,6 +106,13 @@ public class HDLForLoop extends AbstractHDLForLoop {
 				return null;
 			return obj.getParam();
 		}
+
+		@Override
+		public HDLForLoop setValue(HDLForLoop obj, HDLVariable value) {
+			if (obj == null)
+				return null;
+			return obj.setParam(value);
+		}
 	};
 	/**
 	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
@@ -109,6 +123,13 @@ public class HDLForLoop extends AbstractHDLForLoop {
 			if (obj == null)
 				return null;
 			return obj.getDos();
+		}
+
+		@Override
+		public HDLForLoop setValue(HDLForLoop obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setDos(value);
 		}
 	};
 

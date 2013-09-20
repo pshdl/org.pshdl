@@ -80,6 +80,13 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 				return null;
 			return obj.getLabel();
 		}
+
+		@Override
+		public HDLSwitchCaseStatement setValue(HDLSwitchCaseStatement obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setLabel(value);
+		}
 	};
 	/**
 	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
@@ -90,6 +97,13 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 			if (obj == null)
 				return null;
 			return obj.getDos();
+		}
+
+		@Override
+		public HDLSwitchCaseStatement setValue(HDLSwitchCaseStatement obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setDos(value);
 		}
 	};
 	// $CONTENT-BEGIN$

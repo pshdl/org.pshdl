@@ -85,6 +85,13 @@ public class HDLInterface extends AbstractHDLInterface {
 				return null;
 			return obj.getPorts();
 		}
+
+		@Override
+		public HDLInterface setValue(HDLInterface obj, ArrayList<HDLVariableDeclaration> value) {
+			if (obj == null)
+				return null;
+			return obj.setPorts(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 

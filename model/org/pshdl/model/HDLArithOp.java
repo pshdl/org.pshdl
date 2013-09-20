@@ -105,6 +105,13 @@ public class HDLArithOp extends AbstractHDLArithOp {
 				return null;
 			return obj.getType();
 		}
+
+		@Override
+		public HDLArithOp setValue(HDLArithOp obj, HDLArithOpType value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$

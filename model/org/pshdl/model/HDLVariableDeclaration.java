@@ -124,6 +124,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 				return null;
 			return obj.getRegister();
 		}
+
+		@Override
+		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLRegisterConfig value) {
+			if (obj == null)
+				return null;
+			return obj.setRegister(value);
+		}
 	};
 	/**
 	 * The accessor for the field direction which is of type HDLDirection.
@@ -134,6 +141,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			if (obj == null)
 				return null;
 			return obj.getDirection();
+		}
+
+		@Override
+		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLDirection value) {
+			if (obj == null)
+				return null;
+			return obj.setDirection(value);
 		}
 	};
 	/**
@@ -146,6 +160,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 				return null;
 			return obj.getTypeRefName();
 		}
+
+		@Override
+		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLQualifiedName value) {
+			if (obj == null)
+				return null;
+			return obj.setType(value);
+		}
 	};
 	/**
 	 * The accessor for the field primitive which is of type HDLPrimitive.
@@ -156,6 +177,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			if (obj == null)
 				return null;
 			return obj.getPrimitive();
+		}
+
+		@Override
+		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, HDLPrimitive value) {
+			if (obj == null)
+				return null;
+			return obj.setPrimitive(value);
 		}
 	};
 	/**
@@ -168,6 +196,13 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			if (obj == null)
 				return null;
 			return obj.getVariables();
+		}
+
+		@Override
+		public HDLVariableDeclaration setValue(HDLVariableDeclaration obj, ArrayList<HDLVariable> value) {
+			if (obj == null)
+				return null;
+			return obj.setVariables(value);
 		}
 	};
 

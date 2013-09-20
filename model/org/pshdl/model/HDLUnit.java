@@ -112,6 +112,13 @@ public class HDLUnit extends AbstractHDLUnit {
 				return null;
 			return obj.getAnnotations();
 		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, ArrayList<HDLAnnotation> value) {
+			if (obj == null)
+				return null;
+			return obj.setAnnotations(value);
+		}
 	};
 	/**
 	 * The accessor for the field libURI which is of type String.
@@ -122,6 +129,13 @@ public class HDLUnit extends AbstractHDLUnit {
 			if (obj == null)
 				return null;
 			return obj.getLibURI();
+		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setLibURI(value);
 		}
 	};
 	/**
@@ -134,6 +148,13 @@ public class HDLUnit extends AbstractHDLUnit {
 				return null;
 			return obj.getName();
 		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, String value) {
+			if (obj == null)
+				return null;
+			return obj.setName(value);
+		}
 	};
 	/**
 	 * The accessor for the field imports which is of type ArrayList<String>.
@@ -144,6 +165,13 @@ public class HDLUnit extends AbstractHDLUnit {
 			if (obj == null)
 				return null;
 			return obj.getImports();
+		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, ArrayList<String> value) {
+			if (obj == null)
+				return null;
+			return obj.setImports(value);
 		}
 	};
 	/**
@@ -157,6 +185,13 @@ public class HDLUnit extends AbstractHDLUnit {
 				return null;
 			return obj.getInits();
 		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setInits(value);
+		}
 	};
 	/**
 	 * The accessor for the field statements which is of type
@@ -169,6 +204,13 @@ public class HDLUnit extends AbstractHDLUnit {
 				return null;
 			return obj.getStatements();
 		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, ArrayList<HDLStatement> value) {
+			if (obj == null)
+				return null;
+			return obj.setStatements(value);
+		}
 	};
 	/**
 	 * The accessor for the field simulation which is of type Boolean.
@@ -179,6 +221,13 @@ public class HDLUnit extends AbstractHDLUnit {
 			if (obj == null)
 				return null;
 			return obj.getSimulation();
+		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setSimulation(value);
 		}
 	};
 	/**
@@ -191,6 +240,13 @@ public class HDLUnit extends AbstractHDLUnit {
 			if (obj == null)
 				return null;
 			return obj.getExtendRefName();
+		}
+
+		@Override
+		public HDLUnit setValue(HDLUnit obj, ArrayList<HDLQualifiedName> value) {
+			if (obj == null)
+				return null;
+			return obj.setExtend(value);
 		}
 	};
 	// $CONTENT-BEGIN$
