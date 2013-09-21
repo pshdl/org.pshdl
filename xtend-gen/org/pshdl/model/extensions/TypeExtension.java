@@ -385,9 +385,6 @@ public class TypeExtension {
         return Optional.<HDLPrimitive>of(_setType_1);
       }
     }
-    String _val = lit.getVal();
-    char _charAt = _val.charAt(0);
-    final boolean isSigned = (!Objects.equal(Character.valueOf(_charAt), "-"));
     final BigInteger bigVal = lit.getValueAsBigInt();
     int _bitLength = bigVal.bitLength();
     boolean _greaterThan = (_bitLength > 31);
@@ -398,7 +395,8 @@ public class TypeExtension {
       HDLPrimitive _setWidth = _uint.setWidth(_get);
       return Optional.<HDLPrimitive>of(_setWidth);
     }
-    HDLPrimitive _target = HDLPrimitive.target(isSigned);
+    boolean _isSigned = lit.isSigned();
+    HDLPrimitive _target = HDLPrimitive.target(_isSigned);
     return Optional.<HDLPrimitive>of(_target);
   }
   

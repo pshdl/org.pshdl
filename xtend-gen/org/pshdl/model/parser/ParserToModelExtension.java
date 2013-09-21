@@ -1133,8 +1133,8 @@ public class ParserToModelExtension {
         public HDLExpression apply(final PsFuncOptArrayContext it) {
           HDLExpression _xifexpression = null;
           PsExpressionContext _psExpression = it.psExpression();
-          boolean _notEquals = (!Objects.equal(_psExpression, null));
-          if (_notEquals) {
+          boolean _tripleNotEquals = (_psExpression != null);
+          if (_tripleNotEquals) {
             PsExpressionContext _psExpression_1 = it.psExpression();
             IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
             _xifexpression = ((HDLExpression) _hDL);
@@ -1165,8 +1165,8 @@ public class ParserToModelExtension {
         public HDLExpression apply(final PsFuncOptArrayContext it) {
           HDLExpression _xifexpression = null;
           PsExpressionContext _psExpression = it.psExpression();
-          boolean _notEquals = (!Objects.equal(_psExpression, null));
-          if (_notEquals) {
+          boolean _tripleNotEquals = (_psExpression != null);
+          if (_tripleNotEquals) {
             PsExpressionContext _psExpression_1 = it.psExpression();
             IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
             _xifexpression = ((HDLExpression) _hDL);
@@ -1351,8 +1351,8 @@ public class ParserToModelExtension {
       }
     }
     PsWidthContext _psWidth = context.psWidth();
-    boolean _notEquals = (!Objects.equal(_psWidth, null));
-    if (_notEquals) {
+    boolean _tripleNotEquals_14 = (_psWidth != null);
+    if (_tripleNotEquals_14) {
       PsWidthContext _psWidth_1 = context.psWidth();
       IHDLObject _hDL_1 = this.toHDL(_psWidth_1);
       HDLFunctionParameter _setContainer = res.setContainer(((HDLExpression) _hDL_1));

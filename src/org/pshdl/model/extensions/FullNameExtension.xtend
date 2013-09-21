@@ -65,7 +65,6 @@ class FullNameExtension {
 	/**
 	 * Returns the {@link HDLQualifiedName} for the given obj. 
 	 */
-	@Nonnull
 	def static HDLQualifiedName fullNameOf(IHDLObject obj) {
 		if (obj === null)
 			return null;

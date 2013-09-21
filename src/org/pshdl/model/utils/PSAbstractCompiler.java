@@ -17,6 +17,8 @@ import com.google.common.io.*;
 
 public class PSAbstractCompiler {
 
+	private static final Random RANDOM = new Random();
+
 	/**
 	 * Do not report any progress and proceed whenever possible
 	 * 
@@ -161,7 +163,7 @@ public class PSAbstractCompiler {
 	private final ExecutorService service;
 
 	public PSAbstractCompiler() {
-		this("PSHDLLib" + new Random().nextLong(), null);
+		this("PSHDLLib" + RANDOM.nextLong(), null);
 	}
 
 	public PSAbstractCompiler(String uri, ExecutorService service) {

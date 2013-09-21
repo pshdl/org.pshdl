@@ -218,13 +218,13 @@ class StringWriteExtension {
 			case HDLFunctionParameter$Type::FUNCTION: {
 				sb.append(
 					'''<«FOR HDLFunctionParameter p : func.funcSpec SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
-				if (func.funcReturnSpec != null)
+				if (func.funcReturnSpec !== null)
 					sb.append(highlight.simpleSpace).append("=>").append(highlight.simpleSpace).append(
 						func.funcReturnSpec.toString(highlight))
 				sb.append('>')
 			}
 		}
-		if (func.name != null)
+		if (func.name !== null)
 			sb.append(highlight.simpleSpace).append(highlight.varName(func.name))
 		for (d : func.dim) {
 			switch (d) {
@@ -247,7 +247,7 @@ class StringWriteExtension {
 		sb.append(highlight.simpleSpace)
 		sb.append(highlight.keyword("function"))
 		sb.append(highlight.simpleSpace)
-		if (func.returnType != null)
+		if (func.returnType !== null)
 			sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
 		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')
@@ -281,7 +281,7 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("substitute")).append(highlight.simpleSpace).append(highlight.keyword("function")).
 			append(highlight.simpleSpace)
-		if (func.returnType != null)
+		if (func.returnType !== null)
 			sb.append(func.returnType.toString(highlight)).append(highlight.simpleSpace)
 		sb.append(highlight.functionDecl(func.name))
 		sb.append('''(«FOR HDLFunctionParameter arg : func.args SEPARATOR ','»«arg.toString(highlight)»«ENDFOR»)''')

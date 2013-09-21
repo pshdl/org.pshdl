@@ -91,8 +91,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       handled.add(Integer.valueOf(_minus));
       StringConcatenation _builder = new StringConcatenation();
       {
-        boolean _notEquals = (!Objects.equal(packageName, null));
-        if (_notEquals) {
+        boolean _tripleNotEquals = (packageName != null);
+        if (_tripleNotEquals) {
           _builder.append("package ");
           _builder.append(packageName, "");
           _builder.append(";");
@@ -646,27 +646,27 @@ public class JavaCompiler implements ITypeOuptutProvider {
             boolean _and_3 = false;
             boolean _and_4 = false;
             int _minus_1 = (-1);
-            boolean _tripleEquals = (Integer.valueOf(f_1.edgeNegDepRes) == Integer.valueOf(_minus_1));
-            if (!_tripleEquals) {
+            boolean _equals_1 = (f_1.edgeNegDepRes == _minus_1);
+            if (!_equals_1) {
               _and_4 = false;
             } else {
               int _minus_2 = (-1);
-              boolean _tripleEquals_1 = (Integer.valueOf(f_1.edgePosDepRes) == Integer.valueOf(_minus_2));
-              _and_4 = (_tripleEquals && _tripleEquals_1);
+              boolean _equals_2 = (f_1.edgePosDepRes == _minus_2);
+              _and_4 = (_equals_1 && _equals_2);
             }
             if (!_and_4) {
               _and_3 = false;
             } else {
               int _length = f_1.predNegDepRes.length;
-              boolean _tripleEquals_2 = (Integer.valueOf(_length) == Integer.valueOf(0));
-              _and_3 = (_and_4 && _tripleEquals_2);
+              boolean _equals_3 = (_length == 0);
+              _and_3 = (_and_4 && _equals_3);
             }
             if (!_and_3) {
               _and_2 = false;
             } else {
               int _length_1 = f_1.predPosDepRes.length;
-              boolean _tripleEquals_3 = (Integer.valueOf(_length_1) == Integer.valueOf(0));
-              _and_2 = (_and_3 && _tripleEquals_3);
+              boolean _equals_4 = (_length_1 == 0);
+              _and_2 = (_and_3 && _equals_4);
             }
             if (_and_2) {
               _builder.append("\t\t");
@@ -744,8 +744,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
         final Function1<VariableInformation,Boolean> _function_1 = new Function1<VariableInformation,Boolean>() {
             public Boolean apply(final VariableInformation it) {
               Boolean _get = JavaCompiler.this.cce.prevMap.get(it.name);
-              boolean _notEquals = (!Objects.equal(_get, null));
-              return Boolean.valueOf(_notEquals);
+              boolean _tripleNotEquals = (_get != null);
+              return Boolean.valueOf(_tripleNotEquals);
             }
           };
         Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(_excludeNull_2, _function_1);
@@ -794,8 +794,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
     int _minus = (-1);
-    boolean _tripleNotEquals = (Integer.valueOf(f.edgeNegDepRes) != Integer.valueOf(_minus));
-    if (_tripleNotEquals) {
+    boolean _notEquals = (f.edgeNegDepRes != _minus);
+    if (_notEquals) {
       StringConcatenation _builder = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
       String _idName = this.cce.idName(_asInternal, false, false);
@@ -809,8 +809,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       first = false;
     }
     int _minus_1 = (-1);
-    boolean _tripleNotEquals_1 = (Integer.valueOf(f.edgePosDepRes) != Integer.valueOf(_minus_1));
-    if (_tripleNotEquals_1) {
+    boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
+    if (_notEquals_1) {
       boolean _not = (!first);
       if (_not) {
         sb.append(" && ");
@@ -1651,8 +1651,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
         {
           int _length_1 = info.arrayIdx.length;
           int _length_2 = info.info.dimensions.length;
-          boolean _tripleEquals = (Integer.valueOf(_length_1) == Integer.valueOf(_length_2));
-          if (_tripleEquals) {
+          boolean _equals_2 = (_length_1 == _length_2);
+          if (_equals_2) {
             {
               if (this.debug) {
                 _builder_2.append("if (listener!=null)");
@@ -1684,8 +1684,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       } else {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
-          boolean _equals_2 = (info.actualWidth == info.info.width);
-          if (_equals_2) {
+          boolean _equals_3 = (info.actualWidth == info.info.width);
+          if (_equals_3) {
             String _javaType_3 = this.getJavaType(info);
             _builder_3.append(_javaType_3, "");
             _builder_3.append(" ");
@@ -1697,8 +1697,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            boolean _equals_3 = (info.actualWidth == 1);
-            if (_equals_3) {
+            boolean _equals_4 = (info.actualWidth == 1);
+            if (_equals_4) {
               String _javaType_4 = this.getJavaType(info);
               _builder_3.append(_javaType_4, "");
               _builder_3.append(" ");
@@ -1733,8 +1733,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
         {
           int _length_3 = info.arrayIdx.length;
           int _length_4 = info.info.dimensions.length;
-          boolean _tripleEquals_1 = (Integer.valueOf(_length_3) == Integer.valueOf(_length_4));
-          if (_tripleEquals_1) {
+          boolean _equals_5 = (_length_3 == _length_4);
+          if (_equals_5) {
             {
               if (this.debug) {
                 _builder_3.append("if (listener!=null)");
@@ -2651,12 +2651,12 @@ public class JavaCompiler implements ITypeOuptutProvider {
       } else {
         boolean _and = false;
         Boolean _get = this.cce.prevMap.get(info.name);
-        boolean _notEquals = (!Objects.equal(_get, null));
-        if (!_notEquals) {
+        boolean _tripleNotEquals = (_get != null);
+        if (!_tripleNotEquals) {
           _and = false;
         } else {
           Boolean _get_1 = this.cce.prevMap.get(info.name);
-          _and = (_notEquals && (_get_1).booleanValue());
+          _and = (_tripleNotEquals && (_get_1).booleanValue());
         }
         _or = (_isPredicate || _and);
       }
@@ -2684,11 +2684,11 @@ public class JavaCompiler implements ITypeOuptutProvider {
     _builder.newLineIfNotEmpty();
     {
       boolean _and_1 = false;
-      boolean _notEquals_1 = (!Objects.equal(includePrev, null));
-      if (!_notEquals_1) {
+      boolean _tripleNotEquals_1 = (includePrev != null);
+      if (!_tripleNotEquals_1) {
         _and_1 = false;
       } else {
-        _and_1 = (_notEquals_1 && (includePrev).booleanValue());
+        _and_1 = (_tripleNotEquals_1 && (includePrev).booleanValue());
       }
       if (_and_1) {
         _builder.append("private ");
@@ -2751,8 +2751,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
   public MultiOption getUsage() {
     Options _options = new Options();
     final Options options = _options;
-    options.addOption("p", "pkg", true, "The package the generated source will use. If non is specified the package from the module is used");
-    options.addOption("d", "debug", false, "If debug is specified, the source will contain support for a IDebugListener");
+    options.addOption("p", "pkg", true, 
+      "The package the generated source will use. If non is specified the package from the module is used");
+    options.addOption("d", "debug", false, 
+      "If debug is specified, the source will contain support for a IDebugListener");
     String _hookName = this.getHookName();
     String _plus = ("Options for the " + _hookName);
     String _plus_1 = (_plus + " type:");
@@ -2766,13 +2768,13 @@ public class JavaCompiler implements ITypeOuptutProvider {
     String pkg = null;
     final String optionPkg = cli.getOptionValue("pkg");
     boolean debug = cli.hasOption("debug");
-    boolean _notEquals = (!Objects.equal(optionPkg, null));
-    if (_notEquals) {
+    boolean _tripleNotEquals = (optionPkg != null);
+    if (_tripleNotEquals) {
       pkg = optionPkg;
     } else {
       int _minus = (-1);
-      boolean _tripleNotEquals = (Integer.valueOf(li) != Integer.valueOf(_minus));
-      if (_tripleNotEquals) {
+      boolean _notEquals = (li != _minus);
+      if (_notEquals) {
         int _minus_1 = (li - 1);
         String _substring = moduleName.substring(0, _minus_1);
         pkg = _substring;

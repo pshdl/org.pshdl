@@ -182,8 +182,8 @@ public class CommonCompilerExtension {
   
   public boolean isArray(final VariableInformation information) {
     int _length = information.dimensions.length;
-    boolean _tripleNotEquals = (Integer.valueOf(_length) != Integer.valueOf(0));
-    return _tripleNotEquals;
+    boolean _notEquals = (_length != 0);
+    return _notEquals;
   }
   
   public StringBuilder arrayAccess(final VariableInformation v) {
@@ -258,8 +258,8 @@ public class CommonCompilerExtension {
           varAccess.append("+");
         }
         Integer _xifexpression = null;
-        boolean _equals = Objects.equal(arr, null);
-        if (_equals) {
+        boolean _tripleEquals = (arr == null);
+        if (_tripleEquals) {
           _xifexpression = i;
         } else {
           Integer _get = arr.get((i).intValue());
@@ -441,8 +441,8 @@ public class CommonCompilerExtension {
     final int targetSize = (targetSizeWithType >> 1);
     final int shift = (64 - targetSize);
     int _bitwiseAnd = (targetSizeWithType & 1);
-    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
-    if (_tripleEquals) {
+    boolean _equals = (_bitwiseAnd == 1);
+    if (_equals) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("t");
       _builder.append(b, "");
@@ -469,8 +469,8 @@ public class CommonCompilerExtension {
     final int targetSize = (targetSizeWithType >> 1);
     final int shift = (64 - targetSize);
     int _bitwiseAnd = (targetSizeWithType & 1);
-    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
-    if (_tripleEquals) {
+    boolean _equals = (_bitwiseAnd == 1);
+    if (_equals) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append(op, "");
       _builder.append(" t");

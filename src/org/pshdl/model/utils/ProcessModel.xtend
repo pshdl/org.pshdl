@@ -143,7 +143,7 @@ class ProcessModel {
 	}
 
 	def merge(ProcessModel model) {
-		if (model != null) {
+		if (model !== null) {
 			unclockedStatements.putAll(model.unclockedStatements)
 			clockedStatements.putAll(model.clockedStatements)
 		}

@@ -552,7 +552,7 @@ class ParserToModelExtension {
 		res = res.setRw(HDLFunctionParameter$RWType::RETURN)
 		res = res.setDim(
 			context.dims.map[
-				if(it.psExpression != null) it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
+				if(it.psExpression !== null) it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
 		return res
 	}
 
@@ -561,7 +561,7 @@ class ParserToModelExtension {
 		res = res.setName(new HDLVariable().setName(context.RULE_ID.text))
 		res = res.setDim(
 			context.dims.map[
-				if(it.psExpression != null) it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
+				if(it.psExpression !== null) it.psExpression.toHDL as HDLExpression else HDLFunctionParameter::EMPTY_ARR])
 		return res
 	}
 
@@ -612,7 +612,7 @@ class ParserToModelExtension {
 					res = res.setFuncReturnSpec(x.psFuncParamType.toHDL as HDLFunctionParameter)
 			}
 		}
-		if (context.psWidth != null)
+		if (context.psWidth !== null)
 			res = res.setContainer(context.psWidth.toHDL as HDLExpression)
 		return res
 	}

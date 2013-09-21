@@ -518,27 +518,27 @@ public class DartCompiler implements ITypeOuptutProvider {
             boolean _and_3 = false;
             boolean _and_4 = false;
             int _minus_1 = (-1);
-            boolean _tripleEquals = (Integer.valueOf(f_1.edgeNegDepRes) == Integer.valueOf(_minus_1));
-            if (!_tripleEquals) {
+            boolean _equals = (f_1.edgeNegDepRes == _minus_1);
+            if (!_equals) {
               _and_4 = false;
             } else {
               int _minus_2 = (-1);
-              boolean _tripleEquals_1 = (Integer.valueOf(f_1.edgePosDepRes) == Integer.valueOf(_minus_2));
-              _and_4 = (_tripleEquals && _tripleEquals_1);
+              boolean _equals_1 = (f_1.edgePosDepRes == _minus_2);
+              _and_4 = (_equals && _equals_1);
             }
             if (!_and_4) {
               _and_3 = false;
             } else {
               int _length = f_1.predNegDepRes.length;
-              boolean _tripleEquals_2 = (Integer.valueOf(_length) == Integer.valueOf(0));
-              _and_3 = (_and_4 && _tripleEquals_2);
+              boolean _equals_2 = (_length == 0);
+              _and_3 = (_and_4 && _equals_2);
             }
             if (!_and_3) {
               _and_2 = false;
             } else {
               int _length_1 = f_1.predPosDepRes.length;
-              boolean _tripleEquals_3 = (Integer.valueOf(_length_1) == Integer.valueOf(0));
-              _and_2 = (_and_3 && _tripleEquals_3);
+              boolean _equals_3 = (_length_1 == 0);
+              _and_2 = (_and_3 && _equals_3);
             }
             if (_and_2) {
               _builder.append("\t\t");
@@ -605,8 +605,8 @@ public class DartCompiler implements ITypeOuptutProvider {
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
             public Boolean apply(final VariableInformation it) {
               Boolean _get = DartCompiler.this.cce.prevMap.get(it.name);
-              boolean _notEquals = (!Objects.equal(_get, null));
-              return Boolean.valueOf(_notEquals);
+              boolean _tripleNotEquals = (_get != null);
+              return Boolean.valueOf(_tripleNotEquals);
             }
           };
         Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull_2, _function);
@@ -711,8 +711,8 @@ public class DartCompiler implements ITypeOuptutProvider {
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
     int _minus = (-1);
-    boolean _tripleNotEquals = (Integer.valueOf(f.edgeNegDepRes) != Integer.valueOf(_minus));
-    if (_tripleNotEquals) {
+    boolean _notEquals = (f.edgeNegDepRes != _minus);
+    if (_notEquals) {
       StringConcatenation _builder = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
       String _idName = this.cce.idName(_asInternal, false, true);
@@ -726,8 +726,8 @@ public class DartCompiler implements ITypeOuptutProvider {
       first = false;
     }
     int _minus_1 = (-1);
-    boolean _tripleNotEquals_1 = (Integer.valueOf(f.edgePosDepRes) != Integer.valueOf(_minus_1));
-    if (_tripleNotEquals_1) {
+    boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
+    if (_notEquals_1) {
       boolean _not = (!first);
       if (_not) {
         sb.append(" && ");
@@ -2247,8 +2247,8 @@ public class DartCompiler implements ITypeOuptutProvider {
           _matched=true;
           final int targetSize = (inst.arg1 >> 1);
           int _bitwiseAnd = (inst.arg1 & 1);
-          boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
-          if (_tripleEquals) {
+          boolean _equals = (_bitwiseAnd == 1);
+          if (_equals) {
             StringConcatenation _builder_20 = new StringConcatenation();
             _builder_20.append("int t");
             _builder_20.append(pos, "");
@@ -2420,8 +2420,8 @@ public class DartCompiler implements ITypeOuptutProvider {
   public CharSequence twoOpValue(final String op, final int a, final int b, final int targetSizeWithType) {
     final int targetSize = (targetSizeWithType >> 1);
     int _bitwiseAnd = (targetSizeWithType & 1);
-    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
-    if (_tripleEquals) {
+    boolean _equals = (_bitwiseAnd == 1);
+    if (_equals) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("t");
       _builder.append(b, "");
@@ -2447,8 +2447,8 @@ public class DartCompiler implements ITypeOuptutProvider {
   public CharSequence singleOpValue(final String op, final String cast, final int a, final int targetSizeWithType) {
     final int targetSize = (targetSizeWithType >> 1);
     int _bitwiseAnd = (targetSizeWithType & 1);
-    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
-    if (_tripleEquals) {
+    boolean _equals = (_bitwiseAnd == 1);
+    if (_equals) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append(op, "");
       _builder.append(" t");
@@ -2605,12 +2605,12 @@ public class DartCompiler implements ITypeOuptutProvider {
       } else {
         boolean _and = false;
         Boolean _get = this.cce.prevMap.get(info.name);
-        boolean _notEquals = (!Objects.equal(_get, null));
-        if (!_notEquals) {
+        boolean _tripleNotEquals = (_get != null);
+        if (!_tripleNotEquals) {
           _and = false;
         } else {
           Boolean _get_1 = this.cce.prevMap.get(info.name);
-          _and = (_notEquals && (_get_1).booleanValue());
+          _and = (_tripleNotEquals && (_get_1).booleanValue());
         }
         _or = (_isPredicate || _and);
       }
@@ -2633,11 +2633,11 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.newLineIfNotEmpty();
     {
       boolean _and_1 = false;
-      boolean _notEquals_1 = (!Objects.equal(includePrev, null));
-      if (!_notEquals_1) {
+      boolean _tripleNotEquals_1 = (includePrev != null);
+      if (!_tripleNotEquals_1) {
         _and_1 = false;
       } else {
-        _and_1 = (_notEquals_1 && (includePrev).booleanValue());
+        _and_1 = (_tripleNotEquals_1 && (includePrev).booleanValue());
       }
       if (_and_1) {
         String _dartType_1 = this.dartType(info, true);

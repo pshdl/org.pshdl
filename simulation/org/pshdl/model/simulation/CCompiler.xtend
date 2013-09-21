@@ -136,8 +136,8 @@ class CCompiler implements ITypeOuptutProvider {
 							regUpdatePos=0;
 					«ENDIF»
 					«FOR f : em.frames»
-						«IF f.edgeNegDepRes === -1 && f.edgePosDepRes === -1 && f.predNegDepRes.length === 0 &&
-				f.predPosDepRes.length === 0»
+						«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 && f.predNegDepRes.length == 0 &&
+				f.predPosDepRes.length == 0»
 							«f.frameName»();
 						«ELSE»
 							«f.edgeNegDepRes.createNegEdge(handled)»
@@ -157,7 +157,7 @@ class CCompiler implements ITypeOuptutProvider {
 						epsCycle++;
 						} while (regUpdatePos!=0 && !disabledRegOutputlogic);
 					«ENDIF»
-					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) != null]»
+					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) !== null]»
 						«v.copyPrev»
 					«ENDFOR»
 				}
@@ -243,13 +243,13 @@ class CCompiler implements ITypeOuptutProvider {
 	def predicates(Frame f) {
 		val sb = new StringBuilder
 		var first = true;
-		if (f.edgeNegDepRes !== -1) {
+		if (f.edgeNegDepRes != -1) {
 			sb.append(
 				'''«f.edgeNegDepRes.asInternal.idName(false, false)»_isFalling && !«f.edgeNegDepRes.asInternal.
 					idName(false, false)»_fallingIsHandled''')
 			first = false
 		}
-		if (f.edgePosDepRes !== -1) {
+		if (f.edgePosDepRes != -1) {
 			if (!first)
 				sb.append(' && ')
 			sb.append(
@@ -629,7 +629,7 @@ class CCompiler implements ITypeOuptutProvider {
 	def sra(int targetSizeWithType, int a, int b) {
 		val targetSize = (targetSizeWithType >> 1)
 		val shift = bitWidth - targetSize
-		if ((targetSizeWithType.bitwiseAnd(1)) === 1)
+		if ((targetSizeWithType.bitwiseAnd(1)) == 1)
 			return signExtend('''((«int_t()»)t«b») >> t«a»''', '''(«int_t()»)''', shift)
 		return '''(((«int_t»)t«b») >> t«a») & «targetSize.asMaskL»l'''
 	}
@@ -664,10 +664,10 @@ class CCompiler implements ITypeOuptutProvider {
 	}
 
 	def decl(VariableInformation info, Boolean includePrev) '''
-		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»uint64_t «info.idName(false,
+		«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»uint64_t «info.idName(false,
 			false)»_update=0;«ENDIF»
 		«info.cType» «info.idName(false, false)»«IF !info.dimensions.empty»[«info.totalSize»]«ENDIF»;
-		«IF includePrev != null && includePrev»«info.cType» «info.idName(true, false)»«IF !info.dimensions.empty»[«info.
+		«IF includePrev !== null && includePrev»«info.cType» «info.idName(true, false)»«IF !info.dimensions.empty»[«info.
 			totalSize»]«ENDIF»;«ENDIF»
 		«IF info.isRegister»«info.cType» «info.idName(false, false)»$reg«IF !info.dimensions.empty»[«info.totalSize»]«ENDIF»;«ENDIF»
 	'''
@@ -695,7 +695,7 @@ class CCompiler implements ITypeOuptutProvider {
 		val comp = new CCompiler(em)
 		val List<SideFile> sideFiles = Lists.newLinkedList
 		val simFile = generateSimEncapsuation
-		if (simFile != null)
+		if (simFile !== null)
 			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets::UTF_8), true));
 		return Lists::newArrayList(
 			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, hookName, true));
@@ -703,7 +703,7 @@ class CCompiler implements ITypeOuptutProvider {
 
 	def String generateSimEncapsuation() {
 		val Unit unit = getUnit(em)
-		if (unit == null)
+		if (unit === null)
 			return null
 		return generateSimEncapsuation(unit, MemoryModel::buildRows(unit))
 	}

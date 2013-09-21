@@ -38,7 +38,7 @@ import com.google.common.collect.*;
 
 public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 	private final IHDLInterpreter interpreter;
-	private final Map<Integer, BigInteger> lastVal = Maps.newHashMap();
+	private final Map<String, BigInteger> lastVal = Maps.newHashMap();
 	private final Map<Integer, String> idxName = Maps.newHashMap();
 	private final Map<String, Integer> widths = Maps.newHashMap();
 	private final PrintStream printStream;

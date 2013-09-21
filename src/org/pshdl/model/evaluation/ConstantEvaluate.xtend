@@ -90,9 +90,9 @@ class ConstantEvaluate {
 	 * the provided context is used to retrieve a value for them.
 	 * 
 	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
-	 */  
+	 */
 	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
-		if (exp==null)
+		if (exp === null)
 			return Optional::absent
 		return INST.constantEvaluate(exp, context)
 	}
@@ -107,7 +107,7 @@ class ConstantEvaluate {
 	def dispatch Optional<BigInteger> constantEvaluate(HDLArrayInit obj, HDLEvaluationContext context) {
 		return Optional::absent
 	}
-	
+
 	def dispatch Optional<BigInteger> constantEvaluate(IHDLObject obj, HDLEvaluationContext context) {
 		throw new IllegalArgumentException("Did not implement constantEvaulate for type:" + obj.classType)
 	}
@@ -197,8 +197,8 @@ class ConstantEvaluate {
 	}
 
 	def Optional<BigInteger> subEvaluate(HDLExpression container, HDLExpression left, HDLEvaluationContext context) {
-		if (left==null)
-			throw new IllegalArgumentException("Container:"+container+" has null left expression");
+		if (left === null)
+			throw new IllegalArgumentException("Container:" + container + " has null left expression");
 		val Optional<BigInteger> leftVal = left.constantEvaluate(context)
 		if (!leftVal.present) {
 			container.addMeta(SOURCE, left)
@@ -297,13 +297,13 @@ class ConstantEvaluate {
 			case SRA:
 				return Optional::of(leftVal.get.shiftRight(rightVal.get.intValue))
 			case SRL: {
-				val l=leftVal.get
+				val l = leftVal.get
 				if (l.signum < 0) {
-					val t=TypeExtension::typeOf(obj.left)
-					if (t.present){
-						val width=HDLPrimitives::getWidth(t.get,context)
-						if (width!==null){
-							val shiftWidth=rightVal.get.intValue
+					val t = TypeExtension::typeOf(obj.left)
+					if (t.present) {
+						val width = HDLPrimitives::getWidth(t.get, context)
+						if (width !== null) {
+							val shiftWidth = rightVal.get.intValue
 							val res = BigIntegerFrame::srl(l, width, shiftWidth)
 							return Optional::of(res)
 						}

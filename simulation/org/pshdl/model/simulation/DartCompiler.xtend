@@ -172,8 +172,8 @@ class DartCompiler implements ITypeOuptutProvider {
 							_regUpdates.clear();
 					«ENDIF»
 					«FOR f : em.frames»
-						«IF f.edgeNegDepRes === -1 && f.edgePosDepRes === -1 && f.predNegDepRes.length === 0 &&
-				f.predPosDepRes.length === 0»
+						«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 && f.predNegDepRes.length == 0 &&
+				f.predPosDepRes.length == 0»
 							_frame«f.uniqueID»();
 						«ELSE»
 							«f.edgeNegDepRes.createNegEdge(handled)»
@@ -193,7 +193,7 @@ class DartCompiler implements ITypeOuptutProvider {
 						_epsCycle++;
 						} while (!_regUpdates.isEmpty && !_disabledRegOutputlogic);
 					«ENDIF»
-					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) != null]»
+					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) !== null]»
 						«v.copyPrev»
 					«ENDFOR»
 				}
@@ -231,13 +231,13 @@ class DartCompiler implements ITypeOuptutProvider {
 	def predicates(Frame f) {
 		val sb = new StringBuilder
 		var first = true;
-		if (f.edgeNegDepRes !== -1) {
+		if (f.edgeNegDepRes != -1) {
 			sb.append(
 				'''«f.edgeNegDepRes.asInternal.idName(false, true)»_isFalling && !«f.edgeNegDepRes.asInternal.
 					idName(false, true)»_fallingIsHandled''')
 			first = false
 		}
-		if (f.edgePosDepRes !== -1) {
+		if (f.edgePosDepRes != -1) {
 			if (!first)
 				sb.append(' && ')
 			sb.append(
@@ -659,7 +659,7 @@ class DartCompiler implements ITypeOuptutProvider {
 				twoOp(sb, pos, "<<", a, b, inst.arg1)
 			case Instruction::srl:{
 				val targetSize=inst.arg1>>1;
-				if ((inst.arg1.bitwiseAnd(1))===1)
+				if ((inst.arg1.bitwiseAnd(1))==1)
 					sb.append('''int t«pos»=«signExtend('''_srl(t«b», t«a», «inst.arg1»)''', targetSize)»;''')
 				else
 					sb.append('''int t«pos»=(_srl(t«b», t«a», «inst.arg1»)) & «targetSize.asMask»;''')
@@ -694,14 +694,14 @@ class DartCompiler implements ITypeOuptutProvider {
 	
 	def twoOpValue(String op, int a,int b, int targetSizeWithType) {
 		val targetSize=(targetSizeWithType>>1)
-		if ((targetSizeWithType.bitwiseAnd(1))===1)
+		if ((targetSizeWithType.bitwiseAnd(1))==1)
 			return signExtend('''t«b» «op» t«a»''', targetSize)
 		return '''(t«b» «op» t«a») & «targetSize.asMask»'''
 	}
 	
 	def singleOpValue(String op, String cast, int a,int targetSizeWithType) {
 		val targetSize=(targetSizeWithType>>1)
-		if ((targetSizeWithType.bitwiseAnd(1))===1)
+		if ((targetSizeWithType.bitwiseAnd(1))==1)
 			return signExtend('''«op» t«a»''', targetSize)
 		return '''(«op» t«a») & «targetSize.asMask»'''
 	}
@@ -744,9 +744,9 @@ class DartCompiler implements ITypeOuptutProvider {
 
 	def decl(VariableInformation info, Boolean includePrev) {
 		'''
-			«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»int «info.idName(false, true)»_update=0;«ENDIF»
+			«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»int «info.idName(false, true)»_update=0;«ENDIF»
 			«info.dartType(true)» «info.idName(false, true)»=«initValue(info)»
-			«IF includePrev != null && includePrev»«info.dartType(true)» «info.idName(true, true)»=0;«ENDIF»
+			«IF includePrev !== null && includePrev»«info.dartType(true)» «info.idName(true, true)»=0;«ENDIF»
 			«IF info.isRegister»«info.dartType(true)» «info.idName(false, true)»$reg=«initValue(info)»«ENDIF»
 		'''
 	}

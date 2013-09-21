@@ -30,7 +30,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import java.util.Arrays;
 import java.util.Iterator;
-import javax.annotation.Nonnull;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
@@ -80,7 +79,6 @@ public class FullNameExtension {
   /**
    * Returns the {@link HDLQualifiedName} for the given obj.
    */
-  @Nonnull
   public static HDLQualifiedName fullNameOf(final IHDLObject obj) {
     HDLQualifiedName _xblockexpression = null;
     {

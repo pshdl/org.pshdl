@@ -193,7 +193,7 @@ public class SimulationTransformationExtension {
     }
     final Integer width = _xifexpression;
     HDLRegisterConfig _register = obj.getRegister();
-    final boolean isReg = (!Objects.equal(_register, null));
+    final boolean isReg = (_register != null);
     FluidFrame _fluidFrame = new FluidFrame("#null", false);
     final FluidFrame res = _fluidFrame;
     VariableInformation _variableInformation = new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null);
@@ -227,9 +227,9 @@ public class SimulationTransformationExtension {
     for (final HDLVariable hVar : _variables) {
       {
         HDLAnnotation _annotation = hVar.getAnnotation(HDLBuiltInAnnotations.clock);
-        boolean clock = (!Objects.equal(_annotation, null));
+        boolean clock = (_annotation != null);
         HDLAnnotation _annotation_1 = hVar.getAnnotation(HDLBuiltInAnnotations.reset);
-        boolean reset = (!Objects.equal(_annotation_1, null));
+        boolean reset = (_annotation_1 != null);
         HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
         final String varName = _fullNameOf.toString();
         LinkedList<Integer> _linkedList = new LinkedList<Integer>();
@@ -305,8 +305,8 @@ public class SimulationTransformationExtension {
         HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(clk);
         final String name = _fullNameOf_1.toString();
         HDLRegClockType _clockType = config.getClockType();
-        boolean _equals = Objects.equal(_clockType, HDLRegClockType.RISING);
-        if (_equals) {
+        boolean _tripleEquals_3 = (_clockType == HDLRegClockType.RISING);
+        if (_tripleEquals_3) {
           ArgumentedInstruction _argumentedInstruction_2 = new ArgumentedInstruction(Instruction.isRisingEdge, name);
           res.add(_argumentedInstruction_2);
         } else {
@@ -315,9 +315,9 @@ public class SimulationTransformationExtension {
         }
       }
       this.createInit(config, obj, context, res, true);
-      HDLRegResetActiveType _resetType_1 = config.getResetType();
-      boolean _equals_1 = Objects.equal(_resetType_1, HDLRegSyncType.ASYNC);
-      if (_equals_1) {
+      HDLRegSyncType _syncType_1 = config.getSyncType();
+      boolean _tripleEquals_4 = (_syncType_1 == HDLRegSyncType.ASYNC);
+      if (_tripleEquals_4) {
         this.createInit(config, obj, context, res, false);
       }
       res.add(Instruction.const0);
@@ -330,8 +330,8 @@ public class SimulationTransformationExtension {
         public String apply(final HDLAnnotation it) {
           String _xifexpression = null;
           String _value = it.getValue();
-          boolean _equals = Objects.equal(_value, null);
-          if (_equals) {
+          boolean _tripleEquals = (_value == null);
+          if (_tripleEquals) {
             String _name = it.getName();
             String _substring = _name.substring(1);
             _xifexpression = _substring;
@@ -425,18 +425,18 @@ public class SimulationTransformationExtension {
         String _plus = (InternalInformation.PRED_PREFIX + cName);
         FluidFrame _fluidFrame = new FluidFrame(_plus, false);
         final FluidFrame caseFrame = _fluidFrame;
-        boolean _notEquals = (!Objects.equal(predicate, null));
-        if (_notEquals) {
+        boolean _tripleNotEquals = (predicate != null);
+        if (_tripleNotEquals) {
           caseFrame.add(predicate);
         }
         caseFrame.createPredVar();
         HDLExpression _label = c.getLabel();
-        boolean _equals = Objects.equal(_label, null);
-        if (_equals) {
+        boolean _tripleEquals_1 = (_label == null);
+        if (_tripleEquals_1) {
           ArrayList<HDLSwitchCaseStatement> _cases_1 = obj.getCases();
           for (final HDLSwitchCaseStatement cSub : _cases_1) {
-            boolean _notEquals_1 = (!Objects.equal(cSub, c));
-            if (_notEquals_1) {
+            boolean _notEquals = (!Objects.equal(cSub, c));
+            if (_notEquals) {
               HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(cSub);
               String _string = _fullNameOf_2.toString();
               ArgumentedInstruction _argumentedInstruction = new ArgumentedInstruction(Instruction.negPredicate, _string);
@@ -458,8 +458,8 @@ public class SimulationTransformationExtension {
           } else {
             HDLExpression _label_2 = c.getLabel();
             HDLClass _classType_1 = _label_2.getClassType();
-            boolean _tripleEquals_1 = (_classType_1 == HDLClass.HDLEnumRef);
-            if (_tripleEquals_1) {
+            boolean _tripleEquals_2 = (_classType_1 == HDLClass.HDLEnumRef);
+            if (_tripleEquals_2) {
               HDLExpression _label_3 = c.getLabel();
               final HDLEnumRef ref = ((HDLEnumRef) _label_3);
               Optional<HDLEnum> _resolveHEnum = ref.resolveHEnum();

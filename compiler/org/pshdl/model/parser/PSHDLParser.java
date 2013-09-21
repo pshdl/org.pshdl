@@ -96,7 +96,6 @@ public class PSHDLParser {
 					} while (t.getChannel() != 0);
 					line = t.getLine();
 					charPositionInLine = t.getCharPositionInLine();
-					offendingSymbol = t;
 				}
 				totalOffset = t.getStartIndex();
 				final String text = t.getText();

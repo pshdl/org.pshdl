@@ -419,7 +419,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	'''
 
 	def boolean hasWriteDefs(Row row) {
-		row.definitions.findFirst[it.hasWrite] != null
+		row.definitions.findFirst[it.hasWrite] !== null
 	}
 
 	def boolean hasWrite(NamedElement ne) {

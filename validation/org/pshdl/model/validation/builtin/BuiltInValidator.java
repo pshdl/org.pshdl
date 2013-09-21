@@ -994,8 +994,8 @@ public class BuiltInValidator implements IHDLValidator {
 				if (!t.isPresent()) {
 					problems.add(new Problem(ARRAY_DIMENSIONS_NOT_CONSTANT, left));
 				}
-				if ((t != null) && (s != null))
-					if (!s.equals(t)) {
+				if ((t.isPresent()) && (s.isPresent()))
+					if (!s.get().equals(t.get())) {
 						problems.add(new Problem(ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS, ass));
 					}
 			}

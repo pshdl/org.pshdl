@@ -1,6 +1,5 @@
 package org.pshdl.model.utils;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
@@ -288,8 +287,8 @@ public class ProcessModel {
   }
   
   public ProcessModel merge(final ProcessModel model) {
-    boolean _notEquals = (!Objects.equal(model, null));
-    if (_notEquals) {
+    boolean _tripleNotEquals = (model != null);
+    if (_tripleNotEquals) {
       this.unclockedStatements.putAll(model.unclockedStatements);
       this.clockedStatements.putAll(model.clockedStatements);
     }

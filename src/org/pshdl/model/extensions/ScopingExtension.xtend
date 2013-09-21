@@ -177,7 +177,7 @@ class ScopingExtension {
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(HDLDirectGeneration gen) {
-		if (gen.getHIf==null)
+		if (gen.getHIf === null)
 			return Collections::emptyList
 		return Collections::singletonList(gen.getHIf)
 	}
@@ -188,21 +188,21 @@ class ScopingExtension {
 
 	def dispatch List<HDLVariable> doGetVariables(HDLInlineFunction obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		for (v:obj.args)
+		for (v : obj.args)
 			res.add(v.name)
 		return res
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLNativeFunction obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		for (v:obj.args)
+		for (v : obj.args)
 			res.add(v.name)
 		return res
 	}
-	
+
 	def dispatch List<HDLVariable> doGetVariables(HDLSubstituteFunction obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		for (v:obj.args)
+		for (v : obj.args)
 			res.add(v.name)
 		return res
 	}
@@ -438,7 +438,8 @@ class ScopingExtension {
 	}
 
 	def private static HDLVariable getVariable(HDLInterface hIf, String lastSegment) {
-		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).first
+		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).
+			first
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLEnum hEnum, HDLQualifiedName hVar) {

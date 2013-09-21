@@ -595,8 +595,8 @@ public class StringWriteExtension {
         }
         sb.append(_builder);
         HDLFunctionParameter _funcReturnSpec = func.getFuncReturnSpec();
-        boolean _notEquals = (!Objects.equal(_funcReturnSpec, null));
-        if (_notEquals) {
+        boolean _tripleNotEquals_1 = (_funcReturnSpec != null);
+        if (_tripleNotEquals_1) {
           String _simpleSpace = highlight.simpleSpace();
           StringBuilder _append_4 = sb.append(_simpleSpace);
           StringBuilder _append_5 = _append_4.append("=>");
@@ -610,8 +610,8 @@ public class StringWriteExtension {
       }
     }
     HDLVariable _name = func.getName();
-    boolean _notEquals_1 = (!Objects.equal(_name, null));
-    if (_notEquals_1) {
+    boolean _tripleNotEquals_2 = (_name != null);
+    if (_tripleNotEquals_2) {
       String _simpleSpace_2 = highlight.simpleSpace();
       StringBuilder _append_7 = sb.append(_simpleSpace_2);
       HDLVariable _name_1 = func.getName();
@@ -669,8 +669,8 @@ public class StringWriteExtension {
     String _simpleSpace_3 = highlight.simpleSpace();
     sb.append(_simpleSpace_3);
     HDLFunctionParameter _returnType = func.getReturnType();
-    boolean _notEquals = (!Objects.equal(_returnType, null));
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_returnType != null);
+    if (_tripleNotEquals) {
       HDLFunctionParameter _returnType_1 = func.getReturnType();
       String _string_1 = this.toString(_returnType_1, highlight);
       StringBuilder _append_2 = sb.append(_string_1);
@@ -788,8 +788,8 @@ public class StringWriteExtension {
     String _simpleSpace_2 = highlight.simpleSpace();
     _append_3.append(_simpleSpace_2);
     HDLFunctionParameter _returnType = func.getReturnType();
-    boolean _notEquals = (!Objects.equal(_returnType, null));
-    if (_notEquals) {
+    boolean _tripleNotEquals = (_returnType != null);
+    if (_tripleNotEquals) {
       HDLFunctionParameter _returnType_1 = func.getReturnType();
       String _string_1 = this.toString(_returnType_1, highlight);
       StringBuilder _append_4 = sb.append(_string_1);

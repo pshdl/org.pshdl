@@ -120,7 +120,7 @@ public abstract class AbstractHDLObject {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache = null;
 
 	@Override
 	public int hashCode() {

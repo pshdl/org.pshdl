@@ -55,14 +55,16 @@ public class SourceInfo {
 			this.endLine = startLine;
 			this.endPosInLine = startPosInLine;
 		}
-		this.length = tokens.getText(context.getSourceInterval()).length();
 		if (tokens != null) {
+			this.length = tokens.getText(context.getSourceInterval()).length();
 			final List<Token> hidden = tokens.getHiddenTokensToLeft(context.start.getTokenIndex(), PSHDLLangLexer.COMMENTS);
 			if (hidden != null) {
 				for (final Token token : hidden) {
 					comments.add(token.getText());
 				}
 			}
+		} else {
+			this.length = -1;
 		}
 	}
 

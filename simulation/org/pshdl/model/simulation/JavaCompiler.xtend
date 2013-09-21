@@ -54,7 +54,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 
 	private extension CommonCompilerExtension cce
 
-	new(){}
+	new() {
+	}
 
 	new(ExecutableModel em, boolean includeDebug, int cores) {
 		this.cce = new CommonCompilerExtension(em)
@@ -62,7 +63,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 		this.cores = cores;
 	}
 
-	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener, int cores) {
+	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener,
+		int cores) {
 		return new JavaCompiler(em, includeDebugListener, cores).compile(packageName, unitName).toString
 	}
 
@@ -70,7 +72,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		val Set<Integer> handled = new HashSet
 		handled.add(-1)
 		'''
-			«IF packageName != null»package «packageName»;«ENDIF»
+			«IF packageName !== null»package «packageName»;«ENDIF»
 			«imports»
 			
 			public class «unitName» implements IHDLInterpreter{
@@ -196,8 +198,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 							listener.startCycle(deltaCycle, epsCycle, this);
 					«ENDIF»
 					«FOR f : em.frames»
-						«IF f.edgeNegDepRes === -1 && f.edgePosDepRes === -1 && f.predNegDepRes.length === 0 &&
-				f.predPosDepRes.length === 0»
+						«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 && f.predNegDepRes.length == 0 &&
+				f.predPosDepRes.length == 0»
 							«f.frameName»();
 						«ELSE»
 							«f.edgeNegDepRes.createNegEdge(handled)»
@@ -221,7 +223,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 						epsCycle++;
 						} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);
 					«ENDIF»
-					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) != null]»
+					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) !== null]»
 						«v.copyPrev»
 					«ENDFOR»
 					«IF debug»
@@ -240,13 +242,13 @@ class JavaCompiler implements ITypeOuptutProvider {
 	def predicates(Frame f) {
 		val sb = new StringBuilder
 		var first = true;
-		if (f.edgeNegDepRes !== -1) {
+		if (f.edgeNegDepRes != -1) {
 			sb.append(
 				'''«f.edgeNegDepRes.asInternal.idName(false, false)»_isFalling && !«f.edgeNegDepRes.asInternal.
 					idName(false, false)»_fallingIsHandled''')
 			first = false
 		}
-		if (f.edgePosDepRes !== -1) {
+		if (f.edgePosDepRes != -1) {
 			if (!first)
 				sb.append(' && ')
 			sb.append(
@@ -490,7 +492,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 			«ELSE»
 				«info.javaType» «varName»=(«info.info.idName(prev, false)»«sb» >> «info.bitEnd») & «mask»;
 			«ENDIF»
-			«IF info.arrayIdx.length === info.info.dimensions.length»
+			«IF info.arrayIdx.length == info.info.dimensions.length»
 				«IF debug»
 					if (listener!=null)
 						listener.loadingInternal(«frameID», em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»«varName»?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(«varName»)«ENDIF», null);
@@ -504,7 +506,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 			«ELSE»
 				«info.javaType» «varName»= («info.info.idName(prev, false)»«arrAcc» >> «info.bitEnd») & «info.actualWidth.asMaskL»;
 			«ENDIF»
-			«IF info.arrayIdx.length === info.info.dimensions.length»
+			«IF info.arrayIdx.length == info.info.dimensions.length»
 				«IF debug»
 					if (listener!=null)
 						listener.loadingInternal(«frameID», em.internals[«intIdx.get(info.fullName)»], «IF info.isPred»«varName»?BigInteger.ONE:BigInteger.ZERO«ELSE»BigInteger.valueOf(«varName»)«ENDIF», null);
@@ -751,10 +753,10 @@ class JavaCompiler implements ITypeOuptutProvider {
 	}
 
 	def decl(VariableInformation info, Boolean includePrev) '''
-		«IF info.isPredicate || (prevMap.get(info.name) != null && prevMap.get(info.name))»private long «info.idName(false,
+		«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»private long «info.idName(false,
 			false)»_update=0;«ENDIF»
 		public «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»;
-		«IF includePrev != null && includePrev»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(true,
+		«IF includePrev !== null && includePrev»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(true,
 			false)»;«ENDIF»
 		«IF info.isRegister»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»$reg;«ENDIF»
 	'''
@@ -767,33 +769,35 @@ class JavaCompiler implements ITypeOuptutProvider {
 			import org.pshdl.interpreter.frames.*;
 		«ENDIF»
 	'''
-	
+
 	override getHookName() {
 		return "Java"
 	}
 
 	override getUsage() {
 		val options = new Options;
-		options.addOption('p',"pkg",true, "The package the generated source will use. If non is specified the package from the module is used")
-		options.addOption('d',"debug",false, "If debug is specified, the source will contain support for a IDebugListener")
-		return new MultiOption("Options for the "+hookName+" type:", null, options)
+		options.addOption('p', "pkg", true,
+			"The package the generated source will use. If non is specified the package from the module is used")
+		options.addOption('d', "debug", false,
+			"If debug is specified, the source will contain support for a IDebugListener")
+		return new MultiOption("Options for the " + hookName + " type:", null, options)
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
 		val moduleName = em.moduleName
 		val li = moduleName.lastIndexOf('.')
 		var String pkg = null
-		val optionPkg=cli.getOptionValue("pkg")
-		var boolean debug=cli.hasOption("debug")
-		if (optionPkg!=null){
-			pkg=optionPkg
-		} else if (li!==-1){
-			pkg=moduleName.substring(0,li-1)
+		val optionPkg = cli.getOptionValue("pkg")
+		var boolean debug = cli.hasOption("debug")
+		if (optionPkg !== null) {
+			pkg = optionPkg
+		} else if (li != -1) {
+			pkg = moduleName.substring(0, li - 1)
 		}
-		val unitName = moduleName.substring(li+1, moduleName.length);
+		val unitName = moduleName.substring(li + 1, moduleName.length);
 		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, pkg, unitName, debug, 1), moduleName, Collections::emptyList, em.source, hookName, true));
+			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, pkg, unitName, debug, 1), moduleName,
+				Collections::emptyList, em.source, hookName, true));
 	}
-	
-	
+
 }

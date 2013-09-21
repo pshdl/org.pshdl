@@ -1223,8 +1223,8 @@ public class BusAccess {
         }
       };
     NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(row.definitions, _function);
-    boolean _notEquals = (!Objects.equal(_findFirst, null));
-    return _notEquals;
+    boolean _tripleNotEquals = (_findFirst != null);
+    return _tripleNotEquals;
   }
   
   public boolean hasWrite(final NamedElement ne) {

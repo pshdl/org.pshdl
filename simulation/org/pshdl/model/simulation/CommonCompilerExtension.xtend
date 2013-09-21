@@ -95,7 +95,7 @@ class CommonCompilerExtension {
 	}
 
 	def isArray(VariableInformation information) {
-		information.dimensions.length !== 0
+		information.dimensions.length != 0
 	}
 
 	def arrayAccess(VariableInformation v) {
@@ -135,7 +135,7 @@ class CommonCompilerExtension {
 			val dim = dims.get(i)
 			if (i != 0)
 				varAccess.append('+')
-			val idx = if(arr == null) i else arr.get(i)
+			val idx = if(arr === null) i else arr.get(i)
 			if (dim != 1)
 				varAccess.append('''«varName»«idx»*«dim»''')
 			else
@@ -216,7 +216,7 @@ class CommonCompilerExtension {
 	def twoOpValue(String op, String cast, int a,int b, int targetSizeWithType) {
 		val targetSize=(targetSizeWithType>>1)
 		val shift=64-targetSize
-		if ((targetSizeWithType.bitwiseAnd(1))===1)
+		if ((targetSizeWithType.bitwiseAnd(1))==1)
 			return signExtend('''t«b» «op» t«a»''', cast, shift)
 		return '''(t«b» «op» t«a») & «targetSize.asMaskL»'''
 	}
@@ -224,7 +224,7 @@ class CommonCompilerExtension {
 	def singleOpValue(String op, String cast, int a,int targetSizeWithType) {
 		val targetSize=(targetSizeWithType>>1)
 		val shift=64-targetSize
-		if ((targetSizeWithType.bitwiseAnd(1))===1)
+		if ((targetSizeWithType.bitwiseAnd(1))==1)
 			return signExtend('''«op» t«a»''', cast, shift)
 		return '''(«op» t«a») & «targetSize.asMaskL»'''
 	}

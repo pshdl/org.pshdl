@@ -256,27 +256,27 @@ public class CCompiler implements ITypeOuptutProvider {
             boolean _and_1 = false;
             boolean _and_2 = false;
             int _minus_1 = (-1);
-            boolean _tripleEquals = (Integer.valueOf(f_1.edgeNegDepRes) == Integer.valueOf(_minus_1));
-            if (!_tripleEquals) {
+            boolean _equals = (f_1.edgeNegDepRes == _minus_1);
+            if (!_equals) {
               _and_2 = false;
             } else {
               int _minus_2 = (-1);
-              boolean _tripleEquals_1 = (Integer.valueOf(f_1.edgePosDepRes) == Integer.valueOf(_minus_2));
-              _and_2 = (_tripleEquals && _tripleEquals_1);
+              boolean _equals_1 = (f_1.edgePosDepRes == _minus_2);
+              _and_2 = (_equals && _equals_1);
             }
             if (!_and_2) {
               _and_1 = false;
             } else {
               int _length = f_1.predNegDepRes.length;
-              boolean _tripleEquals_2 = (Integer.valueOf(_length) == Integer.valueOf(0));
-              _and_1 = (_and_2 && _tripleEquals_2);
+              boolean _equals_2 = (_length == 0);
+              _and_1 = (_and_2 && _equals_2);
             }
             if (!_and_1) {
               _and = false;
             } else {
               int _length_1 = f_1.predPosDepRes.length;
-              boolean _tripleEquals_3 = (Integer.valueOf(_length_1) == Integer.valueOf(0));
-              _and = (_and_1 && _tripleEquals_3);
+              boolean _equals_3 = (_length_1 == 0);
+              _and = (_and_1 && _equals_3);
             }
             if (_and) {
               _builder.append("\t\t");
@@ -343,8 +343,8 @@ public class CCompiler implements ITypeOuptutProvider {
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
             public Boolean apply(final VariableInformation it) {
               Boolean _get = CCompiler.this.cce.prevMap.get(it.name);
-              boolean _notEquals = (!Objects.equal(_get, null));
-              return Boolean.valueOf(_notEquals);
+              boolean _tripleNotEquals = (_get != null);
+              return Boolean.valueOf(_tripleNotEquals);
             }
           };
         Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull_1, _function);
@@ -687,8 +687,8 @@ public class CCompiler implements ITypeOuptutProvider {
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
     int _minus = (-1);
-    boolean _tripleNotEquals = (Integer.valueOf(f.edgeNegDepRes) != Integer.valueOf(_minus));
-    if (_tripleNotEquals) {
+    boolean _notEquals = (f.edgeNegDepRes != _minus);
+    if (_notEquals) {
       StringConcatenation _builder = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
       String _idName = this.cce.idName(_asInternal, false, false);
@@ -702,8 +702,8 @@ public class CCompiler implements ITypeOuptutProvider {
       first = false;
     }
     int _minus_1 = (-1);
-    boolean _tripleNotEquals_1 = (Integer.valueOf(f.edgePosDepRes) != Integer.valueOf(_minus_1));
-    if (_tripleNotEquals_1) {
+    boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
+    if (_notEquals_1) {
       boolean _not = (!first);
       if (_not) {
         sb.append(" && ");
@@ -2136,8 +2136,8 @@ public class CCompiler implements ITypeOuptutProvider {
     final int targetSize = (targetSizeWithType >> 1);
     final int shift = (this.bitWidth - targetSize);
     int _bitwiseAnd = (targetSizeWithType & 1);
-    boolean _tripleEquals = (Integer.valueOf(_bitwiseAnd) == Integer.valueOf(1));
-    if (_tripleEquals) {
+    boolean _equals = (_bitwiseAnd == 1);
+    if (_equals) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("((");
       CharSequence _int_t = this.int_t();
@@ -2255,12 +2255,12 @@ public class CCompiler implements ITypeOuptutProvider {
       } else {
         boolean _and = false;
         Boolean _get = this.cce.prevMap.get(info.name);
-        boolean _notEquals = (!Objects.equal(_get, null));
-        if (!_notEquals) {
+        boolean _tripleNotEquals = (_get != null);
+        if (!_tripleNotEquals) {
           _and = false;
         } else {
           Boolean _get_1 = this.cce.prevMap.get(info.name);
-          _and = (_notEquals && (_get_1).booleanValue());
+          _and = (_tripleNotEquals && (_get_1).booleanValue());
         }
         _or = (_isPredicate || _and);
       }
@@ -2292,11 +2292,11 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLineIfNotEmpty();
     {
       boolean _and_1 = false;
-      boolean _notEquals_1 = (!Objects.equal(includePrev, null));
-      if (!_notEquals_1) {
+      boolean _tripleNotEquals_1 = (includePrev != null);
+      if (!_tripleNotEquals_1) {
         _and_1 = false;
       } else {
-        _and_1 = (_notEquals_1 && (includePrev).booleanValue());
+        _and_1 = (_tripleNotEquals_1 && (includePrev).booleanValue());
       }
       if (_and_1) {
         CharSequence _cType_1 = this.cType(info);
@@ -2378,8 +2378,8 @@ public class CCompiler implements ITypeOuptutProvider {
     final CCompiler comp = _cCompiler;
     final List<SideFile> sideFiles = Lists.<SideFile>newLinkedList();
     final String simFile = this.generateSimEncapsuation();
-    boolean _notEquals = (!Objects.equal(simFile, null));
-    if (_notEquals) {
+    boolean _tripleNotEquals = (simFile != null);
+    if (_tripleNotEquals) {
       byte[] _bytes = simFile.getBytes(Charsets.UTF_8);
       SideFile _sideFile = new SideFile("simEncapsulation.c", _bytes, true);
       sideFiles.add(_sideFile);
@@ -2393,8 +2393,8 @@ public class CCompiler implements ITypeOuptutProvider {
   
   public String generateSimEncapsuation() {
     final Unit unit = this.getUnit(this.cce.em);
-    boolean _equals = Objects.equal(unit, null);
-    if (_equals) {
+    boolean _tripleEquals = (unit == null);
+    if (_tripleEquals) {
       return null;
     }
     List<Row> _buildRows = MemoryModel.buildRows(unit);

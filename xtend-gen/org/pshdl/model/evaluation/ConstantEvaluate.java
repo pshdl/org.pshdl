@@ -102,8 +102,8 @@ public class ConstantEvaluate {
    * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
    */
   public static Optional<BigInteger> valueOf(final HDLExpression exp, final HDLEvaluationContext context) {
-    boolean _equals = Objects.equal(exp, null);
-    if (_equals) {
+    boolean _tripleEquals = (exp == null);
+    if (_tripleEquals) {
       return Optional.<BigInteger>absent();
     }
     return ConstantEvaluate.INST.constantEvaluate(exp, context);
@@ -291,8 +291,8 @@ public class ConstantEvaluate {
   }
   
   public Optional<BigInteger> subEvaluate(final HDLExpression container, final HDLExpression left, final HDLEvaluationContext context) {
-    boolean _equals = Objects.equal(left, null);
-    if (_equals) {
+    boolean _tripleEquals = (left == null);
+    if (_tripleEquals) {
       String _plus = ("Container:" + container);
       String _plus_1 = (_plus + " has null left expression");
       IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_1);
