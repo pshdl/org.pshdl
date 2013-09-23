@@ -875,6 +875,9 @@ public class Insulin {
 			if (hasRstRef && !hasRegister) {
 				insertSig(ms, unit, defRstVar, SignalInserted.RstInserted);
 			}
+			// Remove the insertion meta to allow the re-use of the same model
+			unit.resetMeta(SignalInserted.RstInserted);
+			unit.resetMeta(SignalInserted.ClkInserted);
 		}
 		return ms.apply(apply);
 	}
@@ -897,7 +900,7 @@ public class Insulin {
 
 		@Override
 		public boolean inherit() {
-			return true;
+			return false;
 		}
 	}
 

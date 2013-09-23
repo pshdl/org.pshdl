@@ -70,6 +70,8 @@ public interface IHDLObject {
 	 */
 	public <K> void addMeta(MetaAccess<K> key, K value);
 
+	public <K> void removeMeta(MetaAccess<K> key, K value);
+
 	/**
 	 * A boolean meta that can be used as a flag
 	 * 
@@ -78,6 +80,8 @@ public interface IHDLObject {
 	 *            <code>true</code> for this key
 	 */
 	public void setMeta(MetaAccess<Boolean> meta);
+
+	public void resetMeta(MetaAccess<Boolean> meta);
 
 	/**
 	 * Check whether the given {@link MetaAccess} is present on this object

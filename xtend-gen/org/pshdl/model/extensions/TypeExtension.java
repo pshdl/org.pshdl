@@ -395,8 +395,9 @@ public class TypeExtension {
       HDLPrimitive _setWidth = _uint.setWidth(_get);
       return Optional.<HDLPrimitive>of(_setWidth);
     }
-    boolean _isSigned = lit.isSigned();
-    HDLPrimitive _target = HDLPrimitive.target(_isSigned);
+    boolean _isNegative = lit.isNegative();
+    boolean _not = (!_isNegative);
+    HDLPrimitive _target = HDLPrimitive.target(_not);
     return Optional.<HDLPrimitive>of(_target);
   }
   

@@ -234,7 +234,7 @@ class TypeExtension {
 		val BigInteger bigVal = lit.valueAsBigInt
 		if (bigVal.bitLength > 31)
 			return Optional::of(HDLPrimitive::uint.setWidth(HDLLiteral::get(bigVal.bitLength)))
-		return Optional::of(HDLPrimitive::target(lit.signed))
+		return Optional::of(HDLPrimitive::target(!lit.negative))
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableRef ref) {

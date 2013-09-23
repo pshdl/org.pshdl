@@ -182,8 +182,18 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	}
 
 	@Override
+	public <K> void removeMeta(MetaAccess<K> key, K value) {
+		metaData.remove(key);
+	}
+
+	@Override
 	public void setMeta(MetaAccess<Boolean> meta) {
 		addMeta(meta, true);
+	}
+
+	@Override
+	public void resetMeta(MetaAccess<Boolean> meta) {
+		removeMeta(meta, true);
 	}
 
 	@Override

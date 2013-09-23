@@ -43,7 +43,8 @@ class ProcessModel {
 
 	def static ProcessModel toProcessModel(HDLUnit stmnt) {
 		val pm = new ProcessModel()
-		stmnt.getAllObjectsOf(typeof(HDLStatement), false).forEach[s|pm.merge(s.toProcessModel(DEF_PROCESS))]
+		stmnt.inits.forEach[s|pm.merge(s.toProcessModel(DEF_PROCESS))]
+		stmnt.statements.forEach[s|pm.merge(s.toProcessModel(DEF_PROCESS))]
 		return pm
 	}
 

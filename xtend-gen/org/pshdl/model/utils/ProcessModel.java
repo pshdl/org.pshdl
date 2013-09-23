@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.MapExtensions;
@@ -74,14 +73,22 @@ public class ProcessModel {
   public static ProcessModel toProcessModel(final HDLUnit stmnt) {
     ProcessModel _processModel = new ProcessModel();
     final ProcessModel pm = _processModel;
-    HDLStatement[] _allObjectsOf = stmnt.<HDLStatement>getAllObjectsOf(HDLStatement.class, false);
+    ArrayList<HDLStatement> _inits = stmnt.getInits();
     final Procedure1<HDLStatement> _function = new Procedure1<HDLStatement>() {
         public void apply(final HDLStatement s) {
           ProcessModel _processModel = ProcessModel.toProcessModel(s, ProcessModel.DEF_PROCESS);
           pm.merge(_processModel);
         }
       };
-    IterableExtensions.<HDLStatement>forEach(((Iterable<HDLStatement>)Conversions.doWrapArray(_allObjectsOf)), _function);
+    IterableExtensions.<HDLStatement>forEach(_inits, _function);
+    ArrayList<HDLStatement> _statements = stmnt.getStatements();
+    final Procedure1<HDLStatement> _function_1 = new Procedure1<HDLStatement>() {
+        public void apply(final HDLStatement s) {
+          ProcessModel _processModel = ProcessModel.toProcessModel(s, ProcessModel.DEF_PROCESS);
+          pm.merge(_processModel);
+        }
+      };
+    IterableExtensions.<HDLStatement>forEach(_statements, _function_1);
     return pm;
   }
   

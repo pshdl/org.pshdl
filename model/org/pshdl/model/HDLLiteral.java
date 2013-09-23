@@ -255,7 +255,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 		return new HDLLiteral().setStr(true).setVal(string);
 	}
 
-	public boolean isSigned() {
+	public boolean isNegative() {
 		return getVal().charAt(0) == '-';
 	}
 	// $CONTENT-END$
