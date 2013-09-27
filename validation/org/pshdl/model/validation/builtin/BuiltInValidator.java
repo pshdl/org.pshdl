@@ -104,6 +104,7 @@ public class BuiltInValidator implements IHDLValidator {
 			// TODO Validate bitWidth mismatch
 			checkBitWidthMismatch(pkg, problems, hContext);
 			checkAssignments(pkg, problems, hContext);
+			// TODO Disallow directions within sub scopes
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
 			// collision
