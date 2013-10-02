@@ -58,7 +58,7 @@ class DartCompiler implements ITypeOuptutProvider {
 	new(){}
 
 	new(ExecutableModel em) {
-		this.cce = new CommonCompilerExtension(em)
+		this.cce = new CommonCompilerExtension(em, -1)
 		epsWidth=Integer::highestOneBit(prevMap.size)+1
 	}
 

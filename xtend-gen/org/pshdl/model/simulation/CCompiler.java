@@ -82,14 +82,14 @@ public class CCompiler implements ITypeOuptutProvider {
   }
   
   public CCompiler(final ExecutableModel em) {
-    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
-    this.cce = _commonCompilerExtension;
     boolean _lessEqualsThan = (em.maxDataWidth <= 32);
     if (_lessEqualsThan) {
       this.bitWidth = 32;
     } else {
       this.bitWidth = 64;
     }
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, this.bitWidth);
+    this.cce = _commonCompilerExtension;
   }
   
   public static String doCompileMainC(final ExecutableModel em) {
@@ -396,7 +396,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t");
             {
               boolean _and = false;
-              boolean _notEquals = (v.width != 64);
+              boolean _notEquals = (v.width != this.bitWidth);
               if (!_notEquals) {
                 _and = false;
               } else {
@@ -440,7 +440,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t");
             {
               boolean _and_1 = false;
-              boolean _notEquals_1 = (v.width != 64);
+              boolean _notEquals_1 = (v.width != this.bitWidth);
               if (!_notEquals_1) {
                 _and_1 = false;
               } else {
@@ -577,7 +577,7 @@ public class CCompiler implements ITypeOuptutProvider {
               if (_isPredicate_3) {
                 _builder.append("?1:0");
               } else {
-                boolean _notEquals_2 = (v_3.width != 64);
+                boolean _notEquals_2 = (v_3.width != this.bitWidth);
                 if (_notEquals_2) {
                   _builder.append(" & ");
                   CharSequence _asMaskL_2 = this.cce.asMaskL(v_3.width);
@@ -611,7 +611,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("]");
             {
               boolean _and_2 = false;
-              boolean _notEquals_3 = (v_3.width != 64);
+              boolean _notEquals_3 = (v_3.width != this.bitWidth);
               if (!_notEquals_3) {
                 _and_2 = false;
               } else {

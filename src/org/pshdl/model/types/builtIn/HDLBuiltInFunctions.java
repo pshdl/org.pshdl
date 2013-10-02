@@ -31,6 +31,7 @@ import java.util.*;
 
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
+import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import org.pshdl.model.utils.services.*;
@@ -41,7 +42,7 @@ import com.google.common.collect.*;
 public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	public static enum BuiltInFunctions {
-		highZ
+		highZ, min, max, abs
 	}
 
 	@Override
@@ -50,6 +51,12 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 		try {
 			final BuiltInFunctions func = BuiltInFunctions.valueOf(name);
 			switch (func) {
+			case min:
+			case max:
+				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+			case abs:
+				return new HDLTypeInferenceInfo(HDLPrimitive.getNatural(), HDLPrimitive.getInteger());
+
 			case highZ:
 				if (function.getParams().size() == 1)
 					return new HDLTypeInferenceInfo(HDLPrimitive.getBit(), HDLPrimitive.getNatural());
@@ -63,6 +70,13 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	@Override
 	public Optional<BigInteger> evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
 		switch (getFuncEnum(function)) {
+		case abs:
+			return Optional.of(args.get(0).abs());
+		case min:
+			return Optional.of(args.get(0).min(args.get(1)));
+		case max:
+			return Optional.of(args.get(0).max(args.get(1)));
+
 		case highZ:
 			return Optional.absent();
 		}
@@ -77,11 +91,37 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	@Override
 	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context) {
+		if (function.getParams().isEmpty())
+			return null;
+		final Optional<Range<BigInteger>> zeroArg = RangeExtension.rangeOf(function.getParams().get(0), context);
+		if (!zeroArg.isPresent())
+			return null;
+		final Range<BigInteger> zeroRange = zeroArg.get();
 		switch (getFuncEnum(function)) {
+		case abs:
+			final BigInteger from = zeroRange.lowerEndpoint().abs();
+			final BigInteger to = zeroRange.upperEndpoint().abs();
+			return asRange(from, to);
+		case min:
+			final Optional<Range<BigInteger>> oneArgMin = RangeExtension.rangeOf(function.getParams().get(1), context);
+			if (!oneArgMin.isPresent())
+				return null;
+			return asRange(zeroRange.lowerEndpoint().min(oneArgMin.get().lowerEndpoint()), zeroRange.upperEndpoint().min(oneArgMin.get().upperEndpoint()));
+		case max:
+			final Optional<Range<BigInteger>> oneArgMax = RangeExtension.rangeOf(function.getParams().get(1), context);
+			if (!oneArgMax.isPresent())
+				return null;
+			return asRange(zeroRange.lowerEndpoint().max(oneArgMax.get().lowerEndpoint()), zeroRange.upperEndpoint().max(oneArgMax.get().upperEndpoint()));
 		case highZ:
 			return null;
 		}
 		return null;
+	}
+
+	public Range<BigInteger> asRange(BigInteger from, BigInteger to) {
+		if (from.compareTo(to) > 0)
+			return Range.closed(to, from);
+		return Range.closed(from, to);
 	}
 
 	@Override
@@ -101,6 +141,26 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 		case highZ: {
 			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
 					"Returns a high Z. This is useful for tri-state busses, high z however is not supported in PSHDL as computational value.", "highZ", false, FunctionType.NATIVE);
+			return fi;
+		}
+		case abs: {
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
+					"Returns the absolute value of a number (makes it positive)", "uint - the absolute (positive) value of a number", false, FunctionType.NATIVE);
+			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
+			return fi;
+		}
+		case max: {
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the bigger value of two numbers",
+					"int - the bigger value of two numbers", false, FunctionType.NATIVE);
+			fi.arguments.put("int numberA", "The first number");
+			fi.arguments.put("int numberB", "The second number");
+			return fi;
+		}
+		case min: {
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the smaller value of two numbers",
+					"int - the smaller value of two numbers", false, FunctionType.NATIVE);
+			fi.arguments.put("int numberA", "The first number");
+			fi.arguments.put("int numberB", "The second number");
 			return fi;
 		}
 		}

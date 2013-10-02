@@ -73,12 +73,12 @@ class CCompiler implements ITypeOuptutProvider {
 	}
 
 	new(ExecutableModel em) {
-		this.cce = new CommonCompilerExtension(em)
 		if (em.maxDataWidth <= 32) {
 			bitWidth = 32;
 		} else {
 			bitWidth = 64;
 		}
+		this.cce = new CommonCompilerExtension(em, bitWidth)
 	}
 
 	def static String doCompileMainC(ExecutableModel em) {
@@ -173,12 +173,12 @@ class CCompiler implements ITypeOuptutProvider {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
 						case «varIdx.get(v.name)»: 
-							«IF v.width != 64 && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+							«IF v.width != bitWidth && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
 							«v.idName(false, false)»=value«IF v.predicate»==0?false:true«ENDIF»;
 							break;
 					«ELSE»
 						case «varIdx.get(v.name)»: 
-							«IF v.width != 64 && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+							«IF v.width != bitWidth && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
 							va_start(va_arrayIdx, value);
 							«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]=value;
 							va_end(va_arrayIdx);
@@ -209,11 +209,11 @@ class CCompiler implements ITypeOuptutProvider {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: return «v.idName(false, false)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.asMaskL»«ENDIF»;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»«IF v.predicate»?1:0«ELSEIF v.width != bitWidth» & «v.width.asMaskL»«ENDIF»;
 					«ELSE»
 						case «varIdx.get(v.name)»: {
 							va_start(va_arrayIdx, idx);
-							«uint_t» res=«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]«IF v.width != 64 && !v.predicate» & «v.width.
+							«uint_t» res=«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]«IF v.width != bitWidth && !v.predicate» & «v.width.
 			asMaskL»«ENDIF»;
 							va_end(va_arrayIdx);
 							return res;

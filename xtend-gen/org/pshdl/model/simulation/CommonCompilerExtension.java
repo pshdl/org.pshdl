@@ -47,8 +47,11 @@ public class CommonCompilerExtension {
   
   public boolean hasClock;
   
-  public CommonCompilerExtension(final ExecutableModel em) {
+  public int bitWidth;
+  
+  public CommonCompilerExtension(final ExecutableModel em, final int bitWidth) {
     this.em = em;
+    this.bitWidth = bitWidth;
     int _length = em.variables.length;
     ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
     for (final Integer i : _doubleDotLessThan) {
@@ -439,7 +442,7 @@ public class CommonCompilerExtension {
   
   public CharSequence twoOpValue(final String op, final String cast, final int a, final int b, final int targetSizeWithType) {
     final int targetSize = (targetSizeWithType >> 1);
-    final int shift = (64 - targetSize);
+    final int shift = (this.bitWidth - targetSize);
     int _bitwiseAnd = (targetSizeWithType & 1);
     boolean _equals = (_bitwiseAnd == 1);
     if (_equals) {
@@ -467,7 +470,7 @@ public class CommonCompilerExtension {
   
   public CharSequence singleOpValue(final String op, final String cast, final int a, final int targetSizeWithType) {
     final int targetSize = (targetSizeWithType >> 1);
-    final int shift = (64 - targetSize);
+    final int shift = (this.bitWidth - targetSize);
     int _bitwiseAnd = (targetSizeWithType & 1);
     boolean _equals = (_bitwiseAnd == 1);
     if (_equals) {

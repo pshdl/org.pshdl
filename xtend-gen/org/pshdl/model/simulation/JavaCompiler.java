@@ -70,7 +70,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
   }
   
   public JavaCompiler(final ExecutableModel em, final boolean includeDebug, final int cores) {
-    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
     this.cce = _commonCompilerExtension;
     this.debug = includeDebug;
     this.cores = cores;

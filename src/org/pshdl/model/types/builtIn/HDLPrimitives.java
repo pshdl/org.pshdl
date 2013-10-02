@@ -399,7 +399,7 @@ public class HDLPrimitives {
 				return leftW;
 			if ((leftW == null) && (rightW != null))
 				return rightW;
-			return PSHDLLib.MAX_UINT.getReplacementExpressionArgs(exp, leftW, rightW);
+			return PSHDLLib.MAX_UINT.getCall(leftW, rightW);
 		case MUL:
 			if ((leftW == null) && (rightW == null))
 				return null;

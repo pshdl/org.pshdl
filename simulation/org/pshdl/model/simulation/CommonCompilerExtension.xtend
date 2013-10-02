@@ -17,9 +17,11 @@ class CommonCompilerExtension {
 	public Map<String, Integer> intIdx = new HashMap
 	public Map<String, Boolean> prevMap = new HashMap
 	public boolean hasClock
+	public int bitWidth
 
-	new(ExecutableModel em) {
+	new(ExecutableModel em, int bitWidth) {
 		this.em = em
+		this.bitWidth=bitWidth
 		for (i : 0 ..< em.variables.length) {
 			varIdx.put(em.variables.get(i).name, i)
 		}
@@ -215,7 +217,7 @@ class CommonCompilerExtension {
 	
 	def twoOpValue(String op, String cast, int a,int b, int targetSizeWithType) {
 		val targetSize=(targetSizeWithType>>1)
-		val shift=64-targetSize
+		val shift=bitWidth-targetSize
 		if ((targetSizeWithType.bitwiseAnd(1))==1)
 			return signExtend('''t«b» «op» t«a»''', cast, shift)
 		return '''(t«b» «op» t«a») & «targetSize.asMaskL»'''
@@ -223,7 +225,7 @@ class CommonCompilerExtension {
 	
 	def singleOpValue(String op, String cast, int a,int targetSizeWithType) {
 		val targetSize=(targetSizeWithType>>1)
-		val shift=64-targetSize
+		val shift=bitWidth-targetSize
 		if ((targetSizeWithType.bitwiseAnd(1))==1)
 			return signExtend('''«op» t«a»''', cast, shift)
 		return '''(«op» t«a») & «targetSize.asMaskL»'''

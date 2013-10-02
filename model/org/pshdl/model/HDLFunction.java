@@ -30,6 +30,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import org.pshdl.model.extensions.*;
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
@@ -173,13 +174,17 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			}
 		}
 		final T newExp = msExp.apply(orig);
-		final Iterator<IHDLObject> iterator = newExp.deepIterator();
+		final Iterator<IHDLObject> iterator = newExp.iterator();
 		while (iterator.hasNext()) {
 			final IHDLObject obj = iterator.next();
 			obj.addMeta(META, origin);
 		}
 		newExp.addMeta(META, origin);
 		return newExp;
+	}
+
+	public HDLFunctionCall getCall(HDLExpression... args) {
+		return new HDLFunctionCall().setName(FullNameExtension.fullNameOf(this)).setParams(Arrays.asList(args));
 	}
 	// $CONTENT-END$
 

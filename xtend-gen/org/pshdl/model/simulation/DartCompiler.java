@@ -69,7 +69,8 @@ public class DartCompiler implements ITypeOuptutProvider {
   }
   
   public DartCompiler(final ExecutableModel em) {
-    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em);
+    int _minus = (-1);
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, _minus);
     this.cce = _commonCompilerExtension;
     int _size = this.cce.prevMap.size();
     int _highestOneBit = Integer.highestOneBit(_size);

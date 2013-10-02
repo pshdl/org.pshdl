@@ -58,7 +58,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 	}
 
 	new(ExecutableModel em, boolean includeDebug, int cores) {
-		this.cce = new CommonCompilerExtension(em)
+		this.cce = new CommonCompilerExtension(em, 64)
 		this.debug = includeDebug
 		this.cores = cores;
 	}
