@@ -122,7 +122,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		try {
 			final ExecutableModel em = createExecutable(unit, src);
 			if (!cli.hasOption("noEm")) {
-				IOUtil.writeExecutableModel(new Date().getTime(), em, new File(dir, unitName.toString() + ".em"));
+				IOUtil.writeExecutableModel(System.currentTimeMillis(), em, new File(dir, unitName.toString() + ".em"));
 			}
 			if (type != null) {
 				final ITypeOuptutProvider ito = providers.get(type.toLowerCase());
