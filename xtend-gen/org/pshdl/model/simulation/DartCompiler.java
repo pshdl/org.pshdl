@@ -78,14 +78,15 @@ public class DartCompiler implements ITypeOuptutProvider {
     this.epsWidth = _plus;
   }
   
-  public static List<CompileResult> doCompile(final ExecutableModel em, final String unitName, final String moduleName, final Set<Problem> syntaxProblems) {
+  public static List<CompileResult> doCompile(final ExecutableModel em, final String unitName, final Set<Problem> syntaxProblems) {
     DartCompiler _dartCompiler = new DartCompiler(em);
     final DartCompiler comp = _dartCompiler;
     CharSequence _compile = comp.compile(unitName);
     String _string = _compile.toString();
     List<SideFile> _emptyList = Collections.<SideFile>emptyList();
     String _hookName = comp.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, moduleName, _emptyList, em.source, _hookName, true);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, 
+      em.moduleName, _emptyList, em.source, _hookName, true);
     return Lists.<CompileResult>newArrayList(_compileResult);
   }
   
@@ -2732,7 +2733,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       int _length = moduleName.length();
       int _minus = (_length - 1);
       final String unitName = moduleName.substring(_plus, _minus);
-      List<CompileResult> _doCompile = DartCompiler.doCompile(em, unitName, moduleName, syntaxProblems);
+      List<CompileResult> _doCompile = DartCompiler.doCompile(em, unitName, syntaxProblems);
       _xblockexpression = (_doCompile);
     }
     return _xblockexpression;

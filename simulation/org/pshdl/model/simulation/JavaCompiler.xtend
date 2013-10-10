@@ -61,11 +61,11 @@ class JavaCompiler implements ITypeOuptutProvider {
 		this.debug = includeDebug
 	}
 	
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean debug, String moduleName) {
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean debug) {
 		val comp=new JavaCompiler(em, debug)
 		val code=comp.compile(pkg, unitName).toString
 		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, code, moduleName,
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName,
 				Collections::emptyList, em.source, comp.hookName, true))
 	}
 
@@ -796,7 +796,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 			pkg = moduleName.substring(0, li - 1)
 		}
 		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName, debug, moduleName);
+		doCompile(syntaxProblems, em, pkg, unitName, debug);
 	}
 
 }

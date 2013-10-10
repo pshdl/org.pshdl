@@ -63,11 +63,11 @@ class DartCompiler implements ITypeOuptutProvider {
 		epsWidth = Integer::highestOneBit(prevMap.size) + 1
 	}
 
-	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName, String moduleName, Set<Problem> syntaxProblems) {
+	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName, Set<Problem> syntaxProblems) {
 		val comp=new DartCompiler(em)
 		return Lists::newArrayList(
 			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName).toString,
-				moduleName, Collections::emptyList, em.source, comp.hookName, true));
+				em.moduleName, Collections::emptyList, em.source, comp.hookName, true));
 	}
 
 	def compile(String unitName) {
@@ -779,7 +779,7 @@ import '../simulation_comm.dart';
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
 		val moduleName = em.moduleName
 		val unitName = moduleName.substring(moduleName.lastIndexOf('.') + 1, moduleName.length - 1);
-		doCompile(em, unitName, moduleName, syntaxProblems)
+		doCompile(em, unitName, syntaxProblems)
 	}
 
 }

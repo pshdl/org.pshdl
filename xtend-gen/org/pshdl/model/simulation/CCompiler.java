@@ -2416,8 +2416,8 @@ public class CCompiler implements ITypeOuptutProvider {
           boolean _startsWith = a.startsWith("busDescription");
           if (_startsWith) {
             Splitter _limit = annoSplitter.limit(2);
-            List<String> _splitToList = _limit.splitToList(a);
-            final String value = _splitToList.get(1);
+            Iterable<String> _split = _limit.split(a);
+            final String value = IterableExtensions.<String>last(_split);
             HashSet<Problem> _hashSet = new HashSet<Problem>();
             Unit _parseUnit = MemoryModelAST.parseUnit(value, _hashSet, 0);
             unit = _parseUnit;

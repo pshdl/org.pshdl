@@ -74,14 +74,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
     this.debug = includeDebug;
   }
   
-  public static ArrayList<CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean debug, final String moduleName) {
+  public static ArrayList<CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean debug) {
     JavaCompiler _javaCompiler = new JavaCompiler(em, debug);
     final JavaCompiler comp = _javaCompiler;
     CharSequence _compile = comp.compile(pkg, unitName);
     final String code = _compile.toString();
     List<SideFile> _emptyList = Collections.<SideFile>emptyList();
     String _hookName = comp.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, code, moduleName, _emptyList, em.source, _hookName, true);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, code, em.moduleName, _emptyList, em.source, _hookName, true);
     return Lists.<CompileResult>newArrayList(_compileResult);
   }
   
@@ -2788,7 +2788,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       int _plus = (li + 1);
       int _length = moduleName.length();
       final String unitName = moduleName.substring(_plus, _length);
-      ArrayList<CompileResult> _doCompile = JavaCompiler.doCompile(syntaxProblems, em, pkg, unitName, debug, moduleName);
+      ArrayList<CompileResult> _doCompile = JavaCompiler.doCompile(syntaxProblems, em, pkg, unitName, debug);
       _xblockexpression = (_doCompile);
     }
     return _xblockexpression;

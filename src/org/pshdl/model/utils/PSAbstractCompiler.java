@@ -378,7 +378,7 @@ public class PSAbstractCompiler {
 					}
 				}
 			}
-			throw new IllegalArgumentException("No modules found for: " + file);
+			return null;
 		}
 		final HDLPackage pkg = pkgs.values().iterator().next();
 		for (final HDLUnit unit : pkg.getUnits()) {

@@ -718,7 +718,7 @@ class CCompiler implements ITypeOuptutProvider {
 		if (em.annotations !== null) {
 			for (a : em.annotations) {
 				if (a.startsWith("busDescription")) {
-					val value = annoSplitter.limit(2).splitToList(a).get(1)
+					val value = annoSplitter.limit(2).split(a).last
 					unit = MemoryModelAST.parseUnit(value, new HashSet, 0)
 				}
 			}
