@@ -78,10 +78,15 @@ public class DartCompiler implements ITypeOuptutProvider {
     this.epsWidth = _plus;
   }
   
-  public static String doCompile(final ExecutableModel em, final String unitName) {
+  public static List<CompileResult> doCompile(final ExecutableModel em, final String unitName, final String moduleName, final Set<Problem> syntaxProblems) {
     DartCompiler _dartCompiler = new DartCompiler(em);
-    CharSequence _compile = _dartCompiler.compile(unitName);
-    return _compile.toString();
+    final DartCompiler comp = _dartCompiler;
+    CharSequence _compile = comp.compile(unitName);
+    String _string = _compile.toString();
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
+    String _hookName = comp.getHookName();
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, moduleName, _emptyList, em.source, _hookName, true);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
   
   public CharSequence compile(final String unitName) {
@@ -739,7 +744,8 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.append(_idName_2, "");
       _builder_1.append("_isRising&& !");
       InternalInformation _asInternal_3 = this.cce.asInternal(f.edgePosDepRes);
-      String _idName_3 = this.cce.idName(_asInternal_3, false, true);
+      String _idName_3 = this.cce.idName(_asInternal_3, false, 
+        true);
       _builder_1.append(_idName_3, "");
       _builder_1.append("_risingIsHandled");
       sb.append(_builder_1);
@@ -2718,16 +2724,17 @@ public class DartCompiler implements ITypeOuptutProvider {
   }
   
   public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    final String moduleName = em.moduleName;
-    int _lastIndexOf = moduleName.lastIndexOf(".");
-    int _plus = (_lastIndexOf + 1);
-    int _length = moduleName.length();
-    int _minus = (_length - 1);
-    final String unitName = moduleName.substring(_plus, _minus);
-    String _doCompile = DartCompiler.doCompile(em, unitName);
-    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
-    String _hookName = this.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName, true);
-    return Lists.<CompileResult>newArrayList(_compileResult);
+    List<CompileResult> _xblockexpression = null;
+    {
+      final String moduleName = em.moduleName;
+      int _lastIndexOf = moduleName.lastIndexOf(".");
+      int _plus = (_lastIndexOf + 1);
+      int _length = moduleName.length();
+      int _minus = (_length - 1);
+      final String unitName = moduleName.substring(_plus, _minus);
+      List<CompileResult> _doCompile = DartCompiler.doCompile(em, unitName, moduleName, syntaxProblems);
+      _xblockexpression = (_doCompile);
+    }
+    return _xblockexpression;
   }
 }

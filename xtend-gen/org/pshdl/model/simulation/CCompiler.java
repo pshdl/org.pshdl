@@ -2373,11 +2373,11 @@ public class CCompiler implements ITypeOuptutProvider {
     return _multiOption;
   }
   
-  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+  public static List<CompileResult> doCompile(final ExecutableModel em, final Set<Problem> syntaxProblems) {
     CCompiler _cCompiler = new CCompiler(em);
     final CCompiler comp = _cCompiler;
     final List<SideFile> sideFiles = Lists.<SideFile>newLinkedList();
-    final String simFile = this.generateSimEncapsuation();
+    final String simFile = comp.generateSimEncapsuation();
     boolean _tripleNotEquals = (simFile != null);
     if (_tripleNotEquals) {
       byte[] _bytes = simFile.getBytes(Charsets.UTF_8);
@@ -2386,9 +2386,14 @@ public class CCompiler implements ITypeOuptutProvider {
     }
     CharSequence _compile = comp.compile();
     String _string = _compile.toString();
-    String _hookName = this.getHookName();
+    String _hookName = comp.getHookName();
     CompileResult _compileResult = new CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, true);
     return Lists.<CompileResult>newArrayList(_compileResult);
+  }
+  
+  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    List<CompileResult> _doCompile = CCompiler.doCompile(em, syntaxProblems);
+    return _doCompile;
   }
   
   public String generateSimEncapsuation() {

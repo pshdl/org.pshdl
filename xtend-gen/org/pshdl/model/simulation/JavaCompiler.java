@@ -28,6 +28,7 @@ package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,25 +62,27 @@ import org.pshdl.model.validation.Problem;
 public class JavaCompiler implements ITypeOuptutProvider {
   private boolean debug;
   
-  private int cores;
-  
   @Extension
   private CommonCompilerExtension cce;
   
   public JavaCompiler() {
   }
   
-  public JavaCompiler(final ExecutableModel em, final boolean includeDebug, final int cores) {
+  public JavaCompiler(final ExecutableModel em, final boolean includeDebug) {
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
     this.cce = _commonCompilerExtension;
     this.debug = includeDebug;
-    this.cores = cores;
   }
   
-  public static String doCompile(final ExecutableModel em, final String packageName, final String unitName, final boolean includeDebugListener, final int cores) {
-    JavaCompiler _javaCompiler = new JavaCompiler(em, includeDebugListener, cores);
-    CharSequence _compile = _javaCompiler.compile(packageName, unitName);
-    return _compile.toString();
+  public static ArrayList<CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean debug, final String moduleName) {
+    JavaCompiler _javaCompiler = new JavaCompiler(em, debug);
+    final JavaCompiler comp = _javaCompiler;
+    CharSequence _compile = comp.compile(pkg, unitName);
+    final String code = _compile.toString();
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
+    String _hookName = comp.getHookName();
+    CompileResult _compileResult = new CompileResult(syntaxProblems, code, moduleName, _emptyList, em.source, _hookName, true);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
   
   public CharSequence compile(final String packageName, final String unitName) {
@@ -2763,30 +2766,31 @@ public class JavaCompiler implements ITypeOuptutProvider {
   }
   
   public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    final String moduleName = em.moduleName;
-    final int li = moduleName.lastIndexOf(".");
-    String pkg = null;
-    final String optionPkg = cli.getOptionValue("pkg");
-    boolean debug = cli.hasOption("debug");
-    boolean _tripleNotEquals = (optionPkg != null);
-    if (_tripleNotEquals) {
-      pkg = optionPkg;
-    } else {
-      int _minus = (-1);
-      boolean _notEquals = (li != _minus);
-      if (_notEquals) {
-        int _minus_1 = (li - 1);
-        String _substring = moduleName.substring(0, _minus_1);
-        pkg = _substring;
+    ArrayList<CompileResult> _xblockexpression = null;
+    {
+      final String moduleName = em.moduleName;
+      final int li = moduleName.lastIndexOf(".");
+      String pkg = null;
+      final String optionPkg = cli.getOptionValue("pkg");
+      boolean debug = cli.hasOption("debug");
+      boolean _tripleNotEquals = (optionPkg != null);
+      if (_tripleNotEquals) {
+        pkg = optionPkg;
+      } else {
+        int _minus = (-1);
+        boolean _notEquals = (li != _minus);
+        if (_notEquals) {
+          int _minus_1 = (li - 1);
+          String _substring = moduleName.substring(0, _minus_1);
+          pkg = _substring;
+        }
       }
+      int _plus = (li + 1);
+      int _length = moduleName.length();
+      final String unitName = moduleName.substring(_plus, _length);
+      ArrayList<CompileResult> _doCompile = JavaCompiler.doCompile(syntaxProblems, em, pkg, unitName, debug, moduleName);
+      _xblockexpression = (_doCompile);
     }
-    int _plus = (li + 1);
-    int _length = moduleName.length();
-    final String unitName = moduleName.substring(_plus, _length);
-    String _doCompile = JavaCompiler.doCompile(em, pkg, unitName, debug, 1);
-    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
-    String _hookName = this.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _doCompile, moduleName, _emptyList, em.source, _hookName, true);
-    return Lists.<CompileResult>newArrayList(_compileResult);
+    return _xblockexpression;
   }
 }

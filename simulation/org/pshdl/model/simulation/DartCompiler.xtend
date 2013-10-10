@@ -55,15 +55,19 @@ class DartCompiler implements ITypeOuptutProvider {
 	private extension CommonCompilerExtension cce
 	private int epsWidth
 
-	new(){}
+	new() {
+	}
 
 	new(ExecutableModel em) {
 		this.cce = new CommonCompilerExtension(em, -1)
-		epsWidth=Integer::highestOneBit(prevMap.size)+1
+		epsWidth = Integer::highestOneBit(prevMap.size) + 1
 	}
 
-	def static String doCompile(ExecutableModel em, String unitName) {
-		return new DartCompiler(em).compile(unitName).toString
+	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName, String moduleName, Set<Problem> syntaxProblems) {
+		val comp=new DartCompiler(em)
+		return Lists::newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName).toString,
+				moduleName, Collections::emptyList, em.source, comp.hookName, true));
 	}
 
 	def compile(String unitName) {
@@ -241,8 +245,8 @@ class DartCompiler implements ITypeOuptutProvider {
 			if (!first)
 				sb.append(' && ')
 			sb.append(
-				'''«f.edgePosDepRes.asInternal.idName(false, true)»_isRising&& !«f.edgePosDepRes.asInternal.
-					idName(false, true)»_risingIsHandled''')
+				'''«f.edgePosDepRes.asInternal.idName(false, true)»_isRising&& !«f.edgePosDepRes.asInternal.idName(false,
+					true)»_risingIsHandled''')
 			first = false
 		}
 		for (p : f.predNegDepRes) {
@@ -412,11 +416,11 @@ class DartCompiler implements ITypeOuptutProvider {
 		}
 		val clock = if(v.isClock) ", clock:true" else ""
 		val reset = if(v.isReset) ", reset:true" else ""
-		var type="INVALID"
-		switch (v.type){
-			case VariableInformation$Type::BIT: type="Port.TYPE_BIT"
-			case VariableInformation$Type::INT: type="Port.TYPE_INT"
-			case VariableInformation$Type::UINT: type="Port.TYPE_UINT"
+		var type = "INVALID"
+		switch (v.type) {
+			case VariableInformation$Type::BIT: type = "Port.TYPE_BIT"
+			case VariableInformation$Type::INT: type = "Port.TYPE_INT"
+			case VariableInformation$Type::UINT: type = "Port.TYPE_UINT"
 		}
 		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]", "\\\\\\$")»", «v.width», «type»«dims»«clock»«reset»)'''
 	}
@@ -516,8 +520,7 @@ class DartCompiler implements ITypeOuptutProvider {
 				arrayAccessBracket(null)»;«ENDIF»
 				«info.info.idName(false, true)»«regSuffix»«info.info.arrayAccessBracket(null)»=«value»;
 			«ELSE»
-				«info.info.dartType(false)» current=«info.info.idName(false, true)»«regSuffix»«info.info.
-				arrayAccessBracket(null)» & «writeMask»;
+				«info.info.dartType(false)» current=«info.info.idName(false, true)»«regSuffix»«info.info.arrayAccessBracket(null)» & «writeMask»;
 				«value»=((«value» & «maskString») << «info.bitEnd»;
 				«info.info.idName(false, true)»«regSuffix»«info.info.arrayAccessBracket(null)»=current|«value»);
 			«ENDIF»
@@ -589,7 +592,8 @@ class DartCompiler implements ITypeOuptutProvider {
 					sb.append(
 						'''
 							«name»«internal.info.arrayAccessBracket(arr)»=t«a»;
-							_regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», «IF internal.info.array»«internal.info.arrayAccess(arr)»«ELSE»-1«ENDIF»));
+							_regUpdates.add(new RegUpdate(«varIdx.get(internal.info.name)», «IF internal.info.array»«internal.info.
+								arrayAccess(arr)»«ELSE»-1«ENDIF»));
 						''')
 					arr.clear
 				}
@@ -613,7 +617,7 @@ class DartCompiler implements ITypeOuptutProvider {
 			case Instruction::cast_int: {
 				val targetWidth = inst.arg1;
 				val currWidth = inst.arg2;
-				sb.append('''int t«pos»=«signExtend('''t«a»''',Math::min(targetWidth, currWidth))»;''')
+				sb.append('''int t«pos»=«signExtend('''t«a»''', Math::min(targetWidth, currWidth))»;''')
 			}
 			case Instruction::cast_uint: {
 				sb.append('''int t«pos»=t«a» & «inst.arg1.asMask»;''')
@@ -657,14 +661,14 @@ class DartCompiler implements ITypeOuptutProvider {
 				twoOp(sb, pos, "/", a, b, inst.arg1)
 			case Instruction::sll:
 				twoOp(sb, pos, "<<", a, b, inst.arg1)
-			case Instruction::srl:{
-				val targetSize=inst.arg1>>1;
-				if ((inst.arg1.bitwiseAnd(1))==1)
+			case Instruction::srl: {
+				val targetSize = inst.arg1 >> 1;
+				if ((inst.arg1.bitwiseAnd(1)) == 1)
 					sb.append('''int t«pos»=«signExtend('''_srl(t«b», t«a», «inst.arg1»)''', targetSize)»;''')
 				else
 					sb.append('''int t«pos»=(_srl(t«b», t«a», «inst.arg1»)) & «targetSize.asMask»;''')
 			}
-			case Instruction::sra: 
+			case Instruction::sra:
 				twoOp(sb, pos, ">>", a, b, inst.arg1)
 			case Instruction::eq:
 				sb.append('''bool t«pos»=t«b» == t«a»;''')
@@ -687,25 +691,25 @@ class DartCompiler implements ITypeOuptutProvider {
 			'''//«inst»
 				''')
 	}
-	
+
 	def twoOp(StringBuilder sb, int pos, String op, int a, int b, int targetSizeWithType) {
 		sb.append('''int t«pos»=«twoOpValue(op, a, b, targetSizeWithType)»;''')
 	}
-	
-	def twoOpValue(String op, int a,int b, int targetSizeWithType) {
-		val targetSize=(targetSizeWithType>>1)
-		if ((targetSizeWithType.bitwiseAnd(1))==1)
+
+	def twoOpValue(String op, int a, int b, int targetSizeWithType) {
+		val targetSize = (targetSizeWithType >> 1)
+		if ((targetSizeWithType.bitwiseAnd(1)) == 1)
 			return signExtend('''t«b» «op» t«a»''', targetSize)
 		return '''(t«b» «op» t«a») & «targetSize.asMask»'''
 	}
-	
-	def singleOpValue(String op, String cast, int a,int targetSizeWithType) {
-		val targetSize=(targetSizeWithType>>1)
-		if ((targetSizeWithType.bitwiseAnd(1))==1)
+
+	def singleOpValue(String op, String cast, int a, int targetSizeWithType) {
+		val targetSize = (targetSizeWithType >> 1)
+		if ((targetSizeWithType.bitwiseAnd(1)) == 1)
 			return signExtend('''«op» t«a»''', targetSize)
 		return '''(«op» t«a») & «targetSize.asMask»'''
 	}
-	
+
 	def signExtend(CharSequence op, int size) '''signExtend(«op», «size»)'''
 
 	def constant(int id, Frame f) '''«f.constants.get(id).toHexString»'''
@@ -718,24 +722,24 @@ class DartCompiler implements ITypeOuptutProvider {
 		var jt = "int"
 		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
 			jt = "bool"
-		if (information.array && withArray){
-			if (jt=="bool")
+		if (information.array && withArray) {
+			if (jt == "bool")
 				return '''List<«jt»>'''
-			if (information.width<=8 && information.type===VariableInformation$Type::INT)
+			if (information.width <= 8 && information.type === VariableInformation$Type::INT)
 				return '''Int8List'''
-			if (information.width<=8)
+			if (information.width <= 8)
 				return '''Uint8List'''
-			if (information.width<=16 && information.type===VariableInformation$Type::INT)
+			if (information.width <= 16 && information.type === VariableInformation$Type::INT)
 				return '''Int16List'''
-			if (information.width<=16)
+			if (information.width <= 16)
 				return '''Uint16List'''
-			if (information.width<=32 && information.type===VariableInformation$Type::INT)
+			if (information.width <= 32 && information.type === VariableInformation$Type::INT)
 				return '''Int32List'''
-			if (information.width<=32)
+			if (information.width <= 32)
 				return '''Uint32List'''
-			if (information.width<=64 && information.type===VariableInformation$Type::INT)
+			if (information.width <= 64 && information.type === VariableInformation$Type::INT)
 				return '''Int64List'''
-			if (information.width<=64)
+			if (information.width <= 64)
 				return '''Uint64List'''
 			return '''List<«jt»>'''
 		}
@@ -774,9 +778,8 @@ import '../simulation_comm.dart';
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
 		val moduleName = em.moduleName
-		val unitName=moduleName.substring(moduleName.lastIndexOf('.')+1, moduleName.length-1);
-		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, unitName), moduleName, Collections::emptyList, em.source, hookName, true));
+		val unitName = moduleName.substring(moduleName.lastIndexOf('.') + 1, moduleName.length - 1);
+		doCompile(em, unitName, moduleName, syntaxProblems)
 	}
-	
+
 }

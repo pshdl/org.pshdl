@@ -50,22 +50,23 @@ import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 
 class JavaCompiler implements ITypeOuptutProvider {
 	private boolean debug
-	private int cores
 
 	private extension CommonCompilerExtension cce
 
 	new() {
 	}
 
-	new(ExecutableModel em, boolean includeDebug, int cores) {
+	new(ExecutableModel em, boolean includeDebug) {
 		this.cce = new CommonCompilerExtension(em, 64)
 		this.debug = includeDebug
-		this.cores = cores;
 	}
-
-	def static String doCompile(ExecutableModel em, String packageName, String unitName, boolean includeDebugListener,
-		int cores) {
-		return new JavaCompiler(em, includeDebugListener, cores).compile(packageName, unitName).toString
+	
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean debug, String moduleName) {
+		val comp=new JavaCompiler(em, debug)
+		val code=comp.compile(pkg, unitName).toString
+		return Lists::newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, moduleName,
+				Collections::emptyList, em.source, comp.hookName, true))
 	}
 
 	def compile(String packageName, String unitName) {
@@ -795,9 +796,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 			pkg = moduleName.substring(0, li - 1)
 		}
 		val unitName = moduleName.substring(li + 1, moduleName.length);
-		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, doCompile(em, pkg, unitName, debug, 1), moduleName,
-				Collections::emptyList, em.source, hookName, true));
+		doCompile(syntaxProblems, em, pkg, unitName, debug, moduleName);
 	}
 
 }

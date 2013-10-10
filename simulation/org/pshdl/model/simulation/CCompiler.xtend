@@ -691,14 +691,18 @@ class CCompiler implements ITypeOuptutProvider {
 		return new MultiOption(null, null, options)
 	}
 
-	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems){
 		val comp = new CCompiler(em)
 		val List<SideFile> sideFiles = Lists.newLinkedList
-		val simFile = generateSimEncapsuation
+		val simFile = comp.generateSimEncapsuation
 		if (simFile !== null)
 			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets::UTF_8), true));
 		return Lists::newArrayList(
-			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, hookName, true));
+			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, comp.hookName, true));
+	}
+
+	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		doCompile(em, syntaxProblems)
 	}
 
 	def String generateSimEncapsuation() {
