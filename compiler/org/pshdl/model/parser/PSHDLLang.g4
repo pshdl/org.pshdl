@@ -35,6 +35,9 @@ public static final int COMMENTS = 2;
 @parser::members {
 public static final String MISSING_SEMI="MISSING_SEMI";
 public static final String MISSING_NAME="MISSING_NAME";
+public static final String MISSING_TYPE="MISSING_TYPE";
+public static final String MISSING_WIDTH="MISSING_WIDTH";
+public static final String WRONG_ORDER="WRONG_ORDER";
 }
 
 psModel :
@@ -121,7 +124,11 @@ psBitAccess :
 ;
 
 psAccessRange :
-	from=psExpression ( ':' to=psExpression )?
+	from=psExpression (
+		( ':' to=psExpression )
+		| ( '+:' inc=psExpression)
+		| ( '-:' dec=psExpression)
+	)?
 ;
 
 psVariableRef :
@@ -259,6 +266,8 @@ psEnum :
 
 psVariableDeclaration :
 	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* ';'
+	|	psDirection psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_TYPE);}
+	|	psPrimitive psDirection psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(WRONG_ORDER);}
 	|	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_SEMI);}
 ;
 
@@ -297,6 +306,7 @@ psAnnotationType :
 
 psPrimitive :
 	(isRegister='register' psPassedArguments? )? (psPrimitiveType psWidth? |  (isEnum='enum' | isRecord='record') psQualifiedName)
+	|	(psPrimitiveType psWidth? |  (isEnum='enum' | isRecord='record') psQualifiedName) (isRegister='register' psPassedArguments? ) {notifyErrorListeners(WRONG_ORDER);}
 ;
 
 psPrimitiveType :
@@ -305,6 +315,7 @@ psPrimitiveType :
 
 psWidth :
 	'<' psExpression '>'
+	|	'<' '>' {notifyErrorListeners(MISSING_WIDTH);}
 ;
 
 psInterfaceDeclaration :

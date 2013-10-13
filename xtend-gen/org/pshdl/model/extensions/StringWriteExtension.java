@@ -1863,12 +1863,40 @@ public class StringWriteExtension {
       String _leaving = this.leaving(range, highlight);
       return (_plus_2 + _leaving);
     }
-    String _entering_1 = this.entering(range, highlight);
-    HDLExpression _to_1 = range.getTo();
-    String _string_2 = this.toString(_to_1, highlight);
-    String _plus_3 = (_entering_1 + _string_2);
-    String _leaving_1 = this.leaving(range, highlight);
-    return (_plus_3 + _leaving_1);
+    HDLExpression _inc = range.getInc();
+    boolean _tripleNotEquals_1 = (_inc != null);
+    if (_tripleNotEquals_1) {
+      String _entering_1 = this.entering(range, highlight);
+      HDLExpression _to_1 = range.getTo();
+      String _string_2 = this.toString(_to_1, highlight);
+      String _plus_3 = (_entering_1 + _string_2);
+      String _plus_4 = (_plus_3 + " +: ");
+      HDLExpression _inc_1 = range.getInc();
+      String _string_3 = this.toString(_inc_1, highlight);
+      String _plus_5 = (_plus_4 + _string_3);
+      String _leaving_1 = this.leaving(range, highlight);
+      return (_plus_5 + _leaving_1);
+    }
+    HDLExpression _dec = range.getDec();
+    boolean _tripleNotEquals_2 = (_dec != null);
+    if (_tripleNotEquals_2) {
+      String _entering_2 = this.entering(range, highlight);
+      HDLExpression _to_2 = range.getTo();
+      String _string_4 = this.toString(_to_2, highlight);
+      String _plus_6 = (_entering_2 + _string_4);
+      String _plus_7 = (_plus_6 + " -: ");
+      HDLExpression _dec_1 = range.getDec();
+      String _string_5 = this.toString(_dec_1, highlight);
+      String _plus_8 = (_plus_7 + _string_5);
+      String _leaving_2 = this.leaving(range, highlight);
+      return (_plus_8 + _leaving_2);
+    }
+    String _entering_3 = this.entering(range, highlight);
+    HDLExpression _to_3 = range.getTo();
+    String _string_6 = this.toString(_to_3, highlight);
+    String _plus_9 = (_entering_3 + _string_6);
+    String _leaving_3 = this.leaving(range, highlight);
+    return (_plus_9 + _leaving_3);
   }
   
   protected String _toString(final HDLVariable hVar, final SyntaxHighlighter highlight) {

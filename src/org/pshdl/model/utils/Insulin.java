@@ -66,6 +66,7 @@ public class Insulin {
 		RWValidation.annotateReadCount(apply);
 		RWValidation.annotateWriteCount(apply);
 		apply = inlineConstants(apply);
+		apply = convertIncRecRanges(apply);
 		apply = handlePostfixOp(apply);
 		apply = handleDelayedSignals(apply);
 		apply = handleOutPortRead(apply);
@@ -83,6 +84,22 @@ public class Insulin {
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	public static <T extends IHDLObject> T convertIncRecRanges(T pkg) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
+		for (final HDLRange hdlRange : ranges) {
+			if (hdlRange.getInc() != null) {
+				final HDLArithOp incD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.PLUS).setRight(hdlRange.getInc());
+				ms.replace(hdlRange, new HDLRange().setFrom(incD).setTo(hdlRange.getTo()));
+			}
+			if (hdlRange.getDec() != null) {
+				final HDLArithOp decD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.MINUS).setRight(hdlRange.getDec());
+				ms.replace(hdlRange, new HDLRange().setFrom(hdlRange.getTo()).setTo(decD));
+			}
+		}
+		return ms.apply(pkg);
 	}
 
 	public static <T extends IHDLObject> T fixMultiDimAssignments(T pkg) {

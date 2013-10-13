@@ -33,7 +33,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.misc.*;
 import org.pshdl.model.*;
-import org.pshdl.model.parser.PSHDLLangParser.PsExtendsContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
@@ -88,6 +87,18 @@ public class PSHDLParser {
 				error = SyntaxErrors.MissingSemicolon;
 				msg = "Missing ';'";
 			}
+			if ((e == null) && PSHDLLangParser.WRONG_ORDER.equals(msg)) {
+				error = SyntaxErrors.WrongOrder;
+				msg = "The order for variable declarations is «direction?» «type» «register?» «name»";
+			}
+			if ((e == null) && PSHDLLangParser.MISSING_WIDTH.equals(msg)) {
+				error = SyntaxErrors.MissingWidth;
+				msg = "The empty width <> is only allowed in function declarations";
+			}
+			if ((e == null) && PSHDLLangParser.MISSING_TYPE.equals(msg)) {
+				error = SyntaxErrors.MissingType;
+				msg = "The variable declaration is missing its type";
+			}
 			if (offendingSymbol instanceof Token) {
 				Token t = (Token) offendingSymbol;
 				if (error == SyntaxErrors.MissingSemicolon) {
@@ -130,47 +141,13 @@ public class PSHDLParser {
 	}
 
 	public static enum SyntaxErrors implements IErrorCode {
-		FailedPredicate, NoViableAlternative, LexerNoViableAlternative, InputMismatch, OtherException, MissingSemicolon;
+		FailedPredicate, NoViableAlternative, LexerNoViableAlternative, InputMismatch, OtherException, MissingSemicolon, MissingType, WrongOrder, MissingWidth;
 
 		@Override
 		public ProblemSeverity getSeverity() {
 			return ProblemSeverity.ERROR;
 		}
 
-	}
-
-	public static class Rewriter extends PSHDLLangBaseListener {
-		private final TokenStreamRewriter rewriter;
-
-		public Rewriter(TokenStream ts) {
-			rewriter = new TokenStreamRewriter(ts);
-		}
-
-		@Override
-		public void enterPsExtends(PsExtendsContext ctx) {
-		}
-	}
-
-	public static String annotateUnit(String original, HDLUnit unit) {
-		// for (final HDLAnnotation anno : unit.getAnnotations()) {
-		// if (HDLBuiltInAnnotations.autoInterface.is(anno)) {
-		// final HDLInterface hif = unit.asInterface();
-		// final HDLQualifiedName fqn = FullNameExtension.fullNameOf(unit);
-		// final HDLQualifiedName lastFQN = fqn.skipLast(1).append("I" +
-		// fqn.getLastSegment());
-		// final Optional<HDLInterface> resolveInterface =
-		// ScopingExtension.INST.resolveInterface(unit, lastFQN);
-		// final boolean needExtend =
-		// !unit.getExtendRefName().contains(lastFQN);
-		// if (resolveInterface.isPresent()) {
-		// final SourceInfo info =
-		// resolveInterface.get().getMeta(SourceInfo.INFO);
-		//
-		// } else {
-		// }
-		// }
-		// }
-		return original;
 	}
 
 	/**

@@ -1217,11 +1217,11 @@ public class BusAccess {
   
   public boolean hasWriteDefs(final Row row) {
     final Function1<NamedElement,Boolean> _function = new Function1<NamedElement,Boolean>() {
-        public Boolean apply(final NamedElement it) {
-          boolean _hasWrite = BusAccess.this.hasWrite(it);
-          return Boolean.valueOf(_hasWrite);
-        }
-      };
+      public Boolean apply(final NamedElement it) {
+        boolean _hasWrite = BusAccess.this.hasWrite(it);
+        return Boolean.valueOf(_hasWrite);
+      }
+    };
     NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(row.definitions, _function);
     boolean _tripleNotEquals = (_findFirst != null);
     return _tripleNotEquals;

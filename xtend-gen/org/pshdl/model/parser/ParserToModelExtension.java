@@ -198,21 +198,21 @@ public class ParserToModelExtension {
     }
     List<PsUnitContext> _psUnit = ctx.psUnit();
     final Function1<PsUnitContext,HDLUnit> _function = new Function1<PsUnitContext,HDLUnit>() {
-        public HDLUnit apply(final PsUnitContext it) {
-          HDLUnit _hDLUnit = ParserToModelExtension.this.toHDLUnit(it, libURI);
-          return _hDLUnit;
-        }
-      };
+      public HDLUnit apply(final PsUnitContext it) {
+        HDLUnit _hDLUnit = ParserToModelExtension.this.toHDLUnit(it, libURI);
+        return _hDLUnit;
+      }
+    };
     List<HDLUnit> _map = ListExtensions.<PsUnitContext, HDLUnit>map(_psUnit, _function);
     HDLPackage _setUnits = pkg.setUnits(_map);
     pkg = _setUnits;
     List<PsDeclarationContext> _psDeclaration = ctx.psDeclaration();
     final Function1<PsDeclarationContext,HDLDeclaration> _function_1 = new Function1<PsDeclarationContext,HDLDeclaration>() {
-        public HDLDeclaration apply(final PsDeclarationContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLDeclaration) _hDL);
-        }
-      };
+      public HDLDeclaration apply(final PsDeclarationContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLDeclaration) _hDL);
+      }
+    };
     List<HDLDeclaration> _map_1 = ListExtensions.<PsDeclarationContext, HDLDeclaration>map(_psDeclaration, _function_1);
     HDLPackage _setDeclarations = pkg.setDeclarations(_map_1);
     pkg = _setDeclarations;
@@ -229,11 +229,11 @@ public class ParserToModelExtension {
     HDLDeclaration res = ((HDLDeclaration) _hDL);
     List<PsAnnotationContext> _psAnnotation = context.psAnnotation();
     final Function1<PsAnnotationContext,HDLAnnotation> _function = new Function1<PsAnnotationContext,HDLAnnotation>() {
-        public HDLAnnotation apply(final PsAnnotationContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLAnnotation) _hDL);
-        }
-      };
+      public HDLAnnotation apply(final PsAnnotationContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLAnnotation) _hDL);
+      }
+    };
     List<HDLAnnotation> _map = ListExtensions.<PsAnnotationContext, HDLAnnotation>map(_psAnnotation, _function);
     HDLDeclaration _setAnnotations = res.setAnnotations(_map);
     res = _setAnnotations;
@@ -273,11 +273,11 @@ public class ParserToModelExtension {
     }
     List<PsBlockContext> _psBlock = context.psBlock();
     final Function1<PsBlockContext,HDLStatement> _function = new Function1<PsBlockContext,HDLStatement>() {
-        public HDLStatement apply(final PsBlockContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLStatement) _hDL);
-        }
-      };
+      public HDLStatement apply(final PsBlockContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLStatement) _hDL);
+      }
+    };
     List<HDLStatement> _map = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock, _function);
     HDLBlock _setStatements = block.setStatements(_map);
     block = _setStatements;
@@ -373,11 +373,11 @@ public class ParserToModelExtension {
         PsPassedArgumentsContext _psPassedArguments_1 = _psPrimitive_3.psPassedArguments();
         List<PsArgumentContext> _psArgument = _psPassedArguments_1.psArgument();
         final Function1<PsArgumentContext,HDLArgument> _function = new Function1<PsArgumentContext,HDLArgument>() {
-            public HDLArgument apply(final PsArgumentContext it) {
-              IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-              return ((HDLArgument) _hDL);
-            }
-          };
+          public HDLArgument apply(final PsArgumentContext it) {
+            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+            return ((HDLArgument) _hDL);
+          }
+        };
         List<HDLArgument> _map = ListExtensions.<PsArgumentContext, HDLArgument>map(_psArgument, _function);
         args = _map;
       }
@@ -412,11 +412,11 @@ public class ParserToModelExtension {
       HDLArrayInit _hDLArrayInit = new HDLArrayInit();
       List<PsExpressionContext> _psExpression_1 = context.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function = new Function1<PsExpressionContext,HDLExpression>() {
-          public HDLExpression apply(final PsExpressionContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLExpression) _hDL);
-          }
-        };
+        public HDLExpression apply(final PsExpressionContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLExpression) _hDL);
+        }
+      };
       List<HDLExpression> _map = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression_1, _function);
       final HDLArrayInit arr = _hDLArrayInit.setExp(_map);
       return this.<HDLArrayInit>attachContext(arr, context);
@@ -465,11 +465,11 @@ public class ParserToModelExtension {
     HDLVariable res = _hDLVariable.setName(_name);
     List<PsAnnotationContext> _psAnnotation = context.psAnnotation();
     final Function1<PsAnnotationContext,HDLAnnotation> _function = new Function1<PsAnnotationContext,HDLAnnotation>() {
-        public HDLAnnotation apply(final PsAnnotationContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLAnnotation) _hDL);
-        }
-      };
+      public HDLAnnotation apply(final PsAnnotationContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLAnnotation) _hDL);
+      }
+    };
     List<HDLAnnotation> _map = ListExtensions.<PsAnnotationContext, HDLAnnotation>map(_psAnnotation, _function);
     HDLVariable _setAnnotations = res.setAnnotations(_map);
     res = _setAnnotations;
@@ -479,11 +479,11 @@ public class ParserToModelExtension {
       PsArrayContext _psArray_1 = context.psArray();
       List<PsExpressionContext> _psExpression = _psArray_1.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function_1 = new Function1<PsExpressionContext,HDLExpression>() {
-          public HDLExpression apply(final PsExpressionContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLExpression) _hDL);
-          }
-        };
+        public HDLExpression apply(final PsExpressionContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLExpression) _hDL);
+        }
+      };
       List<HDLExpression> _map_1 = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression, _function_1);
       HDLVariable _setDimensions = res.setDimensions(_map_1);
       res = _setDimensions;
@@ -587,11 +587,11 @@ public class ParserToModelExtension {
     HDLConcat cat = _hDLConcat;
     List<PsExpressionContext> _psExpression = context.psExpression();
     final Function1<PsExpressionContext,HDLExpression> _function = new Function1<PsExpressionContext,HDLExpression>() {
-        public HDLExpression apply(final PsExpressionContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLExpression) _hDL);
-        }
-      };
+      public HDLExpression apply(final PsExpressionContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLExpression) _hDL);
+      }
+    };
     List<HDLExpression> _map = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression, _function);
     HDLConcat _setCats = cat.setCats(_map);
     cat = _setCats;
@@ -889,11 +889,11 @@ public class ParserToModelExtension {
     PsInterfaceDeclContext _psInterfaceDecl = context.psInterfaceDecl();
     List<PsPortDeclarationContext> _psPortDeclaration = _psInterfaceDecl.psPortDeclaration();
     final Function1<PsPortDeclarationContext,HDLVariableDeclaration> _function = new Function1<PsPortDeclarationContext,HDLVariableDeclaration>() {
-        public HDLVariableDeclaration apply(final PsPortDeclarationContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLVariableDeclaration) _hDL);
-        }
-      };
+      public HDLVariableDeclaration apply(final PsPortDeclarationContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLVariableDeclaration) _hDL);
+      }
+    };
     List<HDLVariableDeclaration> _map = ListExtensions.<PsPortDeclarationContext, HDLVariableDeclaration>map(_psPortDeclaration, _function);
     HDLInterface _setPorts = hIf.setPorts(_map);
     hIf = _setPorts;
@@ -908,11 +908,11 @@ public class ParserToModelExtension {
     HDLVariableDeclaration res = ((HDLVariableDeclaration) _hDL);
     List<PsAnnotationContext> _psAnnotation = context.psAnnotation();
     final Function1<PsAnnotationContext,HDLAnnotation> _function = new Function1<PsAnnotationContext,HDLAnnotation>() {
-        public HDLAnnotation apply(final PsAnnotationContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLAnnotation) _hDL);
-        }
-      };
+      public HDLAnnotation apply(final PsAnnotationContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLAnnotation) _hDL);
+      }
+    };
     List<HDLAnnotation> _map = ListExtensions.<PsAnnotationContext, HDLAnnotation>map(_psAnnotation, _function);
     HDLVariableDeclaration _setAnnotations = res.setAnnotations(_map);
     res = _setAnnotations;
@@ -971,11 +971,11 @@ public class ParserToModelExtension {
       PsPassedArgumentsContext _psPassedArguments_1 = context.psPassedArguments();
       List<PsArgumentContext> _psArgument = _psPassedArguments_1.psArgument();
       final Function1<PsArgumentContext,HDLArgument> _function = new Function1<PsArgumentContext,HDLArgument>() {
-          public HDLArgument apply(final PsArgumentContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLArgument) _hDL);
-          }
-        };
+        public HDLArgument apply(final PsArgumentContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLArgument) _hDL);
+        }
+      };
       List<HDLArgument> _map = ListExtensions.<PsArgumentContext, HDLArgument>map(_psArgument, _function);
       HDLDirectGeneration _setArguments = gen.setArguments(_map);
       gen = _setArguments;
@@ -1039,11 +1039,11 @@ public class ParserToModelExtension {
     HDLEnum he = ((HDLEnum) _hDL);
     List<PsVariableContext> _psVariable = context.psVariable();
     final Function1<PsVariableContext,HDLVariable> _function = new Function1<PsVariableContext,HDLVariable>() {
-        public HDLVariable apply(final PsVariableContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLVariable) _hDL);
-        }
-      };
+      public HDLVariable apply(final PsVariableContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLVariable) _hDL);
+      }
+    };
     List<HDLVariable> _map = ListExtensions.<PsVariableContext, HDLVariable>map(_psVariable, _function);
     HDLEnum _setEnums = he.setEnums(_map);
     he = _setEnums;
@@ -1061,22 +1061,22 @@ public class ParserToModelExtension {
     func = _setName;
     List<PsStatementContext> _psStatement = context.psStatement();
     final Function1<PsStatementContext,HDLStatement> _function = new Function1<PsStatementContext,HDLStatement>() {
-        public HDLStatement apply(final PsStatementContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLStatement) _hDL);
-        }
-      };
+      public HDLStatement apply(final PsStatementContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLStatement) _hDL);
+      }
+    };
     List<HDLStatement> _map = ListExtensions.<PsStatementContext, HDLStatement>map(_psStatement, _function);
     HDLSubstituteFunction _setStmnts = func.setStmnts(_map);
     func = _setStmnts;
     PsFuncParamContext _psFuncParam = context.psFuncParam();
     List<PsFuncSpecContext> _psFuncSpec = _psFuncParam.psFuncSpec();
     final Function1<PsFuncSpecContext,HDLFunctionParameter> _function_1 = new Function1<PsFuncSpecContext,HDLFunctionParameter>() {
-        public HDLFunctionParameter apply(final PsFuncSpecContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLFunctionParameter) _hDL);
-        }
-      };
+      public HDLFunctionParameter apply(final PsFuncSpecContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLFunctionParameter) _hDL);
+      }
+    };
     List<HDLFunctionParameter> _map_1 = ListExtensions.<PsFuncSpecContext, HDLFunctionParameter>map(_psFuncSpec, _function_1);
     HDLSubstituteFunction _setArgs = func.setArgs(_map_1);
     func = _setArgs;
@@ -1104,11 +1104,11 @@ public class ParserToModelExtension {
     PsFuncParamContext _psFuncParam = context.psFuncParam();
     List<PsFuncSpecContext> _psFuncSpec = _psFuncParam.psFuncSpec();
     final Function1<PsFuncSpecContext,HDLFunctionParameter> _function = new Function1<PsFuncSpecContext,HDLFunctionParameter>() {
-        public HDLFunctionParameter apply(final PsFuncSpecContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLFunctionParameter) _hDL);
-        }
-      };
+      public HDLFunctionParameter apply(final PsFuncSpecContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLFunctionParameter) _hDL);
+      }
+    };
     List<HDLFunctionParameter> _map = ListExtensions.<PsFuncSpecContext, HDLFunctionParameter>map(_psFuncSpec, _function);
     HDLNativeFunction _setArgs = func.setArgs(_map);
     func = _setArgs;
@@ -1130,21 +1130,21 @@ public class ParserToModelExtension {
     HDLFunctionParameter _setRw = res.setRw(RWType.RETURN);
     res = _setRw;
     final Function1<PsFuncOptArrayContext,HDLExpression> _function = new Function1<PsFuncOptArrayContext,HDLExpression>() {
-        public HDLExpression apply(final PsFuncOptArrayContext it) {
-          HDLExpression _xifexpression = null;
-          PsExpressionContext _psExpression = it.psExpression();
-          boolean _tripleNotEquals = (_psExpression != null);
-          if (_tripleNotEquals) {
-            PsExpressionContext _psExpression_1 = it.psExpression();
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
-            _xifexpression = ((HDLExpression) _hDL);
-          } else {
-            HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
-            _xifexpression = _EMPTY_ARR;
-          }
-          return _xifexpression;
+      public HDLExpression apply(final PsFuncOptArrayContext it) {
+        HDLExpression _xifexpression = null;
+        PsExpressionContext _psExpression = it.psExpression();
+        boolean _tripleNotEquals = (_psExpression != null);
+        if (_tripleNotEquals) {
+          PsExpressionContext _psExpression_1 = it.psExpression();
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
+          _xifexpression = ((HDLExpression) _hDL);
+        } else {
+          HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
+          _xifexpression = _EMPTY_ARR;
         }
-      };
+        return _xifexpression;
+      }
+    };
     List<HDLExpression> _map = ListExtensions.<PsFuncOptArrayContext, HDLExpression>map(context.dims, _function);
     HDLFunctionParameter _setDim = res.setDim(_map);
     res = _setDim;
@@ -1162,21 +1162,21 @@ public class ParserToModelExtension {
     HDLFunctionParameter _setName_1 = res.setName(_setName);
     res = _setName_1;
     final Function1<PsFuncOptArrayContext,HDLExpression> _function = new Function1<PsFuncOptArrayContext,HDLExpression>() {
-        public HDLExpression apply(final PsFuncOptArrayContext it) {
-          HDLExpression _xifexpression = null;
-          PsExpressionContext _psExpression = it.psExpression();
-          boolean _tripleNotEquals = (_psExpression != null);
-          if (_tripleNotEquals) {
-            PsExpressionContext _psExpression_1 = it.psExpression();
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
-            _xifexpression = ((HDLExpression) _hDL);
-          } else {
-            HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
-            _xifexpression = _EMPTY_ARR;
-          }
-          return _xifexpression;
+      public HDLExpression apply(final PsFuncOptArrayContext it) {
+        HDLExpression _xifexpression = null;
+        PsExpressionContext _psExpression = it.psExpression();
+        boolean _tripleNotEquals = (_psExpression != null);
+        if (_tripleNotEquals) {
+          PsExpressionContext _psExpression_1 = it.psExpression();
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
+          _xifexpression = ((HDLExpression) _hDL);
+        } else {
+          HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
+          _xifexpression = _EMPTY_ARR;
         }
-      };
+        return _xifexpression;
+      }
+    };
     List<HDLExpression> _map = ListExtensions.<PsFuncOptArrayContext, HDLExpression>map(context.dims, _function);
     HDLFunctionParameter _setDim = res.setDim(_map);
     res = _setDim;
@@ -1332,11 +1332,11 @@ public class ParserToModelExtension {
         res = _setType_12;
         List<PsFuncParamWithRWContext> _psFuncParamWithRW = x.psFuncParamWithRW();
         final Function1<PsFuncParamWithRWContext,HDLFunctionParameter> _function = new Function1<PsFuncParamWithRWContext,HDLFunctionParameter>() {
-            public HDLFunctionParameter apply(final PsFuncParamWithRWContext it) {
-              IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-              return ((HDLFunctionParameter) _hDL);
-            }
-          };
+          public HDLFunctionParameter apply(final PsFuncParamWithRWContext it) {
+            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+            return ((HDLFunctionParameter) _hDL);
+          }
+        };
         List<HDLFunctionParameter> _map = ListExtensions.<PsFuncParamWithRWContext, HDLFunctionParameter>map(_psFuncParamWithRW, _function);
         HDLFunctionParameter _setFuncSpec = res.setFuncSpec(_map);
         res = _setFuncSpec;
@@ -1375,11 +1375,11 @@ public class ParserToModelExtension {
     PsFuncParamContext _psFuncParam = context.psFuncParam();
     List<PsFuncSpecContext> _psFuncSpec = _psFuncParam.psFuncSpec();
     final Function1<PsFuncSpecContext,HDLFunctionParameter> _function = new Function1<PsFuncSpecContext,HDLFunctionParameter>() {
-        public HDLFunctionParameter apply(final PsFuncSpecContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLFunctionParameter) _hDL);
-        }
-      };
+      public HDLFunctionParameter apply(final PsFuncSpecContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLFunctionParameter) _hDL);
+      }
+    };
     List<HDLFunctionParameter> _map = ListExtensions.<PsFuncSpecContext, HDLFunctionParameter>map(_psFuncSpec, _function);
     HDLInlineFunction _setArgs = func.setArgs(_map);
     func = _setArgs;
@@ -1435,11 +1435,11 @@ public class ParserToModelExtension {
       PsFuncArgsContext _psFuncArgs_1 = context.psFuncArgs();
       List<PsExpressionContext> _psExpression = _psFuncArgs_1.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function = new Function1<PsExpressionContext,HDLExpression>() {
-          public HDLExpression apply(final PsExpressionContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLExpression) _hDL);
-          }
-        };
+        public HDLExpression apply(final PsExpressionContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLExpression) _hDL);
+        }
+      };
       List<HDLExpression> _map = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression, _function);
       HDLUnresolvedFragmentFunction _setParams = uff.setParams(_map);
       frag = _setParams;
@@ -1455,11 +1455,11 @@ public class ParserToModelExtension {
         PsArrayContext _psArray_1 = context.psArray();
         List<PsExpressionContext> _psExpression_1 = _psArray_1.psExpression();
         final Function1<PsExpressionContext,HDLExpression> _function_1 = new Function1<PsExpressionContext,HDLExpression>() {
-            public HDLExpression apply(final PsExpressionContext it) {
-              IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-              return ((HDLExpression) _hDL);
-            }
-          };
+          public HDLExpression apply(final PsExpressionContext it) {
+            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+            return ((HDLExpression) _hDL);
+          }
+        };
         List<HDLExpression> _map_1 = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression_1, _function_1);
         HDLUnresolvedFragment _setArray = frag.setArray(_map_1);
         frag = _setArray;
@@ -1470,11 +1470,11 @@ public class ParserToModelExtension {
         PsBitAccessContext _psBitAccess_1 = context.psBitAccess();
         List<PsAccessRangeContext> _psAccessRange = _psBitAccess_1.psAccessRange();
         final Function1<PsAccessRangeContext,HDLRange> _function_2 = new Function1<PsAccessRangeContext,HDLRange>() {
-            public HDLRange apply(final PsAccessRangeContext it) {
-              IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-              return ((HDLRange) _hDL);
-            }
-          };
+          public HDLRange apply(final PsAccessRangeContext it) {
+            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+            return ((HDLRange) _hDL);
+          }
+        };
         List<HDLRange> _map_2 = ListExtensions.<PsAccessRangeContext, HDLRange>map(_psAccessRange, _function_2);
         HDLUnresolvedFragment _setBits = frag.setBits(_map_2);
         frag = _setBits;
@@ -1526,6 +1526,22 @@ public class ParserToModelExtension {
       HDLRange _setTo = _setFrom.setTo(((HDLExpression) _hDL_2));
       res = _setTo;
     }
+    boolean _tripleNotEquals_1 = (context.inc != null);
+    if (_tripleNotEquals_1) {
+      IHDLObject _hDL_3 = this.toHDL(context.from);
+      HDLRange _setTo_1 = res.setTo(((HDLExpression) _hDL_3));
+      IHDLObject _hDL_4 = this.toHDL(context.inc);
+      HDLRange _setInc = _setTo_1.setInc(((HDLExpression) _hDL_4));
+      res = _setInc;
+    }
+    boolean _tripleNotEquals_2 = (context.dec != null);
+    if (_tripleNotEquals_2) {
+      IHDLObject _hDL_5 = this.toHDL(context.from);
+      HDLRange _setTo_2 = res.setTo(((HDLExpression) _hDL_5));
+      IHDLObject _hDL_6 = this.toHDL(context.dec);
+      HDLRange _setDec = _setTo_2.setDec(((HDLExpression) _hDL_6));
+      res = _setDec;
+    }
     return this.<HDLRange>attachContext(res, context);
   }
   
@@ -1542,11 +1558,11 @@ public class ParserToModelExtension {
     }
     List<PsBlockContext> _psBlock = context.psBlock();
     final Function1<PsBlockContext,HDLStatement> _function = new Function1<PsBlockContext,HDLStatement>() {
-        public HDLStatement apply(final PsBlockContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLStatement) _hDL);
-        }
-      };
+      public HDLStatement apply(final PsBlockContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLStatement) _hDL);
+      }
+    };
     List<HDLStatement> _map = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock, _function);
     HDLSwitchCaseStatement _setDos = hCase.setDos(_map);
     hCase = _setDos;
@@ -1560,11 +1576,11 @@ public class ParserToModelExtension {
     HDLSwitchStatement switchStmnt = _hDLSwitchStatement.setCaseExp(((HDLExpression) _hDL));
     List<PsCaseStatementsContext> _psCaseStatements = context.psCaseStatements();
     final Function1<PsCaseStatementsContext,HDLSwitchCaseStatement> _function = new Function1<PsCaseStatementsContext,HDLSwitchCaseStatement>() {
-        public HDLSwitchCaseStatement apply(final PsCaseStatementsContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLSwitchCaseStatement) _hDL);
-        }
-      };
+      public HDLSwitchCaseStatement apply(final PsCaseStatementsContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLSwitchCaseStatement) _hDL);
+      }
+    };
     List<HDLSwitchCaseStatement> _map = ListExtensions.<PsCaseStatementsContext, HDLSwitchCaseStatement>map(_psCaseStatements, _function);
     HDLSwitchStatement _setCases = switchStmnt.setCases(_map);
     switchStmnt = _setCases;
@@ -1581,11 +1597,11 @@ public class ParserToModelExtension {
       PsArrayContext _psArray_1 = context.psArray();
       List<PsExpressionContext> _psExpression = _psArray_1.psExpression();
       final Function1<PsExpressionContext,HDLExpression> _function = new Function1<PsExpressionContext,HDLExpression>() {
-          public HDLExpression apply(final PsExpressionContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLExpression) _hDL);
-          }
-        };
+        public HDLExpression apply(final PsExpressionContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLExpression) _hDL);
+        }
+      };
       List<HDLExpression> _map = ListExtensions.<PsExpressionContext, HDLExpression>map(_psExpression, _function);
       HDLVariable _setDimensions = hVar.setDimensions(_map);
       hVar = _setDimensions;
@@ -1601,11 +1617,11 @@ public class ParserToModelExtension {
       PsPassedArgumentsContext _psPassedArguments_1 = context.psPassedArguments();
       List<PsArgumentContext> _psArgument = _psPassedArguments_1.psArgument();
       final Function1<PsArgumentContext,HDLArgument> _function_1 = new Function1<PsArgumentContext,HDLArgument>() {
-          public HDLArgument apply(final PsArgumentContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLArgument) _hDL);
-          }
-        };
+        public HDLArgument apply(final PsArgumentContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLArgument) _hDL);
+        }
+      };
       List<HDLArgument> _map_1 = ListExtensions.<PsArgumentContext, HDLArgument>map(_psArgument, _function_1);
       HDLInterfaceInstantiation _setArguments = hii.setArguments(_map_1);
       hii = _setArguments;
@@ -1621,22 +1637,22 @@ public class ParserToModelExtension {
     PsBitAccessContext _psBitAccess = context.psBitAccess();
     List<PsAccessRangeContext> _psAccessRange = _psBitAccess.psAccessRange();
     final Function1<PsAccessRangeContext,HDLRange> _function = new Function1<PsAccessRangeContext,HDLRange>() {
-        public HDLRange apply(final PsAccessRangeContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLRange) _hDL);
-        }
-      };
+      public HDLRange apply(final PsAccessRangeContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLRange) _hDL);
+      }
+    };
     List<HDLRange> _map = ListExtensions.<PsAccessRangeContext, HDLRange>map(_psAccessRange, _function);
     HDLForLoop _setRange = loop.setRange(_map);
     loop = _setRange;
     PsSimpleBlockContext _psSimpleBlock = context.psSimpleBlock();
     List<PsBlockContext> _psBlock = _psSimpleBlock.psBlock();
     final Function1<PsBlockContext,HDLStatement> _function_1 = new Function1<PsBlockContext,HDLStatement>() {
-        public HDLStatement apply(final PsBlockContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLStatement) _hDL);
-        }
-      };
+      public HDLStatement apply(final PsBlockContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLStatement) _hDL);
+      }
+    };
     List<HDLStatement> _map_1 = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock, _function_1);
     HDLForLoop _setDos = loop.setDos(_map_1);
     loop = _setDos;
@@ -1650,11 +1666,11 @@ public class ParserToModelExtension {
     HDLIfStatement res = _hDLIfStatement.setIfExp(((HDLExpression) _hDL));
     List<PsBlockContext> _psBlock = context.ifBlk.psBlock();
     final Function1<PsBlockContext,HDLStatement> _function = new Function1<PsBlockContext,HDLStatement>() {
-        public HDLStatement apply(final PsBlockContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLStatement) _hDL);
-        }
-      };
+      public HDLStatement apply(final PsBlockContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLStatement) _hDL);
+      }
+    };
     List<HDLStatement> _map = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock, _function);
     HDLIfStatement _setThenDo = res.setThenDo(_map);
     res = _setThenDo;
@@ -1662,11 +1678,11 @@ public class ParserToModelExtension {
     if (_tripleNotEquals) {
       List<PsBlockContext> _psBlock_1 = context.elseBlk.psBlock();
       final Function1<PsBlockContext,HDLStatement> _function_1 = new Function1<PsBlockContext,HDLStatement>() {
-          public HDLStatement apply(final PsBlockContext it) {
-            IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-            return ((HDLStatement) _hDL);
-          }
-        };
+        public HDLStatement apply(final PsBlockContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+          return ((HDLStatement) _hDL);
+        }
+      };
       List<HDLStatement> _map_1 = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock_1, _function_1);
       HDLIfStatement _setElseDo = res.setElseDo(_map_1);
       res = _setElseDo;
@@ -1771,31 +1787,31 @@ public class ParserToModelExtension {
     unit = _setSimulation;
     List<PsAnnotationContext> _psAnnotation = context.psAnnotation();
     final Function1<PsAnnotationContext,HDLAnnotation> _function = new Function1<PsAnnotationContext,HDLAnnotation>() {
-        public HDLAnnotation apply(final PsAnnotationContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLAnnotation) _hDL);
-        }
-      };
+      public HDLAnnotation apply(final PsAnnotationContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLAnnotation) _hDL);
+      }
+    };
     List<HDLAnnotation> _map = ListExtensions.<PsAnnotationContext, HDLAnnotation>map(_psAnnotation, _function);
     HDLUnit _setAnnotations = unit.setAnnotations(_map);
     unit = _setAnnotations;
     List<PsImportsContext> _psImports = context.psImports();
     final Function1<PsImportsContext,String> _function_1 = new Function1<PsImportsContext,String>() {
-        public String apply(final PsImportsContext it) {
-          String _name = ParserToModelExtension.this.toName(it);
-          return _name;
-        }
-      };
+      public String apply(final PsImportsContext it) {
+        String _name = ParserToModelExtension.this.toName(it);
+        return _name;
+      }
+    };
     List<String> _map_1 = ListExtensions.<PsImportsContext, String>map(_psImports, _function_1);
     HDLUnit _setImports = unit.setImports(_map_1);
     unit = _setImports;
     List<PsBlockContext> _psBlock = context.psBlock();
     final Function1<PsBlockContext,HDLStatement> _function_2 = new Function1<PsBlockContext,HDLStatement>() {
-        public HDLStatement apply(final PsBlockContext it) {
-          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
-          return ((HDLStatement) _hDL);
-        }
-      };
+      public HDLStatement apply(final PsBlockContext it) {
+        IHDLObject _hDL = ParserToModelExtension.this.toHDL(it);
+        return ((HDLStatement) _hDL);
+      }
+    };
     List<HDLStatement> _map_2 = ListExtensions.<PsBlockContext, HDLStatement>map(_psBlock, _function_2);
     HDLUnit _setStatements = unit.setStatements(_map_2);
     unit = _setStatements;

@@ -698,6 +698,14 @@ class StringWriteExtension {
 			return range.entering(highlight) + range.from.toString(highlight) + ":" + range.to.toString(highlight) +
 				range.leaving(highlight)
 		}
+		if (range.inc !== null) {
+			return range.entering(highlight) + range.to.toString(highlight) +  " +: " + range.inc.toString(highlight)+
+				range.leaving(highlight)
+		}
+		if (range.dec !== null) {
+			return range.entering(highlight) + range.to.toString(highlight) +  " -: " + range.dec.toString(highlight)+
+				range.leaving(highlight)
+		}
 		return range.entering(highlight) + range.to.toString(highlight) + range.leaving(highlight)
 	}
 

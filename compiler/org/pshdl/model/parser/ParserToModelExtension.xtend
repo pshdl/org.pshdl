@@ -680,6 +680,10 @@ class ParserToModelExtension {
 		var res = new HDLRange().setTo(context.from.toHDL as HDLExpression)
 		if (context.to !== null)
 			res = res.setFrom(context.from.toHDL as HDLExpression).setTo(context.to.toHDL as HDLExpression)
+		if (context.inc !== null)
+			res = res.setTo(context.from.toHDL as HDLExpression).setInc(context.inc.toHDL as HDLExpression)
+		if (context.dec !== null)
+			res = res.setTo(context.from.toHDL as HDLExpression).setDec(context.dec.toHDL as HDLExpression)
 		return res.attachContext(context)
 	}
 

@@ -44,12 +44,17 @@ public abstract class AbstractHDLRange extends HDLObject {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param from
 	 *            the value for from. Can be <code>null</code>.
+	 * @param inc
+	 *            the value for inc. Can be <code>null</code>.
+	 * @param dec
+	 *            the value for dec. Can be <code>null</code>.
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLRange(int id, @Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
+	public AbstractHDLRange(int id, @Nullable IHDLObject container, @Nullable HDLExpression from, @Nullable HDLExpression inc, @Nullable HDLExpression dec,
+			@Nonnull HDLExpression to, boolean validate) {
 		super(id, container, validate);
 		if (validate) {
 			from = validateFrom(from);
@@ -58,6 +63,22 @@ public abstract class AbstractHDLRange extends HDLObject {
 			this.from = from;
 		} else {
 			this.from = null;
+		}
+		if (validate) {
+			inc = validateInc(inc);
+		}
+		if (inc != null) {
+			this.inc = inc;
+		} else {
+			this.inc = null;
+		}
+		if (validate) {
+			dec = validateDec(dec);
+		}
+		if (dec != null) {
+			this.dec = dec;
+		} else {
+			this.dec = null;
 		}
 		if (validate) {
 			to = validateTo(to);
@@ -72,6 +93,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 	public AbstractHDLRange() {
 		super();
 		this.from = null;
+		this.inc = null;
+		this.dec = null;
 		this.to = null;
 	}
 
@@ -89,6 +112,38 @@ public abstract class AbstractHDLRange extends HDLObject {
 
 	protected HDLExpression validateFrom(HDLExpression from) {
 		return from;
+	}
+
+	protected final HDLExpression inc;
+
+	/**
+	 * Get the inc field. Can be <code>null</code>.
+	 * 
+	 * @return the field
+	 */
+	@Nullable
+	public HDLExpression getInc() {
+		return inc;
+	}
+
+	protected HDLExpression validateInc(HDLExpression inc) {
+		return inc;
+	}
+
+	protected final HDLExpression dec;
+
+	/**
+	 * Get the dec field. Can be <code>null</code>.
+	 * 
+	 * @return the field
+	 */
+	@Nullable
+	public HDLExpression getDec() {
+		return dec;
+	}
+
+	protected HDLExpression validateDec(HDLExpression dec) {
+		return dec;
 	}
 
 	protected final HDLExpression to;
@@ -117,7 +172,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Override
 	@Nonnull
 	public HDLRange copy() {
-		final HDLRange newObject = new HDLRange(id, null, from, to, false);
+		final HDLRange newObject = new HDLRange(id, null, from, inc, dec, to, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -131,8 +186,10 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange copyFiltered(CopyFilter filter) {
 		final HDLExpression filteredfrom = filter.copyObject("from", this, from);
+		final HDLExpression filteredinc = filter.copyObject("inc", this, inc);
+		final HDLExpression filtereddec = filter.copyObject("dec", this, dec);
 		final HDLExpression filteredto = filter.copyObject("to", this, to);
-		return filter.postFilter((HDLRange) this, new HDLRange(id, null, filteredfrom, filteredto, false));
+		return filter.postFilter((HDLRange) this, new HDLRange(id, null, filteredfrom, filteredinc, filtereddec, filteredto, false));
 	}
 
 	/**
@@ -173,7 +230,35 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange setFrom(@Nullable HDLExpression from) {
 		from = validateFrom(from);
-		final HDLRange res = new HDLRange(id, container, from, to, false);
+		final HDLRange res = new HDLRange(id, container, from, inc, dec, to, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getInc()}.
+	 * 
+	 * @param inc
+	 *            sets the new inc of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRange} with the updated inc field.
+	 */
+	@Nonnull
+	public HDLRange setInc(@Nullable HDLExpression inc) {
+		inc = validateInc(inc);
+		final HDLRange res = new HDLRange(id, container, from, inc, dec, to, false);
+		return res;
+	}
+
+	/**
+	 * Setter for the field {@link #getDec()}.
+	 * 
+	 * @param dec
+	 *            sets the new dec of this object. Can be <code>null</code>.
+	 * @return a new instance of {@link HDLRange} with the updated dec field.
+	 */
+	@Nonnull
+	public HDLRange setDec(@Nullable HDLExpression dec) {
+		dec = validateDec(dec);
+		final HDLRange res = new HDLRange(id, container, from, inc, dec, to, false);
 		return res;
 	}
 
@@ -188,7 +273,7 @@ public abstract class AbstractHDLRange extends HDLObject {
 	@Nonnull
 	public HDLRange setTo(@Nonnull HDLExpression to) {
 		to = validateTo(to);
-		final HDLRange res = new HDLRange(id, container, from, to, false);
+		final HDLRange res = new HDLRange(id, container, from, inc, dec, to, false);
 		return res;
 	}
 
@@ -208,6 +293,16 @@ public abstract class AbstractHDLRange extends HDLObject {
 				return false;
 		} else if (!from.equals(other.from))
 			return false;
+		if (inc == null) {
+			if (other.inc != null)
+				return false;
+		} else if (!inc.equals(other.inc))
+			return false;
+		if (dec == null) {
+			if (other.dec != null)
+				return false;
+		} else if (!dec.equals(other.dec))
+			return false;
 		if (to == null) {
 			if (other.to != null)
 				return false;
@@ -225,6 +320,8 @@ public abstract class AbstractHDLRange extends HDLObject {
 		int result = super.hashCode();
 		final int prime = 31;
 		result = (prime * result) + ((from == null) ? 0 : from.hashCode());
+		result = (prime * result) + ((inc == null) ? 0 : inc.hashCode());
+		result = (prime * result) + ((dec == null) ? 0 : dec.hashCode());
 		result = (prime * result) + ((to == null) ? 0 : to.hashCode());
 		hashCache = result;
 		return result;
@@ -238,6 +335,12 @@ public abstract class AbstractHDLRange extends HDLObject {
 		if (from != null) {
 			sb.append(".setFrom(").append(from.toConstructionString(spacing + "\t")).append(")");
 		}
+		if (inc != null) {
+			sb.append(".setInc(").append(inc.toConstructionString(spacing + "\t")).append(")");
+		}
+		if (dec != null) {
+			sb.append(".setDec(").append(dec.toConstructionString(spacing + "\t")).append(")");
+		}
 		if (to != null) {
 			sb.append(".setTo(").append(to.toConstructionString(spacing + "\t")).append(")");
 		}
@@ -250,6 +353,14 @@ public abstract class AbstractHDLRange extends HDLObject {
 		validateFrom(getFrom());
 		if (getFrom() != null) {
 			getFrom().validateAllFields(this, checkResolve);
+		}
+		validateInc(getInc());
+		if (getInc() != null) {
+			getInc().validateAllFields(this, checkResolve);
+		}
+		validateDec(getDec());
+		if (getDec() != null) {
+			getDec().validateAllFields(this, checkResolve);
 		}
 		validateTo(getTo());
 		if (getTo() != null) {
@@ -282,6 +393,16 @@ public abstract class AbstractHDLRange extends HDLObject {
 						}
 						break;
 					case 1:
+						if (inc != null) {
+							current = Iterators.concat(Iterators.forArray(inc), inc.deepIterator());
+						}
+						break;
+					case 2:
+						if (dec != null) {
+							current = Iterators.concat(Iterators.forArray(dec), dec.deepIterator());
+						}
+						break;
+					case 3:
 						if (to != null) {
 							current = Iterators.concat(Iterators.forArray(to), to.deepIterator());
 						}
@@ -326,6 +447,16 @@ public abstract class AbstractHDLRange extends HDLObject {
 						}
 						break;
 					case 1:
+						if (inc != null) {
+							current = Iterators.singletonIterator(inc);
+						}
+						break;
+					case 2:
+						if (dec != null) {
+							current = Iterators.singletonIterator(dec);
+						}
+						break;
+					case 3:
 						if (to != null) {
 							current = Iterators.singletonIterator(to);
 						}

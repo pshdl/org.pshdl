@@ -75,19 +75,19 @@ public class ProcessModel {
     final ProcessModel pm = _processModel;
     ArrayList<HDLStatement> _inits = stmnt.getInits();
     final Procedure1<HDLStatement> _function = new Procedure1<HDLStatement>() {
-        public void apply(final HDLStatement s) {
-          ProcessModel _processModel = ProcessModel.toProcessModel(s, ProcessModel.DEF_PROCESS);
-          pm.merge(_processModel);
-        }
-      };
+      public void apply(final HDLStatement s) {
+        ProcessModel _processModel = ProcessModel.toProcessModel(s, ProcessModel.DEF_PROCESS);
+        pm.merge(_processModel);
+      }
+    };
     IterableExtensions.<HDLStatement>forEach(_inits, _function);
     ArrayList<HDLStatement> _statements = stmnt.getStatements();
     final Procedure1<HDLStatement> _function_1 = new Procedure1<HDLStatement>() {
-        public void apply(final HDLStatement s) {
-          ProcessModel _processModel = ProcessModel.toProcessModel(s, ProcessModel.DEF_PROCESS);
-          pm.merge(_processModel);
-        }
-      };
+      public void apply(final HDLStatement s) {
+        ProcessModel _processModel = ProcessModel.toProcessModel(s, ProcessModel.DEF_PROCESS);
+        pm.merge(_processModel);
+      }
+    };
     IterableExtensions.<HDLStatement>forEach(_statements, _function_1);
     return pm;
   }
@@ -145,21 +145,21 @@ public class ProcessModel {
     final ProcessModel res = _processModel_2;
     Map<Integer,Collection<HDLStatement>> _asMap = pm.unclockedStatements.asMap();
     final Procedure2<Integer,Collection<HDLStatement>> _function = new Procedure2<Integer,Collection<HDLStatement>>() {
-        public void apply(final Integer subPid, final Collection<HDLStatement> stmnts) {
-          ArrayList<HDLStatement> _arrayList = new ArrayList<HDLStatement>(stmnts);
-          T _setValue = field.setValue(obj, ((C) _arrayList));
-          res.unclockedStatements.put(subPid, _setValue);
-        }
-      };
+      public void apply(final Integer subPid, final Collection<HDLStatement> stmnts) {
+        ArrayList<HDLStatement> _arrayList = new ArrayList<HDLStatement>(stmnts);
+        T _setValue = field.setValue(obj, ((C) _arrayList));
+        res.unclockedStatements.put(subPid, _setValue);
+      }
+    };
     MapExtensions.<Integer, Collection<HDLStatement>>forEach(_asMap, _function);
     Map<HDLRegisterConfig,Collection<HDLStatement>> _asMap_1 = pm.clockedStatements.asMap();
     final Procedure2<HDLRegisterConfig,Collection<HDLStatement>> _function_1 = new Procedure2<HDLRegisterConfig,Collection<HDLStatement>>() {
-        public void apply(final HDLRegisterConfig reg, final Collection<HDLStatement> stmnts) {
-          ArrayList<HDLStatement> _arrayList = new ArrayList<HDLStatement>(stmnts);
-          T _setValue = field.setValue(obj, ((C) _arrayList));
-          res.clockedStatements.put(reg, _setValue);
-        }
-      };
+      public void apply(final HDLRegisterConfig reg, final Collection<HDLStatement> stmnts) {
+        ArrayList<HDLStatement> _arrayList = new ArrayList<HDLStatement>(stmnts);
+        T _setValue = field.setValue(obj, ((C) _arrayList));
+        res.clockedStatements.put(reg, _setValue);
+      }
+    };
     MapExtensions.<HDLRegisterConfig, Collection<HDLStatement>>forEach(_asMap_1, _function_1);
     return res;
   }
@@ -169,21 +169,21 @@ public class ProcessModel {
     final ProcessModel thenPM = _processModel;
     ArrayList<HDLStatement> _thenDo = stmnt.getThenDo();
     final Procedure1<HDLStatement> _function = new Procedure1<HDLStatement>() {
-        public void apply(final HDLStatement s) {
-          ProcessModel _processModel = ProcessModel.toProcessModel(s, pid);
-          thenPM.merge(_processModel);
-        }
-      };
+      public void apply(final HDLStatement s) {
+        ProcessModel _processModel = ProcessModel.toProcessModel(s, pid);
+        thenPM.merge(_processModel);
+      }
+    };
     IterableExtensions.<HDLStatement>forEach(_thenDo, _function);
     ProcessModel _processModel_1 = new ProcessModel();
     final ProcessModel elsePM = _processModel_1;
     ArrayList<HDLStatement> _elseDo = stmnt.getElseDo();
     final Procedure1<HDLStatement> _function_1 = new Procedure1<HDLStatement>() {
-        public void apply(final HDLStatement s) {
-          ProcessModel _processModel = ProcessModel.toProcessModel(s, pid);
-          elsePM.merge(_processModel);
-        }
-      };
+      public void apply(final HDLStatement s) {
+        ProcessModel _processModel = ProcessModel.toProcessModel(s, pid);
+        elsePM.merge(_processModel);
+      }
+    };
     IterableExtensions.<HDLStatement>forEach(_elseDo, _function_1);
     HashSet<HDLRegisterConfig> _hashSet = new HashSet<HDLRegisterConfig>();
     final HashSet<HDLRegisterConfig> clocks = _hashSet;
@@ -244,12 +244,12 @@ public class ProcessModel {
     if (hasUnclocked) {
       final List<HDLSwitchCaseStatement> newCases = Lists.<HDLSwitchCaseStatement>newLinkedList();
       final Procedure2<HDLSwitchCaseStatement,ProcessModel> _function = new Procedure2<HDLSwitchCaseStatement,ProcessModel>() {
-          public void apply(final HDLSwitchCaseStatement caze, final ProcessModel caseStatements) {
-            Collection<HDLStatement> _get = caseStatements.unclockedStatements.get(Integer.valueOf(pid));
-            HDLSwitchCaseStatement _setDos = caze.setDos(_get);
-            newCases.add(_setDos);
-          }
-        };
+        public void apply(final HDLSwitchCaseStatement caze, final ProcessModel caseStatements) {
+          Collection<HDLStatement> _get = caseStatements.unclockedStatements.get(Integer.valueOf(pid));
+          HDLSwitchCaseStatement _setDos = caze.setDos(_get);
+          newCases.add(_setDos);
+        }
+      };
       MapExtensions.<HDLSwitchCaseStatement, ProcessModel>forEach(pms, _function);
       HDLSwitchStatement _setCases = stmnt.setCases(newCases);
       res.addUnclocked(pid, _setCases);
@@ -258,12 +258,12 @@ public class ProcessModel {
       {
         final List<HDLSwitchCaseStatement> newCases_1 = Lists.<HDLSwitchCaseStatement>newLinkedList();
         final Procedure2<HDLSwitchCaseStatement,ProcessModel> _function_1 = new Procedure2<HDLSwitchCaseStatement,ProcessModel>() {
-            public void apply(final HDLSwitchCaseStatement caze, final ProcessModel caseStatements) {
-              Collection<HDLStatement> _get = caseStatements.clockedStatements.get(reg);
-              HDLSwitchCaseStatement _setDos = caze.setDos(_get);
-              newCases_1.add(_setDos);
-            }
-          };
+          public void apply(final HDLSwitchCaseStatement caze, final ProcessModel caseStatements) {
+            Collection<HDLStatement> _get = caseStatements.clockedStatements.get(reg);
+            HDLSwitchCaseStatement _setDos = caze.setDos(_get);
+            newCases_1.add(_setDos);
+          }
+        };
         MapExtensions.<HDLSwitchCaseStatement, ProcessModel>forEach(pms, _function_1);
         HDLSwitchStatement _setCases_1 = stmnt.setCases(newCases_1);
         res.addClocked(reg, _setCases_1);
@@ -329,7 +329,7 @@ public class ProcessModel {
     {
       Map<Integer,Collection<HDLStatement>> _asMap = this.unclockedStatements.asMap();
       Set<Entry<Integer,Collection<HDLStatement>>> _entrySet = _asMap.entrySet();
-      for(final Entry<Integer,Collection<HDLStatement>> e : _entrySet) {
+      for(final Entry<Integer, Collection<HDLStatement>> e : _entrySet) {
         _builder.append("Process:");
         Integer _key = e.getKey();
         _builder.append(_key, "");
@@ -353,7 +353,7 @@ public class ProcessModel {
     {
       Map<HDLRegisterConfig,Collection<HDLStatement>> _asMap_1 = this.clockedStatements.asMap();
       Set<Entry<HDLRegisterConfig,Collection<HDLStatement>>> _entrySet_1 = _asMap_1.entrySet();
-      for(final Entry<HDLRegisterConfig,Collection<HDLStatement>> e_1 : _entrySet_1) {
+      for(final Entry<HDLRegisterConfig, Collection<HDLStatement>> e_1 : _entrySet_1) {
         _builder.append("Process:");
         HDLRegisterConfig _key_1 = e_1.getKey();
         _builder.append(_key_1, "");

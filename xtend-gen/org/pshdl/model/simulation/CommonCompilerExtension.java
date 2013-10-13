@@ -26,21 +26,21 @@ public class CommonCompilerExtension {
   
   public Map<String,Integer> varIdx = new Function0<Map<String,Integer>>() {
     public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String,Integer>();
+      HashMap<String,Integer> _hashMap = new HashMap<String, Integer>();
       return _hashMap;
     }
   }.apply();
   
   public Map<String,Integer> intIdx = new Function0<Map<String,Integer>>() {
     public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String,Integer>();
+      HashMap<String,Integer> _hashMap = new HashMap<String, Integer>();
       return _hashMap;
     }
   }.apply();
   
   public Map<String,Boolean> prevMap = new Function0<Map<String,Boolean>>() {
     public Map<String,Boolean> apply() {
-      HashMap<String,Boolean> _hashMap = new HashMap<String,Boolean>();
+      HashMap<String,Boolean> _hashMap = new HashMap<String, Boolean>();
       return _hashMap;
     }
   }.apply();
@@ -107,11 +107,11 @@ public class CommonCompilerExtension {
   
   public Iterable<VariableInformation> excludeNull(final VariableInformation[] vars) {
     final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-        public Boolean apply(final VariableInformation it) {
-          boolean _isNotNull = CommonCompilerExtension.this.isNotNull(it);
-          return Boolean.valueOf(_isNotNull);
-        }
-      };
+      public Boolean apply(final VariableInformation it) {
+        boolean _isNotNull = CommonCompilerExtension.this.isNotNull(it);
+        return Boolean.valueOf(_isNotNull);
+      }
+    };
     Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(vars)), _function);
     return _filter;
   }
@@ -129,11 +129,11 @@ public class CommonCompilerExtension {
   
   public Iterable<InternalInformation> excludeNull(final InternalInformation[] vars) {
     final Function1<InternalInformation,Boolean> _function = new Function1<InternalInformation,Boolean>() {
-        public Boolean apply(final InternalInformation it) {
-          boolean _isNotNull = CommonCompilerExtension.this.isNotNull(it.info);
-          return Boolean.valueOf(_isNotNull);
-        }
-      };
+      public Boolean apply(final InternalInformation it) {
+        boolean _isNotNull = CommonCompilerExtension.this.isNotNull(it.info);
+        return Boolean.valueOf(_isNotNull);
+      }
+    };
     Iterable<InternalInformation> _filter = IterableExtensions.<InternalInformation>filter(((Iterable<InternalInformation>)Conversions.doWrapArray(vars)), _function);
     return _filter;
   }

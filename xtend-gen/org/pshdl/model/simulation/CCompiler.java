@@ -341,12 +341,12 @@ public class CCompiler implements ITypeOuptutProvider {
       {
         Iterable<VariableInformation> _excludeNull_1 = this.cce.excludeNull(this.cce.em.variables);
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-            public Boolean apply(final VariableInformation it) {
-              Boolean _get = CCompiler.this.cce.prevMap.get(it.name);
-              boolean _tripleNotEquals = (_get != null);
-              return Boolean.valueOf(_tripleNotEquals);
-            }
-          };
+          public Boolean apply(final VariableInformation it) {
+            Boolean _get = CCompiler.this.cce.prevMap.get(it.name);
+            boolean _tripleNotEquals = (_get != null);
+            return Boolean.valueOf(_tripleNotEquals);
+          }
+        };
         Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull_1, _function);
         for(final VariableInformation v_1 : _filter) {
           _builder.append("\t\t");
@@ -2442,24 +2442,24 @@ public class CCompiler implements ITypeOuptutProvider {
     HashSet<String> _hashSet = new HashSet<String>();
     final Set<String> varNames = _hashSet;
     final Procedure1<Row> _function = new Procedure1<Row>() {
-        public void apply(final Row it) {
-          List<Definition> _allDefs = CCompiler.this.ba.allDefs(it);
-          final Function1<Definition,Boolean> _function = new Function1<Definition,Boolean>() {
-              public Boolean apply(final Definition it) {
-                boolean _tripleNotEquals = (it.type != Type.UNUSED);
-                return Boolean.valueOf(_tripleNotEquals);
-              }
-            };
-          Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
-          final Procedure1<Definition> _function_1 = new Procedure1<Definition>() {
-              public void apply(final Definition it) {
-                String _name = it.getName();
-                varNames.add(_name);
-              }
-            };
-          IterableExtensions.<Definition>forEach(_filter, _function_1);
-        }
-      };
+      public void apply(final Row it) {
+        List<Definition> _allDefs = CCompiler.this.ba.allDefs(it);
+        final Function1<Definition,Boolean> _function = new Function1<Definition,Boolean>() {
+          public Boolean apply(final Definition it) {
+            boolean _tripleNotEquals = (it.type != Type.UNUSED);
+            return Boolean.valueOf(_tripleNotEquals);
+          }
+        };
+        Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
+        final Procedure1<Definition> _function_1 = new Procedure1<Definition>() {
+          public void apply(final Definition it) {
+            String _name = it.getName();
+            varNames.add(_name);
+          }
+        };
+        IterableExtensions.<Definition>forEach(_filter, _function_1);
+      }
+    };
     IterableExtensions.<Row>forEach(rows, _function);
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("//  BusAccessSim.c");

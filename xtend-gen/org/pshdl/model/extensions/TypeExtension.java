@@ -362,7 +362,11 @@ public class TypeExtension {
   
   protected Optional<? extends HDLType> _determineType(final HDLFunctionCall call) {
     HDLTypeInferenceInfo _inferenceInfo = HDLFunctions.getInferenceInfo(call);
-    return Optional.<HDLType>fromNullable(_inferenceInfo.result);
+    HDLType _result = null;
+    if (_inferenceInfo!=null) {
+      _result=_inferenceInfo.result;
+    }
+    return Optional.<HDLType>fromNullable(_result);
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLLiteral lit) {

@@ -327,25 +327,25 @@ public class SimulationTransformationExtension {
   
   public String[] toAnnoString(final Iterable<HDLAnnotation> annotations) {
     final Function1<HDLAnnotation,String> _function = new Function1<HDLAnnotation,String>() {
-        public String apply(final HDLAnnotation it) {
-          String _xifexpression = null;
-          String _value = it.getValue();
-          boolean _tripleEquals = (_value == null);
-          if (_tripleEquals) {
-            String _name = it.getName();
-            String _substring = _name.substring(1);
-            _xifexpression = _substring;
-          } else {
-            String _name_1 = it.getName();
-            String _substring_1 = _name_1.substring(1);
-            String _plus = (_substring_1 + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
-            String _value_1 = it.getValue();
-            String _plus_1 = (_plus + _value_1);
-            _xifexpression = _plus_1;
-          }
-          return _xifexpression;
+      public String apply(final HDLAnnotation it) {
+        String _xifexpression = null;
+        String _value = it.getValue();
+        boolean _tripleEquals = (_value == null);
+        if (_tripleEquals) {
+          String _name = it.getName();
+          String _substring = _name.substring(1);
+          _xifexpression = _substring;
+        } else {
+          String _name_1 = it.getName();
+          String _substring_1 = _name_1.substring(1);
+          String _plus = (_substring_1 + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
+          String _value_1 = it.getValue();
+          String _plus_1 = (_plus + _value_1);
+          _xifexpression = _plus_1;
         }
-      };
+        return _xifexpression;
+      }
+    };
     Iterable<String> _map = IterableExtensions.<HDLAnnotation, String>map(annotations, _function);
     return ((String[])Conversions.unwrapArray(_map, String.class));
   }

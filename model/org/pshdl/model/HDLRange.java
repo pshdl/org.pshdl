@@ -43,6 +43,8 @@ import com.google.common.base.*;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression from. Can be <code>null</code>.</li>
+ * <li>HDLExpression inc. Can be <code>null</code>.</li>
+ * <li>HDLExpression dec. Can be <code>null</code>.</li>
  * <li>HDLExpression to. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
@@ -54,13 +56,18 @@ public class HDLRange extends AbstractHDLRange {
 	 *            the value for container. Can be <code>null</code>.
 	 * @param from
 	 *            the value for from. Can be <code>null</code>.
+	 * @param inc
+	 *            the value for inc. Can be <code>null</code>.
+	 * @param dec
+	 *            the value for dec. Can be <code>null</code>.
 	 * @param to
 	 *            the value for to. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLRange(int id, @Nullable IHDLObject container, @Nullable HDLExpression from, @Nonnull HDLExpression to, boolean validate) {
-		super(id, container, from, to, validate);
+	public HDLRange(int id, @Nullable IHDLObject container, @Nullable HDLExpression from, @Nullable HDLExpression inc, @Nullable HDLExpression dec, @Nonnull HDLExpression to,
+			boolean validate) {
+		super(id, container, from, inc, dec, to, validate);
 	}
 
 	public HDLRange() {
@@ -91,6 +98,42 @@ public class HDLRange extends AbstractHDLRange {
 			if (obj == null)
 				return null;
 			return obj.setFrom(value);
+		}
+	};
+	/**
+	 * The accessor for the field inc which is of type HDLExpression.
+	 */
+	public static HDLFieldAccess<HDLRange, HDLExpression> fInc = new HDLFieldAccess<HDLRange, HDLExpression>("inc") {
+		@Override
+		public HDLExpression getValue(HDLRange obj) {
+			if (obj == null)
+				return null;
+			return obj.getInc();
+		}
+
+		@Override
+		public HDLRange setValue(HDLRange obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setInc(value);
+		}
+	};
+	/**
+	 * The accessor for the field dec which is of type HDLExpression.
+	 */
+	public static HDLFieldAccess<HDLRange, HDLExpression> fDec = new HDLFieldAccess<HDLRange, HDLExpression>("dec") {
+		@Override
+		public HDLExpression getValue(HDLRange obj) {
+			if (obj == null)
+				return null;
+			return obj.getDec();
+		}
+
+		@Override
+		public HDLRange setValue(HDLRange obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setDec(value);
 		}
 	};
 	/**

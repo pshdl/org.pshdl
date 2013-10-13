@@ -610,12 +610,12 @@ public class DartCompiler implements ITypeOuptutProvider {
       {
         Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-            public Boolean apply(final VariableInformation it) {
-              Boolean _get = DartCompiler.this.cce.prevMap.get(it.name);
-              boolean _tripleNotEquals = (_get != null);
-              return Boolean.valueOf(_tripleNotEquals);
-            }
-          };
+          public Boolean apply(final VariableInformation it) {
+            Boolean _get = DartCompiler.this.cce.prevMap.get(it.name);
+            boolean _tripleNotEquals = (_get != null);
+            return Boolean.valueOf(_tripleNotEquals);
+          }
+        };
         Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull_2, _function);
         for(final VariableInformation v_3 : _filter) {
           _builder.append("\t\t");
@@ -1186,11 +1186,11 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     {
       final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            boolean _tripleEquals = (it.dir == Direction.IN);
-            return Boolean.valueOf(_tripleEquals);
-          }
-        };
+        public Boolean apply(final VariableInformation it) {
+          boolean _tripleEquals = (it.dir == Direction.IN);
+          return Boolean.valueOf(_tripleEquals);
+        }
+      };
       Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function);
       boolean _hasElements = false;
       for(final VariableInformation v : _filter) {
@@ -1213,11 +1213,11 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     {
       final Function1<VariableInformation,Boolean> _function_1 = new Function1<VariableInformation,Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            boolean _tripleEquals = (it.dir == Direction.INOUT);
-            return Boolean.valueOf(_tripleEquals);
-          }
-        };
+        public Boolean apply(final VariableInformation it) {
+          boolean _tripleEquals = (it.dir == Direction.INOUT);
+          return Boolean.valueOf(_tripleEquals);
+        }
+      };
       Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function_1);
       boolean _hasElements_1 = false;
       for(final VariableInformation v_1 : _filter_1) {
@@ -1240,11 +1240,11 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     {
       final Function1<VariableInformation,Boolean> _function_2 = new Function1<VariableInformation,Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            boolean _tripleEquals = (it.dir == Direction.OUT);
-            return Boolean.valueOf(_tripleEquals);
-          }
-        };
+        public Boolean apply(final VariableInformation it) {
+          boolean _tripleEquals = (it.dir == Direction.OUT);
+          return Boolean.valueOf(_tripleEquals);
+        }
+      };
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function_2);
       boolean _hasElements_2 = false;
       for(final VariableInformation v_2 : _filter_2) {
@@ -1267,11 +1267,11 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     {
       final Function1<VariableInformation,Boolean> _function_3 = new Function1<VariableInformation,Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            boolean _tripleEquals = (it.dir == Direction.INTERNAL);
-            return Boolean.valueOf(_tripleEquals);
-          }
-        };
+        public Boolean apply(final VariableInformation it) {
+          boolean _tripleEquals = (it.dir == Direction.INTERNAL);
+          return Boolean.valueOf(_tripleEquals);
+        }
+      };
       Iterable<VariableInformation> _filter_3 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function_3);
       boolean _hasElements_3 = false;
       for(final VariableInformation v_3 : _filter_3) {
