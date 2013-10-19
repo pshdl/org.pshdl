@@ -254,4 +254,5 @@ public class HDLResolver {
 		}
 		return res;
 	}
+
 }
