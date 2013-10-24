@@ -65,6 +65,7 @@ import java.math.BigDecimal
 import com.google.common.base.Optional
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.interpreter.frames.BigIntegerFrame
+import org.pshdl.model.HDLStatement
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -115,24 +116,16 @@ class RangeExtension {
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional::absent
 		}
-		var HDLAnnotation range = hVar.get.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
-		if (range !== null) {
-			val value = range.value.split(";")
-
-			//TODO Allow simple references
-			return Optional::of(Range::closed(new BigInteger(value.get(0)), new BigInteger(value.get(1))))
-		}
+		val annoCheck=checkAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range))
+		if (annoCheck.present)
+			return annoCheck
 		val container = hVar.get.container
 		if (container !== null) {
 			if (container instanceof HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
-				range = hvd.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range)
-				if (range !== null) {
-					val String[] value = range.value.split(";")
-
-					//TODO Allow simple references
-					return Optional::of(Range::closed(new BigInteger(value.get(0)), new BigInteger(value.get(1))))
-				}
+				val subAnnoCheck = checkAnnotation(hvd.getAnnotation(HDLBuiltInAnnotationProvider$HDLBuiltInAnnotations::range))
+				if (subAnnoCheck.present)
+					return subAnnoCheck
 			}
 			if (container instanceof HDLForLoop) {
 				val HDLForLoop loop = container as HDLForLoop
@@ -177,6 +170,24 @@ class RangeExtension {
 		return Optional::absent
 	}
 
+	
+
+	def static Optional<Range<BigInteger>> checkAnnotation(HDLAnnotation range) {
+		if (range !== null) {
+			val value = range.value.split(";")
+
+			//TODO Allow simple references
+			try {
+				val lowerBound=new BigInteger(value.get(0))
+				val upperBound=new BigInteger(value.get(1))
+				return Optional::of(Range::closed(lowerBound,upperBound))
+			} catch(Exception e){
+				//print("Invalid arguments for range annotation "+range.value+"\n")
+				return Optional::absent
+			}
+		}
+		return Optional::absent
+	}
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj) {
 		return rangeOf(obj, null)
 	}

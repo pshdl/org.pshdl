@@ -51,18 +51,6 @@ public class PSHDLLib {
 	private static HDLFunction createABS(Type type) {
 		return new HDLNativeFunction().setSimOnly(false).setName("abs").setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
 				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ));
-		// .setExpr(
-		// new HDLTernary()
-		// .setIfExpr(
-		// new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.abs.a"))).setRight(new
-		// HDLLiteral().setVal("0"))
-		// .setType(HDLEqualityOpType.LESS))
-		// .setThenExpr(new
-		// HDLManip().setType(HDLManipType.ARITH_NEG).setTarget(new
-		// HDLVariableRef().setVar(new HDLQualifiedName("pshdl.abs.a"))))
-		// .setElseExpr(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.abs.a"))));
 	}
 
 	public static final HDLFunction MIN_UINT = createMIN(Type.ANY_UINT);
@@ -72,17 +60,6 @@ public class PSHDLLib {
 		return new HDLNativeFunction().setSimOnly(false).setName("min").setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
 				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
 				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")).setRw(RWType.READ));
-		// .setExpr(
-		// new HDLTernary()
-		// .setIfExpr(
-		// new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.min.a")))
-		// .setRight(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.min.b"))).setType(HDLEqualityOpType.LESS))
-		// .setThenExpr(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.min.a")))
-		// .setElseExpr(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.min.b"))));
 	}
 
 	public static final HDLFunction MAX_INT = createMAX(Type.ANY_INT);
@@ -92,40 +69,32 @@ public class PSHDLLib {
 		return new HDLNativeFunction().setSimOnly(false).setName("max").setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
 				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
 				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")).setRw(RWType.READ));
-		// .setExpr(
-		// new HDLTernary()
-		// .setIfExpr(
-		// new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.max.a")))
-		// .setRight(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.max.b"))).setType(HDLEqualityOpType.GREATER))
-		// .setThenExpr(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.max.a")))
-		// .setElseExpr(new HDLVariableRef().setVar(new
-		// HDLQualifiedName("pshdl.max.b"))));
 	}
 
 	public static final HDLFunction[] FUNCTIONS = new HDLFunction[] { MIN_UINT, MAX_UINT, ABS_UINT, MIN_INT, MAX_INT, ABS_INT };
 
 	private static HDLPackage LIB = null;
+	private static Object LIB_LOCK = new Object();
 
 	public static HDLPackage getLib() {
-		if (LIB == null) {
-			HDLPackage pkg = new HDLPackage().setLibURI("PSHDLLib").setPkg("pshdl");
-			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(TIMEUNIT));
-			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(EDGE));
-			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
-			pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(SYNC));
-			for (final HDLFunction func : FUNCTIONS) {
-				pkg = pkg.addDeclarations(func);
-			}
-			final CompilerInformation info = HDLCore.getCompilerInformation();
-			for (final Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet())
-				if (e.getValue().type == FunctionType.NATIVE) {
-					pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
+		synchronized (LIB_LOCK) {
+			if (LIB == null) {
+				HDLPackage pkg = new HDLPackage().setLibURI("PSHDLLib").setPkg("pshdl");
+				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(TIMEUNIT));
+				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(EDGE));
+				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
+				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(SYNC));
+				for (final HDLFunction func : FUNCTIONS) {
+					pkg = pkg.addDeclarations(func);
 				}
-			pkg.freeze(null);
-			LIB = pkg;
+				final CompilerInformation info = HDLCore.getCompilerInformation();
+				for (final Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet())
+					if (e.getValue().type == FunctionType.NATIVE) {
+						pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
+					}
+				pkg.freeze(null);
+				LIB = pkg;
+			}
 		}
 		return LIB;
 	}

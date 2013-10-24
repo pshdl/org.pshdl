@@ -9,6 +9,7 @@ import org.pshdl.model.*;
 import org.pshdl.model.parser.*;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 import com.google.common.base.*;
@@ -350,7 +351,22 @@ public class PSAbstractCompiler {
 		for (final Entry<String, Set<Problem>> e : issues.entrySet()) {
 			System.out.println("File:" + e.getKey());
 			for (final Problem p : e.getValue()) {
-				System.out.println("\t" + p.toString());
+				final HDLAdvise advise = HDLValidator.advise(p);
+				System.out.println("\t" + p.severity + " at line: " + p.line + ":" + p.offsetInLine);
+				if (advise != null) {
+					System.out.println("\t\t" + advise.message);
+					System.out.println("\t\t" + advise.explanation);
+					for (final String help : advise.solutions) {
+						System.out.println("\t\t\t" + help);
+					}
+				} else {
+					if (p.info != null) {
+						System.out.println("\t\t" + p.info);
+					}
+					if (p.context != null) {
+						System.out.println("\t\t Object:" + p.context);
+					}
+				}
 			}
 		}
 	}
@@ -394,6 +410,11 @@ public class PSAbstractCompiler {
 		return hasError(validate);
 	}
 
+	/**
+	 * 
+	 * @return <code>true</code> when at least one error has been found
+	 * @throws Exception
+	 */
 	public boolean validatePackages() throws Exception {
 		validated = true;
 		boolean validationError = false;
@@ -462,5 +483,9 @@ public class PSAbstractCompiler {
 
 	public Map<String, Set<Problem>> getAllProblems() {
 		return issues;
+	}
+
+	public Collection<HDLUnit> getUnits() {
+		return lib.units.values();
 	}
 }

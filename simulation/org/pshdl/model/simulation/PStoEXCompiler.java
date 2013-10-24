@@ -47,6 +47,10 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 
 	private final Map<String, ITypeOuptutProvider> providers;
 
+	public PStoEXCompiler() {
+		this(null);
+	}
+
 	public PStoEXCompiler(ExecutorService service) {
 		super("CMDLINE", service);
 		final Collection<ITypeOuptutProvider> allImplementations = HDLCore.getAllImplementations(ITypeOuptutProvider.class);
@@ -67,8 +71,8 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		final Options options = new Options();
 		options.addOption(new Option("o", "outputDir", true, "Specify the directory to which the files will be written, default is: src-gen/psex/[type]"));
 		options.addOption(new Option("noEm", "disable the output of the byte-code .em file"));
-		options.addOption(OptionBuilder.withArgName("type")
-				.withDescription("The output type to generate. Valid options are: " + listTypes() + ". Each type may require additional command line arguments").hasArg()
+		options.addOption(OptionBuilder.withArgName(listTypes("|"))
+				.withDescription("The output type to generate. Valid options are: " + listTypes(", ") + ". Each type may require additional command line arguments").hasArg()
 				.create("type"));
 		final MultiOption mo = new MultiOption(getHookName() + " usage: [OPTIONS] MODULE <files>", null, options);
 		for (final ITypeOuptutProvider ito : providers.values()) {
@@ -77,17 +81,21 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		return mo;
 	}
 
-	private String listTypes() {
-		return Joiner.on(", ").join(providers.keySet());
+	private String listTypes(String sep) {
+		return Joiner.on(sep).join(providers.keySet());
 	}
 
 	@Override
 	public String invoke(CommandLine cli) throws Exception {
 		final List<String> argList = cli.getArgList();
-		if (argList.size() == 0)
-			return "Missing module and file arguments, try help " + getHookName();
-		if (argList.size() == 1)
-			return "Missing file arguments, try help " + getHookName();
+		if (argList.size() == 0) {
+			getUsage().printHelp(System.out);
+			return "Missing module and file arguments";
+		}
+		if (argList.size() == 1) {
+			getUsage().printHelp(System.out);
+			return "Missing file arguments";
+		}
 		final HDLQualifiedName unitName = new HDLQualifiedName(argList.get(0));
 		System.out.println("Using module:\t" + unitName);
 		final List<File> files = Lists.newLinkedList();
@@ -97,6 +105,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		System.out.println("Parsing files:");
 		for (int i = 1; i < argList.size(); i++) {
 			final File source = new File(argList.get(i));
+			System.out.println("\t" + source.getAbsolutePath());
 			if (!source.exists())
 				return "The file: " + source + " can not be found";
 			files.add(source);

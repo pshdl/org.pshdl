@@ -113,7 +113,7 @@ public interface IOutputProvider {
 	 * it.
 	 * 
 	 * @param args
-	 *            the arguments including the hook
+	 *            the arguments excluding the hook
 	 * @return an explanation of what went wrong or <code>null</code> if it was
 	 *         successful
 	 */
