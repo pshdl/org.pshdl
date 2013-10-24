@@ -48,11 +48,11 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 	private final Map<String, ITypeOuptutProvider> providers;
 
 	public PStoEXCompiler() {
-		this(null);
+		this(null, null);
 	}
 
-	public PStoEXCompiler(ExecutorService service) {
-		super("CMDLINE", service);
+	public PStoEXCompiler(String uri, ExecutorService service) {
+		super(uri, service);
 		final Collection<ITypeOuptutProvider> allImplementations = HDLCore.getAllImplementations(ITypeOuptutProvider.class);
 		providers = Maps.newTreeMap();
 		for (final ITypeOuptutProvider ito : allImplementations) {
@@ -160,19 +160,6 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 			throw e;
 		}
 		return em;
-	}
-
-	public static void main(String[] args) throws Exception {
-		final PStoEXCompiler psx = new PStoEXCompiler(createExecutor());
-		final MultiOption options = psx.getUsage();
-		options.printHelp(System.out);
-		final CommandLineParser clp = new PosixParser();
-		final String invoke = psx.invoke(clp.parse(options.allOptions(), args));
-		if (invoke != null) {
-			System.err.println(invoke);
-			System.exit(1);
-		}
-		System.exit(0);
 	}
 
 	public ExecutableModel createExecutable(HDLQualifiedName name, String src) throws CycleException {

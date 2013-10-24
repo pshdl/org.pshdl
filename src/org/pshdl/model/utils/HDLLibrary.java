@@ -60,15 +60,21 @@ public class HDLLibrary {
 
 	private static Map<String, HDLLibrary> libs = new HashMap<String, HDLLibrary>();
 
-	public static HDLLibrary getLibrary(String uri) {
-		return libs.get(uri);
+	public static HDLLibrary getLibrary(String libURI) {
+		if (libURI == null)
+			throw new IllegalArgumentException("Library uri can not be null");
+		return libs.get(libURI);
 	}
 
-	public static void registerLibrary(String uri, HDLLibrary library) {
-		libs.put(uri, library);
+	public static void registerLibrary(String libURI, HDLLibrary library) {
+		if (libURI == null)
+			throw new IllegalArgumentException("Library uri can not be null");
+		libs.put(libURI, library);
 	}
 
 	public static void unregister(String libURI) {
+		if (libURI == null)
+			throw new IllegalArgumentException("Library uri can not be null");
 		libs.remove(libURI);
 	}
 

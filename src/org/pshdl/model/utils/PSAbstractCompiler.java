@@ -172,10 +172,14 @@ public class PSAbstractCompiler {
 		if (!HDLCore.isInitialized()) {
 			HDLCore.defaultInit();
 		}
-		this.uri = uri;
+		if (uri == null) {
+			this.uri = "RANDOM" + Long.toHexString(RANDOM.nextLong());
+		} else {
+			this.uri = uri;
+		}
 		this.service = service;
-		lib = new HDLLibrary();
-		HDLLibrary.registerLibrary(uri, lib);
+		this.lib = new HDLLibrary();
+		HDLLibrary.registerLibrary(this.uri, this.lib);
 	}
 
 	public boolean add(File source) throws Exception {
