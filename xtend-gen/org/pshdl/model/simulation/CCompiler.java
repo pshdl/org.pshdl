@@ -2656,7 +2656,7 @@ public class CCompiler implements ITypeOuptutProvider {
       }
     }
     _builder.append("\t");
-    _builder.append("if (disableEdges) {");
+    _builder.append("if (!disableEdges) {");
     _builder.newLine();
     _builder.append("\t\t");
     _builder.append("pshdl_sim_setInput(");

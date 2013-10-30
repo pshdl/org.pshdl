@@ -801,7 +801,7 @@ int set«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition
 	«FOR Definition d : row.writeDefs»
 	pshdl_sim_setInput(«d.name.defineName», «d.name», index);
 	«ENDFOR»
-	if (disableEdges) {
+	if (!disableEdges) {
 		pshdl_sim_setInput(«"Bus2IP_Clk".defineName», 0, 0);
 		pshdl_sim_run();
 	}

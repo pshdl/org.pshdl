@@ -355,7 +355,9 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	}
 
 	def generateConditions(Row row, Definition d) '''
-		«IF d.warn == Definition$WarnType::silentLimit»
+		«IF d.width==32»
+«««		Required because maxValue overflows..		
+		«ELSEIF d.warn == Definition$WarnType::silentLimit»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				«row.getVarName(d)»=«d.maxValueHex»;
 			}

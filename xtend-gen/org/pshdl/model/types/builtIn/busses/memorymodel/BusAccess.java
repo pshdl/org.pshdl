@@ -884,115 +884,46 @@ public class BusAccess {
   public CharSequence generateConditions(final Row row, final Definition d) {
     StringConcatenation _builder = new StringConcatenation();
     {
-      boolean _equals = Objects.equal(d.warn, WarnType.silentLimit);
+      boolean _equals = (d.width == 32);
       if (_equals) {
-        _builder.append("if (");
-        String _varName = this.getVarName(row, d);
-        _builder.append(_varName, "");
-        _builder.append(" > ");
-        String _maxValueHex = this.getMaxValueHex(d);
-        _builder.append(_maxValueHex, "");
-        _builder.append(") {");
-        _builder.newLineIfNotEmpty();
-        _builder.append("\t");
-        String _varName_1 = this.getVarName(row, d);
-        _builder.append(_varName_1, "	");
-        _builder.append("=");
-        String _maxValueHex_1 = this.getMaxValueHex(d);
-        _builder.append(_maxValueHex_1, "	");
-        _builder.append(";");
-        _builder.newLineIfNotEmpty();
-        _builder.append("}");
-        _builder.newLine();
-        {
-          boolean _equals_1 = Objects.equal(d.type, Type.INT);
-          if (_equals_1) {
-            _builder.append("if (");
-            String _varName_2 = this.getVarName(row, d);
-            _builder.append(_varName_2, "");
-            _builder.append(" < ");
-            String _maxValueNegHex = this.getMaxValueNegHex(d);
-            _builder.append(_maxValueNegHex, "");
-            _builder.append(") {");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t");
-            String _varName_3 = this.getVarName(row, d);
-            _builder.append(_varName_3, "	");
-            _builder.append("=");
-            String _maxValueNegHex_1 = this.getMaxValueNegHex(d);
-            _builder.append(_maxValueNegHex_1, "	");
-            _builder.append(";");
-            _builder.newLineIfNotEmpty();
-            _builder.append("}");
-            _builder.newLine();
-          }
-        }
       } else {
-        boolean _equals_2 = Objects.equal(d.warn, WarnType.limit);
-        if (_equals_2) {
+        boolean _equals_1 = Objects.equal(d.warn, WarnType.silentLimit);
+        if (_equals_1) {
           _builder.append("if (");
-          String _varName_4 = this.getVarName(row, d);
-          _builder.append(_varName_4, "");
+          String _varName = this.getVarName(row, d);
+          _builder.append(_varName, "");
           _builder.append(" > ");
-          String _maxValueHex_2 = this.getMaxValueHex(d);
-          _builder.append(_maxValueHex_2, "");
+          String _maxValueHex = this.getMaxValueHex(d);
+          _builder.append(_maxValueHex, "");
           _builder.append(") {");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
-          _builder.append("warn(limit, ");
-          String _varName_5 = this.getVarName(row, d);
-          _builder.append(_varName_5, "	");
-          _builder.append(", \"");
-          String _varNameIndex = this.getVarNameIndex(row, d);
-          _builder.append(_varNameIndex, "	");
-          _builder.append("\", \"");
-          _builder.append(row.name, "	");
-          _builder.append("\", \"using ");
-          String _maxValueHex_3 = this.getMaxValueHex(d);
-          _builder.append(_maxValueHex_3, "	");
-          _builder.append("\");");
-          _builder.newLineIfNotEmpty();
-          _builder.append("\t");
-          String _varName_6 = this.getVarName(row, d);
-          _builder.append(_varName_6, "	");
+          String _varName_1 = this.getVarName(row, d);
+          _builder.append(_varName_1, "	");
           _builder.append("=");
-          String _maxValueHex_4 = this.getMaxValueHex(d);
-          _builder.append(_maxValueHex_4, "	");
+          String _maxValueHex_1 = this.getMaxValueHex(d);
+          _builder.append(_maxValueHex_1, "	");
           _builder.append(";");
           _builder.newLineIfNotEmpty();
           _builder.append("}");
           _builder.newLine();
           {
-            boolean _equals_3 = Objects.equal(d.type, Type.INT);
-            if (_equals_3) {
+            boolean _equals_2 = Objects.equal(d.type, Type.INT);
+            if (_equals_2) {
               _builder.append("if (");
-              String _varName_7 = this.getVarName(row, d);
-              _builder.append(_varName_7, "");
+              String _varName_2 = this.getVarName(row, d);
+              _builder.append(_varName_2, "");
               _builder.append(" < ");
-              String _maxValueNegHex_2 = this.getMaxValueNegHex(d);
-              _builder.append(_maxValueNegHex_2, "");
+              String _maxValueNegHex = this.getMaxValueNegHex(d);
+              _builder.append(_maxValueNegHex, "");
               _builder.append(") {");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
-              _builder.append("warn(limit, ");
-              String _varName_8 = this.getVarName(row, d);
-              _builder.append(_varName_8, "	");
-              _builder.append(", \"");
-              String _varNameIndex_1 = this.getVarNameIndex(row, d);
-              _builder.append(_varNameIndex_1, "	");
-              _builder.append("\", \"");
-              _builder.append(row.name, "	");
-              _builder.append("\", \"using ");
-              String _maxValueNegHex_3 = this.getMaxValueNegHex(d);
-              _builder.append(_maxValueNegHex_3, "	");
-              _builder.append("\");");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              String _varName_9 = this.getVarName(row, d);
-              _builder.append(_varName_9, "	");
+              String _varName_3 = this.getVarName(row, d);
+              _builder.append(_varName_3, "	");
               _builder.append("=");
-              String _maxValueNegHex_4 = this.getMaxValueNegHex(d);
-              _builder.append(_maxValueNegHex_4, "	");
+              String _maxValueNegHex_1 = this.getMaxValueNegHex(d);
+              _builder.append(_maxValueNegHex_1, "	");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("}");
@@ -1000,43 +931,71 @@ public class BusAccess {
             }
           }
         } else {
-          boolean _equals_4 = Objects.equal(d.warn, WarnType.silentMask);
-          if (_equals_4) {
+          boolean _equals_3 = Objects.equal(d.warn, WarnType.limit);
+          if (_equals_3) {
             _builder.append("if (");
-            String _varName_10 = this.getVarName(row, d);
-            _builder.append(_varName_10, "");
+            String _varName_4 = this.getVarName(row, d);
+            _builder.append(_varName_4, "");
             _builder.append(" > ");
-            String _maxValueHex_5 = this.getMaxValueHex(d);
-            _builder.append(_maxValueHex_5, "");
+            String _maxValueHex_2 = this.getMaxValueHex(d);
+            _builder.append(_maxValueHex_2, "");
             _builder.append(") {");
             _builder.newLineIfNotEmpty();
             _builder.append("\t");
-            String _varName_11 = this.getVarName(row, d);
-            _builder.append(_varName_11, "	");
-            _builder.append("&=");
-            String _maxValueHex_6 = this.getMaxValueHex(d);
-            _builder.append(_maxValueHex_6, "	");
+            _builder.append("warn(limit, ");
+            String _varName_5 = this.getVarName(row, d);
+            _builder.append(_varName_5, "	");
+            _builder.append(", \"");
+            String _varNameIndex = this.getVarNameIndex(row, d);
+            _builder.append(_varNameIndex, "	");
+            _builder.append("\", \"");
+            _builder.append(row.name, "	");
+            _builder.append("\", \"using ");
+            String _maxValueHex_3 = this.getMaxValueHex(d);
+            _builder.append(_maxValueHex_3, "	");
+            _builder.append("\");");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
+            String _varName_6 = this.getVarName(row, d);
+            _builder.append(_varName_6, "	");
+            _builder.append("=");
+            String _maxValueHex_4 = this.getMaxValueHex(d);
+            _builder.append(_maxValueHex_4, "	");
             _builder.append(";");
             _builder.newLineIfNotEmpty();
             _builder.append("}");
             _builder.newLine();
             {
-              boolean _equals_5 = Objects.equal(d.type, Type.INT);
-              if (_equals_5) {
+              boolean _equals_4 = Objects.equal(d.type, Type.INT);
+              if (_equals_4) {
                 _builder.append("if (");
-                String _varName_12 = this.getVarName(row, d);
-                _builder.append(_varName_12, "");
+                String _varName_7 = this.getVarName(row, d);
+                _builder.append(_varName_7, "");
                 _builder.append(" < ");
-                String _maxValueNegHex_5 = this.getMaxValueNegHex(d);
-                _builder.append(_maxValueNegHex_5, "");
+                String _maxValueNegHex_2 = this.getMaxValueNegHex(d);
+                _builder.append(_maxValueNegHex_2, "");
                 _builder.append(") {");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t");
-                String _varName_13 = this.getVarName(row, d);
-                _builder.append(_varName_13, "	");
-                _builder.append("&=");
-                String _maxValueNegHex_6 = this.getMaxValueNegHex(d);
-                _builder.append(_maxValueNegHex_6, "	");
+                _builder.append("warn(limit, ");
+                String _varName_8 = this.getVarName(row, d);
+                _builder.append(_varName_8, "	");
+                _builder.append(", \"");
+                String _varNameIndex_1 = this.getVarNameIndex(row, d);
+                _builder.append(_varNameIndex_1, "	");
+                _builder.append("\", \"");
+                _builder.append(row.name, "	");
+                _builder.append("\", \"using ");
+                String _maxValueNegHex_3 = this.getMaxValueNegHex(d);
+                _builder.append(_maxValueNegHex_3, "	");
+                _builder.append("\");");
+                _builder.newLineIfNotEmpty();
+                _builder.append("\t");
+                String _varName_9 = this.getVarName(row, d);
+                _builder.append(_varName_9, "	");
+                _builder.append("=");
+                String _maxValueNegHex_4 = this.getMaxValueNegHex(d);
+                _builder.append(_maxValueNegHex_4, "	");
                 _builder.append(";");
                 _builder.newLineIfNotEmpty();
                 _builder.append("}");
@@ -1044,71 +1003,43 @@ public class BusAccess {
               }
             }
           } else {
-            boolean _equals_6 = Objects.equal(d.warn, WarnType.mask);
-            if (_equals_6) {
+            boolean _equals_5 = Objects.equal(d.warn, WarnType.silentMask);
+            if (_equals_5) {
               _builder.append("if (");
-              String _varName_14 = this.getVarName(row, d);
-              _builder.append(_varName_14, "");
+              String _varName_10 = this.getVarName(row, d);
+              _builder.append(_varName_10, "");
               _builder.append(" > ");
-              String _maxValueHex_7 = this.getMaxValueHex(d);
-              _builder.append(_maxValueHex_7, "");
+              String _maxValueHex_5 = this.getMaxValueHex(d);
+              _builder.append(_maxValueHex_5, "");
               _builder.append(") {");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
-              _builder.append("warn(mask, ");
-              String _varName_15 = this.getVarName(row, d);
-              _builder.append(_varName_15, "	");
-              _builder.append(", \"");
-              String _varNameIndex_2 = this.getVarNameIndex(row, d);
-              _builder.append(_varNameIndex_2, "	");
-              _builder.append("\", \"");
-              _builder.append(row.name, "	");
-              _builder.append("\", \"masking with ");
-              String _maxValueHex_8 = this.getMaxValueHex(d);
-              _builder.append(_maxValueHex_8, "	");
-              _builder.append("\");");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              String _varName_16 = this.getVarName(row, d);
-              _builder.append(_varName_16, "	");
+              String _varName_11 = this.getVarName(row, d);
+              _builder.append(_varName_11, "	");
               _builder.append("&=");
-              String _maxValueHex_9 = this.getMaxValueHex(d);
-              _builder.append(_maxValueHex_9, "	");
+              String _maxValueHex_6 = this.getMaxValueHex(d);
+              _builder.append(_maxValueHex_6, "	");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("}");
               _builder.newLine();
               {
-                boolean _equals_7 = Objects.equal(d.type, Type.INT);
-                if (_equals_7) {
+                boolean _equals_6 = Objects.equal(d.type, Type.INT);
+                if (_equals_6) {
                   _builder.append("if (");
-                  String _varName_17 = this.getVarName(row, d);
-                  _builder.append(_varName_17, "");
+                  String _varName_12 = this.getVarName(row, d);
+                  _builder.append(_varName_12, "");
                   _builder.append(" < ");
-                  String _maxValueNegHex_7 = this.getMaxValueNegHex(d);
-                  _builder.append(_maxValueNegHex_7, "");
+                  String _maxValueNegHex_5 = this.getMaxValueNegHex(d);
+                  _builder.append(_maxValueNegHex_5, "");
                   _builder.append(") {");
                   _builder.newLineIfNotEmpty();
                   _builder.append("\t");
-                  _builder.append("warn(mask, ");
-                  String _varName_18 = this.getVarName(row, d);
-                  _builder.append(_varName_18, "	");
-                  _builder.append(", \"");
-                  String _varNameIndex_3 = this.getVarNameIndex(row, d);
-                  _builder.append(_varNameIndex_3, "	");
-                  _builder.append("\", \"");
-                  _builder.append(row.name, "	");
-                  _builder.append("\", \"masking with ");
-                  String _maxValueNegHex_8 = this.getMaxValueNegHex(d);
-                  _builder.append(_maxValueNegHex_8, "	");
-                  _builder.append("\");");
-                  _builder.newLineIfNotEmpty();
-                  _builder.append("\t");
-                  String _varName_19 = this.getVarName(row, d);
-                  _builder.append(_varName_19, "	");
+                  String _varName_13 = this.getVarName(row, d);
+                  _builder.append(_varName_13, "	");
                   _builder.append("&=");
-                  String _maxValueNegHex_9 = this.getMaxValueNegHex(d);
-                  _builder.append(_maxValueNegHex_9, "	");
+                  String _maxValueNegHex_6 = this.getMaxValueNegHex(d);
+                  _builder.append(_maxValueNegHex_6, "	");
                   _builder.append(";");
                   _builder.newLineIfNotEmpty();
                   _builder.append("}");
@@ -1116,60 +1047,87 @@ public class BusAccess {
                 }
               }
             } else {
-              boolean _equals_8 = Objects.equal(d.warn, WarnType.silentError);
-              if (_equals_8) {
+              boolean _equals_7 = Objects.equal(d.warn, WarnType.mask);
+              if (_equals_7) {
                 _builder.append("if (");
-                String _varName_20 = this.getVarName(row, d);
-                _builder.append(_varName_20, "");
+                String _varName_14 = this.getVarName(row, d);
+                _builder.append(_varName_14, "");
                 _builder.append(" > ");
-                String _maxValueHex_10 = this.getMaxValueHex(d);
-                _builder.append(_maxValueHex_10, "");
+                String _maxValueHex_7 = this.getMaxValueHex(d);
+                _builder.append(_maxValueHex_7, "");
                 _builder.append(") {");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t");
-                _builder.append("return 0;");
-                _builder.newLine();
+                _builder.append("warn(mask, ");
+                String _varName_15 = this.getVarName(row, d);
+                _builder.append(_varName_15, "	");
+                _builder.append(", \"");
+                String _varNameIndex_2 = this.getVarNameIndex(row, d);
+                _builder.append(_varNameIndex_2, "	");
+                _builder.append("\", \"");
+                _builder.append(row.name, "	");
+                _builder.append("\", \"masking with ");
+                String _maxValueHex_8 = this.getMaxValueHex(d);
+                _builder.append(_maxValueHex_8, "	");
+                _builder.append("\");");
+                _builder.newLineIfNotEmpty();
+                _builder.append("\t");
+                String _varName_16 = this.getVarName(row, d);
+                _builder.append(_varName_16, "	");
+                _builder.append("&=");
+                String _maxValueHex_9 = this.getMaxValueHex(d);
+                _builder.append(_maxValueHex_9, "	");
+                _builder.append(";");
+                _builder.newLineIfNotEmpty();
                 _builder.append("}");
                 _builder.newLine();
                 {
-                  boolean _equals_9 = Objects.equal(d.type, Type.INT);
-                  if (_equals_9) {
+                  boolean _equals_8 = Objects.equal(d.type, Type.INT);
+                  if (_equals_8) {
                     _builder.append("if (");
-                    String _varName_21 = this.getVarName(row, d);
-                    _builder.append(_varName_21, "");
+                    String _varName_17 = this.getVarName(row, d);
+                    _builder.append(_varName_17, "");
                     _builder.append(" < ");
-                    String _maxValueNegHex_10 = this.getMaxValueNegHex(d);
-                    _builder.append(_maxValueNegHex_10, "");
+                    String _maxValueNegHex_7 = this.getMaxValueNegHex(d);
+                    _builder.append(_maxValueNegHex_7, "");
                     _builder.append(") {");
                     _builder.newLineIfNotEmpty();
                     _builder.append("\t");
-                    _builder.append("return 0;");
-                    _builder.newLine();
+                    _builder.append("warn(mask, ");
+                    String _varName_18 = this.getVarName(row, d);
+                    _builder.append(_varName_18, "	");
+                    _builder.append(", \"");
+                    String _varNameIndex_3 = this.getVarNameIndex(row, d);
+                    _builder.append(_varNameIndex_3, "	");
+                    _builder.append("\", \"");
+                    _builder.append(row.name, "	");
+                    _builder.append("\", \"masking with ");
+                    String _maxValueNegHex_8 = this.getMaxValueNegHex(d);
+                    _builder.append(_maxValueNegHex_8, "	");
+                    _builder.append("\");");
+                    _builder.newLineIfNotEmpty();
+                    _builder.append("\t");
+                    String _varName_19 = this.getVarName(row, d);
+                    _builder.append(_varName_19, "	");
+                    _builder.append("&=");
+                    String _maxValueNegHex_9 = this.getMaxValueNegHex(d);
+                    _builder.append(_maxValueNegHex_9, "	");
+                    _builder.append(";");
+                    _builder.newLineIfNotEmpty();
                     _builder.append("}");
                     _builder.newLine();
                   }
                 }
               } else {
-                boolean _equals_10 = Objects.equal(d.warn, WarnType.error);
-                if (_equals_10) {
+                boolean _equals_9 = Objects.equal(d.warn, WarnType.silentError);
+                if (_equals_9) {
                   _builder.append("if (");
-                  String _varName_22 = this.getVarName(row, d);
-                  _builder.append(_varName_22, "");
+                  String _varName_20 = this.getVarName(row, d);
+                  _builder.append(_varName_20, "");
                   _builder.append(" > ");
-                  String _maxValueHex_11 = this.getMaxValueHex(d);
-                  _builder.append(_maxValueHex_11, "");
+                  String _maxValueHex_10 = this.getMaxValueHex(d);
+                  _builder.append(_maxValueHex_10, "");
                   _builder.append(") {");
-                  _builder.newLineIfNotEmpty();
-                  _builder.append("\t");
-                  _builder.append("warn(error, ");
-                  String _varName_23 = this.getVarName(row, d);
-                  _builder.append(_varName_23, "	");
-                  _builder.append(", \"");
-                  String _varNameIndex_4 = this.getVarNameIndex(row, d);
-                  _builder.append(_varNameIndex_4, "	");
-                  _builder.append("\", \"");
-                  _builder.append(row.name, "	");
-                  _builder.append("\", \"returning with 0\");");
                   _builder.newLineIfNotEmpty();
                   _builder.append("\t");
                   _builder.append("return 0;");
@@ -1177,32 +1135,78 @@ public class BusAccess {
                   _builder.append("}");
                   _builder.newLine();
                   {
-                    boolean _equals_11 = Objects.equal(d.type, Type.INT);
-                    if (_equals_11) {
+                    boolean _equals_10 = Objects.equal(d.type, Type.INT);
+                    if (_equals_10) {
                       _builder.append("if (");
-                      String _varName_24 = this.getVarName(row, d);
-                      _builder.append(_varName_24, "");
+                      String _varName_21 = this.getVarName(row, d);
+                      _builder.append(_varName_21, "");
                       _builder.append(" < ");
-                      String _maxValueNegHex_11 = this.getMaxValueNegHex(d);
-                      _builder.append(_maxValueNegHex_11, "");
+                      String _maxValueNegHex_10 = this.getMaxValueNegHex(d);
+                      _builder.append(_maxValueNegHex_10, "");
                       _builder.append(") {");
-                      _builder.newLineIfNotEmpty();
-                      _builder.append("\t");
-                      _builder.append("warn(error, ");
-                      String _varName_25 = this.getVarName(row, d);
-                      _builder.append(_varName_25, "	");
-                      _builder.append(", \"");
-                      String _varNameIndex_5 = this.getVarNameIndex(row, d);
-                      _builder.append(_varNameIndex_5, "	");
-                      _builder.append("\", \"");
-                      _builder.append(row.name, "	");
-                      _builder.append("\", \"returning with 0\");");
                       _builder.newLineIfNotEmpty();
                       _builder.append("\t");
                       _builder.append("return 0;");
                       _builder.newLine();
                       _builder.append("}");
                       _builder.newLine();
+                    }
+                  }
+                } else {
+                  boolean _equals_11 = Objects.equal(d.warn, WarnType.error);
+                  if (_equals_11) {
+                    _builder.append("if (");
+                    String _varName_22 = this.getVarName(row, d);
+                    _builder.append(_varName_22, "");
+                    _builder.append(" > ");
+                    String _maxValueHex_11 = this.getMaxValueHex(d);
+                    _builder.append(_maxValueHex_11, "");
+                    _builder.append(") {");
+                    _builder.newLineIfNotEmpty();
+                    _builder.append("\t");
+                    _builder.append("warn(error, ");
+                    String _varName_23 = this.getVarName(row, d);
+                    _builder.append(_varName_23, "	");
+                    _builder.append(", \"");
+                    String _varNameIndex_4 = this.getVarNameIndex(row, d);
+                    _builder.append(_varNameIndex_4, "	");
+                    _builder.append("\", \"");
+                    _builder.append(row.name, "	");
+                    _builder.append("\", \"returning with 0\");");
+                    _builder.newLineIfNotEmpty();
+                    _builder.append("\t");
+                    _builder.append("return 0;");
+                    _builder.newLine();
+                    _builder.append("}");
+                    _builder.newLine();
+                    {
+                      boolean _equals_12 = Objects.equal(d.type, Type.INT);
+                      if (_equals_12) {
+                        _builder.append("if (");
+                        String _varName_24 = this.getVarName(row, d);
+                        _builder.append(_varName_24, "");
+                        _builder.append(" < ");
+                        String _maxValueNegHex_11 = this.getMaxValueNegHex(d);
+                        _builder.append(_maxValueNegHex_11, "");
+                        _builder.append(") {");
+                        _builder.newLineIfNotEmpty();
+                        _builder.append("\t");
+                        _builder.append("warn(error, ");
+                        String _varName_25 = this.getVarName(row, d);
+                        _builder.append(_varName_25, "	");
+                        _builder.append(", \"");
+                        String _varNameIndex_5 = this.getVarNameIndex(row, d);
+                        _builder.append(_varNameIndex_5, "	");
+                        _builder.append("\", \"");
+                        _builder.append(row.name, "	");
+                        _builder.append("\", \"returning with 0\");");
+                        _builder.newLineIfNotEmpty();
+                        _builder.append("\t");
+                        _builder.append("return 0;");
+                        _builder.newLine();
+                        _builder.append("}");
+                        _builder.newLine();
+                      }
                     }
                   }
                 }
