@@ -351,10 +351,17 @@ public class PSAbstractCompiler {
 		issues.remove(src);
 	}
 
-	protected void printErrors() {
+	protected boolean printErrors() {
+		boolean hasError = false;
 		for (final Entry<String, Set<Problem>> e : issues.entrySet()) {
-			System.out.println("File:" + e.getKey());
-			for (final Problem p : e.getValue()) {
+			final Set<Problem> value = e.getValue();
+			if (!value.isEmpty()) {
+				System.out.println("File:" + e.getKey());
+			}
+			for (final Problem p : value) {
+				if (p.severity == ProblemSeverity.ERROR) {
+					hasError = true;
+				}
 				final HDLAdvise advise = HDLValidator.advise(p);
 				System.out.println("\t" + p.severity + " at line: " + p.line + ":" + p.offsetInLine);
 				if (advise != null) {
@@ -373,15 +380,15 @@ public class PSAbstractCompiler {
 				}
 			}
 		}
+		return hasError;
 	}
 
 	public boolean hasError(Collection<Problem> syntaxProblems) {
-		boolean error = false;
+		final boolean error = false;
 		if (syntaxProblems.size() != 0) {
 			for (final Problem problem : syntaxProblems) {
-				if (problem.severity == ProblemSeverity.ERROR) {
-					error = true;
-				}
+				if (problem.severity == ProblemSeverity.ERROR)
+					return true;
 			}
 		}
 		return error;
