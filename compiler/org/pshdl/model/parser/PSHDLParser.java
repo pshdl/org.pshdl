@@ -39,6 +39,8 @@ import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
+import com.google.common.base.*;
+
 public class PSHDLParser {
 
 	public static String[] getKeywords() throws Exception {
@@ -99,6 +101,10 @@ public class PSHDLParser {
 				error = SyntaxErrors.MissingType;
 				msg = "The variable declaration is missing its type";
 			}
+			if ((e == null) && PSHDLLangParser.MISSING_IFPAREN.equals(msg)) {
+				error = SyntaxErrors.MissingIfParen;
+				msg = "The syntax for if-statements is 'if («expression») { «thenStatements*» } else { «elseStatements*» }";
+			}
 			if (offendingSymbol instanceof Token) {
 				Token t = (Token) offendingSymbol;
 				if (error == SyntaxErrors.MissingSemicolon) {
@@ -141,7 +147,7 @@ public class PSHDLParser {
 	}
 
 	public static enum SyntaxErrors implements IErrorCode {
-		FailedPredicate, NoViableAlternative, LexerNoViableAlternative, InputMismatch, OtherException, MissingSemicolon, MissingType, WrongOrder, MissingWidth;
+		FailedPredicate, NoViableAlternative, LexerNoViableAlternative, InputMismatch, OtherException, MissingSemicolon, MissingType, WrongOrder, MissingWidth, MissingIfParen;
 
 		@Override
 		public ProblemSeverity getSeverity() {

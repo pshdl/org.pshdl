@@ -41,8 +41,7 @@ import org.pshdl.model.utils.*;
  * <li>ArrayList<HDLRange> range. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * <li>HDLVariable param. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> dos. Can <b>not</b> be <code>null</code>,
- * additionally the collection must contain at least one element.</li>
+ * <li>ArrayList<HDLStatement> dos. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLForLoop extends AbstractHDLForLoop {
@@ -57,12 +56,11 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	 * @param param
 	 *            the value for param. Can <b>not</b> be <code>null</code>.
 	 * @param dos
-	 *            the value for dos. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for dos. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLForLoop(int id, @Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nonnull Iterable<HDLStatement> dos, boolean validate) {
+	public HDLForLoop(int id, @Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nullable Iterable<HDLStatement> dos, boolean validate) {
 		super(id, container, range, param, dos, validate);
 	}
 

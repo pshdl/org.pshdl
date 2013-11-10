@@ -153,8 +153,9 @@ public class RWValidation {
 				}
 			}
 			// XXX check for interface and ensure that it is only this instance
-			if (ref instanceof HDLUnresolvedFragment)
-				return;
+			if (ref instanceof HDLUnresolvedFragment) {
+				continue;
+			}
 			final Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
 			if (var.isPresent()) {
 				final HDLVariable rVar = var.get();

@@ -349,7 +349,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				return new HDLQualifiedName(uf.getFrag()).append(sub.getFrag());
 			return new HDLQualifiedName(uf.getFrag());
 		}
-		return null;
+		return HDLQualifiedName.invalid(expression.toString());
 	}
 
 	@Nullable

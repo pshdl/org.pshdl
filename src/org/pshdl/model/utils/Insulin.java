@@ -849,12 +849,12 @@ public class Insulin {
 				defRstVar = newVar;
 				customRst = true;
 			}
-			boolean hasRegister = false;
+			boolean hasClkRegister = false, hasRstRegister = false;
 			// Replace all $clk and $rst with the clock in HDLRegisters
 			final Collection<HDLRegisterConfig> clkRefs = HDLQuery.select(HDLRegisterConfig.class).from(unit).where(HDLRegisterConfig.fClk)
 					.lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
 			for (final HDLRegisterConfig reg : clkRefs) {
-				hasRegister = true;
+				hasClkRegister = true;
 				ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
 				if (!customClk) {
 					insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
@@ -863,7 +863,7 @@ public class Insulin {
 			final Collection<HDLRegisterConfig> rstRefs = HDLQuery.select(HDLRegisterConfig.class).from(unit).where(HDLRegisterConfig.fRst)
 					.lastSegmentIs(HDLRegisterConfig.DEF_RST).getAll();
 			for (HDLRegisterConfig reg : rstRefs) {
-				hasRegister = true;
+				hasRstRegister = true;
 				final HDLRegisterConfig orig = reg;
 				reg = ms.getReplacement(reg);
 				ms.replacePrune(orig, reg.setRst(HDLQualifiedName.create(defRstVar.getName())));
@@ -886,10 +886,10 @@ public class Insulin {
 				ms.replace(rstRef, defRstVar.asHDLRef());
 				hasRstRef = true;
 			}
-			if (hasClkRef && !hasRegister) {
+			if (hasClkRef && !hasClkRegister) {
 				insertSig(ms, unit, defClkVar, SignalInserted.ClkInserted);
 			}
-			if (hasRstRef && !hasRegister) {
+			if (hasRstRef && !hasRstRegister) {
 				insertSig(ms, unit, defRstVar, SignalInserted.RstInserted);
 			}
 			// Remove the insertion meta to allow the re-use of the same model

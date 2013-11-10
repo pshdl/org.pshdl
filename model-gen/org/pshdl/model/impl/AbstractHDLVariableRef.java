@@ -351,7 +351,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

@@ -48,12 +48,11 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @param param
 	 *            the value for param. Can <b>not</b> be <code>null</code>.
 	 * @param dos
-	 *            the value for dos. Can <b>not</b> be <code>null</code>,
-	 *            additionally the collection must contain at least one element.
+	 *            the value for dos. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLForLoop(int id, @Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nonnull Iterable<HDLStatement> dos,
+	public AbstractHDLForLoop(int id, @Nullable IHDLObject container, @Nonnull Iterable<HDLRange> range, @Nonnull HDLVariable param, @Nullable Iterable<HDLStatement> dos,
 			boolean validate) {
 		super(id, container, validate);
 		if (validate) {
@@ -133,8 +132,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	protected final ArrayList<HDLStatement> dos;
 
 	/**
-	 * Get the dos field. Can <b>not</b> be <code>null</code>, additionally the
-	 * collection must contain at least one element.
+	 * Get the dos field. Can be <code>null</code>.
 	 * 
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
@@ -145,9 +143,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 
 	protected Iterable<HDLStatement> validateDos(Iterable<HDLStatement> dos) {
 		if (dos == null)
-			throw new IllegalArgumentException("The field dos can not be null!");
-		if (!dos.iterator().hasNext())
-			throw new IllegalArgumentException("The field dos must contain at least one item!");
+			return new ArrayList<HDLStatement>();
 		return dos;
 	}
 
@@ -298,13 +294,11 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * Setter for the field {@link #getDos()}.
 	 * 
 	 * @param dos
-	 *            sets the new dos of this object. Can <b>not</b> be
-	 *            <code>null</code>, additionally the collection must contain at
-	 *            least one element.
+	 *            sets the new dos of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
 	@Nonnull
-	public HDLForLoop setDos(@Nonnull Iterable<HDLStatement> dos) {
+	public HDLForLoop setDos(@Nullable Iterable<HDLStatement> dos) {
 		dos = validateDos(dos);
 		final HDLForLoop res = new HDLForLoop(id, container, range, param, dos, false);
 		return res;
@@ -318,7 +312,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
 	@Nonnull
-	public HDLForLoop addDos(@Nonnull HDLStatement newDos) {
+	public HDLForLoop addDos(@Nullable HDLStatement newDos) {
 		if (newDos == null)
 			throw new IllegalArgumentException("Element of dos can not be null!");
 		final ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
@@ -336,7 +330,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 	 * @return a new instance of {@link HDLForLoop} with the updated dos field.
 	 */
 	@Nonnull
-	public HDLForLoop removeDos(@Nonnull HDLStatement newDos) {
+	public HDLForLoop removeDos(@Nullable HDLStatement newDos) {
 		if (newDos == null)
 			throw new IllegalArgumentException("Removed element of dos can not be null!");
 		final ArrayList<HDLStatement> dos = (ArrayList<HDLStatement>) this.dos.clone();
@@ -390,7 +384,7 @@ public abstract class AbstractHDLForLoop extends HDLCompound {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

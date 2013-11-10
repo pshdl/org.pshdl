@@ -209,7 +209,7 @@ public abstract class AbstractHDLFunction extends HDLDeclaration {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

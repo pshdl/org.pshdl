@@ -37,6 +37,7 @@ public static final String MISSING_SEMI="MISSING_SEMI";
 public static final String MISSING_NAME="MISSING_NAME";
 public static final String MISSING_TYPE="MISSING_TYPE";
 public static final String MISSING_WIDTH="MISSING_WIDTH";
+public static final String MISSING_IFPAREN="MISSING_IFPAREN";
 public static final String WRONG_ORDER="WRONG_ORDER";
 }
 
@@ -223,8 +224,8 @@ psCompoundStatement :
 ;
 
 psIfStatement :
-	'if' '(' psExpression ')' ifBlk=psSimpleBlock 
-	('else' elseBlk=psSimpleBlock )?
+	'if' '(' psExpression ')' ifBlk=psSimpleBlock ('else' elseBlk=psSimpleBlock )?
+	| 'if' psExpression ifBlk=psSimpleBlock ('else' elseBlk=psSimpleBlock )? {notifyErrorListeners(MISSING_IFPAREN);}
 ;
 
 psSimpleBlock : 
@@ -266,9 +267,9 @@ psEnum :
 
 psVariableDeclaration :
 	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* ';'
-	|	psDirection psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_TYPE);}
-	|	psPrimitive psDirection psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(WRONG_ORDER);}
-	|	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_SEMI);}
+	|	psDirection psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_TYPE);} ';'
+	|	psPrimitive psDirection psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(WRONG_ORDER);} ';'
+	|	psDirection? psPrimitive psDeclAssignment ( ',' psDeclAssignment )* {notifyErrorListeners(MISSING_SEMI);} ';'
 ;
 
 psDeclAssignment :

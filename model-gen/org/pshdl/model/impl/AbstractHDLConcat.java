@@ -226,7 +226,7 @@ public abstract class AbstractHDLConcat extends HDLObject implements HDLExpressi
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

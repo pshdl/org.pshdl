@@ -318,7 +318,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

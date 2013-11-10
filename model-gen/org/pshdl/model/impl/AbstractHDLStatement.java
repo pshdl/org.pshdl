@@ -92,7 +92,7 @@ public abstract class AbstractHDLStatement extends HDLObject {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

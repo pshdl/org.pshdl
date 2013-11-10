@@ -31,6 +31,7 @@ import java.util.*;
 import javax.annotation.*;
 
 public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
+	public static final String INVALID = "!INVALID!";
 	public static final char LOCAL_TYPE_SEP = '@';
 	public static final HDLQualifiedName EMPTY = new HDLQualifiedName(new String[0]);
 	private final String[] qfn;
@@ -214,5 +215,9 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	@Override
 	public int compareTo(HDLQualifiedName arg0) {
 		return toString().compareTo(arg0.toString());
+	}
+
+	public static HDLQualifiedName invalid(String string) {
+		return new HDLQualifiedName(INVALID + "." + string);
 	}
 }

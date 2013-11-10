@@ -277,7 +277,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

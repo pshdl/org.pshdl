@@ -75,11 +75,11 @@ class DartCompiler implements ITypeOuptutProvider {
 		handled.add(-1)
 		'''
 			«imports»
-			void main(){
+			void main(List<String> args, SendPort replyTo){
 			  «IF hasClock»
-			  	handleReceive((e,l) => new «unitName»(e,l));
+			  	handleReceive((e,l) => new «unitName»(e,l), replyTo);
 			  «ELSE»
-			  	handleReceive((e,l) => new «unitName»());
+			  	handleReceive((e,l) => new «unitName»(), replyTo);
 			  «ENDIF»
 			}
 			«IF hasClock»
@@ -764,6 +764,7 @@ class DartCompiler implements ITypeOuptutProvider {
 import 'dart:collection';
 «ENDIF»
 import 'dart:typed_data';
+import 'dart:isolate';
 import '../simulation_comm.dart';
 	'''
 

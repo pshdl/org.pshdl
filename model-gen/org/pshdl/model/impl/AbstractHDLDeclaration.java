@@ -138,7 +138,7 @@ public abstract class AbstractHDLDeclaration extends HDLObject implements HDLSta
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

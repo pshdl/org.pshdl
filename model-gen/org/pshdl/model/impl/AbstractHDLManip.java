@@ -263,7 +263,7 @@ public abstract class AbstractHDLManip extends HDLObject implements HDLExpressio
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

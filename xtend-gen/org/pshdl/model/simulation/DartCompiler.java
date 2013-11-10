@@ -101,20 +101,20 @@ public class DartCompiler implements ITypeOuptutProvider {
       CharSequence _imports = this.getImports();
       _builder.append(_imports, "");
       _builder.newLineIfNotEmpty();
-      _builder.append("void main(){");
+      _builder.append("void main(List<String> args, SendPort replyTo){");
       _builder.newLine();
       {
         if (this.cce.hasClock) {
           _builder.append("  ");
           _builder.append("handleReceive((e,l) => new ");
           _builder.append(unitName, "  ");
-          _builder.append("(e,l));");
+          _builder.append("(e,l), replyTo);");
           _builder.newLineIfNotEmpty();
         } else {
           _builder.append("  ");
           _builder.append("handleReceive((e,l) => new ");
           _builder.append(unitName, "  ");
-          _builder.append("());");
+          _builder.append("(), replyTo);");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -2707,6 +2707,8 @@ public class DartCompiler implements ITypeOuptutProvider {
       }
     }
     _builder.append("import \'dart:typed_data\';");
+    _builder.newLine();
+    _builder.append("import \'dart:isolate\';");
     _builder.newLine();
     _builder.append("import \'../simulation_comm.dart\';");
     _builder.newLine();

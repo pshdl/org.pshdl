@@ -92,7 +92,7 @@ public abstract class AbstractHDLExpression extends HDLObject {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

@@ -205,7 +205,7 @@ public abstract class AbstractHDLBitOp extends HDLOpExpression {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

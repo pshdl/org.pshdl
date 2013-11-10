@@ -92,7 +92,7 @@ public abstract class AbstractHDLReference extends HDLObject implements HDLExpre
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

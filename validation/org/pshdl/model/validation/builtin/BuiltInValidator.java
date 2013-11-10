@@ -263,8 +263,17 @@ public class BuiltInValidator implements IHDLValidator {
 	 */
 	private static void checkRegisters(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (final HDLVariableDeclaration hvd : hvds)
-			if (hvd.getRegister() != null) {
+		for (final HDLVariableDeclaration hvd : hvds) {
+			final HDLRegisterConfig reg = hvd.getRegister();
+			if (reg != null) {
+				final HDLQualifiedName clkRefName = reg.getClkRefName();
+				if ((clkRefName != null) && (clkRefName.length > 0) && clkRefName.getSegment(0).equals(HDLQualifiedName.INVALID)) {
+					problems.add(new Problem(REGISTER_CLOCK_NOT_NAME, reg, "Only simple variable references are allowed as clock"));
+				}
+				final HDLQualifiedName rstRefName = reg.getRstRefName();
+				if ((rstRefName != null) && (rstRefName.length > 0) && rstRefName.getSegment(0).equals(HDLQualifiedName.INVALID)) {
+					problems.add(new Problem(REGISTER_RESET_NOT_NAME, reg, "Only simple variable references are allowed as reset"));
+				}
 				switch (hvd.getDirection()) {
 				case CONSTANT:
 				case PARAMETER:
@@ -276,6 +285,7 @@ public class BuiltInValidator implements IHDLValidator {
 				default:
 				}
 			}
+		}
 	}
 
 	/**

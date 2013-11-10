@@ -189,7 +189,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {

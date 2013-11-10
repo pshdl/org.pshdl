@@ -270,7 +270,7 @@ public abstract class AbstractHDLAssignment extends HDLObject implements HDLStat
 		return true;
 	}
 
-	private static Integer hashCache;
+	private Integer hashCache;
 
 	@Override
 	public int hashCode() {
