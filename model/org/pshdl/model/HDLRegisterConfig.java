@@ -36,9 +36,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLRegisterConfig contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>HDLQualifiedName clk. Can <b>not</b> be <code>null</code>.</li>
- * <li>HDLQualifiedName rst. Can <b>not</b> be <code>null</code>.</li>
- * <li>HDLQualifiedName enable. Can be <code>null</code>.</li>
+ * <li>HDLExpression clk. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression rst. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLRegClockType clockType. Can be <code>null</code>.</li>
  * <li>HDLRegResetActiveType resetType. Can be <code>null</code>.</li>
  * <li>HDLRegSyncType syncType. Can be <code>null</code>.</li>
@@ -56,8 +55,6 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 *            the value for clk. Can <b>not</b> be <code>null</code>.
 	 * @param rst
 	 *            the value for rst. Can <b>not</b> be <code>null</code>.
-	 * @param enable
-	 *            the value for enable. Can be <code>null</code>.
 	 * @param clockType
 	 *            the value for clockType. Can be <code>null</code>.
 	 * @param resetType
@@ -71,10 +68,9 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName clk, @Nonnull HDLQualifiedName rst, @Nullable HDLQualifiedName enable,
-			@Nullable HDLRegClockType clockType, @Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue,
-			@Nullable HDLExpression delay, boolean validate) {
-		super(id, container, clk, rst, enable, clockType, resetType, syncType, resetValue, delay, validate);
+	public HDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLExpression clk, @Nonnull HDLExpression rst, @Nullable HDLRegClockType clockType,
+			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue, @Nullable HDLExpression delay, boolean validate) {
+		super(id, container, clk, rst, clockType, resetType, syncType, resetValue, delay, validate);
 	}
 
 	public HDLRegisterConfig() {
@@ -102,57 +98,39 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	}
 
 	/**
-	 * The accessor for the field clk which is of type HDLQualifiedName.
+	 * The accessor for the field clk which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>("clk") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("clk") {
 		@Override
-		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
+		public HDLExpression getValue(HDLRegisterConfig obj) {
 			if (obj == null)
 				return null;
-			return obj.getClkRefName();
+			return obj.getClk();
 		}
 
 		@Override
-		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLQualifiedName value) {
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
 			if (obj == null)
 				return null;
 			return obj.setClk(value);
 		}
 	};
 	/**
-	 * The accessor for the field rst which is of type HDLQualifiedName.
+	 * The accessor for the field rst which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>("rst") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("rst") {
 		@Override
-		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
+		public HDLExpression getValue(HDLRegisterConfig obj) {
 			if (obj == null)
 				return null;
-			return obj.getRstRefName();
+			return obj.getRst();
 		}
 
 		@Override
-		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLQualifiedName value) {
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
 			if (obj == null)
 				return null;
 			return obj.setRst(value);
-		}
-	};
-	/**
-	 * The accessor for the field enable which is of type HDLQualifiedName.
-	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName> fEnable = new HDLFieldAccess<HDLRegisterConfig, HDLQualifiedName>("enable") {
-		@Override
-		public HDLQualifiedName getValue(HDLRegisterConfig obj) {
-			if (obj == null)
-				return null;
-			return obj.getEnableRefName();
-		}
-
-		@Override
-		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLQualifiedName value) {
-			if (obj == null)
-				return null;
-			return obj.setEnable(value);
 		}
 	};
 	/**
@@ -259,11 +237,19 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String DEF_RST = "$rst";
 	public static final String DEF_CLK = "$clk";
 
+	public static HDLExpression DEF_RST_REF() {
+		return new HDLVariableRef().setVar(HDLQualifiedName.create(DEF_RST));
+	}
+
+	public static HDLExpression DEF_CLK_REF() {
+		return new HDLVariableRef().setVar(HDLQualifiedName.create(DEF_CLK));
+	}
+
 	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig()//
-				.setClk(HDLQualifiedName.create(DEF_CLK))//
-				.setRst(HDLQualifiedName.create(DEF_RST))//
+				.setClk(DEF_CLK_REF())//
+				.setRst(DEF_RST_REF())//
 				.setResetValue(HDLLiteral.get(0))//
 				.normalize()//
 		;
@@ -278,17 +264,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			if (RESET_PARAM.equals(name)) {
 				if (refName == null)
 					throw new IllegalArgumentException("Can not get a name for clk from:" + genArgs.getExpression());
-				config = config.setRst(refName);
+				config = config.setRst(genArgs.getExpression());
 			}
 			if (CLOCK_PARAM.equals(name)) {
 				if (refName == null)
 					throw new IllegalArgumentException("Can not get a name for rst from:" + genArgs.getExpression());
-				config = config.setClk(refName);
-			}
-			if (ENABLE_PARAM.equals(name)) {
-				if (refName == null)
-					throw new IllegalArgumentException("Can not get a name for enable from:" + genArgs.getExpression());
-				config = config.setEnable(refName);
+				config = config.setClk(genArgs.getExpression());
 			}
 			if (EDGE_PARAM.equals(name)) {
 				final String value = getString(genArgs);
@@ -370,18 +351,16 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return false;
 		if (!(obj instanceof AbstractHDLRegisterConfig))
 			return false;
-		// if (!super.equals(obj))
-		// return false;
 		final AbstractHDLRegisterConfig other = (AbstractHDLRegisterConfig) obj;
 		if (clk == null) {
-			if (other.getClkRefName() != null)
+			if (other.getClk() != null)
 				return false;
-		} else if (!clk.equals(other.getClkRefName()))
+		} else if (!clk.equals(other.getClk()))
 			return false;
 		if (rst == null) {
-			if (other.getRstRefName() != null)
+			if (other.getRst() != null)
 				return false;
-		} else if (!rst.equals(other.getRstRefName()))
+		} else if (!rst.equals(other.getRst()))
 			return false;
 		if (clockType == null) {
 			if (other.getClockType() != null)
@@ -401,8 +380,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		return true;
 	}
 
+	private Integer hashCache = null;
+
 	@Override
 	public int hashCode() {
+		if (hashCache != null)
+			return hashCache;
 		int result = 1;
 		final int prime = 31;
 		result = (prime * result) + (clk == null ? 0 : clk.hashCode());
@@ -410,6 +393,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		result = (prime * result) + (clockType == null ? 0 : clockType.hashCode());
 		result = (prime * result) + (resetType == null ? 0 : resetType.hashCode());
 		result = (prime * result) + (syncType == null ? 0 : syncType.hashCode());
+		hashCache = result;
 		return result;
 	}
 

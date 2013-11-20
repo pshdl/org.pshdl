@@ -855,7 +855,7 @@ public class Insulin {
 					.lastSegmentIs(HDLRegisterConfig.DEF_CLK).getAll();
 			for (final HDLRegisterConfig reg : clkRefs) {
 				hasClkRegister = true;
-				ms.replace(reg, reg.setClk(HDLQualifiedName.create(defClkVar.getName())));
+				ms.replace(reg, reg.setClk(defClkVar.asHDLRef()));
 				if (!customClk) {
 					insertSig(ms, reg.getContainer(), defClkVar, SignalInserted.ClkInserted);
 				}
@@ -866,7 +866,7 @@ public class Insulin {
 				hasRstRegister = true;
 				final HDLRegisterConfig orig = reg;
 				reg = ms.getReplacement(reg);
-				ms.replacePrune(orig, reg.setRst(HDLQualifiedName.create(defRstVar.getName())));
+				ms.replacePrune(orig, reg.setRst(defRstVar.asHDLRef()));
 				if (!customRst) {
 					insertSig(ms, orig.getContainer(), defRstVar, SignalInserted.RstInserted);
 				}

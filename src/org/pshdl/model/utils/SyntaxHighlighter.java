@@ -224,7 +224,7 @@ public class SyntaxHighlighter {
 	}
 
 	public String variableRefName(HDLQualifiedName refName) {
-		return refName.getLastSegment();
+		return refName.toString();
 	}
 
 	public String param(String param) {

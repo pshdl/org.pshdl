@@ -43,6 +43,7 @@ import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
+import org.pshdl.model.simulation.*;
 import org.pshdl.model.utils.services.*;
 
 import com.google.common.base.*;
@@ -609,13 +610,13 @@ public class HDLPrimitives {
 	private static Range<BigInteger> intRange(BigInteger bitWidth) {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
 		final BigInteger min = max.negate().subtract(BigInteger.ONE);
-		return Range.closed(min, max);
+		return RangeTool.createRange(min, max);
 	}
 
 	private static Range<BigInteger> uintRange(BigInteger bitWidth) {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
 		final BigInteger min = BigInteger.ZERO;
-		return Range.closed(min, max);
+		return RangeTool.createRange(min, max);
 	}
 
 	public static Integer getWidth(HDLType type, HDLEvaluationContext context) {

@@ -1514,21 +1514,21 @@ public class StringWriteExtension {
     final StringBuilder params = _stringBuilder_1;
     params.append("(");
     boolean first = true;
-    HDLQualifiedName _clkRefName = reg.getClkRefName();
-    HDLQualifiedName _clkRefName_1 = defaultReg.getClkRefName();
-    boolean _notEquals = (!Objects.equal(_clkRefName, _clkRefName_1));
+    HDLExpression _clk = reg.getClk();
+    HDLExpression _clk_1 = defaultReg.getClk();
+    boolean _notEquals = (!Objects.equal(_clk, _clk_1));
     if (_notEquals) {
       String _param = highlight.param(HDLRegisterConfig.CLOCK_PARAM);
       StringBuilder _append = params.append(_param);
       StringBuilder _append_1 = _append.append("=");
-      HDLQualifiedName _clkRefName_2 = reg.getClkRefName();
-      String _variableRefName = highlight.variableRefName(_clkRefName_2);
-      _append_1.append(_variableRefName);
+      HDLExpression _clk_2 = reg.getClk();
+      String _string = this.toString(_clk_2, highlight);
+      _append_1.append(_string);
       first = false;
     }
-    HDLQualifiedName _rstRefName = reg.getRstRefName();
-    HDLQualifiedName _rstRefName_1 = defaultReg.getRstRefName();
-    boolean _notEquals_1 = (!Objects.equal(_rstRefName, _rstRefName_1));
+    HDLExpression _rst = reg.getRst();
+    HDLExpression _rst_1 = defaultReg.getRst();
+    boolean _notEquals_1 = (!Objects.equal(_rst, _rst_1));
     if (_notEquals_1) {
       boolean _not = (!first);
       if (_not) {
@@ -1537,25 +1537,9 @@ public class StringWriteExtension {
       String _param_1 = highlight.param(HDLRegisterConfig.RESET_PARAM);
       StringBuilder _append_2 = params.append(_param_1);
       StringBuilder _append_3 = _append_2.append("=");
-      HDLQualifiedName _rstRefName_2 = reg.getRstRefName();
-      String _variableRefName_1 = highlight.variableRefName(_rstRefName_2);
-      _append_3.append(_variableRefName_1);
-      first = false;
-    }
-    HDLQualifiedName _enableRefName = reg.getEnableRefName();
-    HDLQualifiedName _enableRefName_1 = defaultReg.getEnableRefName();
-    boolean _notEquals_2 = (!Objects.equal(_enableRefName, _enableRefName_1));
-    if (_notEquals_2) {
-      boolean _not_1 = (!first);
-      if (_not_1) {
-        params.append(", ");
-      }
-      String _param_2 = highlight.param(HDLRegisterConfig.ENABLE_PARAM);
-      StringBuilder _append_4 = params.append(_param_2);
-      StringBuilder _append_5 = _append_4.append("=");
-      HDLQualifiedName _enableRefName_2 = reg.getEnableRefName();
-      String _variableRefName_2 = highlight.variableRefName(_enableRefName_2);
-      _append_5.append(_variableRefName_2);
+      HDLExpression _rst_2 = reg.getRst();
+      String _string_1 = this.toString(_rst_2, highlight);
+      _append_3.append(_string_1);
       first = false;
     }
     boolean _and = false;
@@ -1570,20 +1554,20 @@ public class StringWriteExtension {
       _and = (_tripleNotEquals && _tripleNotEquals_1);
     }
     if (_and) {
-      boolean _not_2 = (!first);
-      if (_not_2) {
+      boolean _not_1 = (!first);
+      if (_not_1) {
         params.append(", ");
       }
-      String _param_3 = highlight.param(HDLRegisterConfig.EDGE_PARAM);
-      StringBuilder _append_6 = params.append(_param_3);
-      StringBuilder _append_7 = _append_6.append("=");
+      String _param_2 = highlight.param(HDLRegisterConfig.EDGE_PARAM);
+      StringBuilder _append_4 = params.append(_param_2);
+      StringBuilder _append_5 = _append_4.append("=");
       String _enumRefType = highlight.enumRefType("Edge");
-      StringBuilder _append_8 = _append_7.append(_enumRefType);
-      StringBuilder _append_9 = _append_8.append(".");
+      StringBuilder _append_6 = _append_5.append(_enumRefType);
+      StringBuilder _append_7 = _append_6.append(".");
       HDLRegClockType _clockType_3 = reg.getClockType();
-      String _string = _clockType_3.toString();
-      String _enumRefVar = highlight.enumRefVar(_string);
-      _append_9.append(_enumRefVar);
+      String _string_2 = _clockType_3.toString();
+      String _enumRefVar = highlight.enumRefVar(_string_2);
+      _append_7.append(_enumRefVar);
       first = false;
     }
     boolean _and_1 = false;
@@ -1598,20 +1582,20 @@ public class StringWriteExtension {
       _and_1 = (_tripleNotEquals_2 && _tripleNotEquals_3);
     }
     if (_and_1) {
-      boolean _not_3 = (!first);
-      if (_not_3) {
+      boolean _not_2 = (!first);
+      if (_not_2) {
         params.append(", ");
       }
-      String _param_4 = highlight.param(HDLRegisterConfig.RESET_SYNC_PARAM);
-      StringBuilder _append_10 = params.append(_param_4);
-      StringBuilder _append_11 = _append_10.append("=");
+      String _param_3 = highlight.param(HDLRegisterConfig.RESET_SYNC_PARAM);
+      StringBuilder _append_8 = params.append(_param_3);
+      StringBuilder _append_9 = _append_8.append("=");
       String _enumRefType_1 = highlight.enumRefType("Sync");
-      StringBuilder _append_12 = _append_11.append(_enumRefType_1);
-      StringBuilder _append_13 = _append_12.append(".");
+      StringBuilder _append_10 = _append_9.append(_enumRefType_1);
+      StringBuilder _append_11 = _append_10.append(".");
       HDLRegSyncType _syncType_3 = reg.getSyncType();
-      String _string_1 = _syncType_3.toString();
-      String _enumRefVar_1 = highlight.enumRefVar(_string_1);
-      _append_13.append(_enumRefVar_1);
+      String _string_3 = _syncType_3.toString();
+      String _enumRefVar_1 = highlight.enumRefVar(_string_3);
+      _append_11.append(_enumRefVar_1);
       first = false;
     }
     boolean _and_2 = false;
@@ -1626,57 +1610,57 @@ public class StringWriteExtension {
       _and_2 = (_tripleNotEquals_4 && _tripleNotEquals_5);
     }
     if (_and_2) {
-      boolean _not_4 = (!first);
-      if (_not_4) {
+      boolean _not_3 = (!first);
+      if (_not_3) {
         params.append(", ");
       }
-      String _param_5 = highlight.param(HDLRegisterConfig.RESET_TYPE_PARAM);
-      StringBuilder _append_14 = params.append(_param_5);
-      StringBuilder _append_15 = _append_14.append("=");
+      String _param_4 = highlight.param(HDLRegisterConfig.RESET_TYPE_PARAM);
+      StringBuilder _append_12 = params.append(_param_4);
+      StringBuilder _append_13 = _append_12.append("=");
       String _enumRefType_2 = highlight.enumRefType("Active");
-      StringBuilder _append_16 = _append_15.append(_enumRefType_2);
-      StringBuilder _append_17 = _append_16.append(".");
+      StringBuilder _append_14 = _append_13.append(_enumRefType_2);
+      StringBuilder _append_15 = _append_14.append(".");
       HDLRegResetActiveType _resetType_3 = reg.getResetType();
-      String _string_2 = _resetType_3.toString();
-      String _enumRefVar_2 = highlight.enumRefVar(_string_2);
-      _append_17.append(_enumRefVar_2);
+      String _string_4 = _resetType_3.toString();
+      String _enumRefVar_2 = highlight.enumRefVar(_string_4);
+      _append_15.append(_enumRefVar_2);
       first = false;
     }
     HDLExpression _resetValue = reg.getResetValue();
     HDLExpression _resetValue_1 = defaultReg.getResetValue();
-    boolean _notEquals_3 = (!Objects.equal(_resetValue, _resetValue_1));
+    boolean _notEquals_2 = (!Objects.equal(_resetValue, _resetValue_1));
+    if (_notEquals_2) {
+      boolean _not_4 = (!first);
+      if (_not_4) {
+        params.append(", ");
+      }
+      String _param_5 = highlight.param(HDLRegisterConfig.RESET_VALUE_PARAM);
+      StringBuilder _append_16 = params.append(_param_5);
+      StringBuilder _append_17 = _append_16.append("=");
+      HDLExpression _resetValue_2 = reg.getResetValue();
+      String _string_5 = this.toString(_resetValue_2, highlight);
+      _append_17.append(_string_5);
+      first = false;
+    }
+    HDLExpression _delay = reg.getDelay();
+    HDLExpression _delay_1 = defaultReg.getDelay();
+    boolean _notEquals_3 = (!Objects.equal(_delay, _delay_1));
     if (_notEquals_3) {
       boolean _not_5 = (!first);
       if (_not_5) {
         params.append(", ");
       }
-      String _param_6 = highlight.param(HDLRegisterConfig.RESET_VALUE_PARAM);
+      String _param_6 = highlight.param(HDLRegisterConfig.DELAY_PARAM);
       StringBuilder _append_18 = params.append(_param_6);
       StringBuilder _append_19 = _append_18.append("=");
-      HDLExpression _resetValue_2 = reg.getResetValue();
-      String _string_3 = this.toString(_resetValue_2, highlight);
-      _append_19.append(_string_3);
-      first = false;
-    }
-    HDLExpression _delay = reg.getDelay();
-    HDLExpression _delay_1 = defaultReg.getDelay();
-    boolean _notEquals_4 = (!Objects.equal(_delay, _delay_1));
-    if (_notEquals_4) {
-      boolean _not_6 = (!first);
-      if (_not_6) {
-        params.append(", ");
-      }
-      String _param_7 = highlight.param(HDLRegisterConfig.DELAY_PARAM);
-      StringBuilder _append_20 = params.append(_param_7);
-      StringBuilder _append_21 = _append_20.append("=");
       HDLExpression _delay_2 = reg.getDelay();
-      String _string_4 = this.toString(_delay_2, highlight);
-      _append_21.append(_string_4);
+      String _string_6 = this.toString(_delay_2, highlight);
+      _append_19.append(_string_6);
       first = false;
     }
     params.append(")");
-    boolean _not_7 = (!first);
-    if (_not_7) {
+    boolean _not_6 = (!first);
+    if (_not_6) {
       sb.append(params);
     }
     String _simpleSpace = highlight.simpleSpace();

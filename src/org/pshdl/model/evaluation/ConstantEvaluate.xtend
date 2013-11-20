@@ -361,6 +361,11 @@ class ConstantEvaluate {
 				return Optional::absent
 			}
 			val HDLExpression cRef = context.get(hVar.get)
+			if (cRef===null) {
+				obj.addMeta(SOURCE, hVar.get)
+				obj.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT)
+				return Optional::absent
+			}
 			val Optional<BigInteger> cRefEval = cRef.constantEvaluate(context)
 			if (!cRefEval.present) {
 				obj.addMeta(SOURCE, cRef)

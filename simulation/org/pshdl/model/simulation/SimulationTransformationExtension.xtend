@@ -92,6 +92,7 @@ import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnno
 import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLAnnotation
+import org.pshdl.model.utils.HDLQualifiedName
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -180,14 +181,14 @@ class SimulationTransformationExtension {
 		}
 		if (isReg) {
 			val config = obj.register.normalize
-			val rst = config.resolveRst.get
+			val rst = config.rst
 			val String rstName = fullNameOf(rst).toString
 			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType::HIGH)
 				res.add(new ArgumentedInstruction(posPredicate, rstName))
 			else
 				res.add(new ArgumentedInstruction(negPredicate, rstName))
 			if (config.syncType === HDLRegisterConfig$HDLRegSyncType::SYNC) {
-				val HDLVariable clk = config.resolveClk.get
+				val HDLExpression clk = config.clk
 				val String name = fullNameOf(clk).toString
 				if (config.clockType === RISING)
 					res.add(new ArgumentedInstruction(isRisingEdge, name))
@@ -315,13 +316,13 @@ class SimulationTransformationExtension {
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true), constant)
 		if (config !== null) {
 			config = config.normalize
-			val HDLVariable clk = config.resolveClk.get
+			val clk = config.clk
 			val String name = fullNameOf(clk).toString
 			if (config.clockType == RISING)
 				res.add(new ArgumentedInstruction(isRisingEdge, name))
 			else
 				res.add(new ArgumentedInstruction(isFallingEdge, name))
-			val rst = config.resolveRst.get
+			val rst = config.rst
 			val String rstName = fullNameOf(rst).toString
 			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType::HIGH)
 				res.add(new ArgumentedInstruction(negPredicate, rstName))
@@ -398,12 +399,12 @@ class SimulationTransformationExtension {
 		}
 		res.annotations = obj.annotations.toAnnoString
 		val regConfigs = obj.getAllObjectsOf(typeof(HDLRegisterConfig), true)
-		val Set<String> lst = new HashSet
+		val Set<HDLQualifiedName> lst = new HashSet
 		for (HDLRegisterConfig reg : regConfigs) {
-			val HDLVariable rstVar = reg.resolveRst.get
-			if (!lst.contains(rstVar.name)) {
-				lst.add(rstVar.name)
-				val rstVarName = fullNameOf(rstVar).toString
+			val HDLQualifiedName rstVar = fullNameOf(reg.rst)
+			if (!lst.contains(rstVar)) {
+				lst.add(rstVar)
+				val rstVarName = rstVar.toString
 				val rstFrame = new FluidFrame(InternalInformation::PRED_PREFIX + rstVarName, false)
 				rstFrame.add(new ArgumentedInstruction(loadInternal, rstVarName))
 				rstFrame.add(const0)

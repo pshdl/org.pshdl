@@ -40,6 +40,7 @@ import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
+import org.pshdl.model.simulation.*;
 import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.utils.*;
@@ -266,13 +267,23 @@ public class BuiltInValidator implements IHDLValidator {
 		for (final HDLVariableDeclaration hvd : hvds) {
 			final HDLRegisterConfig reg = hvd.getRegister();
 			if (reg != null) {
-				final HDLQualifiedName clkRefName = reg.getClkRefName();
-				if ((clkRefName != null) && (clkRefName.length > 0) && clkRefName.getSegment(0).equals(HDLQualifiedName.INVALID)) {
-					problems.add(new Problem(REGISTER_CLOCK_NOT_NAME, reg, "Only simple variable references are allowed as clock"));
+				final HDLExpression clk = reg.getClk();
+				final Optional<BigInteger> clkWidth = ConstantEvaluate.valueOf(TypeExtension.getWidth(clk));
+				if (!clkWidth.isPresent()) {
+					problems.add(new Problem(CLOCK_UNKNOWN_WIDTH, clk));
+				} else {
+					if (!clkWidth.get().equals(BigInteger.ONE)) {
+						problems.add(new Problem(CLOCK_NOT_BIT, clk));
+					}
 				}
-				final HDLQualifiedName rstRefName = reg.getRstRefName();
-				if ((rstRefName != null) && (rstRefName.length > 0) && rstRefName.getSegment(0).equals(HDLQualifiedName.INVALID)) {
-					problems.add(new Problem(REGISTER_RESET_NOT_NAME, reg, "Only simple variable references are allowed as reset"));
+				final HDLExpression rst = reg.getRst();
+				final Optional<BigInteger> rstWidth = ConstantEvaluate.valueOf(TypeExtension.getWidth(rst));
+				if (!rstWidth.isPresent()) {
+					problems.add(new Problem(REST_UNKNOWN_WIDTH, rst));
+				} else {
+					if (!rstWidth.get().equals(BigInteger.ONE)) {
+						problems.add(new Problem(RESET_NOT_BIT, rst));
+					}
 				}
 				switch (hvd.getDirection()) {
 				case CONSTANT:
@@ -412,15 +423,6 @@ public class BuiltInValidator implements IHDLValidator {
 			final Optional<HDLInterface> type = hii.resolveHIf();
 			if (!type.isPresent()) {
 				problems.add(new Problem(UNRESOLVED_INTERFACE, hii));
-			}
-		}
-		final HDLRegisterConfig[] regs = pkg.getAllObjectsOf(HDLRegisterConfig.class, true);
-		for (final HDLRegisterConfig reg : regs) {
-			if (reg.resolveClk() == null) {
-				problems.add(new Problem(UNRESOLVED_VARIABLE, reg));
-			}
-			if (reg.resolveRst() == null) {
-				problems.add(new Problem(UNRESOLVED_VARIABLE, reg));
 			}
 		}
 	}
@@ -957,7 +959,7 @@ public class BuiltInValidator implements IHDLValidator {
 			final Range<BigInteger> accessRange = accessRangeRaw.get();
 			Range<BigInteger> arrayRange = arrayRangeRaw.get();
 			final BigInteger upperEndpoint = arrayRange.upperEndpoint();
-			arrayRange = Range.closed(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
+			arrayRange = RangeTool.createRange(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
 			final String info = "Expected value range:" + accessRange;
 			if (accessRange.upperEndpoint().signum() < 0) {
 				problems.add(new Problem(ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));

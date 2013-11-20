@@ -701,6 +701,13 @@ public class ConstantEvaluate {
       }
       HDLVariable _get_3 = hVar.get();
       final HDLExpression cRef = context.get(_get_3);
+      boolean _tripleEquals_1 = (cRef == null);
+      if (_tripleEquals_1) {
+        HDLVariable _get_4 = hVar.get();
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _get_4);
+        obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
+        return Optional.<BigInteger>absent();
+      }
       final Optional<BigInteger> cRefEval = this.constantEvaluate(cRef, context);
       boolean _isPresent_2 = cRefEval.isPresent();
       boolean _not_3 = (!_isPresent_2);

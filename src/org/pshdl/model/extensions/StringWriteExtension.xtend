@@ -562,23 +562,14 @@ class StringWriteExtension {
 		val StringBuilder params = new StringBuilder
 		params.append('(')
 		var boolean first = true
-		if (reg.clkRefName != defaultReg.clkRefName) {
-			params.append(highlight.param(HDLRegisterConfig::CLOCK_PARAM)).append('=').append(
-				highlight.variableRefName(reg.clkRefName))
+		if (reg.clk != defaultReg.clk) {
+			params.append(highlight.param(HDLRegisterConfig::CLOCK_PARAM)).append('=').append(reg.clk.toString(highlight))
 			first = false
 		}
-		if (reg.rstRefName != defaultReg.rstRefName) {
+		if (reg.rst != defaultReg.rst) {
 			if (!first)
 				params.append(", ")
-			params.append(highlight.param(HDLRegisterConfig::RESET_PARAM)).append('=').append(
-				highlight.variableRefName(reg.rstRefName))
-			first = false
-		}
-		if (reg.enableRefName != defaultReg.enableRefName) {
-			if (!first)
-				params.append(", ")
-			params.append(highlight.param(HDLRegisterConfig::ENABLE_PARAM)).append('=').append(
-				highlight.variableRefName(reg.enableRefName))
+			params.append(highlight.param(HDLRegisterConfig::RESET_PARAM)).append('=').append(reg.rst.toString(highlight))
 			first = false
 		}
 		if (reg.clockType !== null && reg.clockType !== defaultReg.clockType) {

@@ -32,6 +32,7 @@ import java.util.*;
 import org.pshdl.model.*;
 import org.pshdl.model.evaluation.*;
 import org.pshdl.model.extensions.*;
+import org.pshdl.model.simulation.*;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import org.pshdl.model.utils.services.*;
@@ -120,8 +121,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	public Range<BigInteger> asRange(BigInteger from, BigInteger to) {
 		if (from.compareTo(to) > 0)
-			return Range.closed(to, from);
-		return Range.closed(from, to);
+			return RangeTool.createRange(to, from);
+		return RangeTool.createRange(from, to);
 	}
 
 	@Override

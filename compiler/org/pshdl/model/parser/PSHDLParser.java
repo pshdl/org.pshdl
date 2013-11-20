@@ -39,8 +39,6 @@ import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.*;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
-import com.google.common.base.*;
-
 public class PSHDLParser {
 
 	public static String[] getKeywords() throws Exception {

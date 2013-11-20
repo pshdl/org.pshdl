@@ -174,17 +174,6 @@ public class RWValidation {
 				}
 			}
 		}
-		final HDLRegisterConfig[] regConfs = orig.getAllObjectsOf(HDLRegisterConfig.class, true);
-		for (final HDLRegisterConfig conf : regConfs) {
-			final Optional<HDLVariable> clk = conf.resolveClk();
-			if (clk.isPresent()) {
-				incMeta(clk.get(), IntegerMeta.READ_COUNT);
-			}
-			final Optional<HDLVariable> rst = conf.resolveRst();
-			if (rst.isPresent()) {
-				incMeta(rst.get(), IntegerMeta.READ_COUNT);
-			}
-		}
 	}
 
 	public static final GenericMeta<HDLBlock> BLOCK_META = new GenericMeta<HDLBlock>("BLOCK_META", true);

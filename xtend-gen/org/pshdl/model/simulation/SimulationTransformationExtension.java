@@ -284,8 +284,7 @@ public class SimulationTransformationExtension {
     if (isReg) {
       HDLRegisterConfig _register_1 = obj.getRegister();
       final HDLRegisterConfig config = _register_1.normalize();
-      Optional<HDLVariable> _resolveRst = config.resolveRst();
-      final HDLVariable rst = _resolveRst.get();
+      final HDLExpression rst = config.getRst();
       HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(rst);
       final String rstName = _fullNameOf.toString();
       HDLRegResetActiveType _resetType = config.getResetType();
@@ -300,8 +299,7 @@ public class SimulationTransformationExtension {
       HDLRegSyncType _syncType = config.getSyncType();
       boolean _tripleEquals_2 = (_syncType == HDLRegSyncType.SYNC);
       if (_tripleEquals_2) {
-        Optional<HDLVariable> _resolveClk = config.resolveClk();
-        final HDLVariable clk = _resolveClk.get();
+        final HDLExpression clk = config.getClk();
         HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(clk);
         final String name = _fullNameOf_1.toString();
         HDLRegClockType _clockType = config.getClockType();
@@ -545,8 +543,7 @@ public class SimulationTransformationExtension {
     if (_tripleNotEquals_1) {
       HDLRegisterConfig _normalize = config.normalize();
       config = _normalize;
-      Optional<HDLVariable> _resolveClk = config.resolveClk();
-      final HDLVariable clk = _resolveClk.get();
+      final HDLExpression clk = config.getClk();
       HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(clk);
       final String name = _fullNameOf.toString();
       HDLRegClockType _clockType = config.getClockType();
@@ -558,8 +555,7 @@ public class SimulationTransformationExtension {
         ArgumentedInstruction _argumentedInstruction_1 = new ArgumentedInstruction(Instruction.isFallingEdge, name);
         res.add(_argumentedInstruction_1);
       }
-      Optional<HDLVariable> _resolveRst = config.resolveRst();
-      final HDLVariable rst = _resolveRst.get();
+      final HDLExpression rst = config.getRst();
       HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(rst);
       final String rstName = _fullNameOf_1.toString();
       HDLRegResetActiveType _resetType = config.getResetType();
@@ -702,20 +698,17 @@ public class SimulationTransformationExtension {
     String[] _annoString = this.toAnnoString(_annotations);
     res.annotations = _annoString;
     final HDLRegisterConfig[] regConfigs = obj.<HDLRegisterConfig>getAllObjectsOf(HDLRegisterConfig.class, true);
-    HashSet<String> _hashSet = new HashSet<String>();
-    final Set<String> lst = _hashSet;
+    HashSet<HDLQualifiedName> _hashSet = new HashSet<HDLQualifiedName>();
+    final Set<HDLQualifiedName> lst = _hashSet;
     for (final HDLRegisterConfig reg : regConfigs) {
       {
-        Optional<HDLVariable> _resolveRst = reg.resolveRst();
-        final HDLVariable rstVar = _resolveRst.get();
-        String _name = rstVar.getName();
-        boolean _contains = lst.contains(_name);
+        HDLExpression _rst = reg.getRst();
+        final HDLQualifiedName rstVar = FullNameExtension.fullNameOf(_rst);
+        boolean _contains = lst.contains(rstVar);
         boolean _not = (!_contains);
         if (_not) {
-          String _name_1 = rstVar.getName();
-          lst.add(_name_1);
-          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(rstVar);
-          final String rstVarName = _fullNameOf.toString();
+          lst.add(rstVar);
+          final String rstVarName = rstVar.toString();
           String _plus = (InternalInformation.PRED_PREFIX + rstVarName);
           FluidFrame _fluidFrame_1 = new FluidFrame(_plus, false);
           final FluidFrame rstFrame = _fluidFrame_1;
