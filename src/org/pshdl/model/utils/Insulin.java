@@ -750,7 +750,7 @@ public class Insulin {
 				final HDLType resolveType = hvd.resolveType().get();
 				if (resolveType instanceof HDLEnum) {
 					final HDLEnum hEnum = (HDLEnum) resolveType;
-					return new HDLVariableRef().setVar(hEnum.getEnums().get(0).asRef());
+					return (HDLExpression) new HDLEnumRef().setHEnum(hEnum.asRef()).setVar(hEnum.getEnums().get(0).asRef()).freeze(hEnum);
 				}
 			}
 		return defaultValue;

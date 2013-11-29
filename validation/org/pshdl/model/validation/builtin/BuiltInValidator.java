@@ -268,21 +268,35 @@ public class BuiltInValidator implements IHDLValidator {
 			final HDLRegisterConfig reg = hvd.getRegister();
 			if (reg != null) {
 				final HDLExpression clk = reg.getClk();
-				final Optional<BigInteger> clkWidth = ConstantEvaluate.valueOf(TypeExtension.getWidth(clk));
-				if (!clkWidth.isPresent()) {
-					problems.add(new Problem(CLOCK_UNKNOWN_WIDTH, clk));
-				} else {
-					if (!clkWidth.get().equals(BigInteger.ONE)) {
-						problems.add(new Problem(CLOCK_NOT_BIT, clk));
+				if (clk != null) {
+					final HDLExpression width = TypeExtension.getWidth(clk);
+					if (width == null) {
+						problems.add(new Problem(CLOCK_UNKNOWN_WIDTH, clk));
+					} else {
+						final Optional<BigInteger> clkWidth = ConstantEvaluate.valueOf(width);
+						if (!clkWidth.isPresent()) {
+							problems.add(new Problem(CLOCK_UNKNOWN_WIDTH, clk));
+						} else {
+							if (!clkWidth.get().equals(BigInteger.ONE)) {
+								problems.add(new Problem(CLOCK_NOT_BIT, clk));
+							}
+						}
 					}
 				}
 				final HDLExpression rst = reg.getRst();
-				final Optional<BigInteger> rstWidth = ConstantEvaluate.valueOf(TypeExtension.getWidth(rst));
-				if (!rstWidth.isPresent()) {
-					problems.add(new Problem(REST_UNKNOWN_WIDTH, rst));
-				} else {
-					if (!rstWidth.get().equals(BigInteger.ONE)) {
-						problems.add(new Problem(RESET_NOT_BIT, rst));
+				if (rst != null) {
+					final HDLExpression width = TypeExtension.getWidth(rst);
+					if (width == null) {
+						problems.add(new Problem(REST_UNKNOWN_WIDTH, rst));
+					} else {
+						final Optional<BigInteger> rstWidth = ConstantEvaluate.valueOf(width);
+						if (!rstWidth.isPresent()) {
+							problems.add(new Problem(REST_UNKNOWN_WIDTH, rst));
+						} else {
+							if (!rstWidth.get().equals(BigInteger.ONE)) {
+								problems.add(new Problem(RESET_NOT_BIT, rst));
+							}
+						}
 					}
 				}
 				switch (hvd.getDirection()) {
