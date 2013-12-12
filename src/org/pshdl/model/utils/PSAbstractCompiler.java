@@ -499,4 +499,8 @@ public class PSAbstractCompiler {
 	public Collection<HDLUnit> getUnits() {
 		return lib.units.values();
 	}
+
+	public Map<String, HDLPackage> getFileUnits() {
+		return pkgs;
+	}
 }

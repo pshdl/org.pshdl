@@ -86,9 +86,16 @@ public class ScopingExtension {
   }.apply();
   
   public Optional<HDLVariable> resolveVariableDefault(final IHDLObject obj, final HDLQualifiedName hVar) {
-    IHDLObject _container = obj.getContainer();
-    boolean _tripleEquals = (_container == null);
+    boolean _or = false;
+    boolean _tripleEquals = (obj == null);
     if (_tripleEquals) {
+      _or = true;
+    } else {
+      IHDLObject _container = obj.getContainer();
+      boolean _tripleEquals_1 = (_container == null);
+      _or = (_tripleEquals || _tripleEquals_1);
+    }
+    if (_or) {
       return Optional.<HDLVariable>absent();
     }
     IHDLObject _container_1 = obj.getContainer();

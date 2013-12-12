@@ -74,7 +74,7 @@ class ScopingExtension {
 	public static ScopingExtension INST = new ScopingExtension
 
 	def Optional<HDLVariable> resolveVariableDefault(IHDLObject obj, HDLQualifiedName hVar) {
-		if (obj.container === null) {
+		if (obj===null || obj.container === null) {
 			return Optional::absent
 		}
 		return obj.container.resolveVariable(hVar)
