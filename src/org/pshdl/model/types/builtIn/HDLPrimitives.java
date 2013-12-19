@@ -637,7 +637,7 @@ public class HDLPrimitives {
 				width = ConstantEvaluate.valueOf(determineType.getWidth(), context).orNull();
 				break;
 			default:
-				throw new IllegalArgumentException("Can not determine width of " + determineType);
+				return null;
 			}
 			if (width != null)
 				return width.intValue();

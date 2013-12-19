@@ -107,7 +107,7 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 		if (!resolveHIf.isPresent())
 			return Optional.absent();
 		final ModificationSet ms = new ModificationSet();
-		final HDLInterface getInterface = resolveHIf.get();
+		final HDLInterface getInterface = Insulin.resolveFragments(resolveHIf.get());
 		final ArrayList<HDLVariableDeclaration> ports = getInterface.getPorts();
 		final String prefix = getVar().getName();
 		for (final HDLVariableDeclaration hvd : ports) {
