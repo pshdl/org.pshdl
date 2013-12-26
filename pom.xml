@@ -4,6 +4,10 @@
 	<groupId>org.pshdl</groupId>
 	<artifactId>core</artifactId>
 	<version>0.1.48</version>
+	<properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
