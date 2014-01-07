@@ -433,7 +433,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	}
 
 	def getMaxValueNegHex(Definition d) {
-		"0x" + Integer::toHexString(-d.maxValue - 1)
+		"-0x" + Integer::toHexString(d.maxValue+1)
 	}
 
 	def getMaxValue(Definition d) {

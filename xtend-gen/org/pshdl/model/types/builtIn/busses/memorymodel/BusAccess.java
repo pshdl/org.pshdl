@@ -1252,11 +1252,10 @@ public class BusAccess {
   
   public String getMaxValueNegHex(final Definition d) {
     int _maxValue = this.getMaxValue(d);
-    int _minus = (-_maxValue);
-    int _minus_1 = (_minus - 1);
-    String _hexString = Integer.toHexString(_minus_1);
-    String _plus = ("0x" + _hexString);
-    return _plus;
+    int _plus = (_maxValue + 1);
+    String _hexString = Integer.toHexString(_plus);
+    String _plus_1 = ("-0x" + _hexString);
+    return _plus_1;
   }
   
   public int getMaxValue(final Definition d) {
