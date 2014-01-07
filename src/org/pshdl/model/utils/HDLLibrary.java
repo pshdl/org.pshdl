@@ -63,13 +63,16 @@ public class HDLLibrary {
 	public static HDLLibrary getLibrary(String libURI) {
 		if (libURI == null)
 			throw new IllegalArgumentException("Library uri can not be null");
-		return libs.get(libURI);
+		final HDLLibrary hdlLibrary = libs.get(libURI);
+		return hdlLibrary;
 	}
 
 	public static void registerLibrary(String libURI, HDLLibrary library) {
 		if (libURI == null)
 			throw new IllegalArgumentException("Library uri can not be null");
-		libs.put(libURI, library);
+		final HDLLibrary put = libs.put(libURI, library);
+		if ((put != null) && (put != library))
+			throw new IllegalArgumentException("A library with this id already exists!");
 	}
 
 	public static void unregister(String libURI) {

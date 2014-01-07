@@ -26,27 +26,41 @@
  ******************************************************************************/
 package org.pshdl.model.extensions
 
+import com.google.common.base.Optional
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import java.math.BigInteger
+import java.util.ArrayList
+import java.util.Iterator
+import java.util.List
 import org.pshdl.model.HDLArithOp
-import org.pshdl.model.HDLArithOp$HDLArithOpType
+import org.pshdl.model.HDLArithOp.HDLArithOpType
+import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLBitOp
 import org.pshdl.model.HDLClass
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLDirectGeneration
+import org.pshdl.model.HDLEnum
 import org.pshdl.model.HDLEnumRef
 import org.pshdl.model.HDLEqualityOp
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.HDLInlineFunction
+import org.pshdl.model.HDLInterface
 import org.pshdl.model.HDLInterfaceInstantiation
 import org.pshdl.model.HDLLiteral
-import org.pshdl.model.HDLLiteral$HDLLiteralPresentation
+import org.pshdl.model.HDLLiteral.HDLLiteralPresentation
 import org.pshdl.model.HDLManip
+import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
-import org.pshdl.model.HDLPrimitive$HDLPrimitiveType
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
+import org.pshdl.model.HDLRegisterConfig
 import org.pshdl.model.HDLShiftOp
 import org.pshdl.model.HDLTernary
 import org.pshdl.model.HDLType
+import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration
 import org.pshdl.model.HDLVariableRef
@@ -54,25 +68,11 @@ import org.pshdl.model.IHDLObject
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
 import org.pshdl.model.utils.HDLProblemException
+import org.pshdl.model.utils.Insulin
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
-import java.math.BigInteger
-import java.util.Iterator
-import java.util.List
 
 import static org.pshdl.model.extensions.TypeExtension.*
-import org.pshdl.model.HDLUnresolvedFragment
-import org.pshdl.model.utils.Insulin
-import org.pshdl.model.HDLObject$GenericMeta
-import org.pshdl.model.HDLArrayInit
-import org.pshdl.model.HDLRegisterConfig
-import com.google.common.base.Optional
-import org.pshdl.model.HDLEnum
-import org.pshdl.model.HDLInterface
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
-import java.util.ArrayList
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
@@ -84,7 +84,8 @@ class TypeExtension {
 	}
 
 	private def static cachedType(IHDLObject obj) {
-		return INST.determineType(obj)
+		val type = INST.determineType(obj)
+		return type
 	}
 
 	/**
@@ -180,7 +181,11 @@ class TypeExtension {
 			type = nextCatType.get
 			if (!(type instanceof HDLPrimitive))
 				return Optional::absent
-			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType::PLUS).setRight(getWidth(type))
+			val tWidth = getWidth(type)
+			if (tWidth === null)
+				//This can happen when we have invalid concatenations
+				return Optional::absent
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType::PLUS).setRight(tWidth)
 			width = HDLPrimitives::simplifyWidth(cat, width)
 		}
 		return Optional::of(HDLPrimitive::bitvector.setWidth(width).setContainer(cat))

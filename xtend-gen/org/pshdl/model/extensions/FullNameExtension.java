@@ -264,8 +264,13 @@ public class FullNameExtension {
     if (_tripleNotEquals) {
       return cached;
     }
-    Optional<HDLVariable> _resolveVar = ref.resolveVar();
-    HDLVariable _get = _resolveVar.get();
+    final Optional<HDLVariable> varRef = ref.resolveVar();
+    boolean _isPresent = varRef.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return null;
+    }
+    HDLVariable _get = varRef.get();
     return this.getFullName(_get);
   }
   
@@ -275,8 +280,13 @@ public class FullNameExtension {
     if (_tripleNotEquals) {
       return cached;
     }
-    Optional<HDLVariable> _resolveVar = ref.resolveVar();
-    HDLVariable _get = _resolveVar.get();
+    final Optional<HDLVariable> varRef = ref.resolveVar();
+    boolean _isPresent = varRef.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      return null;
+    }
+    HDLVariable _get = varRef.get();
     return this.getFullName(_get);
   }
   

@@ -658,7 +658,7 @@ class DartCompiler implements ITypeOuptutProvider {
 			case Instruction::mul:
 				twoOp(sb, pos, "*", a, b, inst.arg1)
 			case Instruction::div:
-				twoOp(sb, pos, "/", a, b, inst.arg1)
+				twoOp(sb, pos, "~/", a, b, inst.arg1)
 			case Instruction::sll:
 				twoOp(sb, pos, "<<", a, b, inst.arg1)
 			case Instruction::srl: {

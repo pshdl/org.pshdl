@@ -81,6 +81,7 @@ public class Insulin {
 		apply = fixMultiDimAssignments(apply);
 		apply = fixDoubleNegate(apply);
 		apply = fortifyType(apply);
+		apply = resolveFragments(apply);
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;

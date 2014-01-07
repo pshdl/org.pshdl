@@ -109,7 +109,6 @@ public class BuiltInValidator implements IHDLValidator {
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
 			// collision
-			// TODO check for proper variable naming
 			// TODO check for valid parameter
 			checkSwitchStatements(pkg, problems, hContext);
 			// TODO Type checking!
@@ -287,11 +286,11 @@ public class BuiltInValidator implements IHDLValidator {
 				if (rst != null) {
 					final HDLExpression width = TypeExtension.getWidth(rst);
 					if (width == null) {
-						problems.add(new Problem(REST_UNKNOWN_WIDTH, rst));
+						problems.add(new Problem(RESET_UNKNOWN_WIDTH, rst));
 					} else {
 						final Optional<BigInteger> rstWidth = ConstantEvaluate.valueOf(width);
 						if (!rstWidth.isPresent()) {
-							problems.add(new Problem(REST_UNKNOWN_WIDTH, rst));
+							problems.add(new Problem(RESET_UNKNOWN_WIDTH, rst));
 						} else {
 							if (!rstWidth.get().equals(BigInteger.ONE)) {
 								problems.add(new Problem(RESET_NOT_BIT, rst));
@@ -478,35 +477,36 @@ public class BuiltInValidator implements IHDLValidator {
 				final HDLPrimitive right = (HDLPrimitive) rType.get();
 				if ((right.getType() == HDLPrimitiveType.STRING) && (left.getType() != HDLPrimitiveType.STRING)) {
 					problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Strings can only be assigned to other strings"));
-				}
-				switch (left.getType()) {
-				case BIT:
-					if (right.getType() != HDLPrimitiveType.BIT)
-						if (right.getWidth() != null) {
-							final Optional<BigInteger> w = ConstantEvaluate.valueOf(right.getWidth(), context);
-							if (w.isPresent() && !w.get().equals(BigInteger.ONE)) {
-								problems.add(new Problem(ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
+				} else {
+					switch (left.getType()) {
+					case BIT:
+						if (right.getType() != HDLPrimitiveType.BIT)
+							if (right.getWidth() != null) {
+								final Optional<BigInteger> w = ConstantEvaluate.valueOf(right.getWidth(), context);
+								if (w.isPresent() && !w.get().equals(BigInteger.ONE)) {
+									problems.add(new Problem(ASSIGNMENT_CLIPPING_WILL_OCCUR, rightExp, obj));
+								}
 							}
+						break;
+					case BITVECTOR:
+						break;
+					case BOOL:
+						// String is also invalid, but handled above
+						break;
+					case INT:
+					case INTEGER:
+					case NATURAL:
+					case UINT:
+						if (!right.isNumber()) {
+							problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Value needs to be numeric"));
 						}
-					break;
-				case BITVECTOR:
-					break;
-				case BOOL:
-					// Anything but String can be assigned
-					break;
-				case INT:
-				case INTEGER:
-				case NATURAL:
-				case UINT:
-					if ((right.getType() == HDLPrimitiveType.BIT) || (right.getType() == HDLPrimitiveType.BITVECTOR)) {
-						problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Target needs to be numeric"));
+						break;
+					case STRING:
+						if (right.getType() != HDLPrimitiveType.STRING) {
+							problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Strings can only be assigned to other strings"));
+						}
+						break;
 					}
-					break;
-				case STRING:
-					if (right.getType() != HDLPrimitiveType.STRING) {
-						problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Strings can only be assigned to other strings"));
-					}
-					break;
 				}
 			}
 			break;
@@ -560,6 +560,11 @@ public class BuiltInValidator implements IHDLValidator {
 				final HDLPrimitive primitive = (HDLPrimitive) type.get();
 				if (primitive.getWidth() == null) {
 					problems.add(new Problem(SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
+				}
+				final Optional<BigInteger> width = ConstantEvaluate.valueOf(primitive.getWidth(), null);
+				if (!width.isPresent()
+						&& ((primitive.getType() == HDLPrimitiveType.INT) || (primitive.getType() == HDLPrimitiveType.UINT) || (primitive.getType() == HDLPrimitiveType.BITVECTOR))) {
+					problems.add(new Problem(SWITCH_CASE_NEEDS_CONSTANT_WIDTH, switchStatement.getCaseExp()));
 				}
 			}
 			final boolean isEnum = type.get() instanceof HDLEnum;
@@ -719,8 +724,8 @@ public class BuiltInValidator implements IHDLValidator {
 				case LOGIC_NEG:
 					if (tt instanceof HDLPrimitive) {
 						final HDLPrimitive primitive = (HDLPrimitive) tt;
-						if (!primitive.isBits() && (primitive.getType() != HDLPrimitiveType.BOOL)) {
-							problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use logic negate on a non boolean/number"));
+						if ((primitive.getType() != HDLPrimitiveType.BOOL) && (primitive.getType() != HDLPrimitiveType.BIT)) {
+							problems.add(new Problem(BOOL_NEGATE_NUMERIC_NOT_SUPPORTED, manip, "Can not use logic negate on a non boolean/bit"));
 						}
 					} else {
 						problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use logic negate on a non boolean"));
@@ -924,6 +929,8 @@ public class BuiltInValidator implements IHDLValidator {
 			if (container instanceof HDLAssignment) {
 				final HDLAssignment ass = (HDLAssignment) container;
 				final HDLReference left = ass.getLeft();
+				if (left instanceof HDLUnresolvedFragment)
+					return;
 				if (left.getClassType() == HDLClass.HDLEnumRef) {
 					problems.add(new Problem(ASSIGNMENT_ENUM_NOT_WRITABLE, left));
 				} else {
@@ -973,7 +980,12 @@ public class BuiltInValidator implements IHDLValidator {
 			final Range<BigInteger> accessRange = accessRangeRaw.get();
 			Range<BigInteger> arrayRange = arrayRangeRaw.get();
 			final BigInteger upperEndpoint = arrayRange.upperEndpoint();
-			arrayRange = RangeTool.createRange(BigInteger.ZERO, upperEndpoint.subtract(BigInteger.ONE));
+			final BigInteger subtract = upperEndpoint.subtract(BigInteger.ONE);
+			if (subtract.compareTo(BigInteger.ZERO) < 0) {
+				// Maybe generate a warning here?
+				continue;
+			}
+			arrayRange = RangeTool.createRange(BigInteger.ZERO, subtract);
 			final String info = "Expected value range:" + accessRange;
 			if (accessRange.upperEndpoint().signum() < 0) {
 				problems.add(new Problem(ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));

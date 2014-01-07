@@ -99,7 +99,8 @@ public class TypeExtension {
   }
   
   private static Optional<? extends HDLType> cachedType(final IHDLObject obj) {
-    return TypeExtension.INST.determineType(obj);
+    final Optional<? extends HDLType> type = TypeExtension.INST.determineType(obj);
+    return type;
   }
   
   /**
@@ -299,11 +300,15 @@ public class TypeExtension {
         if (_not_3) {
           return Optional.<HDLType>absent();
         }
+        final HDLExpression tWidth = TypeExtension.getWidth(type);
+        boolean _tripleEquals_1 = (tWidth == null);
+        if (_tripleEquals_1) {
+          return Optional.<HDLType>absent();
+        }
         HDLArithOp _hDLArithOp = new HDLArithOp();
         HDLArithOp _setLeft = _hDLArithOp.setLeft(width);
         HDLArithOp _setType = _setLeft.setType(HDLArithOpType.PLUS);
-        HDLExpression _width = TypeExtension.getWidth(type);
-        HDLArithOp _setRight = _setType.setRight(_width);
+        HDLArithOp _setRight = _setType.setRight(tWidth);
         width = _setRight;
         HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(cat, width);
         width = _simplifyWidth;

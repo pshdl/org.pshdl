@@ -164,7 +164,7 @@ public class PSAbstractCompiler {
 	private final ExecutorService service;
 
 	public PSAbstractCompiler() {
-		this("PSHDLLib" + RANDOM.nextLong(), null);
+		this("PSHDLLib" + nextLong(), null);
 	}
 
 	public PSAbstractCompiler(String uri, ExecutorService service) {
@@ -173,13 +173,19 @@ public class PSAbstractCompiler {
 			HDLCore.defaultInit();
 		}
 		if (uri == null) {
-			this.uri = "RANDOM" + Long.toHexString(RANDOM.nextLong());
+			this.uri = "RANDOM" + Long.toHexString(nextLong());
 		} else {
 			this.uri = uri;
 		}
 		this.service = service;
 		this.lib = new HDLLibrary();
 		HDLLibrary.registerLibrary(this.uri, this.lib);
+	}
+
+	public static long nextLong() {
+		synchronized (RANDOM) {
+			return RANDOM.nextLong();
+		}
 	}
 
 	public boolean add(File source) throws Exception {

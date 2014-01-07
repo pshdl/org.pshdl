@@ -217,8 +217,15 @@ public class ParserToModelExtension {
     HDLPackage _setDeclarations = pkg.setDeclarations(_map_1);
     pkg = _setDeclarations;
     pkg.freeze(null);
-    HDLLibrary _library = HDLLibrary.getLibrary(libURI);
-    _library.addPkg(pkg, src);
+    final HDLLibrary library = HDLLibrary.getLibrary(libURI);
+    boolean _equals = Objects.equal(library, null);
+    if (_equals) {
+      String _plus = ("The library " + libURI);
+      String _plus_1 = (_plus + " is not valid");
+      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_1);
+      throw _illegalArgumentException;
+    }
+    library.addPkg(pkg, src);
     HDLPackage _attachContext = this.<HDLPackage>attachContext(pkg, ctx);
     return ((HDLPackage) _attachContext);
   }

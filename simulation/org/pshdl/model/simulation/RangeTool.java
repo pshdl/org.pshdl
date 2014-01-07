@@ -161,7 +161,9 @@ public class RangeTool {
 		return temp;
 	}
 
-	public static <C extends Comparable<?>> Range<C> createRange(C lower, C upper) {
+	public static <C extends Comparable<C>> Range<C> createRange(C lower, C upper) {
+		if (lower.compareTo(upper) > 0)
+			return Range.closed(upper, lower);
 		return Range.closed(lower, upper);
 	}
 }

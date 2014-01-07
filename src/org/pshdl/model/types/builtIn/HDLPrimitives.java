@@ -590,7 +590,7 @@ public class HDLPrimitives {
 		case INT: {
 			final Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
-				return null;
+				return Optional.absent();
 			return Optional.of(intRange(bitWidth.get()));
 		}
 		case INTEGER:
@@ -598,7 +598,7 @@ public class HDLPrimitives {
 		case UINT: {
 			final Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
-				return null;
+				return Optional.absent();
 			return Optional.of(uintRange(bitWidth.get()));
 		}
 		case NATURAL:

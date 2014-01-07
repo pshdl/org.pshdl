@@ -26,28 +26,28 @@
  ******************************************************************************/
 package org.pshdl.model.extensions
 
+import java.util.Iterator
+import javax.annotation.Nonnull
 import org.pshdl.model.HDLBlock
 import org.pshdl.model.HDLEnum
+import org.pshdl.model.HDLEnumDeclaration
+import org.pshdl.model.HDLEnumRef
 import org.pshdl.model.HDLForLoop
 import org.pshdl.model.HDLFunction
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInterface
 import org.pshdl.model.HDLObject
-import org.pshdl.model.HDLObject$GenericMeta
+import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPackage
 import org.pshdl.model.HDLSwitchCaseStatement
 import org.pshdl.model.HDLSwitchStatement
 import org.pshdl.model.HDLUnit
 import org.pshdl.model.HDLVariable
+import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.utils.HDLQualifiedName
-import java.util.Iterator
 
 import static org.pshdl.model.extensions.FullNameExtension.*
-import javax.annotation.Nonnull
-import org.pshdl.model.HDLVariableRef
-import org.pshdl.model.HDLEnumDeclaration
-import org.pshdl.model.HDLEnumRef
 
 /**
  * The FullNameExtension provides a {@link HDLQualifiedName} for every IHDLObject. 
@@ -180,14 +180,20 @@ class FullNameExtension {
 		val cached=ref.getMeta(FULLNAME)
 		if (cached !== null)
 			return cached
-		return ref.resolveVar.get.fullName
+		val varRef = ref.resolveVar
+		if (!varRef.present)
+			return null
+		return varRef.get.fullName
 	}
 	
 	def dispatch HDLQualifiedName getFullName(HDLVariableRef ref) {
 		val cached=ref.getMeta(FULLNAME)
 		if (cached !== null)
 			return cached
-		return ref.resolveVar.get.fullName
+		val varRef = ref.resolveVar
+		if (!varRef.present)
+			return null
+		return varRef.get.fullName
 	}
 	
 	def dispatch HDLQualifiedName getFullName(HDLVariable unit) {

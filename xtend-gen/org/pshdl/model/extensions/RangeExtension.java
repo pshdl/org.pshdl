@@ -65,6 +65,7 @@ import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.ProblemDescription;
 import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.simulation.RangeTool;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.types.builtIn.HDLPrimitives;
@@ -90,7 +91,14 @@ public class RangeExtension {
    * Meta for information.
    */
   public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj) {
-    return RangeExtension.INST.determineRange(obj, null);
+    final Optional<Range<BigInteger>> range = RangeExtension.INST.determineRange(obj, null);
+    boolean _equals = Objects.equal(range, null);
+    if (_equals) {
+      String _string = obj.toString();
+      NullPointerException _nullPointerException = new NullPointerException(_string);
+      throw _nullPointerException;
+    }
+    return range;
   }
   
   /**
@@ -98,7 +106,14 @@ public class RangeExtension {
    * Meta for information.
    */
   public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj, final HDLEvaluationContext context) {
-    return RangeExtension.INST.determineRange(obj, context);
+    final Optional<Range<BigInteger>> range = RangeExtension.INST.determineRange(obj, context);
+    boolean _equals = Objects.equal(range, null);
+    if (_equals) {
+      String _string = obj.toString();
+      NullPointerException _nullPointerException = new NullPointerException(_string);
+      throw _nullPointerException;
+    }
+    return range;
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLExpression obj, final HDLEvaluationContext context) {
@@ -117,8 +132,8 @@ public class RangeExtension {
   protected Optional<Range<BigInteger>> _determineRange(final HDLLiteral obj, final HDLEvaluationContext context) {
     BigInteger _valueAsBigInt = obj.getValueAsBigInt();
     BigInteger _valueAsBigInt_1 = obj.getValueAsBigInt();
-    Range<BigInteger> _closed = Range.<BigInteger>closed(_valueAsBigInt, _valueAsBigInt_1);
-    return Optional.<Range<BigInteger>>of(_closed);
+    Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_valueAsBigInt, _valueAsBigInt_1);
+    return Optional.<Range<BigInteger>>of(_createRange);
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLVariableRef obj, final HDLEvaluationContext context) {
@@ -127,8 +142,8 @@ public class RangeExtension {
     if (_isPresent) {
       BigInteger _get = bigVal.get();
       BigInteger _get_1 = bigVal.get();
-      Range<BigInteger> _closed = Range.<BigInteger>closed(_get, _get_1);
-      return Optional.<Range<BigInteger>>of(_closed);
+      Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_get, _get_1);
+      return Optional.<Range<BigInteger>>of(_createRange);
     }
     final Optional<HDLVariable> hVar = obj.resolveVar();
     boolean _isPresent_1 = hVar.isPresent();
@@ -214,8 +229,8 @@ public class RangeExtension {
         int _intValue = bitWidth.intValue();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
         BigInteger _subtract = _shiftLeft.subtract(BigInteger.ONE);
-        Range<BigInteger> _closed_1 = Range.<BigInteger>closed(BigInteger.ZERO, _subtract);
-        return Optional.<Range<BigInteger>>of(_closed_1);
+        Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(BigInteger.ZERO, _subtract);
+        return Optional.<Range<BigInteger>>of(_createRange_1);
       }
     }
     HDLVariable _get_5 = hVar.get();
@@ -250,8 +265,8 @@ public class RangeExtension {
         String _get_1 = value[1];
         BigInteger _bigInteger_1 = new BigInteger(_get_1);
         final BigInteger upperBound = _bigInteger_1;
-        Range<BigInteger> _closed = Range.<BigInteger>closed(lowerBound, upperBound);
-        return Optional.<Range<BigInteger>>of(_closed);
+        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(lowerBound, upperBound);
+        return Optional.<Range<BigInteger>>of(_createRange);
       } catch (final Throwable _t) {
         if (_t instanceof Exception) {
           final Exception e = (Exception)_t;
@@ -293,25 +308,25 @@ public class RangeExtension {
       if (_greaterThan) {
         BigInteger _get_2 = to.get();
         BigInteger _get_3 = from.get();
-        Range<BigInteger> _closed = Range.<BigInteger>closed(_get_2, _get_3);
-        return Optional.<Range<BigInteger>>of(_closed);
+        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_get_2, _get_3);
+        return Optional.<Range<BigInteger>>of(_createRange);
       }
       BigInteger _get_4 = from.get();
       BigInteger _get_5 = to.get();
-      Range<BigInteger> _closed_1 = Range.<BigInteger>closed(_get_4, _get_5);
-      return Optional.<Range<BigInteger>>of(_closed_1);
+      Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(_get_4, _get_5);
+      return Optional.<Range<BigInteger>>of(_createRange_1);
     }
     BigInteger _get_6 = to.get();
     BigInteger _get_7 = to.get();
-    Range<BigInteger> _closed_2 = Range.<BigInteger>closed(_get_6, _get_7);
-    return Optional.<Range<BigInteger>>of(_closed_2);
+    Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(_get_6, _get_7);
+    return Optional.<Range<BigInteger>>of(_createRange_2);
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLEqualityOp obj, final HDLEvaluationContext context) {
     obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
-    Range<BigInteger> _closed = Range.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
-    return Optional.<Range<BigInteger>>of(_closed);
+    Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(BigInteger.ZERO, BigInteger.ONE);
+    return Optional.<Range<BigInteger>>of(_createRange);
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLShiftOp obj, final HDLEvaluationContext context) {
@@ -365,8 +380,8 @@ public class RangeExtension {
         BigInteger _max = ff.max(ft);
         BigInteger _max_1 = _max.max(tf);
         BigInteger _max_2 = _max_1.max(tt);
-        Range<BigInteger> _closed = Range.<BigInteger>closed(_min_2, _max_2);
-        return Optional.<Range<BigInteger>>of(_closed);
+        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_min_2, _max_2);
+        return Optional.<Range<BigInteger>>of(_createRange);
       }
     }
     if (!_matched) {
@@ -402,8 +417,8 @@ public class RangeExtension {
         BigInteger _max_3 = ff_1.max(ft_1);
         BigInteger _max_4 = _max_3.max(tf_1);
         BigInteger _max_5 = _max_4.max(tt_1);
-        Range<BigInteger> _closed_1 = Range.<BigInteger>closed(_min_5, _max_5);
-        return Optional.<Range<BigInteger>>of(_closed_1);
+        Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(_min_5, _max_5);
+        return Optional.<Range<BigInteger>>of(_createRange_1);
       }
     }
     if (!_matched) {
@@ -435,8 +450,8 @@ public class RangeExtension {
         BigInteger _max_6 = ff_2.max(ft_2);
         BigInteger _max_7 = _max_6.max(tf_2);
         BigInteger _max_8 = _max_7.max(tt_2);
-        Range<BigInteger> _closed_2 = Range.<BigInteger>closed(_min_8, _max_8);
-        return Optional.<Range<BigInteger>>of(_closed_2);
+        Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(_min_8, _max_8);
+        return Optional.<Range<BigInteger>>of(_createRange_2);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
@@ -485,8 +500,8 @@ public class RangeExtension {
         int _bitLength = _upperEndpoint.bitLength();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_bitLength);
         BigInteger _subtract = _shiftLeft.subtract(BigInteger.ONE);
-        Range<BigInteger> _closed = Range.<BigInteger>closed(BigInteger.ZERO, _subtract);
-        return Optional.<Range<BigInteger>>of(_closed);
+        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(BigInteger.ZERO, _subtract);
+        return Optional.<Range<BigInteger>>of(_createRange);
       }
     }
     if (!_matched) {
@@ -502,8 +517,8 @@ public class RangeExtension {
         BigInteger _shiftLeft_1 = BigInteger.ONE.shiftLeft(_bitLength_1);
         BigInteger _subtract_1 = _shiftLeft_1.subtract(BigInteger.ONE);
         BigInteger _min = _upperEndpoint_1.min(_subtract_1);
-        Range<BigInteger> _closed_1 = Range.<BigInteger>closed(BigInteger.ZERO, _min);
-        return Optional.<Range<BigInteger>>of(_closed_1);
+        Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(BigInteger.ZERO, _min);
+        return Optional.<Range<BigInteger>>of(_createRange_1);
       }
     }
     if (!_matched) {
@@ -519,8 +534,8 @@ public class RangeExtension {
         _matched=true;
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
-        Range<BigInteger> _closed_2 = Range.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
-        return Optional.<Range<BigInteger>>of(_closed_2);
+        Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(BigInteger.ZERO, BigInteger.ONE);
+        return Optional.<Range<BigInteger>>of(_createRange_2);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
@@ -558,8 +573,8 @@ public class RangeExtension {
         Range<BigInteger> _get_3 = rightRange.get();
         BigInteger _upperEndpoint_1 = _get_3.upperEndpoint();
         BigInteger _add_1 = _upperEndpoint.add(_upperEndpoint_1);
-        Range<BigInteger> _closed = Range.<BigInteger>closed(_add, _add_1);
-        return Optional.<Range<BigInteger>>of(_closed);
+        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_add, _add_1);
+        return Optional.<Range<BigInteger>>of(_createRange);
       }
     }
     if (!_matched) {
@@ -575,8 +590,8 @@ public class RangeExtension {
         Range<BigInteger> _get_7 = rightRange.get();
         BigInteger _upperEndpoint_3 = _get_7.upperEndpoint();
         BigInteger _subtract_1 = _upperEndpoint_2.subtract(_upperEndpoint_3);
-        Range<BigInteger> _closed_1 = Range.<BigInteger>closed(_subtract, _subtract_1);
-        return Optional.<Range<BigInteger>>of(_closed_1);
+        Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(_subtract, _subtract_1);
+        return Optional.<Range<BigInteger>>of(_createRange_1);
       }
     }
     if (!_matched) {
@@ -629,7 +644,7 @@ public class RangeExtension {
         BigInteger _upperEndpoint_7 = _get_14.upperEndpoint();
         BigDecimal _bigDecimal_1 = new BigDecimal(_upperEndpoint_7);
         BigDecimal _divide_1 = BigDecimal.ONE.divide(_bigDecimal_1);
-        final Range<BigDecimal> mulRange = Range.<BigDecimal>closed(_divide, _divide_1);
+        final Range<BigDecimal> mulRange = RangeTool.<BigDecimal>createRange(_divide, _divide_1);
         Range<BigInteger> _get_15 = leftRange.get();
         BigInteger _lowerEndpoint_7 = _get_15.lowerEndpoint();
         BigDecimal _bigDecimal_2 = new BigDecimal(_lowerEndpoint_7);
@@ -658,8 +673,8 @@ public class RangeExtension {
         BigDecimal _max_1 = _max.max(tf);
         BigDecimal _max_2 = _max_1.max(tt);
         BigInteger _bigInteger_1 = _max_2.toBigInteger();
-        Range<BigInteger> _closed_2 = Range.<BigInteger>closed(_bigInteger, _bigInteger_1);
-        return Optional.<Range<BigInteger>>of(_closed_2);
+        Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(_bigInteger, _bigInteger_1);
+        return Optional.<Range<BigInteger>>of(_createRange_2);
       }
     }
     if (!_matched) {
@@ -691,8 +706,8 @@ public class RangeExtension {
         BigInteger _max_3 = ff_1.max(ft_1);
         BigInteger _max_4 = _max_3.max(tf_1);
         BigInteger _max_5 = _max_4.max(tt_1);
-        Range<BigInteger> _closed_3 = Range.<BigInteger>closed(_min_5, _max_5);
-        return Optional.<Range<BigInteger>>of(_closed_3);
+        Range<BigInteger> _createRange_3 = RangeTool.<BigInteger>createRange(_min_5, _max_5);
+        return Optional.<Range<BigInteger>>of(_createRange_3);
       }
     }
     if (!_matched) {
@@ -704,8 +719,8 @@ public class RangeExtension {
         Range<BigInteger> _get_28 = rightRange.get();
         final BigInteger rue = _get_28.upperEndpoint();
         final BigInteger rightBound = rue.max(BigInteger.ZERO);
-        Range<BigInteger> _closed_4 = Range.<BigInteger>closed(leftBound, rightBound);
-        return Optional.<Range<BigInteger>>of(_closed_4);
+        Range<BigInteger> _createRange_4 = RangeTool.<BigInteger>createRange(leftBound, rightBound);
+        return Optional.<Range<BigInteger>>of(_createRange_4);
       }
     }
     if (!_matched) {
@@ -741,8 +756,8 @@ public class RangeExtension {
         BigInteger _max_6 = ff_2.max(ft_2);
         BigInteger _max_7 = _max_6.max(tf_2);
         BigInteger _max_8 = _max_7.max(tt_2);
-        Range<BigInteger> _closed_5 = Range.<BigInteger>closed(_min_8, _max_8);
-        return Optional.<Range<BigInteger>>of(_closed_5);
+        Range<BigInteger> _createRange_5 = RangeTool.<BigInteger>createRange(_min_8, _max_8);
+        return Optional.<Range<BigInteger>>of(_createRange_5);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");
@@ -803,8 +818,8 @@ public class RangeExtension {
         Range<BigInteger> _get_3 = right.get();
         BigInteger _lowerEndpoint = _get_3.lowerEndpoint();
         BigInteger _negate_1 = _lowerEndpoint.negate();
-        Range<BigInteger> _closed = Range.<BigInteger>closed(_negate, _negate_1);
-        return Optional.<Range<BigInteger>>of(_closed);
+        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_negate, _negate_1);
+        return Optional.<Range<BigInteger>>of(_createRange);
       }
     }
     if (!_matched) {
@@ -815,8 +830,8 @@ public class RangeExtension {
         int _bitLength = _upperEndpoint_1.bitLength();
         BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_bitLength);
         BigInteger _subtract = _shiftLeft.subtract(BigInteger.ONE);
-        Range<BigInteger> _closed_1 = Range.<BigInteger>closed(BigInteger.ZERO, _subtract);
-        return Optional.<Range<BigInteger>>of(_closed_1);
+        Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(BigInteger.ZERO, _subtract);
+        return Optional.<Range<BigInteger>>of(_createRange_1);
       }
     }
     if (!_matched) {
@@ -824,8 +839,8 @@ public class RangeExtension {
         _matched=true;
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);
-        Range<BigInteger> _closed_2 = Range.<BigInteger>closed(BigInteger.ZERO, BigInteger.ONE);
-        return Optional.<Range<BigInteger>>of(_closed_2);
+        Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(BigInteger.ZERO, BigInteger.ONE);
+        return Optional.<Range<BigInteger>>of(_createRange_2);
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented obj op");

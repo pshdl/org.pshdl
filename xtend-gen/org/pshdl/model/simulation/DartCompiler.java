@@ -2241,7 +2241,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.div)) {
           _matched=true;
-          this.twoOp(sb, pos, "/", a, b, inst.arg1);
+          this.twoOp(sb, pos, "~/", a, b, inst.arg1);
         }
       }
       if (!_matched) {

@@ -26,15 +26,18 @@
  ******************************************************************************/
 package org.pshdl.model.parser
 
+import java.util.ArrayList
+import org.antlr.v4.runtime.BufferedTokenStream
+import org.antlr.v4.runtime.ParserRuleContext
 import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArgument
 import org.pshdl.model.HDLArithOp
-import org.pshdl.model.HDLArithOp$HDLArithOpType
+import org.pshdl.model.HDLArithOp.HDLArithOpType
 import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLAssignment
-import org.pshdl.model.HDLAssignment$HDLAssignmentType
+import org.pshdl.model.HDLAssignment.HDLAssignmentType
 import org.pshdl.model.HDLBitOp
-import org.pshdl.model.HDLBitOp$HDLBitOpType
+import org.pshdl.model.HDLBitOp.HDLBitOpType
 import org.pshdl.model.HDLBlock
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLDeclaration
@@ -42,9 +45,13 @@ import org.pshdl.model.HDLDirectGeneration
 import org.pshdl.model.HDLEnum
 import org.pshdl.model.HDLEnumDeclaration
 import org.pshdl.model.HDLEqualityOp
-import org.pshdl.model.HDLEqualityOp$HDLEqualityOpType
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLForLoop
+import org.pshdl.model.HDLFunction
+import org.pshdl.model.HDLFunctionParameter
+import org.pshdl.model.HDLFunctionParameter.RWType
+import org.pshdl.model.HDLFunctionParameter.Type
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInlineFunction
 import org.pshdl.model.HDLInterface
@@ -52,16 +59,16 @@ import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.HDLInterfaceInstantiation
 import org.pshdl.model.HDLLiteral
 import org.pshdl.model.HDLManip
-import org.pshdl.model.HDLManip$HDLManipType
+import org.pshdl.model.HDLManip.HDLManipType
 import org.pshdl.model.HDLNativeFunction
 import org.pshdl.model.HDLPackage
 import org.pshdl.model.HDLPrimitive
-import org.pshdl.model.HDLPrimitive$HDLPrimitiveType
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLReference
 import org.pshdl.model.HDLRegisterConfig
 import org.pshdl.model.HDLShiftOp
-import org.pshdl.model.HDLShiftOp$HDLShiftOpType
+import org.pshdl.model.HDLShiftOp.HDLShiftOpType
 import org.pshdl.model.HDLStatement
 import org.pshdl.model.HDLSubstituteFunction
 import org.pshdl.model.HDLSwitchCaseStatement
@@ -73,82 +80,75 @@ import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLUnresolvedFragmentFunction
 import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration
-import org.pshdl.model.HDLVariableDeclaration$HDLDirection
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection
 import org.pshdl.model.IHDLObject
+import org.pshdl.model.parser.PSHDLLangParser.PsAccessRangeContext
+import org.pshdl.model.parser.PSHDLLangParser.PsAddContext
+import org.pshdl.model.parser.PSHDLLangParser.PsAnnotationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsArgumentContext
+import org.pshdl.model.parser.PSHDLLangParser.PsArrayInitContext
+import org.pshdl.model.parser.PSHDLLangParser.PsArrayInitExpContext
+import org.pshdl.model.parser.PSHDLLangParser.PsArrayInitSubContext
+import org.pshdl.model.parser.PSHDLLangParser.PsArrayInitSubParensContext
+import org.pshdl.model.parser.PSHDLLangParser.PsAssignmentOrFuncContext
+import org.pshdl.model.parser.PSHDLLangParser.PsBitAndContext
+import org.pshdl.model.parser.PSHDLLangParser.PsBitLogAndContext
+import org.pshdl.model.parser.PSHDLLangParser.PsBitLogOrContext
+import org.pshdl.model.parser.PSHDLLangParser.PsBitOrContext
+import org.pshdl.model.parser.PSHDLLangParser.PsBitXorContext
+import org.pshdl.model.parser.PSHDLLangParser.PsBlockContext
+import org.pshdl.model.parser.PSHDLLangParser.PsCaseStatementsContext
+import org.pshdl.model.parser.PSHDLLangParser.PsCastContext
+import org.pshdl.model.parser.PSHDLLangParser.PsCompoundStatementContext
+import org.pshdl.model.parser.PSHDLLangParser.PsConcatContext
+import org.pshdl.model.parser.PSHDLLangParser.PsDeclAssignmentContext
+import org.pshdl.model.parser.PSHDLLangParser.PsDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsDeclarationTypeContext
+import org.pshdl.model.parser.PSHDLLangParser.PsDirectGenerationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsEnumContext
+import org.pshdl.model.parser.PSHDLLangParser.PsEnumDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsEqualityCompContext
+import org.pshdl.model.parser.PSHDLLangParser.PsEqualityContext
+import org.pshdl.model.parser.PSHDLLangParser.PsExpressionContext
+import org.pshdl.model.parser.PSHDLLangParser.PsForStatementContext
+import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamTypeContext
+import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamWithRWContext
+import org.pshdl.model.parser.PSHDLLangParser.PsFuncRecturnTypeContext
+import org.pshdl.model.parser.PSHDLLangParser.PsFuncSpecContext
+import org.pshdl.model.parser.PSHDLLangParser.PsFunctionContext
+import org.pshdl.model.parser.PSHDLLangParser.PsFunctionDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsIfStatementContext
+import org.pshdl.model.parser.PSHDLLangParser.PsImportsContext
+import org.pshdl.model.parser.PSHDLLangParser.PsInlineFunctionContext
+import org.pshdl.model.parser.PSHDLLangParser.PsInstantiationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsInterfaceContext
+import org.pshdl.model.parser.PSHDLLangParser.PsInterfaceDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsInterfaceInstantiationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsManipContext
+import org.pshdl.model.parser.PSHDLLangParser.PsModelContext
+import org.pshdl.model.parser.PSHDLLangParser.PsMulContext
+import org.pshdl.model.parser.PSHDLLangParser.PsNativeFunctionContext
+import org.pshdl.model.parser.PSHDLLangParser.PsParensContext
+import org.pshdl.model.parser.PSHDLLangParser.PsPortDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsPrimitiveContext
+import org.pshdl.model.parser.PSHDLLangParser.PsProcessContext
+import org.pshdl.model.parser.PSHDLLangParser.PsQualifiedNameContext
+import org.pshdl.model.parser.PSHDLLangParser.PsRefPartContext
+import org.pshdl.model.parser.PSHDLLangParser.PsShiftContext
+import org.pshdl.model.parser.PSHDLLangParser.PsStatementContext
+import org.pshdl.model.parser.PSHDLLangParser.PsSubstituteFunctionContext
+import org.pshdl.model.parser.PSHDLLangParser.PsSwitchStatementContext
+import org.pshdl.model.parser.PSHDLLangParser.PsTernaryContext
+import org.pshdl.model.parser.PSHDLLangParser.PsTypeDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsUnitContext
+import org.pshdl.model.parser.PSHDLLangParser.PsValueContext
+import org.pshdl.model.parser.PSHDLLangParser.PsValueExpContext
+import org.pshdl.model.parser.PSHDLLangParser.PsVariableContext
+import org.pshdl.model.parser.PSHDLLangParser.PsVariableDeclarationContext
+import org.pshdl.model.parser.PSHDLLangParser.PsVariableRefContext
+import org.pshdl.model.parser.PSHDLLangParser.PsWidthContext
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
-import org.pshdl.model.parser.PSHDLLangParser$PsModelContext
-import org.pshdl.model.parser.PSHDLLangParser$PsUnitContext
-import org.pshdl.model.parser.PSHDLLangParser$PsDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsDeclarationTypeContext
-import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitContext
-import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitSubParensContext
-import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitExpContext
-import org.pshdl.model.parser.PSHDLLangParser$PsAnnotationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsFunctionDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsFuncParamTypeContext
-import org.pshdl.model.parser.PSHDLLangParser$PsTypeDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsVariableDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsEnumDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsInterfaceDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsInterfaceContext
-import org.pshdl.model.parser.PSHDLLangParser$PsPortDeclarationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsPrimitiveContext
-import org.pshdl.model.parser.PSHDLLangParser$PsQualifiedNameContext
-import org.pshdl.model.parser.PSHDLLangParser$PsWidthContext
-import org.pshdl.model.parser.PSHDLLangParser$PsExpressionContext
-import org.pshdl.model.parser.PSHDLLangParser$PsDeclAssignmentContext
-import org.pshdl.model.parser.PSHDLLangParser$PsVariableContext
-import org.pshdl.model.parser.PSHDLLangParser$PsImportsContext
-import org.pshdl.model.parser.PSHDLLangParser$PsValueExpContext
-import org.pshdl.model.parser.PSHDLLangParser$PsValueContext
-import org.pshdl.model.parser.PSHDLLangParser$PsBlockContext
-import org.pshdl.model.parser.PSHDLLangParser$PsInstantiationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsDirectGenerationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsStatementContext
-import org.pshdl.model.parser.PSHDLLangParser$PsAssignmentOrFuncContext
-import org.pshdl.model.parser.PSHDLLangParser$PsCompoundStatementContext
-import org.pshdl.model.parser.PSHDLLangParser$PsForStatementContext
-import org.pshdl.model.parser.PSHDLLangParser$PsFuncParamWithRWContext
-import org.pshdl.model.parser.PSHDLLangParser$PsFuncRecturnTypeContext
-import org.pshdl.model.parser.PSHDLLangParser$PsAccessRangeContext
-import org.pshdl.model.parser.PSHDLLangParser$PsVariableRefContext
-import org.pshdl.model.parser.PSHDLLangParser$PsRefPartContext
-import org.pshdl.model.parser.PSHDLLangParser$PsAddContext
-import org.pshdl.model.parser.PSHDLLangParser$PsMulContext
-import org.pshdl.model.parser.PSHDLLangParser$PsBitAndContext
-import org.pshdl.model.parser.PSHDLLangParser$PsBitLogOrContext
-import org.pshdl.model.parser.PSHDLLangParser$PsBitLogAndContext
-import org.pshdl.model.parser.PSHDLLangParser$PsBitXorContext
-import org.pshdl.model.parser.PSHDLLangParser$PsBitOrContext
-import org.pshdl.model.parser.PSHDLLangParser$PsEqualityContext
-import org.pshdl.model.parser.PSHDLLangParser$PsFuncSpecContext
-import org.pshdl.model.parser.PSHDLLangParser$PsShiftContext
-import org.pshdl.model.parser.PSHDLLangParser$PsIfStatementContext
-import org.pshdl.model.parser.PSHDLLangParser$PsParensContext
-import org.pshdl.model.parser.PSHDLLangParser$PsEqualityCompContext
-import org.pshdl.model.parser.PSHDLLangParser$PsConcatContext
-import org.pshdl.model.parser.PSHDLLangParser$PsEnumContext
-import org.pshdl.model.parser.PSHDLLangParser$PsSwitchStatementContext
-import org.pshdl.model.parser.PSHDLLangParser$PsCaseStatementsContext
-import org.pshdl.model.parser.PSHDLLangParser$PsInterfaceInstantiationContext
-import org.pshdl.model.parser.PSHDLLangParser$PsTernaryContext
-import org.pshdl.model.parser.PSHDLLangParser$PsManipContext
-import org.pshdl.model.parser.PSHDLLangParser$PsCastContext
-import org.pshdl.model.parser.PSHDLLangParser$PsProcessContext
-import org.pshdl.model.parser.PSHDLLangParser$PsArgumentContext
-import org.pshdl.model.parser.PSHDLLangParser$PsInlineFunctionContext
-import org.pshdl.model.parser.PSHDLLangParser$PsFunctionContext
-import org.pshdl.model.parser.PSHDLLangParser$PsSubstituteFunctionContext
-import org.pshdl.model.parser.PSHDLLangParser$PsNativeFunctionContext
-import org.pshdl.model.parser.PSHDLLangParser$PsArrayInitSubContext
-import java.util.ArrayList
-import org.antlr.v4.runtime.BufferedTokenStream
-import org.antlr.v4.runtime.ParserRuleContext
-import org.pshdl.model.HDLFunction
-import org.pshdl.model.HDLFunctionParameter
-import org.pshdl.model.HDLFunctionParameter$RWType
-import org.pshdl.model.HDLFunctionParameter$Type
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -168,7 +168,10 @@ class ParserToModelExtension {
 		pkg = pkg.setUnits(ctx.psUnit.map[toHDLUnit(libURI)])
 		pkg = pkg.setDeclarations(ctx.psDeclaration.map[toHDL as HDLDeclaration])
 		pkg.freeze(null)
-		HDLLibrary::getLibrary(libURI).addPkg(pkg, src);
+		val library = HDLLibrary::getLibrary(libURI)
+		if (library==null)
+			throw new IllegalArgumentException("The library "+libURI+" is not valid")
+		library.addPkg(pkg, src);
 		return pkg.attachContext(ctx) as HDLPackage
 	}
 

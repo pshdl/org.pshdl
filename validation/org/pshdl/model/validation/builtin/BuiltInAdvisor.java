@@ -389,6 +389,29 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "Variables starting with $ are not recommended",
 					"Variables starting with $ are used for internal/automatically generated signals. Using such a variable may cause a name collision",
 					"Rename your variable to something without $ in the beginning");
+		case BOOL_NEGATE_NUMERIC_NOT_SUPPORTED:
+			final HDLManip node = (HDLManip) problem.node;
+			return new HDLAdvise(problem, "Logic negate does not support numbers",
+					"The logical negate is intended for negating booleans, while it can also use a single bit, you probably want to use the binary invert ~.", "Use ~"
+							+ node.getTarget());
+		case CLOCK_NOT_BIT:
+			break;
+		case CLOCK_UNKNOWN_WIDTH:
+			break;
+		case REGISTER_CLOCK_NOT_NAME:
+			break;
+		case REGISTER_RESET_NOT_NAME:
+			break;
+		case RESET_NOT_BIT:
+			break;
+		case RESET_UNKNOWN_WIDTH:
+			break;
+		case SWITCH_CASE_NEEDS_CONSTANT_WIDTH:
+			return new HDLAdvise(
+					problem,
+					"The switch expression needs to have a known width",
+					"The width of the switch expression needs to be constant. That means that it can not work on parameterized values as these are only known when the module is instanciated.",
+					"Create a new signal with a fixed width and use that as the switch expression");
 		}
 		return null;
 	}
