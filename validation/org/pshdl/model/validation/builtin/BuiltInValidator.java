@@ -149,7 +149,9 @@ public class BuiltInValidator implements IHDLValidator {
 			final ArrayList<HDLArgument> arguments = hii.getArguments();
 			for (final HDLArgument hdlArgument : arguments) {
 				if (!paramNames.containsKey(hdlArgument.getName())) {
-					problems.add(new Problem(PARAMETER_NOT_FOUND, hdlArgument));
+					// XXX CHECK THIS!
+					// problems.add(new Problem(PARAMETER_NOT_FOUND,
+					// hdlArgument));
 				} else {
 					final HDLVariable var = paramNames.get(hdlArgument.getName());
 					checkAss(hdlArgument, var, hdlArgument.getExpression(), problems, getContext(hContext, hdlArgument));
@@ -865,10 +867,10 @@ public class BuiltInValidator implements IHDLValidator {
 							if (!(def instanceof HDLLiteral)) {
 								problems.add(new Problem(CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
 							}
-						}
 					}
 				}
 			}
+		}
 		final HDLForLoop[] forLoops = unit.getAllObjectsOf(HDLForLoop.class, true);
 		for (final HDLForLoop hdlForLoop : forLoops) {
 			for (final HDLRange r : hdlForLoop.getRange()) {
