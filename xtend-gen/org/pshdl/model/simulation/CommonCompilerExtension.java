@@ -328,7 +328,8 @@ public class CommonCompilerExtension {
     String _format = String.format("%03d", Integer.valueOf(_max));
     _builder.append(_format, "");
     _builder.append("frame");
-    String _format_1 = String.format("%04X", Integer.valueOf(f.uniqueID));
+    String _format_1 = String.format("%04X", 
+      Integer.valueOf(f.uniqueID));
     _builder.append(_format_1, "");
     return _builder;
   }

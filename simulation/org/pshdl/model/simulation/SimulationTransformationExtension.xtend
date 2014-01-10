@@ -100,7 +100,7 @@ class SimulationTransformationExtension {
 	public static final char ANNO_VALUE_SEP = '|'
 
 	def static FluidFrame simulationModelOf(IHDLObject obj, HDLEvaluationContext context) {
-		return INST.toSimulationModel(obj, context)
+		return INST.toSimulationModel(obj, context.withEnumAndBool(true, true))
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLExpression obj, HDLEvaluationContext context) {
@@ -267,9 +267,7 @@ class SimulationTransformationExtension {
 				else {
 					if (c.label.classType === HDLClass::HDLEnumRef) {
 						val HDLEnumRef ref = c.label as HDLEnumRef
-						val hEnum = ref.resolveHEnum.get
-						val hVar = ref.resolveVar.get
-						l = hEnum.enums.indexOf(hVar)
+						l = ref.asInt
 					} else {
 						throw new IllegalArgumentException("Unsupported label type");
 					}
@@ -285,6 +283,12 @@ class SimulationTransformationExtension {
 			res.addReferencedFrame(caseFrame)
 		}
 		return res
+	}
+
+	def asInt(HDLEnumRef ref) {
+		val hEnum = ref.resolveHEnum.get
+		val hVar = ref.resolveVar.get
+		return hEnum.enums.indexOf(hVar)
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLIfStatement obj, HDLEvaluationContext context) {
@@ -507,7 +511,8 @@ class SimulationTransformationExtension {
 					val Optional<BigInteger> bVal = valueOf(obj, context)
 					if (!bVal.present)
 						throw new IllegalArgumentException("Const/param should be constant")
-					res.addConstant(refName, bVal.get)
+					else
+						res.addConstant(refName, bVal.get)
 				}
 			}
 			case IN: {

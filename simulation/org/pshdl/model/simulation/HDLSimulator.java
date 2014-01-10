@@ -114,7 +114,7 @@ public class HDLSimulator {
 			case HDLVariable:
 				final HDLVariable var = (HDLVariable) container;
 				addInit(var.asHDLRef(), arrayInit, var.getContainer(), ms);
-				ms.replace(var, var.setDefaultValue(null));
+				// ms.replace(var, var.setDefaultValue(null));
 				break;
 			case HDLRegisterConfig:
 				// resetValues are taken care of later

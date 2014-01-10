@@ -63,11 +63,12 @@ class DartCompiler implements ITypeOuptutProvider {
 		epsWidth = Integer::highestOneBit(prevMap.size) + 1
 	}
 
-	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName, Set<Problem> syntaxProblems) {
-		val comp=new DartCompiler(em)
+	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName,
+		Set<Problem> syntaxProblems) {
+		val comp = new DartCompiler(em)
 		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName).toString,
-				em.moduleName, Collections::emptyList, em.source, comp.hookName, true));
+			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName).toString, em.moduleName,
+				Collections::emptyList, em.source, comp.hookName, true));
 	}
 
 	def compile(String unitName) {

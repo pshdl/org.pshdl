@@ -60,13 +60,13 @@ class JavaCompiler implements ITypeOuptutProvider {
 		this.cce = new CommonCompilerExtension(em, 64)
 		this.debug = includeDebug
 	}
-	
+
 	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean debug) {
-		val comp=new JavaCompiler(em, debug)
-		val code=comp.compile(pkg, unitName).toString
+		val comp = new JavaCompiler(em, debug)
+		val code = comp.compile(pkg, unitName).toString
 		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName,
-				Collections::emptyList, em.source, comp.hookName, true))
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, Collections::emptyList, em.source,
+				comp.hookName, true))
 	}
 
 	def compile(String packageName, String unitName) {

@@ -42,6 +42,7 @@ import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLConcat;
+import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
@@ -166,6 +167,19 @@ public class ConstantEvaluate {
     if (!_matched) {
       if (Objects.equal(_switchValue,HDLLiteralPresentation.BOOL)) {
         _matched=true;
+        boolean _and = false;
+        boolean _notEquals = (!Objects.equal(context, null));
+        if (!_notEquals) {
+          _and = false;
+        } else {
+          _and = (_notEquals && context.boolAsInt);
+        }
+        if (_and) {
+          HDLLiteral _false = HDLLiteral.getFalse();
+          boolean _equals = obj.equals(_false);
+          boolean _not = (!_equals);
+          return ConstantEvaluate.boolInt(_not);
+        }
         return Optional.<BigInteger>absent();
       }
     }
@@ -647,6 +661,18 @@ public class ConstantEvaluate {
     int _size = _array.size();
     boolean _notEquals = (_size != 0);
     if (_notEquals) {
+      final Optional<HDLVariable> hVarOpt = obj.resolveVar();
+      boolean _isPresent = hVarOpt.isPresent();
+      if (_isPresent) {
+        final HDLVariable hVar = hVarOpt.get();
+        HDLDirection _direction = hVar.getDirection();
+        boolean _equals = Objects.equal(_direction, HDLDirection.CONSTANT);
+        if (_equals) {
+          final HDLExpression defVal = hVar.getDefaultValue();
+          ArrayList<HDLExpression> _array_1 = obj.getArray();
+          return this.arrayDefValue(defVal, _array_1, context);
+        }
+      }
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
@@ -661,8 +687,8 @@ public class ConstantEvaluate {
     }
     final Optional<? extends HDLType> type = TypeExtension.typeOf(obj);
     boolean _or = false;
-    boolean _isPresent = type.isPresent();
-    boolean _not = (!_isPresent);
+    boolean _isPresent_1 = type.isPresent();
+    boolean _not = (!_isPresent_1);
     if (_not) {
       _or = true;
     } else {
@@ -675,42 +701,42 @@ public class ConstantEvaluate {
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
-    final Optional<HDLVariable> hVar = obj.resolveVar();
-    boolean _isPresent_1 = hVar.isPresent();
-    boolean _not_2 = (!_isPresent_1);
+    final Optional<HDLVariable> hVar_1 = obj.resolveVar();
+    boolean _isPresent_2 = hVar_1.isPresent();
+    boolean _not_2 = (!_isPresent_2);
     if (_not_2) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<BigInteger>absent();
     }
-    HDLVariable _get_1 = hVar.get();
+    HDLVariable _get_1 = hVar_1.get();
     final HDLDirection dir = _get_1.getDirection();
-    boolean _equals = Objects.equal(dir, HDLDirection.CONSTANT);
-    if (_equals) {
-      HDLVariable _get_2 = hVar.get();
+    boolean _equals_1 = Objects.equal(dir, HDLDirection.CONSTANT);
+    if (_equals_1) {
+      HDLVariable _get_2 = hVar_1.get();
       HDLExpression _defaultValue = _get_2.getDefaultValue();
       return this.subEvaluate(obj, _defaultValue, context);
     }
-    boolean _equals_1 = Objects.equal(dir, HDLDirection.PARAMETER);
-    if (_equals_1) {
+    boolean _equals_2 = Objects.equal(dir, HDLDirection.PARAMETER);
+    if (_equals_2) {
       boolean _tripleEquals = (context == null);
       if (_tripleEquals) {
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return Optional.<BigInteger>absent();
       }
-      HDLVariable _get_3 = hVar.get();
+      HDLVariable _get_3 = hVar_1.get();
       final HDLExpression cRef = context.get(_get_3);
       boolean _tripleEquals_1 = (cRef == null);
       if (_tripleEquals_1) {
-        HDLVariable _get_4 = hVar.get();
+        HDLVariable _get_4 = hVar_1.get();
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _get_4);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();
       }
       final Optional<BigInteger> cRefEval = this.constantEvaluate(cRef, context);
-      boolean _isPresent_2 = cRefEval.isPresent();
-      boolean _not_3 = (!_isPresent_2);
+      boolean _isPresent_3 = cRefEval.isPresent();
+      boolean _not_3 = (!_isPresent_3);
       if (_not_3) {
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
@@ -723,7 +749,55 @@ public class ConstantEvaluate {
     return Optional.<BigInteger>absent();
   }
   
+  public Optional<BigInteger> arrayDefValue(final HDLExpression expression, final List<HDLExpression> expressions, final HDLEvaluationContext context) {
+    if ((expression instanceof HDLArrayInit)) {
+      boolean _isEmpty = expressions.isEmpty();
+      if (_isEmpty) {
+        return Optional.<BigInteger>absent();
+      }
+      HDLExpression _get = expressions.get(0);
+      final Optional<BigInteger> idx = ConstantEvaluate.valueOf(_get, context);
+      boolean _isPresent = idx.isPresent();
+      boolean _not = (!_isPresent);
+      if (_not) {
+        return Optional.<BigInteger>absent();
+      }
+      final HDLArrayInit arr = ((HDLArrayInit) expression);
+      BigInteger _get_1 = idx.get();
+      final int idxValue = _get_1.intValue();
+      ArrayList<HDLExpression> _exp = arr.getExp();
+      int _size = _exp.size();
+      boolean _lessThan = (_size < idxValue);
+      if (_lessThan) {
+        return Optional.<BigInteger>of(BigInteger.ZERO);
+      }
+      ArrayList<HDLExpression> _exp_1 = arr.getExp();
+      HDLExpression _get_2 = _exp_1.get(idxValue);
+      int _size_1 = expressions.size();
+      List<HDLExpression> _subList = expressions.subList(1, _size_1);
+      return this.arrayDefValue(_get_2, _subList, context);
+    }
+    return this.constantEvaluate(expression, context);
+  }
+  
   protected Optional<BigInteger> _constantEvaluate(final HDLEnumRef obj, final HDLEvaluationContext context) {
+    boolean _and = false;
+    boolean _notEquals = (!Objects.equal(context, null));
+    if (!_notEquals) {
+      _and = false;
+    } else {
+      _and = (_notEquals && context.enumAsInt);
+    }
+    if (_and) {
+      Optional<HDLEnum> _resolveHEnum = obj.resolveHEnum();
+      final HDLEnum hEnum = _resolveHEnum.get();
+      Optional<HDLVariable> _resolveVar = obj.resolveVar();
+      final HDLVariable hVar = _resolveVar.get();
+      ArrayList<HDLVariable> _enums = hEnum.getEnums();
+      int _indexOf = _enums.indexOf(hVar);
+      BigInteger _valueOf = BigInteger.valueOf(_indexOf);
+      return Optional.<BigInteger>of(_valueOf);
+    }
     obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ENUMS_NOT_SUPPORTED_FOR_CONSTANTS);
     return Optional.<BigInteger>absent();

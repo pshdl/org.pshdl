@@ -2387,7 +2387,8 @@ public class CCompiler implements ITypeOuptutProvider {
     CharSequence _compile = comp.compile();
     String _string = _compile.toString();
     String _hookName = comp.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, true);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, 
+      true);
     return Lists.<CompileResult>newArrayList(_compileResult);
   }
   

@@ -21,7 +21,7 @@ class CommonCompilerExtension {
 
 	new(ExecutableModel em, int bitWidth) {
 		this.em = em
-		this.bitWidth=bitWidth
+		this.bitWidth = bitWidth
 		for (i : 0 ..< em.variables.length) {
 			varIdx.put(em.variables.get(i).name, i)
 		}
@@ -146,14 +146,17 @@ class CommonCompilerExtension {
 		return varAccess
 	}
 
-	def toHexString(BigInteger value) '''«IF value.signum<0»-«ENDIF»0x«value.abs.toString(16)»'''
+	def toHexString(BigInteger value) '''«IF value.signum < 0»-«ENDIF»0x«value.abs.toString(16)»'''
 
 	def toHexStringL(long value) '''0x«Long::toHexString(value)»l'''
+
 	def toHexStringI(Integer value) '''0x«Integer::toHexString(value)»'''
 
-	def getFrameName(Frame f) '''s«String::format("%03d",Math::max(f.scheduleStage,0))»frame«String::format("%04X",f.uniqueID)»'''
+	def getFrameName(Frame f) '''s«String::format("%03d", Math::max(f.scheduleStage, 0))»frame«String::format("%04X",
+		f.uniqueID)»'''
 
 	def constantL(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
+
 	def constantI(int id, Frame f) '''«f.constants.get(id).intValue.toHexStringI»'''
 
 	def totalSize(VariableInformation info) {
@@ -179,10 +182,10 @@ class CommonCompilerExtension {
 	}
 
 	def idName(String name, boolean prev, boolean field) {
-		var res=name;
-		val isReg=name.endsWith("$reg")
+		var res = name;
+		val isReg = name.endsWith("$reg")
 		if (isReg)
-			res=name.substring(0,name.length-4)
+			res = name.substring(0, name.length - 4)
 		res = res.replaceAll("[\\.\\$\\@]+", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
 			replaceAll('\\[', 'arr').replaceAll('\\]', '')
 		if (res.startsWith("#"))
@@ -190,7 +193,7 @@ class CommonCompilerExtension {
 		if (field)
 			res = "_" + res
 		if (isReg)
-			res=res+"$reg"
+			res = res + "$reg"
 		if (prev)
 			return res + '_prev'
 		return res
@@ -214,27 +217,27 @@ class CommonCompilerExtension {
 		}
 		return maxUpdates
 	}
-	
-	def twoOpValue(String op, String cast, int a,int b, int targetSizeWithType) {
-		val targetSize=(targetSizeWithType>>1)
-		val shift=bitWidth-targetSize
-		if ((targetSizeWithType.bitwiseAnd(1))==1)
+
+	def twoOpValue(String op, String cast, int a, int b, int targetSizeWithType) {
+		val targetSize = (targetSizeWithType >> 1)
+		val shift = bitWidth - targetSize
+		if ((targetSizeWithType.bitwiseAnd(1)) == 1)
 			return signExtend('''t«b» «op» t«a»''', cast, shift)
 		return '''(t«b» «op» t«a») & «targetSize.asMaskL»'''
 	}
-	
-	def singleOpValue(String op, String cast, int a,int targetSizeWithType) {
-		val targetSize=(targetSizeWithType>>1)
-		val shift=bitWidth-targetSize
-		if ((targetSizeWithType.bitwiseAnd(1))==1)
+
+	def singleOpValue(String op, String cast, int a, int targetSizeWithType) {
+		val targetSize = (targetSizeWithType >> 1)
+		val shift = bitWidth - targetSize
+		if ((targetSizeWithType.bitwiseAnd(1)) == 1)
 			return signExtend('''«op» t«a»''', cast, shift)
 		return '''(«op» t«a») & «targetSize.asMaskL»'''
 	}
-	
+
 	def signExtend(CharSequence op, CharSequence cast, int shift) {
-		if (shift==0)
+		if (shift == 0)
 			return op
-		if (cast!==null && cast!="")
+		if (cast !== null && cast != "")
 			return '''((«cast»(«op»)) << «shift») >> «shift»'''
 		'''((«op») << «shift») >> «shift»'''
 	}

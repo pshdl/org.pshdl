@@ -143,15 +143,13 @@ public class BuiltInValidator implements IHDLValidator {
 			final Map<String, HDLVariable> paramNames = Maps.newHashMap();
 			for (final HDLVariableDeclaration hvd : params) {
 				for (final HDLVariable var : hvd.getVariables()) {
-					paramNames.put(var.getName(), var);
+					paramNames.put(var.getMeta(HDLInterfaceInstantiation.ORIG_NAME), var);
 				}
 			}
 			final ArrayList<HDLArgument> arguments = hii.getArguments();
 			for (final HDLArgument hdlArgument : arguments) {
 				if (!paramNames.containsKey(hdlArgument.getName())) {
-					// XXX CHECK THIS!
-					// problems.add(new Problem(PARAMETER_NOT_FOUND,
-					// hdlArgument));
+					problems.add(new Problem(PARAMETER_NOT_FOUND, hdlArgument));
 				} else {
 					final HDLVariable var = paramNames.get(hdlArgument.getName());
 					checkAss(hdlArgument, var, hdlArgument.getExpression(), problems, getContext(hContext, hdlArgument));
@@ -859,14 +857,14 @@ public class BuiltInValidator implements IHDLValidator {
 				if (var.getDefaultValue() == null) {
 					problems.add(new Problem(CONSTANT_NEED_DEFAULTVALUE, var));
 				} else {
+					HDLEvaluationContext lContext = getContext(hContext, var);
+					if (lContext != null) {
+						lContext = lContext.withEnumAndBool(true, true);
+					}
 					if (def instanceof HDLArrayInit) {
-						checkConstantsArrayInit(problems, (HDLArrayInit) def);
+						checkConstantsArrayInit(problems, (HDLArrayInit) def, lContext);
 					} else {
-						final Optional<BigInteger> constant = ConstantEvaluate.valueOf(def, getContext(hContext, var));
-						if (!constant.isPresent())
-							if (!(def instanceof HDLLiteral)) {
-								problems.add(new Problem(CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, def, var, null));
-							}
+						assumeConstant(problems, CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, null, def, lContext);
 					}
 				}
 			}
@@ -888,15 +886,34 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private static void checkConstantsArrayInit(Set<Problem> problems, HDLArrayInit arrayInit) {
+	public static void assumeConstant(Set<Problem> problems, IErrorCode code, final HDLExpression contextNode, final HDLExpression exp, HDLEvaluationContext lContext) {
+		final Optional<BigInteger> constant = ConstantEvaluate.valueOf(exp, lContext);
+		if (!constant.isPresent()) {
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(exp);
+			if (typeOf.isPresent()) {
+				if (typeOf.get() instanceof HDLPrimitive) {
+					final HDLPrimitive prim = (HDLPrimitive) typeOf.get();
+					if (prim.isNumber()) {
+						problems.add(new Problem(code, exp, contextNode, null));
+					}
+				}
+			} else {
+				if (!(exp instanceof HDLEnumRef)) {
+					problems.add(new Problem(code, exp, contextNode, null));
+				}
+			}
+		}
+	}
+
+	private static void checkConstantsArrayInit(Set<Problem> problems, HDLArrayInit arrayInit, HDLEvaluationContext context) {
 		for (final HDLExpression exp : arrayInit.getExp()) {
 			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(exp);
 			if (!valueOf.isPresent())
 				if (exp instanceof HDLArrayInit) {
 					final HDLArrayInit hai = (HDLArrayInit) exp;
-					checkConstantsArrayInit(problems, hai);
+					checkConstantsArrayInit(problems, hai, context);
 				} else {
-					problems.add(new Problem(CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, exp, arrayInit, null));
+					assumeConstant(problems, CONSTANT_DEFAULT_VALUE_NOT_CONSTANT, exp, arrayInit, context);
 				}
 		}
 	}

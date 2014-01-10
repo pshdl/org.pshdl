@@ -542,8 +542,8 @@ public class Insulin {
 	public static <T extends IHDLObject> T setParameterOnInstance(T apply) {
 		final ModificationSet ms = new ModificationSet();
 		final HDLInterfaceInstantiation[] hiis = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
-		final Map<String, HDLExpression> argMap = new HashMap<String, HDLExpression>();
 		for (final HDLInterfaceInstantiation hdi : hiis) {
+			final Map<String, HDLExpression> argMap = new HashMap<String, HDLExpression>();
 			final ArrayList<HDLArgument> arguments = hdi.getArguments();
 			for (final HDLArgument hdlArgument : arguments) {
 				argMap.put(hdlArgument.getName(), hdlArgument.getExpression());

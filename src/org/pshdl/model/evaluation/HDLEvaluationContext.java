@@ -49,9 +49,18 @@ import org.pshdl.model.utils.*;
 public class HDLEvaluationContext {
 
 	private final Map<String, HDLExpression> context;
+	public boolean enumAsInt = false;
+	public boolean boolAsInt = false;
 
 	public HDLEvaluationContext(Map<String, HDLExpression> context) {
 		this.context = context;
+	}
+
+	public HDLEvaluationContext withEnumAndBool(boolean enumAsInt, boolean boolAsInt) {
+		final HDLEvaluationContext res = new HDLEvaluationContext(context);
+		res.enumAsInt = enumAsInt;
+		res.boolAsInt = boolAsInt;
+		return res;
 	}
 
 	/**

@@ -213,8 +213,8 @@ class CCompiler implements ITypeOuptutProvider {
 					«ELSE»
 						case «varIdx.get(v.name)»: {
 							va_start(va_arrayIdx, idx);
-							«uint_t» res=«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]«IF v.width != bitWidth && !v.predicate» & «v.width.
-			asMaskL»«ENDIF»;
+							«uint_t» res=«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]«IF v.width != bitWidth && !v.predicate» & «v.
+			width.asMaskL»«ENDIF»;
 							va_end(va_arrayIdx);
 							return res;
 						}
@@ -691,14 +691,15 @@ class CCompiler implements ITypeOuptutProvider {
 		return new MultiOption(null, null, options)
 	}
 
-	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems){
+	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems) {
 		val comp = new CCompiler(em)
 		val List<SideFile> sideFiles = Lists.newLinkedList
 		val simFile = comp.generateSimEncapsuation
 		if (simFile !== null)
 			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets::UTF_8), true));
 		return Lists::newArrayList(
-			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, comp.hookName, true));
+			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, comp.hookName,
+				true));
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {

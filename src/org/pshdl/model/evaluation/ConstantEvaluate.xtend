@@ -26,7 +26,14 @@
  ******************************************************************************/
 package org.pshdl.model.evaluation
 
+import com.google.common.base.Optional
+import java.math.BigInteger
+import java.util.ArrayList
+import java.util.LinkedList
+import java.util.List
+import org.pshdl.interpreter.frames.BigIntegerFrame
 import org.pshdl.model.HDLArithOp
+import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLBitOp
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLEnumRef
@@ -34,36 +41,30 @@ import org.pshdl.model.HDLEqualityOp
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.HDLLiteral
-import org.pshdl.model.HDLLiteral$HDLLiteralPresentation
+import org.pshdl.model.HDLLiteral.HDLLiteralPresentation
 import org.pshdl.model.HDLManip
-import org.pshdl.model.HDLObject$GenericMeta
+import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
 import org.pshdl.model.HDLShiftOp
 import org.pshdl.model.HDLTernary
 import org.pshdl.model.HDLType
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLVariable
-import org.pshdl.model.HDLVariableDeclaration$HDLDirection
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.extensions.TypeExtension
 import org.pshdl.model.types.builtIn.HDLFunctions
-import org.pshdl.model.utils.Insulin
-import java.math.BigInteger
-import java.util.LinkedList
-import java.util.List
-
-import static org.pshdl.model.HDLArithOp$HDLArithOpType.*
-import static org.pshdl.model.HDLBitOp$HDLBitOpType.*
-import static org.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
-import static org.pshdl.model.HDLManip$HDLManipType.*
-import static org.pshdl.model.HDLShiftOp$HDLShiftOpType.*
-import static org.pshdl.model.HDLVariableDeclaration$HDLDirection.*
-import static org.pshdl.model.extensions.ProblemDescription.*
-import com.google.common.base.Optional
-import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.types.builtIn.HDLPrimitives
-import org.pshdl.interpreter.frames.BigIntegerFrame
+import org.pshdl.model.utils.Insulin
+
+import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
+import static org.pshdl.model.HDLBitOp.HDLBitOpType.*
+import static org.pshdl.model.HDLEqualityOp.HDLEqualityOpType.*
+import static org.pshdl.model.HDLManip.HDLManipType.*
+import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*
+import static org.pshdl.model.extensions.ProblemDescription.*
 
 /**
  * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link org.pshdl.model.IHDLObject}. Of course
@@ -129,8 +130,12 @@ class ConstantEvaluate {
 		switch (obj.presentation) {
 			case HDLLiteral$HDLLiteralPresentation::STR:
 				return Optional::absent
-			case HDLLiteral$HDLLiteralPresentation::BOOL:
+			case HDLLiteral$HDLLiteralPresentation::BOOL: {
+				if (context!=null && context.boolAsInt){
+					return boolInt(!obj.equals(HDLLiteral.^false))
+				}
 				return Optional::absent
+			}
 		}
 		return Optional::of(obj.valueAsBigInt)
 	}
@@ -329,6 +334,14 @@ class ConstantEvaluate {
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLVariableRef obj, HDLEvaluationContext context) {
 		if (obj.array.size != 0) {
+			val hVarOpt = obj.resolveVar
+			if (hVarOpt.present) {
+				val hVar = hVarOpt.get
+				if (hVar.direction == CONSTANT) {
+					val defVal = hVar.defaultValue
+					return arrayDefValue(defVal, obj.array, context)
+				}
+			}
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS)
 			return Optional::absent
@@ -361,7 +374,7 @@ class ConstantEvaluate {
 				return Optional::absent
 			}
 			val HDLExpression cRef = context.get(hVar.get)
-			if (cRef===null) {
+			if (cRef === null) {
 				obj.addMeta(SOURCE, hVar.get)
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT)
 				return Optional::absent
@@ -379,7 +392,32 @@ class ConstantEvaluate {
 		return Optional::absent
 	}
 
+	def Optional<BigInteger> arrayDefValue(HDLExpression expression, List<HDLExpression> expressions,
+		HDLEvaluationContext context) {
+		if (expression instanceof HDLArrayInit) {
+			if (expressions.empty) {
+				return Optional::absent
+			}
+			val idx = valueOf(expressions.get(0), context)
+			if (!idx.present) {
+				return Optional::absent
+			}
+			val arr = expression as HDLArrayInit
+			val idxValue = idx.get.intValue
+			if (arr.exp.size < idxValue) {
+				return Optional.of(0bi)
+			}
+			return arrayDefValue(arr.exp.get(idxValue), expressions.subList(1, expressions.size), context)
+		}
+		return constantEvaluate(expression, context)
+	}
+
 	def dispatch Optional<BigInteger> constantEvaluate(HDLEnumRef obj, HDLEvaluationContext context) {
+		if (context != null && context.enumAsInt) {
+			val hEnum = obj.resolveHEnum.get
+			val hVar = obj.resolveVar.get
+			return Optional.of(BigInteger.valueOf(hEnum.enums.indexOf(hVar)))
+		}
 		obj.addMeta(SOURCE, obj)
 		obj.addMeta(DESCRIPTION, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS)
 		return Optional::absent

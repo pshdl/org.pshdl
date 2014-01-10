@@ -109,7 +109,8 @@ public class SimulationTransformationExtension {
   public final static char ANNO_VALUE_SEP = '|';
   
   public static FluidFrame simulationModelOf(final IHDLObject obj, final HDLEvaluationContext context) {
-    return SimulationTransformationExtension.INST.toSimulationModel(obj, context);
+    HDLEvaluationContext _withEnumAndBool = context.withEnumAndBool(true, true);
+    return SimulationTransformationExtension.INST.toSimulationModel(obj, _withEnumAndBool);
   }
   
   protected FluidFrame _toSimulationModel(final HDLExpression obj, final HDLEvaluationContext context) {
@@ -460,13 +461,8 @@ public class SimulationTransformationExtension {
             if (_tripleEquals_2) {
               HDLExpression _label_3 = c.getLabel();
               final HDLEnumRef ref = ((HDLEnumRef) _label_3);
-              Optional<HDLEnum> _resolveHEnum = ref.resolveHEnum();
-              final HDLEnum hEnum = _resolveHEnum.get();
-              Optional<HDLVariable> _resolveVar = ref.resolveVar();
-              final HDLVariable hVar = _resolveVar.get();
-              ArrayList<HDLVariable> _enums = hEnum.getEnums();
-              int _indexOf = _enums.indexOf(hVar);
-              l = _indexOf;
+              int _asInt = this.asInt(ref);
+              l = _asInt;
             } else {
               IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Unsupported label type");
               throw _illegalArgumentException;
@@ -490,6 +486,15 @@ public class SimulationTransformationExtension {
       }
     }
     return res;
+  }
+  
+  public int asInt(final HDLEnumRef ref) {
+    Optional<HDLEnum> _resolveHEnum = ref.resolveHEnum();
+    final HDLEnum hEnum = _resolveHEnum.get();
+    Optional<HDLVariable> _resolveVar = ref.resolveVar();
+    final HDLVariable hVar = _resolveVar.get();
+    ArrayList<HDLVariable> _enums = hEnum.getEnums();
+    return _enums.indexOf(hVar);
   }
   
   protected FluidFrame _toSimulationModel(final HDLIfStatement obj, final HDLEvaluationContext context) {
@@ -988,9 +993,10 @@ public class SimulationTransformationExtension {
           if (_not_4) {
             IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Const/param should be constant");
             throw _illegalArgumentException;
+          } else {
+            BigInteger _get_1 = bVal.get();
+            res.addConstant(refName, _get_1);
           }
-          BigInteger _get_1 = bVal.get();
-          res.addConstant(refName, _get_1);
         }
       }
     }
