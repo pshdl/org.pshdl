@@ -36,31 +36,25 @@ import java.util.List;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLArithOp;
-import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLBitOp;
-import org.pshdl.model.HDLBitOp.HDLBitOpType;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLConcat;
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLEqualityOp;
-import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLLiteral;
-import org.pshdl.model.HDLLiteral.HDLLiteralPresentation;
 import org.pshdl.model.HDLManip;
-import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLShiftOp;
-import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import org.pshdl.model.HDLTernary;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnresolvedFragment;
 import org.pshdl.model.HDLVariable;
-import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
@@ -155,17 +149,17 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLLiteral obj, final HDLEvaluationContext context) {
-    HDLLiteralPresentation _presentation = obj.getPresentation();
-    final HDLLiteralPresentation _switchValue = _presentation;
+    HDLLiteral.HDLLiteralPresentation _presentation = obj.getPresentation();
+    final HDLLiteral.HDLLiteralPresentation _switchValue = _presentation;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteralPresentation.STR)) {
+      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.STR)) {
         _matched=true;
         return Optional.<BigInteger>absent();
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteralPresentation.BOOL)) {
+      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.BOOL)) {
         _matched=true;
         boolean _and = false;
         boolean _notEquals = (!Objects.equal(context, null));
@@ -195,11 +189,11 @@ public class ConstantEvaluate {
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    HDLManipType _type = obj.getType();
-    final HDLManipType _switchValue = _type;
+    HDLManip.HDLManipType _type = obj.getType();
+    final HDLManip.HDLManipType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.ARITH_NEG)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.ARITH_NEG)) {
         _matched=true;
         BigInteger _get = eval.get();
         BigInteger _negate = _get.negate();
@@ -207,7 +201,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.BIT_NEG)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.BIT_NEG)) {
         _matched=true;
         BigInteger _get_1 = eval.get();
         BigInteger _not_1 = _get_1.not();
@@ -215,7 +209,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.LOGIC_NEG)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.LOGIC_NEG)) {
         _matched=true;
         HDLExpression _target_1 = obj.getTarget();
         final Optional<BigInteger> const_ = this.constantEvaluate(_target_1, context);
@@ -229,7 +223,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.CAST)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.CAST)) {
         _matched=true;
         final HDLType type = obj.getCastTo();
         if ((type instanceof HDLPrimitive)) {
@@ -307,9 +301,7 @@ public class ConstantEvaluate {
   public Optional<BigInteger> subEvaluate(final HDLExpression container, final HDLExpression left, final HDLEvaluationContext context) {
     boolean _tripleEquals = (left == null);
     if (_tripleEquals) {
-      String _plus = ("Container:" + container);
-      String _plus_1 = (_plus + " has null left expression");
-      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus_1);
+      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException((("Container:" + container) + " has null left expression"));
       throw _illegalArgumentException;
     }
     final Optional<BigInteger> leftVal = this.constantEvaluate(left, context);
@@ -338,11 +330,11 @@ public class ConstantEvaluate {
     if (_not_1) {
       return Optional.<BigInteger>absent();
     }
-    HDLArithOpType _type = obj.getType();
-    final HDLArithOpType _switchValue = _type;
+    HDLArithOp.HDLArithOpType _type = obj.getType();
+    final HDLArithOp.HDLArithOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.DIV)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.DIV)) {
         _matched=true;
         BigInteger _get = leftVal.get();
         BigInteger _get_1 = rightVal.get();
@@ -351,7 +343,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.MUL)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MUL)) {
         _matched=true;
         BigInteger _get_2 = leftVal.get();
         BigInteger _get_3 = rightVal.get();
@@ -360,7 +352,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.MINUS)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MINUS)) {
         _matched=true;
         BigInteger _get_4 = leftVal.get();
         BigInteger _get_5 = rightVal.get();
@@ -369,7 +361,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.PLUS)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.PLUS)) {
         _matched=true;
         BigInteger _get_6 = leftVal.get();
         BigInteger _get_7 = rightVal.get();
@@ -378,7 +370,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.MOD)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MOD)) {
         _matched=true;
         BigInteger _get_8 = leftVal.get();
         BigInteger _get_9 = rightVal.get();
@@ -387,7 +379,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.POW)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.POW)) {
         _matched=true;
         BigInteger _get_10 = leftVal.get();
         BigInteger _get_11 = rightVal.get();
@@ -415,11 +407,11 @@ public class ConstantEvaluate {
     if (_not_1) {
       return Optional.<BigInteger>absent();
     }
-    HDLBitOpType _type = obj.getType();
-    final HDLBitOpType _switchValue = _type;
+    HDLBitOp.HDLBitOpType _type = obj.getType();
+    final HDLBitOp.HDLBitOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOpType.AND)) {
+      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.AND)) {
         _matched=true;
         BigInteger _get = leftVal.get();
         BigInteger _get_1 = rightVal.get();
@@ -428,7 +420,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOpType.OR)) {
+      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.OR)) {
         _matched=true;
         BigInteger _get_2 = leftVal.get();
         BigInteger _get_3 = rightVal.get();
@@ -437,7 +429,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOpType.XOR)) {
+      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.XOR)) {
         _matched=true;
         BigInteger _get_4 = leftVal.get();
         BigInteger _get_5 = rightVal.get();
@@ -446,7 +438,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOpType.LOGI_AND)) {
+      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.LOGI_AND)) {
         _matched=true;
         BigInteger _get_6 = leftVal.get();
         boolean _equals = BigInteger.ZERO.equals(_get_6);
@@ -454,17 +446,11 @@ public class ConstantEvaluate {
         BigInteger _get_7 = rightVal.get();
         boolean _equals_1 = BigInteger.ZERO.equals(_get_7);
         final boolean r = (!_equals_1);
-        boolean _and_1 = false;
-        if (!l) {
-          _and_1 = false;
-        } else {
-          _and_1 = (l && r);
-        }
-        return ConstantEvaluate.boolInt(_and_1);
+        return ConstantEvaluate.boolInt((l && r));
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOpType.LOGI_OR)) {
+      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.LOGI_OR)) {
         _matched=true;
         BigInteger _get_8 = leftVal.get();
         boolean _equals_2 = BigInteger.ZERO.equals(_get_8);
@@ -472,13 +458,7 @@ public class ConstantEvaluate {
         BigInteger _get_9 = rightVal.get();
         boolean _equals_3 = BigInteger.ZERO.equals(_get_9);
         final boolean r_1 = (!_equals_3);
-        boolean _or_1 = false;
-        if (l_1) {
-          _or_1 = true;
-        } else {
-          _or_1 = (l_1 || r_1);
-        }
-        return ConstantEvaluate.boolInt(_or_1);
+        return ConstantEvaluate.boolInt((l_1 || r_1));
       }
     }
     RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
@@ -500,11 +480,11 @@ public class ConstantEvaluate {
     if (_not_1) {
       return Optional.<BigInteger>absent();
     }
-    HDLEqualityOpType _type = obj.getType();
-    final HDLEqualityOpType _switchValue = _type;
+    HDLEqualityOp.HDLEqualityOpType _type = obj.getType();
+    final HDLEqualityOp.HDLEqualityOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOpType.EQ)) {
+      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.EQ)) {
         _matched=true;
         BigInteger _get = leftVal.get();
         BigInteger _get_1 = rightVal.get();
@@ -513,7 +493,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOpType.NOT_EQ)) {
+      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.NOT_EQ)) {
         _matched=true;
         BigInteger _get_2 = leftVal.get();
         BigInteger _get_3 = rightVal.get();
@@ -523,7 +503,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOpType.GREATER)) {
+      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.GREATER)) {
         _matched=true;
         BigInteger _get_4 = leftVal.get();
         BigInteger _get_5 = rightVal.get();
@@ -533,7 +513,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOpType.GREATER_EQ)) {
+      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.GREATER_EQ)) {
         _matched=true;
         BigInteger _get_6 = leftVal.get();
         BigInteger _get_7 = rightVal.get();
@@ -543,7 +523,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOpType.LESS)) {
+      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.LESS)) {
         _matched=true;
         BigInteger _get_8 = leftVal.get();
         BigInteger _get_9 = rightVal.get();
@@ -553,7 +533,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOpType.LESS_EQ)) {
+      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.LESS_EQ)) {
         _matched=true;
         BigInteger _get_10 = leftVal.get();
         BigInteger _get_11 = rightVal.get();
@@ -581,11 +561,11 @@ public class ConstantEvaluate {
     if (_not_1) {
       return Optional.<BigInteger>absent();
     }
-    HDLShiftOpType _type = obj.getType();
-    final HDLShiftOpType _switchValue = _type;
+    HDLShiftOp.HDLShiftOpType _type = obj.getType();
+    final HDLShiftOp.HDLShiftOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SLL)) {
+      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SLL)) {
         _matched=true;
         BigInteger _get = leftVal.get();
         BigInteger _get_1 = rightVal.get();
@@ -595,7 +575,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SRA)) {
+      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SRA)) {
         _matched=true;
         BigInteger _get_2 = leftVal.get();
         BigInteger _get_3 = rightVal.get();
@@ -605,7 +585,7 @@ public class ConstantEvaluate {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SRL)) {
+      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SRL)) {
         _matched=true;
         final BigInteger l = leftVal.get();
         int _signum = l.signum();
@@ -665,8 +645,8 @@ public class ConstantEvaluate {
       boolean _isPresent = hVarOpt.isPresent();
       if (_isPresent) {
         final HDLVariable hVar = hVarOpt.get();
-        HDLDirection _direction = hVar.getDirection();
-        boolean _equals = Objects.equal(_direction, HDLDirection.CONSTANT);
+        HDLVariableDeclaration.HDLDirection _direction = hVar.getDirection();
+        boolean _equals = Objects.equal(_direction, HDLVariableDeclaration.HDLDirection.CONSTANT);
         if (_equals) {
           final HDLExpression defVal = hVar.getDefaultValue();
           ArrayList<HDLExpression> _array_1 = obj.getArray();
@@ -692,9 +672,7 @@ public class ConstantEvaluate {
     if (_not) {
       _or = true;
     } else {
-      HDLType _get = type.get();
-      boolean _not_1 = (!(_get instanceof HDLPrimitive));
-      _or = (_not || _not_1);
+      _or = (_not || (!(type.get() instanceof HDLPrimitive)));
     }
     if (_or) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
@@ -703,21 +681,21 @@ public class ConstantEvaluate {
     }
     final Optional<HDLVariable> hVar_1 = obj.resolveVar();
     boolean _isPresent_2 = hVar_1.isPresent();
-    boolean _not_2 = (!_isPresent_2);
-    if (_not_2) {
+    boolean _not_1 = (!_isPresent_2);
+    if (_not_1) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<BigInteger>absent();
     }
-    HDLVariable _get_1 = hVar_1.get();
-    final HDLDirection dir = _get_1.getDirection();
-    boolean _equals_1 = Objects.equal(dir, HDLDirection.CONSTANT);
+    HDLVariable _get = hVar_1.get();
+    final HDLVariableDeclaration.HDLDirection dir = _get.getDirection();
+    boolean _equals_1 = Objects.equal(dir, HDLVariableDeclaration.HDLDirection.CONSTANT);
     if (_equals_1) {
-      HDLVariable _get_2 = hVar_1.get();
-      HDLExpression _defaultValue = _get_2.getDefaultValue();
+      HDLVariable _get_1 = hVar_1.get();
+      HDLExpression _defaultValue = _get_1.getDefaultValue();
       return this.subEvaluate(obj, _defaultValue, context);
     }
-    boolean _equals_2 = Objects.equal(dir, HDLDirection.PARAMETER);
+    boolean _equals_2 = Objects.equal(dir, HDLVariableDeclaration.HDLDirection.PARAMETER);
     if (_equals_2) {
       boolean _tripleEquals = (context == null);
       if (_tripleEquals) {
@@ -725,19 +703,19 @@ public class ConstantEvaluate {
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return Optional.<BigInteger>absent();
       }
-      HDLVariable _get_3 = hVar_1.get();
-      final HDLExpression cRef = context.get(_get_3);
+      HDLVariable _get_2 = hVar_1.get();
+      final HDLExpression cRef = context.get(_get_2);
       boolean _tripleEquals_1 = (cRef == null);
       if (_tripleEquals_1) {
-        HDLVariable _get_4 = hVar_1.get();
-        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _get_4);
+        HDLVariable _get_3 = hVar_1.get();
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _get_3);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();
       }
       final Optional<BigInteger> cRefEval = this.constantEvaluate(cRef, context);
       boolean _isPresent_3 = cRefEval.isPresent();
-      boolean _not_3 = (!_isPresent_3);
-      if (_not_3) {
+      boolean _not_2 = (!_isPresent_3);
+      if (_not_2) {
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();

@@ -95,8 +95,7 @@ public class CCompiler implements ITypeOuptutProvider {
     {
       HashSet<Integer> _hashSet = new HashSet<Integer>();
       final Set<Integer> handled = _hashSet;
-      int _minus = (-1);
-      handled.add(Integer.valueOf(_minus));
+      handled.add(Integer.valueOf((-1)));
       StringConcatenation _builder = new StringConcatenation();
       CharSequence _imports = this.getImports();
       _builder.append(_imports, "");
@@ -246,29 +245,19 @@ public class CCompiler implements ITypeOuptutProvider {
           {
             boolean _and = false;
             boolean _and_1 = false;
-            boolean _and_2 = false;
-            int _minus_1 = (-1);
-            boolean _equals = (f_1.edgeNegDepRes == _minus_1);
-            if (!_equals) {
-              _and_2 = false;
-            } else {
-              int _minus_2 = (-1);
-              boolean _equals_1 = (f_1.edgePosDepRes == _minus_2);
-              _and_2 = (_equals && _equals_1);
-            }
-            if (!_and_2) {
+            if (!((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1)))) {
               _and_1 = false;
             } else {
               int _length = f_1.predNegDepRes.length;
-              boolean _equals_2 = (_length == 0);
-              _and_1 = (_and_2 && _equals_2);
+              boolean _equals = (_length == 0);
+              _and_1 = (((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1))) && _equals);
             }
             if (!_and_1) {
               _and = false;
             } else {
               int _length_1 = f_1.predPosDepRes.length;
-              boolean _equals_3 = (_length_1 == 0);
-              _and = (_and_1 && _equals_3);
+              boolean _equals_1 = (_length_1 == 0);
+              _and = (_and_1 && _equals_1);
             }
             if (_and) {
               _builder.append("\t\t");
@@ -388,13 +377,12 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t");
             {
               boolean _and = false;
-              boolean _notEquals = (v.width != this.bitWidth);
-              if (!_notEquals) {
+              if (!(v.width != this.bitWidth)) {
                 _and = false;
               } else {
                 boolean _isPredicate = this.cce.isPredicate(v);
                 boolean _not = (!_isPredicate);
-                _and = (_notEquals && _not);
+                _and = ((v.width != this.bitWidth) && _not);
               }
               if (_and) {
                 _builder.append("value&=");
@@ -432,13 +420,12 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t");
             {
               boolean _and_1 = false;
-              boolean _notEquals_1 = (v.width != this.bitWidth);
-              if (!_notEquals_1) {
+              if (!(v.width != this.bitWidth)) {
                 _and_1 = false;
               } else {
                 boolean _isPredicate_2 = this.cce.isPredicate(v);
                 boolean _not_1 = (!_isPredicate_2);
-                _and_1 = (_notEquals_1 && _not_1);
+                _and_1 = ((v.width != this.bitWidth) && _not_1);
               }
               if (_and_1) {
                 _builder.append("value&=");
@@ -569,8 +556,7 @@ public class CCompiler implements ITypeOuptutProvider {
               if (_isPredicate_3) {
                 _builder.append("?1:0");
               } else {
-                boolean _notEquals_2 = (v_3.width != this.bitWidth);
-                if (_notEquals_2) {
+                if ((v_3.width != this.bitWidth)) {
                   _builder.append(" & ");
                   CharSequence _asMaskL_2 = this.cce.asMaskL(v_3.width);
                   _builder.append(_asMaskL_2, "\t\t");
@@ -603,13 +589,12 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("]");
             {
               boolean _and_2 = false;
-              boolean _notEquals_3 = (v_3.width != this.bitWidth);
-              if (!_notEquals_3) {
+              if (!(v_3.width != this.bitWidth)) {
                 _and_2 = false;
               } else {
                 boolean _isPredicate_4 = this.cce.isPredicate(v_3);
                 boolean _not_2 = (!_isPredicate_4);
-                _and_2 = (_notEquals_3 && _not_2);
+                _and_2 = ((v_3.width != this.bitWidth) && _not_2);
               }
               if (_and_2) {
                 _builder.append(" & ");
@@ -654,12 +639,10 @@ public class CCompiler implements ITypeOuptutProvider {
     for (final Integer i : _doubleDotLessThan) {
       {
         final Integer dim = dims.get((i).intValue());
-        boolean _notEquals = ((i).intValue() != 0);
-        if (_notEquals) {
+        if (((i).intValue() != 0)) {
           varAccess.append("+");
         }
-        boolean _notEquals_1 = ((dim).intValue() != 1);
-        if (_notEquals_1) {
+        if (((dim).intValue() != 1)) {
           StringConcatenation _builder = new StringConcatenation();
           _builder.append("va_arg(va_arrayIdx, int) *");
           _builder.append(dim, "");
@@ -678,9 +661,7 @@ public class CCompiler implements ITypeOuptutProvider {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
-    int _minus = (-1);
-    boolean _notEquals = (f.edgeNegDepRes != _minus);
-    if (_notEquals) {
+    if ((f.edgeNegDepRes != (-1))) {
       StringConcatenation _builder = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
       String _idName = this.cce.idName(_asInternal, false, false);
@@ -693,11 +674,8 @@ public class CCompiler implements ITypeOuptutProvider {
       sb.append(_builder);
       first = false;
     }
-    int _minus_1 = (-1);
-    boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
-    if (_notEquals_1) {
-      boolean _not = (!first);
-      if (_not) {
+    if ((f.edgePosDepRes != (-1))) {
+      if ((!first)) {
         sb.append(" && ");
       }
       StringConcatenation _builder_1 = new StringConcatenation();
@@ -714,8 +692,7 @@ public class CCompiler implements ITypeOuptutProvider {
     }
     for (final int p : f.predNegDepRes) {
       {
-        boolean _not_1 = (!first);
-        if (_not_1) {
+        if ((!first)) {
           sb.append(" && ");
         }
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -730,8 +707,7 @@ public class CCompiler implements ITypeOuptutProvider {
     }
     for (final int p_1 : f.predPosDepRes) {
       {
-        boolean _not_1 = (!first);
-        if (_not_1) {
+        if ((!first)) {
           sb.append(" && ");
         }
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -758,8 +734,7 @@ public class CCompiler implements ITypeOuptutProvider {
       handled.add(Integer.valueOf(id));
       StringConcatenation _builder_1 = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(id);
-      int _minus = (-1);
-      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
       _builder_1.append(_ter, "");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("bool p");
@@ -817,14 +792,12 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal = this.cce.asInternal(id);
-      int _minus = (-1);
-      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
       _builder_1.append(_ter, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
-      int _minus_1 = (-1);
-      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
+      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, (-1));
       _builder_1.append(_ter_1, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -846,8 +819,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
-      int _minus_2 = (-1);
-      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, (-1));
       _builder_1.append(_ter_2, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -901,14 +873,12 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal = this.cce.asInternal(id);
-      int _minus = (-1);
-      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
       _builder_1.append(_ter, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
-      int _minus_1 = (-1);
-      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
+      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, (-1));
       _builder_1.append(_ter_1, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -930,8 +900,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
-      int _minus_2 = (-1);
-      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, (-1));
       _builder_1.append(_ter_2, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -1104,8 +1073,7 @@ public class CCompiler implements ITypeOuptutProvider {
       final String arrAcc = _xifexpression;
       String varName = ("t" + Integer.valueOf(pos));
       if (info.isPred) {
-        String _plus = ("p" + Integer.valueOf(pos));
-        varName = _plus;
+        varName = ("p" + Integer.valueOf(pos));
       }
       if (prev) {
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -1117,8 +1085,7 @@ public class CCompiler implements ITypeOuptutProvider {
       if (info.fixedArray) {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
-          boolean _equals_1 = (info.actualWidth == info.info.width);
-          if (_equals_1) {
+          if ((info.actualWidth == info.info.width)) {
             CharSequence _cType = this.cType(info);
             _builder_3.append(_cType, "");
             _builder_3.append(" ");
@@ -1130,8 +1097,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            boolean _equals_2 = (info.actualWidth == 1);
-            if (_equals_2) {
+            if ((info.actualWidth == 1)) {
               CharSequence _cType_1 = this.cType(info);
               _builder_3.append(_cType_1, "");
               _builder_3.append(" ");
@@ -1166,8 +1132,7 @@ public class CCompiler implements ITypeOuptutProvider {
       } else {
         StringConcatenation _builder_4 = new StringConcatenation();
         {
-          boolean _equals_3 = (info.actualWidth == info.info.width);
-          if (_equals_3) {
+          if ((info.actualWidth == info.info.width)) {
             CharSequence _cType_3 = this.cType(info);
             _builder_4.append(_cType_3, "");
             _builder_4.append(" ");
@@ -1179,8 +1144,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_4.append(";");
             _builder_4.newLineIfNotEmpty();
           } else {
-            boolean _equals_4 = (info.actualWidth == 1);
-            if (_equals_4) {
+            if ((info.actualWidth == 1)) {
               CharSequence _cType_4 = this.cType(info);
               _builder_4.append(_cType_4, "");
               _builder_4.append(" ");
@@ -1256,8 +1220,7 @@ public class CCompiler implements ITypeOuptutProvider {
       if (info.fixedArray) {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
-          boolean _equals = (info.actualWidth == info.info.width);
-          if (_equals) {
+          if ((info.actualWidth == info.info.width)) {
             {
               if (info.isShadowReg) {
                 CharSequence _cType = this.cType(info.info);
@@ -1354,8 +1317,7 @@ public class CCompiler implements ITypeOuptutProvider {
         _builder_4.append("l;");
         _builder_4.newLineIfNotEmpty();
         {
-          boolean _equals_1 = (info.actualWidth == info.info.width);
-          if (_equals_1) {
+          if ((info.actualWidth == info.info.width)) {
             {
               if (info.isShadowReg) {
                 CharSequence _cType_2 = this.cType(info.info);
@@ -1458,31 +1420,26 @@ public class CCompiler implements ITypeOuptutProvider {
         {
           int a = 0;
           int b = 0;
-          boolean _greaterThan = (i.inst.pop > 0);
-          if (_greaterThan) {
+          if ((i.inst.pop > 0)) {
             Integer _pop = stack.pop();
             a = (_pop).intValue();
           }
-          boolean _greaterThan_1 = (i.inst.pop > 1);
-          if (_greaterThan_1) {
+          if ((i.inst.pop > 1)) {
             Integer _pop_1 = stack.pop();
             b = (_pop_1).intValue();
           }
-          boolean _greaterThan_2 = (i.inst.push > 0);
-          if (_greaterThan_2) {
+          if ((i.inst.push > 0)) {
             stack.push(Integer.valueOf(pos));
           }
           boolean _tripleEquals = (i.inst == Instruction.pushAddIndex);
           if (_tripleEquals) {
             arr.add(Integer.valueOf(arrPos));
-            int _plus = (arrPos + 1);
-            arrPos = _plus;
+            arrPos = (arrPos + 1);
           }
           this.toExpression(i, frame, func, pos, a, b, arr, arrPos);
           boolean _tripleNotEquals = (i.inst != Instruction.pushAddIndex);
           if (_tripleNotEquals) {
-            int _plus_1 = (pos + 1);
-            pos = _plus_1;
+            pos = (pos + 1);
           }
         }
       }
@@ -1598,12 +1555,11 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_3.append("reg.offset=");
             {
               boolean _and = false;
-              boolean _not = (!isDynMem);
-              if (!_not) {
+              if (!(!isDynMem)) {
                 _and = false;
               } else {
                 boolean _isArray = this.cce.isArray(internal.info);
-                _and = (_not && _isArray);
+                _and = ((!isDynMem) && _isArray);
               }
               if (_and) {
                 StringBuilder _arrayAccess_1 = this.cce.arrayAccess(internal.info, arr);
@@ -1650,9 +1606,7 @@ public class CCompiler implements ITypeOuptutProvider {
           _matched=true;
           final int highBit = inst.arg1;
           final int lowBit = inst.arg2;
-          int _minus = (highBit - lowBit);
-          int _plus_1 = (_minus + 1);
-          long _doubleLessThan = (1l << _plus_1);
+          long _doubleLessThan = (1l << ((highBit - lowBit) + 1));
           final long mask = (_doubleLessThan - 1);
           StringConcatenation _builder_5 = new StringConcatenation();
           CharSequence _uTemp_1 = this.uTemp(pos, "t");
@@ -1671,8 +1625,7 @@ public class CCompiler implements ITypeOuptutProvider {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.cast_int)) {
           _matched=true;
-          boolean _notEquals = (inst.arg1 != this.bitWidth);
-          if (_notEquals) {
+          if ((inst.arg1 != this.bitWidth)) {
             int _min = Math.min(inst.arg1, inst.arg2);
             final int shiftWidth = (this.bitWidth - _min);
             StringConcatenation _builder_6 = new StringConcatenation();
@@ -1707,8 +1660,7 @@ public class CCompiler implements ITypeOuptutProvider {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.cast_uint)) {
           _matched=true;
-          boolean _notEquals_1 = (inst.arg1 != this.bitWidth);
-          if (_notEquals_1) {
+          if ((inst.arg1 != this.bitWidth)) {
             StringConcatenation _builder_8 = new StringConcatenation();
             CharSequence _uTemp_4 = this.uTemp(pos, "t");
             _builder_8.append(_uTemp_4, "");
@@ -1832,8 +1784,7 @@ public class CCompiler implements ITypeOuptutProvider {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.loadConstant)) {
           _matched=true;
-          boolean _equals = (this.bitWidth == 32);
-          if (_equals) {
+          if ((this.bitWidth == 32)) {
             StringConcatenation _builder_18 = new StringConcatenation();
             CharSequence _uTemp_11 = this.uTemp(pos, "t");
             _builder_18.append(_uTemp_11, "");
@@ -2190,8 +2141,7 @@ public class CCompiler implements ITypeOuptutProvider {
       }
       int size = 1;
       for (final int d : info.dimensions) {
-        int _multiply = (size * d);
-        size = _multiply;
+        size = (size * d);
       }
       StringConcatenation _builder_1 = new StringConcatenation();
       String _idName = this.cce.idName(info, false, false);
