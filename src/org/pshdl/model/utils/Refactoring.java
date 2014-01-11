@@ -128,16 +128,28 @@ public class Refactoring {
 		}
 		res.replace(hi, allStatements.toArray(new HDLStatement[allStatements.size()]));
 		HDLUnit apply = res.apply(container);
-		if (!iterNames.isEmpty()) {
-			final HDLVariable loopName = new HDLVariable().setName(iterNames.get(0).toString());
-			final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(
-					new HDLArithOp().setLeft(outerDims.get(0)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
-			HDLForLoop loop = new HDLForLoop().setParam(loopName).addRange(range);
+		for (int i = 0; i < iterNames.size(); i++) {
+			final HDLQualifiedName iterName = iterNames.get(i);
+			final HDLVariable loopName = new HDLVariable().setName(iterName.toString());
+			final HDLExpression loopTarget = outerDims.get(i);
+			final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(loopTarget).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
 			final HDLUnit derefed = dereferenceRefs(apply);
 			final List<HDLStatement> combined = derefed.getInits();
 			combined.addAll(derefed.getStatements());
-			loop = loop.setDos(combined);
-			apply = apply.setInits(null).setStatements(Collections.singleton((HDLStatement) loop)).copyDeepFrozen(container.getContainer());
+			final List<HDLStatement> newStmnts = Lists.newArrayList();
+			for (final Iterator<HDLStatement> iterator = combined.iterator(); iterator.hasNext();) {
+				final HDLStatement hdlStatement = iterator.next();
+				if (hdlStatement instanceof HDLVariableDeclaration) {
+					final HDLVariableDeclaration hvd = (HDLVariableDeclaration) hdlStatement;
+					if ((hvd.getDirection() == HDLDirection.CONSTANT) || (hvd.getDirection() == HDLDirection.PARAMETER)) {
+						iterator.remove();
+						newStmnts.add(hvd);
+					}
+				}
+			}
+			final HDLForLoop loop = new HDLForLoop().setParam(loopName).addRange(range).setDos(combined);
+			newStmnts.add(loop);
+			apply = apply.setInits(null).setStatements(newStmnts).copyDeepFrozen(container.getContainer());
 		}
 		pkg = pkg.addUnits(apply);
 		try {
