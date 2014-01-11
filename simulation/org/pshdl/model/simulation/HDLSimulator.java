@@ -373,31 +373,36 @@ public class HDLSimulator {
 	 * @return
 	 */
 	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit unit) {
-		final HDLForLoop[] loops = unit.getAllObjectsOf(HDLForLoop.class, true);
-		final ModificationSet ms = new ModificationSet();
-		for (final HDLForLoop loop : loops) {
-			final HDLVariable param = loop.getParam();
-			final Optional<Range<BigInteger>> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
-			final List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
-			for (final HDLStatement stmnt : loop.getDos()) {
-				final Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
-				if (refs.size() == 0) {
-					newStmnts.add(stmnt);
-				} else {
-					BigInteger counter = r.get().lowerEndpoint();
-					do {
-						final ModificationSet stmntMs = new ModificationSet();
-						for (final HDLVariableRef ref : refs) {
-							stmntMs.replace(ref, HDLLiteral.get(counter));
-						}
-						newStmnts.add(stmntMs.apply(stmnt));
-						counter = counter.add(BigInteger.ONE);
-					} while (counter.compareTo(r.get().upperEndpoint()) <= 0);
+		HDLUnit newUnit = unit;
+		do {
+			unit = newUnit;
+			final HDLForLoop[] loops = unit.getAllObjectsOf(HDLForLoop.class, true);
+			final ModificationSet ms = new ModificationSet();
+			for (final HDLForLoop loop : loops) {
+				final HDLVariable param = loop.getParam();
+				final Optional<Range<BigInteger>> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
+				final List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
+				for (final HDLStatement stmnt : loop.getDos()) {
+					final Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
+					if (refs.size() == 0) {
+						newStmnts.add(stmnt);
+					} else {
+						BigInteger counter = r.get().lowerEndpoint();
+						do {
+							final ModificationSet stmntMs = new ModificationSet();
+							for (final HDLVariableRef ref : refs) {
+								stmntMs.replace(ref, HDLLiteral.get(counter));
+							}
+							newStmnts.add(stmntMs.apply(stmnt));
+							counter = counter.add(BigInteger.ONE);
+						} while (counter.compareTo(r.get().upperEndpoint()) <= 0);
+					}
 				}
+				ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));
 			}
-			ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));
-		}
-		return ms.apply(unit);
+			newUnit = ms.apply(unit);
+		} while (newUnit != unit);
+		return newUnit;
 	}
 
 	public static void resetTempIDs() {

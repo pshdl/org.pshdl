@@ -96,7 +96,11 @@ public class Refactoring {
 		subUnit = prefixVariables(subUnit, prefix, separator);
 		subUnit = extractDefaultValue(subUnit);
 		final ArrayList<HDLExpression> outerDims = hiVar.getDimensions();
-		subUnit = addArrayReference(subUnit, outerDims);
+		final List<HDLQualifiedName> iterNames = Lists.newArrayListWithCapacity(outerDims.size());
+		for (int i = 0; i < outerDims.size(); i++) {
+			iterNames.add(new HDLQualifiedName(Insulin.getTempName("inline", "idx")));
+		}
+		subUnit = addArrayReference(subUnit, outerDims, iterNames);
 		subUnit = addNewDimensions(subUnit, outerDims);
 		subUnit = changeDirection(subUnit);
 		subUnit = dereferenceRefs(subUnit);
@@ -122,24 +126,19 @@ public class Refactoring {
 				}
 			}
 		}
-		if (outerDims.size() == 0) {
-			res.replace(hi, allStatements.toArray(new HDLStatement[allStatements.size()]));
-		} else {
+		res.replace(hi, allStatements.toArray(new HDLStatement[allStatements.size()]));
+		HDLUnit apply = res.apply(container);
+		if (!iterNames.isEmpty()) {
+			final HDLVariable loopName = new HDLVariable().setName(iterNames.get(0).toString());
 			final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(
 					new HDLArithOp().setLeft(outerDims.get(0)).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
-			HDLForLoop loop = new HDLForLoop().setParam(new HDLVariable().setName("I")).addRange(range);
-			for (final Iterator<HDLStatement> iterator = allStatements.iterator(); iterator.hasNext();) {
-				final HDLStatement statement = iterator.next();
-				if (statement instanceof HDLDeclaration) {
-					final HDLDeclaration hdd = (HDLDeclaration) statement;
-					res.addTo(container, HDLUnit.fInits, hdd);
-					iterator.remove();
-				}
-			}
-			loop = loop.setDos(allStatements);
-			res.replace(hi, loop);
+			HDLForLoop loop = new HDLForLoop().setParam(loopName).addRange(range);
+			final HDLUnit derefed = dereferenceRefs(apply);
+			final List<HDLStatement> combined = derefed.getInits();
+			combined.addAll(derefed.getStatements());
+			loop = loop.setDos(combined);
+			apply = apply.setInits(null).setStatements(Collections.singleton((HDLStatement) loop)).copyDeepFrozen(container.getContainer());
 		}
-		final HDLUnit apply = res.apply(container);
 		pkg = pkg.addUnits(apply);
 		try {
 			apply.validateAllFields(container.getContainer(), true);
@@ -211,7 +210,7 @@ public class Refactoring {
 		for (final HDLVariableRef varRef : ref) {
 			final String string = varRef.getVarRefName().toString();
 			if (string.startsWith(subUnitName)) {
-				ms.replace(varRef, varRef.setVar(varRef.getVarRefName().getLocalPart()));
+				ms.replace(varRef, varRef.setVar(new HDLQualifiedName(varRef.getVarRefName().getLastSegment())));
 			}
 		}
 		return ms.apply(subUnit);
@@ -265,13 +264,13 @@ public class Refactoring {
 		return subUnit;
 	}
 
-	private static HDLUnit addArrayReference(HDLUnit subUnit, ArrayList<HDLExpression> outerDims) {
+	private static HDLUnit addArrayReference(HDLUnit subUnit, ArrayList<HDLExpression> outerDims, List<HDLQualifiedName> iteratorNames) {
 		final ModificationSet subMS = new ModificationSet();
 		final HDLVariableRef[] refs = subUnit.getAllObjectsOf(HDLVariableRef.class, true);
 		for (final HDLVariableRef ref : refs) {
 			final LinkedList<HDLExpression> array = Lists.newLinkedList();
 			for (int i = 0; i < outerDims.size(); i++) {
-				array.add(new HDLVariableRef().setVar(HDLQualifiedName.create(Character.toString((char) ('I' + i)))));
+				array.add(new HDLVariableRef().setVar(iteratorNames.get(i)));
 			}
 			array.addAll(ref.getArray());
 			subMS.replace(ref, ref.setArray(array));
