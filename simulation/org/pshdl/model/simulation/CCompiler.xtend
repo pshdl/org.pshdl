@@ -751,9 +751,9 @@ extern void pshdl_sim_run();
 extern bool disableEdges;
 
 «FOR v : varNames»
-#define «v.defineName» «varIdx.get('''«em.moduleName».«v»''')»
+#define «v.defineName» «varIdx.get('''«em.moduleName».«v»'''.toString)»
 «ENDFOR»
-#define «"Bus2IP_Clk".defineName» «varIdx.get('''«em.moduleName».Bus2IP_Clk''')»
+#define «"Bus2IP_Clk".defineName» «varIdx.get('''«em.moduleName».Bus2IP_Clk'''.toString)»
 
 '''
 		val checkedRows = new HashSet<String>()
@@ -768,7 +768,9 @@ extern bool disableEdges;
 		return res
 	}
 
-	def getDefineName(String v) '''«em.moduleName».«v.idName(false, false)»'''
+	def getDefineName(String v) {
+		'''«em.moduleName».«v»'''.toString.idName(false, false)
+	}
 
 	def simGetter(Row row) '''
 //Getter

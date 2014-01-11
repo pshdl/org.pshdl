@@ -2500,26 +2500,28 @@ public class CCompiler implements ITypeOuptutProvider {
     {
       for(final String v : varNames) {
         _builder.append("#define ");
-        CharSequence _defineName = this.getDefineName(v);
+        String _defineName = this.getDefineName(v);
         _builder.append(_defineName, "");
         _builder.append(" ");
         StringConcatenation _builder_1 = new StringConcatenation();
         _builder_1.append(this.cce.em.moduleName, "");
         _builder_1.append(".");
         _builder_1.append(v, "");
-        Integer _get = this.cce.varIdx.get(_builder_1);
+        String _string = _builder_1.toString();
+        Integer _get = this.cce.varIdx.get(_string);
         _builder.append(_get, "");
         _builder.newLineIfNotEmpty();
       }
     }
     _builder.append("#define ");
-    CharSequence _defineName_1 = this.getDefineName("Bus2IP_Clk");
+    String _defineName_1 = this.getDefineName("Bus2IP_Clk");
     _builder.append(_defineName_1, "");
     _builder.append(" ");
     StringConcatenation _builder_2 = new StringConcatenation();
     _builder_2.append(this.cce.em.moduleName, "");
     _builder_2.append(".Bus2IP_Clk");
-    Integer _get_1 = this.cce.varIdx.get(_builder_2);
+    String _string_1 = _builder_2.toString();
+    Integer _get_1 = this.cce.varIdx.get(_string_1);
     _builder.append(_get_1, "");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
@@ -2545,13 +2547,14 @@ public class CCompiler implements ITypeOuptutProvider {
     return res;
   }
   
-  public CharSequence getDefineName(final String v) {
+  public String getDefineName(final String v) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append(this.cce.em.moduleName, "");
     _builder.append(".");
-    String _idName = this.cce.idName(v, false, false);
-    _builder.append(_idName, "");
-    return _builder;
+    _builder.append(v, "");
+    String _string = _builder.toString();
+    String _idName = this.cce.idName(_string, false, false);
+    return _idName;
   }
   
   public CharSequence simGetter(final Row row) {
@@ -2579,7 +2582,7 @@ public class CCompiler implements ITypeOuptutProvider {
         String _varName = this.ba.getVarName(row, d);
         _builder.append(_varName, "\t");
         _builder.append("=pshdl_sim_getOutput(");
-        CharSequence _defineName = this.getDefineName(d.name);
+        String _defineName = this.getDefineName(d.name);
         _builder.append(_defineName, "\t");
         _builder.append(", index);");
         _builder.newLineIfNotEmpty();
@@ -2649,7 +2652,7 @@ public class CCompiler implements ITypeOuptutProvider {
       for(final Definition d : _writeDefs_2) {
         _builder.append("\t");
         _builder.append("pshdl_sim_setInput(");
-        CharSequence _defineName = this.getDefineName(d.name);
+        String _defineName = this.getDefineName(d.name);
         _builder.append(_defineName, "\t");
         _builder.append(", ");
         _builder.append(d.name, "\t");
@@ -2662,7 +2665,7 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("\t\t");
     _builder.append("pshdl_sim_setInput(");
-    CharSequence _defineName_1 = this.getDefineName("Bus2IP_Clk");
+    String _defineName_1 = this.getDefineName("Bus2IP_Clk");
     _builder.append(_defineName_1, "\t\t");
     _builder.append(", 0, 0);");
     _builder.newLineIfNotEmpty();
@@ -2674,7 +2677,7 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("\t");
     _builder.append("pshdl_sim_setInput(");
-    CharSequence _defineName_2 = this.getDefineName("Bus2IP_Clk");
+    String _defineName_2 = this.getDefineName("Bus2IP_Clk");
     _builder.append(_defineName_2, "\t");
     _builder.append(", 1, 0);");
     _builder.newLineIfNotEmpty();
