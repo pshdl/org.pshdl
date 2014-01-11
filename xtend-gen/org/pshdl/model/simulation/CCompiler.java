@@ -50,7 +50,6 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
-import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
@@ -59,14 +58,13 @@ import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.simulation.SimulationTransformationExtension;
 import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
-import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
-import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
-import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
+import org.pshdl.model.utils.PSAbstractCompiler;
+import org.pshdl.model.utils.services.IHDLGenerator;
+import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
@@ -77,17 +75,11 @@ public class CCompiler implements ITypeOuptutProvider {
   private final int bitWidth;
   
   public CCompiler() {
-    int _minus = (-1);
-    this.bitWidth = _minus;
+    this.bitWidth = 64;
   }
   
   public CCompiler(final ExecutableModel em) {
-    boolean _lessEqualsThan = (em.maxDataWidth <= 32);
-    if (_lessEqualsThan) {
-      this.bitWidth = 32;
-    } else {
-      this.bitWidth = 64;
-    }
+    this.bitWidth = 64;
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, this.bitWidth);
     this.cce = _commonCompilerExtension;
   }
@@ -131,7 +123,7 @@ public class CCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           _builder.append("regUpdate_t regUpdates[");
           int _maxRegUpdates = this.cce.maxRegUpdates(this.cce.em);
-          _builder.append(_maxRegUpdates, "	");
+          _builder.append(_maxRegUpdates, "\t");
           _builder.append("];");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
@@ -151,7 +143,7 @@ public class CCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           Boolean _get = this.cce.prevMap.get(v.name);
           CharSequence _decl = this.decl(v, _get);
-          _builder.append(_decl, "	");
+          _builder.append(_decl, "\t");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -167,7 +159,7 @@ public class CCompiler implements ITypeOuptutProvider {
         for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
           CharSequence _method = this.method(f);
-          _builder.append(_method, "	");
+          _builder.append(_method, "\t");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -225,7 +217,7 @@ public class CCompiler implements ITypeOuptutProvider {
         if (this.cce.hasClock) {
           _builder.append("\t");
           CharSequence _copyRegs = this.copyRegs();
-          _builder.append(_copyRegs, "	");
+          _builder.append(_copyRegs, "\t");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -281,23 +273,23 @@ public class CCompiler implements ITypeOuptutProvider {
             if (_and) {
               _builder.append("\t\t");
               CharSequence _frameName = this.cce.getFrameName(f_1);
-              _builder.append(_frameName, "		");
+              _builder.append(_frameName, "\t\t");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
             } else {
               _builder.append("\t\t");
               CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handled);
-              _builder.append(_createNegEdge, "		");
+              _builder.append(_createNegEdge, "\t\t");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
-              _builder.append(_createPosEdge, "		");
+              _builder.append(_createPosEdge, "\t\t");
               _builder.newLineIfNotEmpty();
               {
                 for(final int p : f_1.predNegDepRes) {
                   _builder.append("\t\t");
                   CharSequence _createboolPred = this.createboolPred(p, handled);
-                  _builder.append(_createboolPred, "		");
+                  _builder.append(_createboolPred, "\t\t");
                   _builder.newLineIfNotEmpty();
                 }
               }
@@ -305,20 +297,20 @@ public class CCompiler implements ITypeOuptutProvider {
                 for(final int p_1 : f_1.predPosDepRes) {
                   _builder.append("\t\t");
                   CharSequence _createboolPred_1 = this.createboolPred(p_1, handled);
-                  _builder.append(_createboolPred_1, "		");
+                  _builder.append(_createboolPred_1, "\t\t");
                   _builder.newLineIfNotEmpty();
                 }
               }
               _builder.append("\t\t");
               _builder.append("if (");
               String _predicates = this.predicates(f_1);
-              _builder.append(_predicates, "		");
+              _builder.append(_predicates, "\t\t");
               _builder.append(")");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               _builder.append("\t");
               CharSequence _frameName_1 = this.cce.getFrameName(f_1);
-              _builder.append(_frameName_1, "			");
+              _builder.append(_frameName_1, "\t\t\t");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
             }
@@ -351,7 +343,7 @@ public class CCompiler implements ITypeOuptutProvider {
         for(final VariableInformation v_1 : _filter) {
           _builder.append("\t\t");
           String _copyPrev = this.copyPrev(v_1);
-          _builder.append(_copyPrev, "		");
+          _builder.append(_copyPrev, "\t\t");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -389,7 +381,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "		");
+            _builder.append(_get, "\t\t");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -407,7 +399,7 @@ public class CCompiler implements ITypeOuptutProvider {
               if (_and) {
                 _builder.append("value&=");
                 CharSequence _asMaskL = this.cce.asMaskL(v.width);
-                _builder.append(_asMaskL, "			");
+                _builder.append(_asMaskL, "\t\t\t");
                 _builder.append(";");
               }
             }
@@ -415,7 +407,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("\t");
             String _idName = this.cce.idName(v, false, false);
-            _builder.append(_idName, "			");
+            _builder.append(_idName, "\t\t\t");
             _builder.append("=value");
             {
               boolean _isPredicate_1 = this.cce.isPredicate(v);
@@ -433,7 +425,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_1 = this.cce.varIdx.get(v.name);
-            _builder.append(_get_1, "		");
+            _builder.append(_get_1, "\t\t");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -451,7 +443,7 @@ public class CCompiler implements ITypeOuptutProvider {
               if (_and_1) {
                 _builder.append("value&=");
                 CharSequence _asMaskL_1 = this.cce.asMaskL(v.width);
-                _builder.append(_asMaskL_1, "			");
+                _builder.append(_asMaskL_1, "\t\t\t");
                 _builder.append(";");
               }
             }
@@ -463,10 +455,10 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("\t");
             String _idName_1 = this.cce.idName(v, false, false);
-            _builder.append(_idName_1, "			");
+            _builder.append(_idName_1, "\t\t\t");
             _builder.append("[");
             StringBuilder _arrayVarArgAccessArrIdx = this.arrayVarArgAccessArrIdx(v);
-            _builder.append(_arrayVarArgAccessArrIdx, "			");
+            _builder.append(_arrayVarArgAccessArrIdx, "\t\t\t");
             _builder.append("]=value;");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -498,9 +490,9 @@ public class CCompiler implements ITypeOuptutProvider {
         _builder.append("\t\t");
         _builder.append("case ");
         Integer _get_2 = this.cce.varIdx.get(v_1.name);
-        _builder.append(_get_2, "		");
+        _builder.append(_get_2, "\t\t");
         _builder.append(": return \"");
-        _builder.append(v_1.name, "		");
+        _builder.append(v_1.name, "\t\t");
         _builder.append("\";");
         _builder.newLineIfNotEmpty();
       }
@@ -536,7 +528,7 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.append("*numElements=");
     int _length_1 = this.cce.em.variables.length;
     int _minus = (_length_1 - 1);
-    _builder.append(_minus, "	");
+    _builder.append(_minus, "\t");
     _builder.append(";");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -568,10 +560,10 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_4 = this.cce.varIdx.get(v_3.name);
-            _builder.append(_get_4, "		");
+            _builder.append(_get_4, "\t\t");
             _builder.append(": return ");
             String _idName_2 = this.cce.idName(v_3, false, false);
-            _builder.append(_idName_2, "		");
+            _builder.append(_idName_2, "\t\t");
             {
               boolean _isPredicate_3 = this.cce.isPredicate(v_3);
               if (_isPredicate_3) {
@@ -581,7 +573,7 @@ public class CCompiler implements ITypeOuptutProvider {
                 if (_notEquals_2) {
                   _builder.append(" & ");
                   CharSequence _asMaskL_2 = this.cce.asMaskL(v_3.width);
-                  _builder.append(_asMaskL_2, "		");
+                  _builder.append(_asMaskL_2, "\t\t");
                 }
               }
             }
@@ -591,7 +583,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_5 = this.cce.varIdx.get(v_3.name);
-            _builder.append(_get_5, "		");
+            _builder.append(_get_5, "\t\t");
             _builder.append(": {");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -601,13 +593,13 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("\t");
             CharSequence _uint_t_1 = this.uint_t();
-            _builder.append(_uint_t_1, "			");
+            _builder.append(_uint_t_1, "\t\t\t");
             _builder.append(" res=");
             String _idName_3 = this.cce.idName(v_3, false, false);
-            _builder.append(_idName_3, "			");
+            _builder.append(_idName_3, "\t\t\t");
             _builder.append("[");
             StringBuilder _arrayVarArgAccessArrIdx_1 = this.arrayVarArgAccessArrIdx(v_3);
-            _builder.append(_arrayVarArgAccessArrIdx_1, "			");
+            _builder.append(_arrayVarArgAccessArrIdx_1, "\t\t\t");
             _builder.append("]");
             {
               boolean _and_2 = false;
@@ -622,7 +614,7 @@ public class CCompiler implements ITypeOuptutProvider {
               if (_and_2) {
                 _builder.append(" & ");
                 CharSequence _asMaskL_3 = this.cce.asMaskL(v_3.width);
-                _builder.append(_asMaskL_3, "			");
+                _builder.append(_asMaskL_3, "\t\t\t");
               }
             }
             _builder.append(";");
@@ -790,7 +782,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("p");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("_fresh=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -827,24 +819,24 @@ public class CCompiler implements ITypeOuptutProvider {
       InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
-      _builder_1.append(_ter, "	");
+      _builder_1.append(_ter, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
       int _minus_1 = (-1);
       CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
-      _builder_1.append(_ter_1, "	");
+      _builder_1.append(_ter_1, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("if ((t");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("_prev!=0) || (t");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("!=1)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
       String _idName_2 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_2, "		");
+      _builder_1.append(_idName_2, "\t\t");
       _builder_1.append("_isRising=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -856,13 +848,13 @@ public class CCompiler implements ITypeOuptutProvider {
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
       int _minus_2 = (-1);
       CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
-      _builder_1.append(_ter_2, "	");
+      _builder_1.append(_ter_2, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_3 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_3, "	");
+      _builder_1.append(_idName_3, "\t");
       _builder_1.append("_isRising=t");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("==1;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -874,7 +866,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_5 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_5, "	");
+      _builder_1.append(_idName_5, "\t");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -911,24 +903,24 @@ public class CCompiler implements ITypeOuptutProvider {
       InternalInformation _asInternal = this.cce.asInternal(id);
       int _minus = (-1);
       CharSequence _ter = this.getter(_asInternal, false, id, _minus);
-      _builder_1.append(_ter, "	");
+      _builder_1.append(_ter, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
       int _minus_1 = (-1);
       CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
-      _builder_1.append(_ter_1, "	");
+      _builder_1.append(_ter_1, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("if ((t");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("_prev!=1) || (t");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("!=0)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
       String _idName_2 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_2, "		");
+      _builder_1.append(_idName_2, "\t\t");
       _builder_1.append("_isFalling=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -940,13 +932,13 @@ public class CCompiler implements ITypeOuptutProvider {
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
       int _minus_2 = (-1);
       CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
-      _builder_1.append(_ter_2, "	");
+      _builder_1.append(_ter_2, "\t");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_3 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_3, "	");
+      _builder_1.append(_idName_3, "\t");
       _builder_1.append("_isFalling=t");
-      _builder_1.append(id, "	");
+      _builder_1.append(id, "\t");
       _builder_1.append("==0;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -958,7 +950,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_5 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_5, "	");
+      _builder_1.append(_idName_5, "\t");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -991,7 +983,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t\t");
             _builder.append("case ");
             Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "			");
+            _builder.append(_get, "\t\t\t");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             {
@@ -1000,10 +992,10 @@ public class CCompiler implements ITypeOuptutProvider {
               if (_equals) {
                 _builder.append("\t\t\t");
                 String _idName = this.cce.idName(v, false, false);
-                _builder.append(_idName, "			");
+                _builder.append(_idName, "\t\t\t");
                 _builder.append(" = ");
                 String _idName_1 = this.cce.idName(v, false, false);
-                _builder.append(_idName_1, "			");
+                _builder.append(_idName_1, "\t\t\t");
                 _builder.append("$reg; break;");
                 _builder.newLineIfNotEmpty();
               } else {
@@ -1014,13 +1006,13 @@ public class CCompiler implements ITypeOuptutProvider {
                 _builder.append("\t");
                 _builder.append("memcpy(");
                 String _idName_2 = this.cce.idName(v, false, false);
-                _builder.append(_idName_2, "				");
+                _builder.append(_idName_2, "\t\t\t\t");
                 _builder.append(", ");
                 String _idName_3 = this.cce.idName(v, false, false);
-                _builder.append(_idName_3, "				");
+                _builder.append(_idName_3, "\t\t\t\t");
                 _builder.append("$reg, ");
                 int _talSize = this.cce.totalSize(v);
-                _builder.append(_talSize, "				");
+                _builder.append(_talSize, "\t\t\t\t");
                 _builder.append(");");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
@@ -1029,10 +1021,10 @@ public class CCompiler implements ITypeOuptutProvider {
                 _builder.append("\t\t\t");
                 _builder.append("\t");
                 String _idName_4 = this.cce.idName(v, false, false);
-                _builder.append(_idName_4, "				");
+                _builder.append(_idName_4, "\t\t\t\t");
                 _builder.append("[reg.offset] = ");
                 String _idName_5 = this.cce.idName(v, false, false);
-                _builder.append(_idName_5, "				");
+                _builder.append(_idName_5, "\t\t\t\t");
                 _builder.append("$reg[reg.offset]; break;");
                 _builder.newLineIfNotEmpty();
               }
@@ -1066,17 +1058,16 @@ public class CCompiler implements ITypeOuptutProvider {
       return _builder.toString();
     }
     StringConcatenation _builder_1 = new StringConcatenation();
-    _builder_1.append("System.arraycopy(");
-    String _idName_2 = this.cce.idName(info, false, false);
+    _builder_1.append("memcpy(");
+    String _idName_2 = this.cce.idName(info, true, false);
     _builder_1.append(_idName_2, "");
-    _builder_1.append(",0,");
-    String _idName_3 = this.cce.idName(info, true, false);
+    _builder_1.append(",");
+    String _idName_3 = this.cce.idName(info, false, false);
     _builder_1.append(_idName_3, "");
-    _builder_1.append(", 0, ");
-    String _idName_4 = this.cce.idName(info, false, 
-      false);
-    _builder_1.append(_idName_4, "");
-    _builder_1.append(".length);");
+    _builder_1.append(", ");
+    int _talSize = this.cce.totalSize(info);
+    _builder_1.append(_talSize, "");
+    _builder_1.append(");");
     return _builder_1.toString();
   }
   
@@ -1117,109 +1108,111 @@ public class CCompiler implements ITypeOuptutProvider {
         varName = _plus;
       }
       if (prev) {
-        String _plus_1 = (varName + "_prev");
-        varName = _plus_1;
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append(varName, "");
+        _builder_2.append("_prev");
+        varName = _builder_2.toString();
       }
       CharSequence _xifexpression_1 = null;
       if (info.fixedArray) {
-        StringConcatenation _builder_2 = new StringConcatenation();
+        StringConcatenation _builder_3 = new StringConcatenation();
         {
           boolean _equals_1 = (info.actualWidth == info.info.width);
           if (_equals_1) {
             CharSequence _cType = this.cType(info);
-            _builder_2.append(_cType, "");
-            _builder_2.append(" ");
-            _builder_2.append(varName, "");
-            _builder_2.append("=");
+            _builder_3.append(_cType, "");
+            _builder_3.append(" ");
+            _builder_3.append(varName, "");
+            _builder_3.append("=");
             String _idName = this.cce.idName(info.info, prev, false);
-            _builder_2.append(_idName, "");
-            _builder_2.append(sb, "");
-            _builder_2.append(";");
-            _builder_2.newLineIfNotEmpty();
+            _builder_3.append(_idName, "");
+            _builder_3.append(sb, "");
+            _builder_3.append(";");
+            _builder_3.newLineIfNotEmpty();
           } else {
             boolean _equals_2 = (info.actualWidth == 1);
             if (_equals_2) {
               CharSequence _cType_1 = this.cType(info);
-              _builder_2.append(_cType_1, "");
-              _builder_2.append(" ");
-              _builder_2.append(varName, "");
-              _builder_2.append("=(");
-              String _idName_1 = this.cce.idName(info.info, prev, false);
-              _builder_2.append(_idName_1, "");
-              _builder_2.append(sb, "");
-              _builder_2.append(" >> ");
-              _builder_2.append(info.bitStart, "");
-              _builder_2.append(") & 1;");
-              _builder_2.newLineIfNotEmpty();
-            } else {
-              CharSequence _cType_2 = this.cType(info);
-              _builder_2.append(_cType_2, "");
-              _builder_2.append(" ");
-              _builder_2.append(varName, "");
-              _builder_2.append("=(");
-              String _idName_2 = this.cce.idName(info.info, prev, false);
-              _builder_2.append(_idName_2, "");
-              _builder_2.append(sb, "");
-              _builder_2.append(" >> ");
-              _builder_2.append(info.bitEnd, "");
-              _builder_2.append(") & ");
-              _builder_2.append(mask, "");
-              _builder_2.append(";");
-              _builder_2.newLineIfNotEmpty();
-            }
-          }
-        }
-        _xifexpression_1 = _builder_2;
-      } else {
-        StringConcatenation _builder_3 = new StringConcatenation();
-        {
-          boolean _equals_3 = (info.actualWidth == info.info.width);
-          if (_equals_3) {
-            CharSequence _cType_3 = this.cType(info);
-            _builder_3.append(_cType_3, "");
-            _builder_3.append(" ");
-            _builder_3.append(varName, "");
-            _builder_3.append("= ");
-            String _idName_3 = this.cce.idName(info.info, prev, false);
-            _builder_3.append(_idName_3, "");
-            _builder_3.append(arrAcc, "");
-            _builder_3.append(";");
-            _builder_3.newLineIfNotEmpty();
-          } else {
-            boolean _equals_4 = (info.actualWidth == 1);
-            if (_equals_4) {
-              CharSequence _cType_4 = this.cType(info);
-              _builder_3.append(_cType_4, "");
+              _builder_3.append(_cType_1, "");
               _builder_3.append(" ");
               _builder_3.append(varName, "");
-              _builder_3.append("= (");
-              String _idName_4 = this.cce.idName(info.info, prev, false);
-              _builder_3.append(_idName_4, "");
-              _builder_3.append(arrAcc, "");
+              _builder_3.append("=(");
+              String _idName_1 = this.cce.idName(info.info, prev, false);
+              _builder_3.append(_idName_1, "");
+              _builder_3.append(sb, "");
               _builder_3.append(" >> ");
               _builder_3.append(info.bitStart, "");
               _builder_3.append(") & 1;");
               _builder_3.newLineIfNotEmpty();
             } else {
-              CharSequence _cType_5 = this.cType(info);
-              _builder_3.append(_cType_5, "");
+              CharSequence _cType_2 = this.cType(info);
+              _builder_3.append(_cType_2, "");
               _builder_3.append(" ");
               _builder_3.append(varName, "");
-              _builder_3.append("= (");
-              String _idName_5 = this.cce.idName(info.info, prev, false);
-              _builder_3.append(_idName_5, "");
-              _builder_3.append(arrAcc, "");
+              _builder_3.append("=(");
+              String _idName_2 = this.cce.idName(info.info, prev, false);
+              _builder_3.append(_idName_2, "");
+              _builder_3.append(sb, "");
               _builder_3.append(" >> ");
               _builder_3.append(info.bitEnd, "");
               _builder_3.append(") & ");
-              CharSequence _asMaskL = this.cce.asMaskL(info.actualWidth);
-              _builder_3.append(_asMaskL, "");
-              _builder_3.append("l;");
+              _builder_3.append(mask, "");
+              _builder_3.append(";");
               _builder_3.newLineIfNotEmpty();
             }
           }
         }
         _xifexpression_1 = _builder_3;
+      } else {
+        StringConcatenation _builder_4 = new StringConcatenation();
+        {
+          boolean _equals_3 = (info.actualWidth == info.info.width);
+          if (_equals_3) {
+            CharSequence _cType_3 = this.cType(info);
+            _builder_4.append(_cType_3, "");
+            _builder_4.append(" ");
+            _builder_4.append(varName, "");
+            _builder_4.append("= ");
+            String _idName_3 = this.cce.idName(info.info, prev, false);
+            _builder_4.append(_idName_3, "");
+            _builder_4.append(arrAcc, "");
+            _builder_4.append(";");
+            _builder_4.newLineIfNotEmpty();
+          } else {
+            boolean _equals_4 = (info.actualWidth == 1);
+            if (_equals_4) {
+              CharSequence _cType_4 = this.cType(info);
+              _builder_4.append(_cType_4, "");
+              _builder_4.append(" ");
+              _builder_4.append(varName, "");
+              _builder_4.append("= (");
+              String _idName_4 = this.cce.idName(info.info, prev, false);
+              _builder_4.append(_idName_4, "");
+              _builder_4.append(arrAcc, "");
+              _builder_4.append(" >> ");
+              _builder_4.append(info.bitStart, "");
+              _builder_4.append(") & 1;");
+              _builder_4.newLineIfNotEmpty();
+            } else {
+              CharSequence _cType_5 = this.cType(info);
+              _builder_4.append(_cType_5, "");
+              _builder_4.append(" ");
+              _builder_4.append(varName, "");
+              _builder_4.append("= (");
+              String _idName_5 = this.cce.idName(info.info, prev, false);
+              _builder_4.append(_idName_5, "");
+              _builder_4.append(arrAcc, "");
+              _builder_4.append(" >> ");
+              _builder_4.append(info.bitEnd, "");
+              _builder_4.append(") & ");
+              CharSequence _asMaskL = this.cce.asMaskL(info.actualWidth);
+              _builder_4.append(_asMaskL, "");
+              _builder_4.append("l;");
+              _builder_4.newLineIfNotEmpty();
+            }
+          }
+        }
+        _xifexpression_1 = _builder_4;
       }
       _xblockexpression = (_xifexpression_1);
     }
@@ -1253,141 +1246,45 @@ public class CCompiler implements ITypeOuptutProvider {
       String fixedAccess = _xifexpression;
       String regSuffix = "";
       if (info.isShadowReg) {
-        String _plus = ("$reg" + fixedAccess);
-        fixedAccess = _plus;
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("$reg");
+        _builder_2.append(fixedAccess, "");
+        fixedAccess = _builder_2.toString();
         regSuffix = "$reg";
       }
       CharSequence _xifexpression_1 = null;
       if (info.fixedArray) {
-        StringConcatenation _builder_2 = new StringConcatenation();
+        StringConcatenation _builder_3 = new StringConcatenation();
         {
           boolean _equals = (info.actualWidth == info.info.width);
           if (_equals) {
             {
               if (info.isShadowReg) {
                 CharSequence _cType = this.cType(info.info);
-                _builder_2.append(_cType, "");
-                _builder_2.append(" current=");
-                String _idName = this.cce.idName(info.info, false, false);
-                _builder_2.append(_idName, "");
-                _builder_2.append(fixedAccess, "");
-                _builder_2.append(";");
-              }
-            }
-            _builder_2.newLineIfNotEmpty();
-            String _idName_1 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_1, "");
-            _builder_2.append(fixedAccess, "");
-            _builder_2.append("=");
-            _builder_2.append(value, "");
-            _builder_2.append(";");
-            _builder_2.newLineIfNotEmpty();
-          } else {
-            CharSequence _cType_1 = this.cType(info.info);
-            _builder_2.append(_cType_1, "");
-            _builder_2.append(" current=");
-            String _idName_2 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_2, "");
-            _builder_2.append(fixedAccess, "");
-            _builder_2.append(" & ");
-            _builder_2.append(writeMask, "");
-            _builder_2.append(";");
-            _builder_2.newLineIfNotEmpty();
-            _builder_2.append(value, "");
-            _builder_2.append("=((");
-            _builder_2.append(value, "");
-            _builder_2.append(" & ");
-            _builder_2.append(maskString, "");
-            _builder_2.append(") << ");
-            _builder_2.append(info.bitEnd, "");
-            _builder_2.append(");");
-            _builder_2.newLineIfNotEmpty();
-            String _idName_3 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_3, "");
-            _builder_2.append(fixedAccess, "");
-            _builder_2.append("=current|");
-            _builder_2.append(value, "");
-            _builder_2.append(";");
-            _builder_2.newLineIfNotEmpty();
-          }
-        }
-        {
-          if (info.isShadowReg) {
-            _builder_2.append("static regUpdate_t reg;");
-            _builder_2.newLine();
-            _builder_2.append("if (current!=");
-            _builder_2.append(value, "");
-            _builder_2.append("){");
-            _builder_2.newLineIfNotEmpty();
-            _builder_2.append("\t");
-            _builder_2.append("reg.internal=");
-            Integer _get = this.cce.varIdx.get(info.info.name);
-            _builder_2.append(_get, "	");
-            _builder_2.append(";");
-            _builder_2.newLineIfNotEmpty();
-            _builder_2.append("\t");
-            _builder_2.append("reg.offset=");
-            _builder_2.append(off, "	");
-            _builder_2.append(";");
-            _builder_2.newLineIfNotEmpty();
-            _builder_2.append("\t");
-            _builder_2.append("regUpdates[regUpdatePos++]=reg;");
-            _builder_2.newLine();
-            _builder_2.append("}");
-            _builder_2.newLine();
-          }
-        }
-        {
-          if (info.isPred) {
-            String _idName_4 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_4, "");
-            _builder_2.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
-          }
-        }
-        _builder_2.newLineIfNotEmpty();
-        _xifexpression_1 = _builder_2;
-      } else {
-        StringConcatenation _builder_3 = new StringConcatenation();
-        _builder_3.append("int offset=(int)");
-        _builder_3.append(varAccess, "");
-        _builder_3.append(";");
-        _builder_3.newLineIfNotEmpty();
-        _builder_3.append("offset&=");
-        long _dimMask = this.cce.dimMask(info);
-        CharSequence _hexStringL = this.cce.toHexStringL(_dimMask);
-        _builder_3.append(_hexStringL, "");
-        _builder_3.append("l;");
-        _builder_3.newLineIfNotEmpty();
-        {
-          boolean _equals_1 = (info.actualWidth == info.info.width);
-          if (_equals_1) {
-            {
-              if (info.isShadowReg) {
-                CharSequence _cType_2 = this.cType(info.info);
-                _builder_3.append(_cType_2, "");
+                _builder_3.append(_cType, "");
                 _builder_3.append(" current=");
-                String _idName_5 = this.cce.idName(info.info, false, false);
-                _builder_3.append(_idName_5, "");
-                _builder_3.append(regSuffix, "");
-                _builder_3.append("[offset];");
+                String _idName = this.cce.idName(info.info, false, false);
+                _builder_3.append(_idName, "");
+                _builder_3.append(fixedAccess, "");
+                _builder_3.append(";");
               }
             }
             _builder_3.newLineIfNotEmpty();
-            String _idName_6 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_6, "");
-            _builder_3.append(regSuffix, "");
-            _builder_3.append("[offset]=");
+            String _idName_1 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_1, "");
+            _builder_3.append(fixedAccess, "");
+            _builder_3.append("=");
             _builder_3.append(value, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            CharSequence _cType_3 = this.cType(info.info);
-            _builder_3.append(_cType_3, "");
+            CharSequence _cType_1 = this.cType(info.info);
+            _builder_3.append(_cType_1, "");
             _builder_3.append(" current=");
-            String _idName_7 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_7, "");
-            _builder_3.append(regSuffix, "");
-            _builder_3.append("[offset] & ");
+            String _idName_2 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_2, "");
+            _builder_3.append(fixedAccess, "");
+            _builder_3.append(" & ");
             _builder_3.append(writeMask, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
@@ -1398,14 +1295,14 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_3.append(maskString, "");
             _builder_3.append(") << ");
             _builder_3.append(info.bitEnd, "");
-            _builder_3.append(";");
-            _builder_3.newLineIfNotEmpty();
-            String _idName_8 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_8, "");
-            _builder_3.append(regSuffix, "");
-            _builder_3.append("[offset]=current|");
-            _builder_3.append(value, "");
             _builder_3.append(");");
+            _builder_3.newLineIfNotEmpty();
+            String _idName_3 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_3, "");
+            _builder_3.append(fixedAccess, "");
+            _builder_3.append("=current|");
+            _builder_3.append(value, "");
+            _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           }
         }
@@ -1419,13 +1316,15 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
             _builder_3.append("reg.internal=");
-            Integer _get_1 = this.cce.varIdx.get(info.info.name);
-            _builder_3.append(_get_1, "	");
+            Integer _get = this.cce.varIdx.get(info.info.name);
+            _builder_3.append(_get, "\t");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
-            _builder_3.append("reg.offset=offset;");
-            _builder_3.newLine();
+            _builder_3.append("reg.offset=");
+            _builder_3.append(off, "\t");
+            _builder_3.append(";");
+            _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
             _builder_3.append("regUpdates[regUpdatePos++]=reg;");
             _builder_3.newLine();
@@ -1435,13 +1334,109 @@ public class CCompiler implements ITypeOuptutProvider {
         }
         {
           if (info.isPred) {
-            String _idName_9 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_9, "");
+            String _idName_4 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_4, "");
             _builder_3.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
           }
         }
         _builder_3.newLineIfNotEmpty();
         _xifexpression_1 = _builder_3;
+      } else {
+        StringConcatenation _builder_4 = new StringConcatenation();
+        _builder_4.append("int offset=(int)");
+        _builder_4.append(varAccess, "");
+        _builder_4.append(";");
+        _builder_4.newLineIfNotEmpty();
+        _builder_4.append("offset&=");
+        long _dimMask = this.cce.dimMask(info);
+        CharSequence _hexStringL = this.cce.toHexStringL(_dimMask);
+        _builder_4.append(_hexStringL, "");
+        _builder_4.append("l;");
+        _builder_4.newLineIfNotEmpty();
+        {
+          boolean _equals_1 = (info.actualWidth == info.info.width);
+          if (_equals_1) {
+            {
+              if (info.isShadowReg) {
+                CharSequence _cType_2 = this.cType(info.info);
+                _builder_4.append(_cType_2, "");
+                _builder_4.append(" current=");
+                String _idName_5 = this.cce.idName(info.info, false, false);
+                _builder_4.append(_idName_5, "");
+                _builder_4.append(regSuffix, "");
+                _builder_4.append("[offset];");
+              }
+            }
+            _builder_4.newLineIfNotEmpty();
+            String _idName_6 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_6, "");
+            _builder_4.append(regSuffix, "");
+            _builder_4.append("[offset]=");
+            _builder_4.append(value, "");
+            _builder_4.append(";");
+            _builder_4.newLineIfNotEmpty();
+          } else {
+            CharSequence _cType_3 = this.cType(info.info);
+            _builder_4.append(_cType_3, "");
+            _builder_4.append(" current=");
+            String _idName_7 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_7, "");
+            _builder_4.append(regSuffix, "");
+            _builder_4.append("[offset] & ");
+            _builder_4.append(writeMask, "");
+            _builder_4.append(";");
+            _builder_4.newLineIfNotEmpty();
+            _builder_4.append(value, "");
+            _builder_4.append("=((");
+            _builder_4.append(value, "");
+            _builder_4.append(" & ");
+            _builder_4.append(maskString, "");
+            _builder_4.append(") << ");
+            _builder_4.append(info.bitEnd, "");
+            _builder_4.append(";");
+            _builder_4.newLineIfNotEmpty();
+            String _idName_8 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_8, "");
+            _builder_4.append(regSuffix, "");
+            _builder_4.append("[offset]=current|");
+            _builder_4.append(value, "");
+            _builder_4.append(");");
+            _builder_4.newLineIfNotEmpty();
+          }
+        }
+        {
+          if (info.isShadowReg) {
+            _builder_4.append("static regUpdate_t reg;");
+            _builder_4.newLine();
+            _builder_4.append("if (current!=");
+            _builder_4.append(value, "");
+            _builder_4.append("){");
+            _builder_4.newLineIfNotEmpty();
+            _builder_4.append("\t");
+            _builder_4.append("reg.internal=");
+            Integer _get_1 = this.cce.varIdx.get(info.info.name);
+            _builder_4.append(_get_1, "\t");
+            _builder_4.append(";");
+            _builder_4.newLineIfNotEmpty();
+            _builder_4.append("\t");
+            _builder_4.append("reg.offset=offset;");
+            _builder_4.newLine();
+            _builder_4.append("\t");
+            _builder_4.append("regUpdates[regUpdatePos++]=reg;");
+            _builder_4.newLine();
+            _builder_4.append("}");
+            _builder_4.newLine();
+          }
+        }
+        {
+          if (info.isPred) {
+            String _idName_9 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_9, "");
+            _builder_4.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
+          }
+        }
+        _builder_4.newLineIfNotEmpty();
+        _xifexpression_1 = _builder_4;
       }
       _xblockexpression = (_xifexpression_1);
     }
@@ -1459,7 +1454,7 @@ public class CCompiler implements ITypeOuptutProvider {
       final List<Integer> arr = _linkedList;
       StringBuilder _stringBuilder = new StringBuilder();
       final StringBuilder func = _stringBuilder;
-      for (final FastInstruction i : frame.instructions) {
+      for (final Frame.FastInstruction i : frame.instructions) {
         {
           int a = 0;
           int b = 0;
@@ -1500,7 +1495,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder.append("() {");
       _builder.newLineIfNotEmpty();
       _builder.append("\t");
-      _builder.append(func, "	");
+      _builder.append(func, "\t");
       _builder.newLineIfNotEmpty();
       {
         InternalInformation _asInternal = this.cce.asInternal(frame.outputId);
@@ -1509,7 +1504,7 @@ public class CCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           InternalInformation _asInternal_1 = this.cce.asInternal(frame.outputId);
           CharSequence _setter = this.setter(_asInternal_1, last);
-          _builder.append(_setter, "	");
+          _builder.append(_setter, "\t");
           _builder.newLineIfNotEmpty();
         } else {
           _builder.append("\t");
@@ -1517,7 +1512,7 @@ public class CCompiler implements ITypeOuptutProvider {
           _builder.newLine();
           _builder.append("\t");
           _builder.append("(void)");
-          _builder.append(last, "	");
+          _builder.append(last, "\t");
           _builder.append(";");
           _builder.newLineIfNotEmpty();
         }
@@ -1529,7 +1524,7 @@ public class CCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public StringBuilder toExpression(final FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
+  public StringBuilder toExpression(final Frame.FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
     StringBuilder _xblockexpression = null;
     {
       final Instruction _switchValue = inst.inst;
@@ -1596,7 +1591,7 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_3.append("\t");
             _builder_3.append("reg.internal=");
             Integer _get = this.cce.varIdx.get(info.name);
-            _builder_3.append(_get, "	");
+            _builder_3.append(_get, "\t");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
             _builder_3.append("\t");
@@ -1612,7 +1607,7 @@ public class CCompiler implements ITypeOuptutProvider {
               }
               if (_and) {
                 StringBuilder _arrayAccess_1 = this.cce.arrayAccess(internal.info, arr);
-                _builder_3.append(_arrayAccess_1, "	");
+                _builder_3.append(_arrayAccess_1, "\t");
               } else {
                 _builder_3.append("-1");
               }
@@ -2366,34 +2361,34 @@ public class CCompiler implements ITypeOuptutProvider {
     return "C";
   }
   
-  public MultiOption getUsage() {
+  public IOutputProvider.MultiOption getUsage() {
     Options _options = new Options();
     final Options options = _options;
-    MultiOption _multiOption = new MultiOption(null, null, options);
+    IOutputProvider.MultiOption _multiOption = new IOutputProvider.MultiOption(null, null, options);
     return _multiOption;
   }
   
-  public static List<CompileResult> doCompile(final ExecutableModel em, final Set<Problem> syntaxProblems) {
+  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final Set<Problem> syntaxProblems) {
     CCompiler _cCompiler = new CCompiler(em);
     final CCompiler comp = _cCompiler;
-    final List<SideFile> sideFiles = Lists.<SideFile>newLinkedList();
+    final List<IHDLGenerator.SideFile> sideFiles = Lists.<IHDLGenerator.SideFile>newLinkedList();
     final String simFile = comp.generateSimEncapsuation();
     boolean _tripleNotEquals = (simFile != null);
     if (_tripleNotEquals) {
       byte[] _bytes = simFile.getBytes(Charsets.UTF_8);
-      SideFile _sideFile = new SideFile("simEncapsulation.c", _bytes, true);
+      IHDLGenerator.SideFile _sideFile = new IHDLGenerator.SideFile("simEncapsulation.c", _bytes, true);
       sideFiles.add(_sideFile);
     }
     CharSequence _compile = comp.compile();
     String _string = _compile.toString();
     String _hookName = comp.getHookName();
-    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, 
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, 
       true);
-    return Lists.<CompileResult>newArrayList(_compileResult);
+    return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
   
-  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    List<CompileResult> _doCompile = CCompiler.doCompile(em, syntaxProblems);
+  public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    List<PSAbstractCompiler.CompileResult> _doCompile = CCompiler.doCompile(em, syntaxProblems);
     return _doCompile;
   }
   
@@ -2447,7 +2442,7 @@ public class CCompiler implements ITypeOuptutProvider {
         List<Definition> _allDefs = CCompiler.this.ba.allDefs(it);
         final Function1<Definition,Boolean> _function = new Function1<Definition,Boolean>() {
           public Boolean apply(final Definition it) {
-            boolean _tripleNotEquals = (it.type != Type.UNUSED);
+            boolean _tripleNotEquals = (it.type != Definition.Type.UNUSED);
             return Boolean.valueOf(_tripleNotEquals);
           }
         };
@@ -2505,22 +2500,26 @@ public class CCompiler implements ITypeOuptutProvider {
     {
       for(final String v : varNames) {
         _builder.append("#define ");
-        String _defineName = this.getDefineName(v);
+        CharSequence _defineName = this.getDefineName(v);
         _builder.append(_defineName, "");
         _builder.append(" ");
-        String _plus = (this.cce.em.moduleName + ".");
-        String _plus_1 = (_plus + v);
-        Integer _get = this.cce.varIdx.get(_plus_1);
+        StringConcatenation _builder_1 = new StringConcatenation();
+        _builder_1.append(this.cce.em.moduleName, "");
+        _builder_1.append(".");
+        _builder_1.append(v, "");
+        Integer _get = this.cce.varIdx.get(_builder_1);
         _builder.append(_get, "");
         _builder.newLineIfNotEmpty();
       }
     }
     _builder.append("#define ");
-    String _defineName_1 = this.getDefineName("Bus2IP_Clk");
+    CharSequence _defineName_1 = this.getDefineName("Bus2IP_Clk");
     _builder.append(_defineName_1, "");
     _builder.append(" ");
-    String _plus_2 = (this.cce.em.moduleName + ".Bus2IP_Clk");
-    Integer _get_1 = this.cce.varIdx.get(_plus_2);
+    StringConcatenation _builder_2 = new StringConcatenation();
+    _builder_2.append(this.cce.em.moduleName, "");
+    _builder_2.append(".Bus2IP_Clk");
+    Integer _get_1 = this.cce.varIdx.get(_builder_2);
     _builder.append(_get_1, "");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
@@ -2534,23 +2533,25 @@ public class CCompiler implements ITypeOuptutProvider {
         boolean _hasWriteDefs = this.ba.hasWriteDefs(row);
         if (_hasWriteDefs) {
           CharSequence _simSetter = this.simSetter(row);
-          String _plus_3 = (res + _simSetter);
-          res = _plus_3;
+          String _plus = (res + _simSetter);
+          res = _plus;
         }
         CharSequence _simGetter = this.simGetter(row);
-        String _plus_4 = (res + _simGetter);
-        res = _plus_4;
+        String _plus_1 = (res + _simGetter);
+        res = _plus_1;
         checkedRows.add(row.name);
       }
     }
     return res;
   }
   
-  public String getDefineName(final String v) {
-    String _plus = (this.cce.em.moduleName + ".");
-    String _plus_1 = (_plus + v);
-    String _idName = this.cce.idName(_plus_1, false, false);
-    return _idName;
+  public CharSequence getDefineName(final String v) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(this.cce.em.moduleName, "");
+    _builder.append(".");
+    String _idName = this.cce.idName(v, false, false);
+    _builder.append(_idName, "");
+    return _builder;
   }
   
   public CharSequence simGetter(final Row row) {
@@ -2576,10 +2577,10 @@ public class CCompiler implements ITypeOuptutProvider {
         _builder.append("\t");
         _builder.append("*");
         String _varName = this.ba.getVarName(row, d);
-        _builder.append(_varName, "	");
+        _builder.append(_varName, "\t");
         _builder.append("=pshdl_sim_getOutput(");
-        String _defineName = this.getDefineName(d.name);
-        _builder.append(_defineName, "	");
+        CharSequence _defineName = this.getDefineName(d.name);
+        _builder.append(_defineName, "\t");
         _builder.append(", index);");
         _builder.newLineIfNotEmpty();
       }
@@ -2600,14 +2601,14 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.append("\t");
     _builder.append("return get");
     String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
-    _builder.append(_firstUpper_2, "	");
+    _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
       List<Definition> _allDefs_2 = this.ba.allDefs(row);
       for(final Definition d_1 : _allDefs_2) {
         _builder.append(", &result->");
         String _varNameIndex = this.ba.getVarNameIndex(row, d_1);
-        _builder.append(_varNameIndex, "	");
+        _builder.append(_varNameIndex, "\t");
       }
     }
     _builder.append(");");
@@ -2639,7 +2640,7 @@ public class CCompiler implements ITypeOuptutProvider {
       for(final Definition ne : _writeDefs_1) {
         _builder.append("\t");
         CharSequence _generateConditions = this.ba.generateConditions(row, ne);
-        _builder.append(_generateConditions, "	");
+        _builder.append(_generateConditions, "\t");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -2648,10 +2649,10 @@ public class CCompiler implements ITypeOuptutProvider {
       for(final Definition d : _writeDefs_2) {
         _builder.append("\t");
         _builder.append("pshdl_sim_setInput(");
-        String _defineName = this.getDefineName(d.name);
-        _builder.append(_defineName, "	");
+        CharSequence _defineName = this.getDefineName(d.name);
+        _builder.append(_defineName, "\t");
         _builder.append(", ");
-        _builder.append(d.name, "	");
+        _builder.append(d.name, "\t");
         _builder.append(", index);");
         _builder.newLineIfNotEmpty();
       }
@@ -2661,8 +2662,8 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("\t\t");
     _builder.append("pshdl_sim_setInput(");
-    String _defineName_1 = this.getDefineName("Bus2IP_Clk");
-    _builder.append(_defineName_1, "		");
+    CharSequence _defineName_1 = this.getDefineName("Bus2IP_Clk");
+    _builder.append(_defineName_1, "\t\t");
     _builder.append(", 0, 0);");
     _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
@@ -2673,8 +2674,8 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("\t");
     _builder.append("pshdl_sim_setInput(");
-    String _defineName_2 = this.getDefineName("Bus2IP_Clk");
-    _builder.append(_defineName_2, "	");
+    CharSequence _defineName_2 = this.getDefineName("Bus2IP_Clk");
+    _builder.append(_defineName_2, "\t");
     _builder.append(", 1, 0);");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -2682,7 +2683,7 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("\t");
     _builder.append("//warn(invalidIndex, index, \"\", \"");
-    _builder.append(row.name, "	");
+    _builder.append(row.name, "\t");
     _builder.append("\", \"\");");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -2701,14 +2702,14 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.append("\t");
     _builder.append("return set");
     String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
-    _builder.append(_firstUpper_2, "	");
+    _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
       List<Definition> _writeDefs_3 = this.ba.writeDefs(row);
       for(final Definition d_1 : _writeDefs_3) {
         _builder.append(", newVal->");
         String _varNameIndex = this.ba.getVarNameIndex(row, d_1);
-        _builder.append(_varNameIndex, "	");
+        _builder.append(_varNameIndex, "\t");
       }
     }
     _builder.append(");");

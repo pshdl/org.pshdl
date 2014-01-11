@@ -69,15 +69,11 @@ class CCompiler implements ITypeOuptutProvider {
 	private final int bitWidth;
 
 	new() {
-		bitWidth = -1
+		bitWidth = 64
 	}
 
 	new(ExecutableModel em) {
-		if (em.maxDataWidth <= 32) {
-			bitWidth = 32;
-		} else {
-			bitWidth = 64;
-		}
+		bitWidth = 64;
 		this.cce = new CommonCompilerExtension(em, bitWidth)
 	}
 
@@ -361,8 +357,7 @@ class CCompiler implements ITypeOuptutProvider {
 	def copyPrev(VariableInformation info) {
 		if (info.dimensions.length == 0)
 			return '''«info.idName(true, false)»=«info.idName(false, false)»;'''
-		return '''System.arraycopy(«info.idName(false, false)»,0,«info.idName(true, false)», 0, «info.idName(false,
-			false)».length);'''
+		return '''memcpy(«info.idName(true, false)»,«info.idName(false, false)», «info.totalSize»);'''
 	}
 
 	def getter(InternalInformation info, boolean prev, int pos, int frameID) {
@@ -373,11 +368,11 @@ class CCompiler implements ITypeOuptutProvider {
 		val arrAcc = if (info.info.dimensions.length == 0)
 				''
 			else '''[«info.info.arrayAccess(null)» & «info.dimMask.toHexStringL»l]'''
-		var varName = 't' + pos
+		var String varName = 't' + pos
 		if (info.isPred)
 			varName = 'p' + pos
 		if (prev)
-			varName = varName + "_prev"
+			varName = '''«varName»_prev'''
 		if (info.fixedArray) '''
 			«IF info.actualWidth == info.info.width»
 				«info.cType» «varName»=«info.info.idName(prev, false)»«sb»;
@@ -406,7 +401,7 @@ class CCompiler implements ITypeOuptutProvider {
 		var fixedAccess = if (info.arrayIdx.length > 0) '''[«off»]''' else ''''''
 		var regSuffix = ''
 		if (info.isShadowReg) {
-			fixedAccess = "$reg" + fixedAccess
+			fixedAccess = '''$reg«fixedAccess»'''
 			regSuffix = "$reg"
 		}
 		if (info.fixedArray) '''
@@ -756,9 +751,9 @@ extern void pshdl_sim_run();
 extern bool disableEdges;
 
 «FOR v : varNames»
-#define «v.defineName» «varIdx.get(em.moduleName + "." + v)»
+#define «v.defineName» «varIdx.get('''«em.moduleName».«v»''')»
 «ENDFOR»
-#define «"Bus2IP_Clk".defineName» «varIdx.get(em.moduleName + ".Bus2IP_Clk")»
+#define «"Bus2IP_Clk".defineName» «varIdx.get('''«em.moduleName».Bus2IP_Clk''')»
 
 '''
 		val checkedRows = new HashSet<String>()
@@ -773,9 +768,7 @@ extern bool disableEdges;
 		return res
 	}
 
-	def getDefineName(String v) {
-		(em.moduleName + "." + v).idName(false, false)
-	}
+	def getDefineName(String v) '''«em.moduleName».«v.idName(false, false)»'''
 
 	def simGetter(Row row) '''
 //Getter
