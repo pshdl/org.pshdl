@@ -615,8 +615,6 @@ class ParserToModelExtension {
 					res = res.setFuncReturnSpec(x.psFuncParamType.toHDL as HDLFunctionParameter)
 			}
 		}
-		if (context.psWidth !== null)
-			res = res.setContainer(context.psWidth.toHDL as HDLExpression)
 		return res
 	}
 

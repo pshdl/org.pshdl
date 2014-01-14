@@ -143,34 +143,59 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	public <T extends IHDLObject> T substitute(Iterable<HDLFunctionParameter> paraneter, Iterable<HDLExpression> arguments, T stmnt, IHDLObject origin) {
 		final ModificationSet msExp = new ModificationSet();
 		@SuppressWarnings("unchecked")
-		final T orig = (T) stmnt.copyFiltered(CopyFilter.DEEP_META);
+		final T orig = (T) stmnt.copyDeepFrozen(origin.getContainer());
 		final Iterator<HDLExpression> argIter = arguments.iterator();
 		for (final HDLFunctionParameter param : args) {
 			if (!argIter.hasNext()) {
 				continue;
 			}
 			final HDLExpression arg = argIter.next();
-			final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName().getName())
-					.getAll();
-			for (final HDLVariableRef argRef : allArgRefs) {
-				final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
-				if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
-					if (exp instanceof HDLVariableRef) {
-						final HDLVariableRef ref = (HDLVariableRef) exp;
-						HDLVariableRef nref = ref;
-						for (final HDLRange bit : argRef.getBits()) {
-							nref = nref.addBits(substitute(args, arguments, bit, origin));
+			switch (param.getType()) {
+			case ANY_BIT:
+			case ANY_INT:
+			case ANY_UINT:
+			case BOOL_TYPE:
+			case REG_BIT:
+			case REG_INT:
+			case REG_UINT:
+			case STRING_TYPE:
+				final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef())
+						.getAll();
+				for (final HDLVariableRef argRef : allArgRefs) {
+					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
+					if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
+						if (exp instanceof HDLVariableRef) {
+							final HDLVariableRef ref = (HDLVariableRef) exp;
+							HDLVariableRef nref = ref;
+							for (final HDLRange bit : argRef.getBits()) {
+								nref = nref.addBits(substitute(args, arguments, bit, origin));
+							}
+							for (final HDLExpression aExp : argRef.getArray()) {
+								nref = nref.addArray(substitute(args, arguments, aExp, origin));
+							}
+							msExp.replace(argRef, nref);
+						} else {
+							msExp.replace(argRef, exp);
 						}
-						for (final HDLExpression aExp : argRef.getArray()) {
-							nref = nref.addArray(substitute(args, arguments, aExp, origin));
-						}
-						msExp.replace(argRef, nref);
 					} else {
 						msExp.replace(argRef, exp);
 					}
-				} else {
-					msExp.replace(argRef, exp);
 				}
+				break;
+			case ENUM:
+			case ANY_ENUM:
+				break;
+			case IF:
+			case ANY_IF:
+				final Collection<HDLInterfaceRef> allIfRefs = HDLQuery.select(HDLInterfaceRef.class).from(orig).where(HDLInterfaceRef.fHIf).isEqualTo(param.getName().asRef())
+						.getAll();
+				for (final HDLInterfaceRef argRef : allIfRefs) {
+					final HDLQualifiedName fqn = FullNameExtension.fullNameOf(arg);
+					msExp.replace(argRef, argRef.setHIf(fqn));
+				}
+				break;
+			case FUNCTION:
+				break;
 			}
 		}
 		final T newExp = msExp.apply(orig);

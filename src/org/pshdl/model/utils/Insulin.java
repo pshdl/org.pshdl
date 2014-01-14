@@ -37,6 +37,7 @@ import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLFunctionParameter.Type;
 import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
@@ -335,7 +336,10 @@ public class Insulin {
 			}
 			cFrag = cFrag.getSub();
 		}
-		final IHDLObject container = uFrag.getContainer();
+		IHDLObject container = uFrag.getContainer();
+		while (container instanceof HDLArrayInit) {
+			container = container.getContainer();
+		}
 		if (container instanceof HDLSwitchCaseStatement) {
 			final HDLSwitchCaseStatement caseStatement = (HDLSwitchCaseStatement) container;
 			final IHDLObject caseContainer = caseStatement.getContainer();
@@ -401,11 +405,31 @@ public class Insulin {
 				final HDLVariable variable = variableRaw.get();
 				if (sub == null)
 					return Optional.of(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()));
+				final HDLFunctionParameter funcPar = variable.getContainer(HDLFunctionParameter.class);
+				if (funcPar != null) {
+					if (funcPar.getType() == Type.IF) {
+						final Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(funcPar, funcPar.getIfSpecRefName());
+						if (resolveInterface.isPresent()) {
+							final HDLQualifiedName typeName = fullNameOf(resolveInterface.get());
+							final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag())).setArray(sub.getArray())
+									.setBits(sub.getBits());
+							return Optional.of(hir);
+						}
+					}
+					if (funcPar.getType() == Type.ENUM) {
+						final Optional<HDLEnum> resolveEnum = ScopingExtension.INST.resolveEnum(funcPar, funcPar.getEnumSpecRefName());
+						if (resolveEnum.isPresent()) {
+							final HDLQualifiedName typeName = fullNameOf(resolveEnum.get());
+							final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
+							return Optional.of(enumRef);
+						}
+					}
+				}
 				final Optional<? extends HDLType> type = TypeExtension.typeOf(variable);
 				if ((type.isPresent()) && (type.get().getClassType() == HDLClass.HDLInterface)) {
 					final HDLQualifiedName typeName = fullNameOf(type.get());
-					final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
-							.setArray(sub.getArray()).setBits(sub.getBits());
+					final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag())).setArray(sub.getArray())
+							.setBits(sub.getBits());
 					return Optional.of(hir);
 				}
 				return Optional.of(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()));

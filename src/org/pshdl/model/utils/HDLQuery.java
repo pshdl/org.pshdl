@@ -305,9 +305,16 @@ public class HDLQuery {
 		final Collection<HDLInterfaceRef> refs = HDLQuery.select(HDLInterfaceRef.class).from(obj).where(HDLInterfaceRef.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll();
 		for (final Iterator<HDLInterfaceRef> iterator = refs.iterator(); iterator.hasNext();) {
 			final HDLInterfaceRef hir = iterator.next();
-			final HDLQualifiedName fullNameOf = FullNameExtension.fullNameOf(hir.resolveHIf().get());
-			if (!asRef.equals(fullNameOf)) {
-				iterator.remove();
+			final Optional<HDLVariable> resolveHIf = hir.resolveHIf();
+			if (resolveHIf.isPresent()) {
+				final HDLQualifiedName fullNameOf = FullNameExtension.fullNameOf(resolveHIf.get());
+				if (!asRef.equals(fullNameOf)) {
+					iterator.remove();
+				}
+			} else {
+				if (!asRef.equals(hir.getHIfRefName())) {
+					iterator.remove();
+				}
 			}
 		}
 		return refs;

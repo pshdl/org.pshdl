@@ -258,7 +258,7 @@ psTypeDeclaration :
 ;
 
 psEnumDeclaration :
-	'enum' psEnum '=' '{' psVariable ( ',' psVariable )* '}'
+	'enum' psEnum hasAss='='? '{' psVariable ( ',' psVariable )* '}'
 ;
 
 psEnum :

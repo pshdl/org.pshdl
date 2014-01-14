@@ -1267,14 +1267,6 @@ public class ParserToModelExtension {
         }
       }
     }
-    PSHDLLangParser.PsWidthContext _psWidth = context.psWidth();
-    boolean _tripleNotEquals_14 = (_psWidth != null);
-    if (_tripleNotEquals_14) {
-      PSHDLLangParser.PsWidthContext _psWidth_1 = context.psWidth();
-      IHDLObject _hDL_1 = this.toHDL(_psWidth_1);
-      HDLFunctionParameter _setContainer = res.setContainer(((HDLExpression) _hDL_1));
-      res = _setContainer;
-    }
     return res;
   }
   
