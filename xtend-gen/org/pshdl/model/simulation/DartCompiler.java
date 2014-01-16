@@ -45,14 +45,17 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
+import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
+import org.pshdl.interpreter.VariableInformation.Direction;
+import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
-import org.pshdl.model.utils.PSAbstractCompiler;
-import org.pshdl.model.utils.services.IHDLGenerator;
-import org.pshdl.model.utils.services.IOutputProvider;
+import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
@@ -66,7 +69,8 @@ public class DartCompiler implements ITypeOuptutProvider {
   }
   
   public DartCompiler(final ExecutableModel em) {
-    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, (-1));
+    int _minus = (-1);
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, _minus);
     this.cce = _commonCompilerExtension;
     int _size = this.cce.prevMap.size();
     int _highestOneBit = Integer.highestOneBit(_size);
@@ -74,15 +78,15 @@ public class DartCompiler implements ITypeOuptutProvider {
     this.epsWidth = _plus;
   }
   
-  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final String unitName, final Set<Problem> syntaxProblems) {
+  public static List<CompileResult> doCompile(final ExecutableModel em, final String unitName, final Set<Problem> syntaxProblems) {
     DartCompiler _dartCompiler = new DartCompiler(em);
     final DartCompiler comp = _dartCompiler;
     CharSequence _compile = comp.compile(unitName);
     String _string = _compile.toString();
-    List<IHDLGenerator.SideFile> _emptyList = Collections.<IHDLGenerator.SideFile>emptyList();
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
     String _hookName = comp.getHookName();
-    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, em.moduleName, _emptyList, em.source, _hookName, true);
-    return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, _string, em.moduleName, _emptyList, em.source, _hookName, true);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
   
   public CharSequence compile(final String unitName) {
@@ -90,7 +94,8 @@ public class DartCompiler implements ITypeOuptutProvider {
     {
       HashSet<Integer> _hashSet = new HashSet<Integer>();
       final Set<Integer> handled = _hashSet;
-      handled.add(Integer.valueOf((-1)));
+      int _minus = (-1);
+      handled.add(Integer.valueOf(_minus));
       StringConcatenation _builder = new StringConcatenation();
       CharSequence _imports = this.getImports();
       _builder.append(_imports, "");
@@ -215,7 +220,7 @@ public class DartCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           Boolean _get = this.cce.prevMap.get(v.name);
           CharSequence _decl = this.decl(v, _get);
-          _builder.append(_decl, "\t");
+          _builder.append(_decl, "	");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -227,10 +232,10 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder.newLine();
       _builder.append("\t");
       _builder.append("int get updateStamp=>(_deltaCycle << ");
-      _builder.append(this.epsWidth, "\t");
+      _builder.append(this.epsWidth, "	");
       _builder.append(") | (_epsCycle & ");
       CharSequence _asMask = this.cce.asMask(this.epsWidth);
-      _builder.append(_asMask, "\t");
+      _builder.append(_asMask, "	");
       _builder.append(");");
       _builder.newLineIfNotEmpty();
       _builder.append("\t");
@@ -242,15 +247,15 @@ public class DartCompiler implements ITypeOuptutProvider {
           if (!_hasElements) {
             _hasElements = true;
           } else {
-            _builder.appendImmediate(",", "\t\t");
+            _builder.appendImmediate(",", "		");
           }
           _builder.append("\t\t");
           _builder.append("\"");
           String _replaceAll = v_1.name.replaceAll("[\\$]", "\\\\\\$");
-          _builder.append(_replaceAll, "\t\t");
+          _builder.append(_replaceAll, "		");
           _builder.append("\": ");
           Integer _get_1 = this.cce.varIdx.get(v_1.name);
-          _builder.append(_get_1, "\t\t");
+          _builder.append(_get_1, "		");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -265,7 +270,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder.append("\t");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append(unitName, "\t");
+      _builder.append(unitName, "	");
       _builder.append("(");
       {
         if (this.cce.hasClock) {
@@ -282,16 +287,16 @@ public class DartCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           _builder.append("set ");
           String _idName = this.cce.idName(v_2, false, false);
-          _builder.append(_idName, "\t");
+          _builder.append(_idName, "	");
           _builder.append("(");
           String _dartType = this.dartType(v_2, true);
-          _builder.append(_dartType, "\t");
+          _builder.append(_dartType, "	");
           _builder.append(" value) =>");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t");
           String _idName_1 = this.cce.idName(v_2, false, true);
-          _builder.append(_idName_1, "\t\t");
+          _builder.append(_idName_1, "		");
           _builder.append("=value ");
           {
             boolean _and = false;
@@ -307,7 +312,7 @@ public class DartCompiler implements ITypeOuptutProvider {
             if (_and) {
               _builder.append("& ");
               CharSequence _asMask_1 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_1, "\t\t");
+              _builder.append(_asMask_1, "		");
             }
           }
           _builder.append(";");
@@ -316,16 +321,16 @@ public class DartCompiler implements ITypeOuptutProvider {
           _builder.newLine();
           _builder.append("\t");
           String _dartType_1 = this.dartType(v_2, true);
-          _builder.append(_dartType_1, "\t");
+          _builder.append(_dartType_1, "	");
           _builder.append(" get ");
           String _idName_2 = this.cce.idName(v_2, false, false);
-          _builder.append(_idName_2, "\t");
+          _builder.append(_idName_2, "	");
           _builder.append(" =>");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t");
           String _idName_3 = this.cce.idName(v_2, false, true);
-          _builder.append(_idName_3, "\t\t");
+          _builder.append(_idName_3, "		");
           _builder.append(" ");
           {
             boolean _and_1 = false;
@@ -341,7 +346,7 @@ public class DartCompiler implements ITypeOuptutProvider {
             if (_and_1) {
               _builder.append("& ");
               CharSequence _asMask_2 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_2, "\t\t");
+              _builder.append(_asMask_2, "		");
             }
           }
           _builder.append(";");
@@ -354,17 +359,17 @@ public class DartCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("void set");
               String _idName_4 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_4, "\t");
+              _builder.append(_idName_4, "	");
               _builder.append("(");
               String _dartType_2 = this.dartType(v_2, false);
-              _builder.append(_dartType_2, "\t");
+              _builder.append(_dartType_2, "	");
               _builder.append(" value");
               {
                 int _size = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
                 ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _size, true);
                 for(final Integer i : _doubleDotLessThan) {
                   _builder.append(", int a");
-                  _builder.append(i, "\t");
+                  _builder.append(i, "	");
                 }
               }
               _builder.append(") {");
@@ -372,12 +377,12 @@ public class DartCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("\t");
               String _idName_5 = this.cce.idName(v_2, false, true);
-              _builder.append(_idName_5, "\t\t");
+              _builder.append(_idName_5, "		");
               String _arrayAccessBracket = this.cce.arrayAccessBracket(v_2, null);
-              _builder.append(_arrayAccessBracket, "\t\t");
+              _builder.append(_arrayAccessBracket, "		");
               _builder.append("=value & ");
               CharSequence _asMask_3 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_3, "\t\t");
+              _builder.append(_asMask_3, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -387,10 +392,10 @@ public class DartCompiler implements ITypeOuptutProvider {
               _builder.newLine();
               _builder.append("\t");
               String _dartType_3 = this.dartType(v_2, false);
-              _builder.append(_dartType_3, "\t");
+              _builder.append(_dartType_3, "	");
               _builder.append(" get");
               String _idName_6 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_6, "\t");
+              _builder.append(_idName_6, "	");
               _builder.append("(");
               {
                 int _size_1 = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
@@ -400,10 +405,10 @@ public class DartCompiler implements ITypeOuptutProvider {
                   if (!_hasElements_1) {
                     _hasElements_1 = true;
                   } else {
-                    _builder.appendImmediate(",", "\t");
+                    _builder.appendImmediate(",", "	");
                   }
                   _builder.append("int a");
-                  _builder.append(i_1, "\t");
+                  _builder.append(i_1, "	");
                 }
               }
               _builder.append(") {");
@@ -412,12 +417,12 @@ public class DartCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("return ");
               String _idName_7 = this.cce.idName(v_2, false, true);
-              _builder.append(_idName_7, "\t\t");
+              _builder.append(_idName_7, "		");
               String _arrayAccessBracket_1 = this.cce.arrayAccessBracket(v_2, null);
-              _builder.append(_arrayAccessBracket_1, "\t\t");
+              _builder.append(_arrayAccessBracket_1, "		");
               _builder.append(" & ");
               CharSequence _asMask_4 = this.cce.asMask(v_2.width);
-              _builder.append(_asMask_4, "\t\t");
+              _builder.append(_asMask_4, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -433,7 +438,7 @@ public class DartCompiler implements ITypeOuptutProvider {
         for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
           String _method = this.method(f);
-          _builder.append(_method, "\t");
+          _builder.append(_method, "	");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -445,7 +450,7 @@ public class DartCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           _builder.append("\t");
           _builder.append("int dc = local >> ");
-          _builder.append(this.epsWidth, "\t\t");
+          _builder.append(this.epsWidth, "		");
           _builder.append(";");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
@@ -472,7 +477,7 @@ public class DartCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           _builder.append("if ((dc == _deltaCycle) && ((local & ");
           CharSequence _asMask_5 = this.cce.asMask(this.epsWidth);
-          _builder.append(_asMask_5, "\t\t");
+          _builder.append(_asMask_5, "		");
           _builder.append(") == _epsCycle))");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
@@ -517,40 +522,50 @@ public class DartCompiler implements ITypeOuptutProvider {
           {
             boolean _and_2 = false;
             boolean _and_3 = false;
-            if (!((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1)))) {
+            boolean _and_4 = false;
+            int _minus_1 = (-1);
+            boolean _equals = (f_1.edgeNegDepRes == _minus_1);
+            if (!_equals) {
+              _and_4 = false;
+            } else {
+              int _minus_2 = (-1);
+              boolean _equals_1 = (f_1.edgePosDepRes == _minus_2);
+              _and_4 = (_equals && _equals_1);
+            }
+            if (!_and_4) {
               _and_3 = false;
             } else {
               int _length = f_1.predNegDepRes.length;
-              boolean _equals = (_length == 0);
-              _and_3 = (((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1))) && _equals);
+              boolean _equals_2 = (_length == 0);
+              _and_3 = (_and_4 && _equals_2);
             }
             if (!_and_3) {
               _and_2 = false;
             } else {
               int _length_1 = f_1.predPosDepRes.length;
-              boolean _equals_1 = (_length_1 == 0);
-              _and_2 = (_and_3 && _equals_1);
+              boolean _equals_3 = (_length_1 == 0);
+              _and_2 = (_and_3 && _equals_3);
             }
             if (_and_2) {
               _builder.append("\t\t");
               _builder.append("_frame");
-              _builder.append(f_1.uniqueID, "\t\t");
+              _builder.append(f_1.uniqueID, "		");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
             } else {
               _builder.append("\t\t");
               CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handled);
-              _builder.append(_createNegEdge, "\t\t");
+              _builder.append(_createNegEdge, "		");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
-              _builder.append(_createPosEdge, "\t\t");
+              _builder.append(_createPosEdge, "		");
               _builder.newLineIfNotEmpty();
               {
                 for(final int p : f_1.predNegDepRes) {
                   _builder.append("\t\t");
                   CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
-                  _builder.append(_createBooleanPred, "\t\t");
+                  _builder.append(_createBooleanPred, "		");
                   _builder.newLineIfNotEmpty();
                 }
               }
@@ -558,20 +573,20 @@ public class DartCompiler implements ITypeOuptutProvider {
                 for(final int p_1 : f_1.predPosDepRes) {
                   _builder.append("\t\t");
                   CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
-                  _builder.append(_createBooleanPred_1, "\t\t");
+                  _builder.append(_createBooleanPred_1, "		");
                   _builder.newLineIfNotEmpty();
                 }
               }
               _builder.append("\t\t");
               _builder.append("if (");
               String _predicates = this.predicates(f_1);
-              _builder.append(_predicates, "\t\t");
+              _builder.append(_predicates, "		");
               _builder.append(")");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               _builder.append("\t");
               _builder.append("_frame");
-              _builder.append(f_1.uniqueID, "\t\t\t");
+              _builder.append(f_1.uniqueID, "			");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
             }
@@ -604,7 +619,7 @@ public class DartCompiler implements ITypeOuptutProvider {
         for(final VariableInformation v_3 : _filter) {
           _builder.append("\t\t");
           String _copyPrev = this.copyPrev(v_3);
-          _builder.append(_copyPrev, "\t\t");
+          _builder.append(_copyPrev, "		");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -615,7 +630,7 @@ public class DartCompiler implements ITypeOuptutProvider {
         if (this.cce.hasClock) {
           _builder.append("\t");
           CharSequence _copyRegs = this.copyRegs();
-          _builder.append(_copyRegs, "\t");
+          _builder.append(_copyRegs, "	");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -688,7 +703,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder.newLine();
       _builder.append("\t");
       CharSequence _hdlInterpreter = this.hdlInterpreter();
-      _builder.append(_hdlInterpreter, "\t");
+      _builder.append(_hdlInterpreter, "	");
       _builder.newLineIfNotEmpty();
       _builder.append("}");
       _builder.newLine();
@@ -701,7 +716,9 @@ public class DartCompiler implements ITypeOuptutProvider {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
-    if ((f.edgeNegDepRes != (-1))) {
+    int _minus = (-1);
+    boolean _notEquals = (f.edgeNegDepRes != _minus);
+    if (_notEquals) {
       StringConcatenation _builder = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
       String _idName = this.cce.idName(_asInternal, false, true);
@@ -714,8 +731,11 @@ public class DartCompiler implements ITypeOuptutProvider {
       sb.append(_builder);
       first = false;
     }
-    if ((f.edgePosDepRes != (-1))) {
-      if ((!first)) {
+    int _minus_1 = (-1);
+    boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
+    if (_notEquals_1) {
+      boolean _not = (!first);
+      if (_not) {
         sb.append(" && ");
       }
       StringConcatenation _builder_1 = new StringConcatenation();
@@ -733,7 +753,8 @@ public class DartCompiler implements ITypeOuptutProvider {
     }
     for (final int p : f.predNegDepRes) {
       {
-        if ((!first)) {
+        boolean _not_1 = (!first);
+        if (_not_1) {
           sb.append(" && ");
         }
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -748,7 +769,8 @@ public class DartCompiler implements ITypeOuptutProvider {
     }
     for (final int p_1 : f.predPosDepRes) {
       {
-        if ((!first)) {
+        boolean _not_1 = (!first);
+        if (_not_1) {
           sb.append(" && ");
         }
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -775,7 +797,8 @@ public class DartCompiler implements ITypeOuptutProvider {
       handled.add(Integer.valueOf(id));
       StringConcatenation _builder_1 = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(id);
-      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
+      int _minus = (-1);
+      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("bool p");
@@ -803,7 +826,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("p");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("_fresh=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -838,24 +861,26 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal = this.cce.asInternal(id);
-      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
-      _builder_1.append(_ter, "\t");
+      int _minus = (-1);
+      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
-      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, (-1));
-      _builder_1.append(_ter_1, "\t");
+      int _minus_1 = (-1);
+      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
+      _builder_1.append(_ter_1, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("if ((t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("_prev!=0) || (t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("!=1)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
       String _idName_2 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_2, "\t\t");
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isRising=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -865,14 +890,15 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
-      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, (-1));
-      _builder_1.append(_ter_2, "\t");
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_3 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_3, "\t");
+      _builder_1.append(_idName_3, "	");
       _builder_1.append("_isRising=t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("==1;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -884,7 +910,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_5 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_5, "\t");
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -919,24 +945,26 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal = this.cce.asInternal(id);
-      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
-      _builder_1.append(_ter, "\t");
+      int _minus = (-1);
+      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
-      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, (-1));
-      _builder_1.append(_ter_1, "\t");
+      int _minus_1 = (-1);
+      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
+      _builder_1.append(_ter_1, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("if ((t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("_prev!=1) || (t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("!=0)) {");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t\t");
       String _idName_2 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_2, "\t\t");
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isFalling=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -946,14 +974,15 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
-      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, (-1));
-      _builder_1.append(_ter_2, "\t");
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_3 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_3, "\t");
+      _builder_1.append(_idName_3, "	");
       _builder_1.append("_isFalling=t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("==0;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -965,7 +994,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_5 = this.cce.idName(internal, false, true);
-      _builder_1.append(_idName_5, "\t");
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -992,13 +1021,13 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "\t\t");
+            _builder.append(_get, "		");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
             _builder.append("\t");
             String _idName = this.cce.idName(v, false, false);
-            _builder.append(_idName, "\t\t\t");
+            _builder.append(_idName, "			");
             _builder.append("=value");
             {
               boolean _isPredicate = this.cce.isPredicate(v);
@@ -1016,7 +1045,7 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_1 = this.cce.varIdx.get(v.name);
-            _builder.append(_get_1, "\t\t");
+            _builder.append(_get_1, "		");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -1057,10 +1086,10 @@ public class DartCompiler implements ITypeOuptutProvider {
         _builder.append("\t\t");
         _builder.append("case ");
         Integer _get_2 = this.cce.varIdx.get(v_1.name);
-        _builder.append(_get_2, "\t\t");
+        _builder.append(_get_2, "		");
         _builder.append(": return \"");
         String _replaceAll = v_1.name.replaceAll("[\\$]", "\\\\\\$");
-        _builder.append(_replaceAll, "\t\t");
+        _builder.append(_replaceAll, "		");
         _builder.append("\";");
         _builder.newLineIfNotEmpty();
       }
@@ -1090,10 +1119,10 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_3 = this.cce.varIdx.get(v_2.name);
-            _builder.append(_get_3, "\t\t");
+            _builder.append(_get_3, "		");
             _builder.append(": return ");
             String _idName_1 = this.cce.idName(v_2, false, false);
-            _builder.append(_idName_1, "\t\t");
+            _builder.append(_idName_1, "		");
             _builder.append("?1:0;");
             _builder.newLineIfNotEmpty();
           } else {
@@ -1102,17 +1131,17 @@ public class DartCompiler implements ITypeOuptutProvider {
               _builder.append("\t\t");
               _builder.append("case ");
               Integer _get_4 = this.cce.varIdx.get(v_2.name);
-              _builder.append(_get_4, "\t\t");
+              _builder.append(_get_4, "		");
               _builder.append(": return 0;");
               _builder.newLineIfNotEmpty();
             } else {
               _builder.append("\t\t");
               _builder.append("case ");
               Integer _get_5 = this.cce.varIdx.get(v_2.name);
-              _builder.append(_get_5, "\t\t");
+              _builder.append(_get_5, "		");
               _builder.append(": return ");
               String _idName_2 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_2, "\t\t");
+              _builder.append(_idName_2, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
             }
@@ -1157,7 +1186,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     {
       final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
         public Boolean apply(final VariableInformation it) {
-          boolean _tripleEquals = (it.dir == VariableInformation.Direction.IN);
+          boolean _tripleEquals = (it.dir == Direction.IN);
           return Boolean.valueOf(_tripleEquals);
         }
       };
@@ -1167,11 +1196,11 @@ public class DartCompiler implements ITypeOuptutProvider {
         if (!_hasElements) {
           _hasElements = true;
         } else {
-          _builder.appendImmediate(",", "\t");
+          _builder.appendImmediate(",", "	");
         }
         _builder.append("\t");
         CharSequence _asPort = this.asPort(v);
-        _builder.append(_asPort, "\t");
+        _builder.append(_asPort, "	");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -1184,7 +1213,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     {
       final Function1<VariableInformation,Boolean> _function_1 = new Function1<VariableInformation,Boolean>() {
         public Boolean apply(final VariableInformation it) {
-          boolean _tripleEquals = (it.dir == VariableInformation.Direction.INOUT);
+          boolean _tripleEquals = (it.dir == Direction.INOUT);
           return Boolean.valueOf(_tripleEquals);
         }
       };
@@ -1194,11 +1223,11 @@ public class DartCompiler implements ITypeOuptutProvider {
         if (!_hasElements_1) {
           _hasElements_1 = true;
         } else {
-          _builder.appendImmediate(",", "\t");
+          _builder.appendImmediate(",", "	");
         }
         _builder.append("\t");
         CharSequence _asPort_1 = this.asPort(v_1);
-        _builder.append(_asPort_1, "\t");
+        _builder.append(_asPort_1, "	");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -1211,7 +1240,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     {
       final Function1<VariableInformation,Boolean> _function_2 = new Function1<VariableInformation,Boolean>() {
         public Boolean apply(final VariableInformation it) {
-          boolean _tripleEquals = (it.dir == VariableInformation.Direction.OUT);
+          boolean _tripleEquals = (it.dir == Direction.OUT);
           return Boolean.valueOf(_tripleEquals);
         }
       };
@@ -1221,11 +1250,11 @@ public class DartCompiler implements ITypeOuptutProvider {
         if (!_hasElements_2) {
           _hasElements_2 = true;
         } else {
-          _builder.appendImmediate(",", "\t");
+          _builder.appendImmediate(",", "	");
         }
         _builder.append("\t");
         CharSequence _asPort_2 = this.asPort(v_2);
-        _builder.append(_asPort_2, "\t");
+        _builder.append(_asPort_2, "	");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -1238,7 +1267,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     {
       final Function1<VariableInformation,Boolean> _function_3 = new Function1<VariableInformation,Boolean>() {
         public Boolean apply(final VariableInformation it) {
-          boolean _tripleEquals = (it.dir == VariableInformation.Direction.INTERNAL);
+          boolean _tripleEquals = (it.dir == Direction.INTERNAL);
           return Boolean.valueOf(_tripleEquals);
         }
       };
@@ -1248,11 +1277,11 @@ public class DartCompiler implements ITypeOuptutProvider {
         if (!_hasElements_3) {
           _hasElements_3 = true;
         } else {
-          _builder.appendImmediate(",", "\t");
+          _builder.appendImmediate(",", "	");
         }
         _builder.append("\t");
         CharSequence _asPort_3 = this.asPort(v_3);
-        _builder.append(_asPort_3, "\t");
+        _builder.append(_asPort_3, "	");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -1299,22 +1328,22 @@ public class DartCompiler implements ITypeOuptutProvider {
       }
       final String reset = _xifexpression_1;
       String type = "INVALID";
-      final VariableInformation.Type _switchValue = v.type;
+      final Type _switchValue = v.type;
       boolean _matched = false;
       if (!_matched) {
-        if (Objects.equal(_switchValue,VariableInformation.Type.BIT)) {
+        if (Objects.equal(_switchValue,Type.BIT)) {
           _matched=true;
           type = "Port.TYPE_BIT";
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,VariableInformation.Type.INT)) {
+        if (Objects.equal(_switchValue,Type.INT)) {
           _matched=true;
           type = "Port.TYPE_INT";
         }
       }
       if (!_matched) {
-        if (Objects.equal(_switchValue,VariableInformation.Type.UINT)) {
+        if (Objects.equal(_switchValue,Type.UINT)) {
           _matched=true;
           type = "Port.TYPE_UINT";
         }
@@ -1356,7 +1385,7 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t\t");
             _builder.append("case ");
             Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "\t\t\t");
+            _builder.append(_get, "			");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             {
@@ -1365,10 +1394,10 @@ public class DartCompiler implements ITypeOuptutProvider {
               if (_not) {
                 _builder.append("\t\t\t");
                 String _idName = this.cce.idName(v, false, true);
-                _builder.append(_idName, "\t\t\t");
+                _builder.append(_idName, "			");
                 _builder.append(" = ");
                 String _idName_1 = this.cce.idName(v, false, true);
-                _builder.append(_idName_1, "\t\t\t");
+                _builder.append(_idName_1, "			");
                 _builder.append("$reg; break;");
                 _builder.newLineIfNotEmpty();
               } else {
@@ -1378,13 +1407,13 @@ public class DartCompiler implements ITypeOuptutProvider {
                 _builder.append("\t\t\t");
                 _builder.append("\t");
                 String _idName_2 = this.cce.idName(v, false, true);
-                _builder.append(_idName_2, "\t\t\t\t");
+                _builder.append(_idName_2, "				");
                 _builder.append(".fillRange(0, ");
                 int _talSize = this.cce.totalSize(v);
-                _builder.append(_talSize, "\t\t\t\t");
+                _builder.append(_talSize, "				");
                 _builder.append(", ");
                 String _idName_3 = this.cce.idName(v, false, true);
-                _builder.append(_idName_3, "\t\t\t\t");
+                _builder.append(_idName_3, "				");
                 _builder.append("$reg[0]);");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
@@ -1393,10 +1422,10 @@ public class DartCompiler implements ITypeOuptutProvider {
                 _builder.append("\t\t\t");
                 _builder.append("\t");
                 String _idName_4 = this.cce.idName(v, false, true);
-                _builder.append(_idName_4, "\t\t\t\t");
+                _builder.append(_idName_4, "				");
                 _builder.append("[reg.offset] = ");
                 String _idName_5 = this.cce.idName(v, false, true);
-                _builder.append(_idName_5, "\t\t\t\t");
+                _builder.append(_idName_5, "				");
                 _builder.append("$reg[reg.offset]; ");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
@@ -1482,16 +1511,19 @@ public class DartCompiler implements ITypeOuptutProvider {
       final String arrAcc = _builder_1.toString();
       String varName = ("t" + Integer.valueOf(pos));
       if (info.isPred) {
-        varName = ("p" + Integer.valueOf(pos));
+        String _plus = ("p" + Integer.valueOf(pos));
+        varName = _plus;
       }
       if (prev) {
-        varName = (varName + "_prev");
+        String _plus_1 = (varName + "_prev");
+        varName = _plus_1;
       }
       CharSequence _xifexpression = null;
       if (info.fixedArray) {
         StringConcatenation _builder_2 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals = (info.actualWidth == info.info.width);
+          if (_equals) {
             String _dartType = this.dartType(info);
             _builder_2.append(_dartType, "");
             _builder_2.append(" ");
@@ -1503,7 +1535,8 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
-            if ((info.actualWidth == 1)) {
+            boolean _equals_1 = (info.actualWidth == 1);
+            if (_equals_1) {
               String _dartType_1 = this.dartType(info);
               _builder_2.append(_dartType_1, "");
               _builder_2.append(" ");
@@ -1538,7 +1571,8 @@ public class DartCompiler implements ITypeOuptutProvider {
       } else {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals_2 = (info.actualWidth == info.info.width);
+          if (_equals_2) {
             String _dartType_3 = this.dartType(info);
             _builder_3.append(_dartType_3, "");
             _builder_3.append(" ");
@@ -1550,7 +1584,8 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            if ((info.actualWidth == 1)) {
+            boolean _equals_3 = (info.actualWidth == 1);
+            if (_equals_3) {
               String _dartType_4 = this.dartType(info);
               _builder_3.append(_dartType_4, "");
               _builder_3.append(" ");
@@ -1617,14 +1652,16 @@ public class DartCompiler implements ITypeOuptutProvider {
       String fixedAccess = _xifexpression;
       String regSuffix = "";
       if (info.isShadowReg) {
-        fixedAccess = ("$reg" + fixedAccess);
+        String _plus = ("$reg" + fixedAccess);
+        fixedAccess = _plus;
         regSuffix = "$reg";
       }
       CharSequence _xifexpression_1 = null;
       if (info.fixedArray) {
         StringConcatenation _builder_2 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals = (info.actualWidth == info.info.width);
+          if (_equals) {
             {
               if (info.isShadowReg) {
                 String _dartType = this.dartType(info.info, false);
@@ -1682,9 +1719,9 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder_2.append("\t");
             _builder_2.append("_regUpdates.add(new RegUpdate(");
             Integer _get = this.cce.varIdx.get(info.info.name);
-            _builder_2.append(_get, "\t");
+            _builder_2.append(_get, "	");
             _builder_2.append(", ");
-            _builder_2.append(off, "\t");
+            _builder_2.append(off, "	");
             _builder_2.append("));");
             _builder_2.newLineIfNotEmpty();
           }
@@ -1701,7 +1738,8 @@ public class DartCompiler implements ITypeOuptutProvider {
       } else {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals_1 = (info.actualWidth == info.info.width);
+          if (_equals_1) {
             {
               if (info.isShadowReg) {
                 String _dartType_2 = this.dartType(info.info, false);
@@ -1767,10 +1805,10 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder_3.append("\t");
             _builder_3.append("_regUpdates.add(new RegUpdate(");
             Integer _get_1 = this.cce.varIdx.get(info.info.name);
-            _builder_3.append(_get_1, "\t");
+            _builder_3.append(_get_1, "	");
             _builder_3.append(", ");
             StringBuilder _arrayAccess = this.cce.arrayAccess(info.info, null);
-            _builder_3.append(_arrayAccess, "\t");
+            _builder_3.append(_arrayAccess, "	");
             _builder_3.append("));");
             _builder_3.newLineIfNotEmpty();
           }
@@ -1805,30 +1843,35 @@ public class DartCompiler implements ITypeOuptutProvider {
     final Stack<Integer> stack = _stack;
     LinkedList<Integer> _linkedList = new LinkedList<Integer>();
     final List<Integer> arr = _linkedList;
-    for (final Frame.FastInstruction i : frame.instructions) {
+    for (final FastInstruction i : frame.instructions) {
       {
         int a = 0;
         int b = 0;
-        if ((i.inst.pop > 0)) {
+        boolean _greaterThan = (i.inst.pop > 0);
+        if (_greaterThan) {
           Integer _pop = stack.pop();
           a = (_pop).intValue();
         }
-        if ((i.inst.pop > 1)) {
+        boolean _greaterThan_1 = (i.inst.pop > 1);
+        if (_greaterThan_1) {
           Integer _pop_1 = stack.pop();
           b = (_pop_1).intValue();
         }
-        if ((i.inst.push > 0)) {
+        boolean _greaterThan_2 = (i.inst.push > 0);
+        if (_greaterThan_2) {
           stack.push(Integer.valueOf(pos));
         }
         boolean _tripleEquals = (i.inst == Instruction.pushAddIndex);
         if (_tripleEquals) {
           arr.add(Integer.valueOf(arrPos));
-          arrPos = (arrPos + 1);
+          int _plus = (arrPos + 1);
+          arrPos = _plus;
         }
         this.toExpression(i, frame, sb, pos, a, b, arr, arrPos);
         boolean _tripleNotEquals = (i.inst != Instruction.pushAddIndex);
         if (_tripleNotEquals) {
-          pos = (pos + 1);
+          int _plus_1 = (pos + 1);
+          pos = _plus_1;
         }
       }
     }
@@ -1853,7 +1896,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     return sb.toString();
   }
   
-  public StringBuilder toExpression(final Frame.FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
+  public StringBuilder toExpression(final FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
     StringBuilder _xblockexpression = null;
     {
       final Instruction _switchValue = inst.inst;
@@ -1987,7 +2030,9 @@ public class DartCompiler implements ITypeOuptutProvider {
           _matched=true;
           final int highBit = inst.arg1;
           final int lowBit = inst.arg2;
-          final CharSequence mask = this.cce.asMask(((highBit - lowBit) + 1));
+          int _minus = (highBit - lowBit);
+          int _plus = (_minus + 1);
+          final CharSequence mask = this.cce.asMask(_plus);
           StringConcatenation _builder_7 = new StringConcatenation();
           _builder_7.append("int t");
           _builder_7.append(pos, "");
@@ -2473,69 +2518,77 @@ public class DartCompiler implements ITypeOuptutProvider {
         return _builder.toString();
       }
       boolean _and_1 = false;
-      if (!(information.width <= 8)) {
+      boolean _lessEqualsThan = (information.width <= 8);
+      if (!_lessEqualsThan) {
         _and_1 = false;
       } else {
-        boolean _tripleEquals = (information.type == VariableInformation.Type.INT);
-        _and_1 = ((information.width <= 8) && _tripleEquals);
+        boolean _tripleEquals = (information.type == Type.INT);
+        _and_1 = (_lessEqualsThan && _tripleEquals);
       }
       if (_and_1) {
         StringConcatenation _builder_1 = new StringConcatenation();
         _builder_1.append("Int8List");
         return _builder_1.toString();
       }
-      if ((information.width <= 8)) {
+      boolean _lessEqualsThan_1 = (information.width <= 8);
+      if (_lessEqualsThan_1) {
         StringConcatenation _builder_2 = new StringConcatenation();
         _builder_2.append("Uint8List");
         return _builder_2.toString();
       }
       boolean _and_2 = false;
-      if (!(information.width <= 16)) {
+      boolean _lessEqualsThan_2 = (information.width <= 16);
+      if (!_lessEqualsThan_2) {
         _and_2 = false;
       } else {
-        boolean _tripleEquals_1 = (information.type == VariableInformation.Type.INT);
-        _and_2 = ((information.width <= 16) && _tripleEquals_1);
+        boolean _tripleEquals_1 = (information.type == Type.INT);
+        _and_2 = (_lessEqualsThan_2 && _tripleEquals_1);
       }
       if (_and_2) {
         StringConcatenation _builder_3 = new StringConcatenation();
         _builder_3.append("Int16List");
         return _builder_3.toString();
       }
-      if ((information.width <= 16)) {
+      boolean _lessEqualsThan_3 = (information.width <= 16);
+      if (_lessEqualsThan_3) {
         StringConcatenation _builder_4 = new StringConcatenation();
         _builder_4.append("Uint16List");
         return _builder_4.toString();
       }
       boolean _and_3 = false;
-      if (!(information.width <= 32)) {
+      boolean _lessEqualsThan_4 = (information.width <= 32);
+      if (!_lessEqualsThan_4) {
         _and_3 = false;
       } else {
-        boolean _tripleEquals_2 = (information.type == VariableInformation.Type.INT);
-        _and_3 = ((information.width <= 32) && _tripleEquals_2);
+        boolean _tripleEquals_2 = (information.type == Type.INT);
+        _and_3 = (_lessEqualsThan_4 && _tripleEquals_2);
       }
       if (_and_3) {
         StringConcatenation _builder_5 = new StringConcatenation();
         _builder_5.append("Int32List");
         return _builder_5.toString();
       }
-      if ((information.width <= 32)) {
+      boolean _lessEqualsThan_5 = (information.width <= 32);
+      if (_lessEqualsThan_5) {
         StringConcatenation _builder_6 = new StringConcatenation();
         _builder_6.append("Uint32List");
         return _builder_6.toString();
       }
       boolean _and_4 = false;
-      if (!(information.width <= 64)) {
+      boolean _lessEqualsThan_6 = (information.width <= 64);
+      if (!_lessEqualsThan_6) {
         _and_4 = false;
       } else {
-        boolean _tripleEquals_3 = (information.type == VariableInformation.Type.INT);
-        _and_4 = ((information.width <= 64) && _tripleEquals_3);
+        boolean _tripleEquals_3 = (information.type == Type.INT);
+        _and_4 = (_lessEqualsThan_6 && _tripleEquals_3);
       }
       if (_and_4) {
         StringConcatenation _builder_7 = new StringConcatenation();
         _builder_7.append("Int64List");
         return _builder_7.toString();
       }
-      if ((information.width <= 64)) {
+      boolean _lessEqualsThan_7 = (information.width <= 64);
+      if (_lessEqualsThan_7) {
         StringConcatenation _builder_8 = new StringConcatenation();
         _builder_8.append("Uint64List");
         return _builder_8.toString();
@@ -2665,15 +2718,15 @@ public class DartCompiler implements ITypeOuptutProvider {
     return "Dart";
   }
   
-  public IOutputProvider.MultiOption getUsage() {
+  public MultiOption getUsage() {
     Options _options = new Options();
     final Options options = _options;
-    IOutputProvider.MultiOption _multiOption = new IOutputProvider.MultiOption(null, null, options);
+    MultiOption _multiOption = new MultiOption(null, null, options);
     return _multiOption;
   }
   
-  public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    List<PSAbstractCompiler.CompileResult> _xblockexpression = null;
+  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    List<CompileResult> _xblockexpression = null;
     {
       final String moduleName = em.moduleName;
       int _lastIndexOf = moduleName.lastIndexOf(".");
@@ -2681,7 +2734,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       int _length = moduleName.length();
       int _minus = (_length - 1);
       final String unitName = moduleName.substring(_plus, _minus);
-      List<PSAbstractCompiler.CompileResult> _doCompile = DartCompiler.doCompile(em, unitName, syntaxProblems);
+      List<CompileResult> _doCompile = DartCompiler.doCompile(em, unitName, syntaxProblems);
       _xblockexpression = (_doCompile);
     }
     return _xblockexpression;

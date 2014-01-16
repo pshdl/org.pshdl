@@ -411,8 +411,8 @@ public class Insulin {
 						final Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(funcPar, funcPar.getIfSpecRefName());
 						if (resolveInterface.isPresent()) {
 							final HDLQualifiedName typeName = fullNameOf(resolveInterface.get());
-							final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag())).setArray(sub.getArray())
-									.setBits(sub.getBits());
+							final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
+									.setArray(sub.getArray()).setBits(sub.getBits());
 							return Optional.of(hir);
 						}
 					}
@@ -428,8 +428,8 @@ public class Insulin {
 				final Optional<? extends HDLType> type = TypeExtension.typeOf(variable);
 				if ((type.isPresent()) && (type.get().getClassType() == HDLClass.HDLInterface)) {
 					final HDLQualifiedName typeName = fullNameOf(type.get());
-					final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag())).setArray(sub.getArray())
-							.setBits(sub.getBits());
+					final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
+							.setArray(sub.getArray()).setBits(sub.getBits());
 					return Optional.of(hir);
 				}
 				return Optional.of(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()));
@@ -662,7 +662,11 @@ public class Insulin {
 	private static <T extends IHDLObject> T generateInitializations(T apply) {
 		final ModificationSet ms = new ModificationSet();
 		final HDLVariableDeclaration[] allVarDecls = apply.getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (final HDLVariableDeclaration hvd : allVarDecls)
+		for (final HDLVariableDeclaration hvd : allVarDecls) {
+			final HDLUnit unit = hvd.getContainer(HDLUnit.class);
+			if ((unit != null) && unit.getSimulation()) {
+				continue;
+			}
 			if (!doNotInit.contains(hvd.getDirection())) {
 				final HDLRegisterConfig register = hvd.getRegister();
 				for (final HDLVariable var : hvd.getVariables()) {
@@ -675,9 +679,9 @@ public class Insulin {
 						final HDLVariableRef setVar = new HDLVariableRef().setVar(var.asRef());
 						generateInit(Collections.<HDLExpression> emptyList(), var.getDimensions(), ms, var, var, defaultValue, setVar);
 					}
-
 				}
 			}
+		}
 		// Initialize all Interface instantiations by assigning the default
 		// value to each Port
 		final HDLInterfaceInstantiation[] hii = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
@@ -1351,8 +1355,10 @@ public class Insulin {
 								final HDLRange r = bits.get(j);
 								final Optional<Range<BigInteger>> vr = RangeExtension.rangeOf(r, context);
 								if (vr.isPresent()) {
-									final BigInteger add = shift.add(vr.get().upperEndpoint().subtract(vr.get().lowerEndpoint()).abs());
-									final BigInteger res = constant.get().shiftRight(shift.intValue()).and(BigInteger.ONE.shiftLeft(add.intValue()).subtract(BigInteger.ONE));
+									final BigInteger add = vr.get().upperEndpoint().subtract(vr.get().lowerEndpoint()).abs();
+									final BigInteger mask = BigInteger.ONE.shiftLeft(add.intValue() + 1).subtract(BigInteger.ONE);
+									final BigInteger shifted = constant.get().shiftRight(shift.intValue());
+									final BigInteger res = shifted.and(mask);
 									final HDLVariableRef newRef = ref.setBits(HDLObject.asList(r));
 									final HDLAssignment newAss = new HDLAssignment().setLeft(newRef).setType(ass.getType()).setRight(HDLLiteral.get(res));
 									replacements.add(newAss);
@@ -1365,7 +1371,7 @@ public class Insulin {
 							final String varName = getTempName(varRefName.getLastSegment(), "bitAccess");
 							final HDLQualifiedName hVarName = new HDLQualifiedName(varName);
 							replacements.add(new HDLVariableDeclaration().setType(TypeExtension.typeOf(ref).get()).addVariables(new HDLVariable().setName(varName)));
-							replacements.add(new HDLAssignment().setLeft(new HDLVariableRef().setVar(varRefName.skipLast(1).append(varName))).setRight(ass.getRight()));
+							replacements.add(new HDLAssignment().setLeft(new HDLVariableRef().setVar(hVarName)).setRight(ass.getRight()));
 							BigInteger shift = BigInteger.ZERO;
 							for (int j = bits.size() - 1; j >= 0; j--) {
 								final HDLRange r = bits.get(j);

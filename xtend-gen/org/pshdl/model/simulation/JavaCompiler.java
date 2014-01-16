@@ -46,14 +46,16 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
+import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
+import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
-import org.pshdl.model.utils.PSAbstractCompiler;
-import org.pshdl.model.utils.services.IHDLGenerator;
-import org.pshdl.model.utils.services.IOutputProvider;
+import org.pshdl.model.utils.PSAbstractCompiler.CompileResult;
+import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
@@ -72,15 +74,15 @@ public class JavaCompiler implements ITypeOuptutProvider {
     this.debug = includeDebug;
   }
   
-  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean debug) {
+  public static ArrayList<CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean debug) {
     JavaCompiler _javaCompiler = new JavaCompiler(em, debug);
     final JavaCompiler comp = _javaCompiler;
     CharSequence _compile = comp.compile(pkg, unitName);
     final String code = _compile.toString();
-    List<IHDLGenerator.SideFile> _emptyList = Collections.<IHDLGenerator.SideFile>emptyList();
+    List<SideFile> _emptyList = Collections.<SideFile>emptyList();
     String _hookName = comp.getHookName();
-    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, _emptyList, em.source, _hookName, true);
-    return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
+    CompileResult _compileResult = new CompileResult(syntaxProblems, code, em.moduleName, _emptyList, em.source, _hookName, true);
+    return Lists.<CompileResult>newArrayList(_compileResult);
   }
   
   public CharSequence compile(final String packageName, final String unitName) {
@@ -88,7 +90,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
     {
       HashSet<Integer> _hashSet = new HashSet<Integer>();
       final Set<Integer> handled = _hashSet;
-      handled.add(Integer.valueOf((-1)));
+      int _minus = (-1);
+      handled.add(Integer.valueOf(_minus));
       StringConcatenation _builder = new StringConcatenation();
       {
         boolean _tripleNotEquals = (packageName != null);
@@ -263,7 +266,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder.append("\t");
           Boolean _get = this.cce.prevMap.get(v.name);
           CharSequence _decl = this.decl(v, _get);
-          _builder.append(_decl, "\t");
+          _builder.append(_decl, "	");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -305,7 +308,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder.newLine();
           _builder.append("\t");
           _builder.append("public ");
-          _builder.append(unitName, "\t");
+          _builder.append(unitName, "	");
           _builder.append("() {");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
@@ -343,7 +346,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.newLine();
       _builder.append("\t");
       _builder.append("public ");
-      _builder.append(unitName, "\t");
+      _builder.append(unitName, "	");
       _builder.append("(");
       {
         if (this.cce.hasClock) {
@@ -393,14 +396,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
         for(final VariableInformation v_1 : _excludeNull_1) {
           _builder.append("\t\t");
           CharSequence _init = this.init(v_1);
-          _builder.append(_init, "\t\t");
+          _builder.append(_init, "		");
           _builder.newLineIfNotEmpty();
           _builder.append("\t\t");
           _builder.append("varIdx.put(\"");
-          _builder.append(v_1.name, "\t\t");
+          _builder.append(v_1.name, "		");
           _builder.append("\", ");
           Integer _get_1 = this.cce.varIdx.get(v_1.name);
-          _builder.append(_get_1, "\t\t");
+          _builder.append(_get_1, "		");
           _builder.append(");");
           _builder.newLineIfNotEmpty();
         }
@@ -411,7 +414,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       {
         final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
           public Boolean apply(final VariableInformation it) {
-            boolean _tripleNotEquals = (it.dir != VariableInformation.Direction.INTERNAL);
+            boolean _tripleNotEquals = (it.dir != Direction.INTERNAL);
             return Boolean.valueOf(_tripleNotEquals);
           }
         };
@@ -425,19 +428,19 @@ public class JavaCompiler implements ITypeOuptutProvider {
               _builder.append("public void set");
               String _idName = this.cce.idName(v_2, false, false);
               String _firstUpper = StringExtensions.toFirstUpper(_idName);
-              _builder.append(_firstUpper, "\t");
+              _builder.append(_firstUpper, "	");
               _builder.append("(");
               String _javaType = this.getJavaType(v_2);
-              _builder.append(_javaType, "\t");
+              _builder.append(_javaType, "	");
               _builder.append(" value) {");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
               _builder.append("\t");
               String _idName_1 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_1, "\t\t");
+              _builder.append(_idName_1, "		");
               _builder.append("=value & ");
               CharSequence _asMaskL = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL, "\t\t");
+              _builder.append(_asMaskL, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -448,21 +451,21 @@ public class JavaCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("public ");
               String _javaType_1 = this.getJavaType(v_2);
-              _builder.append(_javaType_1, "\t");
+              _builder.append(_javaType_1, "	");
               _builder.append(" get");
               String _idName_2 = this.cce.idName(v_2, false, false);
               String _firstUpper_1 = StringExtensions.toFirstUpper(_idName_2);
-              _builder.append(_firstUpper_1, "\t");
+              _builder.append(_firstUpper_1, "	");
               _builder.append("() {");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
               _builder.append("\t");
               _builder.append("return ");
               String _idName_3 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_3, "\t\t");
+              _builder.append(_idName_3, "		");
               _builder.append(" & ");
               CharSequence _asMaskL_1 = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL_1, "\t\t");
+              _builder.append(_asMaskL_1, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -473,17 +476,17 @@ public class JavaCompiler implements ITypeOuptutProvider {
               _builder.append("public void set");
               String _idName_4 = this.cce.idName(v_2, false, false);
               String _firstUpper_2 = StringExtensions.toFirstUpper(_idName_4);
-              _builder.append(_firstUpper_2, "\t");
+              _builder.append(_firstUpper_2, "	");
               _builder.append("(");
               String _javaType_2 = this.getJavaType(v_2);
-              _builder.append(_javaType_2, "\t");
+              _builder.append(_javaType_2, "	");
               _builder.append(" value");
               {
                 int _size_1 = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
                 ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _size_1, true);
                 for(final Integer i : _doubleDotLessThan) {
                   _builder.append(", int a");
-                  _builder.append(i, "\t");
+                  _builder.append(i, "	");
                 }
               }
               _builder.append(") {");
@@ -491,13 +494,13 @@ public class JavaCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("\t");
               String _idName_5 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_5, "\t\t");
+              _builder.append(_idName_5, "		");
               _builder.append("[");
               StringBuilder _arrayAccess = this.cce.arrayAccess(v_2);
-              _builder.append(_arrayAccess, "\t\t");
+              _builder.append(_arrayAccess, "		");
               _builder.append("]=value & ");
               CharSequence _asMaskL_2 = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL_2, "\t\t");
+              _builder.append(_asMaskL_2, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -508,11 +511,11 @@ public class JavaCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("public ");
               String _javaType_3 = this.getJavaType(v_2);
-              _builder.append(_javaType_3, "\t");
+              _builder.append(_javaType_3, "	");
               _builder.append(" get");
               String _idName_6 = this.cce.idName(v_2, false, false);
               String _firstUpper_3 = StringExtensions.toFirstUpper(_idName_6);
-              _builder.append(_firstUpper_3, "\t");
+              _builder.append(_firstUpper_3, "	");
               _builder.append("(");
               {
                 int _size_2 = IterableExtensions.size(((Iterable<? extends Object>)Conversions.doWrapArray(v_2.dimensions)));
@@ -522,10 +525,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
                   if (!_hasElements) {
                     _hasElements = true;
                   } else {
-                    _builder.appendImmediate(",", "\t");
+                    _builder.appendImmediate(",", "	");
                   }
                   _builder.append("int a");
-                  _builder.append(i_1, "\t");
+                  _builder.append(i_1, "	");
                 }
               }
               _builder.append(") {");
@@ -534,13 +537,13 @@ public class JavaCompiler implements ITypeOuptutProvider {
               _builder.append("\t");
               _builder.append("return ");
               String _idName_7 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_7, "\t\t");
+              _builder.append(_idName_7, "		");
               _builder.append("[");
               StringBuilder _arrayAccess_1 = this.cce.arrayAccess(v_2);
-              _builder.append(_arrayAccess_1, "\t\t");
+              _builder.append(_arrayAccess_1, "		");
               _builder.append("] & ");
               CharSequence _asMaskL_3 = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL_3, "\t\t");
+              _builder.append(_asMaskL_3, "		");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
@@ -554,7 +557,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
         for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
           String _method = this.method(f);
-          _builder.append(_method, "\t");
+          _builder.append(_method, "	");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -644,40 +647,50 @@ public class JavaCompiler implements ITypeOuptutProvider {
           {
             boolean _and_2 = false;
             boolean _and_3 = false;
-            if (!((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1)))) {
+            boolean _and_4 = false;
+            int _minus_1 = (-1);
+            boolean _equals_1 = (f_1.edgeNegDepRes == _minus_1);
+            if (!_equals_1) {
+              _and_4 = false;
+            } else {
+              int _minus_2 = (-1);
+              boolean _equals_2 = (f_1.edgePosDepRes == _minus_2);
+              _and_4 = (_equals_1 && _equals_2);
+            }
+            if (!_and_4) {
               _and_3 = false;
             } else {
               int _length = f_1.predNegDepRes.length;
-              boolean _equals_1 = (_length == 0);
-              _and_3 = (((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1))) && _equals_1);
+              boolean _equals_3 = (_length == 0);
+              _and_3 = (_and_4 && _equals_3);
             }
             if (!_and_3) {
               _and_2 = false;
             } else {
               int _length_1 = f_1.predPosDepRes.length;
-              boolean _equals_2 = (_length_1 == 0);
-              _and_2 = (_and_3 && _equals_2);
+              boolean _equals_4 = (_length_1 == 0);
+              _and_2 = (_and_3 && _equals_4);
             }
             if (_and_2) {
               _builder.append("\t\t");
               CharSequence _frameName = this.cce.getFrameName(f_1);
-              _builder.append(_frameName, "\t\t");
+              _builder.append(_frameName, "		");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
             } else {
               _builder.append("\t\t");
               CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handled);
-              _builder.append(_createNegEdge, "\t\t");
+              _builder.append(_createNegEdge, "		");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
-              _builder.append(_createPosEdge, "\t\t");
+              _builder.append(_createPosEdge, "		");
               _builder.newLineIfNotEmpty();
               {
                 for(final int p : f_1.predNegDepRes) {
                   _builder.append("\t\t");
                   CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
-                  _builder.append(_createBooleanPred, "\t\t");
+                  _builder.append(_createBooleanPred, "		");
                   _builder.newLineIfNotEmpty();
                 }
               }
@@ -685,20 +698,20 @@ public class JavaCompiler implements ITypeOuptutProvider {
                 for(final int p_1 : f_1.predPosDepRes) {
                   _builder.append("\t\t");
                   CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
-                  _builder.append(_createBooleanPred_1, "\t\t");
+                  _builder.append(_createBooleanPred_1, "		");
                   _builder.newLineIfNotEmpty();
                 }
               }
               _builder.append("\t\t");
               _builder.append("if (");
               String _predicates = this.predicates(f_1);
-              _builder.append(_predicates, "\t\t");
+              _builder.append(_predicates, "		");
               _builder.append(")");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
               _builder.append("\t");
               CharSequence _frameName_1 = this.cce.getFrameName(f_1);
-              _builder.append(_frameName_1, "\t\t\t");
+              _builder.append(_frameName_1, "			");
               _builder.append("();");
               _builder.newLineIfNotEmpty();
             }
@@ -742,7 +755,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
         for(final VariableInformation v_3 : _filter_1) {
           _builder.append("\t\t");
           String _copyPrev = this.copyPrev(v_3);
-          _builder.append(_copyPrev, "\t\t");
+          _builder.append(_copyPrev, "		");
           _builder.newLineIfNotEmpty();
         }
       }
@@ -764,13 +777,13 @@ public class JavaCompiler implements ITypeOuptutProvider {
         if (this.cce.hasClock) {
           _builder.append("\t");
           CharSequence _copyRegs = this.copyRegs();
-          _builder.append(_copyRegs, "\t");
+          _builder.append(_copyRegs, "	");
           _builder.newLineIfNotEmpty();
         }
       }
       _builder.append("\t");
       CharSequence _hdlInterpreter = this.hdlInterpreter();
-      _builder.append(_hdlInterpreter, "\t");
+      _builder.append(_hdlInterpreter, "	");
       _builder.newLineIfNotEmpty();
       _builder.append("}");
       _builder.newLine();
@@ -783,7 +796,9 @@ public class JavaCompiler implements ITypeOuptutProvider {
     StringBuilder _stringBuilder = new StringBuilder();
     final StringBuilder sb = _stringBuilder;
     boolean first = true;
-    if ((f.edgeNegDepRes != (-1))) {
+    int _minus = (-1);
+    boolean _notEquals = (f.edgeNegDepRes != _minus);
+    if (_notEquals) {
       StringConcatenation _builder = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
       String _idName = this.cce.idName(_asInternal, false, false);
@@ -796,8 +811,11 @@ public class JavaCompiler implements ITypeOuptutProvider {
       sb.append(_builder);
       first = false;
     }
-    if ((f.edgePosDepRes != (-1))) {
-      if ((!first)) {
+    int _minus_1 = (-1);
+    boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
+    if (_notEquals_1) {
+      boolean _not = (!first);
+      if (_not) {
         sb.append(" && ");
       }
       StringConcatenation _builder_1 = new StringConcatenation();
@@ -814,7 +832,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
     }
     for (final int p : f.predNegDepRes) {
       {
-        if ((!first)) {
+        boolean _not_1 = (!first);
+        if (_not_1) {
           sb.append(" && ");
         }
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -829,7 +848,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
     }
     for (final int p_1 : f.predPosDepRes) {
       {
-        if ((!first)) {
+        boolean _not_1 = (!first);
+        if (_not_1) {
           sb.append(" && ");
         }
         StringConcatenation _builder_2 = new StringConcatenation();
@@ -856,7 +876,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       handled.add(Integer.valueOf(id));
       StringConcatenation _builder_1 = new StringConcatenation();
       InternalInformation _asInternal = this.cce.asInternal(id);
-      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
+      int _minus = (-1);
+      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
       _builder_1.append(_ter, "");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("boolean p");
@@ -885,14 +906,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder_1.append("\t");
           _builder_1.append(" \t");
           _builder_1.append("listener.skippingPredicateNotFresh(-1, em.internals[");
-          _builder_1.append(id, "\t \t");
+          _builder_1.append(id, "	 	");
           _builder_1.append("], true, null);");
           _builder_1.newLineIfNotEmpty();
         }
       }
       _builder_1.append("\t");
       _builder_1.append("p");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("_fresh=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -927,19 +948,21 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal = this.cce.asInternal(id);
-      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
-      _builder_1.append(_ter, "\t");
+      int _minus = (-1);
+      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
-      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, (-1));
-      _builder_1.append(_ter_1, "\t");
+      int _minus_1 = (-1);
+      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
+      _builder_1.append(_ter_1, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("if ((t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("_prev!=0) || (t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("!=1)) {");
       _builder_1.newLineIfNotEmpty();
       {
@@ -950,14 +973,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder_1.append("\t\t");
           _builder_1.append("\t");
           _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
-          _builder_1.append(id, "\t\t\t");
+          _builder_1.append(id, "			");
           _builder_1.append("], true, null);");
           _builder_1.newLineIfNotEmpty();
         }
       }
       _builder_1.append("\t\t");
       String _idName_2 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_2, "\t\t");
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isRising=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -967,14 +990,15 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
-      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, (-1));
-      _builder_1.append(_ter_2, "\t");
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_3 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_3, "\t");
+      _builder_1.append(_idName_3, "	");
       _builder_1.append("_isRising=t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("==1;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -992,14 +1016,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder_1.append("\t");
           _builder_1.append("\t");
           _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
-          _builder_1.append(id, "\t\t");
+          _builder_1.append(id, "		");
           _builder_1.append("], true, null);");
           _builder_1.newLineIfNotEmpty();
         }
       }
       _builder_1.append("\t");
       String _idName_5 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_5, "\t");
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_risingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -1034,19 +1058,21 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal = this.cce.asInternal(id);
-      CharSequence _ter = this.getter(_asInternal, false, id, (-1));
-      _builder_1.append(_ter, "\t");
+      int _minus = (-1);
+      CharSequence _ter = this.getter(_asInternal, false, id, _minus);
+      _builder_1.append(_ter, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       InternalInformation _asInternal_1 = this.cce.asInternal(id);
-      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, (-1));
-      _builder_1.append(_ter_1, "\t");
+      int _minus_1 = (-1);
+      CharSequence _ter_1 = this.getter(_asInternal_1, true, id, _minus_1);
+      _builder_1.append(_ter_1, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       _builder_1.append("if ((t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("_prev!=1) || (t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("!=0)) {");
       _builder_1.newLineIfNotEmpty();
       {
@@ -1057,14 +1083,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder_1.append("\t\t");
           _builder_1.append(" \t");
           _builder_1.append("listener.skippingNotAnEdge(-1, em.internals[");
-          _builder_1.append(id, "\t\t \t");
+          _builder_1.append(id, "		 	");
           _builder_1.append("], false, null);");
           _builder_1.newLineIfNotEmpty();
         }
       }
       _builder_1.append("\t\t");
       String _idName_2 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_2, "\t\t");
+      _builder_1.append(_idName_2, "		");
       _builder_1.append("_isFalling=false;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
@@ -1074,14 +1100,15 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder_1.newLine();
       _builder_1.append("\t");
       InternalInformation _asInternal_2 = this.cce.asInternal(id);
-      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, (-1));
-      _builder_1.append(_ter_2, "\t");
+      int _minus_2 = (-1);
+      CharSequence _ter_2 = this.getter(_asInternal_2, false, id, _minus_2);
+      _builder_1.append(_ter_2, "	");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("\t");
       String _idName_3 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_3, "\t");
+      _builder_1.append(_idName_3, "	");
       _builder_1.append("_isFalling=t");
-      _builder_1.append(id, "\t");
+      _builder_1.append(id, "	");
       _builder_1.append("==0;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -1099,14 +1126,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder_1.append("\t");
           _builder_1.append(" \t");
           _builder_1.append("listener.skippingHandledEdge(-1, em.internals[");
-          _builder_1.append(id, "\t \t");
+          _builder_1.append(id, "	 	");
           _builder_1.append("], false, null);");
           _builder_1.newLineIfNotEmpty();
         }
       }
       _builder_1.append("\t");
       String _idName_5 = this.cce.idName(internal, false, false);
-      _builder_1.append(_idName_5, "\t");
+      _builder_1.append(_idName_5, "	");
       _builder_1.append("_fallingIsHandled=true;");
       _builder_1.newLineIfNotEmpty();
       _builder_1.append("}");
@@ -1165,24 +1192,25 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "\t\t");
+            _builder.append(_get, "		");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
             _builder.append("\t");
             {
               boolean _and = false;
-              if (!(v.width != 64)) {
+              boolean _notEquals = (v.width != 64);
+              if (!_notEquals) {
                 _and = false;
               } else {
                 boolean _isPredicate = this.cce.isPredicate(v);
                 boolean _not = (!_isPredicate);
-                _and = ((v.width != 64) && _not);
+                _and = (_notEquals && _not);
               }
               if (_and) {
                 _builder.append("value&=");
                 CharSequence _asMaskL = this.cce.asMaskL(v.width);
-                _builder.append(_asMaskL, "\t\t\t");
+                _builder.append(_asMaskL, "			");
                 _builder.append(";");
               }
             }
@@ -1190,7 +1218,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("\t");
             String _idName = this.cce.idName(v, false, false);
-            _builder.append(_idName, "\t\t\t");
+            _builder.append(_idName, "			");
             _builder.append("=value");
             {
               boolean _isPredicate_1 = this.cce.isPredicate(v);
@@ -1208,24 +1236,25 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_1 = this.cce.varIdx.get(v.name);
-            _builder.append(_get_1, "\t\t");
+            _builder.append(_get_1, "		");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
             _builder.append("\t");
             {
               boolean _and_1 = false;
-              if (!(v.width != 64)) {
+              boolean _notEquals_1 = (v.width != 64);
+              if (!_notEquals_1) {
                 _and_1 = false;
               } else {
                 boolean _isPredicate_2 = this.cce.isPredicate(v);
                 boolean _not_1 = (!_isPredicate_2);
-                _and_1 = ((v.width != 64) && _not_1);
+                _and_1 = (_notEquals_1 && _not_1);
               }
               if (_and_1) {
                 _builder.append("value&=");
                 CharSequence _asMaskL_1 = this.cce.asMaskL(v.width);
-                _builder.append(_asMaskL_1, "\t\t\t");
+                _builder.append(_asMaskL_1, "			");
                 _builder.append(";");
               }
             }
@@ -1233,10 +1262,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("\t");
             String _idName_1 = this.cce.idName(v, false, false);
-            _builder.append(_idName_1, "\t\t\t");
+            _builder.append(_idName_1, "			");
             _builder.append("[");
             StringBuilder _arrayAccessArrIdx = this.cce.arrayAccessArrIdx(v);
-            _builder.append(_arrayAccessArrIdx, "\t\t\t");
+            _builder.append(_arrayAccessArrIdx, "			");
             _builder.append("]=value;");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -1282,9 +1311,9 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _builder.append("\t\t");
         _builder.append("case ");
         Integer _get_2 = this.cce.varIdx.get(v_1.name);
-        _builder.append(_get_2, "\t\t");
+        _builder.append(_get_2, "		");
         _builder.append(": return \"");
-        _builder.append(v_1.name, "\t\t");
+        _builder.append(v_1.name, "		");
         _builder.append("\";");
         _builder.newLineIfNotEmpty();
       }
@@ -1328,19 +1357,20 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_3 = this.cce.varIdx.get(v_2.name);
-            _builder.append(_get_3, "\t\t");
+            _builder.append(_get_3, "		");
             _builder.append(": return ");
             String _idName_2 = this.cce.idName(v_2, false, false);
-            _builder.append(_idName_2, "\t\t");
+            _builder.append(_idName_2, "		");
             {
               boolean _isPredicate_3 = this.cce.isPredicate(v_2);
               if (_isPredicate_3) {
                 _builder.append("?1:0");
               } else {
-                if ((v_2.width != 64)) {
+                boolean _notEquals_2 = (v_2.width != 64);
+                if (_notEquals_2) {
                   _builder.append(" & ");
                   CharSequence _asMaskL_2 = this.cce.asMaskL(v_2.width);
-                  _builder.append(_asMaskL_2, "\t\t");
+                  _builder.append(_asMaskL_2, "		");
                 }
               }
             }
@@ -1350,27 +1380,28 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t");
             _builder.append("case ");
             Integer _get_4 = this.cce.varIdx.get(v_2.name);
-            _builder.append(_get_4, "\t\t");
+            _builder.append(_get_4, "		");
             _builder.append(": return ");
             String _idName_3 = this.cce.idName(v_2, false, false);
-            _builder.append(_idName_3, "\t\t");
+            _builder.append(_idName_3, "		");
             _builder.append("[");
             StringBuilder _arrayAccessArrIdx_1 = this.cce.arrayAccessArrIdx(v_2);
-            _builder.append(_arrayAccessArrIdx_1, "\t\t");
+            _builder.append(_arrayAccessArrIdx_1, "		");
             _builder.append("]");
             {
               boolean _and_2 = false;
-              if (!(v_2.width != 64)) {
+              boolean _notEquals_3 = (v_2.width != 64);
+              if (!_notEquals_3) {
                 _and_2 = false;
               } else {
                 boolean _isPredicate_4 = this.cce.isPredicate(v_2);
                 boolean _not_2 = (!_isPredicate_4);
-                _and_2 = ((v_2.width != 64) && _not_2);
+                _and_2 = (_notEquals_3 && _not_2);
               }
               if (_and_2) {
                 _builder.append(" & ");
                 CharSequence _asMaskL_3 = this.cce.asMaskL(v_2.width);
-                _builder.append(_asMaskL_3, "\t\t");
+                _builder.append(_asMaskL_3, "		");
               }
             }
             _builder.append(";");
@@ -1440,7 +1471,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder.append("\t\t\t");
             _builder.append("case ");
             Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "\t\t\t");
+            _builder.append(_get, "			");
             _builder.append(": ");
             _builder.newLineIfNotEmpty();
             {
@@ -1449,10 +1480,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
               if (_equals) {
                 _builder.append("\t\t\t");
                 String _idName = this.cce.idName(v, false, false);
-                _builder.append(_idName, "\t\t\t");
+                _builder.append(_idName, "			");
                 _builder.append(" = ");
                 String _idName_1 = this.cce.idName(v, false, false);
-                _builder.append(_idName_1, "\t\t\t");
+                _builder.append(_idName_1, "			");
                 _builder.append("$reg; break;");
                 _builder.newLineIfNotEmpty();
               } else {
@@ -1462,10 +1493,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
                 _builder.append("\t\t\t");
                 _builder.append("\t");
                 String _idName_2 = this.cce.idName(v, false, false);
-                _builder.append(_idName_2, "\t\t\t\t");
+                _builder.append(_idName_2, "				");
                 _builder.append("[reg.offset] = ");
                 String _idName_3 = this.cce.idName(v, false, false);
-                _builder.append(_idName_3, "\t\t\t\t");
+                _builder.append(_idName_3, "				");
                 _builder.append("$reg[reg.offset];");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
@@ -1475,10 +1506,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
                 _builder.append("\t");
                 _builder.append("Arrays.fill(");
                 String _idName_4 = this.cce.idName(v, false, false);
-                _builder.append(_idName_4, "\t\t\t\t");
+                _builder.append(_idName_4, "				");
                 _builder.append(", ");
                 String _idName_5 = this.cce.idName(v, false, false);
-                _builder.append(_idName_5, "\t\t\t\t");
+                _builder.append(_idName_5, "				");
                 _builder.append("$reg[0]); ");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
@@ -1564,16 +1595,19 @@ public class JavaCompiler implements ITypeOuptutProvider {
       final String arrAcc = _builder_1.toString();
       String varName = ("t" + Integer.valueOf(pos));
       if (info.isPred) {
-        varName = ("p" + Integer.valueOf(pos));
+        String _plus = ("p" + Integer.valueOf(pos));
+        varName = _plus;
       }
       if (prev) {
-        varName = (varName + "_prev");
+        String _plus_1 = (varName + "_prev");
+        varName = _plus_1;
       }
       CharSequence _xifexpression = null;
       if (info.fixedArray) {
         StringConcatenation _builder_2 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals = (info.actualWidth == info.info.width);
+          if (_equals) {
             String _javaType = this.getJavaType(info);
             _builder_2.append(_javaType, "");
             _builder_2.append(" ");
@@ -1585,7 +1619,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
-            if ((info.actualWidth == 1)) {
+            boolean _equals_1 = (info.actualWidth == 1);
+            if (_equals_1) {
               String _javaType_1 = this.getJavaType(info);
               _builder_2.append(_javaType_1, "");
               _builder_2.append(" ");
@@ -1619,26 +1654,26 @@ public class JavaCompiler implements ITypeOuptutProvider {
         {
           int _length_1 = info.arrayIdx.length;
           int _length_2 = info.info.dimensions.length;
-          boolean _equals = (_length_1 == _length_2);
-          if (_equals) {
+          boolean _equals_2 = (_length_1 == _length_2);
+          if (_equals_2) {
             {
               if (this.debug) {
                 _builder_2.append("if (listener!=null)");
                 _builder_2.newLine();
                 _builder_2.append("\t");
                 _builder_2.append("listener.loadingInternal(");
-                _builder_2.append(frameID, "\t");
+                _builder_2.append(frameID, "	");
                 _builder_2.append(", em.internals[");
                 Integer _get = this.cce.intIdx.get(info.fullName);
-                _builder_2.append(_get, "\t");
+                _builder_2.append(_get, "	");
                 _builder_2.append("], ");
                 {
                   if (info.isPred) {
-                    _builder_2.append(varName, "\t");
+                    _builder_2.append(varName, "	");
                     _builder_2.append("?BigInteger.ONE:BigInteger.ZERO");
                   } else {
                     _builder_2.append("BigInteger.valueOf(");
-                    _builder_2.append(varName, "\t");
+                    _builder_2.append(varName, "	");
                     _builder_2.append(")");
                   }
                 }
@@ -1652,7 +1687,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       } else {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals_3 = (info.actualWidth == info.info.width);
+          if (_equals_3) {
             String _javaType_3 = this.getJavaType(info);
             _builder_3.append(_javaType_3, "");
             _builder_3.append(" ");
@@ -1664,7 +1700,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            if ((info.actualWidth == 1)) {
+            boolean _equals_4 = (info.actualWidth == 1);
+            if (_equals_4) {
               String _javaType_4 = this.getJavaType(info);
               _builder_3.append(_javaType_4, "");
               _builder_3.append(" ");
@@ -1699,26 +1736,26 @@ public class JavaCompiler implements ITypeOuptutProvider {
         {
           int _length_3 = info.arrayIdx.length;
           int _length_4 = info.info.dimensions.length;
-          boolean _equals_1 = (_length_3 == _length_4);
-          if (_equals_1) {
+          boolean _equals_5 = (_length_3 == _length_4);
+          if (_equals_5) {
             {
               if (this.debug) {
                 _builder_3.append("if (listener!=null)");
                 _builder_3.newLine();
                 _builder_3.append("\t");
                 _builder_3.append("listener.loadingInternal(");
-                _builder_3.append(frameID, "\t");
+                _builder_3.append(frameID, "	");
                 _builder_3.append(", em.internals[");
                 Integer _get_1 = this.cce.intIdx.get(info.fullName);
-                _builder_3.append(_get_1, "\t");
+                _builder_3.append(_get_1, "	");
                 _builder_3.append("], ");
                 {
                   if (info.isPred) {
-                    _builder_3.append(varName, "\t");
+                    _builder_3.append(varName, "	");
                     _builder_3.append("?BigInteger.ONE:BigInteger.ZERO");
                   } else {
                     _builder_3.append("BigInteger.valueOf(");
-                    _builder_3.append(varName, "\t");
+                    _builder_3.append(varName, "	");
                     _builder_3.append(")");
                   }
                 }
@@ -1762,14 +1799,16 @@ public class JavaCompiler implements ITypeOuptutProvider {
       String fixedAccess = _xifexpression;
       String regSuffix = "";
       if (info.isShadowReg) {
-        fixedAccess = ("$reg" + fixedAccess);
+        String _plus = ("$reg" + fixedAccess);
+        fixedAccess = _plus;
         regSuffix = "$reg";
       }
       CharSequence _xifexpression_1 = null;
       if (info.fixedArray) {
         StringConcatenation _builder_2 = new StringConcatenation();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals = (info.actualWidth == info.info.width);
+          if (_equals) {
             {
               if (info.isShadowReg) {
                 String _javaType = this.getJavaType(info.info);
@@ -1827,9 +1866,9 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder_2.append("\t");
             _builder_2.append("regUpdates.add(new RegUpdate(");
             Integer _get = this.cce.varIdx.get(info.info.name);
-            _builder_2.append(_get, "\t");
+            _builder_2.append(_get, "	");
             _builder_2.append(", ");
-            _builder_2.append(off, "\t");
+            _builder_2.append(off, "	");
             _builder_2.append("));");
             _builder_2.newLineIfNotEmpty();
           }
@@ -1850,7 +1889,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _builder_3.append(";");
         _builder_3.newLineIfNotEmpty();
         {
-          if ((info.actualWidth == info.info.width)) {
+          boolean _equals_1 = (info.actualWidth == info.info.width);
+          if (_equals_1) {
             {
               if (info.isShadowReg) {
                 String _javaType_2 = this.getJavaType(info.info);
@@ -1908,7 +1948,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder_3.append("\t");
             _builder_3.append("regUpdates.add(new RegUpdate(");
             Integer _get_1 = this.cce.varIdx.get(info.info.name);
-            _builder_3.append(_get_1, "\t");
+            _builder_3.append(_get_1, "	");
             _builder_3.append(", offset));");
             _builder_3.newLineIfNotEmpty();
           }
@@ -1945,7 +1985,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _builder.append("\t");
         _builder.append("\t");
         _builder.append("listener.startFrame(");
-        _builder.append(frame.uniqueID, "\t\t");
+        _builder.append(frame.uniqueID, "		");
         _builder.append(", deltaCycle, epsCycle, null);");
         _builder.newLineIfNotEmpty();
       }
@@ -1957,30 +1997,35 @@ public class JavaCompiler implements ITypeOuptutProvider {
     final Stack<Integer> stack = _stack;
     LinkedList<Integer> _linkedList = new LinkedList<Integer>();
     final List<Integer> arr = _linkedList;
-    for (final Frame.FastInstruction i : frame.instructions) {
+    for (final FastInstruction i : frame.instructions) {
       {
         int a = 0;
         int b = 0;
-        if ((i.inst.pop > 0)) {
+        boolean _greaterThan = (i.inst.pop > 0);
+        if (_greaterThan) {
           Integer _pop = stack.pop();
           a = (_pop).intValue();
         }
-        if ((i.inst.pop > 1)) {
+        boolean _greaterThan_1 = (i.inst.pop > 1);
+        if (_greaterThan_1) {
           Integer _pop_1 = stack.pop();
           b = (_pop_1).intValue();
         }
-        if ((i.inst.push > 0)) {
+        boolean _greaterThan_2 = (i.inst.push > 0);
+        if (_greaterThan_2) {
           stack.push(Integer.valueOf(pos));
         }
         boolean _tripleEquals = (i.inst == Instruction.pushAddIndex);
         if (_tripleEquals) {
           arr.add(Integer.valueOf(arrPos));
-          arrPos = (arrPos + 1);
+          int _plus = (arrPos + 1);
+          arrPos = _plus;
         }
         this.toExpression(i, frame, sb, pos, a, b, arr, arrPos);
         boolean _tripleNotEquals = (i.inst != Instruction.pushAddIndex);
         if (_tripleNotEquals) {
-          pos = (pos + 1);
+          int _plus_1 = (pos + 1);
+          pos = _plus_1;
         }
       }
     }
@@ -2005,11 +2050,11 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _builder_2.newLine();
         _builder_2.append("\t");
         _builder_2.append("listener.writingResult(");
-        _builder_2.append(frame.uniqueID, "\t");
+        _builder_2.append(frame.uniqueID, "	");
         _builder_2.append(", em.internals[");
-        _builder_2.append(frame.outputId, "\t");
+        _builder_2.append(frame.outputId, "	");
         _builder_2.append("], BigInteger.valueOf(");
-        _builder_2.append(last, "\t");
+        _builder_2.append(last, "	");
         {
           InternalInformation _asInternal_2 = this.cce.asInternal(frame.outputId);
           if (_asInternal_2.isPred) {
@@ -2026,7 +2071,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return sb.toString();
   }
   
-  public StringBuilder toExpression(final Frame.FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
+  public StringBuilder toExpression(final FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
     StringBuilder _xblockexpression = null;
     {
       final Instruction _switchValue = inst.inst;
@@ -2087,11 +2132,12 @@ public class JavaCompiler implements ITypeOuptutProvider {
             _builder_3.append(", ");
             {
               boolean _and = false;
-              if (!(!isDynMem)) {
+              boolean _not = (!isDynMem);
+              if (!_not) {
                 _and = false;
               } else {
                 boolean _isArray = this.cce.isArray(internal.info);
-                _and = ((!isDynMem) && _isArray);
+                _and = (_not && _isArray);
               }
               if (_and) {
                 StringBuilder _arrayAccess_1 = this.cce.arrayAccess(internal.info, arr);
@@ -2131,7 +2177,9 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _matched=true;
           final int highBit = inst.arg1;
           final int lowBit = inst.arg2;
-          long _doubleLessThan = (1l << ((highBit - lowBit) + 1));
+          int _minus = (highBit - lowBit);
+          int _plus = (_minus + 1);
+          long _doubleLessThan = (1l << _plus);
           final long mask = (_doubleLessThan - 1);
           StringConcatenation _builder_5 = new StringConcatenation();
           _builder_5.append("long t");
@@ -2168,7 +2216,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       if (!_matched) {
         if (Objects.equal(_switchValue,Instruction.cast_uint)) {
           _matched=true;
-          if ((inst.arg1 != 64)) {
+          boolean _notEquals = (inst.arg1 != 64);
+          if (_notEquals) {
             StringConcatenation _builder_8 = new StringConcatenation();
             _builder_8.append("long t");
             _builder_8.append(pos, "");
@@ -2545,7 +2594,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       }
       int size = 1;
       for (final int d : info.dimensions) {
-        size = (size * d);
+        int _multiply = (size * d);
+        size = _multiply;
       }
       StringConcatenation _builder_1 = new StringConcatenation();
       String _idName = this.cce.idName(info, false, false);
@@ -2701,7 +2751,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return "Java";
   }
   
-  public IOutputProvider.MultiOption getUsage() {
+  public MultiOption getUsage() {
     Options _options = new Options();
     final Options options = _options;
     options.addOption("p", "pkg", true, 
@@ -2711,12 +2761,12 @@ public class JavaCompiler implements ITypeOuptutProvider {
     String _hookName = this.getHookName();
     String _plus = ("Options for the " + _hookName);
     String _plus_1 = (_plus + " type:");
-    IOutputProvider.MultiOption _multiOption = new IOutputProvider.MultiOption(_plus_1, null, options);
+    MultiOption _multiOption = new MultiOption(_plus_1, null, options);
     return _multiOption;
   }
   
-  public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    ArrayList<PSAbstractCompiler.CompileResult> _xblockexpression = null;
+  public List<CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    ArrayList<CompileResult> _xblockexpression = null;
     {
       final String moduleName = em.moduleName;
       final int li = moduleName.lastIndexOf(".");
@@ -2727,14 +2777,18 @@ public class JavaCompiler implements ITypeOuptutProvider {
       if (_tripleNotEquals) {
         pkg = optionPkg;
       } else {
-        if ((li != (-1))) {
-          String _substring = moduleName.substring(0, (li - 1));
+        int _minus = (-1);
+        boolean _notEquals = (li != _minus);
+        if (_notEquals) {
+          int _minus_1 = (li - 1);
+          String _substring = moduleName.substring(0, _minus_1);
           pkg = _substring;
         }
       }
+      int _plus = (li + 1);
       int _length = moduleName.length();
-      final String unitName = moduleName.substring((li + 1), _length);
-      ArrayList<PSAbstractCompiler.CompileResult> _doCompile = JavaCompiler.doCompile(syntaxProblems, em, pkg, unitName, debug);
+      final String unitName = moduleName.substring(_plus, _length);
+      ArrayList<CompileResult> _doCompile = JavaCompiler.doCompile(syntaxProblems, em, pkg, unitName, debug);
       _xblockexpression = (_doCompile);
     }
     return _xblockexpression;

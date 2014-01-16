@@ -41,6 +41,9 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Column;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
@@ -392,10 +395,10 @@ public class BusAccess {
                   }
                   _builder_1.append("\t");
                   CharSequence _busType = this.getBusType(d);
-                  _builder_1.append(_busType, "\t");
+                  _builder_1.append(_busType, "	");
                   _builder_1.append("\t");
                   String _varNameArray = this.getVarNameArray(row, d);
-                  _builder_1.append(_varNameArray, "\t");
+                  _builder_1.append(_varNameArray, "	");
                   _builder_1.append(";");
                   _builder_1.newLineIfNotEmpty();
                 }
@@ -482,10 +485,10 @@ public class BusAccess {
             for(final NamedElement neRow : col.rows) {
               _builder_1.append("\t");
               String _name_1 = neRow.getName();
-              _builder_1.append(_name_1, "\t");
+              _builder_1.append(_name_1, "	");
               _builder_1.append("_t ");
               String _name_2 = neRow.getName();
-              _builder_1.append(_name_2, "\t");
+              _builder_1.append(_name_2, "	");
               _builder_1.append(";");
               _builder_1.newLineIfNotEmpty();
             }
@@ -569,7 +572,8 @@ public class BusAccess {
     for (final Row row : rows) {
       {
         final boolean handled = doneRows.contains(row.name);
-        if ((!handled)) {
+        boolean _not = (!handled);
+        if (_not) {
           CharSequence _generateGetterFunction = this.generateGetterFunction(row, rows);
           String _plus = (res + _generateGetterFunction);
           res = _plus;
@@ -600,7 +604,7 @@ public class BusAccess {
     _builder.newLine();
     _builder.append("\t");
     String _generateAddressReadSwitch = this.generateAddressReadSwitch(row, rows);
-    _builder.append(_generateAddressReadSwitch, "\t");
+    _builder.append(_generateAddressReadSwitch, "	");
     _builder.newLineIfNotEmpty();
     {
       List<Definition> _allDefs_1 = this.allDefs(row);
@@ -608,13 +612,13 @@ public class BusAccess {
         _builder.append("\t");
         _builder.append("*");
         String _varName = this.getVarName(row, d);
-        _builder.append(_varName, "\t");
+        _builder.append(_varName, "	");
         _builder.append("=(val >> ");
         int _shiftVal = this.shiftVal(d);
-        _builder.append(_shiftVal, "\t");
+        _builder.append(_shiftVal, "	");
         _builder.append(") & ");
         String _maxValueHex = this.getMaxValueHex(d);
-        _builder.append(_maxValueHex, "\t");
+        _builder.append(_maxValueHex, "	");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
       }
@@ -634,14 +638,14 @@ public class BusAccess {
     _builder.append("\t");
     _builder.append("return get");
     String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
-    _builder.append(_firstUpper_2, "\t");
+    _builder.append(_firstUpper_2, "	");
     _builder.append("Direct(base, index");
     {
       List<Definition> _allDefs_2 = this.allDefs(row);
       for(final Definition d_1 : _allDefs_2) {
         _builder.append(", &result->");
         String _varNameIndex = this.getVarNameIndex(row, d_1);
-        _builder.append(_varNameIndex, "\t");
+        _builder.append(_varNameIndex, "	");
       }
     }
     _builder.append(");");
@@ -653,7 +657,8 @@ public class BusAccess {
   
   public int shiftVal(final Definition d) {
     final int size = MemoryModel.getSize(d);
-    return (d.bitPos - (size - 1));
+    int _minus = (size - 1);
+    return (d.bitPos - _minus);
   }
   
   public String generateSetterFunctions(final List<Row> rows) {
@@ -665,11 +670,12 @@ public class BusAccess {
       {
         final boolean handled = doneRows.contains(row.name);
         boolean _and = false;
-        if (!(!handled)) {
+        boolean _not = (!handled);
+        if (!_not) {
           _and = false;
         } else {
           boolean _hasWriteDefs = this.hasWriteDefs(row);
-          _and = ((!handled) && _hasWriteDefs);
+          _and = (_not && _hasWriteDefs);
         }
         if (_and) {
           CharSequence _generateSetterFunction = this.generateSetterFunction(row, rows);
@@ -702,7 +708,7 @@ public class BusAccess {
       for(final Definition ne : _writeDefs_1) {
         _builder.append("\t");
         CharSequence _generateConditions = this.generateConditions(row, ne);
-        _builder.append(_generateConditions, "\t");
+        _builder.append(_generateConditions, "	");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -712,18 +718,18 @@ public class BusAccess {
       List<Definition> _writeDefs_2 = this.writeDefs(row);
       for(final Definition d_1 : _writeDefs_2) {
         String _shifted = this.shifted(d_1, row);
-        _builder.append(_shifted, "\t");
+        _builder.append(_shifted, "	");
       }
     }
     _builder.append(" 0;");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     String _generateAddressSwitch = this.generateAddressSwitch(row, rows);
-    _builder.append(_generateAddressSwitch, "\t");
+    _builder.append(_generateAddressSwitch, "	");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("warn(invalidIndex, index, \"\", \"");
-    _builder.append(row.name, "\t");
+    _builder.append(row.name, "	");
     _builder.append("\", \"\");");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -741,14 +747,14 @@ public class BusAccess {
     _builder.append("\t");
     _builder.append("return set");
     String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
-    _builder.append(_firstUpper_2, "\t");
+    _builder.append(_firstUpper_2, "	");
     _builder.append("Direct(base, index");
     {
       List<Definition> _writeDefs_3 = this.writeDefs(row);
       for(final Definition d_2 : _writeDefs_3) {
         _builder.append(", newVal->");
         String _varNameIndex = this.getVarNameIndex(row, d_2);
-        _builder.append(_varNameIndex, "\t");
+        _builder.append(_varNameIndex, "	");
       }
     }
     _builder.append(");");
@@ -775,7 +781,7 @@ public class BusAccess {
     LinkedList<Definition> _linkedList = new LinkedList<Definition>();
     final List<Definition> res = _linkedList;
     for (final NamedElement ne : row.definitions) {
-      boolean _notEquals = (!Objects.equal(((Definition) ne).type, Definition.Type.UNUSED));
+      boolean _notEquals = (!Objects.equal(((Definition) ne).type, Type.UNUSED));
       if (_notEquals) {
         res.add(((Definition) ne));
       }
@@ -815,9 +821,11 @@ public class BusAccess {
           _builder_1.newLineIfNotEmpty();
           String _plus = (res + _builder_1);
           res = _plus;
-          rIdx = (rIdx + 1);
+          int _plus_1 = (rIdx + 1);
+          rIdx = _plus_1;
         }
-        idx = (idx + 1);
+        int _plus_2 = (idx + 1);
+        idx = _plus_2;
       }
     }
     StringConcatenation _builder_1 = new StringConcatenation();
@@ -825,7 +833,7 @@ public class BusAccess {
     _builder_1.newLine();
     _builder_1.append("\t");
     _builder_1.append("warn(invalidIndex, index, \"\", \"");
-    _builder_1.append(row.name, "\t");
+    _builder_1.append(row.name, "	");
     _builder_1.append("\", \"\"); ");
     _builder_1.newLineIfNotEmpty();
     _builder_1.append("\t");
@@ -858,9 +866,11 @@ public class BusAccess {
           _builder_1.newLineIfNotEmpty();
           String _plus = (res + _builder_1);
           res = _plus;
-          rIdx = (rIdx + 1);
+          int _plus_1 = (rIdx + 1);
+          rIdx = _plus_1;
         }
-        idx = (idx + 1);
+        int _plus_2 = (idx + 1);
+        idx = _plus_2;
       }
     }
     StringConcatenation _builder_1 = new StringConcatenation();
@@ -874,10 +884,11 @@ public class BusAccess {
   public CharSequence generateConditions(final Row row, final Definition d) {
     StringConcatenation _builder = new StringConcatenation();
     {
-      if ((d.width == 32)) {
+      boolean _equals = (d.width == 32);
+      if (_equals) {
       } else {
-        boolean _equals = Objects.equal(d.warn, Definition.WarnType.silentLimit);
-        if (_equals) {
+        boolean _equals_1 = Objects.equal(d.warn, WarnType.silentLimit);
+        if (_equals_1) {
           _builder.append("if (");
           String _varName = this.getVarName(row, d);
           _builder.append(_varName, "");
@@ -888,17 +899,17 @@ public class BusAccess {
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           String _varName_1 = this.getVarName(row, d);
-          _builder.append(_varName_1, "\t");
+          _builder.append(_varName_1, "	");
           _builder.append("=");
           String _maxValueHex_1 = this.getMaxValueHex(d);
-          _builder.append(_maxValueHex_1, "\t");
+          _builder.append(_maxValueHex_1, "	");
           _builder.append(";");
           _builder.newLineIfNotEmpty();
           _builder.append("}");
           _builder.newLine();
           {
-            boolean _equals_1 = Objects.equal(d.type, Definition.Type.INT);
-            if (_equals_1) {
+            boolean _equals_2 = Objects.equal(d.type, Type.INT);
+            if (_equals_2) {
               _builder.append("if (");
               String _varName_2 = this.getVarName(row, d);
               _builder.append(_varName_2, "");
@@ -909,10 +920,10 @@ public class BusAccess {
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
               String _varName_3 = this.getVarName(row, d);
-              _builder.append(_varName_3, "\t");
+              _builder.append(_varName_3, "	");
               _builder.append("=");
               String _maxValueNegHex_1 = this.getMaxValueNegHex(d);
-              _builder.append(_maxValueNegHex_1, "\t");
+              _builder.append(_maxValueNegHex_1, "	");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("}");
@@ -920,8 +931,8 @@ public class BusAccess {
             }
           }
         } else {
-          boolean _equals_2 = Objects.equal(d.warn, Definition.WarnType.limit);
-          if (_equals_2) {
+          boolean _equals_3 = Objects.equal(d.warn, WarnType.limit);
+          if (_equals_3) {
             _builder.append("if (");
             String _varName_4 = this.getVarName(row, d);
             _builder.append(_varName_4, "");
@@ -933,30 +944,30 @@ public class BusAccess {
             _builder.append("\t");
             _builder.append("warn(limit, ");
             String _varName_5 = this.getVarName(row, d);
-            _builder.append(_varName_5, "\t");
+            _builder.append(_varName_5, "	");
             _builder.append(", \"");
             String _varNameIndex = this.getVarNameIndex(row, d);
-            _builder.append(_varNameIndex, "\t");
+            _builder.append(_varNameIndex, "	");
             _builder.append("\", \"");
-            _builder.append(row.name, "\t");
+            _builder.append(row.name, "	");
             _builder.append("\", \"using ");
             String _maxValueHex_3 = this.getMaxValueHex(d);
-            _builder.append(_maxValueHex_3, "\t");
+            _builder.append(_maxValueHex_3, "	");
             _builder.append("\");");
             _builder.newLineIfNotEmpty();
             _builder.append("\t");
             String _varName_6 = this.getVarName(row, d);
-            _builder.append(_varName_6, "\t");
+            _builder.append(_varName_6, "	");
             _builder.append("=");
             String _maxValueHex_4 = this.getMaxValueHex(d);
-            _builder.append(_maxValueHex_4, "\t");
+            _builder.append(_maxValueHex_4, "	");
             _builder.append(";");
             _builder.newLineIfNotEmpty();
             _builder.append("}");
             _builder.newLine();
             {
-              boolean _equals_3 = Objects.equal(d.type, Definition.Type.INT);
-              if (_equals_3) {
+              boolean _equals_4 = Objects.equal(d.type, Type.INT);
+              if (_equals_4) {
                 _builder.append("if (");
                 String _varName_7 = this.getVarName(row, d);
                 _builder.append(_varName_7, "");
@@ -968,23 +979,23 @@ public class BusAccess {
                 _builder.append("\t");
                 _builder.append("warn(limit, ");
                 String _varName_8 = this.getVarName(row, d);
-                _builder.append(_varName_8, "\t");
+                _builder.append(_varName_8, "	");
                 _builder.append(", \"");
                 String _varNameIndex_1 = this.getVarNameIndex(row, d);
-                _builder.append(_varNameIndex_1, "\t");
+                _builder.append(_varNameIndex_1, "	");
                 _builder.append("\", \"");
-                _builder.append(row.name, "\t");
+                _builder.append(row.name, "	");
                 _builder.append("\", \"using ");
                 String _maxValueNegHex_3 = this.getMaxValueNegHex(d);
-                _builder.append(_maxValueNegHex_3, "\t");
+                _builder.append(_maxValueNegHex_3, "	");
                 _builder.append("\");");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t");
                 String _varName_9 = this.getVarName(row, d);
-                _builder.append(_varName_9, "\t");
+                _builder.append(_varName_9, "	");
                 _builder.append("=");
                 String _maxValueNegHex_4 = this.getMaxValueNegHex(d);
-                _builder.append(_maxValueNegHex_4, "\t");
+                _builder.append(_maxValueNegHex_4, "	");
                 _builder.append(";");
                 _builder.newLineIfNotEmpty();
                 _builder.append("}");
@@ -992,8 +1003,8 @@ public class BusAccess {
               }
             }
           } else {
-            boolean _equals_4 = Objects.equal(d.warn, Definition.WarnType.silentMask);
-            if (_equals_4) {
+            boolean _equals_5 = Objects.equal(d.warn, WarnType.silentMask);
+            if (_equals_5) {
               _builder.append("if (");
               String _varName_10 = this.getVarName(row, d);
               _builder.append(_varName_10, "");
@@ -1004,17 +1015,17 @@ public class BusAccess {
               _builder.newLineIfNotEmpty();
               _builder.append("\t");
               String _varName_11 = this.getVarName(row, d);
-              _builder.append(_varName_11, "\t");
+              _builder.append(_varName_11, "	");
               _builder.append("&=");
               String _maxValueHex_6 = this.getMaxValueHex(d);
-              _builder.append(_maxValueHex_6, "\t");
+              _builder.append(_maxValueHex_6, "	");
               _builder.append(";");
               _builder.newLineIfNotEmpty();
               _builder.append("}");
               _builder.newLine();
               {
-                boolean _equals_5 = Objects.equal(d.type, Definition.Type.INT);
-                if (_equals_5) {
+                boolean _equals_6 = Objects.equal(d.type, Type.INT);
+                if (_equals_6) {
                   _builder.append("if (");
                   String _varName_12 = this.getVarName(row, d);
                   _builder.append(_varName_12, "");
@@ -1025,10 +1036,10 @@ public class BusAccess {
                   _builder.newLineIfNotEmpty();
                   _builder.append("\t");
                   String _varName_13 = this.getVarName(row, d);
-                  _builder.append(_varName_13, "\t");
+                  _builder.append(_varName_13, "	");
                   _builder.append("&=");
                   String _maxValueNegHex_6 = this.getMaxValueNegHex(d);
-                  _builder.append(_maxValueNegHex_6, "\t");
+                  _builder.append(_maxValueNegHex_6, "	");
                   _builder.append(";");
                   _builder.newLineIfNotEmpty();
                   _builder.append("}");
@@ -1036,8 +1047,8 @@ public class BusAccess {
                 }
               }
             } else {
-              boolean _equals_6 = Objects.equal(d.warn, Definition.WarnType.mask);
-              if (_equals_6) {
+              boolean _equals_7 = Objects.equal(d.warn, WarnType.mask);
+              if (_equals_7) {
                 _builder.append("if (");
                 String _varName_14 = this.getVarName(row, d);
                 _builder.append(_varName_14, "");
@@ -1049,30 +1060,30 @@ public class BusAccess {
                 _builder.append("\t");
                 _builder.append("warn(mask, ");
                 String _varName_15 = this.getVarName(row, d);
-                _builder.append(_varName_15, "\t");
+                _builder.append(_varName_15, "	");
                 _builder.append(", \"");
                 String _varNameIndex_2 = this.getVarNameIndex(row, d);
-                _builder.append(_varNameIndex_2, "\t");
+                _builder.append(_varNameIndex_2, "	");
                 _builder.append("\", \"");
-                _builder.append(row.name, "\t");
+                _builder.append(row.name, "	");
                 _builder.append("\", \"masking with ");
                 String _maxValueHex_8 = this.getMaxValueHex(d);
-                _builder.append(_maxValueHex_8, "\t");
+                _builder.append(_maxValueHex_8, "	");
                 _builder.append("\");");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t");
                 String _varName_16 = this.getVarName(row, d);
-                _builder.append(_varName_16, "\t");
+                _builder.append(_varName_16, "	");
                 _builder.append("&=");
                 String _maxValueHex_9 = this.getMaxValueHex(d);
-                _builder.append(_maxValueHex_9, "\t");
+                _builder.append(_maxValueHex_9, "	");
                 _builder.append(";");
                 _builder.newLineIfNotEmpty();
                 _builder.append("}");
                 _builder.newLine();
                 {
-                  boolean _equals_7 = Objects.equal(d.type, Definition.Type.INT);
-                  if (_equals_7) {
+                  boolean _equals_8 = Objects.equal(d.type, Type.INT);
+                  if (_equals_8) {
                     _builder.append("if (");
                     String _varName_17 = this.getVarName(row, d);
                     _builder.append(_varName_17, "");
@@ -1084,23 +1095,23 @@ public class BusAccess {
                     _builder.append("\t");
                     _builder.append("warn(mask, ");
                     String _varName_18 = this.getVarName(row, d);
-                    _builder.append(_varName_18, "\t");
+                    _builder.append(_varName_18, "	");
                     _builder.append(", \"");
                     String _varNameIndex_3 = this.getVarNameIndex(row, d);
-                    _builder.append(_varNameIndex_3, "\t");
+                    _builder.append(_varNameIndex_3, "	");
                     _builder.append("\", \"");
-                    _builder.append(row.name, "\t");
+                    _builder.append(row.name, "	");
                     _builder.append("\", \"masking with ");
                     String _maxValueNegHex_8 = this.getMaxValueNegHex(d);
-                    _builder.append(_maxValueNegHex_8, "\t");
+                    _builder.append(_maxValueNegHex_8, "	");
                     _builder.append("\");");
                     _builder.newLineIfNotEmpty();
                     _builder.append("\t");
                     String _varName_19 = this.getVarName(row, d);
-                    _builder.append(_varName_19, "\t");
+                    _builder.append(_varName_19, "	");
                     _builder.append("&=");
                     String _maxValueNegHex_9 = this.getMaxValueNegHex(d);
-                    _builder.append(_maxValueNegHex_9, "\t");
+                    _builder.append(_maxValueNegHex_9, "	");
                     _builder.append(";");
                     _builder.newLineIfNotEmpty();
                     _builder.append("}");
@@ -1108,8 +1119,8 @@ public class BusAccess {
                   }
                 }
               } else {
-                boolean _equals_8 = Objects.equal(d.warn, Definition.WarnType.silentError);
-                if (_equals_8) {
+                boolean _equals_9 = Objects.equal(d.warn, WarnType.silentError);
+                if (_equals_9) {
                   _builder.append("if (");
                   String _varName_20 = this.getVarName(row, d);
                   _builder.append(_varName_20, "");
@@ -1124,8 +1135,8 @@ public class BusAccess {
                   _builder.append("}");
                   _builder.newLine();
                   {
-                    boolean _equals_9 = Objects.equal(d.type, Definition.Type.INT);
-                    if (_equals_9) {
+                    boolean _equals_10 = Objects.equal(d.type, Type.INT);
+                    if (_equals_10) {
                       _builder.append("if (");
                       String _varName_21 = this.getVarName(row, d);
                       _builder.append(_varName_21, "");
@@ -1142,8 +1153,8 @@ public class BusAccess {
                     }
                   }
                 } else {
-                  boolean _equals_10 = Objects.equal(d.warn, Definition.WarnType.error);
-                  if (_equals_10) {
+                  boolean _equals_11 = Objects.equal(d.warn, WarnType.error);
+                  if (_equals_11) {
                     _builder.append("if (");
                     String _varName_22 = this.getVarName(row, d);
                     _builder.append(_varName_22, "");
@@ -1155,12 +1166,12 @@ public class BusAccess {
                     _builder.append("\t");
                     _builder.append("warn(error, ");
                     String _varName_23 = this.getVarName(row, d);
-                    _builder.append(_varName_23, "\t");
+                    _builder.append(_varName_23, "	");
                     _builder.append(", \"");
                     String _varNameIndex_4 = this.getVarNameIndex(row, d);
-                    _builder.append(_varNameIndex_4, "\t");
+                    _builder.append(_varNameIndex_4, "	");
                     _builder.append("\", \"");
-                    _builder.append(row.name, "\t");
+                    _builder.append(row.name, "	");
                     _builder.append("\", \"returning with 0\");");
                     _builder.newLineIfNotEmpty();
                     _builder.append("\t");
@@ -1169,8 +1180,8 @@ public class BusAccess {
                     _builder.append("}");
                     _builder.newLine();
                     {
-                      boolean _equals_11 = Objects.equal(d.type, Definition.Type.INT);
-                      if (_equals_11) {
+                      boolean _equals_12 = Objects.equal(d.type, Type.INT);
+                      if (_equals_12) {
                         _builder.append("if (");
                         String _varName_24 = this.getVarName(row, d);
                         _builder.append(_varName_24, "");
@@ -1182,12 +1193,12 @@ public class BusAccess {
                         _builder.append("\t");
                         _builder.append("warn(error, ");
                         String _varName_25 = this.getVarName(row, d);
-                        _builder.append(_varName_25, "\t");
+                        _builder.append(_varName_25, "	");
                         _builder.append(", \"");
                         String _varNameIndex_5 = this.getVarNameIndex(row, d);
-                        _builder.append(_varNameIndex_5, "\t");
+                        _builder.append(_varNameIndex_5, "	");
                         _builder.append("\", \"");
-                        _builder.append(row.name, "\t");
+                        _builder.append(row.name, "	");
                         _builder.append("\", \"returning with 0\");");
                         _builder.newLineIfNotEmpty();
                         _builder.append("\t");
@@ -1222,11 +1233,11 @@ public class BusAccess {
   
   public boolean hasWrite(final NamedElement ne) {
     boolean _and = false;
-    boolean _tripleNotEquals = (((Definition) ne).rw != Definition.RWType.r);
+    boolean _tripleNotEquals = (((Definition) ne).rw != RWType.r);
     if (!_tripleNotEquals) {
       _and = false;
     } else {
-      boolean _tripleNotEquals_1 = (((Definition) ne).type != Definition.Type.UNUSED);
+      boolean _tripleNotEquals_1 = (((Definition) ne).type != Type.UNUSED);
       _and = (_tripleNotEquals && _tripleNotEquals_1);
     }
     return _and;
@@ -1248,7 +1259,7 @@ public class BusAccess {
   }
   
   public int getMaxValue(final Definition d) {
-    boolean _notEquals = (!Objects.equal(d.type, Definition.Type.INT));
+    boolean _notEquals = (!Objects.equal(d.type, Type.INT));
     if (_notEquals) {
       int _size = MemoryModel.getSize(d);
       int _doubleLessThan = (1 << _size);
@@ -1279,7 +1290,8 @@ public class BusAccess {
   
   public String getVarName(final Row row, final Definition d) {
     final Integer dim = row.defCount.get(d.name);
-    if (((dim).intValue() == 1)) {
+    boolean _equals = ((dim).intValue() == 1);
+    if (_equals) {
       return d.name;
     } else {
       return (d.name + d.arrayIndex);
@@ -1288,19 +1300,25 @@ public class BusAccess {
   
   public String getVarNameIndex(final Row row, final Definition d) {
     final Integer dim = row.defCount.get(d.name);
-    if (((dim).intValue() == 1)) {
+    boolean _equals = ((dim).intValue() == 1);
+    if (_equals) {
       return d.name;
     } else {
-      return (((d.name + "[") + d.arrayIndex) + "]");
+      String _plus = (d.name + "[");
+      String _plus_1 = (_plus + d.arrayIndex);
+      return (_plus_1 + "]");
     }
   }
   
   public String getVarNameArray(final Row row, final Definition d) {
     final Integer dim = row.defCount.get(d.name);
-    if (((dim).intValue() == 1)) {
+    boolean _equals = ((dim).intValue() == 1);
+    if (_equals) {
       return d.name;
     } else {
-      return (((d.name + "[") + dim) + "]");
+      String _plus = (d.name + "[");
+      String _plus_1 = (_plus + dim);
+      return (_plus_1 + "]");
     }
   }
   

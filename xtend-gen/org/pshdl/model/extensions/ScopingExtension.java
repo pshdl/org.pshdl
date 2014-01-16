@@ -48,6 +48,7 @@ import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLNativeFunction;
 import org.pshdl.model.HDLObject;
+import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLStatement;
 import org.pshdl.model.HDLSubstituteFunction;
@@ -63,6 +64,10 @@ import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.HDLQuery.FieldSelector;
+import org.pshdl.model.utils.HDLQuery.Result;
+import org.pshdl.model.utils.HDLQuery.Selector;
+import org.pshdl.model.utils.HDLQuery.Source;
 import org.pshdl.model.utils.HDLResolver;
 import org.pshdl.model.utils.MetaAccess;
 import org.pshdl.model.validation.Problem;
@@ -143,7 +148,7 @@ public class ScopingExtension {
   
   private static MetaAccess<HDLResolver> RESOLVER = new Function0<MetaAccess<HDLResolver>>() {
     public MetaAccess<HDLResolver> apply() {
-      HDLObject.GenericMeta<HDLResolver> _genericMeta = new HDLObject.GenericMeta<HDLResolver>("RESOLVER", false);
+      GenericMeta<HDLResolver> _genericMeta = new GenericMeta<HDLResolver>("RESOLVER", false);
       return _genericMeta;
     }
   }.apply();
@@ -324,7 +329,8 @@ public class ScopingExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleEquals = (_container == null);
     if (_tripleEquals) {
-      Problem _problem = new Problem(ErrorCode.UNRESOLVED_ENUM, obj, ("for hEnum:" + hEnum));
+      String _plus = ("for hEnum:" + hEnum);
+      Problem _problem = new Problem(ErrorCode.UNRESOLVED_ENUM, obj, _plus);
       HDLProblemException _hDLProblemException = new HDLProblemException(_problem);
       throw _hDLProblemException;
     }
@@ -336,7 +342,8 @@ public class ScopingExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleEquals = (_container == null);
     if (_tripleEquals) {
-      Problem _problem = new Problem(ErrorCode.UNRESOLVED_INTERFACE, obj, ("for interface:" + hIf));
+      String _plus = ("for interface:" + hIf);
+      Problem _problem = new Problem(ErrorCode.UNRESOLVED_INTERFACE, obj, _plus);
       HDLProblemException _hDLProblemException = new HDLProblemException(_problem);
       throw _hDLProblemException;
     }
@@ -348,7 +355,8 @@ public class ScopingExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleEquals = (_container == null);
     if (_tripleEquals) {
-      Problem _problem = new Problem(ErrorCode.UNRESOLVED_TYPE, obj, ("for type:" + hVar));
+      String _plus = ("for type:" + hVar);
+      Problem _problem = new Problem(ErrorCode.UNRESOLVED_TYPE, obj, _plus);
       HDLProblemException _hDLProblemException = new HDLProblemException(_problem);
       throw _hDLProblemException;
     }
@@ -360,7 +368,8 @@ public class ScopingExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleEquals = (_container == null);
     if (_tripleEquals) {
-      Problem _problem = new Problem(ErrorCode.UNRESOLVED_VARIABLE, obj, ("for hVariable:" + hVar));
+      String _plus = ("for hVariable:" + hVar);
+      Problem _problem = new Problem(ErrorCode.UNRESOLVED_VARIABLE, obj, _plus);
       HDLProblemException _hDLProblemException = new HDLProblemException(_problem);
       throw _hDLProblemException;
     }
@@ -658,13 +667,14 @@ public class ScopingExtension {
     final HDLVariable resolved = ScopingExtension.getVariable(hIf, _lastSegment);
     boolean _tripleNotEquals = (resolved != null);
     if (_tripleNotEquals) {
-      if ((hVar.length == 1)) {
+      boolean _equals = (hVar.length == 1);
+      if (_equals) {
         return Optional.<HDLVariable>of(resolved);
       }
       HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hIf);
       HDLQualifiedName _skipLast = hVar.skipLast(1);
-      boolean _equals = _fullNameOf.equals(_skipLast);
-      if (_equals) {
+      boolean _equals_1 = _fullNameOf.equals(_skipLast);
+      if (_equals_1) {
         return Optional.<HDLVariable>of(resolved);
       }
     }
@@ -672,22 +682,23 @@ public class ScopingExtension {
   }
   
   private static HDLVariable getVariable(final HDLInterface hIf, final String lastSegment) {
-    HDLQuery.Source<HDLVariable> _select = HDLQuery.<HDLVariable>select(HDLVariable.class);
-    HDLQuery.Selector<HDLVariable> _from = _select.from(hIf);
-    HDLQuery.FieldSelector<HDLVariable,String> _where = _from.<String>where(HDLVariable.fName);
-    HDLQuery.Result<HDLVariable,String> _lastSegmentIs = _where.lastSegmentIs(lastSegment);
+    Source<HDLVariable> _select = HDLQuery.<HDLVariable>select(HDLVariable.class);
+    Selector<HDLVariable> _from = _select.from(hIf);
+    FieldSelector<HDLVariable,String> _where = _from.<String>where(HDLVariable.fName);
+    Result<HDLVariable,String> _lastSegmentIs = _where.lastSegmentIs(lastSegment);
     return _lastSegmentIs.getFirst();
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLEnum hEnum, final HDLQualifiedName hVar) {
-    if ((hVar.length == 1)) {
+    boolean _equals = (hVar.length == 1);
+    if (_equals) {
       String _lastSegment = hVar.getLastSegment();
       return ScopingExtension.getVariable(hEnum, _lastSegment);
     }
     HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hEnum);
     HDLQualifiedName _skipLast = hVar.skipLast(1);
-    boolean _equals = _fullNameOf.equals(_skipLast);
-    if (_equals) {
+    boolean _equals_1 = _fullNameOf.equals(_skipLast);
+    if (_equals_1) {
       String _lastSegment_1 = hVar.getLastSegment();
       return ScopingExtension.getVariable(hEnum, _lastSegment_1);
     }

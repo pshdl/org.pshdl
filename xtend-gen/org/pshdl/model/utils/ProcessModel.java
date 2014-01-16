@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -36,7 +37,7 @@ import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLUnresolvedFragment;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.extensions.StringWriteExtension;
-import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import org.pshdl.model.utils.SyntaxHighlighter;
 
 @SuppressWarnings("all")
@@ -48,11 +49,26 @@ public class ProcessModel {
     }
   }.apply();
   
-  public Multimap<Integer,HDLStatement> unclockedStatements = LinkedListMultimap.<Integer, HDLStatement>create();
+  public Multimap<Integer,HDLStatement> unclockedStatements = new Function0<Multimap<Integer,HDLStatement>>() {
+    public Multimap<Integer,HDLStatement> apply() {
+      LinkedListMultimap<Integer,HDLStatement> _create = LinkedListMultimap.<Integer, HDLStatement>create();
+      return _create;
+    }
+  }.apply();
   
-  public Multimap<HDLRegisterConfig,HDLStatement> clockedStatements = LinkedListMultimap.<HDLRegisterConfig, HDLStatement>create();
+  public Multimap<HDLRegisterConfig,HDLStatement> clockedStatements = new Function0<Multimap<HDLRegisterConfig,HDLStatement>>() {
+    public Multimap<HDLRegisterConfig,HDLStatement> apply() {
+      LinkedListMultimap<HDLRegisterConfig,HDLStatement> _create = LinkedListMultimap.<HDLRegisterConfig, HDLStatement>create();
+      return _create;
+    }
+  }.apply();
   
-  public final static int DEF_PROCESS = (-1);
+  public final static int DEF_PROCESS = new Function0<Integer>() {
+    public Integer apply() {
+      int _minus = (-1);
+      return _minus;
+    }
+  }.apply();
   
   public static ProcessModel toProcessModel(final HDLUnit stmnt) {
     ProcessModel _processModel = new ProcessModel();
@@ -91,7 +107,8 @@ public class ProcessModel {
   }
   
   protected static ProcessModel _toProcessModel(final HDLStatement stmnt, final int pid) {
-    RuntimeException _runtimeException = new RuntimeException(("Not implemented for statement:" + stmnt));
+    String _plus = ("Not implemented for statement:" + stmnt);
+    RuntimeException _runtimeException = new RuntimeException(_plus);
     throw _runtimeException;
   }
   
@@ -116,7 +133,7 @@ public class ProcessModel {
     return ProcessModel.<HDLSwitchCaseStatement, HDLStatement, ArrayList<HDLStatement>>toProcessModel(stmnt, HDLSwitchCaseStatement.fDos, pid);
   }
   
-  private static <T extends HDLStatement, V extends HDLStatement, C extends Collection<V>> ProcessModel toProcessModel(final T obj, final HDLQuery.HDLFieldAccess<T,C> field, final int pid) {
+  private static <T extends HDLStatement, V extends HDLStatement, C extends Collection<V>> ProcessModel toProcessModel(final T obj, final HDLFieldAccess<T,C> field, final int pid) {
     ProcessModel _processModel = new ProcessModel();
     final ProcessModel pm = _processModel;
     C _value = field.getValue(obj);
@@ -258,7 +275,8 @@ public class ProcessModel {
   protected static ProcessModel _toProcessModel(final HDLAssignment stmnt, final int pid) {
     final HDLReference ref = stmnt.getLeft();
     if ((ref instanceof HDLUnresolvedFragment)) {
-      RuntimeException _runtimeException = new RuntimeException(("Not implemented for HDLUnresolvedFragment:" + stmnt));
+      String _plus = ("Not implemented for HDLUnresolvedFragment:" + stmnt);
+      RuntimeException _runtimeException = new RuntimeException(_plus);
       throw _runtimeException;
     }
     final HDLResolvedRef rRef = ((HDLResolvedRef) ref);
@@ -310,8 +328,8 @@ public class ProcessModel {
     _builder.newLine();
     {
       Map<Integer,Collection<HDLStatement>> _asMap = this.unclockedStatements.asMap();
-      Set<Map.Entry<Integer,Collection<HDLStatement>>> _entrySet = _asMap.entrySet();
-      for(final Map.Entry<Integer, Collection<HDLStatement>> e : _entrySet) {
+      Set<Entry<Integer,Collection<HDLStatement>>> _entrySet = _asMap.entrySet();
+      for(final Entry<Integer, Collection<HDLStatement>> e : _entrySet) {
         _builder.append("Process:");
         Integer _key = e.getKey();
         _builder.append(_key, "");
@@ -334,8 +352,8 @@ public class ProcessModel {
     _builder.newLine();
     {
       Map<HDLRegisterConfig,Collection<HDLStatement>> _asMap_1 = this.clockedStatements.asMap();
-      Set<Map.Entry<HDLRegisterConfig,Collection<HDLStatement>>> _entrySet_1 = _asMap_1.entrySet();
-      for(final Map.Entry<HDLRegisterConfig, Collection<HDLStatement>> e_1 : _entrySet_1) {
+      Set<Entry<HDLRegisterConfig,Collection<HDLStatement>>> _entrySet_1 = _asMap_1.entrySet();
+      for(final Entry<HDLRegisterConfig, Collection<HDLStatement>> e_1 : _entrySet_1) {
         _builder.append("Process:");
         HDLRegisterConfig _key_1 = e_1.getKey();
         _builder.append(_key_1, "");

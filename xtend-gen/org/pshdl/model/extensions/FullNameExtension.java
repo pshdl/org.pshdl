@@ -38,8 +38,10 @@ import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLIfStatement;
+import org.pshdl.model.HDLIfStatement.TreeSide;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLObject;
+import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLSwitchStatement;
@@ -60,9 +62,9 @@ public class FullNameExtension {
   /**
    * This annotation is used to store {@ink HDLQualifiedName} for the case that the resolution diverges from the actual tree
    */
-  public static HDLObject.GenericMeta<HDLQualifiedName> FULLNAME = new Function0<HDLObject.GenericMeta<HDLQualifiedName>>() {
-    public HDLObject.GenericMeta<HDLQualifiedName> apply() {
-      HDLObject.GenericMeta<HDLQualifiedName> _genericMeta = new HDLObject.GenericMeta<HDLQualifiedName>("FULLNAME", true);
+  public static GenericMeta<HDLQualifiedName> FULLNAME = new Function0<GenericMeta<HDLQualifiedName>>() {
+    public GenericMeta<HDLQualifiedName> apply() {
+      GenericMeta<HDLQualifiedName> _genericMeta = new GenericMeta<HDLQualifiedName>("FULLNAME", true);
       return _genericMeta;
     }
   }.apply();
@@ -115,7 +117,8 @@ public class FullNameExtension {
           HDLClass _classType_1 = obj.getClassType();
           boolean _tripleEquals_1 = (_classType == _classType_1);
           if (_tripleEquals_1) {
-            count = (count + 1);
+            int _plus = (count + 1);
+            count = _plus;
           }
         }
         boolean _hasNext_1 = iterator.hasNext();
@@ -344,10 +347,10 @@ public class FullNameExtension {
       if ((_container_2 instanceof HDLIfStatement)) {
         IHDLObject _container_3 = obj.getContainer();
         final HDLIfStatement ifStmnt = ((HDLIfStatement) _container_3);
-        final HDLIfStatement.TreeSide side = ifStmnt.treeSide(obj);
+        final TreeSide side = ifStmnt.treeSide(obj);
         boolean _matched = false;
         if (!_matched) {
-          if (Objects.equal(side,HDLIfStatement.TreeSide.thenTree)) {
+          if (Objects.equal(side,TreeSide.thenTree)) {
             _matched=true;
             String _string = fn.toString();
             String _plus = (_string + "p");
@@ -356,7 +359,7 @@ public class FullNameExtension {
           }
         }
         if (!_matched) {
-          if (Objects.equal(side,HDLIfStatement.TreeSide.elseTree)) {
+          if (Objects.equal(side,TreeSide.elseTree)) {
             _matched=true;
             String _string_1 = fn.toString();
             String _plus_1 = (_string_1 + "n");

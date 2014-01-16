@@ -15,6 +15,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
+import org.pshdl.interpreter.Frame.FastInstruction;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
@@ -65,11 +66,15 @@ public class CommonCompilerExtension {
     }
     for (final Frame f : em.frames) {
       {
-        if ((f.edgeNegDepRes != (-1))) {
+        int _minus = (-1);
+        boolean _notEquals = (f.edgeNegDepRes != _minus);
+        if (_notEquals) {
           InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
           this.prevMap.put(_asInternal.info.name, Boolean.valueOf(true));
         }
-        if ((f.edgePosDepRes != (-1))) {
+        int _minus_1 = (-1);
+        boolean _notEquals_1 = (f.edgePosDepRes != _minus_1);
+        if (_notEquals_1) {
           InternalInformation _asInternal_1 = this.asInternal(f.edgePosDepRes);
           this.prevMap.put(_asInternal_1.info.name, Boolean.valueOf(true));
         }
@@ -93,7 +98,8 @@ public class CommonCompilerExtension {
   public CharSequence asMaskL(final int width) {
     long _doubleLessThan = (1l << width);
     final long mask = (_doubleLessThan - 1);
-    if ((width == 64)) {
+    boolean _equals = (width == 64);
+    if (_equals) {
       return "0xFFFFFFFFFFFFFFFFl";
     }
     return this.toHexStringL(mask);
@@ -135,7 +141,8 @@ public class CommonCompilerExtension {
   public long dimMask(final InternalInformation info) {
     final int size = this.totalSize(info.info);
     final long res = Long.highestOneBit(size);
-    if ((res == size)) {
+    boolean _equals = (res == size);
+    if (_equals) {
       return (res - 1);
     }
     long _doubleLessThan = (res << 1);
@@ -151,7 +158,9 @@ public class CommonCompilerExtension {
       {
         final int arr = v.arrayIdx[(i).intValue()];
         final Integer dim = dims.get((i).intValue());
-        off = (off + (arr * (dim).intValue()));
+        int _multiply = (arr * (dim).intValue());
+        int _plus = (off + _multiply);
+        off = _plus;
       }
     }
     return off;
@@ -213,11 +222,13 @@ public class CommonCompilerExtension {
     for (final Integer i : _doubleDotLessThan) {
       {
         final Integer dim = dims.get((i).intValue());
-        if (((i).intValue() != 0)) {
+        boolean _notEquals = ((i).intValue() != 0);
+        if (_notEquals) {
           varAccess.append("+");
         }
         final Integer idx = i;
-        if (((dim).intValue() != 1)) {
+        boolean _notEquals_1 = ((dim).intValue() != 1);
+        if (_notEquals_1) {
           StringConcatenation _builder = new StringConcatenation();
           _builder.append("arrayIdx[");
           _builder.append(idx, "");
@@ -245,7 +256,8 @@ public class CommonCompilerExtension {
     for (final Integer i : _doubleDotLessThan) {
       {
         final Integer dim = dims.get((i).intValue());
-        if (((i).intValue() != 0)) {
+        boolean _notEquals = ((i).intValue() != 0);
+        if (_notEquals) {
           varAccess.append("+");
         }
         Integer _xifexpression = null;
@@ -257,7 +269,8 @@ public class CommonCompilerExtension {
           _xifexpression = _get;
         }
         final Integer idx = _xifexpression;
-        if (((dim).intValue() != 1)) {
+        boolean _notEquals_1 = ((dim).intValue() != 1);
+        if (_notEquals_1) {
           StringConcatenation _builder = new StringConcatenation();
           _builder.append(varName, "");
           _builder.append(idx, "");
@@ -342,7 +355,8 @@ public class CommonCompilerExtension {
   public int totalSize(final VariableInformation info) {
     int size = 1;
     for (final int d : info.dimensions) {
-      size = (size * d);
+      int _multiply = (size * d);
+      size = _multiply;
     }
     return size;
   }
@@ -385,10 +399,12 @@ public class CommonCompilerExtension {
       res = _substring_1;
     }
     if (field) {
-      res = ("_" + res);
+      String _plus = ("_" + res);
+      res = _plus;
     }
     if (isReg) {
-      res = (res + "$reg");
+      String _plus_1 = (res + "$reg");
+      res = _plus_1;
     }
     if (prev) {
       return (res + "_prev");
@@ -404,18 +420,20 @@ public class CommonCompilerExtension {
         boolean _isNotNull = this.isNotNull(oi.info);
         boolean _not = (!_isNotNull);
         if (_not) {
-          for (final Frame.FastInstruction inst : f.instructions) {
+          for (final FastInstruction inst : f.instructions) {
             boolean _tripleEquals = (inst.inst == Instruction.writeInternal);
             if (_tripleEquals) {
               InternalInformation _asInternal = this.asInternal(inst.arg1);
               if (_asInternal.isShadowReg) {
-                maxUpdates = (maxUpdates + 1);
+                int _plus = (maxUpdates + 1);
+                maxUpdates = _plus;
               }
             }
           }
         } else {
           if (oi.isShadowReg) {
-            maxUpdates = (maxUpdates + 1);
+            int _plus_1 = (maxUpdates + 1);
+            maxUpdates = _plus_1;
           }
         }
       }
@@ -477,7 +495,8 @@ public class CommonCompilerExtension {
   public CharSequence signExtend(final CharSequence op, final CharSequence cast, final int shift) {
     CharSequence _xblockexpression = null;
     {
-      if ((shift == 0)) {
+      boolean _equals = (shift == 0);
+      if (_equals) {
         return op;
       }
       boolean _and = false;

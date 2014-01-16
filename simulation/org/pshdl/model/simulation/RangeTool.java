@@ -103,61 +103,69 @@ public class RangeTool {
 						.result();
 			}
 		});
+		RangeVal last = null;
 		int count = 0;
-		BigInteger start = null;
-		for (final RangeVal rangeVal : value) {
-			count += rangeVal.count;
-			if (rangeVal.isStart()) {
-				if (start != null)
-					// If there was an unended start, then we have to end it
-					if (start.equals(rangeVal.value)) {
-						// Or at the same location
-						res.add(RangeTool.createRange(start, rangeVal.value));
-						// res.add(new ValueRange(start, rangeVal.value));
+		for (final RangeVal current : value) {
+			if (last != null) {
+				if (last.isStart()) {
+					if (current.isStart()) {
+						res.add(createRange(last.value, current.value.subtract(BigInteger.ONE)));
 					} else {
-						// just one before the new start
-						res.add(RangeTool.createRange(start, rangeVal.value.subtract(BigInteger.ONE)));
+						res.add(createRange(last.value, current.value));
 					}
-				// res.add(new ValueRange(start,
-				// rangeVal.value.subtract(BigInteger.ONE)));
-				// Set the start to the current Element
-				start = rangeVal.value;
-			} else {
-				// End the current range at this Element
-				res.add(RangeTool.createRange(start, rangeVal.value));
-				if (count > 0) {
-					// If we expect another end later, the element following
-					// this will have to start one after
-					start = rangeVal.value.add(BigInteger.ONE);
 				} else {
-					// No new range anymore
-					start = null;
+					if (current.isStart()) {
+						if ((count > 0) && (current.value.subtract(last.value).compareTo(BigInteger.ONE) > 0)) {
+							res.add(createRange(last.value.add(BigInteger.ONE), current.value.subtract(BigInteger.ONE)));
+						}
+					} else {
+						res.add(createRange(last.value.add(BigInteger.ONE), current.value));
+					}
 				}
+			} else {
+				if (!current.isStart())
+					throw new IllegalArgumentException("this should not happen");
 			}
+			count += current.count;
+			last = current;
 		}
 		return res;
 	}
 
 	public static void main(String[] args) {
+		validate(split(createRanges(6, 10, 5, 5, 0, 10)));
+		validate(split(createRanges(1, 2, 5, 6)));
+		validate(split(createRanges(1, 2, 5, 6, 1, 6)));
 		// 5->8 9->10 11
-		System.out.println(split(createRanges(5, 8, 9, 10, 11, 11)));
+		validate(split(createRanges(5, 8, 9, 10, 11, 11)));
 		// 5, 6->7, 8, 9, 10
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9)));
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9)));
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9)));
-		System.out.println(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9, 14, 18)));
-		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7)));
-		System.out.println(split(createRanges(2, 2, 7, 13, 7, 10, 5, 5, 6, 6, 7, 7, 5, 8, 10, 10)));
-		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 8)));
-		System.out.println(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 7)));
+		validate(split(createRanges(5, 10, 6, 8, 8, 9)));
+		validate(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9)));
+		validate(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9)));
+		validate(split(createRanges(5, 10, 6, 8, 8, 9, 6, 9, 6, 11, 8, 9, 14, 18)));
+		validate(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7)));
+		validate(split(createRanges(2, 2, 7, 13, 7, 10, 5, 5, 6, 6, 7, 7, 5, 8, 10, 10)));
+		validate(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 8)));
+		validate(split(createRanges(7, 10, 5, 5, 6, 6, 7, 7, 5, 7)));
+	}
+
+	private static void validate(Set<Range<BigInteger>> split) {
+		System.out.println("Result:" + split);
+		Range<BigInteger> last = Range.closed(BigInteger.valueOf(-1), BigInteger.valueOf(-1));
+		for (final Range<BigInteger> range : split) {
+			if (range.isConnected(last))
+				throw new IllegalArgumentException("Ranges are connected:" + last + " and " + range);
+			last = range;
+		}
 	}
 
 	private static List<RangeVal> createRanges(int... r) {
 		final List<RangeVal> temp = new LinkedList<RangeVal>();
-		for (int i = 0; i < r.length; i++) {
-			temp.add(new RangeVal(BigInteger.valueOf(r[i]), (i % 2) == 0 ? 1 : -1));
+		for (int i = 0; i < r.length; i += 2) {
+			temp.add(new RangeVal(BigInteger.valueOf(r[i]), 1));
+			temp.add(new RangeVal(BigInteger.valueOf(r[i + 1]), -1));
+			System.out.print("[" + r[i] + "," + r[i + 1] + "] ");
 		}
-		System.out.println("HDLSimulator.createRanges()" + temp);
 		return temp;
 	}
 
