@@ -36,7 +36,6 @@ import java.util.List;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLArithOp;
-import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLClass;
@@ -51,11 +50,9 @@ import org.pshdl.model.HDLInlineFunction;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLLiteral;
-import org.pshdl.model.HDLLiteral.HDLLiteralPresentation;
 import org.pshdl.model.HDLManip;
-import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLPrimitive;
-import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLRegisterConfig;
 import org.pshdl.model.HDLShiftOp;
@@ -237,9 +234,9 @@ public class TypeExtension {
     throw _runtimeException;
   }
   
-  private static GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new Function0<GenericMeta<Boolean>>() {
-    public GenericMeta<Boolean> apply() {
-      GenericMeta<Boolean> _genericMeta = new GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", 
+  private static HDLObject.GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new Function0<HDLObject.GenericMeta<Boolean>>() {
+    public HDLObject.GenericMeta<Boolean> apply() {
+      HDLObject.GenericMeta<Boolean> _genericMeta = new HDLObject.GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", 
         false);
       return _genericMeta;
     }
@@ -274,8 +271,7 @@ public class TypeExtension {
       return Optional.<HDLType>absent();
     }
     HDLType type = nextType.get();
-    boolean _not_1 = (!(type instanceof HDLPrimitive));
-    if (_not_1) {
+    if ((!(type instanceof HDLPrimitive))) {
       return Optional.<HDLType>absent();
     }
     HDLExpression width = TypeExtension.getWidth(type);
@@ -290,14 +286,13 @@ public class TypeExtension {
         HDLExpression _next_1 = iter.next();
         final Optional<? extends HDLType> nextCatType = TypeExtension.cachedType(_next_1);
         boolean _isPresent_1 = nextCatType.isPresent();
-        boolean _not_2 = (!_isPresent_1);
-        if (_not_2) {
+        boolean _not_1 = (!_isPresent_1);
+        if (_not_1) {
           return Optional.<HDLType>absent();
         }
         HDLType _get = nextCatType.get();
         type = _get;
-        boolean _not_3 = (!(type instanceof HDLPrimitive));
-        if (_not_3) {
+        if ((!(type instanceof HDLPrimitive))) {
           return Optional.<HDLType>absent();
         }
         final HDLExpression tWidth = TypeExtension.getWidth(type);
@@ -307,7 +302,7 @@ public class TypeExtension {
         }
         HDLArithOp _hDLArithOp = new HDLArithOp();
         HDLArithOp _setLeft = _hDLArithOp.setLeft(width);
-        HDLArithOp _setType = _setLeft.setType(HDLArithOpType.PLUS);
+        HDLArithOp _setType = _setLeft.setType(HDLArithOp.HDLArithOpType.PLUS);
         HDLArithOp _setRight = _setType.setRight(tWidth);
         width = _setRight;
         HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(cat, width);
@@ -343,8 +338,8 @@ public class TypeExtension {
   
   protected static HDLExpression _getWidth(final HDLPrimitive type) {
     final HDLExpression width = type.getWidth();
-    HDLPrimitiveType _type = type.getType();
-    boolean _equals = Objects.equal(_type, HDLPrimitiveType.BIT);
+    HDLPrimitive.HDLPrimitiveType _type = type.getType();
+    boolean _equals = Objects.equal(_type, HDLPrimitive.HDLPrimitiveType.BIT);
     if (_equals) {
       return HDLLiteral.get(1);
     }
@@ -375,22 +370,22 @@ public class TypeExtension {
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLLiteral lit) {
-    HDLLiteralPresentation _presentation = lit.getPresentation();
-    final HDLLiteralPresentation _switchValue = _presentation;
+    HDLLiteral.HDLLiteralPresentation _presentation = lit.getPresentation();
+    final HDLLiteral.HDLLiteralPresentation _switchValue = _presentation;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteralPresentation.STR)) {
+      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.STR)) {
         _matched=true;
         HDLPrimitive _hDLPrimitive = new HDLPrimitive();
-        HDLPrimitive _setType = _hDLPrimitive.setType(HDLPrimitiveType.STRING);
+        HDLPrimitive _setType = _hDLPrimitive.setType(HDLPrimitive.HDLPrimitiveType.STRING);
         return Optional.<HDLPrimitive>of(_setType);
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteralPresentation.BOOL)) {
+      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.BOOL)) {
         _matched=true;
         HDLPrimitive _hDLPrimitive_1 = new HDLPrimitive();
-        HDLPrimitive _setType_1 = _hDLPrimitive_1.setType(HDLPrimitiveType.BOOL);
+        HDLPrimitive _setType_1 = _hDLPrimitive_1.setType(HDLPrimitive.HDLPrimitiveType.BOOL);
         return Optional.<HDLPrimitive>of(_setType_1);
       }
     }
@@ -467,7 +462,7 @@ public class TypeExtension {
       {
         HDLArithOp _hDLArithOp = new HDLArithOp();
         HDLArithOp _setLeft = _hDLArithOp.setLeft(width);
-        HDLArithOp _setType = _setLeft.setType(HDLArithOpType.PLUS);
+        HDLArithOp _setType = _setLeft.setType(HDLArithOp.HDLArithOpType.PLUS);
         HDLRange _next_1 = iter.next();
         HDLExpression _width_1 = _next_1.getWidth();
         HDLArithOp _setRight = _setType.setRight(_width_1);

@@ -38,9 +38,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
-import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLBitOp;
-import org.pshdl.model.HDLBitOp.HDLBitOpType;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLConcat;
 import org.pshdl.model.HDLEnumRef;
@@ -50,11 +48,9 @@ import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLManip;
-import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLShiftOp;
-import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnresolvedFragment;
 import org.pshdl.model.HDLVariable;
@@ -66,7 +62,7 @@ import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.ProblemDescription;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.RangeTool;
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider;
 import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.types.builtIn.HDLPrimitives;
 
@@ -154,7 +150,7 @@ public class RangeExtension {
       return Optional.<Range<BigInteger>>absent();
     }
     HDLVariable _get_2 = hVar.get();
-    HDLAnnotation _annotation = _get_2.getAnnotation(HDLBuiltInAnnotations.range);
+    HDLAnnotation _annotation = _get_2.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.range);
     final Optional<Range<BigInteger>> annoCheck = RangeExtension.checkAnnotation(_annotation);
     boolean _isPresent_2 = annoCheck.isPresent();
     if (_isPresent_2) {
@@ -166,7 +162,7 @@ public class RangeExtension {
     if (_tripleNotEquals) {
       if ((container instanceof HDLVariableDeclaration)) {
         final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) container);
-        HDLAnnotation _annotation_1 = hvd.getAnnotation(HDLBuiltInAnnotations.range);
+        HDLAnnotation _annotation_1 = hvd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.range);
         final Optional<Range<BigInteger>> subAnnoCheck = RangeExtension.checkAnnotation(_annotation_1);
         boolean _isPresent_3 = subAnnoCheck.isPresent();
         if (_isPresent_3) {
@@ -344,11 +340,11 @@ public class RangeExtension {
     if (_not_1) {
       return Optional.<Range<BigInteger>>absent();
     }
-    HDLShiftOpType _type = obj.getType();
-    final HDLShiftOpType _switchValue = _type;
+    HDLShiftOp.HDLShiftOpType _type = obj.getType();
+    final HDLShiftOp.HDLShiftOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SLL)) {
+      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SLL)) {
         _matched=true;
         Range<BigInteger> _get = leftRange.get();
         BigInteger _lowerEndpoint = _get.lowerEndpoint();
@@ -385,7 +381,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SRA)) {
+      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SRA)) {
         _matched=true;
         Range<BigInteger> _get_8 = leftRange.get();
         BigInteger _lowerEndpoint_4 = _get_8.lowerEndpoint();
@@ -422,7 +418,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOpType.SRL)) {
+      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SRL)) {
         _matched=true;
         Range<BigInteger> _get_16 = leftRange.get();
         BigInteger _lowerEndpoint_8 = _get_16.lowerEndpoint();
@@ -479,16 +475,16 @@ public class RangeExtension {
     if (_not_1) {
       return Optional.<Range<BigInteger>>absent();
     }
-    HDLBitOpType _type = obj.getType();
-    final HDLBitOpType type = _type;
+    HDLBitOp.HDLBitOpType _type = obj.getType();
+    final HDLBitOp.HDLBitOpType type = _type;
     boolean _matched = false;
     if (!_matched) {
       boolean _or = false;
-      boolean _equals = Objects.equal(type, HDLBitOpType.OR);
+      boolean _equals = Objects.equal(type, HDLBitOp.HDLBitOpType.OR);
       if (_equals) {
         _or = true;
       } else {
-        boolean _equals_1 = Objects.equal(type, HDLBitOpType.XOR);
+        boolean _equals_1 = Objects.equal(type, HDLBitOp.HDLBitOpType.XOR);
         _or = (_equals || _equals_1);
       }
       if (_or) {
@@ -505,7 +501,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(type,HDLBitOpType.AND)) {
+      if (Objects.equal(type,HDLBitOp.HDLBitOpType.AND)) {
         _matched=true;
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);
@@ -523,11 +519,11 @@ public class RangeExtension {
     }
     if (!_matched) {
       boolean _or_1 = false;
-      boolean _equals_2 = Objects.equal(type, HDLBitOpType.LOGI_AND);
+      boolean _equals_2 = Objects.equal(type, HDLBitOp.HDLBitOpType.LOGI_AND);
       if (_equals_2) {
         _or_1 = true;
       } else {
-        boolean _equals_3 = Objects.equal(type, HDLBitOpType.LOGI_OR);
+        boolean _equals_3 = Objects.equal(type, HDLBitOp.HDLBitOpType.LOGI_OR);
         _or_1 = (_equals_2 || _equals_3);
       }
       if (_or_1) {
@@ -557,11 +553,11 @@ public class RangeExtension {
     if (_not_1) {
       return Optional.<Range<BigInteger>>absent();
     }
-    HDLArithOpType _type = obj.getType();
-    final HDLArithOpType _switchValue = _type;
+    HDLArithOp.HDLArithOpType _type = obj.getType();
+    final HDLArithOp.HDLArithOpType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.PLUS)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.PLUS)) {
         _matched=true;
         Range<BigInteger> _get = leftRange.get();
         BigInteger _lowerEndpoint = _get.lowerEndpoint();
@@ -578,7 +574,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.MINUS)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MINUS)) {
         _matched=true;
         Range<BigInteger> _get_4 = leftRange.get();
         BigInteger _lowerEndpoint_2 = _get_4.lowerEndpoint();
@@ -595,7 +591,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.DIV)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.DIV)) {
         _matched=true;
         boolean _or = false;
         Range<BigInteger> _get_8 = rightRange.get();
@@ -678,7 +674,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.MUL)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MUL)) {
         _matched=true;
         Range<BigInteger> _get_19 = leftRange.get();
         BigInteger _lowerEndpoint_11 = _get_19.lowerEndpoint();
@@ -711,7 +707,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.MOD)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MOD)) {
         _matched=true;
         Range<BigInteger> _get_27 = rightRange.get();
         final BigInteger rle = _get_27.lowerEndpoint();
@@ -724,7 +720,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOpType.POW)) {
+      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.POW)) {
         _matched=true;
         Range<BigInteger> _get_29 = leftRange.get();
         BigInteger _lowerEndpoint_15 = _get_29.lowerEndpoint();
@@ -778,11 +774,11 @@ public class RangeExtension {
     if (_not) {
       return Optional.<Range<BigInteger>>absent();
     }
-    HDLManipType _type = obj.getType();
-    final HDLManipType _switchValue = _type;
+    HDLManip.HDLManipType _type = obj.getType();
+    final HDLManip.HDLManipType _switchValue = _type;
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.CAST)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.CAST)) {
         _matched=true;
         final HDLType type = obj.getCastTo();
         if ((type instanceof HDLPrimitive)) {
@@ -810,7 +806,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.ARITH_NEG)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.ARITH_NEG)) {
         _matched=true;
         Range<BigInteger> _get_2 = right.get();
         BigInteger _upperEndpoint = _get_2.upperEndpoint();
@@ -823,7 +819,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.BIT_NEG)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.BIT_NEG)) {
         _matched=true;
         Range<BigInteger> _get_4 = right.get();
         BigInteger _upperEndpoint_1 = _get_4.upperEndpoint();
@@ -835,7 +831,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManipType.LOGIC_NEG)) {
+      if (Objects.equal(_switchValue,HDLManip.HDLManipType.LOGIC_NEG)) {
         _matched=true;
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BOOLEAN_NOT_SUPPORTED_FOR_RANGES);

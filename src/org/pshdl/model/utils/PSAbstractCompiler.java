@@ -535,4 +535,8 @@ public class PSAbstractCompiler {
 	public Map<String, HDLPackage> getFileUnits() {
 		return pkgs;
 	}
+
+	public String getHookName() {
+		return "validator";
+	}
 }
