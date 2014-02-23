@@ -406,7 +406,7 @@ class DartCompiler implements ITypeOuptutProvider {
 				«FOR v : em.variables.filter[dir === Direction::INTERNAL] SEPARATOR ','»
 					«v.asPort»
 				«ENDFOR»
-				], _varIdx);
+				], _varIdx, "«em.moduleName»");
 		'''
 	}
 

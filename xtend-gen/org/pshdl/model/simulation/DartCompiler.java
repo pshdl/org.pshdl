@@ -1257,8 +1257,10 @@ public class DartCompiler implements ITypeOuptutProvider {
       }
     }
     _builder.append("\t");
-    _builder.append("], _varIdx);");
-    _builder.newLine();
+    _builder.append("], _varIdx, \"");
+    _builder.append(this.cce.em.moduleName, "\t");
+    _builder.append("\");");
+    _builder.newLineIfNotEmpty();
     return _builder;
   }
   
