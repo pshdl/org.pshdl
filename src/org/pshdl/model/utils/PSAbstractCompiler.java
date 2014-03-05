@@ -145,7 +145,8 @@ public class PSAbstractCompiler {
 			if (unitName) {
 				newName = entityName + "." + codeType.toLowerCase();
 			} else {
-				newName = newName.substring(0, newName.length() - 5) + codeType.toLowerCase();
+				final String fe = Files.getFileExtension(newName);
+				newName = newName.substring(0, newName.length() - fe.length()) + codeType.toLowerCase();
 			}
 			return newName;
 		}
@@ -181,7 +182,7 @@ public class PSAbstractCompiler {
 		return res.toArray(new File[res.size()]);
 	}
 
-	protected final String uri;
+	public final String uri;
 	protected final HDLLibrary lib;
 	protected final ConcurrentMap<String, HDLPackage> pkgs = Maps.newConcurrentMap();
 	protected final ConcurrentMap<String, Set<Problem>> issues = Maps.newConcurrentMap();
@@ -335,7 +336,11 @@ public class PSAbstractCompiler {
 	}
 
 	protected CompileResult createResult(final String src, final String code, String codeType, boolean unitName) {
-		final Set<Problem> syntaxProblems = new HashSet<Problem>(issues.get(src));
+		final Set<Problem> knownIssues = issues.get(src);
+		final Set<Problem> syntaxProblems = new HashSet<Problem>();
+		if (knownIssues != null) {
+			syntaxProblems.addAll(knownIssues);
+		}
 		String name = "<ERROR>";
 		final HDLPackage hdlPackage = pkgs.get(src);
 		if (hdlPackage != null) {

@@ -39,7 +39,7 @@ public interface IHDLObject {
 	public HDLClass getClassType();
 
 	/**
-	 * Copies this object using the provded {@link CopyFilter}
+	 * Copies this object using the provided {@link CopyFilter}
 	 * 
 	 * @param filter
 	 *            an implementation of the {@link CopyFilter} such as
@@ -70,7 +70,13 @@ public interface IHDLObject {
 	 */
 	public <K> void addMeta(MetaAccess<K> key, K value);
 
-	public <K> void removeMeta(MetaAccess<K> key, K value);
+	/**
+	 * Removes a meta from this object
+	 * 
+	 * @param key
+	 *            {@link MetaAccess#name()} will be used to remove the meta.
+	 */
+	public <K> void removeMeta(MetaAccess<K> key);
 
 	/**
 	 * A boolean meta that can be used as a flag
@@ -81,6 +87,12 @@ public interface IHDLObject {
 	 */
 	public void setMeta(MetaAccess<Boolean> meta);
 
+	/**
+	 * A boolean meta that can be used as a flag
+	 * 
+	 * @param meta
+	 *            {@link MetaAccess#name()} will be used to remove the meta
+	 */
 	public void resetMeta(MetaAccess<Boolean> meta);
 
 	/**
@@ -146,10 +158,9 @@ public interface IHDLObject {
 	public <T> T[] getAllObjectsOf(Class<? extends T> clazz, boolean deep);
 
 	/**
-	 * This iterator iterates over all children and their children in a depth
-	 * first manner.
+	 * This iterator iterates over all children
 	 * 
-	 * @return an iterator over all children and their children
+	 * @return an iterator over all children
 	 */
 	public Iterator<IHDLObject> iterator();
 

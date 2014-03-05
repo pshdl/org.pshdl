@@ -58,7 +58,7 @@ import org.pshdl.model.utils.HDLQualifiedName;
 @SuppressWarnings("all")
 public class FullNameExtension {
   /**
-   * This annotation is used to store {@ink HDLQualifiedName} for the case that the resolution diverges from the actual tree
+   * This annotation is used to store {@link HDLQualifiedName} for the case that the resolution diverges from the actual tree
    */
   public static HDLObject.GenericMeta<HDLQualifiedName> FULLNAME = new Function0<HDLObject.GenericMeta<HDLQualifiedName>>() {
     public HDLObject.GenericMeta<HDLQualifiedName> apply() {

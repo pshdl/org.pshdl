@@ -4,5 +4,6 @@ src/de/tuhh/ict/pshdl/model/impl
 *.smap
 .clover
 PSHDLCompiler.jar
+!/target/*.jar
 /target
 *.versionsBackup
