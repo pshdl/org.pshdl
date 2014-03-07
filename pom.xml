@@ -9,11 +9,11 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	<distributionManagement>
-  <repository>
-    <id>gh-pages</id>
-    <url>file:///Users/karstenbecker/Dropbox/PSHDL/MavenRepo/</url>
-  </repository>
-</distributionManagement>
+		<repository>
+			<id>repo</id>
+			<url>file:///Users/karstenbecker/Dropbox/PSHDL/MavenRepo/</url>
+		</repository>
+	</distributionManagement>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
