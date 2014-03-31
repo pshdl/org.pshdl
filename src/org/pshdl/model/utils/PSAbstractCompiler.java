@@ -544,4 +544,8 @@ public class PSAbstractCompiler {
 	public String getHookName() {
 		return "validator";
 	}
+
+	public void invalidate() {
+		validated = false;
+	}
 }
