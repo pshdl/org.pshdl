@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -460,7 +460,7 @@ public class Insulin {
 
 	/**
 	 * Attempt to create an enum if the type provided is an actual enum
-	 * 
+	 *
 	 * @param uFrag
 	 *            the fragment
 	 * @param type
@@ -499,7 +499,7 @@ public class Insulin {
 	/**
 	 * Finds cases where a either a ARITH_NEG contains another ARITH_NEG, or
 	 * where an ARITH_NEG contains a negative literal
-	 * 
+	 *
 	 */
 	public static <T extends IHDLObject> T fixDoubleNegate(T pkg) {
 		final ModificationSet ms = new ModificationSet();
@@ -601,7 +601,7 @@ public class Insulin {
 	/**
 	 * Checks for HDLDirectGenerations and calls the generators. If they are
 	 * includes, it will be included and the references resolved
-	 * 
+	 *
 	 */
 	private static <T extends IHDLObject> T includeGenerators(T apply, String src) {
 		final ModificationSet ms = new ModificationSet();
@@ -787,7 +787,7 @@ public class Insulin {
 
 	/**
 	 * Generate the code to initialize an array with the given default value.
-	 * 
+	 *
 	 * @param varDim
 	 *            all dimensions that need to be filled
 	 * @param i
@@ -856,7 +856,7 @@ public class Insulin {
 	 * Checks for the clock and reset annotation and replaces all $clk and $rst
 	 * references with it. It also inserts the clk and rst signals into the
 	 * HDLUnit if needed.
-	 * 
+	 *
 	 * @param unit
 	 * @return
 	 */

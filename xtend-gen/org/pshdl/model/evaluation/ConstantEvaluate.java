@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArrayInit;
@@ -73,12 +72,7 @@ import org.pshdl.model.utils.Insulin;
  */
 @SuppressWarnings("all")
 public class ConstantEvaluate {
-  private static ConstantEvaluate INST = new Function0<ConstantEvaluate>() {
-    public ConstantEvaluate apply() {
-      ConstantEvaluate _constantEvaluate = new ConstantEvaluate();
-      return _constantEvaluate;
-    }
-  }.apply();
+  private static ConstantEvaluate INST = new ConstantEvaluate();
   
   /**
    * Attempts to determine a constant that the given Expression can be replaced with. This method does not use parameters
@@ -124,8 +118,7 @@ public class ConstantEvaluate {
   protected Optional<BigInteger> _constantEvaluate(final IHDLObject obj, final HDLEvaluationContext context) {
     HDLClass _classType = obj.getClassType();
     String _plus = ("Did not implement constantEvaulate for type:" + _classType);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLTernary obj, final HDLEvaluationContext context) {
@@ -150,31 +143,27 @@ public class ConstantEvaluate {
   
   protected Optional<BigInteger> _constantEvaluate(final HDLLiteral obj, final HDLEvaluationContext context) {
     HDLLiteral.HDLLiteralPresentation _presentation = obj.getPresentation();
-    final HDLLiteral.HDLLiteralPresentation _switchValue = _presentation;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.STR)) {
-        _matched=true;
-        return Optional.<BigInteger>absent();
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.BOOL)) {
-        _matched=true;
-        boolean _and = false;
-        boolean _notEquals = (!Objects.equal(context, null));
-        if (!_notEquals) {
-          _and = false;
-        } else {
-          _and = (_notEquals && context.boolAsInt);
-        }
-        if (_and) {
-          HDLLiteral _false = HDLLiteral.getFalse();
-          boolean _equals = obj.equals(_false);
-          boolean _not = (!_equals);
-          return ConstantEvaluate.boolInt(_not);
-        }
-        return Optional.<BigInteger>absent();
+    if (_presentation != null) {
+      switch (_presentation) {
+        case STR:
+          return Optional.<BigInteger>absent();
+        case BOOL:
+          boolean _and = false;
+          boolean _notEquals = (!Objects.equal(context, null));
+          if (!_notEquals) {
+            _and = false;
+          } else {
+            _and = context.boolAsInt;
+          }
+          if (_and) {
+            HDLLiteral _false = HDLLiteral.getFalse();
+            boolean _equals = obj.equals(_false);
+            boolean _not = (!_equals);
+            return ConstantEvaluate.boolInt(_not);
+          }
+          return Optional.<BigInteger>absent();
+        default:
+          break;
       }
     }
     BigInteger _valueAsBigInt = obj.getValueAsBigInt();
@@ -190,70 +179,57 @@ public class ConstantEvaluate {
       return Optional.<BigInteger>absent();
     }
     HDLManip.HDLManipType _type = obj.getType();
-    final HDLManip.HDLManipType _switchValue = _type;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManip.HDLManipType.ARITH_NEG)) {
-        _matched=true;
-        BigInteger _get = eval.get();
-        BigInteger _negate = _get.negate();
-        return Optional.<BigInteger>of(_negate);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManip.HDLManipType.BIT_NEG)) {
-        _matched=true;
-        BigInteger _get_1 = eval.get();
-        BigInteger _not_1 = _get_1.not();
-        return Optional.<BigInteger>of(_not_1);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManip.HDLManipType.LOGIC_NEG)) {
-        _matched=true;
-        HDLExpression _target_1 = obj.getTarget();
-        final Optional<BigInteger> const_ = this.constantEvaluate(_target_1, context);
-        boolean _isPresent_1 = const_.isPresent();
-        if (_isPresent_1) {
-          BigInteger _get_2 = const_.get();
-          boolean _equals = _get_2.equals(BigInteger.ZERO);
-          return ConstantEvaluate.boolInt(_equals);
-        }
-        return Optional.<BigInteger>absent();
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLManip.HDLManipType.CAST)) {
-        _matched=true;
-        final HDLType type = obj.getCastTo();
-        if ((type instanceof HDLPrimitive)) {
-          final HDLPrimitive prim = ((HDLPrimitive) type);
-          HDLExpression _width = prim.getWidth();
-          boolean _tripleNotEquals = (_width != null);
-          if (_tripleNotEquals) {
-            HDLExpression _width_1 = prim.getWidth();
-            final Optional<BigInteger> width = this.constantEvaluate(_width_1, context);
-            boolean _isPresent_2 = width.isPresent();
-            if (_isPresent_2) {
-              BigInteger _get_3 = eval.get();
-              BigInteger _get_4 = width.get();
-              int _intValue = _get_4.intValue();
-              BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
-              BigInteger _mod = _get_3.mod(_shiftLeft);
-              return Optional.<BigInteger>of(_mod);
-            }
-            return Optional.<BigInteger>absent();
+    if (_type != null) {
+      switch (_type) {
+        case ARITH_NEG:
+          BigInteger _get = eval.get();
+          BigInteger _negate = _get.negate();
+          return Optional.<BigInteger>of(_negate);
+        case BIT_NEG:
+          BigInteger _get_1 = eval.get();
+          BigInteger _not_1 = _get_1.not();
+          return Optional.<BigInteger>of(_not_1);
+        case LOGIC_NEG:
+          HDLExpression _target_1 = obj.getTarget();
+          final Optional<BigInteger> const_ = this.constantEvaluate(_target_1, context);
+          boolean _isPresent_1 = const_.isPresent();
+          if (_isPresent_1) {
+            BigInteger _get_2 = const_.get();
+            boolean _equals = _get_2.equals(BigInteger.ZERO);
+            return ConstantEvaluate.boolInt(_equals);
           }
-          return eval;
-        }
-        HDLExpression _target_2 = obj.getTarget();
-        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _target_2);
-        obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
-        return Optional.<BigInteger>absent();
+          return Optional.<BigInteger>absent();
+        case CAST:
+          final HDLType type = obj.getCastTo();
+          if ((type instanceof HDLPrimitive)) {
+            final HDLPrimitive prim = ((HDLPrimitive) type);
+            HDLExpression _width = prim.getWidth();
+            boolean _tripleNotEquals = (_width != null);
+            if (_tripleNotEquals) {
+              HDLExpression _width_1 = prim.getWidth();
+              final Optional<BigInteger> width = this.constantEvaluate(_width_1, context);
+              boolean _isPresent_2 = width.isPresent();
+              if (_isPresent_2) {
+                BigInteger _get_3 = eval.get();
+                BigInteger _get_4 = width.get();
+                int _intValue = _get_4.intValue();
+                BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
+                BigInteger _mod = _get_3.mod(_shiftLeft);
+                return Optional.<BigInteger>of(_mod);
+              }
+              return Optional.<BigInteger>absent();
+            }
+            return eval;
+          }
+          HDLExpression _target_2 = obj.getTarget();
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _target_2);
+          obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
+          return Optional.<BigInteger>absent();
+        default:
+          break;
       }
     }
-    RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
-    throw _runtimeException;
+    throw new RuntimeException("Incorrectly implemented constant evaluation!");
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLConcat obj, final HDLEvaluationContext context) {
@@ -301,8 +277,7 @@ public class ConstantEvaluate {
   public Optional<BigInteger> subEvaluate(final HDLExpression container, final HDLExpression left, final HDLEvaluationContext context) {
     boolean _tripleEquals = (left == null);
     if (_tripleEquals) {
-      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException((("Container:" + container) + " has null left expression"));
-      throw _illegalArgumentException;
+      throw new IllegalArgumentException((("Container:" + container) + " has null left expression"));
     }
     final Optional<BigInteger> leftVal = this.constantEvaluate(left, context);
     boolean _isPresent = leftVal.isPresent();
@@ -331,65 +306,44 @@ public class ConstantEvaluate {
       return Optional.<BigInteger>absent();
     }
     HDLArithOp.HDLArithOpType _type = obj.getType();
-    final HDLArithOp.HDLArithOpType _switchValue = _type;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.DIV)) {
-        _matched=true;
-        BigInteger _get = leftVal.get();
-        BigInteger _get_1 = rightVal.get();
-        BigInteger _divide = _get.divide(_get_1);
-        return Optional.<BigInteger>of(_divide);
+    if (_type != null) {
+      switch (_type) {
+        case DIV:
+          BigInteger _get = leftVal.get();
+          BigInteger _get_1 = rightVal.get();
+          BigInteger _divide = _get.divide(_get_1);
+          return Optional.<BigInteger>of(_divide);
+        case MUL:
+          BigInteger _get_2 = leftVal.get();
+          BigInteger _get_3 = rightVal.get();
+          BigInteger _multiply = _get_2.multiply(_get_3);
+          return Optional.<BigInteger>of(_multiply);
+        case MINUS:
+          BigInteger _get_4 = leftVal.get();
+          BigInteger _get_5 = rightVal.get();
+          BigInteger _subtract = _get_4.subtract(_get_5);
+          return Optional.<BigInteger>of(_subtract);
+        case PLUS:
+          BigInteger _get_6 = leftVal.get();
+          BigInteger _get_7 = rightVal.get();
+          BigInteger _add = _get_6.add(_get_7);
+          return Optional.<BigInteger>of(_add);
+        case MOD:
+          BigInteger _get_8 = leftVal.get();
+          BigInteger _get_9 = rightVal.get();
+          BigInteger _remainder = _get_8.remainder(_get_9);
+          return Optional.<BigInteger>of(_remainder);
+        case POW:
+          BigInteger _get_10 = leftVal.get();
+          BigInteger _get_11 = rightVal.get();
+          int _intValue = _get_11.intValue();
+          BigInteger _pow = _get_10.pow(_intValue);
+          return Optional.<BigInteger>of(_pow);
+        default:
+          break;
       }
     }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MUL)) {
-        _matched=true;
-        BigInteger _get_2 = leftVal.get();
-        BigInteger _get_3 = rightVal.get();
-        BigInteger _multiply = _get_2.multiply(_get_3);
-        return Optional.<BigInteger>of(_multiply);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MINUS)) {
-        _matched=true;
-        BigInteger _get_4 = leftVal.get();
-        BigInteger _get_5 = rightVal.get();
-        BigInteger _subtract = _get_4.subtract(_get_5);
-        return Optional.<BigInteger>of(_subtract);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.PLUS)) {
-        _matched=true;
-        BigInteger _get_6 = leftVal.get();
-        BigInteger _get_7 = rightVal.get();
-        BigInteger _add = _get_6.add(_get_7);
-        return Optional.<BigInteger>of(_add);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.MOD)) {
-        _matched=true;
-        BigInteger _get_8 = leftVal.get();
-        BigInteger _get_9 = rightVal.get();
-        BigInteger _remainder = _get_8.remainder(_get_9);
-        return Optional.<BigInteger>of(_remainder);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLArithOp.HDLArithOpType.POW)) {
-        _matched=true;
-        BigInteger _get_10 = leftVal.get();
-        BigInteger _get_11 = rightVal.get();
-        int _intValue = _get_11.intValue();
-        BigInteger _pow = _get_10.pow(_intValue);
-        return Optional.<BigInteger>of(_pow);
-      }
-    }
-    RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
-    throw _runtimeException;
+    throw new RuntimeException("Incorrectly implemented constant evaluation!");
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLBitOp obj, final HDLEvaluationContext context) {
@@ -408,61 +362,44 @@ public class ConstantEvaluate {
       return Optional.<BigInteger>absent();
     }
     HDLBitOp.HDLBitOpType _type = obj.getType();
-    final HDLBitOp.HDLBitOpType _switchValue = _type;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.AND)) {
-        _matched=true;
-        BigInteger _get = leftVal.get();
-        BigInteger _get_1 = rightVal.get();
-        BigInteger _and = _get.and(_get_1);
-        return Optional.<BigInteger>of(_and);
+    if (_type != null) {
+      switch (_type) {
+        case AND:
+          BigInteger _get = leftVal.get();
+          BigInteger _get_1 = rightVal.get();
+          BigInteger _and = _get.and(_get_1);
+          return Optional.<BigInteger>of(_and);
+        case OR:
+          BigInteger _get_2 = leftVal.get();
+          BigInteger _get_3 = rightVal.get();
+          BigInteger _or = _get_2.or(_get_3);
+          return Optional.<BigInteger>of(_or);
+        case XOR:
+          BigInteger _get_4 = leftVal.get();
+          BigInteger _get_5 = rightVal.get();
+          BigInteger _xor = _get_4.xor(_get_5);
+          return Optional.<BigInteger>of(_xor);
+        case LOGI_AND:
+          BigInteger _get_6 = leftVal.get();
+          boolean _equals = BigInteger.ZERO.equals(_get_6);
+          final boolean l = (!_equals);
+          BigInteger _get_7 = rightVal.get();
+          boolean _equals_1 = BigInteger.ZERO.equals(_get_7);
+          final boolean r = (!_equals_1);
+          return ConstantEvaluate.boolInt((l && r));
+        case LOGI_OR:
+          BigInteger _get_8 = leftVal.get();
+          boolean _equals_2 = BigInteger.ZERO.equals(_get_8);
+          final boolean l_1 = (!_equals_2);
+          BigInteger _get_9 = rightVal.get();
+          boolean _equals_3 = BigInteger.ZERO.equals(_get_9);
+          final boolean r_1 = (!_equals_3);
+          return ConstantEvaluate.boolInt((l_1 || r_1));
+        default:
+          break;
       }
     }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.OR)) {
-        _matched=true;
-        BigInteger _get_2 = leftVal.get();
-        BigInteger _get_3 = rightVal.get();
-        BigInteger _or = _get_2.or(_get_3);
-        return Optional.<BigInteger>of(_or);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.XOR)) {
-        _matched=true;
-        BigInteger _get_4 = leftVal.get();
-        BigInteger _get_5 = rightVal.get();
-        BigInteger _xor = _get_4.xor(_get_5);
-        return Optional.<BigInteger>of(_xor);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.LOGI_AND)) {
-        _matched=true;
-        BigInteger _get_6 = leftVal.get();
-        boolean _equals = BigInteger.ZERO.equals(_get_6);
-        final boolean l = (!_equals);
-        BigInteger _get_7 = rightVal.get();
-        boolean _equals_1 = BigInteger.ZERO.equals(_get_7);
-        final boolean r = (!_equals_1);
-        return ConstantEvaluate.boolInt((l && r));
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLBitOp.HDLBitOpType.LOGI_OR)) {
-        _matched=true;
-        BigInteger _get_8 = leftVal.get();
-        boolean _equals_2 = BigInteger.ZERO.equals(_get_8);
-        final boolean l_1 = (!_equals_2);
-        BigInteger _get_9 = rightVal.get();
-        boolean _equals_3 = BigInteger.ZERO.equals(_get_9);
-        final boolean r_1 = (!_equals_3);
-        return ConstantEvaluate.boolInt((l_1 || r_1));
-      }
-    }
-    RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
-    throw _runtimeException;
+    throw new RuntimeException("Incorrectly implemented constant evaluation!");
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLEqualityOp obj, final HDLEvaluationContext context) {
@@ -481,69 +418,48 @@ public class ConstantEvaluate {
       return Optional.<BigInteger>absent();
     }
     HDLEqualityOp.HDLEqualityOpType _type = obj.getType();
-    final HDLEqualityOp.HDLEqualityOpType _switchValue = _type;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.EQ)) {
-        _matched=true;
-        BigInteger _get = leftVal.get();
-        BigInteger _get_1 = rightVal.get();
-        boolean _equals = _get.equals(_get_1);
-        return ConstantEvaluate.boolInt(_equals);
+    if (_type != null) {
+      switch (_type) {
+        case EQ:
+          BigInteger _get = leftVal.get();
+          BigInteger _get_1 = rightVal.get();
+          boolean _equals = _get.equals(_get_1);
+          return ConstantEvaluate.boolInt(_equals);
+        case NOT_EQ:
+          BigInteger _get_2 = leftVal.get();
+          BigInteger _get_3 = rightVal.get();
+          boolean _equals_1 = _get_2.equals(_get_3);
+          boolean _not_2 = (!_equals_1);
+          return ConstantEvaluate.boolInt(_not_2);
+        case GREATER:
+          BigInteger _get_4 = leftVal.get();
+          BigInteger _get_5 = rightVal.get();
+          int _compareTo = _get_4.compareTo(_get_5);
+          boolean _greaterThan = (_compareTo > 0);
+          return ConstantEvaluate.boolInt(_greaterThan);
+        case GREATER_EQ:
+          BigInteger _get_6 = leftVal.get();
+          BigInteger _get_7 = rightVal.get();
+          int _compareTo_1 = _get_6.compareTo(_get_7);
+          boolean _greaterEqualsThan = (_compareTo_1 >= 0);
+          return ConstantEvaluate.boolInt(_greaterEqualsThan);
+        case LESS:
+          BigInteger _get_8 = leftVal.get();
+          BigInteger _get_9 = rightVal.get();
+          int _compareTo_2 = _get_8.compareTo(_get_9);
+          boolean _lessThan = (_compareTo_2 < 0);
+          return ConstantEvaluate.boolInt(_lessThan);
+        case LESS_EQ:
+          BigInteger _get_10 = leftVal.get();
+          BigInteger _get_11 = rightVal.get();
+          int _compareTo_3 = _get_10.compareTo(_get_11);
+          boolean _lessEqualsThan = (_compareTo_3 <= 0);
+          return ConstantEvaluate.boolInt(_lessEqualsThan);
+        default:
+          break;
       }
     }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.NOT_EQ)) {
-        _matched=true;
-        BigInteger _get_2 = leftVal.get();
-        BigInteger _get_3 = rightVal.get();
-        boolean _equals_1 = _get_2.equals(_get_3);
-        boolean _not_2 = (!_equals_1);
-        return ConstantEvaluate.boolInt(_not_2);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.GREATER)) {
-        _matched=true;
-        BigInteger _get_4 = leftVal.get();
-        BigInteger _get_5 = rightVal.get();
-        int _compareTo = _get_4.compareTo(_get_5);
-        boolean _greaterThan = (_compareTo > 0);
-        return ConstantEvaluate.boolInt(_greaterThan);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.GREATER_EQ)) {
-        _matched=true;
-        BigInteger _get_6 = leftVal.get();
-        BigInteger _get_7 = rightVal.get();
-        int _compareTo_1 = _get_6.compareTo(_get_7);
-        boolean _greaterEqualsThan = (_compareTo_1 >= 0);
-        return ConstantEvaluate.boolInt(_greaterEqualsThan);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.LESS)) {
-        _matched=true;
-        BigInteger _get_8 = leftVal.get();
-        BigInteger _get_9 = rightVal.get();
-        int _compareTo_2 = _get_8.compareTo(_get_9);
-        boolean _lessThan = (_compareTo_2 < 0);
-        return ConstantEvaluate.boolInt(_lessThan);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLEqualityOp.HDLEqualityOpType.LESS_EQ)) {
-        _matched=true;
-        BigInteger _get_10 = leftVal.get();
-        BigInteger _get_11 = rightVal.get();
-        int _compareTo_3 = _get_10.compareTo(_get_11);
-        boolean _lessEqualsThan = (_compareTo_3 <= 0);
-        return ConstantEvaluate.boolInt(_lessEqualsThan);
-      }
-    }
-    RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
-    throw _runtimeException;
+    throw new RuntimeException("Incorrectly implemented constant evaluation!");
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLShiftOp obj, final HDLEvaluationContext context) {
@@ -562,64 +478,54 @@ public class ConstantEvaluate {
       return Optional.<BigInteger>absent();
     }
     HDLShiftOp.HDLShiftOpType _type = obj.getType();
-    final HDLShiftOp.HDLShiftOpType _switchValue = _type;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SLL)) {
-        _matched=true;
-        BigInteger _get = leftVal.get();
-        BigInteger _get_1 = rightVal.get();
-        int _intValue = _get_1.intValue();
-        BigInteger _shiftLeft = _get.shiftLeft(_intValue);
-        return Optional.<BigInteger>of(_shiftLeft);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SRA)) {
-        _matched=true;
-        BigInteger _get_2 = leftVal.get();
-        BigInteger _get_3 = rightVal.get();
-        int _intValue_1 = _get_3.intValue();
-        BigInteger _shiftRight = _get_2.shiftRight(_intValue_1);
-        return Optional.<BigInteger>of(_shiftRight);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLShiftOp.HDLShiftOpType.SRL)) {
-        _matched=true;
-        final BigInteger l = leftVal.get();
-        int _signum = l.signum();
-        boolean _lessThan = (_signum < 0);
-        if (_lessThan) {
-          HDLExpression _left_1 = obj.getLeft();
-          final Optional<? extends HDLType> t = TypeExtension.typeOf(_left_1);
-          boolean _isPresent_2 = t.isPresent();
-          if (_isPresent_2) {
-            HDLType _get_4 = t.get();
-            final Integer width = HDLPrimitives.getWidth(_get_4, context);
-            boolean _tripleNotEquals = (width != null);
-            if (_tripleNotEquals) {
-              BigInteger _get_5 = rightVal.get();
-              final int shiftWidth = _get_5.intValue();
-              final BigInteger res = BigIntegerFrame.srl(l, (width).intValue(), shiftWidth);
-              return Optional.<BigInteger>of(res);
+    if (_type != null) {
+      switch (_type) {
+        case SLL:
+          BigInteger _get = leftVal.get();
+          BigInteger _get_1 = rightVal.get();
+          int _intValue = _get_1.intValue();
+          BigInteger _shiftLeft = _get.shiftLeft(_intValue);
+          return Optional.<BigInteger>of(_shiftLeft);
+        case SRA:
+          BigInteger _get_2 = leftVal.get();
+          BigInteger _get_3 = rightVal.get();
+          int _intValue_1 = _get_3.intValue();
+          BigInteger _shiftRight = _get_2.shiftRight(_intValue_1);
+          return Optional.<BigInteger>of(_shiftRight);
+        case SRL:
+          final BigInteger l = leftVal.get();
+          int _signum = l.signum();
+          boolean _lessThan = (_signum < 0);
+          if (_lessThan) {
+            HDLExpression _left_1 = obj.getLeft();
+            final Optional<? extends HDLType> t = TypeExtension.typeOf(_left_1);
+            boolean _isPresent_2 = t.isPresent();
+            if (_isPresent_2) {
+              HDLType _get_4 = t.get();
+              final Integer width = HDLPrimitives.getWidth(_get_4, context);
+              boolean _tripleNotEquals = (width != null);
+              if (_tripleNotEquals) {
+                BigInteger _get_5 = rightVal.get();
+                final int shiftWidth = _get_5.intValue();
+                final BigInteger res = BigIntegerFrame.srl(l, (width).intValue(), shiftWidth);
+                return Optional.<BigInteger>of(res);
+              }
             }
+            return Optional.<BigInteger>absent();
           }
-          return Optional.<BigInteger>absent();
-        }
-        BigInteger _get_6 = rightVal.get();
-        int _intValue_2 = _get_6.intValue();
-        BigInteger _shiftRight_1 = l.shiftRight(_intValue_2);
-        return Optional.<BigInteger>of(_shiftRight_1);
+          BigInteger _get_6 = rightVal.get();
+          int _intValue_2 = _get_6.intValue();
+          BigInteger _shiftRight_1 = l.shiftRight(_intValue_2);
+          return Optional.<BigInteger>of(_shiftRight_1);
+        default:
+          break;
       }
     }
-    RuntimeException _runtimeException = new RuntimeException("Incorrectly implemented constant evaluation!");
-    throw _runtimeException;
+    throw new RuntimeException("Incorrectly implemented constant evaluation!");
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLFunctionCall obj, final HDLEvaluationContext context) {
-    LinkedList<BigInteger> _linkedList = new LinkedList<BigInteger>();
-    final List<BigInteger> args = _linkedList;
+    final List<BigInteger> args = new LinkedList<BigInteger>();
     ArrayList<HDLExpression> _params = obj.getParams();
     for (final HDLExpression arg : _params) {
       {
@@ -672,7 +578,7 @@ public class ConstantEvaluate {
     if (_not) {
       _or = true;
     } else {
-      _or = (_not || (!(type.get() instanceof HDLPrimitive)));
+      _or = (!(type.get() instanceof HDLPrimitive));
     }
     if (_or) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
@@ -764,7 +670,7 @@ public class ConstantEvaluate {
     if (!_notEquals) {
       _and = false;
     } else {
-      _and = (_notEquals && context.enumAsInt);
+      _and = context.enumAsInt;
     }
     if (_and) {
       Optional<HDLEnum> _resolveHEnum = obj.resolveHEnum();
@@ -784,11 +690,9 @@ public class ConstantEvaluate {
   public static Optional<BigInteger> boolInt(final boolean b) {
     Optional<BigInteger> _xifexpression = null;
     if (b) {
-      Optional<BigInteger> _of = Optional.<BigInteger>of(BigInteger.ONE);
-      _xifexpression = _of;
+      _xifexpression = Optional.<BigInteger>of(BigInteger.ONE);
     } else {
-      Optional<BigInteger> _of_1 = Optional.<BigInteger>of(BigInteger.ZERO);
-      _xifexpression = _of_1;
+      _xifexpression = Optional.<BigInteger>of(BigInteger.ZERO);
     }
     return _xifexpression;
   }

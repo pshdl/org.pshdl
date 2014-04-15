@@ -111,8 +111,7 @@ public class ParserToModelExtension {
     List<PSHDLLangParser.PsUnitContext> _psUnit = ctx.psUnit();
     final Function1<PSHDLLangParser.PsUnitContext,HDLUnit> _function = new Function1<PSHDLLangParser.PsUnitContext,HDLUnit>() {
       public HDLUnit apply(final PSHDLLangParser.PsUnitContext it) {
-        HDLUnit _hDLUnit = ParserToModelExtension.this.toHDLUnit(it, libURI);
-        return _hDLUnit;
+        return ParserToModelExtension.this.toHDLUnit(it, libURI);
       }
     };
     List<HDLUnit> _map = ListExtensions.<PSHDLLangParser.PsUnitContext, HDLUnit>map(_psUnit, _function);
@@ -132,8 +131,7 @@ public class ParserToModelExtension {
     final HDLLibrary library = HDLLibrary.getLibrary(libURI);
     boolean _equals = Objects.equal(library, null);
     if (_equals) {
-      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException((("The library " + libURI) + " is not valid"));
-      throw _illegalArgumentException;
+      throw new IllegalArgumentException((("The library " + libURI) + " is not valid"));
     }
     library.addPkg(pkg, src);
     HDLPackage _attachContext = this.<HDLPackage>attachContext(pkg, ctx);
@@ -160,8 +158,7 @@ public class ParserToModelExtension {
   public <T extends IHDLObject> T attachContext(final T obj, final ParserRuleContext context) {
     boolean _tripleEquals = (obj == null);
     if (_tripleEquals) {
-      NullPointerException _nullPointerException = new NullPointerException("Null is not allowed");
-      throw _nullPointerException;
+      throw new NullPointerException("Null is not allowed");
     }
     SourceInfo _sourceInfo = new SourceInfo(this.tokens, context);
     obj.<SourceInfo>addMeta(SourceInfo.INFO, _sourceInfo);
@@ -181,8 +178,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLBlock _toHDL(final PSHDLLangParser.PsProcessContext context) {
-    HDLBlock _hDLBlock = new HDLBlock();
-    HDLBlock block = _hDLBlock;
+    HDLBlock block = new HDLBlock();
     boolean _tripleNotEquals = (context.isProcess != null);
     if (_tripleNotEquals) {
       HDLBlock _setProcess = block.setProcess(true);
@@ -249,13 +245,11 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsDeclarationTypeContext> _class = context.getClass();
     String _plus = ("Not implemented:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected HDLVariableDeclaration _toHDL(final PSHDLLangParser.PsVariableDeclarationContext context) {
-    HDLVariableDeclaration _hDLVariableDeclaration = new HDLVariableDeclaration();
-    HDLVariableDeclaration res = _hDLVariableDeclaration;
+    HDLVariableDeclaration res = new HDLVariableDeclaration();
     PSHDLLangParser.PsPrimitiveContext _psPrimitive = context.psPrimitive();
     IHDLObject _hDL = this.toHDL(_psPrimitive);
     HDLVariableDeclaration _setType = res.setType(((HDLType) _hDL));
@@ -280,8 +274,7 @@ public class ParserToModelExtension {
     PSHDLLangParser.PsPrimitiveContext _psPrimitive_1 = context.psPrimitive();
     boolean _tripleNotEquals_1 = (_psPrimitive_1.isRegister != null);
     if (_tripleNotEquals_1) {
-      ArrayList<HDLArgument> _arrayList = new ArrayList<HDLArgument>();
-      Iterable<HDLArgument> args = _arrayList;
+      Iterable<HDLArgument> args = new ArrayList<HDLArgument>();
       PSHDLLangParser.PsPrimitiveContext _psPrimitive_2 = context.psPrimitive();
       PSHDLLangParser.PsPassedArgumentsContext _psPassedArguments = _psPrimitive_2.psPassedArguments();
       boolean _tripleNotEquals_2 = (_psPassedArguments != null);
@@ -362,8 +355,8 @@ public class ParserToModelExtension {
     String _text = _psPrimitiveType.getText();
     String _upperCase = _text.toUpperCase();
     final HDLPrimitive.HDLPrimitiveType pt = HDLPrimitive.HDLPrimitiveType.valueOf(_upperCase);
-    IHDLObject _hDL = null;
     PSHDLLangParser.PsWidthContext _psWidth = context.psWidth();
+    IHDLObject _hDL = null;
     if (_psWidth!=null) {
       _hDL=this.toHDL(_psWidth);
     }
@@ -424,25 +417,23 @@ public class ParserToModelExtension {
   public HDLPrimitive.HDLPrimitiveType getResultingType(final HDLPrimitive.HDLPrimitiveType pt, final HDLExpression width) {
     boolean _tripleNotEquals = (width != null);
     if (_tripleNotEquals) {
-      boolean _matched = false;
-      if (!_matched) {
-        if (Objects.equal(pt,HDLPrimitive.HDLPrimitiveType.BIT)) {
-          _matched=true;
-          return HDLPrimitive.HDLPrimitiveType.BITVECTOR;
+      if (pt != null) {
+        switch (pt) {
+          case BIT:
+            return HDLPrimitive.HDLPrimitiveType.BITVECTOR;
+          default:
+            break;
         }
       }
     } else {
-      boolean _matched_1 = false;
-      if (!_matched_1) {
-        if (Objects.equal(pt,HDLPrimitive.HDLPrimitiveType.INT)) {
-          _matched_1=true;
-          return HDLPrimitive.HDLPrimitiveType.INTEGER;
-        }
-      }
-      if (!_matched_1) {
-        if (Objects.equal(pt,HDLPrimitive.HDLPrimitiveType.UINT)) {
-          _matched_1=true;
-          return HDLPrimitive.HDLPrimitiveType.NATURAL;
+      if (pt != null) {
+        switch (pt) {
+          case INT:
+            return HDLPrimitive.HDLPrimitiveType.INTEGER;
+          case UINT:
+            return HDLPrimitive.HDLPrimitiveType.NATURAL;
+          default:
+            break;
         }
       }
     }
@@ -489,8 +480,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsValueContext> _class = context.getClass();
     String _plus = ("Not correctly implemented:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected IHDLObject _toHDL(final PSHDLLangParser.PsValueExpContext context) {
@@ -500,8 +490,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLConcat _toHDL(final PSHDLLangParser.PsConcatContext context) {
-    HDLConcat _hDLConcat = new HDLConcat();
-    HDLConcat cat = _hDLConcat;
+    HDLConcat cat = new HDLConcat();
     List<PSHDLLangParser.PsExpressionContext> _psExpression = context.psExpression();
     final Function1<PSHDLLangParser.PsExpressionContext,HDLExpression> _function = new Function1<PSHDLLangParser.PsExpressionContext,HDLExpression>() {
       public HDLExpression apply(final PSHDLLangParser.PsExpressionContext it) {
@@ -670,8 +659,8 @@ public class ParserToModelExtension {
     String _text = _psPrimitiveType.getText();
     String _upperCase = _text.toUpperCase();
     final HDLPrimitive.HDLPrimitiveType pt = HDLPrimitive.HDLPrimitiveType.valueOf(_upperCase);
-    IHDLObject _hDL = null;
     PSHDLLangParser.PsWidthContext _psWidth = context.psWidth();
+    IHDLObject _hDL = null;
     if (_psWidth!=null) {
       _hDL=this.toHDL(_psWidth);
     }
@@ -699,28 +688,19 @@ public class ParserToModelExtension {
       res = _setCastTo;
     } else {
       int _type = context.type.getType();
-      final int _switchValue = _type;
-      boolean _matched = false;
-      if (!_matched) {
-        if (Objects.equal(_switchValue,PSHDLLangLexer.LOGIC_NEG)) {
-          _matched=true;
+      switch (_type) {
+        case PSHDLLangLexer.LOGIC_NEG:
           HDLManip _setType_1 = res.setType(HDLManip.HDLManipType.LOGIC_NEG);
           res = _setType_1;
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,PSHDLLangLexer.ARITH_NEG)) {
-          _matched=true;
+          break;
+        case PSHDLLangLexer.ARITH_NEG:
           HDLManip _setType_2 = res.setType(HDLManip.HDLManipType.ARITH_NEG);
           res = _setType_2;
-        }
-      }
-      if (!_matched) {
-        if (Objects.equal(_switchValue,PSHDLLangLexer.BIT_NEG)) {
-          _matched=true;
+          break;
+        case PSHDLLangLexer.BIT_NEG:
           HDLManip _setType_3 = res.setType(HDLManip.HDLManipType.BIT_NEG);
           res = _setType_3;
-        }
+          break;
       }
     }
     return this.<HDLManip>attachContext(res, context);
@@ -751,8 +731,7 @@ public class ParserToModelExtension {
   protected HDLExpression _toHDL(final PSHDLLangParser.PsExpressionContext context) {
     Class<? extends PSHDLLangParser.PsExpressionContext> _class = context.getClass();
     String _plus = ("Not implemented:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   public String toName(final PSHDLLangParser.PsEnumContext context) {
@@ -767,8 +746,7 @@ public class ParserToModelExtension {
   
   public HDLQualifiedName toFQNName(final PSHDLLangParser.PsQualifiedNameContext context) {
     String _text = context.getText();
-    HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_text);
-    return _hDLQualifiedName;
+    return new HDLQualifiedName(_text);
   }
   
   public String toName(final PSHDLLangParser.PsQualifiedNameContext context) {
@@ -794,8 +772,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsTypeDeclarationContext> _class = context.getClass();
     String _plus = ("Not implemented:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected HDLInterfaceDeclaration _toHDL(final PSHDLLangParser.PsInterfaceDeclarationContext context) {
@@ -860,8 +837,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsBlockContext> _class = context.getClass();
     String _plus = ("Not correctly implemented type:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected HDLDirectGeneration _toHDL(final PSHDLLangParser.PsDirectGenerationContext context) {
@@ -939,8 +915,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsInstantiationContext> _class = context.getClass();
     String _plus = ("Not implemented type:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected HDLEnum _toHDL(final PSHDLLangParser.PsEnumContext context) {
@@ -970,8 +945,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLSubstituteFunction _toHDL(final PSHDLLangParser.PsSubstituteFunctionContext context) {
-    HDLSubstituteFunction _hDLSubstituteFunction = new HDLSubstituteFunction();
-    HDLSubstituteFunction func = _hDLSubstituteFunction;
+    HDLSubstituteFunction func = new HDLSubstituteFunction();
     PSHDLLangParser.PsFunctionContext _psFunction = context.psFunction();
     String _name = this.toName(_psFunction);
     HDLSubstituteFunction _setName = func.setName(_name);
@@ -1009,8 +983,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLNativeFunction _toHDL(final PSHDLLangParser.PsNativeFunctionContext context) {
-    HDLNativeFunction _hDLNativeFunction = new HDLNativeFunction();
-    HDLNativeFunction func = _hDLNativeFunction;
+    HDLNativeFunction func = new HDLNativeFunction();
     PSHDLLangParser.PsFunctionContext _psFunction = context.psFunction();
     String _name = this.toName(_psFunction);
     HDLNativeFunction _setName = func.setName(_name);
@@ -1056,8 +1029,7 @@ public class ParserToModelExtension {
           IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
           _xifexpression = ((HDLExpression) _hDL);
         } else {
-          HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
-          _xifexpression = _EMPTY_ARR;
+          _xifexpression = HDLFunctionParameter.EMPTY_ARR();
         }
         return _xifexpression;
       }
@@ -1088,8 +1060,7 @@ public class ParserToModelExtension {
           IHDLObject _hDL = ParserToModelExtension.this.toHDL(_psExpression_1);
           _xifexpression = ((HDLExpression) _hDL);
         } else {
-          HDLExpression _EMPTY_ARR = HDLFunctionParameter.EMPTY_ARR();
-          _xifexpression = _EMPTY_ARR;
+          _xifexpression = HDLFunctionParameter.EMPTY_ARR();
         }
         return _xifexpression;
       }
@@ -1120,8 +1091,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLFunctionParameter _toHDL(final PSHDLLangParser.PsFuncParamTypeContext context) {
-    HDLFunctionParameter _hDLFunctionParameter = new HDLFunctionParameter();
-    HDLFunctionParameter res = _hDLFunctionParameter;
+    HDLFunctionParameter res = new HDLFunctionParameter();
     final PSHDLLangParser.PsFuncParamTypeContext x = context;
     boolean _matched = false;
     if (!_matched) {
@@ -1271,8 +1241,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLInlineFunction _toHDL(final PSHDLLangParser.PsInlineFunctionContext context) {
-    HDLInlineFunction _hDLInlineFunction = new HDLInlineFunction();
-    HDLInlineFunction func = _hDLInlineFunction;
+    HDLInlineFunction func = new HDLInlineFunction();
     PSHDLLangParser.PsFunctionContext _psFunction = context.psFunction();
     String _name = this.toName(_psFunction);
     HDLInlineFunction _setName = func.setName(_name);
@@ -1328,8 +1297,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsFunctionDeclarationContext> _class = context.getClass();
     String _plus = ("Not implemented type:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected HDLUnresolvedFragment _toHDL(final PSHDLLangParser.PsRefPartContext context) {
@@ -1455,8 +1423,7 @@ public class ParserToModelExtension {
   }
   
   protected HDLSwitchCaseStatement _toHDL(final PSHDLLangParser.PsCaseStatementsContext context) {
-    HDLSwitchCaseStatement _hDLSwitchCaseStatement = new HDLSwitchCaseStatement();
-    HDLSwitchCaseStatement hCase = _hDLSwitchCaseStatement;
+    HDLSwitchCaseStatement hCase = new HDLSwitchCaseStatement();
     PSHDLLangParser.PsValueContext _psValue = context.psValue();
     boolean _tripleNotEquals = (_psValue != null);
     if (_tripleNotEquals) {
@@ -1623,8 +1590,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsCompoundStatementContext> _class = context.getClass();
     String _plus = ("Unhandled type:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected IHDLObject _toHDL(final PSHDLLangParser.PsStatementContext context) {
@@ -1651,8 +1617,7 @@ public class ParserToModelExtension {
     }
     Class<? extends PSHDLLangParser.PsStatementContext> _class = context.getClass();
     String _plus = ("Unhandled type:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   protected IHDLObject _toHDL(final PSHDLLangParser.PsAssignmentOrFuncContext context) {
@@ -1678,10 +1643,9 @@ public class ParserToModelExtension {
   }
   
   protected IHDLObject _toHDL(final Object context) {
-    Class<? extends Object> _class = context.getClass();
+    Class<?> _class = context.getClass();
     String _plus = ("Unhandled type:" + _class);
-    IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
-    throw _illegalArgumentException;
+    throw new IllegalArgumentException(_plus);
   }
   
   public HDLUnit toHDLUnit(final PSHDLLangParser.PsUnitContext context, final String libURI) {
@@ -1707,8 +1671,7 @@ public class ParserToModelExtension {
     List<PSHDLLangParser.PsImportsContext> _psImports = context.psImports();
     final Function1<PSHDLLangParser.PsImportsContext,String> _function_1 = new Function1<PSHDLLangParser.PsImportsContext,String>() {
       public String apply(final PSHDLLangParser.PsImportsContext it) {
-        String _name = ParserToModelExtension.this.toName(it);
-        return _name;
+        return ParserToModelExtension.this.toName(it);
       }
     };
     List<String> _map_1 = ListExtensions.<PSHDLLangParser.PsImportsContext, String>map(_psImports, _function_1);

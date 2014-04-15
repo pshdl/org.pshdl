@@ -140,8 +140,8 @@ class StringWriteExtension {
 	def dispatch String toString(HDLUnresolvedFragmentFunction frag, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
 		switch (container: frag.container) {
-			HDLStatement: isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
 			HDLBlock: isStatement = true
+			HDLStatement: isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
 			HDLUnit: isStatement = true
 		}
 		val String sb = if(isStatement) highlight.spacing.toString else ""
@@ -189,9 +189,9 @@ class StringWriteExtension {
 	def dispatch String toString(HDLFunctionCall func, SyntaxHighlighter highlight) {
 		var boolean isStatement = false
 		switch (container: func.container) {
+			HDLBlock: isStatement = true
 			HDLStatement: isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall) &&
 				!(container instanceof HDLInlineFunction)
-			HDLBlock: isStatement = true
 			HDLUnit: isStatement = true
 		}
 		val StringBuilder sb = if(isStatement) highlight.spacing else new StringBuilder

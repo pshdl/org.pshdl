@@ -237,8 +237,7 @@ public class BusAccess {
   public String generatePrintDef(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    HashSet<String> _hashSet = new HashSet<String>();
-    final HashSet<String> checkedRows = _hashSet;
+    final HashSet<String> checkedRows = new HashSet<String>();
     for (final Row row : rows) {
       {
         boolean _contains = checkedRows.contains(row.name);
@@ -264,8 +263,7 @@ public class BusAccess {
   public String generatePrint(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    HashSet<String> _hashSet = new HashSet<String>();
-    final HashSet<String> checkedRows = _hashSet;
+    final HashSet<String> checkedRows = new HashSet<String>();
     for (final Row row : rows) {
       {
         boolean _contains = checkedRows.contains(row.name);
@@ -362,12 +360,10 @@ public class BusAccess {
   public String generateDeclarations(final Unit unit, final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    HashSet<String> _hashSet = new HashSet<String>();
-    final HashSet<String> checkedRows = _hashSet;
+    final HashSet<String> checkedRows = new HashSet<String>();
     for (final Row row : rows) {
       {
-        HashSet<String> _hashSet_1 = new HashSet<String>();
-        final HashSet<String> checkedDefs = _hashSet_1;
+        final HashSet<String> checkedDefs = new HashSet<String>();
         boolean _contains = checkedRows.contains(row.name);
         boolean _not = (!_contains);
         if (_not) {
@@ -564,8 +560,7 @@ public class BusAccess {
   public String generateGetterFunctions(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    HashSet<String> _hashSet = new HashSet<String>();
-    final HashSet<String> doneRows = _hashSet;
+    final HashSet<String> doneRows = new HashSet<String>();
     for (final Row row : rows) {
       {
         final boolean handled = doneRows.contains(row.name);
@@ -659,8 +654,7 @@ public class BusAccess {
   public String generateSetterFunctions(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    HashSet<String> _hashSet = new HashSet<String>();
-    final HashSet<String> doneRows = _hashSet;
+    final HashSet<String> doneRows = new HashSet<String>();
     for (final Row row : rows) {
       {
         final boolean handled = doneRows.contains(row.name);
@@ -669,7 +663,7 @@ public class BusAccess {
           _and = false;
         } else {
           boolean _hasWriteDefs = this.hasWriteDefs(row);
-          _and = ((!handled) && _hasWriteDefs);
+          _and = _hasWriteDefs;
         }
         if (_and) {
           CharSequence _generateSetterFunction = this.generateSetterFunction(row, rows);
@@ -772,8 +766,7 @@ public class BusAccess {
   }
   
   public List<Definition> allDefs(final Row row) {
-    LinkedList<Definition> _linkedList = new LinkedList<Definition>();
-    final List<Definition> res = _linkedList;
+    final List<Definition> res = new LinkedList<Definition>();
     for (final NamedElement ne : row.definitions) {
       boolean _notEquals = (!Objects.equal(((Definition) ne).type, Definition.Type.UNUSED));
       if (_notEquals) {
@@ -784,8 +777,7 @@ public class BusAccess {
   }
   
   public List<Definition> writeDefs(final Row row) {
-    LinkedList<Definition> _linkedList = new LinkedList<Definition>();
-    final List<Definition> res = _linkedList;
+    final List<Definition> res = new LinkedList<Definition>();
     for (final NamedElement ne : row.definitions) {
       boolean _hasWrite = this.hasWrite(ne);
       if (_hasWrite) {
@@ -1211,13 +1203,11 @@ public class BusAccess {
   public boolean hasWriteDefs(final Row row) {
     final Function1<NamedElement,Boolean> _function = new Function1<NamedElement,Boolean>() {
       public Boolean apply(final NamedElement it) {
-        boolean _hasWrite = BusAccess.this.hasWrite(it);
-        return Boolean.valueOf(_hasWrite);
+        return Boolean.valueOf(BusAccess.this.hasWrite(it));
       }
     };
     NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(row.definitions, _function);
-    boolean _tripleNotEquals = (_findFirst != null);
-    return _tripleNotEquals;
+    return (_findFirst != null);
   }
   
   public boolean hasWrite(final NamedElement ne) {
@@ -1227,7 +1217,7 @@ public class BusAccess {
       _and = false;
     } else {
       boolean _tripleNotEquals_1 = (((Definition) ne).type != Definition.Type.UNUSED);
-      _and = (_tripleNotEquals && _tripleNotEquals_1);
+      _and = _tripleNotEquals_1;
     }
     return _and;
   }
@@ -1235,16 +1225,14 @@ public class BusAccess {
   public String getMaxValueHex(final Definition d) {
     int _maxValue = this.getMaxValue(d);
     String _hexString = Integer.toHexString(_maxValue);
-    String _plus = ("0x" + _hexString);
-    return _plus;
+    return ("0x" + _hexString);
   }
   
   public String getMaxValueNegHex(final Definition d) {
     int _maxValue = this.getMaxValue(d);
     int _plus = (_maxValue + 1);
     String _hexString = Integer.toHexString(_plus);
-    String _plus_1 = ("-0x" + _hexString);
-    return _plus_1;
+    return ("-0x" + _hexString);
   }
   
   public int getMaxValue(final Definition d) {

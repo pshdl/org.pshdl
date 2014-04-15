@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -33,14 +33,14 @@ import org.pshdl.model.utils.*;
 public interface IHDLObject {
 	/**
 	 * Returns the most precise class that this {@link IHDLObject} implements
-	 * 
+	 *
 	 * @return the class that implements this interface
 	 */
 	public HDLClass getClassType();
 
 	/**
 	 * Copies this object using the provided {@link CopyFilter}
-	 * 
+	 *
 	 * @param filter
 	 *            an implementation of the {@link CopyFilter} such as
 	 *            {@link CopyFilter.DeepCloneFilter}
@@ -51,7 +51,7 @@ public interface IHDLObject {
 	/**
 	 * Applies {@link CopyFilter.DeepCloneFilter} and calls
 	 * {@link #freeze(IHDLObject)} afterwards on the copy
-	 * 
+	 *
 	 * @param container
 	 *            the new {@link IHDLObject} that should become the container of
 	 *            the copy
@@ -61,7 +61,7 @@ public interface IHDLObject {
 
 	/**
 	 * Attaches some information to this {@link IHDLObject}
-	 * 
+	 *
 	 * @param key
 	 *            {@link MetaAccess#name()} will be used to store the value. If
 	 *            it already exists, it will be overwritten
@@ -72,7 +72,7 @@ public interface IHDLObject {
 
 	/**
 	 * Removes a meta from this object
-	 * 
+	 *
 	 * @param key
 	 *            {@link MetaAccess#name()} will be used to remove the meta.
 	 */
@@ -80,7 +80,7 @@ public interface IHDLObject {
 
 	/**
 	 * A boolean meta that can be used as a flag
-	 * 
+	 *
 	 * @param meta
 	 *            {@link MetaAccess#name()} will be used to store
 	 *            <code>true</code> for this key
@@ -89,7 +89,7 @@ public interface IHDLObject {
 
 	/**
 	 * A boolean meta that can be used as a flag
-	 * 
+	 *
 	 * @param meta
 	 *            {@link MetaAccess#name()} will be used to remove the meta
 	 */
@@ -97,7 +97,7 @@ public interface IHDLObject {
 
 	/**
 	 * Check whether the given {@link MetaAccess} is present on this object
-	 * 
+	 *
 	 * @param key
 	 *            the key to lookup
 	 * @return <code>true</code> if meta with this key has been attached,
@@ -107,7 +107,7 @@ public interface IHDLObject {
 
 	/**
 	 * Retrieve the value stored by this {@link MetaAccess}
-	 * 
+	 *
 	 * @param key
 	 *            {@link MetaAccess#name()} will be used to retrieve the value
 	 * @return the attached value or <code>null</code> if no value has been set
@@ -119,7 +119,7 @@ public interface IHDLObject {
 	 * Retrieves all objects of the given class and subclasses that are children
 	 * of this object, or the object itself as well. Consider the following
 	 * example:
-	 * 
+	 *
 	 * <pre>
 	 * HDLForLoop (forLoop)
 	 * +--HDLAssignment (assA)
@@ -144,7 +144,7 @@ public interface IHDLObject {
 	 * <code>forLoop.getAllObjectsOf(HDLAssignment.class, false)</code> will
 	 * return <code>[assA, assB]</code></li>
 	 * </ul>
-	 * 
+	 *
 	 * @param clazz
 	 *            all instances of this class and its subclasses will be
 	 *            returned
@@ -159,7 +159,7 @@ public interface IHDLObject {
 
 	/**
 	 * This iterator iterates over all children
-	 * 
+	 *
 	 * @return an iterator over all children
 	 */
 	public Iterator<IHDLObject> iterator();

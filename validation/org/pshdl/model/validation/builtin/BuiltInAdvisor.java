@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -77,7 +77,7 @@ public class BuiltInAdvisor {
 				solutions = new String[] {
 						"Cast the index to uint with:(uint)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") annotation to define a range" };
+						+ "\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
@@ -89,7 +89,7 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
 					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
 					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
-							+ "\") Annotation to indicate the expected range");
+					+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			return new HDLAdvise(problem, "The dimensions of assignment do not match", "When an array is assigned to another array, the size of the dimension need to match.",
@@ -135,7 +135,7 @@ public class BuiltInAdvisor {
 			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName()
-							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
+					+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
 					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
 		}
 		case INTERFACE_OUT_PORT_NEVER_READ: {

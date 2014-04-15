@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -32,7 +32,7 @@ import java.util.*;
 public class CompilerInformation implements Serializable {
 	public static class FunctionInformation implements Serializable {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -731752567686038980L;
 
@@ -61,7 +61,7 @@ public class CompilerInformation implements Serializable {
 
 	public static class AnnotationInformation implements Serializable {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -847723181271503799L;
 		public final String provider;
@@ -94,7 +94,7 @@ public class CompilerInformation implements Serializable {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7392136487645025249L;
 	public final String version;

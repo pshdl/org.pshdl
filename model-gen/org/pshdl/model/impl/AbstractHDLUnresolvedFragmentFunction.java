@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -40,7 +40,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 	/**
 	 * Constructs a new instance of
 	 * {@link AbstractHDLUnresolvedFragmentFunction}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param frag
@@ -79,7 +79,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Get the params field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -95,7 +95,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -108,7 +108,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -125,7 +125,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -138,7 +138,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 * 
+	 *
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -153,7 +153,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Setter for the field {@link #getFrag()}.
-	 * 
+	 *
 	 * @param frag
 	 *            sets the new frag of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -170,7 +170,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Setter for the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param array
 	 *            sets the new array of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
@@ -186,7 +186,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Adds a new value to the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param newArray
 	 *            the value that should be added to the field
 	 *            {@link #getArray()}
@@ -206,7 +206,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Removes a value from the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param newArray
 	 *            the value that should be removed from the field
 	 *            {@link #getArray()}
@@ -226,7 +226,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Removes a value from the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getArray()}
@@ -244,7 +244,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Setter for the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param bits
 	 *            sets the new bits of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
@@ -260,7 +260,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Adds a new value to the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param newBits
 	 *            the value that should be added to the field {@link #getBits()}
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
@@ -279,7 +279,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Removes a value from the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param newBits
 	 *            the value that should be removed from the field
 	 *            {@link #getBits()}
@@ -299,7 +299,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Removes a value from the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getBits()}
@@ -317,7 +317,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Setter for the field {@link #getSub()}.
-	 * 
+	 *
 	 * @param sub
 	 *            sets the new sub of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
@@ -333,7 +333,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Setter for the field {@link #getParams()}.
-	 * 
+	 *
 	 * @param params
 	 *            sets the new params of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnresolvedFragmentFunction} with the
@@ -348,7 +348,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Adds a new value to the field {@link #getParams()}.
-	 * 
+	 *
 	 * @param newParams
 	 *            the value that should be added to the field
 	 *            {@link #getParams()}
@@ -367,7 +367,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Removes a value from the field {@link #getParams()}.
-	 * 
+	 *
 	 * @param newParams
 	 *            the value that should be removed from the field
 	 *            {@link #getParams()}
@@ -386,7 +386,7 @@ public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolve
 
 	/**
 	 * Removes a value from the field {@link #getParams()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getParams()}

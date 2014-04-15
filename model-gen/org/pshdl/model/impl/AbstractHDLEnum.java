@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,7 @@ import com.google.common.collect.*;
 public abstract class AbstractHDLEnum extends HDLValueType {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLEnum}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -76,7 +76,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 	/**
 	 * Get the enums field. Can <b>not</b> be <code>null</code>, additionally
 	 * the collection must contain at least one element.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -94,7 +94,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -107,7 +107,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -121,7 +121,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -134,7 +134,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 * 
+	 *
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -149,7 +149,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Setter for the field {@link #getName()}.
-	 * 
+	 *
 	 * @param name
 	 *            sets the new name of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -165,7 +165,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Setter for the field {@link #getDim()}.
-	 * 
+	 *
 	 * @param dim
 	 *            sets the new dim of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLEnum} with the updated dim field.
@@ -180,7 +180,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Adds a new value to the field {@link #getDim()}.
-	 * 
+	 *
 	 * @param newDim
 	 *            the value that should be added to the field {@link #getDim()}
 	 * @return a new instance of {@link HDLEnum} with the updated dim field.
@@ -198,7 +198,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Removes a value from the field {@link #getDim()}.
-	 * 
+	 *
 	 * @param newDim
 	 *            the value that should be removed from the field
 	 *            {@link #getDim()}
@@ -217,7 +217,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Removes a value from the field {@link #getDim()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getDim()}
@@ -233,7 +233,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Setter for the field {@link #getEnums()}.
-	 * 
+	 *
 	 * @param enums
 	 *            sets the new enums of this object. Can <b>not</b> be
 	 *            <code>null</code>, additionally the collection must contain at
@@ -249,7 +249,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Adds a new value to the field {@link #getEnums()}.
-	 * 
+	 *
 	 * @param newEnums
 	 *            the value that should be added to the field
 	 *            {@link #getEnums()}
@@ -267,7 +267,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Removes a value from the field {@link #getEnums()}.
-	 * 
+	 *
 	 * @param newEnums
 	 *            the value that should be removed from the field
 	 *            {@link #getEnums()}
@@ -285,7 +285,7 @@ public abstract class AbstractHDLEnum extends HDLValueType {
 
 	/**
 	 * Removes a value from the field {@link #getEnums()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getEnums()}

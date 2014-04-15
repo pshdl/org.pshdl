@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -42,9 +42,9 @@ import org.pshdl.model.utils.*;
  * not need to be the value the unit is instantiated with. This context stores a
  * mapping for those parameters to the actual value. See
  * {@link ConstantEvaluate#constantEvaluate(IHDLObject, HDLEvaluationContext)}
- * 
+ *
  * @author Karsten Becker
- * 
+ *
  */
 public class HDLEvaluationContext {
 
@@ -65,7 +65,7 @@ public class HDLEvaluationContext {
 
 	/**
 	 * Returns the value for the given {@link HDLVariable}
-	 * 
+	 *
 	 * @param ref
 	 *            the name of this variable is used to lookup the value
 	 * @return the value if successful, <code>null</code> if no such value can
@@ -81,7 +81,7 @@ public class HDLEvaluationContext {
 	/**
 	 * Generates a default context where all parameter are assumed to be the
 	 * constant they are initialized with
-	 * 
+	 *
 	 * @param unit
 	 *            the unit to create the context for
 	 * @return a HDLEvaluationContext with all parameters set to their default
@@ -99,7 +99,7 @@ public class HDLEvaluationContext {
 	/**
 	 * Generates a default context where all parameter are assumed to be the
 	 * constant they are initialized with
-	 * 
+	 *
 	 * @param unit
 	 *            the unit to create the context for
 	 * @return a HDLEvaluationContext with all parameters set to their default

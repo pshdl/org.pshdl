@@ -10,7 +10,6 @@ import java.util.Map;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.ExclusiveRange;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
@@ -23,26 +22,11 @@ import org.pshdl.interpreter.utils.Instruction;
 public class CommonCompilerExtension {
   public ExecutableModel em;
   
-  public Map<String,Integer> varIdx = new Function0<Map<String,Integer>>() {
-    public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String, Integer>();
-      return _hashMap;
-    }
-  }.apply();
+  public Map<String,Integer> varIdx = new HashMap<String, Integer>();
   
-  public Map<String,Integer> intIdx = new Function0<Map<String,Integer>>() {
-    public Map<String,Integer> apply() {
-      HashMap<String,Integer> _hashMap = new HashMap<String, Integer>();
-      return _hashMap;
-    }
-  }.apply();
+  public Map<String,Integer> intIdx = new HashMap<String, Integer>();
   
-  public Map<String,Boolean> prevMap = new Function0<Map<String,Boolean>>() {
-    public Map<String,Boolean> apply() {
-      HashMap<String,Boolean> _hashMap = new HashMap<String, Boolean>();
-      return _hashMap;
-    }
-  }.apply();
+  public Map<String,Boolean> prevMap = new HashMap<String, Boolean>();
   
   public boolean hasClock;
   
@@ -102,34 +86,28 @@ public class CommonCompilerExtension {
   public Iterable<VariableInformation> excludeNull(final VariableInformation[] vars) {
     final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
       public Boolean apply(final VariableInformation it) {
-        boolean _isNotNull = CommonCompilerExtension.this.isNotNull(it);
-        return Boolean.valueOf(_isNotNull);
+        return Boolean.valueOf(CommonCompilerExtension.this.isNotNull(it));
       }
     };
-    Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(vars)), _function);
-    return _filter;
+    return IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(vars)), _function);
   }
   
   public boolean isNotNull(final VariableInformation it) {
-    boolean _notEquals = (!Objects.equal(it.name, "#null"));
-    return _notEquals;
+    return (!Objects.equal(it.name, "#null"));
   }
   
   public boolean isNull(final VariableInformation it) {
     boolean _isNotNull = this.isNotNull(it);
-    boolean _not = (!_isNotNull);
-    return _not;
+    return (!_isNotNull);
   }
   
   public Iterable<InternalInformation> excludeNull(final InternalInformation[] vars) {
     final Function1<InternalInformation,Boolean> _function = new Function1<InternalInformation,Boolean>() {
       public Boolean apply(final InternalInformation it) {
-        boolean _isNotNull = CommonCompilerExtension.this.isNotNull(it.info);
-        return Boolean.valueOf(_isNotNull);
+        return Boolean.valueOf(CommonCompilerExtension.this.isNotNull(it.info));
       }
     };
-    Iterable<InternalInformation> _filter = IterableExtensions.<InternalInformation>filter(((Iterable<InternalInformation>)Conversions.doWrapArray(vars)), _function);
-    return _filter;
+    return IterableExtensions.<InternalInformation>filter(((Iterable<InternalInformation>)Conversions.doWrapArray(vars)), _function);
   }
   
   public long dimMask(final InternalInformation info) {
@@ -160,8 +138,7 @@ public class CommonCompilerExtension {
   public ArrayList<Integer> dimsLastOne(final VariableInformation v) {
     ArrayList<Integer> _xblockexpression = null;
     {
-      ArrayList<Integer> _arrayList = new ArrayList<Integer>(((Collection<? extends Integer>)Conversions.doWrapArray(v.dimensions)));
-      final ArrayList<Integer> dims = _arrayList;
+      final ArrayList<Integer> dims = new ArrayList<Integer>((Collection<? extends Integer>)Conversions.doWrapArray(v.dimensions));
       int _size = dims.size();
       boolean _greaterThan = (_size > 0);
       if (_greaterThan) {
@@ -169,25 +146,22 @@ public class CommonCompilerExtension {
         int _minus = (_size_1 - 1);
         dims.set(_minus, Integer.valueOf(1));
       }
-      _xblockexpression = (dims);
+      _xblockexpression = dims;
     }
     return _xblockexpression;
   }
   
   public boolean isArray(final VariableInformation information) {
     int _length = information.dimensions.length;
-    boolean _notEquals = (_length != 0);
-    return _notEquals;
+    return (_length != 0);
   }
   
   public StringBuilder arrayAccess(final VariableInformation v) {
-    StringBuilder _arrayAccess = this.arrayAccess(v, null, "a");
-    return _arrayAccess;
+    return this.arrayAccess(v, null, "a");
   }
   
   public StringBuilder arrayAccess(final VariableInformation v, final List<Integer> arr) {
-    StringBuilder _arrayAccess = this.arrayAccess(v, arr, "a");
-    return _arrayAccess;
+    return this.arrayAccess(v, arr, "a");
   }
   
   public String arrayAccessBracket(final VariableInformation v, final List<Integer> arr) {
@@ -205,8 +179,7 @@ public class CommonCompilerExtension {
   }
   
   public StringBuilder arrayAccessArrIdx(final VariableInformation v) {
-    StringBuilder _stringBuilder = new StringBuilder();
-    final StringBuilder varAccess = _stringBuilder;
+    final StringBuilder varAccess = new StringBuilder();
     final ArrayList<Integer> dims = this.dimsLastOne(v);
     int _length = v.dimensions.length;
     ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
@@ -237,8 +210,7 @@ public class CommonCompilerExtension {
   }
   
   public StringBuilder arrayAccess(final VariableInformation v, final List<Integer> arr, final String varName) {
-    StringBuilder _stringBuilder = new StringBuilder();
-    final StringBuilder varAccess = _stringBuilder;
+    final StringBuilder varAccess = new StringBuilder();
     final ArrayList<Integer> dims = this.dimsLastOne(v);
     int _length = v.dimensions.length;
     ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
@@ -253,8 +225,7 @@ public class CommonCompilerExtension {
         if (_tripleEquals) {
           _xifexpression = i;
         } else {
-          Integer _get = arr.get((i).intValue());
-          _xifexpression = _get;
+          _xifexpression = arr.get((i).intValue());
         }
         final Integer idx = _xifexpression;
         if (((dim).intValue() != 1)) {
@@ -348,8 +319,7 @@ public class CommonCompilerExtension {
   }
   
   public boolean isPredicate(final VariableInformation info) {
-    boolean _startsWith = info.name.startsWith(InternalInformation.PRED_PREFIX);
-    return _startsWith;
+    return info.name.startsWith(InternalInformation.PRED_PREFIX);
   }
   
   public String idName(final VariableInformation information, final boolean prev, final boolean field) {
@@ -486,7 +456,7 @@ public class CommonCompilerExtension {
         _and = false;
       } else {
         boolean _notEquals = (!Objects.equal(cast, ""));
-        _and = (_tripleNotEquals && _notEquals);
+        _and = _notEquals;
       }
       if (_and) {
         StringConcatenation _builder = new StringConcatenation();
@@ -507,7 +477,7 @@ public class CommonCompilerExtension {
       _builder_1.append(shift, "");
       _builder_1.append(") >> ");
       _builder_1.append(shift, "");
-      _xblockexpression = (_builder_1);
+      _xblockexpression = _builder_1;
     }
     return _xblockexpression;
   }

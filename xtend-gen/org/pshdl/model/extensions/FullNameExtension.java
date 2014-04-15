@@ -26,11 +26,9 @@
  */
 package org.pshdl.model.extensions;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import java.util.Arrays;
 import java.util.Iterator;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLEnum;
@@ -60,19 +58,9 @@ public class FullNameExtension {
   /**
    * This annotation is used to store {@link HDLQualifiedName} for the case that the resolution diverges from the actual tree
    */
-  public static HDLObject.GenericMeta<HDLQualifiedName> FULLNAME = new Function0<HDLObject.GenericMeta<HDLQualifiedName>>() {
-    public HDLObject.GenericMeta<HDLQualifiedName> apply() {
-      HDLObject.GenericMeta<HDLQualifiedName> _genericMeta = new HDLObject.GenericMeta<HDLQualifiedName>("FULLNAME", true);
-      return _genericMeta;
-    }
-  }.apply();
+  public static HDLObject.GenericMeta<HDLQualifiedName> FULLNAME = new HDLObject.GenericMeta<HDLQualifiedName>("FULLNAME", true);
   
-  private static FullNameExtension INST = new Function0<FullNameExtension>() {
-    public FullNameExtension apply() {
-      FullNameExtension _fullNameExtension = new FullNameExtension();
-      return _fullNameExtension;
-    }
-  }.apply();
+  private static FullNameExtension INST = new FullNameExtension();
   
   /**
    * Returns the {@link HDLQualifiedName} for the given obj.
@@ -89,8 +77,7 @@ public class FullNameExtension {
       if (_tripleNotEquals) {
         return cached;
       }
-      HDLQualifiedName _fullName = FullNameExtension.INST.getFullName(obj);
-      _xblockexpression = (_fullName);
+      _xblockexpression = FullNameExtension.INST.getFullName(obj);
     }
     return _xblockexpression;
   }
@@ -345,23 +332,18 @@ public class FullNameExtension {
         IHDLObject _container_3 = obj.getContainer();
         final HDLIfStatement ifStmnt = ((HDLIfStatement) _container_3);
         final HDLIfStatement.TreeSide side = ifStmnt.treeSide(obj);
-        boolean _matched = false;
-        if (!_matched) {
-          if (Objects.equal(side,HDLIfStatement.TreeSide.thenTree)) {
-            _matched=true;
-            String _string = fn.toString();
-            String _plus = (_string + "p");
-            HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_plus);
-            return _hDLQualifiedName;
-          }
-        }
-        if (!_matched) {
-          if (Objects.equal(side,HDLIfStatement.TreeSide.elseTree)) {
-            _matched=true;
-            String _string_1 = fn.toString();
-            String _plus_1 = (_string_1 + "n");
-            HDLQualifiedName _hDLQualifiedName_1 = new HDLQualifiedName(_plus_1);
-            return _hDLQualifiedName_1;
+        if (side != null) {
+          switch (side) {
+            case thenTree:
+              String _string = fn.toString();
+              String _plus = (_string + "p");
+              return new HDLQualifiedName(_plus);
+            case elseTree:
+              String _string_1 = fn.toString();
+              String _plus_1 = (_string_1 + "n");
+              return new HDLQualifiedName(_plus_1);
+            default:
+              break;
           }
         }
       }

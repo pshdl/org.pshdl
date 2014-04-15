@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -54,15 +54,15 @@ public class ABP3BusCodeGen extends CommonBusCode {
 		final Map<String, Boolean> isArray = buildArrayMap(hdi);
 		final int addrWidth = ((int) Math.ceil(Math.log10(rows.size() * 4) / Math.log10(2)));
 		HDLUnit res = new HDLUnit()
-				.setName(name)
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.IN).addAnnotations(new HDLAnnotation().setName("@clock")).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PCLK")))
+		.setName(name)
+		.addStatements(
+				new HDLVariableDeclaration().setDirection(HDLDirection.IN).addAnnotations(new HDLAnnotation().setName("@clock")).setType(HDLQualifiedName.create("#bit"))
+				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PCLK")))
 				.addStatements(
 						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PRESETn")))
-				.addStatements(
-						new HDLVariableDeclaration()
+						.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PRESETn")))
+						.addStatements(
+								new HDLVariableDeclaration()
 								.setDirection(HDLDirection.INTERNAL)
 								.addAnnotations(new HDLAnnotation().setName("@reset"))
 								.setType(HDLQualifiedName.create("#bit"))
@@ -70,55 +70,55 @@ public class ABP3BusCodeGen extends CommonBusCode {
 								.addVariables(
 										new HDLVariable().setName("rst").setDefaultValue(
 												new HDLManip().setType(HDLManipType.BIT_NEG).setTarget(new HDLVariableRef().setVar(HDLQualifiedName.create("PRESETn"))))))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PENABLE")))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PSEL")))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(addrWidth)))
-								.addVariables(new HDLVariable().setName("PADDR")))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PWRITE")))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit<32>"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
-								.addVariables(new HDLVariable().setName("PWDATA")))
-				.addStatements(
-						new HDLVariableDeclaration().setRegister(HDLRegisterConfig.defaultConfig().setClockType(HDLRegClockType.FALLING)).setDirection(HDLDirection.OUT)
-								.setType(HDLQualifiedName.create("#bit<32>"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
-								.addVariables(new HDLVariable().setName("PRDATA")))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
-								.addVariables(new HDLVariable().setName("PREADY").setDefaultValue(new HDLLiteral().setVal("1"))))
-				.addStatements(
-						new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
-								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
-								.addVariables(new HDLVariable().setName("PSLVERR").setDefaultValue(new HDLLiteral().setVal("0"))))
-				.addStatements(
-						new HDLIfStatement().setIfExp(
-								new HDLBitOp()
-										.setLeft(
-												new HDLBitOp().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PWRITE")))
-														.setRight(new HDLVariableRef().setVar(HDLQualifiedName.create("PSEL"))).setType(HDLBitOpType.LOGI_AND))
-										.setRight(new HDLVariableRef().setVar(HDLQualifiedName.create("PENABLE"))).setType(HDLBitOpType.LOGI_AND)).addThenDo(
-								createWriteSwitch(rows, isArray)))
-				.addStatements(
-						new HDLIfStatement()
-								.setIfExp(
-										new HDLBitOp()
-												.setLeft(
-														new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PWRITE")))
-																.setRight(new HDLLiteral().setVal("0")).setType(HDLEqualityOpType.EQ))
-												.setRight(new HDLVariableRef().setVar(HDLQualifiedName.create("PSEL"))).setType(HDLBitOpType.LOGI_AND))
-								.addThenDo(createReadSwitch(rows, isArray))
-								.addElseDo(
-										new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PRDATA"))).setType(HDLAssignmentType.ASSGN)
-												.setRight(new HDLLiteral().setVal("0")))).setSimulation(false);
+												.addStatements(
+														new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
+														.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PENABLE")))
+														.addStatements(
+																new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
+																.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PSEL")))
+																.addStatements(
+																		new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(addrWidth)))
+																		.addVariables(new HDLVariable().setName("PADDR")))
+																		.addStatements(
+																				new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit"))
+																				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("PWRITE")))
+																				.addStatements(
+																						new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLQualifiedName.create("#bit<32>"))
+																						.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
+																						.addVariables(new HDLVariable().setName("PWDATA")))
+																						.addStatements(
+																								new HDLVariableDeclaration().setRegister(HDLRegisterConfig.defaultConfig().setClockType(HDLRegClockType.FALLING)).setDirection(HDLDirection.OUT)
+																								.setType(HDLQualifiedName.create("#bit<32>"))
+																								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
+																								.addVariables(new HDLVariable().setName("PRDATA")))
+																								.addStatements(
+																										new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
+																										.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
+																										.addVariables(new HDLVariable().setName("PREADY").setDefaultValue(new HDLLiteral().setVal("1"))))
+																										.addStatements(
+																												new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
+																												.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
+																												.addVariables(new HDLVariable().setName("PSLVERR").setDefaultValue(new HDLLiteral().setVal("0"))))
+																												.addStatements(
+																														new HDLIfStatement().setIfExp(
+																																new HDLBitOp()
+																																.setLeft(
+																																		new HDLBitOp().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PWRITE")))
+																																		.setRight(new HDLVariableRef().setVar(HDLQualifiedName.create("PSEL"))).setType(HDLBitOpType.LOGI_AND))
+																																		.setRight(new HDLVariableRef().setVar(HDLQualifiedName.create("PENABLE"))).setType(HDLBitOpType.LOGI_AND)).addThenDo(
+																																				createWriteSwitch(rows, isArray)))
+																																				.addStatements(
+																																						new HDLIfStatement()
+																																						.setIfExp(
+																																								new HDLBitOp()
+																																								.setLeft(
+																																										new HDLEqualityOp().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PWRITE")))
+																																										.setRight(new HDLLiteral().setVal("0")).setType(HDLEqualityOpType.EQ))
+																																										.setRight(new HDLVariableRef().setVar(HDLQualifiedName.create("PSEL"))).setType(HDLBitOpType.LOGI_AND))
+																																										.addThenDo(createReadSwitch(rows, isArray))
+																																										.addElseDo(
+																																												new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PRDATA"))).setType(HDLAssignmentType.ASSGN)
+																																												.setRight(new HDLLiteral().setVal("0")))).setSimulation(false);
 		for (final HDLVariableDeclaration port : hdi.getPorts()) {
 			res = res.addStatements(port.setDirection(HDLDirection.INTERNAL));
 		}

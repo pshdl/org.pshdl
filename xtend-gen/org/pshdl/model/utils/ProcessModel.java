@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.MapExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
@@ -41,12 +40,7 @@ import org.pshdl.model.utils.SyntaxHighlighter;
 
 @SuppressWarnings("all")
 public class ProcessModel {
-  private static AtomicInteger ai = new Function0<AtomicInteger>() {
-    public AtomicInteger apply() {
-      AtomicInteger _atomicInteger = new AtomicInteger();
-      return _atomicInteger;
-    }
-  }.apply();
+  private static AtomicInteger ai = new AtomicInteger();
   
   public Multimap<Integer,HDLStatement> unclockedStatements = LinkedListMultimap.<Integer, HDLStatement>create();
   
@@ -55,8 +49,7 @@ public class ProcessModel {
   public final static int DEF_PROCESS = (-1);
   
   public static ProcessModel toProcessModel(final HDLUnit stmnt) {
-    ProcessModel _processModel = new ProcessModel();
-    final ProcessModel pm = _processModel;
+    final ProcessModel pm = new ProcessModel();
     ArrayList<HDLStatement> _inits = stmnt.getInits();
     final Procedure1<HDLStatement> _function = new Procedure1<HDLStatement>() {
       public void apply(final HDLStatement s) {
@@ -78,8 +71,7 @@ public class ProcessModel {
   
   protected static ProcessModel _toProcessModel(final HDLFunctionCall stmnt, final int pid) {
     ProcessModel _processModel = new ProcessModel();
-    ProcessModel _addUnclocked = _processModel.addUnclocked(pid, stmnt);
-    return _addUnclocked;
+    return _processModel.addUnclocked(pid, stmnt);
   }
   
   protected static ProcessModel _toProcessModel(final HDLInstantiation stmnt, final int pid) {
@@ -91,16 +83,14 @@ public class ProcessModel {
   }
   
   protected static ProcessModel _toProcessModel(final HDLStatement stmnt, final int pid) {
-    RuntimeException _runtimeException = new RuntimeException(("Not implemented for statement:" + stmnt));
-    throw _runtimeException;
+    throw new RuntimeException(("Not implemented for statement:" + stmnt));
   }
   
   protected static ProcessModel _toProcessModel(final HDLBlock stmnt, final int pid) {
     int _xifexpression = (int) 0;
     Boolean _process = stmnt.getProcess();
     if ((_process).booleanValue()) {
-      int _andIncrement = ProcessModel.ai.getAndIncrement();
-      _xifexpression = _andIncrement;
+      _xifexpression = ProcessModel.ai.getAndIncrement();
     } else {
       _xifexpression = pid;
     }
@@ -117,15 +107,13 @@ public class ProcessModel {
   }
   
   private static <T extends HDLStatement, V extends HDLStatement, C extends Collection<V>> ProcessModel toProcessModel(final T obj, final HDLQuery.HDLFieldAccess<T,C> field, final int pid) {
-    ProcessModel _processModel = new ProcessModel();
-    final ProcessModel pm = _processModel;
+    final ProcessModel pm = new ProcessModel();
     C _value = field.getValue(obj);
     for (final V subStmnt : _value) {
-      ProcessModel _processModel_1 = ProcessModel.toProcessModel(subStmnt, pid);
-      pm.merge(_processModel_1);
+      ProcessModel _processModel = ProcessModel.toProcessModel(subStmnt, pid);
+      pm.merge(_processModel);
     }
-    ProcessModel _processModel_2 = new ProcessModel();
-    final ProcessModel res = _processModel_2;
+    final ProcessModel res = new ProcessModel();
     Map<Integer,Collection<HDLStatement>> _asMap = pm.unclockedStatements.asMap();
     final Procedure2<Integer,Collection<HDLStatement>> _function = new Procedure2<Integer,Collection<HDLStatement>>() {
       public void apply(final Integer subPid, final Collection<HDLStatement> stmnts) {
@@ -148,8 +136,7 @@ public class ProcessModel {
   }
   
   protected static ProcessModel _toProcessModel(final HDLIfStatement stmnt, final int pid) {
-    ProcessModel _processModel = new ProcessModel();
-    final ProcessModel thenPM = _processModel;
+    final ProcessModel thenPM = new ProcessModel();
     ArrayList<HDLStatement> _thenDo = stmnt.getThenDo();
     final Procedure1<HDLStatement> _function = new Procedure1<HDLStatement>() {
       public void apply(final HDLStatement s) {
@@ -158,8 +145,7 @@ public class ProcessModel {
       }
     };
     IterableExtensions.<HDLStatement>forEach(_thenDo, _function);
-    ProcessModel _processModel_1 = new ProcessModel();
-    final ProcessModel elsePM = _processModel_1;
+    final ProcessModel elsePM = new ProcessModel();
     ArrayList<HDLStatement> _elseDo = stmnt.getElseDo();
     final Procedure1<HDLStatement> _function_1 = new Procedure1<HDLStatement>() {
       public void apply(final HDLStatement s) {
@@ -168,14 +154,12 @@ public class ProcessModel {
       }
     };
     IterableExtensions.<HDLStatement>forEach(_elseDo, _function_1);
-    HashSet<HDLRegisterConfig> _hashSet = new HashSet<HDLRegisterConfig>();
-    final HashSet<HDLRegisterConfig> clocks = _hashSet;
+    final HashSet<HDLRegisterConfig> clocks = new HashSet<HDLRegisterConfig>();
     Set<HDLRegisterConfig> _keySet = thenPM.clockedStatements.keySet();
     clocks.addAll(_keySet);
     Set<HDLRegisterConfig> _keySet_1 = elsePM.clockedStatements.keySet();
     clocks.addAll(_keySet_1);
-    ProcessModel _processModel_2 = new ProcessModel();
-    final ProcessModel res = _processModel_2;
+    final ProcessModel res = new ProcessModel();
     boolean _or = false;
     boolean _isEmpty = thenPM.unclockedStatements.isEmpty();
     boolean _not = (!_isEmpty);
@@ -184,7 +168,7 @@ public class ProcessModel {
     } else {
       boolean _isEmpty_1 = elsePM.unclockedStatements.isEmpty();
       boolean _not_1 = (!_isEmpty_1);
-      _or = (_not || _not_1);
+      _or = _not_1;
     }
     if (_or) {
       Collection<HDLStatement> _unclocked = thenPM.getUnclocked(pid);
@@ -205,8 +189,7 @@ public class ProcessModel {
   
   protected static ProcessModel _toProcessModel(final HDLSwitchStatement stmnt, final int pid) {
     final Map<HDLSwitchCaseStatement,ProcessModel> pms = Maps.<HDLSwitchCaseStatement, ProcessModel>newLinkedHashMap();
-    HashSet<HDLRegisterConfig> _hashSet = new HashSet<HDLRegisterConfig>();
-    final HashSet<HDLRegisterConfig> clocks = _hashSet;
+    final HashSet<HDLRegisterConfig> clocks = new HashSet<HDLRegisterConfig>();
     boolean hasUnclocked = false;
     ArrayList<HDLSwitchCaseStatement> _cases = stmnt.getCases();
     for (final HDLSwitchCaseStatement caze : _cases) {
@@ -222,8 +205,7 @@ public class ProcessModel {
         pms.put(caze, casePM);
       }
     }
-    ProcessModel _processModel = new ProcessModel();
-    final ProcessModel res = _processModel;
+    final ProcessModel res = new ProcessModel();
     if (hasUnclocked) {
       final List<HDLSwitchCaseStatement> newCases = Lists.<HDLSwitchCaseStatement>newLinkedList();
       final Procedure2<HDLSwitchCaseStatement,ProcessModel> _function = new Procedure2<HDLSwitchCaseStatement,ProcessModel>() {
@@ -258,8 +240,7 @@ public class ProcessModel {
   protected static ProcessModel _toProcessModel(final HDLAssignment stmnt, final int pid) {
     final HDLReference ref = stmnt.getLeft();
     if ((ref instanceof HDLUnresolvedFragment)) {
-      RuntimeException _runtimeException = new RuntimeException(("Not implemented for HDLUnresolvedFragment:" + stmnt));
-      throw _runtimeException;
+      throw new RuntimeException(("Not implemented for HDLUnresolvedFragment:" + stmnt));
     }
     final HDLResolvedRef rRef = ((HDLResolvedRef) ref);
     Optional<HDLVariable> _resolveVar = rRef.resolveVar();

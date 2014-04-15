@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,7 @@ import com.google.common.collect.*;
 public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLSwitchStatement}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param caseExp
@@ -80,7 +80,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Get the caseExp field. Can <b>not</b> be <code>null</code>.
-	 * 
+	 *
 	 * @return the field
 	 */
 	@Nonnull
@@ -98,7 +98,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Get the cases field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -114,7 +114,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -127,7 +127,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -140,7 +140,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -153,7 +153,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 * 
+	 *
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -168,7 +168,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getCaseExp()}.
-	 * 
+	 *
 	 * @param caseExp
 	 *            sets the new caseExp of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -184,7 +184,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getCases()}.
-	 * 
+	 *
 	 * @param cases
 	 *            sets the new cases of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLSwitchStatement} with the updated
@@ -199,7 +199,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Adds a new value to the field {@link #getCases()}.
-	 * 
+	 *
 	 * @param newCases
 	 *            the value that should be added to the field
 	 *            {@link #getCases()}
@@ -218,7 +218,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Removes a value from the field {@link #getCases()}.
-	 * 
+	 *
 	 * @param newCases
 	 *            the value that should be removed from the field
 	 *            {@link #getCases()}
@@ -237,7 +237,7 @@ public abstract class AbstractHDLSwitchStatement extends HDLCompound {
 
 	/**
 	 * Removes a value from the field {@link #getCases()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getCases()}

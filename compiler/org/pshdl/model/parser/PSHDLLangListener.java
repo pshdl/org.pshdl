@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.tree.*;
 public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psVariableRef}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -45,7 +45,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psVariableRef}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -53,7 +53,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psProcess}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -61,7 +61,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psProcess}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -69,7 +69,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psVariable}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -77,7 +77,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psVariable}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -85,7 +85,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psPassedArguments}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -93,7 +93,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psPassedArguments}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -102,7 +102,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psSubstituteFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -111,7 +111,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psSubstituteFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -119,7 +119,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParamWithRW}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -127,7 +127,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParamWithRW}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -135,7 +135,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psManip}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -143,7 +143,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psManip}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -151,7 +151,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitLogAnd}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -159,7 +159,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitLogAnd}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -167,7 +167,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitLogOr}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -175,7 +175,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitLogOr}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -184,7 +184,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psVariableDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -193,7 +193,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psVariableDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -201,7 +201,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncOptArray}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -209,7 +209,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncOptArray}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -217,7 +217,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncRecturnType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -225,7 +225,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncRecturnType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -233,7 +233,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitXor}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -241,7 +241,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitXor}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -249,7 +249,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psNativeFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -257,7 +257,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psNativeFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -265,7 +265,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psEnum}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -273,7 +273,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psEnum}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -282,7 +282,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psQualifiedNameImport}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -291,7 +291,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psQualifiedNameImport}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -300,7 +300,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psInterfaceInstantiation}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -309,7 +309,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psInterfaceInstantiation}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -317,7 +317,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psForStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -325,7 +325,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psForStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -333,7 +333,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psSwitchStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -341,7 +341,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psSwitchStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -349,7 +349,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParam}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -357,7 +357,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParam}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -365,7 +365,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psAssignmentOp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -373,7 +373,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psAssignmentOp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -381,7 +381,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psEnumDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -389,7 +389,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psEnumDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -397,7 +397,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psWidth}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -405,7 +405,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psWidth}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -413,7 +413,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psAccessRange}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -421,7 +421,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psAccessRange}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -430,7 +430,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psArrayInitSubParens}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -439,7 +439,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psArrayInitSubParens}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -447,7 +447,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psInlineFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -455,7 +455,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psInlineFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -463,7 +463,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psParens}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -471,7 +471,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psParens}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -479,7 +479,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitAnd}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -487,7 +487,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitAnd}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -495,7 +495,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParamType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -503,7 +503,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParamType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -512,7 +512,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psCompoundStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -521,7 +521,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psCompoundStatement}
 	 * .
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -529,7 +529,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -537,7 +537,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -545,7 +545,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psValue}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -553,7 +553,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psValue}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -562,7 +562,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psInterfaceDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -571,7 +571,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psInterfaceDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -579,7 +579,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psEqualityComp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -587,7 +587,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psEqualityComp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -595,7 +595,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psConcat}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -603,7 +603,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psConcat}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -611,7 +611,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psPortDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -619,7 +619,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psPortDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -627,7 +627,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psAnnotationType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -635,7 +635,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psAnnotationType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -643,7 +643,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psDeclAssignment}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -651,7 +651,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psDeclAssignment}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -659,7 +659,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBlock}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -667,7 +667,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBlock}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -676,7 +676,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psDirectGeneration}
 	 * .
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -684,7 +684,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psDirectGeneration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -692,7 +692,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psEquality}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -700,7 +700,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psEquality}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -708,7 +708,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psAnnotation}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -716,7 +716,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psAnnotation}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -724,7 +724,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psCast}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -732,7 +732,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psCast}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -740,7 +740,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psQualifiedName}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -748,7 +748,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psQualifiedName}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -756,7 +756,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psArrayInitExp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -764,7 +764,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psArrayInitExp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -772,7 +772,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psRefPart}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -780,7 +780,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psRefPart}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -788,7 +788,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -796,7 +796,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFunction}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -804,7 +804,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psArrayInit}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -812,7 +812,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psArrayInit}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -821,7 +821,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by
 	 * {@link PSHDLLangParser#psFunctionDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -830,7 +830,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Exit a parse tree produced by
 	 * {@link PSHDLLangParser#psFunctionDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -838,7 +838,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psDeclarationType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -846,7 +846,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psDeclarationType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -854,7 +854,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psInterfaceDecl}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -862,7 +862,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psInterfaceDecl}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -871,7 +871,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psInterfaceExtends}
 	 * .
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -879,7 +879,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psInterfaceExtends}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -887,7 +887,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psValueExp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -895,7 +895,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psValueExp}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -903,7 +903,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psUnit}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -911,7 +911,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psUnit}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -919,7 +919,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psInstantiation}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -927,7 +927,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psInstantiation}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -935,7 +935,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psTypeDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -943,7 +943,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psTypeDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -952,7 +952,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psAssignmentOrFunc}
 	 * .
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -960,7 +960,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psAssignmentOrFunc}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -968,7 +968,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psDirection}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -976,7 +976,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psDirection}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -984,7 +984,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psMul}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -992,7 +992,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psMul}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1000,7 +1000,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psPrimitiveType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1008,7 +1008,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psPrimitiveType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1016,7 +1016,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psModel}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1024,7 +1024,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psModel}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1032,7 +1032,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitAccess}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1040,7 +1040,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitAccess}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1048,7 +1048,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psArray}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1056,7 +1056,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psArray}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1064,7 +1064,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncArgs}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1072,7 +1072,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncArgs}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1080,7 +1080,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psImports}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1088,7 +1088,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psImports}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1096,7 +1096,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psArrayInitSub}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1104,7 +1104,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psArrayInitSub}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1112,7 +1112,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncSpec}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1120,7 +1120,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncSpec}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1128,7 +1128,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psInterface}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1136,7 +1136,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psInterface}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1144,7 +1144,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psSimpleBlock}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1152,7 +1152,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psSimpleBlock}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1160,7 +1160,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psPrimitive}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1168,7 +1168,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psPrimitive}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1176,7 +1176,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitOr}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1184,7 +1184,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitOr}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1192,7 +1192,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psExtends}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1200,7 +1200,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psExtends}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1208,7 +1208,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psArgument}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1216,7 +1216,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psArgument}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1224,7 +1224,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psShift}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1232,7 +1232,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psShift}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1240,7 +1240,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psCaseStatements}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1248,7 +1248,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psCaseStatements}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1256,7 +1256,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psAdd}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1264,7 +1264,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psAdd}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1272,7 +1272,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psTernary}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1280,7 +1280,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psTernary}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1288,7 +1288,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1296,7 +1296,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psDeclaration}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1304,7 +1304,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParamRWType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1312,7 +1312,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParamRWType}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1320,7 +1320,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psIfStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */
@@ -1328,7 +1328,7 @@ public interface PSHDLLangListener extends ParseTreeListener {
 
 	/**
 	 * Exit a parse tree produced by {@link PSHDLLangParser#psIfStatement}.
-	 * 
+	 *
 	 * @param ctx
 	 *            the parse tree
 	 */

@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -244,9 +244,9 @@ public class HDLSimulator {
 			final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(typeOf.get()).addVariables(var);
 			final HDLAssignment newAss = new HDLAssignment().setLeft(var.asHDLRef());
 			final HDLIfStatement ifStatement = new HDLIfStatement()//
-					.setIfExp(ternary.getIfExpr())//
-					.addThenDo(newAss.setRight(ternary.getThenExpr()))//
-					.addElseDo(newAss.setRight(ternary.getElseExpr()));
+			.setIfExp(ternary.getIfExpr())//
+			.addThenDo(newAss.setRight(ternary.getThenExpr()))//
+			.addElseDo(newAss.setRight(ternary.getElseExpr()));
 			ms.replace(ternary, var.asHDLRef());
 			ms.insertBefore(ternary.getContainer(HDLStatement.class), hvd, ifStatement);
 		}
@@ -333,7 +333,7 @@ public class HDLSimulator {
 				if (!ref.getBits().isEmpty()) {
 					for (final HDLRange bit : ref.getBits())
 						if (bit.getFrom() != null) { // Singular ranges don't do
-														// anything
+							// anything
 							final Optional<Range<BigInteger>> range = RangeExtension.rangeOf(bit, context);
 							if (!range.isPresent())
 								throw new IllegalArgumentException("Can not determine Range of:" + bit);
@@ -367,7 +367,7 @@ public class HDLSimulator {
 	/**
 	 * Unrolls a loop and creates the statements with an accordingly replaced
 	 * loop parameter
-	 * 
+	 *
 	 * @param context
 	 * @param unit
 	 * @return

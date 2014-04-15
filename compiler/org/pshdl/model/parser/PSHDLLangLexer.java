@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -47,19 +47,19 @@ public class PSHDLLangLexer extends Lexer {
 	public static String[] modeNames = { "DEFAULT_MODE" };
 
 	public static final String[] tokenNames = { "<INVALID>", "'record'", "'register'", "'['", "'param'", "'substitute'", "'inout'", "'}'", "'case'", "'->'", "'simulation'", "')'",
-			"'generate'", "'inline'", "'-:'", "'@'", "'+:'", "'.*'", "'const'", "']'", "'default'", "'in'", "','", "':'", "'('", "'if'", "'$rst'", "'?'", "'package'", "'{'",
-			"'native'", "'extends'", "'else'", "'import'", "'.'", "'=>'", "'for'", "'process'", "'$clk'", "';'", "'include'", "'switch'", "'#'", "'out'", "'&'", "'|'", "'^'",
-			"'&&'", "'||'", "'*'", "'/'", "'+'", "'%'", "'**'", "'<<'", "'>>'", "'>>>'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'='", "'+='", "'-='", "'*='", "'/='",
-			"'%='", "'&='", "'^='", "'|='", "'<<='", "'>>>='", "'>>='", "'-'", "'~'", "'!'", "'int<>'", "'uint<>'", "'bit<>'", "'interface<>'", "'enum<>'", "'bit'", "'int'",
-			"'uint'", "'string'", "'bool'", "'enum'", "'interface'", "'function'", "'module'", "'testbench'", "RULE_PS_LITERAL_TERMINAL", "RULE_ID", "RULE_STRING",
-			"RULE_ML_COMMENT", "RULE_GENERATOR_CONTENT", "RULE_SL_COMMENT", "RULE_WS" };
+		"'generate'", "'inline'", "'-:'", "'@'", "'+:'", "'.*'", "'const'", "']'", "'default'", "'in'", "','", "':'", "'('", "'if'", "'$rst'", "'?'", "'package'", "'{'",
+		"'native'", "'extends'", "'else'", "'import'", "'.'", "'=>'", "'for'", "'process'", "'$clk'", "';'", "'include'", "'switch'", "'#'", "'out'", "'&'", "'|'", "'^'",
+		"'&&'", "'||'", "'*'", "'/'", "'+'", "'%'", "'**'", "'<<'", "'>>'", "'>>>'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'='", "'+='", "'-='", "'*='", "'/='",
+		"'%='", "'&='", "'^='", "'|='", "'<<='", "'>>>='", "'>>='", "'-'", "'~'", "'!'", "'int<>'", "'uint<>'", "'bit<>'", "'interface<>'", "'enum<>'", "'bit'", "'int'",
+		"'uint'", "'string'", "'bool'", "'enum'", "'interface'", "'function'", "'module'", "'testbench'", "RULE_PS_LITERAL_TERMINAL", "RULE_ID", "RULE_STRING",
+		"RULE_ML_COMMENT", "RULE_GENERATOR_CONTENT", "RULE_SL_COMMENT", "RULE_WS" };
 	public static final String[] ruleNames = { "T__42", "T__41", "T__40", "T__39", "T__38", "T__37", "T__36", "T__35", "T__34", "T__33", "T__32", "T__31", "T__30", "T__29",
-			"T__28", "T__27", "T__26", "T__25", "T__24", "T__23", "T__22", "T__21", "T__20", "T__19", "T__18", "T__17", "T__16", "T__15", "T__14", "T__13", "T__12", "T__11",
-			"T__10", "T__9", "T__8", "T__7", "T__6", "T__5", "T__4", "T__3", "T__2", "T__1", "T__0", "AND", "OR", "XOR", "LOGI_AND", "LOGI_OR", "MUL", "DIV", "PLUS", "MOD", "POW",
-			"SLL", "SRA", "SRL", "EQ", "NOT_EQ", "LESS", "LESS_EQ", "GREATER", "GREATER_EQ", "ASSGN", "ADD_ASSGN", "SUB_ASSGN", "MUL_ASSGN", "DIV_ASSGN", "MOD_ASSGN", "AND_ASSGN",
-			"XOR_ASSGN", "OR_ASSGN", "SLL_ASSGN", "SRL_ASSGN", "SRA_ASSGN", "ARITH_NEG", "BIT_NEG", "LOGIC_NEG", "ANY_INT", "ANY_UINT", "ANY_BIT", "ANY_IF", "ANY_ENUM", "BIT",
-			"INT", "UINT", "STRING", "BOOL", "ENUM", "INTERFACE", "FUNCTION", "MODULE", "TESTBENCH", "RULE_PS_LITERAL_TERMINAL", "IDCHARFIRST", "IDCHAR", "RULE_ID", "ESC",
-			"RULE_STRING", "RULE_ML_COMMENT", "RULE_GENERATOR_CONTENT", "RULE_SL_COMMENT", "RULE_WS" };
+		"T__28", "T__27", "T__26", "T__25", "T__24", "T__23", "T__22", "T__21", "T__20", "T__19", "T__18", "T__17", "T__16", "T__15", "T__14", "T__13", "T__12", "T__11",
+		"T__10", "T__9", "T__8", "T__7", "T__6", "T__5", "T__4", "T__3", "T__2", "T__1", "T__0", "AND", "OR", "XOR", "LOGI_AND", "LOGI_OR", "MUL", "DIV", "PLUS", "MOD", "POW",
+		"SLL", "SRA", "SRL", "EQ", "NOT_EQ", "LESS", "LESS_EQ", "GREATER", "GREATER_EQ", "ASSGN", "ADD_ASSGN", "SUB_ASSGN", "MUL_ASSGN", "DIV_ASSGN", "MOD_ASSGN", "AND_ASSGN",
+		"XOR_ASSGN", "OR_ASSGN", "SLL_ASSGN", "SRL_ASSGN", "SRA_ASSGN", "ARITH_NEG", "BIT_NEG", "LOGIC_NEG", "ANY_INT", "ANY_UINT", "ANY_BIT", "ANY_IF", "ANY_ENUM", "BIT",
+		"INT", "UINT", "STRING", "BOOL", "ENUM", "INTERFACE", "FUNCTION", "MODULE", "TESTBENCH", "RULE_PS_LITERAL_TERMINAL", "IDCHARFIRST", "IDCHAR", "RULE_ID", "ESC",
+		"RULE_STRING", "RULE_ML_COMMENT", "RULE_GENERATOR_CONTENT", "RULE_SL_COMMENT", "RULE_WS" };
 
 	public static final int WHITESPACE = 1;
 	public static final int COMMENTS = 2;

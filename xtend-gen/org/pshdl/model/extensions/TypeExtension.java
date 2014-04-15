@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Conversions;
-import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLBitOp;
@@ -73,12 +72,7 @@ import org.pshdl.model.validation.builtin.ErrorCode;
 
 @SuppressWarnings("all")
 public class TypeExtension {
-  private static TypeExtension INST = new Function0<TypeExtension>() {
-    public TypeExtension apply() {
-      TypeExtension _typeExtension = new TypeExtension();
-      return _typeExtension;
-    }
-  }.apply();
+  private static TypeExtension INST = new TypeExtension();
   
   public static Optional<? extends HDLType> typeOf(final IHDLObject obj) {
     Optional<? extends HDLType> _xblockexpression = null;
@@ -86,11 +80,9 @@ public class TypeExtension {
       boolean _isFrozen = obj.isFrozen();
       boolean _not = (!_isFrozen);
       if (_not) {
-        IllegalArgumentException _illegalArgumentException = new IllegalArgumentException("Target needs to be frozen");
-        throw _illegalArgumentException;
+        throw new IllegalArgumentException("Target needs to be frozen");
       }
-      Optional<? extends HDLType> _cachedType = TypeExtension.cachedType(obj);
-      _xblockexpression = (_cachedType);
+      _xblockexpression = TypeExtension.cachedType(obj);
     }
     return _xblockexpression;
   }
@@ -126,50 +118,30 @@ public class TypeExtension {
       return Optional.<HDLType>absent();
     }
     HDLClass _classType = container.getClassType();
-    final HDLClass _switchValue = _classType;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLVariableDeclaration)) {
-        _matched=true;
-        Optional<? extends HDLType> _cachedType = TypeExtension.cachedType(((HDLVariableDeclaration) container));
-        ArrayList<HDLExpression> _dimensions = hVar.getDimensions();
-        return this.attachDim(_cachedType, _dimensions);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLDirectGeneration)) {
-        _matched=true;
-        HDLInterface _hIf = ((HDLDirectGeneration) container).getHIf();
-        Optional<HDLInterface> _fromNullable = Optional.<HDLInterface>fromNullable(_hIf);
-        ArrayList<HDLExpression> _dimensions_1 = hVar.getDimensions();
-        return this.attachDim(_fromNullable, _dimensions_1);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLInterfaceInstantiation)) {
-        _matched=true;
-        Optional<HDLInterface> _resolveHIf = ((HDLInterfaceInstantiation) container).resolveHIf();
-        ArrayList<HDLExpression> _dimensions_2 = hVar.getDimensions();
-        return this.attachDim(_resolveHIf, _dimensions_2);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLForLoop)) {
-        _matched=true;
-        HDLPrimitive _natural = HDLPrimitive.getNatural();
-        return Optional.<HDLPrimitive>of(_natural);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLInlineFunction)) {
-        _matched=true;
-        return Optional.<HDLType>absent();
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLClass.HDLSubstituteFunction)) {
-        _matched=true;
-        return Optional.<HDLType>absent();
+    if (_classType != null) {
+      switch (_classType) {
+        case HDLVariableDeclaration:
+          Optional<? extends HDLType> _cachedType = TypeExtension.cachedType(((HDLVariableDeclaration) container));
+          ArrayList<HDLExpression> _dimensions = hVar.getDimensions();
+          return this.attachDim(_cachedType, _dimensions);
+        case HDLDirectGeneration:
+          HDLInterface _hIf = ((HDLDirectGeneration) container).getHIf();
+          Optional<HDLInterface> _fromNullable = Optional.<HDLInterface>fromNullable(_hIf);
+          ArrayList<HDLExpression> _dimensions_1 = hVar.getDimensions();
+          return this.attachDim(_fromNullable, _dimensions_1);
+        case HDLInterfaceInstantiation:
+          Optional<HDLInterface> _resolveHIf = ((HDLInterfaceInstantiation) container).resolveHIf();
+          ArrayList<HDLExpression> _dimensions_2 = hVar.getDimensions();
+          return this.attachDim(_resolveHIf, _dimensions_2);
+        case HDLForLoop:
+          HDLPrimitive _natural = HDLPrimitive.getNatural();
+          return Optional.<HDLPrimitive>of(_natural);
+        case HDLInlineFunction:
+          return Optional.<HDLType>absent();
+        case HDLSubstituteFunction:
+          return Optional.<HDLType>absent();
+        default:
+          break;
       }
     }
     return Optional.<HDLType>absent();
@@ -217,7 +189,7 @@ public class TypeExtension {
           HDLType _get_1 = sub.get();
           boolean _equals_1 = _get_1.equals(res);
           boolean _not = (!_equals_1);
-          _and = (_isPresent && _not);
+          _and = _not;
         }
         if (_and) {
           return sub;
@@ -230,17 +202,11 @@ public class TypeExtension {
   protected Optional<? extends HDLType> _determineType(final HDLExpression cat) {
     HDLClass _classType = cat.getClassType();
     String _plus = ("Did not correctly implement determineType for:" + _classType);
-    RuntimeException _runtimeException = new RuntimeException(_plus);
-    throw _runtimeException;
+    throw new RuntimeException(_plus);
   }
   
-  private static HDLObject.GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new Function0<HDLObject.GenericMeta<Boolean>>() {
-    public HDLObject.GenericMeta<Boolean> apply() {
-      HDLObject.GenericMeta<Boolean> _genericMeta = new HDLObject.GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", 
-        false);
-      return _genericMeta;
-    }
-  }.apply();
+  private static HDLObject.GenericMeta<Boolean> DETERMINE_TYPE_RESOLVE = new HDLObject.GenericMeta<Boolean>("DETERMINE_TYPE_RESOLVE", 
+    false);
   
   protected Optional<? extends HDLType> _determineType(final HDLUnresolvedFragment cat) {
     boolean _hasMeta = cat.hasMeta(TypeExtension.DETERMINE_TYPE_RESOLVE);
@@ -371,22 +337,18 @@ public class TypeExtension {
   
   protected Optional<? extends HDLType> _determineType(final HDLLiteral lit) {
     HDLLiteral.HDLLiteralPresentation _presentation = lit.getPresentation();
-    final HDLLiteral.HDLLiteralPresentation _switchValue = _presentation;
-    boolean _matched = false;
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.STR)) {
-        _matched=true;
-        HDLPrimitive _hDLPrimitive = new HDLPrimitive();
-        HDLPrimitive _setType = _hDLPrimitive.setType(HDLPrimitive.HDLPrimitiveType.STRING);
-        return Optional.<HDLPrimitive>of(_setType);
-      }
-    }
-    if (!_matched) {
-      if (Objects.equal(_switchValue,HDLLiteral.HDLLiteralPresentation.BOOL)) {
-        _matched=true;
-        HDLPrimitive _hDLPrimitive_1 = new HDLPrimitive();
-        HDLPrimitive _setType_1 = _hDLPrimitive_1.setType(HDLPrimitive.HDLPrimitiveType.BOOL);
-        return Optional.<HDLPrimitive>of(_setType_1);
+    if (_presentation != null) {
+      switch (_presentation) {
+        case STR:
+          HDLPrimitive _hDLPrimitive = new HDLPrimitive();
+          HDLPrimitive _setType = _hDLPrimitive.setType(HDLPrimitive.HDLPrimitiveType.STRING);
+          return Optional.<HDLPrimitive>of(_setType);
+        case BOOL:
+          HDLPrimitive _hDLPrimitive_1 = new HDLPrimitive();
+          HDLPrimitive _setType_1 = _hDLPrimitive_1.setType(HDLPrimitive.HDLPrimitiveType.BOOL);
+          return Optional.<HDLPrimitive>of(_setType_1);
+        default:
+          break;
       }
     }
     final BigInteger bigVal = lit.getValueAsBigInt();
@@ -446,7 +408,7 @@ public class TypeExtension {
       HDLRange _get_1 = bits.get(0);
       HDLExpression _from = _get_1.getFrom();
       boolean _tripleEquals = (_from == null);
-      _and = (_equals_1 && _tripleEquals);
+      _and = _tripleEquals;
     }
     if (_and) {
       HDLPrimitive _bit = HDLPrimitive.getBit();
@@ -522,8 +484,7 @@ public class TypeExtension {
   
   protected Optional<? extends HDLType> _determineType(final HDLInlineFunction func) {
     Problem _problem = new Problem(ErrorCode.INLINE_FUNCTION_NO_TYPE, func);
-    HDLProblemException _hDLProblemException = new HDLProblemException(_problem);
-    throw _hDLProblemException;
+    throw new HDLProblemException(_problem);
   }
   
   public Optional<? extends HDLType> determineType(final IHDLObject ref) {

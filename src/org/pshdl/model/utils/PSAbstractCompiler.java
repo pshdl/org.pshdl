@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -48,9 +48,9 @@ public class PSAbstractCompiler {
 
 	/**
 	 * Do not report any progress and proceed whenever possible
-	 * 
+	 *
 	 * @author Karsten Becker
-	 * 
+	 *
 	 */
 	public static final class NullListener implements ICompilationListener {
 		@Override
@@ -69,7 +69,7 @@ public class PSAbstractCompiler {
 
 		/**
 		 * Check whether you want to continue compiling this source
-		 * 
+		 *
 		 * @param src
 		 *            the src location of this file
 		 * @param parse
@@ -85,9 +85,9 @@ public class PSAbstractCompiler {
 
 	/**
 	 * A container for the results of the compilation
-	 * 
+	 *
 	 * @author Karsten Becker
-	 * 
+	 *
 	 */
 	public static class CompileResult {
 		/**
@@ -222,7 +222,7 @@ public class PSAbstractCompiler {
 	/**
 	 * Parse and add a unit to the HDLLibrary so that all references can be
 	 * resolved later
-	 * 
+	 *
 	 * @param contents
 	 *            the PSHDL module to add
 	 * @param src
@@ -239,7 +239,7 @@ public class PSAbstractCompiler {
 	/**
 	 * Parse and add a unit to the HDLLibrary so that all references can be
 	 * resolved later
-	 * 
+	 *
 	 * @param contents
 	 *            the PSHDL module to add
 	 * @param src
@@ -376,7 +376,7 @@ public class PSAbstractCompiler {
 	/**
 	 * Removes all resources related to this src. This can be important for
 	 * incremental compilation.
-	 * 
+	 *
 	 * @param src
 	 *            the src name that was used to register a added input
 	 */
@@ -459,7 +459,7 @@ public class PSAbstractCompiler {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return <code>true</code> when at least one error has been found
 	 * @throws Exception
 	 */

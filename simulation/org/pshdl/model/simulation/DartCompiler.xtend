@@ -601,8 +601,6 @@ class DartCompiler implements ITypeOuptutProvider {
 			}
 			case Instruction::noop:
 				sb.append("//Do nothing")
-			case Instruction::and:
-				sb.append('''int t«pos»=t«b» & t«a»;''')
 			case Instruction::arith_neg:
 				sb.append('''int t«pos»=-t«a»;''')
 			case Instruction::bit_neg:

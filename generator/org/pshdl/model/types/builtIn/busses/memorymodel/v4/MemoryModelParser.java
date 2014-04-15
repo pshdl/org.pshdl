@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,7 @@ public class MemoryModelParser extends Parser {
 	public static final int T__21 = 1, T__20 = 2, T__19 = 3, T__18 = 4, T__17 = 5, T__16 = 6, T__15 = 7, T__14 = 8, T__13 = 9, T__12 = 10, T__11 = 11, T__10 = 12, T__9 = 13,
 			T__8 = 14, T__7 = 15, T__6 = 16, T__5 = 17, T__4 = 18, T__3 = 19, T__2 = 20, T__1 = 21, T__0 = 22, ID = 23, INT = 24, COMMENT = 25, WS = 26;
 	public static final String[] tokenNames = { "<INVALID>", "'memory'", "'column'", "'error'", "']'", "'row'", "'limit'", "'mask'", "'register'", "'rw'", "'['", "'<'", "'int'",
-			"'r'", "'w'", "';'", "'alias'", "'>'", "'{'", "'silent'", "'}'", "'uint'", "'bit'", "ID", "INT", "COMMENT", "WS" };
+		"'r'", "'w'", "';'", "'alias'", "'>'", "'{'", "'silent'", "'}'", "'uint'", "'bit'", "ID", "INT", "COMMENT", "WS" };
 	public static final int RULE_unit = 0, RULE_declaration = 1, RULE_row = 2, RULE_column = 3, RULE_alias = 4, RULE_memory = 5, RULE_definition = 6, RULE_warnType = 7,
 			RULE_rwStatus = 8, RULE_width = 9, RULE_type = 10, RULE_reference = 11;
 	public static final String[] ruleNames = { "unit", "declaration", "row", "column", "alias", "memory", "definition", "warnType", "rwStatus", "width", "type", "reference" };
@@ -195,21 +195,21 @@ public class MemoryModelParser extends Parser {
 						row();
 					}
 				}
-					break;
+				break;
 				case 2: {
 					{
 						setState(33);
 						column();
 					}
 				}
-					break;
+				break;
 				case 16: {
 					{
 						setState(34);
 						alias();
 					}
 				}
-					break;
+				break;
 				default:
 					throw new NoViableAltException(this);
 				}
@@ -297,14 +297,14 @@ public class MemoryModelParser extends Parser {
 								definition();
 							}
 						}
-							break;
+						break;
 						case ID: {
 							{
 								setState(41);
 								reference();
 							}
 						}
-							break;
+						break;
 						default:
 							throw new NoViableAltException(this);
 						}
@@ -476,14 +476,14 @@ public class MemoryModelParser extends Parser {
 								definition();
 							}
 						}
-							break;
+						break;
 						case ID: {
 							{
 								setState(64);
 								reference();
 							}
 						}
-							break;
+						break;
 						default:
 							throw new NoViableAltException(this);
 						}

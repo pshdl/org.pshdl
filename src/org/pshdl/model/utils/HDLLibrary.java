@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -99,7 +99,7 @@ public class HDLLibrary {
 	/**
 	 * Adds the given enum to the library so that it can be resolved by
 	 * {@link #resolve(Iterable, HDLQualifiedName)}
-	 * 
+	 *
 	 * @param hEnum
 	 */
 	public void addEnum(HDLEnum hEnum, String src) {
@@ -112,7 +112,7 @@ public class HDLLibrary {
 	/**
 	 * Adds the given function to the library so that it can be resolved by
 	 * {@link #resolveFunction(Iterable, HDLQualifiedName)}
-	 * 
+	 *
 	 * @param func
 	 */
 	public void addFunction(HDLFunction func, String src) {
@@ -125,7 +125,7 @@ public class HDLLibrary {
 	/**
 	 * Adds the given interface to the library so that it can be resolved by
 	 * {@link #resolve(Iterable, HDLQualifiedName)}
-	 * 
+	 *
 	 * @param hIf
 	 */
 	public void addInterface(HDLInterface hIf, String src) {
@@ -137,7 +137,7 @@ public class HDLLibrary {
 
 	/**
 	 * Adds a package to this library. This includes all units and declarations
-	 * 
+	 *
 	 * @param pkg
 	 *            the package to be added
 	 * @param src
@@ -191,7 +191,7 @@ public class HDLLibrary {
 
 	/**
 	 * Add generated files to this library so that it can be retrieved later
-	 * 
+	 *
 	 * @param files
 	 * @param src
 	 */
@@ -202,7 +202,7 @@ public class HDLLibrary {
 	/**
 	 * Adds the given variable to the library so that it can be resolved by
 	 * {@link #resolveVariable(Iterable, HDLQualifiedName)}
-	 * 
+	 *
 	 * @param var
 	 */
 	public void addVariable(HDLVariable var, String src) {
@@ -228,7 +228,7 @@ public class HDLLibrary {
 	/**
 	 * Removes all types, variables, functions etc. which were derived from the
 	 * given src. This is useful for incremental compilation.
-	 * 
+	 *
 	 * @param src
 	 */
 	public void removeAllSrc(String src) {
@@ -257,7 +257,7 @@ public class HDLLibrary {
 	 * Resolves a type by firstly checking if it already exists given the
 	 * qualified name. If not the specific imports are tried first, then the
 	 * wild card ones in order of declaration.
-	 * 
+	 *
 	 * @param imports
 	 *            a list of specific and wild card imports
 	 * @param type
@@ -289,7 +289,7 @@ public class HDLLibrary {
 	 * Resolves a type by firstly checking if it already exists given the
 	 * qualified name. If not the specific imports are tried first, then the
 	 * wild card ones in order of declaration.
-	 * 
+	 *
 	 * @param imports
 	 *            a list of specific and wild card imports
 	 * @param type
@@ -326,7 +326,7 @@ public class HDLLibrary {
 	 * Resolves a type by firstly checking if it already exists given the
 	 * qualified name. If not the specific imports are tried first, then the
 	 * wild card ones in order of declaration.
-	 * 
+	 *
 	 * @param imports
 	 *            a list of specific and wild card imports
 	 * @param type

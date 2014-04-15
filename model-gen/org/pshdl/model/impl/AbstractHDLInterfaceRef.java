@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -43,7 +43,7 @@ import com.google.common.collect.*;
 public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLInterfaceRef}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -106,7 +106,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Get the ifArray field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -122,7 +122,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -135,7 +135,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -151,7 +151,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -164,7 +164,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 * 
+	 *
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -179,7 +179,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Setter for the field {@link #getVar()}.
-	 * 
+	 *
 	 * @param var
 	 *            sets the new var of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -196,7 +196,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Setter for the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param array
 	 *            sets the new array of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLInterfaceRef} with the updated array
@@ -212,7 +212,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Adds a new value to the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param newArray
 	 *            the value that should be added to the field
 	 *            {@link #getArray()}
@@ -232,7 +232,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Removes a value from the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param newArray
 	 *            the value that should be removed from the field
 	 *            {@link #getArray()}
@@ -252,7 +252,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Removes a value from the field {@link #getArray()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getArray()}
@@ -270,7 +270,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Setter for the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param bits
 	 *            sets the new bits of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLInterfaceRef} with the updated bits
@@ -286,7 +286,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Adds a new value to the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param newBits
 	 *            the value that should be added to the field {@link #getBits()}
 	 * @return a new instance of {@link HDLInterfaceRef} with the updated bits
@@ -305,7 +305,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Removes a value from the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param newBits
 	 *            the value that should be removed from the field
 	 *            {@link #getBits()}
@@ -325,7 +325,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Removes a value from the field {@link #getBits()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getBits()}
@@ -343,7 +343,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Setter for the field {@link #getHIf()}.
-	 * 
+	 *
 	 * @param hIf
 	 *            sets the new hIf of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -359,7 +359,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Setter for the field {@link #getIfArray()}.
-	 * 
+	 *
 	 * @param ifArray
 	 *            sets the new ifArray of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLInterfaceRef} with the updated
@@ -374,7 +374,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Adds a new value to the field {@link #getIfArray()}.
-	 * 
+	 *
 	 * @param newIfArray
 	 *            the value that should be added to the field
 	 *            {@link #getIfArray()}
@@ -393,7 +393,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Removes a value from the field {@link #getIfArray()}.
-	 * 
+	 *
 	 * @param newIfArray
 	 *            the value that should be removed from the field
 	 *            {@link #getIfArray()}
@@ -412,7 +412,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 
 	/**
 	 * Removes a value from the field {@link #getIfArray()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getIfArray()}

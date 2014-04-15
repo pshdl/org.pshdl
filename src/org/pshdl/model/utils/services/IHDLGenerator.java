@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -45,9 +45,9 @@ import com.google.common.base.*;
  * good idea to provide at least a registration for the {@link ServiceLoader}
  * via the META-INF/sevices mechanism, which is the default
  * {@link IServiceProvider}.
- * 
+ *
  * @author Karsten Becker
- * 
+ *
  */
 public interface IHDLGenerator {
 	/**
@@ -121,7 +121,7 @@ public interface IHDLGenerator {
 	/**
 	 * Attempts to get an interface for this generator. If is should fail,
 	 * caused by invalid parameters for example, it should mark it as absent.
-	 * 
+	 *
 	 * @param hdl
 	 *            the generator element
 	 * @return a non null {@link Optional} which should contain the interface
@@ -132,7 +132,7 @@ public interface IHDLGenerator {
 	/**
 	 * Attempts to get the implementation of this generator. If is should fail,
 	 * caused by invalid parameters for example, it should mark it as absent.
-	 * 
+	 *
 	 * @param hdl
 	 *            the generator element
 	 * @return a non null {@link Optional} which should contain the interface
@@ -145,7 +145,7 @@ public interface IHDLGenerator {
 	 * are what can be found when a generator is instantiated. That is
 	 * <code>=generate ID()</code>. Methods of this generator will only be
 	 * invoked for these certain IDs.
-	 * 
+	 *
 	 * @return a list of ids that this generator supports
 	 */
 	@Nonnull
@@ -155,7 +155,7 @@ public interface IHDLGenerator {
 	 * Ensures that the configuration of this generator is correct.<br>
 	 * <b>Note:</b> if you use your own {@link IErrorCode} you should also
 	 * provide an implementation of {@link IHDLValidator}.
-	 * 
+	 *
 	 * @param hdg
 	 *            the direct generation node
 	 * @param problems
@@ -172,7 +172,7 @@ public interface IHDLGenerator {
 	 * {@link HDLValidator} to ensure that no duplicate variables/ports exists.
 	 * The minimum return are the {@link HDLVariableDeclaration} of the
 	 * generated {@link HDLInterface}.
-	 * 
+	 *
 	 * @param hdl
 	 *            the direct generation node
 	 * @return a non null, but potentially empty list of
@@ -186,7 +186,7 @@ public interface IHDLGenerator {
 	 * Provide information about this generator. This is used to display the
 	 * user some information about what this generator can do for him and who
 	 * provided it.
-	 * 
+	 *
 	 * @param name
 	 *            the generator ID to get the information for.
 	 * @return
