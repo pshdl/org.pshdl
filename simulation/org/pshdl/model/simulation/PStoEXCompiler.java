@@ -149,13 +149,15 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		return null;
 	}
 
-	public ExecutableModel createExecutable(HDLUnit unit, String src, boolean dumpIntermediate) throws CycleException {
+	public static ExecutableModel createExecutable(HDLUnit unit, String src, boolean dumpIntermediate) throws CycleException {
 		final HDLEvaluationContext context = HDLEvaluationContext.createDefault(unit);
 		final HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src, '_');
-		try {
-			Files.write(simulationModel.toString(), new File(src + "_ir.pshdl"), Charsets.UTF_8);
-		} catch (final IOException e1) {
-			e1.printStackTrace();
+		if (dumpIntermediate) {
+			try {
+				Files.write(simulationModel.toString(), new File(src + "_ir.pshdl"), Charsets.UTF_8);
+			} catch (final IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 		final FluidFrame model = SimulationTransformationExtension.simulationModelOf(simulationModel, context);
 		final HDLQualifiedName fqn = FullNameExtension.fullNameOf(simulationModel);
