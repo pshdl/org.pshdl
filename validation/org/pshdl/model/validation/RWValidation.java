@@ -64,13 +64,13 @@ public class RWValidation {
 				problems.add(new Problem(UNUSED_VARIABLE, hdlVariable));
 			} else {
 				final HDLDirection dir = hdlVariable.getDirection();
-				if ((readCount == 0) && (dir == IN)) {
+				if ((readCount == 0) && ((dir == IN) || (dir == INOUT))) {
 					problems.add(new Problem(IN_PORT_NEVER_READ, hdlVariable));
 				}
 				if ((writeCount > 0) && (dir == IN)) {
 					problems.add(new Problem(WRITE_ACCESS_TO_IN_PORT, hdlVariable));
 				}
-				if ((writeCount == 0) && (dir == OUT)) {
+				if ((writeCount == 0) && ((dir == OUT) || (dir == INOUT))) {
 					problems.add(new Problem(OUT_PORT_NEVER_WRITTEN, hdlVariable));
 				}
 				if ((writeCount == 0) && (dir == INTERNAL)) {
@@ -104,22 +104,20 @@ public class RWValidation {
 				for (final HDLVariable hdlVariable : variables) {
 					final boolean written = writeList.contains(hdlVariable.getName());
 					final boolean read = readList.contains(hdlVariable.getName());
-					if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || isGlobal(hdlVariable)
-							|| (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null)) {
+					if (isGlobal(hdlVariable)) {
 						continue;
 					}
 					final HDLDirection dir = hdlVariable.getDirection();
-					// XXX Take care of inout
 					if (!read && !written && !((dir == PARAMETER) || (dir == CONSTANT))) {
 						problems.add(new Problem(ErrorCode.INTERFACE_UNUSED_PORT, hii, hdlVariable, null));
 					} else {
-						if (!read && (dir == OUT)) {
+						if (!read && ((dir == OUT) || (dir == INOUT))) {
 							problems.add(new Problem(ErrorCode.INTERFACE_OUT_PORT_NEVER_READ, hii, hdlVariable, null));
 						}
 						if (written && (dir == OUT)) {
 							problems.add(new Problem(ErrorCode.INTERFACE_OUT_WRITTEN, hii, hdlVariable, null));
 						}
-						if (!written && (dir == IN)) {
+						if (!written && ((dir == IN) || (dir == INOUT))) {
 							problems.add(new Problem(ErrorCode.INTERFACE_IN_PORT_NEVER_WRITTEN, hii, hdlVariable, null));
 						}
 					}

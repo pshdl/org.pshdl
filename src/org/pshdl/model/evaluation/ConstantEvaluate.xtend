@@ -102,7 +102,7 @@ class ConstantEvaluate {
 		val type = Insulin::resolveFragment(obj)
 		if (!type.present)
 			return Optional::absent
-		return type.get.copyDeepFrozen(obj.container).constantEvaluate(context)
+		return type.get.obj.copyDeepFrozen(obj.container).constantEvaluate(context)
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLArrayInit obj, HDLEvaluationContext context) {

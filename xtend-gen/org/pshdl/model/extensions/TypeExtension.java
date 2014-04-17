@@ -214,15 +214,15 @@ public class TypeExtension {
       return Optional.<HDLType>absent();
     }
     cat.setMeta(TypeExtension.DETERMINE_TYPE_RESOLVE);
-    Optional<? extends IHDLObject> resolved = Insulin.resolveFragment(cat);
+    Optional<Insulin.ResolvedPart> resolved = Insulin.resolveFragment(cat);
     boolean _isPresent = resolved.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return Optional.<HDLType>absent();
     }
-    IHDLObject _get = resolved.get();
+    Insulin.ResolvedPart _get = resolved.get();
     IHDLObject _container = cat.getContainer();
-    IHDLObject _copyDeepFrozen = _get.copyDeepFrozen(_container);
+    IHDLObject _copyDeepFrozen = _get.obj.copyDeepFrozen(_container);
     return TypeExtension.cachedType(_copyDeepFrozen);
   }
   

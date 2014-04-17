@@ -30,6 +30,7 @@ import java.math.*;
 import java.util.*;
 
 import org.pshdl.model.*;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.internal.*;
@@ -77,7 +78,7 @@ public class BuiltInAdvisor {
 				solutions = new String[] {
 						"Cast the index to uint with:(uint)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-						+ "\") annotation to define a range" };
+								+ "\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
@@ -89,7 +90,7 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
 					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
 					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
-					+ "\") Annotation to indicate the expected range");
+							+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			return new HDLAdvise(problem, "The dimensions of assignment do not match", "When an array is assigned to another array, the size of the dimension need to match.",
@@ -135,7 +136,7 @@ public class BuiltInAdvisor {
 			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName()
-					+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
+							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
 					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
 		}
 		case INTERFACE_OUT_PORT_NEVER_READ: {
@@ -395,23 +396,52 @@ public class BuiltInAdvisor {
 					"The logical negate is intended for negating booleans, while it can also use a single bit, you probably want to use the binary invert ~.", "Use ~"
 							+ node.getTarget());
 		case CLOCK_NOT_BIT:
-			break;
+			return new HDLAdvise(problem, "The clock needs to be of type bit",
+					"A clock can only be a single bit variable. It is not advised to use the output of a combinatorical logic as clock as this may impact timing",
+					"Assign the value to a single bit variable");
 		case CLOCK_UNKNOWN_WIDTH:
-			break;
-		case REGISTER_CLOCK_NOT_NAME:
-			break;
-		case REGISTER_RESET_NOT_NAME:
-			break;
+			return new HDLAdvise(problem, "The clock needs to be of type bit, but the width could not be determined",
+					"A clock can only be a single bit variable. It is not advised to use the output of a combinatorical logic as clock as this may impact the timing.",
+					"Assign the value to a single bit variable");
 		case RESET_NOT_BIT:
-			break;
+			return new HDLAdvise(problem, "The reset needs to be of type bit",
+					"A reset can only be a single bit variable. It is not advised to use the output of a combinatorical logic as reset as this may impact the timing",
+					"Assign the value to a single bit variable");
 		case RESET_UNKNOWN_WIDTH:
-			break;
+			return new HDLAdvise(problem, "The reset needs to be of type bit, but the width could not be determined",
+					"A reset can only be a single bit variable. It is not advised to use the output of a combinatorical logic as clock as this may impact the timing.",
+					"Assign the value to a single bit variable");
 		case SWITCH_CASE_NEEDS_CONSTANT_WIDTH:
 			return new HDLAdvise(
 					problem,
 					"The switch expression needs to have a known width",
 					"The width of the switch expression needs to be constant. That means that it can not work on parameterized values as these are only known when the module is instanciated.",
 					"Create a new signal with a fixed width and use that as the switch expression");
+		case PARAMETER_NOT_FOUND: {
+			final HDLArgument arg = (HDLArgument) problem.node;
+			final HDLInterface hif = (HDLInterface) problem.context;
+			final TreeSet<String> validNames = Sets.newTreeSet();
+			final Collection<HDLVariableDeclaration> params = HDLQuery.select(HDLVariableDeclaration.class).from(hif).where(HDLVariableDeclaration.fDirection)
+					.isEqualTo(HDLDirection.PARAMETER).getAll();
+			for (final HDLVariableDeclaration port : params) {
+				for (final HDLVariable var : port.getVariables()) {
+					final String origName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
+					if (origName == null) {
+						validNames.add(var.getName());
+					} else {
+						validNames.add(origName);
+					}
+
+				}
+			}
+			return new HDLAdvise(problem, "The parameter '" + arg.getName() + "' does not exist",
+					"In the interface that you instantiate, a variable declaration of type parameter with that name could not be found.", getMatchProposal(validNames,
+							"Parameters", arg.getName()));
+		}
+		case REGISTER_UNKNOWN_ARGUMENT: {
+			final HDLArgument arg = (HDLArgument) problem.node;
+			return new HDLAdvise(problem, "The parameter '" + arg.getName() + "' does not exist", "", getMatchProposal(HDLRegisterConfig.VALID_PARAMS, "Parameters", arg.getName()));
+		}
 		}
 		return null;
 	}

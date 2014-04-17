@@ -295,13 +295,14 @@ public class Insulin {
 				final IHDLObject container = uFrag.getContainer();
 				if ((container instanceof HDLUnresolvedFragment)) {
 					final HDLUnresolvedFragment fragment = (HDLUnresolvedFragment) container;
+					// Skip fragments that are sub fragments such as b in a.b
 					if (fragment.getSub() == uFrag) {
 						continue;
 					}
 				}
-				final Optional<? extends IHDLObject> resolved = resolveFragment(uFrag);
-				if (resolved.isPresent()) {
-					ms.replace(uFrag, resolved.get());
+				final Optional<ResolvedPart> resolved = resolveFragment(uFrag);
+				if (resolved.isPresent() && (resolved.get().remainder == null)) {
+					ms.replace(uFrag, resolved.get().obj);
 				}
 			}
 			final T newPkg = ms.apply(pkg);
@@ -312,7 +313,7 @@ public class Insulin {
 		return pkg;
 	}
 
-	public static Optional<? extends IHDLObject> resolveFragment(HDLUnresolvedFragment uFrag) {
+	public static Optional<ResolvedPart> resolveFragment(HDLUnresolvedFragment uFrag) {
 		// Single fragment (no function) resolves to variable -> Variable
 		// Single fragment (function) resolved to function -> FunctionCall
 		// Fragment (no bits, no function) resolves to variable,
@@ -327,9 +328,9 @@ public class Insulin {
 		HDLUnresolvedFragment cFrag = uFrag;
 		while (cFrag != null) {
 			fqn = fqn.append(cFrag.getFrag());
-			final Optional<? extends IHDLObject> attemptResolve = attemptResolve(cFrag, fqn);
+			final Optional<ResolvedPart> attemptResolve = attemptResolve(cFrag, fqn);
 			if (attemptResolve.isPresent()) {
-				final Optional<HDLFunctionCall> methodChaining = tryMethodChaining(cFrag, attemptResolve);
+				final Optional<ResolvedPart> methodChaining = tryMethodChaining(cFrag, Optional.of(attemptResolve.get().obj));
 				if (methodChaining.isPresent())
 					return methodChaining;
 				return attemptResolve;
@@ -377,7 +378,7 @@ public class Insulin {
 		return Optional.absent();
 	}
 
-	private static Optional<HDLFunctionCall> tryMethodChaining(HDLUnresolvedFragment cFrag, Optional<? extends IHDLObject> attemptResolve) {
+	private static Optional<ResolvedPart> tryMethodChaining(HDLUnresolvedFragment cFrag, Optional<? extends IHDLObject> attemptResolve) {
 		final HDLUnresolvedFragment sub = cFrag.getSub();
 		if (sub instanceof HDLUnresolvedFragmentFunction) {
 			final HDLUnresolvedFragmentFunction huf = (HDLUnresolvedFragmentFunction) sub;
@@ -388,23 +389,38 @@ public class Insulin {
 				params.add(0, (HDLExpression) attemptResolve.get());
 				final HDLFunctionCall funcCall = new HDLFunctionCall().setName(funcName).setParams(params);
 				final Optional<HDLFunctionCall> funcOp = Optional.of(funcCall);
-				final Optional<HDLFunctionCall> methodChaining = tryMethodChaining(sub, funcOp);
+				final Optional<ResolvedPart> methodChaining = tryMethodChaining(sub, funcOp);
 				if (methodChaining.isPresent())
 					return methodChaining;
-				return funcOp;
+				if (funcOp.isPresent())
+					return Optional.of(new ResolvedPart(funcOp.get(), sub.getSub()));
+				return Optional.absent();
 			}
 		}
 		return Optional.absent();
 	}
 
-	protected static Optional<? extends IHDLObject> attemptResolve(HDLUnresolvedFragment uFrag, HDLQualifiedName hVar) {
+	public static class ResolvedPart {
+		public final IHDLObject obj;
+		public final HDLUnresolvedFragment remainder;
+
+		public ResolvedPart(IHDLObject obj, HDLUnresolvedFragment remainder) {
+			super();
+			this.obj = obj;
+			this.remainder = remainder;
+		}
+
+	}
+
+	protected static Optional<ResolvedPart> attemptResolve(HDLUnresolvedFragment uFrag, HDLQualifiedName hVar) {
+		final HDLUnresolvedFragment sub = uFrag.getSub();
 		if (uFrag.getClassType() != HDLClass.HDLUnresolvedFragmentFunction) {
 			final Optional<HDLVariable> variableRaw = ScopingExtension.INST.resolveVariable(uFrag, hVar);
-			final HDLUnresolvedFragment sub = uFrag.getSub();
+			final HDLUnresolvedFragment ssub = sub != null ? sub.getSub() : null;
 			if (variableRaw.isPresent()) {
 				final HDLVariable variable = variableRaw.get();
 				if (sub == null)
-					return Optional.of(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()));
+					return Optional.of(new ResolvedPart(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()), sub));
 				final HDLFunctionParameter funcPar = variable.getContainer(HDLFunctionParameter.class);
 				if (funcPar != null) {
 					if (funcPar.getType() == Type.IF) {
@@ -413,7 +429,7 @@ public class Insulin {
 							final HDLQualifiedName typeName = fullNameOf(resolveInterface.get());
 							final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
 									.setArray(sub.getArray()).setBits(sub.getBits());
-							return Optional.of(hir);
+							return Optional.of(new ResolvedPart(hir, ssub));
 						}
 					}
 					if (funcPar.getType() == Type.ENUM) {
@@ -421,7 +437,7 @@ public class Insulin {
 						if (resolveEnum.isPresent()) {
 							final HDLQualifiedName typeName = fullNameOf(resolveEnum.get());
 							final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
-							return Optional.of(enumRef);
+							return Optional.of(new ResolvedPart(enumRef, ssub));
 						}
 					}
 				}
@@ -430,16 +446,16 @@ public class Insulin {
 					final HDLQualifiedName typeName = fullNameOf(type.get());
 					final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(variable.asRef()).setIfArray(uFrag.getArray()).setVar(typeName.append(sub.getFrag()))
 							.setArray(sub.getArray()).setBits(sub.getBits());
-					return Optional.of(hir);
+					return Optional.of(new ResolvedPart(hir, ssub));
 				}
-				return Optional.of(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()));
+				return Optional.of(new ResolvedPart(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()), sub));
 			}
 			final Optional<HDLEnum> enumRaw = ScopingExtension.INST.resolveEnum(uFrag, hVar);
 			if (enumRaw.isPresent())
 				if (sub != null) {
 					final HDLQualifiedName typeName = fullNameOf(enumRaw.get());
 					final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
-					return Optional.of(enumRef);
+					return Optional.of(new ResolvedPart(enumRef, ssub));
 				}
 			final Optional<? extends HDLType> typeRaw = ScopingExtension.INST.resolveType(uFrag, hVar);
 			if (typeRaw.isPresent())
@@ -447,13 +463,13 @@ public class Insulin {
 					final HDLQualifiedName typeName = fullNameOf(typeRaw.get());
 					if (typeRaw.get() instanceof HDLEnum) {
 						final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
-						return Optional.of(enumRef);
+						return Optional.of(new ResolvedPart(enumRef, ssub));
 					}
 				}
 		} else {
 			final HDLUnresolvedFragmentFunction uff = (HDLUnresolvedFragmentFunction) uFrag;
 			final HDLFunctionCall call = new HDLFunctionCall().setName(hVar).setParams(uff.getParams());
-			return Optional.of(call);
+			return Optional.of(new ResolvedPart(call, sub));
 		}
 		return Optional.absent();
 	}
@@ -467,14 +483,14 @@ public class Insulin {
 	 *            the type
 	 * @return may return null if not successful
 	 */
-	private static Optional<HDLEnumRef> createFullEnum(HDLUnresolvedFragment uFrag, HDLType type) {
+	private static Optional<ResolvedPart> createFullEnum(HDLUnresolvedFragment uFrag, HDLType type) {
 		if (type instanceof HDLEnum) {
 			final HDLEnum enumType = (HDLEnum) type;
 			final Optional<HDLVariable> variable = ScopingExtension.getVariable(enumType, uFrag.getFrag());
 			if (variable.isPresent()) {
 				final HDLQualifiedName typeName = fullNameOf(enumType);
 				final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(uFrag.getFrag()));
-				return Optional.of(enumRef);
+				return Optional.of(new ResolvedPart(enumRef, uFrag.getSub()));
 			}
 		}
 		return Optional.absent();
@@ -1168,6 +1184,7 @@ public class Insulin {
 	@SuppressWarnings("incomplete-switch")
 	private static void fortifyOpExpressions(IHDLObject apply, ModificationSet ms) {
 		final HDLExpression[] opEx = apply.getAllObjectsOf(HDLExpression.class, true);
+		final HDLPrimitives instance = HDLPrimitives.getInstance();
 		for (final HDLExpression opExpression : opEx) {
 			if (BuiltInValidator.skipExp(opExpression)) {
 				continue;
@@ -1180,30 +1197,30 @@ public class Insulin {
 				final HDLArithOp aop = (HDLArithOp) opExpression;
 				left = aop.getLeft();
 				right = aop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getArithOpType(aop);
+				inferenceInfo = instance.getArithOpType(aop);
 				break;
 			case HDLShiftOp:
 				final HDLShiftOp sop = (HDLShiftOp) opExpression;
 				left = sop.getLeft();
 				right = sop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getShiftOpType(sop);
+				inferenceInfo = instance.getShiftOpType(sop);
 				break;
 			case HDLBitOp:
 				final HDLBitOp bop = (HDLBitOp) opExpression;
 				left = bop.getLeft();
 				right = bop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getBitOpType(bop);
+				inferenceInfo = instance.getBitOpType(bop);
 				break;
 			case HDLEqualityOp:
 				final HDLEqualityOp eop = (HDLEqualityOp) opExpression;
 				left = eop.getLeft();
 				right = eop.getRight();
-				inferenceInfo = HDLPrimitives.getInstance().getEqualityOpType(eop);
+				inferenceInfo = instance.getEqualityOpType(eop);
 				break;
 			case HDLManip:
 				final HDLManip manip = (HDLManip) opExpression;
 				left = manip.getTarget();
-				inferenceInfo = HDLPrimitives.getInstance().getManipOpType(manip);
+				inferenceInfo = instance.getManipOpType(manip);
 			}
 			if (inferenceInfo != null) {
 				if (inferenceInfo.error != null)

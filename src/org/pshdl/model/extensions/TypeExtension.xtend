@@ -159,7 +159,7 @@ class TypeExtension {
 		var resolved = Insulin::resolveFragment(cat)
 		if (!resolved.present)
 			return Optional::absent
-		return resolved.get.copyDeepFrozen(cat.container).cachedType
+		return resolved.get.obj.copyDeepFrozen(cat.container).cachedType
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLConcat cat) {

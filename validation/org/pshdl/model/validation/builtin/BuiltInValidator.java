@@ -56,8 +56,8 @@ public class BuiltInValidator implements IHDLValidator {
 	public static final GenericMeta<Range<BigInteger>> ARRAY_RANGE = new GenericMeta<Range<BigInteger>>("arrayRange", true);
 	public static final GenericMeta<Range<BigInteger>> ACCESS_RANGE = new GenericMeta<Range<BigInteger>>("accessRange", true);
 	public static String[] PSHDL_KEYWORDS = new String[] { "bit", "out", "string", "switch", "include", "process", "for", "function", "import", "else", "extends", "native",
-		"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
-		"param", "register", "interface" };
+			"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
+			"param", "register", "interface" };
 	public final static Set<String> keywordSet;
 	static {
 		keywordSet = new HashSet<String>();
@@ -138,7 +138,8 @@ public class BuiltInValidator implements IHDLValidator {
 			if (!hIf.isPresent()) {
 				continue;
 			}
-			final Collection<HDLVariableDeclaration> params = HDLQuery.select(HDLVariableDeclaration.class).from(hIf.get()).where(HDLVariableDeclaration.fDirection)
+			final HDLInterface hif = hIf.get();
+			final Collection<HDLVariableDeclaration> params = HDLQuery.select(HDLVariableDeclaration.class).from(hif).where(HDLVariableDeclaration.fDirection)
 					.isEqualTo(HDLDirection.PARAMETER).getAll();
 			final Map<String, HDLVariable> paramNames = Maps.newHashMap();
 			for (final HDLVariableDeclaration hvd : params) {
@@ -149,7 +150,7 @@ public class BuiltInValidator implements IHDLValidator {
 			final ArrayList<HDLArgument> arguments = hii.getArguments();
 			for (final HDLArgument hdlArgument : arguments) {
 				if (!paramNames.containsKey(hdlArgument.getName())) {
-					problems.add(new Problem(PARAMETER_NOT_FOUND, hdlArgument));
+					problems.add(new Problem(PARAMETER_NOT_FOUND, hdlArgument, hif));
 				} else {
 					final HDLVariable var = paramNames.get(hdlArgument.getName());
 					checkAss(hdlArgument, var, hdlArgument.getExpression(), problems, getContext(hContext, hdlArgument));
@@ -294,6 +295,12 @@ public class BuiltInValidator implements IHDLValidator {
 		for (final HDLVariableDeclaration hvd : hvds) {
 			final HDLRegisterConfig reg = hvd.getRegister();
 			if (reg != null) {
+				final Iterable<HDLArgument> meta = reg.getMeta(HDLRegisterConfig.ORIGINAL_ARGS);
+				for (final HDLArgument hdlArgument : meta) {
+					if (!HDLRegisterConfig.VALID_PARAMS.contains(hdlArgument.getName())) {
+						problems.add(new Problem(REGISTER_UNKNOWN_ARGUMENT, hdlArgument));
+					}
+				}
 				final HDLExpression clk = reg.getClk();
 				if (clk != null) {
 					final HDLExpression width = TypeExtension.getWidth(clk);
@@ -768,18 +775,19 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private static void checkOpExpression(Set<Problem> problems, HDLOpExpression ope, IHDLObject node) {
 		HDLTypeInferenceInfo info = null;
+		final HDLPrimitives instance = HDLPrimitives.getInstance();
 		switch (ope.getClassType()) {
 		case HDLArithOp:
-			info = HDLPrimitives.getInstance().getArithOpType((HDLArithOp) ope);
+			info = instance.getArithOpType((HDLArithOp) ope);
 			break;
 		case HDLBitOp:
-			info = HDLPrimitives.getInstance().getBitOpType((HDLBitOp) ope);
+			info = instance.getBitOpType((HDLBitOp) ope);
 			break;
 		case HDLShiftOp:
-			info = HDLPrimitives.getInstance().getShiftOpType((HDLShiftOp) ope);
+			info = instance.getShiftOpType((HDLShiftOp) ope);
 			break;
 		case HDLEqualityOp:
-			info = HDLPrimitives.getInstance().getEqualityOpType((HDLEqualityOp) ope);
+			info = instance.getEqualityOpType((HDLEqualityOp) ope);
 			break;
 		default:
 			throw new IllegalArgumentException("Did not expect class:" + ope.getClassType());

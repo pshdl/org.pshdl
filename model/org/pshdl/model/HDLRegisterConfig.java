@@ -26,11 +26,15 @@
  ******************************************************************************/
 package org.pshdl.model;
 
+import java.util.*;
+
 import javax.annotation.*;
 
 import org.pshdl.model.impl.*;
 import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+
+import com.google.common.collect.*;
 
 /**
  * The class HDLRegisterConfig contains the following fields
@@ -229,13 +233,15 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public static final String EDGE_PARAM = "clockEdge";
 	public static final String CLOCK_PARAM = "clock";
 	public static final String RESET_PARAM = "reset";
-	public static final String ENABLE_PARAM = "enable";
 	public static final String DELAY_PARAM = "delay";
 	public static final String RESET_SYNC_PARAM = "resetSync";
 	public static final String RESET_TYPE_PARAM = "resetType";
 	public static final String RESET_VALUE_PARAM = "resetValue";
+	public static final Set<String> VALID_PARAMS = Sets.newHashSet(EDGE_PARAM, CLOCK_PARAM, RESET_PARAM, DELAY_PARAM, RESET_SYNC_PARAM, RESET_TYPE_PARAM, RESET_VALUE_PARAM);
 	public static final String DEF_RST = "$rst";
 	public static final String DEF_CLK = "$clk";
+
+	public static final GenericMeta<Iterable<HDLArgument>> ORIGINAL_ARGS = new GenericMeta<>("OriginalArgs", true);
 
 	public static HDLExpression DEF_RST_REF() {
 		return new HDLVariableRef().setVar(HDLQualifiedName.create(DEF_RST));
@@ -248,10 +254,10 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig()//
-		.setClk(DEF_CLK_REF())//
-		.setRst(DEF_RST_REF())//
-		.setResetValue(HDLLiteral.get(0))//
-		.normalize()//
+				.setClk(DEF_CLK_REF())//
+				.setRst(DEF_RST_REF())//
+				.setResetValue(HDLLiteral.get(0))//
+				.normalize()//
 		;
 	}
 
@@ -308,6 +314,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				config = config.setDelay(genArgs.getExpression());
 			}
 		}
+		config.addMeta(ORIGINAL_ARGS, args);
 		return config;
 	}
 

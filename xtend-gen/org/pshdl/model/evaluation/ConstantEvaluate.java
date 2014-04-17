@@ -99,15 +99,15 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLUnresolvedFragment obj, final HDLEvaluationContext context) {
-    final Optional<? extends IHDLObject> type = Insulin.resolveFragment(obj);
+    final Optional<Insulin.ResolvedPart> type = Insulin.resolveFragment(obj);
     boolean _isPresent = type.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    IHDLObject _get = type.get();
+    Insulin.ResolvedPart _get = type.get();
     IHDLObject _container = obj.getContainer();
-    IHDLObject _copyDeepFrozen = _get.copyDeepFrozen(_container);
+    IHDLObject _copyDeepFrozen = _get.obj.copyDeepFrozen(_container);
     return this.constantEvaluate(_copyDeepFrozen, context);
   }
   
