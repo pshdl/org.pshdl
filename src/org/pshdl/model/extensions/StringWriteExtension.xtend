@@ -28,9 +28,10 @@ package org.pshdl.model.extensions
 
 import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArgument
+import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLAssignment
 import org.pshdl.model.HDLBitOp
-import org.pshdl.model.HDLBitOp$HDLBitOpType
+import org.pshdl.model.HDLBitOp.HDLBitOpType
 import org.pshdl.model.HDLBlock
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLDeclaration
@@ -42,6 +43,7 @@ import org.pshdl.model.HDLEqualityOp
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLForLoop
 import org.pshdl.model.HDLFunctionCall
+import org.pshdl.model.HDLFunctionParameter
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInlineFunction
 import org.pshdl.model.HDLInterface
@@ -50,7 +52,7 @@ import org.pshdl.model.HDLInterfaceInstantiation
 import org.pshdl.model.HDLInterfaceRef
 import org.pshdl.model.HDLLiteral
 import org.pshdl.model.HDLManip
-import org.pshdl.model.HDLManip$HDLManipType
+import org.pshdl.model.HDLManip.HDLManipType
 import org.pshdl.model.HDLNativeFunction
 import org.pshdl.model.HDLOpExpression
 import org.pshdl.model.HDLPackage
@@ -64,19 +66,17 @@ import org.pshdl.model.HDLSwitchStatement
 import org.pshdl.model.HDLTernary
 import org.pshdl.model.HDLType
 import org.pshdl.model.HDLUnit
+import org.pshdl.model.HDLUnresolvedFragment
+import org.pshdl.model.HDLUnresolvedFragmentFunction
 import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
+import org.pshdl.model.utils.HDLQualifiedName
 import org.pshdl.model.utils.SyntaxHighlighter
-import org.pshdl.model.utils.SyntaxHighlighter$Context
+import org.pshdl.model.utils.SyntaxHighlighter.Context
 
 import static org.pshdl.model.extensions.StringWriteExtension.*
-import org.pshdl.model.HDLUnresolvedFragment
-import org.pshdl.model.HDLUnresolvedFragmentFunction
-import org.pshdl.model.HDLArrayInit
-import org.pshdl.model.HDLFunctionParameter
-import org.pshdl.model.utils.HDLQualifiedName
 
 class StringWriteExtension {
 
@@ -138,22 +138,19 @@ class StringWriteExtension {
 		toString(highlight)»)«op.leaving(highlight)»'''
 
 	def dispatch String toString(HDLUnresolvedFragmentFunction frag, SyntaxHighlighter highlight) {
-		var boolean isStatement = false
-		switch (container: frag.container) {
-			HDLBlock: isStatement = true
-			HDLStatement: isStatement = !(container instanceof HDLAssignment) && !(container instanceof HDLFunctionCall)
-			HDLUnit: isStatement = true
-		}
-		val String sb = if(isStatement) highlight.spacing.toString else ""
+		val String sb = if(frag.isStatement) highlight.spacing.toString else ""
 		var res = sb + frag.entering(highlight) + toStringFrag(frag, highlight) +
 			'''(«FOR HDLExpression p : frag.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»)'''
-		if (isStatement)
+		if (frag.isStatement)
 			res = res + ";"
 		return res + frag.leaving(highlight)
 	}
 
 	def dispatch String toString(HDLUnresolvedFragment frag, SyntaxHighlighter highlight) {
-		return frag.entering(highlight) + toStringFrag(frag, highlight) + frag.leaving(highlight)
+		var string = frag.entering(highlight) + toStringFrag(frag, highlight)
+		if (frag.isStatement)
+			string=string+";"
+		return string + frag.leaving(highlight)
 	}
 
 	def String toStringFrag(HDLUnresolvedFragment frag, SyntaxHighlighter highlight) {

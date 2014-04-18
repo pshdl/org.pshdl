@@ -38,6 +38,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String frag. Can <b>not</b> be <code>null</code>.</li>
+ * <li>Boolean isStatement. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> array. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
  * <li>HDLUnresolvedFragment sub. Can be <code>null</code>.</li>
@@ -52,6 +53,9 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 	 *            the value for container. Can be <code>null</code>.
 	 * @param frag
 	 *            the value for frag. Can <b>not</b> be <code>null</code>.
+	 * @param isStatement
+	 *            the value for isStatement. Can <b>not</b> be <code>null</code>
+	 *            .
 	 * @param array
 	 *            the value for array. Can be <code>null</code>.
 	 * @param bits
@@ -63,9 +67,9 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLUnresolvedFragmentFunction(int id, @Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
-			@Nullable HDLUnresolvedFragment sub, @Nullable Iterable<HDLExpression> params, boolean validate) {
-		super(id, container, frag, array, bits, sub, params, validate);
+	public HDLUnresolvedFragmentFunction(int id, @Nullable IHDLObject container, @Nonnull String frag, @Nonnull Boolean isStatement, @Nullable Iterable<HDLExpression> array,
+			@Nullable Iterable<HDLRange> bits, @Nullable HDLUnresolvedFragment sub, @Nullable Iterable<HDLExpression> params, boolean validate) {
+		super(id, container, frag, isStatement, array, bits, sub, params, validate);
 	}
 
 	public HDLUnresolvedFragmentFunction() {

@@ -244,9 +244,9 @@ public class HDLSimulator {
 			final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(typeOf.get()).addVariables(var);
 			final HDLAssignment newAss = new HDLAssignment().setLeft(var.asHDLRef());
 			final HDLIfStatement ifStatement = new HDLIfStatement()//
-			.setIfExp(ternary.getIfExpr())//
-			.addThenDo(newAss.setRight(ternary.getThenExpr()))//
-			.addElseDo(newAss.setRight(ternary.getElseExpr()));
+					.setIfExp(ternary.getIfExpr())//
+					.addThenDo(newAss.setRight(ternary.getThenExpr()))//
+					.addElseDo(newAss.setRight(ternary.getElseExpr()));
 			ms.replace(ternary, var.asHDLRef());
 			ms.insertBefore(ternary.getContainer(HDLStatement.class), hvd, ifStatement);
 		}

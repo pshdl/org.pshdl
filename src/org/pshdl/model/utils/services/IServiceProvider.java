@@ -39,6 +39,8 @@ public interface IServiceProvider {
 
 	public Collection<IHDLValidator> getAllValidators();
 
+	public Collection<IInsulinParticitant> getAllInsulinParticipants();
+
 	public <T> Collection<T> getAllImplementations(Class<T> clazz);
 
 	public static class ServiceLoaderProvider implements IServiceProvider {
@@ -89,6 +91,16 @@ public interface IServiceProvider {
 		public <T> Collection<T> getAllImplementations(Class<T> clazz) {
 			final ServiceLoader<T> load = ServiceLoader.load(clazz);
 			return Lists.newLinkedList(load);
+		}
+
+		@Override
+		public Collection<IInsulinParticitant> getAllInsulinParticipants() {
+			final ServiceLoader<IInsulinParticitant> functions = ServiceLoader.load(IInsulinParticitant.class);
+			final List<IInsulinParticitant> res = new LinkedList<IInsulinParticitant>();
+			for (final IInsulinParticitant func : functions) {
+				res.add(func);
+			}
+			return res;
 		}
 
 	}

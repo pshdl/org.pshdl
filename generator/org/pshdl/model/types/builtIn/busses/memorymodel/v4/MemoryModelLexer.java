@@ -40,9 +40,9 @@ public class MemoryModelLexer extends Lexer {
 	public static String[] modeNames = { "DEFAULT_MODE" };
 
 	public static final String[] tokenNames = { "<INVALID>", "'memory'", "'column'", "'error'", "']'", "'row'", "'limit'", "'mask'", "'register'", "'rw'", "'['", "'<'", "'int'",
-		"'r'", "'w'", "';'", "'alias'", "'>'", "'{'", "'silent'", "'}'", "'uint'", "'bit'", "ID", "INT", "COMMENT", "WS" };
+			"'r'", "'w'", "';'", "'alias'", "'>'", "'{'", "'silent'", "'}'", "'uint'", "'bit'", "ID", "INT", "COMMENT", "WS" };
 	public static final String[] ruleNames = { "T__21", "T__20", "T__19", "T__18", "T__17", "T__16", "T__15", "T__14", "T__13", "T__12", "T__11", "T__10", "T__9", "T__8", "T__7",
-		"T__6", "T__5", "T__4", "T__3", "T__2", "T__1", "T__0", "ID", "INT", "COMMENT", "WS" };
+			"T__6", "T__5", "T__4", "T__3", "T__2", "T__1", "T__0", "ID", "INT", "COMMENT", "WS" };
 
 	public MemoryModelLexer(CharStream input) {
 		super(input);

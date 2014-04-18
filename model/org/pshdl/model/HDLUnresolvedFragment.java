@@ -38,6 +38,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String frag. Can <b>not</b> be <code>null</code>.</li>
+ * <li>Boolean isStatement. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> array. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
  * <li>HDLUnresolvedFragment sub. Can be <code>null</code>.</li>
@@ -51,6 +52,9 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	 *            the value for container. Can be <code>null</code>.
 	 * @param frag
 	 *            the value for frag. Can <b>not</b> be <code>null</code>.
+	 * @param isStatement
+	 *            the value for isStatement. Can <b>not</b> be <code>null</code>
+	 *            .
 	 * @param array
 	 *            the value for array. Can be <code>null</code>.
 	 * @param bits
@@ -60,9 +64,9 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLUnresolvedFragment(int id, @Nullable IHDLObject container, @Nonnull String frag, @Nullable Iterable<HDLExpression> array, @Nullable Iterable<HDLRange> bits,
-			@Nullable HDLUnresolvedFragment sub, boolean validate) {
-		super(id, container, frag, array, bits, sub, validate);
+	public HDLUnresolvedFragment(int id, @Nullable IHDLObject container, @Nonnull String frag, @Nonnull Boolean isStatement, @Nullable Iterable<HDLExpression> array,
+			@Nullable Iterable<HDLRange> bits, @Nullable HDLUnresolvedFragment sub, boolean validate) {
+		super(id, container, frag, isStatement, array, bits, sub, validate);
 	}
 
 	public HDLUnresolvedFragment() {
@@ -93,6 +97,24 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 			if (obj == null)
 				return null;
 			return obj.setFrag(value);
+		}
+	};
+	/**
+	 * The accessor for the field isStatement which is of type Boolean.
+	 */
+	public static HDLFieldAccess<HDLUnresolvedFragment, Boolean> fIsStatement = new HDLFieldAccess<HDLUnresolvedFragment, Boolean>("isStatement") {
+		@Override
+		public Boolean getValue(HDLUnresolvedFragment obj) {
+			if (obj == null)
+				return null;
+			return obj.getIsStatement();
+		}
+
+		@Override
+		public HDLUnresolvedFragment setValue(HDLUnresolvedFragment obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setIsStatement(value);
 		}
 	};
 	/**

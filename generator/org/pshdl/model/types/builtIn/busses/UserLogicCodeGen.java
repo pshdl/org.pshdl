@@ -52,16 +52,16 @@ public class UserLogicCodeGen extends CommonBusCode {
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.NATURAL))
 				.addVariables(new HDLVariable().setName("C_NUM_REG").setDefaultValue(HDLLiteral.get(regCount)));
 		final HDLVariableDeclaration Bus2IP_RdCE = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.IN)
-		.setType(HDLQualifiedName.create("#bit<C_NUM_REG>"))
-		.setPrimitive(
-				new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))
+				.setDirection(HDLDirection.IN)
+				.setType(HDLQualifiedName.create("#bit<C_NUM_REG>"))
+				.setPrimitive(
+						new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))
 				.addVariables(new HDLVariable().setName("Bus2IP_RdCE"));
 		final HDLVariableDeclaration Bus2IP_WrCE = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.IN)
-		.setType(HDLQualifiedName.create("#bit<C_NUM_REG>"))
-		.setPrimitive(
-				new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))
+				.setDirection(HDLDirection.IN)
+				.setType(HDLQualifiedName.create("#bit<C_NUM_REG>"))
+				.setPrimitive(
+						new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))
 				.addVariables(new HDLVariable().setName("Bus2IP_WrCE"));
 		final HDLVariableDeclaration Bus2IP_Clk = new HDLVariableDeclaration().setDirection(HDLDirection.IN).addAnnotations(new HDLAnnotation().setName("@clock"))
 				.addAnnotations(new HDLAnnotation().setName("@VHDLAttribute").setValue("SIGIS=CLK")).setType(HDLQualifiedName.create("#bit"))
@@ -70,60 +70,60 @@ public class UserLogicCodeGen extends CommonBusCode {
 				.addAnnotations(new HDLAnnotation().setName("@VHDLAttribute").setValue("SIGIS=RST")).setType(HDLQualifiedName.create("#bit"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(new HDLVariable().setName("Bus2IP_Reset"));
 		final HDLVariableDeclaration IP2Bus_RdAck = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.OUT)
-		.setType(HDLQualifiedName.create("#bit"))
-		.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
-		.addVariables(
-				new HDLVariable().setName("IP2Bus_RdAck").setDefaultValue(
-						new HDLManip()
-						.setType(HDLManipType.CAST)
-						.setTarget(new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_RdCE")))
-						.setCastTo(
-								new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.UINT)
-								.setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))));
+				.setDirection(HDLDirection.OUT)
+				.setType(HDLQualifiedName.create("#bit"))
+				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
+				.addVariables(
+						new HDLVariable().setName("IP2Bus_RdAck").setDefaultValue(
+								new HDLManip()
+										.setType(HDLManipType.CAST)
+										.setTarget(new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_RdCE")))
+										.setCastTo(
+												new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.UINT)
+														.setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))));
 		final HDLVariableDeclaration IP2Bus_WrAck = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.OUT)
-		.setType(HDLQualifiedName.create("#bit"))
-		.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
-		.addVariables(
-				new HDLVariable().setName("IP2Bus_WrAck").setDefaultValue(
-						new HDLManip()
-						.setType(HDLManipType.CAST)
-						.setTarget(new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_WrCE")))
-						.setCastTo(
-								new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.UINT)
-								.setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))));
+				.setDirection(HDLDirection.OUT)
+				.setType(HDLQualifiedName.create("#bit"))
+				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
+				.addVariables(
+						new HDLVariable().setName("IP2Bus_WrAck").setDefaultValue(
+								new HDLManip()
+										.setType(HDLManipType.CAST)
+										.setTarget(new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_WrCE")))
+										.setCastTo(
+												new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.UINT)
+														.setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_NUM_REG"))))));
 		final HDLVariableDeclaration IP2Bus_Error = new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
 				.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT))
 				.addVariables(new HDLVariable().setName("IP2Bus_Error").setDefaultValue(new HDLLiteral().setVal("0")));
 		final HDLVariableDeclaration IP2Bus_Data = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.OUT)
-		.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
-		.setPrimitive(
-				new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
+				.setDirection(HDLDirection.OUT)
+				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
+				.setPrimitive(
+						new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
 				.addVariables(new HDLVariable().setName("IP2Bus_Data").setDefaultValue(new HDLLiteral().setVal("0")));
 		final HDLVariableDeclaration slv_reg_read_sel = new HDLVariableDeclaration().setDirection(HDLDirection.INTERNAL)
 				.setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(regCount)))
 				.addVariables(new HDLVariable().setName("slv_reg_read_sel").setDefaultValue(new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_RdCE"))));
 		final HDLVariableDeclaration Bus2IP_Data = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.IN)
-		.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
-		.setPrimitive(
-				new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
+				.setDirection(HDLDirection.IN)
+				.setType(HDLQualifiedName.create("#bit<C_SLV_DWIDTH>"))
+				.setPrimitive(
+						new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))))
 				.addVariables(new HDLVariable().setName("Bus2IP_Data"));
 		final HDLVariableDeclaration slv_reg_write_sel = new HDLVariableDeclaration().setDirection(HDLDirection.INTERNAL)
 				.setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(regCount)))
 				.addVariables(new HDLVariable().setName("slv_reg_write_sel").setDefaultValue(new HDLVariableRef().setVar(HDLQualifiedName.create("Bus2IP_WrCE"))));
 		final HDLVariableDeclaration Bus2IP_BE = new HDLVariableDeclaration()
-		.setDirection(HDLDirection.IN)
-		.setType(HDLQualifiedName.create("#bit<(C_SLV_DWIDTH/8)>"))
-		.setPrimitive(
-				new HDLPrimitive()
-				.setName("#primitive")
-				.setType(HDLPrimitiveType.BITVECTOR)
-				.setWidth(
-						new HDLArithOp().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))).setRight(new HDLLiteral().setVal("8"))
-						.setType(HDLArithOpType.DIV))).addVariables(new HDLVariable().setName("Bus2IP_BE"));
+				.setDirection(HDLDirection.IN)
+				.setType(HDLQualifiedName.create("#bit<(C_SLV_DWIDTH/8)>"))
+				.setPrimitive(
+						new HDLPrimitive()
+								.setName("#primitive")
+								.setType(HDLPrimitiveType.BITVECTOR)
+								.setWidth(
+										new HDLArithOp().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("C_SLV_DWIDTH"))).setRight(new HDLLiteral().setVal("8"))
+												.setType(HDLArithOpType.DIV))).addVariables(new HDLVariable().setName("Bus2IP_BE"));
 		final HDLSwitchStatement writeSwitch = createWriteSwitch(rows, isArray);
 		final HDLSwitchStatement readSwitch = createReadSwitch(rows, isArray);
 		HDLUnit hUnit = new HDLUnit().setSimulation(false).setName(name).addStatements(C_SLV_WIDTH).addStatements(C_NUM_REG).addStatements(Bus2IP_RdCE).addStatements(Bus2IP_WrCE)
@@ -224,7 +224,7 @@ public class UserLogicCodeGen extends CommonBusCode {
 
 	private static HDLSwitchStatement createReadSwitch(List<Row> rows, Map<String, Boolean> isArray) {
 		final HDLSwitchCaseStatement defaultCase = new HDLSwitchCaseStatement().addDos(new HDLAssignment()
-		.setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("IP2Bus_Data"))).setType(HDLAssignmentType.ASSGN).setRight(new HDLLiteral().setVal("0")));
+				.setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("IP2Bus_Data"))).setType(HDLAssignmentType.ASSGN).setRight(new HDLLiteral().setVal("0")));
 		HDLSwitchStatement hdlSwitchStatement = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("slv_reg_read_sel")));
 		int pos = 0;
 		final Map<String, Integer> intPos = new HashMap<String, Integer>();

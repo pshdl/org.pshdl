@@ -66,6 +66,9 @@ public class Insulin {
 		T apply = resolveFragments(orig);
 		RWValidation.annotateReadCount(apply);
 		RWValidation.annotateWriteCount(apply);
+		for (final IInsulinParticitant part : participants.values()) {
+			apply = part.preInsulin(apply, src);
+		}
 		apply = inlineConstants(apply);
 		apply = convertIncRecRanges(apply);
 		apply = handlePostfixOp(apply);
@@ -83,6 +86,9 @@ public class Insulin {
 		apply = fixDoubleNegate(apply);
 		apply = fortifyType(apply);
 		apply = resolveFragments(apply);
+		for (final IInsulinParticitant part : participants.values()) {
+			apply = part.postInsulin(apply, src);
+		}
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
@@ -301,8 +307,18 @@ public class Insulin {
 					}
 				}
 				final Optional<ResolvedPart> resolved = resolveFragment(uFrag);
-				if (resolved.isPresent() && (resolved.get().remainder == null)) {
-					ms.replace(uFrag, resolved.get().obj);
+				if (resolved.isPresent()) {
+					final ResolvedPart resolvedPart = resolved.get();
+					// If the remainder is not null, then we attempted to access
+					// something illegal
+					if (resolvedPart.remainder == null) {
+						if ((resolvedPart.obj instanceof HDLStatement) && uFrag.getIsStatement()) {
+							ms.replace(uFrag, resolvedPart.obj);
+						}
+						if ((resolvedPart.obj instanceof HDLExpression) && !uFrag.getIsStatement()) {
+							ms.replace(uFrag, resolvedPart.obj);
+						}
+					}
 				}
 			}
 			final T newPkg = ms.apply(pkg);
@@ -1332,6 +1348,7 @@ public class Insulin {
 	}
 
 	private static AtomicInteger objectID = new AtomicInteger();
+	private static HashMap<String, IInsulinParticitant> participants;
 
 	public static void resetID() {
 		objectID.set(0);
@@ -1480,6 +1497,15 @@ public class Insulin {
 			}
 		}
 		return ms.apply(orig);
+	}
+
+	public static void init(CompilerInformation info, IServiceProvider sp) {
+		participants = new HashMap<String, IInsulinParticitant>();
+		for (final IInsulinParticitant iip : sp.getAllInsulinParticipants()) {
+			final String name = iip.getName();
+			participants.put(name, iip);
+			info.registeredInsulinParticipant.put(name, iip);
+		}
 	}
 
 }

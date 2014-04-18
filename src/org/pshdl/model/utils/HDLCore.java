@@ -67,10 +67,12 @@ public class HDLCore {
 		info.registeredFunctions.clear();
 		info.registeredGenerators.clear();
 		info.registeredValidators.clear();
+		info.registeredInsulinParticipant.clear();
 		HDLFunctions.init(info, serviceProvider);
 		HDLAnnotations.init(info, serviceProvider);
 		HDLGenerators.init(info, serviceProvider);
 		HDLValidator.init(info, serviceProvider);
+		Insulin.init(info, serviceProvider);
 		initialized = true;
 		HDLCore.serviceProvider = serviceProvider;
 	}

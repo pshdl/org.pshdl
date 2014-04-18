@@ -236,30 +236,9 @@ public class StringWriteExtension {
   }
   
   protected String _toString(final HDLUnresolvedFragmentFunction frag, final SyntaxHighlighter highlight) {
-    boolean isStatement = false;
-    IHDLObject _container = frag.getContainer();
-    final IHDLObject container = _container;
-    boolean _matched = false;
-    if (!_matched) {
-      if (container instanceof HDLBlock) {
-        _matched=true;
-        isStatement = true;
-      }
-    }
-    if (!_matched) {
-      if (container instanceof HDLStatement) {
-        _matched=true;
-        isStatement = ((!(container instanceof HDLAssignment)) && (!(container instanceof HDLFunctionCall)));
-      }
-    }
-    if (!_matched) {
-      if (container instanceof HDLUnit) {
-        _matched=true;
-        isStatement = true;
-      }
-    }
     String _xifexpression = null;
-    if (isStatement) {
+    Boolean _isStatement = frag.getIsStatement();
+    if ((_isStatement).booleanValue()) {
       StringBuilder _spacing = highlight.getSpacing();
       _xifexpression = _spacing.toString();
     } else {
@@ -287,7 +266,8 @@ public class StringWriteExtension {
     }
     _builder.append(")");
     String res = (_plus_1 + _builder);
-    if (isStatement) {
+    Boolean _isStatement_1 = frag.getIsStatement();
+    if ((_isStatement_1).booleanValue()) {
       res = (res + ";");
     }
     String _leaving = this.leaving(frag, highlight);
@@ -297,9 +277,13 @@ public class StringWriteExtension {
   protected String _toString(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight) {
     String _entering = this.entering(frag, highlight);
     String _stringFrag = this.toStringFrag(frag, highlight);
-    String _plus = (_entering + _stringFrag);
+    String string = (_entering + _stringFrag);
+    Boolean _isStatement = frag.getIsStatement();
+    if ((_isStatement).booleanValue()) {
+      string = (string + ";");
+    }
     String _leaving = this.leaving(frag, highlight);
-    return (_plus + _leaving);
+    return (string + _leaving);
   }
   
   public String toStringFrag(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight) {
