@@ -168,7 +168,7 @@ class ParserToModelExtension {
 		pkg = pkg.setUnits(ctx.psUnit.map[toHDLUnit(libURI)])
 		pkg = pkg.setDeclarations(ctx.psDeclaration.map[toHDL(true) as HDLDeclaration])
 		pkg.freeze(null)
-		val library = HDLLibrary::getLibrary(libURI)
+		val library = HDLLibrary.getLibrary(libURI)
 		if (library == null)
 			throw new IllegalArgumentException("The library " + libURI + " is not valid")
 		library.addPkg(pkg, src);
@@ -184,7 +184,7 @@ class ParserToModelExtension {
 	def <T extends IHDLObject> T attachContext(T obj, ParserRuleContext context) {
 		if (obj === null)
 			throw new NullPointerException("Null is not allowed")
-		obj.addMeta(SourceInfo::INFO, new SourceInfo(tokens, context))
+		obj.addMeta(SourceInfo.INFO, new SourceInfo(tokens, context))
 		return obj //attachContext method body
 	}
 
@@ -226,9 +226,9 @@ class ParserToModelExtension {
 	def dispatch HDLVariableDeclaration toHDL(PsVariableDeclarationContext context, boolean isStatement) {
 		var res = new HDLVariableDeclaration
 		res = res.setType(context.psPrimitive.toHDL(false) as HDLType)
-		var HDLDirection dir = HDLDirection::INTERNAL
+		var HDLDirection dir = HDLDirection.INTERNAL
 		if (context.psDirection !== null)
-			dir = HDLDirection::getOp(context.psDirection.text)
+			dir = HDLDirection.getOp(context.psDirection.text)
 		res = res.setDirection(dir)
 		for (varDecl : context.psDeclAssignment)
 			res = res.addVariables(varDecl.toHDL(false) as HDLVariable)
@@ -236,7 +236,7 @@ class ParserToModelExtension {
 			var Iterable<HDLArgument> args = new ArrayList<HDLArgument>
 			if (context.psPrimitive.psPassedArguments !== null)
 				args = context.psPrimitive.psPassedArguments.psArgument.map[toHDL(false) as HDLArgument]
-			res = res.setRegister(HDLRegisterConfig::fromArgs(args))
+			res = res.setRegister(HDLRegisterConfig.fromArgs(args))
 		}
 		return res.attachContext(context)
 	}
@@ -267,7 +267,7 @@ class ParserToModelExtension {
 	def dispatch HDLType toHDL(PsPrimitiveContext context, boolean isStatement) {
 		if (context.psQualifiedName !== null)
 			return new HDLEnum().setName(context.psQualifiedName.toName).attachContext(context)
-		val HDLPrimitiveType pt = HDLPrimitiveType::valueOf(context.psPrimitiveType.text.toUpperCase)
+		val HDLPrimitiveType pt = HDLPrimitiveType.valueOf(context.psPrimitiveType.text.toUpperCase)
 		val HDLExpression width = context.psWidth?.toHDL(false) as HDLExpression
 		return new HDLPrimitive().setType(pt.getResultingType(width)).setWidth(width).attachContext(context)
 	}
@@ -289,15 +289,15 @@ class ParserToModelExtension {
 	def HDLPrimitiveType getResultingType(HDLPrimitiveType pt, HDLExpression width) {
 		if (width !== null) {
 			switch (pt) {
-				case HDLPrimitiveType::BIT:
-					return HDLPrimitiveType::BITVECTOR //NOATTACH getResultingType method body
+				case HDLPrimitiveType.BIT:
+					return HDLPrimitiveType.BITVECTOR //NOATTACH getResultingType method body
 			}
 		} else {
 			switch (pt) {
-				case HDLPrimitiveType::INT:
-					return HDLPrimitiveType::INTEGER //NOATTACH getResultingType method body
-				case HDLPrimitiveType::UINT:
-					return HDLPrimitiveType::NATURAL //NOATTACH getResultingType method body
+				case HDLPrimitiveType.INT:
+					return HDLPrimitiveType.INTEGER //NOATTACH getResultingType method body
+				case HDLPrimitiveType.UINT:
+					return HDLPrimitiveType.NATURAL //NOATTACH getResultingType method body
 			}
 		}
 		return pt; //NOATTACH getResultingType method body
@@ -331,42 +331,42 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitLogOrContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType::LOGI_OR)
+		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.LOGI_OR)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitLogAndContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType::LOGI_AND)
+		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.LOGI_AND)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitXorContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType::XOR)
+		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.XOR)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitOrContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType::OR)
+		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.OR)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitAndContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType::AND)
+		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.AND)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLShiftOp toHDL(PsShiftContext context, boolean isStatement) {
-		val type = HDLShiftOp$HDLShiftOpType::getOp(context.op.text)
+		val type = HDLShiftOp$HDLShiftOpType.getOp(context.op.text)
 		var res = new HDLShiftOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -374,7 +374,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLEqualityOp toHDL(PsEqualityCompContext context, boolean isStatement) {
-		val type = HDLEqualityOp$HDLEqualityOpType::getOp(context.op.text)
+		val type = HDLEqualityOp$HDLEqualityOpType.getOp(context.op.text)
 		var res = new HDLEqualityOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -382,7 +382,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLEqualityOp toHDL(PsEqualityContext context, boolean isStatement) {
-		val type = HDLEqualityOp$HDLEqualityOpType::getOp(context.op.text)
+		val type = HDLEqualityOp$HDLEqualityOpType.getOp(context.op.text)
 		var res = new HDLEqualityOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -390,7 +390,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLArithOp toHDL(PsMulContext context, boolean isStatement) {
-		val type = HDLArithOp$HDLArithOpType::getOp(context.op.text)
+		val type = HDLArithOp$HDLArithOpType.getOp(context.op.text)
 		var res = new HDLArithOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -398,7 +398,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLArithOp toHDL(PsAddContext context, boolean isStatement) {
-		val type = HDLArithOp$HDLArithOpType::getOp(context.op.text)
+		val type = HDLArithOp$HDLArithOpType.getOp(context.op.text)
 		var res = new HDLArithOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -406,7 +406,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLPrimitive toHDL(PsCastContext context, boolean isStatement) {
-		val HDLPrimitiveType pt = HDLPrimitiveType::valueOf(context.psPrimitiveType.text.toUpperCase)
+		val HDLPrimitiveType pt = HDLPrimitiveType.valueOf(context.psPrimitiveType.text.toUpperCase)
 		val HDLExpression width = context.psWidth?.toHDL(false) as HDLExpression
 		return new HDLPrimitive().setType(pt.getResultingType(width)).setWidth(width).attachContext(context)
 	}
@@ -414,16 +414,16 @@ class ParserToModelExtension {
 	def dispatch HDLManip toHDL(PsManipContext context, boolean isStatement) {
 		var res = new HDLManip().setTarget(context.psExpression.toHDL(false) as HDLExpression)
 		if (context.psCast !== null) {
-			res = res.setType(HDLManip$HDLManipType::CAST)
+			res = res.setType(HDLManip$HDLManipType.CAST)
 			res = res.setCastTo(context.psCast.toHDL(false) as HDLType)
 		} else {
 			switch (context.type.type) {
-				case PSHDLLangLexer::LOGIC_NEG:
-					res = res.setType(HDLManip$HDLManipType::LOGIC_NEG)
-				case PSHDLLangLexer::ARITH_NEG:
-					res = res.setType(HDLManip$HDLManipType::ARITH_NEG)
-				case PSHDLLangLexer::BIT_NEG:
-					res = res.setType(HDLManip$HDLManipType::BIT_NEG)
+				case PSHDLLangLexer.LOGIC_NEG:
+					res = res.setType(HDLManip$HDLManipType.LOGIC_NEG)
+				case PSHDLLangLexer.ARITH_NEG:
+					res = res.setType(HDLManip$HDLManipType.ARITH_NEG)
+				case PSHDLLangLexer.BIT_NEG:
+					res = res.setType(HDLManip$HDLManipType.BIT_NEG)
 			}
 		}
 		return res.attachContext(context)
@@ -551,10 +551,10 @@ class ParserToModelExtension {
 
 	def dispatch HDLFunctionParameter toHDL(PsFuncRecturnTypeContext context, boolean isStatement) {
 		var res = context.psFuncParamType.toHDL(isStatement) as HDLFunctionParameter
-		res = res.setRw(HDLFunctionParameter$RWType::RETURN)
+		res = res.setRw(HDLFunctionParameter$RWType.RETURN)
 		res = res.setDim(
 			context.dims.map[
-				if(it.psExpression !== null) it.psExpression.toHDL(false) as HDLExpression else HDLFunctionParameter::
+				if(it.psExpression !== null) it.psExpression.toHDL(false) as HDLExpression else HDLFunctionParameter.
 					EMPTY_ARR])
 		return res
 	}
@@ -564,7 +564,7 @@ class ParserToModelExtension {
 		res = res.setName(new HDLVariable().setName(context.RULE_ID.text))
 		res = res.setDim(
 			context.dims.map[
-				if(it.psExpression !== null) it.psExpression.toHDL(false) as HDLExpression else HDLFunctionParameter::
+				if(it.psExpression !== null) it.psExpression.toHDL(false) as HDLExpression else HDLFunctionParameter.
 					EMPTY_ARR])
 		return res
 	}
@@ -572,9 +572,9 @@ class ParserToModelExtension {
 	def dispatch HDLFunctionParameter toHDL(PsFuncParamWithRWContext context, boolean isStatement) {
 		var res = context.psFuncParamType.toHDL(isStatement) as HDLFunctionParameter
 		if (context.psFuncParamRWType !== null)
-			res = res.setRw(HDLFunctionParameter$RWType::getOp(context.psFuncParamRWType.text))
+			res = res.setRw(HDLFunctionParameter$RWType.getOp(context.psFuncParamRWType.text))
 		else
-			res = res.setRw(HDLFunctionParameter$RWType::READ)
+			res = res.setRw(HDLFunctionParameter$RWType.READ)
 		return res
 	}
 
@@ -582,35 +582,35 @@ class ParserToModelExtension {
 		var res = new HDLFunctionParameter
 		switch (x:context) {
 			case x.ANY_INT !== null:
-				res = res.setType(Type::ANY_INT)
+				res = res.setType(Type.ANY_INT)
 			case x.ANY_UINT !== null:
-				res = res.setType(Type::ANY_UINT)
+				res = res.setType(Type.ANY_UINT)
 			case x.ANY_BIT !== null:
-				res = res.setType(Type::ANY_BIT)
+				res = res.setType(Type.ANY_BIT)
 			case x.INT !== null:
-				res = res.setType(Type::REG_INT)
+				res = res.setType(Type.REG_INT)
 			case x.UINT !== null:
-				res = res.setType(Type::REG_UINT)
+				res = res.setType(Type.REG_UINT)
 			case x.BIT !== null:
-				res = res.setType(Type::REG_BIT)
+				res = res.setType(Type.REG_BIT)
 			case x.BOOL !== null:
-				res = res.setType(Type::BOOL_TYPE)
+				res = res.setType(Type.BOOL_TYPE)
 			case x.STRING !== null:
-				res = res.setType(Type::STRING_TYPE)
+				res = res.setType(Type.STRING_TYPE)
 			case x.ANY_IF !== null:
-				res = res.setType(Type::ANY_IF)
+				res = res.setType(Type.ANY_IF)
 			case x.ANY_ENUM !== null:
-				res = res.setType(Type::ANY_ENUM)
+				res = res.setType(Type.ANY_ENUM)
 			case x.INTERFACE !== null: {
-				res = res.setType(^Type::^IF)
+				res = res.setType(^Type.^IF)
 				res = res.setIfSpec(x.psQualifiedName.toFQNName)
 			}
 			case x.ENUM !== null: {
-				res = res.setType(^Type::ENUM)
+				res = res.setType(^Type.ENUM)
 				res = res.setEnumSpec(x.psQualifiedName.toFQNName)
 			}
 			case x.FUNCTION !== null: {
-				res = res.setType(^Type::FUNCTION)
+				res = res.setType(^Type.FUNCTION)
 				res = res.setFuncSpec(x.psFuncParamWithRW.map[toHDL(false) as HDLFunctionParameter])
 				if (x.psFuncParamType !== null)
 					res = res.setFuncReturnSpec(x.psFuncParamType.toHDL(false) as HDLFunctionParameter)
@@ -660,9 +660,9 @@ class ParserToModelExtension {
 
 	def dispatch HDLReference toHDL(PsVariableRefContext context, boolean isStatement) {
 		if (context.isClk !== null)
-			return HDLRegisterConfig::defaultClk(true).asHDLRef.attachContext(context)
+			return HDLRegisterConfig.defaultClk(true).asHDLRef.attachContext(context)
 		if (context.isRst !== null)
-			return HDLRegisterConfig::defaultRst(true).asHDLRef.attachContext(context)
+			return HDLRegisterConfig.defaultRst(true).asHDLRef.attachContext(context)
 		var HDLUnresolvedFragment current = null
 		for (sub : context.psRefPart.reverseView) {
 			var frag = sub.toHDL(false) as HDLUnresolvedFragment
@@ -756,7 +756,7 @@ class ParserToModelExtension {
 	def dispatch IHDLObject toHDL(PsAssignmentOrFuncContext context, boolean isStatement) {
 		var hVar = context.psVariableRef.toHDL(isStatement) as HDLReference
 		if (context.psAssignmentOp !== null) {
-			val type = HDLAssignment$HDLAssignmentType::getOp(context.psAssignmentOp.text)
+			val type = HDLAssignment$HDLAssignmentType.getOp(context.psAssignmentOp.text)
 			if (hVar instanceof HDLUnresolvedFragment)
 				hVar=hVar.setIsStatement(false)
 			var ass = new HDLAssignment().setLeft(hVar).setType(type)
@@ -772,7 +772,7 @@ class ParserToModelExtension {
 
 	def HDLUnit toHDLUnit(PsUnitContext context, String libURI) {
 		var unit = new HDLUnit().setName(context.psInterface.toName).setLibURI(libURI)
-		unit = unit.setSimulation(context.unitType.type == PSHDLLangLexer::TESTBENCH);
+		unit = unit.setSimulation(context.unitType.type == PSHDLLangLexer.TESTBENCH);
 		unit = unit.setAnnotations(context.psAnnotation.map[toHDL(true) as HDLAnnotation])
 		unit = unit.setImports(context.psImports.map[toName()])
 		unit = unit.setStatements(context.psBlock.map[toHDL(true) as HDLStatement])

@@ -64,8 +64,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean debug) {
 		val comp = new JavaCompiler(em, debug)
 		val code = comp.compile(pkg, unitName).toString
-		return Lists::newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, Collections::emptyList, em.source,
+		return Lists.newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, Collections.emptyList, em.source,
 				comp.hookName, true))
 	}
 
@@ -151,7 +151,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 						varIdx.put("«v.name»", «varIdx.get(v.name)»);
 					«ENDFOR»
 				}
-				«FOR v : em.variables.filter[dir !== VariableInformation$Direction::INTERNAL]»
+				«FOR v : em.variables.filter[dir !== VariableInformation$Direction.INTERNAL]»
 					«IF v.dimensions.size == 0»
 						public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value) {
 							«v.idName(false, false)»=value & «v.width.asMaskL»;
@@ -584,12 +584,12 @@ class JavaCompiler implements ITypeOuptutProvider {
 				b = stack.pop
 			if (i.inst.push > 0)
 				stack.push(pos)
-			if (i.inst === Instruction::pushAddIndex) {
+			if (i.inst === Instruction.pushAddIndex) {
 				arr.add(arrPos)
 				arrPos = arrPos + 1
 			}
 			i.toExpression(frame, sb, pos, a, b, arr, arrPos)
-			if (i.inst !== Instruction::pushAddIndex)
+			if (i.inst !== Instruction.pushAddIndex)
 				pos = pos + 1
 		}
 		val last = "t" + stack.pop
@@ -614,9 +614,9 @@ class JavaCompiler implements ITypeOuptutProvider {
 	def toExpression(FastInstruction inst, Frame f, StringBuilder sb, int pos, int a, int b, List<Integer> arr,
 		int arrPos) {
 		switch (inst.inst) {
-			case Instruction::pushAddIndex:
+			case Instruction.pushAddIndex:
 				sb.append('''int a«arr.last»=(int)t«a»;''')
-			case Instruction::writeInternal: {
+			case Instruction.writeInternal: {
 				val internal = inst.arg1.asInternal
 				val isDynMem = arr.size < internal.info.dimensions.length
 				if (isDynMem) {
@@ -632,90 +632,90 @@ class JavaCompiler implements ITypeOuptutProvider {
 							internal.info.array»«internal.info.arrayAccess(arr)»«ELSE»-1«ENDIF»));''')
 				arr.clear
 			}
-			case Instruction::noop:
+			case Instruction.noop:
 				sb.append("//Do nothing")
-			case Instruction::bitAccessSingle:
+			case Instruction.bitAccessSingle:
 				sb.append('''long t«pos»=(t«a» >> «inst.arg1») & 1;''')
-			case Instruction::bitAccessSingleRange: {
+			case Instruction.bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
 				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
 				sb.append('''long t«pos»=(t«a» >> «lowBit») & «mask.toHexStringL»;''')
 			}
-			case Instruction::cast_int: {
-				val shiftWidth = 64 - Math::min(inst.arg1, inst.arg2);
+			case Instruction.cast_int: {
+				val shiftWidth = 64 - Math.min(inst.arg1, inst.arg2);
 				sb.append('''long t«pos»=«signExtend('''t«a»''', null, shiftWidth)»;''')
 			}
-			case Instruction::cast_uint: {
+			case Instruction.cast_uint: {
 				if (inst.arg1 != 64) {
 					sb.append('''long t«pos»=t«a» & «inst.arg1.asMaskL»;''')
 				} else {
 					sb.append('''long t«pos»=t«a»;''')
 				}
 			}
-			case Instruction::logiNeg:
+			case Instruction.logiNeg:
 				sb.append('''boolean t«pos»=!t«a»;''')
-			case Instruction::logiAnd:
+			case Instruction.logiAnd:
 				sb.append('''boolean t«pos»=t«a» && t«b»;''')
-			case Instruction::logiOr:
+			case Instruction.logiOr:
 				sb.append('''boolean t«pos»=t«a» || t«b»;''')
-			case Instruction::const0:
+			case Instruction.const0:
 				sb.append('''long t«pos»=0;''')
-			case Instruction::const1:
+			case Instruction.const1:
 				sb.append('''long t«pos»=1;''')
-			case Instruction::const2:
+			case Instruction.const2:
 				sb.append('''long t«pos»=2;''')
-			case Instruction::constAll1:
+			case Instruction.constAll1:
 				sb.append('''long t«pos»=«inst.arg1.asMaskL»;''')
-			case Instruction::concat:
+			case Instruction.concat:
 				sb.append('''long t«pos»=(t«b» << «inst.arg2») | t«a»;''')
-			case Instruction::loadConstant:
+			case Instruction.loadConstant:
 				sb.append('''long t«pos»=«inst.arg1.constantL(f)»;''')
-			case Instruction::loadInternal: {
+			case Instruction.loadInternal: {
 				val internal = inst.arg1.asInternal
 				sb.append(internal.getter(false, pos, f.uniqueID))
 				arr.clear
 			}
-			case Instruction::arith_neg:
+			case Instruction.arith_neg:
 				sb.append('''long t«pos»=«singleOpValue('-', null, a, inst.arg1)»;''')
-			case Instruction::bit_neg:
+			case Instruction.bit_neg:
 				sb.append('''long t«pos»=«singleOpValue('~', null, a, inst.arg1)»;''')
-			case Instruction::and:
+			case Instruction.and:
 				sb.append(twoOp('&', inst.arg1, pos, a, b))
-			case Instruction::or:
+			case Instruction.or:
 				sb.append(twoOp('|', inst.arg1, pos, a, b))
-			case Instruction::xor:
+			case Instruction.xor:
 				sb.append(twoOp('^', inst.arg1, pos, a, b))
-			case Instruction::plus:
+			case Instruction.plus:
 				sb.append(twoOp('+', inst.arg1, pos, a, b))
-			case Instruction::minus:
+			case Instruction.minus:
 				sb.append(twoOp('-', inst.arg1, pos, a, b))
-			case Instruction::mul:
+			case Instruction.mul:
 				sb.append(twoOp('*', inst.arg1, pos, a, b))
-			case Instruction::div:
+			case Instruction.div:
 				sb.append(twoOp('/', inst.arg1, pos, a, b))
-			case Instruction::sll:
+			case Instruction.sll:
 				sb.append(twoOp('<<', inst.arg1, pos, a, b))
-			case Instruction::srl:
+			case Instruction.srl:
 				sb.append(twoOp('>>>', inst.arg1, pos, a, b))
-			case Instruction::sra:
+			case Instruction.sra:
 				sb.append(twoOp('>>', inst.arg1, pos, a, b))
-			case Instruction::eq:
+			case Instruction.eq:
 				sb.append('''boolean t«pos»=t«b» == t«a»;''')
-			case Instruction::not_eq:
+			case Instruction.not_eq:
 				sb.append('''boolean t«pos»=t«b» != t«a»;''')
-			case Instruction::less:
+			case Instruction.less:
 				sb.append('''boolean t«pos»=t«b» < t«a»;''')
-			case Instruction::less_eq:
+			case Instruction.less_eq:
 				sb.append('''boolean t«pos»=t«b» <= t«a»;''')
-			case Instruction::greater:
+			case Instruction.greater:
 				sb.append('''boolean t«pos»=t«b» > t«a»;''')
-			case Instruction::greater_eq:
+			case Instruction.greater_eq:
 				sb.append('''boolean t«pos»=t«b» >= t«a»;''')
-			case Instruction::isRisingEdge:
+			case Instruction.isRisingEdge:
 				sb.append(
 					'''«inst.arg1.asInternal.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
-			case Instruction::isFallingEdge:
+			case Instruction.isFallingEdge:
 				sb.append(
 					'''«inst.arg1.asInternal.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
 		}
@@ -748,7 +748,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 	}
 
 	def getJavaType(VariableInformation information) {
-		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
+		if (information.name.startsWith(InternalInformation.PRED_PREFIX))
 			return "boolean"
 		return "long"
 	}

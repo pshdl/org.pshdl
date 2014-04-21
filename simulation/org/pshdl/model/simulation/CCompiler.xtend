@@ -460,12 +460,12 @@ class CCompiler implements ITypeOuptutProvider {
 				b = stack.pop
 			if (i.inst.push > 0)
 				stack.push(pos)
-			if (i.inst === Instruction::pushAddIndex) {
+			if (i.inst === Instruction.pushAddIndex) {
 				arr.add(arrPos)
 				arrPos = arrPos + 1
 			}
 			i.toExpression(frame, func, pos, a, b, arr, arrPos)
-			if (i.inst !== Instruction::pushAddIndex)
+			if (i.inst !== Instruction.pushAddIndex)
 				pos = pos + 1
 		}
 		val last = "t" + stack.pop
@@ -485,9 +485,9 @@ class CCompiler implements ITypeOuptutProvider {
 	def toExpression(FastInstruction inst, Frame f, StringBuilder sb, int pos, int a, int b, List<Integer> arr,
 		int arrPos) {
 		switch (inst.inst) {
-			case Instruction::pushAddIndex:
+			case Instruction.pushAddIndex:
 				sb.append('''int a«arr.last»=(int)t«a»;''')
-			case Instruction::writeInternal: {
+			case Instruction.writeInternal: {
 				val internal = inst.arg1.asInternal
 				val info = internal.info
 				val isDynMem = arr.size < info.dimensions.length
@@ -510,19 +510,19 @@ class CCompiler implements ITypeOuptutProvider {
 				}
 				arr.clear
 			}
-			case Instruction::noop:
+			case Instruction.noop:
 				sb.append("//Do nothing")
-			case Instruction::bitAccessSingle:
+			case Instruction.bitAccessSingle:
 				sb.append('''«pos.uTemp('t')»=(t«a» >> «inst.arg1») & 1;''')
-			case Instruction::bitAccessSingleRange: {
+			case Instruction.bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
 				val long mask = (1l << ((highBit - lowBit) + 1)) - 1
 				sb.append('''«pos.uTemp('t')»=(t«a» >> «lowBit») & «mask.toHexStringL»l;''')
 			}
-			case Instruction::cast_int: {
+			case Instruction.cast_int: {
 				if (inst.arg1 != bitWidth) {
-					val shiftWidth = bitWidth - Math::min(inst.arg1, inst.arg2);
+					val shiftWidth = bitWidth - Math.min(inst.arg1, inst.arg2);
 					sb.append(
 						'''
 							«pos.sTemp('c')»=t«a» << «shiftWidth»;
@@ -532,79 +532,79 @@ class CCompiler implements ITypeOuptutProvider {
 					sb.append('''«pos.uTemp('t')»=t«a»;''')
 				}
 			}
-			case Instruction::cast_uint: {
+			case Instruction.cast_uint: {
 				if (inst.arg1 != bitWidth) {
 					sb.append('''«pos.uTemp('t')»=t«a» & «inst.arg1.asMaskL»l;''')
 				} else {
 					sb.append('''«pos.uTemp('t')»=t«a»;''')
 				}
 			}
-			case Instruction::logiNeg:
+			case Instruction.logiNeg:
 				sb.append('''bool t«pos»=!t«a»;''')
-			case Instruction::logiAnd:
+			case Instruction.logiAnd:
 				sb.append('''bool t«pos»=t«a» && t«b»;''')
-			case Instruction::logiOr:
+			case Instruction.logiOr:
 				sb.append('''bool t«pos»=t«a» || t«b»;''')
-			case Instruction::const0:
+			case Instruction.const0:
 				sb.append('''«pos.uTemp('t')»=0;''')
-			case Instruction::const1:
+			case Instruction.const1:
 				sb.append('''«pos.uTemp('t')»=1;''')
-			case Instruction::const2:
+			case Instruction.const2:
 				sb.append('''«pos.uTemp('t')»=2;''')
-			case Instruction::constAll1:
+			case Instruction.constAll1:
 				sb.append('''«pos.uTemp('t')»=«inst.arg1.asMaskL»l;''')
-			case Instruction::concat:
+			case Instruction.concat:
 				sb.append('''«pos.uTemp('t')»=(t«b» << «inst.arg2») | t«a»;''')
-			case Instruction::loadConstant:
+			case Instruction.loadConstant:
 				if (bitWidth == 32)
 					sb.append('''«pos.uTemp('t')»=«inst.arg1.constantI(f)»;''')
 				else
 					sb.append('''«pos.uTemp('t')»=«inst.arg1.constantL(f)»l;''')
-			case Instruction::loadInternal: {
+			case Instruction.loadInternal: {
 				val internal = inst.arg1.asInternal
 				sb.append(internal.getter(false, pos, f.uniqueID))
 				arr.clear
 			}
-			case Instruction::arith_neg:
+			case Instruction.arith_neg:
 				sb.append('''«pos.uTemp('t')»=«singleOpValue('-', '''(«int_t()»)''', a, inst.arg1)»;''')
-			case Instruction::bit_neg:
+			case Instruction.bit_neg:
 				sb.append('''«pos.uTemp('t')»=«singleOpValue('~', '''(«int_t()»)''', a, inst.arg1)»;''')
-			case Instruction::and:
+			case Instruction.and:
 				sb.append(twoOp('&', inst.arg1, pos, a, b))
-			case Instruction::or:
+			case Instruction.or:
 				sb.append(twoOp('|', inst.arg1, pos, a, b))
-			case Instruction::xor:
+			case Instruction.xor:
 				sb.append(twoOp('^', inst.arg1, pos, a, b))
-			case Instruction::plus:
+			case Instruction.plus:
 				sb.append(twoOp('+', inst.arg1, pos, a, b))
-			case Instruction::minus:
+			case Instruction.minus:
 				sb.append(twoOp('-', inst.arg1, pos, a, b))
-			case Instruction::mul:
+			case Instruction.mul:
 				sb.append(twoOp('*', inst.arg1, pos, a, b))
-			case Instruction::div:
+			case Instruction.div:
 				sb.append(twoOp('/', inst.arg1, pos, a, b))
-			case Instruction::sll:
+			case Instruction.sll:
 				sb.append(twoOp('<<', inst.arg1, pos, a, b))
-			case Instruction::srl:
+			case Instruction.srl:
 				sb.append(twoOp('>>', inst.arg1, pos, a, b))
-			case Instruction::sra:
+			case Instruction.sra:
 				sb.append('''«pos.uTemp('t')»=«sra(inst.arg1, a, b)»;''')
-			case Instruction::eq:
+			case Instruction.eq:
 				sb.append('''bool t«pos»=t«b» == t«a»;''')
-			case Instruction::not_eq:
+			case Instruction.not_eq:
 				sb.append('''bool t«pos»=t«b» != t«a»;''')
-			case Instruction::less:
+			case Instruction.less:
 				sb.append('''bool t«pos»=t«b» < t«a»;''')
-			case Instruction::less_eq:
+			case Instruction.less_eq:
 				sb.append('''bool t«pos»=t«b» <= t«a»;''')
-			case Instruction::greater:
+			case Instruction.greater:
 				sb.append('''bool t«pos»=t«b» > t«a»;''')
-			case Instruction::greater_eq:
+			case Instruction.greater_eq:
 				sb.append('''bool t«pos»=t«b» >= t«a»;''')
-			case Instruction::isRisingEdge:
+			case Instruction.isRisingEdge:
 				sb.append(
 					'''«inst.arg1.asInternal.info.idName(false, false)»_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
-			case Instruction::isFallingEdge:
+			case Instruction.isFallingEdge:
 				sb.append(
 					'''«inst.arg1.asInternal.info.idName(false, false)»_update=((uint64_t) deltaCycle << 16l) | (epsCycle & 0xFFFF);''')
 		}
@@ -653,7 +653,7 @@ class CCompiler implements ITypeOuptutProvider {
 	}
 
 	def cType(VariableInformation information) {
-		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
+		if (information.name.startsWith(InternalInformation.PRED_PREFIX))
 			return "bool"
 		return uint_t()
 	}
@@ -691,8 +691,8 @@ class CCompiler implements ITypeOuptutProvider {
 		val List<SideFile> sideFiles = Lists.newLinkedList
 		val simFile = comp.generateSimEncapsuation
 		if (simFile !== null)
-			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets::UTF_8), true));
-		return Lists::newArrayList(
+			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets.UTF_8), true));
+		return Lists.newArrayList(
 			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, comp.hookName,
 				true));
 	}
@@ -705,12 +705,12 @@ class CCompiler implements ITypeOuptutProvider {
 		val Unit unit = getUnit(em)
 		if (unit === null)
 			return null
-		return generateSimEncapsuation(unit, MemoryModel::buildRows(unit))
+		return generateSimEncapsuation(unit, MemoryModel.buildRows(unit))
 	}
 
 	def getUnit(ExecutableModel model) {
 		var Unit unit
-		val annoSplitter = Splitter::on(SimulationTransformationExtension::ANNO_VALUE_SEP);
+		val annoSplitter = Splitter.on(SimulationTransformationExtension.ANNO_VALUE_SEP);
 		if (em.annotations !== null) {
 			for (a : em.annotations) {
 				if (a.startsWith("busDescription")) {
@@ -726,7 +726,7 @@ class CCompiler implements ITypeOuptutProvider {
 
 	private def generateSimEncapsuation(Unit unit, Iterable<Row> rows) {
 		val Set<String> varNames = new HashSet
-		rows.forEach[it.allDefs.filter[it.type !== Definition::Type::UNUSED].forEach[varNames.add(it.getName)]]
+		rows.forEach[it.allDefs.filter[it.type !== Definition.Type.UNUSED].forEach[varNames.add(it.getName)]]
 		var res = '''
 //  BusAccessSim.c
 //

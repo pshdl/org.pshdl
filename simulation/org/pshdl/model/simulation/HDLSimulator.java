@@ -53,12 +53,28 @@ public class HDLSimulator {
 		insulin = unrollForLoops(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
+		insulin = convertBooleanLiterals(context, insulin);
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
 		// TODO Rewrite highZ function
 		insulin = removeDeadLeaves(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
+	}
+
+	private static HDLUnit convertBooleanLiterals(HDLEvaluationContext context, HDLUnit insulin) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLLiteral[] literals = insulin.getAllObjectsOf(HDLLiteral.class, true);
+		for (final HDLLiteral hdlLiteral : literals) {
+			final String val = hdlLiteral.getVal();
+			if (HDLLiteral.TRUE.equals(val)) {
+				ms.replace(hdlLiteral, HDLLiteral.get(1));
+			}
+			if (HDLLiteral.FALSE.equals(val)) {
+				ms.replace(hdlLiteral, HDLLiteral.get(0));
+			}
+		}
+		return ms.apply(insulin);
 	}
 
 	private static HDLUnit getSingleUnit(final HDLPackage pkg) {

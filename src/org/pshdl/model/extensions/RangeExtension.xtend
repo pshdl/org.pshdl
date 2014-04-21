@@ -106,31 +106,31 @@ class RangeExtension {
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
-		return Optional::absent
+		return Optional.absent
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLLiteral obj, HDLEvaluationContext context) {
-		return Optional::of(RangeTool::createRange(obj.valueAsBigInt, obj.valueAsBigInt))
+		return Optional.of(RangeTool.createRange(obj.valueAsBigInt, obj.valueAsBigInt))
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLVariableRef obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> bigVal = ConstantEvaluate::valueOf(obj, context)
+		val Optional<BigInteger> bigVal = ConstantEvaluate.valueOf(obj, context)
 		if (bigVal.present)
-			return Optional::of(RangeTool::createRange(bigVal.get, bigVal.get))
+			return Optional.of(RangeTool.createRange(bigVal.get, bigVal.get))
 		val hVar = obj.resolveVar
 		if (!hVar.present) {
 			obj.addMeta(SOURCE, obj)
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
-			return Optional::absent
+			return Optional.absent
 		}
-		val annoCheck=checkAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations::range))
+		val annoCheck=checkAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range))
 		if (annoCheck.present)
 			return annoCheck
 		val container = hVar.get.container
 		if (container !== null) {
 			if (container instanceof HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
-				val subAnnoCheck = checkAnnotation(hvd.getAnnotation(HDLBuiltInAnnotations::range))
+				val subAnnoCheck = checkAnnotation(hvd.getAnnotation(HDLBuiltInAnnotations.range))
 				if (subAnnoCheck.present)
 					return subAnnoCheck
 			}
@@ -144,11 +144,11 @@ class RangeExtension {
 						if (rRange.present)
 							res = res.span(rRange.get)
 						else
-							Optional::absent
+							Optional.absent
 					}
-					return Optional::of(res)
+					return Optional.of(res)
 				} else {
-					return Optional::absent
+					return Optional.absent
 				}
 			}
 		}
@@ -157,7 +157,7 @@ class RangeExtension {
 			for (HDLRange r : obj.bits) {
 				var HDLExpression width = r.width
 				width = width.copyDeepFrozen(r)
-				var Optional<BigInteger> cw = ConstantEvaluate::valueOf(width, context)
+				var Optional<BigInteger> cw = ConstantEvaluate.valueOf(width, context)
 				if (!cw.present) {
 					bitWidth = null
 				} else {
@@ -165,16 +165,16 @@ class RangeExtension {
 				}
 			}
 			if (bitWidth !== null) {
-				return Optional::of(RangeTool::createRange(0bi, 1bi.shiftLeft(bitWidth.intValue).subtract(1bi)))
+				return Optional.of(RangeTool.createRange(0bi, 1bi.shiftLeft(bitWidth.intValue).subtract(1bi)))
 			}
 		}
-		val Optional<? extends HDLType> type = TypeExtension::typeOf(hVar.get)
+		val Optional<? extends HDLType> type = TypeExtension.typeOf(hVar.get)
 		if (type.present && type.get instanceof HDLPrimitive) {
-			return HDLPrimitives::instance.getValueRange(type.get as HDLPrimitive, context)
+			return HDLPrimitives.instance.getValueRange(type.get as HDLPrimitive, context)
 		}
 		obj.addMeta(SOURCE, obj)
 		obj.addMeta(DESCRIPTION, NON_PRIMITVE_TYPE_NOT_EVALUATED)
-		return Optional::absent
+		return Optional.absent
 	}
 
 	
@@ -187,101 +187,111 @@ class RangeExtension {
 			try {
 				val lowerBound=new BigInteger(value.get(0))
 				val upperBound=new BigInteger(value.get(1))
-				return Optional::of(RangeTool::createRange(lowerBound,upperBound))
+				return Optional.of(RangeTool.createRange(lowerBound,upperBound))
 			} catch(Exception e){
 				//print("Invalid arguments for range annotation "+range.value+"\n")
-				return Optional::absent
+				return Optional.absent
 			}
 		}
-		return Optional::absent
+		return Optional.absent
 	}
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj) {
 		return rangeOf(obj, null)
 	}
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> to = ConstantEvaluate::valueOf(obj.to, context)
+		val Optional<BigInteger> to = ConstantEvaluate.valueOf(obj.to, context)
 		if (!to.present)
-			return Optional::absent;
+			return Optional.absent;
 		if (obj.from !== null) {
-			val Optional<BigInteger> from = ConstantEvaluate::valueOf(obj.from, context)
+			val Optional<BigInteger> from = ConstantEvaluate.valueOf(obj.from, context)
 			if (!from.present)
-				return Optional::absent;
-			if (from.get.compareTo(to.get) > 0)
-				return Optional::of(RangeTool::createRange(to.get, from.get))
-			return Optional::of(RangeTool::createRange(from.get, to.get))
+				return Optional.absent;
+			return Optional.of(RangeTool.createRange(from.get, to.get))
 		}
-		return Optional::of(RangeTool::createRange(to.get, to.get))
+		if (obj.dec!==null){
+			val decVal=ConstantEvaluate.valueOf(obj.dec, context)
+			if (!decVal.present)
+				return Optional.absent
+			return Optional.of(RangeTool.createRange(to.get, decVal.get))
+		}
+		if (obj.inc!==null){
+			val incVal=ConstantEvaluate.valueOf(obj.inc, context)
+			if (!incVal.present)
+				return Optional.absent
+			return Optional.of(RangeTool.createRange(to.get, incVal.get))
+		}
+		return Optional.of(RangeTool.createRange(to.get, to.get))
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLEqualityOp obj, HDLEvaluationContext context) {
 		obj.addMeta(SOURCE, obj)
 		obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
-		return Optional::of(RangeTool::createRange(0bi, 1bi))
+		return Optional.of(RangeTool.createRange(0bi, 1bi))
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLShiftOp obj, HDLEvaluationContext context) {
 		val Optional<Range<BigInteger>> leftRange = obj.left.determineRange(context)
 		if (!leftRange.present)
-			return Optional::absent
+			return Optional.absent
 		val Optional<Range<BigInteger>> rightRange = obj.right.determineRange(context)
 		if (!rightRange.present)
-			return Optional::absent
+			return Optional.absent
 		switch (obj.type) {
 			case SLL: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.shiftLeft(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger ft = leftRange.get.lowerEndpoint.shiftLeft(rightRange.get.upperEndpoint.intValue)
 				val BigInteger tf = leftRange.get.upperEndpoint.shiftLeft(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger tt = leftRange.get.upperEndpoint.shiftLeft(rightRange.get.upperEndpoint.intValue)
-				return Optional::of(RangeTool::createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
+				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case SRA: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.shiftRight(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger ft = leftRange.get.lowerEndpoint.shiftRight(rightRange.get.upperEndpoint.intValue)
 				val BigInteger tf = leftRange.get.upperEndpoint.shiftRight(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger tt = leftRange.get.upperEndpoint.shiftRight(rightRange.get.upperEndpoint.intValue)
-				return Optional::of(RangeTool::createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
+				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case SRL: {
 				val BigInteger ff = srl(leftRange.get.lowerEndpoint, rightRange.get.lowerEndpoint)
 				val BigInteger ft = srl(leftRange.get.lowerEndpoint, rightRange.get.upperEndpoint)
 				val BigInteger tf = srl(leftRange.get.upperEndpoint, rightRange.get.lowerEndpoint)
 				val BigInteger tt = srl(leftRange.get.upperEndpoint, rightRange.get.upperEndpoint)
-				return Optional::of(RangeTool::createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
+				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 		}
 		throw new RuntimeException("Incorrectly implemented obj op")
 	}
 
 	def private static BigInteger srl(BigInteger a, BigInteger b) {
-		BigIntegerFrame::srl(a, 1024, b.intValue);
+		BigIntegerFrame.srl(a, 1024, b.intValue);
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLBitOp obj, HDLEvaluationContext context) {
 		val Optional<Range<BigInteger>> leftRange = obj.left.determineRange(context)
 		if (!leftRange.present)
-			return Optional::absent
+			return Optional.absent
 		val Optional<Range<BigInteger>> rightRange = obj.right.determineRange(context)
 		if (!rightRange.present)
-			return Optional::absent
+			return Optional.absent
 		switch (type: obj.type) {
 			case type == OR || type == XOR: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-				return Optional::of(
-					RangeTool::createRange(0bi, 1bi.shiftLeft(leftRange.get.upperEndpoint.bitLength).subtract(1bi)))
+				return Optional.of(
+					RangeTool.createRange(0bi, 1bi.shiftLeft(leftRange.get.upperEndpoint.bitLength).subtract(1bi)))
 			}
 			case AND: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
-				return Optional::of(
-					RangeTool::createRange(0bi,
+				return Optional.of(
+					RangeTool.createRange(0bi,
 						leftRange.get.upperEndpoint.min(
 							1bi.shiftLeft(rightRange.get.upperEndpoint.bitLength).subtract(1bi))))
 			}
 			case type == LOGI_AND || type == LOGI_OR: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
-				return Optional::of(RangeTool::createRange(0bi, 1bi))
+				return Optional.of(RangeTool.createRange(0bi, 1bi))
 			}
 		}
 		throw new RuntimeException("Incorrectly implemented obj op")
@@ -291,52 +301,52 @@ class RangeExtension {
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLArithOp obj, HDLEvaluationContext context) {
 		val Optional<Range<BigInteger>> leftRange = obj.left.determineRange(context)
 		if (!leftRange.present)
-			return Optional::absent
+			return Optional.absent
 		val Optional<Range<BigInteger>> rightRange = obj.right.determineRange(context)
 		if (!rightRange.present)
-			return Optional::absent
+			return Optional.absent
 		switch (obj.type) {
 			case PLUS:
-				return Optional::of(
-					RangeTool::createRange(leftRange.get.lowerEndpoint.add(rightRange.get.lowerEndpoint),
+				return Optional.of(
+					RangeTool.createRange(leftRange.get.lowerEndpoint.add(rightRange.get.lowerEndpoint),
 						leftRange.get.upperEndpoint.add(rightRange.get.upperEndpoint)))
 			case MINUS:
-				return Optional::of(
-					RangeTool::createRange(leftRange.get.lowerEndpoint.subtract(rightRange.get.lowerEndpoint),
+				return Optional.of(
+					RangeTool.createRange(leftRange.get.lowerEndpoint.subtract(rightRange.get.lowerEndpoint),
 						leftRange.get.upperEndpoint.subtract(rightRange.get.upperEndpoint)))
 			case DIV: {
 				if (rightRange.get.lowerEndpoint.equals(0bi) || rightRange.get.upperEndpoint.equals(0bi)) {
 					obj.addMeta(SOURCE, obj)
 					obj.addMeta(DESCRIPTION, ZERO_DIVIDE)
-					return Optional::absent
+					return Optional.absent
 				}
 				if (rightRange.get.lowerEndpoint.signum * rightRange.get.upperEndpoint.signum < 0 ||
 					rightRange.get.upperEndpoint.signum == 0) {
 					obj.addMeta(SOURCE, obj)
 					obj.addMeta(DESCRIPTION, POSSIBLY_ZERO_DIVIDE)
 				}
-				val mulRange = RangeTool::createRange(1bd.divide(new BigDecimal(rightRange.get.lowerEndpoint)),
+				val mulRange = RangeTool.createRange(1bd.divide(new BigDecimal(rightRange.get.lowerEndpoint)),
 					1bd.divide(new BigDecimal(rightRange.get.upperEndpoint)))
 				val BigDecimal ff = new BigDecimal(leftRange.get.lowerEndpoint).multiply(mulRange.lowerEndpoint)
 				val BigDecimal ft = new BigDecimal(leftRange.get.lowerEndpoint).multiply(mulRange.upperEndpoint)
 				val BigDecimal tf = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.lowerEndpoint)
 				val BigDecimal tt = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.upperEndpoint)
-				return Optional::of(
-					RangeTool::createRange(ff.min(ft).min(tf).min(tt).toBigInteger, ff.max(ft).max(tf).max(tt).toBigInteger))
+				return Optional.of(
+					RangeTool.createRange(ff.min(ft).min(tf).min(tt).toBigInteger, ff.max(ft).max(tf).max(tt).toBigInteger))
 			}
 			case MUL: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.multiply(rightRange.get.lowerEndpoint)
 				val BigInteger ft = leftRange.get.lowerEndpoint.multiply(rightRange.get.upperEndpoint)
 				val BigInteger tf = leftRange.get.upperEndpoint.multiply(rightRange.get.lowerEndpoint)
 				val BigInteger tt = leftRange.get.upperEndpoint.multiply(rightRange.get.upperEndpoint)
-				return Optional::of(RangeTool::createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
+				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case MOD: {
 				val rle=rightRange.get.lowerEndpoint
 				val leftBound=rle.min(0bi)
 				val rue=rightRange.get.upperEndpoint
 				val rightBound=rue.max(0bi)
-				return Optional::of(RangeTool::createRange(leftBound, rightBound))
+				return Optional.of(RangeTool.createRange(leftBound, rightBound))
 			}
 				
 			case POW: {
@@ -344,7 +354,7 @@ class RangeExtension {
 				val BigInteger ft = leftRange.get.lowerEndpoint.pow(rightRange.get.upperEndpoint.intValue)
 				val BigInteger tf = leftRange.get.upperEndpoint.pow(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger tt = leftRange.get.upperEndpoint.pow(rightRange.get.upperEndpoint.intValue)
-				return Optional::of(RangeTool::createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
+				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 		}
 		throw new RuntimeException("Incorrectly implemented obj op")
@@ -353,50 +363,50 @@ class RangeExtension {
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLEnumRef obj, HDLEvaluationContext context) {
 		obj.addMeta(SOURCE, obj)
 		obj.addMeta(DESCRIPTION, ENUMS_NOT_SUPPORTED_FOR_CONSTANTS)
-		return Optional::absent
+		return Optional.absent
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLManip obj, HDLEvaluationContext context) {
 		val Optional<Range<BigInteger>> right = obj.target.determineRange(context)
 		if (!right.present)
-			return Optional::absent
+			return Optional.absent
 		switch (obj.type) {
 			case CAST: {
 				val HDLType type = obj.castTo
 				if (type instanceof HDLPrimitive) {
-					val Optional<Range<BigInteger>> castRange = HDLPrimitives::getInstance.getValueRange(
+					val Optional<Range<BigInteger>> castRange = HDLPrimitives.getInstance.getValueRange(
 						type as HDLPrimitive, context)
 					if (!castRange.present)
-						return Optional::absent
+						return Optional.absent
 					if (!right.present)
-						return Optional::absent
-					return Optional::of(castRange.get.intersection(right.get))
+						return Optional.absent
+					return Optional.of(castRange.get.intersection(right.get))
 				}
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, TYPE_NOT_SUPPORTED_FOR_CONSTANTS)
-				return Optional::absent
+				return Optional.absent
 			}
 			case ARITH_NEG:
-				return Optional::of(RangeTool::createRange(right.get.upperEndpoint.negate, right.get.lowerEndpoint.negate))
+				return Optional.of(RangeTool.createRange(right.get.upperEndpoint.negate, right.get.lowerEndpoint.negate))
 			case BIT_NEG:
-				return Optional::of(RangeTool::createRange(0bi, 1bi.shiftLeft(right.get.upperEndpoint.bitLength).subtract(1bi)))
+				return Optional.of(RangeTool.createRange(0bi, 1bi.shiftLeft(right.get.upperEndpoint.bitLength).subtract(1bi)))
 			case LOGIC_NEG: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)
-				return Optional::of(RangeTool::createRange(0bi, 1bi))
+				return Optional.of(RangeTool.createRange(0bi, 1bi))
 			}
 		}
 		throw new RuntimeException("Incorrectly implemented obj op")
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLFunctionCall obj, HDLEvaluationContext context) {
-		return HDLFunctions::determineRange(obj, context)
+		return HDLFunctions.determineRange(obj, context)
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLConcat obj, HDLEvaluationContext context) {
-		val type = TypeExtension::typeOf(obj)
+		val type = TypeExtension.typeOf(obj)
 		if (!type.present)
-			return Optional::absent
-		return HDLPrimitives::instance.getValueRange(type.get as HDLPrimitive, context)
+			return Optional.absent
+		return HDLPrimitives.instance.getValueRange(type.get as HDLPrimitive, context)
 	}
 }

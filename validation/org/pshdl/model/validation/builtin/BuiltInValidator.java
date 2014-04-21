@@ -413,6 +413,18 @@ public class BuiltInValidator implements IHDLValidator {
 						default:
 							problems.add(new Problem(BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
 						}
+						final Optional<Range<BigInteger>> bitSizeRangeOpt = RangeExtension.rangeOf(primitive.getWidth(), getContext(hContext, primitive));
+						if (!bitSizeRangeOpt.isPresent()) {
+							continue;
+						}
+						final Range<BigInteger> availableRange = bitSizeRangeOpt.get();
+						for (final HDLRange bit : ref.getBits()) {
+							final Optional<Range<BigInteger>> accessRangeFrom = RangeExtension.rangeOf(bit);
+							if (!accessRangeFrom.isPresent()) {
+								continue;
+							}
+							checkAccessBoundaries(accessRangeFrom.get(), availableRange, problems, bit, ref, true);
+						}
 					}
 				}
 			}
@@ -1005,7 +1017,7 @@ public class BuiltInValidator implements IHDLValidator {
 							validateArrayAssignment(problems, context, ref, ass, left, targetDim);
 						} else {
 							final HDLClass classType = ass.getRight().getClassType();
-							if ((classType != HDLClass.HDLVariableRef) && (classType != HDLClass.HDLArrayInit)) {
+							if ((classType != HDLClass.HDLVariableRef) && (classType != HDLClass.HDLInterfaceRef) && (classType != HDLClass.HDLArrayInit)) {
 								problems.add(new Problem(ARRAY_WRITE_MULTI_DIMENSION, ass));
 							}
 						}
@@ -1033,27 +1045,49 @@ public class BuiltInValidator implements IHDLValidator {
 				break;
 			}
 			final Range<BigInteger> accessRange = accessRangeRaw.get();
-			Range<BigInteger> arrayRange = arrayRangeRaw.get();
-			final BigInteger upperEndpoint = arrayRange.upperEndpoint();
-			final BigInteger subtract = upperEndpoint.subtract(BigInteger.ONE);
-			if (subtract.compareTo(BigInteger.ZERO) < 0) {
-				// Maybe generate a warning here?
-				continue;
-			}
-			arrayRange = RangeTool.createRange(BigInteger.ZERO, subtract);
-			final String info = "Expected value range:" + accessRange;
-			if (accessRange.upperEndpoint().signum() < 0) {
-				problems.add(new Problem(ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			} else if (accessRange.lowerEndpoint().signum() < 0) {
-				problems.add(new Problem(ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			}
-			if (!arrayRange.isConnected(accessRange)) {
-				problems.add(new Problem(ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			} else if (accessRange.upperEndpoint().compareTo(upperEndpoint) > 0) {
-				problems.add(new Problem(ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-			}
-
+			final Range<BigInteger> arrayRange = arrayRangeRaw.get();
+			checkAccessBoundaries(accessRange, arrayRange, problems, arr, ref, false);
 			dim++;
+		}
+	}
+
+	/**
+	 *
+	 * @param accessRange
+	 *            the range in which the array/bits can be acccessed
+	 * @param arrayRange
+	 *            the range of the size that array size/ width of the type can
+	 *            be in
+	 * @param problems
+	 *            problems will be added here
+	 * @param arr
+	 *            the accessing {@link HDLExpression}
+	 * @param ref
+	 *            the reference that is accessed
+	 * @param bit
+	 *            when true bit access errors will be reported
+	 */
+	private static void checkAccessBoundaries(Range<BigInteger> accessRange, Range<BigInteger> arrayRange, Set<Problem> problems, IHDLObject arr, HDLVariableRef ref, boolean bit) {
+		final BigInteger upperEndpoint = arrayRange.upperEndpoint();
+		final BigInteger subtract = upperEndpoint.subtract(BigInteger.ONE);
+		if (subtract.compareTo(BigInteger.ZERO) < 0) {
+			// Maybe generate a warning here?
+			// continue;
+		}
+		arrayRange = RangeTool.createRange(BigInteger.ZERO, subtract);
+		final String info = "Expected value range:" + arrayRange;
+		if (accessRange.upperEndpoint().signum() < 0) {
+			problems.add(new Problem(bit ? BIT_ACCESS_NEGATIVE : ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
+		} else if (accessRange.lowerEndpoint().signum() < 0) {
+			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_NEGATIVE : ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE,
+					arrayRange));
+		}
+		if (!arrayRange.isConnected(accessRange)) {
+			problems.add(new Problem(bit ? BIT_ACCESS_OUT_OF_BOUNDS : ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange)
+					.addMeta(ARRAY_RANGE, arrayRange));
+		} else if (accessRange.upperEndpoint().compareTo(subtract) > 0) {
+			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_OUT_OF_BOUNDS : ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(
+					ARRAY_RANGE, arrayRange));
 		}
 	}
 

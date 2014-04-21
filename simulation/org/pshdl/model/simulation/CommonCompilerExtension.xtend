@@ -71,7 +71,7 @@ class CommonCompilerExtension {
 
 	def dimMask(InternalInformation info) {
 		val size = info.info.totalSize
-		val res = Long::highestOneBit(size)
+		val res = Long.highestOneBit(size)
 		if (res == size)
 			return res - 1;
 		return (res << 1) - 1;
@@ -148,11 +148,11 @@ class CommonCompilerExtension {
 
 	def toHexString(BigInteger value) '''«IF value.signum < 0»-«ENDIF»0x«value.abs.toString(16)»'''
 
-	def toHexStringL(long value) '''0x«Long::toHexString(value)»l'''
+	def toHexStringL(long value) '''0x«Long.toHexString(value)»l'''
 
-	def toHexStringI(Integer value) '''0x«Integer::toHexString(value)»'''
+	def toHexStringI(Integer value) '''0x«Integer.toHexString(value)»'''
 
-	def getFrameName(Frame f) '''s«String::format("%03d", Math::max(f.scheduleStage, 0))»frame«String::format("%04X",
+	def getFrameName(Frame f) '''s«String.format("%03d", Math.max(f.scheduleStage, 0))»frame«String.format("%04X",
 		f.uniqueID)»'''
 
 	def constantL(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
@@ -168,7 +168,7 @@ class CommonCompilerExtension {
 	}
 
 	def isPredicate(VariableInformation info) {
-		info.name.startsWith(InternalInformation::PRED_PREFIX)
+		info.name.startsWith(InternalInformation.PRED_PREFIX)
 	}
 
 	def idName(VariableInformation information, boolean prev, boolean field) {
@@ -205,7 +205,7 @@ class CommonCompilerExtension {
 			val oi = f.outputId.asInternal
 			if (!oi.info.notNull) {
 				for (inst : f.instructions) {
-					if (inst.inst === Instruction::writeInternal) {
+					if (inst.inst === Instruction.writeInternal) {
 						if (inst.arg1.asInternal.isShadowReg)
 							maxUpdates = maxUpdates + 1;
 					}

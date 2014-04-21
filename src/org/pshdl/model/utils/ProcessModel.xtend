@@ -107,7 +107,7 @@ class ProcessModel {
 	}
 
 	dispatch static def ProcessModel toProcessModel(HDLSwitchStatement stmnt, int pid) {
-		val Map<HDLSwitchCaseStatement, ProcessModel> pms = Maps::newLinkedHashMap
+		val Map<HDLSwitchCaseStatement, ProcessModel> pms = Maps.newLinkedHashMap
 		val clocks = new HashSet<HDLRegisterConfig>
 		var hasUnclocked = false
 		for (HDLSwitchCaseStatement caze : stmnt.cases) {

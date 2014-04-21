@@ -95,7 +95,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = loop.superFullName
 		val count = countInstance(loop)
-		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"for" + count)
+		return fullName.append(HDLQualifiedName.LOCAL_TYPE_SEP+"for" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLBlock block) {
@@ -104,7 +104,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = block.superFullName
 		val count = countInstance(block)
-		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"block" + count)
+		return fullName.append(HDLQualifiedName.LOCAL_TYPE_SEP+"block" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLIfStatement ifStamnt) {
@@ -113,7 +113,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = ifStamnt.superFullName
 		val count = countInstance(ifStamnt)
-		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"if" + count)
+		return fullName.append(HDLQualifiedName.LOCAL_TYPE_SEP+"if" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLSwitchStatement stmnt) {
@@ -122,7 +122,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = stmnt.superFullName
 		val count = countInstance(stmnt)
-		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"switch" + count)
+		return fullName.append(HDLQualifiedName.LOCAL_TYPE_SEP+"switch" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLSwitchCaseStatement stmnt) {
@@ -131,7 +131,7 @@ class FullNameExtension {
 			return cached
 		val HDLQualifiedName fullName = stmnt.superFullName
 		val count = countInstance(stmnt)
-		return fullName.append(HDLQualifiedName::LOCAL_TYPE_SEP+"case" + count)
+		return fullName.append(HDLQualifiedName.LOCAL_TYPE_SEP+"case" + count)
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLUnit unit) {
@@ -210,7 +210,7 @@ class FullNameExtension {
 			return cached
 		if (obj.container !== null)
 			return getFullName(obj.container)
-		return HDLQualifiedName::EMPTY
+		return HDLQualifiedName.EMPTY
 	}
 
 	def dispatch HDLQualifiedName getFullName(HDLObject obj) {
@@ -219,7 +219,7 @@ class FullNameExtension {
 			return cached
 		if (obj.container !== null)
 			return getFullName(obj.container)
-		return HDLQualifiedName::EMPTY
+		return HDLQualifiedName.EMPTY
 	}
 
 	def HDLQualifiedName getSuperFullName(HDLObject obj) {
@@ -232,15 +232,15 @@ class FullNameExtension {
 				val HDLIfStatement ifStmnt=obj.container as HDLIfStatement
 				val side=ifStmnt.treeSide(obj)
 				switch (side){
-					case HDLIfStatement$TreeSide::thenTree: 
+					case HDLIfStatement$TreeSide.thenTree: 
 						return new HDLQualifiedName(fn.toString+"p")
-					case HDLIfStatement$TreeSide::elseTree: 
+					case HDLIfStatement$TreeSide.elseTree: 
 						return new HDLQualifiedName(fn.toString+"n")
 				}
 			}			
 			return fn
 		}
-		return HDLQualifiedName::EMPTY
+		return HDLQualifiedName.EMPTY
 	}
 
 }

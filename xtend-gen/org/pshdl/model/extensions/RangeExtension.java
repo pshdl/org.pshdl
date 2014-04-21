@@ -288,23 +288,43 @@ public class RangeExtension {
       }
       BigInteger _get = from.get();
       BigInteger _get_1 = to.get();
-      int _compareTo = _get.compareTo(_get_1);
-      boolean _greaterThan = (_compareTo > 0);
-      if (_greaterThan) {
-        BigInteger _get_2 = to.get();
-        BigInteger _get_3 = from.get();
-        Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_get_2, _get_3);
-        return Optional.<Range<BigInteger>>of(_createRange);
+      Range<BigInteger> _createRange = RangeTool.<BigInteger>createRange(_get, _get_1);
+      return Optional.<Range<BigInteger>>of(_createRange);
+    }
+    HDLExpression _dec = obj.getDec();
+    boolean _tripleNotEquals_1 = (_dec != null);
+    if (_tripleNotEquals_1) {
+      HDLExpression _dec_1 = obj.getDec();
+      final Optional<BigInteger> decVal = ConstantEvaluate.valueOf(_dec_1, context);
+      boolean _isPresent_2 = decVal.isPresent();
+      boolean _not_2 = (!_isPresent_2);
+      if (_not_2) {
+        return Optional.<Range<BigInteger>>absent();
       }
-      BigInteger _get_4 = from.get();
-      BigInteger _get_5 = to.get();
-      Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(_get_4, _get_5);
+      BigInteger _get_2 = to.get();
+      BigInteger _get_3 = decVal.get();
+      Range<BigInteger> _createRange_1 = RangeTool.<BigInteger>createRange(_get_2, _get_3);
       return Optional.<Range<BigInteger>>of(_createRange_1);
+    }
+    HDLExpression _inc = obj.getInc();
+    boolean _tripleNotEquals_2 = (_inc != null);
+    if (_tripleNotEquals_2) {
+      HDLExpression _inc_1 = obj.getInc();
+      final Optional<BigInteger> incVal = ConstantEvaluate.valueOf(_inc_1, context);
+      boolean _isPresent_3 = incVal.isPresent();
+      boolean _not_3 = (!_isPresent_3);
+      if (_not_3) {
+        return Optional.<Range<BigInteger>>absent();
+      }
+      BigInteger _get_4 = to.get();
+      BigInteger _get_5 = incVal.get();
+      Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(_get_4, _get_5);
+      return Optional.<Range<BigInteger>>of(_createRange_2);
     }
     BigInteger _get_6 = to.get();
     BigInteger _get_7 = to.get();
-    Range<BigInteger> _createRange_2 = RangeTool.<BigInteger>createRange(_get_6, _get_7);
-    return Optional.<Range<BigInteger>>of(_createRange_2);
+    Range<BigInteger> _createRange_3 = RangeTool.<BigInteger>createRange(_get_6, _get_7);
+    return Optional.<Range<BigInteger>>of(_createRange_3);
   }
   
   protected Optional<Range<BigInteger>> _determineRange(final HDLEqualityOp obj, final HDLEvaluationContext context) {

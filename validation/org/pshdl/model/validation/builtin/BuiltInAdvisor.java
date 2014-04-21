@@ -59,14 +59,38 @@ public class BuiltInAdvisor {
 					"The annotation you have used is not known to the compiler. Maybe it was misspelled or it is not installed.", annoProposal,
 					"Check the installed libraries of the compiler");
 		}
+		case BIT_ACCESS_NEGATIVE:
+			return new HDLAdvise(problem, "The index of the bit access can only be negative",
+					"When bits are accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
 		case ARRAY_INDEX_NEGATIVE:
 			return new HDLAdvise(problem, "The index of the array can only be negative",
 					"When an array is accessed, the index has to be positive as negative indexes don't make sense", "Cast the index to uint");
+		case BIT_ACCESS_OUT_OF_BOUNDS: {
+			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
+			return new HDLAdvise(problem, "The bit access exceeds the variables' capacity", "Valid access index for the variable are: " + arrayRange
+					+ " while the index has a range of: " + accessRange + ". These don't overlap which means that the index will never be valid");
+		}
 		case ARRAY_INDEX_OUT_OF_BOUNDS: {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
 			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			return new HDLAdvise(problem, "The array index exceeds its capacity", "Valid access index for the array are: " + arrayRange + " while the index has a range of: "
 					+ accessRange + ". These don't overlap which means that the index will never be valid");
+		}
+		case BIT_ACCESS_POSSIBLY_NEGATIVE: {
+			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
+			String[] solutions;
+			if (!arrayRange.isConnected(accessRange)) {
+				solutions = new String[] { "Cast the index to uint with:(uint<>)" + problem.node };
+			} else {
+				solutions = new String[] {
+						"Cast the index to uint with:(uint<>)" + problem.node,
+						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
+								+ "\") annotation to define a range" };
+			}
+			return new HDLAdvise(problem, "The bit access could possibly become negative", "The given bit access has a possible negative value (" + accessRange.lowerEndpoint()
+					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
 		}
 		case ARRAY_INDEX_POSSIBLY_NEGATIVE: {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
@@ -81,7 +105,16 @@ public class BuiltInAdvisor {
 								+ "\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
-					+ "), even tough it does not need to become negative by design, it would be possible. This moght indicate a programming error", solutions);
+					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
+		}
+		case BIT_ACCESS_POSSIBLY_OUT_OF_BOUNDS: {
+			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
+			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
+			final Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
+			return new HDLAdvise(problem, "The bit access can exceed the variables' capacity", "The given bit access has a possible range of:" + accessRange
+					+ " while the highest index of the variable is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
+					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
+							+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);

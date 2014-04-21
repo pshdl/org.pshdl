@@ -138,7 +138,7 @@ class SimulationTransformationExtension {
 		val res = new FluidFrame
 		var pos = 0
 		for (HDLExpression exp : obj.exp) {
-			res.append(HDLLiteral::get(pos).toSimulationModel(context))
+			res.append(HDLLiteral.get(pos).toSimulationModel(context))
 			res.add(pushAddIndex)
 			res.append(exp.toSimulationModel(context, varName))
 			pos = pos + 1
@@ -148,31 +148,31 @@ class SimulationTransformationExtension {
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context) {
 		val type = obj.resolveType.get
-		val width = if(type.classType === HDLClass::HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
+		val width = if(type.classType === HDLClass.HDLPrimitive) HDLPrimitives.getWidth(type, context) else 32
 		val isReg = obj.register !== null
 		val FluidFrame res = new FluidFrame("#null", false)
-		res.addVar(new VariableInformation(Direction::INTERNAL, "#null", 1, Type::BIT, false, false, false, null))
+		res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
 		var Direction dir
 		switch (obj.direction) {
-			case IN: dir = Direction::IN
-			case OUT: dir = Direction::OUT
-			case INOUT: dir = Direction::INOUT
-			default: dir = Direction::INTERNAL
+			case IN: dir = Direction.IN
+			case OUT: dir = Direction.OUT
+			case INOUT: dir = Direction.INOUT
+			default: dir = Direction.INTERNAL
 		}
 		for (HDLVariable hVar : obj.variables) {
-			var clock = hVar.getAnnotation(HDLBuiltInAnnotations::clock) !== null
-			var reset = hVar.getAnnotation(HDLBuiltInAnnotations::reset) !== null
+			var clock = hVar.getAnnotation(HDLBuiltInAnnotations.clock) !== null
+			var reset = hVar.getAnnotation(HDLBuiltInAnnotations.reset) !== null
 			val varName = fullNameOf(hVar).toString
 			val dims = new LinkedList<Integer>()
 			for (HDLExpression dim : hVar.dimensions)
 				dims.add(valueOf(dim, context).get.intValue)
-			var vType = Type::BIT
-			if (type.classType === HDLClass::HDLPrimitive) {
+			var vType = Type.BIT
+			if (type.classType === HDLClass.HDLPrimitive) {
 				switch ((type as HDLPrimitive).type) {
-					case INT: vType = Type::INT
-					case INTEGER: vType = Type::INT
-					case UINT: vType = Type::UINT
-					case NATURAL: vType = Type::UINT
+					case INT: vType = Type.INT
+					case INTEGER: vType = Type.INT
+					case UINT: vType = Type.UINT
+					case NATURAL: vType = Type.UINT
 				}
 			}
 			val allAnnos = hVar.annotations + obj.annotations
@@ -183,11 +183,11 @@ class SimulationTransformationExtension {
 			val config = obj.register.normalize
 			val rst = config.rst
 			val String rstName = fullNameOf(rst).toString
-			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType::HIGH)
+			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType.HIGH)
 				res.add(new ArgumentedInstruction(posPredicate, rstName))
 			else
 				res.add(new ArgumentedInstruction(negPredicate, rstName))
-			if (config.syncType === HDLRegisterConfig$HDLRegSyncType::SYNC) {
+			if (config.syncType === HDLRegisterConfig$HDLRegSyncType.SYNC) {
 				val HDLExpression clk = config.clk
 				val String name = fullNameOf(clk).toString
 				if (config.clockType === RISING)
@@ -196,7 +196,7 @@ class SimulationTransformationExtension {
 					res.add(new ArgumentedInstruction(isFallingEdge, name))
 			}
 			createInit(config, obj, context, res, true);
-			if (config.syncType === HDLRegSyncType::ASYNC)
+			if (config.syncType === HDLRegSyncType.ASYNC)
 				createInit(config, obj, context, res, false);
 			res.add(const0)
 		}
@@ -216,7 +216,7 @@ class SimulationTransformationExtension {
 				res.add(const0)
 				var varName = fullNameOf(hVar).toString
 				if (toReg)
-					varName = varName + InternalInformation::REG_POSTFIX
+					varName = varName + InternalInformation.REG_POSTFIX
 				res.add(new ArgumentedInstruction(writeInternal, varName))
 				val HDLArrayInit arr = config.resetValue as HDLArrayInit
 				res.append(arr.toSimulationModel(context, varName))
@@ -226,7 +226,7 @@ class SimulationTransformationExtension {
 			for (HDLVariable hVar : obj.variables) {
 				var varName = fullNameOf(hVar).toString
 				if (toReg)
-					varName = varName + InternalInformation::REG_POSTFIX
+					varName = varName + InternalInformation.REG_POSTFIX
 				res.append(resetFrame)
 				res.add(new ArgumentedInstruction(writeInternal, varName))
 			}
@@ -243,11 +243,11 @@ class SimulationTransformationExtension {
 		val res = obj.caseExp.toSimulationModel(context)
 		res.setName(name)
 		val type = typeOf(obj.caseExp).get
-		val width = if(type.classType === HDLClass::HDLPrimitive) HDLPrimitives::getWidth(type, context) else 32
-		res.addVar(new VariableInformation(Direction::INTERNAL, name, width, Type::BIT, false, false, false, null))
+		val width = if(type.classType === HDLClass.HDLPrimitive) HDLPrimitives.getWidth(type, context) else 32
+		res.addVar(new VariableInformation(Direction.INTERNAL, name, width, Type.BIT, false, false, false, null))
 		for (HDLSwitchCaseStatement c : obj.cases) {
 			val cName = fullNameOf(c).toString
-			val caseFrame = new FluidFrame(InternalInformation::PRED_PREFIX + cName, false)
+			val caseFrame = new FluidFrame(InternalInformation.PRED_PREFIX + cName, false)
 			if (predicate !== null)
 				caseFrame.add(predicate)
 			caseFrame.createPredVar
@@ -265,7 +265,7 @@ class SimulationTransformationExtension {
 				if (const.present)
 					l = const.get.intValue
 				else {
-					if (c.label.classType === HDLClass::HDLEnumRef) {
+					if (c.label.classType === HDLClass.HDLEnumRef) {
 						val HDLEnumRef ref = c.label as HDLEnumRef
 						l = ref.asInt
 					} else {
@@ -273,7 +273,7 @@ class SimulationTransformationExtension {
 					}
 				}
 				caseFrame.add(new ArgumentedInstruction(loadInternal, name))
-				caseFrame.addConstant("label", BigInteger::valueOf(l))
+				caseFrame.addConstant("label", BigInteger.valueOf(l))
 				caseFrame.add(eq)
 			}
 			for (d : c.dos) {
@@ -294,7 +294,7 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLIfStatement obj, HDLEvaluationContext context) {
 		val name = fullNameOf(obj).toString
 		val ifModel = obj.ifExp.toSimulationModel(context)
-		ifModel.setName(InternalInformation::PRED_PREFIX + name)
+		ifModel.setName(InternalInformation.PRED_PREFIX + name)
 		ifModel.createPredVar
 		for (s : obj.thenDo) {
 			val thenDo = s.toSimulationModelPred(new ArgumentedInstruction(posPredicate, name), context)
@@ -314,7 +314,7 @@ class SimulationTransformationExtension {
 		var HDLRegisterConfig config = hVar.registerConfig
 		var FluidFrame res
 		if (config !== null)
-			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + InternalInformation::REG_POSTFIX,
+			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true) + InternalInformation.REG_POSTFIX,
 				constant)
 		else
 			res = new FluidFrame(getVarName(obj.left as HDLVariableRef, true), constant)
@@ -328,7 +328,7 @@ class SimulationTransformationExtension {
 				res.add(new ArgumentedInstruction(isFallingEdge, name))
 			val rst = config.rst
 			val String rstName = fullNameOf(rst).toString
-			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType::HIGH)
+			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType.HIGH)
 				res.add(new ArgumentedInstruction(negPredicate, rstName))
 			else
 				res.add(new ArgumentedInstruction(posPredicate, rstName))
@@ -382,11 +382,11 @@ class SimulationTransformationExtension {
 		val Iterator<HDLExpression> iter = obj.cats.iterator
 		val init = iter.next
 		res.append(init.toSimulationModel(context))
-		var int owidth = HDLPrimitives::getWidth(typeOf(init).get, context)
+		var int owidth = HDLPrimitives.getWidth(typeOf(init).get, context)
 		while (iter.hasNext) {
 			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context))
-			val int width = HDLPrimitives::getWidth(typeOf(exp).get, context)
+			val int width = HDLPrimitives.getWidth(typeOf(exp).get, context)
 			res.add(new ArgumentedInstruction(concat, owidth.toString, width.toString))
 			owidth = owidth + width
 		}
@@ -409,7 +409,7 @@ class SimulationTransformationExtension {
 			if (!lst.contains(rstVar)) {
 				lst.add(rstVar)
 				val rstVarName = rstVar.toString
-				val rstFrame = new FluidFrame(InternalInformation::PRED_PREFIX + rstVarName, false)
+				val rstFrame = new FluidFrame(InternalInformation.PRED_PREFIX + rstVarName, false)
 				rstFrame.add(new ArgumentedInstruction(loadInternal, rstVarName))
 				rstFrame.add(const0)
 				rstFrame.add(not_eq)
@@ -476,7 +476,7 @@ class SimulationTransformationExtension {
 		val hEnum = obj.resolveHEnum.get
 		val hVar = obj.resolveVar.get
 		val idx = hEnum.enums.indexOf(hVar)
-		res.addConstant(fullNameOf(hVar).toString, BigInteger::valueOf(idx))
+		res.addConstant(fullNameOf(hVar).toString, BigInteger.valueOf(idx))
 		return res
 	}
 
@@ -649,8 +649,8 @@ class SimulationTransformationExtension {
 
 	def targetSizeWithType(HDLExpression op, HDLEvaluationContext context) {
 		val HDLPrimitive type = typeOf(op).get as HDLPrimitive
-		val width = HDLPrimitives::getWidth(typeOf(op).get, context)
-		if (type.type === HDLPrimitiveType::INT || type.type === HDLPrimitiveType::INTEGER)
+		val width = HDLPrimitives.getWidth(typeOf(op).get, context)
+		if (type.type === HDLPrimitiveType.INT || type.type === HDLPrimitiveType.INTEGER)
 			return (width << 1).bitwiseOr(1)
 		return (width << 1)
 	}

@@ -38,7 +38,7 @@ class BusAccess {
 //
 //  BusStdDefinitions.h
 //
-//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
+//  Automatically generated on «IF withDate»«SimpleDateFormat.dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #ifndef BusStdDefinitions_h
@@ -66,7 +66,7 @@ void setWarn(warnFunc_p warnFunction);
 	def generatePrintC(Unit unit, List<Row> rows, boolean withDate) '''//
 //  BusPrint.c
 //
-//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
+//  Automatically generated on «IF withDate»«SimpleDateFormat.dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #include <stdio.h>
@@ -93,7 +93,7 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 	def generatePrintH(Unit unit, List<Row> rows, boolean withDate) '''//
 //  BusPrint.h
 //
-//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
+//  Automatically generated on «IF withDate»«SimpleDateFormat.dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #ifndef BusPrint_h
@@ -126,8 +126,8 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 		for (Row row : rows) {
 			if (!checkedRows.contains(row.name)) {
 				res = res + '''void print«row.name.toFirstUpper»(«row.name»_t *data){
-    printf("«row.name.toFirstUpper» «FOR Definition d : row.allDefs» «d.name»: 0x%0«Math::ceil(
-					MemoryModel::getSize(d) / 4f).intValue»x«ENDFOR»\n"«FOR Definition d : row.allDefs», data->«row.
+    printf("«row.name.toFirstUpper» «FOR Definition d : row.allDefs» «d.name»: 0x%0«Math.ceil(
+					MemoryModel.getSize(d) / 4f).intValue»x«ENDFOR»\n"«FOR Definition d : row.allDefs», data->«row.
 					getVarNameIndex(d)»«ENDFOR»);
 }
 '''
@@ -140,7 +140,7 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 	def generateAccessH(Unit unit, List<Row> rows, boolean withDate) '''//
 //  BusDefinitions.h
 //
-//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
+//  Automatically generated on «IF withDate»«SimpleDateFormat.dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #ifndef BusDefinitions_h
@@ -203,7 +203,7 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 	def generateAccessC(List<Row> rows, boolean withDate) '''//
 //  BusAcces.c
 //
-//  Automatically generated on «IF withDate»«SimpleDateFormat::dateTimeInstance.format(new Date)»«ENDIF».
+//  Automatically generated on «IF withDate»«SimpleDateFormat.dateTimeInstance.format(new Date)»«ENDIF».
 //
 
 #include <stdint.h>
@@ -255,7 +255,7 @@ int get«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *resu
 '''
 
 	def shiftVal(Definition d) {
-		val size = MemoryModel::getSize(d)
+		val size = MemoryModel.getSize(d)
 		return d.bitPos - (size - 1)
 	}
 
@@ -295,7 +295,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	def allDefs(Row row) {
 		val List<Definition> res = new LinkedList<Definition>()
 		for (NamedElement ne : row.definitions) {
-			if ((ne as Definition).type != Definition$Type::UNUSED) {
+			if ((ne as Definition).type != Definition$Type.UNUSED) {
 				res.add(ne as Definition)
 			}
 		}
@@ -357,61 +357,61 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	def generateConditions(Row row, Definition d) '''
 		«IF d.width==32»
 «««		Required because maxValue overflows..		
-		«ELSEIF d.warn == Definition$WarnType::silentLimit»
+		«ELSEIF d.warn == Definition$WarnType.silentLimit»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				«row.getVarName(d)»=«d.maxValueHex»;
 			}
-			«IF d.type == Definition$Type::INT»
+			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					«row.getVarName(d)»=«d.maxValueNegHex»;
 				}
 			«ENDIF»
-		«ELSEIF d.warn == Definition$WarnType::limit»
+		«ELSEIF d.warn == Definition$WarnType.limit»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueHex»");
 				«row.getVarName(d)»=«d.maxValueHex»;
 			}
-			«IF d.type == Definition$Type::INT»
+			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueNegHex»");
 					«row.getVarName(d)»=«d.maxValueNegHex»;
 				}
 			«ENDIF»
-		«ELSEIF d.warn == Definition$WarnType::silentMask»
+		«ELSEIF d.warn == Definition$WarnType.silentMask»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				«row.getVarName(d)»&=«d.maxValueHex»;
 			}
-			«IF d.type == Definition$Type::INT»
+			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					«row.getVarName(d)»&=«d.maxValueNegHex»;
 				}
 			«ENDIF»
-		«ELSEIF d.warn == Definition$WarnType::mask»
+		«ELSEIF d.warn == Definition$WarnType.mask»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueHex»");
 				«row.getVarName(d)»&=«d.maxValueHex»;
 			}
-			«IF d.type == Definition$Type::INT»
+			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueNegHex»");
 					«row.getVarName(d)»&=«d.maxValueNegHex»;
 				}
 			«ENDIF»
-		«ELSEIF d.warn == Definition$WarnType::silentError»
+		«ELSEIF d.warn == Definition$WarnType.silentError»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				return 0;
 			}
-			«IF d.type == Definition$Type::INT»
+			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					return 0;
 				}
 			«ENDIF»
-		«ELSEIF d.warn == Definition$WarnType::error»
+		«ELSEIF d.warn == Definition$WarnType.error»
 			if («row.getVarName(d)» > «d.maxValueHex») {
 				warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
 				return 0;
 			}
-			«IF d.type == Definition$Type::INT»
+			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
 					warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
 					return 0;
@@ -425,22 +425,22 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	}
 
 	def boolean hasWrite(NamedElement ne) {
-		(ne as Definition).rw !== Definition$RWType::r && (ne as Definition).type !== Definition$Type::UNUSED
+		(ne as Definition).rw !== Definition$RWType.r && (ne as Definition).type !== Definition$Type.UNUSED
 	}
 
 	def getMaxValueHex(Definition d) {
-		"0x" + Integer::toHexString(d.maxValue)
+		"0x" + Integer.toHexString(d.maxValue)
 	}
 
 	def getMaxValueNegHex(Definition d) {
-		"-0x" + Integer::toHexString(d.maxValue+1)
+		"-0x" + Integer.toHexString(d.maxValue+1)
 	}
 
 	def getMaxValue(Definition d) {
-		if (d.type != Definition$Type::INT) {
-			return (1 << MemoryModel::getSize(d)) - 1
+		if (d.type != Definition$Type.INT) {
+			return (1 << MemoryModel.getSize(d)) - 1
 		} else {
-			return (1 << (MemoryModel::getSize(d) - 1)) - 1
+			return (1 << (MemoryModel.getSize(d) - 1)) - 1
 		}
 	}
 
@@ -475,6 +475,6 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 		}
 	}
 
-	def getBusType(Definition d) '''bus_«d.type.toString.toLowerCase»«MemoryModel::getSize(d)»_t'''
+	def getBusType(Definition d) '''bus_«d.type.toString.toLowerCase»«MemoryModel.getSize(d)»_t'''
 
 }

@@ -272,7 +272,7 @@ public class HDLUnit extends AbstractHDLUnit {
 				}
 			}
 		HDLVariable clk = null, rst = null;
-		boolean hasReg = false;
+		final Set<HDLRegisterConfig> regConfigs = Sets.newHashSet();
 		for (final HDLVariableDeclaration hvd : declarations) {
 			switch (hvd.getDirection()) {
 			case PARAMETER:
@@ -302,25 +302,36 @@ public class HDLUnit extends AbstractHDLUnit {
 				}
 			}
 			if (hvd.getRegister() != null) {
-				hasReg = true;
+				regConfigs.add(hvd.getRegister());
 			}
 		}
-		if (hasReg) {
-			if (clk == null) {
-				addSignal(HDLRegisterConfig.DEF_CLK, HDLBuiltInAnnotations.clock);
+		boolean needDefaultClk = false;
+		boolean needDefaultRst = false;
+		if (clk == null) {
+			if (hasRef(this, HDLRegisterConfig.DEF_CLK)) {
+				needDefaultClk = true;
 			}
-			if (rst == null) {
-				addSignal(HDLRegisterConfig.DEF_RST, HDLBuiltInAnnotations.reset);
+			for (final HDLRegisterConfig config : regConfigs) {
+				if ((config.getClk() == null) || hasRef(config, HDLRegisterConfig.DEF_CLK)) {
+					needDefaultClk = true;
+				}
 			}
-		} else {
-			final boolean hasClkRef = HDLQuery.select(HDLVariableRef.class).from(this).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK).getFirst() != null;
-			if (hasClkRef && (clk == null)) {
-				addSignal(HDLRegisterConfig.DEF_CLK, HDLBuiltInAnnotations.clock);
+		}
+		if (rst == null) {
+			if (hasRef(this, HDLRegisterConfig.DEF_RST)) {
+				needDefaultRst = true;
 			}
-			final boolean hasRstRef = HDLQuery.select(HDLVariableRef.class).from(this).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_RST).getFirst() != null;
-			if (hasRstRef && (rst == null)) {
-				addSignal(HDLRegisterConfig.DEF_RST, HDLBuiltInAnnotations.reset);
+			for (final HDLRegisterConfig config : regConfigs) {
+				if ((config.getRst() == null) || hasRef(config, HDLRegisterConfig.DEF_RST)) {
+					needDefaultRst = true;
+				}
 			}
+		}
+		if (needDefaultClk) {
+			addSignal(HDLRegisterConfig.DEF_CLK, HDLBuiltInAnnotations.clock);
+		}
+		if (needDefaultRst) {
+			addSignal(HDLRegisterConfig.DEF_RST, HDLBuiltInAnnotations.reset);
 		}
 		final ModificationSet ms = new ModificationSet();
 		final HDLVariableRef[] refs = unitIF.getAllObjectsOf(HDLVariableRef.class, true);
@@ -336,6 +347,11 @@ public class HDLUnit extends AbstractHDLUnit {
 		unitIF.addMeta(FULLNAME, fullName);
 		unitIF.setID(getID());
 		return unitIF;
+	}
+
+	private boolean hasRef(IHDLObject obj, String varName) {
+		final boolean hasClkRef = HDLQuery.select(HDLVariableRef.class).from(obj).where(HDLResolvedRef.fVar).lastSegmentIs(varName).getFirst() != null;
+		return hasClkRef;
 	}
 
 	public HDLVariableDeclaration cleanedVariables(HDLVariableDeclaration hvd) {

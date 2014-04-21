@@ -60,15 +60,15 @@ class DartCompiler implements ITypeOuptutProvider {
 
 	new(ExecutableModel em) {
 		this.cce = new CommonCompilerExtension(em, -1)
-		epsWidth = Integer::highestOneBit(prevMap.size) + 1
+		epsWidth = Integer.highestOneBit(prevMap.size) + 1
 	}
 
 	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName,
 		Set<Problem> syntaxProblems) {
 		val comp = new DartCompiler(em)
-		return Lists::newArrayList(
+		return Lists.newArrayList(
 			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName).toString, em.moduleName,
-				Collections::emptyList, em.source, comp.hookName, true));
+				Collections.emptyList, em.source, comp.hookName, true));
 	}
 
 	def compile(String unitName) {
@@ -388,22 +388,22 @@ class DartCompiler implements ITypeOuptutProvider {
 		'''
 			Description get description=>new Description(
 				[
-				«FOR v : em.variables.filter[dir === Direction::IN] SEPARATOR ','»
+				«FOR v : em.variables.filter[dir === Direction.IN] SEPARATOR ','»
 					«v.asPort»
 				«ENDFOR»
 				],
 				[
-				«FOR v : em.variables.filter[dir === Direction::INOUT] SEPARATOR ','»
+				«FOR v : em.variables.filter[dir === Direction.INOUT] SEPARATOR ','»
 					«v.asPort»
 				«ENDFOR»
 				],
 				[
-				«FOR v : em.variables.filter[dir === Direction::OUT] SEPARATOR ','»
+				«FOR v : em.variables.filter[dir === Direction.OUT] SEPARATOR ','»
 					«v.asPort»
 				«ENDFOR»
 				],
 				[
-				«FOR v : em.variables.filter[dir === Direction::INTERNAL] SEPARATOR ','»
+				«FOR v : em.variables.filter[dir === Direction.INTERNAL] SEPARATOR ','»
 					«v.asPort»
 				«ENDFOR»
 				], _varIdx, "«em.moduleName»");
@@ -419,9 +419,9 @@ class DartCompiler implements ITypeOuptutProvider {
 		val reset = if(v.isReset) ", reset:true" else ""
 		var type = "INVALID"
 		switch (v.type) {
-			case VariableInformation$Type::BIT: type = "Port.TYPE_BIT"
-			case VariableInformation$Type::INT: type = "Port.TYPE_INT"
-			case VariableInformation$Type::UINT: type = "Port.TYPE_UINT"
+			case VariableInformation$Type.BIT: type = "Port.TYPE_BIT"
+			case VariableInformation$Type.INT: type = "Port.TYPE_INT"
+			case VariableInformation$Type.UINT: type = "Port.TYPE_UINT"
 		}
 		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]", "\\\\\\$")»", «v.width», «type»«dims»«clock»«reset»)'''
 	}
@@ -553,12 +553,12 @@ class DartCompiler implements ITypeOuptutProvider {
 				b = stack.pop
 			if (i.inst.push > 0)
 				stack.push(pos)
-			if (i.inst === Instruction::pushAddIndex) {
+			if (i.inst === Instruction.pushAddIndex) {
 				arr.add(arrPos)
 				arrPos = arrPos + 1
 			}
 			i.toExpression(frame, sb, pos, a, b, arr, arrPos)
-			if (i.inst !== Instruction::pushAddIndex)
+			if (i.inst !== Instruction.pushAddIndex)
 				pos = pos + 1
 		}
 		val last = "t" + stack.pop
@@ -578,9 +578,9 @@ class DartCompiler implements ITypeOuptutProvider {
 	def toExpression(FastInstruction inst, Frame f, StringBuilder sb, int pos, int a, int b, List<Integer> arr,
 		int arrPos) {
 		switch (inst.inst) {
-			case Instruction::pushAddIndex:
+			case Instruction.pushAddIndex:
 				sb.append('''int a«arr.last»=t«a»;''')
-			case Instruction::writeInternal: {
+			case Instruction.writeInternal: {
 				val internal = inst.arg1.asInternal
 				var name = (internal).idName(false, true);
 				if (arr.size < inst.arg1.asInternal.info.dimensions.length) {
@@ -599,91 +599,91 @@ class DartCompiler implements ITypeOuptutProvider {
 					arr.clear
 				}
 			}
-			case Instruction::noop:
+			case Instruction.noop:
 				sb.append("//Do nothing")
-			case Instruction::arith_neg:
+			case Instruction.arith_neg:
 				sb.append('''int t«pos»=-t«a»;''')
-			case Instruction::bit_neg:
+			case Instruction.bit_neg:
 				sb.append('''int t«pos»=~t«a»;''')
-			case Instruction::bitAccessSingle:
+			case Instruction.bitAccessSingle:
 				sb.append('''int t«pos»=(t«a» >> «inst.arg1») & 1;''')
-			case Instruction::bitAccessSingleRange: {
+			case Instruction.bitAccessSingleRange: {
 				val highBit = inst.arg1
 				val lowBit = inst.arg2
 				val mask = ((highBit - lowBit) + 1).asMask
 				sb.append('''int t«pos»=(t«a» >> «lowBit») & «mask»;''')
 			}
-			case Instruction::cast_int: {
+			case Instruction.cast_int: {
 				val targetWidth = inst.arg1;
 				val currWidth = inst.arg2;
-				sb.append('''int t«pos»=«signExtend('''t«a»''', Math::min(targetWidth, currWidth))»;''')
+				sb.append('''int t«pos»=«signExtend('''t«a»''', Math.min(targetWidth, currWidth))»;''')
 			}
-			case Instruction::cast_uint: {
+			case Instruction.cast_uint: {
 				sb.append('''int t«pos»=t«a» & «inst.arg1.asMask»;''')
 			}
-			case Instruction::logiNeg:
+			case Instruction.logiNeg:
 				sb.append('''bool t«pos»=!t«a»;''')
-			case Instruction::logiAnd:
+			case Instruction.logiAnd:
 				sb.append('''bool t«pos»=t«a» && t«b»;''')
-			case Instruction::logiOr:
+			case Instruction.logiOr:
 				sb.append('''bool t«pos»=t«a» || t«b»;''')
-			case Instruction::const0:
+			case Instruction.const0:
 				sb.append('''int t«pos»=0;''')
-			case Instruction::const1:
+			case Instruction.const1:
 				sb.append('''int t«pos»=1;''')
-			case Instruction::const2:
+			case Instruction.const2:
 				sb.append('''int t«pos»=2;''')
-			case Instruction::constAll1:
+			case Instruction.constAll1:
 				sb.append('''int t«pos»=«inst.arg1.asMask»;''')
-			case Instruction::concat:
+			case Instruction.concat:
 				sb.append('''int t«pos»=(t«b» << «inst.arg2») | t«a»;''')
-			case Instruction::loadConstant:
+			case Instruction.loadConstant:
 				sb.append('''int t«pos»=«inst.arg1.constant(f)»;''')
-			case Instruction::loadInternal: {
+			case Instruction.loadInternal: {
 				val internal = inst.arg1.asInternal
 				sb.append(internal.getter(false, pos, f.uniqueID))
 				arr.clear
 			}
-			case Instruction::and:
+			case Instruction.and:
 				twoOp(sb, pos, "&", a, b, inst.arg1)
-			case Instruction::or:
+			case Instruction.or:
 				twoOp(sb, pos, "|", a, b, inst.arg1)
-			case Instruction::xor:
+			case Instruction.xor:
 				twoOp(sb, pos, "^", a, b, inst.arg1)
-			case Instruction::plus:
+			case Instruction.plus:
 				twoOp(sb, pos, "+", a, b, inst.arg1)
-			case Instruction::minus:
+			case Instruction.minus:
 				twoOp(sb, pos, "-", a, b, inst.arg1)
-			case Instruction::mul:
+			case Instruction.mul:
 				twoOp(sb, pos, "*", a, b, inst.arg1)
-			case Instruction::div:
+			case Instruction.div:
 				twoOp(sb, pos, "~/", a, b, inst.arg1)
-			case Instruction::sll:
+			case Instruction.sll:
 				twoOp(sb, pos, "<<", a, b, inst.arg1)
-			case Instruction::srl: {
+			case Instruction.srl: {
 				val targetSize = inst.arg1 >> 1;
 				if ((inst.arg1.bitwiseAnd(1)) == 1)
 					sb.append('''int t«pos»=«signExtend('''_srl(t«b», t«a», «inst.arg1»)''', targetSize)»;''')
 				else
 					sb.append('''int t«pos»=(_srl(t«b», t«a», «inst.arg1»)) & «targetSize.asMask»;''')
 			}
-			case Instruction::sra:
+			case Instruction.sra:
 				twoOp(sb, pos, ">>", a, b, inst.arg1)
-			case Instruction::eq:
+			case Instruction.eq:
 				sb.append('''bool t«pos»=t«b» == t«a»;''')
-			case Instruction::not_eq:
+			case Instruction.not_eq:
 				sb.append('''bool t«pos»=t«b» != t«a»;''')
-			case Instruction::less:
+			case Instruction.less:
 				sb.append('''bool t«pos»=t«b» < t«a»;''')
-			case Instruction::less_eq:
+			case Instruction.less_eq:
 				sb.append('''bool t«pos»=t«b» <= t«a»;''')
-			case Instruction::greater:
+			case Instruction.greater:
 				sb.append('''bool t«pos»=t«b» > t«a»;''')
-			case Instruction::greater_eq:
+			case Instruction.greater_eq:
 				sb.append('''bool t«pos»=t«b» >= t«a»;''')
-			case Instruction::isRisingEdge:
+			case Instruction.isRisingEdge:
 				sb.append('''«inst.arg1.asInternal.info.idName(false, true)»_update=updateStamp;''')
-			case Instruction::isFallingEdge:
+			case Instruction.isFallingEdge:
 				sb.append('''«inst.arg1.asInternal.info.idName(false, true)»_update=updateStamp;''')
 		}
 		sb.append(
@@ -719,24 +719,24 @@ class DartCompiler implements ITypeOuptutProvider {
 
 	def dartType(VariableInformation information, boolean withArray) {
 		var jt = "int"
-		if (information.name.startsWith(InternalInformation::PRED_PREFIX))
+		if (information.name.startsWith(InternalInformation.PRED_PREFIX))
 			jt = "bool"
 		if (information.array && withArray) {
 			if (jt == "bool")
 				return '''List<«jt»>'''
-			if (information.width <= 8 && information.type === VariableInformation$Type::INT)
+			if (information.width <= 8 && information.type === VariableInformation$Type.INT)
 				return '''Int8List'''
 			if (information.width <= 8)
 				return '''Uint8List'''
-			if (information.width <= 16 && information.type === VariableInformation$Type::INT)
+			if (information.width <= 16 && information.type === VariableInformation$Type.INT)
 				return '''Int16List'''
 			if (information.width <= 16)
 				return '''Uint16List'''
-			if (information.width <= 32 && information.type === VariableInformation$Type::INT)
+			if (information.width <= 32 && information.type === VariableInformation$Type.INT)
 				return '''Int32List'''
 			if (information.width <= 32)
 				return '''Uint32List'''
-			if (information.width <= 64 && information.type === VariableInformation$Type::INT)
+			if (information.width <= 64 && information.type === VariableInformation$Type.INT)
 				return '''Int64List'''
 			if (information.width <= 64)
 				return '''Uint64List'''

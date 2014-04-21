@@ -75,7 +75,7 @@ class ScopingExtension {
 
 	def Optional<HDLVariable> resolveVariableDefault(IHDLObject obj, HDLQualifiedName hVar) {
 		if (obj===null || obj.container === null) {
-			return Optional::absent
+			return Optional.absent
 		}
 		return obj.container.resolveVariable(hVar)
 	}
@@ -86,25 +86,25 @@ class ScopingExtension {
 
 	def dispatch Optional<HDLFunction> resolveFunction(IHDLObject obj, HDLQualifiedName hVar) {
 		if (obj.container === null)
-			return Optional::absent
+			return Optional.absent
 		return obj.container.resolveFunction(hVar)
 	}
 
 	def dispatch Optional<HDLEnum> resolveEnum(IHDLObject obj, HDLQualifiedName hEnum) {
 		if (obj.container === null)
-			return Optional::absent
+			return Optional.absent
 		return obj.container.resolveEnum(hEnum)
 	}
 
 	def dispatch Optional<? extends HDLType> resolveType(IHDLObject obj, HDLQualifiedName type) {
 		if (obj.container === null)
-			return Optional::absent
+			return Optional.absent
 		return obj.container.resolveType(type)
 	}
 
 	def dispatch Optional<HDLInterface> resolveInterface(IHDLObject obj, HDLQualifiedName hIf) {
 		if (obj.container === null)
-			return Optional::absent
+			return Optional.absent
 		return obj.container.resolveInterface(hIf)
 	}
 
@@ -141,49 +141,49 @@ class ScopingExtension {
 
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLIfStatement obj) {
 		val List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>
-		res.addAll(HDLResolver::getallEnumDeclarations(obj.thenDo))
-		res.addAll(HDLResolver::getallEnumDeclarations(obj.elseDo))
+		res.addAll(HDLResolver.getallEnumDeclarations(obj.thenDo))
+		res.addAll(HDLResolver.getallEnumDeclarations(obj.elseDo))
 		return res
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLIfStatement obj) {
 		val List<HDLInterface> res = new LinkedList<HDLInterface>
-		res.addAll(HDLResolver::getallInterfaceDeclarations(obj.thenDo))
-		res.addAll(HDLResolver::getallInterfaceDeclarations(obj.elseDo))
+		res.addAll(HDLResolver.getallInterfaceDeclarations(obj.thenDo))
+		res.addAll(HDLResolver.getallInterfaceDeclarations(obj.elseDo))
 		return res
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLIfStatement obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		res.addAll(HDLResolver::getallVariableDeclarations(obj.thenDo))
-		res.addAll(HDLResolver::getallVariableDeclarations(obj.elseDo))
+		res.addAll(HDLResolver.getallVariableDeclarations(obj.thenDo))
+		res.addAll(HDLResolver.getallVariableDeclarations(obj.elseDo))
 		return res
 	}
 
 	def dispatch  List<HDLEnumDeclaration> doGetEnumDeclarations(IHDLObject gen) {
-		return Collections::emptyList
+		return Collections.emptyList
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(IHDLObject gen) {
-		return Collections::emptyList
+		return Collections.emptyList
 	}
 
 	def dispatch  List<HDLVariable> doGetVariables(IHDLObject gen) {
-		return Collections::emptyList
+		return Collections.emptyList
 	}
 
 	def dispatch  List<HDLEnumDeclaration> doGetEnumDeclarations(HDLDirectGeneration gen) {
-		return Collections::emptyList
+		return Collections.emptyList
 	}
 
 	def dispatch  List<HDLInterface> doGetInterfaceDeclarations(HDLDirectGeneration gen) {
 		if (gen.getHIf === null)
-			return Collections::emptyList
-		return Collections::singletonList(gen.getHIf)
+			return Collections.emptyList
+		return Collections.singletonList(gen.getHIf)
 	}
 
 	def dispatch  List<HDLVariable> doGetVariables(HDLDirectGeneration gen) {
-		return Collections::singletonList(gen.getVar)
+		return Collections.singletonList(gen.getVar)
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLInlineFunction obj) {
@@ -208,63 +208,63 @@ class ScopingExtension {
 	}
 
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLForLoop obj) {
-		return HDLResolver::getallEnumDeclarations(obj.dos)
+		return HDLResolver.getallEnumDeclarations(obj.dos)
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLForLoop obj) {
-		return HDLResolver::getallInterfaceDeclarations(obj.dos)
+		return HDLResolver.getallInterfaceDeclarations(obj.dos)
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLForLoop obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
-		res.addAll(HDLResolver::getallVariableDeclarations(obj.dos))
+		res.addAll(HDLResolver.getallVariableDeclarations(obj.dos))
 		res.add(obj.param)
 		return res
 	}
 
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLBlock obj) {
-		return HDLResolver::getallEnumDeclarations(obj.statements)
+		return HDLResolver.getallEnumDeclarations(obj.statements)
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLBlock obj) {
-		return HDLResolver::getallInterfaceDeclarations(obj.statements)
+		return HDLResolver.getallInterfaceDeclarations(obj.statements)
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLBlock obj) {
-		return HDLResolver::getallVariableDeclarations(obj.statements)
+		return HDLResolver.getallVariableDeclarations(obj.statements)
 	}
 
 	def dispatch Optional<HDLEnum> resolveEnum(HDLAssignment obj, org.pshdl.model.utils.HDLQualifiedName hEnum) {
 		if (obj.container === null)
-			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_ENUM, obj, "for hEnum:" + hEnum))
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, obj, "for hEnum:" + hEnum))
 		return obj.container.resolveEnum(hEnum)
 	}
 
 	def dispatch Optional<HDLInterface> resolveInterface(HDLAssignment obj, HDLQualifiedName hIf) {
 		if (obj.container === null)
-			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_INTERFACE, obj, "for interface:" + hIf))
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_INTERFACE, obj, "for interface:" + hIf))
 		return obj.container.resolveInterface(hIf)
 	}
 
 	def dispatch Optional<? extends HDLType> resolveType(HDLAssignment obj, HDLQualifiedName hVar) {
 		if (obj.container === null)
-			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_TYPE, obj, "for type:" + hVar))
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_TYPE, obj, "for type:" + hVar))
 		return obj.container.resolveType(hVar)
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLAssignment obj, HDLQualifiedName hVar) {
 		if (obj.container === null)
-			throw new HDLProblemException(new Problem(ErrorCode::UNRESOLVED_VARIABLE, obj, "for hVariable:" + hVar))
+			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_VARIABLE, obj, "for hVariable:" + hVar))
 		return obj.container.resolveVariable(hVar)
 	}
 
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLEnumDeclaration obj) {
-		return Collections::singletonList(obj)
+		return Collections.singletonList(obj)
 	}
 
 	//HDLVariableDeclaration
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLInterfaceDeclaration obj) {
-		return Collections::singletonList(obj.HIf)
+		return Collections.singletonList(obj.HIf)
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLVariableDeclaration obj) {
@@ -272,20 +272,20 @@ class ScopingExtension {
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLInterfaceInstantiation obj) {
-		return Collections::singletonList(obj.^var)
+		return Collections.singletonList(obj.^var)
 	}
 
 	//HDLSwitchCaseStatement
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLSwitchCaseStatement obj) {
-		return HDLResolver::getallEnumDeclarations(obj.dos)
+		return HDLResolver.getallEnumDeclarations(obj.dos)
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLSwitchCaseStatement obj) {
-		return HDLResolver::getallInterfaceDeclarations(obj.dos)
+		return HDLResolver.getallInterfaceDeclarations(obj.dos)
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLSwitchCaseStatement obj) {
-		return HDLResolver::getallVariableDeclarations(obj.dos)
+		return HDLResolver.getallVariableDeclarations(obj.dos)
 	}
 
 	//HDLSwitchStatement
@@ -317,36 +317,36 @@ class ScopingExtension {
 	def dispatch Optional<HDLFunction> resolveFunction(HDLPackage obj, HDLQualifiedName hFunc) {
 		var HDLLibrary library = obj.library
 		if (library === null)
-			library = HDLLibrary::getLibrary(obj.getLibURI)
-		return library.resolveFunction(HDLObject::asList(obj.pkg + ".*"), hFunc)
+			library = HDLLibrary.getLibrary(obj.getLibURI)
+		return library.resolveFunction(HDLObject.asList(obj.pkg + ".*"), hFunc)
 	}
 
 	def dispatch Optional<HDLEnum> resolveEnum(HDLPackage obj, HDLQualifiedName hEnum) {
 		val res = obj.resolveType(hEnum)
 		if (res.present && res.get instanceof HDLEnum)
 			return res as Optional<HDLEnum>
-		return Optional::absent
+		return Optional.absent
 	}
 
 	def dispatch Optional<HDLInterface> resolveInterface(HDLPackage obj, HDLQualifiedName hIf) {
 		val res = obj.resolveType(hIf)
 		if (res.present && res.get instanceof HDLInterface)
 			return res as Optional<HDLInterface>
-		return Optional::absent
+		return Optional.absent
 	}
 
 	def dispatch Optional<? extends HDLType> resolveType(HDLPackage obj, HDLQualifiedName type) {
 		var HDLLibrary library = obj.library
 		if (obj.library === null)
-			library = HDLLibrary::getLibrary(obj.getLibURI)
-		return library.resolve(HDLObject::asList(obj.pkg + ".*"), type)
+			library = HDLLibrary.getLibrary(obj.getLibURI)
+		return library.resolve(HDLObject.asList(obj.pkg + ".*"), type)
 	}
 
 	def dispatch Optional<HDLVariable> resolveVariable(HDLPackage obj, HDLQualifiedName hVar) {
 		var HDLLibrary library = obj.library
 		if (obj.library === null)
-			library = HDLLibrary::getLibrary(obj.getLibURI)
-		return library.resolveVariable(HDLObject::asList(obj.pkg + ".*"), hVar)
+			library = HDLLibrary.getLibrary(obj.getLibURI)
+		return library.resolveVariable(HDLObject.asList(obj.pkg + ".*"), hVar)
 	}
 
 	//HDLUnit begin
@@ -357,7 +357,7 @@ class ScopingExtension {
 		val res = obj.resolveType(hEnum)
 		if (res.present && res.get instanceof HDLEnum)
 			return res as Optional<HDLEnum>
-		return Optional::absent
+		return Optional.absent
 	}
 
 	def dispatch Optional<HDLFunction> resolveFunction(HDLUnit obj, HDLQualifiedName hFunc) {
@@ -366,9 +366,9 @@ class ScopingExtension {
 			return resolveEnum
 		var HDLLibrary library = obj.library
 		if (obj.library === null)
-			library = HDLLibrary::getLibrary(obj.getLibURI)
+			library = HDLLibrary.getLibrary(obj.getLibURI)
 		val newImports = obj.imports
-		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
+		newImports.add(FullNameExtension.fullNameOf(obj).skipLast(1).append("*").toString)
 		return library.resolveFunction(newImports, hFunc)
 	}
 
@@ -379,7 +379,7 @@ class ScopingExtension {
 		val res = obj.resolveType(hIf)
 		if (res.present && res.get instanceof HDLInterface)
 			return res as Optional<HDLInterface>
-		return Optional::absent
+		return Optional.absent
 	}
 
 	def dispatch Optional<? extends HDLType> resolveType(HDLUnit obj, HDLQualifiedName type) {
@@ -388,9 +388,9 @@ class ScopingExtension {
 			return resolveType
 		var HDLLibrary library = obj.library
 		if (obj.library === null)
-			library = HDLLibrary::getLibrary(obj.getLibURI)
+			library = HDLLibrary.getLibrary(obj.getLibURI)
 		val newImports = obj.imports
-		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
+		newImports.add(FullNameExtension.fullNameOf(obj).skipLast(1).append("*").toString)
 		return library.resolve(newImports, type)
 	}
 
@@ -400,27 +400,27 @@ class ScopingExtension {
 			return hdlVariable
 		var HDLLibrary library = obj.library
 		if (obj.library === null)
-			library = HDLLibrary::getLibrary(obj.getLibURI)
+			library = HDLLibrary.getLibrary(obj.getLibURI)
 		val newImports = obj.imports
-		newImports.add(FullNameExtension::fullNameOf(obj).skipLast(1).append("*").toString)
+		newImports.add(FullNameExtension.fullNameOf(obj).skipLast(1).append("*").toString)
 		return library.resolveVariable(newImports, hVar)
 	}
 
 	def dispatch List<HDLEnumDeclaration> doGetEnumDeclarations(HDLUnit obj) {
-		val List<HDLEnumDeclaration> res = HDLResolver::getallEnumDeclarations(obj.inits)
-		res.addAll(HDLResolver::getallEnumDeclarations(obj.statements))
+		val List<HDLEnumDeclaration> res = HDLResolver.getallEnumDeclarations(obj.inits)
+		res.addAll(HDLResolver.getallEnumDeclarations(obj.statements))
 		return res
 	}
 
 	def dispatch List<HDLInterface> doGetInterfaceDeclarations(HDLUnit obj) {
-		val List<HDLInterface> res = HDLResolver::getallInterfaceDeclarations(obj.inits)
-		res.addAll(HDLResolver::getallInterfaceDeclarations(obj.statements))
+		val List<HDLInterface> res = HDLResolver.getallInterfaceDeclarations(obj.inits)
+		res.addAll(HDLResolver.getallInterfaceDeclarations(obj.statements))
 		return res
 	}
 
 	def dispatch List<HDLVariable> doGetVariables(HDLUnit obj) {
-		val List<HDLVariable> res = HDLResolver::getallVariableDeclarations(obj.inits)
-		res.addAll(HDLResolver::getallVariableDeclarations(obj.statements))
+		val List<HDLVariable> res = HDLResolver.getallVariableDeclarations(obj.inits)
+		res.addAll(HDLResolver.getallVariableDeclarations(obj.statements))
 		return res
 	}
 
@@ -428,17 +428,17 @@ class ScopingExtension {
 		val HDLVariable resolved = getVariable(hIf, hVar.getLastSegment)
 		if (resolved !== null) {
 			if (hVar.length == 1) {
-				return Optional::of(resolved)
+				return Optional.of(resolved)
 			}
-			if (FullNameExtension::fullNameOf(hIf).equals(hVar.skipLast(1))) {
-				return Optional::of(resolved)
+			if (FullNameExtension.fullNameOf(hIf).equals(hVar.skipLast(1))) {
+				return Optional.of(resolved)
 			}
 		}
 		return resolveVariableDefault(hIf, hVar)
 	}
 
 	def private static HDLVariable getVariable(HDLInterface hIf, String lastSegment) {
-		return HDLQuery::select(typeof(HDLVariable)).from(hIf).where(HDLVariable::fName).lastSegmentIs(lastSegment).
+		return HDLQuery.select(typeof(HDLVariable)).from(hIf).where(HDLVariable.fName).lastSegmentIs(lastSegment).
 			first
 	}
 
@@ -446,7 +446,7 @@ class ScopingExtension {
 		if (hVar.length == 1) {
 			return getVariable(hEnum, hVar.getLastSegment)
 		}
-		if (FullNameExtension::fullNameOf(hEnum).equals(hVar.skipLast(1))) {
+		if (FullNameExtension.fullNameOf(hEnum).equals(hVar.skipLast(1))) {
 			return getVariable(hEnum, hVar.getLastSegment)
 		}
 		return resolveVariable(hEnum, hVar)
@@ -455,10 +455,10 @@ class ScopingExtension {
 	def public static Optional<HDLVariable> getVariable(HDLEnum hEnum, String lastSegment) {
 		for (HDLVariable hVar : hEnum.getEnums) {
 			if (hVar.name.equals(lastSegment)) {
-				return Optional::of(hVar)
+				return Optional.of(hVar)
 			}
 		}
-		return Optional::absent
+		return Optional.absent
 	}
 
 }
