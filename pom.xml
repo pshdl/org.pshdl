@@ -157,7 +157,7 @@
 		<dependency>
 			<groupId>org.pshdl</groupId>
 			<artifactId>interpreter</artifactId>
-			<version>0.1.73</version>
+			<version>0.1.74</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
