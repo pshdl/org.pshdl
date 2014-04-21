@@ -305,8 +305,11 @@ public class BuiltInAdvisor {
 					"A variable that is declared with just one dimension, can not be access with two or more",
 					"Check that the declared type has the expected number of dimensione", "Remove one of more array acceses");
 		case ASSIGNMENT_NOT_SUPPORTED:
-			return new HDLAdvise(problem, problem.info, "Some types can not be automatically converted.", "Convert the type explicitly",
-					"Check that the assignment target has the expected type");
+			return new HDLAdvise(
+					problem,
+					problem.info,
+					"Some types can not be automatically converted, you thus need to cast the right hand side explicitly.\nUnintended conversions can happen for example if you access the bits of an int/uint the result will be bit, or the result of concatenation is also bit.",
+					"Convert the type explicitly by casting it", "Check that the assignment target has the expected type");
 		case ASSIGNMENT_CLIPPING_WILL_OCCUR:
 			return new HDLAdvise(problem, "The assigned target has fewer bits than the assigned value", "The assigned value will be truncated", "Widen the assignment target",
 					"Explicitly down cast the assigned value");

@@ -545,7 +545,7 @@ public class BuiltInValidator implements IHDLValidator {
 					case NATURAL:
 					case UINT:
 						if (!right.isNumber()) {
-							problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "Value needs to be numeric"));
+							problems.add(new Problem(ASSIGNMENT_NOT_SUPPORTED, obj, "The assigned value needs to be numeric (uint<?>/int<?>)"));
 						}
 						break;
 					case STRING:
