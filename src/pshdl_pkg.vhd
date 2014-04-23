@@ -1,7 +1,35 @@
+--    PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+--    output suitable for implementation or simulation of it.
+--    
+--    Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+--
+--    This program is free software: you can redistribute it and/or modify
+--    it under the terms of the GNU General Public License as published by
+--    the Free Software Foundation, either version 3 of the License, or
+--    (at your option) any later version.
+--
+--    This program is distributed in the hope that it will be useful,
+--    but WITHOUT ANY WARRANTY; without even the implied warranty of
+--    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--    GNU General Public License for more details.
+--
+--    You should have received a copy of the GNU General Public License
+--    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+--
+--    This License does not grant permission to use the trade names, trademarks,
+--    service marks, or product names of the Licensor, except as required for 
+--    reasonable and customary use in describing the origin of the Work.
+--
+--Contributors:
+--    Karsten Becker - initial API and implementation
+
+--Updated for version 0.1.75 on 2014-04-23
+--Added ternary overload for boolean
+--Added not overload for integer
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 
 package ShiftOps is
 
@@ -547,16 +575,27 @@ use work.Casts.all;
 package Types is
 
 	function ternaryOp(condition: boolean; thenValue: integer; elseValue:integer) return integer;
+	function ternaryOp(condition: boolean; thenValue: boolean; elseValue:boolean) return boolean;
 	function ternaryOp(condition: boolean; thenValue: unsigned; elseValue:unsigned) return unsigned;
 	function ternaryOp(condition: boolean; thenValue: signed; elseValue:signed) return signed;
 	function ternaryOp(condition: boolean; thenValue: std_logic_vector; elseValue:std_logic_vector) return std_logic_vector;
 	function ternaryOp(condition: boolean; thenValue: std_logic; elseValue:std_logic) return std_logic;
+	function "not" (L: INTEGER) return INTEGER;
 	function "or" (L: INTEGER; R: INTEGER) return INTEGER;
 	function "xor" (L: INTEGER; R: INTEGER) return INTEGER;
 	function "and" (L: INTEGER; R: INTEGER) return INTEGER;
 end;
 
 package body Types is
+
+	function ternaryOp(condition: boolean; thenValue: boolean; elseValue:boolean) return boolean is
+	begin
+		if (condition) then
+			return thenValue;
+		else
+			return elseValue;
+		end if;
+	end ternaryOp;
 
 	function ternaryOp(condition: boolean; thenValue: integer; elseValue:integer) return integer is
 	begin
@@ -602,6 +641,11 @@ package body Types is
 			return elseValue;
 		end if;
 	end ternaryOp;
+
+	function "not" (L: INTEGER) return INTEGER is
+	begin
+		return intToInteger(not resizeInteger(L,32));
+	end "not";
 
 	function "or" (L: INTEGER; R: INTEGER) return INTEGER is
 	begin
