@@ -30,6 +30,7 @@ import java.math.*;
 import java.util.*;
 
 import org.pshdl.model.*;
+import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.extensions.*;
 import org.pshdl.model.utils.*;
@@ -277,6 +278,22 @@ public class BuiltInAdvisor {
 					"Check that the function is imported or fully referenced");
 		case UNSUPPORTED_TYPE_FOR_OP:
 			switch (problem.node.getClassType()) {
+			case HDLManip:
+				final HDLManip manip = (HDLManip) problem.node;
+				final HDLManipType type = manip.getType();
+				switch (type) {
+				case ARITH_NEG:
+					return new HDLAdvise(problem, problem.info, "The arithmetic negation is not available for non numeric types. It is only support for int/uint",
+							"Cast either side to uint<?>/int<?>");
+				case BIT_NEG:
+					return new HDLAdvise(problem, problem.info, "The bit negation is not available for non bit types. It is only support for int/uint/bit",
+							"Cast either side to uint<?>/int<?>/bit<?>");
+				case LOGIC_NEG:
+					return new HDLAdvise(problem, problem.info, "The logic negation is only allowed for bit and bool types.");
+				case CAST:
+					break;
+				}
+				return new HDLAdvise(problem, problem.info, "The operation " + type + " is not supported for the expresion.");
 			case HDLArithOp:
 				return new HDLAdvise(problem, problem.info, "Arithmetic operations require an interpretable value, they can not work on bit types",
 						"Cast either side to uint<?>/int<?>");

@@ -487,6 +487,9 @@ class ParserToModelExtension {
 			return context.psInstantiation.toHDL(true).attachContext(context)
 		if (context.psStatement !== null)
 			return context.psStatement.toHDL(true).attachContext(context)
+		if (context.psBlock!==null){
+			return new HDLBlock().setProcess(false).setStatements(context.psBlock.map[toHDL(true) as HDLStatement])
+		}
 		throw new IllegalArgumentException("Not correctly implemented type:" + context.getClass());
 	}
 

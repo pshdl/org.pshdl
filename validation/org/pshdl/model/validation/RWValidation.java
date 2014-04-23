@@ -201,7 +201,7 @@ public class RWValidation {
 		}
 	}
 
-	public static HDLBlock UNIT_BLOCK = new HDLBlock();
+	public static HDLBlock UNIT_BLOCK = new HDLBlock().setProcess(false);
 
 	public static void annotateWriteCount(IHDLObject orig) {
 		final HDLAssignment[] list = orig.getAllObjectsOf(HDLAssignment.class, true);
@@ -238,16 +238,12 @@ public class RWValidation {
 				if (block == null) {
 					block = UNIT_BLOCK;
 				}
-				if ((hdlVariable.getMeta(BLOCK_META) != null) && (hdlVariable.getMeta(BLOCK_META) != block)) {
+				if ((hdlVariable.getMeta(BLOCK_META) != null) && ((hdlVariable.getMeta(BLOCK_META) != block) && block.getProcess())) {
 					Set<HDLBlock> meta = hdlVariable.getMeta(BLOCK_META_CLASH);
 					if (meta == null) {
 						meta = new HashSet<HDLBlock>();
 					}
-					if (block == null) {
-						meta.add(UNIT_BLOCK);
-					} else {
-						meta.add(block);
-					}
+					meta.add(block);
 					hdlVariable.addMeta(BLOCK_META_CLASH, meta);
 				}
 				hdlVariable.addMeta(BLOCK_META, block);

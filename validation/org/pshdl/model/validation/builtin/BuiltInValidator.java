@@ -759,6 +759,9 @@ public class BuiltInValidator implements IHDLValidator {
 					}
 					break;
 				case BIT_NEG:
+					if (manip.getTarget().getClassType() == HDLClass.HDLLiteral) {
+						problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not use binary negate on literals as they have no width"));
+					}
 					if (tt instanceof HDLPrimitive) {
 						final HDLPrimitive primitive = (HDLPrimitive) tt;
 						if (!primitive.isBits()) {

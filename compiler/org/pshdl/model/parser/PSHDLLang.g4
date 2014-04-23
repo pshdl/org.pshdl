@@ -64,7 +64,8 @@ psQualifiedNameImport :
 ;
 
 psBlock :
-	psDeclaration | psInstantiation | psStatement
+	(psDeclaration | psInstantiation | psStatement)
+	|	('{' psBlock* '}')
 ;
 
 psProcess :
@@ -98,14 +99,14 @@ psCast :
 ;
 
 psExpression :
-	(psCast | type='!'<assoc=right> | type='~'<assoc=right> | type='-'<assoc=right>) psExpression  #psManip
+	<assoc=right> (psCast | type='!' | type='~' | type='-') psExpression  			#psManip
 	| psExpression op=('**' | '*' | '/' | '%') psExpression							#psMul
 	| psExpression op=('+' | '-') psExpression 										#psAdd
 	| psExpression op=('<<' | '>>' | '>>>') psExpression 							#psShift
 	| psExpression op=('<' | '<=' | '>' | '>=') psExpression						#psEqualityComp
 	| psExpression op=('==' | '!=') psExpression									#psEquality
 	| psExpression '&' psExpression													#psBitAnd
-	| psExpression '^'<assoc=right> psExpression									#psBitXor
+	| <assoc=right>psExpression '^' psExpression									#psBitXor
 	| psExpression '|' psExpression													#psBitOr
 	| psExpression '#' psExpression													#psConcat
 	| psExpression '&&' psExpression												#psBitLogAnd

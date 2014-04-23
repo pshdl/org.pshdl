@@ -276,7 +276,7 @@ public class HDLPrimitives {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
 	 * .tuhh.ict.pshdl.model.HDLArithOp)
 	 */
@@ -617,6 +617,26 @@ public class HDLPrimitives {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
 		final BigInteger min = BigInteger.ZERO;
 		return RangeTool.createRange(min, max);
+	}
+
+	public static HDLExpression getWidthEpression(HDLType type) {
+		if (type.getClassType() == HDLClass.HDLPrimitive) {
+			final HDLPrimitive determineType = (HDLPrimitive) type;
+			switch (determineType.getType()) {
+			case BIT:
+				return HDLLiteral.get(1);
+			case INTEGER:
+			case NATURAL:
+				return HDLLiteral.get(32);
+			case UINT:
+			case INT:
+			case BITVECTOR:
+				return determineType.getWidth();
+			default:
+				return null;
+			}
+		}
+		return null;
 	}
 
 	public static Integer getWidth(HDLType type, HDLEvaluationContext context) {

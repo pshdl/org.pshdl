@@ -835,6 +835,21 @@ public class ParserToModelExtension {
       IHDLObject _hDL_2 = this.toHDL(_psStatement_1, true);
       return this.<IHDLObject>attachContext(_hDL_2, context);
     }
+    List<PSHDLLangParser.PsBlockContext> _psBlock = context.psBlock();
+    boolean _tripleNotEquals_3 = (_psBlock != null);
+    if (_tripleNotEquals_3) {
+      HDLBlock _hDLBlock = new HDLBlock();
+      HDLBlock _setProcess = _hDLBlock.setProcess(false);
+      List<PSHDLLangParser.PsBlockContext> _psBlock_1 = context.psBlock();
+      final Function1<PSHDLLangParser.PsBlockContext,HDLStatement> _function = new Function1<PSHDLLangParser.PsBlockContext,HDLStatement>() {
+        public HDLStatement apply(final PSHDLLangParser.PsBlockContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it, true);
+          return ((HDLStatement) _hDL);
+        }
+      };
+      List<HDLStatement> _map = ListExtensions.<PSHDLLangParser.PsBlockContext, HDLStatement>map(_psBlock_1, _function);
+      return _setProcess.setStatements(_map);
+    }
     Class<? extends PSHDLLangParser.PsBlockContext> _class = context.getClass();
     String _plus = ("Not correctly implemented type:" + _class);
     throw new IllegalArgumentException(_plus);
