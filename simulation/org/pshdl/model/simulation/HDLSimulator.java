@@ -26,20 +26,54 @@
  ******************************************************************************/
 package org.pshdl.model.simulation;
 
-import java.math.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLArrayInit;
+import org.pshdl.model.HDLAssignment;
+import org.pshdl.model.HDLDeclaration;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLForLoop;
+import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLIfStatement.TreeSide;
+import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLRange;
+import org.pshdl.model.HDLReference;
+import org.pshdl.model.HDLResolvedRef;
+import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLTernary;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.RangeExtension;
+import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.RangeTool.RangeVal;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.HDLLibrary;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.Insulin;
+import org.pshdl.model.utils.ModificationSet;
+import org.pshdl.model.utils.Refactoring;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 
 public class HDLSimulator {
 
@@ -260,9 +294,9 @@ public class HDLSimulator {
 			final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(typeOf.get()).addVariables(var);
 			final HDLAssignment newAss = new HDLAssignment().setLeft(var.asHDLRef());
 			final HDLIfStatement ifStatement = new HDLIfStatement()//
-					.setIfExp(ternary.getIfExpr())//
-					.addThenDo(newAss.setRight(ternary.getThenExpr()))//
-					.addElseDo(newAss.setRight(ternary.getElseExpr()));
+			.setIfExp(ternary.getIfExpr())//
+			.addThenDo(newAss.setRight(ternary.getThenExpr()))//
+			.addElseDo(newAss.setRight(ternary.getElseExpr()));
 			ms.replace(ternary, var.asHDLRef());
 			ms.insertBefore(ternary.getContainer(HDLStatement.class), hvd, ifStatement);
 		}

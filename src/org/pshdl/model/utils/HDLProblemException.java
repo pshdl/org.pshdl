@@ -26,9 +26,9 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.util.*;
+import java.util.Arrays;
 
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
 
 public class HDLProblemException extends RuntimeException {
 

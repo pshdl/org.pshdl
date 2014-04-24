@@ -26,19 +26,30 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.extensions.StringWriteExtension;
+import org.pshdl.model.impl.AbstractHDLObject;
+import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import org.pshdl.model.utils.internal.*;
+import org.pshdl.model.utils.MetaAccess;
+import org.pshdl.model.utils.SyntaxHighlighter;
+import org.pshdl.model.utils.internal.NonSameList;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
 
 /**
  * The class HDLObject contains the following fields

@@ -26,18 +26,29 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLPrimitive;
+import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
+import org.pshdl.model.validation.Problem;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
-import com.google.common.io.*;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 public class MemoryModel {
 

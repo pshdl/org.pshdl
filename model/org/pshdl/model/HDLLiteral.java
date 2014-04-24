@@ -26,11 +26,12 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.math.*;
+import java.math.BigInteger;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.impl.*;
+import org.pshdl.model.impl.AbstractHDLLiteral;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**

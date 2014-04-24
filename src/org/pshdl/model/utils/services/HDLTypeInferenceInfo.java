@@ -26,9 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.util.*;
+import java.util.Arrays;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLPrimitive;
+import org.pshdl.model.HDLType;
 
 public class HDLTypeInferenceInfo {
 	public HDLType result;

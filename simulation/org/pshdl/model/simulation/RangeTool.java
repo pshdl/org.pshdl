@@ -26,10 +26,18 @@
  ******************************************************************************/
 package org.pshdl.model.simulation;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Range;
 
 public class RangeTool {
 	public static class RangeVal implements Comparable<RangeVal> {

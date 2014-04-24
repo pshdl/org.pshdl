@@ -26,9 +26,12 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Token;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 
 public class Row implements NamedElement {

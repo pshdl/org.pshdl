@@ -26,28 +26,50 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
-import static com.google.common.base.Preconditions.*;
-import static org.pshdl.model.HDLArithOp.HDLArithOpType.*;
-import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.pshdl.model.HDLArithOp.HDLArithOpType.PLUS;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BIT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BITVECTOR;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BOOL;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.INT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.INTEGER;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.NATURAL;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.STRING;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.UINT;
 
-import java.io.*;
-import java.math.*;
-import java.util.*;
+import java.io.FileOutputStream;
+import java.math.BigInteger;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLManip;
+import org.pshdl.model.HDLObject;
+import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.simulation.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.HDLShiftOp;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.simulation.RangeTool;
+import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 
 public class HDLPrimitives {
 
@@ -276,7 +298,7 @@ public class HDLPrimitives {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
 	 * .tuhh.ict.pshdl.model.HDLArithOp)
 	 */

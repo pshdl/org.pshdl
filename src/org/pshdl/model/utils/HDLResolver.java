@@ -26,15 +26,29 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import org.pshdl.model.*;
-import org.pshdl.model.extensions.*;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumDeclaration;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.extensions.ScopingExtension;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 public class HDLResolver {
 

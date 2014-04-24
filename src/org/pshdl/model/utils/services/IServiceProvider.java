@@ -26,9 +26,12 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ServiceLoader;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
 
 public interface IServiceProvider {
 	public Collection<IHDLAnnotation> getAllAnnotations();

@@ -26,15 +26,24 @@
  ******************************************************************************/
 package org.pshdl.model.evaluation;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
-import static org.pshdl.model.utils.HDLQuery.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
+import static org.pshdl.model.utils.HDLQuery.isEqualTo;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
 
 /**
  * This is used to resolve parameter to constants. When a HDLUnit has parameter

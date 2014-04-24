@@ -26,7 +26,7 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
 
 public interface IHDLAnnotation {

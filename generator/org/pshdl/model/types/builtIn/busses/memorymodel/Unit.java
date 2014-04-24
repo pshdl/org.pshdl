@@ -26,7 +26,8 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Unit {
 	public Map<String, NamedElement> declarations = new LinkedHashMap<String, NamedElement>();

@@ -26,7 +26,8 @@
  ******************************************************************************/
 package org.pshdl.model.utils.internal;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.TreeSet;
 
 public class LevenshteinDistance {
 	private static int minimum(int a, int b, int c) {

@@ -26,11 +26,11 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.*;
+import java.util.ArrayList;
 
-import javax.annotation.*;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.impl.*;
+import org.pshdl.model.impl.AbstractHDLArrayInit;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**

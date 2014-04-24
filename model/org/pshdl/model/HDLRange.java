@@ -26,17 +26,19 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.math.*;
+import java.math.BigInteger;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.impl.*;
-import org.pshdl.model.types.builtIn.*;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.impl.AbstractHDLRange;
+import org.pshdl.model.types.builtIn.HDLPrimitives;
+import org.pshdl.model.types.builtIn.PSHDLLib;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 /**
  * The class HDLRange contains the following fields

@@ -26,16 +26,26 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.ServiceLoader;
 
-import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.types.builtIn.HDLAnnotations;
+import org.pshdl.model.types.builtIn.HDLFunctions;
+import org.pshdl.model.types.builtIn.HDLGenerators;
+import org.pshdl.model.utils.services.CompilerInformation;
+import org.pshdl.model.utils.services.IHDLAnnotation;
+import org.pshdl.model.utils.services.IHDLAnnotationProvider;
+import org.pshdl.model.utils.services.IHDLFunctionResolver;
+import org.pshdl.model.utils.services.IHDLGenerator;
+import org.pshdl.model.utils.services.IHDLValidator;
+import org.pshdl.model.utils.services.IServiceProvider;
 import org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.HDLValidator;
 
-import com.google.common.base.*;
-import com.google.common.io.*;
+import com.google.common.base.Charsets;
+import com.google.common.io.ByteStreams;
 
 /**
  * HDLCore is the central place to register custom services like

@@ -26,13 +26,22 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.pshdl.model.*;
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.utils.internal.*;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLEnumRef;
+import org.pshdl.model.HDLInterfaceRef;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.extensions.FullNameExtension;
+import org.pshdl.model.utils.internal.NonSameList;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 public class HDLQuery {
 	public static abstract class HDLFieldAccess<T extends IHDLObject, K> {

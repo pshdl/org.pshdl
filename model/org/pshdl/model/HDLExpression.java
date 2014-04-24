@@ -26,7 +26,7 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.CopyFilter;
 
 public interface HDLExpression extends org.pshdl.model.IHDLObject {
 

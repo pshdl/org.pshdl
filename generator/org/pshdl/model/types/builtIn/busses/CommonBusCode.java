@@ -26,13 +26,23 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
-import org.pshdl.model.types.builtIn.busses.memorymodel.*;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLRange;
+import org.pshdl.model.HDLSwitchCaseStatement;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
+import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
+import org.pshdl.model.utils.HDLQualifiedName;
 
 public class CommonBusCode {
 	public static HDLSwitchCaseStatement createReadCase(Row row, int reg, Map<String, Integer> intPos, Map<String, Boolean> isArray, String dataPort, HDLLiteral labelValue) {

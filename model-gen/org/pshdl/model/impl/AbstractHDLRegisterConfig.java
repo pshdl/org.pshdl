@@ -26,17 +26,23 @@
  ******************************************************************************/
 package org.pshdl.model.impl;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Iterator;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLObject;
+import org.pshdl.model.HDLRegisterConfig;
 import org.pshdl.model.HDLRegisterConfig.HDLRegClockType;
 import org.pshdl.model.HDLRegisterConfig.HDLRegResetActiveType;
 import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.CopyFilter;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterators;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLRegisterConfig extends HDLObject {

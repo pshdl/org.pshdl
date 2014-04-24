@@ -26,20 +26,25 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import org.pshdl.model.*;
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.types.builtIn.busses.*;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.extensions.StringWriteExtension;
+import org.pshdl.model.types.builtIn.busses.BusGenSideFiles;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
-import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.internal.*;
+import org.pshdl.model.utils.SyntaxHighlighter;
+import org.pshdl.model.utils.internal.Helper;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
-import com.google.common.base.*;
+import com.google.common.base.Charsets;
 
 public class MemoryModelSideFiles {
 

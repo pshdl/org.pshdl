@@ -26,12 +26,18 @@
  ******************************************************************************/
 package org.pshdl.model.impl;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Iterator;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLObject;
+import org.pshdl.model.HDLReference;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.CopyFilter;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLReference extends HDLObject implements HDLExpression {

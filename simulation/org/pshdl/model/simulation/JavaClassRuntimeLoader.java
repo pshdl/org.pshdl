@@ -26,14 +26,16 @@
  ******************************************************************************/
 package org.pshdl.model.simulation;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.net.URLClassLoader;
 
-import javax.tools.*;
 import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
-import org.pshdl.interpreter.*;
+import org.pshdl.interpreter.IHDLInterpreter;
 
 public class JavaClassRuntimeLoader {
 

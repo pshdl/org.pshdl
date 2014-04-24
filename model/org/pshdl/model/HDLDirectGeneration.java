@@ -26,10 +26,11 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.impl.*;
-import org.pshdl.model.types.builtIn.*;
+import org.pshdl.model.impl.AbstractHDLDirectGeneration;
+import org.pshdl.model.types.builtIn.HDLGenerators;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**

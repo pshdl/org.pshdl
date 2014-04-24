@@ -26,8 +26,9 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CompilerInformation implements Serializable {
 	public static class FunctionInformation implements Serializable {

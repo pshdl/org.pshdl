@@ -26,9 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.util.*;
+import java.util.ArrayList;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLObject;
+import org.pshdl.model.IHDLObject;
 
 public interface CopyFilter {
 	CopyFilter DEEP_META = new DeepCloneFilter();

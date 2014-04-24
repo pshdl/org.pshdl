@@ -26,18 +26,29 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import org.pshdl.model.*;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLInlineFunction;
+import org.pshdl.model.HDLPrimitive;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
+import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
+import org.pshdl.model.utils.services.IHDLFunctionResolver;
+import org.pshdl.model.utils.services.IServiceProvider;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 
 public class HDLFunctions {
 

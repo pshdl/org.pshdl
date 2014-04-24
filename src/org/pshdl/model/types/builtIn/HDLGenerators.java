@@ -26,17 +26,26 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.pshdl.model.*;
-import org.pshdl.model.evaluation.*;
+import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLVariableDeclaration;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.utils.services.CompilerInformation;
+import org.pshdl.model.utils.services.IHDLGenerator;
 import org.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
-import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.builtin.*;
+import org.pshdl.model.utils.services.IServiceProvider;
+import org.pshdl.model.validation.Problem;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 public class HDLGenerators {
 	private static Map<String, IHDLGenerator> generators;

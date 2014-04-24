@@ -81,13 +81,7 @@ public class RangeExtension {
    * Meta for information.
    */
   public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj) {
-    final Optional<Range<BigInteger>> range = RangeExtension.INST.determineRange(obj, null);
-    boolean _equals = Objects.equal(range, null);
-    if (_equals) {
-      String _string = obj.toString();
-      throw new NullPointerException(_string);
-    }
-    return range;
+    return RangeExtension.rangeOf(obj, null);
   }
   
   /**
@@ -95,9 +89,13 @@ public class RangeExtension {
    * Meta for information.
    */
   public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj, final HDLEvaluationContext context) {
-    final Optional<Range<BigInteger>> range = RangeExtension.INST.determineRange(obj, context);
-    boolean _equals = Objects.equal(range, null);
+    boolean _equals = Objects.equal(obj, null);
     if (_equals) {
+      throw new NullPointerException();
+    }
+    final Optional<Range<BigInteger>> range = RangeExtension.INST.determineRange(obj, context);
+    boolean _equals_1 = Objects.equal(range, null);
+    if (_equals_1) {
       String _string = obj.toString();
       throw new NullPointerException(_string);
     }

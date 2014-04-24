@@ -26,17 +26,33 @@
  ******************************************************************************/
 package org.pshdl.model.parser;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.misc.*;
-import org.pshdl.model.*;
+import org.antlr.v4.runtime.LexerNoViableAltException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Nullable;
+import org.pshdl.model.HDLPackage;
 import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 public class PSHDLParser {

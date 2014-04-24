@@ -26,17 +26,24 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.impl.AbstractHDLInterfaceInstantiation;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.Insulin;
+import org.pshdl.model.utils.ModificationSet;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 /**
  * The class HDLInterfaceInstantiation contains the following fields

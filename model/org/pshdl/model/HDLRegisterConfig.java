@@ -26,15 +26,17 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.*;
+import java.util.Set;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.impl.AbstractHDLRegisterConfig;
+import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Sets;
 
 /**
  * The class HDLRegisterConfig contains the following fields
@@ -254,10 +256,10 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig()//
-				.setClk(DEF_CLK_REF())//
-				.setRst(DEF_RST_REF())//
-				.setResetValue(HDLLiteral.get(0))//
-				.normalize()//
+		.setClk(DEF_CLK_REF())//
+		.setRst(DEF_RST_REF())//
+		.setResetValue(HDLLiteral.get(0))//
+		.normalize()//
 		;
 	}
 

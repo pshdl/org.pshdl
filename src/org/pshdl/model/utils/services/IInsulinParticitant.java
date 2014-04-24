@@ -1,7 +1,7 @@
 package org.pshdl.model.utils.services;
 
-import org.pshdl.model.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.Insulin;
 
 public interface IInsulinParticitant {
 

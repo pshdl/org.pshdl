@@ -26,14 +26,24 @@
  ******************************************************************************/
 package org.pshdl.model.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLRange;
+import org.pshdl.model.HDLUnresolvedFragment;
+import org.pshdl.model.HDLUnresolvedFragmentFunction;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.CopyFilter;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 
 @SuppressWarnings("all")
 public abstract class AbstractHDLUnresolvedFragmentFunction extends HDLUnresolvedFragment {

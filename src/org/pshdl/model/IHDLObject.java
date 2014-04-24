@@ -26,9 +26,11 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Iterator;
 
-import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.MetaAccess;
 
 public interface IHDLObject {
 	/**

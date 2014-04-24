@@ -26,13 +26,16 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.pshdl.model.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.HDLAnnotation;
+import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.CompilerInformation.AnnotationInformation;
-import org.pshdl.model.validation.*;
-import org.pshdl.model.validation.builtin.*;
+import org.pshdl.model.utils.services.IHDLAnnotation;
+import org.pshdl.model.utils.services.IServiceProvider;
+import org.pshdl.model.validation.Problem;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
 public class HDLAnnotations {
 	private static Map<String, IHDLAnnotation> annotations;

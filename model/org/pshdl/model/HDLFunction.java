@@ -26,14 +26,21 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.extensions.FullNameExtension;
+import org.pshdl.model.impl.AbstractHDLFunction;
+import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.ModificationSet;
 
 /**
  * The class HDLFunction contains the following fields
@@ -160,7 +167,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case REG_UINT:
 			case STRING_TYPE:
 				final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef())
-						.getAll();
+				.getAll();
 				for (final HDLVariableRef argRef : allArgRefs) {
 					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 					if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
@@ -188,7 +195,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case IF:
 			case ANY_IF:
 				final Collection<HDLInterfaceRef> allIfRefs = HDLQuery.select(HDLInterfaceRef.class).from(orig).where(HDLInterfaceRef.fHIf).isEqualTo(param.getName().asRef())
-						.getAll();
+				.getAll();
 				for (final HDLInterfaceRef argRef : allIfRefs) {
 					final HDLQualifiedName fqn = FullNameExtension.fullNameOf(arg);
 					msExp.replace(argRef, argRef.setHIf(fqn));

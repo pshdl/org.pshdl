@@ -24,12 +24,13 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from MemoryModel.g4 by ANTLR 4.1
+// Generated from MemoryModel.g4 by ANTLR 4.2.2
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * This class provides an empty implementation of {@link MemoryModelListener},
@@ -39,8 +40,10 @@ import org.antlr.v4.runtime.tree.*;
 public class MemoryModelBaseListener implements MemoryModelListener {
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterUnit(@NotNull MemoryModelParser.UnitContext ctx) {
@@ -48,8 +51,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitUnit(@NotNull MemoryModelParser.UnitContext ctx) {
@@ -57,8 +62,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
@@ -66,8 +73,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
@@ -75,8 +84,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) {
@@ -84,8 +95,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) {
@@ -93,8 +106,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterDefinition(@NotNull MemoryModelParser.DefinitionContext ctx) {
@@ -102,8 +117,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitDefinition(@NotNull MemoryModelParser.DefinitionContext ctx) {
@@ -111,8 +128,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterAlias(@NotNull MemoryModelParser.AliasContext ctx) {
@@ -120,8 +139,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitAlias(@NotNull MemoryModelParser.AliasContext ctx) {
@@ -129,8 +150,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterWidth(@NotNull MemoryModelParser.WidthContext ctx) {
@@ -138,8 +161,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitWidth(@NotNull MemoryModelParser.WidthContext ctx) {
@@ -147,8 +172,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
@@ -156,8 +183,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
@@ -165,8 +194,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
@@ -174,8 +205,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
@@ -183,8 +216,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterType(@NotNull MemoryModelParser.TypeContext ctx) {
@@ -192,8 +227,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitType(@NotNull MemoryModelParser.TypeContext ctx) {
@@ -201,8 +238,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterReference(@NotNull MemoryModelParser.ReferenceContext ctx) {
@@ -210,8 +249,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitReference(@NotNull MemoryModelParser.ReferenceContext ctx) {
@@ -219,8 +260,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterMemory(@NotNull MemoryModelParser.MemoryContext ctx) {
@@ -228,8 +271,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitMemory(@NotNull MemoryModelParser.MemoryContext ctx) {
@@ -237,8 +282,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterRow(@NotNull MemoryModelParser.RowContext ctx) {
@@ -246,8 +293,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitRow(@NotNull MemoryModelParser.RowContext ctx) {
@@ -255,8 +304,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void enterEveryRule(@NotNull ParserRuleContext ctx) {
@@ -264,8 +315,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void exitEveryRule(@NotNull ParserRuleContext ctx) {
@@ -273,8 +326,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void visitTerminal(@NotNull TerminalNode node) {
@@ -282,8 +337,10 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 
 	/**
 	 * {@inheritDoc}
-	 * <p/>
+	 *
+	 * <p>
 	 * The default implementation does nothing.
+	 * </p>
 	 */
 	@Override
 	public void visitErrorNode(@NotNull ErrorNode node) {

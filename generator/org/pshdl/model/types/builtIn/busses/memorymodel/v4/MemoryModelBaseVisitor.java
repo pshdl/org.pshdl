@@ -27,7 +27,7 @@
 // Generated from MemoryModel.g4 by ANTLR 4.0
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 public class MemoryModelBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MemoryModelVisitor<T> {
 	@Override

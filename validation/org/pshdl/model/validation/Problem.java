@@ -26,14 +26,16 @@
  ******************************************************************************/
 package org.pshdl.model.validation;
 
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlEnum;
 
-import org.pshdl.model.*;
-import org.pshdl.model.parser.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.parser.SourceInfo;
+import org.pshdl.model.utils.MetaAccess;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 

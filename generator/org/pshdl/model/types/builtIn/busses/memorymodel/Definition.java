@@ -26,9 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Token;
 
 public class Definition implements NamedElement {
 	public enum WarnType {
@@ -49,8 +50,9 @@ public class Definition implements NamedElement {
 				return "error";
 			case silentError:
 				return "silent error";
+			default:
+				throw new IllegalArgumentException("Did not correctly implement this:" + this);
 			}
-			return null;
 		}
 	}
 

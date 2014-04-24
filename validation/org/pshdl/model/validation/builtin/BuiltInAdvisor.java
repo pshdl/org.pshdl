@@ -26,20 +26,39 @@
  ******************************************************************************/
 package org.pshdl.model.validation.builtin;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAnnotation;
+import org.pshdl.model.HDLArgument;
+import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLUnresolvedFragment;
+import org.pshdl.model.HDLUnresolvedFragmentFunction;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.internal.*;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.extensions.ScopingExtension;
+import org.pshdl.model.utils.HDLCore;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.internal.LevenshteinDistance;
 import org.pshdl.model.utils.internal.LevenshteinDistance.Score;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 
 public class BuiltInAdvisor {
 
@@ -88,7 +107,7 @@ public class BuiltInAdvisor {
 				solutions = new String[] {
 						"Cast the index to uint with:(uint<>)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") annotation to define a range" };
+						+ "\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The bit access could possibly become negative", "The given bit access has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
@@ -103,7 +122,7 @@ public class BuiltInAdvisor {
 				solutions = new String[] {
 						"Cast the index to uint with:(uint)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") annotation to define a range" };
+						+ "\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
@@ -115,7 +134,7 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The bit access can exceed the variables' capacity", "The given bit access has a possible range of:" + accessRange
 					+ " while the highest index of the variable is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
 					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
-							+ "\") Annotation to indicate the expected range");
+					+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
@@ -124,7 +143,7 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
 					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
 					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
-							+ "\") Annotation to indicate the expected range");
+					+ "\") Annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			return new HDLAdvise(problem, "The dimensions of assignment do not match", "When an array is assigned to another array, the size of the dimension need to match.",
@@ -170,7 +189,7 @@ public class BuiltInAdvisor {
 			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
 			return new HDLAdvise(problem, "No write access to the in port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " detected",
 					"It appears that the port " + var.getName()
-							+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
+					+ " is never written, altough it is marked as in port. If you don't write to it, it will have the default value of 0",
 					"Write a meaningful value to the port", "Write a zero to it: " + hii.getVar().getName() + "." + var.getName() + " = 0;");
 		}
 		case INTERFACE_OUT_PORT_NEVER_READ: {

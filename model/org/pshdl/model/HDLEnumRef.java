@@ -26,14 +26,15 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.extensions.ScopingExtension;
+import org.pshdl.model.impl.AbstractHDLEnumRef;
+import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 /**
  * The class HDLEnumRef contains the following fields

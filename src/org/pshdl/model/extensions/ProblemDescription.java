@@ -27,8 +27,8 @@
 package org.pshdl.model.extensions;
 
 import org.pshdl.model.HDLObject.GenericMeta;
-import org.pshdl.model.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.MetaAccess;
 
 /**
  * This {@link MetaAccess} is used to annotate an {@link IHDLObject} with

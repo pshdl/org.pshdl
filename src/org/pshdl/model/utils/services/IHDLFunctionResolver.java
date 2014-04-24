@@ -26,15 +26,15 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.List;
 
-import org.pshdl.model.*;
-import org.pshdl.model.evaluation.*;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 
 public interface IHDLFunctionResolver {
 	public HDLTypeInferenceInfo resolve(HDLFunctionCall function);

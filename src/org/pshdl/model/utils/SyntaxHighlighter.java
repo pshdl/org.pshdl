@@ -26,10 +26,12 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.util.*;
+import java.util.Stack;
 
-import org.pshdl.model.*;
-import org.pshdl.model.parser.*;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.parser.SourceInfo;
 
 public class SyntaxHighlighter {
 

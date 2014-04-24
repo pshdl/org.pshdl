@@ -26,16 +26,29 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Set;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.pshdl.model.parser.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.pshdl.model.parser.PSHDLParser;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Alias;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Column;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Memory;
+import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Reference;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.AliasContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ColumnContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DeclarationContext;
@@ -45,11 +58,11 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.Ref
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.RowContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.UnitContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.WarnTypeContext;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
-import com.google.common.io.*;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 public class MemoryModelAST extends MemoryModelBaseListener {
 

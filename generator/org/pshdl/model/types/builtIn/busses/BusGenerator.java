@@ -26,31 +26,58 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.io.*;
-import java.math.*;
-import java.util.*;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.pshdl.model.*;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.parser.*;
+import org.pshdl.model.HDLArgument;
+import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.parser.SourceInfo;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.types.builtIn.busses.memorymodel.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Memory;
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModelSideFiles;
+import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Reference;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
+import org.pshdl.model.utils.HDLProblemException;
+import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.utils.services.IHDLAnnotation;
+import org.pshdl.model.utils.services.IHDLAnnotationProvider;
+import org.pshdl.model.utils.services.IHDLGenerator;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
-import org.pshdl.model.validation.builtin.*;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
 
 public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 

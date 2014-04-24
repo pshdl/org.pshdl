@@ -26,19 +26,33 @@
  ******************************************************************************/
 package org.pshdl.model.simulation;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.*;
-import java.util.regex.*;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.pshdl.interpreter.*;
+import org.pshdl.interpreter.ExecutableModel;
+import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.Frame.FastInstruction;
+import org.pshdl.interpreter.InternalInformation;
+import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
-import org.pshdl.interpreter.utils.*;
+import org.pshdl.interpreter.utils.Instruction;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class FluidFrame {
 

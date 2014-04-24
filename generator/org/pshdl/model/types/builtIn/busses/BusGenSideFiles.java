@@ -26,18 +26,26 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.internal.*;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider;
+import org.pshdl.model.utils.internal.Helper;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
-import com.google.common.io.*;
+import com.google.common.io.ByteStreams;
 
 public class BusGenSideFiles {
 

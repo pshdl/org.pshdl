@@ -26,23 +26,33 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.FULLNAME;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.impl.*;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.impl.AbstractHDLUnit;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.types.builtIn.HDLGenerators;
+import org.pshdl.model.utils.HDLLibrary;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.ModificationSet;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * The class HDLUnit contains the following fields

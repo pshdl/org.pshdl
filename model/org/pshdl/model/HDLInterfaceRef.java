@@ -26,16 +26,17 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.*;
+import java.util.ArrayList;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.impl.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.impl.AbstractHDLInterfaceRef;
+import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 /**
  * The class HDLInterfaceRef contains the following fields

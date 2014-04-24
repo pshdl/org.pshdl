@@ -26,7 +26,8 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public enum HDLClass {
 	HDLObject(HDLObject.class), // HDLObject

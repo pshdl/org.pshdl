@@ -26,12 +26,19 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
 
 public interface IOutputProvider {
 	public static class MultiOption {

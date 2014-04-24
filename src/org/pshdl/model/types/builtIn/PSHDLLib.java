@@ -28,13 +28,20 @@ package org.pshdl.model.types.builtIn;
 
 import java.util.Map.Entry;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumDeclaration;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLFunctionParameter.RWType;
 import org.pshdl.model.HDLFunctionParameter.Type;
-import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.HDLNativeFunction;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.utils.HDLCore;
+import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
 import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
+import org.pshdl.model.utils.services.IServiceProvider;
 
 public class PSHDLLib {
 

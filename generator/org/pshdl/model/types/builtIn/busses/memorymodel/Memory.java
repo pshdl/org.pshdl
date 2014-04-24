@@ -26,9 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Token;
 
 public class Memory implements NamedElement {
 	public List<Reference> references = new LinkedList<Reference>();

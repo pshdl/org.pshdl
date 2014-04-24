@@ -24,15 +24,24 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from MemoryModel.g4 by ANTLR 4.1
+// Generated from MemoryModel.g4 by ANTLR 4.2.2
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
-import java.util.*;
+import java.util.List;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class MemoryModelParser extends Parser {
@@ -59,6 +68,11 @@ public class MemoryModelParser extends Parser {
 	@Override
 	public String[] getRuleNames() {
 		return ruleNames;
+	}
+
+	@Override
+	public String getSerializedATN() {
+		return _serializedATN;
 	}
 
 	@Override
@@ -991,24 +1005,24 @@ public class MemoryModelParser extends Parser {
 		return _localctx;
 	}
 
-	public static final String _serializedATN = "\3\uacf5\uee8c\u4f5d\u8b0d\u4a45\u78bd\u1b2f\u3378\3\34\u0084\4\2\t\2"
+	public static final String _serializedATN = "\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\34\u0084\4\2\t\2"
 			+ "\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13" + "\t\13\4\f\t\f\4\r\t\r\3\2\7\2\34\n\2\f\2\16\2\37\13\2\3\2\3\2\3\3\3\3"
 			+ "\3\3\5\3&\n\3\3\4\3\4\3\4\3\4\3\4\7\4-\n\4\f\4\16\4\60\13\4\3\4\3\4\3" + "\5\3\5\3\5\3\5\7\58\n\5\f\5\16\5;\13\5\3\5\3\5\3\6\3\6\3\6\3\6\3\6\7\6"
 			+ "D\n\6\f\6\16\6G\13\6\3\6\3\6\3\7\3\7\3\7\7\7N\n\7\f\7\16\7Q\13\7\3\7\3" + "\7\3\b\3\b\5\bW\n\b\3\b\3\b\3\b\3\b\3\b\5\b^\n\b\3\b\3\b\3\b\3\b\7\bd"
 			+ "\n\b\f\b\16\bg\13\b\3\b\5\bj\n\b\3\b\3\b\3\t\5\to\n\t\3\t\3\t\3\n\3\n" + "\3\13\3\13\3\f\3\f\3\r\3\r\3\r\3\r\7\r}\n\r\f\r\16\r\u0080\13\r\3\r\3"
-			+ "\r\3\r\2\16\2\4\6\b\n\f\16\20\22\24\26\30\2\5\4\2\5\5\b\t\4\2\13\13\17" + "\20\4\2\16\16\27\30\u0086\2\35\3\2\2\2\4%\3\2\2\2\6\'\3\2\2\2\b\63\3\2"
-			+ "\2\2\n>\3\2\2\2\fJ\3\2\2\2\16T\3\2\2\2\20n\3\2\2\2\22r\3\2\2\2\24t\3\2" + "\2\2\26v\3\2\2\2\30x\3\2\2\2\32\34\5\4\3\2\33\32\3\2\2\2\34\37\3\2\2\2"
-			+ "\35\33\3\2\2\2\35\36\3\2\2\2\36 \3\2\2\2\37\35\3\2\2\2 !\5\f\7\2!\3\3" + "\2\2\2\"&\5\6\4\2#&\5\b\5\2$&\5\n\6\2%\"\3\2\2\2%#\3\2\2\2%$\3\2\2\2&"
-			+ "\5\3\2\2\2\'(\7\7\2\2()\7\31\2\2).\7\24\2\2*-\5\16\b\2+-\5\30\r\2,*\3" + "\2\2\2,+\3\2\2\2-\60\3\2\2\2.,\3\2\2\2./\3\2\2\2/\61\3\2\2\2\60.\3\2\2"
-			+ "\2\61\62\7\26\2\2\62\7\3\2\2\2\63\64\7\4\2\2\64\65\7\31\2\2\659\7\24\2" + "\2\668\5\30\r\2\67\66\3\2\2\28;\3\2\2\29\67\3\2\2\29:\3\2\2\2:<\3\2\2"
-			+ "\2;9\3\2\2\2<=\7\26\2\2=\t\3\2\2\2>?\7\22\2\2?@\7\31\2\2@E\7\24\2\2AD" + "\5\16\b\2BD\5\30\r\2CA\3\2\2\2CB\3\2\2\2DG\3\2\2\2EC\3\2\2\2EF\3\2\2\2"
-			+ "FH\3\2\2\2GE\3\2\2\2HI\7\26\2\2I\13\3\2\2\2JK\7\3\2\2KO\7\24\2\2LN\5\30" + "\r\2ML\3\2\2\2NQ\3\2\2\2OM\3\2\2\2OP\3\2\2\2PR\3\2\2\2QO\3\2\2\2RS\7\26"
-			+ "\2\2S\r\3\2\2\2TV\5\22\n\2UW\7\n\2\2VU\3\2\2\2VW\3\2\2\2WX\3\2\2\2X]\5" + "\26\f\2YZ\7\r\2\2Z[\5\24\13\2[\\\7\23\2\2\\^\3\2\2\2]Y\3\2\2\2]^\3\2\2"
-			+ "\2^_\3\2\2\2_e\7\31\2\2`a\7\f\2\2ab\7\32\2\2bd\7\6\2\2c`\3\2\2\2dg\3\2" + "\2\2ec\3\2\2\2ef\3\2\2\2fi\3\2\2\2ge\3\2\2\2hj\5\20\t\2ih\3\2\2\2ij\3"
-			+ "\2\2\2jk\3\2\2\2kl\7\21\2\2l\17\3\2\2\2mo\7\25\2\2nm\3\2\2\2no\3\2\2\2" + "op\3\2\2\2pq\t\2\2\2q\21\3\2\2\2rs\t\3\2\2s\23\3\2\2\2tu\7\32\2\2u\25"
-			+ "\3\2\2\2vw\t\4\2\2w\27\3\2\2\2x~\7\31\2\2yz\7\f\2\2z{\7\32\2\2{}\7\6\2" + "\2|y\3\2\2\2}\u0080\3\2\2\2~|\3\2\2\2~\177\3\2\2\2\177\u0081\3\2\2\2\u0080"
-			+ "~\3\2\2\2\u0081\u0082\7\21\2\2\u0082\31\3\2\2\2\20\35%,.9CEOV]ein~";
-	public static final ATN _ATN = ATNSimulator.deserialize(_serializedATN.toCharArray());
+			+ "\r\3\r\2\2\16\2\4\6\b\n\f\16\20\22\24\26\30\2\5\4\2\5\5\b\t\4\2\13\13" + "\17\20\4\2\16\16\27\30\u0086\2\35\3\2\2\2\4%\3\2\2\2\6\'\3\2\2\2\b\63"
+			+ "\3\2\2\2\n>\3\2\2\2\fJ\3\2\2\2\16T\3\2\2\2\20n\3\2\2\2\22r\3\2\2\2\24" + "t\3\2\2\2\26v\3\2\2\2\30x\3\2\2\2\32\34\5\4\3\2\33\32\3\2\2\2\34\37\3"
+			+ "\2\2\2\35\33\3\2\2\2\35\36\3\2\2\2\36 \3\2\2\2\37\35\3\2\2\2 !\5\f\7\2" + "!\3\3\2\2\2\"&\5\6\4\2#&\5\b\5\2$&\5\n\6\2%\"\3\2\2\2%#\3\2\2\2%$\3\2"
+			+ "\2\2&\5\3\2\2\2\'(\7\7\2\2()\7\31\2\2).\7\24\2\2*-\5\16\b\2+-\5\30\r\2" + ",*\3\2\2\2,+\3\2\2\2-\60\3\2\2\2.,\3\2\2\2./\3\2\2\2/\61\3\2\2\2\60.\3"
+			+ "\2\2\2\61\62\7\26\2\2\62\7\3\2\2\2\63\64\7\4\2\2\64\65\7\31\2\2\659\7" + "\24\2\2\668\5\30\r\2\67\66\3\2\2\28;\3\2\2\29\67\3\2\2\29:\3\2\2\2:<\3"
+			+ "\2\2\2;9\3\2\2\2<=\7\26\2\2=\t\3\2\2\2>?\7\22\2\2?@\7\31\2\2@E\7\24\2" + "\2AD\5\16\b\2BD\5\30\r\2CA\3\2\2\2CB\3\2\2\2DG\3\2\2\2EC\3\2\2\2EF\3\2"
+			+ "\2\2FH\3\2\2\2GE\3\2\2\2HI\7\26\2\2I\13\3\2\2\2JK\7\3\2\2KO\7\24\2\2L" + "N\5\30\r\2ML\3\2\2\2NQ\3\2\2\2OM\3\2\2\2OP\3\2\2\2PR\3\2\2\2QO\3\2\2\2"
+			+ "RS\7\26\2\2S\r\3\2\2\2TV\5\22\n\2UW\7\n\2\2VU\3\2\2\2VW\3\2\2\2WX\3\2" + "\2\2X]\5\26\f\2YZ\7\r\2\2Z[\5\24\13\2[\\\7\23\2\2\\^\3\2\2\2]Y\3\2\2\2"
+			+ "]^\3\2\2\2^_\3\2\2\2_e\7\31\2\2`a\7\f\2\2ab\7\32\2\2bd\7\6\2\2c`\3\2\2" + "\2dg\3\2\2\2ec\3\2\2\2ef\3\2\2\2fi\3\2\2\2ge\3\2\2\2hj\5\20\t\2ih\3\2"
+			+ "\2\2ij\3\2\2\2jk\3\2\2\2kl\7\21\2\2l\17\3\2\2\2mo\7\25\2\2nm\3\2\2\2n" + "o\3\2\2\2op\3\2\2\2pq\t\2\2\2q\21\3\2\2\2rs\t\3\2\2s\23\3\2\2\2tu\7\32"
+			+ "\2\2u\25\3\2\2\2vw\t\4\2\2w\27\3\2\2\2x~\7\31\2\2yz\7\f\2\2z{\7\32\2\2" + "{}\7\6\2\2|y\3\2\2\2}\u0080\3\2\2\2~|\3\2\2\2~\177\3\2\2\2\177\u0081\3"
+			+ "\2\2\2\u0080~\3\2\2\2\u0081\u0082\7\21\2\2\u0082\31\3\2\2\2\20\35%,.9" + "CEOV]ein~";
+	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

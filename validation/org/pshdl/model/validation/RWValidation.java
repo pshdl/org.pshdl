@@ -26,21 +26,52 @@
  ******************************************************************************/
 package org.pshdl.model.validation;
 
-import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*;
-import static org.pshdl.model.validation.builtin.ErrorCode.*;
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.CONSTANT;
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.IN;
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.INOUT;
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.INTERNAL;
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.OUT;
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.PARAMETER;
+import static org.pshdl.model.validation.builtin.ErrorCode.INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN;
+import static org.pshdl.model.validation.builtin.ErrorCode.INTERNAL_SIGNAL_WRITTEN_BUT_NEVER_READ;
+import static org.pshdl.model.validation.builtin.ErrorCode.IN_PORT_NEVER_READ;
+import static org.pshdl.model.validation.builtin.ErrorCode.OUT_PORT_NEVER_WRITTEN;
+import static org.pshdl.model.validation.builtin.ErrorCode.PARAMETER_OR_CONSTANT_NEVER_READ;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNUSED_VARIABLE;
+import static org.pshdl.model.validation.builtin.ErrorCode.WRITE_ACCESS_TO_IN_PORT;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
+import org.pshdl.model.HDLBlock;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLInterfaceDeclaration;
+import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLInterfaceRef;
 import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLReference;
+import org.pshdl.model.HDLResolvedRef;
+import org.pshdl.model.HDLUnresolvedFragment;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.utils.*;
-import org.pshdl.model.validation.builtin.*;
+import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.MetaAccess;
+import org.pshdl.model.validation.builtin.BuiltInValidator;
 import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {

@@ -26,9 +26,11 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	public static final String INVALID = "!INVALID!";

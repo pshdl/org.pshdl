@@ -26,7 +26,12 @@
  ******************************************************************************/
 package org.pshdl.model.utils.internal;
 
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable {
 	private final Map<Integer, T> map = new LinkedHashMap<Integer, T>();

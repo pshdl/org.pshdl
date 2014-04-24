@@ -26,18 +26,25 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
-import org.pshdl.model.*;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariableDeclaration;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.utils.Insulin;
 import org.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.HDLValidator;
+import org.pshdl.model.validation.Problem;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
 
 /**
  * This interface can be implemented to add an additional generator to the

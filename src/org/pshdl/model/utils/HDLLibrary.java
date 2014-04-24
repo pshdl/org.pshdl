@@ -26,19 +26,35 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLDeclaration;
+import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumDeclaration;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLObject.GenericMeta;
-import org.pshdl.model.types.builtIn.*;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.types.builtIn.PSHDLLib;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 
 public class HDLLibrary {
 	private static class Record {

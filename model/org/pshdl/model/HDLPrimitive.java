@@ -26,16 +26,23 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.*;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BIT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BITVECTOR;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.INT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.INTEGER;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.NATURAL;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.UINT;
 
-import java.util.*;
+import java.util.EnumSet;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.impl.*;
+import org.pshdl.model.extensions.StringWriteExtension;
+import org.pshdl.model.impl.AbstractHDLPrimitive;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.utils.MetaAccess;
+import org.pshdl.model.utils.SyntaxHighlighter;
 
 /**
  * The class HDLPrimitive contains the following fields

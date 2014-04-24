@@ -27,9 +27,10 @@
 // Generated from PSHDLLang.g4 by ANTLR 4.2.2
 package org.pshdl.model.parser;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * This class provides an empty implementation of {@link PSHDLLangListener},

@@ -26,10 +26,18 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLObject;
+import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 public class ModificationSet {

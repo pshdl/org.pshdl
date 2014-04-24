@@ -26,21 +26,45 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import org.pshdl.model.*;
-import org.pshdl.model.parser.*;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.parser.PSHDLParser;
 import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.HDLValidator;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
+import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
-import com.google.common.io.*;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 
 public class PSAbstractCompiler {
 

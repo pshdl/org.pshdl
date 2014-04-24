@@ -27,12 +27,24 @@
 // Generated from PSHDLLang.g4 by ANTLR 4.2.2
 package org.pshdl.model.parser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.FailedPredicateException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class PSHDLLangParser extends Parser {
@@ -48,12 +60,12 @@ public class PSHDLLangParser extends Parser {
 			MODULE = 91, TESTBENCH = 92, RULE_PS_LITERAL_TERMINAL = 93, RULE_ID = 94, RULE_STRING = 95, RULE_ML_COMMENT = 96, RULE_GENERATOR_CONTENT = 97, RULE_SL_COMMENT = 98,
 			RULE_WS = 99;
 	public static final String[] tokenNames = { "<INVALID>", "'default'", "'.*'", "'{'", "'for'", "'include'", "'('", "'package'", "','", "'const'", "']'", "'@'", "'#'",
-			"'simulation'", "'register'", "'generate'", "'native'", "'process'", "'record'", "'inline'", "';'", "'extends'", "'}'", "'if'", "'?'", "'$rst'", "'inout'", "'switch'",
-			"'.'", "'param'", "'case'", "'->'", "'out'", "'substitute'", "'$clk'", "':'", "'['", "'=>'", "'in'", "'else'", "')'", "'+:'", "'-:'", "'import'", "'&'", "'|'", "'^'",
-			"'&&'", "'||'", "'*'", "'/'", "'+'", "'%'", "'**'", "'<<'", "'>>'", "'>>>'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'='", "'+='", "'-='", "'*='", "'/='",
-			"'%='", "'&='", "'^='", "'|='", "'<<='", "'>>>='", "'>>='", "'-'", "'~'", "'!'", "'int<>'", "'uint<>'", "'bit<>'", "'interface<>'", "'enum<>'", "'bit'", "'int'",
-			"'uint'", "'string'", "'bool'", "'enum'", "'interface'", "'function'", "'module'", "'testbench'", "RULE_PS_LITERAL_TERMINAL", "RULE_ID", "RULE_STRING",
-			"RULE_ML_COMMENT", "RULE_GENERATOR_CONTENT", "RULE_SL_COMMENT", "RULE_WS" };
+		"'simulation'", "'register'", "'generate'", "'native'", "'process'", "'record'", "'inline'", "';'", "'extends'", "'}'", "'if'", "'?'", "'$rst'", "'inout'", "'switch'",
+		"'.'", "'param'", "'case'", "'->'", "'out'", "'substitute'", "'$clk'", "':'", "'['", "'=>'", "'in'", "'else'", "')'", "'+:'", "'-:'", "'import'", "'&'", "'|'", "'^'",
+		"'&&'", "'||'", "'*'", "'/'", "'+'", "'%'", "'**'", "'<<'", "'>>'", "'>>>'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'='", "'+='", "'-='", "'*='", "'/='",
+		"'%='", "'&='", "'^='", "'|='", "'<<='", "'>>>='", "'>>='", "'-'", "'~'", "'!'", "'int<>'", "'uint<>'", "'bit<>'", "'interface<>'", "'enum<>'", "'bit'", "'int'",
+		"'uint'", "'string'", "'bool'", "'enum'", "'interface'", "'function'", "'module'", "'testbench'", "RULE_PS_LITERAL_TERMINAL", "RULE_ID", "RULE_STRING",
+		"RULE_ML_COMMENT", "RULE_GENERATOR_CONTENT", "RULE_SL_COMMENT", "RULE_WS" };
 	public static final int RULE_psModel = 0, RULE_psUnit = 1, RULE_psExtends = 2, RULE_psImports = 3, RULE_psQualifiedNameImport = 4, RULE_psBlock = 5, RULE_psProcess = 6,
 			RULE_psInstantiation = 7, RULE_psInterfaceInstantiation = 8, RULE_psDirectGeneration = 9, RULE_psPassedArguments = 10, RULE_psArgument = 11, RULE_psCast = 12,
 			RULE_psExpression = 13, RULE_psValue = 14, RULE_psBitAccess = 15, RULE_psAccessRange = 16, RULE_psVariableRef = 17, RULE_psRefPart = 18, RULE_psVariable = 19,
@@ -66,13 +78,13 @@ public class PSHDLLangParser extends Parser {
 			RULE_psAnnotationType = 55, RULE_psPrimitive = 56, RULE_psPrimitiveType = 57, RULE_psWidth = 58, RULE_psInterfaceDeclaration = 59, RULE_psInterface = 60,
 			RULE_psInterfaceExtends = 61, RULE_psInterfaceDecl = 62, RULE_psPortDeclaration = 63, RULE_psQualifiedName = 64;
 	public static final String[] ruleNames = { "psModel", "psUnit", "psExtends", "psImports", "psQualifiedNameImport", "psBlock", "psProcess", "psInstantiation",
-			"psInterfaceInstantiation", "psDirectGeneration", "psPassedArguments", "psArgument", "psCast", "psExpression", "psValue", "psBitAccess", "psAccessRange",
-			"psVariableRef", "psRefPart", "psVariable", "psStatement", "psFunctionDeclaration", "psInlineFunction", "psSubstituteFunction", "psNativeFunction",
-			"psFuncRecturnType", "psFuncParam", "psFuncSpec", "psFuncParamWithRW", "psFuncOptArray", "psFuncParamRWType", "psFuncParamType", "psFunction", "psFuncArgs",
-			"psAssignmentOrFunc", "psAssignmentOp", "psCompoundStatement", "psIfStatement", "psSimpleBlock", "psForStatement", "psSwitchStatement", "psCaseStatements",
-			"psDeclaration", "psDeclarationType", "psTypeDeclaration", "psEnumDeclaration", "psEnum", "psVariableDeclaration", "psDeclAssignment", "psArrayInit",
-			"psArrayInitSubParens", "psArrayInitSub", "psArray", "psDirection", "psAnnotation", "psAnnotationType", "psPrimitive", "psPrimitiveType", "psWidth",
-			"psInterfaceDeclaration", "psInterface", "psInterfaceExtends", "psInterfaceDecl", "psPortDeclaration", "psQualifiedName" };
+		"psInterfaceInstantiation", "psDirectGeneration", "psPassedArguments", "psArgument", "psCast", "psExpression", "psValue", "psBitAccess", "psAccessRange",
+		"psVariableRef", "psRefPart", "psVariable", "psStatement", "psFunctionDeclaration", "psInlineFunction", "psSubstituteFunction", "psNativeFunction",
+		"psFuncRecturnType", "psFuncParam", "psFuncSpec", "psFuncParamWithRW", "psFuncOptArray", "psFuncParamRWType", "psFuncParamType", "psFunction", "psFuncArgs",
+		"psAssignmentOrFunc", "psAssignmentOp", "psCompoundStatement", "psIfStatement", "psSimpleBlock", "psForStatement", "psSwitchStatement", "psCaseStatements",
+		"psDeclaration", "psDeclarationType", "psTypeDeclaration", "psEnumDeclaration", "psEnum", "psVariableDeclaration", "psDeclAssignment", "psArrayInit",
+		"psArrayInitSubParens", "psArrayInitSub", "psArray", "psDirection", "psAnnotation", "psAnnotationType", "psPrimitive", "psPrimitiveType", "psWidth",
+		"psInterfaceDeclaration", "psInterface", "psInterfaceExtends", "psInterfaceDecl", "psPortDeclaration", "psQualifiedName" };
 
 	@Override
 	public String getGrammarFileName() {
@@ -190,13 +202,13 @@ public class PSHDLLangParser extends Parser {
 							setState(136);
 							psUnit();
 						}
-							break;
+						break;
 
 						case 2: {
 							setState(137);
 							psDeclaration();
 						}
-							break;
+						break;
 						}
 					}
 					setState(142);
@@ -719,19 +731,19 @@ public class PSHDLLangParser extends Parser {
 						setState(219);
 						psDeclaration();
 					}
-						break;
+					break;
 
 					case 2: {
 						setState(220);
 						psInstantiation();
 					}
-						break;
+					break;
 
 					case 3: {
 						setState(221);
 						psStatement();
 					}
-						break;
+					break;
 					}
 				}
 				break;
@@ -1884,29 +1896,29 @@ public class PSHDLLangParser extends Parser {
 						setState(329);
 						psCast();
 					}
-						break;
+					break;
 					case LOGIC_NEG: {
 						setState(330);
 						((PsManipContext) _localctx).type = match(LOGIC_NEG);
 					}
-						break;
+					break;
 					case BIT_NEG: {
 						setState(331);
 						((PsManipContext) _localctx).type = match(BIT_NEG);
 					}
-						break;
+					break;
 					case ARITH_NEG: {
 						setState(332);
 						((PsManipContext) _localctx).type = match(ARITH_NEG);
 					}
-						break;
+					break;
 					default:
 						throw new NoViableAltException(this);
 					}
 					setState(335);
 					psExpression(16);
 				}
-					break;
+				break;
 
 				case 2: {
 					_localctx = new PsValueExpContext(_localctx);
@@ -1915,7 +1927,7 @@ public class PSHDLLangParser extends Parser {
 					setState(336);
 					psValue();
 				}
-					break;
+				break;
 
 				case 3: {
 					_localctx = new PsArrayInitExpContext(_localctx);
@@ -1924,7 +1936,7 @@ public class PSHDLLangParser extends Parser {
 					setState(337);
 					psArrayInitSubParens();
 				}
-					break;
+				break;
 
 				case 4: {
 					_localctx = new PsParensContext(_localctx);
@@ -1937,7 +1949,7 @@ public class PSHDLLangParser extends Parser {
 					setState(340);
 					match(40);
 				}
-					break;
+				break;
 				}
 				_ctx.stop = _input.LT(-1);
 				setState(385);
@@ -1968,7 +1980,7 @@ public class PSHDLLangParser extends Parser {
 								setState(346);
 								psExpression(16);
 							}
-								break;
+							break;
 
 							case 2: {
 								_localctx = new PsAddContext(new PsExpressionContext(_parentctx, _parentState));
@@ -1986,7 +1998,7 @@ public class PSHDLLangParser extends Parser {
 								setState(349);
 								psExpression(15);
 							}
-								break;
+							break;
 
 							case 3: {
 								_localctx = new PsShiftContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2004,7 +2016,7 @@ public class PSHDLLangParser extends Parser {
 								setState(352);
 								psExpression(14);
 							}
-								break;
+							break;
 
 							case 4: {
 								_localctx = new PsEqualityCompContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2022,7 +2034,7 @@ public class PSHDLLangParser extends Parser {
 								setState(355);
 								psExpression(13);
 							}
-								break;
+							break;
 
 							case 5: {
 								_localctx = new PsEqualityContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2040,7 +2052,7 @@ public class PSHDLLangParser extends Parser {
 								setState(358);
 								psExpression(12);
 							}
-								break;
+							break;
 
 							case 6: {
 								_localctx = new PsBitAndContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2053,7 +2065,7 @@ public class PSHDLLangParser extends Parser {
 								setState(361);
 								psExpression(11);
 							}
-								break;
+							break;
 
 							case 7: {
 								_localctx = new PsBitXorContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2066,7 +2078,7 @@ public class PSHDLLangParser extends Parser {
 								setState(364);
 								psExpression(9);
 							}
-								break;
+							break;
 
 							case 8: {
 								_localctx = new PsBitOrContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2079,7 +2091,7 @@ public class PSHDLLangParser extends Parser {
 								setState(367);
 								psExpression(9);
 							}
-								break;
+							break;
 
 							case 9: {
 								_localctx = new PsConcatContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2092,7 +2104,7 @@ public class PSHDLLangParser extends Parser {
 								setState(370);
 								psExpression(8);
 							}
-								break;
+							break;
 
 							case 10: {
 								_localctx = new PsBitLogAndContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2105,7 +2117,7 @@ public class PSHDLLangParser extends Parser {
 								setState(373);
 								psExpression(7);
 							}
-								break;
+							break;
 
 							case 11: {
 								_localctx = new PsBitLogOrContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2118,7 +2130,7 @@ public class PSHDLLangParser extends Parser {
 								setState(376);
 								psExpression(6);
 							}
-								break;
+							break;
 
 							case 12: {
 								_localctx = new PsTernaryContext(new PsExpressionContext(_parentctx, _parentState));
@@ -2135,7 +2147,7 @@ public class PSHDLLangParser extends Parser {
 								setState(381);
 								psExpression(5);
 							}
-								break;
+							break;
 							}
 						}
 					}
@@ -2362,7 +2374,7 @@ public class PSHDLLangParser extends Parser {
 						_localctx.to = psExpression(0);
 					}
 				}
-					break;
+				break;
 				case 41: {
 					{
 						setState(407);
@@ -2371,7 +2383,7 @@ public class PSHDLLangParser extends Parser {
 						_localctx.inc = psExpression(0);
 					}
 				}
-					break;
+				break;
 				case 42: {
 					{
 						setState(409);
@@ -2380,7 +2392,7 @@ public class PSHDLLangParser extends Parser {
 						_localctx.dec = psExpression(0);
 					}
 				}
-					break;
+				break;
 				case 8:
 				case 22:
 					break;
@@ -2551,7 +2563,7 @@ public class PSHDLLangParser extends Parser {
 						setState(426);
 						psArray();
 					}
-						break;
+					break;
 					}
 					setState(430);
 					switch (getInterpreter().adaptivePredict(_input, 45, _ctx)) {
@@ -2559,16 +2571,16 @@ public class PSHDLLangParser extends Parser {
 						setState(429);
 						psBitAccess();
 					}
-						break;
+					break;
 					}
 				}
-					break;
+				break;
 
 				case 2: {
 					setState(432);
 					psFuncArgs();
 				}
-					break;
+				break;
 				}
 			}
 		} catch (final RecognitionException re) {
@@ -4191,7 +4203,7 @@ public class PSHDLLangParser extends Parser {
 						setState(620);
 						_localctx.elseBlk = psSimpleBlock();
 					}
-						break;
+					break;
 					}
 				}
 				break;
@@ -4213,7 +4225,7 @@ public class PSHDLLangParser extends Parser {
 						setState(627);
 						_localctx.elseBlk = psSimpleBlock();
 					}
-						break;
+					break;
 					}
 					notifyErrorListeners(MISSING_IFPAREN);
 				}
@@ -4515,12 +4527,12 @@ public class PSHDLLangParser extends Parser {
 					setState(667);
 					psValue();
 				}
-					break;
+				break;
 				case 1: {
 					setState(668);
 					match(1);
 				}
-					break;
+				break;
 				default:
 					throw new NoViableAltException(this);
 				}
@@ -5467,7 +5479,7 @@ public class PSHDLLangParser extends Parser {
 							match(10);
 						}
 					}
-						break;
+					break;
 					default:
 						throw new NoViableAltException(this);
 					}
@@ -5743,7 +5755,7 @@ public class PSHDLLangParser extends Parser {
 						}
 
 					}
-						break;
+					break;
 					case 18:
 					case ENUM: {
 						setState(835);
@@ -5752,19 +5764,19 @@ public class PSHDLLangParser extends Parser {
 							setState(833);
 							_localctx.isEnum = match(ENUM);
 						}
-							break;
+						break;
 						case 18: {
 							setState(834);
 							_localctx.isRecord = match(18);
 						}
-							break;
+						break;
 						default:
 							throw new NoViableAltException(this);
 						}
 						setState(837);
 						psQualifiedName();
 					}
-						break;
+					break;
 					default:
 						throw new NoViableAltException(this);
 					}
@@ -5793,7 +5805,7 @@ public class PSHDLLangParser extends Parser {
 						}
 
 					}
-						break;
+					break;
 					case 18:
 					case ENUM: {
 						setState(846);
@@ -5802,19 +5814,19 @@ public class PSHDLLangParser extends Parser {
 							setState(844);
 							_localctx.isEnum = match(ENUM);
 						}
-							break;
+						break;
 						case 18: {
 							setState(845);
 							_localctx.isRecord = match(18);
 						}
-							break;
+						break;
 						default:
 							throw new NoViableAltException(this);
 						}
 						setState(848);
 						psQualifiedName();
 					}
-						break;
+					break;
 					default:
 						throw new NoViableAltException(this);
 					}

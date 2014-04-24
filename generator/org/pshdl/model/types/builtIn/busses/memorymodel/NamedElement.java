@@ -26,7 +26,7 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Token;
 
 public interface NamedElement {
 	public String getName();

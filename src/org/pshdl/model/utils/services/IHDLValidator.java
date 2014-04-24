@@ -26,13 +26,14 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
-import org.pshdl.model.*;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.utils.*;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
 public interface IHDLValidator {

@@ -26,9 +26,12 @@
  ******************************************************************************/
 package org.pshdl.model.parser;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BufferedTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.pshdl.model.HDLObject.GenericMeta;
 
 public class SourceInfo {

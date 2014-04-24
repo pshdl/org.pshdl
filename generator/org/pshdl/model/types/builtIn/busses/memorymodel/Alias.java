@@ -26,9 +26,9 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.*;
+import java.util.LinkedList;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Token;
 
 public class Alias implements NamedElement {
 	public String name;
