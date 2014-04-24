@@ -84,10 +84,7 @@ class RangeExtension {
 	 * Meta for information.
 	 */
 	def static Optional<Range<BigInteger>> rangeOf(HDLExpression obj) {
-		val range = INST.determineRange(obj, null)
-		if (range==null)
-			throw new NullPointerException(obj.toString)
-		return range
+		return rangeOf(obj, null)
 	}
 
 	/**
@@ -95,6 +92,8 @@ class RangeExtension {
 	 * Meta for information.
 	 */
 	def static Optional<Range<BigInteger>> rangeOf(HDLExpression obj, HDLEvaluationContext context) {
+		if (obj==null)
+			throw new NullPointerException()
 		val range = INST.determineRange(obj, context)
 		if (range==null)
 			throw new NullPointerException(obj.toString)

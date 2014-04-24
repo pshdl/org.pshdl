@@ -26,19 +26,86 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLAssignment;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLDeclaration;
+import org.pshdl.model.HDLEnumDeclaration;
+import org.pshdl.model.HDLEnumRef;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLForLoop;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLInterfaceDeclaration;
+import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLInterfaceRef;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLRange;
+import org.pshdl.model.HDLReference;
+import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.extensions.*;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.extensions.FullNameExtension;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
-import com.google.common.io.*;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 public class Refactoring {
+
+	public static interface ISideEffecResolver {
+		void resolveSideEffectExpression(HDLExpression exp, HDLReference ref, ModificationSet ms);
+
+		void resolveSideEffectStatement(HDLStatement ass, HDLReference ref, ModificationSet ms);
+	}
+
+	public HDLUnit removeVariable(HDLUnit obj, HDLVariable hdlVariable, ISideEffecResolver resolver) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLClass classType = hdlVariable.getContainer().getClassType();
+		Iterable<? extends HDLReference> refs;
+		switch (classType) {
+		case HDLEnum:
+			refs = HDLQuery.getEnumRefs(obj, hdlVariable);
+			break;
+		case HDLVariableDeclaration:
+		case HDLFunctionParameter:
+		case HDLForLoop:
+			refs = HDLQuery.getVarRefs(obj, hdlVariable);
+			break;
+		case HDLDirectGeneration:
+		case HDLInterfaceInstantiation:
+			refs = HDLQuery.getInterfaceRefs(obj, hdlVariable);
+			break;
+		default:
+			throw new RuntimeException("Did not expect a container of type:" + classType);
+		}
+		for (final HDLReference ref : refs) {
+			final IHDLObject container = ref.getContainer();
+			if (container instanceof HDLExpression) {
+				final HDLExpression exp = (HDLExpression) container;
+				resolver.resolveSideEffectExpression(exp, ref, ms);
+			}
+			if (container instanceof HDLStatement) {
+				final HDLStatement stmnt = (HDLStatement) container;
+				resolver.resolveSideEffectStatement(stmnt, ref, ms);
+			}
+		}
+		return ms.apply(obj);
+	}
 
 	/**
 	 * Rename a variable

@@ -26,38 +26,168 @@
  ******************************************************************************/
 package org.pshdl.model.validation.builtin;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
-import static org.pshdl.model.utils.HDLQuery.*;
-import static org.pshdl.model.validation.builtin.ErrorCode.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
+import static org.pshdl.model.utils.HDLQuery.isEqualTo;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_ASSIGNMENT_NOT_SAME_DIMENSIONS;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_DIMENSIONS_NOT_CONSTANT;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_INDEX_NEGATIVE;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_INDEX_NO_RANGE;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_INDEX_OUT_OF_BOUNDS;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_INDEX_POSSIBLY_NEGATIVE;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_REFERENCE_NOT_SAME_DIMENSIONS;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_REFERENCE_TOO_FEW_DIMENSIONS_IN_EXPRESSION;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_REFERENCE_TOO_MANY_DIMENSIONS;
+import static org.pshdl.model.validation.builtin.ErrorCode.ARRAY_WRITE_MULTI_DIMENSION;
+import static org.pshdl.model.validation.builtin.ErrorCode.ASSIGNMENT_CLIPPING_WILL_OCCUR;
+import static org.pshdl.model.validation.builtin.ErrorCode.ASSIGNMENT_ENUM_NOT_WRITABLE;
+import static org.pshdl.model.validation.builtin.ErrorCode.ASSIGNMENT_NOT_ENUM;
+import static org.pshdl.model.validation.builtin.ErrorCode.ASSIGNMENT_NOT_PRIMITIVE;
+import static org.pshdl.model.validation.builtin.ErrorCode.ASSIGNMENT_NOT_SUPPORTED;
+import static org.pshdl.model.validation.builtin.ErrorCode.BIT_ACCESS_NEGATIVE;
+import static org.pshdl.model.validation.builtin.ErrorCode.BIT_ACCESS_NOT_POSSIBLE;
+import static org.pshdl.model.validation.builtin.ErrorCode.BIT_ACCESS_NOT_POSSIBLE_ON_TYPE;
+import static org.pshdl.model.validation.builtin.ErrorCode.BIT_ACCESS_OUT_OF_BOUNDS;
+import static org.pshdl.model.validation.builtin.ErrorCode.BIT_ACCESS_POSSIBLY_NEGATIVE;
+import static org.pshdl.model.validation.builtin.ErrorCode.BIT_ACCESS_POSSIBLY_OUT_OF_BOUNDS;
+import static org.pshdl.model.validation.builtin.ErrorCode.BOOL_NEGATE_NUMERIC_NOT_SUPPORTED;
+import static org.pshdl.model.validation.builtin.ErrorCode.CLOCK_NOT_BIT;
+import static org.pshdl.model.validation.builtin.ErrorCode.CLOCK_UNKNOWN_WIDTH;
+import static org.pshdl.model.validation.builtin.ErrorCode.COMBINED_ASSIGNMENT_NOT_ALLOWED;
+import static org.pshdl.model.validation.builtin.ErrorCode.CONCAT_TYPE_NOT_ALLOWED;
+import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_DEFAULT_VALUE_NOT_CONSTANT;
+import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_NEED_DEFAULTVALUE;
+import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_PORT_CANT_REGISTER;
+import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_WIDTH_MISMATCH;
+import static org.pshdl.model.validation.builtin.ErrorCode.EQUALITY_ALWAYS_FALSE;
+import static org.pshdl.model.validation.builtin.ErrorCode.EQUALITY_ALWAYS_TRUE;
+import static org.pshdl.model.validation.builtin.ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT;
+import static org.pshdl.model.validation.builtin.ErrorCode.FUNCTION_SAME_NAME;
+import static org.pshdl.model.validation.builtin.ErrorCode.GLOBAL_CANT_REGISTER;
+import static org.pshdl.model.validation.builtin.ErrorCode.GLOBAL_NOT_CONSTANT;
+import static org.pshdl.model.validation.builtin.ErrorCode.GLOBAL_VAR_SAME_NAME;
+import static org.pshdl.model.validation.builtin.ErrorCode.IN_PORT_CANT_REGISTER;
+import static org.pshdl.model.validation.builtin.ErrorCode.MULTI_PROCESS_WRITE;
+import static org.pshdl.model.validation.builtin.ErrorCode.NO_SUCH_FUNCTION;
+import static org.pshdl.model.validation.builtin.ErrorCode.ONLY_ONE_CLOCK_ANNOTATION_ALLOWED;
+import static org.pshdl.model.validation.builtin.ErrorCode.ONLY_ONE_RESET_ANNOTATION_ALLOWED;
+import static org.pshdl.model.validation.builtin.ErrorCode.PARAMETER_NOT_FOUND;
+import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_DOWN;
+import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_UP;
+import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_OVERLAP;
+import static org.pshdl.model.validation.builtin.ErrorCode.REGISTER_UNKNOWN_ARGUMENT;
+import static org.pshdl.model.validation.builtin.ErrorCode.RESET_NOT_BIT;
+import static org.pshdl.model.validation.builtin.ErrorCode.RESET_UNKNOWN_WIDTH;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_CASE_NEEDS_CONSTANT_WIDTH;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_CASE_NEEDS_WIDTH;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_LABEL_DUPLICATE;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_LABEL_NOT_CONSTANT;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_LABEL_WRONG_ENUM;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_MULTIPLE_DEFAULT;
+import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_NO_DEFAULT;
+import static org.pshdl.model.validation.builtin.ErrorCode.TYPE_SAME_NAME;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNKNOWN_RANGE;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_ENUM;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_FRAGMENT;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_FUNCTION;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_INTERFACE;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_TYPE;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_VARIABLE;
+import static org.pshdl.model.validation.builtin.ErrorCode.UNSUPPORTED_TYPE_FOR_OP;
+import static org.pshdl.model.validation.builtin.ErrorCode.VARIABLE_KEYWORD_NAME;
+import static org.pshdl.model.validation.builtin.ErrorCode.VARIABLE_NAME_NOT_RECOMMENDED;
+import static org.pshdl.model.validation.builtin.ErrorCode.VARIABLE_SAME_NAME;
+import static org.pshdl.model.validation.builtin.ErrorCode.VARIABLE_SAME_NAME_DIFFERENT_CASE;
+import static org.pshdl.model.validation.builtin.ErrorCode.VARIABLE_SCOPE_SAME_NAME;
+import static org.pshdl.model.validation.builtin.ErrorCode.VARIABLE_SCOPE_SAME_NAME_DIFFERENT_CASE;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAnnotation;
+import org.pshdl.model.HDLArgument;
+import org.pshdl.model.HDLArithOp;
+import org.pshdl.model.HDLArrayInit;
+import org.pshdl.model.HDLAssignment;
+import org.pshdl.model.HDLBitOp;
+import org.pshdl.model.HDLBlock;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLConcat;
+import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumRef;
+import org.pshdl.model.HDLEqualityOp;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLForLoop;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLInlineFunction;
+import org.pshdl.model.HDLInstantiation;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLInterfaceRef;
+import org.pshdl.model.HDLManip;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLOpExpression;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLRange;
+import org.pshdl.model.HDLReference;
+import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLResolvedRef;
+import org.pshdl.model.HDLShiftOp;
+import org.pshdl.model.HDLSubstituteFunction;
+import org.pshdl.model.HDLSwitchCaseStatement;
+import org.pshdl.model.HDLSwitchStatement;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLUnresolvedFragment;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
-import org.pshdl.model.simulation.*;
-import org.pshdl.model.types.builtIn.*;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.RangeExtension;
+import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.simulation.RangeTool;
+import org.pshdl.model.types.builtIn.HDLAnnotations;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.utils.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.types.builtIn.HDLFunctions;
+import org.pshdl.model.types.builtIn.HDLGenerators;
+import org.pshdl.model.types.builtIn.HDLPrimitives;
+import org.pshdl.model.utils.HDLLibrary;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.HDLQuery;
+import org.pshdl.model.utils.Insulin;
+import org.pshdl.model.utils.MetaAccess;
+import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
+import org.pshdl.model.utils.services.IHDLValidator;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.validation.Problem;
+import org.pshdl.model.validation.RWValidation;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Range;
 
 public class BuiltInValidator implements IHDLValidator {
 
 	public static final GenericMeta<Range<BigInteger>> ARRAY_RANGE = new GenericMeta<Range<BigInteger>>("arrayRange", true);
 	public static final GenericMeta<Range<BigInteger>> ACCESS_RANGE = new GenericMeta<Range<BigInteger>>("accessRange", true);
 	public static String[] PSHDL_KEYWORDS = new String[] { "bit", "out", "string", "switch", "include", "process", "for", "function", "import", "else", "extends", "native",
-			"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
-			"param", "register", "interface" };
+		"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
+		"param", "register", "interface" };
 	public final static Set<String> keywordSet;
 	static {
 		keywordSet = new HashSet<String>();
@@ -412,6 +542,7 @@ public class BuiltInValidator implements IHDLValidator {
 							break;
 						default:
 							problems.add(new Problem(BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
+							continue;
 						}
 						final Optional<Range<BigInteger>> bitSizeRangeOpt = RangeExtension.rangeOf(primitive.getWidth(), getContext(hContext, primitive));
 						if (!bitSizeRangeOpt.isPresent()) {
@@ -1073,10 +1204,9 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkAccessBoundaries(Range<BigInteger> accessRange, Range<BigInteger> arrayRange, Set<Problem> problems, IHDLObject arr, HDLVariableRef ref, boolean bit) {
 		final BigInteger upperEndpoint = arrayRange.upperEndpoint();
 		final BigInteger subtract = upperEndpoint.subtract(BigInteger.ONE);
-		if (subtract.compareTo(BigInteger.ZERO) < 0) {
+		if (subtract.compareTo(BigInteger.ZERO) < 0)
 			// Maybe generate a warning here?
-			// continue;
-		}
+			return;
 		arrayRange = RangeTool.createRange(BigInteger.ZERO, subtract);
 		final String info = "Expected value range:" + arrayRange;
 		if (accessRange.upperEndpoint().signum() < 0) {

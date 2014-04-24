@@ -26,36 +26,102 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
-import static org.pshdl.model.extensions.FullNameExtension.*;
+import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.math.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.pshdl.model.*;
+import org.pshdl.model.HDLAnnotation;
+import org.pshdl.model.HDLArgument;
+import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
+import org.pshdl.model.HDLArrayInit;
+import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
+import org.pshdl.model.HDLBitOp;
 import org.pshdl.model.HDLBitOp.HDLBitOpType;
+import org.pshdl.model.HDLBlock;
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLConcat;
+import org.pshdl.model.HDLDirectGeneration;
+import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumRef;
+import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLForLoop;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLFunctionParameter.Type;
+import org.pshdl.model.HDLIfStatement;
+import org.pshdl.model.HDLInlineFunction;
+import org.pshdl.model.HDLInterface;
+import org.pshdl.model.HDLInterfaceInstantiation;
+import org.pshdl.model.HDLInterfaceRef;
+import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.HDLOpExpression;
+import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLRange;
+import org.pshdl.model.HDLReference;
+import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLResolvedRef;
+import org.pshdl.model.HDLShiftOp;
 import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
+import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLSubstituteFunction;
+import org.pshdl.model.HDLSwitchCaseStatement;
+import org.pshdl.model.HDLSwitchStatement;
+import org.pshdl.model.HDLTernary;
+import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLUnresolvedFragment;
+import org.pshdl.model.HDLUnresolvedFragmentFunction;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
-import org.pshdl.model.evaluation.*;
-import org.pshdl.model.extensions.*;
+import org.pshdl.model.HDLVariableRef;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.RangeExtension;
+import org.pshdl.model.extensions.ScopingExtension;
+import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.types.builtIn.*;
-import org.pshdl.model.utils.services.*;
+import org.pshdl.model.types.builtIn.HDLFunctions;
+import org.pshdl.model.types.builtIn.HDLGenerators;
+import org.pshdl.model.types.builtIn.HDLPrimitives;
+import org.pshdl.model.utils.services.CompilerInformation;
+import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
 import org.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
-import org.pshdl.model.validation.*;
+import org.pshdl.model.utils.services.IInsulinParticitant;
+import org.pshdl.model.utils.services.IServiceProvider;
+import org.pshdl.model.validation.RWValidation;
 import org.pshdl.model.validation.RWValidation.Init;
-import org.pshdl.model.validation.builtin.*;
+import org.pshdl.model.validation.builtin.BuiltInValidator;
 import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
-import com.google.common.base.*;
-import com.google.common.collect.*;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 
 public class Insulin {
 	public static final GenericMeta<Boolean> insulated = new GenericMeta<Boolean>("insulated", true);
@@ -187,7 +253,11 @@ public class Insulin {
 					for (final HDLVariableRef ref : refs) {
 						final Optional<BigInteger> refVal = ConstantEvaluate.valueOf(ref);
 						if (refVal.isPresent()) {
-							ms.replace(ref, HDLLiteral.get(refVal.get()));
+							final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(ref);
+							if (typeOf.isPresent()) {
+								final HDLManip castedType = new HDLManip().setType(HDLManipType.CAST).setCastTo(typeOf.get()).setTarget(HDLLiteral.get(refVal.get()));
+								ms.replace(ref, castedType);
+							}
 						} else {
 							allRefUsed = false;
 						}
@@ -934,7 +1004,7 @@ public class Insulin {
 			}
 
 			boolean hasClkRef = false, hasRstRef = false;
-			// Replace all $clk, $rst, $ena VariableRefs
+			// Replace all $clk, $rst VariableRefs
 			final Collection<HDLVariableRef> clkVarRefs = HDLQuery.select(HDLVariableRef.class).from(unit).where(HDLResolvedRef.fVar).lastSegmentIs(HDLRegisterConfig.DEF_CLK)
 					.getAll();
 			for (final HDLVariableRef clkRef : clkVarRefs) {
@@ -956,6 +1026,19 @@ public class Insulin {
 			// Remove the insertion meta to allow the re-use of the same model
 			unit.resetMeta(SignalInserted.RstInserted);
 			unit.resetMeta(SignalInserted.ClkInserted);
+			final HDLRegisterConfig[] regs = unit.getAllObjectsOf(HDLRegisterConfig.class, true);
+			for (final HDLRegisterConfig reg : regs) {
+				if (!(reg.getClk() instanceof HDLVariableRef)) {
+					final HDLVariable tempClock = new HDLVariable().setName(getTempName("clock", "buf")).setDefaultValue(reg.getClk());
+					ms.insertBefore(reg.getContainer(HDLStatement.class), new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).addVariables(tempClock));
+					ms.replace(reg.getClk(), tempClock.asHDLRef());
+				}
+				if (!(reg.getRst() instanceof HDLVariableRef)) {
+					final HDLVariable tempReset = new HDLVariable().setName(getTempName("reset", "buf")).setDefaultValue(reg.getRst());
+					ms.insertBefore(reg, new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).addVariables(tempReset));
+					ms.replace(reg.getClk(), tempReset.asHDLRef());
+				}
+			}
 		}
 		return ms.apply(apply);
 	}
