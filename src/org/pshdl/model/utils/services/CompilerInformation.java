@@ -30,12 +30,8 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CompilerInformation implements Serializable {
-	public static class FunctionInformation implements Serializable {
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = -731752567686038980L;
+public class CompilerInformation {
+	public static class FunctionInformation {
 
 		public static enum FunctionType {
 			NATIVE, INLINE, SUBSTITUTION
@@ -60,11 +56,7 @@ public class CompilerInformation implements Serializable {
 		}
 	}
 
-	public static class AnnotationInformation implements Serializable {
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = -847723181271503799L;
+	public static class AnnotationInformation {
 		public final String provider;
 		public final String name;
 		public final String summary;
@@ -94,10 +86,6 @@ public class CompilerInformation implements Serializable {
 		}
 	}
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 7392136487645025249L;
 	public final String version;
 	public final Map<String, AnnotationInformation> registeredAnnotations = new LinkedHashMap<String, AnnotationInformation>();
 	public final Map<String, GeneratorInformation> registeredGenerators = new LinkedHashMap<String, GeneratorInformation>();

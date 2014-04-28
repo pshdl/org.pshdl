@@ -92,10 +92,10 @@ class RangeExtension {
 	 * Meta for information.
 	 */
 	def static Optional<Range<BigInteger>> rangeOf(HDLExpression obj, HDLEvaluationContext context) {
-		if (obj==null)
+		if (obj === null)
 			throw new NullPointerException()
 		val range = INST.determineRange(obj, context)
-		if (range==null)
+		if (range === null)
 			throw new NullPointerException(obj.toString)
 		return range
 	}
@@ -122,7 +122,7 @@ class RangeExtension {
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional.absent
 		}
-		val annoCheck=checkAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range))
+		val annoCheck = checkAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range))
 		if (annoCheck.present)
 			return annoCheck
 		val container = hVar.get.container
@@ -176,27 +176,28 @@ class RangeExtension {
 		return Optional.absent
 	}
 
-	
-
 	def static Optional<Range<BigInteger>> checkAnnotation(HDLAnnotation range) {
 		if (range !== null) {
 			val value = range.value.split(";")
 
 			//TODO Allow simple references
 			try {
-				val lowerBound=new BigInteger(value.get(0))
-				val upperBound=new BigInteger(value.get(1))
-				return Optional.of(RangeTool.createRange(lowerBound,upperBound))
-			} catch(Exception e){
+				val lowerBound = new BigInteger(value.get(0))
+				val upperBound = new BigInteger(value.get(1))
+				return Optional.of(RangeTool.createRange(lowerBound, upperBound))
+			} catch (Exception e) {
+
 				//print("Invalid arguments for range annotation "+range.value+"\n")
 				return Optional.absent
 			}
 		}
 		return Optional.absent
 	}
+
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj) {
 		return rangeOf(obj, null)
 	}
+
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj, HDLEvaluationContext context) {
 		val Optional<BigInteger> to = ConstantEvaluate.valueOf(obj.to, context)
 		if (!to.present)
@@ -207,14 +208,14 @@ class RangeExtension {
 				return Optional.absent;
 			return Optional.of(RangeTool.createRange(from.get, to.get))
 		}
-		if (obj.dec!==null){
-			val decVal=ConstantEvaluate.valueOf(obj.dec, context)
+		if (obj.dec !== null) {
+			val decVal = ConstantEvaluate.valueOf(obj.dec, context)
 			if (!decVal.present)
 				return Optional.absent
 			return Optional.of(RangeTool.createRange(to.get, decVal.get))
 		}
-		if (obj.inc!==null){
-			val incVal=ConstantEvaluate.valueOf(obj.inc, context)
+		if (obj.inc !== null) {
+			val incVal = ConstantEvaluate.valueOf(obj.inc, context)
 			if (!incVal.present)
 				return Optional.absent
 			return Optional.of(RangeTool.createRange(to.get, incVal.get))
@@ -331,7 +332,8 @@ class RangeExtension {
 				val BigDecimal tf = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.lowerEndpoint)
 				val BigDecimal tt = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.upperEndpoint)
 				return Optional.of(
-					RangeTool.createRange(ff.min(ft).min(tf).min(tt).toBigInteger, ff.max(ft).max(tf).max(tt).toBigInteger))
+					RangeTool.createRange(ff.min(ft).min(tf).min(tt).toBigInteger,
+						ff.max(ft).max(tf).max(tt).toBigInteger))
 			}
 			case MUL: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.multiply(rightRange.get.lowerEndpoint)
@@ -341,13 +343,12 @@ class RangeExtension {
 				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case MOD: {
-				val rle=rightRange.get.lowerEndpoint
-				val leftBound=rle.min(0bi)
-				val rue=rightRange.get.upperEndpoint
-				val rightBound=rue.max(0bi)
+				val rle = rightRange.get.lowerEndpoint
+				val leftBound = rle.min(0bi)
+				val rue = rightRange.get.upperEndpoint
+				val rightBound = rue.max(0bi)
 				return Optional.of(RangeTool.createRange(leftBound, rightBound))
 			}
-				
 			case POW: {
 				val BigInteger ff = leftRange.get.lowerEndpoint.pow(rightRange.get.lowerEndpoint.intValue)
 				val BigInteger ft = leftRange.get.lowerEndpoint.pow(rightRange.get.upperEndpoint.intValue)
@@ -388,7 +389,8 @@ class RangeExtension {
 			case ARITH_NEG:
 				return Optional.of(RangeTool.createRange(right.get.upperEndpoint.negate, right.get.lowerEndpoint.negate))
 			case BIT_NEG:
-				return Optional.of(RangeTool.createRange(0bi, 1bi.shiftLeft(right.get.upperEndpoint.bitLength).subtract(1bi)))
+				return Optional.of(
+					RangeTool.createRange(0bi, 1bi.shiftLeft(right.get.upperEndpoint.bitLength).subtract(1bi)))
 			case LOGIC_NEG: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BOOLEAN_NOT_SUPPORTED_FOR_RANGES)

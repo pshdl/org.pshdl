@@ -29,6 +29,7 @@ package org.pshdl.model.types.builtIn.busses;
 import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -62,8 +63,8 @@ public class BusGenSideFiles {
 		res.add(paoFile(unitName, dirName, type, pCore, withDate));
 		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore, withDate));
 		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS, true));
-		try {
-			res.add(new SideFile(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(BusGenSideFiles.class.getResourceAsStream("/pshdl_pkg.vhd")), true));
+		try (InputStream stream = BusGenSideFiles.class.getResourceAsStream("/pshdl_pkg.vhd")) {
+			res.add(new SideFile(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(stream), true));
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

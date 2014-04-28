@@ -192,7 +192,8 @@ public class PSAbstractCompiler {
 				res.add(file);
 				final File parentFile = file.getParentFile();
 				if ((parentFile != null) && !parentFile.exists()) {
-					parentFile.mkdirs();
+					if (!parentFile.mkdirs())
+						throw new IllegalArgumentException("Failed to create directory:" + parentFile);
 				}
 				fos = new FileOutputStream(file);
 				if (sd.contents == SideFile.THIS) {

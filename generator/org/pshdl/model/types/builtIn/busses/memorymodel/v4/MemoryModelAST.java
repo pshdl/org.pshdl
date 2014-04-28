@@ -191,7 +191,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 
 	public static void main(String[] args) throws FileNotFoundException, RecognitionException, IOException {
 		final Set<Problem> problems = Sets.newHashSet();
-		final String string = Files.toString(new File("/Users/karstenbecker/Dropbox/PSHDL/Test/adderTest.txt"), Charsets.UTF_8);
+		final String string = Files.toString(new File(args[0]), Charsets.UTF_8);
 		final Unit parseUnit = parseUnit(string, problems, 0);
 		for (final Problem problem : problems) {
 			System.err.println("MemoryModelAST.main()" + problem);

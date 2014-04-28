@@ -62,8 +62,8 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		printStream = new PrintStream(fileName);
 		switch (type) {
 		case pshdl:
-			printStream.format("module %s {\n", tbName);
-			printStream.format("\t%s dut;\n", dutName);
+			printStream.format("module %s {%n", tbName);
+			printStream.format("\t%s dut;%n", dutName);
 			printStream.println("\tprocess {");
 			break;
 		case vhdl:
@@ -102,11 +102,11 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 						break;
 					}
 				}
-				printStream.printf("\tsignal dut_%s : %s;\n", simpleName(vi.name), varType);
+				printStream.printf("\tsignal dut_%s : %s;%n", simpleName(vi.name), varType);
 			}
-			printStream.printf("begin\n" + //
-					"\tdut : entity work.%s\n" + //
-					"\t\tport map (\n", dutName.toString('_'));
+			printStream.printf("begin%n" + //
+					"\tdut : entity work.%s%n" + //
+					"\t\tport map (%n", dutName.toString('_'));
 
 			boolean first = true;
 			for (final VariableInformation vi : model.variables) {

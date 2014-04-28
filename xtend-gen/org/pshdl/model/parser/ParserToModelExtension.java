@@ -26,7 +26,6 @@
  */
 package org.pshdl.model.parser;
 
-import com.google.common.base.Objects;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -129,8 +128,8 @@ public class ParserToModelExtension {
     pkg = _setDeclarations;
     pkg.freeze(null);
     final HDLLibrary library = HDLLibrary.getLibrary(libURI);
-    boolean _equals = Objects.equal(library, null);
-    if (_equals) {
+    boolean _tripleEquals = (library == null);
+    if (_tripleEquals) {
       throw new IllegalArgumentException((("The library " + libURI) + " is not valid"));
     }
     library.addPkg(pkg, src);

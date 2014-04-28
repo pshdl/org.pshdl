@@ -82,12 +82,12 @@ public class RWValidation {
 			if ((hdlVariable.getContainer(HDLInterfaceDeclaration.class) != null) || isGlobal(hdlVariable) || BuiltInValidator.skipExp(hdlVariable)) {
 				continue;
 			}
-			Integer readCount = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
-			readCount = readCount == null ? 0 : readCount;
-			Integer writeCount = hdlVariable.getMeta(IntegerMeta.WRITE_COUNT);
-			writeCount = writeCount == null ? 0 : writeCount;
-			Integer accessCount = hdlVariable.getMeta(IntegerMeta.ACCESS);
-			accessCount = accessCount == null ? 0 : accessCount;
+			final Integer rc = hdlVariable.getMeta(IntegerMeta.READ_COUNT);
+			final int readCount = rc == null ? 0 : rc;
+			final Integer wc = hdlVariable.getMeta(IntegerMeta.WRITE_COUNT);
+			final int writeCount = wc == null ? 0 : wc;
+			final Integer ac = hdlVariable.getMeta(IntegerMeta.ACCESS);
+			final int accessCount = ac == null ? 0 : ac;
 			if ((hdlVariable.getAnnotation(HDLBuiltInAnnotations.clock) != null) || (hdlVariable.getAnnotation(HDLBuiltInAnnotations.reset) != null)) {
 				continue;
 			}

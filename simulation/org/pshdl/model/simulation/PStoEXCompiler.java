@@ -138,7 +138,8 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		final File dir = new File(outDir);
 		if (!dir.exists()) {
 			System.out.println("Output directory " + dir + " does not exist, creating it");
-			dir.mkdirs();
+			if (!dir.mkdirs())
+				throw new IllegalArgumentException("Failed to create direcory:" + dir);
 		}
 		try {
 			final ExecutableModel em = createExecutable(unit, src, cli.hasOption("ir"));

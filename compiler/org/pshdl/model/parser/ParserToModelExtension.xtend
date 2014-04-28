@@ -169,7 +169,7 @@ class ParserToModelExtension {
 		pkg = pkg.setDeclarations(ctx.psDeclaration.map[toHDL(true) as HDLDeclaration])
 		pkg.freeze(null)
 		val library = HDLLibrary.getLibrary(libURI)
-		if (library == null)
+		if (library === null)
 			throw new IllegalArgumentException("The library " + libURI + " is not valid")
 		library.addPkg(pkg, src);
 		return pkg.attachContext(ctx) as HDLPackage
@@ -487,7 +487,7 @@ class ParserToModelExtension {
 			return context.psInstantiation.toHDL(true).attachContext(context)
 		if (context.psStatement !== null)
 			return context.psStatement.toHDL(true).attachContext(context)
-		if (context.psBlock!==null){
+		if (context.psBlock !== null) {
 			return new HDLBlock().setProcess(false).setStatements(context.psBlock.map[toHDL(true) as HDLStatement])
 		}
 		throw new IllegalArgumentException("Not correctly implemented type:" + context.getClass());
@@ -557,8 +557,10 @@ class ParserToModelExtension {
 		res = res.setRw(HDLFunctionParameter$RWType.RETURN)
 		res = res.setDim(
 			context.dims.map[
-				if(it.psExpression !== null) it.psExpression.toHDL(false) as HDLExpression else HDLFunctionParameter.
-					EMPTY_ARR])
+				if (it.psExpression !== null)
+					it.psExpression.toHDL(false) as HDLExpression
+				else
+					HDLFunctionParameter.EMPTY_ARR])
 		return res
 	}
 
@@ -567,8 +569,10 @@ class ParserToModelExtension {
 		res = res.setName(new HDLVariable().setName(context.RULE_ID.text))
 		res = res.setDim(
 			context.dims.map[
-				if(it.psExpression !== null) it.psExpression.toHDL(false) as HDLExpression else HDLFunctionParameter.
-					EMPTY_ARR])
+				if (it.psExpression !== null)
+					it.psExpression.toHDL(false) as HDLExpression
+				else
+					HDLFunctionParameter.EMPTY_ARR])
 		return res
 	}
 
@@ -761,7 +765,7 @@ class ParserToModelExtension {
 		if (context.psAssignmentOp !== null) {
 			val type = HDLAssignment$HDLAssignmentType.getOp(context.psAssignmentOp.text)
 			if (hVar instanceof HDLUnresolvedFragment)
-				hVar=hVar.setIsStatement(false)
+				hVar = hVar.setIsStatement(false)
 			var ass = new HDLAssignment().setLeft(hVar).setType(type)
 			ass = ass.setRight(context.psExpression.toHDL(false) as HDLExpression)
 			return ass.attachContext(context)

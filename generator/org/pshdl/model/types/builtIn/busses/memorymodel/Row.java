@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 
 public class Row implements NamedElement {
 	public String name;
@@ -55,8 +54,6 @@ public class Row implements NamedElement {
 	}
 
 	public final Map<String, Integer> defCount = new HashMap<String, Integer>();
-	public boolean readOnly = true;
-	public boolean writeOnly = true;
 
 	public void updateInfo() {
 		int bitPos = 31;
@@ -70,12 +67,6 @@ public class Row implements NamedElement {
 			}
 			def.arrayIndex = integer;
 			defCount.put(def.name, ++integer);
-			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
-				readOnly = false;
-			}
-			if ((def.rw == RWType.rw) || (def.rw == RWType.r)) {
-				writeOnly = false;
-			}
 		}
 	}
 

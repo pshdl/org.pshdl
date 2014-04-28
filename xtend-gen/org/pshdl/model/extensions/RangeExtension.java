@@ -89,13 +89,13 @@ public class RangeExtension {
    * Meta for information.
    */
   public static Optional<Range<BigInteger>> rangeOf(final HDLExpression obj, final HDLEvaluationContext context) {
-    boolean _equals = Objects.equal(obj, null);
-    if (_equals) {
+    boolean _tripleEquals = (obj == null);
+    if (_tripleEquals) {
       throw new NullPointerException();
     }
     final Optional<Range<BigInteger>> range = RangeExtension.INST.determineRange(obj, context);
-    boolean _equals_1 = Objects.equal(range, null);
-    if (_equals_1) {
+    boolean _tripleEquals_1 = (range == null);
+    if (_tripleEquals_1) {
       String _string = obj.toString();
       throw new NullPointerException(_string);
     }

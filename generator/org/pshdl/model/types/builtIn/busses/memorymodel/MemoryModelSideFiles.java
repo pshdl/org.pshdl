@@ -90,11 +90,11 @@ public class MemoryModelSideFiles {
 				if (row.column == null) {
 					current = null;
 					colIndex = -1;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>\n", Unit.rowWidth + 2, "Without Column");
+					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>%n", Unit.rowWidth + 2, "Without Column");
 				} else {
 					current = row.column;
 					colIndex = row.colIndex;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>\n", Unit.rowWidth + 2, row.column.name, row.colIndex);
+					ps.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>%n", Unit.rowWidth + 2, row.column.name, row.colIndex);
 				}
 			ps.format("<tr>");
 			ps.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
@@ -113,7 +113,7 @@ public class MemoryModelSideFiles {
 
 			}
 			final Integer integer = getAndInc(rowIndex, row.name);
-			ps.format("<td class='rowInfo'>%s [%d]</td></tr>\n", row.name, integer);
+			ps.format("<td class='rowInfo'>%s [%d]</td></tr>%n", row.name, integer);
 			pos++;
 		}
 		options.put("{TABLE}", ps.toString());

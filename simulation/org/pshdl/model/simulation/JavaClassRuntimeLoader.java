@@ -37,16 +37,18 @@ import javax.tools.ToolProvider;
 
 import org.pshdl.interpreter.IHDLInterpreter;
 
+import com.google.common.io.Files;
+
 public class JavaClassRuntimeLoader {
 
 	public static IHDLInterpreter compileAndLoad(String name, String source, boolean disableEdge, boolean disableOutputLogic) throws Exception {
-		final File tempDir = new File("pshdl2java");
-		tempDir.mkdir();
+		final File tempDir = Files.createTempDir();
 		tempDir.deleteOnExit();
 		final String pathName = name.replace('.', File.separatorChar) + ".java";
 		final File sourceFile = new File(tempDir, pathName);
 		final File pkgDir = sourceFile.getParentFile();
-		pkgDir.mkdirs();
+		if (!pkgDir.mkdirs())
+			throw new IllegalArgumentException("Failed to create package directories:" + pkgDir);
 		final FileWriter fw = new FileWriter(sourceFile);
 		fw.append(source);
 		fw.close();
@@ -61,7 +63,8 @@ public class JavaClassRuntimeLoader {
 		final Class<?> cls = Class.forName(name, true, classLoader);
 		final Constructor<?> constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
 		final IHDLInterpreter instance = (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
-		tempDir.delete();
+		if (!tempDir.delete())
+			throw new IllegalArgumentException("Failed to delete temp directory:" + tempDir);
 		return instance;
 	}
 

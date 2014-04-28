@@ -149,8 +149,8 @@ public class ConstantEvaluate {
           return Optional.<BigInteger>absent();
         case BOOL:
           boolean _and = false;
-          boolean _notEquals = (!Objects.equal(context, null));
-          if (!_notEquals) {
+          boolean _tripleNotEquals = (context != null);
+          if (!_tripleNotEquals) {
             _and = false;
           } else {
             _and = context.boolAsInt;
@@ -666,8 +666,8 @@ public class ConstantEvaluate {
   
   protected Optional<BigInteger> _constantEvaluate(final HDLEnumRef obj, final HDLEvaluationContext context) {
     boolean _and = false;
-    boolean _notEquals = (!Objects.equal(context, null));
-    if (!_notEquals) {
+    boolean _tripleNotEquals = (context != null);
+    if (!_tripleNotEquals) {
       _and = false;
     } else {
       _and = context.enumAsInt;

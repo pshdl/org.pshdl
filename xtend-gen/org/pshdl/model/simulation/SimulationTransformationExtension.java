@@ -165,7 +165,7 @@ public class SimulationTransformationExtension {
     } else {
       _xifexpression = Integer.valueOf(32);
     }
-    final Integer width = _xifexpression;
+    Integer width = _xifexpression;
     HDLRegisterConfig _register = obj.getRegister();
     final boolean isReg = (_register != null);
     final FluidFrame res = new FluidFrame("#null", false);
@@ -713,7 +713,7 @@ public class SimulationTransformationExtension {
             if (_or) {
               _matched=true;
               String _string_2 = Integer.valueOf(primWidth).toString();
-              String _string_3 = Integer.valueOf(currentWidth).toString();
+              String _string_3 = Integer.toString(currentWidth);
               FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_2, _string_3);
               res.instructions.add(_argumentedInstruction_2);
             }
@@ -732,7 +732,7 @@ public class SimulationTransformationExtension {
             if (_or_1) {
               _matched=true;
               String _string_4 = Integer.valueOf(primWidth).toString();
-              String _string_5 = Integer.valueOf(currentWidth).toString();
+              String _string_5 = Integer.toString(currentWidth);
               FluidFrame.ArgumentedInstruction _argumentedInstruction_3 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_4, _string_5);
               res.instructions.add(_argumentedInstruction_3);
             }
@@ -751,7 +751,7 @@ public class SimulationTransformationExtension {
             if (_or_2) {
               _matched=true;
               String _string_6 = Integer.valueOf(primWidth).toString();
-              String _string_7 = Integer.valueOf(currentWidth).toString();
+              String _string_7 = Integer.toString(currentWidth);
               FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_6, _string_7);
               res.instructions.add(_argumentedInstruction_4);
             }
@@ -1022,7 +1022,7 @@ public class SimulationTransformationExtension {
       switch (_type) {
         case AND:
           final int width = this.targetSizeWithType(obj, context);
-          String _string = Integer.valueOf(width).toString();
+          String _string = Integer.toString(width);
           FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.and, _string);
           res.add(_argumentedInstruction);
           break;
@@ -1031,7 +1031,7 @@ public class SimulationTransformationExtension {
           break;
         case OR:
           final int width_1 = this.targetSizeWithType(obj, context);
-          String _string_1 = Integer.valueOf(width_1).toString();
+          String _string_1 = Integer.toString(width_1);
           FluidFrame.ArgumentedInstruction _argumentedInstruction_1 = new FluidFrame.ArgumentedInstruction(Instruction.or, _string_1);
           res.add(_argumentedInstruction_1);
           break;
@@ -1040,7 +1040,7 @@ public class SimulationTransformationExtension {
           break;
         case XOR:
           final int width_2 = this.targetSizeWithType(obj, context);
-          String _string_2 = Integer.valueOf(width_2).toString();
+          String _string_2 = Integer.toString(width_2);
           FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.xor, _string_2);
           res.add(_argumentedInstruction_2);
           break;
@@ -1064,24 +1064,24 @@ public class SimulationTransformationExtension {
     if (_type != null) {
       switch (_type) {
         case DIV:
-          String _string = Integer.valueOf(width).toString();
+          String _string = Integer.toString(width);
           FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.div, _string);
           res.add(_argumentedInstruction);
           break;
         case MINUS:
-          String _string_1 = Integer.valueOf(width).toString();
+          String _string_1 = Integer.toString(width);
           FluidFrame.ArgumentedInstruction _argumentedInstruction_1 = new FluidFrame.ArgumentedInstruction(Instruction.minus, _string_1);
           res.add(_argumentedInstruction_1);
           break;
         case MOD:
           throw new IllegalArgumentException("Mod is not supported as Instruction");
         case MUL:
-          String _string_2 = Integer.valueOf(width).toString();
+          String _string_2 = Integer.toString(width);
           FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.mul, _string_2);
           res.add(_argumentedInstruction_2);
           break;
         case PLUS:
-          String _string_3 = Integer.valueOf(width).toString();
+          String _string_3 = Integer.toString(width);
           FluidFrame.ArgumentedInstruction _argumentedInstruction_3 = new FluidFrame.ArgumentedInstruction(Instruction.plus, _string_3);
           res.add(_argumentedInstruction_3);
           break;

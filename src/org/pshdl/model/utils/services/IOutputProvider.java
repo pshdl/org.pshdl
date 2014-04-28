@@ -26,8 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,7 +59,7 @@ public interface IOutputProvider {
 		}
 
 		public void printHelp(PrintStream out) {
-			final PrintWriter pw = new PrintWriter(out);
+			final PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 			printHelp(pw);
 			pw.close();
 		}

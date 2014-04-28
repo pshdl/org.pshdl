@@ -30,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,23 +52,23 @@ public class Helper {
 		}
 		sb.append(")");
 		final Pattern p = Pattern.compile(sb.toString());
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		String line = null;
-		final StringBuilder res = new StringBuilder();
-		while ((line = reader.readLine()) != null) {
-			final Matcher matcher = p.matcher(line);
-			int offset = 0;
-			while (matcher.find()) {
-				res.append(line.substring(offset, matcher.start()));
-				final String group = matcher.group(1);
-				final String replacement = options.get(group);
-				res.append(replacement);
-				offset = matcher.end();
+		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+			String line = null;
+			final StringBuilder res = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				final Matcher matcher = p.matcher(line);
+				int offset = 0;
+				while (matcher.find()) {
+					res.append(line.substring(offset, matcher.start()));
+					final String group = matcher.group(1);
+					final String replacement = options.get(group);
+					res.append(replacement);
+					offset = matcher.end();
+				}
+				res.append(line.substring(offset));
+				res.append("\n");
 			}
-			res.append(line.substring(offset));
-			res.append("\n");
+			return res.toString().getBytes(Charsets.UTF_8);
 		}
-		stream.close();
-		return res.toString().getBytes(Charsets.UTF_8);
 	}
 }

@@ -148,7 +148,7 @@ class SimulationTransformationExtension {
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context) {
 		val type = obj.resolveType.get
-		val width = if(type.classType === HDLClass.HDLPrimitive) HDLPrimitives.getWidth(type, context) else 32
+		var width = if(type.classType === HDLClass.HDLPrimitive) HDLPrimitives.getWidth(type, context) else 32
 		val isReg = obj.register !== null
 		val FluidFrame res = new FluidFrame("#null", false)
 		res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
@@ -441,13 +441,13 @@ class SimulationTransformationExtension {
 				switch (prim.type) {
 					case current.type === INTEGER || current.type === INT:
 						res.instructions.add(
-							new ArgumentedInstruction(cast_int, primWidth.toString, currentWidth.toString))
+							new ArgumentedInstruction(cast_int, primWidth.toString, Integer.toString(currentWidth)))
 					case current.type === BIT || current.type === BITVECTOR:
 						res.instructions.add(
-							new ArgumentedInstruction(cast_uint, primWidth.toString, currentWidth.toString))
+							new ArgumentedInstruction(cast_uint, primWidth.toString, Integer.toString(currentWidth)))
 					case current.type === UINT || current.type === NATURAL:
 						res.instructions.add(
-							new ArgumentedInstruction(cast_uint, primWidth.toString, currentWidth.toString))
+							new ArgumentedInstruction(cast_uint, primWidth.toString, Integer.toString(currentWidth)))
 					default:
 						throw new IllegalArgumentException("Cast to type:" + prim.type + " not supported")
 				}
@@ -585,19 +585,19 @@ class SimulationTransformationExtension {
 		switch (obj.type) {
 			case AND: {
 				val width = obj.targetSizeWithType(context)
-				res.add(new ArgumentedInstruction(and, width.toString))
+				res.add(new ArgumentedInstruction(and, Integer.toString(width)))
 			}
 			case LOGI_AND:
 				res.add(logiAnd)
 			case OR: {
 				val width = obj.targetSizeWithType(context)
-				res.add(new ArgumentedInstruction(or, width.toString))
+				res.add(new ArgumentedInstruction(or, Integer.toString(width)))
 			}
 			case LOGI_OR:
 				res.add(logiOr)
 			case XOR: {
 				val width = obj.targetSizeWithType(context)
-				res.add(new ArgumentedInstruction(xor, width.toString))
+				res.add(new ArgumentedInstruction(xor, Integer.toString(width)))
 			}
 		}
 		return res
@@ -610,15 +610,15 @@ class SimulationTransformationExtension {
 		val width = obj.targetSizeWithType(context)
 		switch (obj.type) {
 			case DIV:
-				res.add(new ArgumentedInstruction(div, width.toString))
+				res.add(new ArgumentedInstruction(div, Integer.toString(width)))
 			case MINUS:
-				res.add(new ArgumentedInstruction(minus, width.toString))
+				res.add(new ArgumentedInstruction(minus, Integer.toString(width)))
 			case MOD:
 				throw new IllegalArgumentException("Mod is not supported as Instruction")
 			case MUL:
-				res.add(new ArgumentedInstruction(mul, width.toString))
+				res.add(new ArgumentedInstruction(mul, Integer.toString(width)))
 			case PLUS:
-				res.add(new ArgumentedInstruction(plus, width.toString))
+				res.add(new ArgumentedInstruction(plus, Integer.toString(width)))
 			case POW:
 				throw new IllegalArgumentException("Pow is not supported as Instruction")
 		}

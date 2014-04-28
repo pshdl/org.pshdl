@@ -131,7 +131,7 @@ class ConstantEvaluate {
 			case HDLLiteral$HDLLiteralPresentation.STR:
 				return Optional.absent
 			case HDLLiteral$HDLLiteralPresentation.BOOL: {
-				if (context!=null && context.boolAsInt){
+				if (context !== null && context.boolAsInt) {
 					return boolInt(!obj.equals(HDLLiteral.^false))
 				}
 				return Optional.absent
@@ -413,7 +413,7 @@ class ConstantEvaluate {
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLEnumRef obj, HDLEvaluationContext context) {
-		if (context != null && context.enumAsInt) {
+		if (context !== null && context.enumAsInt) {
 			val hEnum = obj.resolveHEnum.get
 			val hVar = obj.resolveVar.get
 			return Optional.of(BigInteger.valueOf(hEnum.enums.indexOf(hVar)))

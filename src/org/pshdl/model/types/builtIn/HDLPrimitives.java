@@ -298,7 +298,7 @@ public class HDLPrimitives {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
 	 * .tuhh.ict.pshdl.model.HDLArithOp)
 	 */
@@ -666,6 +666,7 @@ public class HDLPrimitives {
 			final HDLPrimitive determineType = (HDLPrimitive) type;
 			BigInteger width = null;
 			switch (determineType.getType()) {
+			case BOOL:
 			case BIT:
 				width = BigInteger.ONE;
 				break;

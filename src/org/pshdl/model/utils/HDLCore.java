@@ -88,12 +88,11 @@ public class HDLCore {
 	}
 
 	private static String getVersion() {
-		final InputStream versionStream = HDLCore.class.getResourceAsStream("/version");
-		if (versionStream == null) {
-			System.err.println("Failed to read version");
-			System.exit(-1);
-		}
-		try {
+		try (final InputStream versionStream = HDLCore.class.getResourceAsStream("/version")) {
+			if (versionStream == null) {
+				System.err.println("Failed to read version");
+				System.exit(-1);
+			}
 			return new String(ByteStreams.toByteArray(versionStream), Charsets.UTF_8);
 		} catch (final IOException e) {
 			System.err.println("Failed to read version");
