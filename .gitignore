@@ -7,3 +7,4 @@ PSHDLCompiler.jar
 !/target/*.jar
 /target
 *.versionsBackup
+cov-int

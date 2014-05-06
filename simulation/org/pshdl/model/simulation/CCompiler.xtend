@@ -67,18 +67,21 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess
 class CCompiler implements ITypeOuptutProvider {
 	private extension CommonCompilerExtension cce
 	private final int bitWidth;
+	private final boolean jsonDescription
 
 	new() {
 		bitWidth = 64
+		jsonDescription=false
 	}
 
-	new(ExecutableModel em) {
+	new(ExecutableModel em, boolean jsonDescription) {
 		bitWidth = 64;
+		this.jsonDescription=jsonDescription
 		this.cce = new CommonCompilerExtension(em, bitWidth)
 	}
 
-	def static String doCompileMainC(ExecutableModel em) {
-		return new CCompiler(em).compile.toString
+	def static String doCompileMainC(ExecutableModel em, boolean jsonDescription) {
+		return new CCompiler(em, jsonDescription).compile.toString
 	}
 
 	def compile() {
@@ -193,11 +196,25 @@ class CCompiler implements ITypeOuptutProvider {
 			return 0;
 		}
 		
-		static int varIdx[]={«FOR v : em.variables.excludeNull SEPARATOR ','»«varIdx.get(v.name)»«ENDFOR»};
-		int* pshdl_sim_getAvailableVarIdx(int *numElements){
-			*numElements=«em.variables.length - 1»;
-			return varIdx;
+		«IF jsonDescription»
+		static char* jsonDesc="«JSONDescription»";
+		char* pshdl_sim_getJsonDesc(){
+			return jsonDesc;
 		}
+		
+		int pshdl_sim_getDeltaCycle(){
+			return deltaCycle;
+		}
+		int pshdl_sim_getVarCount(){
+			return «varIdx.size»;
+		}
+		void pshdl_sim_setDisableEdge(bool enable){
+			disableEdges=enable;
+		}
+		void pshdl_sim_setDisabledRegOutputlogic(bool enable){
+			disabledRegOutputlogic=enable;
+		}
+		«ENDIF»
 		
 		«uint_t» pshdl_sim_getOutput(int idx, ...) {
 			va_list va_arrayIdx;
@@ -662,6 +679,7 @@ class CCompiler implements ITypeOuptutProvider {
 		«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»uint64_t «info.idName(false,
 			false)»_update=0;«ENDIF»
 		«info.cType» «info.idName(false, false)»«IF !info.dimensions.empty»[«info.totalSize»]«ENDIF»;
+		#define PSHDL_SIM_«info.idName(false, false).toUpperCase» «varIdx.get(info.name)»
 		«IF includePrev !== null && includePrev»«info.cType» «info.idName(true, false)»«IF !info.dimensions.empty»[«info.
 			totalSize»]«ENDIF»;«ENDIF»
 		«IF info.isRegister»«info.cType» «info.idName(false, false)»$reg«IF !info.dimensions.empty»[«info.totalSize»]«ENDIF»;«ENDIF»
@@ -683,11 +701,12 @@ class CCompiler implements ITypeOuptutProvider {
 
 	override getUsage() {
 		val options = new Options;
+		options.addOption("j","jsonDescription", false, "Generates a string that can be parsed as json that descripes the module")
 		return new MultiOption(null, null, options)
 	}
 
-	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems) {
-		val comp = new CCompiler(em)
+	static def List<CompileResult> doCompile(ExecutableModel em, boolean withJSON, Set<Problem> syntaxProblems) {
+		val comp = new CCompiler(em, withJSON)
 		val List<SideFile> sideFiles = Lists.newLinkedList
 		val simFile = comp.generateSimEncapsuation
 		if (simFile !== null)
@@ -698,7 +717,7 @@ class CCompiler implements ITypeOuptutProvider {
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
-		doCompile(em, syntaxProblems)
+		doCompile(em, cli.hasOption("jsonDescription"), syntaxProblems)
 	}
 
 	def String generateSimEncapsuation() {

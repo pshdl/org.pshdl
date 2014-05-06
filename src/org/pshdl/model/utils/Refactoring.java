@@ -28,8 +28,10 @@ package org.pshdl.model.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,31 +51,102 @@ import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLInterfaceRef;
 import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLManip;
+import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLOpExpression;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
+import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.extensions.FullNameExtension;
+import org.pshdl.model.extensions.TypeExtension;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 public class Refactoring {
 
-	public static interface ISideEffecResolver {
+	public static class SubstituteExpressionResolver implements ISideEffectResolver {
+
+		@Override
+		public void resolveSideEffectExpression(HDLExpression exp, HDLReference ref, ModificationSet ms) {
+			resolveExpression(exp, ref, ms);
+		}
+
+		private void resolveExpression(HDLExpression exp, HDLExpression ref, ModificationSet ms) {
+			final EnumSet<HDLClass> classSet = exp.getClassSet();
+			if (classSet.contains(HDLClass.HDLOpExpression)) {
+				final HDLOpExpression op = (HDLOpExpression) exp;
+				if (op.getLeft() == ref) {
+					ms.replace(op, op.getRight());
+					return;
+				}
+				if (op.getRight() == ref) {
+					ms.replace(op, op.getLeft());
+					return;
+				}
+			}
+			if (classSet.contains(HDLClass.HDLManip)) {
+				final HDLManip manip = (HDLManip) exp;
+				// It doesn't make sense to simply replace or remove an HDLManip
+				resolveExpression(exp, manip, ms);
+				return;
+			}
+			replaceWithZeroOrConstant(ref, ms);
+		}
+
+		private void replaceWithZeroOrConstant(HDLExpression ref, ModificationSet ms) {
+			HDLLiteral value = HDLLiteral.get(0);
+			final Optional<BigInteger> constValue = ConstantEvaluate.valueOf(ref);
+			if (constValue.isPresent()) {
+				value = HDLLiteral.get(constValue.get());
+			}
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(ref);
+			if (!typeOf.isPresent())
+				throw new IllegalArgumentException("Should be able to resolve type, but failed for expression:" + ref);
+			ms.replace(ref, new HDLManip().setType(HDLManipType.CAST).setCastTo(typeOf.get()).setTarget(value));
+		}
+
+		@Override
+		public void resolveSideEffectStatement(HDLStatement stmnt, HDLReference ref, ModificationSet ms) {
+			switch (stmnt.getClassType()) {
+			case HDLAssignment: {
+				final HDLAssignment ass = (HDLAssignment) stmnt;
+				if (ass.getLeft() == ref) {
+					ms.remove(ass);
+				}
+				if (ass.getRight() == ref) {
+					replaceWithZeroOrConstant(ref, ms);
+				}
+				return;
+			}
+			case HDLIfStatement:
+			case HDLSwitchStatement:
+				replaceWithZeroOrConstant(ref, ms);
+				return;
+			default:
+				throw new IllegalArgumentException("Did not expect expression in statement:" + stmnt.getClassType());
+			}
+		}
+	}
+
+	public static interface ISideEffectResolver {
 		void resolveSideEffectExpression(HDLExpression exp, HDLReference ref, ModificationSet ms);
 
 		void resolveSideEffectStatement(HDLStatement ass, HDLReference ref, ModificationSet ms);
 	}
 
-	public HDLUnit removeVariable(HDLUnit obj, HDLVariable hdlVariable, ISideEffecResolver resolver) {
+	public static HDLUnit removeVariable(HDLUnit obj, HDLVariable hdlVariable, ISideEffectResolver resolver) {
 		final ModificationSet ms = new ModificationSet();
 		final HDLClass classType = hdlVariable.getContainer().getClassType();
 		Iterable<? extends HDLReference> refs;

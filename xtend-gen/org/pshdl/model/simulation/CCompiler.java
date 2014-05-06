@@ -73,18 +73,22 @@ public class CCompiler implements ITypeOuptutProvider {
   
   private final int bitWidth;
   
+  private final boolean jsonDescription;
+  
   public CCompiler() {
     this.bitWidth = 64;
+    this.jsonDescription = false;
   }
   
-  public CCompiler(final ExecutableModel em) {
+  public CCompiler(final ExecutableModel em, final boolean jsonDescription) {
     this.bitWidth = 64;
+    this.jsonDescription = jsonDescription;
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, this.bitWidth);
     this.cce = _commonCompilerExtension;
   }
   
-  public static String doCompileMainC(final ExecutableModel em) {
-    CCompiler _cCompiler = new CCompiler(em);
+  public static String doCompileMainC(final ExecutableModel em, final boolean jsonDescription) {
+    CCompiler _cCompiler = new CCompiler(em, jsonDescription);
     CharSequence _compile = _cCompiler.compile();
     return _compile.toString();
   }
@@ -490,36 +494,54 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("static int varIdx[]={");
     {
-      Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
-      boolean _hasElements = false;
-      for(final VariableInformation v_2 : _excludeNull_2) {
-        if (!_hasElements) {
-          _hasElements = true;
-        } else {
-          _builder.appendImmediate(",", "");
-        }
-        Integer _get_3 = this.cce.varIdx.get(v_2.name);
-        _builder.append(_get_3, "");
+      if (this.jsonDescription) {
+        _builder.append("static char* jsonDesc=\"");
+        String _jSONDescription = this.cce.getJSONDescription();
+        _builder.append(_jSONDescription, "");
+        _builder.append("\";");
+        _builder.newLineIfNotEmpty();
+        _builder.append("char* pshdl_sim_getJsonDesc(){");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("return jsonDesc;");
+        _builder.newLine();
+        _builder.append("}");
+        _builder.newLine();
+        _builder.newLine();
+        _builder.append("int pshdl_sim_getDeltaCycle(){");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("return deltaCycle;");
+        _builder.newLine();
+        _builder.append("}");
+        _builder.newLine();
+        _builder.append("int pshdl_sim_getVarCount(){");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("return ");
+        int _size = this.cce.varIdx.size();
+        _builder.append(_size, "\t");
+        _builder.append(";");
+        _builder.newLineIfNotEmpty();
+        _builder.append("}");
+        _builder.newLine();
+        _builder.append("void pshdl_sim_setDisableEdge(bool enable){");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("disableEdges=enable;");
+        _builder.newLine();
+        _builder.append("}");
+        _builder.newLine();
+        _builder.append("void pshdl_sim_setDisabledRegOutputlogic(bool enable){");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("disabledRegOutputlogic=enable;");
+        _builder.newLine();
+        _builder.append("}");
+        _builder.newLine();
       }
     }
-    _builder.append("};");
-    _builder.newLineIfNotEmpty();
-    _builder.append("int* pshdl_sim_getAvailableVarIdx(int *numElements){");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("*numElements=");
-    int _length_1 = this.cce.em.variables.length;
-    int _minus = (_length_1 - 1);
-    _builder.append(_minus, "\t");
-    _builder.append(";");
-    _builder.newLineIfNotEmpty();
-    _builder.append("\t");
-    _builder.append("return varIdx;");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
     _builder.newLine();
     CharSequence _uint_t = this.uint_t();
     _builder.append(_uint_t, "");
@@ -535,27 +557,27 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.append("switch (idx) {");
     _builder.newLine();
     {
-      Iterable<VariableInformation> _excludeNull_3 = this.cce.excludeNull(this.cce.em.variables);
-      for(final VariableInformation v_3 : _excludeNull_3) {
+      Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation v_2 : _excludeNull_2) {
         {
-          int _length_2 = v_3.dimensions.length;
-          boolean _equals_1 = (_length_2 == 0);
+          int _length_1 = v_2.dimensions.length;
+          boolean _equals_1 = (_length_1 == 0);
           if (_equals_1) {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get_4 = this.cce.varIdx.get(v_3.name);
-            _builder.append(_get_4, "\t\t");
+            Integer _get_3 = this.cce.varIdx.get(v_2.name);
+            _builder.append(_get_3, "\t\t");
             _builder.append(": return ");
-            String _idName_2 = this.cce.idName(v_3, false, false);
+            String _idName_2 = this.cce.idName(v_2, false, false);
             _builder.append(_idName_2, "\t\t");
             {
-              boolean _isPredicate_3 = this.cce.isPredicate(v_3);
+              boolean _isPredicate_3 = this.cce.isPredicate(v_2);
               if (_isPredicate_3) {
                 _builder.append("?1:0");
               } else {
-                if ((v_3.width != this.bitWidth)) {
+                if ((v_2.width != this.bitWidth)) {
                   _builder.append(" & ");
-                  CharSequence _asMaskL_2 = this.cce.asMaskL(v_3.width);
+                  CharSequence _asMaskL_2 = this.cce.asMaskL(v_2.width);
                   _builder.append(_asMaskL_2, "\t\t");
                 }
               }
@@ -565,8 +587,8 @@ public class CCompiler implements ITypeOuptutProvider {
           } else {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get_5 = this.cce.varIdx.get(v_3.name);
-            _builder.append(_get_5, "\t\t");
+            Integer _get_4 = this.cce.varIdx.get(v_2.name);
+            _builder.append(_get_4, "\t\t");
             _builder.append(": {");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -578,24 +600,24 @@ public class CCompiler implements ITypeOuptutProvider {
             CharSequence _uint_t_1 = this.uint_t();
             _builder.append(_uint_t_1, "\t\t\t");
             _builder.append(" res=");
-            String _idName_3 = this.cce.idName(v_3, false, false);
+            String _idName_3 = this.cce.idName(v_2, false, false);
             _builder.append(_idName_3, "\t\t\t");
             _builder.append("[");
-            StringBuilder _arrayVarArgAccessArrIdx_1 = this.arrayVarArgAccessArrIdx(v_3);
+            StringBuilder _arrayVarArgAccessArrIdx_1 = this.arrayVarArgAccessArrIdx(v_2);
             _builder.append(_arrayVarArgAccessArrIdx_1, "\t\t\t");
             _builder.append("]");
             {
               boolean _and_2 = false;
-              if (!(v_3.width != this.bitWidth)) {
+              if (!(v_2.width != this.bitWidth)) {
                 _and_2 = false;
               } else {
-                boolean _isPredicate_4 = this.cce.isPredicate(v_3);
+                boolean _isPredicate_4 = this.cce.isPredicate(v_2);
                 boolean _not_2 = (!_isPredicate_4);
                 _and_2 = _not_2;
               }
               if (_and_2) {
                 _builder.append(" & ");
-                CharSequence _asMaskL_3 = this.cce.asMaskL(v_3.width);
+                CharSequence _asMaskL_3 = this.cce.asMaskL(v_2.width);
                 _builder.append(_asMaskL_3, "\t\t\t");
               }
             }
@@ -2119,6 +2141,14 @@ public class CCompiler implements ITypeOuptutProvider {
     }
     _builder.append(";");
     _builder.newLineIfNotEmpty();
+    _builder.append("#define PSHDL_SIM_");
+    String _idName_2 = this.cce.idName(info, false, false);
+    String _upperCase = _idName_2.toUpperCase();
+    _builder.append(_upperCase, "");
+    _builder.append(" ");
+    Integer _get_2 = this.cce.varIdx.get(info.name);
+    _builder.append(_get_2, "");
+    _builder.newLineIfNotEmpty();
     {
       boolean _and_1 = false;
       boolean _tripleNotEquals_1 = (includePrev != null);
@@ -2131,8 +2161,8 @@ public class CCompiler implements ITypeOuptutProvider {
         CharSequence _cType_1 = this.cType(info);
         _builder.append(_cType_1, "");
         _builder.append(" ");
-        String _idName_2 = this.cce.idName(info, true, false);
-        _builder.append(_idName_2, "");
+        String _idName_3 = this.cce.idName(info, true, false);
+        _builder.append(_idName_3, "");
         {
           boolean _isEmpty_1 = IterableExtensions.isEmpty(((Iterable<?>)Conversions.doWrapArray(info.dimensions)));
           boolean _not_1 = (!_isEmpty_1);
@@ -2152,8 +2182,8 @@ public class CCompiler implements ITypeOuptutProvider {
         CharSequence _cType_2 = this.cType(info);
         _builder.append(_cType_2, "");
         _builder.append(" ");
-        String _idName_3 = this.cce.idName(info, false, false);
-        _builder.append(_idName_3, "");
+        String _idName_4 = this.cce.idName(info, false, false);
+        _builder.append(_idName_4, "");
         _builder.append("$reg");
         {
           boolean _isEmpty_2 = IterableExtensions.isEmpty(((Iterable<?>)Conversions.doWrapArray(info.dimensions)));
@@ -2197,11 +2227,12 @@ public class CCompiler implements ITypeOuptutProvider {
   
   public IOutputProvider.MultiOption getUsage() {
     final Options options = new Options();
+    options.addOption("j", "jsonDescription", false, "Generates a string that can be parsed as json that descripes the module");
     return new IOutputProvider.MultiOption(null, null, options);
   }
   
-  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final Set<Problem> syntaxProblems) {
-    final CCompiler comp = new CCompiler(em);
+  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final boolean withJSON, final Set<Problem> syntaxProblems) {
+    final CCompiler comp = new CCompiler(em, withJSON);
     final List<IHDLGenerator.SideFile> sideFiles = Lists.<IHDLGenerator.SideFile>newLinkedList();
     final String simFile = comp.generateSimEncapsuation();
     boolean _tripleNotEquals = (simFile != null);
@@ -2219,7 +2250,8 @@ public class CCompiler implements ITypeOuptutProvider {
   }
   
   public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    return CCompiler.doCompile(em, syntaxProblems);
+    boolean _hasOption = cli.hasOption("jsonDescription");
+    return CCompiler.doCompile(em, _hasOption, syntaxProblems);
   }
   
   public String generateSimEncapsuation() {

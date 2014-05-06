@@ -36,6 +36,34 @@ class CommonCompilerExtension {
 		}
 		this.hasClock = !prevMap.empty
 	}
+	
+	def String getJSONDescription(){
+		val intVar=new ArrayList
+		val inVar=new ArrayList
+		val inOutVar=new ArrayList
+		val outVar=new ArrayList
+		for (vi: em.variables){
+			switch (vi.dir){
+				case IN: inVar.add(vi.toPort)
+				case INOUT: inOutVar.add(vi.toPort)
+				case OUT: outVar.add(vi.toPort)
+				case INTERNAL: intVar.add(vi.toPort)
+			}
+		}
+		return 
+'''{\"moduleName\":\"«em.moduleName»\",\"inPorts\":[«FOR port:inVar SEPARATOR ","»«port»«ENDFOR»],\"inOutPorts\":[«FOR port:inOutVar SEPARATOR ","»«port»«ENDFOR»],\"outPorts\":[«FOR port:outVar SEPARATOR ","»«port»«ENDFOR»],\"internalPorts\":[«FOR port:intVar SEPARATOR ","»«port»«ENDFOR»],\"nameIdx\":{«FOR entry: varIdx.entrySet SEPARATOR ","»\"«entry.key»\":«entry.value»«ENDFOR»}}'''
+	}
+	
+	def String toPort(VariableInformation vi) 
+	'''{\"idx\":«varIdx.get(vi.name)»,\"name\":\"«vi.name»\",\"width\":«vi.width»,\"clock\": «vi.isClock»,\"reset\":«vi.isReset»,\"type\":«vi.bitJsonType»}'''
+	
+	def bitJsonType(VariableInformation vi) {
+		switch (vi.type){
+			case BIT: return 0
+			case INT: return 1
+			case UINT: return 2
+		}
+	}
 
 	def InternalInformation asInternal(int id) {
 		return em.internals.get(id)
