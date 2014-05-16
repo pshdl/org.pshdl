@@ -1369,10 +1369,7 @@ public class StringWriteExtension {
     String _enumName = highlight.enumName(_name);
     sb.append(_enumName);
     String _simpleSpace_2 = highlight.simpleSpace();
-    StringBuilder _append_2 = sb.append(_simpleSpace_2);
-    StringBuilder _append_3 = _append_2.append("=");
-    String _simpleSpace_3 = highlight.simpleSpace();
-    _append_3.append(_simpleSpace_3);
+    sb.append(_simpleSpace_2);
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("{");
     {
@@ -1383,8 +1380,8 @@ public class StringWriteExtension {
         if (!_hasElements) {
           _hasElements = true;
         } else {
-          String _simpleSpace_4 = highlight.simpleSpace();
-          String _plus = ("," + _simpleSpace_4);
+          String _simpleSpace_3 = highlight.simpleSpace();
+          String _plus = ("," + _simpleSpace_3);
           _builder.appendImmediate(_plus, "");
         }
         String _string_1 = this.toString(henum, highlight);
@@ -1437,86 +1434,131 @@ public class StringWriteExtension {
       _append_3.append(_string_1);
       first = false;
     }
-    boolean _and = false;
-    HDLRegisterConfig.HDLRegClockType _clockType = reg.getClockType();
-    boolean _tripleNotEquals = (_clockType != null);
-    if (!_tripleNotEquals) {
-      _and = false;
-    } else {
-      HDLRegisterConfig.HDLRegClockType _clockType_1 = reg.getClockType();
-      HDLRegisterConfig.HDLRegClockType _clockType_2 = defaultReg.getClockType();
-      boolean _tripleNotEquals_1 = (_clockType_1 != _clockType_2);
-      _and = _tripleNotEquals_1;
-    }
-    if (_and) {
+    HDLExpression _unresolvedClockType = reg.getUnresolvedClockType();
+    boolean _tripleNotEquals = (_unresolvedClockType != null);
+    if (_tripleNotEquals) {
       if ((!first)) {
         params.append(", ");
       }
       String _param_2 = highlight.param(HDLRegisterConfig.EDGE_PARAM);
       StringBuilder _append_4 = params.append(_param_2);
       StringBuilder _append_5 = _append_4.append("=");
-      String _enumRefType = highlight.enumRefType("Edge");
-      StringBuilder _append_6 = _append_5.append(_enumRefType);
-      StringBuilder _append_7 = _append_6.append(".");
-      HDLRegisterConfig.HDLRegClockType _clockType_3 = reg.getClockType();
-      String _string_2 = _clockType_3.toString();
-      String _enumRefVar = highlight.enumRefVar(_string_2);
-      _append_7.append(_enumRefVar);
+      HDLExpression _unresolvedClockType_1 = reg.getUnresolvedClockType();
+      String _string_2 = this.toString(_unresolvedClockType_1, highlight);
+      _append_5.append(_string_2);
       first = false;
-    }
-    boolean _and_1 = false;
-    HDLRegisterConfig.HDLRegSyncType _syncType = reg.getSyncType();
-    boolean _tripleNotEquals_2 = (_syncType != null);
-    if (!_tripleNotEquals_2) {
-      _and_1 = false;
     } else {
-      HDLRegisterConfig.HDLRegSyncType _syncType_1 = reg.getSyncType();
-      HDLRegisterConfig.HDLRegSyncType _syncType_2 = defaultReg.getSyncType();
-      boolean _tripleNotEquals_3 = (_syncType_1 != _syncType_2);
-      _and_1 = _tripleNotEquals_3;
+      boolean _and = false;
+      HDLRegisterConfig.HDLRegClockType _clockType = reg.getClockType();
+      boolean _tripleNotEquals_1 = (_clockType != null);
+      if (!_tripleNotEquals_1) {
+        _and = false;
+      } else {
+        HDLRegisterConfig.HDLRegClockType _clockType_1 = reg.getClockType();
+        HDLRegisterConfig.HDLRegClockType _clockType_2 = defaultReg.getClockType();
+        boolean _tripleNotEquals_2 = (_clockType_1 != _clockType_2);
+        _and = _tripleNotEquals_2;
+      }
+      if (_and) {
+        if ((!first)) {
+          params.append(", ");
+        }
+        String _param_3 = highlight.param(HDLRegisterConfig.EDGE_PARAM);
+        StringBuilder _append_6 = params.append(_param_3);
+        StringBuilder _append_7 = _append_6.append("=");
+        String _enumRefType = highlight.enumRefType("Edge");
+        StringBuilder _append_8 = _append_7.append(_enumRefType);
+        StringBuilder _append_9 = _append_8.append(".");
+        HDLRegisterConfig.HDLRegClockType _clockType_3 = reg.getClockType();
+        String _string_3 = _clockType_3.toString();
+        String _enumRefVar = highlight.enumRefVar(_string_3);
+        _append_9.append(_enumRefVar);
+        first = false;
+      }
     }
-    if (_and_1) {
+    HDLExpression _unresolvedSyncType = reg.getUnresolvedSyncType();
+    boolean _tripleNotEquals_3 = (_unresolvedSyncType != null);
+    if (_tripleNotEquals_3) {
       if ((!first)) {
         params.append(", ");
       }
-      String _param_3 = highlight.param(HDLRegisterConfig.RESET_SYNC_PARAM);
-      StringBuilder _append_8 = params.append(_param_3);
-      StringBuilder _append_9 = _append_8.append("=");
-      String _enumRefType_1 = highlight.enumRefType("Sync");
-      StringBuilder _append_10 = _append_9.append(_enumRefType_1);
-      StringBuilder _append_11 = _append_10.append(".");
-      HDLRegisterConfig.HDLRegSyncType _syncType_3 = reg.getSyncType();
-      String _string_3 = _syncType_3.toString();
-      String _enumRefVar_1 = highlight.enumRefVar(_string_3);
-      _append_11.append(_enumRefVar_1);
+      String _param_4 = highlight.param(HDLRegisterConfig.EDGE_PARAM);
+      StringBuilder _append_10 = params.append(_param_4);
+      StringBuilder _append_11 = _append_10.append("=");
+      HDLExpression _unresolvedSyncType_1 = reg.getUnresolvedSyncType();
+      String _string_4 = this.toString(_unresolvedSyncType_1, highlight);
+      _append_11.append(_string_4);
       first = false;
-    }
-    boolean _and_2 = false;
-    HDLRegisterConfig.HDLRegResetActiveType _resetType = reg.getResetType();
-    boolean _tripleNotEquals_4 = (_resetType != null);
-    if (!_tripleNotEquals_4) {
-      _and_2 = false;
     } else {
-      HDLRegisterConfig.HDLRegResetActiveType _resetType_1 = reg.getResetType();
-      HDLRegisterConfig.HDLRegResetActiveType _resetType_2 = defaultReg.getResetType();
-      boolean _tripleNotEquals_5 = (_resetType_1 != _resetType_2);
-      _and_2 = _tripleNotEquals_5;
+      boolean _and_1 = false;
+      HDLRegisterConfig.HDLRegSyncType _syncType = reg.getSyncType();
+      boolean _tripleNotEquals_4 = (_syncType != null);
+      if (!_tripleNotEquals_4) {
+        _and_1 = false;
+      } else {
+        HDLRegisterConfig.HDLRegSyncType _syncType_1 = reg.getSyncType();
+        HDLRegisterConfig.HDLRegSyncType _syncType_2 = defaultReg.getSyncType();
+        boolean _tripleNotEquals_5 = (_syncType_1 != _syncType_2);
+        _and_1 = _tripleNotEquals_5;
+      }
+      if (_and_1) {
+        if ((!first)) {
+          params.append(", ");
+        }
+        String _param_5 = highlight.param(HDLRegisterConfig.RESET_SYNC_PARAM);
+        StringBuilder _append_12 = params.append(_param_5);
+        StringBuilder _append_13 = _append_12.append("=");
+        String _enumRefType_1 = highlight.enumRefType("Sync");
+        StringBuilder _append_14 = _append_13.append(_enumRefType_1);
+        StringBuilder _append_15 = _append_14.append(".");
+        HDLRegisterConfig.HDLRegSyncType _syncType_3 = reg.getSyncType();
+        String _string_5 = _syncType_3.toString();
+        String _enumRefVar_1 = highlight.enumRefVar(_string_5);
+        _append_15.append(_enumRefVar_1);
+        first = false;
+      }
     }
-    if (_and_2) {
+    HDLExpression _unresolvedResetType = reg.getUnresolvedResetType();
+    boolean _tripleNotEquals_6 = (_unresolvedResetType != null);
+    if (_tripleNotEquals_6) {
       if ((!first)) {
         params.append(", ");
       }
-      String _param_4 = highlight.param(HDLRegisterConfig.RESET_TYPE_PARAM);
-      StringBuilder _append_12 = params.append(_param_4);
-      StringBuilder _append_13 = _append_12.append("=");
-      String _enumRefType_2 = highlight.enumRefType("Active");
-      StringBuilder _append_14 = _append_13.append(_enumRefType_2);
-      StringBuilder _append_15 = _append_14.append(".");
-      HDLRegisterConfig.HDLRegResetActiveType _resetType_3 = reg.getResetType();
-      String _string_4 = _resetType_3.toString();
-      String _enumRefVar_2 = highlight.enumRefVar(_string_4);
-      _append_15.append(_enumRefVar_2);
+      String _param_6 = highlight.param(HDLRegisterConfig.EDGE_PARAM);
+      StringBuilder _append_16 = params.append(_param_6);
+      StringBuilder _append_17 = _append_16.append("=");
+      HDLExpression _unresolvedResetType_1 = reg.getUnresolvedResetType();
+      String _string_6 = this.toString(_unresolvedResetType_1, highlight);
+      _append_17.append(_string_6);
       first = false;
+    } else {
+      boolean _and_2 = false;
+      HDLRegisterConfig.HDLRegResetActiveType _resetType = reg.getResetType();
+      boolean _tripleNotEquals_7 = (_resetType != null);
+      if (!_tripleNotEquals_7) {
+        _and_2 = false;
+      } else {
+        HDLRegisterConfig.HDLRegResetActiveType _resetType_1 = reg.getResetType();
+        HDLRegisterConfig.HDLRegResetActiveType _resetType_2 = defaultReg.getResetType();
+        boolean _tripleNotEquals_8 = (_resetType_1 != _resetType_2);
+        _and_2 = _tripleNotEquals_8;
+      }
+      if (_and_2) {
+        if ((!first)) {
+          params.append(", ");
+        }
+        String _param_7 = highlight.param(HDLRegisterConfig.RESET_TYPE_PARAM);
+        StringBuilder _append_18 = params.append(_param_7);
+        StringBuilder _append_19 = _append_18.append("=");
+        String _enumRefType_2 = highlight.enumRefType("Active");
+        StringBuilder _append_20 = _append_19.append(_enumRefType_2);
+        StringBuilder _append_21 = _append_20.append(".");
+        HDLRegisterConfig.HDLRegResetActiveType _resetType_3 = reg.getResetType();
+        String _string_7 = _resetType_3.toString();
+        String _enumRefVar_2 = highlight.enumRefVar(_string_7);
+        _append_21.append(_enumRefVar_2);
+        first = false;
+      }
     }
     HDLExpression _resetValue = reg.getResetValue();
     HDLExpression _resetValue_1 = defaultReg.getResetValue();
@@ -1525,12 +1567,12 @@ public class StringWriteExtension {
       if ((!first)) {
         params.append(", ");
       }
-      String _param_5 = highlight.param(HDLRegisterConfig.RESET_VALUE_PARAM);
-      StringBuilder _append_16 = params.append(_param_5);
-      StringBuilder _append_17 = _append_16.append("=");
+      String _param_8 = highlight.param(HDLRegisterConfig.RESET_VALUE_PARAM);
+      StringBuilder _append_22 = params.append(_param_8);
+      StringBuilder _append_23 = _append_22.append("=");
       HDLExpression _resetValue_2 = reg.getResetValue();
-      String _string_5 = this.toString(_resetValue_2, highlight);
-      _append_17.append(_string_5);
+      String _string_8 = this.toString(_resetValue_2, highlight);
+      _append_23.append(_string_8);
       first = false;
     }
     HDLExpression _delay = reg.getDelay();
@@ -1540,12 +1582,12 @@ public class StringWriteExtension {
       if ((!first)) {
         params.append(", ");
       }
-      String _param_6 = highlight.param(HDLRegisterConfig.DELAY_PARAM);
-      StringBuilder _append_18 = params.append(_param_6);
-      StringBuilder _append_19 = _append_18.append("=");
+      String _param_9 = highlight.param(HDLRegisterConfig.DELAY_PARAM);
+      StringBuilder _append_24 = params.append(_param_9);
+      StringBuilder _append_25 = _append_24.append("=");
       HDLExpression _delay_2 = reg.getDelay();
-      String _string_6 = this.toString(_delay_2, highlight);
-      _append_19.append(_string_6);
+      String _string_9 = this.toString(_delay_2, highlight);
+      _append_25.append(_string_9);
       first = false;
     }
     params.append(")");

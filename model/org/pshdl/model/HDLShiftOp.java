@@ -99,7 +99,7 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 	/**
 	 * The accessor for the field type which is of type HDLShiftOpType.
 	 */
-	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>("type") {
+	public static HDLFieldAccess<HDLShiftOp, HDLShiftOpType> fType = new HDLFieldAccess<HDLShiftOp, HDLShiftOpType>("type", HDLShiftOpType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLShiftOpType getValue(HDLShiftOp obj) {
 			if (obj == null)
@@ -114,6 +114,13 @@ public class HDLShiftOp extends AbstractHDLShiftOp {
 			return obj.setType(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (type == obj)
+			return fType;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

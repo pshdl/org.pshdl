@@ -70,7 +70,8 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 	/**
 	 * The accessor for the field var which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLResolvedRef, HDLQualifiedName> fVar = new HDLFieldAccess<HDLResolvedRef, HDLQualifiedName>("var") {
+	public static HDLFieldAccess<HDLResolvedRef, HDLQualifiedName> fVar = new HDLFieldAccess<HDLResolvedRef, HDLQualifiedName>("var", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLResolvedRef obj) {
 			if (obj == null)
@@ -85,6 +86,13 @@ public abstract class HDLResolvedRef extends AbstractHDLResolvedRef {
 			return obj.setVar(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (var == obj)
+			return fVar;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

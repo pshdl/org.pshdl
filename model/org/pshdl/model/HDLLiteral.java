@@ -74,7 +74,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * The accessor for the field val which is of type String.
 	 */
-	public static HDLFieldAccess<HDLLiteral, String> fVal = new HDLFieldAccess<HDLLiteral, String>("val") {
+	public static HDLFieldAccess<HDLLiteral, String> fVal = new HDLFieldAccess<HDLLiteral, String>("val", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLLiteral obj) {
 			if (obj == null)
@@ -92,7 +92,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	/**
 	 * The accessor for the field str which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLLiteral, Boolean> fStr = new HDLFieldAccess<HDLLiteral, Boolean>("str") {
+	public static HDLFieldAccess<HDLLiteral, Boolean> fStr = new HDLFieldAccess<HDLLiteral, Boolean>("str", Boolean.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public Boolean getValue(HDLLiteral obj) {
 			if (obj == null)
@@ -107,6 +107,16 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return obj.setStr(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (val == obj)
+			return fVal;
+		if (str == obj)
+			return fStr;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 	public static final String TRUE = "true";
 	public static final String FALSE = "false";

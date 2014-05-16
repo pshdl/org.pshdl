@@ -34,6 +34,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArgument;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLDirectGeneration;
@@ -53,6 +54,8 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param arguments
@@ -70,9 +73,10 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLDirectGeneration(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf,
-			@Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include, boolean validate) {
-		super(id, container, var, arguments, validate);
+	public AbstractHDLDirectGeneration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
+			@Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf, @Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include,
+			boolean validate) {
+		super(id, container, annotations, var, arguments, validate);
 		if (validate) {
 			hIf = validateHIf(hIf);
 		}
@@ -183,7 +187,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Override
 	@Nonnull
 	public HDLDirectGeneration copy() {
-		final HDLDirectGeneration newObject = new HDLDirectGeneration(id, null, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration newObject = new HDLDirectGeneration(id, null, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		copyMetaData(this, newObject, false);
 		return newObject;
 	}
@@ -196,14 +200,15 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Override
 	@Nonnull
 	public HDLDirectGeneration copyFiltered(CopyFilter filter) {
+		final ArrayList<HDLAnnotation> filteredannotations = filter.copyContainer("annotations", this, annotations);
 		final HDLVariable filteredvar = filter.copyObject("var", this, var);
 		final ArrayList<HDLArgument> filteredarguments = filter.copyContainer("arguments", this, arguments);
 		final HDLInterface filteredhIf = filter.copyObject("hIf", this, hIf);
 		final String filteredgeneratorID = filter.copyObject("generatorID", this, generatorID);
 		final String filteredgeneratorContent = filter.copyObject("generatorContent", this, generatorContent);
 		final Boolean filteredinclude = filter.copyObject("include", this, include);
-		return filter.postFilter((HDLDirectGeneration) this, new HDLDirectGeneration(id, null, filteredvar, filteredarguments, filteredhIf, filteredgeneratorID,
-				filteredgeneratorContent, filteredinclude, false));
+		return filter.postFilter((HDLDirectGeneration) this, new HDLDirectGeneration(id, null, filteredannotations, filteredvar, filteredarguments, filteredhIf,
+				filteredgeneratorID, filteredgeneratorContent, filteredinclude, false));
 	}
 
 	/**
@@ -235,6 +240,80 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	}
 
 	/**
+	 * Setter for the field {@link #getAnnotations()}.
+	 *
+	 * @param annotations
+	 *            sets the new annotations of this object. Can be
+	 *            <code>null</code>.
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated
+	 *         annotations field.
+	 */
+	@Override
+	@Nonnull
+	public HDLDirectGeneration setAnnotations(@Nullable Iterable<HDLAnnotation> annotations) {
+		annotations = validateAnnotations(annotations);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
+		return res;
+	}
+
+	/**
+	 * Adds a new value to the field {@link #getAnnotations()}.
+	 *
+	 * @param newAnnotations
+	 *            the value that should be added to the field
+	 *            {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated
+	 *         annotations field.
+	 */
+	@Override
+	@Nonnull
+	public HDLDirectGeneration addAnnotations(@Nullable HDLAnnotation newAnnotations) {
+		if (newAnnotations == null)
+			throw new IllegalArgumentException("Element of annotations can not be null!");
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		annotations.add(newAnnotations);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getAnnotations()}.
+	 *
+	 * @param newAnnotations
+	 *            the value that should be removed from the field
+	 *            {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated
+	 *         annotations field.
+	 */
+	@Override
+	@Nonnull
+	public HDLDirectGeneration removeAnnotations(@Nullable HDLAnnotation newAnnotations) {
+		if (newAnnotations == null)
+			throw new IllegalArgumentException("Removed element of annotations can not be null!");
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		annotations.remove(newAnnotations);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
+		return res;
+	}
+
+	/**
+	 * Removes a value from the field {@link #getAnnotations()}.
+	 *
+	 * @param idx
+	 *            the index of the value that should be removed from the field
+	 *            {@link #getAnnotations()}
+	 * @return a new instance of {@link HDLDirectGeneration} with the updated
+	 *         annotations field.
+	 */
+	@Nonnull
+	public HDLDirectGeneration removeAnnotations(int idx) {
+		final ArrayList<HDLAnnotation> annotations = (ArrayList<HDLAnnotation>) this.annotations.clone();
+		annotations.remove(idx);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
+		return res;
+	}
+
+	/**
 	 * Setter for the field {@link #getVar()}.
 	 *
 	 * @param var
@@ -247,7 +326,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setVar(@Nonnull HDLVariable var) {
 		var = validateVar(var);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -264,7 +343,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setArguments(@Nullable Iterable<HDLArgument> arguments) {
 		arguments = validateArguments(arguments);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -284,7 +363,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 			throw new IllegalArgumentException("Element of arguments can not be null!");
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.add(newArguments);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -304,7 +383,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 			throw new IllegalArgumentException("Removed element of arguments can not be null!");
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.remove(newArguments);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -321,7 +400,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	public HDLDirectGeneration removeArguments(int idx) {
 		final ArrayList<HDLArgument> arguments = (ArrayList<HDLArgument>) this.arguments.clone();
 		arguments.remove(idx);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -337,7 +416,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setHIf(@Nonnull HDLInterface hIf) {
 		hIf = validateHIf(hIf);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -353,7 +432,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setGeneratorID(@Nonnull String generatorID) {
 		generatorID = validateGeneratorID(generatorID);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -369,7 +448,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setGeneratorContent(@Nonnull String generatorContent) {
 		generatorContent = validateGeneratorContent(generatorContent);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -385,7 +464,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setInclude(@Nonnull Boolean include) {
 		include = validateInclude(include);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -401,7 +480,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	@Nonnull
 	public HDLDirectGeneration setInclude(boolean include) {
 		include = validateInclude(include);
-		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, var, arguments, hIf, generatorID, generatorContent, include, false);
+		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;
 	}
 
@@ -460,6 +539,15 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 		final boolean first = true;
 		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLDirectGeneration()");
+		if (annotations != null) {
+			if (annotations.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (final HDLAnnotation o : annotations) {
+					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
+		}
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
@@ -519,11 +607,21 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 				while (current == null) {
 					switch (pos++) {
 					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
 						if (var != null) {
 							current = Iterators.concat(Iterators.forArray(var), var.deepIterator());
 						}
 						break;
-					case 1:
+					case 2:
 						if ((arguments != null) && (arguments.size() != 0)) {
 							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(arguments.size());
 							for (final HDLArgument o : arguments) {
@@ -533,7 +631,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 							current = Iterators.concat(iters.iterator());
 						}
 						break;
-					case 2:
+					case 3:
 						if (hIf != null) {
 							current = Iterators.concat(Iterators.forArray(hIf), hIf.deepIterator());
 						}
@@ -573,16 +671,21 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 				while (current == null) {
 					switch (pos++) {
 					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							current = annotations.iterator();
+						}
+						break;
+					case 1:
 						if (var != null) {
 							current = Iterators.singletonIterator(var);
 						}
 						break;
-					case 1:
+					case 2:
 						if ((arguments != null) && (arguments.size() != 0)) {
 							current = arguments.iterator();
 						}
 						break;
-					case 2:
+					case 3:
 						if (hIf != null) {
 							current = Iterators.singletonIterator(hIf);
 						}

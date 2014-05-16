@@ -38,6 +38,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLInstantiation contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
  * </ul>
@@ -48,6 +49,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param arguments
@@ -55,8 +58,9 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLInstantiation(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
-		super(id, container, var, arguments, validate);
+	public HDLInstantiation(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
+			@Nullable Iterable<HDLArgument> arguments, boolean validate) {
+		super(id, container, annotations, var, arguments, validate);
 	}
 
 	public HDLInstantiation() {
@@ -72,9 +76,29 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	}
 
 	/**
+	 * The accessor for the field annotations which is of type
+	 * ArrayList<HDLAnnotation>.
+	 */
+	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLAnnotation>>("annotations",
+			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
+		@Override
+		public ArrayList<HDLAnnotation> getValue(HDLInstantiation obj) {
+			if (obj == null)
+				return null;
+			return obj.getAnnotations();
+		}
+
+		@Override
+		public HDLInstantiation setValue(HDLInstantiation obj, ArrayList<HDLAnnotation> value) {
+			if (obj == null)
+				return null;
+			return obj.setAnnotations(value);
+		}
+	};
+	/**
 	 * The accessor for the field var which is of type HDLVariable.
 	 */
-	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>("var") {
+	public static HDLFieldAccess<HDLInstantiation, HDLVariable> fVar = new HDLFieldAccess<HDLInstantiation, HDLVariable>("var", HDLVariable.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLVariable getValue(HDLInstantiation obj) {
 			if (obj == null)
@@ -93,7 +117,8 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	 * The accessor for the field arguments which is of type
 	 * ArrayList<HDLArgument>.
 	 */
-	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>("arguments") {
+	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>("arguments",
+			HDLArgument.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLArgument> getValue(HDLInstantiation obj) {
 			if (obj == null)
@@ -108,6 +133,17 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 			return obj.setArguments(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (annotations.contains(obj))
+			return fAnnotations;
+		if (var == obj)
+			return fVar;
+		if (arguments.contains(obj))
+			return fArguments;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

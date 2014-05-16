@@ -72,7 +72,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * The accessor for the field left which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>("left") {
+	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fLeft = new HDLFieldAccess<HDLOpExpression, HDLExpression>("left", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
 			if (obj == null)
@@ -90,7 +91,8 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 	/**
 	 * The accessor for the field right which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>("right") {
+	public static HDLFieldAccess<HDLOpExpression, HDLExpression> fRight = new HDLFieldAccess<HDLOpExpression, HDLExpression>("right", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLOpExpression obj) {
 			if (obj == null)
@@ -105,6 +107,15 @@ public abstract class HDLOpExpression extends AbstractHDLOpExpression {
 			return obj.setRight(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (left == obj)
+			return fLeft;
+		if (right == obj)
+			return fRight;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	public abstract Enum<?> getType();

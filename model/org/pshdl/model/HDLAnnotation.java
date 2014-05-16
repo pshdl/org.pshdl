@@ -72,7 +72,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>("name") {
+	public static HDLFieldAccess<HDLAnnotation, String> fName = new HDLFieldAccess<HDLAnnotation, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLAnnotation obj) {
 			if (obj == null)
@@ -90,7 +90,7 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 	/**
 	 * The accessor for the field value which is of type String.
 	 */
-	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>("value") {
+	public static HDLFieldAccess<HDLAnnotation, String> fValue = new HDLFieldAccess<HDLAnnotation, String>("value", String.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public String getValue(HDLAnnotation obj) {
 			if (obj == null)
@@ -105,6 +105,15 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 			return obj.setValue(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (name == obj)
+			return fName;
+		if (value == obj)
+			return fValue;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

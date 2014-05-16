@@ -93,32 +93,6 @@ public abstract class AbstractHDLValueType extends HDLType {
 	public abstract HDLValueType copyDeepFrozen(IHDLObject container);
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof AbstractHDLValueType))
-			return false;
-		if (!super.equals(obj))
-			return false;
-		final AbstractHDLValueType other = (AbstractHDLValueType) obj;
-		return true;
-	}
-
-	private Integer hashCache;
-
-	@Override
-	public int hashCode() {
-		if (hashCache != null)
-			return hashCache;
-		final int result = super.hashCode();
-		final int prime = 31;
-		hashCache = result;
-		return result;
-	}
-
-	@Override
 	public String toConstructionString(String spacing) {
 		final boolean first = true;
 		final StringBuilder sb = new StringBuilder();

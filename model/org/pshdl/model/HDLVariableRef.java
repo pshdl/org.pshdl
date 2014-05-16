@@ -82,7 +82,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	 * The accessor for the field array which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>("array") {
+	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLExpression>>("array", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariableRef obj) {
 			if (obj == null)
@@ -100,7 +101,8 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 	/**
 	 * The accessor for the field bits which is of type ArrayList<HDLRange>.
 	 */
-	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>("bits") {
+	public static HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLVariableRef, ArrayList<HDLRange>>("bits", HDLRange.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLVariableRef obj) {
 			if (obj == null)
@@ -115,6 +117,16 @@ public class HDLVariableRef extends AbstractHDLVariableRef {
 			return obj.setBits(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (array.contains(obj))
+			return fArray;
+		if (bits.contains(obj))
+			return fBits;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 
 	private HDLVariable resolveVarCache;

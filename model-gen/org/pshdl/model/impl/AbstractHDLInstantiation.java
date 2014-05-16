@@ -34,6 +34,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArgument;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLInstantiation;
@@ -53,6 +54,8 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param arguments
@@ -60,8 +63,18 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLInstantiation(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, boolean validate) {
+	public AbstractHDLInstantiation(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
+			@Nullable Iterable<HDLArgument> arguments, boolean validate) {
 		super(id, container, validate);
+		if (validate) {
+			annotations = validateAnnotations(annotations);
+		}
+		this.annotations = new ArrayList<HDLAnnotation>();
+		if (annotations != null) {
+			for (final HDLAnnotation newValue : annotations) {
+				this.annotations.add(newValue);
+			}
+		}
 		if (validate) {
 			var = validateVar(var);
 		}
@@ -83,8 +96,27 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 
 	public AbstractHDLInstantiation() {
 		super();
+		this.annotations = new ArrayList<HDLAnnotation>();
 		this.var = null;
 		this.arguments = new ArrayList<HDLArgument>();
+	}
+
+	protected final ArrayList<HDLAnnotation> annotations;
+
+	/**
+	 * Get the annotations field. Can be <code>null</code>.
+	 *
+	 * @return a clone of the field. Will never return <code>null</code>.
+	 */
+	@Nonnull
+	public ArrayList<HDLAnnotation> getAnnotations() {
+		return (ArrayList<HDLAnnotation>) annotations.clone();
+	}
+
+	protected Iterable<HDLAnnotation> validateAnnotations(Iterable<HDLAnnotation> annotations) {
+		if (annotations == null)
+			return new ArrayList<HDLAnnotation>();
+		return annotations;
 	}
 
 	protected final HDLVariable var;
@@ -122,6 +154,15 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 			return new ArrayList<HDLArgument>();
 		return arguments;
 	}
+
+	@Nonnull
+	public abstract HDLInstantiation setAnnotations(@Nullable Iterable<HDLAnnotation> annotations);
+
+	@Nonnull
+	public abstract HDLInstantiation addAnnotations(@Nullable HDLAnnotation annotations);
+
+	@Nonnull
+	public abstract HDLInstantiation removeAnnotations(@Nullable HDLAnnotation annotations);
 
 	@Nonnull
 	public abstract HDLInstantiation setVar(@Nonnull HDLVariable var);
@@ -173,6 +214,11 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		if (!super.equals(obj))
 			return false;
 		final AbstractHDLInstantiation other = (AbstractHDLInstantiation) obj;
+		if (annotations == null) {
+			if (other.annotations != null)
+				return false;
+		} else if (!annotations.equals(other.annotations))
+			return false;
 		if (var == null) {
 			if (other.var != null)
 				return false;
@@ -194,6 +240,7 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 			return hashCache;
 		int result = super.hashCode();
 		final int prime = 31;
+		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());
 		result = (prime * result) + ((var == null) ? 0 : var.hashCode());
 		result = (prime * result) + ((arguments == null) ? 0 : arguments.hashCode());
 		hashCache = result;
@@ -205,6 +252,15 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 		final boolean first = true;
 		final StringBuilder sb = new StringBuilder();
 		sb.append('\n').append(spacing).append("new HDLInstantiation()");
+		if (annotations != null) {
+			if (annotations.size() > 0) {
+				sb.append('\n').append(spacing);
+				for (final HDLAnnotation o : annotations) {
+					sb.append(".addAnnotations(").append(o.toConstructionString(spacing + "\t\t"));
+					sb.append('\n').append(spacing).append(")");
+				}
+			}
+		}
 		if (var != null) {
 			sb.append(".setVar(").append(var.toConstructionString(spacing + "\t")).append(")");
 		}
@@ -223,6 +279,12 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 	@Override
 	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
 		super.validateAllFields(expectedParent, checkResolve);
+		validateAnnotations(getAnnotations());
+		if (getAnnotations() != null) {
+			for (final HDLAnnotation o : getAnnotations()) {
+				o.validateAllFields(this, checkResolve);
+			}
+		}
 		validateVar(getVar());
 		if (getVar() != null) {
 			getVar().validateAllFields(this, checkResolve);
@@ -255,11 +317,21 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 				while (current == null) {
 					switch (pos++) {
 					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(annotations.size());
+							for (final HDLAnnotation o : annotations) {
+								iters.add(Iterators.forArray(o));
+								iters.add(o.deepIterator());
+							}
+							current = Iterators.concat(iters.iterator());
+						}
+						break;
+					case 1:
 						if (var != null) {
 							current = Iterators.concat(Iterators.forArray(var), var.deepIterator());
 						}
 						break;
-					case 1:
+					case 2:
 						if ((arguments != null) && (arguments.size() != 0)) {
 							final List<Iterator<? extends IHDLObject>> iters = Lists.newArrayListWithCapacity(arguments.size());
 							for (final HDLArgument o : arguments) {
@@ -304,11 +376,16 @@ public abstract class AbstractHDLInstantiation extends HDLObject implements HDLS
 				while (current == null) {
 					switch (pos++) {
 					case 0:
+						if ((annotations != null) && (annotations.size() != 0)) {
+							current = annotations.iterator();
+						}
+						break;
+					case 1:
 						if (var != null) {
 							current = Iterators.singletonIterator(var);
 						}
 						break;
-					case 1:
+					case 2:
 						if ((arguments != null) && (arguments.size() != 0)) {
 							current = arguments.iterator();
 						}

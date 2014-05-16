@@ -45,6 +45,7 @@ import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.parser.SourceInfo;
@@ -245,46 +246,50 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 
 	@Override
 	public Optional<HDLGenerationInfo> getImplementation(HDLDirectGeneration hdl) {
-		Unit unit;
-		final int memCount = getMemCount(hdl);
-		if (hdl.getGeneratorContent().length() == 0) {
-			unit = createDefaultUnit(getRegCount(hdl));
-		} else {
-			try {
-				final Set<Problem> problems = Sets.newHashSet();
-				unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, 0);
-				if (!validate(unit, problems, 0))
-					return Optional.absent();
-			} catch (final Exception e) {
-				throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
+		try {
+			Unit unit;
+			final int memCount = getMemCount(hdl);
+			if (hdl.getGeneratorContent().length() == 0) {
+				unit = createDefaultUnit(getRegCount(hdl));
+			} else {
+				try {
+					final Set<Problem> problems = Sets.newHashSet();
+					unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, 0);
+					if (!validate(unit, problems, 0))
+						return Optional.absent();
+				} catch (final Exception e) {
+					throw new IllegalArgumentException("Invalid input:" + hdl.getGeneratorContent());
+				}
 			}
-		}
-		final String version = getVersion(hdl);
-		final List<Row> rows = MemoryModel.buildRows(unit);
-		final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
-		final List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
-		sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html, true));
-		final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
-		sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, true));
-		if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
-			hdgi = annotateSignals(hdgi, unit);
-			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false, true));
-			hdgi.files.addAll(sideFiles);
-			return Optional.of(hdgi);
-		}
-		if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
-			hdgi = annotateSignals(hdgi, unit);
-			sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true, true));
-			hdgi.files.addAll(sideFiles);
-			return Optional.of(hdgi);
-		}
-		if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
-			HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
-			hdgi = annotateSignals(hdgi, unit);
-			hdgi.files.addAll(sideFiles);
-			return Optional.of(hdgi);
+			final String version = getVersion(hdl);
+			final List<Row> rows = MemoryModel.buildRows(unit);
+			final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
+			final List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
+			sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html, true));
+			final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
+			sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, true));
+			if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
+				hdgi = annotateSignals(hdgi, unit);
+				sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false, true));
+				hdgi.files.addAll(sideFiles);
+				return Optional.of(hdgi);
+			}
+			if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
+				hdgi = annotateSignals(hdgi, unit);
+				sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true, true));
+				hdgi.files.addAll(sideFiles);
+				return Optional.of(hdgi);
+			}
+			if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
+				hdgi = annotateSignals(hdgi, unit);
+				hdgi.files.addAll(sideFiles);
+				return Optional.of(hdgi);
+			}
+		} catch (final Exception e) {
+			return Optional.absent();
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
 	}
@@ -362,6 +367,18 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 					}
 				} catch (final Exception e) {
 					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+				}
+			}
+		}
+		final HDLUnit unit = hdg.getContainer(HDLUnit.class);
+		if (unit == null) {
+			problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "Generator needs to be included in a module"));
+		} else {
+			final ArrayList<HDLVariableDeclaration> ports = unit.asInterface().getPorts();
+			for (final HDLVariableDeclaration port : ports) {
+				if (port.getDirection() == HDLDirection.INOUT) {
+					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, port, "The generator " + hdg.getGeneratorID()
+							+ " does not support generating the required files for ports with inout direction"));
 				}
 			}
 		}

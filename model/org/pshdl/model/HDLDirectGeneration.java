@@ -37,6 +37,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLDirectGeneration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
@@ -51,6 +52,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param arguments
@@ -68,9 +71,10 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLDirectGeneration(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf,
-			@Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include, boolean validate) {
-		super(id, container, var, arguments, hIf, generatorID, generatorContent, include, validate);
+	public HDLDirectGeneration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
+			@Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf, @Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include,
+			boolean validate) {
+		super(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, validate);
 	}
 
 	public HDLDirectGeneration() {
@@ -88,7 +92,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>("hIf") {
+	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>("hIf", HDLInterface.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLInterface getValue(HDLDirectGeneration obj) {
 			if (obj == null)
@@ -106,7 +111,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * The accessor for the field generatorID which is of type String.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>("generatorID") {
+	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorID = new HDLFieldAccess<HDLDirectGeneration, String>("generatorID", String.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
 			if (obj == null)
@@ -124,7 +130,8 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * The accessor for the field generatorContent which is of type String.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>("generatorContent") {
+	public static HDLFieldAccess<HDLDirectGeneration, String> fGeneratorContent = new HDLFieldAccess<HDLDirectGeneration, String>("generatorContent", String.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLDirectGeneration obj) {
 			if (obj == null)
@@ -142,7 +149,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * The accessor for the field include which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>("include") {
+	public static HDLFieldAccess<HDLDirectGeneration, Boolean> fInclude = new HDLFieldAccess<HDLDirectGeneration, Boolean>("include", Boolean.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLDirectGeneration obj) {
 			if (obj == null)
@@ -157,6 +164,20 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 			return obj.setInclude(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (hIf == obj)
+			return fHIf;
+		if (generatorID == obj)
+			return fGeneratorID;
+		if (generatorContent == obj)
+			return fGeneratorContent;
+		if (include == obj)
+			return fInclude;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 
 	private HDLInterface hif = null;

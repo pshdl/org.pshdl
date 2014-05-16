@@ -85,7 +85,7 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	/**
 	 * The accessor for the field frag which is of type String.
 	 */
-	public static HDLFieldAccess<HDLUnresolvedFragment, String> fFrag = new HDLFieldAccess<HDLUnresolvedFragment, String>("frag") {
+	public static HDLFieldAccess<HDLUnresolvedFragment, String> fFrag = new HDLFieldAccess<HDLUnresolvedFragment, String>("frag", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLUnresolvedFragment obj) {
 			if (obj == null)
@@ -103,7 +103,8 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	/**
 	 * The accessor for the field isStatement which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLUnresolvedFragment, Boolean> fIsStatement = new HDLFieldAccess<HDLUnresolvedFragment, Boolean>("isStatement") {
+	public static HDLFieldAccess<HDLUnresolvedFragment, Boolean> fIsStatement = new HDLFieldAccess<HDLUnresolvedFragment, Boolean>("isStatement", Boolean.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLUnresolvedFragment obj) {
 			if (obj == null)
@@ -122,7 +123,8 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	 * The accessor for the field array which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>>("array") {
+	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>>("array",
+			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLUnresolvedFragment obj) {
 			if (obj == null)
@@ -140,7 +142,8 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	/**
 	 * The accessor for the field bits which is of type ArrayList<HDLRange>.
 	 */
-	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>>("bits") {
+	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>>("bits", HDLRange.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLUnresolvedFragment obj) {
 			if (obj == null)
@@ -158,7 +161,8 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	/**
 	 * The accessor for the field sub which is of type HDLUnresolvedFragment.
 	 */
-	public static HDLFieldAccess<HDLUnresolvedFragment, HDLUnresolvedFragment> fSub = new HDLFieldAccess<HDLUnresolvedFragment, HDLUnresolvedFragment>("sub") {
+	public static HDLFieldAccess<HDLUnresolvedFragment, HDLUnresolvedFragment> fSub = new HDLFieldAccess<HDLUnresolvedFragment, HDLUnresolvedFragment>("sub",
+			HDLUnresolvedFragment.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLUnresolvedFragment getValue(HDLUnresolvedFragment obj) {
 			if (obj == null)
@@ -173,6 +177,21 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 			return obj.setSub(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (frag == obj)
+			return fFrag;
+		if (isStatement == obj)
+			return fIsStatement;
+		if (array.contains(obj))
+			return fArray;
+		if (bits.contains(obj))
+			return fBits;
+		if (sub == obj)
+			return fSub;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

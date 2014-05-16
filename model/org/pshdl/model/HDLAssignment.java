@@ -102,7 +102,7 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * The accessor for the field left which is of type HDLReference.
 	 */
-	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>("left") {
+	public static HDLFieldAccess<HDLAssignment, HDLReference> fLeft = new HDLFieldAccess<HDLAssignment, HDLReference>("left", HDLReference.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLReference getValue(HDLAssignment obj) {
 			if (obj == null)
@@ -120,7 +120,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * The accessor for the field type which is of type HDLAssignmentType.
 	 */
-	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>("type") {
+	public static HDLFieldAccess<HDLAssignment, HDLAssignmentType> fType = new HDLFieldAccess<HDLAssignment, HDLAssignmentType>("type", HDLAssignmentType.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLAssignmentType getValue(HDLAssignment obj) {
 			if (obj == null)
@@ -138,7 +139,8 @@ public class HDLAssignment extends AbstractHDLAssignment {
 	/**
 	 * The accessor for the field right which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>("right") {
+	public static HDLFieldAccess<HDLAssignment, HDLExpression> fRight = new HDLFieldAccess<HDLAssignment, HDLExpression>("right", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLAssignment obj) {
 			if (obj == null)
@@ -153,6 +155,17 @@ public class HDLAssignment extends AbstractHDLAssignment {
 			return obj.setRight(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (left == obj)
+			return fLeft;
+		if (type == obj)
+			return fType;
+		if (right == obj)
+			return fRight;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

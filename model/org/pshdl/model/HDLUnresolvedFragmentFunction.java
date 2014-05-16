@@ -90,7 +90,7 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 	 * ArrayList<HDLExpression>.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragmentFunction, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLUnresolvedFragmentFunction, ArrayList<HDLExpression>>(
-			"params") {
+			"params", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLUnresolvedFragmentFunction obj) {
 			if (obj == null)
@@ -105,6 +105,13 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 			return obj.setParams(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (params.contains(obj))
+			return fParams;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

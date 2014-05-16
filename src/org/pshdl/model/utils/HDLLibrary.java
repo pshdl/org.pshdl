@@ -42,6 +42,7 @@ import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceDeclaration;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLType;
@@ -122,7 +123,18 @@ public class HDLLibrary {
 		checkFrozen(hEnum);
 		final HDLQualifiedName fqn = fullNameOf(hEnum);
 		types.put(fqn, hEnum);
-		objects.put(src, new Record(src, Record.RecordType.type, fqn));
+		addRecord(src, new Record(src, Record.RecordType.type, fqn));
+	}
+
+	private void addRecord(String src, Record record) {
+		final Collection<Record> collection = objects.get(src);
+		for (final Iterator<Record> iter = collection.iterator(); iter.hasNext();) {
+			final Record rec = iter.next();
+			if (rec.type == record.type) {
+				iter.remove();
+			}
+		}
+		objects.put(src, record);
 	}
 
 	/**
@@ -135,7 +147,7 @@ public class HDLLibrary {
 		checkFrozen(func);
 		final HDLQualifiedName fqn = fullNameOf(func);
 		functions.put(fqn, func);
-		objects.put(src, new Record(src, Record.RecordType.function, fqn));
+		addRecord(src, new Record(src, Record.RecordType.function, fqn));
 	}
 
 	/**
@@ -148,7 +160,7 @@ public class HDLLibrary {
 		checkFrozen(hIf);
 		final HDLQualifiedName fqn = fullNameOf(hIf);
 		types.put(fqn, hIf);
-		objects.put(src, new Record(src, Record.RecordType.type, fqn));
+		addRecord(src, new Record(src, Record.RecordType.type, fqn));
 	}
 
 	/**
@@ -163,7 +175,7 @@ public class HDLLibrary {
 		checkFrozen(pkg);
 		for (final HDLUnit unit : pkg.getUnits()) {
 			final HDLQualifiedName uq = fullNameOf(unit);
-			objects.put(src, new Record(src, Record.RecordType.unit, uq));
+			addRecord(src, new Record(src, Record.RecordType.unit, uq));
 			units.put(uq, unit);
 			addInterface(unit.asInterface(), uq.toString());
 			final HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
@@ -225,7 +237,7 @@ public class HDLLibrary {
 		checkFrozen(var);
 		final HDLQualifiedName fqn = fullNameOf(var);
 		variables.put(fqn, var);
-		objects.put(src, new Record(src, Record.RecordType.variable, fqn));
+		addRecord(src, new Record(src, Record.RecordType.variable, fqn));
 	}
 
 	private void checkFrozen(IHDLObject hObject) {
@@ -281,19 +293,28 @@ public class HDLLibrary {
 	 * @return the type if found
 	 */
 	public Optional<? extends HDLType> resolve(Iterable<String> imports, HDLQualifiedName type) {
-		final HDLType hdlType = types.get(type);
+		HDLType hdlType = types.get(type);
 		if (hdlType == null) {
 			for (final String string : imports)
-				if (string.endsWith(type.toString()))
-					return Optional.fromNullable(types.get(new HDLQualifiedName(string)));
-			Optional<HDLType> genericImport = checkGenericImport(type, "pshdl.*", types);
-			if (genericImport.isPresent())
-				return genericImport;
+				if (string.endsWith(type.toString())) {
+					hdlType = types.get(new HDLQualifiedName(string));
+					break;
+				}
+		}
+		if (hdlType == null) {
+			final Optional<HDLType> genericImport = checkGenericImport(type, "pshdl.*", types);
+			if (genericImport.isPresent()) {
+				hdlType = genericImport.get();
+			}
+		}
+		if (hdlType == null) {
 			for (final String string : imports)
 				if (string.endsWith(".*")) {
-					genericImport = checkGenericImport(type, string, types);
-					if (genericImport.isPresent())
-						return genericImport;
+					final Optional<HDLType> genericImport = checkGenericImport(type, string, types);
+					if (genericImport.isPresent()) {
+						hdlType = genericImport.get();
+						break;
+					}
 				}
 		}
 		if (hdlType != null)
@@ -420,6 +441,56 @@ public class HDLLibrary {
 				return r.src;
 		}
 		return null;
+	}
+
+	public HDLPackage getAsPackage(String libURI) {
+		HDLPackage pkg = new HDLPackage().setLibURI(libURI);
+		for (final Entry<HDLQualifiedName, HDLVariable> e : variables.entrySet()) {
+			if (e.getKey().getSegment(0).equals("pshdl")) {
+				continue;
+			}
+			final HDLVariable vars = e.getValue();
+			final HDLVariableDeclaration hvd = vars.getContainer(HDLVariableDeclaration.class);
+			if (hvd == null)
+				throw new IllegalArgumentException("The variable: " + vars.getName() + " does not have a declaration");
+			pkg = pkg.addDeclarations(hvd.setVariables(HDLObject.asList(vars.setName(e.getKey().toString()))));
+		}
+		for (final Entry<HDLQualifiedName, HDLFunction> e : functions.entrySet()) {
+			if (e.getKey().getSegment(0).equals("pshdl")) {
+				continue;
+			}
+			final HDLFunction function = e.getValue();
+			pkg = pkg.addDeclarations(function);
+		}
+		for (final Entry<HDLQualifiedName, HDLType> e : types.entrySet()) {
+			if (e.getKey().getSegment(0).equals("pshdl")) {
+				continue;
+			}
+			final HDLType type = e.getValue();
+			if (type.getContainer(HDLUnit.class) != null) {
+				continue;
+			}
+			switch (type.getClassType()) {
+			case HDLInterface:
+				if (!units.containsKey(e.getKey())) {
+					pkg = pkg.addDeclarations(new HDLInterfaceDeclaration().setHIf((HDLInterface) type.setName(e.getKey().toString())));
+				}
+				break;
+			case HDLEnum:
+				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum((HDLEnum) type.setName(e.getKey().toString())));
+				break;
+			default:
+				throw new IllegalArgumentException("Did not expect type:" + type);
+			}
+		}
+		for (final Entry<HDLQualifiedName, HDLUnit> e : units.entrySet()) {
+			if (e.getKey().getSegment(0).equals("pshdl")) {
+				continue;
+			}
+			final HDLUnit unit = e.getValue();
+			pkg = pkg.addUnits(unit.setName(e.getKey().toString()));
+		}
+		return pkg.copyDeepFrozen(null);
 	}
 
 }

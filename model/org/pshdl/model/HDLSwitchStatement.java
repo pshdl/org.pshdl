@@ -74,7 +74,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	/**
 	 * The accessor for the field caseExp which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLSwitchStatement, HDLExpression> fCaseExp = new HDLFieldAccess<HDLSwitchStatement, HDLExpression>("caseExp") {
+	public static HDLFieldAccess<HDLSwitchStatement, HDLExpression> fCaseExp = new HDLFieldAccess<HDLSwitchStatement, HDLExpression>("caseExp", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLSwitchStatement obj) {
 			if (obj == null)
@@ -93,7 +94,8 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	 * The accessor for the field cases which is of type
 	 * ArrayList<HDLSwitchCaseStatement>.
 	 */
-	public static HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>> fCases = new HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>>("cases") {
+	public static HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>> fCases = new HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>>("cases",
+			HDLSwitchCaseStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLSwitchCaseStatement> getValue(HDLSwitchStatement obj) {
 			if (obj == null)
@@ -108,6 +110,15 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 			return obj.setCases(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (caseExp == obj)
+			return fCaseExp;
+		if (cases.contains(obj))
+			return fCases;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

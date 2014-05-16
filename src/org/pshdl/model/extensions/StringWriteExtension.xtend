@@ -542,7 +542,7 @@ class StringWriteExtension {
 		}
 		sb.append(highlight.keyword("enum")).append(highlight.simpleSpace)
 		sb.append(highlight.enumName(decl.HEnum.name))
-		sb.append(highlight.simpleSpace).append("=").append(highlight.simpleSpace)
+		sb.append(highlight.simpleSpace)
 		sb.append(
 			'''{«FOR HDLVariable henum : decl.HEnum.enums SEPARATOR ',' + highlight.simpleSpace»«henum.toString(
 				highlight)»«ENDFOR»}''')
@@ -569,21 +569,36 @@ class StringWriteExtension {
 			params.append(highlight.param(HDLRegisterConfig.RESET_PARAM)).append('=').append(reg.rst.toString(highlight))
 			first = false
 		}
-		if (reg.clockType !== null && reg.clockType !== defaultReg.clockType) {
+		if (reg.unresolvedClockType!==null){
+			if (!first)
+				params.append(", ")
+			params.append(highlight.param(HDLRegisterConfig.EDGE_PARAM)).append('=').append(reg.unresolvedClockType.toString(highlight))
+			first = false
+		} else if (reg.clockType !== null && reg.clockType !== defaultReg.clockType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig.EDGE_PARAM)).append('=').append(
 				highlight.enumRefType("Edge")).append('.').append(highlight.enumRefVar(reg.clockType.toString))
 			first = false
 		}
-		if (reg.syncType !== null && reg.syncType !== defaultReg.syncType) {
+		if (reg.unresolvedSyncType!==null){
+			if (!first)
+				params.append(", ")
+			params.append(highlight.param(HDLRegisterConfig.EDGE_PARAM)).append('=').append(reg.unresolvedSyncType.toString(highlight))
+			first = false
+		} else if (reg.syncType !== null && reg.syncType !== defaultReg.syncType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig.RESET_SYNC_PARAM)).append('=').append(
 				highlight.enumRefType("Sync")).append('.').append(highlight.enumRefVar(reg.syncType.toString))
 			first = false
 		}
-		if (reg.resetType !== null && reg.resetType !== defaultReg.resetType) {
+		if (reg.unresolvedResetType!==null){
+			if (!first)
+				params.append(", ")
+			params.append(highlight.param(HDLRegisterConfig.EDGE_PARAM)).append('=').append(reg.unresolvedResetType.toString(highlight))
+			first = false
+		} else if (reg.resetType !== null && reg.resetType !== defaultReg.resetType) {
 			if (!first)
 				params.append(", ")
 			params.append(highlight.param(HDLRegisterConfig.RESET_TYPE_PARAM)).append('=').append(

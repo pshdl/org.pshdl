@@ -81,7 +81,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	/**
 	 * The accessor for the field ifExp which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>("ifExp") {
+	public static HDLFieldAccess<HDLIfStatement, HDLExpression> fIfExp = new HDLFieldAccess<HDLIfStatement, HDLExpression>("ifExp", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLIfStatement obj) {
 			if (obj == null)
@@ -100,7 +101,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * The accessor for the field thenDo which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("thenDo") {
+	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("thenDo", HDLStatement.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
 			if (obj == null)
@@ -119,7 +121,8 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	 * The accessor for the field elseDo which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("elseDo") {
+	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("elseDo", HDLStatement.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLIfStatement obj) {
 			if (obj == null)
@@ -134,6 +137,17 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 			return obj.setElseDo(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (ifExp == obj)
+			return fIfExp;
+		if (thenDo.contains(obj))
+			return fThenDo;
+		if (elseDo.contains(obj))
+			return fElseDo;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	public static enum TreeSide {

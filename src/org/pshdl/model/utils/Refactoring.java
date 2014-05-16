@@ -76,6 +76,8 @@ import com.google.common.io.Files;
 
 public class Refactoring {
 
+	public static ISideEffectResolver SUBSTITUTE_RESOLVER = new SubstituteExpressionResolver();
+
 	public static class SubstituteExpressionResolver implements ISideEffectResolver {
 
 		@Override
@@ -99,13 +101,18 @@ public class Refactoring {
 			if (classSet.contains(HDLClass.HDLManip)) {
 				final HDLManip manip = (HDLManip) exp;
 				// It doesn't make sense to simply replace or remove an HDLManip
-				resolveExpression(exp, manip, ms);
+				final IHDLObject container = exp.getContainer();
+				if (container instanceof HDLExpression) {
+					resolveExpression((HDLExpression) container, manip, ms);
+				} else {
+					resolveStatement((HDLStatement) container, manip, ms);
+				}
 				return;
 			}
 			replaceWithZeroOrConstant(ref, ms);
 		}
 
-		private void replaceWithZeroOrConstant(HDLExpression ref, ModificationSet ms) {
+		public static void replaceWithZeroOrConstant(HDLExpression ref, ModificationSet ms) {
 			HDLLiteral value = HDLLiteral.get(0);
 			final Optional<BigInteger> constValue = ConstantEvaluate.valueOf(ref);
 			if (constValue.isPresent()) {
@@ -119,6 +126,10 @@ public class Refactoring {
 
 		@Override
 		public void resolveSideEffectStatement(HDLStatement stmnt, HDLReference ref, ModificationSet ms) {
+			resolveStatement(stmnt, ref, ms);
+		}
+
+		private void resolveStatement(HDLStatement stmnt, HDLExpression ref, ModificationSet ms) {
 			switch (stmnt.getClassType()) {
 			case HDLAssignment: {
 				final HDLAssignment ass = (HDLAssignment) stmnt;
@@ -132,11 +143,17 @@ public class Refactoring {
 			}
 			case HDLIfStatement:
 			case HDLSwitchStatement:
+			case HDLSwitchCaseStatement:
 				replaceWithZeroOrConstant(ref, ms);
 				return;
 			default:
 				throw new IllegalArgumentException("Did not expect expression in statement:" + stmnt.getClassType());
 			}
+		}
+
+		@Override
+		public void resolveSideEffectOther(IHDLObject var, HDLReference ref, ModificationSet ms) {
+			replaceWithZeroOrConstant(ref, ms);
 		}
 	}
 
@@ -144,40 +161,80 @@ public class Refactoring {
 		void resolveSideEffectExpression(HDLExpression exp, HDLReference ref, ModificationSet ms);
 
 		void resolveSideEffectStatement(HDLStatement ass, HDLReference ref, ModificationSet ms);
+
+		void resolveSideEffectOther(IHDLObject var, HDLReference ref, ModificationSet ms);
 	}
 
 	public static HDLUnit removeVariable(HDLUnit obj, HDLVariable hdlVariable, ISideEffectResolver resolver) {
-		final ModificationSet ms = new ModificationSet();
-		final HDLClass classType = hdlVariable.getContainer().getClassType();
+		HDLUnit res = obj;
+		int counter = 0;
+		do {
+			counter++;
+			if (counter > 50)
+				throw new IllegalArgumentException("Something went wrong when removing variable references");
+			obj = res;
+			final ModificationSet ms = new ModificationSet();
+			final Iterable<? extends HDLReference> refs = getAllVarRefs(obj, hdlVariable, ms, counter == 1);
+			for (final HDLReference ref : refs) {
+				final IHDLObject container = ref.getContainer();
+				if (container instanceof HDLExpression) {
+					final HDLExpression exp = (HDLExpression) container;
+					resolver.resolveSideEffectExpression(exp, ref, ms);
+					continue;
+				}
+				if (container instanceof HDLStatement) {
+					final HDLStatement stmnt = (HDLStatement) container;
+					resolver.resolveSideEffectStatement(stmnt, ref, ms);
+					continue;
+				}
+				resolver.resolveSideEffectOther(container, ref, ms);
+			}
+			res = ms.apply(obj);
+		} while (res != obj);
+		return res;
+	}
+
+	private static Iterable<? extends HDLReference> getAllVarRefs(HDLUnit obj, HDLVariable hdlVariable, final ModificationSet ms, boolean init) {
+		final IHDLObject varContainer = hdlVariable.getContainer();
+		final HDLClass classType = varContainer.getClassType();
 		Iterable<? extends HDLReference> refs;
 		switch (classType) {
 		case HDLEnum:
 			refs = HDLQuery.getEnumRefs(obj, hdlVariable);
 			break;
 		case HDLVariableDeclaration:
+			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) varContainer;
+			final ArrayList<HDLVariable> vars = hvd.getVariables();
+			if (init) {
+				if (vars.size() == 1) {
+					ms.remove(varContainer);
+				} else {
+					vars.remove(hdlVariable);
+					ms.replace(hvd, hvd.setVariables(vars));
+				}
+			}
+			refs = HDLQuery.getVarRefs(obj, hdlVariable);
+			break;
 		case HDLFunctionParameter:
+			if (init) {
+				ms.remove(varContainer);
+			}
+			refs = HDLQuery.getVarRefs(obj, hdlVariable);
+			break;
 		case HDLForLoop:
 			refs = HDLQuery.getVarRefs(obj, hdlVariable);
 			break;
 		case HDLDirectGeneration:
 		case HDLInterfaceInstantiation:
+			if (init) {
+				ms.remove(varContainer);
+			}
 			refs = HDLQuery.getInterfaceRefs(obj, hdlVariable);
 			break;
 		default:
 			throw new RuntimeException("Did not expect a container of type:" + classType);
 		}
-		for (final HDLReference ref : refs) {
-			final IHDLObject container = ref.getContainer();
-			if (container instanceof HDLExpression) {
-				final HDLExpression exp = (HDLExpression) container;
-				resolver.resolveSideEffectExpression(exp, ref, ms);
-			}
-			if (container instanceof HDLStatement) {
-				final HDLStatement stmnt = (HDLStatement) container;
-				resolver.resolveSideEffectStatement(stmnt, ref, ms);
-			}
-		}
-		return ms.apply(obj);
+		return refs;
 	}
 
 	/**

@@ -76,7 +76,7 @@ public abstract class HDLType extends AbstractHDLType {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>("name") {
+	public static HDLFieldAccess<HDLType, String> fName = new HDLFieldAccess<HDLType, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLType obj) {
 			if (obj == null)
@@ -94,7 +94,8 @@ public abstract class HDLType extends AbstractHDLType {
 	/**
 	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLType, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLType, ArrayList<HDLExpression>>("dim") {
+	public static HDLFieldAccess<HDLType, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLType, ArrayList<HDLExpression>>("dim", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLType obj) {
 			if (obj == null)
@@ -109,6 +110,15 @@ public abstract class HDLType extends AbstractHDLType {
 			return obj.setDim(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (name == obj)
+			return fName;
+		if (dim.contains(obj))
+			return fDim;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	@Nonnull

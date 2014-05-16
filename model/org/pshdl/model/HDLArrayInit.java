@@ -70,7 +70,8 @@ public class HDLArrayInit extends AbstractHDLArrayInit {
 	/**
 	 * The accessor for the field exp which is of type ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLArrayInit, ArrayList<HDLExpression>> fExp = new HDLFieldAccess<HDLArrayInit, ArrayList<HDLExpression>>("exp") {
+	public static HDLFieldAccess<HDLArrayInit, ArrayList<HDLExpression>> fExp = new HDLFieldAccess<HDLArrayInit, ArrayList<HDLExpression>>("exp", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLArrayInit obj) {
 			if (obj == null)
@@ -85,7 +86,15 @@ public class HDLArrayInit extends AbstractHDLArrayInit {
 			return obj.setExp(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (exp.contains(obj))
+			return fExp;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
+
 	// $CONTENT-END$
 
 }

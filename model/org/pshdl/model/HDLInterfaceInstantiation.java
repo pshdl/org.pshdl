@@ -49,6 +49,7 @@ import com.google.common.base.Optional;
  * The class HDLInterfaceInstantiation contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
+ * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName hIf. Can <b>not</b> be <code>null</code>.</li>
@@ -60,6 +61,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
+	 * @param annotations
+	 *            the value for annotations. Can be <code>null</code>.
 	 * @param var
 	 *            the value for var. Can <b>not</b> be <code>null</code>.
 	 * @param arguments
@@ -69,9 +72,9 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLInterfaceInstantiation(int id, @Nullable IHDLObject container, @Nonnull HDLVariable var, @Nullable Iterable<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf,
-			boolean validate) {
-		super(id, container, var, arguments, hIf, validate);
+	public HDLInterfaceInstantiation(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
+			@Nullable Iterable<HDLArgument> arguments, @Nonnull HDLQualifiedName hIf, boolean validate) {
+		super(id, container, annotations, var, arguments, hIf, validate);
 	}
 
 	public HDLInterfaceInstantiation() {
@@ -89,7 +92,8 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 	/**
 	 * The accessor for the field hIf which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>("hIf") {
+	public static HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceInstantiation, HDLQualifiedName>("hIf", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceInstantiation obj) {
 			if (obj == null)
@@ -104,6 +108,14 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			return obj.setHIf(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (hIf == obj)
+			return fHIf;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 
 	public static GenericMeta<String> ORIG_NAME = new GenericMeta<String>("ORIG_NAME", true);

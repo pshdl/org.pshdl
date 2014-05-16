@@ -80,7 +80,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * The accessor for the field range which is of type ArrayList<HDLRange>.
 	 */
-	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>("range") {
+	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>("range", HDLRange.class,
+			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLRange> getValue(HDLForLoop obj) {
 			if (obj == null)
@@ -98,7 +99,7 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * The accessor for the field param which is of type HDLVariable.
 	 */
-	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>("param") {
+	public static HDLFieldAccess<HDLForLoop, HDLVariable> fParam = new HDLFieldAccess<HDLForLoop, HDLVariable>("param", HDLVariable.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLVariable getValue(HDLForLoop obj) {
 			if (obj == null)
@@ -116,7 +117,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	/**
 	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>("dos") {
+	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>("dos", HDLStatement.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLForLoop obj) {
 			if (obj == null)
@@ -131,6 +133,17 @@ public class HDLForLoop extends AbstractHDLForLoop {
 			return obj.setDos(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (range.contains(obj))
+			return fRange;
+		if (param == obj)
+			return fParam;
+		if (dos.contains(obj))
+			return fDos;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	public static HDLForLoop tempLoop(HDLExpression lower, HDLExpression upper) {

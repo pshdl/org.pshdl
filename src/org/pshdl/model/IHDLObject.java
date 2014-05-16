@@ -30,6 +30,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 
 import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import org.pshdl.model.utils.MetaAccess;
 
 public interface IHDLObject {
@@ -171,6 +172,10 @@ public interface IHDLObject {
 	public IHDLObject getContainer();
 
 	public <T extends IHDLObject> T getContainer(Class<T> clazz);
+
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj);
+
+	public HDLFieldAccess<?, ?> getContainingFeature();
 
 	public IHDLObject setContainer(IHDLObject container);
 

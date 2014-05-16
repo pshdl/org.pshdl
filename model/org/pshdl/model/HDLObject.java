@@ -85,7 +85,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	/**
 	 * The accessor for the field container which is of type IHDLObject.
 	 */
-	public static HDLFieldAccess<HDLObject, IHDLObject> fContainer = new HDLFieldAccess<HDLObject, IHDLObject>("container") {
+	public static HDLFieldAccess<HDLObject, IHDLObject> fContainer = new HDLFieldAccess<HDLObject, IHDLObject>("container", IHDLObject.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public IHDLObject getValue(HDLObject obj) {
 			if (obj == null)
@@ -100,6 +100,13 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 			return obj.setContainer(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (container == obj)
+			return fContainer;
+		return null;
+	}
 
 	// $CONTENT-BEGIN$
 
@@ -373,6 +380,13 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 	@Override
 	public String toString() {
 		return StringWriteExtension.asString(this, SyntaxHighlighter.none());
+	}
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature() {
+		if (container != null)
+			return container.getContainingFeature(this);
+		return null;
 	}
 
 	// $CONTENT-END$

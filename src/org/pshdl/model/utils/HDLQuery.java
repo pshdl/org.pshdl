@@ -45,10 +45,18 @@ import com.google.common.base.Predicates;
 
 public class HDLQuery {
 	public static abstract class HDLFieldAccess<T extends IHDLObject, K> {
-		public final String fieldName;
+		public static enum Quantifier {
+			ZERO_OR_ONE, ONE, ZERO_OR_MORE, ONE_OR_MORE
+		}
 
-		protected HDLFieldAccess(String fieldName) {
+		public final String fieldName;
+		public final Class<?> type;
+		public final Quantifier quantifier;
+
+		protected HDLFieldAccess(String fieldName, Class<?> type, Quantifier quantifier) {
 			this.fieldName = fieldName;
+			this.type = type;
+			this.quantifier = quantifier;
 		}
 
 		public abstract K getValue(T obj);
@@ -228,6 +236,8 @@ public class HDLQuery {
 		}
 
 		public <I extends IHDLObject> Result<T, I> fullNameIs(HDLQualifiedName asRef) {
+			if (field != null)
+				throw new IllegalArgumentException("Can only use fullNameIs on whereObj");
 			return new Result<T, I>(from, clazz, null, new FullNameMatcher<I>(asRef));
 		}
 

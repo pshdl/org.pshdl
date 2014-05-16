@@ -82,7 +82,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * The accessor for the field libURI which is of type String.
 	 */
-	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>("libURI") {
+	public static HDLFieldAccess<HDLPackage, String> fLibURI = new HDLFieldAccess<HDLPackage, String>("libURI", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLPackage obj) {
 			if (obj == null)
@@ -100,7 +100,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * The accessor for the field pkg which is of type String.
 	 */
-	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>("pkg") {
+	public static HDLFieldAccess<HDLPackage, String> fPkg = new HDLFieldAccess<HDLPackage, String>("pkg", String.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public String getValue(HDLPackage obj) {
 			if (obj == null)
@@ -118,7 +118,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	/**
 	 * The accessor for the field units which is of type ArrayList<HDLUnit>.
 	 */
-	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>("units") {
+	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>("units", HDLUnit.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLUnit> getValue(HDLPackage obj) {
 			if (obj == null)
@@ -137,7 +138,8 @@ public class HDLPackage extends AbstractHDLPackage {
 	 * The accessor for the field declarations which is of type
 	 * ArrayList<HDLDeclaration>.
 	 */
-	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>("declarations") {
+	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>("declarations",
+			HDLDeclaration.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLDeclaration> getValue(HDLPackage obj) {
 			if (obj == null)
@@ -152,6 +154,19 @@ public class HDLPackage extends AbstractHDLPackage {
 			return obj.setDeclarations(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (libURI == obj)
+			return fLibURI;
+		if (pkg == obj)
+			return fPkg;
+		if (units.contains(obj))
+			return fUnits;
+		if (declarations.contains(obj))
+			return fDeclarations;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	@Override

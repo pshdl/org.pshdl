@@ -85,7 +85,8 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	 * The accessor for the field stmnts which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>> fStmnts = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>>("stmnts") {
+	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>> fStmnts = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>>("stmnts",
+			HDLStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLSubstituteFunction obj) {
 			if (obj == null)
@@ -100,6 +101,13 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 			return obj.setStmnts(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (stmnts.contains(obj))
+			return fStmnts;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	public HDLStatement[] getReplacementStatements(HDLFunctionCall hdi) {

@@ -75,7 +75,7 @@ public class HDLTernary extends AbstractHDLTernary {
 	/**
 	 * The accessor for the field ifExpr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLTernary, HDLExpression> fIfExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("ifExpr") {
+	public static HDLFieldAccess<HDLTernary, HDLExpression> fIfExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("ifExpr", HDLExpression.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
 			if (obj == null)
@@ -93,7 +93,8 @@ public class HDLTernary extends AbstractHDLTernary {
 	/**
 	 * The accessor for the field thenExpr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLTernary, HDLExpression> fThenExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("thenExpr") {
+	public static HDLFieldAccess<HDLTernary, HDLExpression> fThenExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("thenExpr", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
 			if (obj == null)
@@ -111,7 +112,8 @@ public class HDLTernary extends AbstractHDLTernary {
 	/**
 	 * The accessor for the field elseExpr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLTernary, HDLExpression> fElseExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("elseExpr") {
+	public static HDLFieldAccess<HDLTernary, HDLExpression> fElseExpr = new HDLFieldAccess<HDLTernary, HDLExpression>("elseExpr", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLTernary obj) {
 			if (obj == null)
@@ -126,6 +128,17 @@ public class HDLTernary extends AbstractHDLTernary {
 			return obj.setElseExpr(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (ifExpr == obj)
+			return fIfExpr;
+		if (thenExpr == obj)
+			return fThenExpr;
+		if (elseExpr == obj)
+			return fElseExpr;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

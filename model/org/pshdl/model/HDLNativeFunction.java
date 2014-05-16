@@ -82,7 +82,7 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 	/**
 	 * The accessor for the field simOnly which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLNativeFunction, Boolean> fSimOnly = new HDLFieldAccess<HDLNativeFunction, Boolean>("simOnly") {
+	public static HDLFieldAccess<HDLNativeFunction, Boolean> fSimOnly = new HDLFieldAccess<HDLNativeFunction, Boolean>("simOnly", Boolean.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLNativeFunction obj) {
 			if (obj == null)
@@ -97,6 +97,13 @@ public class HDLNativeFunction extends AbstractHDLNativeFunction {
 			return obj.setSimOnly(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (simOnly == obj)
+			return fSimOnly;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

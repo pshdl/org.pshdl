@@ -29,30 +29,31 @@ package org.pshdl.model.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.pshdl.model.HDLObject;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess.Quantifier;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
+/**
+ * A {@link ModificationSet} records changes that will be made to the AST
+ * (HDL*)-models. Those changes can then be applied to rewrite a completly new
+ * AST.
+ *
+ * @author Karsten Becker
+ *
+ */
 public class ModificationSet {
-
-	private static final AtomicInteger gid = new AtomicInteger();
-	private int id = gid.incrementAndGet();
-
-	private static enum ModID implements MetaAccess<Integer> {
-		id;
-
-		@Override
-		public boolean inherit() {
-			return false;
-		}
-	}
 
 	private class MSCopyFilter extends CopyFilter.DeepCloneFilter {
 
@@ -66,105 +67,180 @@ public class ModificationSet {
 				for (final Modification modification : mods) {
 					if (modification.type == ModificationType.REPLACE) {
 						if (modification.with.size() > 1)
-							throw new IllegalArgumentException("Can not replace with more than one object into a single node for feature:" + feature + " of "
-									+ container.getClass());
+							throw new IllegalArgumentException("Can not replace with more than one object into a single node feature:" + feature + " of "
+									+ container.getClassType());
+						if (currentMods.contains(modification.modificationID)) {
+							continue;
+						}
 						final IHDLObject replacement = (IHDLObject) modification.with.get(0);
-						original.addMeta(ModID.id, id);
-						final T copyFiltered = (T) replacement.copyFiltered(this);
-						return copyFiltered;
+						final T actualReplacement;
+						currentMods.add(modification.modificationID);
+						actualReplacement = (T) copyObject(feature, container, replacement);
+						currentMods.remove(modification.modificationID);
+						return actualReplacement;
 					}
-					throw new IllegalArgumentException("Can not insert into a single node for feature:" + feature + " of " + container);
+					if (modification.type == ModificationType.REMOVE)
+						return null;
+					throw new IllegalArgumentException("Can not use " + modification.type + " for single node feature:" + feature + " of " + container.getClassType());
 				}
 			}
 			return super.copyObject(feature, container, original);
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public <T> ArrayList<T> copyContainer(String feature, HDLObject container, Iterable<T> object) {
+		public <T> ArrayList<T> copyContainer(String feature, IHDLObject container, Iterable<T> object) {
+			final ArrayList<T> res = Lists.newArrayList();
 			if (object != null) {
-				final ArrayList<T> res = new ArrayList<T>();
 				for (final T t : object) {
-					final List<Modification> mods = getModifications(t);
-					if (t instanceof IHDLObject) {
-						final IHDLObject newT = (IHDLObject) t;
-						newT.addMeta(ModID.id, id);
-					}
-					if (mods != null) {
-						final List<T> before = new LinkedList<T>();
-						final List<T> after = new LinkedList<T>();
-						final List<T> replace = new LinkedList<T>();
-						boolean remove = false;
-						for (final Modification modification : mods) {
-							switch (modification.type) {
-							case INSERT_AFTER:
-								after.addAll((Collection<? extends T>) modification.with);
-								break;
-							case INSERT_BEFORE:
-								before.addAll((Collection<? extends T>) modification.with);
-								break;
-							case REPLACE:
-								replace.addAll((Collection<? extends T>) modification.with);
-								break;
-							case ADD:
-								break;
-							case REMOVE:
-								remove = true;
-								break;
-							}
-						}
-						multiAdd(res, before, container);
-						if (replace.size() != 0) {
-							multiAdd(res, replace, container);
-						} else {
-							if (!remove) {
-								singleAdd(res, t, container);
-							}
-						}
-						multiAdd(res, after, container);
-					} else {
-						singleAdd(res, t, container);
-					}
+					applyModifications(feature, container, res, t);
 				}
-				final List<Modification> mods = getModWithoutCheck(container);
-				if (mods != null) {
-					for (final Modification mod : mods)
-						if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
-							multiAdd(res, (List<T>) mod.with, container);
-						}
-				}
+				doAddFeature(res, feature, container);
 				return res;
 			}
-			final List<Modification> mods = getModWithoutCheck(container);
-			if (mods != null) {
-				final ArrayList<T> res = new ArrayList<T>();
-				for (final Modification mod : mods)
-					if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
-						multiAdd(res, (List<T>) mod.with, container);
-					}
-				if (res.size() != 0)
-					return res;
-			}
+			doAddFeature(res, feature, container);
+			if (!res.isEmpty())
+				return res;
 			return null;
 		}
 
-		private <T> void multiAdd(ArrayList<T> res, List<T> list, IHDLObject container) {
-			for (final T element : list) {
-				singleAdd(res, element, container);
+		private <T> void applyModifications(String feature, IHDLObject container, final ArrayList<T> res, final T t) {
+			final List<Modification> mods = getModifications(t);
+			if (mods != null) {
+				final List<T> before = Lists.newLinkedList();
+				final List<T> after = Lists.newLinkedList();
+				final List<T> replace = Lists.newLinkedList();
+				boolean remove = false;
+				final Set<Integer> appliedModIDs = Sets.newHashSet();
+				for (final Modification modification : mods) {
+					if (currentMods.contains(modification.modificationID)) {
+						continue;
+					}
+					switch (modification.type) {
+					case INSERT_AFTER:
+						scheduleMod(after, appliedModIDs, modification);
+						break;
+					case INSERT_BEFORE:
+						scheduleMod(before, appliedModIDs, modification);
+						break;
+					case REPLACE:
+						scheduleMod(replace, appliedModIDs, modification);
+						break;
+					case REMOVE:
+						remove = true;
+						break;
+					case ADD:
+						break;
+					}
+				}
+				multiAdd(res, before, container, feature);
+				if (!replace.isEmpty()) {
+					// A replacement is scheduled, so we just add the
+					// replacement objects
+					// and ignore the actual element
+					multiAdd(res, replace, container, feature);
+				} else {
+					// The object is not scheduled for removal, so just add it
+					if (!remove) {
+						singleAdd(res, t, container, feature, true);
+					}
+				}
+				multiAdd(res, after, container, feature);
+				currentMods.removeAll(appliedModIDs);
+			} else {
+				// If there are no modifications for object t then we just add
+				// it to the result
+				singleAdd(res, t, container, feature, true);
 			}
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T> void singleAdd(ArrayList<T> res, T t, IHDLObject container) {
-			if (t instanceof IHDLObject) {
-				final IHDLObject newT = (IHDLObject) t;
-				// newT.addMeta(ModID.id, id);
-				// Marking not needed here as it will be taken care of in
-				// copyObject
-				final T copyFiltered = (T) newT.copyFiltered(this);
-				res.add(copyFiltered);
+		private <T> void scheduleMod(final List<T> list, final Set<Integer> modIDs, final Modification modification) {
+			modIDs.add(modification.modificationID);
+			currentMods.add(modification.modificationID);
+			list.addAll((Collection<? extends T>) modification.with);
+		}
+
+		/**
+		 * Performs all the {@link ModificationType#ADD} modifications for the
+		 * container and the feature.
+		 *
+		 * @param resultList
+		 *            the list that will contain all the replacements
+		 * @param feature
+		 *            the feature of the container that will contain the obj
+		 * @param container
+		 *            the object that will contain the obj
+		 */
+		@SuppressWarnings("unchecked")
+		private <T> void doAddFeature(final ArrayList<T> resultList, String feature, IHDLObject container) {
+			final List<Modification> mods = getModifications(container);
+			if (mods == null)
+				return;
+			final Set<Integer> appliableMods = Sets.newHashSet();
+			final List<Modification> applyMod = Lists.newArrayList();
+			for (final Modification mod : mods) {
+				if ((mod.type == ModificationType.ADD) && feature.equals(mod.feature)) {
+					if (currentMods.contains(mod.modificationID)) {
+						continue;
+					}
+					appliableMods.add(mod.modificationID);
+					applyMod.add(mod);
+				}
+			}
+			currentMods.addAll(appliableMods);
+			for (final Modification mod : applyMod) {
+				multiAdd(resultList, (List<T>) mod.with, container, feature);
+			}
+			currentMods.removeAll(appliableMods);
+		}
+
+		/**
+		 * Adds multiple items to the result list <code>resultList</code> which
+		 * will be added to the <code>feature</code> of the
+		 * <code>container</code>
+		 *
+		 * @param resultList
+		 *            the list that will contain all the replacements
+		 * @param objectList
+		 *            the objects that should be inserted
+		 * @param container
+		 *            the object that will contain the objects
+		 * @param feature
+		 *            the feature of the container that will contain the objects
+		 */
+		private <T> void multiAdd(ArrayList<T> resultList, List<T> objectList, IHDLObject container, String feature) {
+			for (final T element : objectList) {
+				singleAdd(resultList, element, container, feature, false);
+			}
+		}
+
+		/**
+		 * Adds a single item to the result list <code>resultList</code> which
+		 * will be added to the <code>feature</code> of the
+		 * <code>container</code>
+		 *
+		 * @param resultList
+		 *            the list that will contain all the replacements
+		 * @param obj
+		 *            the object that should be inserted
+		 * @param container
+		 *            the object that will contain the obj
+		 * @param feature
+		 *            the feature of the container that will contain the obj
+		 * @param unmodified
+		 *            if <code>true</code> no further substitution will be
+		 *            attempted
+		 */
+		@SuppressWarnings("unchecked")
+		private <T> void singleAdd(ArrayList<T> resultList, T obj, IHDLObject container, String feature, boolean unmodified) {
+			if (obj instanceof IHDLObject) {
+				if (unmodified) {
+					resultList.add((T) ((IHDLObject) obj).copyFiltered(this));
+				} else {
+					resultList.addAll(copyContainer(feature, container, Collections.singleton(obj)));
+				}
 			} else {
-				res.add(t);
+				resultList.add(obj);
 			}
 		}
 
@@ -178,7 +254,14 @@ public class ModificationSet {
 		REPLACE, INSERT_BEFORE, INSERT_AFTER, ADD, REMOVE;
 	}
 
+	/**
+	 * A storage class for all modifications that are scheduled
+	 *
+	 */
 	private static class Modification {
+		private static final AtomicInteger gid = new AtomicInteger();
+
+		public final Integer modificationID = gid.incrementAndGet();
 		public final IHDLObject subject;
 		public final String feature;
 		public final List<Object> with;
@@ -186,7 +269,19 @@ public class ModificationSet {
 
 		@Override
 		public String toString() {
-			return "Modification [subject=" + subject + ", with=" + with + ", type=" + type + "]";
+			final StringBuilder builder = new StringBuilder();
+			builder.append("Modification [type=");
+			builder.append(type);
+			builder.append(", subject=");
+			builder.append(subject);
+			builder.append(", feature=");
+			builder.append(feature);
+			builder.append(", with=");
+			builder.append(with);
+			builder.append(", modificationID=");
+			builder.append(modificationID);
+			builder.append("]");
+			return builder.toString();
 		}
 
 		public Modification(IHDLObject subject, ModificationType type, String feature, Object... with) {
@@ -198,48 +293,123 @@ public class ModificationSet {
 		}
 	}
 
-	private final Map<Integer, List<Modification>> replacements = new HashMap<Integer, List<Modification>>();
+	private final Map<Integer, List<Modification>> replacements = Maps.newHashMap();
+	/**
+	 * Contains the modifications that are currently applied. A modification
+	 * that is currently applied, should not be applied to avoid recursion
+	 */
+	private final Set<Integer> currentMods = Sets.newHashSet();
 
 	private <T> List<Modification> getModifications(T object) {
-		if (object instanceof IHDLObject) {
-			final IHDLObject original = (IHDLObject) object;
-			final Integer modID = original.getMeta(ModID.id);
-			if (modID != null)
-				if (modID == id)
-					return null;
-		}
-		return getModWithoutCheck(object);
+		return replacements.get(getHash(object));
 	}
 
-	private <T> List<Modification> getModWithoutCheck(T object) {
-		final List<Modification> list = replacements.get(getHash(object));
-		if (list != null) {
-			final List<Modification> res = new LinkedList<ModificationSet.Modification>();
-			for (final Modification modification : list)
-				if (modification.subject == object) {
-					res.add(modification);
-				}
-			return res;
-		}
-		return null;
-	}
-
+	/**
+	 * Removes a subject
+	 *
+	 * @param subject
+	 */
 	public void remove(IHDLObject subject) {
+		final IHDLObject container = subject.getContainer();
+		if (container != null) {
+			final HDLFieldAccess<?, ?> feature = container.getContainingFeature(subject);
+			// The feature can be null when the container is set
+			// aritifically for resolution reasons
+			if (feature != null) {
+				switch (feature.quantifier) {
+				case ONE:
+				case ONE_OR_MORE:
+					throw new IllegalArgumentException("Can not remove feature:" + feature.fieldName + " at least one is required");
+				default:
+					break;
+				}
+			}
+		}
 		final Modification mod = new Modification(subject, ModificationType.REMOVE, null);
 		insert(subject, mod);
 	}
 
+	/**
+	 * Replace the subject with other objects. If the with is null or empty, the
+	 * subject will be removed.
+	 *
+	 * @param subject
+	 * @param with
+	 */
 	public void replace(IHDLObject subject, IHDLObject... with) {
-		final Modification mod = new Modification(subject, ModificationType.REPLACE, null, (Object[]) with);
-		insert(subject, mod);
+		if ((with == null) || (with.length == 0)) {
+			remove(subject);
+		} else {
+			final IHDLObject container = subject.getContainer();
+			if (container != null) {
+				final HDLFieldAccess<?, ?> feature = container.getContainingFeature(subject);
+				// The feature can be null when the container is set
+				// aritifically for resolution reasons
+				if (feature != null) {
+					switch (feature.quantifier) {
+					case ONE:
+					case ZERO_OR_ONE:
+						if (with.length != 1)
+							throw new IllegalArgumentException("Can not replace feature:" + feature.fieldName + " with multiple objects");
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			final Modification mod = new Modification(subject, ModificationType.REPLACE, null, (Object[]) with);
+			insert(subject, mod);
+		}
 	}
 
+	/**
+	 * Inserts the objects after the subject. This only works if the subject is
+	 * contained in a List.
+	 *
+	 * @param subject
+	 * @param with
+	 */
 	public void insertAfter(IHDLObject subject, IHDLObject... with) {
+		if ((with == null) || (with.length == 0))
+			return;
+		final IHDLObject container = subject.getContainer();
+		if (container != null) {
+			final HDLFieldAccess<?, ?> feature = container.getContainingFeature(subject);
+			if (feature != null) {
+				if ((feature.quantifier == Quantifier.ZERO_OR_ONE) || (feature.quantifier == Quantifier.ONE))
+					throw new IllegalArgumentException("Can not perform insertAfter on feature: " + feature.fieldName + " not a collection");
+				for (final IHDLObject object : with) {
+					if (!feature.type.isAssignableFrom(object.getClass()))
+						throw new IllegalArgumentException("Can not insertAfter type:" + object.getClassType() + " to feature: " + feature.fieldName);
+				}
+			}
+		}
 		final Modification mod = new Modification(subject, ModificationType.INSERT_AFTER, null, (Object[]) with);
 		insert(subject, mod);
 	}
 
+	/**
+	 * Insert objects before the subject. This only works if the subject is
+	 * contained in a List.
+	 *
+	 * @param subject
+	 * @param with
+	 */
 	public void insertBefore(IHDLObject subject, IHDLObject... with) {
+		if ((with == null) || (with.length == 0))
+			return;
+		final IHDLObject container = subject.getContainer();
+		if (container != null) {
+			final HDLFieldAccess<?, ?> feature = container.getContainingFeature(subject);
+			if (feature != null) {
+				if ((feature.quantifier == Quantifier.ZERO_OR_ONE) || (feature.quantifier == Quantifier.ONE))
+					throw new IllegalArgumentException("Can not perform insertBefore on feature: " + feature.fieldName + " not a collection");
+				for (final IHDLObject object : with) {
+					if (!feature.type.isAssignableFrom(object.getClass()))
+						throw new IllegalArgumentException("Can not insertBefore type:" + object.getClassType() + " to feature: " + feature.fieldName);
+				}
+			}
+		}
 		final Modification mod = new Modification(subject, ModificationType.INSERT_BEFORE, null, (Object[]) with);
 		insert(subject, mod);
 	}
@@ -253,13 +423,26 @@ public class ModificationSet {
 		replacements.put(getHash(subject), list);
 	}
 
-	public <T> void addTo(IHDLObject subject, HDLFieldAccess<?, ArrayList<T>> field, T... add) {
+	/**
+	 * Adds objects to a feature of the subject
+	 *
+	 * @param subject
+	 * @param field
+	 * @param add
+	 */
+	public <T> void addTo(IHDLObject subject, HDLFieldAccess<?, ArrayList<T>> field, @SuppressWarnings("unchecked") T... add) {
+		if ((add == null) || (add.length == 0))
+			return;
+		for (final T t : add) {
+			if (!field.type.isAssignableFrom(t.getClass()))
+				throw new IllegalArgumentException("Can not add type: " + t.getClass() + " to feature: " + field.fieldName + ", incompatible types");
+		}
 		final Modification mod = new Modification(subject, ModificationType.ADD, field.fieldName, add);
 		insert(subject, mod);
 	}
 
 	/**
-	 * Executes all outstanding modifications or returns the orignal object if
+	 * Executes all outstanding modifications or returns the original object if
 	 * nothing needs to be done
 	 *
 	 * @param orig
@@ -269,7 +452,6 @@ public class ModificationSet {
 	public <T extends IHDLObject> T apply(T orig) {
 		if (replacements.size() == 0)
 			return orig;
-		id = gid.incrementAndGet();
 		final T newR = getReplacement(orig);
 		final T res = (T) newR.copyFiltered(new MSCopyFilter());
 		res.freeze(orig.getContainer());

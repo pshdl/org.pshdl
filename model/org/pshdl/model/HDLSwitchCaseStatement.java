@@ -73,7 +73,8 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	/**
 	 * The accessor for the field label which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression> fLabel = new HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression>("label") {
+	public static HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression> fLabel = new HDLFieldAccess<HDLSwitchCaseStatement, HDLExpression>("label", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLSwitchCaseStatement obj) {
 			if (obj == null)
@@ -91,7 +92,8 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 	/**
 	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>>("dos") {
+	public static HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLSwitchCaseStatement, ArrayList<HDLStatement>>("dos",
+			HDLStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLSwitchCaseStatement obj) {
 			if (obj == null)
@@ -106,6 +108,15 @@ public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {
 			return obj.setDos(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (label == obj)
+			return fLabel;
+		if (dos.contains(obj))
+			return fDos;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

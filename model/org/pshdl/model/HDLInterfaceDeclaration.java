@@ -72,7 +72,8 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 	/**
 	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
-	public static HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface> fHIf = new HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface>("hIf") {
+	public static HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface> fHIf = new HDLFieldAccess<HDLInterfaceDeclaration, HDLInterface>("hIf", HDLInterface.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLInterface getValue(HDLInterfaceDeclaration obj) {
 			if (obj == null)
@@ -87,6 +88,13 @@ public class HDLInterfaceDeclaration extends AbstractHDLInterfaceDeclaration {
 			return obj.setHIf(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (hIf == obj)
+			return fHIf;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

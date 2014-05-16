@@ -84,7 +84,8 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 	/**
 	 * The accessor for the field expr which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLInlineFunction, HDLExpression> fExpr = new HDLFieldAccess<HDLInlineFunction, HDLExpression>("expr") {
+	public static HDLFieldAccess<HDLInlineFunction, HDLExpression> fExpr = new HDLFieldAccess<HDLInlineFunction, HDLExpression>("expr", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLInlineFunction obj) {
 			if (obj == null)
@@ -99,6 +100,13 @@ public class HDLInlineFunction extends AbstractHDLInlineFunction {
 			return obj.setExpr(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (expr == obj)
+			return fExpr;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 

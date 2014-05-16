@@ -194,7 +194,11 @@ public class HDLSimulator {
 	private static HDLPackage flattenAll(HDLEvaluationContext context, HDLUnit insulin, char separator) {
 		HDLInterfaceInstantiation[] hii = null;
 		HDLPackage res = new HDLPackage();
+		int count = 0;
 		while ((hii = insulin.getAllObjectsOf(HDLInterfaceInstantiation.class, true)).length > 0) {
+			if (count > 50)
+				throw new IllegalArgumentException("It appears that the number of inlined units is exceptionally large. Maybe a recursive inclusion?");
+			count++;
 			final HDLLibrary library = insulin.getLibrary();
 			final HDLInterfaceInstantiation hi = hii[0];
 			final HDLQualifiedName asRef = hi.resolveHIf().get().asRef();
@@ -424,7 +428,11 @@ public class HDLSimulator {
 	 */
 	private static HDLUnit unrollForLoops(HDLEvaluationContext context, HDLUnit unit) {
 		HDLUnit newUnit = unit;
+		int count = 0;
 		do {
+			if (count > 50)
+				throw new IllegalArgumentException("Something went wrong while unrolling the loops");
+			count++;
 			unit = newUnit;
 			final HDLForLoop[] loops = unit.getAllObjectsOf(HDLForLoop.class, true);
 			final ModificationSet ms = new ModificationSet();

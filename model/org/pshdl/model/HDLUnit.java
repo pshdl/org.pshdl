@@ -115,7 +115,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * The accessor for the field annotations which is of type
 	 * ArrayList<HDLAnnotation>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>>("annotations") {
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>>("annotations", HDLAnnotation.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLUnit obj) {
 			if (obj == null)
@@ -133,7 +134,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * The accessor for the field libURI which is of type String.
 	 */
-	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>("libURI") {
+	public static HDLFieldAccess<HDLUnit, String> fLibURI = new HDLFieldAccess<HDLUnit, String>("libURI", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLUnit obj) {
 			if (obj == null)
@@ -151,7 +152,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>("name") {
+	public static HDLFieldAccess<HDLUnit, String> fName = new HDLFieldAccess<HDLUnit, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLUnit obj) {
 			if (obj == null)
@@ -169,7 +170,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * The accessor for the field imports which is of type ArrayList<String>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>("imports") {
+	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>("imports", String.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<String> getValue(HDLUnit obj) {
 			if (obj == null)
@@ -188,7 +190,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * The accessor for the field inits which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fInits = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("inits") {
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fInits = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("inits", HDLStatement.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLUnit obj) {
 			if (obj == null)
@@ -207,7 +210,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * The accessor for the field statements which is of type
 	 * ArrayList<HDLStatement>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("statements") {
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("statements", HDLStatement.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLStatement> getValue(HDLUnit obj) {
 			if (obj == null)
@@ -225,7 +229,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * The accessor for the field simulation which is of type Boolean.
 	 */
-	public static HDLFieldAccess<HDLUnit, Boolean> fSimulation = new HDLFieldAccess<HDLUnit, Boolean>("simulation") {
+	public static HDLFieldAccess<HDLUnit, Boolean> fSimulation = new HDLFieldAccess<HDLUnit, Boolean>("simulation", Boolean.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Boolean getValue(HDLUnit obj) {
 			if (obj == null)
@@ -244,7 +248,8 @@ public class HDLUnit extends AbstractHDLUnit {
 	 * The accessor for the field extend which is of type
 	 * ArrayList<HDLQualifiedName>.
 	 */
-	public static HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>> fExtend = new HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>>("extend") {
+	public static HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>> fExtend = new HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>>("extend", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLQualifiedName> getValue(HDLUnit obj) {
 			if (obj == null)
@@ -259,6 +264,28 @@ public class HDLUnit extends AbstractHDLUnit {
 			return obj.setExtend(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (annotations.contains(obj))
+			return fAnnotations;
+		if (libURI == obj)
+			return fLibURI;
+		if (name == obj)
+			return fName;
+		if (imports.contains(obj))
+			return fImports;
+		if (inits.contains(obj))
+			return fInits;
+		if (statements.contains(obj))
+			return fStatements;
+		if (simulation == obj)
+			return fSimulation;
+		if (extend.contains(obj))
+			return fExtend;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 	private HDLInterface unitIF = null;
 
@@ -351,9 +378,10 @@ public class HDLUnit extends AbstractHDLUnit {
 			}
 		// System.out.println("HDLUnit.asInterface()" + unitIF);
 		unitIF = ms.apply(unitIF);
-		if (!unitIF.isFrozen()) {
-			unitIF = unitIF.copyDeepFrozen(this);
-		}
+		// unitIF = unitIF.copy().setContainer(this);
+		// if (!unitIF.isFrozen()) {
+		// }
+		unitIF = unitIF.copyDeepFrozen(this);
 		unitIF.addMeta(FULLNAME, fullName);
 		unitIF.setID(getID());
 		return unitIF;

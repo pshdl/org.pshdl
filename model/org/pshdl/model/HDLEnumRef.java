@@ -76,7 +76,8 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 	/**
 	 * The accessor for the field hEnum which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>("hEnum") {
+	public static HDLFieldAccess<HDLEnumRef, HDLQualifiedName> fHEnum = new HDLFieldAccess<HDLEnumRef, HDLQualifiedName>("hEnum", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLEnumRef obj) {
 			if (obj == null)
@@ -91,6 +92,13 @@ public class HDLEnumRef extends AbstractHDLEnumRef {
 			return obj.setHEnum(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (hEnum == obj)
+			return fHEnum;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	@Override

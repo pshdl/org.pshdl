@@ -89,7 +89,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>("name") {
+	public static HDLFieldAccess<HDLFunction, String> fName = new HDLFieldAccess<HDLFunction, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLFunction obj) {
 			if (obj == null)
@@ -108,7 +108,8 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 * The accessor for the field args which is of type
 	 * ArrayList<HDLFunctionParameter>.
 	 */
-	public static HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>> fArgs = new HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>>("args") {
+	public static HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>> fArgs = new HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>>("args",
+			HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLFunctionParameter> getValue(HDLFunction obj) {
 			if (obj == null)
@@ -127,7 +128,8 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	 * The accessor for the field returnType which is of type
 	 * HDLFunctionParameter.
 	 */
-	public static HDLFieldAccess<HDLFunction, HDLFunctionParameter> fReturnType = new HDLFieldAccess<HDLFunction, HDLFunctionParameter>("returnType") {
+	public static HDLFieldAccess<HDLFunction, HDLFunctionParameter> fReturnType = new HDLFieldAccess<HDLFunction, HDLFunctionParameter>("returnType", HDLFunctionParameter.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLFunctionParameter getValue(HDLFunction obj) {
 			if (obj == null)
@@ -142,6 +144,18 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			return obj.setReturnType(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (name == obj)
+			return fName;
+		if (args.contains(obj))
+			return fArgs;
+		if (returnType == obj)
+			return fReturnType;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 
 	public static final GenericMeta<IHDLObject> META = new GenericMeta<IHDLObject>("INLINED_FROM", true);
@@ -167,7 +181,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case REG_UINT:
 			case STRING_TYPE:
 				final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef())
-				.getAll();
+						.getAll();
 				for (final HDLVariableRef argRef : allArgRefs) {
 					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 					if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
@@ -195,7 +209,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case IF:
 			case ANY_IF:
 				final Collection<HDLInterfaceRef> allIfRefs = HDLQuery.select(HDLInterfaceRef.class).from(orig).where(HDLInterfaceRef.fHIf).isEqualTo(param.getName().asRef())
-				.getAll();
+						.getAll();
 				for (final HDLInterfaceRef argRef : allIfRefs) {
 					final HDLQualifiedName fqn = FullNameExtension.fullNameOf(arg);
 					msExp.replace(argRef, argRef.setHIf(fqn));

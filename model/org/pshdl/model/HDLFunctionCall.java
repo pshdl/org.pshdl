@@ -75,7 +75,8 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	/**
 	 * The accessor for the field name which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLFunctionCall, HDLQualifiedName> fName = new HDLFieldAccess<HDLFunctionCall, HDLQualifiedName>("name") {
+	public static HDLFieldAccess<HDLFunctionCall, HDLQualifiedName> fName = new HDLFieldAccess<HDLFunctionCall, HDLQualifiedName>("name", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionCall obj) {
 			if (obj == null)
@@ -94,7 +95,8 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	 * The accessor for the field params which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>>("params") {
+	public static HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>>("params", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLFunctionCall obj) {
 			if (obj == null)
@@ -109,6 +111,15 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 			return obj.setParams(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (name == obj)
+			return fName;
+		if (params.contains(obj))
+			return fParams;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

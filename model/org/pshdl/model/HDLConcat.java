@@ -74,7 +74,8 @@ public class HDLConcat extends AbstractHDLConcat {
 	 * The accessor for the field cats which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>("cats") {
+	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>("cats", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLConcat obj) {
 			if (obj == null)
@@ -89,6 +90,13 @@ public class HDLConcat extends AbstractHDLConcat {
 			return obj.setCats(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (cats.contains(obj))
+			return fCats;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

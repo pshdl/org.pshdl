@@ -33,9 +33,13 @@ import javax.annotation.Nullable;
 
 import org.pshdl.model.impl.AbstractHDLRegisterConfig;
 import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.validation.Problem;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 /**
@@ -44,6 +48,9 @@ import com.google.common.collect.Sets;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression clk. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression rst. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression unresolvedClockType. Can be <code>null</code>.</li>
+ * <li>HDLExpression unresolvedResetType. Can be <code>null</code>.</li>
+ * <li>HDLExpression unresolvedSyncType. Can be <code>null</code>.</li>
  * <li>HDLRegClockType clockType. Can be <code>null</code>.</li>
  * <li>HDLRegResetActiveType resetType. Can be <code>null</code>.</li>
  * <li>HDLRegSyncType syncType. Can be <code>null</code>.</li>
@@ -61,6 +68,12 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 *            the value for clk. Can <b>not</b> be <code>null</code>.
 	 * @param rst
 	 *            the value for rst. Can <b>not</b> be <code>null</code>.
+	 * @param unresolvedClockType
+	 *            the value for unresolvedClockType. Can be <code>null</code>.
+	 * @param unresolvedResetType
+	 *            the value for unresolvedResetType. Can be <code>null</code>.
+	 * @param unresolvedSyncType
+	 *            the value for unresolvedSyncType. Can be <code>null</code>.
 	 * @param clockType
 	 *            the value for clockType. Can be <code>null</code>.
 	 * @param resetType
@@ -74,9 +87,10 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLExpression clk, @Nonnull HDLExpression rst, @Nullable HDLRegClockType clockType,
+	public HDLRegisterConfig(int id, @Nullable IHDLObject container, @Nonnull HDLExpression clk, @Nonnull HDLExpression rst, @Nullable HDLExpression unresolvedClockType,
+			@Nullable HDLExpression unresolvedResetType, @Nullable HDLExpression unresolvedSyncType, @Nullable HDLRegClockType clockType,
 			@Nullable HDLRegResetActiveType resetType, @Nullable HDLRegSyncType syncType, @Nonnull HDLExpression resetValue, @Nullable HDLExpression delay, boolean validate) {
-		super(id, container, clk, rst, clockType, resetType, syncType, resetValue, delay, validate);
+		super(id, container, clk, rst, unresolvedClockType, unresolvedResetType, unresolvedSyncType, clockType, resetType, syncType, resetValue, delay, validate);
 	}
 
 	public HDLRegisterConfig() {
@@ -106,7 +120,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * The accessor for the field clk which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("clk") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fClk = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("clk", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -124,7 +139,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * The accessor for the field rst which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("rst") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fRst = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("rst", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -140,9 +156,70 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		}
 	};
 	/**
+	 * The accessor for the field unresolvedClockType which is of type
+	 * HDLExpression.
+	 */
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fUnresolvedClockType = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("unresolvedClockType",
+			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
+		@Override
+		public HDLExpression getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getUnresolvedClockType();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setUnresolvedClockType(value);
+		}
+	};
+	/**
+	 * The accessor for the field unresolvedResetType which is of type
+	 * HDLExpression.
+	 */
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fUnresolvedResetType = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("unresolvedResetType",
+			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
+		@Override
+		public HDLExpression getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getUnresolvedResetType();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setUnresolvedResetType(value);
+		}
+	};
+	/**
+	 * The accessor for the field unresolvedSyncType which is of type
+	 * HDLExpression.
+	 */
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fUnresolvedSyncType = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("unresolvedSyncType",
+			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
+		@Override
+		public HDLExpression getValue(HDLRegisterConfig obj) {
+			if (obj == null)
+				return null;
+			return obj.getUnresolvedSyncType();
+		}
+
+		@Override
+		public HDLRegisterConfig setValue(HDLRegisterConfig obj, HDLExpression value) {
+			if (obj == null)
+				return null;
+			return obj.setUnresolvedSyncType(value);
+		}
+	};
+	/**
 	 * The accessor for the field clockType which is of type HDLRegClockType.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLRegClockType> fClockType = new HDLFieldAccess<HDLRegisterConfig, HDLRegClockType>("clockType") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegClockType> fClockType = new HDLFieldAccess<HDLRegisterConfig, HDLRegClockType>("clockType", HDLRegClockType.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLRegClockType getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -161,7 +238,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	 * The accessor for the field resetType which is of type
 	 * HDLRegResetActiveType.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetActiveType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetActiveType>("resetType") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegResetActiveType> fResetType = new HDLFieldAccess<HDLRegisterConfig, HDLRegResetActiveType>("resetType",
+			HDLRegResetActiveType.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLRegResetActiveType getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -179,7 +257,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * The accessor for the field syncType which is of type HDLRegSyncType.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType> fSyncType = new HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType>("syncType") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType> fSyncType = new HDLFieldAccess<HDLRegisterConfig, HDLRegSyncType>("syncType", HDLRegSyncType.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLRegSyncType getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -197,7 +276,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * The accessor for the field resetValue which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fResetValue = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("resetValue") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fResetValue = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("resetValue", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -215,7 +295,8 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	/**
 	 * The accessor for the field delay which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fDelay = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("delay") {
+	public static HDLFieldAccess<HDLRegisterConfig, HDLExpression> fDelay = new HDLFieldAccess<HDLRegisterConfig, HDLExpression>("delay", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRegisterConfig obj) {
 			if (obj == null)
@@ -230,6 +311,32 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 			return obj.setDelay(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (clk == obj)
+			return fClk;
+		if (rst == obj)
+			return fRst;
+		if (unresolvedClockType == obj)
+			return fUnresolvedClockType;
+		if (unresolvedResetType == obj)
+			return fUnresolvedResetType;
+		if (unresolvedSyncType == obj)
+			return fUnresolvedSyncType;
+		if (clockType == obj)
+			return fClockType;
+		if (resetType == obj)
+			return fResetType;
+		if (syncType == obj)
+			return fSyncType;
+		if (resetValue == obj)
+			return fResetValue;
+		if (delay == obj)
+			return fDelay;
+		return super.getContainingFeature(obj);
+	}
+
 	// $CONTENT-BEGIN$
 
 	public static final String EDGE_PARAM = "clockEdge";
@@ -256,10 +363,10 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig()//
-		.setClk(DEF_CLK_REF())//
-		.setRst(DEF_RST_REF())//
-		.setResetValue(HDLLiteral.get(0))//
-		.normalize()//
+				.setClk(DEF_CLK_REF())//
+				.setRst(DEF_RST_REF())//
+				.setResetValue(HDLLiteral.get(0))//
+				.normalize()//
 		;
 	}
 
@@ -268,88 +375,31 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 		HDLRegisterConfig config = defaultConfig();
 		for (final HDLArgument genArgs : args) {
 			final String name = genArgs.getName();
-			final HDLQualifiedName refName = getRefName(genArgs.getExpression());
+			final HDLExpression expression = genArgs.getExpression();
 			if (RESET_PARAM.equals(name)) {
-				if (refName == null)
-					throw new IllegalArgumentException("Can not get a name for clk from:" + genArgs.getExpression());
-				config = config.setRst(genArgs.getExpression());
+				config = config.setRst(expression);
 			}
 			if (CLOCK_PARAM.equals(name)) {
-				if (refName == null)
-					throw new IllegalArgumentException("Can not get a name for rst from:" + genArgs.getExpression());
-				config = config.setClk(genArgs.getExpression());
+				config = config.setClk(expression);
 			}
 			if (EDGE_PARAM.equals(name)) {
-				final String value = getString(genArgs);
-				if (value != null) {
-					config = config.setClockType(HDLRegClockType.valueOf(value.toUpperCase()));
-				} else {
-					if (refName == null)
-						throw new IllegalArgumentException("Can not get a name for edge parameter from:" + genArgs.getExpression());
-					config = config.setClockType(HDLRegClockType.valueOf(refName.getLastSegment()));
-				}
+				config = config.setUnresolvedClockType(expression);
 			}
 			if (RESET_SYNC_PARAM.equals(name)) {
-				final String value = getString(genArgs);
-				if (value != null) {
-					config = config.setSyncType(HDLRegSyncType.valueOf(value.toUpperCase()));
-				} else {
-					if (refName == null)
-						throw new IllegalArgumentException("Can not get a name for sync parameter from:" + genArgs.getExpression());
-					config = config.setSyncType(HDLRegSyncType.valueOf(refName.getLastSegment()));
-				}
+				config = config.setUnresolvedSyncType(expression);
 			}
 			if (RESET_TYPE_PARAM.equals(name)) {
-				final String value = getString(genArgs);
-				if (value != null) {
-					config = config.setResetType(HDLRegResetActiveType.valueOf(value.toUpperCase()));
-				} else {
-					if (refName == null)
-						throw new IllegalArgumentException("Can not get a name for sync parameter from:" + genArgs.getExpression());
-					config = config.setResetType(HDLRegResetActiveType.valueOf(refName.getLastSegment()));
-				}
+				config = config.setUnresolvedResetType(expression);
 			}
 			if (RESET_VALUE_PARAM.equals(name)) {
-				config = config.setResetValue(genArgs.getExpression());
+				config = config.setResetValue(expression);
 			}
 			if (DELAY_PARAM.equals(name)) {
-				config = config.setDelay(genArgs.getExpression());
+				config = config.setDelay(expression);
 			}
 		}
 		config.addMeta(ORIGINAL_ARGS, args);
 		return config;
-	}
-
-	/**
-	 * Attempts to get a name for expression
-	 *
-	 * @param expression
-	 * @return
-	 */
-	@Nullable
-	private static HDLQualifiedName getRefName(HDLExpression expression) {
-		if (expression instanceof HDLVariableRef) {
-			final HDLResolvedRef rr = (HDLResolvedRef) expression;
-			return rr.getVarRefName();
-		}
-		if (expression instanceof HDLUnresolvedFragment) {
-			final HDLUnresolvedFragment uf = (HDLUnresolvedFragment) expression;
-			final HDLUnresolvedFragment sub = uf.getSub();
-			if (sub != null)
-				return new HDLQualifiedName(uf.getFrag()).append(sub.getFrag());
-			return new HDLQualifiedName(uf.getFrag());
-		}
-		return HDLQualifiedName.invalid(expression.toString());
-	}
-
-	@Nullable
-	private static String getString(HDLArgument genArgs) {
-		if (genArgs.getExpression() instanceof HDLLiteral) {
-			final HDLLiteral lit = (HDLLiteral) genArgs.getExpression();
-			if (lit.getStr())
-				return lit.getVal();
-		}
-		return null;
 	}
 
 	@Override
@@ -421,18 +471,112 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	public HDLRegisterConfig normalize() {
 		HDLRegisterConfig res = this;
 		if (getResetType() == null) {
-			res = res.setResetType(HDLRegResetActiveType.HIGH);
+			final HDLExpression unresolvedType = getUnresolvedResetType();
+			if (unresolvedType != null) {
+				res = res.setResetTypeFromUnresolved();
+			} else {
+				res = res.setResetType(HDLRegResetActiveType.HIGH);
+			}
 		}
 		if (getSyncType() == null) {
-			res = res.setSyncType(HDLRegSyncType.SYNC);
+			final HDLExpression unresolvedType = getUnresolvedSyncType();
+			if (unresolvedType != null) {
+				res = res.setSyncTypeFromUnresolved();
+			} else {
+				res = res.setSyncType(HDLRegSyncType.SYNC);
+			}
 		}
 		if (getClockType() == null) {
-			res = res.setClockType(HDLRegClockType.RISING);
+			final HDLExpression unresolvedType = getUnresolvedClockType();
+			if (unresolvedType != null) {
+				res = res.setClockTypeFromUnresolved();
+			} else {
+				res = res.setClockType(HDLRegClockType.RISING);
+			}
 		}
 		if (res == this)
 			return this;
 		return res.copyFiltered(CopyFilter.DEEP_META);
 	}
+
+	public HDLRegisterConfig setResetTypeFromUnresolved() {
+		final HDLExpression unresolvedType = getUnresolvedResetType();
+		if (unresolvedType == null)
+			return this;
+		HDLRegisterConfig res = this;
+		if (unresolvedType.getClassType() == HDLClass.HDLEnumRef) {
+			final HDLEnumRef ref = (HDLEnumRef) unresolvedType;
+			final Optional<HDLVariable> var = ref.resolveVar();
+			if (var.isPresent()) {
+				switch (var.get().getName()) {
+				case "HIGH":
+					res = res.setResetType(HDLRegResetActiveType.HIGH);
+					break;
+				case "LOW":
+					res = res.setResetType(HDLRegResetActiveType.LOW);
+					break;
+				default:
+					throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+				}
+				res = res.setUnresolvedResetType(null);
+			}
+		} else
+			throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+		return res;
+	}
+
+	public HDLRegisterConfig setSyncTypeFromUnresolved() {
+		final HDLExpression unresolvedType = getUnresolvedSyncType();
+		if (unresolvedType == null)
+			return this;
+		HDLRegisterConfig res = this;
+		if (unresolvedType.getClassType() == HDLClass.HDLEnumRef) {
+			final HDLEnumRef ref = (HDLEnumRef) unresolvedType;
+			final Optional<HDLVariable> var = ref.resolveVar();
+			if (var.isPresent()) {
+				switch (var.get().getName()) {
+				case "ASYNC":
+					res = res.setSyncType(HDLRegSyncType.ASYNC);
+					break;
+				case "SYNC":
+					res = res.setSyncType(HDLRegSyncType.SYNC);
+					break;
+				default:
+					throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+				}
+				res = res.setUnresolvedSyncType(null);
+			}
+		} else
+			throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+		return res;
+	}
+
+	public HDLRegisterConfig setClockTypeFromUnresolved() {
+		final HDLExpression unresolvedType = getUnresolvedClockType();
+		if (unresolvedType == null)
+			return this;
+		HDLRegisterConfig res = this;
+		if (unresolvedType.getClassType() == HDLClass.HDLEnumRef) {
+			final HDLEnumRef ref = (HDLEnumRef) unresolvedType;
+			final Optional<HDLVariable> var = ref.resolveVar();
+			if (var.isPresent()) {
+				switch (var.get().getName()) {
+				case "RISING":
+					res = res.setClockType(HDLRegClockType.RISING);
+					break;
+				case "FALLING":
+					res = res.setClockType(HDLRegClockType.FALLING);
+					break;
+				default:
+					throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+				}
+				res = res.setUnresolvedClockType(null);
+			}
+		} else
+			throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+		return res;
+	}
+
 	// $CONTENT-END$
 
 }

@@ -148,7 +148,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field rw which is of type RWType.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, RWType> fRw = new HDLFieldAccess<HDLFunctionParameter, RWType>("rw") {
+	public static HDLFieldAccess<HDLFunctionParameter, RWType> fRw = new HDLFieldAccess<HDLFunctionParameter, RWType>("rw", RWType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public RWType getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -166,7 +166,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field type which is of type Type.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, Type> fType = new HDLFieldAccess<HDLFunctionParameter, Type>("type") {
+	public static HDLFieldAccess<HDLFunctionParameter, Type> fType = new HDLFieldAccess<HDLFunctionParameter, Type>("type", Type.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public Type getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -184,7 +184,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field enumSpec which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName> fEnumSpec = new HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName>("enumSpec") {
+	public static HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName> fEnumSpec = new HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName>("enumSpec", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -202,7 +203,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field ifSpec which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName> fIfSpec = new HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName>("ifSpec") {
+	public static HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName> fIfSpec = new HDLFieldAccess<HDLFunctionParameter, HDLQualifiedName>("ifSpec", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -222,7 +224,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 * ArrayList<HDLFunctionParameter>.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLFunctionParameter>> fFuncSpec = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLFunctionParameter>>(
-			"funcSpec") {
+			"funcSpec", HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLFunctionParameter> getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -241,7 +243,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 * The accessor for the field funcReturnSpec which is of type
 	 * HDLFunctionParameter.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter> fFuncReturnSpec = new HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter>("funcReturnSpec") {
+	public static HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter> fFuncReturnSpec = new HDLFieldAccess<HDLFunctionParameter, HDLFunctionParameter>("funcReturnSpec",
+			HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLFunctionParameter getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -259,7 +262,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field name which is of type HDLVariable.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, HDLVariable> fName = new HDLFieldAccess<HDLFunctionParameter, HDLVariable>("name") {
+	public static HDLFieldAccess<HDLFunctionParameter, HDLVariable> fName = new HDLFieldAccess<HDLFunctionParameter, HDLVariable>("name", HDLVariable.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLVariable getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -277,7 +281,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field width which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, HDLExpression> fWidth = new HDLFieldAccess<HDLFunctionParameter, HDLExpression>("width") {
+	public static HDLFieldAccess<HDLFunctionParameter, HDLExpression> fWidth = new HDLFieldAccess<HDLFunctionParameter, HDLExpression>("width", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -295,7 +300,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>>("dim") {
+	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>>("dim",
+			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLFunctionParameter obj) {
 			if (obj == null)
@@ -310,6 +316,29 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			return obj.setDim(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (rw == obj)
+			return fRw;
+		if (type == obj)
+			return fType;
+		if (enumSpec == obj)
+			return fEnumSpec;
+		if (ifSpec == obj)
+			return fIfSpec;
+		if (funcSpec.contains(obj))
+			return fFuncSpec;
+		if (funcReturnSpec == obj)
+			return fFuncReturnSpec;
+		if (name == obj)
+			return fName;
+		if (width == obj)
+			return fWidth;
+		if (dim.contains(obj))
+			return fDim;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	public static final HDLExpression EMPTY_ARR() {

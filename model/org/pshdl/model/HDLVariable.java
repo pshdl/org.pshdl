@@ -84,7 +84,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLVariable, String> fName = new HDLFieldAccess<HDLVariable, String>("name") {
+	public static HDLFieldAccess<HDLVariable, String> fName = new HDLFieldAccess<HDLVariable, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLVariable obj) {
 			if (obj == null)
@@ -103,7 +103,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * The accessor for the field dimensions which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>("dimensions") {
+	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>("dimensions", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLVariable obj) {
 			if (obj == null)
@@ -121,7 +122,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	/**
 	 * The accessor for the field defaultValue which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLVariable, HDLExpression> fDefaultValue = new HDLFieldAccess<HDLVariable, HDLExpression>("defaultValue") {
+	public static HDLFieldAccess<HDLVariable, HDLExpression> fDefaultValue = new HDLFieldAccess<HDLVariable, HDLExpression>("defaultValue", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLVariable obj) {
 			if (obj == null)
@@ -140,7 +142,8 @@ public class HDLVariable extends AbstractHDLVariable {
 	 * The accessor for the field annotations which is of type
 	 * ArrayList<HDLAnnotation>.
 	 */
-	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>("annotations") {
+	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>("annotations",
+			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLAnnotation> getValue(HDLVariable obj) {
 			if (obj == null)
@@ -155,6 +158,19 @@ public class HDLVariable extends AbstractHDLVariable {
 			return obj.setAnnotations(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (name == obj)
+			return fName;
+		if (dimensions.contains(obj))
+			return fDimensions;
+		if (defaultValue == obj)
+			return fDefaultValue;
+		if (annotations.contains(obj))
+			return fAnnotations;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 

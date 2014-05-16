@@ -79,7 +79,7 @@ public class HDLManip extends AbstractHDLManip {
 	/**
 	 * The accessor for the field type which is of type HDLManipType.
 	 */
-	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>("type") {
+	public static HDLFieldAccess<HDLManip, HDLManipType> fType = new HDLFieldAccess<HDLManip, HDLManipType>("type", HDLManipType.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLManipType getValue(HDLManip obj) {
 			if (obj == null)
@@ -97,7 +97,7 @@ public class HDLManip extends AbstractHDLManip {
 	/**
 	 * The accessor for the field target which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>("target") {
+	public static HDLFieldAccess<HDLManip, HDLExpression> fTarget = new HDLFieldAccess<HDLManip, HDLExpression>("target", HDLExpression.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLManip obj) {
 			if (obj == null)
@@ -115,7 +115,7 @@ public class HDLManip extends AbstractHDLManip {
 	/**
 	 * The accessor for the field castTo which is of type HDLType.
 	 */
-	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>("castTo") {
+	public static HDLFieldAccess<HDLManip, HDLType> fCastTo = new HDLFieldAccess<HDLManip, HDLType>("castTo", HDLType.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLType getValue(HDLManip obj) {
 			if (obj == null)
@@ -130,6 +130,17 @@ public class HDLManip extends AbstractHDLManip {
 			return obj.setCastTo(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (type == obj)
+			return fType;
+		if (target == obj)
+			return fTarget;
+		if (castTo == obj)
+			return fCastTo;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

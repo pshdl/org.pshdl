@@ -79,7 +79,8 @@ public class HDLEnum extends AbstractHDLEnum {
 	/**
 	 * The accessor for the field enums which is of type ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>("enums") {
+	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>("enums", HDLVariable.class,
+			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLEnum obj) {
 			if (obj == null)
@@ -94,6 +95,13 @@ public class HDLEnum extends AbstractHDLEnum {
 			return obj.setEnums(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (enums.contains(obj))
+			return fEnums;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

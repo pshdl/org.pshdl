@@ -119,7 +119,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * The accessor for the field register which is of type HDLRegisterConfig.
 	 */
-	public static HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig> fRegister = new HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig>("register") {
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig> fRegister = new HDLFieldAccess<HDLVariableDeclaration, HDLRegisterConfig>("register",
+			HDLRegisterConfig.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLRegisterConfig getValue(HDLVariableDeclaration obj) {
 			if (obj == null)
@@ -137,7 +138,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * The accessor for the field direction which is of type HDLDirection.
 	 */
-	public static HDLFieldAccess<HDLVariableDeclaration, HDLDirection> fDirection = new HDLFieldAccess<HDLVariableDeclaration, HDLDirection>("direction") {
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLDirection> fDirection = new HDLFieldAccess<HDLVariableDeclaration, HDLDirection>("direction", HDLDirection.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLDirection getValue(HDLVariableDeclaration obj) {
 			if (obj == null)
@@ -155,7 +157,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * The accessor for the field type which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName> fType = new HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName>("type") {
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName> fType = new HDLFieldAccess<HDLVariableDeclaration, HDLQualifiedName>("type", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLVariableDeclaration obj) {
 			if (obj == null)
@@ -173,7 +176,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	/**
 	 * The accessor for the field primitive which is of type HDLPrimitive.
 	 */
-	public static HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive> fPrimitive = new HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive>("primitive") {
+	public static HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive> fPrimitive = new HDLFieldAccess<HDLVariableDeclaration, HDLPrimitive>("primitive", HDLPrimitive.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLPrimitive getValue(HDLVariableDeclaration obj) {
 			if (obj == null)
@@ -192,7 +196,8 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	 * The accessor for the field variables which is of type
 	 * ArrayList<HDLVariable>.
 	 */
-	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>("variables") {
+	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>("variables",
+			HDLVariable.class, HDLFieldAccess.Quantifier.ONE_OR_MORE) {
 		@Override
 		public ArrayList<HDLVariable> getValue(HDLVariableDeclaration obj) {
 			if (obj == null)
@@ -207,6 +212,21 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 			return obj.setVariables(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (register == obj)
+			return fRegister;
+		if (direction == obj)
+			return fDirection;
+		if (type == obj)
+			return fType;
+		if (primitive == obj)
+			return fPrimitive;
+		if (variables.contains(obj))
+			return fVariables;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 

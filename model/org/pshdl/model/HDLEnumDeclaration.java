@@ -72,7 +72,7 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 	/**
 	 * The accessor for the field hEnum which is of type HDLEnum.
 	 */
-	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>("hEnum") {
+	public static HDLFieldAccess<HDLEnumDeclaration, HDLEnum> fHEnum = new HDLFieldAccess<HDLEnumDeclaration, HDLEnum>("hEnum", HDLEnum.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLEnum getValue(HDLEnumDeclaration obj) {
 			if (obj == null)
@@ -87,6 +87,13 @@ public class HDLEnumDeclaration extends AbstractHDLEnumDeclaration {
 			return obj.setHEnum(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (hEnum == obj)
+			return fHEnum;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 
 	// $CONTENT-END$

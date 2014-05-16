@@ -88,7 +88,8 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * The accessor for the field hIf which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>("hIf") {
+	public static HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName> fHIf = new HDLFieldAccess<HDLInterfaceRef, HDLQualifiedName>("hIf", HDLQualifiedName.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLInterfaceRef obj) {
 			if (obj == null)
@@ -107,7 +108,8 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	 * The accessor for the field ifArray which is of type
 	 * ArrayList<HDLExpression>.
 	 */
-	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>("ifArray") {
+	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>("ifArray",
+			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
 		@Override
 		public ArrayList<HDLExpression> getValue(HDLInterfaceRef obj) {
 			if (obj == null)
@@ -122,6 +124,15 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 			return obj.setIfArray(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (hIf == obj)
+			return fHIf;
+		if (ifArray.contains(obj))
+			return fIfArray;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 

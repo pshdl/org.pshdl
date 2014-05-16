@@ -72,7 +72,7 @@ public class HDLArgument extends AbstractHDLArgument {
 	/**
 	 * The accessor for the field name which is of type String.
 	 */
-	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>("name") {
+	public static HDLFieldAccess<HDLArgument, String> fName = new HDLFieldAccess<HDLArgument, String>("name", String.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public String getValue(HDLArgument obj) {
 			if (obj == null)
@@ -90,7 +90,8 @@ public class HDLArgument extends AbstractHDLArgument {
 	/**
 	 * The accessor for the field expression which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>("expression") {
+	public static HDLFieldAccess<HDLArgument, HDLExpression> fExpression = new HDLFieldAccess<HDLArgument, HDLExpression>("expression", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLArgument obj) {
 			if (obj == null)
@@ -105,6 +106,15 @@ public class HDLArgument extends AbstractHDLArgument {
 			return obj.setExpression(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (name == obj)
+			return fName;
+		if (expression == obj)
+			return fExpression;
+		return super.getContainingFeature(obj);
+	}
 	// $CONTENT-BEGIN$
 	// $CONTENT-END$
 

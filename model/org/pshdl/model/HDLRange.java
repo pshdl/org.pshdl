@@ -87,7 +87,7 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * The accessor for the field from which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>("from") {
+	public static HDLFieldAccess<HDLRange, HDLExpression> fFrom = new HDLFieldAccess<HDLRange, HDLExpression>("from", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
 			if (obj == null)
@@ -105,7 +105,7 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * The accessor for the field inc which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRange, HDLExpression> fInc = new HDLFieldAccess<HDLRange, HDLExpression>("inc") {
+	public static HDLFieldAccess<HDLRange, HDLExpression> fInc = new HDLFieldAccess<HDLRange, HDLExpression>("inc", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
 			if (obj == null)
@@ -123,7 +123,7 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * The accessor for the field dec which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRange, HDLExpression> fDec = new HDLFieldAccess<HDLRange, HDLExpression>("dec") {
+	public static HDLFieldAccess<HDLRange, HDLExpression> fDec = new HDLFieldAccess<HDLRange, HDLExpression>("dec", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
 			if (obj == null)
@@ -141,7 +141,7 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * The accessor for the field to which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>("to") {
+	public static HDLFieldAccess<HDLRange, HDLExpression> fTo = new HDLFieldAccess<HDLRange, HDLExpression>("to", HDLExpression.class, HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLExpression getValue(HDLRange obj) {
 			if (obj == null)
@@ -156,6 +156,19 @@ public class HDLRange extends AbstractHDLRange {
 			return obj.setTo(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (from == obj)
+			return fFrom;
+		if (inc == obj)
+			return fInc;
+		if (dec == obj)
+			return fDec;
+		if (to == obj)
+			return fTo;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 	/**

@@ -115,7 +115,8 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * The accessor for the field type which is of type HDLPrimitiveType.
 	 */
-	public static HDLFieldAccess<HDLPrimitive, HDLPrimitiveType> fType = new HDLFieldAccess<HDLPrimitive, HDLPrimitiveType>("type") {
+	public static HDLFieldAccess<HDLPrimitive, HDLPrimitiveType> fType = new HDLFieldAccess<HDLPrimitive, HDLPrimitiveType>("type", HDLPrimitiveType.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLPrimitiveType getValue(HDLPrimitive obj) {
 			if (obj == null)
@@ -133,7 +134,8 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * The accessor for the field width which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLPrimitive, HDLExpression> fWidth = new HDLFieldAccess<HDLPrimitive, HDLExpression>("width") {
+	public static HDLFieldAccess<HDLPrimitive, HDLExpression> fWidth = new HDLFieldAccess<HDLPrimitive, HDLExpression>("width", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLExpression getValue(HDLPrimitive obj) {
 			if (obj == null)
@@ -148,6 +150,15 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			return obj.setWidth(value);
 		}
 	};
+
+	@Override
+	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
+		if (type == obj)
+			return fType;
+		if (width == obj)
+			return fWidth;
+		return super.getContainingFeature(obj);
+	}
 
 	// $CONTENT-BEGIN$
 

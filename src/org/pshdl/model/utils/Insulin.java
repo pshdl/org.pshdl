@@ -101,6 +101,7 @@ import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.RangeExtension;
 import org.pshdl.model.extensions.ScopingExtension;
 import org.pshdl.model.extensions.TypeExtension;
@@ -364,7 +365,11 @@ public class Insulin {
 
 	public static <T extends IHDLObject> T resolveFragments(T pkg) {
 		HDLUnresolvedFragment[] fragments;
+		int count = 0;
 		do {
+			if (count > 50)
+				throw new IllegalArgumentException("Failed to resolve fragments within 50 iterations");
+			count++;
 			final ModificationSet ms = new ModificationSet();
 			fragments = pkg.getAllObjectsOf(HDLUnresolvedFragment.class, true);
 			for (final HDLUnresolvedFragment uFrag : fragments) {
@@ -396,7 +401,18 @@ public class Insulin {
 				return pkg;
 			pkg = newPkg;
 		} while (fragments.length > 0);
-		return pkg;
+		final HDLRegisterConfig[] regs = pkg.getAllObjectsOf(HDLRegisterConfig.class, true);
+		final ModificationSet ms = new ModificationSet();
+		for (HDLRegisterConfig reg : regs) {
+			final HDLRegisterConfig orig = reg;
+			reg = reg.setResetTypeFromUnresolved();
+			reg = reg.setSyncTypeFromUnresolved();
+			reg = reg.setClockTypeFromUnresolved();
+			if (reg != orig) {
+				ms.replace(orig, reg);
+			}
+		}
+		return ms.apply(pkg);
 	}
 
 	public static Optional<ResolvedPart> resolveFragment(HDLUnresolvedFragment uFrag) {
@@ -881,7 +897,7 @@ public class Insulin {
 				final HDLType resolveType = hvd.resolveType().get();
 				if (resolveType instanceof HDLEnum) {
 					final HDLEnum hEnum = (HDLEnum) resolveType;
-					return (HDLExpression) new HDLEnumRef().setHEnum(hEnum.asRef()).setVar(hEnum.getEnums().get(0).asRef()).freeze(hEnum);
+					return (HDLExpression) new HDLEnumRef().setHEnum(FullNameExtension.fullNameOf(hEnum)).setVar(hEnum.getEnums().get(0).asRef()).freeze(hEnum);
 				}
 			}
 		return defaultValue;
@@ -918,7 +934,9 @@ public class Insulin {
 		if (synchedArray) {
 			final HDLVariableRef defRef = (HDLVariableRef) defaultValue;
 			if (interfaceDim) {
-				defaultValue = ((HDLInterfaceRef) defRef).addIfArray(paramRef);
+				if (defRef instanceof HDLInterfaceRef) {
+					defaultValue = ((HDLInterfaceRef) defRef).addIfArray(paramRef);
+				}
 			} else {
 				defaultValue = defRef.addArray(paramRef);
 			}
@@ -1280,7 +1298,6 @@ public class Insulin {
 		}
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	private static void fortifyOpExpressions(IHDLObject apply, ModificationSet ms) {
 		final HDLExpression[] opEx = apply.getAllObjectsOf(HDLExpression.class, true);
 		final HDLPrimitives instance = HDLPrimitives.getInstance();
@@ -1320,6 +1337,8 @@ public class Insulin {
 				final HDLManip manip = (HDLManip) opExpression;
 				left = manip.getTarget();
 				inferenceInfo = instance.getManipOpType(manip);
+				break;
+			default:
 			}
 			if (inferenceInfo != null) {
 				if (inferenceInfo.error != null)
