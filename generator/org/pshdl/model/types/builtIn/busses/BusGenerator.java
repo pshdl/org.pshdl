@@ -61,7 +61,6 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Reference;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
-import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQuery;
 import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.services.CompilerInformation.GeneratorInformation;
@@ -117,7 +116,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			try {
 				return createInterface(hdl, name);
 			} catch (final Exception e) {
-				throw new HDLProblemException("An unexpected exception occured while parsing the generator content:" + e, new Problem(ErrorCode.GENERATOR_ERROR, hdl));
+				return Optional.absent();
 			}
 		}
 		try {

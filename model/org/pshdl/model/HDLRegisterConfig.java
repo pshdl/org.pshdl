@@ -33,11 +33,8 @@ import javax.annotation.Nullable;
 
 import org.pshdl.model.impl.AbstractHDLRegisterConfig;
 import org.pshdl.model.utils.CopyFilter;
-import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import org.pshdl.model.validation.Problem;
-import org.pshdl.model.validation.builtin.ErrorCode;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
@@ -516,12 +513,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 					res = res.setResetType(HDLRegResetActiveType.LOW);
 					break;
 				default:
-					throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
 				}
 				res = res.setUnresolvedResetType(null);
 			}
-		} else
-			throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+		}
+		res.addMeta(ORIGINAL_ARGS, getMeta(ORIGINAL_ARGS));
 		return res;
 	}
 
@@ -542,12 +538,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 					res = res.setSyncType(HDLRegSyncType.SYNC);
 					break;
 				default:
-					throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
 				}
 				res = res.setUnresolvedSyncType(null);
 			}
-		} else
-			throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+		}
+		res.addMeta(ORIGINAL_ARGS, getMeta(ORIGINAL_ARGS));
 		return res;
 	}
 
@@ -568,12 +563,11 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 					res = res.setClockType(HDLRegClockType.FALLING);
 					break;
 				default:
-					throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
 				}
 				res = res.setUnresolvedClockType(null);
 			}
-		} else
-			throw new HDLProblemException(new Problem(ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE, unresolvedType));
+		}
+		res.addMeta(ORIGINAL_ARGS, getMeta(ORIGINAL_ARGS));
 		return res;
 	}
 

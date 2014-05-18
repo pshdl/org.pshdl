@@ -27,10 +27,12 @@
 package org.pshdl.model.evaluation
 
 import com.google.common.base.Optional
+import com.google.common.collect.Sets
 import java.math.BigInteger
 import java.util.ArrayList
 import java.util.LinkedList
 import java.util.List
+import java.util.Set
 import org.pshdl.interpreter.frames.BigIntegerFrame
 import org.pshdl.model.HDLArithOp
 import org.pshdl.model.HDLArrayInit
@@ -53,9 +55,11 @@ import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
+import org.pshdl.model.extensions.FullNameExtension
 import org.pshdl.model.extensions.TypeExtension
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.HDLQualifiedName
 import org.pshdl.model.utils.Insulin
 
 import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
@@ -83,7 +87,7 @@ class ConstantEvaluate {
 	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
 	 */
 	def static Optional<BigInteger> valueOf(HDLExpression exp) {
-		return INST.constantEvaluate(exp, null)
+		return INST.constantEvaluate(exp, null, Sets.newHashSet)
 	}
 
 	/**
@@ -95,38 +99,38 @@ class ConstantEvaluate {
 	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
 		if (exp === null)
 			return Optional.absent
-		return INST.constantEvaluate(exp, context)
+		return INST.constantEvaluate(exp, context, Sets.newHashSet)
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLUnresolvedFragment obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		val type = Insulin.resolveFragment(obj)
 		if (!type.present)
 			return Optional.absent
-		return type.get.obj.copyDeepFrozen(obj.container).constantEvaluate(context)
+		return type.get.obj.copyDeepFrozen(obj.container).constantEvaluate(context, evaled)
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLArrayInit obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLArrayInit obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		return Optional.absent
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(IHDLObject obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(IHDLObject obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		throw new IllegalArgumentException("Did not implement constantEvaulate for type:" + obj.classType)
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLTernary obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> res = obj.ifExpr.constantEvaluate(context)
+	def dispatch Optional<BigInteger> constantEvaluate(HDLTernary obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
+		val Optional<BigInteger> res = obj.ifExpr.constantEvaluate(context, evaled)
 		if (res.present) {
 			if (0bi.equals(res.get)) {
-				return obj.elseExpr.constantEvaluate(context)
+				return obj.elseExpr.constantEvaluate(context, evaled)
 			}
-			return obj.thenExpr.constantEvaluate(context)
+			return obj.thenExpr.constantEvaluate(context, evaled)
 		}
 		obj.addMeta(SOURCE, obj.ifExpr)
 		obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
 		return Optional.absent
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLLiteral obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLLiteral obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		switch (obj.presentation) {
 			case HDLLiteral$HDLLiteralPresentation.STR:
 				return Optional.absent
@@ -140,8 +144,8 @@ class ConstantEvaluate {
 		return Optional.of(obj.valueAsBigInt)
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLManip obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> eval = subEvaluate(obj, obj.target, context)
+	def dispatch Optional<BigInteger> constantEvaluate(HDLManip obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
+		val Optional<BigInteger> eval = subEvaluate(obj, obj.target, context, evaled)
 		if (!eval.present) {
 			return Optional.absent
 		}
@@ -151,7 +155,7 @@ class ConstantEvaluate {
 			case BIT_NEG:
 				return Optional.of(eval.get.not)
 			case LOGIC_NEG: {
-				val const = obj.target.constantEvaluate(context)
+				val const = obj.target.constantEvaluate(context, evaled)
 				if (const.present)
 					return boolInt(const.get.equals(0bi))
 				return Optional.absent
@@ -161,7 +165,7 @@ class ConstantEvaluate {
 				if (type instanceof HDLPrimitive) {
 					val HDLPrimitive prim = type  as HDLPrimitive
 					if (prim.width !== null) {
-						val Optional<BigInteger> width = prim.width.constantEvaluate(context)
+						val Optional<BigInteger> width = prim.width.constantEvaluate(context, evaled)
 						if (width.present)
 							return Optional.of(eval.get.mod(1bi.shiftLeft(width.get.intValue)))
 						return Optional.absent
@@ -176,10 +180,10 @@ class ConstantEvaluate {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLConcat obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLConcat obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		var BigInteger sum = 0bi
 		for (HDLExpression cat : obj.cats) {
-			val Optional<BigInteger> im = subEvaluate(obj, cat, context)
+			val Optional<BigInteger> im = subEvaluate(obj, cat, context, evaled)
 			if (!im.present) {
 				return Optional.absent
 			}
@@ -189,7 +193,7 @@ class ConstantEvaluate {
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
 				return Optional.absent
 			}
-			val Optional<BigInteger> width = type.get.width.constantEvaluate(context)
+			val Optional<BigInteger> width = type.get.width.constantEvaluate(context, evaled)
 			if (!width.present) {
 				obj.addMeta(SOURCE, type.get.width)
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE)
@@ -201,10 +205,10 @@ class ConstantEvaluate {
 		return Optional.of(sum)
 	}
 
-	def Optional<BigInteger> subEvaluate(HDLExpression container, HDLExpression left, HDLEvaluationContext context) {
+	def Optional<BigInteger> subEvaluate(HDLExpression container, HDLExpression left, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		if (left === null)
 			throw new IllegalArgumentException("Container:" + container + " has null left expression");
-		val Optional<BigInteger> leftVal = left.constantEvaluate(context)
+		val Optional<BigInteger> leftVal = left.constantEvaluate(context, evaled)
 		if (!leftVal.present) {
 			container.addMeta(SOURCE, left)
 			container.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE)
@@ -213,11 +217,11 @@ class ConstantEvaluate {
 		return leftVal
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLArithOp obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context)
+	def dispatch Optional<BigInteger> constantEvaluate(HDLArithOp obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
+		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context, evaled)
 		if (!leftVal.present)
 			return Optional.absent
-		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context)
+		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context, evaled)
 		if (!rightVal.present)
 			return Optional.absent
 		switch (obj.type) {
@@ -237,11 +241,11 @@ class ConstantEvaluate {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLBitOp obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context)
+	def dispatch Optional<BigInteger> constantEvaluate(HDLBitOp obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
+		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context, evaled)
 		if (!leftVal.present)
 			return Optional.absent
-		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context)
+		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context, evaled)
 		if (!rightVal.present)
 			return Optional.absent
 		switch (obj.type) {
@@ -265,11 +269,11 @@ class ConstantEvaluate {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLEqualityOp obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context)
+	def dispatch Optional<BigInteger> constantEvaluate(HDLEqualityOp obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
+		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context, evaled)
 		if (!leftVal.present)
 			return Optional.absent
-		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context)
+		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context, evaled)
 		if (!rightVal.present)
 			return Optional.absent
 		switch (obj.type) {
@@ -289,11 +293,11 @@ class ConstantEvaluate {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLShiftOp obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context)
+	def dispatch Optional<BigInteger> constantEvaluate(HDLShiftOp obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
+		val Optional<BigInteger> leftVal = subEvaluate(obj, obj.left, context, evaled)
 		if (!leftVal.present)
 			return Optional.absent
-		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context)
+		val Optional<BigInteger> rightVal = subEvaluate(obj, obj.right, context, evaled)
 		if (!rightVal.present)
 			return Optional.absent
 		switch (obj.type) {
@@ -321,10 +325,10 @@ class ConstantEvaluate {
 		throw new RuntimeException("Incorrectly implemented constant evaluation!")
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLFunctionCall obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLFunctionCall obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		val List<BigInteger> args = new LinkedList<BigInteger>
 		for (HDLExpression arg : obj.params) {
-			val Optional<BigInteger> bigVal = subEvaluate(obj, arg, context)
+			val Optional<BigInteger> bigVal = subEvaluate(obj, arg, context, evaled)
 			if (!bigVal.present)
 				return Optional.absent
 			args.add(bigVal.get)
@@ -332,14 +336,14 @@ class ConstantEvaluate {
 		return HDLFunctions.constantEvaluate(obj, args, context)
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLVariableRef obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLVariableRef obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		if (obj.array.size != 0) {
 			val hVarOpt = obj.resolveVar
 			if (hVarOpt.present) {
 				val hVar = hVarOpt.get
 				if (hVar.direction == CONSTANT) {
 					val defVal = hVar.defaultValue
-					return arrayDefValue(defVal, obj.array, context)
+					return arrayDefValue(defVal, obj.array, context, evaled)
 				}
 			}
 			obj.addMeta(SOURCE, obj)
@@ -363,9 +367,20 @@ class ConstantEvaluate {
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional.absent
 		}
+		val fqn = FullNameExtension.fullNameOf(hVar.get)
+		if (evaled.contains(fqn)){
+			obj.addMeta(SOURCE, hVar.get)
+			obj.addMeta(DESCRIPTION, CONSTANT_EVAL_LOOP)
+			return Optional.absent
+		}
+		evaled.add(fqn)
 		val HDLDirection dir = hVar.get.direction
-		if (dir == CONSTANT)
-			return subEvaluate(obj, hVar.get.defaultValue, context)
+		if (dir == CONSTANT){
+			val subEval = subEvaluate(obj, hVar.get.defaultValue, context, evaled)
+			if (subEval.present)
+				evaled.remove(fqn)
+			return subEval
+		}
 
 		if (dir == PARAMETER) {
 			if (context === null) {
@@ -379,12 +394,14 @@ class ConstantEvaluate {
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT)
 				return Optional.absent
 			}
-			val Optional<BigInteger> cRefEval = cRef.constantEvaluate(context)
+			val Optional<BigInteger> cRefEval = cRef.constantEvaluate(context, evaled)
 			if (!cRefEval.present) {
 				obj.addMeta(SOURCE, cRef)
 				obj.addMeta(DESCRIPTION, SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT)
 				return Optional.absent
 			}
+			if (cRefEval.present)
+				evaled.remove(fqn)
 			return cRefEval
 		}
 		obj.addMeta(SOURCE, obj)
@@ -393,7 +410,7 @@ class ConstantEvaluate {
 	}
 
 	def Optional<BigInteger> arrayDefValue(HDLExpression expression, List<HDLExpression> expressions,
-		HDLEvaluationContext context) {
+		HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		if (expression instanceof HDLArrayInit) {
 			if (expressions.empty) {
 				return Optional.absent
@@ -407,12 +424,12 @@ class ConstantEvaluate {
 			if (arr.exp.size < idxValue) {
 				return Optional.of(0bi)
 			}
-			return arrayDefValue(arr.exp.get(idxValue), expressions.subList(1, expressions.size), context)
+			return arrayDefValue(arr.exp.get(idxValue), expressions.subList(1, expressions.size), context, evaled)
 		}
-		return constantEvaluate(expression, context)
+		return constantEvaluate(expression, context, evaled)
 	}
 
-	def dispatch Optional<BigInteger> constantEvaluate(HDLEnumRef obj, HDLEvaluationContext context) {
+	def dispatch Optional<BigInteger> constantEvaluate(HDLEnumRef obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		if (context !== null && context.enumAsInt) {
 			val hEnum = obj.resolveHEnum.get
 			val hVar = obj.resolveVar.get

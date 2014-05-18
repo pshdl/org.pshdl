@@ -281,6 +281,8 @@ public class HDLLibrary {
 		objects.removeAll(src);
 	}
 
+	public static ThreadLocal<Boolean> resolveFragments = new ThreadLocal<>();
+
 	/**
 	 * Resolves a type by firstly checking if it already exists given the
 	 * qualified name. If not the specific imports are tried first, then the
@@ -317,8 +319,11 @@ public class HDLLibrary {
 					}
 				}
 		}
-		if (hdlType != null)
-			return Optional.fromNullable(Insulin.resolveFragments(hdlType));
+		if (hdlType != null) {
+			if ((resolveFragments.get() == null) || resolveFragments.get())
+				return Optional.fromNullable(Insulin.resolveFragments(hdlType));
+			return Optional.of(hdlType);
+		}
 		return Optional.absent();
 	}
 

@@ -59,6 +59,7 @@ import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_DEFAULT_VALU
 import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_NEED_DEFAULTVALUE;
 import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_PORT_CANT_REGISTER;
 import static org.pshdl.model.validation.builtin.ErrorCode.CONSTANT_WIDTH_MISMATCH;
+import static org.pshdl.model.validation.builtin.ErrorCode.DIRECTION_NOT_ALLOWED_IN_SCOPE;
 import static org.pshdl.model.validation.builtin.ErrorCode.EQUALITY_ALWAYS_FALSE;
 import static org.pshdl.model.validation.builtin.ErrorCode.EQUALITY_ALWAYS_TRUE;
 import static org.pshdl.model.validation.builtin.ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT;
@@ -76,6 +77,7 @@ import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_DOWN;
 import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_UP;
 import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_OVERLAP;
 import static org.pshdl.model.validation.builtin.ErrorCode.REGISTER_UNKNOWN_ARGUMENT;
+import static org.pshdl.model.validation.builtin.ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE;
 import static org.pshdl.model.validation.builtin.ErrorCode.RESET_NOT_BIT;
 import static org.pshdl.model.validation.builtin.ErrorCode.RESET_UNKNOWN_WIDTH;
 import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_CASE_NEEDS_CONSTANT_WIDTH;
@@ -186,8 +188,8 @@ public class BuiltInValidator implements IHDLValidator {
 	public static final GenericMeta<Range<BigInteger>> ARRAY_RANGE = new GenericMeta<Range<BigInteger>>("arrayRange", true);
 	public static final GenericMeta<Range<BigInteger>> ACCESS_RANGE = new GenericMeta<Range<BigInteger>>("accessRange", true);
 	public static String[] PSHDL_KEYWORDS = new String[] { "bit", "out", "string", "switch", "include", "process", "for", "function", "import", "else", "extends", "native",
-		"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
-		"param", "register", "interface" };
+			"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
+			"param", "register", "interface" };
 	public final static Set<String> keywordSet;
 	static {
 		keywordSet = new HashSet<String>();
@@ -236,7 +238,7 @@ public class BuiltInValidator implements IHDLValidator {
 			// TODO Validate bitWidth mismatch
 			checkBitWidthMismatch(pkg, problems, hContext);
 			checkAssignments(pkg, problems, hContext);
-			// TODO Disallow directions within sub scopes
+			checkDirectionSubScopes(pkg, problems, hContext);
 			// TODO Multi-bit Write only for Constants
 			// TODO check for signals named clk or rst and warn about the
 			// collision
@@ -259,6 +261,28 @@ public class BuiltInValidator implements IHDLValidator {
 			return false;
 		}
 		return true;
+	}
+
+	private void checkDirectionSubScopes(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		final HDLUnit[] units = pkg.getAllObjectsOf(HDLUnit.class, true);
+		for (final HDLUnit hdlUnit : units) {
+			final Collection<HDLVariableDeclaration> allHVDs = HDLQuery.select(HDLVariableDeclaration.class).from(hdlUnit).where(HDLObject.fContainer).isNotEqualTo(hdlUnit)
+					.getAll();
+			for (final HDLVariableDeclaration hvd : allHVDs) {
+				switch (hvd.getDirection()) {
+				case CONSTANT:
+				case HIDDEN:
+				case INTERNAL:
+					break;
+				case IN:
+				case INOUT:
+				case OUT:
+				case PARAMETER:
+					problems.add(new Problem(DIRECTION_NOT_ALLOWED_IN_SCOPE, hvd));
+					break;
+				}
+			}
+		}
 	}
 
 	private void checkParameterInstance(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
@@ -430,6 +454,15 @@ public class BuiltInValidator implements IHDLValidator {
 					if (!HDLRegisterConfig.VALID_PARAMS.contains(hdlArgument.getName())) {
 						problems.add(new Problem(REGISTER_UNKNOWN_ARGUMENT, hdlArgument));
 					}
+				}
+				if ((reg.getUnresolvedClockType() != null) && !(reg.getUnresolvedClockType() instanceof HDLEnumRef)) {
+					problems.add(new Problem(REGISTER_UNKNOWN_ARGUMENT_VALUE, reg.getUnresolvedClockType(), "Edge.RISING and Edge.FALLING"));
+				}
+				if ((reg.getUnresolvedSyncType() != null) && !(reg.getUnresolvedSyncType() instanceof HDLEnumRef)) {
+					problems.add(new Problem(REGISTER_UNKNOWN_ARGUMENT_VALUE, reg.getUnresolvedSyncType(), "Sync.SYNC and Sync.ASYNC"));
+				}
+				if ((reg.getUnresolvedResetType() != null) && !(reg.getUnresolvedResetType() instanceof HDLEnumRef)) {
+					problems.add(new Problem(REGISTER_UNKNOWN_ARGUMENT_VALUE, reg.getUnresolvedResetType(), "Active.HIGH and Active.LOW"));
 				}
 				final HDLExpression clk = reg.getClk();
 				if (clk != null) {

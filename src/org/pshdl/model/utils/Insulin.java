@@ -148,6 +148,7 @@ public class Insulin {
 		apply = generateClkAndReset(apply);
 		apply = handleMultiBitAccess(apply, null);
 		apply = handleMultiForLoop(apply);
+		apply = hoistBlockLocalVariables(apply);
 		apply = generateInitializations(apply);
 		apply = fixMultiDimAssignments(apply);
 		apply = fixDoubleNegate(apply);
@@ -172,6 +173,27 @@ public class Insulin {
 			if (hdlRange.getDec() != null) {
 				final HDLArithOp decD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.MINUS).setRight(hdlRange.getDec());
 				ms.replace(hdlRange, new HDLRange().setFrom(hdlRange.getTo()).setTo(decD));
+			}
+		}
+		return ms.apply(pkg);
+	}
+
+	public static <T extends IHDLObject> T hoistBlockLocalVariables(T pkg) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLUnit[] units = pkg.getAllObjectsOf(HDLUnit.class, true);
+		for (final HDLUnit hdlUnit : units) {
+			final Collection<HDLVariableDeclaration> allHVDs = HDLQuery.select(HDLVariableDeclaration.class).from(hdlUnit).where(HDLObject.fContainer).isNotEqualTo(hdlUnit)
+					.getAll();
+			for (final HDLVariableDeclaration hvd : allHVDs) {
+				final ArrayList<HDLVariable> newVars = Lists.newArrayList();
+				for (final HDLVariable var : hvd.getVariables()) {
+					final HDLQualifiedName fqn = FullNameExtension.fullNameOf(var);
+					final String newName = '$' + fqn.getLocalPart().toString('_').replace("@", "");
+					Refactoring.renameVariable(var, new HDLQualifiedName(newName), hdlUnit, ms);
+					newVars.add(var.setName(newName));
+				}
+				ms.remove(hvd);
+				ms.addTo(hdlUnit, HDLUnit.fInits, hvd.setVariables(newVars));
 			}
 		}
 		return ms.apply(pkg);
@@ -366,41 +388,48 @@ public class Insulin {
 	public static <T extends IHDLObject> T resolveFragments(T pkg) {
 		HDLUnresolvedFragment[] fragments;
 		int count = 0;
-		do {
-			if (count > 50)
-				throw new IllegalArgumentException("Failed to resolve fragments within 50 iterations");
-			count++;
-			final ModificationSet ms = new ModificationSet();
-			fragments = pkg.getAllObjectsOf(HDLUnresolvedFragment.class, true);
-			for (final HDLUnresolvedFragment uFrag : fragments) {
-				final IHDLObject container = uFrag.getContainer();
-				if ((container instanceof HDLUnresolvedFragment)) {
-					final HDLUnresolvedFragment fragment = (HDLUnresolvedFragment) container;
-					// Skip fragments that are sub fragments such as b in a.b
-					if (fragment.getSub() == uFrag) {
-						continue;
-					}
-				}
-				final Optional<ResolvedPart> resolved = resolveFragment(uFrag);
-				if (resolved.isPresent()) {
-					final ResolvedPart resolvedPart = resolved.get();
-					// If the remainder is not null, then we attempted to access
-					// something illegal
-					if (resolvedPart.remainder == null) {
-						if ((resolvedPart.obj instanceof HDLStatement) && uFrag.getIsStatement()) {
-							ms.replace(uFrag, resolvedPart.obj);
-						}
-						if ((resolvedPart.obj instanceof HDLExpression) && !uFrag.getIsStatement()) {
-							ms.replace(uFrag, resolvedPart.obj);
+		HDLLibrary.resolveFragments.set(false);
+		try {
+			do {
+				if (count > 50)
+					throw new IllegalArgumentException("Failed to resolve fragments within 50 iterations");
+				count++;
+				final ModificationSet ms = new ModificationSet();
+				fragments = pkg.getAllObjectsOf(HDLUnresolvedFragment.class, true);
+				for (final HDLUnresolvedFragment uFrag : fragments) {
+					final IHDLObject container = uFrag.getContainer();
+					if ((container instanceof HDLUnresolvedFragment)) {
+						final HDLUnresolvedFragment fragment = (HDLUnresolvedFragment) container;
+						// Skip fragments that are sub fragments such as b in
+						// a.b
+						if (fragment.getSub() == uFrag) {
+							continue;
 						}
 					}
+					final Optional<ResolvedPart> resolved = resolveFragment(uFrag);
+					if (resolved.isPresent()) {
+						final ResolvedPart resolvedPart = resolved.get();
+						// If the remainder is not null, then we attempted to
+						// access
+						// something illegal
+						if (resolvedPart.remainder == null) {
+							if ((resolvedPart.obj instanceof HDLStatement) && uFrag.getIsStatement()) {
+								ms.replace(uFrag, resolvedPart.obj);
+							}
+							if ((resolvedPart.obj instanceof HDLExpression) && !uFrag.getIsStatement()) {
+								ms.replace(uFrag, resolvedPart.obj);
+							}
+						}
+					}
 				}
-			}
-			final T newPkg = ms.apply(pkg);
-			if ((newPkg == pkg) && (fragments.length != 0))
-				return pkg;
-			pkg = newPkg;
-		} while (fragments.length > 0);
+				final T newPkg = ms.apply(pkg);
+				if ((newPkg == pkg) && (fragments.length != 0))
+					return pkg;
+				pkg = newPkg;
+			} while (fragments.length > 0);
+		} finally {
+			HDLLibrary.resolveFragments.set(true);
+		}
 		final HDLRegisterConfig[] regs = pkg.getAllObjectsOf(HDLRegisterConfig.class, true);
 		final ModificationSet ms = new ModificationSet();
 		for (HDLRegisterConfig reg : regs) {

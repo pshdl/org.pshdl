@@ -61,6 +61,10 @@ public class HDLEvaluationContext {
 	public boolean enumAsInt = false;
 	public boolean boolAsInt = false;
 
+	public HDLEvaluationContext() {
+		this(new HashMap<String, HDLExpression>());
+	}
+
 	public HDLEvaluationContext(Map<String, HDLExpression> context) {
 		this.context = context;
 	}
