@@ -41,8 +41,6 @@ import org.pshdl.model.HDLType;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.utils.services.CompilerInformation;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
 import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
 import org.pshdl.model.utils.services.IHDLFunctionResolver;
 import org.pshdl.model.utils.services.IServiceProvider;
@@ -71,24 +69,6 @@ public class HDLFunctions {
 				info.registeredFunctions.put(funcName, resolver.getFunctionInfo(funcName));
 				list.add(resolver);
 			}
-		}
-		for (final HDLFunction func : PSHDLLib.FUNCTIONS) {
-			FunctionType type;
-			switch (func.getClassType()) {
-			case HDLNativeFunction:
-				type = FunctionType.NATIVE;
-				break;
-			case HDLInlineFunction:
-				type = FunctionType.INLINE;
-				break;
-			case HDLSubstituteFunction:
-				type = FunctionType.SUBSTITUTION;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown type:" + func);
-			}
-			final FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false, type);
-			info.registeredFunctions.put(func.getName(), fi);
 		}
 	}
 
@@ -142,9 +122,9 @@ public class HDLFunctions {
 		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
 		if (list != null) {
 			for (final IHDLFunctionResolver resolver : list) {
-				final Range<BigInteger> eval = resolver.range(function, context);
-				if (eval != null)
-					return Optional.of(eval);
+				final Optional<Range<BigInteger>> eval = resolver.range(function, context);
+				if (eval.isPresent())
+					return eval;
 			}
 		}
 		return Optional.absent();

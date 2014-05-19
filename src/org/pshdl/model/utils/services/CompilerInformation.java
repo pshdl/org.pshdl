@@ -30,29 +30,26 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.pshdl.model.HDLFunction;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 public class CompilerInformation {
 	public static class FunctionInformation {
 
-		public static enum FunctionType {
-			NATIVE, INLINE, SUBSTITUTION
-		}
-
-		public final String name;
 		public final String provider;
 		public final String description;
 		public final Map<String, String> arguments = new LinkedHashMap<String, String>();
 		public final String returnInfo;
-		public final boolean simulationOnly;
-		public final FunctionType type;
+		public final HDLFunction[] function;
 
-		public FunctionInformation(String name, String provider, String description, String returnInfo, boolean simulationOnly, FunctionType type) {
+		public FunctionInformation(String provider, String description, String returnInfo, HDLFunction... function) {
 			super();
-			this.name = name;
 			this.returnInfo = returnInfo;
-			this.simulationOnly = simulationOnly;
 			this.provider = provider;
 			this.description = description;
-			this.type = type;
+			this.function = function;
 		}
 	}
 
@@ -89,7 +86,7 @@ public class CompilerInformation {
 	public final String version;
 	public final Map<String, AnnotationInformation> registeredAnnotations = new LinkedHashMap<String, AnnotationInformation>();
 	public final Map<String, GeneratorInformation> registeredGenerators = new LinkedHashMap<String, GeneratorInformation>();
-	public final Map<String, FunctionInformation> registeredFunctions = new LinkedHashMap<String, FunctionInformation>();
+	public final Multimap<String, FunctionInformation> registeredFunctions = HashMultimap.create();
 	public final Map<String, IHDLValidator> registeredValidators = new LinkedHashMap<String, IHDLValidator>();
 	public final Map<String, IInsulinParticitant> registeredInsulinParticipant = new LinkedHashMap<String, IInsulinParticitant>();
 

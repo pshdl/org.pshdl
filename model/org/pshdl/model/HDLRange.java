@@ -34,8 +34,8 @@ import javax.annotation.Nullable;
 import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.impl.AbstractHDLRange;
+import org.pshdl.model.types.builtIn.HDLBuiltInFunctions;
 import org.pshdl.model.types.builtIn.HDLPrimitives;
-import org.pshdl.model.types.builtIn.PSHDLLib;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 import com.google.common.base.Optional;
@@ -189,7 +189,7 @@ public class HDLRange extends AbstractHDLRange {
 			}
 		}
 		final HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
-		final HDLExpression absRange = PSHDLLib.ABS_UINT.getCall(rangeDist);
+		final HDLExpression absRange = HDLBuiltInFunctions.ABS_UINT.getCall(rangeDist);
 		final HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
 		return HDLPrimitives.simplifyWidth(this, width);
 	}
