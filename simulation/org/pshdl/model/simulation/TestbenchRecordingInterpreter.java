@@ -59,7 +59,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		for (final VariableInformation vi : model.variables) {
 			widths.put(vi.name, vi.width);
 		}
-		printStream = new PrintStream(fileName);
+		printStream = new PrintStream(fileName, "UTF-8");
 		switch (type) {
 		case pshdl:
 			printStream.format("module %s {%n", tbName);

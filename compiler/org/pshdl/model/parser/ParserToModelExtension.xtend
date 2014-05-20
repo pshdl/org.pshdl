@@ -149,6 +149,7 @@ import org.pshdl.model.parser.PSHDLLangParser.PsVariableRefContext
 import org.pshdl.model.parser.PSHDLLangParser.PsWidthContext
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
+import org.pshdl.model.HDLInstantiation
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -515,10 +516,16 @@ class ParserToModelExtension {
 	}
 
 	def dispatch IHDLObject toHDL(PsInstantiationContext context, boolean isStatement) {
-		if (context.psDirectGeneration !== null)
-			return context.psDirectGeneration.toHDL(true).attachContext(context)
+		var HDLInstantiation res = null
+		if (context.psDirectGeneration !== null) {
+			res = context.psDirectGeneration.toHDL(true) as HDLInstantiation
+		}
 		if (context.psInterfaceInstantiation !== null)
-			return context.psInterfaceInstantiation.toHDL(true).attachContext(context)
+			res = context.psInterfaceInstantiation.toHDL(true) as HDLInstantiation
+		if (res !== null) {
+			res = res.setAnnotations(context.psAnnotation.map[toHDL(false) as HDLAnnotation])
+			return res.attachContext(context)
+		}
 		throw new IllegalArgumentException("Not implemented type:" + context.getClass());
 	}
 
@@ -678,8 +685,11 @@ class ParserToModelExtension {
 			}
 			current = frag
 		}
-		current = current.setIsStatement(isStatement)
-		return current.attachContext(context)
+		if (current !== null) {
+			current = current.setIsStatement(isStatement)
+			return current.attachContext(context)
+		}
+		return null
 	}
 
 	def dispatch HDLRange toHDL(PsAccessRangeContext context, boolean isStatement) {

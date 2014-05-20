@@ -73,7 +73,7 @@ psProcess :
 ;
 
 psInstantiation :
-	psInterfaceInstantiation | psDirectGeneration
+	psAnnotation* (psInterfaceInstantiation | psDirectGeneration)
 ;
 
 psInterfaceInstantiation :

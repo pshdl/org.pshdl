@@ -27,7 +27,6 @@
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -59,6 +58,8 @@ public class MemoryModel {
 		System.out.println(unit);
 		final List<Row> rows = buildRows(unit);
 		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows, true);
+		if (builtHTML == null)
+			throw new IllegalArgumentException("buildHTML returned null");
 		System.out.println(new BusAccess().generateAccessC(rows, true));
 		System.out.println(new BusAccess().generateAccessH(unit, rows, true));
 		// // SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
@@ -66,9 +67,7 @@ public class MemoryModel {
 		// System.out.println(sideFile.relPath);
 		// System.out.println(new String(sideFile.contents));
 		// }
-		final FileOutputStream ps = new FileOutputStream(args[0] + "Map.html");
-		ps.write(builtHTML);
-		ps.close();
+		Files.write(builtHTML, new File(args[0] + "Map.html"));
 		final HDLInterface hdi = buildHDLInterface(unit, rows);
 		System.out.println(hdi);
 	}

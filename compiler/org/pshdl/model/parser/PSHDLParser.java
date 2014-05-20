@@ -31,7 +31,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -58,25 +60,26 @@ import org.pshdl.model.validation.Problem.ProblemSeverity;
 public class PSHDLParser {
 
 	public static String[] getKeywords() throws Exception {
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens")));
-		String line = null;
-		final List<String> keywords = new ArrayList<String>();
-		while ((line = reader.readLine()) != null)
-			if (line.charAt(0) == '\'') {
-				final String keyWord = line.substring(1, line.lastIndexOf('\''));
-				if (keyWord.matches("[a-z]+")) {
-					keywords.add(keyWord);
+		final InputStream resourceAsStream = PSHDLParser.class.getResourceAsStream("PSHDLLangLexer.tokens");
+		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8))) {
+			String line = null;
+			final List<String> keywords = new ArrayList<String>();
+			while ((line = reader.readLine()) != null)
+				if (line.charAt(0) == '\'') {
+					final String keyWord = line.substring(1, line.lastIndexOf('\''));
+					if (keyWord.matches("[a-z]+")) {
+						keywords.add(keyWord);
+					}
 				}
-			}
-		reader.close();
-		return keywords.toArray(new String[keywords.size()]);
+			return keywords.toArray(new String[keywords.size()]);
+		}
 	}
 
 	public static HDLPackage parse(File file, String libURI, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
-		final FileInputStream fis = new FileInputStream(file);
-		final HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
-		fis.close();
-		return hdl;
+		try (final FileInputStream fis = new FileInputStream(file)) {
+			final HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
+			return hdl;
+		}
 	}
 
 	public static final class SyntaxErrorCollector extends BaseErrorListener {

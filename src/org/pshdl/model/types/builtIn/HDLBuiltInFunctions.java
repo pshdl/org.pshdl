@@ -27,6 +27,7 @@
 package org.pshdl.model.types.builtIn;
 
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.pshdl.model.HDLFunctionCall;
@@ -41,11 +42,12 @@ import org.pshdl.model.utils.services.IHDLFunctionResolver;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
+import com.google.common.math.BigIntegerMath;
 
 public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 
 	public static enum BuiltInFunctions {
-		highZ, min, max, abs
+		highZ, min, max, abs, log2ceil, log2floor, assertThat
 	}
 
 	@Override
@@ -57,6 +59,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 			case min:
 			case max:
 				return new HDLTypeInferenceInfo(HDLPrimitive.getInteger(), HDLPrimitive.getInteger(), HDLPrimitive.getInteger());
+			case log2ceil:
+			case log2floor:
 			case abs:
 				return new HDLTypeInferenceInfo(HDLPrimitive.getNatural(), HDLPrimitive.getInteger());
 
@@ -64,6 +68,8 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 				if (function.getParams().size() == 1)
 					return new HDLTypeInferenceInfo(HDLPrimitive.getBit(), HDLPrimitive.getNatural());
 				return new HDLTypeInferenceInfo(HDLPrimitive.getBit());
+			case assertThat:
+				return new HDLTypeInferenceInfo(null, HDLPrimitive.getBool(), PSHDLLib.ASSERT, HDLPrimitive.getString());
 			}
 		} catch (final Exception e) {
 		}
@@ -75,11 +81,15 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 		switch (getFuncEnum(function)) {
 		case abs:
 			return Optional.of(args.get(0).abs());
+		case log2ceil:
+			return Optional.of(log2ceil(args.get(0)));
+		case log2floor:
+			return Optional.of(log2floor(args.get(0)));
 		case min:
 			return Optional.of(args.get(0).min(args.get(1)));
 		case max:
 			return Optional.of(args.get(0).max(args.get(1)));
-
+		case assertThat:
 		case highZ:
 			return Optional.absent();
 		}
@@ -101,10 +111,21 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 			return null;
 		final Range<BigInteger> zeroRange = zeroArg.get();
 		switch (getFuncEnum(function)) {
-		case abs:
+		case abs: {
 			final BigInteger from = zeroRange.lowerEndpoint().abs();
 			final BigInteger to = zeroRange.upperEndpoint().abs();
 			return asRange(from, to);
+		}
+		case log2ceil: {
+			final BigInteger from = log2ceil(zeroRange.lowerEndpoint());
+			final BigInteger to = log2ceil(zeroRange.upperEndpoint());
+			return asRange(from, to);
+		}
+		case log2floor: {
+			final BigInteger from = log2floor(zeroRange.lowerEndpoint());
+			final BigInteger to = log2floor(zeroRange.upperEndpoint());
+			return asRange(from, to);
+		}
 		case min:
 			final Optional<Range<BigInteger>> oneArgMin = RangeExtension.rangeOf(function.getParams().get(1), context);
 			if (!oneArgMin.isPresent())
@@ -115,10 +136,19 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 			if (!oneArgMax.isPresent())
 				return null;
 			return asRange(zeroRange.lowerEndpoint().max(oneArgMax.get().lowerEndpoint()), zeroRange.upperEndpoint().max(oneArgMax.get().upperEndpoint()));
+		case assertThat:
 		case highZ:
 			return null;
 		}
 		return null;
+	}
+
+	public static BigInteger log2ceil(BigInteger le) {
+		return BigInteger.valueOf(BigIntegerMath.log2(le, RoundingMode.CEILING));
+	}
+
+	public static BigInteger log2floor(BigInteger le) {
+		return BigInteger.valueOf(BigIntegerMath.log2(le, RoundingMode.FLOOR));
 	}
 
 	public Range<BigInteger> asRange(BigInteger from, BigInteger to) {
@@ -141,6 +171,14 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 	@Override
 	public FunctionInformation getFunctionInfo(String funcName) {
 		switch (BuiltInFunctions.valueOf(funcName)) {
+		case assertThat: {
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Logs something when the assertion fails", "void", false,
+					FunctionType.NATIVE);
+			fi.arguments.put("bool assumption", "The assumption that should be true");
+			fi.arguments.put("String message", "The message that will be printed when the assumption fails");
+			fi.arguments.put("pshdl.Assert assert", "The level");
+			return fi;
+		}
 		case highZ: {
 			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
 					"Returns a high Z. This is useful for tri-state busses, high z however is not supported in PSHDL as computational value.", "highZ", false, FunctionType.NATIVE);
@@ -149,6 +187,18 @@ public class HDLBuiltInFunctions implements IHDLFunctionResolver {
 		case abs: {
 			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
 					"Returns the absolute value of a number (makes it positive)", "uint - the absolute (positive) value of a number", false, FunctionType.NATIVE);
+			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
+			return fi;
+		}
+		case log2ceil: {
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(),
+					"Returns the minimum number of bits to represent the given number, excluding a sign bit", "uint - ceil(log2(abs(number)))", false, FunctionType.NATIVE);
+			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
+			return fi;
+		}
+		case log2floor: {
+			final FunctionInformation fi = new FunctionInformation(funcName, HDLBuiltInFunctions.class.getSimpleName(), "Returns the highest bit set, excluding a sign bit",
+					"uint - floor(log2(abs(number)))", false, FunctionType.NATIVE);
 			fi.arguments.put("int number", "The number. Bit types are not allowed as they don't have an interpretable value");
 			return fi;
 		}

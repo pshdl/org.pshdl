@@ -188,8 +188,8 @@ public class BuiltInValidator implements IHDLValidator {
 	public static final GenericMeta<Range<BigInteger>> ARRAY_RANGE = new GenericMeta<Range<BigInteger>>("arrayRange", true);
 	public static final GenericMeta<Range<BigInteger>> ACCESS_RANGE = new GenericMeta<Range<BigInteger>>("accessRange", true);
 	public static String[] PSHDL_KEYWORDS = new String[] { "bit", "out", "string", "switch", "include", "process", "for", "function", "import", "else", "extends", "native",
-			"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
-			"param", "register", "interface" };
+		"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
+		"param", "register", "interface" };
 	public final static Set<String> keywordSet;
 	static {
 		keywordSet = new HashSet<String>();
@@ -404,11 +404,13 @@ public class BuiltInValidator implements IHDLValidator {
 		for (final HDLObject hif : ifs) {
 			final HDLQualifiedName fqn = fullNameOf(hif);
 			final HDLLibrary library = hif.getLibrary();
-			final Optional<? extends HDLType> resolve = library.resolve(Collections.<String> emptyList(), fqn);
-			if (resolve.isPresent()) {
-				final HDLType type = resolve.get();
-				if (type.getID() != hif.getID()) {
-					problems.add(new Problem(TYPE_SAME_NAME, hif, type));
+			if (library != null) {
+				final Optional<? extends HDLType> resolve = library.resolve(Collections.<String> emptyList(), fqn);
+				if (resolve.isPresent()) {
+					final HDLType type = resolve.get();
+					if (type.getID() != hif.getID()) {
+						problems.add(new Problem(TYPE_SAME_NAME, hif, type));
+					}
 				}
 			}
 		}
@@ -996,17 +998,20 @@ public class BuiltInValidator implements IHDLValidator {
 			if (ref instanceof HDLUnresolvedFragment)
 				return;
 			final HDLOpExpression opExpression = Insulin.toOpExpression(ass);
-			final IHDLObject freeze = opExpression.copyDeepFrozen(ass.getContainer());
-			checkOpExpression(problems, (HDLOpExpression) freeze, ass);
-			final Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
-			if ((var.isPresent()) && (var.get().getRegisterConfig() == null)) {
-				final HDLBlock container = ass.getContainer(HDLBlock.class);
-				if ((container != null) && container.getProcess()) {
-					// If the assignment is happening within a process, chances
-					// are that the dev is trying something legal
-					continue;
+			if (opExpression != null) {
+				final IHDLObject freeze = opExpression.copyDeepFrozen(ass.getContainer());
+				checkOpExpression(problems, (HDLOpExpression) freeze, ass);
+				final Optional<HDLVariable> var = ((HDLResolvedRef) ref).resolveVar();
+				if ((var.isPresent()) && (var.get().getRegisterConfig() == null)) {
+					final HDLBlock container = ass.getContainer(HDLBlock.class);
+					if ((container != null) && container.getProcess()) {
+						// If the assignment is happening within a process,
+						// chances
+						// are that the dev is trying something legal
+						continue;
+					}
+					problems.add(new Problem(COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
 				}
-				problems.add(new Problem(COMBINED_ASSIGNMENT_NOT_ALLOWED, ass));
 			}
 		}
 	}

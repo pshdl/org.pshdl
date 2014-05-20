@@ -27,10 +27,10 @@
 package org.pshdl.model.simulation;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -47,11 +47,11 @@ public class JavaClassRuntimeLoader {
 		final String pathName = name.replace('.', File.separatorChar) + ".java";
 		final File sourceFile = new File(tempDir, pathName);
 		final File pkgDir = sourceFile.getParentFile();
+		if (pkgDir == null)
+			throw new IllegalArgumentException("Failed to get parent of:" + sourceFile);
 		if (!pkgDir.mkdirs())
 			throw new IllegalArgumentException("Failed to create package directories:" + pkgDir);
-		final FileWriter fw = new FileWriter(sourceFile);
-		fw.append(source);
-		fw.close();
+		Files.write(source, sourceFile, StandardCharsets.UTF_8);
 
 		// Compile source file.
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();

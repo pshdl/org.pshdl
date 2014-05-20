@@ -71,7 +71,9 @@ public class TestcaseReducer {
 			public void run(String src, HDLPackage pkg) throws Throwable {
 				Insulin.resetID();
 				final HDLUnit unit = HDLQuery.select(HDLUnit.class).from(pkg).whereObj().fullNameIs(moduleName).getFirst();
-				PStoEXCompiler.createExecutable(unit, src, false);
+				if (unit != null) {
+					PStoEXCompiler.createExecutable(unit, src, false);
+				}
 			}
 
 		}

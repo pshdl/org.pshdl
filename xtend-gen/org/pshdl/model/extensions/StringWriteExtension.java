@@ -1710,15 +1710,22 @@ public class StringWriteExtension {
     final StringBuilder sb = highlight.getSpacing();
     String _entering = this.entering(hii, highlight);
     sb.append(_entering);
+    ArrayList<HDLAnnotation> _annotations = hii.getAnnotations();
+    for (final HDLAnnotation anno : _annotations) {
+      String _string = this.toString(anno, highlight);
+      StringBuilder _append = sb.append(_string);
+      String _simpleSpace = highlight.simpleSpace();
+      _append.append(_simpleSpace);
+    }
     HDLQualifiedName _hIfRefName = hii.getHIfRefName();
-    String _string = _hIfRefName.toString();
-    String _interfaceName = highlight.interfaceName(_string);
-    StringBuilder _append = sb.append(_interfaceName);
-    String _simpleSpace = highlight.simpleSpace();
-    StringBuilder _append_1 = _append.append(_simpleSpace);
+    String _string_1 = _hIfRefName.toString();
+    String _interfaceName = highlight.interfaceName(_string_1);
+    StringBuilder _append_1 = sb.append(_interfaceName);
+    String _simpleSpace_1 = highlight.simpleSpace();
+    StringBuilder _append_2 = _append_1.append(_simpleSpace_1);
     HDLVariable _var = hii.getVar();
-    String _string_1 = this.toString(_var, highlight);
-    _append_1.append(_string_1);
+    String _string_2 = this.toString(_var, highlight);
+    _append_2.append(_string_2);
     StringConcatenation _builder = new StringConcatenation();
     {
       ArrayList<HDLArgument> _arguments = hii.getArguments();
@@ -1730,8 +1737,8 @@ public class StringWriteExtension {
         } else {
           _builder.appendImmediate(",", "");
         }
-        String _string_2 = this.toString(arg, highlight);
-        _builder.append(_string_2, "");
+        String _string_3 = this.toString(arg, highlight);
+        _builder.append(_string_3, "");
       }
       if (_hasElements) {
         _builder.append(")", "");
@@ -1845,36 +1852,43 @@ public class StringWriteExtension {
   protected String _toString(final HDLDirectGeneration hdg, final SyntaxHighlighter highlight) {
     final StringBuilder sb = highlight.getSpacing();
     this.entering(hdg, highlight);
-    Boolean _include = hdg.getInclude();
-    if ((_include).booleanValue()) {
-      StringBuilder _append = sb.append("include");
+    ArrayList<HDLAnnotation> _annotations = hdg.getAnnotations();
+    for (final HDLAnnotation anno : _annotations) {
+      String _string = this.toString(anno, highlight);
+      StringBuilder _append = sb.append(_string);
       String _simpleSpace = highlight.simpleSpace();
       _append.append(_simpleSpace);
+    }
+    Boolean _include = hdg.getInclude();
+    if ((_include).booleanValue()) {
+      StringBuilder _append_1 = sb.append("include");
+      String _simpleSpace_1 = highlight.simpleSpace();
+      _append_1.append(_simpleSpace_1);
     }
     HDLInterface _hIf = hdg.getHIf();
     String _name = _hIf.getName();
     String _interfaceName = highlight.interfaceName(_name);
-    StringBuilder _append_1 = sb.append(_interfaceName);
-    String _simpleSpace_1 = highlight.simpleSpace();
-    StringBuilder _append_2 = _append_1.append(_simpleSpace_1);
+    StringBuilder _append_2 = sb.append(_interfaceName);
+    String _simpleSpace_2 = highlight.simpleSpace();
+    StringBuilder _append_3 = _append_2.append(_simpleSpace_2);
     HDLVariable _var = hdg.getVar();
     String _varName = highlight.varName(_var);
-    StringBuilder _append_3 = _append_2.append(_varName);
-    _append_3.append("=");
-    String _simpleSpace_2 = highlight.simpleSpace();
-    StringBuilder _append_4 = sb.append(_simpleSpace_2);
-    String _keyword = highlight.keyword("generate");
-    StringBuilder _append_5 = _append_4.append(_keyword);
+    StringBuilder _append_4 = _append_3.append(_varName);
+    _append_4.append("=");
     String _simpleSpace_3 = highlight.simpleSpace();
-    StringBuilder _append_6 = _append_5.append(_simpleSpace_3);
+    StringBuilder _append_5 = sb.append(_simpleSpace_3);
+    String _keyword = highlight.keyword("generate");
+    StringBuilder _append_6 = _append_5.append(_keyword);
+    String _simpleSpace_4 = highlight.simpleSpace();
+    StringBuilder _append_7 = _append_6.append(_simpleSpace_4);
     String _generatorID = hdg.getGeneratorID();
     String _generatorID_1 = highlight.generatorID(_generatorID);
-    _append_6.append(_generatorID_1);
+    _append_7.append(_generatorID_1);
     sb.append("(");
     ArrayList<HDLArgument> _arguments = hdg.getArguments();
     for (final HDLArgument args : _arguments) {
-      String _string = this.toString(args, highlight);
-      sb.append(_string);
+      String _string_1 = this.toString(args, highlight);
+      sb.append(_string_1);
     }
     sb.append(")");
     String _generatorContent = hdg.getGeneratorContent();

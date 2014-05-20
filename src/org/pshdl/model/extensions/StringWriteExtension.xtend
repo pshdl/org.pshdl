@@ -77,6 +77,7 @@ import org.pshdl.model.utils.SyntaxHighlighter
 import org.pshdl.model.utils.SyntaxHighlighter.Context
 
 import static org.pshdl.model.extensions.StringWriteExtension.*
+import org.pshdl.model.HDLInstantiation
 
 class StringWriteExtension {
 
@@ -679,6 +680,9 @@ class StringWriteExtension {
 	def dispatch String toString(HDLInterfaceInstantiation hii, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		sb.append(hii.entering(highlight))
+		for (HDLAnnotation anno : hii.annotations) {
+			sb.append(anno.toString(highlight)).append(highlight.simpleSpace)
+		}
 		sb.append(highlight.interfaceName(hii.HIfRefName.toString)).append(highlight.simpleSpace).append(
 			hii.^var.toString(highlight))
 		sb.append(
@@ -731,6 +735,9 @@ class StringWriteExtension {
 	def dispatch String toString(HDLDirectGeneration hdg, SyntaxHighlighter highlight) {
 		val StringBuilder sb = highlight.spacing
 		hdg.entering(highlight)
+		for (HDLAnnotation anno : hdg.annotations) {
+			sb.append(anno.toString(highlight)).append(highlight.simpleSpace)
+		}
 		if (hdg.include)
 			sb.append("include").append(highlight.simpleSpace)
 		sb.append(highlight.interfaceName(hdg.HIf.name)).append(highlight.simpleSpace).append(

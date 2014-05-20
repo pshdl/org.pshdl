@@ -52,6 +52,7 @@ import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLInlineFunction;
+import org.pshdl.model.HDLInstantiation;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLInterfaceInstantiation;
@@ -913,19 +914,34 @@ public class ParserToModelExtension {
   }
   
   protected IHDLObject _toHDL(final PSHDLLangParser.PsInstantiationContext context, final boolean isStatement) {
+    HDLInstantiation res = null;
     PSHDLLangParser.PsDirectGenerationContext _psDirectGeneration = context.psDirectGeneration();
     boolean _tripleNotEquals = (_psDirectGeneration != null);
     if (_tripleNotEquals) {
       PSHDLLangParser.PsDirectGenerationContext _psDirectGeneration_1 = context.psDirectGeneration();
       IHDLObject _hDL = this.toHDL(_psDirectGeneration_1, true);
-      return this.<IHDLObject>attachContext(_hDL, context);
+      res = ((HDLInstantiation) _hDL);
     }
     PSHDLLangParser.PsInterfaceInstantiationContext _psInterfaceInstantiation = context.psInterfaceInstantiation();
     boolean _tripleNotEquals_1 = (_psInterfaceInstantiation != null);
     if (_tripleNotEquals_1) {
       PSHDLLangParser.PsInterfaceInstantiationContext _psInterfaceInstantiation_1 = context.psInterfaceInstantiation();
       IHDLObject _hDL_1 = this.toHDL(_psInterfaceInstantiation_1, true);
-      return this.<IHDLObject>attachContext(_hDL_1, context);
+      res = ((HDLInstantiation) _hDL_1);
+    }
+    boolean _tripleNotEquals_2 = (res != null);
+    if (_tripleNotEquals_2) {
+      List<PSHDLLangParser.PsAnnotationContext> _psAnnotation = context.psAnnotation();
+      final Function1<PSHDLLangParser.PsAnnotationContext,HDLAnnotation> _function = new Function1<PSHDLLangParser.PsAnnotationContext,HDLAnnotation>() {
+        public HDLAnnotation apply(final PSHDLLangParser.PsAnnotationContext it) {
+          IHDLObject _hDL = ParserToModelExtension.this.toHDL(it, false);
+          return ((HDLAnnotation) _hDL);
+        }
+      };
+      List<HDLAnnotation> _map = ListExtensions.<PSHDLLangParser.PsAnnotationContext, HDLAnnotation>map(_psAnnotation, _function);
+      HDLInstantiation _setAnnotations = res.setAnnotations(_map);
+      res = _setAnnotations;
+      return this.<HDLInstantiation>attachContext(res, context);
     }
     Class<? extends PSHDLLangParser.PsInstantiationContext> _class = context.getClass();
     String _plus = ("Not implemented type:" + _class);
@@ -1404,9 +1420,13 @@ public class ParserToModelExtension {
         current = frag;
       }
     }
-    HDLUnresolvedFragment _setIsStatement = current.setIsStatement(isStatement);
-    current = _setIsStatement;
-    return this.<HDLUnresolvedFragment>attachContext(current, context);
+    boolean _tripleNotEquals_2 = (current != null);
+    if (_tripleNotEquals_2) {
+      HDLUnresolvedFragment _setIsStatement = current.setIsStatement(isStatement);
+      current = _setIsStatement;
+      return this.<HDLUnresolvedFragment>attachContext(current, context);
+    }
+    return null;
   }
   
   protected HDLRange _toHDL(final PSHDLLangParser.PsAccessRangeContext context, final boolean isStatement) {

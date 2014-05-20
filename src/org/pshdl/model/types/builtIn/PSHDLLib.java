@@ -51,6 +51,8 @@ public class PSHDLLib {
 	public static final HDLEnum EDGE = new HDLEnum().setName("Edge").addEnums(new HDLVariable().setName("RISING")).addEnums(new HDLVariable().setName("FALLING"));
 	public static final HDLEnum ACTIVE = new HDLEnum().setName("Active").addEnums(new HDLVariable().setName("LOW")).addEnums(new HDLVariable().setName("HIGH"));
 	public static final HDLEnum SYNC = new HDLEnum().setName("Sync").addEnums(new HDLVariable().setName("ASYNC")).addEnums(new HDLVariable().setName("SYNC"));
+	public static final HDLEnum ASSERT = new HDLEnum().setName("Assert").addEnums(new HDLVariable().setName("FATAL")).addEnums(new HDLVariable().setName("ERROR"))
+			.addEnums(new HDLVariable().setName("WARNING")).addEnums(new HDLVariable().setName("INFO"));
 
 	public static final HDLFunction ABS_UINT = createABS(Type.ANY_UINT);
 	public static final HDLFunction ABS_INT = createABS(Type.ANY_INT);
@@ -91,6 +93,7 @@ public class PSHDLLib {
 				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(EDGE));
 				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
 				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(SYNC));
+				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ASSERT));
 				for (final HDLFunction func : FUNCTIONS) {
 					pkg = pkg.addDeclarations(func);
 				}

@@ -23,6 +23,9 @@
 --Contributors:
 --    Karsten Becker - initial API and implementation
 
+--Updated for version 0.1.80 on 2014-05-19
+--Added log2ceil and log2floor
+
 --Updated for version 0.1.75 on 2014-04-23
 --Added ternary overload for boolean
 --Added not overload for integer
@@ -572,6 +575,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.Casts.all;
+use work.ShiftOps.all;
 package Types is
 
 	function ternaryOp(condition: boolean; thenValue: integer; elseValue:integer) return integer;
@@ -581,6 +585,8 @@ package Types is
 	function ternaryOp(condition: boolean; thenValue: std_logic_vector; elseValue:std_logic_vector) return std_logic_vector;
 	function ternaryOp(condition: boolean; thenValue: std_logic; elseValue:std_logic) return std_logic;
 	function "not" (L: INTEGER) return INTEGER;
+	function log2ceil (L: POSITIVE) return NATURAL;
+	function log2floor (L: POSITIVE) return NATURAL;
 	function "or" (L: INTEGER; R: INTEGER) return INTEGER;
 	function "xor" (L: INTEGER; R: INTEGER) return INTEGER;
 	function "and" (L: INTEGER; R: INTEGER) return INTEGER;
@@ -646,6 +652,33 @@ package body Types is
 	begin
 		return intToInteger(not resizeInteger(L,32));
 	end "not";
+
+	function log2ceil (L: POSITIVE) return NATURAL is
+	variable bitCount : natural;
+	variable i: unsigned(31 downto 0);
+   begin
+      i := to_UNSIGNED(L-1, 32);
+		bitCount:=0;
+      while (i > 0) loop
+         bitCount := bitCount + 1;
+			i:=SHIFT_RIGHT(i,1);
+      end loop;
+		return bitCount;
+	end log2ceil;
+	
+	function log2floor (L: POSITIVE) return NATURAL is
+	variable bitCount : natural;
+	variable i: unsigned(31 downto 0);
+   begin
+      i := to_UNSIGNED(L,32);
+		bitCount:=0;
+      while (i > 1) loop
+         bitCount := bitCount + 1;
+			i:=SHIFT_RIGHT(i,1);
+      end loop;
+		return bitCount;
+	end log2floor;
+
 
 	function "or" (L: INTEGER; R: INTEGER) return INTEGER is
 	begin

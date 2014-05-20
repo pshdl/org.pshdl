@@ -29,10 +29,10 @@ package org.pshdl.model.utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,7 +59,6 @@ import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -183,9 +182,7 @@ public class PSAbstractCompiler {
 		final List<File> res = new LinkedList<File>();
 		final File target = new File(outDir, result.fileName);
 		res.add(target);
-		FileOutputStream fos = new FileOutputStream(target);
-		fos.write(result.code.getBytes(Charsets.UTF_8));
-		fos.close();
+		Files.write(result.code, target, StandardCharsets.UTF_8);
 		if (result.sideFiles != null) {
 			for (final SideFile sd : result.sideFiles) {
 				final File file = new File(outDir + "/" + sd.relPath);
@@ -195,13 +192,11 @@ public class PSAbstractCompiler {
 					if (!parentFile.mkdirs())
 						throw new IllegalArgumentException("Failed to create directory:" + parentFile);
 				}
-				fos = new FileOutputStream(file);
 				if (sd.contents == SideFile.THIS) {
-					fos.write(result.code.getBytes(Charsets.UTF_8));
+					Files.write(result.code, file, StandardCharsets.UTF_8);
 				} else {
-					fos.write(sd.contents);
+					Files.write(sd.contents, file);
 				}
-				fos.close();
 			}
 		}
 		return res.toArray(new File[res.size()]);
@@ -255,10 +250,10 @@ public class PSAbstractCompiler {
 	 * @throws IOException
 	 */
 	public boolean add(InputStream contents, String src) throws IOException {
-		final InputStreamReader r = new InputStreamReader(contents, Charsets.UTF_8);
-		final String text = CharStreams.toString(r);
-		r.close();
-		return add(text, src);
+		try (final InputStreamReader r = new InputStreamReader(contents, StandardCharsets.UTF_8)) {
+			final String text = CharStreams.toString(r);
+			return add(text, src);
+		}
 	}
 
 	/**
@@ -547,7 +542,9 @@ public class PSAbstractCompiler {
 	}
 
 	private boolean singleAdd(final File file) throws Exception {
-		return add(new FileInputStream(file), getSourceName(file));
+		try (FileInputStream fis = new FileInputStream(file)) {
+			return add(fis, getSourceName(file));
+		}
 	}
 
 	public Set<Problem> getProblems(File file) {

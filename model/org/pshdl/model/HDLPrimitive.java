@@ -219,6 +219,10 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		return new HDLPrimitive().setType(HDLPrimitiveType.BOOL).setName("#<bool>");
 	}
 
+	public static HDLPrimitive getString() {
+		return new HDLPrimitive().setType(HDLPrimitiveType.STRING).setName("#<string>");
+	}
+
 	public static HDLPrimitive getBit() {
 		return new HDLPrimitive().setType(HDLPrimitiveType.BIT).setName("#bit");
 	}

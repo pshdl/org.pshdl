@@ -37,8 +37,9 @@ import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.NATURAL;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.STRING;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.UINT;
 
-import java.io.FileOutputStream;
+import java.io.File;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +68,9 @@ import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.RangeTool;
 import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
+import com.google.common.io.Files;
 
 public class HDLPrimitives {
 
@@ -252,9 +253,7 @@ public class HDLPrimitives {
 			printTable(sb, bitResolutionTable);
 			sb.append("</body></html>");
 			System.out.println(sb);
-			final FileOutputStream fos = new FileOutputStream("castTable.html");
-			fos.write(sb.toString().getBytes(Charsets.UTF_8));
-			fos.close();
+			Files.write(sb, new File("castTable.html"), StandardCharsets.UTF_8);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -318,6 +317,8 @@ public class HDLPrimitives {
 		if (HDLPrimitive.isTargetMatching(rType)) {
 			rType = lType;
 		}
+		if ((op.getType() == PLUS) && (lType.getType() == STRING) && (rType.getType() == STRING))
+			return new HDLTypeInferenceInfo(HDLPrimitive.getString(), lType, rType);
 		final HDLInferenceTriple triple = arithResolutionTable.get(new HDLInferenceTriple(lType.getType(), rType.getType(), null));
 		final HDLArithOpType type = op.getType();
 		if (triple == null) {
