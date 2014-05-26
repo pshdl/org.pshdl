@@ -63,8 +63,6 @@ public class JavaClassRuntimeLoader {
 		final Class<?> cls = Class.forName(name, true, classLoader);
 		final Constructor<?> constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
 		final IHDLInterpreter instance = (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
-		if (!tempDir.delete())
-			throw new IllegalArgumentException("Failed to delete temp directory:" + tempDir);
 		return instance;
 	}
 
