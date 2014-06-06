@@ -209,10 +209,14 @@ class CCompiler implements ITypeOuptutProvider {
 			return «varIdx.size»;
 		}
 		void pshdl_sim_setDisableEdge(bool enable){
+			«IF hasClock»
 			disableEdges=enable;
+			«ENDIF»
 		}
 		void pshdl_sim_setDisabledRegOutputlogic(bool enable){
+			«IF hasClock»
 			disabledRegOutputlogic=enable;
+			«ENDIF»
 		}
 		«ENDIF»
 		

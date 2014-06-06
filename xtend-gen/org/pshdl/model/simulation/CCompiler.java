@@ -528,16 +528,24 @@ public class CCompiler implements ITypeOuptutProvider {
         _builder.newLine();
         _builder.append("void pshdl_sim_setDisableEdge(bool enable){");
         _builder.newLine();
-        _builder.append("\t");
-        _builder.append("disableEdges=enable;");
-        _builder.newLine();
+        {
+          if (this.cce.hasClock) {
+            _builder.append("\t");
+            _builder.append("disableEdges=enable;");
+            _builder.newLine();
+          }
+        }
         _builder.append("}");
         _builder.newLine();
         _builder.append("void pshdl_sim_setDisabledRegOutputlogic(bool enable){");
         _builder.newLine();
-        _builder.append("\t");
-        _builder.append("disabledRegOutputlogic=enable;");
-        _builder.newLine();
+        {
+          if (this.cce.hasClock) {
+            _builder.append("\t");
+            _builder.append("disabledRegOutputlogic=enable;");
+            _builder.newLine();
+          }
+        }
         _builder.append("}");
         _builder.newLine();
       }
