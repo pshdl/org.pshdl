@@ -109,6 +109,7 @@ import org.pshdl.model.parser.PSHDLLangParser.PsEnumContext
 import org.pshdl.model.parser.PSHDLLangParser.PsEnumDeclarationContext
 import org.pshdl.model.parser.PSHDLLangParser.PsEqualityCompContext
 import org.pshdl.model.parser.PSHDLLangParser.PsEqualityContext
+import org.pshdl.model.parser.PSHDLLangParser.PsExportContext
 import org.pshdl.model.parser.PSHDLLangParser.PsExpressionContext
 import org.pshdl.model.parser.PSHDLLangParser.PsForStatementContext
 import org.pshdl.model.parser.PSHDLLangParser.PsFuncParamTypeContext
@@ -150,6 +151,7 @@ import org.pshdl.model.parser.PSHDLLangParser.PsWidthContext
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
 import org.pshdl.model.HDLInstantiation
+import org.pshdl.model.HDLExport
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -673,10 +675,6 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLReference toHDL(PsVariableRefContext context, boolean isStatement) {
-		if (context.isClk !== null)
-			return HDLRegisterConfig.defaultClk(true).asHDLRef.attachContext(context)
-		if (context.isRst !== null)
-			return HDLRegisterConfig.defaultRst(true).asHDLRef.attachContext(context)
 		var HDLUnresolvedFragment current = null
 		for (sub : context.psRefPart.reverseView) {
 			var frag = sub.toHDL(false) as HDLUnresolvedFragment
@@ -750,6 +748,10 @@ class ParserToModelExtension {
 		return res.attachContext(context)
 	}
 
+	def dispatch IHDLObject toHDL(PsExportContext context, boolean isStatement) {
+		return new HDLExport().setExportRef(context.psVariableRef.toHDL(false) as HDLReference).attachContext(context)
+	}
+	
 	def dispatch IHDLObject toHDL(PsCompoundStatementContext context, boolean isStatement) {
 		if (context.psForStatement !== null)
 			return context.psForStatement.toHDL(true).attachContext(context)

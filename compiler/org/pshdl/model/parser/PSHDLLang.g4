@@ -134,9 +134,7 @@ psAccessRange :
 ;
 
 psVariableRef :
-	psRefPart ('.' psRefPart)* |
-	isClk='$clk' |
-	isRst='$rst'
+	psRefPart ('.' psRefPart)*
 ;
 
 psRefPart :
@@ -151,7 +149,11 @@ psVariable :
 ;
 
 psStatement :
-	psCompoundStatement | psProcess | psAssignmentOrFunc 
+	psCompoundStatement | psProcess | psAssignmentOrFunc | psExport
+;
+
+psExport:
+	'export' psVariableRef ';'
 ;
 
 psFunctionDeclaration :

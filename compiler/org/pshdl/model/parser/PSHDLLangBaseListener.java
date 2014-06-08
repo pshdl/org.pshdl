@@ -1520,6 +1520,28 @@ public class PSHDLLangBaseListener implements PSHDLLangListener {
 	 * </p>
 	 */
 	@Override
+	public void enterPsExport(@NotNull PSHDLLangParser.PsExportContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitPsExport(@NotNull PSHDLLangParser.PsExportContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
 	public void enterPsExtends(@NotNull PSHDLLangParser.PsExtendsContext ctx) {
 	}
 

@@ -1126,6 +1126,22 @@ public interface PSHDLLangListener extends ParseTreeListener {
 	void exitPsPassedArguments(@NotNull PSHDLLangParser.PsPassedArgumentsContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link PSHDLLangParser#psExport}.
+	 *
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void enterPsExport(@NotNull PSHDLLangParser.PsExportContext ctx);
+
+	/**
+	 * Exit a parse tree produced by {@link PSHDLLangParser#psExport}.
+	 *
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void exitPsExport(@NotNull PSHDLLangParser.PsExportContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link PSHDLLangParser#psExtends}.
 	 *
 	 * @param ctx
