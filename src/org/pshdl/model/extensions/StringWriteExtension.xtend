@@ -78,6 +78,7 @@ import org.pshdl.model.utils.SyntaxHighlighter.Context
 
 import static org.pshdl.model.extensions.StringWriteExtension.*
 import org.pshdl.model.HDLInstantiation
+import org.pshdl.model.HDLExport
 
 class StringWriteExtension {
 
@@ -372,6 +373,16 @@ class StringWriteExtension {
 		return sb.toString
 	}
 
+	def dispatch String toString(HDLExport export, SyntaxHighlighter highlight) {
+		val StringBuilder builder = highlight.spacing
+		builder.append(export.entering(highlight))
+		builder.append(highlight.keyword("export"))
+		builder.append(highlight.simpleSpace)
+		builder.append(export.exportRef.toString(highlight))
+		builder.append(';')
+		builder.append(export.leaving(highlight))
+		return builder.toString
+	}
 	def dispatch String toString(HDLAssignment ass, SyntaxHighlighter highlight) {
 		val StringBuilder builder = highlight.spacing
 		builder.append(ass.entering(highlight))

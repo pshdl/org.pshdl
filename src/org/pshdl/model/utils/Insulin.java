@@ -59,6 +59,7 @@ import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
+import org.pshdl.model.HDLExport;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunction;
@@ -126,6 +127,7 @@ import com.google.common.collect.Sets;
 
 public class Insulin {
 	public static final GenericMeta<Boolean> insulated = new GenericMeta<Boolean>("insulated", true);
+	public static final GenericMeta<Boolean> IS_EXPORT = new GenericMeta<Boolean>("isExport", true);
 
 	public static <T extends IHDLObject> T transform(T orig, String src) {
 		if (orig.hasMeta(insulated))
@@ -141,6 +143,7 @@ public class Insulin {
 		apply = handlePostfixOp(apply);
 		apply = handleDelayedSignals(apply);
 		apply = handleOutPortRead(apply);
+		apply = handleExports(apply);
 		apply = includeGenerators(apply, src);
 		apply = inlineFunctions(apply);
 		apply = setParameterOnInstance(apply);
@@ -160,6 +163,29 @@ public class Insulin {
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	public static <T extends IHDLObject> T handleExports(T pkg) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLExport[] exports = pkg.getAllObjectsOf(HDLExport.class, true);
+		for (final HDLExport hdlExport : exports) {
+			final HDLReference ref = hdlExport.getExportRef();
+			if (ref instanceof HDLResolvedRef) {
+				final HDLResolvedRef rr = (HDLResolvedRef) ref;
+				final Optional<HDLVariable> resolveVar = rr.resolveVar();
+				if (resolveVar.isPresent()) {
+					final HDLVariable hdlVariable = resolveVar.get();
+					hdlVariable.setMeta(IS_EXPORT);
+					final IHDLObject container = hdlVariable.getContainer();
+					if (container instanceof HDLVariableDeclaration) {
+						final HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
+						final HDLVariable newVar = hdlVariable.setDefaultValue(null).addAnnotations(HDLBuiltInAnnotations.VHDLLatchable.create(null));
+						ms.replace(hdlExport, hvd.setVariables(HDLObject.asList(newVar)));
+					}
+				}
+			}
+		}
+		return ms.apply(pkg);
 	}
 
 	public static <T extends IHDLObject> T convertIncRecRanges(T pkg) {
@@ -858,7 +884,7 @@ public class Insulin {
 					for (final HDLVariable var : hvd.getVariables()) {
 						// If this port has a full assignment, we don't need to
 						// initialize it.
-						if (meta.contains(var.getName())) {
+						if (meta.contains(var.getName()) || var.hasMeta(IS_EXPORT)) {
 							continue;
 						}
 						final ArrayList<HDLExpression> varDim = var.getDimensions();

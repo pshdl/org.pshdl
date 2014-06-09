@@ -359,6 +359,8 @@ public class FullNameExtension {
       return _getFullName((HDLEnumRef)unit);
     } else if (unit instanceof HDLVariableRef) {
       return _getFullName((HDLVariableRef)unit);
+    } else if (unit instanceof HDLBlock) {
+      return _getFullName((HDLBlock)unit);
     } else if (unit instanceof HDLForLoop) {
       return _getFullName((HDLForLoop)unit);
     } else if (unit instanceof HDLFunction) {
@@ -371,8 +373,6 @@ public class FullNameExtension {
       return _getFullName((HDLSwitchCaseStatement)unit);
     } else if (unit instanceof HDLSwitchStatement) {
       return _getFullName((HDLSwitchStatement)unit);
-    } else if (unit instanceof HDLBlock) {
-      return _getFullName((HDLBlock)unit);
     } else if (unit instanceof HDLPackage) {
       return _getFullName((HDLPackage)unit);
     } else if (unit instanceof HDLUnit) {

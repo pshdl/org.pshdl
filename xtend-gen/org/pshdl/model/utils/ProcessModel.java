@@ -336,7 +336,9 @@ public class ProcessModel {
   }
   
   public static ProcessModel toProcessModel(final HDLStatement stmnt, final int pid) {
-    if (stmnt instanceof HDLForLoop) {
+    if (stmnt instanceof HDLBlock) {
+      return _toProcessModel((HDLBlock)stmnt, pid);
+    } else if (stmnt instanceof HDLForLoop) {
       return _toProcessModel((HDLForLoop)stmnt, pid);
     } else if (stmnt instanceof HDLIfStatement) {
       return _toProcessModel((HDLIfStatement)stmnt, pid);
@@ -346,8 +348,6 @@ public class ProcessModel {
       return _toProcessModel((HDLSwitchStatement)stmnt, pid);
     } else if (stmnt instanceof HDLAssignment) {
       return _toProcessModel((HDLAssignment)stmnt, pid);
-    } else if (stmnt instanceof HDLBlock) {
-      return _toProcessModel((HDLBlock)stmnt, pid);
     } else if (stmnt instanceof HDLDeclaration) {
       return _toProcessModel((HDLDeclaration)stmnt, pid);
     } else if (stmnt instanceof HDLFunctionCall) {

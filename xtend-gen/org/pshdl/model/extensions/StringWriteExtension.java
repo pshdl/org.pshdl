@@ -45,6 +45,7 @@ import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLEqualityOp;
+import org.pshdl.model.HDLExport;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunctionCall;
@@ -945,6 +946,23 @@ public class StringWriteExtension {
     String _leaving = this.leaving(block, highlight);
     sb.append(_leaving);
     return sb.toString();
+  }
+  
+  protected String _toString(final HDLExport export, final SyntaxHighlighter highlight) {
+    final StringBuilder builder = highlight.getSpacing();
+    String _entering = this.entering(export, highlight);
+    builder.append(_entering);
+    String _keyword = highlight.keyword("export");
+    builder.append(_keyword);
+    String _simpleSpace = highlight.simpleSpace();
+    builder.append(_simpleSpace);
+    HDLReference _exportRef = export.getExportRef();
+    String _string = this.toString(_exportRef, highlight);
+    builder.append(_string);
+    builder.append(";");
+    String _leaving = this.leaving(export, highlight);
+    builder.append(_leaving);
+    return builder.toString();
   }
   
   protected String _toString(final HDLAssignment ass, final SyntaxHighlighter highlight) {
@@ -1925,6 +1943,8 @@ public class StringWriteExtension {
       return _toString((HDLVariableRef)ref, highlight);
     } else if (ref instanceof HDLBitOp) {
       return _toString((HDLBitOp)ref, highlight);
+    } else if (ref instanceof HDLBlock) {
+      return _toString((HDLBlock)ref, highlight);
     } else if (ref instanceof HDLDirectGeneration) {
       return _toString((HDLDirectGeneration)ref, highlight);
     } else if (ref instanceof HDLEnumDeclaration) {
@@ -1957,10 +1977,10 @@ public class StringWriteExtension {
       return _toString((HDLArrayInit)ref, highlight);
     } else if (ref instanceof HDLAssignment) {
       return _toString((HDLAssignment)ref, highlight);
-    } else if (ref instanceof HDLBlock) {
-      return _toString((HDLBlock)ref, highlight);
     } else if (ref instanceof HDLConcat) {
       return _toString((HDLConcat)ref, highlight);
+    } else if (ref instanceof HDLExport) {
+      return _toString((HDLExport)ref, highlight);
     } else if (ref instanceof HDLFunctionCall) {
       return _toString((HDLFunctionCall)ref, highlight);
     } else if (ref instanceof HDLFunctionParameter) {

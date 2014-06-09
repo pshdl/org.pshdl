@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
-import org.pshdl.model.HDLObject;
+import org.pshdl.model.HDLCompound;
 import org.pshdl.model.HDLStatement;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.CopyFilter;
@@ -45,7 +45,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 @SuppressWarnings("all")
-public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement {
+public abstract class AbstractHDLBlock extends HDLCompound {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLBlock}
 	 *
@@ -346,7 +346,7 @@ public abstract class AbstractHDLBlock extends HDLObject implements HDLStatement
 
 	@Override
 	public EnumSet<HDLClass> getClassSet() {
-		return EnumSet.of(HDLClass.HDLBlock, HDLClass.HDLStatement, HDLClass.HDLObject);
+		return EnumSet.of(HDLClass.HDLBlock, HDLClass.HDLCompound, HDLClass.HDLStatement, HDLClass.HDLObject);
 	}
 
 	@Override

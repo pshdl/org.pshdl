@@ -768,53 +768,53 @@ public class ScopingExtension {
     }
   }
   
-  public List<HDLEnumDeclaration> doGetEnumDeclarations(final IHDLObject gen) {
-    if (gen instanceof HDLDirectGeneration) {
-      return _doGetEnumDeclarations((HDLDirectGeneration)gen);
-    } else if (gen instanceof HDLEnumDeclaration) {
-      return _doGetEnumDeclarations((HDLEnumDeclaration)gen);
-    } else if (gen instanceof HDLForLoop) {
-      return _doGetEnumDeclarations((HDLForLoop)gen);
-    } else if (gen instanceof HDLIfStatement) {
-      return _doGetEnumDeclarations((HDLIfStatement)gen);
-    } else if (gen instanceof HDLSwitchCaseStatement) {
-      return _doGetEnumDeclarations((HDLSwitchCaseStatement)gen);
-    } else if (gen instanceof HDLSwitchStatement) {
-      return _doGetEnumDeclarations((HDLSwitchStatement)gen);
-    } else if (gen instanceof HDLBlock) {
-      return _doGetEnumDeclarations((HDLBlock)gen);
-    } else if (gen instanceof HDLUnit) {
-      return _doGetEnumDeclarations((HDLUnit)gen);
-    } else if (gen != null) {
-      return _doGetEnumDeclarations(gen);
+  public List<HDLEnumDeclaration> doGetEnumDeclarations(final IHDLObject obj) {
+    if (obj instanceof HDLBlock) {
+      return _doGetEnumDeclarations((HDLBlock)obj);
+    } else if (obj instanceof HDLDirectGeneration) {
+      return _doGetEnumDeclarations((HDLDirectGeneration)obj);
+    } else if (obj instanceof HDLEnumDeclaration) {
+      return _doGetEnumDeclarations((HDLEnumDeclaration)obj);
+    } else if (obj instanceof HDLForLoop) {
+      return _doGetEnumDeclarations((HDLForLoop)obj);
+    } else if (obj instanceof HDLIfStatement) {
+      return _doGetEnumDeclarations((HDLIfStatement)obj);
+    } else if (obj instanceof HDLSwitchCaseStatement) {
+      return _doGetEnumDeclarations((HDLSwitchCaseStatement)obj);
+    } else if (obj instanceof HDLSwitchStatement) {
+      return _doGetEnumDeclarations((HDLSwitchStatement)obj);
+    } else if (obj instanceof HDLUnit) {
+      return _doGetEnumDeclarations((HDLUnit)obj);
+    } else if (obj != null) {
+      return _doGetEnumDeclarations(obj);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
-        Arrays.<Object>asList(gen).toString());
+        Arrays.<Object>asList(obj).toString());
     }
   }
   
-  public List<HDLInterface> doGetInterfaceDeclarations(final IHDLObject gen) {
-    if (gen instanceof HDLDirectGeneration) {
-      return _doGetInterfaceDeclarations((HDLDirectGeneration)gen);
-    } else if (gen instanceof HDLForLoop) {
-      return _doGetInterfaceDeclarations((HDLForLoop)gen);
-    } else if (gen instanceof HDLIfStatement) {
-      return _doGetInterfaceDeclarations((HDLIfStatement)gen);
-    } else if (gen instanceof HDLInterfaceDeclaration) {
-      return _doGetInterfaceDeclarations((HDLInterfaceDeclaration)gen);
-    } else if (gen instanceof HDLSwitchCaseStatement) {
-      return _doGetInterfaceDeclarations((HDLSwitchCaseStatement)gen);
-    } else if (gen instanceof HDLSwitchStatement) {
-      return _doGetInterfaceDeclarations((HDLSwitchStatement)gen);
-    } else if (gen instanceof HDLBlock) {
-      return _doGetInterfaceDeclarations((HDLBlock)gen);
-    } else if (gen instanceof HDLUnit) {
-      return _doGetInterfaceDeclarations((HDLUnit)gen);
-    } else if (gen != null) {
-      return _doGetInterfaceDeclarations(gen);
+  public List<HDLInterface> doGetInterfaceDeclarations(final IHDLObject obj) {
+    if (obj instanceof HDLBlock) {
+      return _doGetInterfaceDeclarations((HDLBlock)obj);
+    } else if (obj instanceof HDLDirectGeneration) {
+      return _doGetInterfaceDeclarations((HDLDirectGeneration)obj);
+    } else if (obj instanceof HDLForLoop) {
+      return _doGetInterfaceDeclarations((HDLForLoop)obj);
+    } else if (obj instanceof HDLIfStatement) {
+      return _doGetInterfaceDeclarations((HDLIfStatement)obj);
+    } else if (obj instanceof HDLInterfaceDeclaration) {
+      return _doGetInterfaceDeclarations((HDLInterfaceDeclaration)obj);
+    } else if (obj instanceof HDLSwitchCaseStatement) {
+      return _doGetInterfaceDeclarations((HDLSwitchCaseStatement)obj);
+    } else if (obj instanceof HDLSwitchStatement) {
+      return _doGetInterfaceDeclarations((HDLSwitchStatement)obj);
+    } else if (obj instanceof HDLUnit) {
+      return _doGetInterfaceDeclarations((HDLUnit)obj);
+    } else if (obj != null) {
+      return _doGetInterfaceDeclarations(obj);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
-        Arrays.<Object>asList(gen).toString());
+        Arrays.<Object>asList(obj).toString());
     }
   }
   
@@ -825,6 +825,8 @@ public class ScopingExtension {
       return _doGetVariables((HDLNativeFunction)obj);
     } else if (obj instanceof HDLSubstituteFunction) {
       return _doGetVariables((HDLSubstituteFunction)obj);
+    } else if (obj instanceof HDLBlock) {
+      return _doGetVariables((HDLBlock)obj);
     } else if (obj instanceof HDLDirectGeneration) {
       return _doGetVariables((HDLDirectGeneration)obj);
     } else if (obj instanceof HDLForLoop) {
@@ -839,8 +841,6 @@ public class ScopingExtension {
       return _doGetVariables((HDLSwitchStatement)obj);
     } else if (obj instanceof HDLVariableDeclaration) {
       return _doGetVariables((HDLVariableDeclaration)obj);
-    } else if (obj instanceof HDLBlock) {
-      return _doGetVariables((HDLBlock)obj);
     } else if (obj instanceof HDLUnit) {
       return _doGetVariables((HDLUnit)obj);
     } else if (obj != null) {
