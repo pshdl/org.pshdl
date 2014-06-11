@@ -150,7 +150,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 				final ITypeOuptutProvider ito = providers.get(type.toLowerCase());
 				final List<CompileResult> results = ito.invoke(cli, em, null);
 				for (final CompileResult cr : results) {
-					writeFiles(dir, cr, true);
+					writeFiles(dir, cr);
 				}
 			}
 		} catch (final CycleException e) {

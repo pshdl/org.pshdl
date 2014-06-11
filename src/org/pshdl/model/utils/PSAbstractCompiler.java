@@ -65,7 +65,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 
-public class PSAbstractCompiler {
+public class PSAbstractCompiler implements AutoCloseable {
 
 	private static final Random RANDOM = new Random();
 
@@ -176,7 +176,7 @@ public class PSAbstractCompiler {
 
 	}
 
-	public static File[] writeFiles(File outDir, CompileResult result, boolean unitName) throws FileNotFoundException, IOException {
+	public static File[] writeFiles(File outDir, CompileResult result) throws FileNotFoundException, IOException {
 		if (result.hasError())
 			return new File[0];
 		final List<File> res = new LinkedList<File>();
@@ -317,6 +317,7 @@ public class PSAbstractCompiler {
 		return false;
 	}
 
+	@Override
 	public void close() {
 		HDLLibrary.unregister(uri);
 	}
@@ -569,5 +570,13 @@ public class PSAbstractCompiler {
 
 	public void invalidate() {
 		validated = false;
+	}
+
+	public void addSource(String asSrc) {
+		srcs.add(asSrc);
+	}
+
+	public String[] getSources() {
+		return srcs.toArray(new String[0]);
 	}
 }
