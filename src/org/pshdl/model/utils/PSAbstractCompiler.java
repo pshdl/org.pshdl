@@ -341,16 +341,17 @@ public class PSAbstractCompiler implements AutoCloseable {
 		synchronized (srcs) {
 			for (final String src : srcs) {
 				final Collection<Problem> issue = issues.get(src);
-				if (listener.useSource(src, issue, hasError(issue))) {
-					final HDLPackage parse = pkgs.get(src);
-					if (listener.startModule(src, parse)) {
-						res.add(doCompile(src, parse));
+				if (issue != null)
+					if (listener.useSource(src, issue, hasError(issue))) {
+						final HDLPackage parse = pkgs.get(src);
+						if (listener.startModule(src, parse)) {
+							res.add(doCompile(src, parse));
+						} else {
+							res.add(createResult(src, null, null, false));
+						}
 					} else {
 						res.add(createResult(src, null, null, false));
 					}
-				} else {
-					res.add(createResult(src, null, null, false));
-				}
 			}
 		}
 		return res;
