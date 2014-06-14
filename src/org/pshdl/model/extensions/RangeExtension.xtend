@@ -160,7 +160,8 @@ class RangeExtension {
 				if (!cw.present) {
 					bitWidth = null
 				} else {
-					bitWidth = bitWidth.add(cw.get)
+					if (bitWidth !== null)
+						bitWidth = bitWidth.add(cw.get)
 				}
 			}
 			if (bitWidth !== null) {

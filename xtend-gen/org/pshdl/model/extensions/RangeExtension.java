@@ -203,9 +203,12 @@ public class RangeExtension {
           if (_not_1) {
             bitWidth = null;
           } else {
-            BigInteger _get_5 = cw.get();
-            BigInteger _add = bitWidth.add(_get_5);
-            bitWidth = _add;
+            boolean _tripleNotEquals_1 = (bitWidth != null);
+            if (_tripleNotEquals_1) {
+              BigInteger _get_5 = cw.get();
+              BigInteger _add = bitWidth.add(_get_5);
+              bitWidth = _add;
+            }
           }
         }
       }
