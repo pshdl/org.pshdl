@@ -97,6 +97,12 @@ public class ParserToModelExtension {
     return _parserToModelExtension.toHDLPkg(ctx, libURI, src);
   }
   
+  public static HDLExpression toHDLExpression(final BufferedTokenStream tokens, final PSHDLLangParser.PsExpressionContext ctx) {
+    ParserToModelExtension _parserToModelExtension = new ParserToModelExtension(tokens);
+    IHDLObject _hDL = _parserToModelExtension.toHDL(ctx, false);
+    return ((HDLExpression) _hDL);
+  }
+  
   public HDLPackage toHDLPkg(final PSHDLLangParser.PsModelContext ctx, final String libURI, final String src) {
     HDLPackage _hDLPackage = new HDLPackage();
     HDLPackage pkg = _hDLPackage.setLibURI(libURI);

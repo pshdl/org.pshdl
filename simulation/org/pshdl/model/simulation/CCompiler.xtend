@@ -170,19 +170,19 @@ class CCompiler implements ITypeOuptutProvider {
 			(void)va_arrayIdx;
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
-					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: 
-							«IF v.width != bitWidth && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
-							«v.idName(false, false)»=value«IF v.predicate»==0?false:true«ENDIF»;
-							break;
-					«ELSE»
-						case «varIdx.get(v.name)»: 
-							«IF v.width != bitWidth && !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
-							va_start(va_arrayIdx, value);
-							«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]=value;
-							va_end(va_arrayIdx);
-							break;
-					«ENDIF»
+					case «varIdx.get(v.name)»: 
+						«IF v.width != bitWidth»
+							«IF v.type===VariableInformation.Type.INT»value=(value<<«bitWidth-v.width»)>>«bitWidth-v.width»;
+							«ELSEIF !v.predicate»value&=«v.width.asMaskL»;«ENDIF»
+						«ENDIF»
+						«IF v.dimensions.length == 0»
+								«v.idName(false, false)»=value«IF v.predicate»==0?false:true«ENDIF»;
+						«ELSE»
+								va_start(va_arrayIdx, value);
+								«v.idName(false, false)»[«v.arrayVarArgAccessArrIdx»]=value;
+								va_end(va_arrayIdx);
+						«ENDIF»
+						break;
 				«ENDFOR»
 			}
 		}

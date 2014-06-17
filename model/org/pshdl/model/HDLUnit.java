@@ -308,6 +308,7 @@ public class HDLUnit extends AbstractHDLUnit {
 					declarations.addAll(portAdditions);
 				}
 			}
+		// TODO export and generic hook for Portadditions
 		HDLVariable clk = null, rst = null;
 		final Set<HDLRegisterConfig> regConfigs = Sets.newHashSet();
 		for (final HDLVariableDeclaration hvd : declarations) {

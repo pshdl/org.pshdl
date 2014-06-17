@@ -62,7 +62,7 @@ public class HDLCore {
 	public static final String VERSION = getVersion();
 	private static final CompilerInformation info = new CompilerInformation(VERSION);
 	private static boolean initialized = false;
-	private static IServiceProvider serviceProvider;
+	private static IServiceProvider serviceProvider = new ServiceLoaderProvider();
 
 	/**
 	 * Initializes the PSHDL Compiler infrastructure with the annotations,
@@ -93,7 +93,7 @@ public class HDLCore {
 				System.err.println("Failed to read version");
 				System.exit(-1);
 			}
-			return new String(ByteStreams.toByteArray(versionStream), Charsets.UTF_8);
+			return new String(ByteStreams.toByteArray(versionStream), Charsets.UTF_8).trim();
 		} catch (final IOException e) {
 			System.err.println("Failed to read version");
 			System.exit(-1);

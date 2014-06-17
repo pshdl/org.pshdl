@@ -364,35 +364,45 @@ public class CCompiler implements ITypeOuptutProvider {
     {
       Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
       for(final VariableInformation v : _excludeNull) {
+        _builder.append("\t\t");
+        _builder.append("case ");
+        Integer _get = this.cce.varIdx.get(v.name);
+        _builder.append(_get, "\t\t");
+        _builder.append(": ");
+        _builder.newLineIfNotEmpty();
+        {
+          if ((v.width != this.bitWidth)) {
+            _builder.append("\t\t");
+            _builder.append("\t");
+            {
+              boolean _tripleEquals = (v.type == VariableInformation.Type.INT);
+              if (_tripleEquals) {
+                _builder.append("value=(value<<");
+                _builder.append((this.bitWidth - v.width), "\t\t\t");
+                _builder.append(")>>");
+                _builder.append((this.bitWidth - v.width), "\t\t\t");
+                _builder.append(";");
+                _builder.newLineIfNotEmpty();
+                _builder.append("\t\t");
+                _builder.append("\t");
+              } else {
+                boolean _isPredicate = this.cce.isPredicate(v);
+                boolean _not = (!_isPredicate);
+                if (_not) {
+                  _builder.append("value&=");
+                  CharSequence _asMaskL = this.cce.asMaskL(v.width);
+                  _builder.append(_asMaskL, "\t\t\t");
+                  _builder.append(";");
+                }
+              }
+            }
+            _builder.newLineIfNotEmpty();
+          }
+        }
         {
           int _length = v.dimensions.length;
           boolean _equals = (_length == 0);
           if (_equals) {
-            _builder.append("\t\t");
-            _builder.append("case ");
-            Integer _get = this.cce.varIdx.get(v.name);
-            _builder.append(_get, "\t\t");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t\t");
-            _builder.append("\t");
-            {
-              boolean _and = false;
-              if (!(v.width != this.bitWidth)) {
-                _and = false;
-              } else {
-                boolean _isPredicate = this.cce.isPredicate(v);
-                boolean _not = (!_isPredicate);
-                _and = _not;
-              }
-              if (_and) {
-                _builder.append("value&=");
-                CharSequence _asMaskL = this.cce.asMaskL(v.width);
-                _builder.append(_asMaskL, "\t\t\t");
-                _builder.append(";");
-              }
-            }
-            _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
             _builder.append("\t");
             String _idName = this.cce.idName(v, false, false);
@@ -406,36 +416,7 @@ public class CCompiler implements ITypeOuptutProvider {
             }
             _builder.append(";");
             _builder.newLineIfNotEmpty();
-            _builder.append("\t\t");
-            _builder.append("\t");
-            _builder.append("break;");
-            _builder.newLine();
           } else {
-            _builder.append("\t\t");
-            _builder.append("case ");
-            Integer _get_1 = this.cce.varIdx.get(v.name);
-            _builder.append(_get_1, "\t\t");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t\t");
-            _builder.append("\t");
-            {
-              boolean _and_1 = false;
-              if (!(v.width != this.bitWidth)) {
-                _and_1 = false;
-              } else {
-                boolean _isPredicate_2 = this.cce.isPredicate(v);
-                boolean _not_1 = (!_isPredicate_2);
-                _and_1 = _not_1;
-              }
-              if (_and_1) {
-                _builder.append("value&=");
-                CharSequence _asMaskL_1 = this.cce.asMaskL(v.width);
-                _builder.append(_asMaskL_1, "\t\t\t");
-                _builder.append(";");
-              }
-            }
-            _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("va_start(va_arrayIdx, value);");
@@ -453,12 +434,12 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append("\t");
             _builder.append("va_end(va_arrayIdx);");
             _builder.newLine();
-            _builder.append("\t\t");
-            _builder.append("\t");
-            _builder.append("break;");
-            _builder.newLine();
           }
         }
+        _builder.append("\t\t");
+        _builder.append("\t");
+        _builder.append("break;");
+        _builder.newLine();
       }
     }
     _builder.append("\t");
@@ -477,8 +458,8 @@ public class CCompiler implements ITypeOuptutProvider {
       for(final VariableInformation v_1 : _excludeNull_1) {
         _builder.append("\t\t");
         _builder.append("case ");
-        Integer _get_2 = this.cce.varIdx.get(v_1.name);
-        _builder.append(_get_2, "\t\t");
+        Integer _get_1 = this.cce.varIdx.get(v_1.name);
+        _builder.append(_get_1, "\t\t");
         _builder.append(": return \"");
         _builder.append(v_1.name, "\t\t");
         _builder.append("\";");
@@ -573,20 +554,20 @@ public class CCompiler implements ITypeOuptutProvider {
           if (_equals_1) {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get_3 = this.cce.varIdx.get(v_2.name);
-            _builder.append(_get_3, "\t\t");
+            Integer _get_2 = this.cce.varIdx.get(v_2.name);
+            _builder.append(_get_2, "\t\t");
             _builder.append(": return ");
             String _idName_2 = this.cce.idName(v_2, false, false);
             _builder.append(_idName_2, "\t\t");
             {
-              boolean _isPredicate_3 = this.cce.isPredicate(v_2);
-              if (_isPredicate_3) {
+              boolean _isPredicate_2 = this.cce.isPredicate(v_2);
+              if (_isPredicate_2) {
                 _builder.append("?1:0");
               } else {
                 if ((v_2.width != this.bitWidth)) {
                   _builder.append(" & ");
-                  CharSequence _asMaskL_2 = this.cce.asMaskL(v_2.width);
-                  _builder.append(_asMaskL_2, "\t\t");
+                  CharSequence _asMaskL_1 = this.cce.asMaskL(v_2.width);
+                  _builder.append(_asMaskL_1, "\t\t");
                 }
               }
             }
@@ -595,8 +576,8 @@ public class CCompiler implements ITypeOuptutProvider {
           } else {
             _builder.append("\t\t");
             _builder.append("case ");
-            Integer _get_4 = this.cce.varIdx.get(v_2.name);
-            _builder.append(_get_4, "\t\t");
+            Integer _get_3 = this.cce.varIdx.get(v_2.name);
+            _builder.append(_get_3, "\t\t");
             _builder.append(": {");
             _builder.newLineIfNotEmpty();
             _builder.append("\t\t");
@@ -615,18 +596,18 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder.append(_arrayVarArgAccessArrIdx_1, "\t\t\t");
             _builder.append("]");
             {
-              boolean _and_2 = false;
+              boolean _and = false;
               if (!(v_2.width != this.bitWidth)) {
-                _and_2 = false;
+                _and = false;
               } else {
-                boolean _isPredicate_4 = this.cce.isPredicate(v_2);
-                boolean _not_2 = (!_isPredicate_4);
-                _and_2 = _not_2;
+                boolean _isPredicate_3 = this.cce.isPredicate(v_2);
+                boolean _not_1 = (!_isPredicate_3);
+                _and = _not_1;
               }
-              if (_and_2) {
+              if (_and) {
                 _builder.append(" & ");
-                CharSequence _asMaskL_3 = this.cce.asMaskL(v_2.width);
-                _builder.append(_asMaskL_3, "\t\t\t");
+                CharSequence _asMaskL_2 = this.cce.asMaskL(v_2.width);
+                _builder.append(_asMaskL_2, "\t\t\t");
               }
             }
             _builder.append(";");

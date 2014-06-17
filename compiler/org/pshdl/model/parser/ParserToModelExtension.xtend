@@ -161,6 +161,9 @@ class ParserToModelExtension {
 	def static HDLPackage toHDL(BufferedTokenStream tokens, PsModelContext ctx, String libURI, String src) {
 		return new ParserToModelExtension(tokens).toHDLPkg(ctx, libURI, src)
 	}
+	def static HDLExpression toHDLExpression(BufferedTokenStream tokens, PsExpressionContext ctx) {
+		return new ParserToModelExtension(tokens).toHDL(ctx, false) as HDLExpression
+	}
 
 	def HDLPackage toHDLPkg(PsModelContext ctx, String libURI, String src) {
 		var pkg = new HDLPackage().setLibURI(libURI)

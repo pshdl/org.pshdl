@@ -50,7 +50,9 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Nullable;
+import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLPackage;
+import org.pshdl.model.parser.PSHDLLangParser.PsExpressionContext;
 import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
@@ -201,6 +203,37 @@ public class PSHDLParser {
 		final PsModelContext psModel = parser.psModel();
 		if (syntaxProblems.size() == 0) {
 			final HDLPackage hdl = ParserToModelExtension.toHDL(tokens, psModel, libURI, src);
+			return hdl;
+		}
+		return null;
+	}
+
+	/**
+	 * Parses the given input String and generates a output {@link HDLPackage}
+	 * if it succeed
+	 *
+	 * @param input
+	 *            the String to parse and convert
+	 * @param libURI
+	 *            the library URI to retrieve a registered {@link HDLLibrary}
+	 * @param syntaxProblems
+	 *            a HashSet where syntax problems will be added to
+	 * @return a {@link HDLPackage} if successful, <code>null</code>l otherwise
+	 */
+	public static HDLExpression parseExpressionString(String input, final Set<Problem> syntaxProblems) {
+		return parseExpressionStream(new ANTLRInputStream(input), syntaxProblems);
+	}
+
+	private static HDLExpression parseExpressionStream(ANTLRInputStream input, final Set<Problem> syntaxProblems) {
+		final PSHDLLangLexer lexer = new PSHDLLangLexer(input);
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+		final PSHDLLangParser parser = new PSHDLLangParser(tokens);
+		final ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
+		parser.getErrorListeners().clear();
+		parser.addErrorListener(listener);
+		final PsExpressionContext psExpression = parser.psExpression();
+		if (syntaxProblems.size() == 0) {
+			final HDLExpression hdl = ParserToModelExtension.toHDLExpression(tokens, psExpression);
 			return hdl;
 		}
 		return null;
