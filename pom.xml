@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pshdl</groupId>
 	<artifactId>core</artifactId>
-	<version>0.1.83</version>
+	<version>0.1.84</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -157,7 +157,7 @@
 		<dependency>
 			<groupId>org.pshdl</groupId>
 			<artifactId>interpreter</artifactId>
-			<version>0.1.83</version>
+			<version>0.1.84</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
