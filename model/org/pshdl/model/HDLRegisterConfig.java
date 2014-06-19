@@ -360,10 +360,10 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 	@Nonnull
 	public static HDLRegisterConfig defaultConfig() {
 		return new HDLRegisterConfig()//
-				.setClk(DEF_CLK_REF())//
-				.setRst(DEF_RST_REF())//
-				.setResetValue(HDLLiteral.get(0))//
-				.normalize()//
+		.setClk(DEF_CLK_REF())//
+		.setRst(DEF_RST_REF())//
+		.setResetValue(HDLLiteral.get(0))//
+		.normalize()//
 		;
 	}
 
