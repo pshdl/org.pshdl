@@ -198,7 +198,9 @@ public class PSHDLParser {
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
 		final PSHDLLangParser parser = new PSHDLLangParser(tokens);
 		final ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
-		parser.getErrorListeners().clear();
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(listener);
+		parser.removeErrorListeners();
 		parser.addErrorListener(listener);
 		final PsModelContext psModel = parser.psModel();
 		if (syntaxProblems.size() == 0) {
@@ -227,10 +229,12 @@ public class PSHDLParser {
 	private static HDLExpression parseExpressionStream(ANTLRInputStream input, final Set<Problem> syntaxProblems) {
 		final PSHDLLangLexer lexer = new PSHDLLangLexer(input);
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+		final ANTLRErrorListener parserListener = new SyntaxErrorCollector(tokens, syntaxProblems);
 		final PSHDLLangParser parser = new PSHDLLangParser(tokens);
-		final ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
-		parser.getErrorListeners().clear();
-		parser.addErrorListener(listener);
+		parser.removeErrorListeners();
+		parser.addErrorListener(parserListener);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(parserListener);
 		final PsExpressionContext psExpression = parser.psExpression();
 		if (syntaxProblems.size() == 0) {
 			final HDLExpression hdl = ParserToModelExtension.toHDLExpression(tokens, psExpression);
