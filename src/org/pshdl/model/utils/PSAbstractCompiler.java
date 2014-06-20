@@ -535,10 +535,8 @@ public class PSAbstractCompiler implements AutoCloseable {
 			future.get();
 		}
 		for (final Set<Problem> p : issues.values()) {
-			for (final Problem problem : p) {
-				if (problem.severity == ProblemSeverity.ERROR)
-					return true;
-			}
+			if (hasError(p))
+				return true;
 		}
 		return false;
 	}
@@ -579,5 +577,20 @@ public class PSAbstractCompiler implements AutoCloseable {
 
 	public String[] getSources() {
 		return srcs.toArray(new String[0]);
+	}
+
+	public void addError(String src, Problem problem) {
+		addSource(src);
+		Set<Problem> set = issues.get(src);
+		if (set == null) {
+			set = Sets.newHashSet();
+			issues.put(src, set);
+		}
+		set.add(problem);
+	}
+
+	public void clearError(String src) {
+		addSource(src);
+		issues.put(src, Sets.<Problem> newHashSet());
 	}
 }
