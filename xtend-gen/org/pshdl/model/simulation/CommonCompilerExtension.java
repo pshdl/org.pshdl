@@ -49,11 +49,11 @@ import org.pshdl.interpreter.utils.Instruction;
 public class CommonCompilerExtension {
   public ExecutableModel em;
   
-  public Map<String,Integer> varIdx = new HashMap<String, Integer>();
+  public Map<String, Integer> varIdx = new HashMap<String, Integer>();
   
-  public Map<String,Integer> intIdx = new HashMap<String, Integer>();
+  public Map<String, Integer> intIdx = new HashMap<String, Integer>();
   
-  public Map<String,Boolean> prevMap = new HashMap<String, Boolean>();
+  public Map<String, Boolean> prevMap = new HashMap<String, Boolean>();
   
   public boolean hasClock;
   
@@ -174,7 +174,7 @@ public class CommonCompilerExtension {
     }
     _builder.append("],\\\"nameIdx\\\":{");
     {
-      Set<Map.Entry<String,Integer>> _entrySet = this.varIdx.entrySet();
+      Set<Map.Entry<String, Integer>> _entrySet = this.varIdx.entrySet();
       boolean _hasElements_4 = false;
       for(final Map.Entry<String, Integer> entry : _entrySet) {
         if (!_hasElements_4) {
@@ -251,7 +251,7 @@ public class CommonCompilerExtension {
   }
   
   public Iterable<VariableInformation> excludeNull(final VariableInformation[] vars) {
-    final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
+    final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
       public Boolean apply(final VariableInformation it) {
         return Boolean.valueOf(CommonCompilerExtension.this.isNotNull(it));
       }
@@ -269,7 +269,7 @@ public class CommonCompilerExtension {
   }
   
   public Iterable<InternalInformation> excludeNull(final InternalInformation[] vars) {
-    final Function1<InternalInformation,Boolean> _function = new Function1<InternalInformation,Boolean>() {
+    final Function1<InternalInformation, Boolean> _function = new Function1<InternalInformation, Boolean>() {
       public Boolean apply(final InternalInformation it) {
         return Boolean.valueOf(CommonCompilerExtension.this.isNotNull(it.info));
       }

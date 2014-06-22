@@ -956,7 +956,7 @@ public class StringWriteExtension {
     builder.append(_keyword);
     String _simpleSpace = highlight.simpleSpace();
     builder.append(_simpleSpace);
-    HDLReference _exportRef = export.getExportRef();
+    HDLExpression _exportRef = export.getExportRef();
     String _string = this.toString(_exportRef, highlight);
     builder.append(_string);
     builder.append(";");

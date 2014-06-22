@@ -36,7 +36,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLExport contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>HDLReference exportRef. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLExpression exportRef. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
 public class HDLExport extends AbstractHDLExport {
@@ -50,7 +50,7 @@ public class HDLExport extends AbstractHDLExport {
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLExport(int id, @Nullable IHDLObject container, @Nonnull HDLReference exportRef, boolean validate) {
+	public HDLExport(int id, @Nullable IHDLObject container, @Nonnull HDLExpression exportRef, boolean validate) {
 		super(id, container, exportRef, validate);
 	}
 
@@ -67,18 +67,19 @@ public class HDLExport extends AbstractHDLExport {
 	}
 
 	/**
-	 * The accessor for the field exportRef which is of type HDLReference.
+	 * The accessor for the field exportRef which is of type HDLExpression.
 	 */
-	public static HDLFieldAccess<HDLExport, HDLReference> fExportRef = new HDLFieldAccess<HDLExport, HDLReference>("exportRef", HDLReference.class, HDLFieldAccess.Quantifier.ONE) {
+	public static HDLFieldAccess<HDLExport, HDLExpression> fExportRef = new HDLFieldAccess<HDLExport, HDLExpression>("exportRef", HDLExpression.class,
+			HDLFieldAccess.Quantifier.ONE) {
 		@Override
-		public HDLReference getValue(HDLExport obj) {
+		public HDLExpression getValue(HDLExport obj) {
 			if (obj == null)
 				return null;
 			return obj.getExportRef();
 		}
 
 		@Override
-		public HDLExport setValue(HDLExport obj, HDLReference value) {
+		public HDLExport setValue(HDLExport obj, HDLExpression value) {
 			if (obj == null)
 				return null;
 			return obj.setExportRef(value);

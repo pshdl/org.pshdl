@@ -501,7 +501,7 @@ public class RangeExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(type,HDLBitOp.HDLBitOpType.AND)) {
+      if (Objects.equal(type, HDLBitOp.HDLBitOpType.AND)) {
         _matched=true;
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.BIT_NOT_SUPPORTED_FOR_RANGES);

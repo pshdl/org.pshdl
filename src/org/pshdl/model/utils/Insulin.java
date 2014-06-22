@@ -169,7 +169,7 @@ public class Insulin {
 		final ModificationSet ms = new ModificationSet();
 		final HDLExport[] exports = pkg.getAllObjectsOf(HDLExport.class, true);
 		for (final HDLExport hdlExport : exports) {
-			final HDLReference ref = hdlExport.getExportRef();
+			final HDLExpression ref = hdlExport.getExportRef();
 			if (ref instanceof HDLResolvedRef) {
 				final HDLResolvedRef rr = (HDLResolvedRef) ref;
 				final Optional<HDLVariable> resolveVar = rr.resolveVar();

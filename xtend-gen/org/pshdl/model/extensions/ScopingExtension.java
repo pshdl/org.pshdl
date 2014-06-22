@@ -649,8 +649,8 @@ public class ScopingExtension {
   private static HDLVariable getVariable(final HDLInterface hIf, final String lastSegment) {
     HDLQuery.Source<HDLVariable> _select = HDLQuery.<HDLVariable>select(HDLVariable.class);
     HDLQuery.Selector<HDLVariable> _from = _select.from(hIf);
-    HDLQuery.FieldSelector<HDLVariable,String> _where = _from.<String>where(HDLVariable.fName);
-    HDLQuery.Result<HDLVariable,String> _lastSegmentIs = _where.lastSegmentIs(lastSegment);
+    HDLQuery.FieldSelector<HDLVariable, String> _where = _from.<String>where(HDLVariable.fName);
+    HDLQuery.Result<HDLVariable, String> _lastSegmentIs = _where.lastSegmentIs(lastSegment);
     return _lastSegmentIs.getFirst();
   }
   

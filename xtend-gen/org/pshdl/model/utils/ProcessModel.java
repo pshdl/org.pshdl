@@ -68,9 +68,9 @@ import org.pshdl.model.utils.SyntaxHighlighter;
 public class ProcessModel {
   private static AtomicInteger ai = new AtomicInteger();
   
-  public Multimap<Integer,HDLStatement> unclockedStatements = LinkedListMultimap.<Integer, HDLStatement>create();
+  public Multimap<Integer, HDLStatement> unclockedStatements = LinkedListMultimap.<Integer, HDLStatement>create();
   
-  public Multimap<HDLRegisterConfig,HDLStatement> clockedStatements = LinkedListMultimap.<HDLRegisterConfig, HDLStatement>create();
+  public Multimap<HDLRegisterConfig, HDLStatement> clockedStatements = LinkedListMultimap.<HDLRegisterConfig, HDLStatement>create();
   
   public final static int DEF_PROCESS = (-1);
   
@@ -132,7 +132,7 @@ public class ProcessModel {
     return ProcessModel.<HDLSwitchCaseStatement, HDLStatement, ArrayList<HDLStatement>>toProcessModel(stmnt, HDLSwitchCaseStatement.fDos, pid);
   }
   
-  private static <T extends HDLStatement, V extends HDLStatement, C extends Collection<V>> ProcessModel toProcessModel(final T obj, final HDLQuery.HDLFieldAccess<T,C> field, final int pid) {
+  private static <T extends HDLStatement, V extends HDLStatement, C extends Collection<V>> ProcessModel toProcessModel(final T obj, final HDLQuery.HDLFieldAccess<T, C> field, final int pid) {
     final ProcessModel pm = new ProcessModel();
     C _value = field.getValue(obj);
     for (final V subStmnt : _value) {
@@ -140,8 +140,8 @@ public class ProcessModel {
       pm.merge(_processModel);
     }
     final ProcessModel res = new ProcessModel();
-    Map<Integer,Collection<HDLStatement>> _asMap = pm.unclockedStatements.asMap();
-    final Procedure2<Integer,Collection<HDLStatement>> _function = new Procedure2<Integer,Collection<HDLStatement>>() {
+    Map<Integer, Collection<HDLStatement>> _asMap = pm.unclockedStatements.asMap();
+    final Procedure2<Integer, Collection<HDLStatement>> _function = new Procedure2<Integer, Collection<HDLStatement>>() {
       public void apply(final Integer subPid, final Collection<HDLStatement> stmnts) {
         ArrayList<HDLStatement> _arrayList = new ArrayList<HDLStatement>(stmnts);
         T _setValue = field.setValue(obj, ((C) _arrayList));
@@ -149,8 +149,8 @@ public class ProcessModel {
       }
     };
     MapExtensions.<Integer, Collection<HDLStatement>>forEach(_asMap, _function);
-    Map<HDLRegisterConfig,Collection<HDLStatement>> _asMap_1 = pm.clockedStatements.asMap();
-    final Procedure2<HDLRegisterConfig,Collection<HDLStatement>> _function_1 = new Procedure2<HDLRegisterConfig,Collection<HDLStatement>>() {
+    Map<HDLRegisterConfig, Collection<HDLStatement>> _asMap_1 = pm.clockedStatements.asMap();
+    final Procedure2<HDLRegisterConfig, Collection<HDLStatement>> _function_1 = new Procedure2<HDLRegisterConfig, Collection<HDLStatement>>() {
       public void apply(final HDLRegisterConfig reg, final Collection<HDLStatement> stmnts) {
         ArrayList<HDLStatement> _arrayList = new ArrayList<HDLStatement>(stmnts);
         T _setValue = field.setValue(obj, ((C) _arrayList));
@@ -214,7 +214,7 @@ public class ProcessModel {
   }
   
   protected static ProcessModel _toProcessModel(final HDLSwitchStatement stmnt, final int pid) {
-    final Map<HDLSwitchCaseStatement,ProcessModel> pms = Maps.<HDLSwitchCaseStatement, ProcessModel>newLinkedHashMap();
+    final Map<HDLSwitchCaseStatement, ProcessModel> pms = Maps.<HDLSwitchCaseStatement, ProcessModel>newLinkedHashMap();
     final HashSet<HDLRegisterConfig> clocks = new HashSet<HDLRegisterConfig>();
     boolean hasUnclocked = false;
     ArrayList<HDLSwitchCaseStatement> _cases = stmnt.getCases();
@@ -234,7 +234,7 @@ public class ProcessModel {
     final ProcessModel res = new ProcessModel();
     if (hasUnclocked) {
       final List<HDLSwitchCaseStatement> newCases = Lists.<HDLSwitchCaseStatement>newLinkedList();
-      final Procedure2<HDLSwitchCaseStatement,ProcessModel> _function = new Procedure2<HDLSwitchCaseStatement,ProcessModel>() {
+      final Procedure2<HDLSwitchCaseStatement, ProcessModel> _function = new Procedure2<HDLSwitchCaseStatement, ProcessModel>() {
         public void apply(final HDLSwitchCaseStatement caze, final ProcessModel caseStatements) {
           Collection<HDLStatement> _get = caseStatements.unclockedStatements.get(Integer.valueOf(pid));
           HDLSwitchCaseStatement _setDos = caze.setDos(_get);
@@ -248,7 +248,7 @@ public class ProcessModel {
     for (final HDLRegisterConfig reg : clocks) {
       {
         final List<HDLSwitchCaseStatement> newCases_1 = Lists.<HDLSwitchCaseStatement>newLinkedList();
-        final Procedure2<HDLSwitchCaseStatement,ProcessModel> _function_1 = new Procedure2<HDLSwitchCaseStatement,ProcessModel>() {
+        final Procedure2<HDLSwitchCaseStatement, ProcessModel> _function_1 = new Procedure2<HDLSwitchCaseStatement, ProcessModel>() {
           public void apply(final HDLSwitchCaseStatement caze, final ProcessModel caseStatements) {
             Collection<HDLStatement> _get = caseStatements.clockedStatements.get(reg);
             HDLSwitchCaseStatement _setDos = caze.setDos(_get);
@@ -316,8 +316,8 @@ public class ProcessModel {
     _builder.append("Unclocked Statements:");
     _builder.newLine();
     {
-      Map<Integer,Collection<HDLStatement>> _asMap = this.unclockedStatements.asMap();
-      Set<Map.Entry<Integer,Collection<HDLStatement>>> _entrySet = _asMap.entrySet();
+      Map<Integer, Collection<HDLStatement>> _asMap = this.unclockedStatements.asMap();
+      Set<Map.Entry<Integer, Collection<HDLStatement>>> _entrySet = _asMap.entrySet();
       for(final Map.Entry<Integer, Collection<HDLStatement>> e : _entrySet) {
         _builder.append("Process:");
         Integer _key = e.getKey();
@@ -340,8 +340,8 @@ public class ProcessModel {
     _builder.append("Clocked Statements:");
     _builder.newLine();
     {
-      Map<HDLRegisterConfig,Collection<HDLStatement>> _asMap_1 = this.clockedStatements.asMap();
-      Set<Map.Entry<HDLRegisterConfig,Collection<HDLStatement>>> _entrySet_1 = _asMap_1.entrySet();
+      Map<HDLRegisterConfig, Collection<HDLStatement>> _asMap_1 = this.clockedStatements.asMap();
+      Set<Map.Entry<HDLRegisterConfig, Collection<HDLStatement>>> _entrySet_1 = _asMap_1.entrySet();
       for(final Map.Entry<HDLRegisterConfig, Collection<HDLStatement>> e_1 : _entrySet_1) {
         _builder.append("Process:");
         HDLRegisterConfig _key_1 = e_1.getKey();

@@ -2,7 +2,7 @@
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
  *
- *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,24 +26,28 @@
  ******************************************************************************/
 package org.pshdl.model.utils.services;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLUnit;
+import org.pshdl.model.HDLVariableDeclaration;
 
-public class HDLTypeInferenceInfo {
-	public HDLType result;
-	public String error;
-	public HDLType[] args;
-
-	public HDLTypeInferenceInfo(HDLType result, HDLType... args) {
-		super();
-		this.args = args;
-		this.result = result;
-	}
-
-	@Override
-	public String toString() {
-		return "HDLTypeInferenceInfo [result=" + result + ", error=" + error + " args=" + Arrays.toString(args) + "]";
-	}
-
+/**
+ * This interface allows the addition of ports to an existing {@link HDLUnit}.
+ * This can be useful for annotation post-processing in addition to an
+ * {@link IInsulinParticitant}
+ *
+ * @author Karsten Becker
+ *
+ */
+public interface IPortAdder {
+	/**
+	 * The returned ports will be added to the given unit. The usage of those
+	 * ports can be contributed via {@link IInsulinParticitant}.
+	 *
+	 * @param unit
+	 *            the unit to which ports could potentially be contributed
+	 * @return <code>null</code> if no ports should be added to this unit. The
+	 *         ports otherwise
+	 */
+	public List<HDLVariableDeclaration> getPortAddition(HDLUnit unit);
 }

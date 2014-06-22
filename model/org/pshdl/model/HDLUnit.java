@@ -32,8 +32,9 @@ import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -41,17 +42,21 @@ import javax.annotation.Nullable;
 
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.impl.AbstractHDLUnit;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.HDLGenerators;
+import org.pshdl.model.utils.HDLCore;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 import org.pshdl.model.utils.ModificationSet;
+import org.pshdl.model.utils.services.IPortAdder;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -294,24 +299,45 @@ public class HDLUnit extends AbstractHDLUnit {
 			return unitIF;
 		final HDLQualifiedName fullName = fullNameOf(this);
 		unitIF = new HDLInterface().setName(fullName.toString());
-		final Collection<HDLVariableDeclaration> declarations = new LinkedList<HDLVariableDeclaration>();
+		final Map<String, HDLVariableDeclaration> decls = Maps.newLinkedHashMap();
 		final HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (final HDLVariableDeclaration hvd : hvds)
 			if (hvd.getContainer(HDLInterface.class) == null) {
-				declarations.add(hvd);
+				addDecl(HDLObject.asList(hvd), decls);
 			}
 		final HDLDirectGeneration[] generators = getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (final HDLDirectGeneration hdgi : generators)
 			if (hdgi.getInclude()) {
-				final List<HDLVariableDeclaration> portAdditions = HDLGenerators.getPortAdditions(hdgi);
-				if (portAdditions != null) {
-					declarations.addAll(portAdditions);
+				addDecl(HDLGenerators.getPortAdditions(hdgi), decls);
+			}
+		final Collection<IPortAdder> portAdder = HDLCore.getAllImplementations(IPortAdder.class);
+		for (final IPortAdder iPortAdder : portAdder) {
+			addDecl(iPortAdder.getPortAddition(this), decls);
+		}
+		final HDLExport[] exports = getAllObjectsOf(HDLExport.class, true);
+		for (final HDLExport hdlExport : exports) {
+			final HDLExpression exportRef = hdlExport.getExportRef();
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(exportRef);
+			if (typeOf.isPresent()) {
+				final HDLType type = typeOf.get();
+				if (type instanceof HDLInterface) {
+					final HDLInterface hIf = (HDLInterface) type;
+					addDecl(hIf.getPorts(), decls);
+					continue;
+				}
+				final HDLResolvedRef ref = exportRef.getAllObjectsOf(HDLResolvedRef.class, true)[0];
+				final Optional<HDLVariable> resolveVar = ref.resolveVar();
+				if (resolveVar.isPresent()) {
+					final HDLVariable variable = resolveVar.get();
+					final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(type).addVariables(variable);
+					addDecl(Collections.singletonList(hvd), decls);
 				}
 			}
+		}
 		// TODO export and generic hook for Portadditions
 		HDLVariable clk = null, rst = null;
 		final Set<HDLRegisterConfig> regConfigs = Sets.newHashSet();
-		for (final HDLVariableDeclaration hvd : declarations) {
+		for (final HDLVariableDeclaration hvd : decls.values()) {
 			switch (hvd.getDirection()) {
 			case PARAMETER:
 			case CONSTANT:
@@ -386,6 +412,27 @@ public class HDLUnit extends AbstractHDLUnit {
 		unitIF.addMeta(FULLNAME, fullName);
 		unitIF.setID(getID());
 		return unitIF;
+	}
+
+	private void addDecl(Iterable<HDLVariableDeclaration> hvds, Map<String, HDLVariableDeclaration> decls) {
+		if (hvds != null) {
+			for (final HDLVariableDeclaration hvd : hvds) {
+				for (final HDLVariable var : hvd.getVariables()) {
+					final String name = var.getName();
+					final HDLVariableDeclaration otherDecl = decls.get(name);
+					if (otherDecl != null) {
+						final Optional<? extends HDLType> otherType = otherDecl.resolveType();
+						final Optional<? extends HDLType> thisType = hvd.resolveType();
+						if (otherType.isPresent() && thisType.isPresent()) {
+							if (!otherType.get().equals(otherType.get()))
+								throw new IllegalArgumentException("Exported types of " + name + " don't match:" + otherType.get() + " and " + thisType.get());
+						}
+					} else {
+						decls.put(name, hvd.setVariables(HDLObject.asList(var)));
+					}
+				}
+			}
+		}
 	}
 
 	private boolean hasRef(IHDLObject obj, String varName) {

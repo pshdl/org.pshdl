@@ -323,7 +323,7 @@ public class CCompiler implements ITypeOuptutProvider {
       }
       {
         Iterable<VariableInformation> _excludeNull_1 = this.cce.excludeNull(this.cce.em.variables);
-        final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
+        final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
           public Boolean apply(final VariableInformation it) {
             Boolean _get = CCompiler.this.cce.prevMap.get(it.name);
             return Boolean.valueOf((_get != null));
@@ -2257,8 +2257,8 @@ public class CCompiler implements ITypeOuptutProvider {
     try {
       Unit unit = null;
       final Splitter annoSplitter = Splitter.on(SimulationTransformationExtension.ANNO_VALUE_SEP);
-      boolean _tripleNotEquals = (this.cce.em.annotations != null);
-      if (_tripleNotEquals) {
+      boolean _notEquals = (!Objects.equal(this.cce.em.annotations, null));
+      if (_notEquals) {
         for (final String a : this.cce.em.annotations) {
           boolean _startsWith = a.startsWith("busDescription");
           if (_startsWith) {
@@ -2285,7 +2285,7 @@ public class CCompiler implements ITypeOuptutProvider {
     final Procedure1<Row> _function = new Procedure1<Row>() {
       public void apply(final Row it) {
         List<Definition> _allDefs = CCompiler.this.ba.allDefs(it);
-        final Function1<Definition,Boolean> _function = new Function1<Definition,Boolean>() {
+        final Function1<Definition, Boolean> _function = new Function1<Definition, Boolean>() {
           public Boolean apply(final Definition it) {
             return Boolean.valueOf((it.type != Definition.Type.UNUSED));
           }

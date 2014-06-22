@@ -1201,7 +1201,7 @@ public class BusAccess {
   }
   
   public boolean hasWriteDefs(final Row row) {
-    final Function1<NamedElement,Boolean> _function = new Function1<NamedElement,Boolean>() {
+    final Function1<NamedElement, Boolean> _function = new Function1<NamedElement, Boolean>() {
       public Boolean apply(final NamedElement it) {
         return Boolean.valueOf(BusAccess.this.hasWrite(it));
       }

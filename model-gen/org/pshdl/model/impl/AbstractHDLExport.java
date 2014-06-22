@@ -34,8 +34,8 @@ import javax.annotation.Nullable;
 
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLExport;
+import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLObject;
-import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLStatement;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.CopyFilter;
@@ -54,7 +54,7 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public AbstractHDLExport(int id, @Nullable IHDLObject container, @Nonnull HDLReference exportRef, boolean validate) {
+	public AbstractHDLExport(int id, @Nullable IHDLObject container, @Nonnull HDLExpression exportRef, boolean validate) {
 		super(id, container, validate);
 		if (validate) {
 			exportRef = validateExportRef(exportRef);
@@ -71,7 +71,7 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 		this.exportRef = null;
 	}
 
-	protected final HDLReference exportRef;
+	protected final HDLExpression exportRef;
 
 	/**
 	 * Get the exportRef field. Can <b>not</b> be <code>null</code>.
@@ -79,11 +79,11 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	 * @return the field
 	 */
 	@Nonnull
-	public HDLReference getExportRef() {
+	public HDLExpression getExportRef() {
 		return exportRef;
 	}
 
-	protected HDLReference validateExportRef(HDLReference exportRef) {
+	protected HDLExpression validateExportRef(HDLExpression exportRef) {
 		if (exportRef == null)
 			throw new IllegalArgumentException("The field exportRef can not be null!");
 		return exportRef;
@@ -110,7 +110,7 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	@Override
 	@Nonnull
 	public HDLExport copyFiltered(CopyFilter filter) {
-		final HDLReference filteredexportRef = filter.copyObject("exportRef", this, exportRef);
+		final HDLExpression filteredexportRef = filter.copyObject("exportRef", this, exportRef);
 		return filter.postFilter((HDLExport) this, new HDLExport(id, null, filteredexportRef, false));
 	}
 
@@ -152,7 +152,7 @@ public abstract class AbstractHDLExport extends HDLObject implements HDLStatemen
 	 *         field.
 	 */
 	@Nonnull
-	public HDLExport setExportRef(@Nonnull HDLReference exportRef) {
+	public HDLExport setExportRef(@Nonnull HDLExpression exportRef) {
 		exportRef = validateExportRef(exportRef);
 		final HDLExport res = new HDLExport(id, container, exportRef, false);
 		return res;

@@ -591,7 +591,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       }
       {
         Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
-        final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
+        final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
           public Boolean apply(final VariableInformation it) {
             Boolean _get = DartCompiler.this.cce.prevMap.get(it.name);
             return Boolean.valueOf((_get != null));
@@ -1151,7 +1151,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
         public Boolean apply(final VariableInformation it) {
           return Boolean.valueOf((it.dir == VariableInformation.Direction.IN));
         }
@@ -1177,7 +1177,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation,Boolean> _function_1 = new Function1<VariableInformation,Boolean>() {
+      final Function1<VariableInformation, Boolean> _function_1 = new Function1<VariableInformation, Boolean>() {
         public Boolean apply(final VariableInformation it) {
           return Boolean.valueOf((it.dir == VariableInformation.Direction.INOUT));
         }
@@ -1203,7 +1203,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation,Boolean> _function_2 = new Function1<VariableInformation,Boolean>() {
+      final Function1<VariableInformation, Boolean> _function_2 = new Function1<VariableInformation, Boolean>() {
         public Boolean apply(final VariableInformation it) {
           return Boolean.valueOf((it.dir == VariableInformation.Direction.OUT));
         }
@@ -1229,7 +1229,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation,Boolean> _function_3 = new Function1<VariableInformation,Boolean>() {
+      final Function1<VariableInformation, Boolean> _function_3 = new Function1<VariableInformation, Boolean>() {
         public Boolean apply(final VariableInformation it) {
           return Boolean.valueOf((it.dir == VariableInformation.Direction.INTERNAL));
         }

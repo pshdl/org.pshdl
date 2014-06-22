@@ -283,7 +283,7 @@ public class SimulationTransformationExtension {
   }
   
   public String[] toAnnoString(final Iterable<HDLAnnotation> annotations) {
-    final Function1<HDLAnnotation,String> _function = new Function1<HDLAnnotation,String>() {
+    final Function1<HDLAnnotation, String> _function = new Function1<HDLAnnotation, String>() {
       public String apply(final HDLAnnotation it) {
         String _xifexpression = null;
         String _value = it.getValue();
@@ -774,7 +774,7 @@ public class SimulationTransformationExtension {
     HDLPrimitive.HDLPrimitiveType _type = current.getType();
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(_type,HDLPrimitive.HDLPrimitiveType.BIT)) {
+      if (Objects.equal(_type, HDLPrimitive.HDLPrimitiveType.BIT)) {
         _matched=true;
         return 1;
       }
@@ -887,7 +887,7 @@ public class SimulationTransformationExtension {
     final HDLVariableDeclaration.HDLDirection dir = _get.getDirection();
     boolean _matched = false;
     if (!_matched) {
-      if (Objects.equal(dir,HDLVariableDeclaration.HDLDirection.INTERNAL)) {
+      if (Objects.equal(dir, HDLVariableDeclaration.HDLDirection.INTERNAL)) {
         _matched=true;
         FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
         res.add(_argumentedInstruction);
@@ -921,7 +921,7 @@ public class SimulationTransformationExtension {
       }
     }
     if (!_matched) {
-      if (Objects.equal(dir,HDLVariableDeclaration.HDLDirection.IN)) {
+      if (Objects.equal(dir, HDLVariableDeclaration.HDLDirection.IN)) {
         _matched=true;
         FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.loadInternal, ((String[])Conversions.unwrapArray(bits, String.class)));
         res.add(_argumentedInstruction_2);

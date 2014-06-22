@@ -407,7 +407,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.append("}");
       _builder.newLine();
       {
-        final Function1<VariableInformation,Boolean> _function = new Function1<VariableInformation,Boolean>() {
+        final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
           public Boolean apply(final VariableInformation it) {
             return Boolean.valueOf((it.dir != VariableInformation.Direction.INTERNAL));
           }
@@ -728,7 +728,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       }
       {
         Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
-        final Function1<VariableInformation,Boolean> _function_1 = new Function1<VariableInformation,Boolean>() {
+        final Function1<VariableInformation, Boolean> _function_1 = new Function1<VariableInformation, Boolean>() {
           public Boolean apply(final VariableInformation it) {
             Boolean _get = JavaCompiler.this.cce.prevMap.get(it.name);
             return Boolean.valueOf((_get != null));
