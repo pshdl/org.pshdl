@@ -181,7 +181,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case REG_UINT:
 			case STRING_TYPE:
 				final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef())
-				.getAll();
+						.getAll();
 				for (final HDLVariableRef argRef : allArgRefs) {
 					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 					if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
@@ -209,7 +209,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case IF:
 			case ANY_IF:
 				final Collection<HDLInterfaceRef> allIfRefs = HDLQuery.select(HDLInterfaceRef.class).from(orig).where(HDLInterfaceRef.fHIf).isEqualTo(param.getName().asRef())
-				.getAll();
+						.getAll();
 				for (final HDLInterfaceRef argRef : allIfRefs) {
 					final HDLQualifiedName fqn = FullNameExtension.fullNameOf(arg);
 					msExp.replace(argRef, argRef.setHIf(fqn));

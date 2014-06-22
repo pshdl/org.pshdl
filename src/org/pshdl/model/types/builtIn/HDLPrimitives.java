@@ -297,7 +297,7 @@ public class HDLPrimitives {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
 	 * .tuhh.ict.pshdl.model.HDLArithOp)
 	 */
