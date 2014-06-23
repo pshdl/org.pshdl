@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLAssignment;
+import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLDeclaration;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLForLoop;
@@ -48,10 +49,12 @@ import org.pshdl.model.HDLIfStatement.TreeSide;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLPackage;
+import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLResolvedRef;
 import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLTernary;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnit;
@@ -62,6 +65,7 @@ import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.RangeExtension;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.RangeTool.RangeVal;
@@ -79,7 +83,7 @@ public class HDLSimulator {
 
 	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
 		if ((unit.getSimulation() != null) && unit.getSimulation())
-			throw new IllegalArgumentException("Testbenches are not supported");
+			return createTestbenchModel(unit, context, src, separator);
 		HDLUnit insulin = Insulin.transform(unit, src);
 		final HDLPackage pkg = flattenAll(context, insulin, separator);
 		insulin = getSingleUnit(pkg);
@@ -94,6 +98,42 @@ public class HDLSimulator {
 		insulin = removeDeadLeaves(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
+	}
+
+	private static HDLUnit createTestbenchModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
+		HDLUnit insulin = Insulin.transform(unit, src);
+		insulin = addTimeVar(insulin);
+		insulin = rewriteProcesses(insulin);
+		return insulin;
+	}
+
+	private static HDLUnit rewriteProcesses(HDLUnit insulin) {
+		final ModificationSet ms = new ModificationSet();
+		final Collection<HDLBlock> processes = HDLQuery.select(HDLBlock.class).from(insulin).where(HDLBlock.fProcess).isEqualTo(Boolean.TRUE).getAll();
+		for (final HDLBlock process : processes) {
+			final HDLQualifiedName fqn = FullNameExtension.fullNameOf(process);
+			HDLVariableDeclaration nextTimeDecl = new HDLVariableDeclaration().setPrimitive(HDLPrimitive.getUint().setWidth(HDLLiteral.get(64)));
+			final HDLVariable nexTimeVar = new HDLVariable().setName("$process_time_next_" + fqn.toString('_')).setDefaultValue(HDLLiteral.get(0));
+			nextTimeDecl = nextTimeDecl.addVariables(nexTimeVar);
+			HDLVariableDeclaration processStateDecl = new HDLVariableDeclaration().setPrimitive(HDLPrimitive.getNatural());
+			final HDLVariable processStateVar = new HDLVariable().setName("$proces_state_" + fqn.toString('_')).setDefaultValue(HDLLiteral.get(0));
+			processStateDecl = processStateDecl.addVariables(processStateVar);
+			ms.addTo(insulin, HDLUnit.fInits, nextTimeDecl, processStateDecl);
+			final HDLSwitchStatement processSwitch = new HDLSwitchStatement().setCaseExp(processStateVar.asHDLRef());
+			final ArrayList<HDLStatement> statements = process.getStatements();
+			for (final HDLStatement hdlStatement : statements) {
+
+			}
+		}
+		return ms.apply(insulin);
+	}
+
+	private static HDLUnit addTimeVar(HDLUnit insulin) {
+		final ModificationSet ms = new ModificationSet();
+		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setPrimitive(HDLPrimitive.getUint().setWidth(HDLLiteral.get(64)));
+		hvd = hvd.addVariables(new HDLVariable().setName("$time").setDefaultValue(HDLLiteral.get(0)));
+		ms.addTo(insulin, HDLUnit.fInits, hvd);
+		return ms.apply(insulin);
 	}
 
 	private static HDLUnit convertBooleanLiterals(HDLEvaluationContext context, HDLUnit insulin) {
