@@ -514,7 +514,7 @@ public class CommonCompilerExtension {
       String _substring = name.substring(0, _minus);
       res = _substring;
     }
-    String _replaceAll = res.replaceAll("[\\.\\$\\@]+", "_");
+    String _replaceAll = res.replaceAll("[\\.\\$\\@\\/]+", "_");
     String _replaceAll_1 = _replaceAll.replaceAll("\\{", "Bit");
     String _replaceAll_2 = _replaceAll_1.replaceAll("\\}", "");
     String _replaceAll_3 = _replaceAll_2.replaceAll(":", "to");

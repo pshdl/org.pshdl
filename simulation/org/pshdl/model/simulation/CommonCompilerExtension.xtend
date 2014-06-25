@@ -240,7 +240,7 @@ class CommonCompilerExtension {
 		val isReg = name.endsWith("$reg")
 		if (isReg)
 			res = name.substring(0, name.length - 4)
-		res = res.replaceAll("[\\.\\$\\@]+", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
+		res = res.replaceAll("[\\.\\$\\@\\/]+", "_").replaceAll('\\{', 'Bit').replaceAll('\\}', '').replaceAll(':', 'to').
 			replaceAll('\\[', 'arr').replaceAll('\\]', '')
 		if (res.startsWith("#"))
 			res = res.substring(1)
