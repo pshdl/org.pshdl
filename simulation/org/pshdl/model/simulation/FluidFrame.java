@@ -124,17 +124,18 @@ public class FluidFrame {
 	public final LinkedList<ArgumentedInstruction> instructions = new LinkedList<ArgumentedInstruction>();
 	public String outputName;
 	public final boolean constant;
+	public final String simProcess;
 
 	public final Set<FluidFrame> references = new LinkedHashSet<FluidFrame>();
 	public final Map<String, VariableInformation> vars = new TreeMap<String, VariableInformation>();
 
 	public String[] annotations;
 
-	public FluidFrame() {
-		this(null, false);
+	public FluidFrame(String simProcess) {
+		this(null, false, simProcess);
 	}
 
-	public FluidFrame(String outputName, boolean constant) {
+	public FluidFrame(String outputName, boolean constant, String simProcess) {
 		this.id = gid.incrementAndGet();
 		if (outputName != null) {
 			this.outputName = outputName;
@@ -142,6 +143,7 @@ public class FluidFrame {
 			this.outputName = Integer.toString(id);
 		}
 		this.constant = constant;
+		this.simProcess = simProcess;
 	}
 
 	public void add(ArgumentedInstruction argumentedInstruction) {
@@ -489,7 +491,7 @@ public class FluidFrame {
 			final FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
 			final BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
 			final Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id,
-					constant, -1);
+					constant, -1, simProcess);
 			for (final FluidFrame ff : references) {
 				ff.toFrame(register);
 			}

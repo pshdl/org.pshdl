@@ -61,7 +61,7 @@ public class TestbenchFunctions implements IHDLFunctionResolver {
 				break;
 			case waitFor:
 				if (function.getParams().size() == 2)
-					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getNatural(), PSHDLLib.TIMEUNIT);
 				break;
 			case waitUntil:
 				if (function.getParams().size() == 1)
@@ -69,7 +69,7 @@ public class TestbenchFunctions implements IHDLFunctionResolver {
 				break;
 			case pulse:
 				if (function.getParams().size() == 3)
-					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit(), HDLPrimitive.getUint(), PSHDLLib.TIMEUNIT);
+					return new HDLTypeInferenceInfo(HDLPrimitive.getBool(), HDLPrimitive.getBit(), HDLPrimitive.getNatural(), PSHDLLib.TIMEUNIT);
 				break;
 			}
 		} catch (final Exception e) {

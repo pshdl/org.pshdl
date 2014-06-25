@@ -358,8 +358,19 @@ public class HDLPrimitives {
 	}
 
 	private HDLTypeInferenceInfo normalize(HDLTypeInferenceInfo info, HDLExpression op) {
-		if (info.result instanceof HDLPrimitive) {
-			HDLPrimitive result = (HDLPrimitive) info.result;
+		info.result = normalizeType(op, info.result);
+		if (info.args != null) {
+			final HDLType[] args = info.args;
+			for (int i = 0; i < args.length; i++) {
+				args[i] = normalizeType(op, args[i]);
+			}
+		}
+		return info;
+	}
+
+	public HDLType normalizeType(HDLExpression op, HDLType arg) {
+		if (arg instanceof HDLPrimitive) {
+			HDLPrimitive result = (HDLPrimitive) arg;
 			if (result.getWidth() != null) {
 				switch (result.getType()) {
 				case BIT:
@@ -387,9 +398,9 @@ public class HDLPrimitives {
 				default:
 				}
 			}
-			info.result = result.setContainer(op);
+			arg = result.copyDeepFrozen(op);
 		}
-		return info;
+		return arg;
 	}
 
 	private HDLExpression getWidth(IHDLObject exp, HDLArithOpType type, HDLTypeInferenceInfo info) {

@@ -96,9 +96,13 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 	}
 
 	// $CONTENT-BEGIN$
-	public HDLAnnotation getAnnotation(Enum<?> range) {
+	public HDLAnnotation getAnnotation(Enum<?> e) {
+		return getAnnotation('@' + e.name());
+	}
+
+	public HDLAnnotation getAnnotation(String name) {
 		for (final HDLAnnotation anno : getAnnotations())
-			if (anno.getName().equals(range.toString()))
+			if (anno.getName().equals(name))
 				return anno;
 		return null;
 	}

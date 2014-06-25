@@ -114,7 +114,18 @@ public class HDLAnnotation extends AbstractHDLAnnotation {
 			return fValue;
 		return super.getContainingFeature(obj);
 	}
+
 	// $CONTENT-BEGIN$
+	@Override
+	protected String validateName(String name) {
+		final String validateName = super.validateName(name);
+		if (validateName.isEmpty())
+			throw new IllegalArgumentException("The empty string is not a valid annotation name");
+		if (validateName.charAt(0) != '@')
+			throw new IllegalArgumentException("Annotation names have to start with an '@'");
+		return validateName;
+	}
+
 	// $CONTENT-END$
 
 }

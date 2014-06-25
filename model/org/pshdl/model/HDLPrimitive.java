@@ -265,6 +265,28 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		return bits.contains(getType());
 	}
 
+	@Override
+	protected HDLExpression validateWidth(HDLExpression width) {
+		if (getType() != null) {
+			switch (getType()) {
+			case BIT:
+			case BOOL:
+			case INTEGER:
+			case NATURAL:
+			case STRING:
+				if (width != null)
+					throw new IllegalArgumentException("Width should be null, but is:" + width);
+				break;
+			case BITVECTOR:
+			case INT:
+			case UINT:
+				if (width == null)
+					throw new IllegalArgumentException("Width can not be null");
+				break;
+			}
+		}
+		return super.validateWidth(width);
+	}
 	// $CONTENT-END$
 
 }

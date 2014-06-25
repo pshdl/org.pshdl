@@ -35,25 +35,35 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLAssignment;
+import org.pshdl.model.HDLAssignment.HDLAssignmentType;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLDeclaration;
+import org.pshdl.model.HDLEqualityOp;
+import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLForLoop;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLIfStatement.TreeSide;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLLiteral;
+import org.pshdl.model.HDLManip;
+import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLResolvedRef;
 import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLTernary;
 import org.pshdl.model.HDLType;
@@ -77,6 +87,8 @@ import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.Refactoring;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 public class HDLSimulator {
@@ -84,6 +96,10 @@ public class HDLSimulator {
 	public static HDLUnit createSimulationModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
 		if ((unit.getSimulation() != null) && unit.getSimulation())
 			return createTestbenchModel(unit, context, src, separator);
+		return createRegularSimModel(unit, context, src, separator);
+	}
+
+	private static HDLUnit createRegularSimModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
 		HDLUnit insulin = Insulin.transform(unit, src);
 		final HDLPackage pkg = flattenAll(context, insulin, separator);
 		insulin = getSingleUnit(pkg);
@@ -94,17 +110,50 @@ public class HDLSimulator {
 		insulin = convertBooleanLiterals(context, insulin);
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
-		// TODO Rewrite highZ function
 		insulin = removeDeadLeaves(context, insulin);
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return insulin;
 	}
 
+	public static final HDLAnnotation TB_VAR = new HDLAnnotation().setName("@TestbenchVar");
+	public static final HDLAnnotation TB_UNIT = new HDLAnnotation().setName("@Testbench");
+
+	/**
+	 * General outline:
+	 *
+	 * <ul>
+	 * <li>Create a global variable $time
+	 * <li>Foreach process create 2 variables: process_state, process_time
+	 * <li>Split process into state machine
+	 * </ul>
+	 *
+	 * Execution then by:
+	 * <ul>
+	 * <li>Run all processes methods until $process_time > $time or
+	 * $process_state < 0 (is blocked)
+	 * <li>Run logic
+	 * </ul>
+	 *
+	 */
 	private static HDLUnit createTestbenchModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
 		HDLUnit insulin = Insulin.transform(unit, src);
 		insulin = addTimeVar(insulin);
 		insulin = rewriteProcesses(insulin);
-		return insulin;
+		insulin = annotateVariableDeclarations(insulin);
+		insulin = insulin.addAnnotations(TB_UNIT).copyDeepFrozen(insulin.getContainer());
+		insulin.validateAllFields(insulin.getContainer(), true);
+		return createRegularSimModel(insulin, context, src, separator);
+	}
+
+	private static HDLUnit annotateVariableDeclarations(HDLUnit insulin) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLVariableDeclaration[] hvds = insulin.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (final HDLVariableDeclaration hdlVariableDeclaration : hvds) {
+			if (hdlVariableDeclaration.getAnnotation(TB_VAR.getName()) == null) {
+				ms.replace(hdlVariableDeclaration, hdlVariableDeclaration.addAnnotations(TB_VAR));
+			}
+		}
+		return ms.apply(insulin);
 	}
 
 	private static HDLUnit rewriteProcesses(HDLUnit insulin) {
@@ -112,27 +161,176 @@ public class HDLSimulator {
 		final Collection<HDLBlock> processes = HDLQuery.select(HDLBlock.class).from(insulin).where(HDLBlock.fProcess).isEqualTo(Boolean.TRUE).getAll();
 		for (final HDLBlock process : processes) {
 			final HDLQualifiedName fqn = FullNameExtension.fullNameOf(process);
-			HDLVariableDeclaration nextTimeDecl = new HDLVariableDeclaration().setPrimitive(HDLPrimitive.getUint().setWidth(HDLLiteral.get(64)));
-			final HDLVariable nexTimeVar = new HDLVariable().setName("$process_time_next_" + fqn.toString('_')).setDefaultValue(HDLLiteral.get(0));
-			nextTimeDecl = nextTimeDecl.addVariables(nexTimeVar);
-			HDLVariableDeclaration processStateDecl = new HDLVariableDeclaration().setPrimitive(HDLPrimitive.getNatural());
-			final HDLVariable processStateVar = new HDLVariable().setName("$proces_state_" + fqn.toString('_')).setDefaultValue(HDLLiteral.get(0));
+			HDLVariableDeclaration processNextTimeDecl = new HDLVariableDeclaration().setType(HDLPrimitive.getUint().setWidth(HDLLiteral.get(64)));
+			final HDLVariable processNexTimeVar = new HDLVariable().setName("$process_time_next_" + fqn.getLastSegment()).setDefaultValue(HDLLiteral.get(0));
+			processNextTimeDecl = processNextTimeDecl.addVariables(processNexTimeVar);
+			HDLVariableDeclaration processStateDecl = new HDLVariableDeclaration().setType(HDLPrimitive.getInteger());
+			final HDLVariable processStateVar = new HDLVariable().setName("$process_state_" + fqn.getLastSegment()).setDefaultValue(HDLLiteral.get(0));
 			processStateDecl = processStateDecl.addVariables(processStateVar);
-			ms.addTo(insulin, HDLUnit.fInits, nextTimeDecl, processStateDecl);
-			final HDLSwitchStatement processSwitch = new HDLSwitchStatement().setCaseExp(processStateVar.asHDLRef());
-			final ArrayList<HDLStatement> statements = process.getStatements();
-			for (final HDLStatement hdlStatement : statements) {
-
+			ms.addTo(insulin, HDLUnit.fInits, processNextTimeDecl, processStateDecl);
+			final Map<Integer, List<HDLStatement>> cases = Maps.newHashMap();
+			int currentCase = 0;
+			cases.put(currentCase, Lists.<HDLStatement> newArrayList());
+			for (final HDLStatement stmnt : process.getStatements()) {
+				currentCase = processStatement(cases, stmnt, currentCase, processStateVar, processNexTimeVar, ms);
 			}
+			cases.get(currentCase).add(new HDLAssignment().setLeft(processStateVar.asHDLRef()).setRight(HDLLiteral.get(0)));
+			final HDLSwitchStatement processSwitch = new HDLSwitchStatement().setCaseExp(processStateVar.asHDLRef());
+			final List<HDLSwitchCaseStatement> caseList = Lists.newArrayList();
+			for (final Entry<Integer, List<HDLStatement>> e : cases.entrySet()) {
+				final HDLSwitchCaseStatement caseStatement = new HDLSwitchCaseStatement().setLabel(HDLLiteral.get(e.getKey())).setDos(e.getValue());
+				caseList.add(caseStatement);
+			}
+			final HDLSwitchStatement finalSwitch = processSwitch.setCases(caseList);
+			ms.replace(process, new HDLBlock().setProcess(true).addStatements(finalSwitch));
 		}
 		return ms.apply(insulin);
 	}
 
+	private static int processStatement(Map<Integer, List<HDLStatement>> cases, HDLStatement stmnt, int currentCase, HDLVariable processStateVar, HDLVariable processNexTimeVar,
+			ModificationSet ms) {
+		final List<HDLStatement> currentCaseList = cases.get(currentCase);
+		switch (stmnt.getClassType()) {
+		case HDLAssignment:
+			currentCaseList.add(stmnt);
+			break;
+		case HDLFunctionCall:
+			final HDLFunctionCall hfc = (HDLFunctionCall) stmnt;
+			final Optional<HDLFunction> func = hfc.resolveName();
+			if (func.isPresent()) {
+				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(func.get());
+				final ArrayList<HDLExpression> params = hfc.getParams();
+				if (fqn.equals(HDLQualifiedName.create("pshdl", "waitFor"))) {
+					final HDLExpression amount = params.get(0);
+					currentCase = waitFor(cases, currentCase, processStateVar, processNexTimeVar, amount);
+				}
+				if (fqn.equals(HDLQualifiedName.create("pshdl", "waitUntil"))) {
+					final int waitCase = currentCase = newCase(cases, currentCase);
+					insertJump(currentCaseList, processStateVar, waitCase);
+					final List<HDLStatement> list = cases.get(waitCase);
+					currentCase = newCase(cases, currentCase);
+					final HDLTernary tern = new HDLTernary().setIfExpr(params.get(0))//
+							.setThenExpr(toInteger(currentCase))//
+							.setElseExpr(toInteger(-(waitCase + 1)));
+					list.add(new HDLAssignment().setLeft(processStateVar.asHDLRef()).setRight(tern));
+				}
+				if (fqn.equals(HDLQualifiedName.create("pshdl", "wait"))) {
+					// Create a new case so that the goto 0 case has some place
+					// to go
+					currentCase = newCase(cases, currentCase);
+					insertJump(currentCaseList, processStateVar, 0x7FFF_FFFF);
+				}
+				if (fqn.equals(HDLQualifiedName.create("pshdl", "pulse"))) {
+					final HDLReference var = (HDLReference) params.get(0);
+					final HDLExpression amount = params.get(1);
+					final HDLAssignment setZero = new HDLAssignment().setLeft(var).setRight(HDLLiteral.get(0));
+					processStatement(cases, setZero, currentCase, processStateVar, processNexTimeVar, ms);
+					currentCase = waitFor(cases, currentCase, processStateVar, processNexTimeVar, amount);
+					final HDLAssignment setOne = new HDLAssignment().setLeft(var).setRight(HDLLiteral.get(1));
+					processStatement(cases, setOne, currentCase, processStateVar, processNexTimeVar, ms);
+					currentCase = waitFor(cases, currentCase, processStateVar, processNexTimeVar, amount);
+				}
+
+			}
+			break;
+		case HDLIfStatement: {
+			final HDLIfStatement ifStmnt = (HDLIfStatement) stmnt;
+			final int thenCase = currentCase = newCase(cases, currentCase);
+			for (final HDLStatement hdlStatement : ifStmnt.getThenDo()) {
+				currentCase = processStatement(cases, hdlStatement, currentCase, processStateVar, processNexTimeVar, ms);
+			}
+			final int thenExitCase = currentCase;
+			final int elseCase = currentCase = newCase(cases, currentCase);
+			for (final HDLStatement hdlStatement : ifStmnt.getElseDo()) {
+				currentCase = processStatement(cases, hdlStatement, currentCase, processStateVar, processNexTimeVar, ms);
+			}
+			final int elseExitCase = currentCase;
+			final int targetCase = currentCase = newCase(cases, currentCase);
+			final HDLTernary tern = new HDLTernary().setIfExpr(ifStmnt.getIfExp())//
+					.setThenExpr(HDLLiteral.get(thenCase)) //
+					.setElseExpr(HDLLiteral.get(elseCase));
+			final HDLAssignment switchJump = new HDLAssignment().setLeft(processStateVar.asHDLRef()).setRight(tern);
+			currentCaseList.add(switchJump);
+			insertJump(cases.get(thenExitCase), processStateVar, targetCase);
+			insertJump(cases.get(elseExitCase), processStateVar, targetCase);
+			break;
+		}
+		case HDLForLoop: {
+			final HDLForLoop loop = (HDLForLoop) stmnt;
+			final String fqn = FullNameExtension.fullNameOf(loop.getParam()).toString('_');
+			final HDLVariable loopVar = loop.getParam().setName(fqn);
+			final HDLRange range = loop.getRange().get(0);
+			new HDLAssignment().setLeft(loopVar.asHDLRef()).setRight(range.getFrom());
+			int condCase;
+			if (currentCaseList.isEmpty()) {
+				condCase = currentCase;
+			} else {
+				condCase = currentCase = newCase(cases, currentCase);
+				insertJump(currentCaseList, processStateVar, condCase);
+			}
+			HDLVariableDeclaration idxDecl = new HDLVariableDeclaration().setType(HDLPrimitive.getNatural());
+			final HDLVariable idxVar = new HDLVariable().setName(fqn);
+			idxDecl = idxDecl.addVariables(idxVar);
+			ms.addTo(loop.getContainer(HDLUnit.class), HDLUnit.fInits, idxDecl);
+			final HDLForLoop newLoop = Refactoring.renameVariable(loop.getParam(), fqn, loop);
+			final int execCase = currentCase = newCase(cases, currentCase);
+			for (final HDLStatement doStatement : newLoop.getDos()) {
+				currentCase = processStatement(cases, doStatement, currentCase, processStateVar, processNexTimeVar, ms);
+			}
+			final List<HDLStatement> caseList = cases.get(currentCase);
+			caseList.add(new HDLAssignment().setLeft(idxVar.asHDLRef()).setType(HDLAssignmentType.ADD_ASSGN).setRight(HDLLiteral.get(1)));
+			insertJump(caseList, processStateVar, condCase);
+			final int exitCase = currentCase = newCase(cases, currentCase);
+			final HDLTernary tern = new HDLTernary().setIfExpr(new HDLEqualityOp().setLeft(loopVar.asHDLRef()).setType(HDLEqualityOpType.GREATER_EQ).setRight(range.getTo()))//
+					.setThenExpr(HDLLiteral.get(execCase)) //
+					.setElseExpr(HDLLiteral.get(exitCase));
+			final HDLAssignment switchJump = new HDLAssignment().setLeft(processStateVar.asHDLRef()).setRight(tern);
+			cases.get(condCase).add(switchJump);
+			break;
+		}
+		case HDLBlock: {
+			final HDLBlock block = (HDLBlock) stmnt;
+			for (final HDLStatement sub : block.getStatements()) {
+				processStatement(cases, sub, currentCase, processStateVar, processNexTimeVar, ms);
+			}
+			break;
+		}
+		case HDLSwitchStatement:
+			throw new IllegalArgumentException("Switch cases are currently not supported in Testbench processes");
+		default:
+			break;
+		}
+		return currentCase;
+	}
+
+	public static HDLManip toInteger(int target) {
+		return new HDLManip().setTarget(HDLLiteral.get(target)).setType(HDLManipType.CAST).setCastTo(HDLPrimitive.getInteger());
+	}
+
+	public static int waitFor(Map<Integer, List<HDLStatement>> cases, int currentCase, HDLVariable processStateVar, HDLVariable processNexTimeVar, HDLExpression amount) {
+		final List<HDLStatement> currentCaseList = cases.get(currentCase);
+		currentCaseList.add(new HDLAssignment().setLeft(processNexTimeVar.asHDLRef()).setType(HDLAssignmentType.ADD_ASSGN).setRight(amount));
+		final int timeCase = currentCase = newCase(cases, currentCase);
+		insertJump(currentCaseList, processStateVar, timeCase);
+		return currentCase;
+	}
+
+	public static void insertJump(final List<HDLStatement> caseList, HDLVariable processStateVar, final int targetCase) {
+		caseList.add(new HDLAssignment().setLeft(processStateVar.asHDLRef()).setRight(HDLLiteral.get(targetCase)));
+	}
+
+	public static int newCase(Map<Integer, List<HDLStatement>> cases, int currentCase) {
+		final int targetCase = currentCase + 1;
+		cases.put(targetCase, Lists.<HDLStatement> newArrayList());
+		return targetCase;
+	}
+
 	private static HDLUnit addTimeVar(HDLUnit insulin) {
 		final ModificationSet ms = new ModificationSet();
-		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setPrimitive(HDLPrimitive.getUint().setWidth(HDLLiteral.get(64)));
+		HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getUint().setWidth(HDLLiteral.get(64)));
 		hvd = hvd.addVariables(new HDLVariable().setName("$time").setDefaultValue(HDLLiteral.get(0)));
 		ms.addTo(insulin, HDLUnit.fInits, hvd);
+		// TODO Unify time base
 		return ms.apply(insulin);
 	}
 

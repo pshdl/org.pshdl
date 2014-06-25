@@ -26,27 +26,28 @@
  ******************************************************************************/
 package org.pshdl.model.simulation
 
-import org.pshdl.interpreter.ExecutableModel
-import org.pshdl.interpreter.VariableInformation
-import org.pshdl.interpreter.InternalInformation
-import org.pshdl.interpreter.Frame
-import org.pshdl.interpreter.Frame$FastInstruction
-import org.pshdl.interpreter.utils.Instruction
-import java.util.Stack
-import java.util.Set
-import java.util.List
-import java.util.LinkedList
-import java.util.HashMap
-import java.util.Map
-import java.util.ArrayList
-import java.util.HashSet
-import org.apache.commons.cli.Options
-import org.apache.commons.cli.CommandLine
-import org.pshdl.model.validation.Problem
 import com.google.common.collect.Lists
+import java.util.ArrayList
 import java.util.Collections
+import java.util.HashMap
+import java.util.HashSet
+import java.util.LinkedList
+import java.util.List
+import java.util.Map
+import java.util.Map.Entry
+import java.util.Set
+import java.util.Stack
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.cli.Options
+import org.pshdl.interpreter.ExecutableModel
+import org.pshdl.interpreter.Frame
+import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.VariableInformation
+import org.pshdl.interpreter.utils.Instruction
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
+import org.pshdl.model.validation.Problem
 
 class JavaCompiler implements ITypeOuptutProvider {
 	private boolean debug
@@ -76,7 +77,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 			«IF packageName !== null»package «packageName»;«ENDIF»
 			«imports»
 			
-			public class «unitName» implements IHDLInterpreter{
+			public class «unitName» implements «IF em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»{
 				«IF hasClock»
 					private static class RegUpdate {
 						public final int internalID;
@@ -187,90 +188,114 @@ class JavaCompiler implements ITypeOuptutProvider {
 						return true;
 					}
 				«ENDIF»
-				public void run(){
-					deltaCycle++;
-					«IF hasClock»
-						epsCycle=0;
-						do {
-							regUpdates.clear();
-					«ENDIF»
-					«IF debug»
-						if (listener!=null)
-							listener.startCycle(deltaCycle, epsCycle, this);
-					«ENDIF»
-					«FOR f : em.frames»
-						«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 && f.predNegDepRes.length == 0 &&
-				f.predPosDepRes.length == 0»
-							«f.frameName»();
-						«ELSE»
-							«f.edgeNegDepRes.createNegEdge(handled)»
-							«f.edgePosDepRes.createPosEdge(handled)»
-							«FOR p : f.predNegDepRes»
-								«p.createBooleanPred(handled)»
-							«ENDFOR»
-							«FOR p : f.predPosDepRes»
-								«p.createBooleanPred(handled)»
-							«ENDFOR»
-							if («f.predicates»)
-								«f.frameName»();
-						«ENDIF»
-					«ENDFOR»
-					«IF hasClock»
-						updateRegs();
-						«IF debug»
-							if (listener!=null && !regUpdates.isEmpty())
-								listener.copyingRegisterValues(this);
-						«ENDIF»
-						epsCycle++;
-						} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);
-					«ENDIF»
-					«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) !== null]»
-						«v.copyPrev»
-					«ENDFOR»
-					«IF debug»
-						if (listener!=null)
-							listener.doneCycle(deltaCycle, this);
-					«ENDIF»
-				}
-				«IF hasClock»
-					«copyRegs»
+				«em.runMethod(handled)»
+				«IF !em.processframes.empty»
+					«em.testbenchMethod(handled)»
 				«ENDIF»
-				«hdlInterpreter»
 			}
 		'''
 	}
 
-	def predicates(Frame f) {
-		val sb = new StringBuilder
-		var first = true;
-		if (f.edgeNegDepRes != -1) {
-			sb.append(
-				'''«f.edgeNegDepRes.asInternal.idName(false, false)»_isFalling && !«f.edgeNegDepRes.asInternal.
-					idName(false, false)»_fallingIsHandled''')
-			first = false
-		}
-		if (f.edgePosDepRes != -1) {
-			if (!first)
-				sb.append(' && ')
-			sb.append(
-				'''«f.edgePosDepRes.asInternal.idName(false, false)»_isRising&& !«f.edgePosDepRes.asInternal.
-					idName(false, false)»_risingIsHandled''')
-			first = false
-		}
-		for (p : f.predNegDepRes) {
-			if (!first)
-				sb.append(' && ')
-			sb.append('''!p«p» && p«p»_fresh''')
-			first = false
-		}
-		for (p : f.predPosDepRes) {
-			if (!first)
-				sb.append(' && ')
-			sb.append('''p«p» && p«p»_fresh''')
-			first = false
-		}
-		return sb.toString
+	def testbenchMethod(ExecutableModel model, Set<Integer> handled) {
+		val Map<String, CharSequence> processes = model.processframes.map[process].toInvertedMap['''''']
+		model.processframes.forEach[
+			processes.put(it.process,
+				processes.get(it.process) + '''
+					«callFrame(it, handled)»
+				''')]
+		return '''
+			«FOR Map.Entry<String, CharSequence> e : processes.entrySet»
+				private boolean runProcess_«e.key»(){
+					long oldTime=«processTime(model, e.key)»;
+					long oldState=«processState(model, e.key)»;
+					while («model.varByName("$time")»>=«processTime(model, e.key)» && 
+							«processState(model, e.key)»>=0 &&
+							«processState(model, e.key)»!= 0x7FFF_FFFF) {
+						«e.value»
+					}
+					return (oldTime != «processTime(model, e.key)») || (oldState != «processState(model, e.key)»);
+				}
+			«ENDFOR»
+			public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener) {
+				long stepCount=0;
+				while («model.varByName("$time")»<=maxTime && stepCount<maxSteps) {
+					boolean modified=false;
+					do {
+						modified = false;
+						«FOR CharSequence e : processes.keySet»
+							if (runProcess_«e»())
+								modified=true;
+						«ENDFOR»
+					} while (modified);
+					run();
+					stepCount++;
+					long nextTime=Long.MAX_VALUE;
+					«FOR CharSequence e : processes.keySet»
+					if («processState(model, e)» >= 0 && «processState(model, e)» != 0x7FFF_FFFF)
+						nextTime=Math.min(nextTime, «processTime(model, e)»);
+					«ENDFOR»
+					«model.varByName("$time")»=nextTime;
+					if (listener!=null && !listener.nextStep(«model.varByName("$time")», stepCount))
+						break;
+				}
+			}
+		'''
 	}
+
+	def runMethod(ExecutableModel model, Set<Integer> handled) '''
+		public void run(){
+			deltaCycle++;
+			«IF hasClock»
+				epsCycle=0;
+				do {
+					regUpdates.clear();
+			«ENDIF»
+			«IF debug»
+				if (listener!=null)
+					listener.startCycle(deltaCycle, epsCycle, this);
+			«ENDIF»
+			«FOR f : em.nonProcessframes»
+				«callFrame(f, handled)»
+			«ENDFOR»
+			«IF hasClock»
+				updateRegs();
+				«IF debug»
+					if (listener!=null && !regUpdates.isEmpty())
+						listener.copyingRegisterValues(this);
+				«ENDIF»
+				epsCycle++;
+				} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);
+			«ENDIF»
+			«FOR v : em.variables.excludeNull.filter[prevMap.get(it.name) !== null]»
+				«v.copyPrev»
+			«ENDFOR»
+			«IF debug»
+				if (listener!=null)
+					listener.doneCycle(deltaCycle, this);
+			«ENDIF»
+		}
+		«IF hasClock»
+			«copyRegs»
+		«ENDIF»
+		«hdlInterpreter»
+	'''
+
+	def callFrame(Frame f, Set<Integer> handled) '''«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 &&
+		f.predNegDepRes.length == 0 && f.predPosDepRes.length == 0»
+			«f.frameName»();
+		«ELSE»
+			«f.edgeNegDepRes.createNegEdge(handled)»
+			«f.edgePosDepRes.createPosEdge(handled)»
+			«FOR p : f.predNegDepRes»
+				«p.createBooleanPred(handled)»
+			«ENDFOR»
+			«FOR p : f.predPosDepRes»
+				«p.createBooleanPred(handled)»
+			«ENDFOR»
+			if («f.predicateConditions»)
+				«f.frameName»();
+		«ENDIF»'''
+
 
 	def createBooleanPred(int id, Set<Integer> handled) {
 		if (handled.contains(id))
@@ -692,6 +717,11 @@ class JavaCompiler implements ITypeOuptutProvider {
 				sb.append(twoOp('-', inst.arg1, pos, a, b))
 			case Instruction.mul:
 				sb.append(twoOp('*', inst.arg1, pos, a, b))
+			case Instruction.mod:
+				sb.append(twoOp('%', inst.arg1, pos, a, b))
+			case Instruction.pow:
+			//it is always 2**x which is the same as 1<<(x-1)
+				sb.append('''long t«pos»=1 << (t«a»-1);''')
 			case Instruction.div:
 				sb.append(twoOp('/', inst.arg1, pos, a, b))
 			case Instruction.sll:

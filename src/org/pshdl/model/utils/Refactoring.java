@@ -492,7 +492,12 @@ public class Refactoring {
 		final ModificationSet subMS = new ModificationSet();
 		final HDLVariable[] vars = subUnit.getAllObjectsOf(HDLVariable.class, true);
 		for (final HDLVariable hdlVariable : vars) {
-			final String newName = prefix + separator + hdlVariable.getName();
+			final String newName;
+			if (hdlVariable.getDirection() == HDLDirection.PARAMETER) {
+				newName = prefix + '_' + hdlVariable.getName();
+			} else {
+				newName = prefix + separator + hdlVariable.getName();
+			}
 			Refactoring.renameVariable(hdlVariable, HDLQualifiedName.create(newName), subUnit, subMS);
 		}
 		subUnit = subMS.apply(subUnit);

@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import org.apache.commons.cli.CommandLine;
@@ -43,6 +44,7 @@ import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -50,6 +52,7 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
+import org.pshdl.model.simulation.HDLSimulator;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.utils.PSAbstractCompiler;
 import org.pshdl.model.utils.services.IHDLGenerator;
@@ -103,7 +106,18 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.newLine();
       _builder.append("public class ");
       _builder.append(unitName, "");
-      _builder.append(" implements IHDLInterpreter{");
+      _builder.append(" implements ");
+      {
+        String _name = HDLSimulator.TB_UNIT.getName();
+        String _substring = _name.substring(1);
+        boolean _contains = ((List<String>)Conversions.doWrapArray(this.cce.em.annotations)).contains(_substring);
+        if (_contains) {
+          _builder.append("IHDLTestbenchInterpreter");
+        } else {
+          _builder.append("IHDLInterpreter");
+        }
+      }
+      _builder.append("{");
       _builder.newLineIfNotEmpty();
       {
         if (this.cce.hasClock) {
@@ -606,168 +620,20 @@ public class JavaCompiler implements ITypeOuptutProvider {
         }
       }
       _builder.append("\t");
-      _builder.append("public void run(){");
-      _builder.newLine();
-      _builder.append("\t\t");
-      _builder.append("deltaCycle++;");
-      _builder.newLine();
-      {
-        if (this.cce.hasClock) {
-          _builder.append("\t\t");
-          _builder.append("epsCycle=0;");
-          _builder.newLine();
-          _builder.append("\t\t");
-          _builder.append("do {");
-          _builder.newLine();
-          _builder.append("\t\t");
-          _builder.append("\t");
-          _builder.append("regUpdates.clear();");
-          _builder.newLine();
-        }
-      }
-      {
-        if (this.debug) {
-          _builder.append("\t\t");
-          _builder.append("if (listener!=null)");
-          _builder.newLine();
-          _builder.append("\t\t");
-          _builder.append("\t");
-          _builder.append("listener.startCycle(deltaCycle, epsCycle, this);");
-          _builder.newLine();
-        }
-      }
-      {
-        for(final Frame f_1 : this.cce.em.frames) {
-          {
-            boolean _and_2 = false;
-            boolean _and_3 = false;
-            if (!((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1)))) {
-              _and_3 = false;
-            } else {
-              int _length = f_1.predNegDepRes.length;
-              boolean _equals_1 = (_length == 0);
-              _and_3 = _equals_1;
-            }
-            if (!_and_3) {
-              _and_2 = false;
-            } else {
-              int _length_1 = f_1.predPosDepRes.length;
-              boolean _equals_2 = (_length_1 == 0);
-              _and_2 = _equals_2;
-            }
-            if (_and_2) {
-              _builder.append("\t\t");
-              CharSequence _frameName = this.cce.getFrameName(f_1);
-              _builder.append(_frameName, "\t\t");
-              _builder.append("();");
-              _builder.newLineIfNotEmpty();
-            } else {
-              _builder.append("\t\t");
-              CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handled);
-              _builder.append(_createNegEdge, "\t\t");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t\t");
-              CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
-              _builder.append(_createPosEdge, "\t\t");
-              _builder.newLineIfNotEmpty();
-              {
-                for(final int p : f_1.predNegDepRes) {
-                  _builder.append("\t\t");
-                  CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
-                  _builder.append(_createBooleanPred, "\t\t");
-                  _builder.newLineIfNotEmpty();
-                }
-              }
-              {
-                for(final int p_1 : f_1.predPosDepRes) {
-                  _builder.append("\t\t");
-                  CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
-                  _builder.append(_createBooleanPred_1, "\t\t");
-                  _builder.newLineIfNotEmpty();
-                }
-              }
-              _builder.append("\t\t");
-              _builder.append("if (");
-              String _predicates = this.predicates(f_1);
-              _builder.append(_predicates, "\t\t");
-              _builder.append(")");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t\t");
-              _builder.append("\t");
-              CharSequence _frameName_1 = this.cce.getFrameName(f_1);
-              _builder.append(_frameName_1, "\t\t\t");
-              _builder.append("();");
-              _builder.newLineIfNotEmpty();
-            }
-          }
-        }
-      }
-      {
-        if (this.cce.hasClock) {
-          _builder.append("\t\t");
-          _builder.append("updateRegs();");
-          _builder.newLine();
-          {
-            if (this.debug) {
-              _builder.append("\t\t");
-              _builder.append("if (listener!=null && !regUpdates.isEmpty())");
-              _builder.newLine();
-              _builder.append("\t\t");
-              _builder.append("\t");
-              _builder.append("listener.copyingRegisterValues(this);");
-              _builder.newLine();
-            }
-          }
-          _builder.append("\t\t");
-          _builder.append("epsCycle++;");
-          _builder.newLine();
-          _builder.append("\t\t");
-          _builder.append("} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);");
-          _builder.newLine();
-        }
-      }
-      {
-        Iterable<VariableInformation> _excludeNull_2 = this.cce.excludeNull(this.cce.em.variables);
-        final Function1<VariableInformation, Boolean> _function_1 = new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            Boolean _get = JavaCompiler.this.cce.prevMap.get(it.name);
-            return Boolean.valueOf((_get != null));
-          }
-        };
-        Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(_excludeNull_2, _function_1);
-        for(final VariableInformation v_3 : _filter_1) {
-          _builder.append("\t\t");
-          String _copyPrev = this.copyPrev(v_3);
-          _builder.append(_copyPrev, "\t\t");
-          _builder.newLineIfNotEmpty();
-        }
-      }
-      {
-        if (this.debug) {
-          _builder.append("\t\t");
-          _builder.append("if (listener!=null)");
-          _builder.newLine();
-          _builder.append("\t\t");
-          _builder.append("\t");
-          _builder.append("listener.doneCycle(deltaCycle, this);");
-          _builder.newLine();
-        }
-      }
-      _builder.append("\t");
-      _builder.append("}");
-      _builder.newLine();
-      {
-        if (this.cce.hasClock) {
-          _builder.append("\t");
-          CharSequence _copyRegs = this.copyRegs();
-          _builder.append(_copyRegs, "\t");
-          _builder.newLineIfNotEmpty();
-        }
-      }
-      _builder.append("\t");
-      CharSequence _hdlInterpreter = this.hdlInterpreter();
-      _builder.append(_hdlInterpreter, "\t");
+      CharSequence _runMethod = this.runMethod(this.cce.em, handled);
+      _builder.append(_runMethod, "\t");
       _builder.newLineIfNotEmpty();
+      {
+        Iterable<Frame> _processframes = this.cce.getProcessframes(this.cce.em);
+        boolean _isEmpty = IterableExtensions.isEmpty(_processframes);
+        boolean _not = (!_isEmpty);
+        if (_not) {
+          _builder.append("\t");
+          String _testbenchMethod = this.testbenchMethod(this.cce.em, handled);
+          _builder.append(_testbenchMethod, "\t");
+          _builder.newLineIfNotEmpty();
+        }
+      }
       _builder.append("}");
       _builder.newLine();
       _xblockexpression = _builder;
@@ -775,69 +641,357 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public String predicates(final Frame f) {
-    final StringBuilder sb = new StringBuilder();
-    boolean first = true;
-    if ((f.edgeNegDepRes != (-1))) {
-      StringConcatenation _builder = new StringConcatenation();
-      InternalInformation _asInternal = this.cce.asInternal(f.edgeNegDepRes);
-      String _idName = this.cce.idName(_asInternal, false, false);
-      _builder.append(_idName, "");
-      _builder.append("_isFalling && !");
-      InternalInformation _asInternal_1 = this.cce.asInternal(f.edgeNegDepRes);
-      String _idName_1 = this.cce.idName(_asInternal_1, false, false);
-      _builder.append(_idName_1, "");
-      _builder.append("_fallingIsHandled");
-      sb.append(_builder);
-      first = false;
-    }
-    if ((f.edgePosDepRes != (-1))) {
-      if ((!first)) {
-        sb.append(" && ");
+  public String testbenchMethod(final ExecutableModel model, final Set<Integer> handled) {
+    Iterable<Frame> _processframes = this.cce.getProcessframes(model);
+    final Function1<Frame, String> _function = new Function1<Frame, String>() {
+      public String apply(final Frame it) {
+        return it.process;
       }
-      StringConcatenation _builder_1 = new StringConcatenation();
-      InternalInformation _asInternal_2 = this.cce.asInternal(f.edgePosDepRes);
-      String _idName_2 = this.cce.idName(_asInternal_2, false, false);
-      _builder_1.append(_idName_2, "");
-      _builder_1.append("_isRising&& !");
-      InternalInformation _asInternal_3 = this.cce.asInternal(f.edgePosDepRes);
-      String _idName_3 = this.cce.idName(_asInternal_3, false, false);
-      _builder_1.append(_idName_3, "");
-      _builder_1.append("_risingIsHandled");
-      sb.append(_builder_1);
-      first = false;
+    };
+    Iterable<String> _map = IterableExtensions.<Frame, String>map(_processframes, _function);
+    final Function1<String, CharSequence> _function_1 = new Function1<String, CharSequence>() {
+      public CharSequence apply(final String it) {
+        StringConcatenation _builder = new StringConcatenation();
+        return _builder.toString();
+      }
+    };
+    final Map<String, CharSequence> processes = IterableExtensions.<String, CharSequence>toInvertedMap(_map, _function_1);
+    Iterable<Frame> _processframes_1 = this.cce.getProcessframes(model);
+    final Procedure1<Frame> _function_2 = new Procedure1<Frame>() {
+      public void apply(final Frame it) {
+        CharSequence _get = processes.get(it.process);
+        StringConcatenation _builder = new StringConcatenation();
+        CharSequence _callFrame = JavaCompiler.this.callFrame(it, handled);
+        _builder.append(_callFrame, "");
+        _builder.newLineIfNotEmpty();
+        String _plus = (_get + _builder.toString());
+        processes.put(it.process, _plus);
+      }
+    };
+    IterableExtensions.<Frame>forEach(_processframes_1, _function_2);
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      Set<Map.Entry<String, CharSequence>> _entrySet = processes.entrySet();
+      for(final Map.Entry<String, CharSequence> e : _entrySet) {
+        _builder.append("private boolean runProcess_");
+        String _key = e.getKey();
+        _builder.append(_key, "");
+        _builder.append("(){");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        _builder.append("long oldTime=");
+        String _key_1 = e.getKey();
+        String _processTime = this.cce.processTime(model, _key_1);
+        _builder.append(_processTime, "\t");
+        _builder.append(";");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        _builder.append("long oldState=");
+        String _key_2 = e.getKey();
+        String _processState = this.cce.processState(model, _key_2);
+        _builder.append(_processState, "\t");
+        _builder.append(";");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        _builder.append("while (");
+        String _varByName = this.cce.varByName(model, "$time");
+        _builder.append(_varByName, "\t");
+        _builder.append(">=");
+        String _key_3 = e.getKey();
+        String _processTime_1 = this.cce.processTime(model, _key_3);
+        _builder.append(_processTime_1, "\t");
+        _builder.append(" && ");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t\t");
+        String _key_4 = e.getKey();
+        String _processState_1 = this.cce.processState(model, _key_4);
+        _builder.append(_processState_1, "\t\t\t");
+        _builder.append(">=0 &&");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t\t");
+        String _key_5 = e.getKey();
+        String _processState_2 = this.cce.processState(model, _key_5);
+        _builder.append(_processState_2, "\t\t\t");
+        _builder.append("!= 0x7FFF_FFFF) {");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t");
+        CharSequence _value = e.getValue();
+        _builder.append(_value, "\t\t");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        _builder.append("}");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("return (oldTime != ");
+        String _key_6 = e.getKey();
+        String _processTime_2 = this.cce.processTime(model, _key_6);
+        _builder.append(_processTime_2, "\t");
+        _builder.append(") || (oldState != ");
+        String _key_7 = e.getKey();
+        String _processState_3 = this.cce.processState(model, _key_7);
+        _builder.append(_processState_3, "\t");
+        _builder.append(");");
+        _builder.newLineIfNotEmpty();
+        _builder.append("}");
+        _builder.newLine();
+      }
     }
-    for (final int p : f.predNegDepRes) {
-      {
-        if ((!first)) {
-          sb.append(" && ");
+    _builder.append("public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("long stepCount=0;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("while (");
+    String _varByName_1 = this.cce.varByName(model, "$time");
+    _builder.append(_varByName_1, "\t");
+    _builder.append("<=maxTime && stepCount<maxSteps) {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t\t");
+    _builder.append("boolean modified=false;");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("do {");
+    _builder.newLine();
+    _builder.append("\t\t\t");
+    _builder.append("modified = false;");
+    _builder.newLine();
+    {
+      Set<String> _keySet = processes.keySet();
+      for(final CharSequence e_1 : _keySet) {
+        _builder.append("\t\t\t");
+        _builder.append("if (runProcess_");
+        _builder.append(e_1, "\t\t\t");
+        _builder.append("())");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t\t");
+        _builder.append("\t");
+        _builder.append("modified=true;");
+        _builder.newLine();
+      }
+    }
+    _builder.append("\t\t");
+    _builder.append("} while (modified);");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("run();");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("stepCount++;");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("long nextTime=Long.MAX_VALUE;");
+    _builder.newLine();
+    {
+      Set<String> _keySet_1 = processes.keySet();
+      for(final CharSequence e_2 : _keySet_1) {
+        _builder.append("\t\t");
+        _builder.append("if (");
+        String _processState_4 = this.cce.processState(model, e_2);
+        _builder.append(_processState_4, "\t\t");
+        _builder.append(" >= 0 && ");
+        String _processState_5 = this.cce.processState(model, e_2);
+        _builder.append(_processState_5, "\t\t");
+        _builder.append(" != 0x7FFF_FFFF)");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t");
+        _builder.append("\t");
+        _builder.append("nextTime=Math.min(nextTime, ");
+        String _processTime_3 = this.cce.processTime(model, e_2);
+        _builder.append(_processTime_3, "\t\t\t");
+        _builder.append(");");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t\t");
+    String _varByName_2 = this.cce.varByName(model, "$time");
+    _builder.append(_varByName_2, "\t\t");
+    _builder.append("=nextTime;");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t\t");
+    _builder.append("if (listener!=null && !listener.nextStep(");
+    String _varByName_3 = this.cce.varByName(model, "$time");
+    _builder.append(_varByName_3, "\t\t");
+    _builder.append(", stepCount))");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t\t\t");
+    _builder.append("break;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    return _builder.toString();
+  }
+  
+  public CharSequence runMethod(final ExecutableModel model, final Set<Integer> handled) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("public void run(){");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("deltaCycle++;");
+    _builder.newLine();
+    {
+      if (this.cce.hasClock) {
+        _builder.append("\t");
+        _builder.append("epsCycle=0;");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("do {");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("\t");
+        _builder.append("regUpdates.clear();");
+        _builder.newLine();
+      }
+    }
+    {
+      if (this.debug) {
+        _builder.append("\t");
+        _builder.append("if (listener!=null)");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("\t");
+        _builder.append("listener.startCycle(deltaCycle, epsCycle, this);");
+        _builder.newLine();
+      }
+    }
+    {
+      Iterable<Frame> _nonProcessframes = this.cce.getNonProcessframes(this.cce.em);
+      for(final Frame f : _nonProcessframes) {
+        _builder.append("\t");
+        CharSequence _callFrame = this.callFrame(f, handled);
+        _builder.append(_callFrame, "\t");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    {
+      if (this.cce.hasClock) {
+        _builder.append("\t");
+        _builder.append("updateRegs();");
+        _builder.newLine();
+        {
+          if (this.debug) {
+            _builder.append("\t");
+            _builder.append("if (listener!=null && !regUpdates.isEmpty())");
+            _builder.newLine();
+            _builder.append("\t");
+            _builder.append("\t");
+            _builder.append("listener.copyingRegisterValues(this);");
+            _builder.newLine();
+          }
         }
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("!p");
-        _builder_2.append(p, "");
-        _builder_2.append(" && p");
-        _builder_2.append(p, "");
-        _builder_2.append("_fresh");
-        sb.append(_builder_2);
-        first = false;
+        _builder.append("\t");
+        _builder.append("epsCycle++;");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("} while (!regUpdates.isEmpty() && !disabledRegOutputlogic);");
+        _builder.newLine();
       }
     }
-    for (final int p_1 : f.predPosDepRes) {
-      {
-        if ((!first)) {
-          sb.append(" && ");
+    {
+      Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+        public Boolean apply(final VariableInformation it) {
+          Boolean _get = JavaCompiler.this.cce.prevMap.get(it.name);
+          return Boolean.valueOf((_get != null));
         }
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("p");
-        _builder_2.append(p_1, "");
-        _builder_2.append(" && p");
-        _builder_2.append(p_1, "");
-        _builder_2.append("_fresh");
-        sb.append(_builder_2);
-        first = false;
+      };
+      Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(_excludeNull, _function);
+      for(final VariableInformation v : _filter) {
+        _builder.append("\t");
+        String _copyPrev = this.copyPrev(v);
+        _builder.append(_copyPrev, "\t");
+        _builder.newLineIfNotEmpty();
       }
     }
-    return sb.toString();
+    {
+      if (this.debug) {
+        _builder.append("\t");
+        _builder.append("if (listener!=null)");
+        _builder.newLine();
+        _builder.append("\t");
+        _builder.append("\t");
+        _builder.append("listener.doneCycle(deltaCycle, this);");
+        _builder.newLine();
+      }
+    }
+    _builder.append("}");
+    _builder.newLine();
+    {
+      if (this.cce.hasClock) {
+        CharSequence _copyRegs = this.copyRegs();
+        _builder.append(_copyRegs, "");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    CharSequence _hdlInterpreter = this.hdlInterpreter();
+    _builder.append(_hdlInterpreter, "");
+    _builder.newLineIfNotEmpty();
+    return _builder;
+  }
+  
+  public CharSequence callFrame(final Frame f, final Set<Integer> handled) {
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      boolean _and = false;
+      boolean _and_1 = false;
+      if (!((f.edgeNegDepRes == (-1)) && (f.edgePosDepRes == (-1)))) {
+        _and_1 = false;
+      } else {
+        int _length = f.predNegDepRes.length;
+        boolean _equals = (_length == 0);
+        _and_1 = _equals;
+      }
+      if (!_and_1) {
+        _and = false;
+      } else {
+        int _length_1 = f.predPosDepRes.length;
+        boolean _equals_1 = (_length_1 == 0);
+        _and = _equals_1;
+      }
+      if (_and) {
+        _builder.newLineIfNotEmpty();
+        CharSequence _frameName = this.cce.getFrameName(f);
+        _builder.append(_frameName, "");
+        _builder.append("();");
+        _builder.newLineIfNotEmpty();
+      } else {
+        CharSequence _createNegEdge = this.createNegEdge(f.edgeNegDepRes, handled);
+        _builder.append(_createNegEdge, "");
+        _builder.newLineIfNotEmpty();
+        CharSequence _createPosEdge = this.createPosEdge(f.edgePosDepRes, handled);
+        _builder.append(_createPosEdge, "");
+        _builder.newLineIfNotEmpty();
+        {
+          for(final int p : f.predNegDepRes) {
+            CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
+            _builder.append(_createBooleanPred, "");
+            _builder.newLineIfNotEmpty();
+          }
+        }
+        {
+          for(final int p_1 : f.predPosDepRes) {
+            CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
+            _builder.append(_createBooleanPred_1, "");
+            _builder.newLineIfNotEmpty();
+          }
+        }
+        _builder.append("if (");
+        String _predicateConditions = this.cce.predicateConditions(f);
+        _builder.append(_predicateConditions, "");
+        _builder.append(")");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        CharSequence _frameName_1 = this.cce.getFrameName(f);
+        _builder.append(_frameName_1, "\t");
+        _builder.append("();");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t");
+      }
+    }
+    return _builder;
   }
   
   public CharSequence createBooleanPred(final int id, final Set<Integer> handled) {
@@ -2296,113 +2450,126 @@ public class JavaCompiler implements ITypeOuptutProvider {
             String _twoOp_5 = this.twoOp("*", inst.arg1, pos, a, b);
             sb.append(_twoOp_5);
             break;
-          case div:
-            String _twoOp_6 = this.twoOp("/", inst.arg1, pos, a, b);
+          case mod:
+            String _twoOp_6 = this.twoOp("%", inst.arg1, pos, a, b);
             sb.append(_twoOp_6);
             break;
-          case sll:
-            String _twoOp_7 = this.twoOp("<<", inst.arg1, pos, a, b);
-            sb.append(_twoOp_7);
-            break;
-          case srl:
-            String _twoOp_8 = this.twoOp(">>>", inst.arg1, pos, a, b);
-            sb.append(_twoOp_8);
-            break;
-          case sra:
-            String _twoOp_9 = this.twoOp(">>", inst.arg1, pos, a, b);
-            sb.append(_twoOp_9);
-            break;
-          case eq:
+          case pow:
             StringConcatenation _builder_21 = new StringConcatenation();
-            _builder_21.append("boolean t");
+            _builder_21.append("long t");
             _builder_21.append(pos, "");
-            _builder_21.append("=t");
-            _builder_21.append(b, "");
-            _builder_21.append(" == t");
+            _builder_21.append("=1 << (t");
             _builder_21.append(a, "");
-            _builder_21.append(";");
+            _builder_21.append("-1);");
             sb.append(_builder_21);
             break;
-          case not_eq:
+          case div:
+            String _twoOp_7 = this.twoOp("/", inst.arg1, pos, a, b);
+            sb.append(_twoOp_7);
+            break;
+          case sll:
+            String _twoOp_8 = this.twoOp("<<", inst.arg1, pos, a, b);
+            sb.append(_twoOp_8);
+            break;
+          case srl:
+            String _twoOp_9 = this.twoOp(">>>", inst.arg1, pos, a, b);
+            sb.append(_twoOp_9);
+            break;
+          case sra:
+            String _twoOp_10 = this.twoOp(">>", inst.arg1, pos, a, b);
+            sb.append(_twoOp_10);
+            break;
+          case eq:
             StringConcatenation _builder_22 = new StringConcatenation();
             _builder_22.append("boolean t");
             _builder_22.append(pos, "");
             _builder_22.append("=t");
             _builder_22.append(b, "");
-            _builder_22.append(" != t");
+            _builder_22.append(" == t");
             _builder_22.append(a, "");
             _builder_22.append(";");
             sb.append(_builder_22);
             break;
-          case less:
+          case not_eq:
             StringConcatenation _builder_23 = new StringConcatenation();
             _builder_23.append("boolean t");
             _builder_23.append(pos, "");
             _builder_23.append("=t");
             _builder_23.append(b, "");
-            _builder_23.append(" < t");
+            _builder_23.append(" != t");
             _builder_23.append(a, "");
             _builder_23.append(";");
             sb.append(_builder_23);
             break;
-          case less_eq:
+          case less:
             StringConcatenation _builder_24 = new StringConcatenation();
             _builder_24.append("boolean t");
             _builder_24.append(pos, "");
             _builder_24.append("=t");
             _builder_24.append(b, "");
-            _builder_24.append(" <= t");
+            _builder_24.append(" < t");
             _builder_24.append(a, "");
             _builder_24.append(";");
             sb.append(_builder_24);
             break;
-          case greater:
+          case less_eq:
             StringConcatenation _builder_25 = new StringConcatenation();
             _builder_25.append("boolean t");
             _builder_25.append(pos, "");
             _builder_25.append("=t");
             _builder_25.append(b, "");
-            _builder_25.append(" > t");
+            _builder_25.append(" <= t");
             _builder_25.append(a, "");
             _builder_25.append(";");
             sb.append(_builder_25);
             break;
-          case greater_eq:
+          case greater:
             StringConcatenation _builder_26 = new StringConcatenation();
             _builder_26.append("boolean t");
             _builder_26.append(pos, "");
             _builder_26.append("=t");
             _builder_26.append(b, "");
-            _builder_26.append(" >= t");
+            _builder_26.append(" > t");
             _builder_26.append(a, "");
             _builder_26.append(";");
             sb.append(_builder_26);
             break;
-          case isRisingEdge:
+          case greater_eq:
             StringConcatenation _builder_27 = new StringConcatenation();
-            InternalInformation _asInternal = this.cce.asInternal(inst.arg1);
-            String _idName_2 = this.cce.idName(_asInternal.info, false, false);
-            _builder_27.append(_idName_2, "");
-            _builder_27.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+            _builder_27.append("boolean t");
+            _builder_27.append(pos, "");
+            _builder_27.append("=t");
+            _builder_27.append(b, "");
+            _builder_27.append(" >= t");
+            _builder_27.append(a, "");
+            _builder_27.append(";");
             sb.append(_builder_27);
             break;
-          case isFallingEdge:
+          case isRisingEdge:
             StringConcatenation _builder_28 = new StringConcatenation();
-            InternalInformation _asInternal_1 = this.cce.asInternal(inst.arg1);
-            String _idName_3 = this.cce.idName(_asInternal_1.info, false, false);
-            _builder_28.append(_idName_3, "");
+            InternalInformation _asInternal = this.cce.asInternal(inst.arg1);
+            String _idName_2 = this.cce.idName(_asInternal.info, false, false);
+            _builder_28.append(_idName_2, "");
             _builder_28.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
             sb.append(_builder_28);
+            break;
+          case isFallingEdge:
+            StringConcatenation _builder_29 = new StringConcatenation();
+            InternalInformation _asInternal_1 = this.cce.asInternal(inst.arg1);
+            String _idName_3 = this.cce.idName(_asInternal_1.info, false, false);
+            _builder_29.append(_idName_3, "");
+            _builder_29.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
+            sb.append(_builder_29);
             break;
           default:
             break;
         }
       }
-      StringConcatenation _builder_29 = new StringConcatenation();
-      _builder_29.append("//");
-      _builder_29.append(inst, "");
-      _builder_29.newLineIfNotEmpty();
-      _xblockexpression = sb.append(_builder_29);
+      StringConcatenation _builder_30 = new StringConcatenation();
+      _builder_30.append("//");
+      _builder_30.append(inst, "");
+      _builder_30.newLineIfNotEmpty();
+      _xblockexpression = sb.append(_builder_30);
     }
     return _xblockexpression;
   }

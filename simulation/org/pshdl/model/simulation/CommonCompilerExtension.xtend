@@ -62,29 +62,29 @@ class CommonCompilerExtension {
 		}
 		this.hasClock = !prevMap.empty
 	}
-	
-	def String getJSONDescription(){
-		val intVar=new ArrayList
-		val inVar=new ArrayList
-		val inOutVar=new ArrayList
-		val outVar=new ArrayList
-		for (vi: em.variables){
-			switch (vi.dir){
+
+	def String getJSONDescription() {
+		val intVar = new ArrayList
+		val inVar = new ArrayList
+		val inOutVar = new ArrayList
+		val outVar = new ArrayList
+		for (vi : em.variables) {
+			switch (vi.dir) {
 				case IN: inVar.add(vi.toPort)
 				case INOUT: inOutVar.add(vi.toPort)
 				case OUT: outVar.add(vi.toPort)
 				case INTERNAL: intVar.add(vi.toPort)
 			}
 		}
-		return 
-'''{\"moduleName\":\"«em.moduleName»\",\"inPorts\":[«FOR port:inVar SEPARATOR ","»«port»«ENDFOR»],\"inOutPorts\":[«FOR port:inOutVar SEPARATOR ","»«port»«ENDFOR»],\"outPorts\":[«FOR port:outVar SEPARATOR ","»«port»«ENDFOR»],\"internalPorts\":[«FOR port:intVar SEPARATOR ","»«port»«ENDFOR»],\"nameIdx\":{«FOR entry: varIdx.entrySet SEPARATOR ","»\"«entry.key»\":«entry.value»«ENDFOR»}}'''
+		return '''{\"moduleName\":\"«em.moduleName»\",\"inPorts\":[«FOR port : inVar SEPARATOR ","»«port»«ENDFOR»],\"inOutPorts\":[«FOR port : inOutVar SEPARATOR ","»«port»«ENDFOR»],\"outPorts\":[«FOR port : outVar SEPARATOR ","»«port»«ENDFOR»],\"internalPorts\":[«FOR port : intVar SEPARATOR ","»«port»«ENDFOR»],\"nameIdx\":{«FOR entry : varIdx.
+			entrySet SEPARATOR ","»\"«entry.key»\":«entry.value»«ENDFOR»}}'''
 	}
-	
-	def String toPort(VariableInformation vi) 
-	'''{\"idx\":«varIdx.get(vi.name)»,\"name\":\"«vi.name»\",\"width\":«vi.width»,\"clock\": «vi.isClock»,\"reset\":«vi.isReset»,\"type\":«vi.bitJsonType»}'''
-	
+
+	def String toPort(VariableInformation vi) '''{\"idx\":«varIdx.get(vi.name)»,\"name\":\"«vi.name»\",\"width\":«vi.
+		width»,\"clock\": «vi.isClock»,\"reset\":«vi.isReset»,\"type\":«vi.bitJsonType»}'''
+
 	def bitJsonType(VariableInformation vi) {
-		switch (vi.type){
+		switch (vi.type) {
 			case BIT: return 0
 			case INT: return 1
 			case UINT: return 2
@@ -206,8 +206,8 @@ class CommonCompilerExtension {
 
 	def toHexStringI(Integer value) '''0x«Integer.toHexString(value)»'''
 
-	def getFrameName(Frame f) '''s«String.format("%03d", Math.max(f.scheduleStage, 0))»frame«String.format("%04X",
-		f.uniqueID)»'''
+	def getFrameName(Frame f) '''«IF f.process != null»«f.process»«ENDIF»s«String.format("%03d",
+		Math.max(f.scheduleStage, 0))»frame«String.format("%04X", f.uniqueID)»'''
 
 	def constantL(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
 
@@ -294,6 +294,59 @@ class CommonCompilerExtension {
 		if (cast !== null && cast != "")
 			return '''((«cast»(«op»)) << «shift») >> «shift»'''
 		'''((«op») << «shift») >> «shift»'''
+	}
+
+	def processState(ExecutableModel model, CharSequence processName) {
+		model.varByName("$process_state_@" + processName)
+	}
+
+	def processTime(ExecutableModel model, CharSequence processName) {
+		model.varByName("$process_time_next_@" + processName)
+	}
+
+	def varByName(ExecutableModel model, String varName) {
+		val fullName = model.moduleName + '.' + varName
+		return model.variables.findFirst[name == varName || name == fullName].idName(false, false)
+	}
+
+	def getNonProcessframes(ExecutableModel model) {
+		model.frames.filter[process == null]
+	}
+
+	def getProcessframes(ExecutableModel model) {
+		model.frames.filter[process != null]
+	}
+
+	def predicateConditions(Frame f) {
+		val sb = new StringBuilder
+		var first = true;
+		if (f.edgeNegDepRes != -1) {
+			sb.append(
+				'''«f.edgeNegDepRes.asInternal.idName(false, false)»_isFalling && !«f.edgeNegDepRes.asInternal.
+					idName(false, false)»_fallingIsHandled''')
+			first = false
+		}
+		if (f.edgePosDepRes != -1) {
+			if (!first)
+				sb.append(' && ')
+			sb.append(
+				'''«f.edgePosDepRes.asInternal.idName(false, false)»_isRising&& !«f.edgePosDepRes.asInternal.
+					idName(false, false)»_risingIsHandled''')
+			first = false
+		}
+		for (p : f.predNegDepRes) {
+			if (!first)
+				sb.append(' && ')
+			sb.append('''!p«p» && p«p»_fresh''')
+			first = false
+		}
+		for (p : f.predPosDepRes) {
+			if (!first)
+				sb.append(' && ')
+			sb.append('''p«p» && p«p»_fresh''')
+			first = false
+		}
+		return sb.toString
 	}
 
 }

@@ -448,13 +448,18 @@ public class CommonCompilerExtension {
   
   public CharSequence getFrameName(final Frame f) {
     StringConcatenation _builder = new StringConcatenation();
+    {
+      boolean _notEquals = (!Objects.equal(f.process, null));
+      if (_notEquals) {
+        _builder.append(f.process, "");
+      }
+    }
     _builder.append("s");
     int _max = Math.max(f.scheduleStage, 0);
     String _format = String.format("%03d", Integer.valueOf(_max));
     _builder.append(_format, "");
     _builder.append("frame");
-    String _format_1 = String.format("%04X", 
-      Integer.valueOf(f.uniqueID));
+    String _format_1 = String.format("%04X", Integer.valueOf(f.uniqueID));
     _builder.append(_format_1, "");
     return _builder;
   }
@@ -647,5 +652,115 @@ public class CommonCompilerExtension {
       _xblockexpression = _builder_1;
     }
     return _xblockexpression;
+  }
+  
+  public String processState(final ExecutableModel model, final CharSequence processName) {
+    return this.varByName(model, ("$process_state_@" + processName));
+  }
+  
+  public String processTime(final ExecutableModel model, final CharSequence processName) {
+    return this.varByName(model, ("$process_time_next_@" + processName));
+  }
+  
+  public String varByName(final ExecutableModel model, final String varName) {
+    final String fullName = ((model.moduleName + ".") + varName);
+    final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+      public Boolean apply(final VariableInformation it) {
+        boolean _or = false;
+        boolean _equals = Objects.equal(it.name, varName);
+        if (_equals) {
+          _or = true;
+        } else {
+          boolean _equals_1 = Objects.equal(it.name, fullName);
+          _or = _equals_1;
+        }
+        return Boolean.valueOf(_or);
+      }
+    };
+    VariableInformation _findFirst = IterableExtensions.<VariableInformation>findFirst(((Iterable<VariableInformation>)Conversions.doWrapArray(model.variables)), _function);
+    return this.idName(_findFirst, false, false);
+  }
+  
+  public Iterable<Frame> getNonProcessframes(final ExecutableModel model) {
+    final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
+      public Boolean apply(final Frame it) {
+        return Boolean.valueOf(Objects.equal(it.process, null));
+      }
+    };
+    return IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(model.frames)), _function);
+  }
+  
+  public Iterable<Frame> getProcessframes(final ExecutableModel model) {
+    final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
+      public Boolean apply(final Frame it) {
+        return Boolean.valueOf((!Objects.equal(it.process, null)));
+      }
+    };
+    return IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(model.frames)), _function);
+  }
+  
+  public String predicateConditions(final Frame f) {
+    final StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    if ((f.edgeNegDepRes != (-1))) {
+      StringConcatenation _builder = new StringConcatenation();
+      InternalInformation _asInternal = this.asInternal(f.edgeNegDepRes);
+      String _idName = this.idName(_asInternal, false, false);
+      _builder.append(_idName, "");
+      _builder.append("_isFalling && !");
+      InternalInformation _asInternal_1 = this.asInternal(f.edgeNegDepRes);
+      String _idName_1 = this.idName(_asInternal_1, false, false);
+      _builder.append(_idName_1, "");
+      _builder.append("_fallingIsHandled");
+      sb.append(_builder);
+      first = false;
+    }
+    if ((f.edgePosDepRes != (-1))) {
+      if ((!first)) {
+        sb.append(" && ");
+      }
+      StringConcatenation _builder_1 = new StringConcatenation();
+      InternalInformation _asInternal_2 = this.asInternal(f.edgePosDepRes);
+      String _idName_2 = this.idName(_asInternal_2, false, false);
+      _builder_1.append(_idName_2, "");
+      _builder_1.append("_isRising&& !");
+      InternalInformation _asInternal_3 = this.asInternal(f.edgePosDepRes);
+      String _idName_3 = this.idName(_asInternal_3, false, false);
+      _builder_1.append(_idName_3, "");
+      _builder_1.append("_risingIsHandled");
+      sb.append(_builder_1);
+      first = false;
+    }
+    for (final int p : f.predNegDepRes) {
+      {
+        if ((!first)) {
+          sb.append(" && ");
+        }
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("!p");
+        _builder_2.append(p, "");
+        _builder_2.append(" && p");
+        _builder_2.append(p, "");
+        _builder_2.append("_fresh");
+        sb.append(_builder_2);
+        first = false;
+      }
+    }
+    for (final int p_1 : f.predPosDepRes) {
+      {
+        if ((!first)) {
+          sb.append(" && ");
+        }
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("p");
+        _builder_2.append(p_1, "");
+        _builder_2.append(" && p");
+        _builder_2.append(p_1, "");
+        _builder_2.append("_fresh");
+        sb.append(_builder_2);
+        first = false;
+      }
+    }
+    return sb.toString();
   }
 }
