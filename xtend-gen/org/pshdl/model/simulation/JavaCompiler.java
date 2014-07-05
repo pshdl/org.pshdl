@@ -85,6 +85,40 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
   
+  public CharSequence coverage(final String packageName, final String unitName) {
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      boolean _tripleNotEquals = (packageName != null);
+      if (_tripleNotEquals) {
+        _builder.append("package ");
+        _builder.append(packageName, "");
+        _builder.append(";");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    CharSequence _imports = this.getImports();
+    _builder.append(_imports, "");
+    _builder.newLineIfNotEmpty();
+    _builder.newLine();
+    _builder.append("public class ");
+    _builder.append(unitName, "");
+    _builder.append("Coverage {");
+    _builder.newLineIfNotEmpty();
+    {
+      Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation v : _excludeNull) {
+        _builder.append("\t");
+        Boolean _get = this.cce.prevMap.get(v.name);
+        CharSequence _decl = this.decl(v, _get);
+        _builder.append(_decl, "\t");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("}");
+    _builder.newLine();
+    return _builder;
+  }
+  
   public CharSequence compile(final String packageName, final String unitName) {
     CharSequence _xblockexpression = null;
     {
@@ -121,143 +155,6 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.newLineIfNotEmpty();
       {
         if (this.cce.hasClock) {
-          _builder.append("\t");
-          _builder.append("private static class RegUpdate {");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("public final int internalID;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("public final int offset;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("public RegUpdate(int internalID, int offset) {");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("super();");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("this.internalID = internalID;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("this.offset = offset;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("}");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("@Override");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("public int hashCode() {");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("final int prime = 31;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("int result = 1;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("result = (prime * result) + internalID;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("result = (prime * result) + offset;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("return result;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("}");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("@Override");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("public boolean equals(Object obj) {");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("if (this == obj)");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t\t");
-          _builder.append("return true;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("if (obj == null)");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t\t");
-          _builder.append("return false;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("if (getClass() != obj.getClass())");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t\t");
-          _builder.append("return false;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("RegUpdate other = (RegUpdate) obj;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("if (internalID != other.internalID)");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t\t");
-          _builder.append("return false;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("if (offset != other.offset)");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t\t");
-          _builder.append("return false;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t\t");
-          _builder.append("return true;");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("\t");
-          _builder.append("}");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.append("}");
-          _builder.newLine();
-          _builder.append("\t");
-          _builder.newLine();
           _builder.append("\t");
           _builder.append("private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();");
           _builder.newLine();
@@ -421,147 +318,6 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.append("}");
       _builder.newLine();
       {
-        final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(final VariableInformation it) {
-            return Boolean.valueOf((it.dir != VariableInformation.Direction.INTERNAL));
-          }
-        };
-        Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function);
-        for(final VariableInformation v_2 : _filter) {
-          {
-            int _size = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(v_2.dimensions)));
-            boolean _equals = (_size == 0);
-            if (_equals) {
-              _builder.append("\t");
-              _builder.append("public void set");
-              String _idName = this.cce.idName(v_2, false, false);
-              String _firstUpper = StringExtensions.toFirstUpper(_idName);
-              _builder.append(_firstUpper, "\t");
-              _builder.append("(");
-              String _javaType = this.getJavaType(v_2);
-              _builder.append(_javaType, "\t");
-              _builder.append(" value) {");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("\t");
-              String _idName_1 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_1, "\t\t");
-              _builder.append("=value & ");
-              CharSequence _asMaskL = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL, "\t\t");
-              _builder.append(";");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("}");
-              _builder.newLine();
-              _builder.append("\t");
-              _builder.newLine();
-              _builder.append("\t");
-              _builder.append("public ");
-              String _javaType_1 = this.getJavaType(v_2);
-              _builder.append(_javaType_1, "\t");
-              _builder.append(" get");
-              String _idName_2 = this.cce.idName(v_2, false, false);
-              String _firstUpper_1 = StringExtensions.toFirstUpper(_idName_2);
-              _builder.append(_firstUpper_1, "\t");
-              _builder.append("() {");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("\t");
-              _builder.append("return ");
-              String _idName_3 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_3, "\t\t");
-              _builder.append(" & ");
-              CharSequence _asMaskL_1 = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL_1, "\t\t");
-              _builder.append(";");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("}");
-              _builder.newLine();
-            } else {
-              _builder.append("\t");
-              _builder.append("public void set");
-              String _idName_4 = this.cce.idName(v_2, false, false);
-              String _firstUpper_2 = StringExtensions.toFirstUpper(_idName_4);
-              _builder.append(_firstUpper_2, "\t");
-              _builder.append("(");
-              String _javaType_2 = this.getJavaType(v_2);
-              _builder.append(_javaType_2, "\t");
-              _builder.append(" value");
-              {
-                int _size_1 = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(v_2.dimensions)));
-                ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _size_1, true);
-                for(final Integer i : _doubleDotLessThan) {
-                  _builder.append(", int a");
-                  _builder.append(i, "\t");
-                }
-              }
-              _builder.append(") {");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("\t");
-              String _idName_5 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_5, "\t\t");
-              _builder.append("[");
-              StringBuilder _arrayAccess = this.cce.arrayAccess(v_2);
-              _builder.append(_arrayAccess, "\t\t");
-              _builder.append("]=value & ");
-              CharSequence _asMaskL_2 = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL_2, "\t\t");
-              _builder.append(";");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("}");
-              _builder.newLine();
-              _builder.append("\t");
-              _builder.newLine();
-              _builder.append("\t");
-              _builder.append("public ");
-              String _javaType_3 = this.getJavaType(v_2);
-              _builder.append(_javaType_3, "\t");
-              _builder.append(" get");
-              String _idName_6 = this.cce.idName(v_2, false, false);
-              String _firstUpper_3 = StringExtensions.toFirstUpper(_idName_6);
-              _builder.append(_firstUpper_3, "\t");
-              _builder.append("(");
-              {
-                int _size_2 = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(v_2.dimensions)));
-                ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _size_2, true);
-                boolean _hasElements = false;
-                for(final Integer i_1 : _doubleDotLessThan_1) {
-                  if (!_hasElements) {
-                    _hasElements = true;
-                  } else {
-                    _builder.appendImmediate(",", "\t");
-                  }
-                  _builder.append("int a");
-                  _builder.append(i_1, "\t");
-                }
-              }
-              _builder.append(") {");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("\t");
-              _builder.append("return ");
-              String _idName_7 = this.cce.idName(v_2, false, false);
-              _builder.append(_idName_7, "\t\t");
-              _builder.append("[");
-              StringBuilder _arrayAccess_1 = this.cce.arrayAccess(v_2);
-              _builder.append(_arrayAccess_1, "\t\t");
-              _builder.append("] & ");
-              CharSequence _asMaskL_3 = this.cce.asMaskL(v_2.width);
-              _builder.append(_asMaskL_3, "\t\t");
-              _builder.append(";");
-              _builder.newLineIfNotEmpty();
-              _builder.append("\t");
-              _builder.append("}");
-              _builder.newLine();
-            }
-          }
-        }
-      }
-      {
         for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");
           String _method = this.method(f);
@@ -639,6 +395,140 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _xblockexpression = _builder;
     }
     return _xblockexpression;
+  }
+  
+  public CharSequence beanMethods() {
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf((it.dir != VariableInformation.Direction.INTERNAL));
+        }
+      };
+      Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.cce.em.variables)), _function);
+      for(final VariableInformation v : _filter) {
+        _builder.newLineIfNotEmpty();
+        {
+          int _size = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(v.dimensions)));
+          boolean _equals = (_size == 0);
+          if (_equals) {
+            _builder.append("public void set");
+            String _idName = this.cce.idName(v, false, false);
+            String _firstUpper = StringExtensions.toFirstUpper(_idName);
+            _builder.append(_firstUpper, "");
+            _builder.append("(");
+            String _javaType = this.getJavaType(v);
+            _builder.append(_javaType, "");
+            _builder.append(" value) {");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
+            String _idName_1 = this.cce.idName(v, false, false);
+            _builder.append(_idName_1, "\t");
+            _builder.append("=value & ");
+            CharSequence _asMaskL = this.cce.asMaskL(v.width);
+            _builder.append(_asMaskL, "\t");
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("}");
+            _builder.newLine();
+            _builder.newLine();
+            _builder.append("public ");
+            String _javaType_1 = this.getJavaType(v);
+            _builder.append(_javaType_1, "");
+            _builder.append(" get");
+            String _idName_2 = this.cce.idName(v, false, false);
+            String _firstUpper_1 = StringExtensions.toFirstUpper(_idName_2);
+            _builder.append(_firstUpper_1, "");
+            _builder.append("() {");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
+            _builder.append("return ");
+            String _idName_3 = this.cce.idName(v, false, false);
+            _builder.append(_idName_3, "\t");
+            _builder.append(" & ");
+            CharSequence _asMaskL_1 = this.cce.asMaskL(v.width);
+            _builder.append(_asMaskL_1, "\t");
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("}");
+            _builder.newLine();
+          } else {
+            _builder.append("public void set");
+            String _idName_4 = this.cce.idName(v, false, false);
+            String _firstUpper_2 = StringExtensions.toFirstUpper(_idName_4);
+            _builder.append(_firstUpper_2, "");
+            _builder.append("(");
+            String _javaType_2 = this.getJavaType(v);
+            _builder.append(_javaType_2, "");
+            _builder.append(" value");
+            {
+              int _size_1 = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(v.dimensions)));
+              ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _size_1, true);
+              for(final Integer i : _doubleDotLessThan) {
+                _builder.append(", int a");
+                _builder.append(i, "");
+              }
+            }
+            _builder.append(") {");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
+            String _idName_5 = this.cce.idName(v, false, false);
+            _builder.append(_idName_5, "\t");
+            _builder.append("[");
+            StringBuilder _arrayAccess = this.cce.arrayAccess(v);
+            _builder.append(_arrayAccess, "\t");
+            _builder.append("]=value & ");
+            CharSequence _asMaskL_2 = this.cce.asMaskL(v.width);
+            _builder.append(_asMaskL_2, "\t");
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("}");
+            _builder.newLine();
+            _builder.newLine();
+            _builder.append("public ");
+            String _javaType_3 = this.getJavaType(v);
+            _builder.append(_javaType_3, "");
+            _builder.append(" get");
+            String _idName_6 = this.cce.idName(v, false, false);
+            String _firstUpper_3 = StringExtensions.toFirstUpper(_idName_6);
+            _builder.append(_firstUpper_3, "");
+            _builder.append("(");
+            {
+              int _size_2 = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(v.dimensions)));
+              ExclusiveRange _doubleDotLessThan_1 = new ExclusiveRange(0, _size_2, true);
+              boolean _hasElements = false;
+              for(final Integer i_1 : _doubleDotLessThan_1) {
+                if (!_hasElements) {
+                  _hasElements = true;
+                } else {
+                  _builder.appendImmediate(",", "");
+                }
+                _builder.append("int a");
+                _builder.append(i_1, "");
+              }
+            }
+            _builder.append(") {");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
+            _builder.append("return ");
+            String _idName_7 = this.cce.idName(v, false, false);
+            _builder.append(_idName_7, "\t");
+            _builder.append("[");
+            StringBuilder _arrayAccess_1 = this.cce.arrayAccess(v);
+            _builder.append(_arrayAccess_1, "\t");
+            _builder.append("] & ");
+            CharSequence _asMaskL_3 = this.cce.asMaskL(v.width);
+            _builder.append(_asMaskL_3, "\t");
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("}");
+            _builder.newLine();
+          }
+        }
+        _builder.append("\t\t");
+      }
+    }
+    return _builder;
   }
   
   public String testbenchMethod(final ExecutableModel model, final Set<Integer> handled) {
@@ -2638,8 +2528,15 @@ public class JavaCompiler implements ITypeOuptutProvider {
   }
   
   public String getJavaType(final VariableInformation information) {
+    boolean _or = false;
     boolean _startsWith = information.name.startsWith(InternalInformation.PRED_PREFIX);
     if (_startsWith) {
+      _or = true;
+    } else {
+      boolean _tripleEquals = (information.type == VariableInformation.Type.BOOL);
+      _or = _tripleEquals;
+    }
+    if (_or) {
       return "boolean";
     }
     return "long";
@@ -2772,6 +2669,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       String pkg = null;
       final String optionPkg = cli.getOptionValue("pkg");
       boolean debug = cli.hasOption("debug");
+      boolean coverage = cli.hasOption("coverage");
       boolean _tripleNotEquals = (optionPkg != null);
       if (_tripleNotEquals) {
         pkg = optionPkg;

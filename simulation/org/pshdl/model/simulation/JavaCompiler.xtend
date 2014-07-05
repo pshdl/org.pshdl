@@ -49,6 +49,15 @@ import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
+@Data
+class JavaCompilerSpecification {
+	ExecutableModel model
+	String pkg
+	String unitName
+	boolean debug
+	boolean createCoverage
+}
+
 class JavaCompiler implements ITypeOuptutProvider {
 	private boolean debug
 
@@ -69,6 +78,17 @@ class JavaCompiler implements ITypeOuptutProvider {
 			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, Collections.emptyList, em.source,
 				comp.hookName, true))
 	}
+	
+	def coverage(String packageName, String unitName) '''
+		«IF packageName !== null»package «packageName»;«ENDIF»
+		«imports»
+		
+		public class «unitName»Coverage {
+			«FOR v : em.variables.excludeNull»
+				«v.decl(prevMap.get(v.name))»
+			«ENDFOR»
+		}
+	'''
 
 	def compile(String packageName, String unitName) {
 		val Set<Integer> handled = new HashSet
@@ -79,42 +99,6 @@ class JavaCompiler implements ITypeOuptutProvider {
 			
 			public class «unitName» implements «IF em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»{
 				«IF hasClock»
-					private static class RegUpdate {
-						public final int internalID;
-						public final int offset;
-						
-						public RegUpdate(int internalID, int offset) {
-							super();
-							this.internalID = internalID;
-							this.offset = offset;
-						}
-						
-						@Override
-						public int hashCode() {
-							final int prime = 31;
-							int result = 1;
-							result = (prime * result) + internalID;
-							result = (prime * result) + offset;
-							return result;
-						}
-						
-						@Override
-						public boolean equals(Object obj) {
-							if (this == obj)
-								return true;
-							if (obj == null)
-								return false;
-							if (getClass() != obj.getClass())
-								return false;
-							RegUpdate other = (RegUpdate) obj;
-							if (internalID != other.internalID)
-								return false;
-							if (offset != other.offset)
-								return false;
-							return true;
-						}
-					}
-					
 					private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();
 					private final boolean disableEdges;
 					private final boolean disabledRegOutputlogic;
@@ -152,25 +136,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 						varIdx.put("«v.name»", «varIdx.get(v.name)»);
 					«ENDFOR»
 				}
-				«FOR v : em.variables.filter[dir !== VariableInformation$Direction.INTERNAL]»
-					«IF v.dimensions.size == 0»
-						public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value) {
-							«v.idName(false, false)»=value & «v.width.asMaskL»;
-						}
-						
-						public «v.javaType» get«v.idName(false, false).toFirstUpper»() {
-							return «v.idName(false, false)» & «v.width.asMaskL»;
-						}
-					«ELSE»
-						public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value«FOR i : (0 ..< v.dimensions.size)», int a«i»«ENDFOR») {
-							«v.idName(false, false)»[«v.arrayAccess»]=value & «v.width.asMaskL»;
-						}
-						
-						public «v.javaType» get«v.idName(false, false).toFirstUpper»(«FOR i : (0 ..< v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
-							return «v.idName(false, false)»[«v.arrayAccess»] & «v.width.asMaskL»;
-						}
-					«ENDIF»
-				«ENDFOR»
+«««				«beanMethods()»
 				«FOR f : em.frames»
 					«f.method»
 				«ENDFOR»
@@ -195,6 +161,28 @@ class JavaCompiler implements ITypeOuptutProvider {
 			}
 		'''
 	}
+	
+	def beanMethods()
+		'''«FOR v : em.variables.filter[dir !== VariableInformation$Direction.INTERNAL]»
+			«IF v.dimensions.size == 0»
+				public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value) {
+					«v.idName(false, false)»=value & «v.width.asMaskL»;
+				}
+				
+				public «v.javaType» get«v.idName(false, false).toFirstUpper»() {
+					return «v.idName(false, false)» & «v.width.asMaskL»;
+				}
+			«ELSE»
+				public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value«FOR i : (0 ..< v.dimensions.size)», int a«i»«ENDFOR») {
+					«v.idName(false, false)»[«v.arrayAccess»]=value & «v.width.asMaskL»;
+				}
+				
+				public «v.javaType» get«v.idName(false, false).toFirstUpper»(«FOR i : (0 ..< v.dimensions.size) SEPARATOR ','»int a«i»«ENDFOR») {
+					return «v.idName(false, false)»[«v.arrayAccess»] & «v.width.asMaskL»;
+				}
+			«ENDIF»
+		«ENDFOR»'''
+	
 
 	def testbenchMethod(ExecutableModel model, Set<Integer> handled) {
 		val Map<String, CharSequence> processes = model.processframes.map[process].toInvertedMap['''''']
@@ -778,7 +766,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 	}
 
 	def getJavaType(VariableInformation information) {
-		if (information.name.startsWith(InternalInformation.PRED_PREFIX))
+		if (information.name.startsWith(InternalInformation.PRED_PREFIX) || information.type===VariableInformation.Type.BOOL)
 			return "boolean"
 		return "long"
 	}
@@ -820,6 +808,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		var String pkg = null
 		val optionPkg = cli.getOptionValue("pkg")
 		var boolean debug = cli.hasOption("debug")
+		var boolean coverage = cli.hasOption("coverage")
 		if (optionPkg !== null) {
 			pkg = optionPkg
 		} else if (li != -1) {

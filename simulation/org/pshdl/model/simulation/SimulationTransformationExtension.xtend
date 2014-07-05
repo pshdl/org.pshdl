@@ -26,75 +26,75 @@
  ******************************************************************************/
 package org.pshdl.model.simulation
 
-import org.pshdl.model.simulation.FluidFrame
-import org.pshdl.model.simulation.FluidFrame$ArgumentedInstruction
+import com.google.common.base.Optional
+import java.math.BigInteger
+import java.util.ArrayList
+import java.util.HashSet
+import java.util.Iterator
+import java.util.LinkedList
+import java.util.List
+import java.util.Set
+import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.VariableInformation
+import org.pshdl.interpreter.VariableInformation.Direction
+import org.pshdl.interpreter.VariableInformation.Type
+import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArithOp
+import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLAssignment
 import org.pshdl.model.HDLBitOp
+import org.pshdl.model.HDLBlock
+import org.pshdl.model.HDLClass
 import org.pshdl.model.HDLConcat
+import org.pshdl.model.HDLEnumDeclaration
+import org.pshdl.model.HDLEnumRef
+import org.pshdl.model.HDLEqualityOp
 import org.pshdl.model.HDLExpression
+import org.pshdl.model.HDLIfStatement
+import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.HDLLiteral
 import org.pshdl.model.HDLManip
 import org.pshdl.model.HDLPrimitive
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLReference
 import org.pshdl.model.HDLRegisterConfig
+import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType
+import org.pshdl.model.HDLResolvedRef
 import org.pshdl.model.HDLShiftOp
 import org.pshdl.model.HDLStatement
+import org.pshdl.model.HDLSwitchCaseStatement
+import org.pshdl.model.HDLSwitchStatement
 import org.pshdl.model.HDLTernary
 import org.pshdl.model.HDLUnit
+import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration
-import org.pshdl.model.HDLVariableDeclaration$HDLDirection
+import org.pshdl.model.HDLVariableDeclaration.HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
+import org.pshdl.model.evaluation.ConstantEvaluate
 import org.pshdl.model.evaluation.HDLEvaluationContext
+import org.pshdl.model.extensions.FullNameExtension
+import org.pshdl.model.simulation.FluidFrame
+import org.pshdl.model.simulation.FluidFrame.ArgumentedInstruction
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
+import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.HDLQualifiedName
+
+import static org.pshdl.interpreter.utils.Instruction.*
+import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
+import static org.pshdl.model.HDLBitOp.HDLBitOpType.*
+import static org.pshdl.model.HDLEqualityOp.HDLEqualityOpType.*
+import static org.pshdl.model.HDLManip.HDLManipType.*
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.*
+import static org.pshdl.model.HDLRegisterConfig.HDLRegClockType.*
+import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
+import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*
 import static org.pshdl.model.evaluation.ConstantEvaluate.*
 import static org.pshdl.model.extensions.FullNameExtension.*
 import static org.pshdl.model.extensions.TypeExtension.*
-import org.pshdl.model.types.builtIn.HDLPrimitives
-import java.math.BigInteger
-import java.util.ArrayList
-import java.util.Iterator
-import org.pshdl.model.HDLUnresolvedFragment
-import org.pshdl.model.HDLResolvedRef
-
-import static org.pshdl.interpreter.utils.Instruction.*
-import static org.pshdl.model.HDLArithOp$HDLArithOpType.*
-import static org.pshdl.model.HDLEqualityOp$HDLEqualityOpType.*
-import static org.pshdl.model.HDLBitOp$HDLBitOpType.*
-import static org.pshdl.model.HDLManip$HDLManipType.*
-import static org.pshdl.model.HDLPrimitive$HDLPrimitiveType.*
-import static org.pshdl.model.HDLRegisterConfig$HDLRegClockType.*
-import static org.pshdl.model.HDLShiftOp$HDLShiftOpType.*
-import static org.pshdl.model.HDLVariableDeclaration$HDLDirection.*
 import static org.pshdl.model.simulation.SimulationTransformationExtension.*
-import com.google.common.base.Optional
-import org.pshdl.model.HDLIfStatement
-import org.pshdl.model.HDLEqualityOp
-import org.pshdl.model.HDLSwitchStatement
-import org.pshdl.model.HDLSwitchCaseStatement
-import org.pshdl.model.HDLEnumRef
-import org.pshdl.model.HDLEnumDeclaration
-import org.pshdl.model.HDLInterfaceDeclaration
-import org.pshdl.model.evaluation.ConstantEvaluate
-import org.pshdl.interpreter.VariableInformation
-import org.pshdl.interpreter.VariableInformation$Direction
-import org.pshdl.interpreter.VariableInformation$Type
-import java.util.LinkedList
-import org.pshdl.interpreter.InternalInformation
-import org.pshdl.model.HDLArrayInit
-import org.pshdl.model.HDLClass
-import java.util.List
-import java.util.Set
-import java.util.HashSet
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
-import org.pshdl.model.HDLRegisterConfig.HDLRegSyncType
-import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
-import org.pshdl.model.HDLAnnotation
-import org.pshdl.model.utils.HDLQualifiedName
-import org.pshdl.model.HDLBlock
-import org.pshdl.model.extensions.FullNameExtension
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
