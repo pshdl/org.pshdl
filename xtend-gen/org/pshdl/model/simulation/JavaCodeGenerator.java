@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -115,6 +116,65 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     {
       Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
       for(final VariableInformation v : _excludeNull) {
+        {
+          int _length = v.dimensions.length;
+          boolean _equals = (_length == 0);
+          if (_equals) {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get = this.varIdx.get(v.name);
+            _builder.append(_get, "\t\t");
+            _builder.append(": ");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            StringConcatenation _builder_1 = new StringConcatenation();
+            {
+              boolean _isPredicate = this.isPredicate(v);
+              if (_isPredicate) {
+                _builder_1.append("value!=0");
+              } else {
+                _builder_1.append("value");
+              }
+            }
+            StringBuilder _assignVariable = this.assignVariable(v, _builder_1, CommonCodeGenerator.NONE, true, false);
+            _builder.append(_assignVariable, "\t\t\t");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("break;");
+            _builder.newLine();
+          } else {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get_1 = this.varIdx.get(v.name);
+            _builder.append(_get_1, "\t\t");
+            _builder.append(": ");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            CharSequence _idName = this.idName(v, true, CommonCodeGenerator.NONE);
+            _builder.append(_idName, "\t\t\t");
+            _builder.append("[");
+            CharSequence _calculateVariableAccessIndexArr = this.calculateVariableAccessIndexArr(v);
+            _builder.append(_calculateVariableAccessIndexArr, "\t\t\t");
+            _builder.append("]=");
+            {
+              boolean _isPredicate_1 = this.isPredicate(v);
+              if (_isPredicate_1) {
+                _builder.append("value!=0");
+              } else {
+                _builder.append("value");
+              }
+            }
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("break;");
+            _builder.newLine();
+          }
+        }
       }
     }
     _builder.append("\t\t");
@@ -134,7 +194,16 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     _builder.append("public int getIndex(String name) {");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("return varIdx.get(name);");
+    _builder.append("Integer idx=varIdx.get(name);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("if (idx==null)");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("throw new IllegalArgumentException(\"The name:\"+name+\" is not a valid index\");");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return idx;");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
@@ -151,8 +220,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
       for(final VariableInformation v_1 : _excludeNull_1) {
         _builder.append("\t\t");
         _builder.append("case ");
-        Integer _get = this.varIdx.get(v_1.name);
-        _builder.append(_get, "\t\t");
+        Integer _get_2 = this.varIdx.get(v_1.name);
+        _builder.append(_get_2, "\t\t");
         _builder.append(": return \"");
         _builder.append(v_1.name, "\t\t");
         _builder.append("\";");
@@ -191,6 +260,64 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     {
       Iterable<VariableInformation> _excludeNull_2 = this.excludeNull(this.em.variables);
       for(final VariableInformation v_2 : _excludeNull_2) {
+        {
+          int _length_1 = v_2.dimensions.length;
+          boolean _equals_1 = (_length_1 == 0);
+          if (_equals_1) {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get_3 = this.varIdx.get(v_2.name);
+            _builder.append(_get_3, "\t\t");
+            _builder.append(": return ");
+            CharSequence _idName_1 = this.idName(v_2, false, CommonCodeGenerator.NONE);
+            _builder.append(_idName_1, "\t\t");
+            {
+              boolean _isPredicate_2 = this.isPredicate(v_2);
+              if (_isPredicate_2) {
+                _builder.append("?1:0");
+              } else {
+                if ((v_2.width != 64)) {
+                  _builder.append(" & ");
+                  BigInteger _calcMask = this.calcMask(v_2.width);
+                  CharSequence _constant = this.constant(_calcMask);
+                  _builder.append(_constant, "\t\t");
+                }
+              }
+            }
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+          } else {
+            _builder.append("\t\t");
+            _builder.append("case ");
+            Integer _get_4 = this.varIdx.get(v_2.name);
+            _builder.append(_get_4, "\t\t");
+            _builder.append(": return ");
+            CharSequence _idName_2 = this.idName(v_2, false, CommonCodeGenerator.NONE);
+            _builder.append(_idName_2, "\t\t");
+            _builder.append("[");
+            CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v_2);
+            _builder.append(_calculateVariableAccessIndexArr_1, "\t\t");
+            _builder.append("]");
+            {
+              boolean _and = false;
+              if (!(v_2.width != 64)) {
+                _and = false;
+              } else {
+                boolean _isPredicate_3 = this.isPredicate(v_2);
+                boolean _not = (!_isPredicate_3);
+                _and = _not;
+              }
+              if (_and) {
+                _builder.append(" & ");
+                BigInteger _calcMask_1 = this.calcMask(v_2.width);
+                CharSequence _constant_1 = this.constant(_calcMask_1);
+                _builder.append(_constant_1, "\t\t");
+              }
+            }
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+          }
+        }
       }
     }
     _builder.append("\t\t");
@@ -526,6 +653,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     _builder.append("\t");
     _builder.append("}");
     _builder.newLine();
+    _builder.append("\t");
+    _builder.append("regUpdates.clear();");
+    _builder.newLine();
     _builder.append("}");
     _builder.newLine();
     return _builder;
@@ -552,6 +682,38 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
       return res;
     }
     return (("(int)(" + res) + ")");
+  }
+  
+  public CharSequence calculateVariableAccessIndexArr(final VariableInformation varInfo) {
+    int _size = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(varInfo.dimensions)));
+    final int lastIndex = (_size - 1);
+    final StringBuilder arrayAccess = new StringBuilder();
+    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, lastIndex, true);
+    for (final Integer i : _doubleDotLessThan) {
+      {
+        if (((i).intValue() != 0)) {
+          arrayAccess.append(" + ");
+        }
+        int _get = varInfo.dimensions[(i).intValue()];
+        String _string = Integer.toString(_get);
+        StringConcatenation _builder = new StringConcatenation();
+        _builder.append(" ");
+        _builder.append("* arrayIdx[");
+        _builder.append(i, " ");
+        _builder.append("]");
+        String _plus = (_string + _builder);
+        arrayAccess.append(_plus);
+      }
+    }
+    if ((lastIndex != 0)) {
+      arrayAccess.append(" + ");
+    }
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("arrayIdx[");
+    _builder.append(lastIndex, "");
+    _builder.append("]");
+    arrayAccess.append(_builder);
+    return arrayAccess;
   }
   
   protected CharSequence arrayInit(final VariableInformation varInfo, final BigInteger zero, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
@@ -585,17 +747,22 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     return _builder;
   }
   
-  protected CharSequence scheduleShadowReg(final InternalInformation outputInternal, final CharSequence last, final CharSequence cpyName, final CharSequence offset) {
+  protected CharSequence scheduleShadowReg(final InternalInformation outputInternal, final CharSequence last, final CharSequence cpyName, final CharSequence offset, final boolean forceRegUpdate) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("if (");
-    _builder.append(cpyName, "");
-    _builder.append("!=");
-    _builder.append(last, "");
-    _builder.append(")");
-    _builder.newLineIfNotEmpty();
-    CharSequence _indent = this.indent();
-    _builder.append(_indent, "");
-    _builder.append("\tregUpdates.add(new RegUpdate(");
+    {
+      if ((!forceRegUpdate)) {
+        _builder.append("if (");
+        _builder.append(cpyName, "");
+        _builder.append("!=");
+        _builder.append(last, "");
+        _builder.append(")");
+        _builder.newLineIfNotEmpty();
+        CharSequence _indent = this.indent();
+        _builder.append(_indent, "");
+        _builder.append("\t");
+      }
+    }
+    _builder.append("regUpdates.add(new RegUpdate(");
     Integer _get = this.varIdx.get(outputInternal.info.name);
     _builder.append(_get, "");
     _builder.append(", ");

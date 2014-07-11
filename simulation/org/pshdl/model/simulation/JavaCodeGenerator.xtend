@@ -61,15 +61,15 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		public void setInput(int idx, long value, int... arrayIdx) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
-«««					«IF v.dimensions.length == 0»
-«««						case «varIdx.get(v.name)»: 
-«««							«assignVariable(v, "value", NONE, true, false)»
-«««							break;
-«««					«ELSE»
-«««						case «varIdx.get(v.name)»: 
-«««							«idName(v, true, NONE)»[«calculateVariableAccessIndex((0..<v.dimensions.length).toList, v, EnumSet.of(Attributes.isArray))»]
-«««							break;
-«««					«ENDIF»
+					«IF v.dimensions.length == 0»
+						case «varIdx.get(v.name)»: 
+							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', NONE, true, false)»
+							break;
+					«ELSE»
+						case «varIdx.get(v.name)»: 
+							«idName(v, true, NONE)»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
+							break;
+					«ENDIF»
 				«ENDFOR»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
@@ -78,7 +78,10 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		
 		@Override
 		public int getIndex(String name) {
-			return varIdx.get(name);
+			Integer idx=varIdx.get(name);
+			if (idx==null)
+				throw new IllegalArgumentException("The name:"+name+" is not a valid index");
+			return idx;
 		}
 		
 		@Override
@@ -101,12 +104,12 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		public long getOutputLong(int idx, int... arrayIdx) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
-«««					«IF v.dimensions.length == 0»
-«««						case «varIdx.get(v.name)»: return «v.idName(false, NONE)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.mask»«ENDIF»;
-«««					«ELSE»
-«««						case «varIdx.get(v.name)»: return «v.idName(false, false)»[«v.arrayAccessArrIdx»]«IF v.width != 64 &&
-«««			!v.predicate» & «v.width.asMaskL»«ENDIF»;
-«««					«ENDIF»
+					«IF v.dimensions.length == 0»
+						case «varIdx.get(v.name)»: return «v.idName(false, NONE)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.calcMask.constant»«ENDIF»;
+					«ELSE»
+						case «varIdx.get(v.name)»: return «v.idName(false, NONE)»[«v.calculateVariableAccessIndexArr»]«IF v.width != 64 &&
+			!v.predicate» & «v.width.calcMask.constant»«ENDIF»;
+					«ENDIF»
 				«ENDFOR»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
@@ -203,6 +206,7 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 					«ENDFOR»
 				}
 			}
+			regUpdates.clear();
 		}
 	'''
 	def getImports() '''
@@ -218,6 +222,22 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 			return res
 		return "(int)("+res+")"
 	}
+	
+	def CharSequence calculateVariableAccessIndexArr(VariableInformation varInfo) {
+		val int lastIndex = varInfo.dimensions.size() - 1;
+		val StringBuilder arrayAccess = new StringBuilder();
+		for (i:0..<lastIndex) {
+			if (i != 0) {
+				arrayAccess.append(" + ");
+			}
+			arrayAccess.append(Integer.toString(varInfo.dimensions.get(i)) + ''' * arrayIdx[«i»]''');
+		}
+		if (lastIndex != 0) {
+			arrayAccess.append(" + ");
+		}
+		arrayAccess.append('''arrayIdx[«lastIndex»]''');
+		return arrayAccess;
+	}
 
 	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<Attributes> attributes) {
 		val attrClone=attributes.clone
@@ -232,9 +252,9 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		private final void «frame.frameName»() {
 	'''
 	
-	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset) '''
-	if («cpyName»!=«last»)
-	«indent()»	regUpdates.add(new RegUpdate(«varIdx.get(outputInternal.info.name)», «offset»));'''
+	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean forceRegUpdate) '''
+	«IF !forceRegUpdate»if («cpyName»!=«last»)
+	«indent()»	«ENDIF»regUpdates.add(new RegUpdate(«varIdx.get(outputInternal.info.name)», «offset»));'''
 	
 	override protected runMethodsHeader(boolean constant) '''public void «IF !constant»run«ELSE»initConstants«ENDIF»() {
 	'''

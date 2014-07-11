@@ -119,7 +119,9 @@ public abstract class CommonCodeGenerator {
 		sb.append(indent()).append(runMethodsHeader(createConstant));
 		indent++;
 		sb.append(indent()).append(assignConstant(EPS_CYCLE, BigInteger.ZERO, NONE)).append(newLine());
-		sb.append(indent()).append(incVar(DELTA_CYCLE)).append(newLine());
+		if (!createConstant) {
+			sb.append(indent()).append(incVar(DELTA_CYCLE)).append(newLine());
+		}
 		if (!createConstant && hasClock) {
 			sb.append(indent()).append(doLoopStart()).append(newLine());
 			indent++;
@@ -486,8 +488,12 @@ public abstract class CommonCodeGenerator {
 		CharSequence offset = "0";
 		final VariableInformation varInfo = outputInternal.info;
 		if (isArray(varInfo)) {
-			if (outputInternal.fixedArray) {
-				offset = Integer.toString(calculateFixedAccesIndex(outputInternal));
+			if (outputInternal.fixedArray && arr.isEmpty()) {
+				if (outputInternal.arrayIdx.length != varInfo.dimensions.length) {
+					offset = "-1";
+				} else {
+					offset = Integer.toString(calculateFixedAccesIndex(outputInternal));
+				}
 			} else {
 				offset = calculateVariableAccessIndex(arr, varInfo);
 			}
@@ -495,7 +501,7 @@ public abstract class CommonCodeGenerator {
 		return offset;
 	}
 
-	protected abstract CharSequence scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset);
+	protected abstract CharSequence scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean force);
 
 	protected CharSequence assignInternal(InternalInformation output, CharSequence value, List<Integer> arr, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
@@ -617,7 +623,7 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case concat:
-			sb.append(assignTempVar(exec.arg1 + exec.arg2, pos, NONE, "(" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE)));
+			sb.append(assignTempVar((exec.arg1 + exec.arg2) << 1, pos, NONE, "(" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE)));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -708,12 +714,15 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		if (internal.isShadowReg) {
 			final String cpyName = tempName + "_cpy";
-			sb.append(
-					assignVariable(createVar(cpyName, internal.actualWidth, internal.info.type), internalWithArrayAccess(internal, arr, EnumSet.of(isShadowReg)), NONE, false, true))
-					.append(comment("Backup of current value"));
-			sb.append(indent()).append(assignInternal(internal, tempName, arr, EnumSet.of(isShadowReg))).append(comment("Assign value"));
+			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
+			if (!forceRegUpdate) {
+				sb.append(assignVariable(createVar(cpyName, internal.actualWidth, internal.info.type), internalWithArrayAccess(internal, arr, NONE), NONE, false, true)).append(
+						comment("Backup of current value"));
+				sb.append(indent());
+			}
+			sb.append(assignInternal(internal, tempName, arr, EnumSet.of(isShadowReg))).append(comment("Assign value"));
 			final CharSequence offset = calcRegUpdateOffset(arr, internal);
-			sb.append(indent()).append(scheduleShadowReg(internal, tempName, cpyName, offset));
+			sb.append(indent()).append(scheduleShadowReg(internal, tempName, cpyName, offset, forceRegUpdate));
 		} else {
 			sb.append(assignInternal(internal, tempName, arr, NONE)).append(comment("Assign value"));
 		}
@@ -739,7 +748,7 @@ public abstract class CommonCodeGenerator {
 		final VariableInformation varInfo = internal.info;
 		final StringBuilder sb = new StringBuilder();
 		if (isArray(varInfo)) {
-			if (internal.fixedArray) {
+			if (internal.fixedArray && arr.isEmpty()) {
 				sb.append(fixedArrayAccess(varName, calculateFixedAccesIndex(internal)));
 			} else {
 				sb.append(arrayAccess(varName, calculateVariableAccessIndex(arr, varInfo)));
