@@ -321,6 +321,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.append("\t");
       _builder.append("}");
       _builder.newLine();
+      _builder.append("\t");
+      CharSequence _beanMethods = this.beanMethods();
+      _builder.append(_beanMethods, "\t");
+      _builder.newLineIfNotEmpty();
       {
         for(final Frame f : this.cce.em.frames) {
           _builder.append("\t");

@@ -140,7 +140,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 						varIdx.put("«v.name»", «varIdx.get(v.name)»);
 					«ENDFOR»
 				}
-«««				«beanMethods()»
+				«beanMethods()»
 				«FOR f : em.frames»
 					«f.method»
 				«ENDFOR»
