@@ -1,8 +1,10 @@
 package org.pshdl.model.simulation;
 
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isArrayIndex;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isEdgeActive;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isEdgeHandled;
+import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isNegEdgeActive;
+import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isNegEdgeHandled;
+import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPosEdgeActive;
+import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPosEdgeHandled;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPredFresh;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPredicate;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPrev;
@@ -51,7 +53,8 @@ public abstract class CommonCodeGenerator {
 	protected int indent = 0;
 	protected Map<String, Integer> varIdx = new HashMap<>();
 	protected Map<String, Integer> intIdx = new HashMap<>();
-	protected Set<String> prevMap = new HashSet<>();
+	protected Set<String> prevMapPos = new HashSet<>();
+	protected Set<String> prevMapNeg = new HashSet<>();
 	protected boolean hasClock;
 	protected final int bitWidth;
 	protected final int maxCosts;
@@ -67,13 +70,13 @@ public abstract class CommonCodeGenerator {
 		}
 		for (final Frame f : em.frames) {
 			if (f.edgeNegDepRes != -1) {
-				prevMap.add(asInternal(f.edgeNegDepRes).info.name);
+				prevMapNeg.add(asInternal(f.edgeNegDepRes).info.name);
 			}
 			if (f.edgePosDepRes != -1) {
-				prevMap.add(asInternal(f.edgePosDepRes).info.name);
+				prevMapPos.add(asInternal(f.edgePosDepRes).info.name);
 			}
 		}
-		this.hasClock = !prevMap.isEmpty();
+		this.hasClock = !prevMapPos.isEmpty() || !prevMapNeg.isEmpty();
 		this.maxCosts = maxCosts;
 	}
 
@@ -145,7 +148,14 @@ public abstract class CommonCodeGenerator {
 			condition.append(" && !").append(DISABLE_REG_OUTPUTLOGIC.name);
 			indent--;
 			sb.append(indent()).append(doLoopEnd(condition)).append(newLine());
-			for (final String prev : prevMap) {
+			for (final String prev : prevMapNeg) {
+				final VariableInformation var = em.variables[varIdx.get(prev)];
+				sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false)).append(newLine());
+			}
+			for (final String prev : prevMapPos) {
+				if (prevMapNeg.contains(prev)) {
+					continue;
+				}
 				final VariableInformation var = em.variables[varIdx.get(prev)];
 				sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false)).append(newLine());
 			}
@@ -232,12 +242,12 @@ public abstract class CommonCodeGenerator {
 		final List<CharSequence> predicates = Lists.newArrayList();
 		final List<Integer> arr = Collections.emptyList();
 		if (frame.edgeNegDepRes != -1) {
-			predicates.add(internalWithArrayAccess(em.internals[frame.edgeNegDepRes], arr, EnumSet.of(isEdgeActive)));
-			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgeNegDepRes], arr, EnumSet.of(isEdgeHandled)));
+			predicates.add(internalWithArrayAccess(em.internals[frame.edgeNegDepRes], arr, EnumSet.of(isNegEdgeActive)));
+			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgeNegDepRes], arr, EnumSet.of(isNegEdgeHandled)));
 		}
 		if (frame.edgePosDepRes != -1) {
-			predicates.add(internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isEdgeActive)));
-			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isEdgeHandled)));
+			predicates.add(internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isPosEdgeActive)));
+			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isPosEdgeHandled)));
 		}
 		for (final int pred : frame.predNegDepRes) {
 			predicates.add("!" + internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
@@ -285,18 +295,18 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		if ((edgeDepRes != -1) && !handledEdges.contains(edgeDepRes)) {
 			sb.append(indent()).append(updateEdge(edgeDepRes, posEdge)).append(newLine());
-			sb.append(indent()).append(updateHandledClk(edgeDepRes)).append(newLine());
+			sb.append(indent()).append(updateHandledClk(edgeDepRes, posEdge)).append(newLine());
 			handledEdges.add(edgeDepRes);
 		}
 		return sb;
 	}
 
-	protected CharSequence updateHandledClk(int edgeDepRes) {
+	protected CharSequence updateHandledClk(int edgeDepRes, boolean posEdge) {
 		final List<Integer> arr = Collections.emptyList();
 		final InternalInformation internal = em.internals[edgeDepRes];
 		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, EnumSet.of(isUpdate));
 		final StringBuilder sb = new StringBuilder();
-		sb.append(assignInternal(internal, skipEdge(updateInternal), arr, EnumSet.of(isEdgeHandled)));
+		sb.append(assignInternal(internal, skipEdge(updateInternal), arr, EnumSet.of(posEdge ? isPosEdgeHandled : isNegEdgeHandled)));
 		return sb;
 	}
 
@@ -315,7 +325,7 @@ public abstract class CommonCodeGenerator {
 		} else {
 			value.append("((").append(prevInternal).append(" == 1) || ").append(DISABLE_EDGES.name).append(") && (").append(currInternal).append(" == 0)");
 		}
-		return assignInternal(internal, value, arr, EnumSet.of(Attributes.isEdgeActive));
+		return assignInternal(internal, value, arr, EnumSet.of(posEdge ? isPosEdgeActive : isNegEdgeActive));
 	}
 
 	protected CharSequence barrierBegin(int stage, int totalStageCosts, boolean createConstant) {
@@ -1051,8 +1061,14 @@ public abstract class CommonCodeGenerator {
 		for (final VariableInformation var : excludeNull(em.variables)) {
 			if (hasPrev(var)) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPrev))).append(newLine());
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isEdgeActive))).append(newLine());
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isEdgeHandled))).append(newLine());
+				if (prevMapPos.contains(var.name)) {
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeActive))).append(newLine());
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeHandled))).append(newLine());
+				}
+				if (prevMapNeg.contains(var.name)) {
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isNegEdgeActive))).append(newLine());
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isNegEdgeHandled))).append(newLine());
+				}
 			}
 			if (hasUpdate(var)) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isUpdate, isPublic))).append(newLine());
@@ -1097,7 +1113,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	public static enum Attributes {
-		baseType, isPrev, isUpdate, isShadowReg, isPublic, isPredicate, isArrayIndex, isEdgeActive, isEdgeHandled, isPredFresh, isArray
+		baseType, isPrev, isUpdate, isShadowReg, isPublic, isPredicate, isArrayIndex, isPosEdgeActive, isPosEdgeHandled, isNegEdgeActive, isNegEdgeHandled, isPredFresh, isArray
 	}
 
 	protected CharSequence createVarDeclaration(VariableInformation var, EnumSet<Attributes> attributes) {
@@ -1125,8 +1141,10 @@ public abstract class CommonCodeGenerator {
 	protected boolean isBoolean(VariableInformation varInfo, EnumSet<Attributes> attributes) {
 		return ((varInfo.type == VariableInformation.Type.BOOL) || //
 				isPredicate(varInfo) || //
-				attributes.contains(isEdgeHandled) || //
-				attributes.contains(isEdgeActive) || //
+				attributes.contains(isPosEdgeHandled) || //
+				attributes.contains(isPosEdgeActive) || //
+				attributes.contains(isNegEdgeHandled) || //
+				attributes.contains(isNegEdgeActive) || //
 				attributes.contains(isPredFresh) //
 				)
 				&& !attributes.contains(isUpdate);
@@ -1238,10 +1256,14 @@ public abstract class CommonCodeGenerator {
 			return res + "_prev";
 		if (attributes.contains(isPredFresh))
 			return res + "_fresh";
-		if (attributes.contains(isEdgeActive))
-			return res + "_active";
-		if (attributes.contains(isEdgeHandled))
-			return res + "_handled";
+		if (attributes.contains(isPosEdgeActive))
+			return res + "_pos_active";
+		if (attributes.contains(isPosEdgeHandled))
+			return res + "_pos_handled";
+		if (attributes.contains(isNegEdgeActive))
+			return res + "_neg_active";
+		if (attributes.contains(isNegEdgeHandled))
+			return res + "_neg_handled";
 		if (attributes.contains(isUpdate))
 			return res + "_update";
 		return res;
@@ -1270,11 +1292,11 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected boolean hasPrev(VariableInformation var) {
-		return prevMap.contains(var.name);
+		return prevMapPos.contains(var.name) || prevMapNeg.contains(var.name);
 	}
 
 	protected boolean hasUpdate(VariableInformation var) {
-		return (isPredicate(var) || prevMap.contains(var.name));
+		return (isPredicate(var) || hasPrev(var));
 	}
 
 	protected Iterable<VariableInformation> excludeNull(VariableInformation... vars) {

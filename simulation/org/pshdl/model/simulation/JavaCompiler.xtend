@@ -92,7 +92,11 @@ class JavaCompiler implements ITypeOuptutProvider {
 
 	def compile(String packageName, String unitName) {
 		val Set<Integer> handled = new HashSet
+		val Set<Integer> handledPosEdge = new HashSet
+		val Set<Integer> handledNegEdge = new HashSet
 		handled.add(-1)
+		handledPosEdge.add(-1)
+		handledNegEdge.add(-1)
 		'''
 			«IF packageName !== null»package «packageName»;«ENDIF»
 			«imports»
@@ -154,9 +158,9 @@ class JavaCompiler implements ITypeOuptutProvider {
 						return true;
 					}
 				«ENDIF»
-				«em.runMethod(handled)»
+				«em.runMethod(handled, handledNegEdge, handledPosEdge)»
 				«IF !em.processframes.empty»
-					«em.testbenchMethod(handled)»
+					«em.testbenchMethod(handled, handledNegEdge, handledPosEdge)»
 				«ENDIF»
 			}
 		'''
@@ -184,12 +188,12 @@ class JavaCompiler implements ITypeOuptutProvider {
 		«ENDFOR»'''
 	
 
-	def testbenchMethod(ExecutableModel model, Set<Integer> handled) {
+	def testbenchMethod(ExecutableModel model, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) {
 		val Map<String, CharSequence> processes = model.processframes.map[process].toInvertedMap['''''']
 		model.processframes.forEach[
 			processes.put(it.process,
 				processes.get(it.process) + '''
-					«callFrame(it, handled)»
+					«callFrame(it, handled, handledNegEdge, handledPosEdge)»
 				''')]
 		return '''
 			«FOR Map.Entry<String, CharSequence> e : processes.entrySet»
@@ -230,7 +234,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def runMethod(ExecutableModel model, Set<Integer> handled) '''
+	def runMethod(ExecutableModel model, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) '''
 		public void run(){
 			deltaCycle++;
 			«IF hasClock»
@@ -243,7 +247,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 					listener.startCycle(deltaCycle, epsCycle, this);
 			«ENDIF»
 			«FOR f : em.nonProcessframes»
-				«callFrame(f, handled)»
+				«callFrame(f, handled, handledNegEdge, handledPosEdge)»
 			«ENDFOR»
 			«IF hasClock»
 				updateRegs();
@@ -268,12 +272,12 @@ class JavaCompiler implements ITypeOuptutProvider {
 		«hdlInterpreter»
 	'''
 
-	def callFrame(Frame f, Set<Integer> handled) '''«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 &&
+	def callFrame(Frame f, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) '''«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 &&
 		f.predNegDepRes.length == 0 && f.predPosDepRes.length == 0»
 			«f.frameName»();
 		«ELSE»
-			«f.edgeNegDepRes.createNegEdge(handled)»
-			«f.edgePosDepRes.createPosEdge(handled)»
+			«f.edgeNegDepRes.createNegEdge(handledNegEdge)»
+			«f.edgePosDepRes.createPosEdge(handledPosEdge)»
 			«FOR p : f.predNegDepRes»
 				«p.createBooleanPred(handled)»
 			«ENDFOR»

@@ -97,7 +97,11 @@ public class CCompiler implements ITypeOuptutProvider {
     CharSequence _xblockexpression = null;
     {
       final Set<Integer> handled = new HashSet<Integer>();
+      final Set<Integer> handledPosEdge = new HashSet<Integer>();
+      final Set<Integer> handledNegEdge = new HashSet<Integer>();
       handled.add(Integer.valueOf((-1)));
+      handledPosEdge.add(Integer.valueOf((-1)));
+      handledNegEdge.add(Integer.valueOf((-1)));
       StringConcatenation _builder = new StringConcatenation();
       CharSequence _imports = this.getImports();
       _builder.append(_imports, "");
@@ -269,11 +273,11 @@ public class CCompiler implements ITypeOuptutProvider {
               _builder.newLineIfNotEmpty();
             } else {
               _builder.append("\t\t");
-              CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handled);
+              CharSequence _createNegEdge = this.createNegEdge(f_1.edgeNegDepRes, handledPosEdge);
               _builder.append(_createNegEdge, "\t\t");
               _builder.newLineIfNotEmpty();
               _builder.append("\t\t");
-              CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handled);
+              CharSequence _createPosEdge = this.createPosEdge(f_1.edgePosDepRes, handledNegEdge);
               _builder.append(_createPosEdge, "\t\t");
               _builder.newLineIfNotEmpty();
               {

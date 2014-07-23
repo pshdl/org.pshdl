@@ -123,7 +123,11 @@ public class JavaCompiler implements ITypeOuptutProvider {
     CharSequence _xblockexpression = null;
     {
       final Set<Integer> handled = new HashSet<Integer>();
+      final Set<Integer> handledPosEdge = new HashSet<Integer>();
+      final Set<Integer> handledNegEdge = new HashSet<Integer>();
       handled.add(Integer.valueOf((-1)));
+      handledPosEdge.add(Integer.valueOf((-1)));
+      handledNegEdge.add(Integer.valueOf((-1)));
       StringConcatenation _builder = new StringConcatenation();
       {
         boolean _tripleNotEquals = (packageName != null);
@@ -376,7 +380,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
         }
       }
       _builder.append("\t");
-      CharSequence _runMethod = this.runMethod(this.cce.em, handled);
+      CharSequence _runMethod = this.runMethod(this.cce.em, handled, handledNegEdge, handledPosEdge);
       _builder.append(_runMethod, "\t");
       _builder.newLineIfNotEmpty();
       {
@@ -385,7 +389,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
         boolean _not = (!_isEmpty);
         if (_not) {
           _builder.append("\t");
-          String _testbenchMethod = this.testbenchMethod(this.cce.em, handled);
+          String _testbenchMethod = this.testbenchMethod(this.cce.em, handled, handledNegEdge, handledPosEdge);
           _builder.append(_testbenchMethod, "\t");
           _builder.newLineIfNotEmpty();
         }
@@ -531,7 +535,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public String testbenchMethod(final ExecutableModel model, final Set<Integer> handled) {
+  public String testbenchMethod(final ExecutableModel model, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
     Iterable<Frame> _processframes = this.cce.getProcessframes(model);
     final Function1<Frame, String> _function = new Function1<Frame, String>() {
       public String apply(final Frame it) {
@@ -551,7 +555,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       public void apply(final Frame it) {
         CharSequence _get = processes.get(it.process);
         StringConcatenation _builder = new StringConcatenation();
-        CharSequence _callFrame = JavaCompiler.this.callFrame(it, handled);
+        CharSequence _callFrame = JavaCompiler.this.callFrame(it, handled, handledNegEdge, handledPosEdge);
         _builder.append(_callFrame, "");
         _builder.newLineIfNotEmpty();
         String _plus = (_get + _builder.toString());
@@ -715,7 +719,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder.toString();
   }
   
-  public CharSequence runMethod(final ExecutableModel model, final Set<Integer> handled) {
+  public CharSequence runMethod(final ExecutableModel model, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("public void run(){");
     _builder.newLine();
@@ -751,7 +755,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
       Iterable<Frame> _nonProcessframes = this.cce.getNonProcessframes(this.cce.em);
       for(final Frame f : _nonProcessframes) {
         _builder.append("\t");
-        CharSequence _callFrame = this.callFrame(f, handled);
+        CharSequence _callFrame = this.callFrame(f, handled, handledNegEdge, handledPosEdge);
         _builder.append(_callFrame, "\t");
         _builder.newLineIfNotEmpty();
       }
@@ -822,7 +826,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public CharSequence callFrame(final Frame f, final Set<Integer> handled) {
+  public CharSequence callFrame(final Frame f, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
     StringConcatenation _builder = new StringConcatenation();
     {
       boolean _and = false;
@@ -848,10 +852,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _builder.append("();");
         _builder.newLineIfNotEmpty();
       } else {
-        CharSequence _createNegEdge = this.createNegEdge(f.edgeNegDepRes, handled);
+        CharSequence _createNegEdge = this.createNegEdge(f.edgeNegDepRes, handledNegEdge);
         _builder.append(_createNegEdge, "");
         _builder.newLineIfNotEmpty();
-        CharSequence _createPosEdge = this.createPosEdge(f.edgePosDepRes, handled);
+        CharSequence _createPosEdge = this.createPosEdge(f.edgePosDepRes, handledPosEdge);
         _builder.append(_createPosEdge, "");
         _builder.newLineIfNotEmpty();
         {

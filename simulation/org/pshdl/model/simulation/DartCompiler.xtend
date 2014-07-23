@@ -73,7 +73,11 @@ class DartCompiler implements ITypeOuptutProvider {
 
 	def compile(String unitName) {
 		val Set<Integer> handled = new HashSet
+		val Set<Integer> handledPosEdge = new HashSet
+		val Set<Integer> handledNegEdge = new HashSet
 		handled.add(-1)
+		handledPosEdge.add(-1)
+		handledNegEdge.add(-1)
 		'''
 			«imports»
 			void main(List<String> args, SendPort replyTo){
@@ -181,8 +185,8 @@ class DartCompiler implements ITypeOuptutProvider {
 				f.predPosDepRes.length == 0»
 							_frame«f.uniqueID»();
 						«ELSE»
-							«f.edgeNegDepRes.createNegEdge(handled)»
-							«f.edgePosDepRes.createPosEdge(handled)»
+							«f.edgeNegDepRes.createNegEdge(handledNegEdge)»
+							«f.edgePosDepRes.createPosEdge(handledPosEdge)»
 							«FOR p : f.predNegDepRes»
 								«p.createBooleanPred(handled)»
 							«ENDFOR»

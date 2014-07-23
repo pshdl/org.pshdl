@@ -86,7 +86,11 @@ class CCompiler implements ITypeOuptutProvider {
 
 	def compile() {
 		val Set<Integer> handled = new HashSet
+		val Set<Integer> handledPosEdge = new HashSet
+		val Set<Integer> handledNegEdge = new HashSet
 		handled.add(-1)
+		handledPosEdge.add(-1)
+		handledNegEdge.add(-1)
 		'''
 			«imports»
 			
@@ -139,8 +143,8 @@ class CCompiler implements ITypeOuptutProvider {
 				f.predPosDepRes.length == 0»
 							«f.frameName»();
 						«ELSE»
-							«f.edgeNegDepRes.createNegEdge(handled)»
-							«f.edgePosDepRes.createPosEdge(handled)»
+							«f.edgeNegDepRes.createNegEdge(handledPosEdge)»
+							«f.edgePosDepRes.createPosEdge(handledNegEdge)»
 							«FOR p : f.predNegDepRes»
 								«p.createboolPred(handled)»
 							«ENDFOR»
