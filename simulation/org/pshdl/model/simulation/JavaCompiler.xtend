@@ -122,11 +122,11 @@ class JavaCompiler implements ITypeOuptutProvider {
 					* Constructs an instance with no debugging and disabledEdge as well as disabledRegOutputlogic are false
 					*/
 					public «unitName»() {
-						this(«IF hasClock»false, false«ENDIF»«IF hasClock && debug»,«ENDIF»«IF debug» null, null«ENDIF»);
+						this(false, false«IF debug», null, null«ENDIF»);
 					}
 				«ENDIF»
 				
-				public «unitName»(«IF hasClock»boolean disableEdges, boolean disabledRegOutputlogic«ENDIF»«IF hasClock && debug»,«ENDIF»«IF debug» IDebugListener listener, ExecutableModel em«ENDIF») {
+				public «unitName»(boolean disableEdges, boolean disabledRegOutputlogic«IF debug», IDebugListener listener, ExecutableModel em«ENDIF») {
 					«IF hasClock»
 						this.disableEdges=disableEdges;
 						this.disabledRegOutputlogic=disabledRegOutputlogic;
@@ -776,7 +776,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 	}
 
 	def decl(VariableInformation info, Boolean includePrev) '''
-		«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»private long «info.idName(false,
+		«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»public long «info.idName(false,
 			false)»_update=0;«ENDIF»
 		public «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»;
 		«IF includePrev !== null && includePrev»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(true,
@@ -821,5 +821,119 @@ class JavaCompiler implements ITypeOuptutProvider {
 		val unitName = moduleName.substring(li + 1, moduleName.length);
 		doCompile(syntaxProblems, em, pkg, unitName, debug);
 	}
+	def CharSequence createChangeAdapter(String packageName, String unitName)
+'''«IF packageName !== null»package «packageName»;«ENDIF»
 
+import org.pshdl.interpreter.IChangeListener;
+import org.pshdl.interpreter.IHDLInterpreter;
+import java.math.BigInteger;
+
+public class ChangeAdapter«unitName» implements IHDLInterpreter{
+	«FOR v : em.variables.excludeNull»
+		«v.decl(prevMap.get(v.name))»
+	«ENDFOR»
+	
+	private «unitName» module;
+	private IChangeListener[] listeners;
+	public ChangeAdapter«unitName»(«unitName» module, IChangeListener ... listeners) {
+		this.module=module;
+		this.listeners=listeners;
+	}
+	
+	@Override
+	public void run() {
+		module.run();
+		«FOR varInfo:em.variables.excludeNull»
+			«varInfo.changedNotification»
+			«varInfo.idName(false, false)»=module.«varInfo.idName(false, false)»;
+		«ENDFOR»
+	}
+
+	@Override
+	public void setInput(String name, BigInteger value, int... arrayIdx) {
+		module.setInput(name, value, arrayIdx);
+	}
+
+	@Override
+	public void setInput(int idx, BigInteger value, int... arrayIdx) {
+		module.setInput(idx, value, arrayIdx);
+	}
+
+	@Override
+	public void setInput(String name, long value, int... arrayIdx) {
+		module.setInput(name, value, arrayIdx);
+	}
+
+	@Override
+	public void setInput(int idx, long value, int... arrayIdx) {
+		module.setInput(idx, value, arrayIdx);
+	}
+
+	@Override
+	public int getIndex(String name) {
+		return module.getIndex(name);
+	}
+
+	@Override
+	public String getName(int idx) {
+		return module.getName(idx);
+	}
+
+	@Override
+	public long getOutputLong(String name, int... arrayIdx) {
+		return module.getOutputLong(name, arrayIdx);
+	}
+
+	@Override
+	public long getOutputLong(int idx, int... arrayIdx) {
+		return module.getOutputLong(idx, arrayIdx);
+	}
+
+	@Override
+	public BigInteger getOutputBig(String name, int... arrayIdx) {
+		return module.getOutputBig(name, arrayIdx);
+	}
+
+	@Override
+	public BigInteger getOutputBig(int idx, int... arrayIdx) {
+		return module.getOutputBig(idx, arrayIdx);
+	}
+
+	@Override
+	public int getDeltaCycle() {
+		return module.getDeltaCycle();
+	}
+}
+'''
+	
+	def changedNotification(VariableInformation vi) {
+		val varName = vi.idName(false, false)
+		if (!vi.array){
+			if (vi.predicate){
+				val varNameUpdate = vi.idName(false, false)+"_update"
+				return '''if (module.«varName» != «varName»)
+	for (IChangeListener listener:listeners)
+		listener.valueChangedPredicate(getDeltaCycle(), "«vi.name»", «varName», module.«varName», «varNameUpdate», module.«varNameUpdate»);
+				'''
+			} else {
+				return '''if (module.«varName» != «varName»)
+	for (IChangeListener listener:listeners)
+		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName» «IF vi.width != 64» & «vi.width.asMaskL»«ENDIF», module.«varName» «IF vi.width != 64» & «vi.width.asMaskL»«ENDIF»);
+				'''
+			}
+		} else {
+			if (vi.predicate){
+				val varNameUpdate = vi.idName(false, false)+"_update"
+				return '''if (!module.«varName».equals(«varName»))
+	for (IChangeListener listener:listeners)
+		listener.valueChangedPredicateArray(getDeltaCycle(), "«vi.name»", «varName», module.«varName», «varNameUpdate», module.«varNameUpdate»);
+				'''
+			} else {
+				return '''if (!module.«varName».equals(«varName»))
+	for (IChangeListener listener:listeners)
+		listener.valueChangedLongArray(getDeltaCycle(), "«vi.name»", «varName», module.«varName»);
+				'''
+			}
+		}
+	}
 }

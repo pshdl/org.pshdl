@@ -27,43 +27,117 @@
 package org.pshdl.model.simulation;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
+import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import org.pshdl.interpreter.IHDLInterpreter;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
-public class JavaClassRuntimeLoader {
+public class JavaClassRuntimeLoader implements AutoCloseable {
 
-	public static IHDLInterpreter compileAndLoad(String name, String source, boolean disableEdge, boolean disableOutputLogic) throws Exception {
-		final File tempDir = Files.createTempDir();
+	public static class DiagnosticsException extends RuntimeException {
+		private static final long serialVersionUID = -1283967107290479965L;
+		public final List<Diagnostic<? extends JavaFileObject>> diagnostics;
+
+		public DiagnosticsException(List<Diagnostic<? extends JavaFileObject>> diagnostics) {
+			this.diagnostics = diagnostics;
+		}
+
+		@Override
+		public String getMessage() {
+			for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
+				if (diagnostic.getKind() == Kind.ERROR)
+					return diagnostic.getMessage(null);
+			}
+			return super.getMessage();
+		}
+	}
+
+	private final static class ErrorCheckDiagnostic implements DiagnosticListener<JavaFileObject> {
+
+		public Kind kind;
+		public List<Diagnostic<? extends JavaFileObject>> diagnostics = Lists.newArrayList();
+
+		@Override
+		public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+			final Kind newKind = diagnostic.getKind();
+			if (newKind == Kind.ERROR) {
+				kind = newKind;
+			}
+			diagnostics.add(diagnostic);
+		}
+	}
+
+	private final File tempDir;
+	private final URLClassLoader classLoader;
+	private final JavaCompiler compiler;
+	private final StandardJavaFileManager fileManager;
+
+	public JavaClassRuntimeLoader() throws Exception {
+		tempDir = Files.createTempDir();
 		tempDir.deleteOnExit();
-		final String pathName = name.replace('.', File.separatorChar) + ".java";
-		final File sourceFile = new File(tempDir, pathName);
-		final File pkgDir = sourceFile.getParentFile();
-		if (pkgDir == null)
-			throw new IllegalArgumentException("Failed to get parent of:" + sourceFile);
-		if (!pkgDir.mkdirs())
-			throw new IllegalArgumentException("Failed to create package directories:" + pkgDir);
-		Files.write(source, sourceFile, StandardCharsets.UTF_8);
+		classLoader = URLClassLoader.newInstance(new URL[] { tempDir.toURI().toURL() });
+		compiler = ToolProvider.getSystemJavaCompiler();
+		fileManager = compiler.getStandardFileManager(null, null, null);
+		final String property = System.getProperty("java.class.path");
+		final List<File> cp = new ArrayList<>();
+		final Iterable<String> split = Splitter.on(File.pathSeparatorChar).split(property);
+		for (final String entry : split) {
+			cp.add(new File(entry));
+		}
+		cp.add(tempDir);
+		fileManager.setLocation(StandardLocation.CLASS_PATH, cp);
+		fileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.singleton(tempDir));
+	}
 
-		// Compile source file.
-		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		if (compiler.run(null, null, null, sourceFile.getPath()) != 0)
-			return null;
-
-		// Load and instantiate compiled class.
-		final URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { tempDir.toURI().toURL() });
-		final Class<?> cls = Class.forName(name, true, classLoader);
+	public IHDLInterpreter compileAndLoad(String mainClassFQN, String sourceCode, boolean disableEdge, boolean disableOutputLogic) throws Exception {
+		final Class<?> cls = compileClass(mainClassFQN, sourceCode);
 		final Constructor<?> constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
 		final IHDLInterpreter instance = (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
 		return instance;
 	}
 
+	public Class<?> compileClass(String mainClassFQN, String sourceCode) throws Exception {
+		final String pathName = mainClassFQN.replace('.', File.separatorChar) + ".java";
+		final File sourceFile = new File(tempDir, pathName);
+		final File pkgDir = sourceFile.getParentFile();
+		if (pkgDir == null)
+			throw new IllegalArgumentException("Failed to get parent of:" + sourceFile);
+		if (!pkgDir.exists() && !pkgDir.mkdirs())
+			throw new IllegalArgumentException("Failed to create package directories:" + pkgDir);
+		Files.write(sourceCode, sourceFile, StandardCharsets.UTF_8);
+
+		final StringWriter error = new StringWriter();
+		final ErrorCheckDiagnostic diagnostic = new ErrorCheckDiagnostic();
+		compiler.getTask(error, fileManager, diagnostic, null, null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile))).call();
+		if (diagnostic.kind == Kind.ERROR)
+			throw new DiagnosticsException(diagnostic.diagnostics);
+
+		// Load and instantiate compiled class.
+		return Class.forName(mainClassFQN, true, classLoader);
+	}
+
+	@Override
+	public void close() throws Exception {
+		fileManager.close();
+	}
 }

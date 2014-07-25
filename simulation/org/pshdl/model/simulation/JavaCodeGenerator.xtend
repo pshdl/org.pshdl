@@ -22,7 +22,7 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 	}
 
 	override protected fieldType(VariableInformation varInfo, EnumSet<Attributes> attributes) {
-		if (varInfo.dimensions.nullOrEmpty || attributes.contains(baseType)){
+		if (varInfo.dimensions.nullOrEmpty || attributes.contains(baseType)) {
 			if (isBoolean(varInfo, attributes))
 				return "boolean "
 			return "long "
@@ -36,12 +36,11 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 	override protected preField(VariableInformation x, EnumSet<Attributes> attributes) '''«IF attributes.
 		contains(Attributes.isPublic)»public«ELSE»private«ENDIF» '''
 
-	override protected footer() 
-'''
+	override protected footer() '''
 	«hdlInterpreter»
 }'''
 
-	def hdlInterpreter() '''
+	def protected hdlInterpreter() '''
 		@Override
 		public void setInput(String name, BigInteger value, int... arrayIdx) {
 			setInput(getIndex(name), value.longValue(), arrayIdx);
@@ -132,7 +131,6 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		}
 	'''
 
-
 	override protected header() '''
 		«IF packageName !== null»package «packageName»;«ENDIF»
 		«imports»
@@ -143,9 +141,8 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 			private Map<String, Integer> varIdx=new HashMap<String, Integer>();
 	'''
 
-	protected override postFieldDeclarations() 
-'''	«IF maxCosts!=Integer.MAX_VALUE»public static ExecutorService mainPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());«ENDIF»
-	«IF hasClock»
+	protected override postFieldDeclarations() '''	«IF maxCosts != Integer.MAX_VALUE»public static ExecutorService mainPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());«ENDIF»
+		«IF hasClock»
 			private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();
 			
 			/**
@@ -162,14 +159,17 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 					varIdx.put("«v.name»", «varIdx.get(v.name)»);
 				«ENDFOR»
 			}
-	«ELSE»
+		«ELSE»
 			public «unitName»() {
 				«FOR v : em.variables.excludeNull»
 					varIdx.put("«v.name»", «varIdx.get(v.name)»);
 				«ENDFOR»
 			}
-	«ENDIF»
-	«IF hasClock»
+			public «unitName»(boolean «DISABLE_EDGES.name», boolean «DISABLE_REG_OUTPUTLOGIC.name») {
+				this();
+			}
+		«ENDIF»
+		«IF hasClock»
 			public boolean skipEdge(long local) {
 				long dc = local >>> 16l;
 				// Register was updated in previous delta cylce, that is ok
@@ -184,9 +184,10 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 			}
 			
 			«copyRegs»
-	«ENDIF»
-'''
-	def copyRegs() '''
+		«ENDIF»
+	'''
+
+	def protected copyRegs() '''
 		private void updateRegs() {
 			for (RegUpdate reg : regUpdates) {
 				switch (reg.internalID) {
@@ -206,10 +207,10 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 					«ENDFOR»
 				}
 			}
-			regUpdates.clear();
 		}
 	'''
-	def getImports() '''
+
+	def  protected getImports() '''
 		import java.util.*;
 		import java.math.*;
 		import org.pshdl.interpreter.*;
@@ -218,15 +219,15 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 
 	override protected calculateVariableAccessIndex(List<Integer> arr, VariableInformation varInfo) {
 		val res = super.calculateVariableAccessIndex(arr, varInfo)
-		if (res.length===0)
+		if (res.length === 0)
 			return res
-		return "(int)("+res+")"
+		return "(int)(" + res + ")"
 	}
-	
-	def CharSequence calculateVariableAccessIndexArr(VariableInformation varInfo) {
+
+	def protected CharSequence calculateVariableAccessIndexArr(VariableInformation varInfo) {
 		val int lastIndex = varInfo.dimensions.size() - 1;
 		val StringBuilder arrayAccess = new StringBuilder();
-		for (i:0..<lastIndex) {
+		for (i : 0 ..< lastIndex) {
 			if (i != 0) {
 				arrayAccess.append(" + ");
 			}
@@ -240,7 +241,7 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 	}
 
 	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<Attributes> attributes) {
-		val attrClone=attributes.clone
+		val attrClone = attributes.clone
 		attrClone.add(baseType)
 		return '''new «varInfo.fieldType(attrClone)»[«varInfo.arraySize»]'''
 	}
@@ -251,40 +252,39 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 	override protected functionHeader(Frame frame) '''
 		private final void «frame.frameName»() {
 	'''
-	
-	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean forceRegUpdate) '''
+
+	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName,
+		CharSequence offset, boolean forceRegUpdate) '''
 	«IF !forceRegUpdate»if («cpyName»!=«last»)
 	«indent()»	«ENDIF»regUpdates.add(new RegUpdate(«varIdx.get(outputInternal.info.name)», «offset»));'''
-	
+
 	override protected runMethodsHeader(boolean constant) '''public void «IF !constant»run«ELSE»initConstants«ENDIF»() {
-	'''
-		
+		'''
+
 	override protected runMethodsFooter(boolean constant) '''}
-	'''
-	
+		'''
+
 	override protected callStage(int stage, boolean constant) '''«stageMethodName(constant, stage)»();
-	'''
-	
-	protected def stageMethodName(boolean constant, int stage)
-		'''«IF constant»const_«ENDIF»stage«String.format("%04d", stage)»'''
-	
-	
-	override protected stageMethodsFooter(int stage, int stageCosts, boolean constant)'''}
-			'''
-	
+		'''
+
+	protected def stageMethodName(boolean constant, int stage) '''«IF constant»const_«ENDIF»stage«String.format("%04d",
+		stage)»'''
+
+	override protected stageMethodsFooter(int stage, int stageCosts, boolean constant) '''}
+		'''
+
 	override protected barrierBegin(int stage, int totalStageCosts, boolean constant) {
-	val res='''List<Callable<Void>> calls=new ArrayList<Callable<Void>>();
+		val res = '''List<Callable<Void>> calls=new ArrayList<Callable<Void>>();
 	«indent()»calls.add(new Callable<Void>() {
 	«indent()»@Override public Void call() {
 	'''
-	indent+=2;
-	return res
-}
-	
-	override protected barrierEnd(int stage, int totalStageCosts, boolean constant){
-	indent-=2;
-val res=
-'''return null;
+		indent += 2;
+		return res
+	}
+
+	override protected barrierEnd(int stage, int totalStageCosts, boolean constant) {
+		indent -= 2;
+		val res = '''return null;
 «indent()»}
 «indent()»});
 «indent()»try {
@@ -293,31 +293,219 @@ val res=
 «indent()»	new RuntimeException(e);
 «indent()»}
 '''
-return res
-	} 
-	
-	override protected barrier() {
-		indent-=2
-		val res='''
-			return null;
-		«indent()»	}
-		«indent()»});
-		calls.add(new Callable<Void>() {
-		«indent()»@Override public Void call() {
-		'''
-		indent+=2
 		return res
 	}
-	
-	override protected stageMethodsHeader(int stage, int stageCosts, boolean constant) '''public void «stageMethodName(constant, stage)»(){
+
+	override protected barrier() {
+		indent -= 2
+		val res = '''
+				return null;
+			«indent()»	}
+			«indent()»});
+			calls.add(new Callable<Void>() {
+			«indent()»@Override public Void call() {
 		'''
-		
-		override protected applyRegUpdates() {
-			return "updateRegs();"
+		indent += 2
+		return res
+	}
+
+	override protected stageMethodsHeader(int stage, int stageCosts, boolean constant) '''public void «stageMethodName(
+		constant, stage)»(){
+		'''
+
+	override protected applyRegUpdates() {
+		return "updateRegs();"
+	}
+
+	override protected checkRegupdates() {
+		return "!regUpdates.isEmpty()"
+	}
+	
+	def String createChangeAdapter(boolean useInterface)
+'''«IF packageName !== null»package «packageName»;«ENDIF»
+
+import org.pshdl.interpreter.IChangeListener;
+import org.pshdl.interpreter.IHDLInterpreter;
+import java.math.BigInteger;
+
+public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implements IHDLInterpreter{
+	«fieldDeclarations(false)»
+	«IF useInterface»
+		«FOR varInfo:em.variables.excludeNull»
+			int «varInfo.idName(true, NONE)»_idx;
+		«ENDFOR»
+	«ENDIF»
+	
+	private «IF useInterface»IHDLInterpreter«ELSE»«unitName»«ENDIF» module;
+	private IChangeListener[] listeners;
+	public «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName»(«IF useInterface»IHDLInterpreter«ELSE»«unitName»«ENDIF» module, IChangeListener ... listeners) {
+		this.module=module;
+		this.listeners=listeners;
+		«IF useInterface»
+		«FOR varInfo:em.variables.excludeNull»
+			«varInfo.idName(true, NONE)»_idx=module.getIndex("«varInfo.name»");
+		«ENDFOR»
+	«ENDIF»
+	}
+	
+	@Override
+	public void run() {
+		module.run();
+		«FOR varInfo:em.variables.excludeNull»
+			«val CharSequence varName=varInfo.idName(true, NONE)»
+			«IF useInterface»
+				«varInfo.changedNotificationInterface»
+				«IF varInfo.array»
+					«IF varInfo.predicate»
+						for (int i=0;i<«varInfo.arraySize»;i++)
+							«varName»[i]=module.getOutputLong(«varName»_idx, i)!=0;
+					«ELSE»
+						for (int i=0;i<«varInfo.arraySize»;i++)
+							«varName»[i]=module.getOutputLong(«varName»_idx, i);
+					«ENDIF»
+				«ELSE»
+					«IF varInfo.predicate»
+						«varName»=module.getOutputLong(«varName»_idx)!=0;
+					«ELSE»
+						«varName»=module.getOutputLong(«varName»_idx);
+					«ENDIF»
+				«ENDIF»
+			«ELSE»
+				«varInfo.changedNotification»
+				«varName»=module.«varName»;
+			«ENDIF»
+		«ENDFOR»
+	}
+
+	@Override
+	public void setInput(String name, BigInteger value, int... arrayIdx) {
+		module.setInput(name, value, arrayIdx);
+	}
+
+	@Override
+	public void setInput(int idx, BigInteger value, int... arrayIdx) {
+		module.setInput(idx, value, arrayIdx);
+	}
+
+	@Override
+	public void setInput(String name, long value, int... arrayIdx) {
+		module.setInput(name, value, arrayIdx);
+	}
+
+	@Override
+	public void setInput(int idx, long value, int... arrayIdx) {
+		module.setInput(idx, value, arrayIdx);
+	}
+
+	@Override
+	public int getIndex(String name) {
+		return module.getIndex(name);
+	}
+
+	@Override
+	public String getName(int idx) {
+		return module.getName(idx);
+	}
+
+	@Override
+	public long getOutputLong(String name, int... arrayIdx) {
+		return module.getOutputLong(name, arrayIdx);
+	}
+
+	@Override
+	public long getOutputLong(int idx, int... arrayIdx) {
+		return module.getOutputLong(idx, arrayIdx);
+	}
+
+	@Override
+	public BigInteger getOutputBig(String name, int... arrayIdx) {
+		return module.getOutputBig(name, arrayIdx);
+	}
+
+	@Override
+	public BigInteger getOutputBig(int idx, int... arrayIdx) {
+		return module.getOutputBig(idx, arrayIdx);
+	}
+
+	@Override
+	public int getDeltaCycle() {
+		return module.getDeltaCycle();
+	}	
+}
+'''
+	
+	def protected changedNotificationInterface(VariableInformation vi) {
+		val varName = vi.idName(true, NONE)
+		if (!vi.array){
+			if (vi.predicate){
+				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				return '''if ((module.getOutputLong(«varName»_idx)!=0) != «varName»)
+	for (IChangeListener listener:listeners)
+		listener.valueChangedPredicate(getDeltaCycle(), "«vi.name»", «varName», (module.getOutputLong(«varName»_idx)!=0), «varNameUpdate», -1);
+'''
+			} else {
+				return '''if (module.getOutputLong(«varName»_idx) != «varName»)
+	for (IChangeListener listener:listeners)
+		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName», module.getOutputLong(«varName»_idx));
+'''
+			}
+		} else {
+			if (vi.predicate){
+				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				return '''{
+boolean[] tempArr=new boolean[«vi.arraySize»];
+for (int i=0;i<«vi.arraySize»;i++)
+	tempArr[i]=module.getOutputLong(«varName»_idx)!=0;
+if (!tempArr.equals(«varName»))
+	for (IChangeListener listener:listeners)
+		listener.valueChangedPredicateArray(getDeltaCycle(), "«vi.name»", «varName», tempArr, «varNameUpdate», -1);
+}
+'''
+			} else {
+				return '''{
+long[] tempArr=new long[«vi.arraySize»];
+for (int i=0;i<«vi.arraySize»;i++)
+	tempArr[i]=module.getOutputLong(«varName»_idx, i);
+if (!tempArr.equals(«varName»))
+	for (IChangeListener listener:listeners)
+		listener.valueChangedLongArray(getDeltaCycle(), "«vi.name»", «varName», tempArr);
+}
+'''
+			}
 		}
-		
-		override protected checkRegupdates() {
-			return "!regUpdates.isEmpty()"
+	}
+	def protected changedNotification(VariableInformation vi) {
+		val varName = vi.idName(true, NONE)
+		if (!vi.array){
+			if (vi.predicate){
+				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				return '''if (module.«varName» != «varName»)
+	for (IChangeListener listener:listeners)
+		listener.valueChangedPredicate(getDeltaCycle(), "«vi.name»", «varName», module.«varName», «varNameUpdate», module.«varNameUpdate»);
+				'''
+			} else {
+				return '''if (module.«varName» != «varName»)
+	for (IChangeListener listener:listeners)
+		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.constant»«ENDIF», module.«varName»«IF vi.width != 64» & «vi.width.calcMask.constant»«ENDIF»);
+				'''
+			}
+		} else {
+			if (vi.predicate){
+				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				return '''if (!module.«varName».equals(«varName»))
+	for (IChangeListener listener:listeners)
+		listener.valueChangedPredicateArray(getDeltaCycle(), "«vi.name»", «varName», module.«varName», «varNameUpdate», module.«varNameUpdate»);
+				'''
+			} else {
+				return '''if (!module.«varName».equals(«varName»))
+	for (IChangeListener listener:listeners)
+		listener.valueChangedLongArray(getDeltaCycle(), "«vi.name»", «varName», module.«varName»);
+				'''
+			}
 		}
-		
+	}
+	
+	override protected clearRegUpdates() '''regUpdates.clear();
+	'''
+
 }

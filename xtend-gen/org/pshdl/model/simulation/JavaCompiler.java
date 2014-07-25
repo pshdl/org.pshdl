@@ -223,26 +223,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("\t");
-          _builder.append("this(");
-          {
-            if (this.cce.hasClock) {
-              _builder.append("false, false");
-            }
-          }
-          {
-            boolean _and = false;
-            if (!this.cce.hasClock) {
-              _and = false;
-            } else {
-              _and = this.debug;
-            }
-            if (_and) {
-              _builder.append(",");
-            }
-          }
+          _builder.append("this(false, false");
           {
             if (this.debug) {
-              _builder.append(" null, null");
+              _builder.append(", null, null");
             }
           }
           _builder.append(");");
@@ -257,26 +241,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.append("\t");
       _builder.append("public ");
       _builder.append(unitName, "\t");
-      _builder.append("(");
-      {
-        if (this.cce.hasClock) {
-          _builder.append("boolean disableEdges, boolean disabledRegOutputlogic");
-        }
-      }
-      {
-        boolean _and_1 = false;
-        if (!this.cce.hasClock) {
-          _and_1 = false;
-        } else {
-          _and_1 = this.debug;
-        }
-        if (_and_1) {
-          _builder.append(",");
-        }
-      }
+      _builder.append("(boolean disableEdges, boolean disabledRegOutputlogic");
       {
         if (this.debug) {
-          _builder.append(" IDebugListener listener, ExecutableModel em");
+          _builder.append(", IDebugListener listener, ExecutableModel em");
         }
       }
       _builder.append(") {");
@@ -2570,7 +2538,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _or = _and;
       }
       if (_or) {
-        _builder.append("private long ");
+        _builder.append("public long ");
         String _idName = this.cce.idName(info, false, 
           false);
         _builder.append(_idName, "");
@@ -2692,5 +2660,368 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _xblockexpression = JavaCompiler.doCompile(syntaxProblems, em, pkg, unitName, debug);
     }
     return _xblockexpression;
+  }
+  
+  public CharSequence createChangeAdapter(final String packageName, final String unitName) {
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      boolean _tripleNotEquals = (packageName != null);
+      if (_tripleNotEquals) {
+        _builder.append("package ");
+        _builder.append(packageName, "");
+        _builder.append(";");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.newLine();
+    _builder.append("import org.pshdl.interpreter.IChangeListener;");
+    _builder.newLine();
+    _builder.append("import org.pshdl.interpreter.IHDLInterpreter;");
+    _builder.newLine();
+    _builder.append("import java.math.BigInteger;");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("public class ChangeAdapter");
+    _builder.append(unitName, "");
+    _builder.append(" implements IHDLInterpreter{");
+    _builder.newLineIfNotEmpty();
+    {
+      Iterable<VariableInformation> _excludeNull = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation v : _excludeNull) {
+        _builder.append("\t");
+        Boolean _get = this.cce.prevMap.get(v.name);
+        CharSequence _decl = this.decl(v, _get);
+        _builder.append(_decl, "\t");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("private ");
+    _builder.append(unitName, "\t");
+    _builder.append(" module;");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("private IChangeListener[] listeners;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public ChangeAdapter");
+    _builder.append(unitName, "\t");
+    _builder.append("(");
+    _builder.append(unitName, "\t");
+    _builder.append(" module, IChangeListener ... listeners) {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t\t");
+    _builder.append("this.module=module;");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("this.listeners=listeners;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void run() {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.run();");
+    _builder.newLine();
+    {
+      Iterable<VariableInformation> _excludeNull_1 = this.cce.excludeNull(this.cce.em.variables);
+      for(final VariableInformation varInfo : _excludeNull_1) {
+        _builder.append("\t\t");
+        String _changedNotification = this.changedNotification(varInfo);
+        _builder.append(_changedNotification, "\t\t");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t");
+        String _idName = this.cce.idName(varInfo, false, false);
+        _builder.append(_idName, "\t\t");
+        _builder.append("=module.");
+        String _idName_1 = this.cce.idName(varInfo, false, false);
+        _builder.append(_idName_1, "\t\t");
+        _builder.append(";");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void setInput(String name, BigInteger value, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.setInput(name, value, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void setInput(int idx, BigInteger value, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.setInput(idx, value, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void setInput(String name, long value, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.setInput(name, value, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void setInput(int idx, long value, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.setInput(idx, value, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public int getIndex(String name) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getIndex(name);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public String getName(int idx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getName(idx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public long getOutputLong(String name, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getOutputLong(name, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public long getOutputLong(int idx, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getOutputLong(idx, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public BigInteger getOutputBig(String name, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getOutputBig(name, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public BigInteger getOutputBig(int idx, int... arrayIdx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getOutputBig(idx, arrayIdx);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public int getDeltaCycle() {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return module.getDeltaCycle();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public String changedNotification(final VariableInformation vi) {
+    final String varName = this.cce.idName(vi, false, false);
+    boolean _isArray = this.cce.isArray(vi);
+    boolean _not = (!_isArray);
+    if (_not) {
+      boolean _isPredicate = this.cce.isPredicate(vi);
+      if (_isPredicate) {
+        String _idName = this.cce.idName(vi, false, false);
+        final String varNameUpdate = (_idName + "_update");
+        StringConcatenation _builder = new StringConcatenation();
+        _builder.append("if (module.");
+        _builder.append(varName, "");
+        _builder.append(" != ");
+        _builder.append(varName, "");
+        _builder.append(")");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        _builder.append("for (IChangeListener listener:listeners)");
+        _builder.newLine();
+        _builder.append("\t\t");
+        _builder.append("listener.valueChangedPredicate(getDeltaCycle(), \"");
+        _builder.append(vi.name, "\t\t");
+        _builder.append("\", ");
+        _builder.append(varName, "\t\t");
+        _builder.append(", module.");
+        _builder.append(varName, "\t\t");
+        _builder.append(", ");
+        _builder.append(varNameUpdate, "\t\t");
+        _builder.append(", module.");
+        _builder.append(varNameUpdate, "\t\t");
+        _builder.append(");");
+        _builder.newLineIfNotEmpty();
+        return _builder.toString();
+      } else {
+        StringConcatenation _builder_1 = new StringConcatenation();
+        _builder_1.append("if (module.");
+        _builder_1.append(varName, "");
+        _builder_1.append(" != ");
+        _builder_1.append(varName, "");
+        _builder_1.append(")");
+        _builder_1.newLineIfNotEmpty();
+        _builder_1.append("\t");
+        _builder_1.append("for (IChangeListener listener:listeners)");
+        _builder_1.newLine();
+        _builder_1.append("\t\t");
+        _builder_1.append("listener.valueChangedLong(getDeltaCycle(), \"");
+        _builder_1.append(vi.name, "\t\t");
+        _builder_1.append("\", ");
+        _builder_1.append(varName, "\t\t");
+        _builder_1.append(" ");
+        {
+          if ((vi.width != 64)) {
+            _builder_1.append(" & ");
+            CharSequence _asMaskL = this.cce.asMaskL(vi.width);
+            _builder_1.append(_asMaskL, "\t\t");
+          }
+        }
+        _builder_1.append(", module.");
+        _builder_1.append(varName, "\t\t");
+        _builder_1.append(" ");
+        {
+          if ((vi.width != 64)) {
+            _builder_1.append(" & ");
+            CharSequence _asMaskL_1 = this.cce.asMaskL(vi.width);
+            _builder_1.append(_asMaskL_1, "\t\t");
+          }
+        }
+        _builder_1.append(");");
+        _builder_1.newLineIfNotEmpty();
+        return _builder_1.toString();
+      }
+    } else {
+      boolean _isPredicate_1 = this.cce.isPredicate(vi);
+      if (_isPredicate_1) {
+        String _idName_1 = this.cce.idName(vi, false, false);
+        final String varNameUpdate_1 = (_idName_1 + "_update");
+        StringConcatenation _builder_2 = new StringConcatenation();
+        _builder_2.append("if (!module.");
+        _builder_2.append(varName, "");
+        _builder_2.append(".equals(");
+        _builder_2.append(varName, "");
+        _builder_2.append("))");
+        _builder_2.newLineIfNotEmpty();
+        _builder_2.append("\t");
+        _builder_2.append("for (IChangeListener listener:listeners)");
+        _builder_2.newLine();
+        _builder_2.append("\t\t");
+        _builder_2.append("listener.valueChangedPredicateArray(getDeltaCycle(), \"");
+        _builder_2.append(vi.name, "\t\t");
+        _builder_2.append("\", ");
+        _builder_2.append(varName, "\t\t");
+        _builder_2.append(", module.");
+        _builder_2.append(varName, "\t\t");
+        _builder_2.append(", ");
+        _builder_2.append(varNameUpdate_1, "\t\t");
+        _builder_2.append(", module.");
+        _builder_2.append(varNameUpdate_1, "\t\t");
+        _builder_2.append(");");
+        _builder_2.newLineIfNotEmpty();
+        return _builder_2.toString();
+      } else {
+        StringConcatenation _builder_3 = new StringConcatenation();
+        _builder_3.append("if (!module.");
+        _builder_3.append(varName, "");
+        _builder_3.append(".equals(");
+        _builder_3.append(varName, "");
+        _builder_3.append("))");
+        _builder_3.newLineIfNotEmpty();
+        _builder_3.append("\t");
+        _builder_3.append("for (IChangeListener listener:listeners)");
+        _builder_3.newLine();
+        _builder_3.append("\t\t");
+        _builder_3.append("listener.valueChangedLongArray(getDeltaCycle(), \"");
+        _builder_3.append(vi.name, "\t\t");
+        _builder_3.append("\", ");
+        _builder_3.append(varName, "\t\t");
+        _builder_3.append(", module.");
+        _builder_3.append(varName, "\t\t");
+        _builder_3.append(");");
+        _builder_3.newLineIfNotEmpty();
+        return _builder_3.toString();
+      }
+    }
   }
 }

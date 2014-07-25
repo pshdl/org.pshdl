@@ -84,12 +84,12 @@ public abstract class CommonCodeGenerator {
 		return em.internals[id];
 	}
 
-	public String doGenerate() {
+	public String doGenerateMainUnit() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(header());
 		preBody();
 		sb.append(preFieldDeclarations());
-		sb.append(fielDeclarations());
+		sb.append(fieldDeclarations(true));
 		sb.append(postFieldDeclarations());
 		sb.append(preFrames());
 		sb.append(frames());
@@ -128,6 +128,7 @@ public abstract class CommonCodeGenerator {
 		if (!createConstant && hasClock) {
 			sb.append(indent()).append(doLoopStart()).append(newLine());
 			indent++;
+			sb.append(indent()).append(clearRegUpdates());
 		}
 		sb.append(indent()).append(assignVariable(TIMESTAMP, "(" + DELTA_CYCLE.name + " << 16) | " + EPS_CYCLE.name, NONE, true, false)).append(newLine());
 		for (int i = 0; i <= maxStage; i++) {
@@ -165,6 +166,8 @@ public abstract class CommonCodeGenerator {
 		sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates));
 		return sb;
 	}
+
+	protected abstract CharSequence clearRegUpdates();
 
 	protected CharSequence createStageMethods(final Multimap<Integer, Frame> schedulingStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
 			final List<Integer> handledPredicates) {
@@ -310,7 +313,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	private CharSequence skipEdge(CharSequence updateInternal) {
+	protected CharSequence skipEdge(CharSequence updateInternal) {
 		return "skipEdge(" + updateInternal + ")";
 	}
 
@@ -453,7 +456,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	private CharSequence frameExecution(Frame frame) {
+	protected CharSequence frameExecution(Frame frame) {
 		final StringBuilder sb = new StringBuilder();
 		int pos = 0;
 		int arrPos = 0;
@@ -541,7 +544,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	private CharSequence doAssign(CharSequence assignValue, int targetSizeWithType) {
+	protected CharSequence doAssign(CharSequence assignValue, int targetSizeWithType) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(" = ");
 		if (isSignedType(targetSizeWithType)) {
@@ -629,7 +632,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	private CharSequence toConcatExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toConcatExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case concat:
@@ -654,7 +657,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	private CharSequence toCastExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toCastExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
 		final StringBuilder sb = new StringBuilder();
 		final String tempName = getTempName(a, NONE);
 		switch (exec.inst) {
@@ -726,18 +729,35 @@ public abstract class CommonCodeGenerator {
 			final String cpyName = tempName + "_cpy";
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
 			if (!forceRegUpdate) {
-				sb.append(assignVariable(createVar(cpyName, internal.actualWidth, internal.info.type), internalWithArrayAccess(internal, arr, NONE), NONE, false, true)).append(
-						comment("Backup of current value"));
+				// TODO save fill value
+				final VariableInformation cpyVar = createVar(cpyName, internal.actualWidth, internal.info.type);
+				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, arr, NONE), NONE, false, true)).append(comment("Backup of current value"));
 				sb.append(indent());
 			}
+			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
 			sb.append(assignInternal(internal, tempName, arr, EnumSet.of(isShadowReg))).append(comment("Assign value"));
 			final CharSequence offset = calcRegUpdateOffset(arr, internal);
-			sb.append(indent()).append(scheduleShadowReg(internal, tempName, cpyName, offset, forceRegUpdate));
+			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, EnumSet.of(isShadowReg)), cpyName, offset, forceRegUpdate));
 		} else {
+			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
 			sb.append(assignInternal(internal, tempName, arr, NONE)).append(comment("Assign value"));
 		}
 		arr.clear();
 		return sb;
+	}
+
+	protected String createBitAccessIfNeeded(InternalInformation internal, String tempName, List<Integer> arr, final StringBuilder sb) {
+		if (internal.bitStart != -1) {
+			final VariableInformation currVar = createVar(tempName + "_current", internal.actualWidth, internal.info.type);
+			sb.append(assignVariable(currVar, invertedMask(internalWithArrayAccess(internal, arr, NONE), internal.bitStart + 1), NONE, false, true)).append(
+					comment("Current value"));
+			final VariableInformation maskVar = createVar(tempName + "_mask_shift", internal.actualWidth, internal.info.type);
+			sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true))
+					.append(comment("Masked and shifted"));
+			tempName = "(" + currVar.name + " | " + maskVar.name + ")";
+			sb.append(indent());
+		}
+		return tempName;
 	}
 
 	protected CharSequence loadInternal(InternalInformation info, List<Integer> arr, EnumSet<Attributes> attributes) {
@@ -941,7 +961,7 @@ public abstract class CommonCodeGenerator {
 		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
 	}
 
-	private CharSequence tempVar(int pos, int targetSizeWithType, EnumSet<Attributes> attributes) {
+	protected CharSequence tempVar(int pos, int targetSizeWithType, EnumSet<Attributes> attributes) {
 		final int width = targetSizeWithType >> 1;
 		Type type = Type.UINT;
 		if (attributes.contains(isPredicate)) {
@@ -966,7 +986,7 @@ public abstract class CommonCodeGenerator {
 		return attributes;
 	}
 
-	private CharSequence getCast(int targetSizeWithType) {
+	protected CharSequence getCast(int targetSizeWithType) {
 		return "";
 	}
 
@@ -995,10 +1015,17 @@ public abstract class CommonCodeGenerator {
 		return (targetSizeWithType & 1) == 1;
 	}
 
-	protected CharSequence mask(String op, int targetSize) {
+	protected CharSequence mask(CharSequence op, int targetSize) {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize);
+		return "(" + op + ") & " + constant(mask);
+	}
+
+	protected CharSequence invertedMask(CharSequence op, int targetSize) {
+		if (targetSize == bitWidth)
+			return op;
+		final BigInteger mask = calcMask(targetSize).not();
 		return "(" + op + ") & " + constant(mask);
 	}
 
@@ -1006,7 +1033,7 @@ public abstract class CommonCodeGenerator {
 		return (BigInteger.ONE.shiftLeft(targetSize)).subtract(BigInteger.ONE);
 	}
 
-	private CharSequence signExtend(CharSequence op, int targetSizeWithType) {
+	protected CharSequence signExtend(CharSequence op, int targetSizeWithType) {
 		final int targetSize = targetSizeWithType >> 1;
 		if (targetSize == 0)
 			return op;
@@ -1055,11 +1082,11 @@ public abstract class CommonCodeGenerator {
 		indent++;
 	}
 
-	protected CharSequence fielDeclarations() {
+	protected CharSequence fieldDeclarations(boolean includePrivate) {
 		final StringBuilder sb = new StringBuilder();
 		preFieldDeclaration();
 		for (final VariableInformation var : excludeNull(em.variables)) {
-			if (hasPrev(var)) {
+			if (hasPrev(var) && includePrivate) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPrev))).append(newLine());
 				if (prevMapPos.contains(var.name)) {
 					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeActive))).append(newLine());
@@ -1073,10 +1100,10 @@ public abstract class CommonCodeGenerator {
 			if (hasUpdate(var)) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isUpdate, isPublic))).append(newLine());
 			}
-			if (isPredicate(var)) {
+			if (isPredicate(var) && includePrivate) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPredFresh))).append(newLine());
 			}
-			if (var.isRegister) {
+			if (var.isRegister && includePrivate) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isShadowReg))).append(newLine());
 			}
 			sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPublic))).append(newLine());
@@ -1184,7 +1211,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence constant(BigInteger constantValue) {
-		if (constantValue.compareTo(BigInteger.TEN) < 0)
+		if ((constantValue.compareTo(BigInteger.TEN) < 0) && (constantValue.compareTo(BigInteger.TEN.negate()) > 0))
 			return constantValue.toString(10);
 		if (constantValue.bitLength() <= 32)
 			return constant32Bit(constantValue.intValue());
@@ -1198,7 +1225,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence constant32Bit(int intValue) {
-		return String.format("0x%08X", intValue);
+		return String.format("0x%08XL", intValue);
 	}
 
 	protected CharSequence constant64Bit(long longValue) {
@@ -1269,7 +1296,7 @@ public abstract class CommonCodeGenerator {
 		return res;
 	}
 
-	CharSequence getFrameName(Frame frame) {
+	protected CharSequence getFrameName(Frame frame) {
 		final Formatter f = new Formatter();
 		if (frame.constant) {
 			f.format("const_");
@@ -1283,7 +1310,7 @@ public abstract class CommonCodeGenerator {
 		return result;
 	}
 
-	public boolean isShadowReg(String name) {
+	protected boolean isShadowReg(String name) {
 		return name.endsWith("$reg");
 	}
 
