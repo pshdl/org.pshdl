@@ -747,10 +747,12 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected String createBitAccessIfNeeded(InternalInformation internal, String tempName, List<Integer> arr, final StringBuilder sb) {
-		if (internal.bitStart != -1) {
+		if (internal.actualWidth != internal.info.width) {
 			final VariableInformation currVar = createVar(tempName + "_current", internal.actualWidth, internal.info.type);
-			sb.append(assignVariable(currVar, invertedMask(internalWithArrayAccess(internal, arr, NONE), internal.bitStart + 1), NONE, false, true)).append(
-					comment("Current value"));
+			final CharSequence currentValue = internalWithArrayAccess(internal, arr, internal.isShadowReg ? EnumSet.of(isShadowReg) : NONE);
+			final BigInteger mask = calcMask(internal.actualWidth);
+			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not());
+			sb.append(assignVariable(currVar, currentValue + " & " + writeMask, NONE, false, true)).append(comment("Current value"));
 			final VariableInformation maskVar = createVar(tempName + "_mask_shift", internal.actualWidth, internal.info.type);
 			sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true))
 					.append(comment("Masked and shifted"));
