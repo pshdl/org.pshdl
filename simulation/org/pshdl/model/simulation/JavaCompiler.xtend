@@ -58,7 +58,7 @@ class JavaCompilerSpecification {
 	boolean createCoverage
 }
 
-class JavaCompiler implements ITypeOuptutProvider {
+class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 	private boolean debug
 
 	private extension CommonCompilerExtension cce
@@ -90,7 +90,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		}
 	'''
 
-	def compile(String packageName, String unitName) {
+	override compile(String packageName, String unitName) {
 		val Set<Integer> handled = new HashSet
 		val Set<Integer> handledPosEdge = new HashSet
 		val Set<Integer> handledNegEdge = new HashSet
@@ -101,11 +101,11 @@ class JavaCompiler implements ITypeOuptutProvider {
 			«IF packageName !== null»package «packageName»;«ENDIF»
 			«imports»
 			
-			public class «unitName» implements «IF em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»{
+			public class «unitName» implements «IF !em.annotations.nullOrEmpty && em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»{
 				«IF hasClock»
 					private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();
-					private final boolean disableEdges;
-					private final boolean disabledRegOutputlogic;
+					private boolean disableEdges;
+					private boolean disabledRegOutputlogic;
 				«ENDIF»
 				«FOR v : em.variables.excludeNull»
 					«v.decl(prevMap.get(v.name))»
@@ -166,7 +166,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 	
-	def beanMethods()
+	def protected beanMethods()
 		'''«FOR v : em.variables.filter[dir !== VariableInformation$Direction.INTERNAL]»
 			«IF v.dimensions.size == 0»
 				public void set«v.idName(false, false).toFirstUpper»(«v.javaType» value) {
@@ -188,7 +188,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		«ENDFOR»'''
 	
 
-	def testbenchMethod(ExecutableModel model, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) {
+	def protected  testbenchMethod(ExecutableModel model, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) {
 		val Map<String, CharSequence> processes = model.processframes.map[process].toInvertedMap['''''']
 		model.processframes.forEach[
 			processes.put(it.process,
@@ -234,7 +234,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def runMethod(ExecutableModel model, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) '''
+	def protected  runMethod(ExecutableModel model, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) '''
+		public void initConstants(){}
 		public void run(){
 			deltaCycle++;
 			«IF hasClock»
@@ -272,24 +273,28 @@ class JavaCompiler implements ITypeOuptutProvider {
 		«hdlInterpreter»
 	'''
 
-	def callFrame(Frame f, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) '''«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 &&
-		f.predNegDepRes.length == 0 && f.predPosDepRes.length == 0»
+	def protected  callFrame(Frame f, Set<Integer> handled, Set<Integer> handledNegEdge, Set<Integer> handledPosEdge) '''«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 &&
+		f.predNegDepRes.nullOrEmpty && f.predPosDepRes.nullOrEmpty»
 			«f.frameName»();
 		«ELSE»
 			«f.edgeNegDepRes.createNegEdge(handledNegEdge)»
 			«f.edgePosDepRes.createPosEdge(handledPosEdge)»
-			«FOR p : f.predNegDepRes»
-				«p.createBooleanPred(handled)»
-			«ENDFOR»
-			«FOR p : f.predPosDepRes»
-				«p.createBooleanPred(handled)»
-			«ENDFOR»
+			«IF !f.predNegDepRes.nullOrEmpty»
+				«FOR p : f.predNegDepRes»
+					«p.createBooleanPred(handled)»
+				«ENDFOR»
+			«ENDIF»
+			«IF !f.predPosDepRes.nullOrEmpty»
+				«FOR p : f.predPosDepRes»
+					«p.createBooleanPred(handled)»
+				«ENDFOR»
+			«ENDIF»
 			if («f.predicateConditions»)
 				«f.frameName»();
 		«ENDIF»'''
 
 
-	def createBooleanPred(int id, Set<Integer> handled) {
+	def protected  createBooleanPred(int id, Set<Integer> handled) {
 		if (handled.contains(id))
 			return ''''''
 		handled.add(id)
@@ -307,7 +312,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def createPosEdge(int id, Set<Integer> handledEdges) {
+	def protected  createPosEdge(int id, Set<Integer> handledEdges) {
 		if (handledEdges.contains(id))
 			return ''''''
 		handledEdges.add(id)
@@ -339,7 +344,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def createNegEdge(int id, Set<Integer> handledEdges) {
+	def protected  createNegEdge(int id, Set<Integer> handledEdges) {
 		if (handledEdges.contains(id))
 			return ''''''
 		handledEdges.add(id)
@@ -371,17 +376,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def hdlInterpreter() '''
-		@Override
-		public void setInput(String name, BigInteger value, int... arrayIdx) {
-			setInput(getIndex(name), value.longValue(), arrayIdx);
-		}
-		
-		@Override
-		public void setInput(int idx, BigInteger value, int... arrayIdx) {
-			setInput(idx, value.longValue(), arrayIdx);
-		}
-		
+	def protected  hdlInterpreter() '''
+
 		@Override
 		public void setInput(String name, long value, int... arrayIdx) {
 			setInput(getIndex(name), value, arrayIdx);
@@ -446,22 +442,31 @@ class JavaCompiler implements ITypeOuptutProvider {
 		}
 		
 		@Override
-		public BigInteger getOutputBig(String name, int... arrayIdx) {
-			return BigInteger.valueOf(getOutputLong(getIndex(name), arrayIdx));
-		}
-		
-		@Override
-		public BigInteger getOutputBig(int idx, int... arrayIdx) {
-			return BigInteger.valueOf(getOutputLong(idx, arrayIdx));
-		}
-		
-		@Override
-		public int getDeltaCycle() {
+		public long getDeltaCycle() {
 			return deltaCycle;
+		}
+		
+		@Override
+		public void close() throws Exception{
+		}
+		@Override
+		public void setFeature(Feature feature, Object value) {
+			switch (feature) {
+			case disableOutputRegs:
+			«IF hasClock»
+				disabledRegOutputlogic = (boolean) value;
+			«ENDIF»
+				break;
+			case disableEdges:
+			«IF hasClock»
+				disableEdges = (boolean) value;
+			«ENDIF»
+				break;
+			}
 		}
 	'''
 
-	def copyRegs() '''
+	def protected  copyRegs() '''
 		private void updateRegs() {
 			for (RegUpdate reg : regUpdates) {
 				switch (reg.internalID) {
@@ -484,14 +489,14 @@ class JavaCompiler implements ITypeOuptutProvider {
 		}
 	'''
 
-	def copyPrev(VariableInformation info) {
+	def protected  copyPrev(VariableInformation info) {
 		if (info.dimensions.length == 0)
 			return '''«info.idName(true, false)»=«info.idName(false, false)»;'''
 		return '''System.arraycopy(«info.idName(false, false)»,0,«info.idName(true, false)», 0, «info.idName(false,
 			false)».length);'''
 	}
 
-	def getter(InternalInformation info, boolean prev, int pos, int frameID) {
+	def protected  getter(InternalInformation info, boolean prev, int pos, int frameID) {
 		val sb = new StringBuilder
 		val mask = info.actualWidth.asMaskL
 		for (arr : info.arrayIdx)
@@ -533,7 +538,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def setter(InternalInformation info, String value) {
+	def protected  setter(InternalInformation info, String value) {
 		val mask = ((1l << info.actualWidth) - 1)
 		val maskString = mask.toHexStringL
 		val writeMask = (mask << (info.bitEnd)).bitwiseNot.toHexStringL
@@ -577,7 +582,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def method(Frame frame) {
+	def protected  method(Frame frame) {
 		val StringBuilder sb = new StringBuilder
 		sb.append(
 			'''
@@ -628,7 +633,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		return sb.toString
 	}
 
-	def toExpression(FastInstruction inst, Frame f, StringBuilder sb, int pos, int a, int b, List<Integer> arr,
+	def protected  toExpression(FastInstruction inst, Frame f, StringBuilder sb, int pos, int a, int b, List<Integer> arr,
 		int arrPos) {
 		switch (inst.inst) {
 			case Instruction.pushAddIndex:
@@ -746,10 +751,10 @@ class JavaCompiler implements ITypeOuptutProvider {
 				''')
 	}
 
-	def String twoOp(String op, int targetSizeWithType, int pos, int a, int b) '''long t«pos»=«twoOpValue(op, null, a, b,
+	def protected  String twoOp(String op, int targetSizeWithType, int pos, int a, int b) '''long t«pos»=«twoOpValue(op, null, a, b,
 		targetSizeWithType)»;'''
 
-	def init(VariableInformation info) {
+	def protected  init(VariableInformation info) {
 		if (info.dimensions.length == 0)
 			return ''''''
 		var size = 1
@@ -762,20 +767,20 @@ class JavaCompiler implements ITypeOuptutProvider {
 		'''
 	}
 
-	def getJavaType(InternalInformation ii) {
+	def protected  getJavaType(InternalInformation ii) {
 		val jt = ii.info.javaType
 		if (ii.arrayIdx.length != ii.info.dimensions.length)
 			return jt + "[]"
 		return jt
 	}
 
-	def getJavaType(VariableInformation information) {
+	def protected  getJavaType(VariableInformation information) {
 		if (information.name.startsWith(InternalInformation.PRED_PREFIX) || information.type===VariableInformation.Type.BOOL)
 			return "boolean"
 		return "long"
 	}
 
-	def decl(VariableInformation info, Boolean includePrev) '''
+	def protected  decl(VariableInformation info, Boolean includePrev) '''
 		«IF info.isPredicate || (prevMap.get(info.name) !== null && prevMap.get(info.name))»public long «info.idName(false,
 			false)»_update=0;«ENDIF»
 		public «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»;
@@ -784,7 +789,7 @@ class JavaCompiler implements ITypeOuptutProvider {
 		«IF info.isRegister»private «info.javaType»«FOR d : info.dimensions»[]«ENDFOR» «info.idName(false, false)»$reg;«ENDIF»
 	'''
 
-	def getImports() '''
+	def protected  getImports() '''
 		import java.util.*;
 		import java.math.*;
 		import org.pshdl.interpreter.*;
@@ -821,7 +826,8 @@ class JavaCompiler implements ITypeOuptutProvider {
 		val unitName = moduleName.substring(li + 1, moduleName.length);
 		doCompile(syntaxProblems, em, pkg, unitName, debug);
 	}
-	def CharSequence createChangeAdapter(String packageName, String unitName)
+	
+	override CharSequence createChangeAdapter(String packageName, String unitName)
 '''«IF packageName !== null»package «packageName»;«ENDIF»
 
 import org.pshdl.interpreter.IChangeListener;
@@ -848,15 +854,10 @@ public class ChangeAdapter«unitName» implements IHDLInterpreter{
 			«varInfo.idName(false, false)»=module.«varInfo.idName(false, false)»;
 		«ENDFOR»
 	}
-
+	
 	@Override
-	public void setInput(String name, BigInteger value, int... arrayIdx) {
-		module.setInput(name, value, arrayIdx);
-	}
-
-	@Override
-	public void setInput(int idx, BigInteger value, int... arrayIdx) {
-		module.setInput(idx, value, arrayIdx);
+	public void initConstants() {
+		module.initConstants();
 	}
 
 	@Override
@@ -890,23 +891,22 @@ public class ChangeAdapter«unitName» implements IHDLInterpreter{
 	}
 
 	@Override
-	public BigInteger getOutputBig(String name, int... arrayIdx) {
-		return module.getOutputBig(name, arrayIdx);
-	}
-
-	@Override
-	public BigInteger getOutputBig(int idx, int... arrayIdx) {
-		return module.getOutputBig(idx, arrayIdx);
-	}
-
-	@Override
-	public int getDeltaCycle() {
+	public long getDeltaCycle() {
 		return module.getDeltaCycle();
+	}
+	@Override
+	public void close() throws Exception{
+		module.close();
+	}
+	
+	@Override
+	public void setFeature(Feature feature, Object value) {
+		module.setFeature(feature, value);
 	}
 }
 '''
 	
-	def changedNotification(VariableInformation vi) {
+	def protected  changedNotification(VariableInformation vi) {
 		val varName = vi.idName(false, false)
 		if (!vi.array){
 			if (vi.predicate){

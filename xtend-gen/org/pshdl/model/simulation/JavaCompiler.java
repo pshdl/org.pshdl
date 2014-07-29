@@ -53,6 +53,7 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.HDLSimulator;
+import org.pshdl.model.simulation.ICodeGen;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.utils.PSAbstractCompiler;
 import org.pshdl.model.utils.services.IHDLGenerator;
@@ -60,7 +61,7 @@ import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class JavaCompiler implements ITypeOuptutProvider {
+public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
   private boolean debug;
   
   @Extension
@@ -146,10 +147,18 @@ public class JavaCompiler implements ITypeOuptutProvider {
       _builder.append(unitName, "");
       _builder.append(" implements ");
       {
-        String _name = HDLSimulator.TB_UNIT.getName();
-        String _substring = _name.substring(1);
-        boolean _contains = ((List<String>)Conversions.doWrapArray(this.cce.em.annotations)).contains(_substring);
-        if (_contains) {
+        boolean _and = false;
+        boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(this.cce.em.annotations)));
+        boolean _not = (!_isNullOrEmpty);
+        if (!_not) {
+          _and = false;
+        } else {
+          String _name = HDLSimulator.TB_UNIT.getName();
+          String _substring = _name.substring(1);
+          boolean _contains = ((List<String>)Conversions.doWrapArray(this.cce.em.annotations)).contains(_substring);
+          _and = _contains;
+        }
+        if (_and) {
           _builder.append("IHDLTestbenchInterpreter");
         } else {
           _builder.append("IHDLInterpreter");
@@ -163,10 +172,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
           _builder.append("private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();");
           _builder.newLine();
           _builder.append("\t");
-          _builder.append("private final boolean disableEdges;");
+          _builder.append("private boolean disableEdges;");
           _builder.newLine();
           _builder.append("\t");
-          _builder.append("private final boolean disabledRegOutputlogic;");
+          _builder.append("private boolean disabledRegOutputlogic;");
           _builder.newLine();
         }
       }
@@ -358,8 +367,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
       {
         Iterable<Frame> _processframes = this.cce.getProcessframes(this.cce.em);
         boolean _isEmpty = IterableExtensions.isEmpty(_processframes);
-        boolean _not = (!_isEmpty);
-        if (_not) {
+        boolean _not_1 = (!_isEmpty);
+        if (_not_1) {
           _builder.append("\t");
           String _testbenchMethod = this.testbenchMethod(this.cce.em, handled, handledNegEdge, handledPosEdge);
           _builder.append(_testbenchMethod, "\t");
@@ -373,7 +382,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public CharSequence beanMethods() {
+  protected CharSequence beanMethods() {
     StringConcatenation _builder = new StringConcatenation();
     {
       final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
@@ -507,7 +516,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public String testbenchMethod(final ExecutableModel model, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
+  protected String testbenchMethod(final ExecutableModel model, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
     Iterable<Frame> _processframes = this.cce.getProcessframes(model);
     final Function1<Frame, String> _function = new Function1<Frame, String>() {
       public String apply(final Frame it) {
@@ -691,8 +700,10 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder.toString();
   }
   
-  public CharSequence runMethod(final ExecutableModel model, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
+  protected CharSequence runMethod(final ExecutableModel model, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
     StringConcatenation _builder = new StringConcatenation();
+    _builder.append("public void initConstants(){}");
+    _builder.newLine();
     _builder.append("public void run(){");
     _builder.newLine();
     _builder.append("\t");
@@ -798,7 +809,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public CharSequence callFrame(final Frame f, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
+  protected CharSequence callFrame(final Frame f, final Set<Integer> handled, final Set<Integer> handledNegEdge, final Set<Integer> handledPosEdge) {
     StringConcatenation _builder = new StringConcatenation();
     {
       boolean _and = false;
@@ -806,16 +817,14 @@ public class JavaCompiler implements ITypeOuptutProvider {
       if (!((f.edgeNegDepRes == (-1)) && (f.edgePosDepRes == (-1)))) {
         _and_1 = false;
       } else {
-        int _length = f.predNegDepRes.length;
-        boolean _equals = (_length == 0);
-        _and_1 = _equals;
+        boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predNegDepRes)));
+        _and_1 = _isNullOrEmpty;
       }
       if (!_and_1) {
         _and = false;
       } else {
-        int _length_1 = f.predPosDepRes.length;
-        boolean _equals_1 = (_length_1 == 0);
-        _and = _equals_1;
+        boolean _isNullOrEmpty_1 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predPosDepRes)));
+        _and = _isNullOrEmpty_1;
       }
       if (_and) {
         _builder.newLineIfNotEmpty();
@@ -831,17 +840,29 @@ public class JavaCompiler implements ITypeOuptutProvider {
         _builder.append(_createPosEdge, "");
         _builder.newLineIfNotEmpty();
         {
-          for(final int p : f.predNegDepRes) {
-            CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
-            _builder.append(_createBooleanPred, "");
-            _builder.newLineIfNotEmpty();
+          boolean _isNullOrEmpty_2 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predNegDepRes)));
+          boolean _not = (!_isNullOrEmpty_2);
+          if (_not) {
+            {
+              for(final int p : f.predNegDepRes) {
+                CharSequence _createBooleanPred = this.createBooleanPred(p, handled);
+                _builder.append(_createBooleanPred, "");
+                _builder.newLineIfNotEmpty();
+              }
+            }
           }
         }
         {
-          for(final int p_1 : f.predPosDepRes) {
-            CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
-            _builder.append(_createBooleanPred_1, "");
-            _builder.newLineIfNotEmpty();
+          boolean _isNullOrEmpty_3 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predPosDepRes)));
+          boolean _not_1 = (!_isNullOrEmpty_3);
+          if (_not_1) {
+            {
+              for(final int p_1 : f.predPosDepRes) {
+                CharSequence _createBooleanPred_1 = this.createBooleanPred(p_1, handled);
+                _builder.append(_createBooleanPred_1, "");
+                _builder.newLineIfNotEmpty();
+              }
+            }
           }
         }
         _builder.append("if (");
@@ -860,7 +881,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public CharSequence createBooleanPred(final int id, final Set<Integer> handled) {
+  protected CharSequence createBooleanPred(final int id, final Set<Integer> handled) {
     CharSequence _xblockexpression = null;
     {
       boolean _contains = handled.contains(Integer.valueOf(id));
@@ -917,7 +938,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public CharSequence createPosEdge(final int id, final Set<Integer> handledEdges) {
+  protected CharSequence createPosEdge(final int id, final Set<Integer> handledEdges) {
     CharSequence _xblockexpression = null;
     {
       boolean _contains = handledEdges.contains(Integer.valueOf(id));
@@ -1024,7 +1045,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public CharSequence createNegEdge(final int id, final Set<Integer> handledEdges) {
+  protected CharSequence createNegEdge(final int id, final Set<Integer> handledEdges) {
     CharSequence _xblockexpression = null;
     {
       boolean _contains = handledEdges.contains(Integer.valueOf(id));
@@ -1131,27 +1152,8 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public CharSequence hdlInterpreter() {
+  protected CharSequence hdlInterpreter() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("public void setInput(String name, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("setInput(getIndex(name), value.longValue(), arrayIdx);");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("public void setInput(int idx, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("setInput(idx, value.longValue(), arrayIdx);");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
     _builder.newLine();
     _builder.append("@Override");
     _builder.newLine();
@@ -1408,37 +1410,62 @@ public class JavaCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("@Override");
     _builder.newLine();
-    _builder.append("public BigInteger getOutputBig(String name, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("return BigInteger.valueOf(getOutputLong(getIndex(name), arrayIdx));");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("public BigInteger getOutputBig(int idx, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("return BigInteger.valueOf(getOutputLong(idx, arrayIdx));");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("public int getDeltaCycle() {");
+    _builder.append("public long getDeltaCycle() {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("return deltaCycle;");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
+    _builder.newLine();
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("public void close() throws Exception{");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("public void setFeature(Feature feature, Object value) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("switch (feature) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("case disableOutputRegs:");
+    _builder.newLine();
+    {
+      if (this.cce.hasClock) {
+        _builder.append("\t");
+        _builder.append("disabledRegOutputlogic = (boolean) value;");
+        _builder.newLine();
+      }
+    }
+    _builder.append("\t\t");
+    _builder.append("break;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("case disableEdges:");
+    _builder.newLine();
+    {
+      if (this.cce.hasClock) {
+        _builder.append("\t");
+        _builder.append("disableEdges = (boolean) value;");
+        _builder.newLine();
+      }
+    }
+    _builder.append("\t\t");
+    _builder.append("break;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
     return _builder;
   }
   
-  public CharSequence copyRegs() {
+  protected CharSequence copyRegs() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("private void updateRegs() {");
     _builder.newLine();
@@ -1516,7 +1543,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public String copyPrev(final VariableInformation info) {
+  protected String copyPrev(final VariableInformation info) {
     int _length = info.dimensions.length;
     boolean _equals = (_length == 0);
     if (_equals) {
@@ -1544,7 +1571,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder_1.toString();
   }
   
-  public CharSequence getter(final InternalInformation info, final boolean prev, final int pos, final int frameID) {
+  protected CharSequence getter(final InternalInformation info, final boolean prev, final int pos, final int frameID) {
     CharSequence _xblockexpression = null;
     {
       final StringBuilder sb = new StringBuilder();
@@ -1749,7 +1776,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public CharSequence setter(final InternalInformation info, final String value) {
+  protected CharSequence setter(final InternalInformation info, final String value) {
     CharSequence _xblockexpression = null;
     {
       long _doubleLessThan = (1l << info.actualWidth);
@@ -1942,7 +1969,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public String method(final Frame frame) {
+  protected String method(final Frame frame) {
     final StringBuilder sb = new StringBuilder();
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("private final void ");
@@ -2037,7 +2064,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return sb.toString();
   }
   
-  public StringBuilder toExpression(final Frame.FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
+  protected StringBuilder toExpression(final Frame.FastInstruction inst, final Frame f, final StringBuilder sb, final int pos, final int a, final int b, final List<Integer> arr, final int arrPos) {
     StringBuilder _xblockexpression = null;
     {
       final Instruction _switchValue = inst.inst;
@@ -2440,7 +2467,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public String twoOp(final String op, final int targetSizeWithType, final int pos, final int a, final int b) {
+  protected String twoOp(final String op, final int targetSizeWithType, final int pos, final int a, final int b) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("long t");
     _builder.append(pos, "");
@@ -2451,7 +2478,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder.toString();
   }
   
-  public CharSequence init(final VariableInformation info) {
+  protected CharSequence init(final VariableInformation info) {
     CharSequence _xblockexpression = null;
     {
       int _length = info.dimensions.length;
@@ -2492,7 +2519,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _xblockexpression;
   }
   
-  public String getJavaType(final InternalInformation ii) {
+  protected String getJavaType(final InternalInformation ii) {
     final String jt = this.getJavaType(ii.info);
     int _length = ii.arrayIdx.length;
     int _length_1 = ii.info.dimensions.length;
@@ -2503,7 +2530,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return jt;
   }
   
-  public String getJavaType(final VariableInformation information) {
+  protected String getJavaType(final VariableInformation information) {
     boolean _or = false;
     boolean _startsWith = information.name.startsWith(InternalInformation.PRED_PREFIX);
     if (_startsWith) {
@@ -2518,7 +2545,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return "long";
   }
   
-  public CharSequence decl(final VariableInformation info, final Boolean includePrev) {
+  protected CharSequence decl(final VariableInformation info, final Boolean includePrev) {
     StringConcatenation _builder = new StringConcatenation();
     {
       boolean _or = false;
@@ -2604,7 +2631,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public CharSequence getImports() {
+  protected CharSequence getImports() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("import java.util.*;");
     _builder.newLine();
@@ -2752,28 +2779,16 @@ public class JavaCompiler implements ITypeOuptutProvider {
     _builder.append("\t");
     _builder.append("}");
     _builder.newLine();
+    _builder.append("\t");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("@Override");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("public void setInput(String name, BigInteger value, int... arrayIdx) {");
+    _builder.append("public void initConstants() {");
     _builder.newLine();
     _builder.append("\t\t");
-    _builder.append("module.setInput(name, value, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public void setInput(int idx, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("module.setInput(idx, value, arrayIdx);");
+    _builder.append("module.initConstants();");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("}");
@@ -2861,36 +2876,36 @@ public class JavaCompiler implements ITypeOuptutProvider {
     _builder.append("@Override");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("public BigInteger getOutputBig(String name, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("return module.getOutputBig(name, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public BigInteger getOutputBig(int idx, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("return module.getOutputBig(idx, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public int getDeltaCycle() {");
+    _builder.append("public long getDeltaCycle() {");
     _builder.newLine();
     _builder.append("\t\t");
     _builder.append("return module.getDeltaCycle();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void close() throws Exception{");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.close();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void setFeature(Feature feature, Object value) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.setFeature(feature, value);");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("}");
@@ -2900,7 +2915,7 @@ public class JavaCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public String changedNotification(final VariableInformation vi) {
+  protected String changedNotification(final VariableInformation vi) {
     final String varName = this.cce.idName(vi, false, false);
     boolean _isArray = this.cce.isArray(vi);
     boolean _not = (!_isArray);

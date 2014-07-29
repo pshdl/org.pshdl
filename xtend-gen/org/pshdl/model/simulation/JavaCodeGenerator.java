@@ -13,9 +13,10 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.model.simulation.CommonCodeGenerator;
 import org.pshdl.model.simulation.HDLSimulator;
+import org.pshdl.model.simulation.ICodeGen;
 
 @SuppressWarnings("all")
-public class JavaCodeGenerator extends CommonCodeGenerator {
+public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
   private String packageName;
   
   private String unitName;
@@ -76,26 +77,6 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
   
   protected CharSequence hdlInterpreter() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("public void setInput(String name, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("setInput(getIndex(name), value.longValue(), arrayIdx);");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("public void setInput(int idx, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("setInput(idx, value.longValue(), arrayIdx);");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
     _builder.append("@Override");
     _builder.newLine();
     _builder.append("public void setInput(String name, long value, int... arrayIdx) {");
@@ -334,30 +315,58 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append("@Override");
     _builder.newLine();
-    _builder.append("public BigInteger getOutputBig(String name, int... arrayIdx) {");
+    _builder.append("public long getDeltaCycle() {");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("return BigInteger.valueOf(getOutputLong(getIndex(name), arrayIdx));");
+    _builder.append("return deltaCycle;");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
     _builder.append("@Override");
     _builder.newLine();
-    _builder.append("public BigInteger getOutputBig(int idx, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("return BigInteger.valueOf(getOutputLong(idx, arrayIdx));");
+    _builder.append("public void close() throws Exception{");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
     _builder.append("@Override");
     _builder.newLine();
-    _builder.append("public int getDeltaCycle() {");
+    _builder.append("public void setFeature(Feature feature, Object value) {");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("return (int)deltaCycle;");
+    _builder.append("switch (feature) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("case disableOutputRegs:");
+    _builder.newLine();
+    {
+      if (this.hasClock) {
+        _builder.append("\t");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t");
+        _builder.append(" = (boolean) value;");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t\t");
+    _builder.append("break;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("case disableEdges:");
+    _builder.newLine();
+    {
+      if (this.hasClock) {
+        _builder.append("\t");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t");
+        _builder.append(" = (boolean) value;");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append("\t\t");
+    _builder.append("break;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
@@ -385,10 +394,18 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     _builder.append(" ");
     _builder.append("implements ");
     {
-      String _name = HDLSimulator.TB_UNIT.getName();
-      String _substring = _name.substring(1);
-      boolean _contains = ((List<String>)Conversions.doWrapArray(this.em.annotations)).contains(_substring);
-      if (_contains) {
+      boolean _and = false;
+      boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(this.em.annotations)));
+      boolean _not = (!_isNullOrEmpty);
+      if (!_not) {
+        _and = false;
+      } else {
+        String _name = HDLSimulator.TB_UNIT.getName();
+        String _substring = _name.substring(1);
+        boolean _contains = ((List<String>)Conversions.doWrapArray(this.em.annotations)).contains(_substring);
+        _and = _contains;
+      }
+      if (_and) {
         _builder.append("IHDLTestbenchInterpreter");
       } else {
         _builder.append("IHDLInterpreter");
@@ -938,7 +955,15 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     return "!regUpdates.isEmpty()";
   }
   
-  public String createChangeAdapter(final boolean useInterface) {
+  public CharSequence compile(final String packageName, final String unitName) {
+    return this.doGenerateMainUnit();
+  }
+  
+  public CharSequence createChangeAdapter(final String packageName, final String unitName) {
+    return this.createChangeAdapter(false);
+  }
+  
+  public CharSequence createChangeAdapter(final boolean useInterface) {
     StringConcatenation _builder = new StringConcatenation();
     {
       boolean _tripleNotEquals = (this.packageName != null);
@@ -1148,32 +1173,6 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     _builder.append("@Override");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("public void setInput(String name, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("module.setInput(name, value, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public void setInput(int idx, BigInteger value, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("module.setInput(idx, value, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
     _builder.append("public void setInput(String name, long value, int... arrayIdx) {");
     _builder.newLine();
     _builder.append("\t\t");
@@ -1252,43 +1251,59 @@ public class JavaCodeGenerator extends CommonCodeGenerator {
     _builder.append("@Override");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("public BigInteger getOutputBig(String name, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("return module.getOutputBig(name, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public BigInteger getOutputBig(int idx, int... arrayIdx) {");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("return module.getOutputBig(idx, arrayIdx);");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("@Override");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("public int getDeltaCycle() {");
+    _builder.append("public long getDeltaCycle() {");
     _builder.newLine();
     _builder.append("\t\t");
     _builder.append("return module.getDeltaCycle();");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("}\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void initConstants() {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.initConstants();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void close() throws Exception{");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.close();");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("@Override");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("public void setFeature(Feature feature, Object value) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("module.setFeature(feature, value);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
-    return _builder.toString();
+    return _builder;
   }
   
   protected String changedNotificationInterface(final VariableInformation vi) {

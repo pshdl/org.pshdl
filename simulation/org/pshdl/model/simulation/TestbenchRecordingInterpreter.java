@@ -32,6 +32,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import org.pshdl.interpreter.ExecutableModel;
+import org.pshdl.interpreter.IHDLBigInterpreter;
 import org.pshdl.interpreter.IHDLInterpreter;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
@@ -39,8 +40,9 @@ import org.pshdl.model.utils.HDLQualifiedName;
 
 import com.google.common.collect.Maps;
 
-public class TestbenchRecordingInterpreter implements IHDLInterpreter {
+public class TestbenchRecordingInterpreter implements IHDLBigInterpreter {
 	private final IHDLInterpreter interpreter;
+	private final IHDLBigInterpreter bigInterpreter;
 	private final Map<String, BigInteger> lastVal = Maps.newHashMap();
 	private final Map<Integer, String> idxName = Maps.newHashMap();
 	private final Map<String, Integer> widths = Maps.newHashMap();
@@ -55,6 +57,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 			throws IOException {
 		super();
 		this.interpreter = interpreter;
+		this.bigInterpreter = BigInterpreterAdapter.adapt(interpreter);
 		this.outputType = type;
 		for (final VariableInformation vi : model.variables) {
 			widths.put(vi.name, vi.width);
@@ -142,7 +145,8 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		}
 	}
 
-	public void close() {
+	@Override
+	public void close() throws Exception {
 		switch (outputType) {
 		case pshdl:
 			printStream.println("\t}");
@@ -153,6 +157,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 					+ "end;");
 		}
 		printStream.close();
+		interpreter.close();
 	}
 
 	@Override
@@ -160,7 +165,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		if (!value.equals(lastVal.get(name))) {
 			setVar(name, value, arrayIdx);
 		}
-		interpreter.setInput(name, value, arrayIdx);
+		bigInterpreter.setInput(name, value, arrayIdx);
 	}
 
 	private void setVar(String name, BigInteger value, int[] arrayIdx) {
@@ -225,7 +230,7 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 		if (!value.equals(lastVal.get(name))) {
 			setVar(name, value, arrayIdx);
 		}
-		interpreter.setInput(idx, value, arrayIdx);
+		bigInterpreter.setInput(idx, value, arrayIdx);
 	}
 
 	@Override
@@ -264,12 +269,12 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 
 	@Override
 	public BigInteger getOutputBig(String name, int... arrayIdx) {
-		return interpreter.getOutputBig(name, arrayIdx);
+		return bigInterpreter.getOutputBig(name, arrayIdx);
 	}
 
 	@Override
 	public BigInteger getOutputBig(int idx, int... arrayIdx) {
-		return interpreter.getOutputBig(idx, arrayIdx);
+		return bigInterpreter.getOutputBig(idx, arrayIdx);
 	}
 
 	@Override
@@ -296,7 +301,17 @@ public class TestbenchRecordingInterpreter implements IHDLInterpreter {
 	}
 
 	@Override
-	public int getDeltaCycle() {
+	public long getDeltaCycle() {
 		return interpreter.getDeltaCycle();
+	}
+
+	@Override
+	public void setFeature(Feature feature, Object value) {
+		interpreter.setFeature(feature, value);
+	}
+
+	@Override
+	public void initConstants() {
+		interpreter.initConstants();
 	}
 }

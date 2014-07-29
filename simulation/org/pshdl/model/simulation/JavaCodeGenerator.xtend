@@ -10,7 +10,7 @@ import org.pshdl.interpreter.VariableInformation
 
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.*
 
-class JavaCodeGenerator extends CommonCodeGenerator {
+class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 
 	String packageName
 	String unitName
@@ -41,16 +41,6 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 }'''
 
 	def protected hdlInterpreter() '''
-		@Override
-		public void setInput(String name, BigInteger value, int... arrayIdx) {
-			setInput(getIndex(name), value.longValue(), arrayIdx);
-		}
-		
-		@Override
-		public void setInput(int idx, BigInteger value, int... arrayIdx) {
-			setInput(idx, value.longValue(), arrayIdx);
-		}
-		
 		@Override
 		public void setInput(String name, long value, int... arrayIdx) {
 			setInput(getIndex(name), value, arrayIdx);
@@ -116,18 +106,28 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		}
 		
 		@Override
-		public BigInteger getOutputBig(String name, int... arrayIdx) {
-			return BigInteger.valueOf(getOutputLong(getIndex(name), arrayIdx));
+		public long getDeltaCycle() {
+			return deltaCycle;
 		}
 		
 		@Override
-		public BigInteger getOutputBig(int idx, int... arrayIdx) {
-			return BigInteger.valueOf(getOutputLong(idx, arrayIdx));
+		public void close() throws Exception{
 		}
 		
 		@Override
-		public int getDeltaCycle() {
-			return (int)deltaCycle;
+		public void setFeature(Feature feature, Object value) {
+			switch (feature) {
+			case disableOutputRegs:
+			«IF hasClock»
+				«DISABLE_REG_OUTPUTLOGIC.name» = (boolean) value;
+			«ENDIF»
+				break;
+			case disableEdges:
+			«IF hasClock»
+				«DISABLE_EDGES.name» = (boolean) value;
+			«ENDIF»
+				break;
+			}
 		}
 	'''
 
@@ -136,7 +136,7 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		«imports»
 		
 		public class «unitName»
-		 implements «IF em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»
+		 implements «IF !em.annotations.nullOrEmpty && em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»
 		{
 			private Map<String, Integer> varIdx=new HashMap<String, Integer>();
 	'''
@@ -321,7 +321,13 @@ class JavaCodeGenerator extends CommonCodeGenerator {
 		return "!regUpdates.isEmpty()"
 	}
 	
-	def String createChangeAdapter(boolean useInterface)
+	override CharSequence compile(String packageName, String unitName){
+		return doGenerateMainUnit();
+	}
+	override CharSequence createChangeAdapter(String packageName, String unitName){
+		return createChangeAdapter(false)
+	}
+	def CharSequence createChangeAdapter(boolean useInterface)
 '''«IF packageName !== null»package «packageName»;«ENDIF»
 
 import org.pshdl.interpreter.IChangeListener;
@@ -378,16 +384,6 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 	}
 
 	@Override
-	public void setInput(String name, BigInteger value, int... arrayIdx) {
-		module.setInput(name, value, arrayIdx);
-	}
-
-	@Override
-	public void setInput(int idx, BigInteger value, int... arrayIdx) {
-		module.setInput(idx, value, arrayIdx);
-	}
-
-	@Override
 	public void setInput(String name, long value, int... arrayIdx) {
 		module.setInput(name, value, arrayIdx);
 	}
@@ -418,19 +414,24 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 	}
 
 	@Override
-	public BigInteger getOutputBig(String name, int... arrayIdx) {
-		return module.getOutputBig(name, arrayIdx);
-	}
-
-	@Override
-	public BigInteger getOutputBig(int idx, int... arrayIdx) {
-		return module.getOutputBig(idx, arrayIdx);
-	}
-
-	@Override
-	public int getDeltaCycle() {
+	public long getDeltaCycle() {
 		return module.getDeltaCycle();
-	}	
+	}
+	
+	@Override
+	public void initConstants() {
+		module.initConstants();
+	}
+	
+	@Override
+	public void close() throws Exception{
+		module.close();
+	}
+	
+	@Override
+	public void setFeature(Feature feature, Object value) {
+		module.setFeature(feature, value);
+	}
 }
 '''
 	

@@ -46,6 +46,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.pshdl.interpreter.IChangeListener;
 import org.pshdl.interpreter.IHDLInterpreter;
 
 import com.google.common.base.Splitter;
@@ -139,5 +140,18 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 	@Override
 	public void close() throws Exception {
 		fileManager.close();
+	}
+
+	public File getTempDir() {
+		return tempDir;
+	}
+
+	public IHDLInterpreter compileAndLoadChangeAdapter(String mainClassFQN, String sourceCode, IHDLInterpreter mainInterpreter, IChangeListener... listeners) throws Exception {
+		final Class<?> adapterClass = compileClass(mainClassFQN, sourceCode);
+		Constructor<?> constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
+		if (constructor == null) {
+			constructor = adapterClass.getConstructor(IHDLInterpreter.class, IChangeListener[].class);
+		}
+		return (IHDLInterpreter) constructor.newInstance(mainInterpreter, listeners);
 	}
 }

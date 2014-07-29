@@ -237,7 +237,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence predicateCheckedFrameCall(Frame frame) {
-		if ((frame.edgeNegDepRes == -1) && (frame.edgePosDepRes == -1) && (frame.predNegDepRes.length == 0) && (frame.predPosDepRes.length == 0)) {
+		if ((frame.edgeNegDepRes == -1) && (frame.edgePosDepRes == -1) && !hasPredicate(frame.predPosDepRes) && !hasPredicate(frame.predNegDepRes)) {
 			final StringBuilder sb = new StringBuilder();
 			sb.append(indent()).append(callFrame(frame));
 			return sb;
@@ -252,15 +252,23 @@ public abstract class CommonCodeGenerator {
 			predicates.add(internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isPosEdgeActive)));
 			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isPosEdgeHandled)));
 		}
-		for (final int pred : frame.predNegDepRes) {
-			predicates.add("!" + internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
-			predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
+		if (frame.predNegDepRes != null) {
+			for (final int pred : frame.predNegDepRes) {
+				predicates.add("!" + internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
+				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
+			}
 		}
-		for (final int pred : frame.predPosDepRes) {
-			predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
-			predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
+		if (frame.predPosDepRes != null) {
+			for (final int pred : frame.predPosDepRes) {
+				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
+				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
+			}
 		}
 		return callFrameWithPredicates(frame, predicates);
+	}
+
+	private boolean hasPredicate(int[] pred) {
+		return (pred != null) && (pred.length != 0);
 	}
 
 	protected CharSequence callFrameWithPredicates(Frame frame, final List<CharSequence> predicates) {
@@ -276,10 +284,12 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence handlePredicates(List<Integer> handledPredicates, boolean positive, int[] predicates) {
 		final StringBuilder sb = new StringBuilder();
-		for (final int pred : predicates) {
-			if ((pred != -1) && !handledPredicates.contains(pred)) {
-				sb.append(indent()).append(updatePredicate(pred, positive)).append(newLine());
-				handledPredicates.add(pred);
+		if (predicates != null) {
+			for (final int pred : predicates) {
+				if ((pred != -1) && !handledPredicates.contains(pred)) {
+					sb.append(indent()).append(updatePredicate(pred, positive)).append(newLine());
+					handledPredicates.add(pred);
+				}
 			}
 		}
 		return sb;
@@ -672,7 +682,7 @@ public abstract class CommonCodeGenerator {
 			break;
 		case cast_int:
 			// Create a targetSizeWitType with int indication
-			sb.append(assignTempVar((exec.arg1 << 1) + 1, pos, NONE, tempName));
+			sb.append(assignTempVar((Math.min(exec.arg1, exec.arg2) << 1) + 1, pos, NONE, tempName));
 			break;
 		case cast_uint:
 			sb.append(assignTempVar(exec.arg1 << 1, pos, NONE, mask(tempName, exec.arg1)));

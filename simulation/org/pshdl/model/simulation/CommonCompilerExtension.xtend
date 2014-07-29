@@ -334,18 +334,20 @@ class CommonCompilerExtension {
 					idName(false, false)»_risingIsHandled''')
 			first = false
 		}
-		for (p : f.predNegDepRes) {
-			if (!first)
-				sb.append(' && ')
-			sb.append('''!p«p» && p«p»_fresh''')
-			first = false
-		}
-		for (p : f.predPosDepRes) {
-			if (!first)
-				sb.append(' && ')
-			sb.append('''p«p» && p«p»_fresh''')
-			first = false
-		}
+		if (!f.predNegDepRes.nullOrEmpty)
+			for (p : f.predNegDepRes) {
+				if (!first)
+					sb.append(' && ')
+				sb.append('''!p«p» && p«p»_fresh''')
+				first = false
+			}
+		if (!f.predPosDepRes.nullOrEmpty)
+			for (p : f.predPosDepRes) {
+				if (!first)
+					sb.append(' && ')
+				sb.append('''p«p» && p«p»_fresh''')
+				first = false
+			}
 		return sb.toString
 	}
 

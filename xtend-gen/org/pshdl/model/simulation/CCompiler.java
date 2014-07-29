@@ -254,16 +254,14 @@ public class CCompiler implements ITypeOuptutProvider {
             if (!((f_1.edgeNegDepRes == (-1)) && (f_1.edgePosDepRes == (-1)))) {
               _and_1 = false;
             } else {
-              int _length = f_1.predNegDepRes.length;
-              boolean _equals = (_length == 0);
-              _and_1 = _equals;
+              boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f_1.predNegDepRes)));
+              _and_1 = _isNullOrEmpty;
             }
             if (!_and_1) {
               _and = false;
             } else {
-              int _length_1 = f_1.predPosDepRes.length;
-              boolean _equals_1 = (_length_1 == 0);
-              _and = _equals_1;
+              boolean _isNullOrEmpty_1 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f_1.predPosDepRes)));
+              _and = _isNullOrEmpty_1;
             }
             if (_and) {
               _builder.append("\t\t");
@@ -281,19 +279,31 @@ public class CCompiler implements ITypeOuptutProvider {
               _builder.append(_createPosEdge, "\t\t");
               _builder.newLineIfNotEmpty();
               {
-                for(final int p : f_1.predNegDepRes) {
-                  _builder.append("\t\t");
-                  CharSequence _createboolPred = this.createboolPred(p, handled);
-                  _builder.append(_createboolPred, "\t\t");
-                  _builder.newLineIfNotEmpty();
+                boolean _isNullOrEmpty_2 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f_1.predNegDepRes)));
+                boolean _not = (!_isNullOrEmpty_2);
+                if (_not) {
+                  {
+                    for(final int p : f_1.predNegDepRes) {
+                      _builder.append("\t\t");
+                      CharSequence _createboolPred = this.createboolPred(p, handled);
+                      _builder.append(_createboolPred, "\t\t");
+                      _builder.newLineIfNotEmpty();
+                    }
+                  }
                 }
               }
               {
-                for(final int p_1 : f_1.predPosDepRes) {
-                  _builder.append("\t\t");
-                  CharSequence _createboolPred_1 = this.createboolPred(p_1, handled);
-                  _builder.append(_createboolPred_1, "\t\t");
-                  _builder.newLineIfNotEmpty();
+                boolean _isNullOrEmpty_3 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f_1.predPosDepRes)));
+                boolean _not_1 = (!_isNullOrEmpty_3);
+                if (_not_1) {
+                  {
+                    for(final int p_1 : f_1.predPosDepRes) {
+                      _builder.append("\t\t");
+                      CharSequence _createboolPred_1 = this.createboolPred(p_1, handled);
+                      _builder.append(_createboolPred_1, "\t\t");
+                      _builder.newLineIfNotEmpty();
+                    }
+                  }
                 }
               }
               _builder.append("\t\t");
@@ -700,34 +710,42 @@ public class CCompiler implements ITypeOuptutProvider {
       sb.append(_builder_1);
       first = false;
     }
-    for (final int p : f.predNegDepRes) {
-      {
-        if ((!first)) {
-          sb.append(" && ");
+    boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predNegDepRes)));
+    boolean _not = (!_isNullOrEmpty);
+    if (_not) {
+      for (final int p : f.predNegDepRes) {
+        {
+          if ((!first)) {
+            sb.append(" && ");
+          }
+          StringConcatenation _builder_2 = new StringConcatenation();
+          _builder_2.append("!p");
+          _builder_2.append(p, "");
+          _builder_2.append(" && p");
+          _builder_2.append(p, "");
+          _builder_2.append("_fresh");
+          sb.append(_builder_2);
+          first = false;
         }
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("!p");
-        _builder_2.append(p, "");
-        _builder_2.append(" && p");
-        _builder_2.append(p, "");
-        _builder_2.append("_fresh");
-        sb.append(_builder_2);
-        first = false;
       }
     }
-    for (final int p_1 : f.predPosDepRes) {
-      {
-        if ((!first)) {
-          sb.append(" && ");
+    boolean _isNullOrEmpty_1 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predPosDepRes)));
+    boolean _not_1 = (!_isNullOrEmpty_1);
+    if (_not_1) {
+      for (final int p_1 : f.predPosDepRes) {
+        {
+          if ((!first)) {
+            sb.append(" && ");
+          }
+          StringConcatenation _builder_2 = new StringConcatenation();
+          _builder_2.append("p");
+          _builder_2.append(p_1, "");
+          _builder_2.append(" && p");
+          _builder_2.append(p_1, "");
+          _builder_2.append("_fresh");
+          sb.append(_builder_2);
+          first = false;
         }
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("p");
-        _builder_2.append(p_1, "");
-        _builder_2.append(" && p");
-        _builder_2.append(p_1, "");
-        _builder_2.append("_fresh");
-        sb.append(_builder_2);
-        first = false;
       }
     }
     return sb.toString();

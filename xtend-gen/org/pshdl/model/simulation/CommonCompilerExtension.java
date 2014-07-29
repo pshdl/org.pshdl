@@ -731,34 +731,42 @@ public class CommonCompilerExtension {
       sb.append(_builder_1);
       first = false;
     }
-    for (final int p : f.predNegDepRes) {
-      {
-        if ((!first)) {
-          sb.append(" && ");
+    boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predNegDepRes)));
+    boolean _not = (!_isNullOrEmpty);
+    if (_not) {
+      for (final int p : f.predNegDepRes) {
+        {
+          if ((!first)) {
+            sb.append(" && ");
+          }
+          StringConcatenation _builder_2 = new StringConcatenation();
+          _builder_2.append("!p");
+          _builder_2.append(p, "");
+          _builder_2.append(" && p");
+          _builder_2.append(p, "");
+          _builder_2.append("_fresh");
+          sb.append(_builder_2);
+          first = false;
         }
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("!p");
-        _builder_2.append(p, "");
-        _builder_2.append(" && p");
-        _builder_2.append(p, "");
-        _builder_2.append("_fresh");
-        sb.append(_builder_2);
-        first = false;
       }
     }
-    for (final int p_1 : f.predPosDepRes) {
-      {
-        if ((!first)) {
-          sb.append(" && ");
+    boolean _isNullOrEmpty_1 = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(f.predPosDepRes)));
+    boolean _not_1 = (!_isNullOrEmpty_1);
+    if (_not_1) {
+      for (final int p_1 : f.predPosDepRes) {
+        {
+          if ((!first)) {
+            sb.append(" && ");
+          }
+          StringConcatenation _builder_2 = new StringConcatenation();
+          _builder_2.append("p");
+          _builder_2.append(p_1, "");
+          _builder_2.append(" && p");
+          _builder_2.append(p_1, "");
+          _builder_2.append("_fresh");
+          sb.append(_builder_2);
+          first = false;
         }
-        StringConcatenation _builder_2 = new StringConcatenation();
-        _builder_2.append("p");
-        _builder_2.append(p_1, "");
-        _builder_2.append(" && p");
-        _builder_2.append(p_1, "");
-        _builder_2.append("_fresh");
-        sb.append(_builder_2);
-        first = false;
       }
     }
     return sb.toString();

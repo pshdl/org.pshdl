@@ -139,18 +139,22 @@ class CCompiler implements ITypeOuptutProvider {
 							regUpdatePos=0;
 					«ENDIF»
 					«FOR f : em.frames»
-						«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 && f.predNegDepRes.length == 0 &&
-				f.predPosDepRes.length == 0»
+						«IF f.edgeNegDepRes == -1 && f.edgePosDepRes == -1 && f.predNegDepRes.nullOrEmpty &&
+				f.predPosDepRes.nullOrEmpty»
 							«f.frameName»();
 						«ELSE»
 							«f.edgeNegDepRes.createNegEdge(handledPosEdge)»
 							«f.edgePosDepRes.createPosEdge(handledNegEdge)»
-							«FOR p : f.predNegDepRes»
-								«p.createboolPred(handled)»
-							«ENDFOR»
-							«FOR p : f.predPosDepRes»
-								«p.createboolPred(handled)»
-							«ENDFOR»
+							«IF !f.predNegDepRes.nullOrEmpty»
+								«FOR p : f.predNegDepRes»
+									«p.createboolPred(handled)»
+								«ENDFOR»
+							«ENDIF»
+							«IF !f.predPosDepRes.nullOrEmpty»
+								«FOR p : f.predPosDepRes»
+									«p.createboolPred(handled)»
+								«ENDFOR»
+							«ENDIF»
 							if («f.predicates»)
 								«f.frameName»();
 						«ENDIF»
@@ -278,18 +282,20 @@ class CCompiler implements ITypeOuptutProvider {
 					idName(false, false)»_risingIsHandled''')
 			first = false
 		}
-		for (p : f.predNegDepRes) {
-			if (!first)
-				sb.append(' && ')
-			sb.append('''!p«p» && p«p»_fresh''')
-			first = false
-		}
-		for (p : f.predPosDepRes) {
-			if (!first)
-				sb.append(' && ')
-			sb.append('''p«p» && p«p»_fresh''')
-			first = false
-		}
+		if (!f.predNegDepRes.nullOrEmpty)
+			for (p : f.predNegDepRes) {
+				if (!first)
+					sb.append(' && ')
+				sb.append('''!p«p» && p«p»_fresh''')
+				first = false
+			}
+		if (!f.predPosDepRes.nullOrEmpty)
+			for (p : f.predPosDepRes) {
+				if (!first)
+					sb.append(' && ')
+				sb.append('''p«p» && p«p»_fresh''')
+				first = false
+			}
 		return sb.toString
 	}
 
