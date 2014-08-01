@@ -436,6 +436,7 @@ class CCompiler implements ITypeOuptutProvider {
 			regSuffix = "$reg"
 		}
 		if (info.fixedArray) '''
+			«IF info.isShadowReg»«info.info.cType» prev=«info.info.idName(false, false)»«fixedAccess»;«ENDIF»
 			«IF info.actualWidth == info.info.width»
 				«IF info.isShadowReg»«info.info.cType» current=«info.info.idName(false, false)»«fixedAccess»;«ENDIF»
 				«info.info.idName(false, false)»«fixedAccess»=«value»;
@@ -446,7 +447,7 @@ class CCompiler implements ITypeOuptutProvider {
 			«ENDIF»
 			«IF info.isShadowReg»
 				static regUpdate_t reg;
-				if (current!=«value»){
+				if (prev!=«value»){
 					reg.internal=«varIdx.get(info.info.name)»;
 					reg.offset=«off»;
 					regUpdates[regUpdatePos++]=reg;
@@ -456,6 +457,7 @@ class CCompiler implements ITypeOuptutProvider {
 		''' else '''
 			int offset=(int)«varAccess»;
 			offset&=«dimMask(info).toHexStringL»l;
+			«IF info.isShadowReg»«info.info.cType» prev=«info.info.idName(false, false)»«regSuffix»[offset];«ENDIF»
 			«IF info.actualWidth == info.info.width»
 				«IF info.isShadowReg»«info.info.cType» current=«info.info.idName(false, false)»«regSuffix»[offset];«ENDIF»
 				«info.info.idName(false, false)»«regSuffix»[offset]=«value»;
@@ -466,7 +468,7 @@ class CCompiler implements ITypeOuptutProvider {
 			«ENDIF»
 			«IF info.isShadowReg»
 				static regUpdate_t reg;
-				if (current!=«value»){
+				if (prev!=«value»){
 					reg.internal=«varIdx.get(info.info.name)»;
 					reg.offset=offset;
 					regUpdates[regUpdatePos++]=reg;
@@ -564,8 +566,9 @@ class CCompiler implements ITypeOuptutProvider {
 				}
 			}
 			case Instruction.cast_uint: {
-				if (inst.arg1 != bitWidth) {
-					sb.append('''«pos.uTemp('t')»=t«a» & «inst.arg1.asMaskL»l;''')
+				val castSize=Math.min(inst.arg1, inst.arg2)
+				if (castSize != bitWidth) {
+					sb.append('''«pos.uTemp('t')»=t«a» & «castSize.asMaskL»l;''')
 				} else {
 					sb.append('''«pos.uTemp('t')»=t«a»;''')
 				}

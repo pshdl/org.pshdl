@@ -55,7 +55,7 @@ public class HDLAnnotations {
 		final IHDLAnnotation iAnno = annotations.get(hdlAnnotation.getName().substring(1));
 		if (iAnno == null)
 			return new Problem[] { new Problem(ErrorCode.ANNOTATION_UNKNOWN, hdlAnnotation) };
-		final String valid = iAnno.validate(hdlAnnotation.getValue());
+		final String valid = iAnno.validate(hdlAnnotation);
 		if (valid != null)
 			return new Problem[] { new Problem(ErrorCode.ANNOTATION_INVALID, hdlAnnotation, valid) };
 		return new Problem[0];

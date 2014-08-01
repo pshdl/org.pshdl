@@ -537,7 +537,7 @@ public class HDLPrimitives {
 		if ((width == null) && (rType.getWidth() != null)) {
 			width = rType.getWidth();
 		}
-		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setType(triple.result).setWidth(width == null ? null : width), lType.setType(triple.left),
+		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(new HDLPrimitive().setWidth(width == null ? null : width).setType(triple.result), lType.setType(triple.left),
 				lType.setType(triple.right));
 		return normalize(info, op);
 	}
@@ -641,13 +641,13 @@ public class HDLPrimitives {
 		throw new IllegalArgumentException("Did not expect type:" + pt.getType());
 	}
 
-	private static Range<BigInteger> intRange(BigInteger bitWidth) {
+	public static Range<BigInteger> intRange(BigInteger bitWidth) {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue() - 1).subtract(BigInteger.ONE);
 		final BigInteger min = max.negate().subtract(BigInteger.ONE);
 		return RangeTool.createRange(min, max);
 	}
 
-	private static Range<BigInteger> uintRange(BigInteger bitWidth) {
+	public static Range<BigInteger> uintRange(BigInteger bitWidth) {
 		final BigInteger max = BigInteger.ONE.shiftLeft(bitWidth.intValue()).subtract(BigInteger.ONE);
 		final BigInteger min = BigInteger.ZERO;
 		return RangeTool.createRange(min, max);

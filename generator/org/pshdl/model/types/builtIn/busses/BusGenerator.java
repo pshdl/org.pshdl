@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArgument;
 import org.pshdl.model.HDLDirectGeneration;
 import org.pshdl.model.HDLExpression;
@@ -86,7 +87,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			"Annotation used by the Busgenerator to annotate variables that can be modified", "A list of rows that use this signal separated by:'" + ROW_SEPARTOR + "'") {
 
 		@Override
-		public String validate(String value) {
+		public String validate(HDLAnnotation annotation) {
 			return null;
 		}
 	};
@@ -94,7 +95,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			"Annotation used by the Busgenerator to give a full representation of the bus system", "A list of rows that use this signal separated by:'" + ROW_SEPARTOR + "'") {
 
 		@Override
-		public String validate(String value) {
+		public String validate(HDLAnnotation annotation) {
 			return null;
 		}
 	};

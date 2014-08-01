@@ -551,6 +551,7 @@ class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 			regSuffix = "$reg"
 		}
 		if (info.fixedArray) '''
+			«IF info.isShadowReg»«info.info.javaType» prev=«info.info.idName(false, false)»«fixedAccess»;«ENDIF»
 			«IF info.actualWidth == info.info.width»
 				«IF info.isShadowReg»«info.info.javaType» current=«info.info.idName(false, false)»«fixedAccess»;«ENDIF»
 				«info.info.idName(false, false)»«fixedAccess»=«value»;
@@ -560,12 +561,13 @@ class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 				«info.info.idName(false, false)»«fixedAccess»=current|«value»;
 			«ENDIF»
 			«IF info.isShadowReg»
-				if (current!=«value»)
+				if (prev!=«value»)
 					regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», «off»));
 			«ENDIF»
 			«IF info.isPred»«info.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
 		''' else '''
 			int offset=(int)«varAccess»;
+			«IF info.isShadowReg»«info.info.javaType» prev=«info.info.idName(false, false)»«regSuffix»[offset];«ENDIF»
 			«IF info.actualWidth == info.info.width»
 				«IF info.isShadowReg»«info.info.javaType» current=«info.info.idName(false, false)»«regSuffix»[offset];«ENDIF»
 				«info.info.idName(false, false)»«regSuffix»[offset]=«value»;
@@ -575,7 +577,7 @@ class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 				«info.info.idName(false, false)»«regSuffix»[offset]=current|«value»);
 			«ENDIF»
 			«IF info.isShadowReg»
-				if (current!=«value»)
+				if (prev!=«value»)
 					regUpdates.add(new RegUpdate(«varIdx.get(info.info.name)», offset));
 			«ENDIF»
 			«IF info.isPred»«info.info.idName(false, false)»_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);«ENDIF»
@@ -669,8 +671,9 @@ class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 				sb.append('''long t«pos»=«signExtend('''t«a»''', null, shiftWidth)»;''')
 			}
 			case Instruction.cast_uint: {
-				if (inst.arg1 != 64) {
-					sb.append('''long t«pos»=t«a» & «inst.arg1.asMaskL»;''')
+				val castSize=Math.min(inst.arg1, inst.arg2)
+				if (castSize != 64) {
+					sb.append('''long t«pos»=t«a» & «castSize.asMaskL»;''')
 				} else {
 					sb.append('''long t«pos»=t«a»;''')
 				}

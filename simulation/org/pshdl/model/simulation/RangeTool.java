@@ -205,6 +205,10 @@ public class RangeTool {
 		return temp;
 	}
 
+	public static Range<BigInteger> createRange(int lower, int upper) {
+		return createRange(BigInteger.valueOf(lower), BigInteger.valueOf(upper));
+	}
+
 	public static <C extends Comparable<C>> Range<C> createRange(C lower, C upper) {
 		if (lower.compareTo(upper) > 0)
 			return Range.closed(upper, lower);

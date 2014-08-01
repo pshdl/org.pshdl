@@ -1247,32 +1247,44 @@ public class CCompiler implements ITypeOuptutProvider {
       if (info.fixedArray) {
         StringConcatenation _builder_3 = new StringConcatenation();
         {
+          if (info.isShadowReg) {
+            CharSequence _cType = this.cType(info.info);
+            _builder_3.append(_cType, "");
+            _builder_3.append(" prev=");
+            String _idName = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName, "");
+            _builder_3.append(fixedAccess, "");
+            _builder_3.append(";");
+          }
+        }
+        _builder_3.newLineIfNotEmpty();
+        {
           if ((info.actualWidth == info.info.width)) {
             {
               if (info.isShadowReg) {
-                CharSequence _cType = this.cType(info.info);
-                _builder_3.append(_cType, "");
+                CharSequence _cType_1 = this.cType(info.info);
+                _builder_3.append(_cType_1, "");
                 _builder_3.append(" current=");
-                String _idName = this.cce.idName(info.info, false, false);
-                _builder_3.append(_idName, "");
+                String _idName_1 = this.cce.idName(info.info, false, false);
+                _builder_3.append(_idName_1, "");
                 _builder_3.append(fixedAccess, "");
                 _builder_3.append(";");
               }
             }
             _builder_3.newLineIfNotEmpty();
-            String _idName_1 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_1, "");
+            String _idName_2 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_2, "");
             _builder_3.append(fixedAccess, "");
             _builder_3.append("=");
             _builder_3.append(value, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            CharSequence _cType_1 = this.cType(info.info);
-            _builder_3.append(_cType_1, "");
+            CharSequence _cType_2 = this.cType(info.info);
+            _builder_3.append(_cType_2, "");
             _builder_3.append(" current=");
-            String _idName_2 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_2, "");
+            String _idName_3 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_3, "");
             _builder_3.append(fixedAccess, "");
             _builder_3.append(" & ");
             _builder_3.append(writeMask, "");
@@ -1287,8 +1299,8 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_3.append(info.bitEnd, "");
             _builder_3.append(");");
             _builder_3.newLineIfNotEmpty();
-            String _idName_3 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_3, "");
+            String _idName_4 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_4, "");
             _builder_3.append(fixedAccess, "");
             _builder_3.append("=current|");
             _builder_3.append(value, "");
@@ -1300,7 +1312,7 @@ public class CCompiler implements ITypeOuptutProvider {
           if (info.isShadowReg) {
             _builder_3.append("static regUpdate_t reg;");
             _builder_3.newLine();
-            _builder_3.append("if (current!=");
+            _builder_3.append("if (prev!=");
             _builder_3.append(value, "");
             _builder_3.append("){");
             _builder_3.newLineIfNotEmpty();
@@ -1324,8 +1336,8 @@ public class CCompiler implements ITypeOuptutProvider {
         }
         {
           if (info.isPred) {
-            String _idName_4 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_4, "");
+            String _idName_5 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_5, "");
             _builder_3.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
           }
         }
@@ -1344,32 +1356,44 @@ public class CCompiler implements ITypeOuptutProvider {
         _builder_4.append("l;");
         _builder_4.newLineIfNotEmpty();
         {
+          if (info.isShadowReg) {
+            CharSequence _cType_3 = this.cType(info.info);
+            _builder_4.append(_cType_3, "");
+            _builder_4.append(" prev=");
+            String _idName_6 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_6, "");
+            _builder_4.append(regSuffix, "");
+            _builder_4.append("[offset];");
+          }
+        }
+        _builder_4.newLineIfNotEmpty();
+        {
           if ((info.actualWidth == info.info.width)) {
             {
               if (info.isShadowReg) {
-                CharSequence _cType_2 = this.cType(info.info);
-                _builder_4.append(_cType_2, "");
+                CharSequence _cType_4 = this.cType(info.info);
+                _builder_4.append(_cType_4, "");
                 _builder_4.append(" current=");
-                String _idName_5 = this.cce.idName(info.info, false, false);
-                _builder_4.append(_idName_5, "");
+                String _idName_7 = this.cce.idName(info.info, false, false);
+                _builder_4.append(_idName_7, "");
                 _builder_4.append(regSuffix, "");
                 _builder_4.append("[offset];");
               }
             }
             _builder_4.newLineIfNotEmpty();
-            String _idName_6 = this.cce.idName(info.info, false, false);
-            _builder_4.append(_idName_6, "");
+            String _idName_8 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_8, "");
             _builder_4.append(regSuffix, "");
             _builder_4.append("[offset]=");
             _builder_4.append(value, "");
             _builder_4.append(";");
             _builder_4.newLineIfNotEmpty();
           } else {
-            CharSequence _cType_3 = this.cType(info.info);
-            _builder_4.append(_cType_3, "");
+            CharSequence _cType_5 = this.cType(info.info);
+            _builder_4.append(_cType_5, "");
             _builder_4.append(" current=");
-            String _idName_7 = this.cce.idName(info.info, false, false);
-            _builder_4.append(_idName_7, "");
+            String _idName_9 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_9, "");
             _builder_4.append(regSuffix, "");
             _builder_4.append("[offset] & ");
             _builder_4.append(writeMask, "");
@@ -1384,8 +1408,8 @@ public class CCompiler implements ITypeOuptutProvider {
             _builder_4.append(info.bitEnd, "");
             _builder_4.append(";");
             _builder_4.newLineIfNotEmpty();
-            String _idName_8 = this.cce.idName(info.info, false, false);
-            _builder_4.append(_idName_8, "");
+            String _idName_10 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_10, "");
             _builder_4.append(regSuffix, "");
             _builder_4.append("[offset]=current|");
             _builder_4.append(value, "");
@@ -1397,7 +1421,7 @@ public class CCompiler implements ITypeOuptutProvider {
           if (info.isShadowReg) {
             _builder_4.append("static regUpdate_t reg;");
             _builder_4.newLine();
-            _builder_4.append("if (current!=");
+            _builder_4.append("if (prev!=");
             _builder_4.append(value, "");
             _builder_4.append("){");
             _builder_4.newLineIfNotEmpty();
@@ -1419,8 +1443,8 @@ public class CCompiler implements ITypeOuptutProvider {
         }
         {
           if (info.isPred) {
-            String _idName_9 = this.cce.idName(info.info, false, false);
-            _builder_4.append(_idName_9, "");
+            String _idName_11 = this.cce.idName(info.info, false, false);
+            _builder_4.append(_idName_11, "");
             _builder_4.append("_update=((uint64_t) deltaCycle << 16ll) | (epsCycle & 0xFFFF);");
           }
         }
@@ -1665,14 +1689,15 @@ public class CCompiler implements ITypeOuptutProvider {
             }
             break;
           case cast_uint:
-            if ((inst.arg1 != this.bitWidth)) {
+            final int castSize = Math.min(inst.arg1, inst.arg2);
+            if ((castSize != this.bitWidth)) {
               StringConcatenation _builder_8 = new StringConcatenation();
               CharSequence _uTemp_4 = this.uTemp(pos, "t");
               _builder_8.append(_uTemp_4, "");
               _builder_8.append("=t");
               _builder_8.append(a, "");
               _builder_8.append(" & ");
-              CharSequence _asMaskL = this.cce.asMaskL(inst.arg1);
+              CharSequence _asMaskL = this.cce.asMaskL(castSize);
               _builder_8.append(_asMaskL, "");
               _builder_8.append("l;");
               sb.append(_builder_8);

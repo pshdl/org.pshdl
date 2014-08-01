@@ -30,9 +30,11 @@ import com.google.common.base.Optional
 import com.google.common.collect.Range
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.HashSet
 import org.pshdl.interpreter.frames.BigIntegerFrame
 import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArithOp
+import org.pshdl.model.HDLArithOp.HDLArithOpType
 import org.pshdl.model.HDLBitOp
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLEnumRef
@@ -44,6 +46,7 @@ import org.pshdl.model.HDLLiteral
 import org.pshdl.model.HDLManip
 import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLShiftOp
 import org.pshdl.model.HDLStatement
@@ -55,9 +58,14 @@ import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.evaluation.ConstantEvaluate
 import org.pshdl.model.evaluation.HDLEvaluationContext
+import org.pshdl.model.parser.PSHDLParser
+import org.pshdl.model.simulation.RangeTool
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.Insulin
+import org.pshdl.model.validation.Problem
 
 import static java.math.BigInteger.*
 import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
@@ -66,7 +74,6 @@ import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.extensions.ProblemDescription.*
 import static org.pshdl.model.extensions.RangeExtension.*
-import org.pshdl.model.simulation.RangeTool
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -105,7 +112,11 @@ class RangeExtension {
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLUnresolvedFragment obj, HDLEvaluationContext context) {
-		return Optional.absent
+		val type = Insulin.resolveFragment(obj)
+		if (!type.present)
+			return Optional.absent
+		val copyDeepFrozen = type.get.obj.copyDeepFrozen(obj.container) as HDLExpression
+		return (copyDeepFrozen).determineRange(context)
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLLiteral obj, HDLEvaluationContext context) {
@@ -122,14 +133,14 @@ class RangeExtension {
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional.absent
 		}
-		val annoCheck = checkAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range))
+		val annoCheck = HDLBuiltInAnnotations.checkRangeAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range), new HashSet<Problem>())
 		if (annoCheck.present)
 			return annoCheck
 		val container = hVar.get.container
 		if (container !== null) {
 			if (container instanceof HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
-				val subAnnoCheck = checkAnnotation(hvd.getAnnotation(HDLBuiltInAnnotations.range))
+				val subAnnoCheck = HDLBuiltInAnnotations.checkRangeAnnotation(hvd.getAnnotation(HDLBuiltInAnnotations.range), new HashSet<Problem>())
 				if (subAnnoCheck.present)
 					return subAnnoCheck
 			}
@@ -177,51 +188,34 @@ class RangeExtension {
 		return Optional.absent
 	}
 
-	def static Optional<Range<BigInteger>> checkAnnotation(HDLAnnotation range) {
-		if (range !== null) {
-			val value = range.value.split(";")
-
-			//TODO Allow simple references
-			try {
-				val lowerBound = new BigInteger(value.get(0))
-				val upperBound = new BigInteger(value.get(1))
-				return Optional.of(RangeTool.createRange(lowerBound, upperBound))
-			} catch (Exception e) {
-
-				//print("Invalid arguments for range annotation "+range.value+"\n")
-				return Optional.absent
-			}
-		}
-		return Optional.absent
-	}
 
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj) {
 		return rangeOf(obj, null)
 	}
 
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj, HDLEvaluationContext context) {
-		val Optional<BigInteger> to = ConstantEvaluate.valueOf(obj.to, context)
+		val Optional<Range<BigInteger>> to = rangeOf(obj.to, context)
 		if (!to.present)
 			return Optional.absent;
 		if (obj.from !== null) {
-			val Optional<BigInteger> from = ConstantEvaluate.valueOf(obj.from, context)
+			val from = rangeOf(obj.from, context)
 			if (!from.present)
 				return Optional.absent;
-			return Optional.of(RangeTool.createRange(from.get, to.get))
+			return Optional.of(from.get.span(to.get))
 		}
 		if (obj.dec !== null) {
-			val decVal = ConstantEvaluate.valueOf(obj.dec, context)
+			val decVal = rangeOf(obj.dec, context)
 			if (!decVal.present)
 				return Optional.absent
-			return Optional.of(RangeTool.createRange(to.get, decVal.get))
+			return Optional.of(to.get.span(decVal.get))
 		}
 		if (obj.inc !== null) {
-			val incVal = ConstantEvaluate.valueOf(obj.inc, context)
+			val incVal = rangeOf(obj.inc, context)
 			if (!incVal.present)
 				return Optional.absent
-			return Optional.of(RangeTool.createRange(to.get, incVal.get))
+			return Optional.of(to.get.span(incVal.get))
 		}
-		return Optional.of(RangeTool.createRange(to.get, to.get))
+		return to
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLEqualityOp obj, HDLEvaluationContext context) {
@@ -234,29 +228,35 @@ class RangeExtension {
 		val Optional<Range<BigInteger>> leftRange = obj.left.determineRange(context)
 		if (!leftRange.present)
 			return Optional.absent
+		val lrVal=leftRange.get
+		if (!lrVal.hasLowerBound || !lrVal.hasUpperBound)
+			return Optional.absent
 		val Optional<Range<BigInteger>> rightRange = obj.right.determineRange(context)
 		if (!rightRange.present)
 			return Optional.absent
+		val rrVal = rightRange.get
+		if (!rrVal.hasLowerBound || !rrVal.hasUpperBound)
+			return Optional.absent
 		switch (obj.type) {
 			case SLL: {
-				val BigInteger ff = leftRange.get.lowerEndpoint.shiftLeft(rightRange.get.lowerEndpoint.intValue)
-				val BigInteger ft = leftRange.get.lowerEndpoint.shiftLeft(rightRange.get.upperEndpoint.intValue)
-				val BigInteger tf = leftRange.get.upperEndpoint.shiftLeft(rightRange.get.lowerEndpoint.intValue)
-				val BigInteger tt = leftRange.get.upperEndpoint.shiftLeft(rightRange.get.upperEndpoint.intValue)
+				val BigInteger ff = lrVal.lowerEndpoint.shiftLeft(rrVal.lowerEndpoint.intValue)
+				val BigInteger ft = lrVal.lowerEndpoint.shiftLeft(rrVal.upperEndpoint.intValue)
+				val BigInteger tf = lrVal.upperEndpoint.shiftLeft(rrVal.lowerEndpoint.intValue)
+				val BigInteger tt = lrVal.upperEndpoint.shiftLeft(rrVal.upperEndpoint.intValue)
 				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case SRA: {
-				val BigInteger ff = leftRange.get.lowerEndpoint.shiftRight(rightRange.get.lowerEndpoint.intValue)
-				val BigInteger ft = leftRange.get.lowerEndpoint.shiftRight(rightRange.get.upperEndpoint.intValue)
-				val BigInteger tf = leftRange.get.upperEndpoint.shiftRight(rightRange.get.lowerEndpoint.intValue)
-				val BigInteger tt = leftRange.get.upperEndpoint.shiftRight(rightRange.get.upperEndpoint.intValue)
+				val BigInteger ff = lrVal.lowerEndpoint.shiftRight(rrVal.lowerEndpoint.intValue)
+				val BigInteger ft = lrVal.lowerEndpoint.shiftRight(rrVal.upperEndpoint.intValue)
+				val BigInteger tf = lrVal.upperEndpoint.shiftRight(rrVal.lowerEndpoint.intValue)
+				val BigInteger tt = lrVal.upperEndpoint.shiftRight(rrVal.upperEndpoint.intValue)
 				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case SRL: {
-				val BigInteger ff = srl(leftRange.get.lowerEndpoint, rightRange.get.lowerEndpoint)
-				val BigInteger ft = srl(leftRange.get.lowerEndpoint, rightRange.get.upperEndpoint)
-				val BigInteger tf = srl(leftRange.get.upperEndpoint, rightRange.get.lowerEndpoint)
-				val BigInteger tt = srl(leftRange.get.upperEndpoint, rightRange.get.upperEndpoint)
+				val BigInteger ff = srl(lrVal.lowerEndpoint, rrVal.lowerEndpoint)
+				val BigInteger ft = srl(lrVal.lowerEndpoint, rrVal.upperEndpoint)
+				val BigInteger tf = srl(lrVal.upperEndpoint, rrVal.lowerEndpoint)
+				val BigInteger tt = srl(lrVal.upperEndpoint, rrVal.upperEndpoint)
 				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 		}
@@ -271,23 +271,29 @@ class RangeExtension {
 		val Optional<Range<BigInteger>> leftRange = obj.left.determineRange(context)
 		if (!leftRange.present)
 			return Optional.absent
+		val lrVal=leftRange.get
+		if (!lrVal.hasLowerBound || !lrVal.hasUpperBound)
+			return Optional.absent
 		val Optional<Range<BigInteger>> rightRange = obj.right.determineRange(context)
 		if (!rightRange.present)
+			return Optional.absent
+		val rrVal = rightRange.get
+		if (!rrVal.hasLowerBound || !rrVal.hasUpperBound)
 			return Optional.absent
 		switch (type: obj.type) {
 			case type == OR || type == XOR: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
 				return Optional.of(
-					RangeTool.createRange(0bi, 1bi.shiftLeft(leftRange.get.upperEndpoint.bitLength).subtract(1bi)))
+					RangeTool.createRange(0bi, 1bi.shiftLeft(lrVal.upperEndpoint.bitLength).subtract(1bi)))
 			}
 			case AND: {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, BIT_NOT_SUPPORTED_FOR_RANGES)
 				return Optional.of(
 					RangeTool.createRange(0bi,
-						leftRange.get.upperEndpoint.min(
-							1bi.shiftLeft(rightRange.get.upperEndpoint.bitLength).subtract(1bi))))
+						lrVal.upperEndpoint.min(
+							1bi.shiftLeft(rrVal.upperEndpoint.bitLength).subtract(1bi))))
 			}
 			case type == LOGI_AND || type == LOGI_OR: {
 				obj.addMeta(SOURCE, obj)
@@ -303,58 +309,64 @@ class RangeExtension {
 		val Optional<Range<BigInteger>> leftRange = obj.left.determineRange(context)
 		if (!leftRange.present)
 			return Optional.absent
+		val lrVal=leftRange.get
+		if (!lrVal.hasLowerBound || !lrVal.hasUpperBound)
+			return Optional.absent
 		val Optional<Range<BigInteger>> rightRange = obj.right.determineRange(context)
 		if (!rightRange.present)
+			return Optional.absent
+		val rrVal = rightRange.get
+		if (!rrVal.hasLowerBound || !rrVal.hasUpperBound)
 			return Optional.absent
 		switch (obj.type) {
 			case PLUS:
 				return Optional.of(
-					RangeTool.createRange(leftRange.get.lowerEndpoint.add(rightRange.get.lowerEndpoint),
-						leftRange.get.upperEndpoint.add(rightRange.get.upperEndpoint)))
+					RangeTool.createRange(lrVal.lowerEndpoint.add(rrVal.lowerEndpoint),
+						lrVal.upperEndpoint.add(rrVal.upperEndpoint)))
 			case MINUS:
 				return Optional.of(
-					RangeTool.createRange(leftRange.get.lowerEndpoint.subtract(rightRange.get.lowerEndpoint),
-						leftRange.get.upperEndpoint.subtract(rightRange.get.upperEndpoint)))
+					RangeTool.createRange(lrVal.lowerEndpoint.subtract(rrVal.lowerEndpoint),
+						lrVal.upperEndpoint.subtract(rrVal.upperEndpoint)))
 			case DIV: {
-				if (rightRange.get.lowerEndpoint.equals(0bi) || rightRange.get.upperEndpoint.equals(0bi)) {
+				if (rrVal.lowerEndpoint.equals(0bi) || rrVal.upperEndpoint.equals(0bi)) {
 					obj.addMeta(SOURCE, obj)
 					obj.addMeta(DESCRIPTION, ZERO_DIVIDE)
 					return Optional.absent
 				}
-				if (rightRange.get.lowerEndpoint.signum * rightRange.get.upperEndpoint.signum < 0 ||
-					rightRange.get.upperEndpoint.signum == 0) {
+				if (rrVal.lowerEndpoint.signum * rrVal.upperEndpoint.signum < 0 ||
+					rrVal.upperEndpoint.signum == 0) {
 					obj.addMeta(SOURCE, obj)
 					obj.addMeta(DESCRIPTION, POSSIBLY_ZERO_DIVIDE)
 				}
-				val mulRange = RangeTool.createRange(1bd.divide(new BigDecimal(rightRange.get.lowerEndpoint)),
-					1bd.divide(new BigDecimal(rightRange.get.upperEndpoint)))
-				val BigDecimal ff = new BigDecimal(leftRange.get.lowerEndpoint).multiply(mulRange.lowerEndpoint)
-				val BigDecimal ft = new BigDecimal(leftRange.get.lowerEndpoint).multiply(mulRange.upperEndpoint)
-				val BigDecimal tf = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.lowerEndpoint)
-				val BigDecimal tt = new BigDecimal(leftRange.get.upperEndpoint).multiply(mulRange.upperEndpoint)
+				val mulRange = RangeTool.createRange(1bd.divide(new BigDecimal(rrVal.lowerEndpoint)),
+					1bd.divide(new BigDecimal(rrVal.upperEndpoint)))
+				val BigDecimal ff = new BigDecimal(lrVal.lowerEndpoint).multiply(mulRange.lowerEndpoint)
+				val BigDecimal ft = new BigDecimal(lrVal.lowerEndpoint).multiply(mulRange.upperEndpoint)
+				val BigDecimal tf = new BigDecimal(lrVal.upperEndpoint).multiply(mulRange.lowerEndpoint)
+				val BigDecimal tt = new BigDecimal(lrVal.upperEndpoint).multiply(mulRange.upperEndpoint)
 				return Optional.of(
 					RangeTool.createRange(ff.min(ft).min(tf).min(tt).toBigInteger,
 						ff.max(ft).max(tf).max(tt).toBigInteger))
 			}
 			case MUL: {
-				val BigInteger ff = leftRange.get.lowerEndpoint.multiply(rightRange.get.lowerEndpoint)
-				val BigInteger ft = leftRange.get.lowerEndpoint.multiply(rightRange.get.upperEndpoint)
-				val BigInteger tf = leftRange.get.upperEndpoint.multiply(rightRange.get.lowerEndpoint)
-				val BigInteger tt = leftRange.get.upperEndpoint.multiply(rightRange.get.upperEndpoint)
+				val BigInteger ff = lrVal.lowerEndpoint.multiply(rrVal.lowerEndpoint)
+				val BigInteger ft = lrVal.lowerEndpoint.multiply(rrVal.upperEndpoint)
+				val BigInteger tf = lrVal.upperEndpoint.multiply(rrVal.lowerEndpoint)
+				val BigInteger tt = lrVal.upperEndpoint.multiply(rrVal.upperEndpoint)
 				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 			case MOD: {
-				val rle = rightRange.get.lowerEndpoint
+				val rle = rrVal.lowerEndpoint
 				val leftBound = rle.min(0bi)
-				val rue = rightRange.get.upperEndpoint
+				val rue = rrVal.upperEndpoint
 				val rightBound = rue.max(0bi)
 				return Optional.of(RangeTool.createRange(leftBound, rightBound))
 			}
 			case POW: {
-				val BigInteger ff = leftRange.get.lowerEndpoint.pow(rightRange.get.lowerEndpoint.intValue)
-				val BigInteger ft = leftRange.get.lowerEndpoint.pow(rightRange.get.upperEndpoint.intValue)
-				val BigInteger tf = leftRange.get.upperEndpoint.pow(rightRange.get.lowerEndpoint.intValue)
-				val BigInteger tt = leftRange.get.upperEndpoint.pow(rightRange.get.upperEndpoint.intValue)
+				val BigInteger ff = lrVal.lowerEndpoint.pow(rrVal.lowerEndpoint.intValue)
+				val BigInteger ft = lrVal.lowerEndpoint.pow(rrVal.upperEndpoint.intValue)
+				val BigInteger tf = lrVal.upperEndpoint.pow(rrVal.lowerEndpoint.intValue)
+				val BigInteger tt = lrVal.upperEndpoint.pow(rrVal.upperEndpoint.intValue)
 				return Optional.of(RangeTool.createRange(ff.min(ft).min(tf).min(tt), ff.max(ft).max(tf).max(tt)))
 			}
 		}
@@ -377,9 +389,18 @@ class RangeExtension {
 				if (type instanceof HDLPrimitive) {
 					val Optional<Range<BigInteger>> castRange = HDLPrimitives.getInstance.getValueRange(
 						type as HDLPrimitive, context)
-					if (!castRange.present)
-						return Optional.absent
 					if (!right.present)
+						return Optional.absent
+					if (type.type == HDLPrimitiveType.INTEGER) {
+						return Optional.of(HDLPrimitives.intRange(32bi).intersection(right.get))
+					}
+					if (type.type == HDLPrimitiveType.NATURAL) {
+						return Optional.of(HDLPrimitives.uintRange(32bi).intersection(right.get))
+					}
+					if (type.type == HDLPrimitiveType.BIT) {
+						return Optional.of(RangeTool.createRange(0bi, 1bi).intersection(right.get))
+					}
+					if (!castRange.present)
 						return Optional.absent
 					return Optional.of(castRange.get.intersection(right.get))
 				}

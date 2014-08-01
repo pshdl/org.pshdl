@@ -461,15 +461,24 @@ class SimulationTransformationExtension {
 				val int currentWidth = getWidth(current, context)
 				var int primWidth = getWidth(prim, context)
 				switch (prim.type) {
-					case current.type === INTEGER || current.type === INT:
+					case current.type === INTEGER || current.type === INT:{
+						//Ensure correct signedness
 						res.instructions.add(
-							new ArgumentedInstruction(cast_int, primWidth.toString, Integer.toString(currentWidth)))
-					case current.type === BIT || current.type === BITVECTOR:
-						res.instructions.add(
-							new ArgumentedInstruction(cast_uint, primWidth.toString, Integer.toString(currentWidth)))
-					case current.type === UINT || current.type === NATURAL:
-						res.instructions.add(
-							new ArgumentedInstruction(cast_uint, primWidth.toString, Integer.toString(currentWidth)))
+							new ArgumentedInstruction(cast_int, Integer.toString(primWidth), Integer.toString(currentWidth)))
+						if (prim.type !== INTEGER && prim.type !== INT) {
+							res.instructions.add(
+								new ArgumentedInstruction(cast_uint, Integer.toString(primWidth), Integer.toString(primWidth)))
+						}
+					}
+					case current.type === UINT || current.type === NATURAL || current.type === BIT || current.type === BITVECTOR:{
+						if (prim.type === INTEGER && prim.type === INT) {
+							res.instructions.add(
+								new ArgumentedInstruction(cast_int, Integer.toString(primWidth), Integer.toString(currentWidth)))
+						} else {
+							res.instructions.add(
+								new ArgumentedInstruction(cast_uint, Integer.toString(primWidth), Integer.toString(currentWidth)))
+						}
+					}
 					default:
 						throw new IllegalArgumentException("Cast to type:" + prim.type + " not supported")
 				}

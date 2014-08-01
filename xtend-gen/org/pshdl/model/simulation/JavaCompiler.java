@@ -1810,32 +1810,44 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
       if (info.fixedArray) {
         StringConcatenation _builder_2 = new StringConcatenation();
         {
+          if (info.isShadowReg) {
+            String _javaType = this.getJavaType(info.info);
+            _builder_2.append(_javaType, "");
+            _builder_2.append(" prev=");
+            String _idName = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName, "");
+            _builder_2.append(fixedAccess, "");
+            _builder_2.append(";");
+          }
+        }
+        _builder_2.newLineIfNotEmpty();
+        {
           if ((info.actualWidth == info.info.width)) {
             {
               if (info.isShadowReg) {
-                String _javaType = this.getJavaType(info.info);
-                _builder_2.append(_javaType, "");
+                String _javaType_1 = this.getJavaType(info.info);
+                _builder_2.append(_javaType_1, "");
                 _builder_2.append(" current=");
-                String _idName = this.cce.idName(info.info, false, false);
-                _builder_2.append(_idName, "");
+                String _idName_1 = this.cce.idName(info.info, false, false);
+                _builder_2.append(_idName_1, "");
                 _builder_2.append(fixedAccess, "");
                 _builder_2.append(";");
               }
             }
             _builder_2.newLineIfNotEmpty();
-            String _idName_1 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_1, "");
+            String _idName_2 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_2, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append("=");
             _builder_2.append(value, "");
             _builder_2.append(";");
             _builder_2.newLineIfNotEmpty();
           } else {
-            String _javaType_1 = this.getJavaType(info.info);
-            _builder_2.append(_javaType_1, "");
+            String _javaType_2 = this.getJavaType(info.info);
+            _builder_2.append(_javaType_2, "");
             _builder_2.append(" current=");
-            String _idName_2 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_2, "");
+            String _idName_3 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_3, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append(" & ");
             _builder_2.append(writeMask, "");
@@ -1850,8 +1862,8 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
             _builder_2.append(info.bitEnd, "");
             _builder_2.append(");");
             _builder_2.newLineIfNotEmpty();
-            String _idName_3 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_3, "");
+            String _idName_4 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_4, "");
             _builder_2.append(fixedAccess, "");
             _builder_2.append("=current|");
             _builder_2.append(value, "");
@@ -1861,7 +1873,7 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
         }
         {
           if (info.isShadowReg) {
-            _builder_2.append("if (current!=");
+            _builder_2.append("if (prev!=");
             _builder_2.append(value, "");
             _builder_2.append(")");
             _builder_2.newLineIfNotEmpty();
@@ -1877,8 +1889,8 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
         }
         {
           if (info.isPred) {
-            String _idName_4 = this.cce.idName(info.info, false, false);
-            _builder_2.append(_idName_4, "");
+            String _idName_5 = this.cce.idName(info.info, false, false);
+            _builder_2.append(_idName_5, "");
             _builder_2.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           }
         }
@@ -1891,32 +1903,44 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
         _builder_3.append(";");
         _builder_3.newLineIfNotEmpty();
         {
+          if (info.isShadowReg) {
+            String _javaType_3 = this.getJavaType(info.info);
+            _builder_3.append(_javaType_3, "");
+            _builder_3.append(" prev=");
+            String _idName_6 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_6, "");
+            _builder_3.append(regSuffix, "");
+            _builder_3.append("[offset];");
+          }
+        }
+        _builder_3.newLineIfNotEmpty();
+        {
           if ((info.actualWidth == info.info.width)) {
             {
               if (info.isShadowReg) {
-                String _javaType_2 = this.getJavaType(info.info);
-                _builder_3.append(_javaType_2, "");
+                String _javaType_4 = this.getJavaType(info.info);
+                _builder_3.append(_javaType_4, "");
                 _builder_3.append(" current=");
-                String _idName_5 = this.cce.idName(info.info, false, false);
-                _builder_3.append(_idName_5, "");
+                String _idName_7 = this.cce.idName(info.info, false, false);
+                _builder_3.append(_idName_7, "");
                 _builder_3.append(regSuffix, "");
                 _builder_3.append("[offset];");
               }
             }
             _builder_3.newLineIfNotEmpty();
-            String _idName_6 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_6, "");
+            String _idName_8 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_8, "");
             _builder_3.append(regSuffix, "");
             _builder_3.append("[offset]=");
             _builder_3.append(value, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
           } else {
-            String _javaType_3 = this.getJavaType(info.info);
-            _builder_3.append(_javaType_3, "");
+            String _javaType_5 = this.getJavaType(info.info);
+            _builder_3.append(_javaType_5, "");
             _builder_3.append(" current=");
-            String _idName_7 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_7, "");
+            String _idName_9 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_9, "");
             _builder_3.append(regSuffix, "");
             _builder_3.append("[offset] & ");
             _builder_3.append(writeMask, "");
@@ -1931,8 +1955,8 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
             _builder_3.append(info.bitEnd, "");
             _builder_3.append(";");
             _builder_3.newLineIfNotEmpty();
-            String _idName_8 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_8, "");
+            String _idName_10 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_10, "");
             _builder_3.append(regSuffix, "");
             _builder_3.append("[offset]=current|");
             _builder_3.append(value, "");
@@ -1942,7 +1966,7 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
         }
         {
           if (info.isShadowReg) {
-            _builder_3.append("if (current!=");
+            _builder_3.append("if (prev!=");
             _builder_3.append(value, "");
             _builder_3.append(")");
             _builder_3.newLineIfNotEmpty();
@@ -1956,8 +1980,8 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
         }
         {
           if (info.isPred) {
-            String _idName_9 = this.cce.idName(info.info, false, false);
-            _builder_3.append(_idName_9, "");
+            String _idName_11 = this.cce.idName(info.info, false, false);
+            _builder_3.append(_idName_11, "");
             _builder_3.append("_update=((long) deltaCycle << 16l) | (epsCycle & 0xFFFF);");
           }
         }
@@ -2187,14 +2211,15 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
             sb.append(_builder_6);
             break;
           case cast_uint:
-            if ((inst.arg1 != 64)) {
+            final int castSize = Math.min(inst.arg1, inst.arg2);
+            if ((castSize != 64)) {
               StringConcatenation _builder_8 = new StringConcatenation();
               _builder_8.append("long t");
               _builder_8.append(pos, "");
               _builder_8.append("=t");
               _builder_8.append(a, "");
               _builder_8.append(" & ");
-              CharSequence _asMaskL = this.cce.asMaskL(inst.arg1);
+              CharSequence _asMaskL = this.cce.asMaskL(castSize);
               _builder_8.append(_asMaskL, "");
               _builder_8.append(";");
               sb.append(_builder_8);

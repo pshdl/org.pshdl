@@ -759,53 +759,83 @@ public class SimulationTransformationExtension {
             }
             if (_or) {
               _matched=true;
-              String _string_2 = Integer.valueOf(primWidth).toString();
+              String _string_2 = Integer.toString(primWidth);
               String _string_3 = Integer.toString(currentWidth);
               FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_2, _string_3);
               res.instructions.add(_argumentedInstruction_2);
+              boolean _and = false;
+              HDLPrimitive.HDLPrimitiveType _type_4 = prim.getType();
+              boolean _tripleNotEquals = (_type_4 != HDLPrimitive.HDLPrimitiveType.INTEGER);
+              if (!_tripleNotEquals) {
+                _and = false;
+              } else {
+                HDLPrimitive.HDLPrimitiveType _type_5 = prim.getType();
+                boolean _tripleNotEquals_1 = (_type_5 != HDLPrimitive.HDLPrimitiveType.INT);
+                _and = _tripleNotEquals_1;
+              }
+              if (_and) {
+                String _string_4 = Integer.toString(primWidth);
+                String _string_5 = Integer.toString(primWidth);
+                FluidFrame.ArgumentedInstruction _argumentedInstruction_3 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_4, _string_5);
+                res.instructions.add(_argumentedInstruction_3);
+              }
             }
           }
           if (!_matched) {
             boolean _or_1 = false;
-            HDLPrimitive.HDLPrimitiveType _type_4 = current.getType();
-            boolean _tripleEquals_2 = (_type_4 == HDLPrimitive.HDLPrimitiveType.BIT);
+            boolean _or_2 = false;
+            boolean _or_3 = false;
+            HDLPrimitive.HDLPrimitiveType _type_6 = current.getType();
+            boolean _tripleEquals_2 = (_type_6 == HDLPrimitive.HDLPrimitiveType.UINT);
             if (_tripleEquals_2) {
+              _or_3 = true;
+            } else {
+              HDLPrimitive.HDLPrimitiveType _type_7 = current.getType();
+              boolean _tripleEquals_3 = (_type_7 == HDLPrimitive.HDLPrimitiveType.NATURAL);
+              _or_3 = _tripleEquals_3;
+            }
+            if (_or_3) {
+              _or_2 = true;
+            } else {
+              HDLPrimitive.HDLPrimitiveType _type_8 = current.getType();
+              boolean _tripleEquals_4 = (_type_8 == HDLPrimitive.HDLPrimitiveType.BIT);
+              _or_2 = _tripleEquals_4;
+            }
+            if (_or_2) {
               _or_1 = true;
             } else {
-              HDLPrimitive.HDLPrimitiveType _type_5 = current.getType();
-              boolean _tripleEquals_3 = (_type_5 == HDLPrimitive.HDLPrimitiveType.BITVECTOR);
-              _or_1 = _tripleEquals_3;
+              HDLPrimitive.HDLPrimitiveType _type_9 = current.getType();
+              boolean _tripleEquals_5 = (_type_9 == HDLPrimitive.HDLPrimitiveType.BITVECTOR);
+              _or_1 = _tripleEquals_5;
             }
             if (_or_1) {
               _matched=true;
-              String _string_4 = Integer.valueOf(primWidth).toString();
-              String _string_5 = Integer.toString(currentWidth);
-              FluidFrame.ArgumentedInstruction _argumentedInstruction_3 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_4, _string_5);
-              res.instructions.add(_argumentedInstruction_3);
+              boolean _and_1 = false;
+              HDLPrimitive.HDLPrimitiveType _type_10 = prim.getType();
+              boolean _tripleEquals_6 = (_type_10 == HDLPrimitive.HDLPrimitiveType.INTEGER);
+              if (!_tripleEquals_6) {
+                _and_1 = false;
+              } else {
+                HDLPrimitive.HDLPrimitiveType _type_11 = prim.getType();
+                boolean _tripleEquals_7 = (_type_11 == HDLPrimitive.HDLPrimitiveType.INT);
+                _and_1 = _tripleEquals_7;
+              }
+              if (_and_1) {
+                String _string_6 = Integer.toString(primWidth);
+                String _string_7 = Integer.toString(currentWidth);
+                FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_6, _string_7);
+                res.instructions.add(_argumentedInstruction_4);
+              } else {
+                String _string_8 = Integer.toString(primWidth);
+                String _string_9 = Integer.toString(currentWidth);
+                FluidFrame.ArgumentedInstruction _argumentedInstruction_5 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_8, _string_9);
+                res.instructions.add(_argumentedInstruction_5);
+              }
             }
           }
           if (!_matched) {
-            boolean _or_2 = false;
-            HDLPrimitive.HDLPrimitiveType _type_6 = current.getType();
-            boolean _tripleEquals_4 = (_type_6 == HDLPrimitive.HDLPrimitiveType.UINT);
-            if (_tripleEquals_4) {
-              _or_2 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_7 = current.getType();
-              boolean _tripleEquals_5 = (_type_7 == HDLPrimitive.HDLPrimitiveType.NATURAL);
-              _or_2 = _tripleEquals_5;
-            }
-            if (_or_2) {
-              _matched=true;
-              String _string_6 = Integer.valueOf(primWidth).toString();
-              String _string_7 = Integer.toString(currentWidth);
-              FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_6, _string_7);
-              res.instructions.add(_argumentedInstruction_4);
-            }
-          }
-          if (!_matched) {
-            HDLPrimitive.HDLPrimitiveType _type_8 = prim.getType();
-            String _plus = ("Cast to type:" + _type_8);
+            HDLPrimitive.HDLPrimitiveType _type_12 = prim.getType();
+            String _plus = ("Cast to type:" + _type_12);
             String _plus_1 = (_plus + " not supported");
             throw new IllegalArgumentException(_plus_1);
           }

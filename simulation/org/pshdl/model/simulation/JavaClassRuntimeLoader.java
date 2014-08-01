@@ -48,6 +48,7 @@ import javax.tools.ToolProvider;
 
 import org.pshdl.interpreter.IChangeListener;
 import org.pshdl.interpreter.IHDLInterpreter;
+import org.pshdl.interpreter.IHDLInterpreterFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -110,11 +111,22 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		fileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.singleton(tempDir));
 	}
 
-	public IHDLInterpreter compileAndLoad(String mainClassFQN, String sourceCode, boolean disableEdge, boolean disableOutputLogic) throws Exception {
+	public IHDLInterpreterFactory compileAndLoad(String mainClassFQN, String sourceCode, final boolean disableEdge, final boolean disableOutputLogic) throws Exception {
 		final Class<?> cls = compileClass(mainClassFQN, sourceCode);
-		final Constructor<?> constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
-		final IHDLInterpreter instance = (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
-		return instance;
+		return new IHDLInterpreterFactory() {
+
+			@Override
+			public IHDLInterpreter newInstance() {
+				Constructor<?> constructor;
+				try {
+					constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
+					final IHDLInterpreter instance = (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
+					return instance;
+				} catch (final Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
 	}
 
 	public Class<?> compileClass(String mainClassFQN, String sourceCode) throws Exception {
@@ -148,8 +160,10 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 
 	public IHDLInterpreter compileAndLoadChangeAdapter(String mainClassFQN, String sourceCode, IHDLInterpreter mainInterpreter, IChangeListener... listeners) throws Exception {
 		final Class<?> adapterClass = compileClass(mainClassFQN, sourceCode);
-		Constructor<?> constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
-		if (constructor == null) {
+		Constructor<?> constructor = null;
+		try {
+			constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
+		} catch (final Exception e) {
 			constructor = adapterClass.getConstructor(IHDLInterpreter.class, IChangeListener[].class);
 		}
 		return (IHDLInterpreter) constructor.newInstance(mainInterpreter, listeners);

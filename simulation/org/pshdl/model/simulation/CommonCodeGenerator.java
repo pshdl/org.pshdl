@@ -119,6 +119,8 @@ public abstract class CommonCodeGenerator {
 		final List<Integer> selectedScheduleStage = Lists.newArrayList();
 		final StringBuilder sb = new StringBuilder();
 		final List<Integer> handledPredicates = Lists.newArrayList();
+		final List<Integer> handledNegEdges = Lists.newArrayList();
+		final List<Integer> handledPosEdges = Lists.newArrayList();
 		sb.append(indent()).append(runMethodsHeader(createConstant));
 		indent++;
 		sb.append(indent()).append(assignConstant(EPS_CYCLE, BigInteger.ZERO, NONE)).append(newLine());
@@ -163,14 +165,14 @@ public abstract class CommonCodeGenerator {
 		}
 		indent--;
 		sb.append(indent()).append(runMethodsFooter(createConstant));
-		sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates));
+		sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates, handledNegEdges, handledPosEdges));
 		return sb;
 	}
 
 	protected abstract CharSequence clearRegUpdates();
 
 	protected CharSequence createStageMethods(final Multimap<Integer, Frame> schedulingStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
-			final List<Integer> handledPredicates) {
+			final List<Integer> handledPredicates, List<Integer> handledNegEdges, List<Integer> handledPosEdges) {
 		final StringBuilder sb = new StringBuilder();
 		for (final int stage : selectedScheduleStage) {
 			final Collection<Frame> stageFrames = schedulingStage.get(stage);
@@ -183,19 +185,19 @@ public abstract class CommonCodeGenerator {
 				matchingFrames.add(frame);
 				totalStageCosts += estimateFrameCosts(frame);
 			}
-			sb.append(createStageMethod(createConstant, handledPredicates, stage, matchingFrames, totalStageCosts));
+			sb.append(createStageMethod(createConstant, handledPredicates, stage, matchingFrames, totalStageCosts, handledNegEdges, handledPosEdges));
 		}
 		return sb;
 	}
 
 	protected CharSequence createStageMethod(final boolean createConstant, final List<Integer> handledPredicates, final int stage, final List<Frame> matchingFrames,
-			int totalStageCosts) {
+			int totalStageCosts, List<Integer> handledNegEdges, List<Integer> handledPosEdges) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(indent()).append(stageMethodsHeader(stage, totalStageCosts, createConstant));
 		indent++;
 		for (final Frame frame : matchingFrames) {
-			sb.append(handleEdge(handledPredicates, false, frame.edgeNegDepRes));
-			sb.append(handleEdge(handledPredicates, true, frame.edgePosDepRes));
+			sb.append(handleEdge(handledNegEdges, false, frame.edgeNegDepRes));
+			sb.append(handleEdge(handledPosEdges, true, frame.edgePosDepRes));
 			sb.append(handlePredicates(handledPredicates, false, frame.predNegDepRes));
 			sb.append(handlePredicates(handledPredicates, true, frame.predPosDepRes));
 		}
@@ -682,10 +684,10 @@ public abstract class CommonCodeGenerator {
 			break;
 		case cast_int:
 			// Create a targetSizeWitType with int indication
-			sb.append(assignTempVar((Math.min(exec.arg1, exec.arg2) << 1) + 1, pos, NONE, tempName));
+			sb.append(assignTempVar((Math.min(exec.arg1, exec.arg2) << 1) | 1, pos, NONE, tempName));
 			break;
 		case cast_uint:
-			sb.append(assignTempVar(exec.arg1 << 1, pos, NONE, mask(tempName, exec.arg1)));
+			sb.append(assignTempVar(Math.min(exec.arg1, exec.arg2) << 1, pos, NONE, mask(tempName, Math.min(exec.arg1, exec.arg2))));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -1053,6 +1055,8 @@ public abstract class CommonCodeGenerator {
 		final int shift = bitWidth - targetSize;
 		if ((cast != null) && (cast.length() != 0))
 			return "((" + cast + "(" + op + ")) << " + shift + ") >> " + shift;
+		if (shift == 0)
+			return op;
 		return "((" + op + ") << " + shift + ") >> " + shift;
 	}
 

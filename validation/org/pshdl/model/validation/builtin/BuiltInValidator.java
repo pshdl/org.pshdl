@@ -223,7 +223,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkParameterInstance(pkg, problems, hContext);
 			checkArrayBoundaries(pkg, problems, hContext);
 			checkConstantEquals(pkg, problems, hContext);
-			checkBitAcces(pkg, problems, hContext);
+			checkBitAccess(pkg, problems, hContext);
 			// TODO Validate value ranges, check for 0 divide
 			checkRangeDirections(pkg, problems, hContext);
 			// TODO Check for POW only power of 2
@@ -540,7 +540,7 @@ public class BuiltInValidator implements IHDLValidator {
 				problems.add(new Problem(UNKNOWN_RANGE, to));
 				continue;
 			}
-			if (fromRangeOf.get().isConnected(toRangeOf.get())) {
+			if (fromRangeOf.get().isConnected(toRangeOf.get()) && !fromRangeOf.get().equals(toRangeOf.get())) {
 				problems.add(new Problem(RANGE_OVERLAP, hdlRange));
 				continue;
 			}
@@ -554,7 +554,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 	}
 
-	private static void checkBitAcces(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkBitAccess(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLVariableRef[] refs = pkg.getAllObjectsOf(HDLVariableRef.class, true);
 		for (final HDLVariableRef ref : refs) {
 			if (skipExp(ref)) {
@@ -579,7 +579,7 @@ public class BuiltInValidator implements IHDLValidator {
 							problems.add(new Problem(BIT_ACCESS_NOT_POSSIBLE, ref, varType.get()));
 							continue;
 						}
-						final Optional<Range<BigInteger>> bitSizeRangeOpt = RangeExtension.rangeOf(primitive.getWidth(), getContext(hContext, primitive));
+						final Optional<Range<BigInteger>> bitSizeRangeOpt = RangeExtension.rangeOf(primitive.getWidth(), null);
 						if (!bitSizeRangeOpt.isPresent()) {
 							continue;
 						}
@@ -1227,7 +1227,7 @@ public class BuiltInValidator implements IHDLValidator {
 	 *
 	 * @param accessRange
 	 *            the range in which the array/bits can be acccessed
-	 * @param arrayRange
+	 * @param indexRange
 	 *            the range of the size that array size/ width of the type can
 	 *            be in
 	 * @param problems
@@ -1239,26 +1239,36 @@ public class BuiltInValidator implements IHDLValidator {
 	 * @param bit
 	 *            when true bit access errors will be reported
 	 */
-	private static void checkAccessBoundaries(Range<BigInteger> accessRange, Range<BigInteger> arrayRange, Set<Problem> problems, IHDLObject arr, HDLVariableRef ref, boolean bit) {
-		final BigInteger upperEndpoint = arrayRange.upperEndpoint();
-		final BigInteger subtract = upperEndpoint.subtract(BigInteger.ONE);
-		if (subtract.compareTo(BigInteger.ZERO) < 0)
-			// Maybe generate a warning here?
-			return;
-		arrayRange = RangeTool.createRange(BigInteger.ZERO, subtract);
-		final String info = "Expected value range:" + arrayRange;
-		if (accessRange.upperEndpoint().signum() < 0) {
-			problems.add(new Problem(bit ? BIT_ACCESS_NEGATIVE : ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, arrayRange));
-		} else if (accessRange.lowerEndpoint().signum() < 0) {
-			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_NEGATIVE : ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE,
-					arrayRange));
+	private static void checkAccessBoundaries(Range<BigInteger> accessRange, Range<BigInteger> declaredRange, Set<Problem> problems, IHDLObject arr, HDLVariableRef ref, boolean bit) {
+		// Reduce the declaredRange to the index limits
+		Range<BigInteger> indexRange;
+		if (declaredRange.hasUpperBound()) {
+			final BigInteger upperEndpoint = declaredRange.upperEndpoint();
+			final BigInteger subtract = upperEndpoint.subtract(BigInteger.ONE);
+			if (subtract.compareTo(BigInteger.ZERO) < 0)
+				// Maybe generate a warning here?
+				return;
+			indexRange = RangeTool.createRange(BigInteger.ZERO, subtract);
+		} else {
+			indexRange = Range.atLeast(BigInteger.ZERO);
 		}
-		if (!arrayRange.isConnected(accessRange)) {
+		final String info = "Expected value range:" + indexRange;
+		// Check if highest idx is negative (Definitely a problem)
+		if (accessRange.hasUpperBound() && (accessRange.upperEndpoint().signum() < 0)) {
+			problems.add(new Problem(bit ? BIT_ACCESS_NEGATIVE : ARRAY_INDEX_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, indexRange));
+			// Check if lowest idx is negative (Might be a problem)
+		} else if (accessRange.hasLowerBound() && (accessRange.lowerEndpoint().signum() < 0)) {
+			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_NEGATIVE : ARRAY_INDEX_POSSIBLY_NEGATIVE, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE,
+					indexRange));
+		}
+		// Check whether the index and the access have at least something in
+		// common (index 0..5 access 7..9)
+		if (!indexRange.isConnected(accessRange)) {
 			problems.add(new Problem(bit ? BIT_ACCESS_OUT_OF_BOUNDS : ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange)
-					.addMeta(ARRAY_RANGE, arrayRange));
-		} else if (accessRange.upperEndpoint().compareTo(subtract) > 0) {
+					.addMeta(ARRAY_RANGE, indexRange));
+		} else if (accessRange.hasUpperBound() && indexRange.hasUpperBound() && (accessRange.upperEndpoint().compareTo(indexRange.upperEndpoint()) > 0)) {
 			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_OUT_OF_BOUNDS : ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(
-					ARRAY_RANGE, arrayRange));
+					ARRAY_RANGE, indexRange));
 		}
 	}
 
