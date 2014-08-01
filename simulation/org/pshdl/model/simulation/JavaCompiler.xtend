@@ -820,7 +820,6 @@ class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 		var String pkg = null
 		val optionPkg = cli.getOptionValue("pkg")
 		var boolean debug = cli.hasOption("debug")
-		var boolean coverage = cli.hasOption("coverage")
 		if (optionPkg !== null) {
 			pkg = optionPkg
 		} else if (li != -1) {

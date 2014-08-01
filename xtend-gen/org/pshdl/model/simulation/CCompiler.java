@@ -2304,8 +2304,8 @@ public class CCompiler implements ITypeOuptutProvider {
     try {
       Unit unit = null;
       final Splitter annoSplitter = Splitter.on(SimulationTransformationExtension.ANNO_VALUE_SEP);
-      boolean _notEquals = (!Objects.equal(this.cce.em.annotations, null));
-      if (_notEquals) {
+      boolean _tripleNotEquals = (this.cce.em.annotations != null);
+      if (_tripleNotEquals) {
         for (final String a : this.cce.em.annotations) {
           boolean _startsWith = a.startsWith("busDescription");
           if (_startsWith) {

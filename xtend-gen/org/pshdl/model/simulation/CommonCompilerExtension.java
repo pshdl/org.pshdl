@@ -449,8 +449,8 @@ public class CommonCompilerExtension {
   public CharSequence getFrameName(final Frame f) {
     StringConcatenation _builder = new StringConcatenation();
     {
-      boolean _notEquals = (!Objects.equal(f.process, null));
-      if (_notEquals) {
+      boolean _tripleNotEquals = (f.process != null);
+      if (_tripleNotEquals) {
         _builder.append(f.process, "");
       }
     }
@@ -677,14 +677,18 @@ public class CommonCompilerExtension {
         return Boolean.valueOf(_or);
       }
     };
-    VariableInformation _findFirst = IterableExtensions.<VariableInformation>findFirst(((Iterable<VariableInformation>)Conversions.doWrapArray(model.variables)), _function);
-    return this.idName(_findFirst, false, false);
+    final VariableInformation findFirst = IterableExtensions.<VariableInformation>findFirst(((Iterable<VariableInformation>)Conversions.doWrapArray(model.variables)), _function);
+    boolean _tripleEquals = (findFirst == null);
+    if (_tripleEquals) {
+      throw new IllegalArgumentException((("Did not find variable " + varName) + " in model"));
+    }
+    return this.idName(findFirst, false, false);
   }
   
   public Iterable<Frame> getNonProcessframes(final ExecutableModel model) {
     final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
       public Boolean apply(final Frame it) {
-        return Boolean.valueOf(Objects.equal(it.process, null));
+        return Boolean.valueOf((it.process == null));
       }
     };
     return IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(model.frames)), _function);
@@ -693,7 +697,7 @@ public class CommonCompilerExtension {
   public Iterable<Frame> getProcessframes(final ExecutableModel model) {
     final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
       public Boolean apply(final Frame it) {
-        return Boolean.valueOf((!Objects.equal(it.process, null)));
+        return Boolean.valueOf((it.process != null));
       }
     };
     return IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(model.frames)), _function);

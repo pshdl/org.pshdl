@@ -747,7 +747,7 @@ class CCompiler implements ITypeOuptutProvider {
 	def getUnit(ExecutableModel model) {
 		var Unit unit
 		val annoSplitter = Splitter.on(SimulationTransformationExtension.ANNO_VALUE_SEP);
-		if (em.annotations != null) {
+		if (em.annotations !== null) {
 			for (a : em.annotations) {
 				if (a.startsWith("busDescription")) {
 					val value = annoSplitter.limit(2).split(a).last

@@ -981,7 +981,7 @@ public class Insulin {
 		final boolean interfaceDim = i < ifDim.size();
 		if (i == (varDim.size() + ifDim.size()))
 			return new HDLAssignment().setLeft(ref).setRight(defaultValue);
-		final HDLExpression dim = interfaceDim ? ifDim.get(i) : varDim.get(i);
+		final HDLExpression dim = interfaceDim ? ifDim.get(i) : varDim.get(i - ifDim.size());
 		final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(dim).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
 		final HDLVariable param = new HDLVariable().setName(getTempName("init", null));
 		final HDLForLoop loop = new HDLForLoop().setRange(HDLObject.asList(range)).setParam(param);

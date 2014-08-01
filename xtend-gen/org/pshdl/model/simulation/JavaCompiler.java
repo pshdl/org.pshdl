@@ -2697,7 +2697,6 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
       String pkg = null;
       final String optionPkg = cli.getOptionValue("pkg");
       boolean debug = cli.hasOption("debug");
-      boolean coverage = cli.hasOption("coverage");
       boolean _tripleNotEquals = (optionPkg != null);
       if (_tripleNotEquals) {
         pkg = optionPkg;

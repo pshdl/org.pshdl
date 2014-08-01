@@ -26,16 +26,16 @@
  ******************************************************************************/
 package org.pshdl.model.simulation
 
+import java.math.BigInteger
 import java.util.ArrayList
+import java.util.HashMap
 import java.util.List
-import org.pshdl.interpreter.InternalInformation
-import org.pshdl.interpreter.VariableInformation
+import java.util.Map
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
+import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
-import java.util.Map
-import java.util.HashMap
-import java.math.BigInteger
 
 class CommonCompilerExtension {
 	public ExecutableModel em
@@ -206,7 +206,7 @@ class CommonCompilerExtension {
 
 	def toHexStringI(Integer value) '''0x«Integer.toHexString(value)»'''
 
-	def getFrameName(Frame f) '''«IF f.process != null»«f.process»«ENDIF»s«String.format("%03d",
+	def getFrameName(Frame f) '''«IF f.process !== null»«f.process»«ENDIF»s«String.format("%03d",
 		Math.max(f.scheduleStage, 0))»frame«String.format("%04X", f.uniqueID)»'''
 
 	def constantL(int id, Frame f) '''«f.constants.get(id).longValue.toHexStringL»'''
@@ -306,15 +306,18 @@ class CommonCompilerExtension {
 
 	def varByName(ExecutableModel model, String varName) {
 		val fullName = model.moduleName + '.' + varName
-		return model.variables.findFirst[name == varName || name == fullName].idName(false, false)
+		val findFirst = model.variables.findFirst[name == varName || name == fullName]
+		if (findFirst===null)
+			throw new IllegalArgumentException("Did not find variable "+varName+" in model")
+		return findFirst.idName(false, false)
 	}
 
 	def getNonProcessframes(ExecutableModel model) {
-		model.frames.filter[process == null]
+		model.frames.filter[process === null]
 	}
 
 	def getProcessframes(ExecutableModel model) {
-		model.frames.filter[process != null]
+		model.frames.filter[process !== null]
 	}
 
 	def predicateConditions(Frame f) {

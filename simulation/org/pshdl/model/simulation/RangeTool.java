@@ -205,7 +205,7 @@ public class RangeTool {
 		return temp;
 	}
 
-	public static Range<BigInteger> createRange(int lower, int upper) {
+	public static Range<BigInteger> createRangeInt(int lower, int upper) {
 		return createRange(BigInteger.valueOf(lower), BigInteger.valueOf(upper));
 	}
 
