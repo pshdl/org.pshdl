@@ -825,23 +825,10 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
   
   protected CharSequence callStage(final int stage, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
-    CharSequence _stageMethodName = this.stageMethodName(constant, stage);
+    CharSequence _stageMethodName = this.stageMethodName(stage, constant);
     _builder.append(_stageMethodName, "");
     _builder.append("();");
     _builder.newLineIfNotEmpty();
-    return _builder;
-  }
-  
-  protected CharSequence stageMethodName(final boolean constant, final int stage) {
-    StringConcatenation _builder = new StringConcatenation();
-    {
-      if (constant) {
-        _builder.append("const_");
-      }
-    }
-    _builder.append("stage");
-    String _format = String.format("%04d", Integer.valueOf(stage));
-    _builder.append(_format, "");
     return _builder;
   }
   
@@ -940,7 +927,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
   protected CharSequence stageMethodsHeader(final int stage, final int stageCosts, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("public void ");
-    CharSequence _stageMethodName = this.stageMethodName(constant, stage);
+    CharSequence _stageMethodName = this.stageMethodName(stage, constant);
     _builder.append(_stageMethodName, "");
     _builder.append("(){");
     _builder.newLineIfNotEmpty();

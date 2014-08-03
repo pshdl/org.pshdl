@@ -156,7 +156,7 @@ public class CCompiler implements ITypeOuptutProvider {
       _builder.append("int epsCycle=0;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("int deltaCycle=0;");
+      _builder.append("uint64_t deltaCycle=0;");
       _builder.newLine();
       _builder.append("\t");
       _builder.newLine();

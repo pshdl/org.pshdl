@@ -1172,6 +1172,27 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
+	protected int maxRegUpdates() {
+		int maxUpdates = 0;
+		for (final Frame f : em.frames) {
+			final InternalInformation oi = asInternal(f.outputId);
+			if (!isNull(oi.info)) {
+				for (final FastInstruction inst : f.instructions) {
+					if (inst.inst == Instruction.writeInternal) {
+						if (asInternal(inst.arg1).isShadowReg) {
+							maxUpdates = maxUpdates + 1;
+						}
+					}
+				}
+			} else {
+				if (oi.isShadowReg) {
+					maxUpdates = maxUpdates + 1;
+				}
+			}
+		}
+		return maxUpdates;
+	}
+
 	protected CharSequence assignArrayInit(VariableInformation var, BigInteger zero, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(fieldName(var, attributes));
@@ -1201,6 +1222,12 @@ public abstract class CommonCodeGenerator {
 			size *= dim;
 		}
 		return size;
+	}
+
+	protected CharSequence stageMethodName(int stage, boolean constant) {
+		if (constant)
+			return "const_stage" + String.format("%04d", stage);
+		return "stage" + String.format("%04d", stage);
 	}
 
 	protected boolean isArray(VariableInformation var) {

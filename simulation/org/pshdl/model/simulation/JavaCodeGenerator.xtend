@@ -264,11 +264,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 	override protected runMethodsFooter(boolean constant) '''}
 		'''
 
-	override protected callStage(int stage, boolean constant) '''«stageMethodName(constant, stage)»();
+	override protected callStage(int stage, boolean constant) '''«stageMethodName(stage, constant)»();
 		'''
-
-	protected def stageMethodName(boolean constant, int stage) '''«IF constant»const_«ENDIF»stage«String.format("%04d",
-		stage)»'''
 
 	override protected stageMethodsFooter(int stage, int stageCosts, boolean constant) '''}
 		'''
@@ -310,7 +307,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 	}
 
 	override protected stageMethodsHeader(int stage, int stageCosts, boolean constant) '''public void «stageMethodName(
-		constant, stage)»(){
+		stage, constant)»(){
 		'''
 
 	override protected applyRegUpdates() {

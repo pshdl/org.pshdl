@@ -109,7 +109,7 @@ class CCompiler implements ITypeOuptutProvider {
 					«v.decl(prevMap.get(v.name))»
 				«ENDFOR»
 				int epsCycle=0;
-				int deltaCycle=0;
+				uint64_t deltaCycle=0;
 				
 				«FOR f : em.frames»
 					«f.method»
