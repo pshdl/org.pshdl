@@ -46,7 +46,7 @@ public abstract class CommonCodeGenerator {
 	protected static final VariableInformation EPS_CYCLE = createVar("epsCycle", 32, Type.UINT);
 	protected static final VariableInformation DELTA_CYCLE = createVar("deltaCycle", 32, Type.UINT);
 	protected static final VariableInformation TIMESTAMP = createVar("timeStamp", 64, Type.UINT);
-	protected static final VariableInformation DISABLE_EDGES = createVar("diableEdge", -1, Type.BOOL);
+	protected static final VariableInformation DISABLE_EDGES = createVar("disableEdges", -1, Type.BOOL);
 	protected static final VariableInformation DISABLE_REG_OUTPUTLOGIC = createVar("disableRegOutputLogic", -1, Type.BOOL);
 	protected static final EnumSet<Attributes> NONE = EnumSet.noneOf(Attributes.class);
 	protected final ExecutableModel em;
@@ -95,14 +95,14 @@ public abstract class CommonCodeGenerator {
 		sb.append(frames());
 		sb.append(postFrames());
 		sb.append(preRunMethods());
-		sb.append(runMethods());
+		sb.append(createRunAndStageMethods());
 		sb.append(postRunMethods());
 		postBody();
 		sb.append(footer());
 		return sb.toString();
 	}
 
-	protected CharSequence runMethods() {
+	protected CharSequence createRunAndStageMethods() {
 		final Multimap<Integer, Frame> schedulingStage = ArrayListMultimap.create();
 		int maxStage = 0;
 		for (final Frame f : em.frames) {
@@ -121,6 +121,25 @@ public abstract class CommonCodeGenerator {
 		final List<Integer> handledPredicates = Lists.newArrayList();
 		final List<Integer> handledNegEdges = Lists.newArrayList();
 		final List<Integer> handledPosEdges = Lists.newArrayList();
+
+		for (int i = 0; i <= maxStage; i++) {
+			final Collection<Frame> frames = schedulingStage.get(i);
+			for (final Frame frame : frames) {
+				if (frame.constant == createConstant) {
+					selectedScheduleStage.add(i);
+					break;
+				}
+			}
+		}
+
+		sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates, handledNegEdges, handledPosEdges));
+
+		createRunMethod(schedulingStage, maxStage, createConstant, selectedScheduleStage, sb);
+		return sb;
+	}
+
+	public void createRunMethod(final Multimap<Integer, Frame> schedulingStage, int maxStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
+			final StringBuilder sb) {
 		sb.append(indent()).append(runMethodsHeader(createConstant));
 		indent++;
 		sb.append(indent()).append(assignConstant(EPS_CYCLE, BigInteger.ZERO, NONE)).append(newLine());
@@ -130,18 +149,11 @@ public abstract class CommonCodeGenerator {
 		if (!createConstant && hasClock) {
 			sb.append(indent()).append(doLoopStart()).append(newLine());
 			indent++;
-			sb.append(indent()).append(clearRegUpdates());
+			sb.append(indent()).append(clearRegUpdates()).append(newLine());
 		}
 		sb.append(indent()).append(assignVariable(TIMESTAMP, "(" + DELTA_CYCLE.name + " << 16) | " + EPS_CYCLE.name, NONE, true, false)).append(newLine());
-		for (int i = 0; i <= maxStage; i++) {
-			final Collection<Frame> frames = schedulingStage.get(i);
-			for (final Frame frame : frames) {
-				if (frame.constant == createConstant) {
-					sb.append(indent()).append(callStage(i, createConstant));
-					selectedScheduleStage.add(i);
-					break;
-				}
-			}
+		for (final Integer stage : selectedScheduleStage) {
+			sb.append(indent()).append(callStage(stage, createConstant));
 		}
 		if (!createConstant && hasClock) {
 			sb.append(indent()).append(applyRegUpdates()).append(newLine());
@@ -153,21 +165,29 @@ public abstract class CommonCodeGenerator {
 			sb.append(indent()).append(doLoopEnd(condition)).append(newLine());
 			for (final String prev : prevMapNeg) {
 				final VariableInformation var = em.variables[varIdx.get(prev)];
-				sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false)).append(newLine());
+				copyPrev(sb, var);
 			}
 			for (final String prev : prevMapPos) {
 				if (prevMapNeg.contains(prev)) {
 					continue;
 				}
 				final VariableInformation var = em.variables[varIdx.get(prev)];
-				sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false)).append(newLine());
+				copyPrev(sb, var);
 			}
 		}
 		indent--;
 		sb.append(indent()).append(runMethodsFooter(createConstant));
-		sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates, handledNegEdges, handledPosEdges));
-		return sb;
 	}
+
+	public void copyPrev(final StringBuilder sb, final VariableInformation var) {
+		if (isArray(var)) {
+			sb.append(indent()).append(copyArray(var));
+		} else {
+			sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false)).append(newLine());
+		}
+	}
+
+	protected abstract CharSequence copyArray(VariableInformation var);
 
 	protected abstract CharSequence clearRegUpdates();
 
@@ -202,7 +222,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(handlePredicates(handledPredicates, true, frame.predPosDepRes));
 		}
 		int stageCosts = 0;
-		if (maxCosts != Integer.MAX_VALUE) {
+		if ((maxCosts != Integer.MAX_VALUE) && (totalStageCosts > maxCosts)) {
 			sb.append(indent()).append(barrierBegin(stage, totalStageCosts, createConstant));
 		}
 		for (final Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
@@ -214,7 +234,7 @@ public abstract class CommonCodeGenerator {
 				stageCosts = 0;
 			}
 		}
-		if (maxCosts != Integer.MAX_VALUE) {
+		if ((maxCosts != Integer.MAX_VALUE) && (totalStageCosts > maxCosts)) {
 			sb.append(indent()).append(barrierEnd(stage, totalStageCosts, createConstant));
 		}
 		indent--;
@@ -526,7 +546,8 @@ public abstract class CommonCodeGenerator {
 		return offset;
 	}
 
-	protected abstract CharSequence scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean force);
+	protected abstract CharSequence scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean force,
+			CharSequence fillValue);
 
 	protected CharSequence assignInternal(InternalInformation output, CharSequence value, List<Integer> arr, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
@@ -749,7 +770,7 @@ public abstract class CommonCodeGenerator {
 			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
 			sb.append(assignInternal(internal, tempName, arr, EnumSet.of(isShadowReg))).append(comment("Assign value"));
 			final CharSequence offset = calcRegUpdateOffset(arr, internal);
-			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, EnumSet.of(isShadowReg)), cpyName, offset, forceRegUpdate));
+			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, EnumSet.of(isShadowReg)), cpyName, offset, forceRegUpdate, tempName));
 		} else {
 			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
 			sb.append(assignInternal(internal, tempName, arr, NONE)).append(comment("Assign value"));
@@ -851,22 +872,22 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case eq:
-			sb.append(twoOp("==", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "==", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case not_eq:
-			sb.append(twoOp("!=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "!=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case less:
-			sb.append(twoOp("<", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "<", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case less_eq:
-			sb.append(twoOp("<=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "<=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case greater:
-			sb.append(twoOp(">", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, ">", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case greater_eq:
-			sb.append(twoOp(">=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, ">=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -878,13 +899,13 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case logiNeg:
-			sb.append(singleOp("!", exec.arg1, pos, a, EnumSet.of(isPredicate)));
+			sb.append(singleOp(exec, "!", exec.arg1, pos, a, EnumSet.of(isPredicate)));
 			break;
 		case logiAnd:
-			sb.append(twoOp("&&", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "&&", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case logiOr:
-			sb.append(twoOp("||", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "||", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
 			break;
 		case negPredicate:
 		case posPredicate:
@@ -899,13 +920,13 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case sll:
-			sb.append(twoOp("<<", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "<<", exec.arg1, pos, b, a, NONE));
 			break;
 		case srl:
-			sb.append(twoOp(">>>", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, ">>>", exec.arg1, pos, b, a, NONE));
 			break;
 		case sra:
-			sb.append(twoOp(">>", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, ">>", exec.arg1, pos, b, a, NONE));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -917,25 +938,25 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case arith_neg:
-			sb.append(singleOp("-", exec.arg1, pos, a, NONE));
+			sb.append(singleOp(exec, "-", exec.arg1, pos, a, NONE));
 			break;
 		case plus:
-			sb.append(twoOp("+", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "+", exec.arg1, pos, b, a, NONE));
 			break;
 		case minus:
-			sb.append(twoOp("-", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "-", exec.arg1, pos, b, a, NONE));
 			break;
 		case mul:
-			sb.append(twoOp("*", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "*", exec.arg1, pos, b, a, NONE));
 			break;
 		case div:
-			sb.append(twoOp("/", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "/", exec.arg1, pos, b, a, NONE));
 			break;
 		case mod:
-			sb.append(twoOp("%", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "%", exec.arg1, pos, b, a, NONE));
 			break;
 		case pow:
-			sb.append(twoOp("%", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "%", exec.arg1, pos, b, a, NONE));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -947,16 +968,16 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case bit_neg:
-			sb.append(singleOp("~", exec.arg1, pos, a, NONE));
+			sb.append(singleOp(exec, "~", exec.arg1, pos, a, NONE));
 			break;
 		case and:
-			sb.append(twoOp("&", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "&", exec.arg1, pos, b, a, NONE));
 			break;
 		case or:
-			sb.append(twoOp("|", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "|", exec.arg1, pos, b, a, NONE));
 			break;
 		case xor:
-			sb.append(twoOp("^", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "^", exec.arg1, pos, b, a, NONE));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -965,12 +986,12 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected StringBuilder singleOp(String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes) {
+	protected StringBuilder singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes) {
 		final CharSequence assignValue = singleOpValue(op, getCast(targetSizeWithType), a, targetSizeWithType, attributes);
 		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
 	}
 
-	protected StringBuilder twoOp(String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
+	protected StringBuilder twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
 		final CharSequence assignValue = twoOpValue(op, getCast(targetSizeWithType), leftOperand, rightOperand, targetSizeWithType, attributes);
 		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
 	}
@@ -1011,7 +1032,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence twoOpValue(CharSequence op, CharSequence cast, int leftOperand, int rightOperand, int targetSizeWithType, EnumSet<Attributes> attributes) {
 		final String finalOp = getTempName(leftOperand, NONE) + " " + op + " " + getTempName(rightOperand, NONE);
-		return assignOpValue(targetSizeWithType, attributes, finalOp);
+		return finalOp;
 	}
 
 	protected CharSequence assignOpValue(int targetSizeWithType, EnumSet<Attributes> attributes, final String finalOp) {
@@ -1091,11 +1112,9 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected void postBody() {
-		indent--;
 	}
 
 	protected void preBody() {
-		indent++;
 	}
 
 	protected CharSequence fieldDeclarations(boolean includePrivate) {
@@ -1176,7 +1195,7 @@ public abstract class CommonCodeGenerator {
 		int maxUpdates = 0;
 		for (final Frame f : em.frames) {
 			final InternalInformation oi = asInternal(f.outputId);
-			if (!isNull(oi.info)) {
+			if (isNull(oi.info)) {
 				for (final FastInstruction inst : f.instructions) {
 					if (inst.inst == Instruction.writeInternal) {
 						if (asInternal(inst.arg1).isShadowReg) {
@@ -1193,14 +1212,14 @@ public abstract class CommonCodeGenerator {
 		return maxUpdates;
 	}
 
-	protected CharSequence assignArrayInit(VariableInformation var, BigInteger zero, EnumSet<Attributes> attributes) {
+	protected CharSequence assignArrayInit(VariableInformation var, BigInteger initValue, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(fieldName(var, attributes));
-		sb.append(doAssign(arrayInit(var, zero, attributes), -1));
+		sb.append(doAssign(arrayInit(var, initValue, attributes), -1));
 		return sb;
 	}
 
-	protected abstract CharSequence arrayInit(VariableInformation var, BigInteger zero, EnumSet<Attributes> attributes);
+	protected abstract CharSequence arrayInit(VariableInformation var, BigInteger initValue, EnumSet<Attributes> attributes);
 
 	protected boolean isBoolean(VariableInformation varInfo, EnumSet<Attributes> attributes) {
 		return ((varInfo.type == VariableInformation.Type.BOOL) || //
@@ -1323,19 +1342,19 @@ public abstract class CommonCodeGenerator {
 			res = res + "$reg";
 		}
 		if (attributes.contains(isPrev))
-			return res + "_prev";
+			return res + "$prev";
 		if (attributes.contains(isPredFresh))
-			return res + "_fresh";
+			return res + "$fresh";
 		if (attributes.contains(isPosEdgeActive))
-			return res + "_pos_active";
+			return res + "$pos_active";
 		if (attributes.contains(isPosEdgeHandled))
-			return res + "_pos_handled";
+			return res + "$pos_handled";
 		if (attributes.contains(isNegEdgeActive))
-			return res + "_neg_active";
+			return res + "$neg_active";
 		if (attributes.contains(isNegEdgeHandled))
-			return res + "_neg_handled";
+			return res + "$neg_handled";
 		if (attributes.contains(isUpdate))
-			return res + "_update";
+			return res + "$update";
 		return res;
 	}
 
@@ -1351,6 +1370,14 @@ public abstract class CommonCodeGenerator {
 		final String result = f.toString();
 		f.close();
 		return result;
+	}
+
+	protected int getVarIdx(InternalInformation ii) {
+		return getVarIdx(ii.info);
+	}
+
+	protected int getVarIdx(VariableInformation vi) {
+		return varIdx.get(vi.name);
 	}
 
 	protected boolean isShadowReg(String name) {
@@ -1389,5 +1416,21 @@ public abstract class CommonCodeGenerator {
 
 	protected boolean isNull(VariableInformation input) {
 		return input.name.equals("#null");
+	}
+
+	protected CharSequence calculateVariableAccessIndexArr(VariableInformation varInfo) {
+		final int lastIndex = varInfo.dimensions.length - 1;
+		final StringBuilder arrayAccess = new StringBuilder();
+		for (int i = 0; i < lastIndex; i++) {
+			if (i != 0) {
+				arrayAccess.append(" + ");
+			}
+			arrayAccess.append(Integer.toString(varInfo.dimensions[i]) + " * arrayIdx[" + i + "]");
+		}
+		if (lastIndex != 0) {
+			arrayAccess.append(" + ");
+		}
+		arrayAccess.append("arrayIdx[" + lastIndex + "]");
+		return arrayAccess;
 	}
 }

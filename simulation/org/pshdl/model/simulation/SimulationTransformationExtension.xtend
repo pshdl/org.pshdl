@@ -471,12 +471,11 @@ class SimulationTransformationExtension {
 						}
 					}
 					case current.type === UINT || current.type === NATURAL || current.type === BIT || current.type === BITVECTOR:{
-						if (prim.type === INTEGER && prim.type === INT) {
+						res.instructions.add(
+							new ArgumentedInstruction(cast_uint, Integer.toString(primWidth), Integer.toString(currentWidth)))
+						if (prim.type === INTEGER || prim.type === INT) {
 							res.instructions.add(
-								new ArgumentedInstruction(cast_int, Integer.toString(primWidth), Integer.toString(currentWidth)))
-						} else {
-							res.instructions.add(
-								new ArgumentedInstruction(cast_uint, Integer.toString(primWidth), Integer.toString(currentWidth)))
+								new ArgumentedInstruction(cast_int, Integer.toString(primWidth), Integer.toString(primWidth)))
 						}
 					}
 					default:

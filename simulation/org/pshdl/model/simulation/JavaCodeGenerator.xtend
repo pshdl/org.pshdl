@@ -21,6 +21,14 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		this.unitName = unitName
 	}
 
+	override protected void postBody() {
+		indent--;
+	}
+
+	override protected void preBody() {
+		indent++;
+	}
+
 	override protected fieldType(VariableInformation varInfo, EnumSet<Attributes> attributes) {
 		if (varInfo.dimensions.nullOrEmpty || attributes.contains(baseType)) {
 			if (isBoolean(varInfo, attributes))
@@ -94,9 +102,9 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: return «v.idName(false, NONE)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.calcMask.constant»«ENDIF»;
+						case «varIdx.get(v.name)»: return «v.idName(true, NONE)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.calcMask.constant»«ENDIF»;
 					«ELSE»
-						case «varIdx.get(v.name)»: return «v.idName(false, NONE)»[«v.calculateVariableAccessIndexArr»]«IF v.width != 64 &&
+						case «varIdx.get(v.name)»: return «v.idName(true, NONE)»[«v.calculateVariableAccessIndexArr»]«IF v.width != 64 &&
 			!v.predicate» & «v.width.calcMask.constant»«ENDIF»;
 					«ENDIF»
 				«ENDFOR»
@@ -141,9 +149,10 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 			private Map<String, Integer> varIdx=new HashMap<String, Integer>();
 	'''
 
-	protected override postFieldDeclarations() '''	«IF maxCosts != Integer.MAX_VALUE»public static ExecutorService mainPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());«ENDIF»
+	protected override postFieldDeclarations() '''
+		«IF maxCosts != Integer.MAX_VALUE»public static ExecutorService mainPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());«ENDIF»
 		«IF hasClock»
-			private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();
+			private List<RegUpdate> regUpdates=new ArrayList<RegUpdate>();
 			
 			/**
 			* Constructs an instance with no debugging and disabledEdge as well as disabledRegOutputlogic are false
@@ -200,7 +209,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 								if (reg.offset!=-1)
 									«v.idName(true, NONE)»[reg.offset] = «v.idName(true, NONE)»$reg[reg.offset];
 								else
-									Arrays.fill(«v.idName(true, NONE)», «v.idName(true, NONE)»$reg[0]); 
+									Arrays.fill(«v.idName(true, NONE)», reg.fillValue); 
 								break;
 							«ENDIF»
 						«ENDIF»
@@ -224,22 +233,6 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		return "(int)(" + res + ")"
 	}
 
-	def protected CharSequence calculateVariableAccessIndexArr(VariableInformation varInfo) {
-		val int lastIndex = varInfo.dimensions.size() - 1;
-		val StringBuilder arrayAccess = new StringBuilder();
-		for (i : 0 ..< lastIndex) {
-			if (i != 0) {
-				arrayAccess.append(" + ");
-			}
-			arrayAccess.append(Integer.toString(varInfo.dimensions.get(i)) + ''' * arrayIdx[«i»]''');
-		}
-		if (lastIndex != 0) {
-			arrayAccess.append(" + ");
-		}
-		arrayAccess.append('''arrayIdx[«lastIndex»]''');
-		return arrayAccess;
-	}
-
 	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<Attributes> attributes) {
 		val attrClone = attributes.clone
 		attrClone.add(baseType)
@@ -254,9 +247,9 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 	'''
 
 	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName,
-		CharSequence offset, boolean forceRegUpdate) '''
+		CharSequence offset, boolean forceRegUpdate, CharSequence fillValue) '''
 	«IF !forceRegUpdate»if («cpyName»!=«last»)
-	«indent()»	«ENDIF»regUpdates.add(new RegUpdate(«varIdx.get(outputInternal.info.name)», «offset»));'''
+	«indent()»	«ENDIF»regUpdates.add(new RegUpdate(«outputInternal.varIdx», «offset», «fillValue»));'''
 
 	override protected runMethodsHeader(boolean constant) '''public void «IF !constant»run«ELSE»initConstants«ENDIF»() {
 		'''
@@ -504,6 +497,9 @@ if (!tempArr.equals(«varName»))
 	}
 	
 	override protected clearRegUpdates() '''regUpdates.clear();
+	'''
+	
+	override protected copyArray(VariableInformation varInfo) '''System.arraycopy(«varInfo.idName(true, NONE)», 0, «varInfo.idName(true, EnumSet.of(Attributes.isPrev))», 0, «varInfo.arraySize»);
 	'''
 
 }

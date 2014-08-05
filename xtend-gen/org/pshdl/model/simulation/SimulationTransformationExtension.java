@@ -810,25 +810,24 @@ public class SimulationTransformationExtension {
             }
             if (_or_1) {
               _matched=true;
-              boolean _and_1 = false;
+              String _string_6 = Integer.toString(primWidth);
+              String _string_7 = Integer.toString(currentWidth);
+              FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_6, _string_7);
+              res.instructions.add(_argumentedInstruction_4);
+              boolean _or_4 = false;
               HDLPrimitive.HDLPrimitiveType _type_10 = prim.getType();
               boolean _tripleEquals_6 = (_type_10 == HDLPrimitive.HDLPrimitiveType.INTEGER);
-              if (!_tripleEquals_6) {
-                _and_1 = false;
+              if (_tripleEquals_6) {
+                _or_4 = true;
               } else {
                 HDLPrimitive.HDLPrimitiveType _type_11 = prim.getType();
                 boolean _tripleEquals_7 = (_type_11 == HDLPrimitive.HDLPrimitiveType.INT);
-                _and_1 = _tripleEquals_7;
+                _or_4 = _tripleEquals_7;
               }
-              if (_and_1) {
-                String _string_6 = Integer.toString(primWidth);
-                String _string_7 = Integer.toString(currentWidth);
-                FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_6, _string_7);
-                res.instructions.add(_argumentedInstruction_4);
-              } else {
+              if (_or_4) {
                 String _string_8 = Integer.toString(primWidth);
-                String _string_9 = Integer.toString(currentWidth);
-                FluidFrame.ArgumentedInstruction _argumentedInstruction_5 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_8, _string_9);
+                String _string_9 = Integer.toString(primWidth);
+                FluidFrame.ArgumentedInstruction _argumentedInstruction_5 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_8, _string_9);
                 res.instructions.add(_argumentedInstruction_5);
               }
             }

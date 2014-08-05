@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
-import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -25,6 +24,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     super(em, 64, maxCosts);
     this.packageName = packageName;
     this.unitName = unitName;
+  }
+  
+  protected void postBody() {
+    this.indent--;
+  }
+  
+  protected void preBody() {
+    this.indent++;
   }
   
   protected CharSequence fieldType(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
@@ -250,7 +257,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             Integer _get_3 = this.varIdx.get(v_2.name);
             _builder.append(_get_3, "\t\t");
             _builder.append(": return ");
-            CharSequence _idName_1 = this.idName(v_2, false, CommonCodeGenerator.NONE);
+            CharSequence _idName_1 = this.idName(v_2, true, CommonCodeGenerator.NONE);
             _builder.append(_idName_1, "\t\t");
             {
               boolean _isPredicate_2 = this.isPredicate(v_2);
@@ -273,7 +280,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             Integer _get_4 = this.varIdx.get(v_2.name);
             _builder.append(_get_4, "\t\t");
             _builder.append(": return ");
-            CharSequence _idName_2 = this.idName(v_2, false, CommonCodeGenerator.NONE);
+            CharSequence _idName_2 = this.idName(v_2, true, CommonCodeGenerator.NONE);
             _builder.append(_idName_2, "\t\t");
             _builder.append("[");
             CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v_2);
@@ -422,7 +429,6 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
   
   protected CharSequence postFieldDeclarations() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("\t");
     {
       if ((this.maxCosts != Integer.MAX_VALUE)) {
         _builder.append("public static ExecutorService mainPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());");
@@ -431,26 +437,19 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     _builder.newLineIfNotEmpty();
     {
       if (this.hasClock) {
-        _builder.append("\t\t");
-        _builder.append("private Set<RegUpdate> regUpdates=new LinkedHashSet<RegUpdate>();");
+        _builder.append("private List<RegUpdate> regUpdates=new ArrayList<RegUpdate>();");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("/**");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("* Constructs an instance with no debugging and disabledEdge as well as disabledRegOutputlogic are false");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("*/");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("public ");
-        _builder.append(this.unitName, "\t\t");
+        _builder.append(this.unitName, "");
         _builder.append("() {");
         _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("this(");
         {
@@ -460,153 +459,126 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
         }
         _builder.append(");");
         _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
         _builder.append("}");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("public ");
-        _builder.append(this.unitName, "\t\t");
+        _builder.append(this.unitName, "");
         _builder.append("(boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "");
         _builder.append(", boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "");
         _builder.append(") {");
         _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("this.");
-        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t");
         _builder.append("=");
-        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("this.");
-        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t");
         _builder.append("=");
-        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
         {
           Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
           for(final VariableInformation v : _excludeNull) {
-            _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("varIdx.put(\"");
-            _builder.append(v.name, "\t\t\t");
+            _builder.append(v.name, "\t");
             _builder.append("\", ");
             Integer _get = this.varIdx.get(v.name);
-            _builder.append(_get, "\t\t\t");
+            _builder.append(_get, "\t");
             _builder.append(");");
             _builder.newLineIfNotEmpty();
           }
         }
-        _builder.append("\t\t");
         _builder.append("}");
         _builder.newLine();
       } else {
-        _builder.append("\t\t");
         _builder.append("public ");
-        _builder.append(this.unitName, "\t\t");
+        _builder.append(this.unitName, "");
         _builder.append("() {");
         _builder.newLineIfNotEmpty();
         {
           Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
           for(final VariableInformation v_1 : _excludeNull_1) {
-            _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("varIdx.put(\"");
-            _builder.append(v_1.name, "\t\t\t");
+            _builder.append(v_1.name, "\t");
             _builder.append("\", ");
             Integer _get_1 = this.varIdx.get(v_1.name);
-            _builder.append(_get_1, "\t\t\t");
+            _builder.append(_get_1, "\t");
             _builder.append(");");
             _builder.newLineIfNotEmpty();
           }
         }
-        _builder.append("\t\t");
         _builder.append("}");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("public ");
-        _builder.append(this.unitName, "\t\t");
+        _builder.append(this.unitName, "");
         _builder.append("(boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "");
         _builder.append(", boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t\t");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "");
         _builder.append(") {");
         _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("this();");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("}");
         _builder.newLine();
       }
     }
     {
       if (this.hasClock) {
-        _builder.append("\t\t");
         _builder.append("public boolean skipEdge(long local) {");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("long dc = local >>> 16l;");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("// Register was updated in previous delta cylce, that is ok");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("if (dc < ");
-        _builder.append(CommonCodeGenerator.DELTA_CYCLE.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.DELTA_CYCLE.name, "\t");
         _builder.append(")");
         _builder.newLineIfNotEmpty();
         _builder.append("\t\t");
-        _builder.append("\t\t");
         _builder.append("return false;");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("// Register was updated in this delta cycle but it is the same eps,");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("// that is ok as well");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("if ((dc == ");
-        _builder.append(CommonCodeGenerator.DELTA_CYCLE.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.DELTA_CYCLE.name, "\t");
         _builder.append(") && ((local & 0xFFFF) == ");
-        _builder.append(CommonCodeGenerator.EPS_CYCLE.name, "\t\t\t");
+        _builder.append(CommonCodeGenerator.EPS_CYCLE.name, "\t");
         _builder.append("))");
         _builder.newLineIfNotEmpty();
         _builder.append("\t\t");
-        _builder.append("\t\t");
         _builder.append("return false;");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("// Don\'t update");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("\t");
         _builder.append("return true;");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.append("}");
         _builder.newLine();
-        _builder.append("\t\t");
         _builder.newLine();
-        _builder.append("\t\t");
         CharSequence _copyRegs = this.copyRegs();
-        _builder.append(_copyRegs, "\t\t");
+        _builder.append(_copyRegs, "");
         _builder.newLineIfNotEmpty();
       }
     }
@@ -666,10 +638,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
                 _builder.append("Arrays.fill(");
                 CharSequence _idName_4 = this.idName(v, true, CommonCodeGenerator.NONE);
                 _builder.append(_idName_4, "\t\t\t\t");
-                _builder.append(", ");
-                CharSequence _idName_5 = this.idName(v, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_5, "\t\t\t\t");
-                _builder.append("$reg[0]); ");
+                _builder.append(", reg.fillValue); ");
                 _builder.newLineIfNotEmpty();
                 _builder.append("\t\t\t");
                 _builder.append("break;");
@@ -714,38 +683,6 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     return (("(int)(" + res) + ")");
   }
   
-  protected CharSequence calculateVariableAccessIndexArr(final VariableInformation varInfo) {
-    int _size = IterableExtensions.size(((Iterable<?>)Conversions.doWrapArray(varInfo.dimensions)));
-    final int lastIndex = (_size - 1);
-    final StringBuilder arrayAccess = new StringBuilder();
-    ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, lastIndex, true);
-    for (final Integer i : _doubleDotLessThan) {
-      {
-        if (((i).intValue() != 0)) {
-          arrayAccess.append(" + ");
-        }
-        int _get = varInfo.dimensions[(i).intValue()];
-        String _string = Integer.toString(_get);
-        StringConcatenation _builder = new StringConcatenation();
-        _builder.append(" ");
-        _builder.append("* arrayIdx[");
-        _builder.append(i, " ");
-        _builder.append("]");
-        String _plus = (_string + _builder);
-        arrayAccess.append(_plus);
-      }
-    }
-    if ((lastIndex != 0)) {
-      arrayAccess.append(" + ");
-    }
-    StringConcatenation _builder = new StringConcatenation();
-    _builder.append("arrayIdx[");
-    _builder.append(lastIndex, "");
-    _builder.append("]");
-    arrayAccess.append(_builder);
-    return arrayAccess;
-  }
-  
   protected CharSequence arrayInit(final VariableInformation varInfo, final BigInteger zero, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
     final EnumSet<CommonCodeGenerator.Attributes> attrClone = attributes.clone();
     attrClone.add(CommonCodeGenerator.Attributes.baseType);
@@ -777,7 +714,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     return _builder;
   }
   
-  protected CharSequence scheduleShadowReg(final InternalInformation outputInternal, final CharSequence last, final CharSequence cpyName, final CharSequence offset, final boolean forceRegUpdate) {
+  protected CharSequence scheduleShadowReg(final InternalInformation outputInternal, final CharSequence last, final CharSequence cpyName, final CharSequence offset, final boolean forceRegUpdate, final CharSequence fillValue) {
     StringConcatenation _builder = new StringConcatenation();
     {
       if ((!forceRegUpdate)) {
@@ -793,10 +730,12 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
       }
     }
     _builder.append("regUpdates.add(new RegUpdate(");
-    Integer _get = this.varIdx.get(outputInternal.info.name);
-    _builder.append(_get, "");
+    int _varIdx = this.getVarIdx(outputInternal);
+    _builder.append(_varIdx, "");
     _builder.append(", ");
     _builder.append(offset, "");
+    _builder.append(", ");
+    _builder.append(fillValue, "");
     _builder.append("));");
     return _builder;
   }
@@ -1557,6 +1496,23 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("regUpdates.clear();");
     _builder.newLine();
+    return _builder;
+  }
+  
+  protected CharSequence copyArray(final VariableInformation varInfo) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("System.arraycopy(");
+    CharSequence _idName = this.idName(varInfo, true, CommonCodeGenerator.NONE);
+    _builder.append(_idName, "");
+    _builder.append(", 0, ");
+    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev);
+    CharSequence _idName_1 = this.idName(varInfo, true, _of);
+    _builder.append(_idName_1, "");
+    _builder.append(", 0, ");
+    int _arraySize = this.getArraySize(varInfo);
+    _builder.append(_arraySize, "");
+    _builder.append(");");
+    _builder.newLineIfNotEmpty();
     return _builder;
   }
 }
