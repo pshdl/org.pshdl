@@ -57,8 +57,9 @@ typedef int32_t bus_int«I»_t;
 
 typedef enum {mask, limit, error, invalidIndex} warningType_t;
 
-typedef void (*warnFunc_p)(warningType_t t, int value, char *def, char *row, char *msg);
+typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row, char *msg);
 void setWarn(warnFunc_p warnFunction);
+extern warnFunc_p warn;
 
 #endif	
 '''
@@ -71,19 +72,21 @@ void setWarn(warnFunc_p warnFunction);
 
 #include <stdio.h>
 #include "BusAccess.h"
+#include "BusPrint.h"
 
-void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *msg) {
+void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg) {
     switch (t) {
+        case error:
+            printf("ERROR for value 0x%llx of definition %s of row %s %s\n",value ,def,row,msg);
+            break;
         case limit:
-            printf("Limited value %d for definition %s of row %s %s\n",value ,def,row,msg);
+            printf("Limited value 0x%llx for definition %s of row %s %s\n",value ,def,row,msg);
             break;
         case mask:
-            printf("Masked value %d for definition %s of row %s %s\n",value ,def,row,msg);
+            printf("Masked value 0x%llx for definition %s of row %s %s\n",value ,def,row,msg);
             break;
         case invalidIndex:
-            printf("The index %d is not valid for the column %s %s\n", value, row, msg);
-        default:
-            break;
+            printf("The index 0x%llx is not valid for the column %s %s\n", value, row, msg);
     }
     
 }
@@ -100,7 +103,7 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 #define BusPrint_h
 
 #include "BusAccess.h"
-void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *msg);
+void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg);
 
 «generatePrintDef(rows)»
 #endif
@@ -210,7 +213,7 @@ void defaultPrintfWarn(warningType_t t, int value, char *def, char *row, char *m
 #include "BusAccess.h"
 #include "BusStdDefinitions.h"
 
-static void defaultWarn(warningType_t t, int value, char *def, char *row, char *msg){
+static void defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){
 }
 
 warnFunc_p warn=defaultWarn;

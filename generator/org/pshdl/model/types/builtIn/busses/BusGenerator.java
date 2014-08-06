@@ -69,6 +69,7 @@ import org.pshdl.model.utils.services.IHDLAnnotation;
 import org.pshdl.model.utils.services.IHDLAnnotationProvider;
 import org.pshdl.model.utils.services.IHDLGenerator;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.Problem.ProblemSeverity;
 import org.pshdl.model.validation.builtin.ErrorCode;
@@ -264,8 +265,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			final String version = getVersion(hdl);
 			final List<Row> rows = MemoryModel.buildRows(unit);
 			final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
-			final List<SideFile> sideFiles = new LinkedList<IHDLGenerator.SideFile>();
-			sideFiles.add(new SideFile(hdl.getVar().getName() + "Map.html", html, true));
+			final List<AuxiliaryContent> sideFiles = new LinkedList<AuxiliaryContent>();
+			sideFiles.add(new AuxiliaryContent(hdl.getVar().getName() + "Map.html", html, true));
 			final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
 			sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, true));
 			if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {

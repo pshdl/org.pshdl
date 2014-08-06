@@ -26,7 +26,6 @@
  */
 package org.pshdl.model.simulation;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -62,7 +61,7 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
 import org.pshdl.model.utils.PSAbstractCompiler;
-import org.pshdl.model.utils.services.IHDLGenerator;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.validation.Problem;
 
@@ -489,62 +488,58 @@ public class CCompiler implements ITypeOuptutProvider {
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
+    _builder.append("static char* jsonDesc=\"");
+    String _jSONDescription = this.cce.getJSONDescription();
+    _builder.append(_jSONDescription, "");
+    _builder.append("\";");
+    _builder.newLineIfNotEmpty();
+    _builder.append("char* pshdl_sim_getJsonDesc(){");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return jsonDesc;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("int pshdl_sim_getDeltaCycle(){");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return deltaCycle;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("int pshdl_sim_getVarCount(){");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return ");
+    int _size = this.cce.varIdx.size();
+    _builder.append(_size, "\t");
+    _builder.append(";");
+    _builder.newLineIfNotEmpty();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("void pshdl_sim_setDisableEdges(bool enable){");
+    _builder.newLine();
     {
-      if (this.jsonDescription) {
-        _builder.append("static char* jsonDesc=\"");
-        String _jSONDescription = this.cce.getJSONDescription();
-        _builder.append(_jSONDescription, "");
-        _builder.append("\";");
-        _builder.newLineIfNotEmpty();
-        _builder.append("char* pshdl_sim_getJsonDesc(){");
-        _builder.newLine();
+      if (this.cce.hasClock) {
         _builder.append("\t");
-        _builder.append("return jsonDesc;");
-        _builder.newLine();
-        _builder.append("}");
-        _builder.newLine();
-        _builder.newLine();
-        _builder.append("int pshdl_sim_getDeltaCycle(){");
-        _builder.newLine();
-        _builder.append("\t");
-        _builder.append("return deltaCycle;");
-        _builder.newLine();
-        _builder.append("}");
-        _builder.newLine();
-        _builder.append("int pshdl_sim_getVarCount(){");
-        _builder.newLine();
-        _builder.append("\t");
-        _builder.append("return ");
-        int _size = this.cce.varIdx.size();
-        _builder.append(_size, "\t");
-        _builder.append(";");
-        _builder.newLineIfNotEmpty();
-        _builder.append("}");
-        _builder.newLine();
-        _builder.append("void pshdl_sim_setDisableEdge(bool enable){");
-        _builder.newLine();
-        {
-          if (this.cce.hasClock) {
-            _builder.append("\t");
-            _builder.append("disableEdges=enable;");
-            _builder.newLine();
-          }
-        }
-        _builder.append("}");
-        _builder.newLine();
-        _builder.append("void pshdl_sim_setDisabledRegOutputlogic(bool enable){");
-        _builder.newLine();
-        {
-          if (this.cce.hasClock) {
-            _builder.append("\t");
-            _builder.append("disabledRegOutputlogic=enable;");
-            _builder.newLine();
-          }
-        }
-        _builder.append("}");
+        _builder.append("disableEdges=enable;");
         _builder.newLine();
       }
     }
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("void pshdl_sim_setDisableRegOutputlogic(bool enable){");
+    _builder.newLine();
+    {
+      if (this.cce.hasClock) {
+        _builder.append("\t");
+        _builder.append("disabledRegOutputlogic=enable;");
+        _builder.newLine();
+      }
+    }
+    _builder.append("}");
+    _builder.newLine();
     _builder.newLine();
     CharSequence _uint_t = this.uint_t();
     _builder.append(_uint_t, "");
@@ -2269,13 +2264,12 @@ public class CCompiler implements ITypeOuptutProvider {
   
   public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final boolean withJSON, final Set<Problem> syntaxProblems) {
     final CCompiler comp = new CCompiler(em, withJSON);
-    final List<IHDLGenerator.SideFile> sideFiles = Lists.<IHDLGenerator.SideFile>newLinkedList();
+    final List<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newLinkedList();
     final String simFile = comp.generateSimEncapsuation();
     boolean _tripleNotEquals = (simFile != null);
     if (_tripleNotEquals) {
-      byte[] _bytes = simFile.getBytes(Charsets.UTF_8);
-      IHDLGenerator.SideFile _sideFile = new IHDLGenerator.SideFile("simEncapsulation.c", _bytes, true);
-      sideFiles.add(_sideFile);
+      AuxiliaryContent _auxiliaryContent = new AuxiliaryContent("simEncapsulation.c", simFile);
+      sideFiles.add(_auxiliaryContent);
     }
     CharSequence _compile = comp.compile();
     String _string = _compile.toString();

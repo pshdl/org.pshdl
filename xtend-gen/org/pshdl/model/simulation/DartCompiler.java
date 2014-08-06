@@ -51,8 +51,8 @@ import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.utils.PSAbstractCompiler;
-import org.pshdl.model.utils.services.IHDLGenerator;
 import org.pshdl.model.utils.services.IOutputProvider;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
@@ -78,7 +78,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     final DartCompiler comp = new DartCompiler(em);
     CharSequence _compile = comp.compile(unitName);
     String _string = _compile.toString();
-    List<IHDLGenerator.SideFile> _emptyList = Collections.<IHDLGenerator.SideFile>emptyList();
+    List<AuxiliaryContent> _emptyList = Collections.<AuxiliaryContent>emptyList();
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, em.moduleName, _emptyList, em.source, _hookName, true);
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);

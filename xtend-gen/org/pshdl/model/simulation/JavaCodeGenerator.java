@@ -355,7 +355,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
         _builder.newLineIfNotEmpty();
       }
     }
-    _builder.append("\t\t");
+    _builder.append("\t");
     _builder.append("break;");
     _builder.newLine();
     _builder.append("\t");
@@ -369,7 +369,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
         _builder.newLineIfNotEmpty();
       }
     }
-    _builder.append("\t\t");
+    _builder.append("\t");
     _builder.append("break;");
     _builder.newLine();
     _builder.append("\t");
@@ -664,8 +664,6 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("import java.util.*;");
     _builder.newLine();
-    _builder.append("import java.math.*;");
-    _builder.newLine();
     _builder.append("import org.pshdl.interpreter.*;");
     _builder.newLine();
     _builder.append("import java.util.concurrent.*;");
@@ -882,7 +880,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
   }
   
   public CharSequence compile(final String packageName, final String unitName) {
-    return this.doGenerateMainUnit();
+    return this.generateMainCode();
   }
   
   public CharSequence createChangeAdapter(final String packageName, final String unitName) {
@@ -919,7 +917,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     _builder.append(" implements IHDLInterpreter{");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    CharSequence _fieldDeclarations = this.fieldDeclarations(false);
+    CharSequence _fieldDeclarations = this.fieldDeclarations(false, true);
     _builder.append(_fieldDeclarations, "\t");
     _builder.newLineIfNotEmpty();
     {
@@ -1514,5 +1512,91 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
     _builder.append(");");
     _builder.newLineIfNotEmpty();
     return _builder;
+  }
+  
+  protected CharSequence assignNextTime(final VariableInformation nextTime, final CharSequence currentProcessTime) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(nextTime.name, "");
+    _builder.append("=Math.min(");
+    _builder.append(nextTime.name, "");
+    _builder.append(", ");
+    _builder.append(currentProcessTime, "");
+    _builder.append(");");
+    return _builder;
+  }
+  
+  protected CharSequence callMethod(final String methodName, final String... args) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(methodName, "");
+    _builder.append("(");
+    {
+      boolean _tripleNotEquals = (args != null);
+      if (_tripleNotEquals) {
+        {
+          boolean _hasElements = false;
+          for(final String arg : args) {
+            if (!_hasElements) {
+              _hasElements = true;
+            } else {
+              _builder.appendImmediate(",", "");
+            }
+            _builder.append(arg, "");
+          }
+        }
+      }
+    }
+    _builder.append(")");
+    return _builder;
+  }
+  
+  protected CharSequence callRunMethod() {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("run();");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  protected CharSequence checkTestbenchListener() {
+    StringConcatenation _builder = new StringConcatenation();
+    CharSequence _indent = this.indent();
+    _builder.append(_indent, "");
+    _builder.append("if (listener!=null && !listener.nextStep(");
+    VariableInformation _varByName = this.varByName("$time");
+    CharSequence _idName = this.idName(_varByName, true, CommonCodeGenerator.NONE);
+    _builder.append(_idName, "");
+    _builder.append(", stepCount))");
+    _builder.newLineIfNotEmpty();
+    CharSequence _indent_1 = this.indent();
+    _builder.append(_indent_1, "");
+    _builder.append("\tbreak;");
+    _builder.newLineIfNotEmpty();
+    return _builder;
+  }
+  
+  protected CharSequence runProcessHeader(final CommonCodeGenerator.ProcessData pd) {
+    CharSequence _xblockexpression = null;
+    {
+      this.indent++;
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("private boolean ");
+      String _processMethodName = this.processMethodName(pd);
+      _builder.append(_processMethodName, "");
+      _builder.append("() {");
+      _builder.newLineIfNotEmpty();
+      _xblockexpression = _builder;
+    }
+    return _xblockexpression;
+  }
+  
+  protected CharSequence runTestbenchHeader() {
+    CharSequence _xblockexpression = null;
+    {
+      this.indent++;
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener) {");
+      _builder.newLine();
+      _xblockexpression = _builder;
+    }
+    return _xblockexpression;
   }
 }

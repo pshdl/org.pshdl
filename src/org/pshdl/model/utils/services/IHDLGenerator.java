@@ -58,65 +58,12 @@ import com.google.common.base.Optional;
  */
 public interface IHDLGenerator {
 	/**
-	 * Side files are used for transporting additional generated content into
-	 * the output of the compiler.
-	 */
-	public static class SideFile {
-		/**
-		 * This singleton can be used to indicate that the resulting VHDL (or
-		 * other output) of the PSHDL should be placed at this given location.
-		 * This can be useful for ip core directory structures.
-		 */
-		public static final byte[] THIS = new byte[] { 'T', 'H', 'I', 'S' };
-		/**
-		 * The directory to which the contents should be written. This will
-		 * always be below the general output folder
-		 */
-		public final String relPath;
-		public final byte[] contents;
-		public final boolean isString;
-
-		public SideFile(String relPath, byte[] contents, boolean isString) {
-			super();
-			this.relPath = relPath;
-			this.contents = contents;
-			this.isString = isString;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = (prime * result) + ((relPath == null) ? 0 : relPath.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			final SideFile other = (SideFile) obj;
-			if (relPath == null) {
-				if (other.relPath != null)
-					return false;
-			} else if (!relPath.equals(other.relPath))
-				return false;
-			return true;
-		}
-
-	}
-
-	/**
 	 * The {@link HDLUnit}, which, if specified to be included, will be merged
 	 * into the containing {@link HDLUnit} via {@link Insulin}. Also the given
 	 * side-files will be registered to be placed in the output folder.
 	 */
 	public static class HDLGenerationInfo {
-		public List<SideFile> files = new LinkedList<SideFile>();
+		public List<AuxiliaryContent> files = new LinkedList<AuxiliaryContent>();
 		public final HDLUnit unit;
 
 		public HDLGenerationInfo(HDLUnit unit) {

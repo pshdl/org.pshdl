@@ -47,7 +47,6 @@ import com.google.common.collect.Lists
 import java.util.Collections
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
-import org.pshdl.model.utils.services.IHDLGenerator.SideFile
 import com.google.common.base.Charsets
 import com.google.common.collect.LinkedHashMultimap
 import com.google.common.base.Joiner
@@ -63,6 +62,7 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Row
 import java.text.SimpleDateFormat
 import java.util.Date
 import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess
+import org.pshdl.model.utils.services.AuxiliaryContent
 
 class CCompiler implements ITypeOuptutProvider {
 	private extension CommonCompilerExtension cce
@@ -204,7 +204,6 @@ class CCompiler implements ITypeOuptutProvider {
 			return 0;
 		}
 		
-		«IF jsonDescription»
 		static char* jsonDesc="«JSONDescription»";
 		char* pshdl_sim_getJsonDesc(){
 			return jsonDesc;
@@ -216,17 +215,16 @@ class CCompiler implements ITypeOuptutProvider {
 		int pshdl_sim_getVarCount(){
 			return «varIdx.size»;
 		}
-		void pshdl_sim_setDisableEdge(bool enable){
+		void pshdl_sim_setDisableEdges(bool enable){
 			«IF hasClock»
 			disableEdges=enable;
 			«ENDIF»
 		}
-		void pshdl_sim_setDisabledRegOutputlogic(bool enable){
+		void pshdl_sim_setDisableRegOutputlogic(bool enable){
 			«IF hasClock»
 			disabledRegOutputlogic=enable;
 			«ENDIF»
 		}
-		«ENDIF»
 		
 		«uint_t» pshdl_sim_getOutput(int idx, ...) {
 			va_list va_arrayIdx;
@@ -724,10 +722,10 @@ class CCompiler implements ITypeOuptutProvider {
 
 	static def List<CompileResult> doCompile(ExecutableModel em, boolean withJSON, Set<Problem> syntaxProblems) {
 		val comp = new CCompiler(em, withJSON)
-		val List<SideFile> sideFiles = Lists.newLinkedList
+		val List<AuxiliaryContent> sideFiles = Lists.newLinkedList
 		val simFile = comp.generateSimEncapsuation
 		if (simFile !== null)
-			sideFiles.add(new SideFile("simEncapsulation.c", simFile.getBytes(Charsets.UTF_8), true));
+			sideFiles.add(new AuxiliaryContent("simEncapsulation.c", simFile));
 		return Lists.newArrayList(
 			new CompileResult(syntaxProblems, comp.compile.toString, em.moduleName, sideFiles, em.source, comp.hookName,
 				true));

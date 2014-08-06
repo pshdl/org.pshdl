@@ -218,7 +218,7 @@ public class HDLSimulator {
 					// Create a new case so that the goto 0 case has some place
 					// to go
 					currentCase = newCase(cases, currentCase);
-					insertJump(currentCaseList, processStateVar, 0x7FFF_FFFF);
+					insertJump(currentCaseList, processStateVar, Integer.MAX_VALUE);
 				}
 				if (fqn.equals(HDLQualifiedName.create("pshdl", "pulse"))) {
 					final HDLReference var = (HDLReference) params.get(0);
@@ -315,7 +315,7 @@ public class HDLSimulator {
 		return currentCase;
 	}
 
-	public static void insertJump(final List<HDLStatement> caseList, HDLVariable processStateVar, final int targetCase) {
+	public static void insertJump(final List<HDLStatement> caseList, HDLVariable processStateVar, final long targetCase) {
 		caseList.add(new HDLAssignment().setLeft(processStateVar.asHDLRef()).setRight(HDLLiteral.get(targetCase)));
 	}
 

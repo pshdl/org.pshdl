@@ -51,7 +51,7 @@ import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.types.builtIn.PSHDLLib;
-import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.LinkedListMultimap;
@@ -101,7 +101,7 @@ public class HDLLibrary {
 	public final Map<HDLQualifiedName, HDLFunction> functions = new ConcurrentHashMap<HDLQualifiedName, HDLFunction>();
 	public final Multimap<String, Record> objects = LinkedListMultimap.create();
 
-	public final Multimap<String, SideFile> sideFiles = LinkedListMultimap.create();
+	public final Multimap<String, AuxiliaryContent> sideFiles = LinkedListMultimap.create();
 
 	public final Map<HDLQualifiedName, HDLType> types = new ConcurrentHashMap<HDLQualifiedName, HDLType>();
 
@@ -223,7 +223,7 @@ public class HDLLibrary {
 	 * @param files
 	 * @param src
 	 */
-	public void addSideFiles(List<SideFile> files, String src) {
+	public void addSideFiles(List<AuxiliaryContent> files, String src) {
 		sideFiles.putAll(src, files);
 	}
 

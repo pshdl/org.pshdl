@@ -1,16 +1,53 @@
+/*******************************************************************************
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ *     
+ *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for 
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ ******************************************************************************/
 package org.pshdl.model.simulation
 
-import org.pshdl.interpreter.ExecutableModel
-import org.pshdl.interpreter.VariableInformation
+import com.google.common.base.Splitter
+import com.google.common.collect.Lists
 import java.math.BigInteger
 import java.util.EnumSet
-import org.pshdl.model.simulation.CommonCodeGenerator.Attributes
+import java.util.HashSet
+import java.util.Set
+import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
-import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
+import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess
+import org.pshdl.model.types.builtIn.busses.memorymodel.Definition
+import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel
+import org.pshdl.model.types.builtIn.busses.memorymodel.Row
+import org.pshdl.model.types.builtIn.busses.memorymodel.Unit
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST
+import org.pshdl.model.utils.services.AuxiliaryContent
+import org.pshdl.model.simulation.CommonCodeGenerator.ProcessData
 
-class CCodeGenerator extends CommonCodeGenerator implements ICodeGen {
+class CCodeGenerator extends CommonCodeGenerator {
 	
 	CommonCompilerExtension cce
 	
@@ -21,10 +58,10 @@ class CCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 	
 	override protected applyRegUpdates() '''updateRegs();'''
 	
-	override protected assignArrayInit(VariableInformation hvar, BigInteger initValue, EnumSet<Attributes> attributes) 
+	override protected assignArrayInit(VariableInformation hvar, BigInteger initValue, EnumSet<CommonCodeGenerator.Attributes> attributes) 
 	'''«fieldName(hvar, attributes)»[«hvar.arraySize»];'''
 	
-	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<Attributes> attributes) {
+	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
@@ -35,24 +72,21 @@ class CCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 	
 	override protected clearRegUpdates() '''regUpdatePos=0;'''
 	
-	override protected fieldType(VariableInformation varInfo, EnumSet<Attributes> attributes) {
-		if (varInfo.dimensions.nullOrEmpty || attributes.contains(Attributes.baseType)) {
-			if (isBoolean(varInfo, attributes))
-				return "bool "
-			return "uint64_t "
-		} else {
-			if (isBoolean(varInfo, attributes))
-				return "bool "
-			return "uint64_t "
-		}
+	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		if (isBoolean(varInfo, attributes))
+			return "bool "
+		return "uint64_t "
 	}
+	
+	override protected justDeclare(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) 
+	'''«fieldName(varInfo, attributes)»«IF varInfo.array»[«varInfo.arraySize»]«ENDIF»;'''
 	
 	override protected footer() '''
 	«helperMethods»
 	'''
 	
 	override protected postFieldDeclarations() '''«IF hasClock»
-	bool skipEdge(uint64_t local) {
+	static bool skipEdge(uint64_t local) {
 		uint64_t dc = local >> 16l;
 		// Register was updated in previous delta cylce, that is ok
 		if (dc < deltaCycle)
@@ -72,7 +106,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		'''
 	
 	override protected functionHeader(Frame frame) '''
-		void «frame.frameName»() {
+		static void «frame.frameName»() {
 	'''
 	
 	override protected header() 
@@ -80,10 +114,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include "pshdl_generic_sim.h"
+#include "«headerName».h"
 
 «IF hasClock»
 	typedef struct regUpdate {
@@ -92,15 +124,15 @@ class CCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		uint64_t fillValue;
 	} regUpdate_t;
 	
-	regUpdate_t regUpdates[«maxRegUpdates»];
-	int regUpdatePos=0;
+	static regUpdate_t regUpdates[«maxRegUpdates»];
+	static int regUpdatePos=0;
 
 «ENDIF»
 
 '''
 
-def copyRegs() '''
-		void updateRegs() {
+def protected copyRegs() '''
+		static void updateRegs() {
 			int i;
 			for (i=0;i<regUpdatePos; i++) {
 				regUpdate_t reg=regUpdates[i];
@@ -124,6 +156,9 @@ def copyRegs() '''
 		}
 	'''
 	
+	override protected writeToNull(String last) '''(void)«last»; //Write to #null
+	'''
+	
 	override protected runMethodsFooter(boolean constant) '''}
 	'''
 	
@@ -144,13 +179,9 @@ def copyRegs() '''
 	override protected stageMethodsFooter(int stage, int totalStageCosts, boolean constant) '''}
 	'''
 	
-	override protected stageMethodsHeader(int stage, int totalStageCosts, boolean constant) '''void «stageMethodName(
+	override protected stageMethodsHeader(int stage, int totalStageCosts, boolean constant) '''static void «stageMethodName(
 		stage, constant)»(){
 		'''
-	
-	override compile(String packageName, String unitName) {
-		return doGenerateMainUnit
-	}
 	
 	override protected getCast(int targetSizeWithType) {
 		if (isSignedType(targetSizeWithType))
@@ -158,7 +189,7 @@ def copyRegs() '''
 		return ""
 	}
 	
-	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
+	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (fi.inst===Instruction.sra){
 			return assignTempVar(targetSizeWithType, pos, attributes, '''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''')
 		}
@@ -167,16 +198,18 @@ def copyRegs() '''
 		}
 		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes)
 	}
-	 
-	override createChangeAdapter(String packageName, String unitName) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
 	
-	override protected copyArray(VariableInformation varInfo) '''memcpy(«varInfo.idName(true, EnumSet.of(Attributes.isPrev))», «varInfo.idName(true, NONE)», «varInfo.arraySize»);
+	override protected copyArray(VariableInformation varInfo) '''memcpy(«varInfo.idName(true, EnumSet.of(CommonCodeGenerator.Attributes.isPrev))», «varInfo.idName(true, NONE)», «varInfo.arraySize»);
 	'''
 	
-	def helperMethods() '''
-		void pshdl_sim_setInput(int idx, long value, int arrayIdx[]) {
+	override protected preField(VariableInformation x, EnumSet<CommonCodeGenerator.Attributes> attributes) '''«IF !attributes.
+		contains(CommonCodeGenerator.Attributes.isPublic)»static«ENDIF» '''
+		
+	def protected helperMethods() '''
+		void pshdl_sim_setInput(int idx, uint64_t value) {
+			pshdl_sim_setInputArray(idx, value, ((void *)0));
+		}
+		void pshdl_sim_setInputArray(int idx, uint64_t value, int arrayIdx[]) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
@@ -206,24 +239,31 @@ def copyRegs() '''
 			return jsonDesc;
 		}
 		
-		int pshdl_sim_getDeltaCycle(){
+		uint64_t pshdl_sim_getDeltaCycle(){
 			return deltaCycle;
 		}
+		
 		int pshdl_sim_getVarCount(){
 			return «varIdx.size»;
 		}
-		void pshdl_sim_setDisableEdge(bool enable){
+		
+		void pshdl_sim_setDisableEdges(bool enable){
 			«IF hasClock»
 			«DISABLE_EDGES.name»=enable;
 			«ENDIF»
 		}
-		void pshdl_sim_setDisabledRegOutputlogic(bool enable){
+		
+		void pshdl_sim_setDisableRegOutputlogic(bool enable){
 			«IF hasClock»
 			«DISABLE_REG_OUTPUTLOGIC.name»=enable;
 			«ENDIF»
 		}
 		
-		uint64_t pshdl_sim_getOutput(int idx, int arrayIdx[]) {
+		uint64_t pshdl_sim_getOutput(int idx) {
+			return pshdl_sim_getOutputArray(idx, ((void *)0));
+		}
+		
+		uint64_t pshdl_sim_getOutputArray(int idx, int arrayIdx[]) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
 					«IF v.dimensions.length == 0»
@@ -263,4 +303,167 @@ def copyRegs() '''
 		'''
 	}
 	
+	override getAuxiliaryContent() {
+		val generic_h=new AuxiliaryContent("pshdl_generic_sim.h", typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h"), true)
+		val specific_h=new AuxiliaryContent(headerName()+".h", specificHeader.toString)
+		val res=Lists.newArrayList(generic_h, specific_h)
+		val simEncapsulation=generateSimEncapsuation
+		if (simEncapsulation!==null)
+			res.add(new AuxiliaryContent("simEncapsulation.c", simEncapsulation))
+		return res
+	}
+	
+	def protected headerName() {
+		"pshdl_"+em.moduleName.idName(false, NONE)+"_sim"
+	}
+	
+	def protected getSpecificHeader() 
+	'''
+	#ifndef _«headerName»_h_
+	#define _«headerName»_h_
+	#include "pshdl_generic_sim.h"
+	
+	«FOR VariableInformation vi: em.variables.excludeNull»
+	#define «vi.defineName» «vi.varIdx»
+	«ENDFOR»
+	
+	«fieldDeclarations(false, false).toString.split("\n").map["extern"+it].join("\n")»
+	
+	#endif
+	'''
+	def String generateSimEncapsuation() {
+		val Unit unit = getUnit(em)
+		if (unit === null)
+			return null
+		return generateSimEncapsuation(unit, MemoryModel.buildRows(unit))
+	}
+
+	def getUnit(ExecutableModel model) {
+		var Unit unit
+		val annoSplitter = Splitter.on(SimulationTransformationExtension.ANNO_VALUE_SEP);
+		if (em.annotations !== null) {
+			for (a : em.annotations) {
+				if (a.startsWith("busDescription")) {
+					val value = annoSplitter.limit(2).split(a).last
+					unit = MemoryModelAST.parseUnit(value, new HashSet, 0)
+				}
+			}
+		}
+		return unit
+	}
+
+	extension BusAccess ba = new BusAccess
+
+	private def generateSimEncapsuation(Unit unit, Iterable<Row> rows) {
+		val Set<String> varNames = new HashSet
+		rows.forEach[it.allDefs.filter[it.type !== Definition.Type.UNUSED].forEach[varNames.add(it.getName)]]
+		var res = '''
+//  BusAccessSim.c
+//
+
+#include <stdint.h>
+#include <stdbool.h>
+#include "BusAccess.h"
+#include "BusStdDefinitions.h"
+#include "pshdl_generic_sim.h"
+#include "«headerName».h"
+
+static void defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){
+}
+
+warnFunc_p warn=defaultWarn;
+
+void setWarn(warnFunc_p warnFunction){
+    warn=warnFunction;
+}
+
+#define «"busclk_idx"» «busIndex»
+
+'''
+		val checkedRows = new HashSet<String>()
+		for (Row row : rows) {
+			if (!checkedRows.contains(row.name)) {
+				if (row.hasWriteDefs)
+					res = res + row.simSetter
+				res = res + row.simGetter
+				checkedRows.add(row.name)
+			}
+		}
+		return res
+	}
+	
+	def protected int getBusIndex() {
+		val pclk=varIdx.get(em.moduleName+".PCLK")
+		if (pclk===null)
+			return varIdx.get(em.moduleName+".Bus2IP_Clk")
+	}
+
+	def protected getDefineName(VariableInformation vi) '''PSHDL_SIM_«vi.idName(true, NONE).toString.toUpperCase»'''
+	def protected getDefineNameString(String s) '''PSHDL_SIM_«(em.moduleName+"."+s).idName(true, NONE).toString.toUpperCase»'''
+
+	def protected simGetter(Row row) '''
+//Getter
+int get«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition definition : row.allDefs»«getParameter(
+		row, definition, true)»«ENDFOR»){
+	int offset[1]={index};
+	«FOR Definition d : row.allDefs»
+	*«row.getVarName(d)»=(«d.busType»)pshdl_sim_getOutputArray(«d.name.getDefineNameString», offset);
+	«ENDFOR»
+	return 1;
+}
+
+int get«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *result){
+	return get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.getVarNameIndex(d)»«ENDFOR»);
+}
+'''
+
+	def protected simSetter(Row row) '''
+// Setter
+int set«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition definition : row.writeDefs»«getParameter(
+		row, definition, false)»«ENDFOR»){
+	int offset[1]={index};
+	«FOR Definition ne : row.writeDefs»
+		«row.generateConditions(ne)»
+	«ENDFOR»
+	«FOR Definition d : row.writeDefs»
+	pshdl_sim_setInputArray(«d.name.getDefineNameString», «d.name», offset);
+	«ENDFOR»
+	if (!«DISABLE_EDGES.name») {
+		pshdl_sim_setInput(busclk_idx, 0);
+		pshdl_sim_run();
+	}
+	pshdl_sim_setInput(busclk_idx, 1);
+	pshdl_sim_run();
+	return 0;
+}
+
+int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newVal) {
+	return set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.getVarNameIndex(d)»«ENDFOR»);
+}
+'''
+
+override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) {
+	throw new UnsupportedOperationException("TODO: auto-generated method stub")
+}
+
+override protected callMethod(String methodName, String... args) {
+	throw new UnsupportedOperationException("TODO: auto-generated method stub")
+}
+
+override protected callRunMethod() {
+	throw new UnsupportedOperationException("TODO: auto-generated method stub")
+}
+
+override protected checkTestbenchListener() {
+	throw new UnsupportedOperationException("TODO: auto-generated method stub")
+}
+
+override protected runProcessHeader(ProcessData pd) {
+	throw new UnsupportedOperationException("TODO: auto-generated method stub")
+}
+
+override protected runTestbenchHeader() {
+	throw new UnsupportedOperationException("TODO: auto-generated method stub")
+}
+
 }

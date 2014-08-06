@@ -129,12 +129,12 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 			«IF hasClock»
 				«DISABLE_REG_OUTPUTLOGIC.name» = (boolean) value;
 			«ENDIF»
-				break;
+			break;
 			case disableEdges:
 			«IF hasClock»
 				«DISABLE_EDGES.name» = (boolean) value;
 			«ENDIF»
-				break;
+			break;
 			}
 		}
 	'''
@@ -219,9 +219,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		}
 	'''
 
-	def  protected getImports() '''
+	def protected getImports() '''
 		import java.util.*;
-		import java.math.*;
 		import org.pshdl.interpreter.*;
 		import java.util.concurrent.*;
 	'''
@@ -310,24 +309,25 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 	override protected checkRegupdates() {
 		return "!regUpdates.isEmpty()"
 	}
-	
-	override CharSequence compile(String packageName, String unitName){
-		return doGenerateMainUnit();
+
+	override CharSequence compile(String packageName, String unitName) {
+		return generateMainCode();
 	}
-	override CharSequence createChangeAdapter(String packageName, String unitName){
+
+	override CharSequence createChangeAdapter(String packageName, String unitName) {
 		return createChangeAdapter(false)
 	}
-	def CharSequence createChangeAdapter(boolean useInterface)
-'''«IF packageName !== null»package «packageName»;«ENDIF»
+
+	def CharSequence createChangeAdapter(boolean useInterface) '''«IF packageName !== null»package «packageName»;«ENDIF»
 
 import org.pshdl.interpreter.IChangeListener;
 import org.pshdl.interpreter.IHDLInterpreter;
 import java.math.BigInteger;
 
 public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implements IHDLInterpreter{
-	«fieldDeclarations(false)»
+	«fieldDeclarations(false, true)»
 	«IF useInterface»
-		«FOR varInfo:em.variables.excludeNull»
+		«FOR varInfo : em.variables.excludeNull»
 			int «varInfo.idName(true, NONE)»_idx;
 		«ENDFOR»
 	«ENDIF»
@@ -338,7 +338,7 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 		this.module=module;
 		this.listeners=listeners;
 		«IF useInterface»
-		«FOR varInfo:em.variables.excludeNull»
+		«FOR varInfo : em.variables.excludeNull»
 			«varInfo.idName(true, NONE)»_idx=module.getIndex("«varInfo.name»");
 		«ENDFOR»
 	«ENDIF»
@@ -347,8 +347,8 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 	@Override
 	public void run() {
 		module.run();
-		«FOR varInfo:em.variables.excludeNull»
-			«val CharSequence varName=varInfo.idName(true, NONE)»
+		«FOR varInfo : em.variables.excludeNull»
+			«val CharSequence varName = varInfo.idName(true, NONE)»
 			«IF useInterface»
 				«varInfo.changedNotificationInterface»
 				«IF varInfo.array»
@@ -424,11 +424,11 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 	}
 }
 '''
-	
+
 	def protected changedNotificationInterface(VariableInformation vi) {
 		val varName = vi.idName(true, NONE)
-		if (!vi.array){
-			if (vi.predicate){
+		if (!vi.array) {
+			if (vi.predicate) {
 				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
 				return '''if ((module.getOutputLong(«varName»_idx)!=0) != «varName»)
 	for (IChangeListener listener:listeners)
@@ -441,7 +441,7 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 '''
 			}
 		} else {
-			if (vi.predicate){
+			if (vi.predicate) {
 				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
 				return '''{
 boolean[] tempArr=new boolean[«vi.arraySize»];
@@ -465,10 +465,11 @@ if (!tempArr.equals(«varName»))
 			}
 		}
 	}
+
 	def protected changedNotification(VariableInformation vi) {
 		val varName = vi.idName(true, NONE)
-		if (!vi.array){
-			if (vi.predicate){
+		if (!vi.array) {
+			if (vi.predicate) {
 				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
 				return '''if (module.«varName» != «varName»)
 	for (IChangeListener listener:listeners)
@@ -477,11 +478,12 @@ if (!tempArr.equals(«varName»))
 			} else {
 				return '''if (module.«varName» != «varName»)
 	for (IChangeListener listener:listeners)
-		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.constant»«ENDIF», module.«varName»«IF vi.width != 64» & «vi.width.calcMask.constant»«ENDIF»);
+		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.constant»«ENDIF», module.«varName»«IF vi.
+					width != 64» & «vi.width.calcMask.constant»«ENDIF»);
 				'''
 			}
 		} else {
-			if (vi.predicate){
+			if (vi.predicate) {
 				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
 				return '''if (!module.«varName».equals(«varName»))
 	for (IChangeListener listener:listeners)
@@ -495,11 +497,37 @@ if (!tempArr.equals(«varName»))
 			}
 		}
 	}
-	
+
 	override protected clearRegUpdates() '''regUpdates.clear();
-	'''
-	
-	override protected copyArray(VariableInformation varInfo) '''System.arraycopy(«varInfo.idName(true, NONE)», 0, «varInfo.idName(true, EnumSet.of(Attributes.isPrev))», 0, «varInfo.arraySize»);
-	'''
+		'''
+
+	override protected copyArray(VariableInformation varInfo) '''System.arraycopy(«varInfo.idName(true, NONE)», 0, «varInfo.
+		idName(true, EnumSet.of(Attributes.isPrev))», 0, «varInfo.arraySize»);
+		'''
+
+	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
+		name», «currentProcessTime»);'''
+
+	override protected callMethod(String methodName, String... args) '''«methodName»(«IF args !== null»«FOR String arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+
+	override protected callRunMethod() '''run();
+		'''
+
+	override protected checkTestbenchListener() '''«indent()»if (listener!=null && !listener.nextStep(«varByName("$time").
+		idName(true, NONE)», stepCount))
+«indent()»	break;
+'''
+
+	override protected runProcessHeader(ProcessData pd) {
+		indent++
+		'''private boolean «processMethodName(pd)»() {
+			'''
+	}
+
+	override protected runTestbenchHeader() {
+		indent++
+		'''public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener) {
+			'''
+	}
 
 }

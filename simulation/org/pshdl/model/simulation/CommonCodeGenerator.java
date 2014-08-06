@@ -12,6 +12,8 @@ import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPublic
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isShadowReg;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isUpdate;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,13 +35,16 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.io.Files;
 
 public abstract class CommonCodeGenerator {
 
@@ -84,18 +89,22 @@ public abstract class CommonCodeGenerator {
 		return em.internals[id];
 	}
 
-	public String doGenerateMainUnit() {
+	public String generateMainCode() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(header());
 		preBody();
 		sb.append(preFieldDeclarations());
-		sb.append(fieldDeclarations(true));
+		sb.append(fieldDeclarations(true, true));
 		sb.append(postFieldDeclarations());
 		sb.append(preFrames());
 		sb.append(frames());
 		sb.append(postFrames());
 		sb.append(preRunMethods());
 		sb.append(createRunAndStageMethods());
+		final CharSequence tbMethods = testbenchMethod();
+		if (tbMethods != null) {
+			sb.append(tbMethods);
+		}
 		sb.append(postRunMethods());
 		postBody();
 		sb.append(footer());
@@ -138,7 +147,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	public void createRunMethod(final Multimap<Integer, Frame> schedulingStage, int maxStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
+	protected void createRunMethod(final Multimap<Integer, Frame> schedulingStage, int maxStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
 			final StringBuilder sb) {
 		sb.append(indent()).append(runMethodsHeader(createConstant));
 		indent++;
@@ -179,7 +188,7 @@ public abstract class CommonCodeGenerator {
 		sb.append(indent()).append(runMethodsFooter(createConstant));
 	}
 
-	public void copyPrev(final StringBuilder sb, final VariableInformation var) {
+	protected void copyPrev(final StringBuilder sb, final VariableInformation var) {
 		if (isArray(var)) {
 			sb.append(indent()).append(copyArray(var));
 		} else {
@@ -251,11 +260,13 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence doLoopStart() {
-		return "do {";
+		indent++;
+		return "do {" + newLine();
 	}
 
 	protected CharSequence doLoopEnd(CharSequence condition) {
-		return "} while (" + condition + ");";
+		indent--;
+		return "} while (" + condition + ");" + newLine();
 	}
 
 	protected CharSequence predicateCheckedFrameCall(Frame frame) {
@@ -289,7 +300,7 @@ public abstract class CommonCodeGenerator {
 		return callFrameWithPredicates(frame, predicates);
 	}
 
-	private boolean hasPredicate(int[] pred) {
+	protected boolean hasPredicate(int[] pred) {
 		return (pred != null) && (pred.length != 0);
 	}
 
@@ -524,9 +535,13 @@ public abstract class CommonCodeGenerator {
 				sb.append(indent()).append(assignInternal(outputInternal, TIMESTAMP.name, arr, EnumSet.of(isUpdate))).append(comment("update timestamp"));
 			}
 		} else {
-			sb.append(comment("Write to #null"));
+			sb.append(writeToNull(last));
 		}
 		return sb;
+	}
+
+	protected CharSequence writeToNull(String last) {
+		return comment("Write to #null");
 	}
 
 	protected CharSequence calcRegUpdateOffset(final List<Integer> arr, final InternalInformation outputInternal) {
@@ -756,13 +771,24 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
+	public Iterable<AuxiliaryContent> getAuxiliaryContent() {
+		return Collections.emptyList();
+	}
+
+	public void writeAuxiliaryContents(File outputDir) throws IOException {
+		for (final AuxiliaryContent aux : getAuxiliaryContent()) {
+			final File auxFile = new File(outputDir, aux.relPath);
+			Files.createParentDirs(auxFile);
+			Files.write(aux.contents, auxFile);
+		}
+	}
+
 	protected CharSequence writeInternal(InternalInformation internal, String tempName, List<Integer> arr) {
 		final StringBuilder sb = new StringBuilder();
 		if (internal.isShadowReg) {
 			final String cpyName = tempName + "_cpy";
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
 			if (!forceRegUpdate) {
-				// TODO save fill value
 				final VariableInformation cpyVar = createVar(cpyName, internal.actualWidth, internal.info.type);
 				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, arr, NONE), NONE, false, true)).append(comment("Backup of current value"));
 				sb.append(indent());
@@ -1117,42 +1143,42 @@ public abstract class CommonCodeGenerator {
 	protected void preBody() {
 	}
 
-	protected CharSequence fieldDeclarations(boolean includePrivate) {
+	protected CharSequence fieldDeclarations(boolean includePrivate, boolean initialize) {
 		final StringBuilder sb = new StringBuilder();
 		preFieldDeclaration();
 		for (final VariableInformation var : excludeNull(em.variables)) {
 			if (hasPrev(var) && includePrivate) {
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPrev))).append(newLine());
+				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPrev), initialize)).append(newLine());
 				if (prevMapPos.contains(var.name)) {
-					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeActive))).append(newLine());
-					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeHandled))).append(newLine());
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeActive), initialize)).append(newLine());
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPosEdgeHandled), initialize)).append(newLine());
 				}
 				if (prevMapNeg.contains(var.name)) {
-					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isNegEdgeActive))).append(newLine());
-					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isNegEdgeHandled))).append(newLine());
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isNegEdgeActive), initialize)).append(newLine());
+					sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isNegEdgeHandled), initialize)).append(newLine());
 				}
 			}
 			if (hasUpdate(var)) {
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isUpdate, isPublic))).append(newLine());
+				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isUpdate, isPublic), initialize)).append(newLine());
 			}
 			if (isPredicate(var) && includePrivate) {
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPredFresh))).append(newLine());
+				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPredFresh), initialize)).append(newLine());
 			}
 			if (var.isRegister && includePrivate) {
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isShadowReg))).append(newLine());
+				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isShadowReg), initialize)).append(newLine());
 			}
-			sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPublic))).append(newLine());
+			sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPublic), initialize)).append(newLine());
 		}
-		sb.append(indent()).append(createVarDeclaration(EPS_CYCLE, EnumSet.of(isPublic))).append(newLine());
-		sb.append(indent()).append(createVarDeclaration(DELTA_CYCLE, EnumSet.of(isPublic))).append(newLine());
-		sb.append(indent()).append(createVarDeclaration(TIMESTAMP, EnumSet.of(isPublic))).append(newLine());
-		sb.append(indent()).append(createVarDeclaration(DISABLE_EDGES, EnumSet.of(isPublic))).append(newLine());
-		sb.append(indent()).append(createVarDeclaration(DISABLE_REG_OUTPUTLOGIC, EnumSet.of(isPublic))).append(newLine());
+		sb.append(indent()).append(createVarDeclaration(EPS_CYCLE, EnumSet.of(isPublic), initialize)).append(newLine());
+		sb.append(indent()).append(createVarDeclaration(DELTA_CYCLE, EnumSet.of(isPublic), initialize)).append(newLine());
+		sb.append(indent()).append(createVarDeclaration(TIMESTAMP, EnumSet.of(isPublic), initialize)).append(newLine());
+		sb.append(indent()).append(createVarDeclaration(DISABLE_EDGES, EnumSet.of(isPublic), initialize)).append(newLine());
+		sb.append(indent()).append(createVarDeclaration(DISABLE_REG_OUTPUTLOGIC, EnumSet.of(isPublic), initialize)).append(newLine());
 		postFieldDeclaration();
 		return sb;
 	}
 
-	public static VariableInformation createVar(String name, int width, Type type) {
+	protected static VariableInformation createVar(String name, int width, Type type) {
 		return new VariableInformation(Direction.INTERNAL, name, width, type, false, false, false, null, null);
 	}
 
@@ -1178,17 +1204,25 @@ public abstract class CommonCodeGenerator {
 		baseType, isPrev, isUpdate, isShadowReg, isPublic, isPredicate, isArrayIndex, isPosEdgeActive, isPosEdgeHandled, isNegEdgeActive, isNegEdgeHandled, isPredFresh, isArray
 	}
 
-	protected CharSequence createVarDeclaration(VariableInformation var, EnumSet<Attributes> attributes) {
+	protected CharSequence createVarDeclaration(VariableInformation var, EnumSet<Attributes> attributes, boolean initialize) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(preField(var, attributes));
 		sb.append(fieldType(var, attributes));
-		if (isArray(var)) {
-			sb.append(assignArrayInit(var, BigInteger.ZERO, attributes));
+		if (initialize) {
+			if (isArray(var)) {
+				sb.append(assignArrayInit(var, BigInteger.ZERO, attributes));
+			} else {
+				sb.append(assignConstant(var, BigInteger.ZERO, attributes));
+			}
 		} else {
-			sb.append(assignConstant(var, BigInteger.ZERO, attributes));
+			sb.append(justDeclare(var, attributes));
 		}
 		sb.append(postField(var));
 		return sb;
+	}
+
+	protected CharSequence justDeclare(VariableInformation var, EnumSet<Attributes> attributes) {
+		return fieldName(var, attributes) + ";";
 	}
 
 	protected int maxRegUpdates() {
@@ -1433,4 +1467,240 @@ public abstract class CommonCodeGenerator {
 		arrayAccess.append("arrayIdx[" + lastIndex + "]");
 		return arrayAccess;
 	}
+
+	protected class ProcessData {
+		public List<Frame> frames = Lists.newArrayList();
+		public final List<Integer> handledPredicates = Lists.newArrayList(), handledNegEdge = Lists.newArrayList(), handledPosEdge = Lists.newArrayList();
+		public final StringBuilder predicates = new StringBuilder();
+		public final StringBuilder calls = new StringBuilder();
+		public final String processName;
+
+		public ProcessData(String processName) {
+			this.processName = processName;
+		}
+
+		public void addFrame(Frame frame) {
+			frames.add(frame);
+			predicates.append(handleEdge(handledNegEdge, false, frame.edgeNegDepRes));
+			predicates.append(handleEdge(handledPosEdge, true, frame.edgePosDepRes));
+			predicates.append(handlePredicates(handledPredicates, false, frame.predNegDepRes));
+			predicates.append(handlePredicates(handledPredicates, true, frame.predPosDepRes));
+			calls.append(predicateCheckedFrameCall(frame));
+		}
+
+	}
+
+	protected CharSequence testbenchMethod() {
+		final Iterable<Frame> processframes = getProcessframes(em);
+		if (!processframes.iterator().hasNext())
+			return null;
+		final Map<String, ProcessData> processes = Maps.newLinkedHashMap();
+		for (final Frame frame : processframes) {
+			ProcessData pd = processes.get(frame.process);
+			if (pd == null) {
+				pd = new ProcessData(frame.process);
+				processes.put(frame.process, pd);
+			}
+			pd.addFrame(frame);
+		}
+		final StringBuilder result = new StringBuilder();
+		result.append(createProcessMethods(processes));
+		result.append(indent()).append(runTestbenchHeader());
+		final VariableInformation stepCount = createVar("stepCount", 64, Type.UINT);
+		result.append(indent()).append(assignVariable(stepCount, constant(BigInteger.ZERO), NONE, false, true)).append(newLine());
+		result.append(indent()).append(whileLoopStart(runTestBenchOuterLoopCondition(stepCount)));
+		final VariableInformation modified = createVar("modified", -1, Type.BOOL);
+		result.append(indent()).append(assignVariable(modified, constantBoolean(BigInteger.ZERO), NONE, false, true)).append(newLine());
+		result.append(indent()).append(doLoopStart());
+		result.append(indent()).append(assignVariable(modified, constantBoolean(BigInteger.ZERO), NONE, false, false)).append(newLine());
+		for (final ProcessData pd : processes.values()) {
+			result.append(indent()).append(ifCondition(callProcessMethod(pd), assignVariable(modified, constantBoolean(BigInteger.ONE), NONE, false, false), null));
+		}
+		result.append(indent()).append(doLoopEnd(condition(Condition.isTrue, modified.name, null)));
+		result.append(indent()).append(callRunMethod());
+		result.append(indent()).append(incVar(stepCount)).append(newLine());
+		final VariableInformation nextTime = createVar("nextTime", 64, Type.UINT);
+		result.append(indent()).append(assignVariable(nextTime, constant(BigInteger.valueOf(Long.MAX_VALUE)), NONE, false, true)).append(newLine());
+		for (final ProcessData pd : processes.values()) {
+			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(BigInteger.ZERO));
+			final CharSequence stateBlockedCondition = condition(Condition.isNotEqual, processState(pd.processName), processStale());
+			final CharSequence condition = condition(Condition.logiAnd, stateCondition, stateBlockedCondition);
+			result.append(indent()).append(ifCondition(condition, assignNextTime(nextTime, processTime(pd.processName)), null));
+		}
+
+		result.append(indent()).append(assignVariable(timeName(), nextTime.name, NONE, true, false)).append(newLine());
+		result.append(checkTestbenchListener());
+		result.append(indent()).append(whileLoopEnd());
+		result.append(indent()).append(runTestbenchFooter());
+		return result;
+	}
+
+	protected abstract CharSequence checkTestbenchListener();
+
+	protected CharSequence runTestbenchFooter() {
+		return "}" + newLine();
+	}
+
+	protected abstract CharSequence assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime);
+
+	protected abstract CharSequence callRunMethod();
+
+	public static enum Condition {
+		isTrue, isFalse, isLess, isLessEqual, isGreater, isGreateEqual, isEqual, isNotEqual, logiAnd, logiOr
+	}
+
+	protected CharSequence condition(Condition condition, CharSequence a, CharSequence b) {
+		switch (condition) {
+		case isEqual:
+			return a + " == " + b;
+		case isNotEqual:
+			return a + " != " + b;
+		case isFalse:
+			return "!" + a;
+		case isTrue:
+			return a;
+		case isGreateEqual:
+			return a + " >= " + b;
+		case isGreater:
+			return a + " > " + b;
+		case isLess:
+			return a + " < " + b;
+		case isLessEqual:
+			return a + " <= " + b;
+		case logiAnd:
+			return "(" + a + ") && (" + b + ")";
+		case logiOr:
+			return "(" + a + ") || (" + b + ")";
+		}
+		throw new IllegalStateException("Should not get here");
+	}
+
+	protected CharSequence ifCondition(CharSequence condition, CharSequence thenDo, CharSequence elseDo) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("if (").append(condition).append(") {").append(newLine());
+		indent++;
+		sb.append(indent()).append(thenDo).append(newLine());
+		indent--;
+		if (elseDo != null) {
+			sb.append("} else {").append(newLine());
+			indent++;
+			sb.append(indent()).append(elseDo).append(newLine());
+			indent--;
+		}
+		sb.append(indent()).append("}").append(newLine());
+		return sb;
+	}
+
+	protected CharSequence callProcessMethod(ProcessData pd) {
+		return callMethod(processMethodName(pd));
+	}
+
+	public String processMethodName(ProcessData pd) {
+		return "runProcess" + pd.processName;
+	}
+
+	protected abstract CharSequence callMethod(String methodName, String... args);
+
+	protected CharSequence createProcessMethods(final Map<String, ProcessData> processes) {
+		final StringBuilder result = new StringBuilder();
+		for (final ProcessData pd : processes.values()) {
+			final String processName = pd.processName;
+			result.append(indent()).append(runProcessHeader(pd));
+			final VariableInformation oldTime = createVar("oldTime", 64, Type.UINT);
+			result.append(indent()).append(assignVariable(oldTime, processTime(processName), NONE, false, true)).append(newLine());
+			final VariableInformation oldState = createVar("oldState", 64, Type.UINT);
+			result.append(indent()).append(assignVariable(oldState, processState(processName), NONE, false, true)).append(newLine());
+			result.append(indent()).append(whileLoopStart(processCondition(processName)));
+			result.append(indent()).append(pd.predicates);
+			result.append(indent()).append(pd.calls);
+			result.append(indent()).append(whileLoopEnd());
+			result.append(indent()).append(runProcessFooter(processName, oldTime, oldState));
+		}
+		return result;
+	}
+
+	protected CharSequence runTestBenchOuterLoopCondition(VariableInformation stepCount) {
+		final CharSequence lessMaxTime = condition(Condition.isLessEqual, idName(timeName(), true, NONE), "maxTime");
+		final CharSequence lessMaxSteps = condition(Condition.isLess, stepCount.name, "maxSteps");
+		return condition(Condition.logiAnd, lessMaxTime, lessMaxSteps);
+	}
+
+	protected abstract CharSequence runTestbenchHeader();
+
+	protected CharSequence whileLoopStart(CharSequence processCondition) {
+		indent++;
+		return "while (" + processCondition + ") {" + newLine();
+	}
+
+	protected CharSequence whileLoopEnd() {
+		indent--;
+		return "}" + newLine();
+	}
+
+	protected CharSequence processCondition(String processName) {
+		final CharSequence isTimeGood = condition(Condition.isGreateEqual, idName(timeName(), true, NONE), processTime(processName));
+		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(BigInteger.ZERO));
+		final CharSequence isNotStale = condition(Condition.isNotEqual, processState(processName), processStale());
+		return condition(Condition.logiAnd, condition(Condition.logiAnd, isNotStale, isNotWaiting), isTimeGood);
+	}
+
+	public VariableInformation timeName() {
+		return varByName("$time");
+	}
+
+	public CharSequence processStale() {
+		return constant(BigInteger.valueOf(Integer.MAX_VALUE));
+	}
+
+	protected abstract CharSequence runProcessHeader(ProcessData pd);
+
+	protected CharSequence runProcessFooter(String processName, VariableInformation oldTime, VariableInformation oldState) {
+		final CharSequence timeModified = condition(Condition.isNotEqual, oldTime.name, processTime(processName));
+		final CharSequence stateModified = condition(Condition.isNotEqual, oldState.name, processState(processName));
+		final StringBuilder sb = new StringBuilder();
+		sb.append(indent()).append("return ").append(condition(Condition.logiOr, stateModified, timeModified)).append(";").append(newLine());
+		indent--;
+		sb.append(indent()).append("}").append(newLine());
+		return sb;
+	}
+
+	protected CharSequence processState(CharSequence processName) {
+		return idName(varByName("$process_state_@" + processName), false, NONE);
+	}
+
+	protected CharSequence processTime(CharSequence processName) {
+		return idName(varByName("$process_time_next_@" + processName), false, NONE);
+	}
+
+	protected VariableInformation varByName(String varName) {
+		final String fullName = em.moduleName + '.' + varName;
+		for (final VariableInformation var : em.variables) {
+			if (var.name.equals(varName))
+				return var;
+			if (var.name.equals(fullName))
+				return var;
+		}
+		throw new IllegalArgumentException("Did not find variable " + varName + " in model");
+	}
+
+	protected Iterable<Frame> getNonProcessframes(ExecutableModel model) {
+		final List<Frame> res = Lists.newArrayList();
+		for (final Frame frame : model.frames) {
+			if (frame.process == null) {
+				res.add(frame);
+			}
+		}
+		return res;
+	}
+
+	protected Iterable<Frame> getProcessframes(ExecutableModel model) {
+		final List<Frame> res = Lists.newArrayList();
+		for (final Frame frame : model.frames) {
+			if (frame.process != null) {
+				res.add(frame);
+			}
+		}
+		return res;
+	}
+
 }

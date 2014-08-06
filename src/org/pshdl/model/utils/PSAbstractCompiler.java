@@ -53,7 +53,7 @@ import java.util.concurrent.Future;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLUnit;
 import org.pshdl.model.parser.PSHDLParser;
-import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.validation.HDLValidator;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 import org.pshdl.model.validation.Problem;
@@ -135,22 +135,22 @@ public class PSAbstractCompiler implements AutoCloseable {
 		/**
 		 * All additional files that have been generated
 		 */
-		public final Set<SideFile> sideFiles;
+		public final Set<AuxiliaryContent> sideFiles;
 		/**
 		 * The src for which this code was generated
 		 */
 		public final String src;
 
-		public CompileResult(Set<Problem> syntaxProblems, String code, String entityName, Collection<SideFile> sideFiles, String src, String codeType, boolean unitName) {
+		public CompileResult(Set<Problem> syntaxProblems, String code, String entityName, Collection<AuxiliaryContent> sideFiles, String src, String codeType, boolean unitName) {
 			super();
 			this.syntaxProblems = syntaxProblems;
 			this.code = code;
 			this.entityName = entityName;
 			this.src = src;
 			if (sideFiles != null) {
-				this.sideFiles = new HashSet<SideFile>(sideFiles);
+				this.sideFiles = new HashSet<AuxiliaryContent>(sideFiles);
 			} else {
-				this.sideFiles = new HashSet<SideFile>();
+				this.sideFiles = new HashSet<AuxiliaryContent>();
 			}
 			this.codeType = codeType;
 			this.fileName = getFileName(src, codeType, unitName);
@@ -184,7 +184,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 		res.add(target);
 		Files.write(result.code, target, StandardCharsets.UTF_8);
 		if (result.sideFiles != null) {
-			for (final SideFile sd : result.sideFiles) {
+			for (final AuxiliaryContent sd : result.sideFiles) {
 				final File file = new File(outDir + "/" + sd.relPath);
 				res.add(file);
 				final File parentFile = file.getParentFile();
@@ -192,7 +192,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 					if (!parentFile.mkdirs())
 						throw new IllegalArgumentException("Failed to create directory:" + parentFile);
 				}
-				if (sd.contents == SideFile.THIS) {
+				if (sd.contents == AuxiliaryContent.THIS) {
 					Files.write(result.code, file, StandardCharsets.UTF_8);
 				} else {
 					Files.write(sd.contents, file);

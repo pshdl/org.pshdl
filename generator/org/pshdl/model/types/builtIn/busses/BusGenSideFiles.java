@@ -44,7 +44,7 @@ import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider;
 import org.pshdl.model.utils.internal.Helper;
-import org.pshdl.model.utils.services.IHDLGenerator.SideFile;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 
 import com.google.common.io.ByteStreams;
 
@@ -52,8 +52,8 @@ public class BusGenSideFiles {
 
 	public static final String WRAPPER_APPENDIX = "core";
 
-	public static List<SideFile> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi, boolean withDate) {
-		final List<SideFile> res = new LinkedList<SideFile>();
+	public static List<AuxiliaryContent> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi, boolean withDate) {
+		final List<AuxiliaryContent> res = new LinkedList<AuxiliaryContent>();
 		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		final String ipcorename = unitName + WRAPPER_APPENDIX;
 		final String dirName = ipcorename + "_" + version;
@@ -62,16 +62,16 @@ public class BusGenSideFiles {
 		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount, withDate));
 		res.add(paoFile(unitName, dirName, type, pCore, withDate));
 		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore, withDate));
-		res.add(new SideFile(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", SideFile.THIS, true));
+		res.add(new AuxiliaryContent(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", AuxiliaryContent.THIS, true));
 		try (InputStream stream = BusGenSideFiles.class.getResourceAsStream("/pshdl_pkg.vhd")) {
-			res.add(new SideFile(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(stream), true));
+			res.add(new AuxiliaryContent(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(stream), true));
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return res;
 	}
 
-	private static SideFile wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir, boolean withDate) {
+	private static AuxiliaryContent wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir, boolean withDate) {
 		final String wrapperName = unitName + WRAPPER_APPENDIX;
 		final String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
 		final Map<String, String> options = new HashMap<String, String>();
@@ -170,14 +170,14 @@ public class BusGenSideFiles {
 		options.put("{GENERICS}", generics.toString());
 		options.put("{GENERICSMAP}", genericsMap.toString());
 		try {
-			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options), true);
+			return new AuxiliaryContent(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_wrapper.vhd", options), true);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static SideFile paoFile(String ipcoreName, String dirName, String type, String rootDir, boolean withDate) {
+	private static AuxiliaryContent paoFile(String ipcoreName, String dirName, String type, String rootDir, boolean withDate) {
 		final String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
 		final Map<String, String> options = new HashMap<String, String>();
 		options.put("{NAME}", ipcoreName);
@@ -188,14 +188,14 @@ public class BusGenSideFiles {
 			options.put("{DATE}", new Date().toString());
 		}
 		try {
-			return new SideFile(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options), true);
+			return new AuxiliaryContent(rootDir + relPath, Helper.processFile(BusGenSideFiles.class, type + "_v2_1_0.pao", options), true);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static SideFile mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type, String rootDir, int memCount, boolean withDate) {
+	private static AuxiliaryContent mpdFile(HDLUnit unit, String ipcoreName, String dirName, String bus_type, String rootDir, int memCount, boolean withDate) {
 		final HDLInterface asInterface = unit.asInterface();
 		final StringBuilder generics = new StringBuilder();
 		final StringBuilder ports = new StringBuilder();
@@ -269,7 +269,7 @@ public class BusGenSideFiles {
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
-			return new SideFile(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options), true);
+			return new AuxiliaryContent(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options), true);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

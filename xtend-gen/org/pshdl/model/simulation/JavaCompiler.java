@@ -56,7 +56,7 @@ import org.pshdl.model.simulation.HDLSimulator;
 import org.pshdl.model.simulation.ICodeGen;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.utils.PSAbstractCompiler;
-import org.pshdl.model.utils.services.IHDLGenerator;
+import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.validation.Problem;
 
@@ -80,7 +80,7 @@ public class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
     final JavaCompiler comp = new JavaCompiler(em, debug);
     CharSequence _compile = comp.compile(pkg, unitName);
     final String code = _compile.toString();
-    List<IHDLGenerator.SideFile> _emptyList = Collections.<IHDLGenerator.SideFile>emptyList();
+    List<AuxiliaryContent> _emptyList = Collections.<AuxiliaryContent>emptyList();
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, _emptyList, em.source, _hookName, true);
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
