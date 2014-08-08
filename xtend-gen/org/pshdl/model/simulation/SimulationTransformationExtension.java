@@ -129,7 +129,7 @@ public class SimulationTransformationExtension {
       String _replaceAll = _lastSegment.replaceAll("@", "");
       newProcess = _replaceAll;
     }
-    final FluidFrame frame = new FluidFrame(null, false, newProcess);
+    final FluidFrame frame = new FluidFrame(obj, null, false, newProcess);
     ArrayList<HDLStatement> _statements = obj.getStatements();
     for (final HDLStatement stmnt : _statements) {
       FluidFrame _simulationModel = this.toSimulationModel(stmnt, context, frame.simProcess);
@@ -148,15 +148,15 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLInterfaceDeclaration obj, final HDLEvaluationContext context, final String process) {
-    return new FluidFrame(null);
+    return new FluidFrame(obj, null);
   }
   
   protected FluidFrame _toSimulationModel(final HDLEnumDeclaration obj, final HDLEvaluationContext context, final String process) {
-    return new FluidFrame(null);
+    return new FluidFrame(obj, null);
   }
   
   protected FluidFrame _toSimulationModelInit(final HDLExpression obj, final HDLEvaluationContext context, final String varName, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     FluidFrame _simulationModel = this.toSimulationModel(obj, context, process);
     res.append(_simulationModel);
     FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.writeInternal, varName);
@@ -165,7 +165,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModelInit(final HDLArrayInit obj, final HDLEvaluationContext context, final String varName, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     int pos = 0;
     ArrayList<HDLExpression> _exp = obj.getExp();
     for (final HDLExpression exp : _exp) {
@@ -210,7 +210,7 @@ public class SimulationTransformationExtension {
     if (_and) {
       newProcess = "ONCE";
     }
-    final FluidFrame res = new FluidFrame("#null", false, newProcess);
+    final FluidFrame res = new FluidFrame(obj, "#null", false, newProcess);
     VariableInformation _variableInformation = new VariableInformation(VariableInformation.Direction.INTERNAL, "#null", 1, VariableInformation.Type.BIT, false, false, false, null);
     res.addVar(_variableInformation);
     VariableInformation.Direction dir = null;
@@ -414,7 +414,7 @@ public class SimulationTransformationExtension {
       {
         HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(c);
         final String cName = _fullNameOf_1.toString();
-        final FluidFrame caseFrame = new FluidFrame((InternalInformation.PRED_PREFIX + cName), false, process);
+        final FluidFrame caseFrame = new FluidFrame(obj, (InternalInformation.PRED_PREFIX + cName), false, process);
         boolean _tripleNotEquals = (predicate != null);
         if (_tripleNotEquals) {
           caseFrame.add(predicate);
@@ -530,12 +530,12 @@ public class SimulationTransformationExtension {
       HDLReference _left = obj.getLeft();
       String _varName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true);
       String _plus = (_varName + InternalInformation.REG_POSTFIX);
-      FluidFrame _fluidFrame = new FluidFrame(_plus, constant, process);
+      FluidFrame _fluidFrame = new FluidFrame(obj, _plus, constant, process);
       res = _fluidFrame;
     } else {
       HDLReference _left_1 = obj.getLeft();
       String _varName_1 = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left_1), true);
-      FluidFrame _fluidFrame_1 = new FluidFrame(_varName_1, constant, process);
+      FluidFrame _fluidFrame_1 = new FluidFrame(obj, _varName_1, constant, process);
       res = _fluidFrame_1;
     }
     boolean _tripleNotEquals_2 = (config != null);
@@ -644,7 +644,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLConcat obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     ArrayList<HDLExpression> _cats = obj.getCats();
     final Iterator<HDLExpression> iter = _cats.iterator();
     final HDLExpression init = iter.next();
@@ -676,7 +676,7 @@ public class SimulationTransformationExtension {
   }
   
   public FluidFrame toSimulationModelUnit(final HDLUnit obj, final HDLEvaluationContext context) {
-    final FluidFrame res = new FluidFrame(null);
+    final FluidFrame res = new FluidFrame(obj, null);
     ArrayList<HDLStatement> _inits = obj.getInits();
     for (final HDLStatement stmnt : _inits) {
       FluidFrame _simulationModel = this.toSimulationModel(stmnt, context, null);
@@ -701,7 +701,7 @@ public class SimulationTransformationExtension {
         if (_not) {
           lst.add(rstVar);
           final String rstVarName = rstVar.toString();
-          final FluidFrame rstFrame = new FluidFrame((InternalInformation.PRED_PREFIX + rstVarName), false, null);
+          final FluidFrame rstFrame = new FluidFrame(obj, (InternalInformation.PRED_PREFIX + rstVarName), false, null);
           FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.loadInternal, rstVarName);
           rstFrame.add(_argumentedInstruction);
           rstFrame.add(Instruction.const0);
@@ -906,7 +906,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLEnumRef obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     Optional<HDLEnum> _resolveHEnum = obj.resolveHEnum();
     final HDLEnum hEnum = _resolveHEnum.get();
     Optional<HDLVariable> _resolveVar = obj.resolveVar();
@@ -921,7 +921,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLVariableRef obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     Optional<HDLVariable> hVar = obj.resolveVar();
     final String refName = SimulationTransformationExtension.getVarName(obj, false);
     boolean fixedArray = true;
@@ -1026,7 +1026,7 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLLiteral obj, final HDLEvaluationContext context, final String process) {
     final BigInteger value = obj.getValueAsBigInt();
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     boolean _equals = BigInteger.ZERO.equals(value);
     if (_equals) {
       res.add(Instruction.const0);
@@ -1050,7 +1050,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLEqualityOp obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     HDLExpression _left = obj.getLeft();
     FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
     res.append(_simulationModel);
@@ -1086,7 +1086,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLBitOp obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     HDLExpression _left = obj.getLeft();
     FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
     res.append(_simulationModel);
@@ -1128,7 +1128,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLArithOp obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     HDLExpression _left = obj.getLeft();
     FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
     res.append(_simulationModel);
@@ -1177,7 +1177,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLShiftOp obj, final HDLEvaluationContext context, final String process) {
-    final FluidFrame res = new FluidFrame(process);
+    final FluidFrame res = new FluidFrame(obj, process);
     HDLExpression _left = obj.getLeft();
     FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
     res.append(_simulationModel);

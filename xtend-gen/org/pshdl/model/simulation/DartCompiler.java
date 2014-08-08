@@ -51,8 +51,8 @@ import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.utils.PSAbstractCompiler;
-import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.utils.services.AuxiliaryContent;
+import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
@@ -74,9 +74,9 @@ public class DartCompiler implements ITypeOuptutProvider {
     this.epsWidth = _plus;
   }
   
-  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final String unitName, final Set<Problem> syntaxProblems) {
+  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final String unitName, final String library, final boolean usePackageImport, final Set<Problem> syntaxProblems) {
     final DartCompiler comp = new DartCompiler(em);
-    CharSequence _compile = comp.compile(unitName);
+    CharSequence _compile = comp.compile(unitName, library, usePackageImport);
     String _string = _compile.toString();
     List<AuxiliaryContent> _emptyList = Collections.<AuxiliaryContent>emptyList();
     String _hookName = comp.getHookName();
@@ -84,7 +84,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
   
-  public CharSequence compile(final String unitName) {
+  public CharSequence compile(final String unitName, final String library, final boolean usePackageImport) {
     CharSequence _xblockexpression = null;
     {
       final Set<Integer> handled = new HashSet<Integer>();
@@ -94,26 +94,25 @@ public class DartCompiler implements ITypeOuptutProvider {
       handledPosEdge.add(Integer.valueOf((-1)));
       handledNegEdge.add(Integer.valueOf((-1)));
       StringConcatenation _builder = new StringConcatenation();
-      CharSequence _imports = this.getImports();
+      {
+        boolean _tripleNotEquals = (library != null);
+        if (_tripleNotEquals) {
+          _builder.append("library ");
+          _builder.append(library, "");
+          _builder.append(";");
+        }
+      }
+      _builder.newLineIfNotEmpty();
+      CharSequence _imports = this.getImports(usePackageImport);
       _builder.append(_imports, "");
       _builder.newLineIfNotEmpty();
       _builder.append("void main(List<String> args, SendPort replyTo){");
       _builder.newLine();
-      {
-        if (this.cce.hasClock) {
-          _builder.append("  ");
-          _builder.append("handleReceive((e,l) => new ");
-          _builder.append(unitName, "  ");
-          _builder.append("(e,l), replyTo);");
-          _builder.newLineIfNotEmpty();
-        } else {
-          _builder.append("  ");
-          _builder.append("handleReceive((e,l) => new ");
-          _builder.append(unitName, "  ");
-          _builder.append("(), replyTo);");
-          _builder.newLineIfNotEmpty();
-        }
-      }
+      _builder.append("  \t");
+      _builder.append("handleReceive((e,l) => new ");
+      _builder.append(unitName, "  \t");
+      _builder.append("(e,l), replyTo);");
+      _builder.newLineIfNotEmpty();
       _builder.append("}");
       _builder.newLine();
       {
@@ -196,7 +195,7 @@ public class DartCompiler implements ITypeOuptutProvider {
       }
       _builder.append("class ");
       _builder.append(unitName, "");
-      _builder.append(" implements DartInterpreter{");
+      _builder.append(" extends DartInterpreter{");
       _builder.newLineIfNotEmpty();
       {
         if (this.cce.hasClock) {
@@ -264,18 +263,19 @@ public class DartCompiler implements ITypeOuptutProvider {
       _builder.append("\t");
       _builder.append("List<String> get names=>_varIdx.keys.toList();");
       _builder.newLine();
-      _builder.append("\t");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append(unitName, "\t");
-      _builder.append("(");
       {
         if (this.cce.hasClock) {
-          _builder.append("this._disableEdges, this._disabledRegOutputlogic");
+          _builder.append("\t");
+          _builder.append(unitName, "\t");
+          _builder.append("(this._disableEdges, this._disabledRegOutputlogic);");
+          _builder.newLineIfNotEmpty();
+        } else {
+          _builder.append("\t");
+          _builder.append(unitName, "\t");
+          _builder.append("(bool disableEdges, bool disabledRegOutputlogic) {}");
+          _builder.newLineIfNotEmpty();
         }
       }
-      _builder.append(");");
-      _builder.newLineIfNotEmpty();
       _builder.append("\t");
       _builder.newLine();
       {
@@ -978,7 +978,7 @@ public class DartCompiler implements ITypeOuptutProvider {
   public CharSequence hdlInterpreter() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.newLine();
-    _builder.append("void setVar(int idx, dynamic value) {");
+    _builder.append("void setVar(int idx, dynamic value, {int offset}) {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("switch (idx) {");
@@ -1077,7 +1077,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("dynamic getVar(int idx) {");
+    _builder.append("dynamic getVar(int idx, {int offset}) {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("switch (idx) {");
@@ -1094,6 +1094,12 @@ public class DartCompiler implements ITypeOuptutProvider {
             _builder.append(": return ");
             String _idName_1 = this.cce.idName(v_2, false, false);
             _builder.append(_idName_1, "\t\t");
+            {
+              boolean _isArray = this.cce.isArray(v_2);
+              if (_isArray) {
+                _builder.append("[offset]");
+              }
+            }
             _builder.append("?1:0;");
             _builder.newLineIfNotEmpty();
           } else {
@@ -1113,6 +1119,12 @@ public class DartCompiler implements ITypeOuptutProvider {
               _builder.append(": return ");
               String _idName_2 = this.cce.idName(v_2, false, false);
               _builder.append(_idName_2, "\t\t");
+              {
+                boolean _isArray_1 = this.cce.isArray(v_2);
+                if (_isArray_1) {
+                  _builder.append("[offset]");
+                }
+              }
               _builder.append(";");
               _builder.newLineIfNotEmpty();
             }
@@ -2512,7 +2524,7 @@ public class DartCompiler implements ITypeOuptutProvider {
     return _builder;
   }
   
-  public CharSequence getImports() {
+  public CharSequence getImports(final boolean usePackageImport) {
     StringConcatenation _builder = new StringConcatenation();
     {
       if (this.cce.hasClock) {
@@ -2524,8 +2536,15 @@ public class DartCompiler implements ITypeOuptutProvider {
     _builder.newLine();
     _builder.append("import \'dart:isolate\';");
     _builder.newLine();
-    _builder.append("import \'../simulation_comm.dart\';");
-    _builder.newLine();
+    {
+      if (usePackageImport) {
+        _builder.append("import \'package:pshdl_api/simulation_comm.dart\';");
+        _builder.newLine();
+      } else {
+        _builder.append("import \'../simulation_comm.dart\';");
+        _builder.newLine();
+      }
+    }
     return _builder;
   }
   
@@ -2535,6 +2554,8 @@ public class DartCompiler implements ITypeOuptutProvider {
   
   public IOutputProvider.MultiOption getUsage() {
     final Options options = new Options();
+    options.addOption("lib", "library", true, "Define the library for the Dart Code");
+    options.addOption("pi", "packageImport", false, "If defined, will use the pshdl_api package");
     return new IOutputProvider.MultiOption(null, null, options);
   }
   
@@ -2547,7 +2568,10 @@ public class DartCompiler implements ITypeOuptutProvider {
       int _length = moduleName.length();
       int _minus = (_length - 1);
       final String unitName = moduleName.substring(_plus, _minus);
-      _xblockexpression = DartCompiler.doCompile(em, unitName, syntaxProblems);
+      final String lib = cli.getOptionValue("lib");
+      final boolean pi = cli.hasOption("pi");
+      Boolean _valueOf = Boolean.valueOf(pi);
+      _xblockexpression = DartCompiler.doCompile(em, unitName, lib, (_valueOf).booleanValue(), syntaxProblems);
     }
     return _xblockexpression;
   }

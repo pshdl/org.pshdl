@@ -358,7 +358,7 @@ class RangeExtension {
 			case MOD: {
 				val rle = rrVal.lowerEndpoint
 				val leftBound = rle.min(0bi)
-				val rue = rrVal.upperEndpoint
+				val rue = rrVal.upperEndpoint.subtract(BigInteger.ONE)
 				val rightBound = rue.max(0bi)
 				return Optional.of(RangeTool.createRange(leftBound, rightBound))
 			}

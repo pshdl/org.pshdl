@@ -49,14 +49,6 @@ import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
-@Data
-class JavaCompilerSpecification {
-	ExecutableModel model
-	String pkg
-	String unitName
-	boolean debug
-	boolean createCoverage
-}
 
 class JavaCompiler implements ITypeOuptutProvider, ICodeGen {
 	private boolean debug

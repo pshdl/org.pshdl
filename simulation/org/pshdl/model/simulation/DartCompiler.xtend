@@ -63,15 +63,15 @@ class DartCompiler implements ITypeOuptutProvider {
 		epsWidth = Integer.highestOneBit(prevMap.size) + 1
 	}
 
-	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName,
+	def static List<PSAbstractCompiler.CompileResult> doCompile(ExecutableModel em, String unitName, String library, boolean usePackageImport,
 		Set<Problem> syntaxProblems) {
 		val comp = new DartCompiler(em)
 		return Lists.newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName).toString, em.moduleName,
+			new PSAbstractCompiler.CompileResult(syntaxProblems, comp.compile(unitName, library, usePackageImport).toString, em.moduleName,
 				Collections.emptyList, em.source, comp.hookName, true));
 	}
 
-	def compile(String unitName) {
+	def compile(String unitName, String library, boolean usePackageImport) {
 		val Set<Integer> handled = new HashSet
 		val Set<Integer> handledPosEdge = new HashSet
 		val Set<Integer> handledNegEdge = new HashSet
@@ -79,13 +79,10 @@ class DartCompiler implements ITypeOuptutProvider {
 		handledPosEdge.add(-1)
 		handledNegEdge.add(-1)
 		'''
-			«imports»
+			«IF library!==null»library «library»;«ENDIF»
+			«getImports(usePackageImport)»
 			void main(List<String> args, SendPort replyTo){
-			  «IF hasClock»
 			  	handleReceive((e,l) => new «unitName»(e,l), replyTo);
-			  «ELSE»
-			  	handleReceive((e,l) => new «unitName»(), replyTo);
-			  «ENDIF»
 			}
 			«IF hasClock»
 				class RegUpdate {
@@ -116,7 +113,7 @@ class DartCompiler implements ITypeOuptutProvider {
 				}
 				
 			«ENDIF»
-			class «unitName» implements DartInterpreter{
+			class «unitName» extends DartInterpreter{
 				«IF hasClock»
 					Set<RegUpdate> _regUpdates=new HashSet<RegUpdate>();
 					final bool _disableEdges;
@@ -135,8 +132,11 @@ class DartCompiler implements ITypeOuptutProvider {
 				};
 				
 				List<String> get names=>_varIdx.keys.toList();
-				
-				«unitName»(«IF hasClock»this._disableEdges, this._disabledRegOutputlogic«ENDIF»);
+				«IF hasClock»
+				«unitName»(this._disableEdges, this._disabledRegOutputlogic);
+				«ELSE»
+				«unitName»(bool disableEdges, bool disabledRegOutputlogic) {}
+				«ENDIF»
 				
 				«FOR v : em.variables.excludeNull»
 					set «v.idName(false, false)»(«v.dartType(true)» value) =>
@@ -333,7 +333,7 @@ class DartCompiler implements ITypeOuptutProvider {
 
 	def hdlInterpreter() '''
 		
-		void setVar(int idx, dynamic value) {
+		void setVar(int idx, dynamic value, {int offset}) {
 			switch (idx) {
 				«FOR v : em.variables»
 					«IF !v.^null»
@@ -364,15 +364,15 @@ class DartCompiler implements ITypeOuptutProvider {
 			}
 		}
 		
-		dynamic getVar(int idx) {
+		dynamic getVar(int idx, {int offset}) {
 			switch (idx) {
 				«FOR v : em.variables»
 					«IF v.predicate»
-						case «varIdx.get(v.name)»: return «v.idName(false, false)»?1:0;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»«IF v.array»[offset]«ENDIF»?1:0;
 					«ELSEIF v.isNull»
 						case «varIdx.get(v.name)»: return 0;
 					«ELSE»
-						case «varIdx.get(v.name)»: return «v.idName(false, false)»;
+						case «varIdx.get(v.name)»: return «v.idName(false, false)»«IF v.array»[offset]«ENDIF»;
 					«ENDIF»
 				«ENDFOR»
 				default:
@@ -762,13 +762,17 @@ class DartCompiler implements ITypeOuptutProvider {
 		'''«IF info.predicate»false«ELSEIF info.array»new «info.dartType(true)»(«info.totalSize»)«ELSE»0«ENDIF»;'''
 	}
 
-	def getImports() '''
+	def getImports(boolean usePackageImport) '''
 «IF hasClock»	
 import 'dart:collection';
 «ENDIF»
 import 'dart:typed_data';
 import 'dart:isolate';
+«IF usePackageImport»
+import 'package:pshdl_api/simulation_comm.dart';
+«ELSE»
 import '../simulation_comm.dart';
+«ENDIF»
 	'''
 
 	override getHookName() {
@@ -777,13 +781,17 @@ import '../simulation_comm.dart';
 
 	override getUsage() {
 		val options = new Options;
+		options.addOption("lib", "library", true, "Define the library for the Dart Code")
+		options.addOption("pi", "packageImport", false, "If defined, will use the pshdl_api package")
 		return new MultiOption(null, null, options)
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
 		val moduleName = em.moduleName
 		val unitName = moduleName.substring(moduleName.lastIndexOf('.') + 1, moduleName.length - 1);
-		doCompile(em, unitName, syntaxProblems)
+		val lib=cli.getOptionValue("lib");
+		val pi=cli.hasOption("pi")
+		doCompile(em, unitName, lib, Boolean.valueOf(pi), syntaxProblems)
 	}
 
 }

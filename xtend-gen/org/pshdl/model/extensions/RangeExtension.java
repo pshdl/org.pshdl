@@ -709,7 +709,8 @@ public class RangeExtension {
         case MOD:
           final BigInteger rle = rrVal.lowerEndpoint();
           final BigInteger leftBound = rle.min(BigInteger.ZERO);
-          final BigInteger rue = rrVal.upperEndpoint();
+          BigInteger _upperEndpoint_16 = rrVal.upperEndpoint();
+          final BigInteger rue = _upperEndpoint_16.subtract(BigInteger.ONE);
           final BigInteger rightBound = rue.max(BigInteger.ZERO);
           Range<BigInteger> _createRange_4 = RangeTool.<BigInteger>createRange(leftBound, rightBound);
           return Optional.<Range<BigInteger>>of(_createRange_4);
@@ -719,17 +720,17 @@ public class RangeExtension {
           int _intValue = _lowerEndpoint_16.intValue();
           final BigInteger ff_2 = _lowerEndpoint_15.pow(_intValue);
           BigInteger _lowerEndpoint_17 = lrVal.lowerEndpoint();
-          BigInteger _upperEndpoint_16 = rrVal.upperEndpoint();
-          int _intValue_1 = _upperEndpoint_16.intValue();
+          BigInteger _upperEndpoint_17 = rrVal.upperEndpoint();
+          int _intValue_1 = _upperEndpoint_17.intValue();
           final BigInteger ft_2 = _lowerEndpoint_17.pow(_intValue_1);
-          BigInteger _upperEndpoint_17 = lrVal.upperEndpoint();
+          BigInteger _upperEndpoint_18 = lrVal.upperEndpoint();
           BigInteger _lowerEndpoint_18 = rrVal.lowerEndpoint();
           int _intValue_2 = _lowerEndpoint_18.intValue();
-          final BigInteger tf_2 = _upperEndpoint_17.pow(_intValue_2);
-          BigInteger _upperEndpoint_18 = lrVal.upperEndpoint();
-          BigInteger _upperEndpoint_19 = rrVal.upperEndpoint();
-          int _intValue_3 = _upperEndpoint_19.intValue();
-          final BigInteger tt_2 = _upperEndpoint_18.pow(_intValue_3);
+          final BigInteger tf_2 = _upperEndpoint_18.pow(_intValue_2);
+          BigInteger _upperEndpoint_19 = lrVal.upperEndpoint();
+          BigInteger _upperEndpoint_20 = rrVal.upperEndpoint();
+          int _intValue_3 = _upperEndpoint_20.intValue();
+          final BigInteger tt_2 = _upperEndpoint_19.pow(_intValue_3);
           BigInteger _min_6 = ff_2.min(ft_2);
           BigInteger _min_7 = _min_6.min(tf_2);
           BigInteger _min_8 = _min_7.min(tt_2);

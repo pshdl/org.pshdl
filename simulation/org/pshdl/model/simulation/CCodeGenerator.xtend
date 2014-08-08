@@ -31,7 +31,10 @@ import com.google.common.collect.Lists
 import java.math.BigInteger
 import java.util.EnumSet
 import java.util.HashSet
+import java.util.List
 import java.util.Set
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
@@ -45,46 +48,51 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Row
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST
 import org.pshdl.model.utils.services.AuxiliaryContent
-import org.pshdl.model.simulation.CommonCodeGenerator.ProcessData
+import org.pshdl.model.validation.Problem
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
+import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
 
-class CCodeGenerator extends CommonCodeGenerator {
-	
+class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
+
 	CommonCompilerExtension cce
-	
+
+	new() {
+	}
 	new(ExecutableModel em, int maxCosts) {
 		super(em, 64, maxCosts)
-		cce=new CommonCompilerExtension(em, 64)
+		this.cce = new CommonCompilerExtension(em, 64)
 	}
-	
+
 	override protected applyRegUpdates() '''updateRegs();'''
-	
-	override protected assignArrayInit(VariableInformation hvar, BigInteger initValue, EnumSet<CommonCodeGenerator.Attributes> attributes) 
-	'''«fieldName(hvar, attributes)»[«hvar.arraySize»];'''
-	
-	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+
+	override protected assignArrayInit(VariableInformation hvar, BigInteger initValue,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) '''«fieldName(hvar, attributes)»[«hvar.arraySize»];'''
+
+	override protected arrayInit(VariableInformation varInfo, BigInteger zero,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override protected callStage(int stage, boolean constant) '''«stageMethodName(stage, constant)»();
 		'''
-	
+
 	override protected checkRegupdates() '''regUpdatePos!=0'''
-	
+
 	override protected clearRegUpdates() '''regUpdatePos=0;'''
-	
+
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (isBoolean(varInfo, attributes))
 			return "bool "
 		return "uint64_t "
 	}
-	
-	override protected justDeclare(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) 
-	'''«fieldName(varInfo, attributes)»«IF varInfo.array»[«varInfo.arraySize»]«ENDIF»;'''
-	
+
+	override protected justDeclare(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) '''«fieldName(
+		varInfo, attributes)»«IF varInfo.array»[«varInfo.arraySize»]«ENDIF»;'''
+
 	override protected footer() '''
-	«helperMethods»
+		«helperMethods»
 	'''
-	
+
 	override protected postFieldDeclarations() '''«IF hasClock»
 	static bool skipEdge(uint64_t local) {
 		uint64_t dc = local >> 16l;
@@ -101,16 +109,15 @@ class CCodeGenerator extends CommonCodeGenerator {
 	«copyRegs»
 	«ENDIF»
 '''
-	
+
 	override protected functionFooter(Frame frame) '''}
 		'''
-	
+
 	override protected functionHeader(Frame frame) '''
 		static void «frame.frameName»() {
 	'''
-	
-	override protected header() 
-'''
+
+	override protected header() '''
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -131,7 +138,7 @@ class CCodeGenerator extends CommonCodeGenerator {
 
 '''
 
-def protected copyRegs() '''
+	def protected copyRegs() '''
 		static void updateRegs() {
 			int i;
 			for (i=0;i<regUpdatePos; i++) {
@@ -155,56 +162,61 @@ def protected copyRegs() '''
 			}
 		}
 	'''
-	
+
 	override protected writeToNull(String last) '''(void)«last»; //Write to #null
-	'''
-	
+		'''
+
 	override protected runMethodsFooter(boolean constant) '''}
-	'''
-	
+		'''
+
 	override protected runMethodsHeader(boolean constant) '''void «IF !constant»pshdl_sim_run«ELSE»pshdl_sim_initConstants«ENDIF»() {
 		'''
-	
-	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean force, CharSequence fillValue)'''
-	«IF !force»if («cpyName»!=«last»)
-	«indent()»	«ENDIF»{
-	«indent()»		static regUpdate_t reg;
-	«indent()»		reg.internal=«outputInternal.varIdx»;
-	«indent()»		reg.offset=«offset»;
-	«indent()»		reg.fillValue=«fillValue»;
-	«indent()»		regUpdates[regUpdatePos++]=reg;
-	«indent()»	}
+
+	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName,
+		CharSequence offset, boolean force, CharSequence fillValue) '''
+		«IF !force»if («cpyName»!=«last»)
+		«indent()»	«ENDIF»{
+		«indent()»		static regUpdate_t reg;
+		«indent()»		reg.internal=«outputInternal.varIdx»;
+		«indent()»		reg.offset=«offset»;
+		«indent()»		reg.fillValue=«fillValue»;
+		«indent()»		regUpdates[regUpdatePos++]=reg;
+		«indent()»	}
 	'''
-	
+
 	override protected stageMethodsFooter(int stage, int totalStageCosts, boolean constant) '''}
-	'''
-	
+		'''
+
 	override protected stageMethodsHeader(int stage, int totalStageCosts, boolean constant) '''static void «stageMethodName(
 		stage, constant)»(){
 		'''
-	
+
 	override protected getCast(int targetSizeWithType) {
 		if (isSignedType(targetSizeWithType))
 			return "(int64_t)"
 		return ""
 	}
-	
-	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		if (fi.inst===Instruction.sra){
-			return assignTempVar(targetSizeWithType, pos, attributes, '''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''')
+
+	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		if (fi.inst === Instruction.sra) {
+			return assignTempVar(targetSizeWithType, pos, attributes,
+				'''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''')
 		}
-		if (fi.inst===Instruction.srl){
-			return assignTempVar(targetSizeWithType, pos, attributes, '''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''')
+		if (fi.inst === Instruction.srl) {
+			return assignTempVar(targetSizeWithType, pos, attributes,
+				'''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''')
 		}
 		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes)
 	}
-	
-	override protected copyArray(VariableInformation varInfo) '''memcpy(«varInfo.idName(true, EnumSet.of(CommonCodeGenerator.Attributes.isPrev))», «varInfo.idName(true, NONE)», «varInfo.arraySize»);
-	'''
-	
+
+	override protected copyArray(VariableInformation varInfo) '''memcpy(«varInfo.idName(true,
+		EnumSet.of(CommonCodeGenerator.Attributes.isPrev))», «varInfo.idName(true, NONE)», «varInfo.arraySize»);
+		'''
+
 	override protected preField(VariableInformation x, EnumSet<CommonCodeGenerator.Attributes> attributes) '''«IF !attributes.
 		contains(CommonCodeGenerator.Attributes.isPublic)»static«ENDIF» '''
-		
+
 	def protected helperMethods() '''
 		void pshdl_sim_setInput(int idx, uint64_t value) {
 			pshdl_sim_setInputArray(idx, value, ((void *)0));
@@ -215,10 +227,18 @@ def protected copyRegs() '''
 					«IF v.dimensions.length == 0»
 						case «varIdx.get(v.name)»: 
 							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', NONE, true, false)»
+							«IF v.isRegister»
+								«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''',
+			EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg), true, false)»
+							«ENDIF»
 							break;
 					«ELSE»
 						case «varIdx.get(v.name)»: 
 							«idName(v, true, NONE)»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
+							«IF v.isRegister»
+								«idName(v, true, EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg))»[«v.calculateVariableAccessIndexArr»]=«IF v.
+			predicate»value!=0«ELSE»value«ENDIF»;
+							«ENDIF»
 							break;
 					«ENDIF»
 				«ENDFOR»
@@ -249,13 +269,13 @@ def protected copyRegs() '''
 		
 		void pshdl_sim_setDisableEdges(bool enable){
 			«IF hasClock»
-			«DISABLE_EDGES.name»=enable;
+				«DISABLE_EDGES.name»=enable;
 			«ENDIF»
 		}
 		
 		void pshdl_sim_setDisableRegOutputlogic(bool enable){
 			«IF hasClock»
-			«DISABLE_REG_OUTPUTLOGIC.name»=enable;
+				«DISABLE_REG_OUTPUTLOGIC.name»=enable;
 			«ENDIF»
 		}
 		
@@ -277,60 +297,60 @@ def protected copyRegs() '''
 			return 0;
 		}	
 	'''
-	
-	override protected barrier() 
+
+	override protected barrier() '''
+		}
+		#pragma omp section
+		{
 	'''
-	}
-	#pragma omp section
-	{
-	'''
-	
+
 	override protected barrierBegin(int stage, int totalStageCosts, boolean createConstant) {
-		indent+=2
+		indent += 2
 		'''
-		#pragma omp parallel sections
-		«indent()»{
-		«indent()»#pragma omp section
-		«indent()»{
-   		'''
-   }
+			#pragma omp parallel sections
+			«indent()»{
+			«indent()»#pragma omp section
+			«indent()»{
+				'''
+	}
 
 	override protected barrierEnd(int stage, int totalStageCosts, boolean createConstant) {
-		indent-=2
+		indent -= 2
 		'''
-			}
-		«indent()»}
+				}
+			«indent()»}
 		'''
 	}
-	
+
 	override getAuxiliaryContent() {
-		val generic_h=new AuxiliaryContent("pshdl_generic_sim.h", typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h"), true)
-		val specific_h=new AuxiliaryContent(headerName()+".h", specificHeader.toString)
-		val res=Lists.newArrayList(generic_h, specific_h)
-		val simEncapsulation=generateSimEncapsuation
-		if (simEncapsulation!==null)
+		val generic_h = new AuxiliaryContent("pshdl_generic_sim.h",
+			typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h"), true)
+		val specific_h = new AuxiliaryContent(headerName() + ".h", specificHeader.toString)
+		val res = Lists.newArrayList(generic_h, specific_h)
+		val simEncapsulation = generateSimEncapsuation
+		if (simEncapsulation !== null)
 			res.add(new AuxiliaryContent("simEncapsulation.c", simEncapsulation))
 		return res
 	}
-	
+
 	def protected headerName() {
-		"pshdl_"+em.moduleName.idName(false, NONE)+"_sim"
+		"pshdl_" + em.moduleName.idName(false, NONE) + "_sim"
 	}
-	
-	def protected getSpecificHeader() 
+
+	def protected getSpecificHeader() '''
+		#ifndef _«headerName»_h_
+		#define _«headerName»_h_
+		#include "pshdl_generic_sim.h"
+		
+		«FOR VariableInformation vi : em.variables.excludeNull»
+			#define «vi.defineName» «vi.varIdx»
+		«ENDFOR»
+		
+		«fieldDeclarations(false, false).toString.split("\n").map["extern" + it].join("\n")»
+		
+		#endif
 	'''
-	#ifndef _«headerName»_h_
-	#define _«headerName»_h_
-	#include "pshdl_generic_sim.h"
-	
-	«FOR VariableInformation vi: em.variables.excludeNull»
-	#define «vi.defineName» «vi.varIdx»
-	«ENDFOR»
-	
-	«fieldDeclarations(false, false).toString.split("\n").map["extern"+it].join("\n")»
-	
-	#endif
-	'''
+
 	def String generateSimEncapsuation() {
 		val Unit unit = getUnit(em)
 		if (unit === null)
@@ -391,15 +411,17 @@ void setWarn(warnFunc_p warnFunction){
 		}
 		return res
 	}
-	
+
 	def protected int getBusIndex() {
-		val pclk=varIdx.get(em.moduleName+".PCLK")
-		if (pclk===null)
-			return varIdx.get(em.moduleName+".Bus2IP_Clk")
+		val pclk = varIdx.get(em.moduleName + ".PCLK")
+		if (pclk === null)
+			return varIdx.get(em.moduleName + ".Bus2IP_Clk")
 	}
 
 	def protected getDefineName(VariableInformation vi) '''PSHDL_SIM_«vi.idName(true, NONE).toString.toUpperCase»'''
-	def protected getDefineNameString(String s) '''PSHDL_SIM_«(em.moduleName+"."+s).idName(true, NONE).toString.toUpperCase»'''
+
+	def protected getDefineNameString(String s) '''PSHDL_SIM_«(em.moduleName + "." + s).idName(true, NONE).toString.
+		toUpperCase»'''
 
 	def protected simGetter(Row row) '''
 //Getter
@@ -442,28 +464,50 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 }
 '''
 
-override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) {
-	throw new UnsupportedOperationException("TODO: auto-generated method stub")
-}
+	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 
-override protected callMethod(String methodName, String... args) {
-	throw new UnsupportedOperationException("TODO: auto-generated method stub")
-}
+	override protected callMethod(String methodName, String... args) {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 
-override protected callRunMethod() {
-	throw new UnsupportedOperationException("TODO: auto-generated method stub")
-}
+	override protected callRunMethod() {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 
-override protected checkTestbenchListener() {
-	throw new UnsupportedOperationException("TODO: auto-generated method stub")
-}
+	override protected checkTestbenchListener() {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 
-override protected runProcessHeader(ProcessData pd) {
-	throw new UnsupportedOperationException("TODO: auto-generated method stub")
-}
+	override protected runProcessHeader(CommonCodeGenerator.ProcessData pd) {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 
-override protected runTestbenchHeader() {
-	throw new UnsupportedOperationException("TODO: auto-generated method stub")
-}
+	override protected runTestbenchHeader() {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
+
+	override getHookName() {
+		return "C"
+	}
+
+	override getUsage() {
+		val options = new Options;
+		return new MultiOption(null, null, options)
+	}
+
+	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems) {
+		val comp = new CCodeGenerator(em, Integer.MAX_VALUE)
+		val List<AuxiliaryContent> sideFiles = Lists.newLinkedList
+		sideFiles.addAll(comp.auxiliaryContent)
+		return Lists.newArrayList(
+			new CompileResult(syntaxProblems, comp.generateMainCode.toString, em.moduleName, sideFiles, em.source,
+				comp.hookName, true));
+	}
+
+	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		doCompile(em, syntaxProblems)
+	}
 
 }

@@ -50,6 +50,7 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
 import org.pshdl.interpreter.VariableInformation.Type;
 import org.pshdl.interpreter.utils.Instruction;
+import org.pshdl.model.IHDLObject;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -131,11 +132,14 @@ public class FluidFrame {
 
 	public String[] annotations;
 
-	public FluidFrame(String simProcess) {
-		this(null, false, simProcess);
+	public final IHDLObject owner;
+
+	public FluidFrame(IHDLObject owner, String simProcess) {
+		this(owner, null, false, simProcess);
 	}
 
-	public FluidFrame(String outputName, boolean constant, String simProcess) {
+	public FluidFrame(IHDLObject owner, String outputName, boolean constant, String simProcess) {
+		this.owner = owner;
 		this.id = gid.incrementAndGet();
 		if (outputName != null) {
 			this.outputName = outputName;

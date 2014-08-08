@@ -141,22 +141,17 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 			if (!dir.mkdirs())
 				throw new IllegalArgumentException("Failed to create direcory:" + dir);
 		}
-		try {
-			final ExecutableModel em = createExecutable(unit, src, cli.hasOption("ir"));
-			if (!cli.hasOption("noEm")) {
-				IOUtil.writeExecutableModel(System.currentTimeMillis(), em, new File(dir, unitName.toString() + ".em"));
-			}
-			if (type != null) {
-				final ITypeOuptutProvider ito = providers.get(type.toLowerCase());
-				final List<CompileResult> results = ito.invoke(cli, em, null);
-				for (final CompileResult cr : results) {
-					writeFiles(dir, cr);
-				}
-			}
-		} catch (final CycleException e) {
-			e.explain(System.err);
+		final ExecutableModel em = createExecutable(unit, src, cli.hasOption("ir"));
+		if (!cli.hasOption("noEm")) {
+			IOUtil.writeExecutableModel(System.currentTimeMillis(), em, new File(dir, unitName.toString() + ".em"));
 		}
-		close();
+		if (type != null) {
+			final ITypeOuptutProvider ito = providers.get(type.toLowerCase());
+			final List<CompileResult> results = ito.invoke(cli, em, null);
+			for (final CompileResult cr : results) {
+				writeFiles(dir, cr);
+			}
+		}
 		return null;
 	}
 

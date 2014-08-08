@@ -27,6 +27,7 @@
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -35,6 +36,8 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
@@ -51,6 +54,7 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCodeGenerator;
 import org.pshdl.model.simulation.CommonCompilerExtension;
+import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.simulation.SimulationTransformationExtension;
 import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
@@ -58,12 +62,17 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
+import org.pshdl.model.utils.PSAbstractCompiler;
 import org.pshdl.model.utils.services.AuxiliaryContent;
+import org.pshdl.model.utils.services.IOutputProvider;
 import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class CCodeGenerator extends CommonCodeGenerator {
+public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
   private CommonCompilerExtension cce;
+  
+  public CCodeGenerator() {
+  }
   
   public CCodeGenerator(final ExecutableModel em, final int maxCosts) {
     super(em, 64, maxCosts);
@@ -547,6 +556,25 @@ public class CCodeGenerator extends CommonCodeGenerator {
             StringBuilder _assignVariable = this.assignVariable(v, _builder_1, CommonCodeGenerator.NONE, true, false);
             _builder.append(_assignVariable, "\t\t\t");
             _builder.newLineIfNotEmpty();
+            {
+              if (v.isRegister) {
+                _builder.append("\t\t");
+                _builder.append("\t");
+                StringConcatenation _builder_2 = new StringConcatenation();
+                {
+                  boolean _isPredicate_1 = this.isPredicate(v);
+                  if (_isPredicate_1) {
+                    _builder_2.append("value!=0");
+                  } else {
+                    _builder_2.append("value");
+                  }
+                }
+                EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
+                StringBuilder _assignVariable_1 = this.assignVariable(v, _builder_2, _of, true, false);
+                _builder.append(_assignVariable_1, "\t\t\t");
+                _builder.newLineIfNotEmpty();
+              }
+            }
             _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("break;");
@@ -567,8 +595,8 @@ public class CCodeGenerator extends CommonCodeGenerator {
             _builder.append(_calculateVariableAccessIndexArr, "\t\t\t");
             _builder.append("]=");
             {
-              boolean _isPredicate_1 = this.isPredicate(v);
-              if (_isPredicate_1) {
+              boolean _isPredicate_2 = this.isPredicate(v);
+              if (_isPredicate_2) {
                 _builder.append("value!=0");
               } else {
                 _builder.append("value");
@@ -576,6 +604,29 @@ public class CCodeGenerator extends CommonCodeGenerator {
             }
             _builder.append(";");
             _builder.newLineIfNotEmpty();
+            {
+              if (v.isRegister) {
+                _builder.append("\t\t");
+                _builder.append("\t");
+                EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
+                CharSequence _idName_1 = this.idName(v, true, _of_1);
+                _builder.append(_idName_1, "\t\t\t");
+                _builder.append("[");
+                CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v);
+                _builder.append(_calculateVariableAccessIndexArr_1, "\t\t\t");
+                _builder.append("]=");
+                {
+                  boolean _isPredicate_3 = this.isPredicate(v);
+                  if (_isPredicate_3) {
+                    _builder.append("value!=0");
+                  } else {
+                    _builder.append("value");
+                  }
+                }
+                _builder.append(";");
+                _builder.newLineIfNotEmpty();
+              }
+            }
             _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("break;");
@@ -700,11 +751,11 @@ public class CCodeGenerator extends CommonCodeGenerator {
             Integer _get_3 = this.varIdx.get(v_2.name);
             _builder.append(_get_3, "\t\t");
             _builder.append(": return ");
-            CharSequence _idName_1 = this.idName(v_2, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName_1, "\t\t");
+            CharSequence _idName_2 = this.idName(v_2, true, CommonCodeGenerator.NONE);
+            _builder.append(_idName_2, "\t\t");
             {
-              boolean _isPredicate_2 = this.isPredicate(v_2);
-              if (_isPredicate_2) {
+              boolean _isPredicate_4 = this.isPredicate(v_2);
+              if (_isPredicate_4) {
                 _builder.append("?1:0");
               } else {
                 if ((v_2.width != 64)) {
@@ -723,19 +774,19 @@ public class CCodeGenerator extends CommonCodeGenerator {
             Integer _get_4 = this.varIdx.get(v_2.name);
             _builder.append(_get_4, "\t\t");
             _builder.append(": return ");
-            CharSequence _idName_2 = this.idName(v_2, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName_2, "\t\t");
+            CharSequence _idName_3 = this.idName(v_2, true, CommonCodeGenerator.NONE);
+            _builder.append(_idName_3, "\t\t");
             _builder.append("[");
-            CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v_2);
-            _builder.append(_calculateVariableAccessIndexArr_1, "\t\t");
+            CharSequence _calculateVariableAccessIndexArr_2 = this.calculateVariableAccessIndexArr(v_2);
+            _builder.append(_calculateVariableAccessIndexArr_2, "\t\t");
             _builder.append("]");
             {
               boolean _and = false;
               if (!(v_2.width != 64)) {
                 _and = false;
               } else {
-                boolean _isPredicate_3 = this.isPredicate(v_2);
-                boolean _not = (!_isPredicate_3);
+                boolean _isPredicate_5 = this.isPredicate(v_2);
+                boolean _not = (!_isPredicate_5);
                 _and = _not;
               }
               if (_and) {
@@ -1230,5 +1281,30 @@ public class CCodeGenerator extends CommonCodeGenerator {
   
   protected CharSequence runTestbenchHeader() {
     throw new UnsupportedOperationException("TODO: auto-generated method stub");
+  }
+  
+  public String getHookName() {
+    return "C";
+  }
+  
+  public IOutputProvider.MultiOption getUsage() {
+    final Options options = new Options();
+    return new IOutputProvider.MultiOption(null, null, options);
+  }
+  
+  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final Set<Problem> syntaxProblems) {
+    final CCodeGenerator comp = new CCodeGenerator(em, Integer.MAX_VALUE);
+    final List<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newLinkedList();
+    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
+    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
+    String _generateMainCode = comp.generateMainCode();
+    String _string = _generateMainCode.toString();
+    String _hookName = comp.getHookName();
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, true);
+    return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
+  }
+  
+  public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    return CCodeGenerator.doCompile(em, syntaxProblems);
   }
 }

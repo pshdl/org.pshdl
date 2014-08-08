@@ -64,7 +64,13 @@ public abstract class CommonCodeGenerator {
 	protected final int bitWidth;
 	protected final int maxCosts;
 
-	public CommonCodeGenerator(ExecutableModel em, int bitWidth, int maxCosts) {
+	protected CommonCodeGenerator() {
+		em = null;
+		bitWidth = 64;
+		maxCosts = Integer.MAX_VALUE;
+	}
+
+	protected CommonCodeGenerator(ExecutableModel em, int bitWidth, int maxCosts) {
 		this.em = em;
 		this.bitWidth = bitWidth;
 		for (int i = 0; i < em.variables.length; i++) {

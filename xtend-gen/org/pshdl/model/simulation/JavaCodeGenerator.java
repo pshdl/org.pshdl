@@ -1,8 +1,14 @@
 package org.pshdl.model.simulation;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
@@ -12,13 +18,20 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.model.simulation.CommonCodeGenerator;
 import org.pshdl.model.simulation.HDLSimulator;
-import org.pshdl.model.simulation.ICodeGen;
+import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.utils.PSAbstractCompiler;
+import org.pshdl.model.utils.services.AuxiliaryContent;
+import org.pshdl.model.utils.services.IOutputProvider;
+import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
+public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
   private String packageName;
   
   private String unitName;
+  
+  public JavaCodeGenerator() {
+  }
   
   public JavaCodeGenerator(final ExecutableModel em, final String packageName, final String unitName, final int maxCosts) {
     super(em, 64, maxCosts);
@@ -128,6 +141,25 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             StringBuilder _assignVariable = this.assignVariable(v, _builder_1, CommonCodeGenerator.NONE, true, false);
             _builder.append(_assignVariable, "\t\t\t");
             _builder.newLineIfNotEmpty();
+            {
+              if (v.isRegister) {
+                _builder.append("\t\t");
+                _builder.append("\t");
+                StringConcatenation _builder_2 = new StringConcatenation();
+                {
+                  boolean _isPredicate_1 = this.isPredicate(v);
+                  if (_isPredicate_1) {
+                    _builder_2.append("value!=0");
+                  } else {
+                    _builder_2.append("value");
+                  }
+                }
+                EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
+                StringBuilder _assignVariable_1 = this.assignVariable(v, _builder_2, _of, true, false);
+                _builder.append(_assignVariable_1, "\t\t\t");
+                _builder.newLineIfNotEmpty();
+              }
+            }
             _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("break;");
@@ -148,8 +180,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             _builder.append(_calculateVariableAccessIndexArr, "\t\t\t");
             _builder.append("]=");
             {
-              boolean _isPredicate_1 = this.isPredicate(v);
-              if (_isPredicate_1) {
+              boolean _isPredicate_2 = this.isPredicate(v);
+              if (_isPredicate_2) {
                 _builder.append("value!=0");
               } else {
                 _builder.append("value");
@@ -157,6 +189,29 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             }
             _builder.append(";");
             _builder.newLineIfNotEmpty();
+            {
+              if (v.isRegister) {
+                _builder.append("\t\t");
+                _builder.append("\t");
+                EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
+                CharSequence _idName_1 = this.idName(v, true, _of_1);
+                _builder.append(_idName_1, "\t\t\t");
+                _builder.append("[");
+                CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v);
+                _builder.append(_calculateVariableAccessIndexArr_1, "\t\t\t");
+                _builder.append("]=");
+                {
+                  boolean _isPredicate_3 = this.isPredicate(v);
+                  if (_isPredicate_3) {
+                    _builder.append("value!=0");
+                  } else {
+                    _builder.append("value");
+                  }
+                }
+                _builder.append(";");
+                _builder.newLineIfNotEmpty();
+              }
+            }
             _builder.append("\t\t");
             _builder.append("\t");
             _builder.append("break;");
@@ -257,11 +312,11 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             Integer _get_3 = this.varIdx.get(v_2.name);
             _builder.append(_get_3, "\t\t");
             _builder.append(": return ");
-            CharSequence _idName_1 = this.idName(v_2, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName_1, "\t\t");
+            CharSequence _idName_2 = this.idName(v_2, true, CommonCodeGenerator.NONE);
+            _builder.append(_idName_2, "\t\t");
             {
-              boolean _isPredicate_2 = this.isPredicate(v_2);
-              if (_isPredicate_2) {
+              boolean _isPredicate_4 = this.isPredicate(v_2);
+              if (_isPredicate_4) {
                 _builder.append("?1:0");
               } else {
                 if ((v_2.width != 64)) {
@@ -280,19 +335,19 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
             Integer _get_4 = this.varIdx.get(v_2.name);
             _builder.append(_get_4, "\t\t");
             _builder.append(": return ");
-            CharSequence _idName_2 = this.idName(v_2, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName_2, "\t\t");
+            CharSequence _idName_3 = this.idName(v_2, true, CommonCodeGenerator.NONE);
+            _builder.append(_idName_3, "\t\t");
             _builder.append("[");
-            CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v_2);
-            _builder.append(_calculateVariableAccessIndexArr_1, "\t\t");
+            CharSequence _calculateVariableAccessIndexArr_2 = this.calculateVariableAccessIndexArr(v_2);
+            _builder.append(_calculateVariableAccessIndexArr_2, "\t\t");
             _builder.append("]");
             {
               boolean _and = false;
               if (!(v_2.width != 64)) {
                 _and = false;
               } else {
-                boolean _isPredicate_3 = this.isPredicate(v_2);
-                boolean _not = (!_isPredicate_3);
+                boolean _isPredicate_5 = this.isPredicate(v_2);
+                boolean _not = (!_isPredicate_5);
                 _and = _not;
               }
               if (_and) {
@@ -877,14 +932,6 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
   
   protected CharSequence checkRegupdates() {
     return "!regUpdates.isEmpty()";
-  }
-  
-  public CharSequence compile(final String packageName, final String unitName) {
-    return this.generateMainCode();
-  }
-  
-  public CharSequence createChangeAdapter(final String packageName, final String unitName) {
-    return this.createChangeAdapter(false);
   }
   
   public CharSequence createChangeAdapter(final boolean useInterface) {
@@ -1598,5 +1645,53 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
       _xblockexpression = _builder;
     }
     return _xblockexpression;
+  }
+  
+  public String getHookName() {
+    return "Java";
+  }
+  
+  public IOutputProvider.MultiOption getUsage() {
+    final Options options = new Options();
+    options.addOption("p", "pkg", true, 
+      "The package the generated source will use. If non is specified the package from the module is used");
+    String _hookName = this.getHookName();
+    String _plus = ("Options for the " + _hookName);
+    String _plus_1 = (_plus + " type:");
+    return new IOutputProvider.MultiOption(_plus_1, null, options);
+  }
+  
+  public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    ArrayList<PSAbstractCompiler.CompileResult> _xblockexpression = null;
+    {
+      final String moduleName = em.moduleName;
+      final int li = moduleName.lastIndexOf(".");
+      String pkg = null;
+      final String optionPkg = cli.getOptionValue("pkg");
+      boolean _tripleNotEquals = (optionPkg != null);
+      if (_tripleNotEquals) {
+        pkg = optionPkg;
+      } else {
+        if ((li != (-1))) {
+          String _substring = moduleName.substring(0, (li - 1));
+          pkg = _substring;
+        }
+      }
+      int _length = moduleName.length();
+      final String unitName = moduleName.substring((li + 1), _length);
+      _xblockexpression = JavaCodeGenerator.doCompile(syntaxProblems, em, pkg, unitName);
+    }
+    return _xblockexpression;
+  }
+  
+  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName) {
+    final JavaCodeGenerator comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE);
+    final String code = comp.generateMainCode();
+    final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
+    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
+    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
+    String _hookName = comp.getHookName();
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source, _hookName, true);
+    return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
 }

@@ -1,20 +1,30 @@
 package org.pshdl.model.simulation
 
+import com.google.common.collect.Lists
 import java.math.BigInteger
+import java.util.Collections
 import java.util.EnumSet
 import java.util.List
+import java.util.Set
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.VariableInformation
+import org.pshdl.model.utils.PSAbstractCompiler
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
+import org.pshdl.model.validation.Problem
 
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.*
 
-class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
+class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
 	String packageName
 	String unitName
 
+	new(){
+	}
 	new(ExecutableModel em, String packageName, String unitName, int maxCosts) {
 		super(em, 64, maxCosts)
 		this.packageName = packageName
@@ -29,7 +39,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		indent++;
 	}
 
-	override protected fieldType(VariableInformation varInfo, EnumSet<Attributes> attributes) {
+	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (varInfo.dimensions.nullOrEmpty || attributes.contains(baseType)) {
 			if (isBoolean(varInfo, attributes))
 				return "boolean "
@@ -41,8 +51,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		}
 	}
 
-	override protected preField(VariableInformation x, EnumSet<Attributes> attributes) '''«IF attributes.
-		contains(Attributes.isPublic)»public«ELSE»private«ENDIF» '''
+	override protected preField(VariableInformation x, EnumSet<CommonCodeGenerator.Attributes> attributes) '''«IF attributes.
+		contains(CommonCodeGenerator.Attributes.isPublic)»public«ELSE»private«ENDIF» '''
 
 	override protected footer() '''
 	«hdlInterpreter»
@@ -61,10 +71,16 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 					«IF v.dimensions.length == 0»
 						case «varIdx.get(v.name)»: 
 							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', NONE, true, false)»
+							«IF v.isRegister»
+							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg), true, false)»
+							«ENDIF»
 							break;
 					«ELSE»
 						case «varIdx.get(v.name)»: 
 							«idName(v, true, NONE)»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
+							«IF v.isRegister»
+							«idName(v, true, EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg))»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
+							«ENDIF»
 							break;
 					«ENDIF»
 				«ENDFOR»
@@ -232,7 +248,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 		return "(int)(" + res + ")"
 	}
 
-	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<Attributes> attributes) {
+	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		val attrClone = attributes.clone
 		attrClone.add(baseType)
 		return '''new «varInfo.fieldType(attrClone)»[«varInfo.arraySize»]'''
@@ -308,14 +324,6 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ICodeGen {
 
 	override protected checkRegupdates() {
 		return "!regUpdates.isEmpty()"
-	}
-
-	override CharSequence compile(String packageName, String unitName) {
-		return generateMainCode();
-	}
-
-	override CharSequence createChangeAdapter(String packageName, String unitName) {
-		return createChangeAdapter(false)
 	}
 
 	def CharSequence createChangeAdapter(boolean useInterface) '''«IF packageName !== null»package «packageName»;«ENDIF»
@@ -502,7 +510,7 @@ if (!tempArr.equals(«varName»))
 		'''
 
 	override protected copyArray(VariableInformation varInfo) '''System.arraycopy(«varInfo.idName(true, NONE)», 0, «varInfo.
-		idName(true, EnumSet.of(Attributes.isPrev))», 0, «varInfo.arraySize»);
+		idName(true, EnumSet.of(CommonCodeGenerator.Attributes.isPrev))», 0, «varInfo.arraySize»);
 		'''
 
 	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
@@ -518,7 +526,7 @@ if (!tempArr.equals(«varName»))
 «indent()»	break;
 '''
 
-	override protected runProcessHeader(ProcessData pd) {
+	override protected runProcessHeader(CommonCodeGenerator.ProcessData pd) {
 		indent++
 		'''private boolean «processMethodName(pd)»() {
 			'''
@@ -528,6 +536,41 @@ if (!tempArr.equals(«varName»))
 		indent++
 		'''public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener) {
 			'''
+	}
+
+	override getHookName() {
+		return "Java"
+	}
+
+	override getUsage() {
+		val options = new Options;
+		options.addOption('p', "pkg", true,
+			"The package the generated source will use. If non is specified the package from the module is used")
+		return new MultiOption("Options for the " + hookName + " type:", null, options)
+	}
+
+	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		val moduleName = em.moduleName
+		val li = moduleName.lastIndexOf('.')
+		var String pkg = null
+		val optionPkg = cli.getOptionValue("pkg")
+		if (optionPkg !== null) {
+			pkg = optionPkg
+		} else if (li != -1) {
+			pkg = moduleName.substring(0, li - 1)
+		}
+		val unitName = moduleName.substring(li + 1, moduleName.length);
+		doCompile(syntaxProblems, em, pkg, unitName);
+	}
+	
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName) {
+		val comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE)
+		val code = comp.generateMainCode
+		val sideFiles=Lists.newArrayList
+		sideFiles.addAll(comp.auxiliaryContent)
+		return Lists.newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
+				comp.hookName, true))
 	}
 
 }
