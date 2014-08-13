@@ -22,6 +22,8 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	String library
 	boolean usePackageImport
 	final int epsWidth = 16;
+	new(){
+	}
 
 	new(ExecutableModel model, String unitName, String library, boolean usePackageImport, int maxCosts) {
 		super(model, -1, maxCosts)
@@ -369,8 +371,8 @@ import '../simulation_comm.dart';
 		return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes)
 	}
 	
-		override getHookName() {
-		return "Java"
+	override getHookName() {
+		return "Dart"
 	}
 
 	override getUsage() {
@@ -395,7 +397,7 @@ import '../simulation_comm.dart';
 	}
 	
 	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean usePackageImport) {
-		val comp = new DartCodeGenerator(em, pkg, unitName, usePackageImport, Integer.MAX_VALUE)
+		val comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE)
 		val code = comp.generateMainCode
 		val sideFiles=Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)

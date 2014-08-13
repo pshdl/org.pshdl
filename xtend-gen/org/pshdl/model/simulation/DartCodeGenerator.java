@@ -36,6 +36,9 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   
   private final int epsWidth = 16;
   
+  public DartCodeGenerator() {
+  }
+  
   public DartCodeGenerator(final ExecutableModel model, final String unitName, final String library, final boolean usePackageImport, final int maxCosts) {
     super(model, (-1), maxCosts);
     this.unitName = unitName;
@@ -1119,7 +1122,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   public String getHookName() {
-    return "Java";
+    return "Dart";
   }
   
   public IOutputProvider.MultiOption getUsage() {
@@ -1156,7 +1159,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean usePackageImport) {
-    final DartCodeGenerator comp = new DartCodeGenerator(em, pkg, unitName, usePackageImport, Integer.MAX_VALUE);
+    final DartCodeGenerator comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
     Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
