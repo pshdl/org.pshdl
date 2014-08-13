@@ -28,10 +28,13 @@ package org.pshdl.model.simulation
 
 import com.google.common.base.Splitter
 import com.google.common.collect.Lists
+import com.google.common.collect.Maps
 import java.math.BigInteger
 import java.util.EnumSet
+import java.util.HashMap
 import java.util.HashSet
 import java.util.List
+import java.util.Map
 import java.util.Set
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.Options
@@ -47,10 +50,10 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST
-import org.pshdl.model.utils.services.AuxiliaryContent
-import org.pshdl.model.validation.Problem
-import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
+import org.pshdl.model.utils.services.AuxiliaryContent
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
+import org.pshdl.model.validation.Problem
 
 class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
@@ -58,6 +61,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 	new() {
 	}
+
 	new(ExecutableModel em, int maxCosts) {
 		super(em, 64, maxCosts)
 		this.cce = new CommonCompilerExtension(em, 64)
@@ -82,8 +86,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (isBoolean(varInfo, attributes))
-			return "bool "
-		return "uint64_t "
+			return "bool"
+		return "uint64_t"
 	}
 
 	override protected justDeclare(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) '''«fieldName(
@@ -125,6 +129,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 #include "«headerName».h"
 
 «IF hasClock»
+	/// Don't use this
 	typedef struct regUpdate {
 		int internal;
 		int offset;
@@ -144,24 +149,21 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			for (i=0;i<regUpdatePos; i++) {
 				regUpdate_t reg=regUpdates[i];
 				switch (reg.internal) {
-					«FOR v : em.variables»
-						«IF v.isRegister»
-							case «varIdx.get(v.name)»: 
-							«IF v.dimensions.length == 0»
-								«v.idName(true, NONE)» = «v.idName(true, NONE)»$reg; break;
-							«ELSE»
-								if (reg.offset!=-1)
-									«v.idName(true, NONE)»[reg.offset] = «v.idName(true, NONE)»$reg[reg.offset];
-								else
-									memset(«v.idName(true, NONE)», reg.fillValue, «v.arraySize»);
-								break;
-							«ENDIF»
-						«ENDIF»
-					«ENDFOR»
+					«updateRegCases»
 				}
 			}
 		}
 	'''
+
+	def static int hash(String str) {
+		var int hash = -2128831035;
+		val byte[] bytes = str.getBytes();
+		for (byte b : bytes) {
+			hash = hash.bitwiseXor(b);
+			hash = hash * 16777619;
+		}
+		return hash;
+	}
 
 	override protected writeToNull(String last) '''(void)«last»; //Write to #null
 		'''
@@ -178,7 +180,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		«indent()»	«ENDIF»{
 		«indent()»		static regUpdate_t reg;
 		«indent()»		reg.internal=«outputInternal.varIdx»;
-		«indent()»		reg.offset=«offset»;
+		«indent()»		reg.offset=(int)«offset»;
 		«indent()»		reg.fillValue=«fillValue»;
 		«indent()»		regUpdates[regUpdatePos++]=reg;
 		«indent()»	}
@@ -218,34 +220,16 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		contains(CommonCodeGenerator.Attributes.isPublic)»static«ENDIF» '''
 
 	def protected helperMethods() '''
-		void pshdl_sim_setInput(int idx, uint64_t value) {
+		void pshdl_sim_setInput(uint32_t idx, uint64_t value) {
 			pshdl_sim_setInputArray(idx, value, ((void *)0));
 		}
-		void pshdl_sim_setInputArray(int idx, uint64_t value, int arrayIdx[]) {
+		void pshdl_sim_setInputArray(uint32_t idx, uint64_t value, uint32_t arrayIdx[]) {
 			switch (idx) {
-				«FOR v : em.variables.excludeNull»
-					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: 
-							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', NONE, true, false)»
-							«IF v.isRegister»
-								«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''',
-			EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg), true, false)»
-							«ENDIF»
-							break;
-					«ELSE»
-						case «varIdx.get(v.name)»: 
-							«idName(v, true, NONE)»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
-							«IF v.isRegister»
-								«idName(v, true, EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg))»[«v.calculateVariableAccessIndexArr»]=«IF v.
-			predicate»value!=0«ELSE»value«ENDIF»;
-							«ENDIF»
-							break;
-					«ENDIF»
-				«ENDFOR»
+				«setInputCases("value", null)»
 			}
 		}
 		
-		char* pshdl_sim_getName(int idx) {
+		char* pshdl_sim_getName(uint32_t idx) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
 					case «varIdx.get(v.name)»: return "«v.name»";
@@ -263,7 +247,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			return deltaCycle;
 		}
 		
-		int pshdl_sim_getVarCount(){
+		uint32_t pshdl_sim_getVarCount(){
 			return «varIdx.size»;
 		}
 		
@@ -279,24 +263,57 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			«ENDIF»
 		}
 		
-		uint64_t pshdl_sim_getOutput(int idx) {
+		static uint32_t hash(char* str){
+			size_t len=strlen(str);
+			uint32_t hash = 2166136261;
+			for (int i=0;i<len;i++){
+			   	hash = hash ^ str[i];
+			   	hash = hash * 16777619;
+			   }
+			return hash;
+		}
+		
+		uint32_t pshdl_sim_getIndex(char* name) {
+			uint32_t hashName=hash(name);
+			switch (hashName) {
+				«FOR Map.Entry<Integer, List<VariableInformation>> e : em.variables.excludeNull.hashed.entrySet»
+					case «constant32Bit(e.key)»:
+						«FOR VariableInformation vi : e.value» 
+							if (strcmp(name, "«vi.name»") == 0)
+								return «vi.varIdx»;
+						«ENDFOR»
+						return -1; //so close...
+				«ENDFOR»
+			default:
+				return -1;
+			}
+		}
+		
+		uint64_t pshdl_sim_getOutput(uint32_t idx) {
 			return pshdl_sim_getOutputArray(idx, ((void *)0));
 		}
 		
-		uint64_t pshdl_sim_getOutputArray(int idx, int arrayIdx[]) {
+		uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t arrayIdx[]) {
 			switch (idx) {
-				«FOR v : em.variables.excludeNull»
-					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: return «v.idName(true, NONE)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.calcMask.constant»«ENDIF»;
-					«ELSE»
-						case «varIdx.get(v.name)»: return «v.idName(true, NONE)»[«v.calculateVariableAccessIndexArr»]«IF v.width != 64 &&
-			!v.predicate» & «v.width.calcMask.constant»«ENDIF»;
-					«ENDIF»
-				«ENDFOR»
+				«getOutputCases(null)»
 			}
 			return 0;
 		}	
 	'''
+
+	def Map<Integer, List<VariableInformation>> getHashed(Iterable<VariableInformation> informations) {
+		val Map<Integer, List<VariableInformation>> res = Maps.newHashMap()
+		for (VariableInformation vi : em.variables) {
+			val hashVal = hash(vi.name)
+			val list = res.get(hashVal)
+			if (list === null) {
+				res.put(hashVal, Lists.newArrayList(vi))
+			} else {
+				list.add(vi)
+			}
+		}
+		return res
+	}
 
 	override protected barrier() '''
 		}
@@ -311,7 +328,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			«indent()»{
 			«indent()»#pragma omp section
 			«indent()»{
-				'''
+		'''
 	}
 
 	override protected barrierEnd(int stage, int totalStageCosts, boolean createConstant) {
@@ -328,8 +345,9 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		val specific_h = new AuxiliaryContent(headerName() + ".h", specificHeader.toString)
 		val res = Lists.newArrayList(generic_h, specific_h)
 		val simEncapsulation = generateSimEncapsuation
-		if (simEncapsulation !== null)
+		if (simEncapsulation !== null) {
 			res.add(new AuxiliaryContent("simEncapsulation.c", simEncapsulation))
+		}
 		return res
 	}
 
@@ -337,18 +355,23 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		"pshdl_" + em.moduleName.idName(false, NONE) + "_sim"
 	}
 
-	def protected getSpecificHeader() '''
-		#ifndef _«headerName»_h_
-		#define _«headerName»_h_
-		#include "pshdl_generic_sim.h"
-		
-		«FOR VariableInformation vi : em.variables.excludeNull»
-			#define «vi.defineName» «vi.varIdx»
-		«ENDFOR»
-		
-		«fieldDeclarations(false, false).toString.split("\n").map["extern" + it].join("\n")»
-		
-		#endif
+	def protected getSpecificHeader() '''/**
+ * @file
+ * @brief Provides access to all fields and their index.
+ */
+
+#ifndef _«headerName»_h_
+#define _«headerName»_h_
+#include "pshdl_generic_sim.h"
+
+«FOR VariableInformation vi : em.variables.excludeNull»
+	///Use this index define to access <tt> «vi.name.replaceAll("\\@", "\\\\@")» </tt> via getOutput/setInput methods
+	#define «vi.defineName» «vi.varIdx»
+«ENDFOR»
+
+«fieldDeclarations(false, false).toString.split("\n").map["extern" + it].join("\n")»
+
+#endif
 	'''
 
 	def String generateSimEncapsuation() {
@@ -378,34 +401,66 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		val Set<String> varNames = new HashSet
 		rows.forEach[it.allDefs.filter[it.type !== Definition.Type.UNUSED].forEach[varNames.add(it.getName)]]
 		var res = '''
-//  BusAccessSim.c
-//
+/**
+ * @file
+ * @brief  Provides methods for simulating accessing to the memory registers
+ *
+ * This file is a substitue for the BusAccess.c file that is used to access real memory.
+ * For each type of row there are methods for setting/getting the values
+ * either directly, or as a struct. A memory map overview has been
+ * generated into BusMap.html.
+ */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include "BusAccess.h"
 #include "BusStdDefinitions.h"
-#include "pshdl_generic_sim.h"
 #include "«headerName».h"
 
+/**
+ * This method provides a null implementation of the warning functionality. You
+ * can use it to provide your own error handling, or you can use the implementation
+ * provided in BusPrint.h
+ */
 static void defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){
 }
 
 warnFunc_p warn=defaultWarn;
 
+/**
+ * This methods allows the user to set a custom warning function. Usually this is used
+ * in conjunction with the implementation provided in BusPrint.h.
+ *
+ * @param warnFunction the new function to use for error reporting
+ *
+ * Example Usage:
+ * @code
+ *    #include "BusPrint.h"
+ *    setWarn(defaultPrintfWarn);
+ * @endcode
+ */
 void setWarn(warnFunc_p warnFunction){
     warn=warnFunction;
 }
 
+///The index of the Clock that is toggled for each setting
 #define «"busclk_idx"» «busIndex»
 
 '''
 		val checkedRows = new HashSet<String>()
+		val rowCounts = new HashMap<String, Integer>()
+		for (Row row : rows) {
+			val idx = rowCounts.get(row.name);
+			if (idx === null)
+				rowCounts.put(row.name, 1)
+			else
+				rowCounts.put(row.name, idx + 1)
+		}
 		for (Row row : rows) {
 			if (!checkedRows.contains(row.name)) {
 				if (row.hasWriteDefs)
-					res = res + row.simSetter
-				res = res + row.simGetter
+					res = res + row.simSetter(rowCounts.get(row.name))
+				res = res + row.simGetter(rowCounts.get(row.name))
 				checkedRows.add(row.name)
 			}
 		}
@@ -416,6 +471,7 @@ void setWarn(warnFunc_p warnFunction){
 		val pclk = varIdx.get(em.moduleName + ".PCLK")
 		if (pclk === null)
 			return varIdx.get(em.moduleName + ".Bus2IP_Clk")
+		return pclk
 	}
 
 	def protected getDefineName(VariableInformation vi) '''PSHDL_SIM_«vi.idName(true, NONE).toString.toUpperCase»'''
@@ -423,43 +479,99 @@ void setWarn(warnFunc_p warnFunction){
 	def protected getDefineNameString(String s) '''PSHDL_SIM_«(em.moduleName + "." + s).idName(true, NONE).toString.
 		toUpperCase»'''
 
-	def protected simGetter(Row row) '''
-//Getter
-int get«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition definition : row.allDefs»«getParameter(
+	def protected simGetter(Row row, int rowCount) '''
+/**
+ * Directly retrieve the fields of row «row.name».
+ *
+ * @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.
+ * @param index the row that you want to access. «IF rowCount == 1»The only valid index is 0«ELSE»Valid values are 0..«rowCount -
+		1»«ENDIF»
+ «FOR Definition d : row.allDefs»
+ * @param «d.name» the value of «d.name» will be written into the memory of this pointer.
+ «ENDFOR»
+ *
+ * @retval 1  Successfully retrieved the values
+ * @retval 0  Something went wrong (invalid index for example)
+ *
+ */
+int get«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.allDefs»«getParameter(
 		row, definition, true)»«ENDFOR»){
-	int offset[1]={index};
+	uint32_t offset[1]={index};
 	«FOR Definition d : row.allDefs»
 	*«row.getVarName(d)»=(«d.busType»)pshdl_sim_getOutputArray(«d.name.getDefineNameString», offset);
 	«ENDFOR»
 	return 1;
 }
 
-int get«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *result){
+/**
+ * Retrieve the fields of row «row.name» into the struct.
+ *
+ * @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.
+ * @param index the row that you want to access. «IF rowCount == 1»The only valid index is 0«ELSE»Valid values are 0..«rowCount -
+		1»«ENDIF»
+ * @param result the values of this row will be written into the struct
+ *
+ * @retval 1  Successfully retrieved the values
+ * @retval 0  Something went wrong (invalid index for example)
+ *
+ */
+int get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t *result){
 	return get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.getVarNameIndex(d)»«ENDFOR»);
 }
 '''
 
-	def protected simSetter(Row row) '''
-// Setter
-int set«row.name.toFirstUpper»Direct(uint32_t *base, int index«FOR Definition definition : row.writeDefs»«getParameter(
+	def protected simSetter(Row row, int rowCount) '''
+/**
+ * Updates the values in memory from the struct. This also advances the simulation by one clock cycle, 
+ * unless PSHDL_SIM_NO_BUSCLK_TOGGLE is defined.
+ *
+ * @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.
+ * @param index the row that you want to access. «IF rowCount == 1»The only valid index is 0«ELSE»Valid values are 0..«rowCount -
+		1»«ENDIF»
+ «FOR Definition d : row.allDefs»
+ * @param «d.name» the value of «d.name» will be written into the register. «explain(d)»
+ «ENDFOR»
+ *
+ * @retval 1  Successfully updated the values
+ * @retval 0  Something went wrong (invalid index or value exceeds its range for example)
+ *
+ */
+int set«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.writeDefs»«getParameter(
 		row, definition, false)»«ENDFOR»){
-	int offset[1]={index};
+	if (index>«rowCount - 1»)
+		return 0;
+	uint32_t offset[1]={index};
 	«FOR Definition ne : row.writeDefs»
 		«row.generateConditions(ne)»
 	«ENDFOR»
 	«FOR Definition d : row.writeDefs»
 	pshdl_sim_setInputArray(«d.name.getDefineNameString», «d.name», offset);
 	«ENDFOR»
+	#ifndef PSHDL_SIM_NO_BUSCLK_TOGGLE
 	if (!«DISABLE_EDGES.name») {
 		pshdl_sim_setInput(busclk_idx, 0);
 		pshdl_sim_run();
 	}
 	pshdl_sim_setInput(busclk_idx, 1);
 	pshdl_sim_run();
-	return 0;
+	#endif
+	return 1;
 }
 
-int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newVal) {
+/**
+ * Updates the values in memory from the struct. This also advances the simulation by one clock cycle, 
+ * unless PSHDL_SIM_NO_BUSCLK_TOGGLE is defined.
+ *
+ * @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.
+ * @param index the row that you want to access. «IF rowCount == 1»The only valid index is 0«ELSE»Valid values are 0..«rowCount -
+		1»«ENDIF»
+ * @param newVal the values of this row will be written into the struct
+ *
+ * @retval 1  Successfully updated the values
+ * @retval 0  Something went wrong (invalid index or value exceeds range for example)
+ *
+ */
+int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t *newVal) {
 	return set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.getVarNameIndex(d)»«ENDFOR»);
 }
 '''
@@ -468,9 +580,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 
-	override protected callMethod(String methodName, String... args) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
+	override protected callMethod(CharSequence methodName, CharSequence... args) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
@@ -509,5 +619,8 @@ int set«row.name.toFirstUpper»(uint32_t *base, int index, «row.name»_t *newV
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
 		doCompile(em, syntaxProblems)
 	}
+
+	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''memset(«vi.idName(true, NONE)», «regFillValue», «vi.
+		arraySize»);'''
 
 }

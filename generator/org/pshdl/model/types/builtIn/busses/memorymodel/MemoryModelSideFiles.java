@@ -70,61 +70,70 @@ public class MemoryModelSideFiles {
 		if (withDate) {
 			options.put("{DATE}", new Date().toString());
 		}
-		Formatter ps = new Formatter();
-		ps.format("<tr><td>Offset</td>");
-		for (int i = 0; i < Unit.rowWidth; i++) {
-			ps.format("<td>%d</td>", Unit.rowWidth - i - 1);
-		}
-		ps.format("<td>Row</td></tr>");
-		options.put("{HEADER}", ps.toString());
-		ps.close();
-		ps = new Formatter();
-		final int mul = Unit.rowWidth / 8;
-		int pos = 0;
-		Column current = null;
-		int colIndex = -1;
-		final Map<String, Integer> defIndex = new HashMap<String, Integer>();
-		final Map<String, Integer> rowIndex = new HashMap<String, Integer>();
-		for (final Row row : rows) {
-			if ((row.column != current) || (row.colIndex != colIndex))
-				if (row.column == null) {
-					current = null;
-					colIndex = -1;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>%n", Unit.rowWidth + 2, "Without Column");
-				} else {
-					current = row.column;
-					colIndex = row.colIndex;
-					ps.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>%n", Unit.rowWidth + 2, row.column.name, row.colIndex);
-				}
-			ps.format("<tr>");
-			ps.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
-			for (final NamedElement dec : row.definitions) {
-				final Definition def = (Definition) dec;
-				final Integer integer = getAndInc(defIndex, def.name);
-				final int size = MemoryModel.getSize(def);
-				if (def.type != Type.UNUSED) {
-					final String toolTip = String.format(
-							"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
-							(def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
-					ps.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name, integer);
-				} else {
-					ps.format("<td colspan='%d' class='field %s %s'>%s</td>", size, def.rw + "Style", "", def.name);
-				}
-
-			}
-			final Integer integer = getAndInc(rowIndex, row.name);
-			ps.format("<td class='rowInfo'>%s [%d]</td></tr>%n", row.name, integer);
-			pos++;
-		}
-		options.put("{TABLE}", ps.toString());
+		options.put("{HEADER}", tableHeader());
+		options.put("{TABLE}", generateTableBody(rows));
 		options.put("{HDLINTERFACE}", StringWriteExtension.asString(MemoryModel.buildHDLInterface(unit, rows).setName("Bus"), new SyntaxHighlighter.HTMLHighlighter(true)));
-		ps.close();
 		try {
 			return Helper.processFile(MemoryModel.class, "memmodelTemplate.html", options);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String tableHeader() {
+		try (final Formatter formatter = new Formatter()) {
+			formatter.format("<TH><TD>Offset</TD>");
+			for (int i = 0; i < Unit.rowWidth; i++) {
+				formatter.format("<TD>%d</TD>", Unit.rowWidth - i - 1);
+			}
+			formatter.format("<TD>Row</TD></TH>");
+			return formatter.toString();
+		}
+	}
+
+	public static String generateTableBody(List<Row> rows) {
+		try (Formatter formatter = new Formatter()) {
+			final int mul = Unit.rowWidth / 8;
+			int pos = 0;
+			Column current = null;
+			int colIndex = -1;
+			final Map<String, Integer> defIndex = new HashMap<String, Integer>();
+			final Map<String, Integer> rowIndex = new HashMap<String, Integer>();
+			for (final Row row : rows) {
+				if ((row.column != current) || (row.colIndex != colIndex))
+					if (row.column == null) {
+						current = null;
+						colIndex = -1;
+						formatter.format("<TR><TD colspan='%d' class='columnHeader'>%s</TD></TR>%n", Unit.rowWidth + 2, "Without Column");
+					} else {
+						current = row.column;
+						colIndex = row.colIndex;
+						formatter.format("<TR><TD colspan='%d' class='columnHeader'>%s [%d]</TD></TR>%n", Unit.rowWidth + 2, row.column.name, row.colIndex);
+					}
+				formatter.format("<TR>");
+				formatter.format("<TD class='offset'>%d [0x%02x]</TD>", pos * mul, pos * mul);
+				for (final NamedElement dec : row.definitions) {
+					final Definition def = (Definition) dec;
+					final Integer integer = getAndInc(defIndex, def.name);
+					final int size = MemoryModel.getSize(def);
+					if (def.type != Type.UNUSED) {
+						final String toolTip = String.format(
+								"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
+								(def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
+						formatter.format("<TD colspan='%d' title='%s' class='field %s %s'>%s [%d]</TD>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name,
+								integer);
+					} else {
+						formatter.format("<TD colspan='%d' class='field %s %s'>%s</TD>", size, def.rw + "Style", "", def.name);
+					}
+
+				}
+				final Integer integer = getAndInc(rowIndex, row.name);
+				formatter.format("<TD class='rowInfo'>%s [%d]</TD></TR>%n", row.name, integer);
+				pos++;
+			}
+			return formatter.toString();
+		}
 	}
 
 	private static Integer getAndInc(Map<String, Integer> defIndex, String name) {

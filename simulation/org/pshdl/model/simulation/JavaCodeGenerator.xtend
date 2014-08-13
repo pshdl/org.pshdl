@@ -40,14 +40,14 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	}
 
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		if (varInfo.dimensions.nullOrEmpty || attributes.contains(baseType)) {
+		if (!varInfo.array || attributes.contains(baseType)) {
 			if (isBoolean(varInfo, attributes))
-				return "boolean "
-			return "long "
+				return "boolean"
+			return "long"
 		} else {
 			if (isBoolean(varInfo, attributes))
-				return "boolean[] "
-			return "long[] "
+				return "boolean[]"
+			return "long[]"
 		}
 	}
 
@@ -67,23 +67,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		@Override
 		public void setInput(int idx, long value, int... arrayIdx) {
 			switch (idx) {
-				«FOR v : em.variables.excludeNull»
-					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: 
-							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', NONE, true, false)»
-							«IF v.isRegister»
-							«assignVariable(v, '''«IF v.predicate»value!=0«ELSE»value«ENDIF»''', EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg), true, false)»
-							«ENDIF»
-							break;
-					«ELSE»
-						case «varIdx.get(v.name)»: 
-							«idName(v, true, NONE)»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
-							«IF v.isRegister»
-							«idName(v, true, EnumSet.of(CommonCodeGenerator.Attributes.isShadowReg))»[«v.calculateVariableAccessIndexArr»]=«IF v.predicate»value!=0«ELSE»value«ENDIF»;
-							«ENDIF»
-							break;
-					«ENDIF»
-				«ENDFOR»
+				«setInputCases("value", null)»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
 			}
@@ -116,14 +100,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		@Override
 		public long getOutputLong(int idx, int... arrayIdx) {
 			switch (idx) {
-				«FOR v : em.variables.excludeNull»
-					«IF v.dimensions.length == 0»
-						case «varIdx.get(v.name)»: return «v.idName(true, NONE)»«IF v.predicate»?1:0«ELSEIF v.width != 64» & «v.width.calcMask.constant»«ENDIF»;
-					«ELSE»
-						case «varIdx.get(v.name)»: return «v.idName(true, NONE)»[«v.calculateVariableAccessIndexArr»]«IF v.width != 64 &&
-			!v.predicate» & «v.width.calcMask.constant»«ENDIF»;
-					«ENDIF»
-				«ENDFOR»
+				«getOutputCases(null)»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
 			}
@@ -135,22 +112,22 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		}
 		
 		@Override
-		public void close() throws Exception{
+		public void close(){
 		}
 		
 		@Override
 		public void setFeature(Feature feature, Object value) {
 			switch (feature) {
-			case disableOutputRegs:
-			«IF hasClock»
-				«DISABLE_REG_OUTPUTLOGIC.name» = (boolean) value;
-			«ENDIF»
-			break;
-			case disableEdges:
-			«IF hasClock»
-				«DISABLE_EDGES.name» = (boolean) value;
-			«ENDIF»
-			break;
+				case disableOutputRegs:
+					«IF hasClock»
+					«DISABLE_REG_OUTPUTLOGIC.name» = (boolean) value;
+					«ENDIF»
+				break;
+				case disableEdges:
+					«IF hasClock»
+					«DISABLE_EDGES.name» = (boolean) value;
+					«ENDIF»
+				break;
 			}
 		}
 	'''
@@ -212,24 +189,16 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		«ENDIF»
 	'''
 
+
+	override protected makeCase(CharSequence caseLabel, CharSequence value, boolean includeBreak) {
+		super.makeCase(caseLabel.toString.replaceAll("L",""), value, includeBreak)
+	}
+	
 	def protected copyRegs() '''
 		private void updateRegs() {
 			for (RegUpdate reg : regUpdates) {
 				switch (reg.internalID) {
-					«FOR v : em.variables»
-						«IF v.isRegister»
-							case «varIdx.get(v.name)»: 
-							«IF v.dimensions.length == 0»
-								«v.idName(true, NONE)» = «v.idName(true, NONE)»$reg; break;
-							«ELSE»
-								if (reg.offset!=-1)
-									«v.idName(true, NONE)»[reg.offset] = «v.idName(true, NONE)»$reg[reg.offset];
-								else
-									Arrays.fill(«v.idName(true, NONE)», reg.fillValue); 
-								break;
-							«ENDIF»
-						«ENDIF»
-					«ENDFOR»
+					«updateRegCases»
 				}
 			}
 		}
@@ -486,8 +455,8 @@ if (!tempArr.equals(«varName»))
 			} else {
 				return '''if (module.«varName» != «varName»)
 	for (IChangeListener listener:listeners)
-		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.constant»«ENDIF», module.«varName»«IF vi.
-					width != 64» & «vi.width.calcMask.constant»«ENDIF»);
+		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.constant(true)»«ENDIF», module.«varName»«IF vi.
+					width != 64» & «vi.width.calcMask.constant(true)»«ENDIF»);
 				'''
 			}
 		} else {
@@ -516,7 +485,7 @@ if (!tempArr.equals(«varName»))
 	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
 		name», «currentProcessTime»);'''
 
-	override protected callMethod(String methodName, String... args) '''«methodName»(«IF args !== null»«FOR String arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+	override protected callMethod(CharSequence methodName, CharSequence... args) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() '''run();
 		'''
@@ -572,5 +541,6 @@ if (!tempArr.equals(«varName»))
 			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
 				comp.hookName, true))
 	}
-
+	
+	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''Arrays.fill(«vi.idName(true, NONE)», «regFillValue»);'''
 }

@@ -1,5 +1,7 @@
 package org.pshdl.model.simulation;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isArrayIndex;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isNegEdgeActive;
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isNegEdgeHandled;
@@ -49,10 +51,14 @@ import com.google.common.io.Files;
 public abstract class CommonCodeGenerator {
 
 	protected static final VariableInformation EPS_CYCLE = createVar("epsCycle", 32, Type.UINT);
-	protected static final VariableInformation DELTA_CYCLE = createVar("deltaCycle", 32, Type.UINT);
+	protected static final VariableInformation DELTA_CYCLE = createVar("deltaCycle", 64, Type.UINT);
 	protected static final VariableInformation TIMESTAMP = createVar("timeStamp", 64, Type.UINT);
 	protected static final VariableInformation DISABLE_EDGES = createVar("disableEdges", -1, Type.BOOL);
 	protected static final VariableInformation DISABLE_REG_OUTPUTLOGIC = createVar("disableRegOutputLogic", -1, Type.BOOL);
+
+	protected static final EnumSet<Attributes> UPDATE = EnumSet.of(isUpdate);
+	protected static final EnumSet<Attributes> PREDICATE = EnumSet.of(isPredicate);
+	protected static final EnumSet<Attributes> SHADOWREG = EnumSet.of(isShadowReg);
 	protected static final EnumSet<Attributes> NONE = EnumSet.noneOf(Attributes.class);
 	protected final ExecutableModel em;
 	protected int indent = 0;
@@ -157,7 +163,7 @@ public abstract class CommonCodeGenerator {
 			final StringBuilder sb) {
 		sb.append(indent()).append(runMethodsHeader(createConstant));
 		indent++;
-		sb.append(indent()).append(assignConstant(EPS_CYCLE, BigInteger.ZERO, NONE)).append(newLine());
+		sb.append(indent()).append(assignConstant(EPS_CYCLE, ZERO, NONE, true)).append(newLine());
 		if (!createConstant) {
 			sb.append(indent()).append(incVar(DELTA_CYCLE)).append(newLine());
 		}
@@ -166,7 +172,8 @@ public abstract class CommonCodeGenerator {
 			indent++;
 			sb.append(indent()).append(clearRegUpdates()).append(newLine());
 		}
-		sb.append(indent()).append(assignVariable(TIMESTAMP, "(" + DELTA_CYCLE.name + " << 16) | " + EPS_CYCLE.name, NONE, true, false)).append(newLine());
+		sb.append(indent()).append(assignVariable(TIMESTAMP, "(" + idName(DELTA_CYCLE, true, NONE) + " << 16) | " + idName(EPS_CYCLE, true, NONE), NONE, true, false, false))
+				.append(newLine());
 		for (final Integer stage : selectedScheduleStage) {
 			sb.append(indent()).append(callStage(stage, createConstant));
 		}
@@ -175,7 +182,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(indent()).append(incVar(EPS_CYCLE)).append(newLine());
 			final StringBuilder condition = new StringBuilder();
 			condition.append(checkRegupdates());
-			condition.append(" && !").append(DISABLE_REG_OUTPUTLOGIC.name);
+			condition.append(" && !").append(idName(DISABLE_REG_OUTPUTLOGIC, true, NONE));
 			indent--;
 			sb.append(indent()).append(doLoopEnd(condition)).append(newLine());
 			for (final String prev : prevMapNeg) {
@@ -198,7 +205,7 @@ public abstract class CommonCodeGenerator {
 		if (isArray(var)) {
 			sb.append(indent()).append(copyArray(var));
 		} else {
-			sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false)).append(newLine());
+			sb.append(indent()).append(assignVariable(var, idName(var, true, NONE), EnumSet.of(isPrev), true, false, false)).append(newLine());
 		}
 	}
 
@@ -262,7 +269,7 @@ public abstract class CommonCodeGenerator {
 	protected abstract CharSequence checkRegupdates();
 
 	protected StringBuilder incVar(VariableInformation incVar) {
-		return assignVariable(incVar, incVar.name + " + 1", NONE, true, false);
+		return assignVariable(incVar, idName(incVar, true, NONE) + " + 1", NONE, true, false, false);
 	}
 
 	protected CharSequence doLoopStart() {
@@ -272,7 +279,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence doLoopEnd(CharSequence condition) {
 		indent--;
-		return "} while (" + condition + ");" + newLine();
+		return "} while (" + condition + ")" + getStatementSeparator() + newLine();
 	}
 
 	protected CharSequence predicateCheckedFrameCall(Frame frame) {
@@ -293,13 +300,13 @@ public abstract class CommonCodeGenerator {
 		}
 		if (frame.predNegDepRes != null) {
 			for (final int pred : frame.predNegDepRes) {
-				predicates.add("!" + internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
+				predicates.add("!" + internalWithArrayAccess(em.internals[pred], arr, PREDICATE));
 				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
 			}
 		}
 		if (frame.predPosDepRes != null) {
 			for (final int pred : frame.predPosDepRes) {
-				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredicate)));
+				predicates.add(internalWithArrayAccess(em.internals[pred], arr, PREDICATE));
 				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
 			}
 		}
@@ -338,8 +345,9 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		final List<Integer> arr = Collections.emptyList();
 		final InternalInformation internal = em.internals[pred];
-		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, EnumSet.of(isUpdate));
-		sb.append(assignInternal(em.internals[pred], updateInternal + " == " + TIMESTAMP.name, arr, EnumSet.of(Attributes.isPredFresh)));
+		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, UPDATE);
+		final CharSequence isFresh = condition(Condition.isEqual, updateInternal, idName(TIMESTAMP, true, NONE));
+		sb.append(assignInternal(em.internals[pred], isFresh, arr, EnumSet.of(Attributes.isPredFresh)));
 		return sb;
 	}
 
@@ -356,14 +364,134 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence updateHandledClk(int edgeDepRes, boolean posEdge) {
 		final List<Integer> arr = Collections.emptyList();
 		final InternalInformation internal = em.internals[edgeDepRes];
-		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, EnumSet.of(isUpdate));
+		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, UPDATE);
 		final StringBuilder sb = new StringBuilder();
 		sb.append(assignInternal(internal, skipEdge(updateInternal), arr, EnumSet.of(posEdge ? isPosEdgeHandled : isNegEdgeHandled)));
 		return sb;
 	}
 
 	protected CharSequence skipEdge(CharSequence updateInternal) {
-		return "skipEdge(" + updateInternal + ")";
+		return callMethod("skipEdge", updateInternal);
+	}
+
+	protected CharSequence getOutputCases(CharSequence cast) {
+		indent++;
+		final StringBuilder result = new StringBuilder();
+		for (final VariableInformation vi : em.variables) {
+			if (isNull(vi)) {
+				continue;
+			}
+			final StringBuilder value = new StringBuilder();
+			value.append(indent());
+			CharSequence idName = idName(vi, true, NONE);
+			if (isArray(vi)) {
+				idName = arrayAccess(idName, calculateVariableAccessIndexArr(vi));
+			}
+			if (isPredicate(vi)) {
+				value.append(ifCondition(condition(Condition.isTrue, idName, null), returnValue(constant(ONE, true)), returnValue(constant(ZERO, true))));
+			} else {
+				final CharSequence fixupValue = fixupValue(idName, getTargetSizeWithType(vi), true);
+				if (cast != null) {
+					value.append(returnValue(doCast(cast, fixupValue)));
+				} else {
+					value.append(returnValue(fixupValue));
+				}
+			}
+			result.append(makeCase(constant(varIdx.get(vi.name), true), value, false));
+		}
+		indent--;
+		return result;
+	}
+
+	protected CharSequence returnValue(CharSequence value) {
+		return "return " + value + getStatementSeparator();
+	}
+
+	protected CharSequence setInputCases(CharSequence valueName, CharSequence cast) {
+		indent++;
+		final StringBuilder result = new StringBuilder();
+		for (final VariableInformation vi : em.variables) {
+			if (isNull(vi)) {
+				continue;
+			}
+			final StringBuilder value = new StringBuilder();
+			value.append(indent());
+			final CharSequence zeroOnePredicate = condition(Condition.isNotEqual, valueName, constant(ZERO, true));
+			CharSequence assignValue = isPredicate(vi) ? zeroOnePredicate : valueName;
+			if ((cast != null) && !isPredicate(vi)) {
+				assignValue = doCast(cast, assignValue);
+			}
+			if (!isArray(vi)) {
+				value.append(assignVariable(vi, assignValue, NONE, true, false, !isPredicate(vi)));
+				if (vi.isRegister) {
+					value.append(newLine()).append(indent()).append(assignVariable(vi, assignValue, SHADOWREG, true, false, !isPredicate(vi)));
+				}
+			} else {
+				value.append(assignArrayElement(vi, assignValue, calculateVariableAccessIndexArr(vi), true, NONE, !isPredicate(vi)));
+				if (vi.isRegister) {
+					value.append(newLine()).append(indent()).append(assignArrayElement(vi, assignValue, calculateVariableAccessIndexArr(vi), true, SHADOWREG, !isPredicate(vi)));
+				}
+			}
+			result.append(makeCase(constant(varIdx.get(vi.name), true), value, true));
+		}
+		indent--;
+		return result;
+	}
+
+	protected CharSequence doCast(CharSequence cast, CharSequence assignValue) {
+		return cast + "(" + assignValue + ")";
+	}
+
+	protected CharSequence updateRegCases() {
+		indent++;
+		final StringBuilder result = new StringBuilder();
+		for (final VariableInformation vi : em.variables) {
+			if (vi.isRegister) {
+				final StringBuilder value = new StringBuilder();
+				value.append(indent());
+				if (isArray(vi)) {
+					final CharSequence condition = condition(Condition.isNotEqual, regOffset(), constant(ONE.negate(), false));
+					final CharSequence assignArrayElement = assignArrayElement(vi, getArrayElement(vi, regOffset(), true, SHADOWREG), regOffset(), true, NONE, true);
+					value.append(ifCondition(condition, assignArrayElement, fillArray(vi, regFillValue())));
+				} else {
+					value.append(assignVariable(vi, idName(vi, true, SHADOWREG), NONE, true, false, false));
+				}
+				result.append(makeCase(constant(varIdx.get(vi.name), true), value, true));
+			}
+		}
+		indent--;
+		return result;
+	}
+
+	protected CharSequence makeCase(CharSequence caseLabel, CharSequence value, boolean includeBreak) {
+		final StringBuilder result = new StringBuilder();
+		result.append("case ").append(caseLabel).append(":").append(newLine());
+		result.append(value).append(newLine());
+		if (includeBreak) {
+			result.append(indent()).append("break").append(getStatementSeparator()).append(newLine());
+		}
+		return result;
+	}
+
+	protected abstract CharSequence fillArray(VariableInformation vi, CharSequence regFillValue);
+
+	protected CharSequence regFillValue() {
+		return "reg.fillValue";
+	}
+
+	protected CharSequence assignArrayElement(VariableInformation vi, CharSequence value, CharSequence offset, boolean field, EnumSet<Attributes> attributes, boolean doMask) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(getArrayElement(vi, offset, field, attributes));
+		sb.append(doAssign(value, getTargetSizeWithType(vi), doMask));
+		return sb;
+	}
+
+	protected CharSequence getArrayElement(VariableInformation vi, CharSequence offset, boolean field, EnumSet<Attributes> attributes) {
+		return idName(vi, field, attributes) + "[" + offset + "]";
+	}
+
+	protected CharSequence regOffset() {
+		return "reg.offset";
 	}
 
 	protected CharSequence updateEdge(int edgeDepRes, boolean posEdge) {
@@ -373,9 +501,9 @@ public abstract class CommonCodeGenerator {
 		final CharSequence currInternal = internalWithArrayAccess(internal, arr, NONE);
 		final StringBuilder value = new StringBuilder();
 		if (posEdge) {
-			value.append("((").append(prevInternal).append(" == 0) || ").append(DISABLE_EDGES.name).append(") && (").append(currInternal).append(" == 1)");
+			value.append("((").append(prevInternal).append(" == 0) || ").append(idName(DISABLE_EDGES, true, NONE)).append(") && (").append(currInternal).append(" == 1)");
 		} else {
-			value.append("((").append(prevInternal).append(" == 1) || ").append(DISABLE_EDGES.name).append(") && (").append(currInternal).append(" == 0)");
+			value.append("((").append(prevInternal).append(" == 1) || ").append(idName(DISABLE_EDGES, true, NONE)).append(") && (").append(currInternal).append(" == 0)");
 		}
 		return assignInternal(internal, value, arr, EnumSet.of(posEdge ? isPosEdgeActive : isNegEdgeActive));
 	}
@@ -469,12 +597,10 @@ public abstract class CommonCodeGenerator {
 		return res;
 	}
 
-	protected abstract CharSequence callStage(int i, boolean constant);
+	protected abstract CharSequence callStage(int stage, boolean constant);
 
 	protected CharSequence callFrame(Frame f) {
-		final StringBuilder sb = new StringBuilder();
-		sb.append(getFrameName(f)).append("();\n");
-		return sb;
+		return callMethod(getFrameName(f)) + ";\n";
 	}
 
 	protected abstract CharSequence stageMethodsHeader(int stage, int totalStageCosts, boolean constant);
@@ -538,7 +664,7 @@ public abstract class CommonCodeGenerator {
 		if (!isNull(varInfo)) {
 			sb.append(writeInternal(outputInternal, last, arr)).append(newLine());
 			if (outputInternal.isPred) {
-				sb.append(indent()).append(assignInternal(outputInternal, TIMESTAMP.name, arr, EnumSet.of(isUpdate))).append(comment("update timestamp"));
+				sb.append(indent()).append(assignInternal(outputInternal, idName(TIMESTAMP, true, NONE), arr, UPDATE)).append(comment("update timestamp"));
 			}
 		} else {
 			sb.append(writeToNull(last));
@@ -577,36 +703,55 @@ public abstract class CommonCodeGenerator {
 		if (output.info.type == Type.INT) {
 			targetSizeWithType++;
 		}
-		sb.append(doAssign(value, targetSizeWithType));
+		sb.append(doAssign(value, targetSizeWithType, false));
 		return sb;
 	}
 
-	protected StringBuilder assignVariable(VariableInformation var, CharSequence assignValue, EnumSet<Attributes> attributes, boolean field, boolean declare) {
+	protected StringBuilder assignVariable(VariableInformation var, CharSequence assignValue, EnumSet<Attributes> attributes, boolean field, boolean declare, boolean doMask) {
 		final StringBuilder sb = new StringBuilder();
 		if (declare) {
-			sb.append(fieldType(var, attributes));
+			sb.append(inlineVarDecl(var, field, attributes));
+		} else {
+			sb.append(idName(var, field, attributes));
 		}
-		sb.append(idName(var, field, attributes));
-		sb.append(doAssign(assignValue, var.width << 1));
+		sb.append(doAssign(assignValue, getTargetSizeWithType(var), doMask));
 		return sb;
+	}
+
+	protected int getTargetSizeWithType(VariableInformation var) {
+		int targetSizeWithType = var.width << 1;
+		if (var.type == Type.INT) {
+			targetSizeWithType++;
+		}
+		return targetSizeWithType;
 	}
 
 	protected StringBuilder assignTempVar(int targetSizeWithType, int pos, EnumSet<Attributes> attributes, CharSequence assignValue) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(tempVar(pos, targetSizeWithType, attributes));
-		sb.append(doAssign(assignValue, targetSizeWithType));
+		sb.append(doAssign(assignValue, targetSizeWithType, false));
 		return sb;
 	}
 
-	protected CharSequence doAssign(CharSequence assignValue, int targetSizeWithType) {
+	protected CharSequence doAssign(CharSequence assignValue, int targetSizeWithType, boolean doMask) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(" = ");
+		sb.append(fixupValue(assignValue, targetSizeWithType, doMask));
+		sb.append(getStatementSeparator());
+		return sb;
+	}
+
+	protected CharSequence fixupValue(CharSequence assignValue, int targetSizeWithType, boolean doMask) {
+		final StringBuilder sb = new StringBuilder();
 		if (isSignedType(targetSizeWithType)) {
 			sb.append(signExtend(assignValue, targetSizeWithType));
 		} else {
-			sb.append(assignValue);
+			if (doMask) {
+				sb.append(mask(assignValue, targetSizeWithType >> 1));
+			} else {
+				sb.append(assignValue);
+			}
 		}
-		sb.append("; ");
 		return sb;
 	}
 
@@ -703,7 +848,7 @@ public abstract class CommonCodeGenerator {
 		switch (exec.inst) {
 		case isFallingEdge:
 		case isRisingEdge:
-			sb.append(assignInternal(em.internals[exec.arg1], TIMESTAMP.name, arr, EnumSet.of(Attributes.isUpdate)));
+			sb.append(assignInternal(em.internals[exec.arg1], idName(TIMESTAMP, true, NONE), arr, EnumSet.of(Attributes.isUpdate)));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -741,19 +886,19 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case const0:
-			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.ZERO)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(ZERO, true)));
 			break;
 		case const1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.ONE)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(ONE, true)));
 			break;
 		case const2:
-			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2))));
+			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2), true)));
 			break;
 		case constAll1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1))));
+			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1), true)));
 			break;
 		case loadConstant:
-			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1])));
+			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true)));
 			break;
 		case loadInternal:
 			sb.append(assignTempVar(-1, pos, NONE, loadInternal(em.internals[exec.arg1], arr, NONE)));
@@ -796,13 +941,13 @@ public abstract class CommonCodeGenerator {
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
 			if (!forceRegUpdate) {
 				final VariableInformation cpyVar = createVar(cpyName, internal.actualWidth, internal.info.type);
-				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, arr, NONE), NONE, false, true)).append(comment("Backup of current value"));
+				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, arr, NONE), NONE, false, true, false)).append(newLine());
 				sb.append(indent());
 			}
 			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
-			sb.append(assignInternal(internal, tempName, arr, EnumSet.of(isShadowReg))).append(comment("Assign value"));
+			sb.append(assignInternal(internal, tempName, arr, SHADOWREG)).append(comment("Assign value"));
 			final CharSequence offset = calcRegUpdateOffset(arr, internal);
-			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, EnumSet.of(isShadowReg)), cpyName, offset, forceRegUpdate, tempName));
+			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, SHADOWREG), cpyName, offset, forceRegUpdate, tempName));
 		} else {
 			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
 			sb.append(assignInternal(internal, tempName, arr, NONE)).append(comment("Assign value"));
@@ -814,12 +959,12 @@ public abstract class CommonCodeGenerator {
 	protected String createBitAccessIfNeeded(InternalInformation internal, String tempName, List<Integer> arr, final StringBuilder sb) {
 		if (internal.actualWidth != internal.info.width) {
 			final VariableInformation currVar = createVar(tempName + "_current", internal.actualWidth, internal.info.type);
-			final CharSequence currentValue = internalWithArrayAccess(internal, arr, internal.isShadowReg ? EnumSet.of(isShadowReg) : NONE);
+			final CharSequence currentValue = internalWithArrayAccess(internal, arr, internal.isShadowReg ? SHADOWREG : NONE);
 			final BigInteger mask = calcMask(internal.actualWidth);
-			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not());
-			sb.append(assignVariable(currVar, currentValue + " & " + writeMask, NONE, false, true)).append(comment("Current value"));
+			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not(), true);
+			sb.append(assignVariable(currVar, currentValue + " & " + writeMask, NONE, false, true, false)).append(comment("Current value"));
 			final VariableInformation maskVar = createVar(tempName + "_mask_shift", internal.actualWidth, internal.info.type);
-			sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true))
+			sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true, false))
 					.append(comment("Masked and shifted"));
 			tempName = "(" + currVar.name + " | " + maskVar.name + ")";
 			sb.append(indent());
@@ -904,22 +1049,22 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case eq:
-			sb.append(twoOp(exec, "==", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "==", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case not_eq:
-			sb.append(twoOp(exec, "!=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "!=", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case less:
-			sb.append(twoOp(exec, "<", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "<", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case less_eq:
-			sb.append(twoOp(exec, "<=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "<=", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case greater:
-			sb.append(twoOp(exec, ">", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, ">", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case greater_eq:
-			sb.append(twoOp(exec, ">=", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, ">=", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -931,13 +1076,13 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case logiNeg:
-			sb.append(singleOp(exec, "!", exec.arg1, pos, a, EnumSet.of(isPredicate)));
+			sb.append(singleOp(exec, "!", exec.arg1, pos, a, PREDICATE));
 			break;
 		case logiAnd:
-			sb.append(twoOp(exec, "&&", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "&&", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case logiOr:
-			sb.append(twoOp(exec, "||", exec.arg1, pos, b, a, EnumSet.of(isPredicate)));
+			sb.append(twoOp(exec, "||", exec.arg1, pos, b, a, PREDICATE));
 			break;
 		case negPredicate:
 		case posPredicate:
@@ -1018,12 +1163,12 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected StringBuilder singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes) {
+	protected CharSequence singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes) {
 		final CharSequence assignValue = singleOpValue(op, getCast(targetSizeWithType), a, targetSizeWithType, attributes);
 		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
 	}
 
-	protected StringBuilder twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
+	protected CharSequence twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
 		final CharSequence assignValue = twoOpValue(op, getCast(targetSizeWithType), leftOperand, rightOperand, targetSizeWithType, attributes);
 		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
 	}
@@ -1040,8 +1185,14 @@ public abstract class CommonCodeGenerator {
 		}
 		final VariableInformation var = createVar(getTempName(pos, attributes), width, type);
 		final StringBuilder sb = new StringBuilder();
-		sb.append(fieldType(var, NONE));
-		sb.append(var.name);
+		sb.append(inlineVarDecl(var, false, NONE));
+		return sb;
+	}
+
+	protected CharSequence inlineVarDecl(final VariableInformation var, boolean field, EnumSet<Attributes> attributes) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(fieldType(var, attributes)).append(" ");
+		sb.append(idName(var, field, attributes));
 		return sb;
 	}
 
@@ -1086,18 +1237,18 @@ public abstract class CommonCodeGenerator {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize);
-		return "(" + op + ") & " + constant(mask);
+		return "(" + op + ") & " + constant(mask, true);
 	}
 
 	protected CharSequence invertedMask(CharSequence op, int targetSize) {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize).not();
-		return "(" + op + ") & " + constant(mask);
+		return "(" + op + ") & " + constant(mask, true);
 	}
 
 	protected BigInteger calcMask(int targetSize) {
-		return (BigInteger.ONE.shiftLeft(targetSize)).subtract(BigInteger.ONE);
+		return (ONE.shiftLeft(targetSize)).subtract(ONE);
 	}
 
 	protected CharSequence signExtend(CharSequence op, int targetSizeWithType) {
@@ -1106,10 +1257,10 @@ public abstract class CommonCodeGenerator {
 			return op;
 		final CharSequence cast = getCast(targetSizeWithType);
 		final int shift = bitWidth - targetSize;
-		if ((cast != null) && (cast.length() != 0))
-			return "((" + cast + "(" + op + ")) << " + shift + ") >> " + shift;
 		if (shift == 0)
 			return op;
+		if ((cast != null) && (cast.length() != 0))
+			return "(" + doCast(cast, op) + " << " + shift + ") >> " + shift;
 		return "((" + op + ") << " + shift + ") >> " + shift;
 	}
 
@@ -1171,7 +1322,7 @@ public abstract class CommonCodeGenerator {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPredFresh), initialize)).append(newLine());
 			}
 			if (var.isRegister && includePrivate) {
-				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isShadowReg), initialize)).append(newLine());
+				sb.append(indent()).append(createVarDeclaration(var, SHADOWREG, initialize)).append(newLine());
 			}
 			sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPublic), initialize)).append(newLine());
 		}
@@ -1213,12 +1364,12 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence createVarDeclaration(VariableInformation var, EnumSet<Attributes> attributes, boolean initialize) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(preField(var, attributes));
-		sb.append(fieldType(var, attributes));
+		sb.append(fieldType(var, attributes)).append(" ");
 		if (initialize) {
 			if (isArray(var)) {
-				sb.append(assignArrayInit(var, BigInteger.ZERO, attributes));
+				sb.append(assignArrayInit(var, ZERO, attributes));
 			} else {
-				sb.append(assignConstant(var, BigInteger.ZERO, attributes));
+				sb.append(assignConstant(var, ZERO, attributes, true));
 			}
 		} else {
 			sb.append(justDeclare(var, attributes));
@@ -1228,7 +1379,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence justDeclare(VariableInformation var, EnumSet<Attributes> attributes) {
-		return fieldName(var, attributes) + ";";
+		return fieldName(var, attributes) + getStatementSeparator() + newLine();
 	}
 
 	protected int maxRegUpdates() {
@@ -1255,7 +1406,7 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence assignArrayInit(VariableInformation var, BigInteger initValue, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(fieldName(var, attributes));
-		sb.append(doAssign(arrayInit(var, initValue, attributes), -1));
+		sb.append(doAssign(arrayInit(var, initValue, attributes), -1, false));
 		return sb;
 	}
 
@@ -1293,27 +1444,33 @@ public abstract class CommonCodeGenerator {
 		return (var.dimensions != null) && (var.dimensions.length != 0);
 	}
 
-	protected CharSequence assignConstant(VariableInformation var, BigInteger constantValue, EnumSet<Attributes> attributes) {
+	protected CharSequence assignConstant(VariableInformation var, BigInteger constantValue, EnumSet<Attributes> attributes, boolean forceUnsigned) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(fieldName(var, attributes));
 		CharSequence assignValue;
 		if (isBoolean(var, attributes)) {
 			assignValue = constantBoolean(constantValue);
 		} else {
-			assignValue = constant(constantValue);
+			assignValue = constant(constantValue, forceUnsigned);
 		}
-		sb.append(doAssign(assignValue, -1));
+		sb.append(doAssign(assignValue, -1, false));
 		return sb;
 	}
 
 	protected CharSequence constantBoolean(BigInteger constantValue) {
-		if (constantValue.equals(BigInteger.ZERO))
+		if (constantValue.equals(ZERO))
 			return "false";
 		return "true";
 	}
 
-	protected CharSequence constant(BigInteger constantValue) {
-		if ((constantValue.compareTo(BigInteger.TEN) < 0) && (constantValue.compareTo(BigInteger.TEN.negate()) > 0))
+	protected CharSequence constant(long constantValue, boolean forceUnsigned) {
+		return constant(BigInteger.valueOf(constantValue), forceUnsigned);
+	}
+
+	protected CharSequence constant(BigInteger constantValue, boolean forceUnsigned) {
+		if ((constantValue.signum() >= 0) && (constantValue.compareTo(BigInteger.TEN) < 0))
+			return constantValue.toString(10);
+		if ((constantValue.signum() < 0) && !forceUnsigned)
 			return constantValue.toString(10);
 		if (constantValue.bitLength() <= 32)
 			return constant32Bit(constantValue.intValue());
@@ -1322,16 +1479,20 @@ public abstract class CommonCodeGenerator {
 		return constantVarLength(constantValue);
 	}
 
+	protected String constantSuffix() {
+		return "L";
+	}
+
 	protected CharSequence constantVarLength(BigInteger constantValue) {
-		return String.format("0x%X", constantValue);
+		return String.format("0x%X%s", constantValue, constantSuffix());
 	}
 
 	protected CharSequence constant32Bit(int intValue) {
-		return String.format("0x%08XL", intValue);
+		return String.format("0x%08X%s", intValue, constantSuffix());
 	}
 
 	protected CharSequence constant64Bit(long longValue) {
-		return String.format("0x%016XL", longValue);
+		return String.format("0x%016X%s", longValue, constantSuffix());
 	}
 
 	protected CharSequence fieldName(VariableInformation var, EnumSet<Attributes> attributes) {
@@ -1513,28 +1674,28 @@ public abstract class CommonCodeGenerator {
 		result.append(createProcessMethods(processes));
 		result.append(indent()).append(runTestbenchHeader());
 		final VariableInformation stepCount = createVar("stepCount", 64, Type.UINT);
-		result.append(indent()).append(assignVariable(stepCount, constant(BigInteger.ZERO), NONE, false, true)).append(newLine());
+		result.append(indent()).append(assignVariable(stepCount, constant(ZERO, true), NONE, false, true, false)).append(newLine());
 		result.append(indent()).append(whileLoopStart(runTestBenchOuterLoopCondition(stepCount)));
 		final VariableInformation modified = createVar("modified", -1, Type.BOOL);
-		result.append(indent()).append(assignVariable(modified, constantBoolean(BigInteger.ZERO), NONE, false, true)).append(newLine());
+		result.append(indent()).append(assignVariable(modified, constantBoolean(ZERO), NONE, false, true, false)).append(newLine());
 		result.append(indent()).append(doLoopStart());
-		result.append(indent()).append(assignVariable(modified, constantBoolean(BigInteger.ZERO), NONE, false, false)).append(newLine());
+		result.append(indent()).append(assignVariable(modified, constantBoolean(ZERO), NONE, false, false, false)).append(newLine());
 		for (final ProcessData pd : processes.values()) {
-			result.append(indent()).append(ifCondition(callProcessMethod(pd), assignVariable(modified, constantBoolean(BigInteger.ONE), NONE, false, false), null));
+			result.append(indent()).append(ifCondition(callProcessMethod(pd), assignVariable(modified, constantBoolean(ONE), NONE, false, false, false), null));
 		}
 		result.append(indent()).append(doLoopEnd(condition(Condition.isTrue, modified.name, null)));
 		result.append(indent()).append(callRunMethod());
 		result.append(indent()).append(incVar(stepCount)).append(newLine());
 		final VariableInformation nextTime = createVar("nextTime", 64, Type.UINT);
-		result.append(indent()).append(assignVariable(nextTime, constant(BigInteger.valueOf(Long.MAX_VALUE)), NONE, false, true)).append(newLine());
+		result.append(indent()).append(assignVariable(nextTime, constant(Long.MAX_VALUE, true), NONE, false, true, false)).append(newLine());
 		for (final ProcessData pd : processes.values()) {
-			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(BigInteger.ZERO));
+			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(ZERO, true));
 			final CharSequence stateBlockedCondition = condition(Condition.isNotEqual, processState(pd.processName), processStale());
 			final CharSequence condition = condition(Condition.logiAnd, stateCondition, stateBlockedCondition);
 			result.append(indent()).append(ifCondition(condition, assignNextTime(nextTime, processTime(pd.processName)), null));
 		}
 
-		result.append(indent()).append(assignVariable(timeName(), nextTime.name, NONE, true, false)).append(newLine());
+		result.append(indent()).append(assignVariable(timeName(), nextTime.name, NONE, true, false, false)).append(newLine());
 		result.append(checkTestbenchListener());
 		result.append(indent()).append(whileLoopEnd());
 		result.append(indent()).append(runTestbenchFooter());
@@ -1588,7 +1749,7 @@ public abstract class CommonCodeGenerator {
 		sb.append(indent()).append(thenDo).append(newLine());
 		indent--;
 		if (elseDo != null) {
-			sb.append("} else {").append(newLine());
+			sb.append(indent()).append("} else {").append(newLine());
 			indent++;
 			sb.append(indent()).append(elseDo).append(newLine());
 			indent--;
@@ -1605,7 +1766,7 @@ public abstract class CommonCodeGenerator {
 		return "runProcess" + pd.processName;
 	}
 
-	protected abstract CharSequence callMethod(String methodName, String... args);
+	protected abstract CharSequence callMethod(CharSequence methodName, CharSequence... args);
 
 	protected CharSequence createProcessMethods(final Map<String, ProcessData> processes) {
 		final StringBuilder result = new StringBuilder();
@@ -1613,9 +1774,9 @@ public abstract class CommonCodeGenerator {
 			final String processName = pd.processName;
 			result.append(indent()).append(runProcessHeader(pd));
 			final VariableInformation oldTime = createVar("oldTime", 64, Type.UINT);
-			result.append(indent()).append(assignVariable(oldTime, processTime(processName), NONE, false, true)).append(newLine());
+			result.append(indent()).append(assignVariable(oldTime, processTime(processName), NONE, false, true, false)).append(newLine());
 			final VariableInformation oldState = createVar("oldState", 64, Type.UINT);
-			result.append(indent()).append(assignVariable(oldState, processState(processName), NONE, false, true)).append(newLine());
+			result.append(indent()).append(assignVariable(oldState, processState(processName), NONE, false, true, false)).append(newLine());
 			result.append(indent()).append(whileLoopStart(processCondition(processName)));
 			result.append(indent()).append(pd.predicates);
 			result.append(indent()).append(pd.calls);
@@ -1645,17 +1806,17 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence processCondition(String processName) {
 		final CharSequence isTimeGood = condition(Condition.isGreateEqual, idName(timeName(), true, NONE), processTime(processName));
-		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(BigInteger.ZERO));
+		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(ZERO, true));
 		final CharSequence isNotStale = condition(Condition.isNotEqual, processState(processName), processStale());
 		return condition(Condition.logiAnd, condition(Condition.logiAnd, isNotStale, isNotWaiting), isTimeGood);
 	}
 
-	public VariableInformation timeName() {
+	protected VariableInformation timeName() {
 		return varByName("$time");
 	}
 
 	public CharSequence processStale() {
-		return constant(BigInteger.valueOf(Integer.MAX_VALUE));
+		return constant(Integer.MAX_VALUE, true);
 	}
 
 	protected abstract CharSequence runProcessHeader(ProcessData pd);
@@ -1664,10 +1825,14 @@ public abstract class CommonCodeGenerator {
 		final CharSequence timeModified = condition(Condition.isNotEqual, oldTime.name, processTime(processName));
 		final CharSequence stateModified = condition(Condition.isNotEqual, oldState.name, processState(processName));
 		final StringBuilder sb = new StringBuilder();
-		sb.append(indent()).append("return ").append(condition(Condition.logiOr, stateModified, timeModified)).append(";").append(newLine());
+		sb.append(indent()).append(returnValue(condition(Condition.logiOr, stateModified, timeModified)));
 		indent--;
 		sb.append(indent()).append("}").append(newLine());
 		return sb;
+	}
+
+	protected String getStatementSeparator() {
+		return ";";
 	}
 
 	protected CharSequence processState(CharSequence processName) {

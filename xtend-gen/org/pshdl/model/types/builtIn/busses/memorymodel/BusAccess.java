@@ -27,14 +27,12 @@
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
 import com.google.common.base.Objects;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
+import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IntegerRange;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
@@ -50,24 +48,16 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 public class BusAccess {
   public CharSequence generateStdDef(final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//");
+    _builder.append("/**");
     _builder.newLine();
-    _builder.append("//  BusStdDefinitions.h");
+    _builder.append(" ");
+    _builder.append("* @file");
     _builder.newLine();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* @brief Provides standard definitions that are used by BusAccess.h");
     _builder.newLine();
-    _builder.append("//  Automatically generated on ");
-    {
-      if (withDate) {
-        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-        Date _date = new Date();
-        String _format = _dateTimeInstance.format(_date);
-        _builder.append(_format, "");
-      }
-    }
-    _builder.append(".");
-    _builder.newLineIfNotEmpty();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.newLine();
     _builder.append("#ifndef BusStdDefinitions_h");
@@ -80,6 +70,9 @@ public class BusAccess {
     {
       IntegerRange _upTo = new IntegerRange(1, 32);
       for(final Integer I : _upTo) {
+        _builder.append("///A bit register of width ");
+        _builder.append(I, "");
+        _builder.newLineIfNotEmpty();
         _builder.append("typedef uint32_t bus_bit");
         _builder.append(I, "");
         _builder.append("_t;");
@@ -89,6 +82,9 @@ public class BusAccess {
     {
       IntegerRange _upTo_1 = new IntegerRange(1, 32);
       for(final Integer I_1 : _upTo_1) {
+        _builder.append("///An unsigned register of width ");
+        _builder.append(I_1, "");
+        _builder.newLineIfNotEmpty();
         _builder.append("typedef uint32_t bus_uint");
         _builder.append(I_1, "");
         _builder.append("_t;");
@@ -98,6 +94,9 @@ public class BusAccess {
     {
       IntegerRange _upTo_2 = new IntegerRange(1, 32);
       for(final Integer I_2 : _upTo_2) {
+        _builder.append("///A signed register of width ");
+        _builder.append(I_2, "");
+        _builder.newLineIfNotEmpty();
         _builder.append("typedef int32_t bus_int");
         _builder.append(I_2, "");
         _builder.append("_t;");
@@ -105,12 +104,87 @@ public class BusAccess {
       }
     }
     _builder.newLine();
-    _builder.append("typedef enum {mask, limit, error, invalidIndex} warningType_t;");
+    _builder.append("/**");
     _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* The various levels of warning that can be used.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/ ");
+    _builder.newLine();
+    _builder.append("typedef enum {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("mask, /**< The value has simply being masked with an AND operation */");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("limit, /**< The value has been saturated within the specified value range */");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("error, /**< The value was out of range and an error has been returned */");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("invalidIndex /**< The index for accessing the row was invalid */");
+    _builder.newLine();
+    _builder.append("} warningType_t;");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* A function pointer for providing a custom waring handler ");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row, char *msg);");
     _builder.newLine();
+    _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* This methods allows the user to set a custom warning handler. Usually this is used");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* in conjunction with the implementation provided in BusPrint.h.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param warnFunction the new function to use for error reporting");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Example Usage:");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @code");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*    #include \"BusPrint.h\"");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*    setWarn(defaultPrintfWarn);");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @endcode");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
     _builder.append("void setWarn(warnFunc_p warnFunction);");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* The variable holding the current warning handler");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("extern warnFunc_p warn;");
     _builder.newLine();
@@ -122,24 +196,16 @@ public class BusAccess {
   
   public CharSequence generatePrintC(final Unit unit, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//");
+    _builder.append("/**");
     _builder.newLine();
-    _builder.append("//  BusPrint.c");
+    _builder.append(" ");
+    _builder.append("* @file");
     _builder.newLine();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* @brief Provides utility methods for printing structs defined by BusAccess.h");
     _builder.newLine();
-    _builder.append("//  Automatically generated on ");
-    {
-      if (withDate) {
-        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-        Date _date = new Date();
-        String _format = _dateTimeInstance.format(_date);
-        _builder.append(_format, "");
-      }
-    }
-    _builder.append(".");
-    _builder.newLineIfNotEmpty();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.newLine();
     _builder.append("#include <stdio.h>");
@@ -202,24 +268,16 @@ public class BusAccess {
   
   public CharSequence generatePrintH(final Unit unit, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//");
+    _builder.append("/**");
     _builder.newLine();
-    _builder.append("//  BusPrint.h");
+    _builder.append(" ");
+    _builder.append("* @file");
     _builder.newLine();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* @brief Provides utility methods for printing structs defined by BusAccess.h");
     _builder.newLine();
-    _builder.append("//  Automatically generated on ");
-    {
-      if (withDate) {
-        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-        Date _date = new Date();
-        String _format = _dateTimeInstance.format(_date);
-        _builder.append(_format, "");
-      }
-    }
-    _builder.append(".");
-    _builder.newLineIfNotEmpty();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.newLine();
     _builder.append("#ifndef BusPrint_h");
@@ -228,6 +286,14 @@ public class BusAccess {
     _builder.newLine();
     _builder.newLine();
     _builder.append("#include \"BusAccess.h\"");
+    _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* An implementation of the warn handler that prints the warning to stdout");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg);");
     _builder.newLine();
@@ -251,6 +317,19 @@ public class BusAccess {
         boolean _not = (!_contains);
         if (_not) {
           StringConcatenation _builder_1 = new StringConcatenation();
+          _builder_1.append("/**");
+          _builder_1.newLine();
+          _builder_1.append(" ");
+          _builder_1.append("* Prints the values within the ");
+          _builder_1.append(row.name, " ");
+          _builder_1.append(" struct");
+          _builder_1.newLineIfNotEmpty();
+          _builder_1.append(" ");
+          _builder_1.append("* @param data a non-null pointer to the struct");
+          _builder_1.newLine();
+          _builder_1.append(" ");
+          _builder_1.append("*/");
+          _builder_1.newLine();
           _builder_1.append("void print");
           String _firstUpper = StringExtensions.toFirstUpper(row.name);
           _builder_1.append(_firstUpper, "");
@@ -327,24 +406,30 @@ public class BusAccess {
   
   public CharSequence generateAccessH(final Unit unit, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//");
+    _builder.append("/**");
     _builder.newLine();
-    _builder.append("//  BusDefinitions.h");
+    _builder.append(" ");
+    _builder.append("* @file");
     _builder.newLine();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* @brief this file defines methods and structs for accessing and storing the memory mapped registers.");
     _builder.newLine();
-    _builder.append("//  Automatically generated on ");
-    {
-      if (withDate) {
-        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-        Date _date = new Date();
-        String _format = _dateTimeInstance.format(_date);
-        _builder.append(_format, "");
-      }
-    }
-    _builder.append(".");
+    _builder.append(" ");
+    _builder.append("* This file was generated from the following definition.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("\\verbatim");
+    _builder.newLine();
+    _builder.append("\t");
+    String _string = unit.toString();
+    _builder.append(_string, "\t");
+    _builder.append(" ");
     _builder.newLineIfNotEmpty();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("\\endverbatim");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.newLine();
     _builder.append("#ifndef BusDefinitions_h");
@@ -377,6 +462,15 @@ public class BusAccess {
           StringConcatenation _builder_1 = new StringConcatenation();
           _builder_1.append("//Typedef");
           _builder_1.newLine();
+          _builder_1.append("/**");
+          _builder_1.newLine();
+          _builder_1.append(" ");
+          _builder_1.append("* This struct stores all fields that are declared within row ");
+          _builder_1.append(row.name, " ");
+          _builder_1.newLineIfNotEmpty();
+          _builder_1.append(" ");
+          _builder_1.append("*/");
+          _builder_1.newLine();
           _builder_1.append("typedef struct ");
           _builder_1.append(row.name, "");
           _builder_1.append(" {");
@@ -393,6 +487,12 @@ public class BusAccess {
                     if (_add) {
                     }
                   }
+                  _builder_1.append("\t");
+                  _builder_1.append("///Field ");
+                  _builder_1.append(d.name, "\t");
+                  _builder_1.append(" within row ");
+                  _builder_1.append(row.name, "\t");
+                  _builder_1.newLineIfNotEmpty();
                   _builder_1.append("\t");
                   CharSequence _busType = this.getBusType(d);
                   _builder_1.append(_busType, "\t");
@@ -416,10 +516,13 @@ public class BusAccess {
             StringConcatenation _builder_2 = new StringConcatenation();
             _builder_2.append("// Setter");
             _builder_2.newLine();
+            CharSequence _setterDirectDoc = this.setterDirectDoc(row, rows, true);
+            _builder_2.append(_setterDirectDoc, "");
+            _builder_2.newLineIfNotEmpty();
             _builder_2.append("int set");
             String _firstUpper = StringExtensions.toFirstUpper(row.name);
             _builder_2.append(_firstUpper, "");
-            _builder_2.append("Direct(uint32_t *base, int index");
+            _builder_2.append("Direct(uint32_t *base, uint32_t index");
             {
               List<Definition> _writeDefs = this.writeDefs(row);
               for(final Definition definition : _writeDefs) {
@@ -429,10 +532,13 @@ public class BusAccess {
             }
             _builder_2.append(");");
             _builder_2.newLineIfNotEmpty();
+            CharSequence _setterDoc = this.setterDoc(row, rows, true);
+            _builder_2.append(_setterDoc, "");
+            _builder_2.newLineIfNotEmpty();
             _builder_2.append("int set");
             String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
             _builder_2.append(_firstUpper_1, "");
-            _builder_2.append("(uint32_t *base, int index, ");
+            _builder_2.append("(uint32_t *base, uint32_t index, ");
             _builder_2.append(row.name, "");
             _builder_2.append("_t *newVal);");
             _builder_2.newLineIfNotEmpty();
@@ -442,10 +548,13 @@ public class BusAccess {
           StringConcatenation _builder_3 = new StringConcatenation();
           _builder_3.append("//Getter");
           _builder_3.newLine();
+          CharSequence _terDirectDoc = this.getterDirectDoc(row, rows, true);
+          _builder_3.append(_terDirectDoc, "");
+          _builder_3.newLineIfNotEmpty();
           _builder_3.append("int get");
           String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
           _builder_3.append(_firstUpper_2, "");
-          _builder_3.append("Direct(uint32_t *base, int index");
+          _builder_3.append("Direct(uint32_t *base, uint32_t index");
           {
             List<Definition> _allDefs_1 = this.allDefs(row);
             for(final Definition definition_1 : _allDefs_1) {
@@ -455,10 +564,13 @@ public class BusAccess {
           }
           _builder_3.append(");");
           _builder_3.newLineIfNotEmpty();
+          CharSequence _terDoc = this.getterDoc(row, rows, true);
+          _builder_3.append(_terDoc, "");
+          _builder_3.newLineIfNotEmpty();
           _builder_3.append("int get");
           String _firstUpper_3 = StringExtensions.toFirstUpper(row.name);
           _builder_3.append(_firstUpper_3, "");
-          _builder_3.append("(uint32_t *base, int index, ");
+          _builder_3.append("(uint32_t *base, uint32_t index, ");
           _builder_3.append(row.name, "");
           _builder_3.append("_t *result);");
           _builder_3.newLineIfNotEmpty();
@@ -477,6 +589,9 @@ public class BusAccess {
         if ((ne instanceof Column)) {
           final Column col = ((Column) ne);
           StringConcatenation _builder_1 = new StringConcatenation();
+          _builder_1.append("///This struct stores all rows defined in colum ");
+          _builder_1.append(col.name, "");
+          _builder_1.newLineIfNotEmpty();
           _builder_1.append("typedef struct ");
           _builder_1.append(col.name, "");
           _builder_1.append(" {");
@@ -484,11 +599,16 @@ public class BusAccess {
           {
             for(final NamedElement neRow : col.rows) {
               _builder_1.append("\t");
+              _builder_1.append("///Struct for row ");
               String _name_1 = neRow.getName();
               _builder_1.append(_name_1, "\t");
-              _builder_1.append("_t ");
+              _builder_1.newLineIfNotEmpty();
+              _builder_1.append("\t");
               String _name_2 = neRow.getName();
               _builder_1.append(_name_2, "\t");
+              _builder_1.append("_t ");
+              String _name_3 = neRow.getName();
+              _builder_1.append(_name_3, "\t");
               _builder_1.append(";");
               _builder_1.newLineIfNotEmpty();
             }
@@ -507,25 +627,27 @@ public class BusAccess {
   
   public CharSequence generateAccessC(final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//");
+    _builder.append("/**");
     _builder.newLine();
-    _builder.append("//  BusAcces.c");
+    _builder.append(" ");
+    _builder.append("* @brief Provides access to the memory mapped registers");
     _builder.newLine();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* ");
     _builder.newLine();
-    _builder.append("//  Automatically generated on ");
-    {
-      if (withDate) {
-        DateFormat _dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-        Date _date = new Date();
-        String _format = _dateTimeInstance.format(_date);
-        _builder.append(_format, "");
-      }
-    }
-    _builder.append(".");
-    _builder.newLineIfNotEmpty();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* For each type of row there are methods for setting/getting the values");
     _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* either directly, or as a struct. A memory map overview has been");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* generated into BusMap.html.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
+    _builder.append(" ");
     _builder.newLine();
     _builder.append("#include <stdint.h>");
     _builder.newLine();
@@ -534,6 +656,20 @@ public class BusAccess {
     _builder.append("#include \"BusStdDefinitions.h\"");
     _builder.newLine();
     _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* This method provides a null implementation of the warning functionality. You");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* can use it to provide your own error handling, or you can use the implementation");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* provided in BusPrint.h");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
     _builder.append("static void defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){");
     _builder.newLine();
     _builder.append("}");
@@ -541,6 +677,41 @@ public class BusAccess {
     _builder.newLine();
     _builder.append("warnFunc_p warn=defaultWarn;");
     _builder.newLine();
+    _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* This methods allows the user to set a custom warning function. Usually this is used");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* in conjunction with the implementation provided in BusPrint.h.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param warnFunction the new function to use for error reporting");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Example Usage:");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @code");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*    #include \"BusPrint.h\"");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*    setWarn(defaultPrintfWarn);");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @endcode");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("void setWarn(warnFunc_p warnFunction){");
     _builder.newLine();
@@ -584,10 +755,13 @@ public class BusAccess {
   
   public CharSequence generateGetterFunction(final Row row, final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
+    CharSequence _terDirectDoc = this.getterDirectDoc(row, rows, false);
+    _builder.append(_terDirectDoc, "");
+    _builder.newLineIfNotEmpty();
     _builder.append("int get");
     String _firstUpper = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper, "");
-    _builder.append("Direct(uint32_t *base, int index");
+    _builder.append("Direct(uint32_t *base, uint32_t index");
     {
       List<Definition> _allDefs = this.allDefs(row);
       for(final Definition definition : _allDefs) {
@@ -626,10 +800,14 @@ public class BusAccess {
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
+    _builder.newLine();
+    CharSequence _terDoc = this.getterDoc(row, rows, false);
+    _builder.append(_terDoc, "");
+    _builder.newLineIfNotEmpty();
     _builder.append("int get");
     String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper_1, "");
-    _builder.append("(uint32_t *base, int index, ");
+    _builder.append("(uint32_t *base, uint32_t index, ");
     _builder.append(row.name, "");
     _builder.append("_t *result){");
     _builder.newLineIfNotEmpty();
@@ -649,6 +827,256 @@ public class BusAccess {
     _builder.append(");");
     _builder.newLineIfNotEmpty();
     _builder.append("}");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public CharSequence setterDoc(final Row row, final List<Row> rows, final boolean header) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("/*");
+    {
+      if ((!header)) {
+        _builder.append("*");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* Updates the values in memory from the struct.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      int _count = this.count(rows, row);
+      boolean _equals = (_count == 1);
+      if (_equals) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        int _count_1 = this.count(rows, row);
+        int _minus = (_count_1 - 1);
+        _builder.append(_minus, " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* @param newVal the values of this row will be written into the struct");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully updated the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index or value exceeds range for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/\t");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public int count(final List<Row> rows, final Row row) {
+    final Function1<Row, Boolean> _function = new Function1<Row, Boolean>() {
+      public Boolean apply(final Row it) {
+        return Boolean.valueOf(Objects.equal(it.name, row.name));
+      }
+    };
+    Iterable<Row> _filter = IterableExtensions.<Row>filter(rows, _function);
+    return ((Object[])Conversions.unwrapArray(_filter, Object.class)).length;
+  }
+  
+  public CharSequence getterDoc(final Row row, final List<Row> rows, final boolean header) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("/*");
+    {
+      if ((!header)) {
+        _builder.append("*");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* Retrieve the fields of row ");
+    _builder.append(row.name, " ");
+    _builder.append(" into the struct.");
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      int _count = this.count(rows, row);
+      boolean _equals = (_count == 1);
+      if (_equals) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        int _count_1 = this.count(rows, row);
+        int _minus = (_count_1 - 1);
+        _builder.append(_minus, " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* @param result the values of this row will be written into the struct");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully retrieved the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public CharSequence setterDirectDoc(final Row row, final List<Row> rows, final boolean header) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("/*");
+    {
+      if ((!header)) {
+        _builder.append("*");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* Updates the values in memory from the struct.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      int _count = this.count(rows, row);
+      boolean _equals = (_count == 1);
+      if (_equals) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        int _count_1 = this.count(rows, row);
+        int _minus = (_count_1 - 1);
+        _builder.append(_minus, " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    {
+      List<Definition> _allDefs = this.allDefs(row);
+      for(final Definition d : _allDefs) {
+        _builder.append(" ");
+        _builder.append("* @param ");
+        _builder.append(d.name, " ");
+        _builder.append(" the value of ");
+        _builder.append(d.name, " ");
+        _builder.append(" will be written into the register. ");
+        StringBuilder _explain = this.explain(d);
+        _builder.append(_explain, " ");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully updated the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index or value exceeds its range for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  public CharSequence getterDirectDoc(final Row row, final List<Row> rows, final boolean header) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("/*");
+    {
+      if ((!header)) {
+        _builder.append("*");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* Directly retrieve the fields of row ");
+    _builder.append(row.name, " ");
+    _builder.append(".");
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      int _count = this.count(rows, row);
+      boolean _equals = (_count == 1);
+      if (_equals) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        int _count_1 = this.count(rows, row);
+        int _minus = (_count_1 - 1);
+        _builder.append(_minus, " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    {
+      List<Definition> _allDefs = this.allDefs(row);
+      for(final Definition d : _allDefs) {
+        _builder.append(" ");
+        _builder.append("* @param ");
+        _builder.append(d.name, " ");
+        _builder.append(" the value of ");
+        _builder.append(d.name, " ");
+        _builder.append(" will be written into the memory of this pointer.");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully retrieved the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     return _builder;
   }
@@ -685,10 +1113,13 @@ public class BusAccess {
   
   public CharSequence generateSetterFunction(final Row row, final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
+    CharSequence _setterDirectDoc = this.setterDirectDoc(row, rows, false);
+    _builder.append(_setterDirectDoc, "");
+    _builder.newLineIfNotEmpty();
     _builder.append("int set");
     String _firstUpper = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper, "");
-    _builder.append("Direct(uint32_t *base, int index");
+    _builder.append("Direct(uint32_t *base, uint32_t index");
     {
       List<Definition> _writeDefs = this.writeDefs(row);
       for(final Definition d : _writeDefs) {
@@ -732,10 +1163,14 @@ public class BusAccess {
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
+    _builder.newLine();
+    CharSequence _setterDoc = this.setterDoc(row, rows, false);
+    _builder.append(_setterDoc, "");
+    _builder.newLineIfNotEmpty();
     _builder.append("int set");
     String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper_1, "");
-    _builder.append("(uint32_t *base, int index, ");
+    _builder.append("(uint32_t *base, uint32_t index, ");
     _builder.append(row.name, "");
     _builder.append("_t *newVal) {");
     _builder.newLineIfNotEmpty();
@@ -756,6 +1191,93 @@ public class BusAccess {
     _builder.newLineIfNotEmpty();
     _builder.append("}");
     _builder.newLine();
+    return _builder;
+  }
+  
+  public StringBuilder explain(final Definition d) {
+    final StringBuilder sb = new StringBuilder();
+    final Definition.WarnType _switchValue = d.warn;
+    if (_switchValue != null) {
+      switch (_switchValue) {
+        case error:
+          StringConcatenation _builder = new StringConcatenation();
+          _builder.append("When this value exceeds its valid range [");
+          CharSequence _humanRange = this.humanRange(d);
+          _builder.append(_humanRange, "");
+          _builder.append("], an error is returned and the warn function called.");
+          sb.append(_builder);
+          break;
+        case limit:
+          StringConcatenation _builder_1 = new StringConcatenation();
+          _builder_1.append("When this value exceeds its valid range [");
+          CharSequence _humanRange_1 = this.humanRange(d);
+          _builder_1.append(_humanRange_1, "");
+          _builder_1.append("], the highest/lowest value is used and the warn function called.");
+          sb.append(_builder_1);
+          break;
+        case mask:
+          StringConcatenation _builder_2 = new StringConcatenation();
+          _builder_2.append("When this value exceeds its valid range [");
+          CharSequence _humanRange_2 = this.humanRange(d);
+          _builder_2.append(_humanRange_2, "");
+          _builder_2.append("], the value is masked with 0x");
+          long _doubleLessThan = (1l << 
+            d.width);
+          long _minus = (_doubleLessThan - 1);
+          _builder_2.append(_minus, "");
+          _builder_2.append(" and the warn function called.");
+          sb.append(_builder_2);
+          break;
+        case silentError:
+          StringConcatenation _builder_3 = new StringConcatenation();
+          _builder_3.append("When this value exceeds its valid range [");
+          CharSequence _humanRange_3 = this.humanRange(d);
+          _builder_3.append(_humanRange_3, "");
+          _builder_3.append("], an error is returned.");
+          sb.append(_builder_3);
+          break;
+        case silentLimit:
+          StringConcatenation _builder_4 = new StringConcatenation();
+          _builder_4.append("When this value exceeds its valid range [");
+          CharSequence _humanRange_4 = this.humanRange(d);
+          _builder_4.append(_humanRange_4, "");
+          _builder_4.append("], an the highest/lowest value is used.");
+          sb.append(_builder_4);
+          break;
+        case silentMask:
+          StringConcatenation _builder_5 = new StringConcatenation();
+          _builder_5.append("When this value exceeds its valid range [");
+          CharSequence _humanRange_5 = this.humanRange(d);
+          _builder_5.append(_humanRange_5, "");
+          _builder_5.append("], the value is masked with 0x");
+          long _doubleLessThan_1 = (1l << 
+            d.width);
+          long _minus_1 = (_doubleLessThan_1 - 1);
+          _builder_5.append(_minus_1, "");
+          _builder_5.append(".");
+          sb.append(_builder_5);
+          break;
+        default:
+          break;
+      }
+    }
+    return sb;
+  }
+  
+  public CharSequence humanRange(final Definition d) {
+    StringConcatenation _builder = new StringConcatenation();
+    {
+      boolean _tripleEquals = (d.type == Definition.Type.INT);
+      if (_tripleEquals) {
+        String _maxValueNegHex = this.getMaxValueNegHex(d);
+        _builder.append(_maxValueNegHex, "");
+      } else {
+        _builder.append("0");
+      }
+    }
+    _builder.append(" .. ");
+    String _maxValueHex = this.getMaxValueHex(d);
+    _builder.append(_maxValueHex, "");
     return _builder;
   }
   

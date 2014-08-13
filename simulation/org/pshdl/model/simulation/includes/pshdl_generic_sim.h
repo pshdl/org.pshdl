@@ -28,10 +28,30 @@
 #ifndef _pshdl_generic_sim_h_
 #define _pshdl_generic_sim_h_
 
-uint64_t pshdl_sim_getOutput(int idx);
-void     pshdl_sim_setInput (int idx, uint64_t value);
-uint64_t pshdl_sim_getOutputArray(int idx, int arrayIdx[]);
-void     pshdl_sim_setInputArray (int idx, uint64_t value, int arrayIdx[]);
+/**
+ * This methods allows the access of any variable that is not an array, declared 
+ * within the PSHDL module.
+ * @param idx the index of the variable as declared in the header file specific
+ *				to your module. The variable may NOT be an array. Accessing an 
+ *				invalid index will return 0.
+ * @retval the value returned is masked to the width of the variable. A sign-extension
+ * 			is NOT performed. Predicates return either 0 or 1
+ */
+uint64_t pshdl_sim_getOutput(uint32_t idx);
+void     pshdl_sim_setInput (uint32_t idx, uint64_t value);
+
+/**
+ * This methods allows the access of any variable declared within the PSHDL module.
+ * @param idx the index of the variable as declared in the header file specific
+ *				to your module. Accessing an invalid index will return 0.
+ * @param arrayIdx when the variable that is accessed is an array, this arrayIdx holds
+ * 					the index for all dimensions. Can be NULL when the variable is not
+ * 					an array
+ * @retval the value returned is masked to the width of the variable. A sign-extension
+ * 			is NOT performed. Predicates return either 0 or 1
+ */
+uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t arrayIdx[]);
+void     pshdl_sim_setInputArray (uint32_t idx, uint64_t value, uint32_t arrayIdx[]);
 
 void     pshdl_sim_setDisableRegOutputlogic(bool enable);
 void     pshdl_sim_setDisableEdges(bool enable);
@@ -39,9 +59,10 @@ void     pshdl_sim_setDisableEdges(bool enable);
 void     pshdl_sim_run(void);
 void     pshdl_sim_initConstants(void);
 
-char*    pshdl_sim_getName(int idx);
+uint32_t pshdl_sim_getIndex(char* name);
+char*    pshdl_sim_getName(uint32_t idx);
 char*    pshdl_sim_getJsonDesc(void);
 uint64_t pshdl_sim_getDeltaCycle(void);
-int      pshdl_sim_getVarCount(void);
+uint32_t pshdl_sim_getVarCount(void);
 
 #endif

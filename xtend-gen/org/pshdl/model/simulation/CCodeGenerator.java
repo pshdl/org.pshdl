@@ -29,12 +29,15 @@ package org.pshdl.model.simulation;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -125,9 +128,9 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence fieldType(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
     boolean _isBoolean = this.isBoolean(varInfo, attributes);
     if (_isBoolean) {
-      return "bool ";
+      return "bool";
     }
-    return "uint64_t ";
+    return "uint64_t";
   }
   
   protected CharSequence justDeclare(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
@@ -237,6 +240,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     {
       if (this.hasClock) {
+        _builder.append("/// Don\'t use this");
+        _builder.newLine();
         _builder.append("typedef struct regUpdate {");
         _builder.newLine();
         _builder.append("\t");
@@ -281,63 +286,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("\t\t");
     _builder.append("switch (reg.internal) {");
     _builder.newLine();
-    {
-      for(final VariableInformation v : this.em.variables) {
-        {
-          if (v.isRegister) {
-            _builder.append("\t\t\t");
-            _builder.append("case ");
-            Integer _get = this.varIdx.get(v.name);
-            _builder.append(_get, "\t\t\t");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            {
-              int _length = v.dimensions.length;
-              boolean _equals = (_length == 0);
-              if (_equals) {
-                _builder.append("\t\t\t");
-                CharSequence _idName = this.idName(v, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName, "\t\t\t");
-                _builder.append(" = ");
-                CharSequence _idName_1 = this.idName(v, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_1, "\t\t\t");
-                _builder.append("$reg; break;");
-                _builder.newLineIfNotEmpty();
-              } else {
-                _builder.append("\t\t\t");
-                _builder.append("if (reg.offset!=-1)");
-                _builder.newLine();
-                _builder.append("\t\t\t");
-                _builder.append("\t");
-                CharSequence _idName_2 = this.idName(v, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_2, "\t\t\t\t");
-                _builder.append("[reg.offset] = ");
-                CharSequence _idName_3 = this.idName(v, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_3, "\t\t\t\t");
-                _builder.append("$reg[reg.offset];");
-                _builder.newLineIfNotEmpty();
-                _builder.append("\t\t\t");
-                _builder.append("else");
-                _builder.newLine();
-                _builder.append("\t\t\t");
-                _builder.append("\t");
-                _builder.append("memset(");
-                CharSequence _idName_4 = this.idName(v, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_4, "\t\t\t\t");
-                _builder.append(", reg.fillValue, ");
-                int _arraySize = this.getArraySize(v);
-                _builder.append(_arraySize, "\t\t\t\t");
-                _builder.append(");");
-                _builder.newLineIfNotEmpty();
-                _builder.append("\t\t\t");
-                _builder.append("break;");
-                _builder.newLine();
-              }
-            }
-          }
-        }
-      }
-    }
+    _builder.append("\t\t\t");
+    CharSequence _updateRegCases = this.updateRegCases();
+    _builder.append(_updateRegCases, "\t\t\t");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
     _builder.append("}");
     _builder.newLine();
@@ -347,6 +299,19 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("}");
     _builder.newLine();
     return _builder;
+  }
+  
+  public static int hash(final String str) {
+    int hash = (-2128831035);
+    final byte[] bytes = str.getBytes();
+    for (final byte b : bytes) {
+      {
+        int _bitwiseXor = (hash ^ b);
+        hash = _bitwiseXor;
+        hash = (hash * 16777619);
+      }
+    }
+    return hash;
   }
   
   protected CharSequence writeToNull(final String last) {
@@ -410,7 +375,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLineIfNotEmpty();
     CharSequence _indent_3 = this.indent();
     _builder.append(_indent_3, "");
-    _builder.append("\t\treg.offset=");
+    _builder.append("\t\treg.offset=(int)");
     _builder.append(offset, "");
     _builder.append(";");
     _builder.newLineIfNotEmpty();
@@ -456,8 +421,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     return "";
   }
   
-  protected StringBuilder twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
-    StringBuilder _xblockexpression = null;
+  protected CharSequence twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+    CharSequence _xblockexpression = null;
     {
       boolean _tripleEquals = (fi.inst == Instruction.sra);
       if (_tripleEquals) {
@@ -517,14 +482,29 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   protected CharSequence helperMethods() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("void pshdl_sim_setInput(int idx, uint64_t value) {");
+    _builder.append("void pshdl_sim_setInput(uint32_t idx, uint64_t value) {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("pshdl_sim_setInputArray(idx, value, ((void *)0));");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
-    _builder.append("void pshdl_sim_setInputArray(int idx, uint64_t value, int arrayIdx[]) {");
+    _builder.append("void pshdl_sim_setInputArray(uint32_t idx, uint64_t value, uint32_t arrayIdx[]) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("switch (idx) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    CharSequence _setInputCases = this.setInputCases("value", null);
+    _builder.append(_setInputCases, "\t\t");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("char* pshdl_sim_getName(uint32_t idx) {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("switch (idx) {");
@@ -532,129 +512,12 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     {
       Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
       for(final VariableInformation v : _excludeNull) {
-        {
-          int _length = v.dimensions.length;
-          boolean _equals = (_length == 0);
-          if (_equals) {
-            _builder.append("\t\t");
-            _builder.append("case ");
-            Integer _get = this.varIdx.get(v.name);
-            _builder.append(_get, "\t\t");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t\t");
-            _builder.append("\t");
-            StringConcatenation _builder_1 = new StringConcatenation();
-            {
-              boolean _isPredicate = this.isPredicate(v);
-              if (_isPredicate) {
-                _builder_1.append("value!=0");
-              } else {
-                _builder_1.append("value");
-              }
-            }
-            StringBuilder _assignVariable = this.assignVariable(v, _builder_1, CommonCodeGenerator.NONE, true, false);
-            _builder.append(_assignVariable, "\t\t\t");
-            _builder.newLineIfNotEmpty();
-            {
-              if (v.isRegister) {
-                _builder.append("\t\t");
-                _builder.append("\t");
-                StringConcatenation _builder_2 = new StringConcatenation();
-                {
-                  boolean _isPredicate_1 = this.isPredicate(v);
-                  if (_isPredicate_1) {
-                    _builder_2.append("value!=0");
-                  } else {
-                    _builder_2.append("value");
-                  }
-                }
-                EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
-                StringBuilder _assignVariable_1 = this.assignVariable(v, _builder_2, _of, true, false);
-                _builder.append(_assignVariable_1, "\t\t\t");
-                _builder.newLineIfNotEmpty();
-              }
-            }
-            _builder.append("\t\t");
-            _builder.append("\t");
-            _builder.append("break;");
-            _builder.newLine();
-          } else {
-            _builder.append("\t\t");
-            _builder.append("case ");
-            Integer _get_1 = this.varIdx.get(v.name);
-            _builder.append(_get_1, "\t\t");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t\t");
-            _builder.append("\t");
-            CharSequence _idName = this.idName(v, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName, "\t\t\t");
-            _builder.append("[");
-            CharSequence _calculateVariableAccessIndexArr = this.calculateVariableAccessIndexArr(v);
-            _builder.append(_calculateVariableAccessIndexArr, "\t\t\t");
-            _builder.append("]=");
-            {
-              boolean _isPredicate_2 = this.isPredicate(v);
-              if (_isPredicate_2) {
-                _builder.append("value!=0");
-              } else {
-                _builder.append("value");
-              }
-            }
-            _builder.append(";");
-            _builder.newLineIfNotEmpty();
-            {
-              if (v.isRegister) {
-                _builder.append("\t\t");
-                _builder.append("\t");
-                EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
-                CharSequence _idName_1 = this.idName(v, true, _of_1);
-                _builder.append(_idName_1, "\t\t\t");
-                _builder.append("[");
-                CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v);
-                _builder.append(_calculateVariableAccessIndexArr_1, "\t\t\t");
-                _builder.append("]=");
-                {
-                  boolean _isPredicate_3 = this.isPredicate(v);
-                  if (_isPredicate_3) {
-                    _builder.append("value!=0");
-                  } else {
-                    _builder.append("value");
-                  }
-                }
-                _builder.append(";");
-                _builder.newLineIfNotEmpty();
-              }
-            }
-            _builder.append("\t\t");
-            _builder.append("\t");
-            _builder.append("break;");
-            _builder.newLine();
-          }
-        }
-      }
-    }
-    _builder.append("\t");
-    _builder.append("}");
-    _builder.newLine();
-    _builder.append("}");
-    _builder.newLine();
-    _builder.newLine();
-    _builder.append("char* pshdl_sim_getName(int idx) {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("switch (idx) {");
-    _builder.newLine();
-    {
-      Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
-      for(final VariableInformation v_1 : _excludeNull_1) {
         _builder.append("\t\t");
         _builder.append("case ");
-        Integer _get_2 = this.varIdx.get(v_1.name);
-        _builder.append(_get_2, "\t\t");
+        Integer _get = this.varIdx.get(v.name);
+        _builder.append(_get, "\t\t");
         _builder.append(": return \"");
-        _builder.append(v_1.name, "\t\t");
+        _builder.append(v.name, "\t\t");
         _builder.append("\";");
         _builder.newLineIfNotEmpty();
       }
@@ -689,7 +552,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("int pshdl_sim_getVarCount(){");
+    _builder.append("uint32_t pshdl_sim_getVarCount(){");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("return ");
@@ -726,7 +589,90 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("uint64_t pshdl_sim_getOutput(int idx) {");
+    _builder.append("static uint32_t hash(char* str){");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("size_t len=strlen(str);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("uint32_t hash = 2166136261;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("for (int i=0;i<len;i++){");
+    _builder.newLine();
+    _builder.append("\t   \t");
+    _builder.append("hash = hash ^ str[i];");
+    _builder.newLine();
+    _builder.append("\t   \t");
+    _builder.append("hash = hash * 16777619;");
+    _builder.newLine();
+    _builder.append("\t   ");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return hash;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("uint32_t pshdl_sim_getIndex(char* name) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("uint32_t hashName=hash(name);");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("switch (hashName) {");
+    _builder.newLine();
+    {
+      Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
+      Map<Integer, List<VariableInformation>> _hashed = this.getHashed(_excludeNull_1);
+      Set<Map.Entry<Integer, List<VariableInformation>>> _entrySet = _hashed.entrySet();
+      for(final Map.Entry<Integer, List<VariableInformation>> e : _entrySet) {
+        _builder.append("\t\t");
+        _builder.append("case ");
+        Integer _key = e.getKey();
+        CharSequence _constant32Bit = this.constant32Bit((_key).intValue());
+        _builder.append(_constant32Bit, "\t\t");
+        _builder.append(":");
+        _builder.newLineIfNotEmpty();
+        {
+          List<VariableInformation> _value = e.getValue();
+          for(final VariableInformation vi : _value) {
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("if (strcmp(name, \"");
+            _builder.append(vi.name, "\t\t\t");
+            _builder.append("\") == 0)");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t");
+            _builder.append("\t");
+            _builder.append("\t");
+            _builder.append("return ");
+            int _varIdx = this.getVarIdx(vi);
+            _builder.append(_varIdx, "\t\t\t\t");
+            _builder.append(";");
+            _builder.newLineIfNotEmpty();
+          }
+        }
+        _builder.append("\t\t");
+        _builder.append("\t");
+        _builder.append("return -1; //so close...");
+        _builder.newLine();
+      }
+    }
+    _builder.append("\t");
+    _builder.append("default:");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("return -1;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("uint64_t pshdl_sim_getOutput(uint32_t idx) {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("return pshdl_sim_getOutputArray(idx, ((void *)0));");
@@ -734,74 +680,15 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("uint64_t pshdl_sim_getOutputArray(int idx, int arrayIdx[]) {");
+    _builder.append("uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t arrayIdx[]) {");
     _builder.newLine();
     _builder.append("\t");
     _builder.append("switch (idx) {");
     _builder.newLine();
-    {
-      Iterable<VariableInformation> _excludeNull_2 = this.excludeNull(this.em.variables);
-      for(final VariableInformation v_2 : _excludeNull_2) {
-        {
-          int _length_1 = v_2.dimensions.length;
-          boolean _equals_1 = (_length_1 == 0);
-          if (_equals_1) {
-            _builder.append("\t\t");
-            _builder.append("case ");
-            Integer _get_3 = this.varIdx.get(v_2.name);
-            _builder.append(_get_3, "\t\t");
-            _builder.append(": return ");
-            CharSequence _idName_2 = this.idName(v_2, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName_2, "\t\t");
-            {
-              boolean _isPredicate_4 = this.isPredicate(v_2);
-              if (_isPredicate_4) {
-                _builder.append("?1:0");
-              } else {
-                if ((v_2.width != 64)) {
-                  _builder.append(" & ");
-                  BigInteger _calcMask = this.calcMask(v_2.width);
-                  CharSequence _constant = this.constant(_calcMask);
-                  _builder.append(_constant, "\t\t");
-                }
-              }
-            }
-            _builder.append(";");
-            _builder.newLineIfNotEmpty();
-          } else {
-            _builder.append("\t\t");
-            _builder.append("case ");
-            Integer _get_4 = this.varIdx.get(v_2.name);
-            _builder.append(_get_4, "\t\t");
-            _builder.append(": return ");
-            CharSequence _idName_3 = this.idName(v_2, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName_3, "\t\t");
-            _builder.append("[");
-            CharSequence _calculateVariableAccessIndexArr_2 = this.calculateVariableAccessIndexArr(v_2);
-            _builder.append(_calculateVariableAccessIndexArr_2, "\t\t");
-            _builder.append("]");
-            {
-              boolean _and = false;
-              if (!(v_2.width != 64)) {
-                _and = false;
-              } else {
-                boolean _isPredicate_5 = this.isPredicate(v_2);
-                boolean _not = (!_isPredicate_5);
-                _and = _not;
-              }
-              if (_and) {
-                _builder.append(" & ");
-                BigInteger _calcMask_1 = this.calcMask(v_2.width);
-                CharSequence _constant_1 = this.constant(_calcMask_1);
-                _builder.append(_constant_1, "\t\t");
-              }
-            }
-            _builder.append(";");
-            _builder.newLineIfNotEmpty();
-          }
-        }
-      }
-    }
+    _builder.append("\t\t");
+    CharSequence _outputCases = this.getOutputCases(null);
+    _builder.append(_outputCases, "\t\t");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("}");
     _builder.newLine();
@@ -811,6 +698,24 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("}\t");
     _builder.newLine();
     return _builder;
+  }
+  
+  public Map<Integer, List<VariableInformation>> getHashed(final Iterable<VariableInformation> informations) {
+    final Map<Integer, List<VariableInformation>> res = Maps.<Integer, List<VariableInformation>>newHashMap();
+    for (final VariableInformation vi : this.em.variables) {
+      {
+        final int hashVal = CCodeGenerator.hash(vi.name);
+        final List<VariableInformation> list = res.get(Integer.valueOf(hashVal));
+        boolean _tripleEquals = (list == null);
+        if (_tripleEquals) {
+          ArrayList<VariableInformation> _newArrayList = Lists.<VariableInformation>newArrayList(vi);
+          res.put(Integer.valueOf(hashVal), _newArrayList);
+        } else {
+          list.add(vi);
+        }
+      }
+    }
+    return res;
   }
   
   protected CharSequence barrier() {
@@ -897,6 +802,18 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   protected CharSequence getSpecificHeader() {
     StringConcatenation _builder = new StringConcatenation();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @file");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @brief Provides access to all fields and their index.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
+    _builder.newLine();
     _builder.append("#ifndef _");
     String _headerName = this.headerName();
     _builder.append(_headerName, "");
@@ -913,6 +830,11 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     {
       Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
       for(final VariableInformation vi : _excludeNull) {
+        _builder.append("///Use this index define to access <tt> ");
+        String _replaceAll = vi.name.replaceAll("\\@", "\\\\@");
+        _builder.append(_replaceAll, "");
+        _builder.append(" </tt> via getOutput/setInput methods");
+        _builder.newLineIfNotEmpty();
         _builder.append("#define ");
         CharSequence _defineName = this.getDefineName(vi);
         _builder.append(_defineName, "");
@@ -1000,9 +922,31 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     };
     IterableExtensions.<Row>forEach(rows, _function);
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//  BusAccessSim.c");
+    _builder.append("/**");
     _builder.newLine();
-    _builder.append("//");
+    _builder.append(" ");
+    _builder.append("* @file");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @brief  Provides methods for simulating accessing to the memory registers");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* This file is a substitue for the BusAccess.c file that is used to access real memory.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* For each type of row there are methods for setting/getting the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* either directly, or as a struct. A memory map overview has been");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* generated into BusMap.html.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.newLine();
     _builder.append("#include <stdint.h>");
@@ -1013,13 +957,25 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append("#include \"BusStdDefinitions.h\"");
     _builder.newLine();
-    _builder.append("#include \"pshdl_generic_sim.h\"");
-    _builder.newLine();
     _builder.append("#include \"");
     String _headerName = this.headerName();
     _builder.append(_headerName, "");
     _builder.append(".h\"");
     _builder.newLineIfNotEmpty();
+    _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* This method provides a null implementation of the warning functionality. You");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* can use it to provide your own error handling, or you can use the implementation");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* provided in BusPrint.h");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("static void defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){");
     _builder.newLine();
@@ -1029,6 +985,41 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("warnFunc_p warn=defaultWarn;");
     _builder.newLine();
     _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* This methods allows the user to set a custom warning function. Usually this is used");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* in conjunction with the implementation provided in BusPrint.h.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param warnFunction the new function to use for error reporting");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Example Usage:");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @code");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*    #include \"BusPrint.h\"");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*    setWarn(defaultPrintfWarn);");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @endcode");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
     _builder.append("void setWarn(warnFunc_p warnFunction){");
     _builder.newLine();
     _builder.append("    ");
@@ -1036,6 +1027,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
+    _builder.newLine();
+    _builder.append("///The index of the Clock that is toggled for each setting");
     _builder.newLine();
     _builder.append("#define ");
     _builder.append("busclk_idx", "");
@@ -1046,20 +1039,34 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     String res = _builder.toString();
     final HashSet<String> checkedRows = new HashSet<String>();
+    final HashMap<String, Integer> rowCounts = new HashMap<String, Integer>();
     for (final Row row : rows) {
-      boolean _contains = checkedRows.contains(row.name);
+      {
+        final Integer idx = rowCounts.get(row.name);
+        boolean _tripleEquals = (idx == null);
+        if (_tripleEquals) {
+          rowCounts.put(row.name, Integer.valueOf(1));
+        } else {
+          rowCounts.put(row.name, Integer.valueOf(((idx).intValue() + 1)));
+        }
+      }
+    }
+    for (final Row row_1 : rows) {
+      boolean _contains = checkedRows.contains(row_1.name);
       boolean _not = (!_contains);
       if (_not) {
-        boolean _hasWriteDefs = this.ba.hasWriteDefs(row);
+        boolean _hasWriteDefs = this.ba.hasWriteDefs(row_1);
         if (_hasWriteDefs) {
-          CharSequence _simSetter = this.simSetter(row);
+          Integer _get = rowCounts.get(row_1.name);
+          CharSequence _simSetter = this.simSetter(row_1, (_get).intValue());
           String _plus = (res + _simSetter);
           res = _plus;
         }
-        CharSequence _simGetter = this.simGetter(row);
+        Integer _get_1 = rowCounts.get(row_1.name);
+        CharSequence _simGetter = this.simGetter(row_1, (_get_1).intValue());
         String _plus_1 = (res + _simGetter);
         res = _plus_1;
-        checkedRows.add(row.name);
+        checkedRows.add(row_1.name);
       }
     }
     return res;
@@ -1071,7 +1078,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     if (_tripleEquals) {
       return (this.varIdx.get((this.em.moduleName + ".Bus2IP_Clk"))).intValue();
     }
-    return 0;
+    return (pclk).intValue();
   }
   
   protected CharSequence getDefineName(final VariableInformation vi) {
@@ -1094,17 +1101,67 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     return _builder;
   }
   
-  protected CharSequence simGetter(final Row row) {
+  protected CharSequence simGetter(final Row row, final int rowCount) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("//Getter");
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Directly retrieve the fields of row ");
+    _builder.append(row.name, " ");
+    _builder.append(".");
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      if ((rowCount == 1)) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        _builder.append((rowCount - 
+          1), " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    {
+      List<Definition> _allDefs = this.ba.allDefs(row);
+      for(final Definition d : _allDefs) {
+        _builder.append(" ");
+        _builder.append("* @param ");
+        _builder.append(d.name, " ");
+        _builder.append(" the value of ");
+        _builder.append(d.name, " ");
+        _builder.append(" will be written into the memory of this pointer.");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully retrieved the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("int get");
     String _firstUpper = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper, "");
-    _builder.append("Direct(uint32_t *base, int index");
+    _builder.append("Direct(uint32_t *base, uint32_t index");
     {
-      List<Definition> _allDefs = this.ba.allDefs(row);
-      for(final Definition definition : _allDefs) {
+      List<Definition> _allDefs_1 = this.ba.allDefs(row);
+      for(final Definition definition : _allDefs_1) {
         String _parameter = this.ba.getParameter(row, definition, true);
         _builder.append(_parameter, "");
       }
@@ -1112,20 +1169,20 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("){");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    _builder.append("int offset[1]={index};");
+    _builder.append("uint32_t offset[1]={index};");
     _builder.newLine();
     {
-      List<Definition> _allDefs_1 = this.ba.allDefs(row);
-      for(final Definition d : _allDefs_1) {
+      List<Definition> _allDefs_2 = this.ba.allDefs(row);
+      for(final Definition d_1 : _allDefs_2) {
         _builder.append("\t");
         _builder.append("*");
-        String _varName = this.ba.getVarName(row, d);
+        String _varName = this.ba.getVarName(row, d_1);
         _builder.append(_varName, "\t");
         _builder.append("=(");
-        CharSequence _busType = this.ba.getBusType(d);
+        CharSequence _busType = this.ba.getBusType(d_1);
         _builder.append(_busType, "\t");
         _builder.append(")pshdl_sim_getOutputArray(");
-        CharSequence _defineNameString = this.getDefineNameString(d.name);
+        CharSequence _defineNameString = this.getDefineNameString(d_1.name);
         _builder.append(_defineNameString, "\t");
         _builder.append(", offset);");
         _builder.newLineIfNotEmpty();
@@ -1137,10 +1194,53 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Retrieve the fields of row ");
+    _builder.append(row.name, " ");
+    _builder.append(" into the struct.");
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      if ((rowCount == 1)) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        _builder.append((rowCount - 
+          1), " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* @param result the values of this row will be written into the struct");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully retrieved the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
     _builder.append("int get");
     String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper_1, "");
-    _builder.append("(uint32_t *base, int index, ");
+    _builder.append("(uint32_t *base, uint32_t index, ");
     _builder.append(row.name, "");
     _builder.append("_t *result){");
     _builder.newLineIfNotEmpty();
@@ -1150,10 +1250,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
-      List<Definition> _allDefs_2 = this.ba.allDefs(row);
-      for(final Definition d_1 : _allDefs_2) {
+      List<Definition> _allDefs_3 = this.ba.allDefs(row);
+      for(final Definition d_2 : _allDefs_3) {
         _builder.append(", &result->");
-        String _varNameIndex = this.ba.getVarNameIndex(row, d_1);
+        String _varNameIndex = this.ba.getVarNameIndex(row, d_2);
         _builder.append(_varNameIndex, "\t");
       }
     }
@@ -1164,14 +1264,67 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     return _builder;
   }
   
-  protected CharSequence simSetter(final Row row) {
+  protected CharSequence simSetter(final Row row, final int rowCount) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("// Setter");
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Updates the values in memory from the struct. This also advances the simulation by one clock cycle, ");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* unless PSHDL_SIM_NO_BUSCLK_TOGGLE is defined.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      if ((rowCount == 1)) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        _builder.append((rowCount - 
+          1), " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    {
+      List<Definition> _allDefs = this.ba.allDefs(row);
+      for(final Definition d : _allDefs) {
+        _builder.append(" ");
+        _builder.append("* @param ");
+        _builder.append(d.name, " ");
+        _builder.append(" the value of ");
+        _builder.append(d.name, " ");
+        _builder.append(" will be written into the register. ");
+        StringBuilder _explain = this.ba.explain(d);
+        _builder.append(_explain, " ");
+        _builder.newLineIfNotEmpty();
+      }
+    }
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully updated the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index or value exceeds its range for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
     _builder.newLine();
     _builder.append("int set");
     String _firstUpper = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper, "");
-    _builder.append("Direct(uint32_t *base, int index");
+    _builder.append("Direct(uint32_t *base, uint32_t index");
     {
       List<Definition> _writeDefs = this.ba.writeDefs(row);
       for(final Definition definition : _writeDefs) {
@@ -1182,7 +1335,15 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("){");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    _builder.append("int offset[1]={index};");
+    _builder.append("if (index>");
+    _builder.append((rowCount - 1), "\t");
+    _builder.append(")");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t\t");
+    _builder.append("return 0;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("uint32_t offset[1]={index};");
     _builder.newLine();
     {
       List<Definition> _writeDefs_1 = this.ba.writeDefs(row);
@@ -1195,17 +1356,20 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     }
     {
       List<Definition> _writeDefs_2 = this.ba.writeDefs(row);
-      for(final Definition d : _writeDefs_2) {
+      for(final Definition d_1 : _writeDefs_2) {
         _builder.append("\t");
         _builder.append("pshdl_sim_setInputArray(");
-        CharSequence _defineNameString = this.getDefineNameString(d.name);
+        CharSequence _defineNameString = this.getDefineNameString(d_1.name);
         _builder.append(_defineNameString, "\t");
         _builder.append(", ");
-        _builder.append(d.name, "\t");
+        _builder.append(d_1.name, "\t");
         _builder.append(", offset);");
         _builder.newLineIfNotEmpty();
       }
     }
+    _builder.append("\t");
+    _builder.append("#ifndef PSHDL_SIM_NO_BUSCLK_TOGGLE");
+    _builder.newLine();
     _builder.append("\t");
     _builder.append("if (!");
     _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t");
@@ -1227,15 +1391,62 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("pshdl_sim_run();");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("return 0;");
+    _builder.append("#endif");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return 1;");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
+    _builder.append("/**");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* Updates the values in memory from the struct. This also advances the simulation by one clock cycle, ");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* unless PSHDL_SIM_NO_BUSCLK_TOGGLE is defined.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory. For simulation this parameter is ignored.");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @param index the row that you want to access. ");
+    {
+      if ((rowCount == 1)) {
+        _builder.append("The only valid index is 0");
+      } else {
+        _builder.append("Valid values are 0..");
+        _builder.append((rowCount - 
+          1), " ");
+      }
+    }
+    _builder.newLineIfNotEmpty();
+    _builder.append(" ");
+    _builder.append("* @param newVal the values of this row will be written into the struct");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 1  Successfully updated the values");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("* @retval 0  Something went wrong (invalid index or value exceeds range for example)");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.append("*/");
+    _builder.newLine();
     _builder.append("int set");
     String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
     _builder.append(_firstUpper_1, "");
-    _builder.append("(uint32_t *base, int index, ");
+    _builder.append("(uint32_t *base, uint32_t index, ");
     _builder.append(row.name, "");
     _builder.append("_t *newVal) {");
     _builder.newLineIfNotEmpty();
@@ -1246,9 +1457,9 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("Direct(base, index");
     {
       List<Definition> _writeDefs_3 = this.ba.writeDefs(row);
-      for(final Definition d_1 : _writeDefs_3) {
+      for(final Definition d_2 : _writeDefs_3) {
         _builder.append(", newVal->");
-        String _varNameIndex = this.ba.getVarNameIndex(row, d_1);
+        String _varNameIndex = this.ba.getVarNameIndex(row, d_2);
         _builder.append(_varNameIndex, "\t");
       }
     }
@@ -1263,8 +1474,28 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     throw new UnsupportedOperationException("TODO: auto-generated method stub");
   }
   
-  protected CharSequence callMethod(final String methodName, final String... args) {
-    throw new UnsupportedOperationException("TODO: auto-generated method stub");
+  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(methodName, "");
+    _builder.append("(");
+    {
+      boolean _tripleNotEquals = (args != null);
+      if (_tripleNotEquals) {
+        {
+          boolean _hasElements = false;
+          for(final CharSequence arg : args) {
+            if (!_hasElements) {
+              _hasElements = true;
+            } else {
+              _builder.appendImmediate(",", "");
+            }
+            _builder.append(arg, "");
+          }
+        }
+      }
+    }
+    _builder.append(")");
+    return _builder;
   }
   
   protected CharSequence callRunMethod() {
@@ -1306,5 +1537,19 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
     return CCodeGenerator.doCompile(em, syntaxProblems);
+  }
+  
+  protected CharSequence fillArray(final VariableInformation vi, final CharSequence regFillValue) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("memset(");
+    CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
+    _builder.append(_idName, "");
+    _builder.append(", ");
+    _builder.append(regFillValue, "");
+    _builder.append(", ");
+    int _arraySize = this.getArraySize(vi);
+    _builder.append(_arraySize, "");
+    _builder.append(");");
+    return _builder;
   }
 }

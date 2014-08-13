@@ -5,12 +5,15 @@ import java.util.EnumSet;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
+import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCodeGenerator;
+import org.pshdl.model.simulation.CommonCompilerExtension;
 
 @SuppressWarnings("all")
 public class GoCodeGenerator extends CommonCodeGenerator {
@@ -18,10 +21,14 @@ public class GoCodeGenerator extends CommonCodeGenerator {
   
   private String unit;
   
+  private CommonCompilerExtension cce;
+  
   public GoCodeGenerator(final ExecutableModel em, final int maxCosts, final String pkg, final String unit) {
     super(em, 64, maxCosts);
     this.pkg = pkg;
     this.unit = unit;
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
+    this.cce = _commonCompilerExtension;
   }
   
   protected CharSequence preFieldDeclarations() {
@@ -47,41 +54,20 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("}");
     _builder.newLine();
-    return _builder;
-  }
-  
-  protected CharSequence applyRegUpdates() {
-    StringConcatenation _builder = new StringConcatenation();
     _builder.append("func (s *");
     _builder.append(this.unit, "");
     _builder.append(") updateRegs() {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    _builder.append("for _, r := range s.regUpdates {");
+    _builder.append("for _, reg := range s.regUpdates {");
     _builder.newLine();
     _builder.append("\t\t");
-    _builder.append("switch r.internal {");
+    _builder.append("switch reg.internal {");
     _builder.newLine();
-    {
-      for(final VariableInformation vi : this.em.variables) {
-        _builder.append("\t\t");
-        _builder.append("case ");
-        int _varIdx = this.getVarIdx(vi);
-        _builder.append(_varIdx, "\t\t");
-        _builder.append(":");
-        _builder.newLineIfNotEmpty();
-        _builder.append("\t\t");
-        _builder.append("\t");
-        _builder.append("s.");
-        CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
-        _builder.append(_idName, "\t\t\t");
-        _builder.append(" = s.");
-        EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isShadowReg);
-        CharSequence _idName_1 = this.idName(vi, true, _of);
-        _builder.append(_idName_1, "\t\t\t");
-        _builder.newLineIfNotEmpty();
-      }
-    }
+    _builder.append("\t\t");
+    CharSequence _updateRegCases = this.updateRegCases();
+    _builder.append(_updateRegCases, "\t\t");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
     _builder.append("}");
     _builder.newLine();
@@ -89,6 +75,32 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.append("}");
     _builder.newLine();
     _builder.append("}");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  protected CharSequence doLoopStart() {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("for {");
+    return _builder;
+  }
+  
+  protected CharSequence doLoopEnd(final CharSequence condition) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("\t");
+    _builder.append("if (");
+    _builder.append(condition, "\t");
+    _builder.append(") { break }");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    return _builder;
+  }
+  
+  protected CharSequence applyRegUpdates() {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("s.updateRegs()");
     _builder.newLine();
     return _builder;
   }
@@ -109,17 +121,17 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     throw new UnsupportedOperationException("TODO: auto-generated method stub");
   }
   
-  protected CharSequence callMethod(final String methodName, final String... args) {
+  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("s.");
     _builder.append(methodName, "");
-    _builder.append("((");
+    _builder.append("(");
     {
       boolean _tripleNotEquals = (args != null);
       if (_tripleNotEquals) {
         {
           boolean _hasElements = false;
-          for(final String arg : args) {
+          for(final CharSequence arg : args) {
             if (!_hasElements) {
               _hasElements = true;
             } else {
@@ -153,14 +165,7 @@ public class GoCodeGenerator extends CommonCodeGenerator {
   
   protected CharSequence checkRegupdates() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("if len(s.regUpdates) > 0 && !s.disableRegOutputLogic {");
-    _builder.newLine();
-    _builder.append("\t\t\t");
-    _builder.append("break");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("}");
-    _builder.newLine();
+    _builder.append("s.regUpdatePos == 0");
     return _builder;
   }
   
@@ -193,22 +198,33 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     if (_or) {
       boolean _isBoolean = this.isBoolean(varInfo, attributes);
       if (_isBoolean) {
-        return "bool ";
+        return "bool";
       }
-      return "uint64 ";
+      return "int64";
     } else {
       boolean _isBoolean_1 = this.isBoolean(varInfo, attributes);
       if (_isBoolean_1) {
-        return "bool[] ";
+        return "[]bool";
       }
-      return "uint64[] ";
+      return "[]int64";
     }
+  }
+  
+  protected CharSequence doCast(final CharSequence cast, final CharSequence assignValue) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(cast, "");
+    _builder.append("(");
+    _builder.append(assignValue, "");
+    _builder.append(")");
+    return _builder;
   }
   
   protected CharSequence footer() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("func (s *SimpleAluGenerator) SetInputWithName(name string, value int64, arrayIdx ...int) {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") SetInputWithName(name string, value int64, arrayIdx ...int) {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("s.SetInput(s.GetIndex(name), value, arrayIdx...)");
     _builder.newLine();
@@ -216,68 +232,17 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
-    _builder.append("func (s *SimpleAluGenerator) SetInput(idx int, value int64, arrayIdx ...int) {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") SetInput(idx int, value int64, arrayIdx ...int) {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("switch idx {");
     _builder.newLine();
-    {
-      Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-      for(final VariableInformation v : _excludeNull) {
-        {
-          int _length = v.dimensions.length;
-          boolean _equals = (_length == 0);
-          if (_equals) {
-            _builder.append("case ");
-            Integer _get = this.varIdx.get(v.name);
-            _builder.append(_get, "");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t");
-            StringConcatenation _builder_1 = new StringConcatenation();
-            {
-              boolean _isPredicate = this.isPredicate(v);
-              if (_isPredicate) {
-                _builder_1.append("value!=0");
-              } else {
-                _builder_1.append("value");
-              }
-            }
-            StringBuilder _assignVariable = this.assignVariable(v, _builder_1, CommonCodeGenerator.NONE, true, false);
-            _builder.append(_assignVariable, "\t");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t");
-            _builder.append("break");
-            _builder.newLine();
-          } else {
-            _builder.append("case ");
-            Integer _get_1 = this.varIdx.get(v.name);
-            _builder.append(_get_1, "");
-            _builder.append(": ");
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t");
-            CharSequence _idName = this.idName(v, true, CommonCodeGenerator.NONE);
-            _builder.append(_idName, "\t");
-            _builder.append("[");
-            CharSequence _calculateVariableAccessIndexArr = this.calculateVariableAccessIndexArr(v);
-            _builder.append(_calculateVariableAccessIndexArr, "\t");
-            _builder.append("]=");
-            {
-              boolean _isPredicate_1 = this.isPredicate(v);
-              if (_isPredicate_1) {
-                _builder.append("value!=0");
-              } else {
-                _builder.append("value");
-              }
-            }
-            _builder.newLineIfNotEmpty();
-            _builder.append("\t");
-            _builder.append("break");
-            _builder.newLine();
-          }
-        }
-      }
-    }
+    _builder.append("\t");
+    CharSequence _setInputCases = this.setInputCases("value", null);
+    _builder.append(_setInputCases, "\t");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("default:");
     _builder.newLine();
@@ -291,8 +256,10 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
-    _builder.append("func (s *SimpleAluGenerator) GetIndex(name string) int {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") GetIndex(name string) int {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("idx, ok := s.varIdx[name]");
     _builder.newLine();
@@ -312,16 +279,12 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
-    _builder.append("func (s *SimpleAluGenerator) GetName(idx int) string {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") GetName(idx int) string {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("switch idx {");
-    _builder.newLine();
-    _builder.append("\t");
-    _builder.append("case 1:");
-    _builder.newLine();
-    _builder.append("\t\t");
-    _builder.append("return \"$Pred_alu.@if0\"");
     _builder.newLine();
     {
       for(final VariableInformation vi : this.em.variables) {
@@ -352,8 +315,10 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
-    _builder.append("func (s *SimpleAluGenerator) GetOutputWithName(name string, arrayIdx ...int) int64 {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") GetOutputWithName(name string, arrayIdx ...int) int64 {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("return s.GetOutput(s.GetIndex(name), arrayIdx...)");
     _builder.newLine();
@@ -361,120 +326,17 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
-    _builder.append("func (s *SimpleAluGenerator) GetOutput(idx int, arrayIdx ...int) int64 {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") GetOutput(idx int, arrayIdx ...int) int64 {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("switch idx {");
     _builder.newLine();
-    {
-      Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
-      for(final VariableInformation v_1 : _excludeNull_1) {
-        {
-          int _length_1 = v_1.dimensions.length;
-          boolean _equals_1 = (_length_1 == 0);
-          if (_equals_1) {
-            _builder.append("case ");
-            Integer _get_2 = this.varIdx.get(v_1.name);
-            _builder.append(_get_2, "");
-            _builder.append(":");
-            _builder.newLineIfNotEmpty();
-            {
-              boolean _isPredicate_2 = this.isPredicate(v_1);
-              if (_isPredicate_2) {
-                _builder.append("\t");
-                _builder.append("if ");
-                CharSequence _idName_1 = this.idName(v_1, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_1, "\t");
-                _builder.append(" {");
-                _builder.newLineIfNotEmpty();
-                _builder.append("\t");
-                _builder.append("\t");
-                _builder.append("return 1");
-                _builder.newLine();
-                _builder.append("\t");
-                _builder.append("else {");
-                _builder.newLine();
-                _builder.append("\t");
-                _builder.append("\t");
-                _builder.append("return 0");
-                _builder.newLine();
-                _builder.append("\t");
-                _builder.append("}");
-                _builder.newLine();
-              } else {
-                _builder.append("\t");
-                _builder.append("return ");
-                CharSequence _idName_2 = this.idName(v_1, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_2, "\t");
-                {
-                  if ((v_1.width != 64)) {
-                    _builder.append(" & ");
-                    BigInteger _calcMask = this.calcMask(v_1.width);
-                    CharSequence _constant = this.constant(_calcMask);
-                    _builder.append(_constant, "\t");
-                  }
-                }
-                _builder.newLineIfNotEmpty();
-              }
-            }
-          } else {
-            _builder.append("case ");
-            Integer _get_3 = this.varIdx.get(v_1.name);
-            _builder.append(_get_3, "");
-            _builder.append(":");
-            _builder.newLineIfNotEmpty();
-            {
-              boolean _isPredicate_3 = this.isPredicate(v_1);
-              if (_isPredicate_3) {
-                _builder.append("if ");
-                CharSequence _idName_3 = this.idName(v_1, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_3, "");
-                _builder.append("[");
-                CharSequence _calculateVariableAccessIndexArr_1 = this.calculateVariableAccessIndexArr(v_1);
-                _builder.append(_calculateVariableAccessIndexArr_1, "");
-                _builder.append("] {");
-                _builder.newLineIfNotEmpty();
-                _builder.append("\t");
-                _builder.append("return 1");
-                _builder.newLine();
-                _builder.append("else {");
-                _builder.newLine();
-                _builder.append("\t");
-                _builder.append("return 0");
-                _builder.newLine();
-                _builder.append("}");
-                _builder.newLine();
-              } else {
-                _builder.append("return ");
-                CharSequence _idName_4 = this.idName(v_1, true, CommonCodeGenerator.NONE);
-                _builder.append(_idName_4, "");
-                _builder.append("[");
-                CharSequence _calculateVariableAccessIndexArr_2 = this.calculateVariableAccessIndexArr(v_1);
-                _builder.append(_calculateVariableAccessIndexArr_2, "");
-                _builder.append("]");
-                {
-                  boolean _and = false;
-                  if (!(v_1.width != 64)) {
-                    _and = false;
-                  } else {
-                    boolean _isPredicate_4 = this.isPredicate(v_1);
-                    boolean _not = (!_isPredicate_4);
-                    _and = _not;
-                  }
-                  if (_and) {
-                    _builder.append(" & ");
-                    BigInteger _calcMask_1 = this.calcMask(v_1.width);
-                    CharSequence _constant_1 = this.constant(_calcMask_1);
-                    _builder.append(_constant_1, "");
-                  }
-                }
-                _builder.newLineIfNotEmpty();
-              }
-            }
-          }
-        }
-      }
-    }
+    _builder.append("\t");
+    CharSequence _outputCases = this.getOutputCases(null);
+    _builder.append(_outputCases, "\t");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("default:");
     _builder.newLine();
@@ -488,12 +350,53 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
-    _builder.append("func (s *SimpleAluGenerator) getDeltaCycle() int64 {");
-    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") GetDeltaCycle() int64 {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("return s.deltaCycle");
     _builder.newLine();
     _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") GetJsonDesc() string {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("return \"");
+    String _jSONDescription = this.cce.getJSONDescription();
+    _builder.append(_jSONDescription, "\t");
+    _builder.append("\"");
+    _builder.newLineIfNotEmpty();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") SetDisableEdge(enable bool) {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("s.");
+    _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t");
+    _builder.append(" = enable");
+    _builder.newLineIfNotEmpty();
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append(" ");
+    _builder.newLine();
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") SetDisableRegOutputLogic(enable bool) {");
+    _builder.newLineIfNotEmpty();
+    _builder.append("\t");
+    _builder.append("s.");
+    _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t");
+    _builder.append(" = enable");
+    _builder.newLineIfNotEmpty();
+    _builder.append("}");
+    _builder.newLine();
     _builder.newLine();
     return _builder;
   }
@@ -507,7 +410,9 @@ public class GoCodeGenerator extends CommonCodeGenerator {
   
   protected CharSequence functionHeader(final Frame frame) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("func (s *SimpleAluGenerator) ");
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") ");
     CharSequence _frameName = this.getFrameName(frame);
     _builder.append(_frameName, "");
     _builder.append(" (){");
@@ -525,7 +430,10 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.append("type regUpdate struct {");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("internal, offset, fillValue int");
+    _builder.append("internal, offset int");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("fillValue int64");
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
@@ -538,15 +446,21 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.append(" {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    _builder.append("return NewSimpleAluGeneratorWithArgs(false, false)");
-    _builder.newLine();
+    _builder.append("return New");
+    _builder.append(this.unit, "\t");
+    _builder.append("WithArgs(false, false)");
+    _builder.newLineIfNotEmpty();
     _builder.append("}");
     _builder.newLine();
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func New");
     _builder.append(this.unit, "");
-    _builder.append("WithArgs(disableEdge, disableRegOutputLogic bool) *");
+    _builder.append("WithArgs(");
+    _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "");
+    _builder.append(", ");
+    _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "");
+    _builder.append(" bool) *");
     _builder.append(this.unit, "");
     _builder.append(" {");
     _builder.newLineIfNotEmpty();
@@ -556,11 +470,17 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.append("{");
     _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
-    _builder.append("disableEdge:           disableEdge,");
-    _builder.newLine();
+    _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t\t");
+    _builder.append(":           ");
+    _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "\t\t");
+    _builder.append(",");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
-    _builder.append("disableRegOutputLogic: disableRegOutputLogic,");
-    _builder.newLine();
+    _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t\t");
+    _builder.append(": ");
+    _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "\t\t");
+    _builder.append(",");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("}");
     _builder.newLine();
@@ -582,17 +502,45 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     {
       Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
       for(final VariableInformation v : _excludeNull) {
+        _builder.append("\t");
         _builder.append("s.varIdx[\"");
-        _builder.append(v.name, "");
+        _builder.append(v.name, "\t");
         _builder.append("\"] =  ");
         Integer _get = this.varIdx.get(v.name);
-        _builder.append(_get, "");
-        _builder.append(")");
+        _builder.append(_get, "\t");
         _builder.newLineIfNotEmpty();
       }
     }
-    _builder.append(" ");
-    _builder.newLine();
+    {
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf(GoCodeGenerator.this.isArray(it));
+        }
+      };
+      Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
+      for(final VariableInformation v_1 : _filter) {
+        _builder.append("\t");
+        CharSequence _idName = this.idName(v_1, true, CommonCodeGenerator.NONE);
+        _builder.append(_idName, "\t");
+        _builder.append(" = make([]int64, ");
+        int _arraySize = this.getArraySize(v_1);
+        _builder.append(_arraySize, "\t");
+        _builder.append(")");
+        _builder.newLineIfNotEmpty();
+        {
+          if (v_1.isRegister) {
+            _builder.append("\t");
+            CharSequence _idName_1 = this.idName(v_1, true, CommonCodeGenerator.SHADOWREG);
+            _builder.append(_idName_1, "\t");
+            _builder.append(" = make([]int64, ");
+            int _arraySize_1 = this.getArraySize(v_1);
+            _builder.append(_arraySize_1, "\t");
+            _builder.append(")");
+            _builder.newLineIfNotEmpty();
+          }
+        }
+      }
+    }
     _builder.append("\t");
     _builder.append("return &s");
     _builder.newLine();
@@ -601,14 +549,16 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.newLine();
     _builder.append("func (s *");
     _builder.append(this.unit, "");
-    _builder.append(") skipEdge(local uint64) bool {");
+    _builder.append(") skipEdge(local int64) bool {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
-    _builder.append("var dc = local >> 16 // zero-extended shift");
+    _builder.append("var dc = int64(uint64(local) >> 16) // zero-extended shift");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("if dc < s.deltaCycle {");
-    _builder.newLine();
+    _builder.append("if dc < s.");
+    _builder.append(CommonCodeGenerator.DELTA_CYCLE.name, "\t");
+    _builder.append(" {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
     _builder.append("return false");
     _builder.newLine();
@@ -618,8 +568,12 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.append(" ");
     _builder.newLine();
     _builder.append("\t");
-    _builder.append("if (dc == s.deltaCycle) && ((local & 0xFFFF) == s.epsCycle) {");
-    _builder.newLine();
+    _builder.append("if (dc == s.");
+    _builder.append(CommonCodeGenerator.DELTA_CYCLE.name, "\t");
+    _builder.append(") && ((local & 0xFFFF) == s.");
+    _builder.append(CommonCodeGenerator.EPS_CYCLE.name, "\t");
+    _builder.append(") {");
+    _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
     _builder.append("return false");
     _builder.newLine();
@@ -636,6 +590,53 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     return _builder;
   }
   
+  protected CharSequence idName(final String name, final boolean field, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+    CharSequence _idName = super.idName(name, field, attributes);
+    String _string = _idName.toString();
+    final String superVal = _string.replace("$", "__");
+    return superVal;
+  }
+  
+  protected String fieldPrefix() {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("s.");
+    return _builder.toString();
+  }
+  
+  protected CharSequence createVarDeclaration(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean initialize) {
+    final StringBuilder sb = new StringBuilder();
+    CharSequence _preField = this.preField(varInfo, attributes);
+    sb.append(_preField);
+    this.indent++;
+    CharSequence _indent = this.indent();
+    sb.append(_indent);
+    this.indent--;
+    CharSequence _idName = this.idName(varInfo, false, attributes);
+    StringBuilder _append = sb.append(_idName);
+    _append.append(" ");
+    CharSequence _fieldType = this.fieldType(varInfo, attributes);
+    sb.append(_fieldType);
+    CharSequence _postField = this.postField(varInfo);
+    sb.append(_postField);
+    return sb;
+  }
+  
+  protected String constantSuffix() {
+    StringConcatenation _builder = new StringConcatenation();
+    return _builder.toString();
+  }
+  
+  protected CharSequence inlineVarDecl(final VariableInformation varInfo, final boolean field, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("var ");
+    CharSequence _idName = this.idName(varInfo, field, attributes);
+    _builder.append(_idName, "");
+    _builder.append(" ");
+    CharSequence _fieldType = this.fieldType(varInfo, attributes);
+    _builder.append(_fieldType, "");
+    return _builder;
+  }
+  
   protected CharSequence runMethodsFooter(final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("}");
@@ -645,7 +646,9 @@ public class GoCodeGenerator extends CommonCodeGenerator {
   
   protected CharSequence runMethodsHeader(final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("func (s *SimpleAluGenerator) ");
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") ");
     {
       if ((!constant)) {
         _builder.append("Run");
@@ -674,14 +677,29 @@ public class GoCodeGenerator extends CommonCodeGenerator {
         _builder.append(cpyName, "");
         _builder.append("!=");
         _builder.append(last, "");
-        _builder.append(")");
-        _builder.newLineIfNotEmpty();
-        CharSequence _indent = this.indent();
-        _builder.append(_indent, "");
-        _builder.append("\t");
+        _builder.append(") ");
       }
     }
     _builder.append("{");
+    _builder.newLineIfNotEmpty();
+    CharSequence _indent = this.indent();
+    _builder.append(_indent, "");
+    _builder.append("\ts.regUpdates[s.regUpdatePos] = regUpdate{");
+    int _varIdx = this.getVarIdx(outputInternal);
+    _builder.append(_varIdx, "");
+    _builder.append(", int(");
+    _builder.append(offset, "");
+    _builder.append("), ");
+    _builder.append(fillValue, "");
+    _builder.append("}");
+    _builder.newLineIfNotEmpty();
+    CharSequence _indent_1 = this.indent();
+    _builder.append(_indent_1, "");
+    _builder.append("\ts.regUpdatePos++");
+    _builder.newLineIfNotEmpty();
+    CharSequence _indent_2 = this.indent();
+    _builder.append(_indent_2, "");
+    _builder.append("}");
     _builder.newLineIfNotEmpty();
     return _builder;
   }
@@ -695,10 +713,78 @@ public class GoCodeGenerator extends CommonCodeGenerator {
   
   protected CharSequence stageMethodsHeader(final int stage, final int totalStageCosts, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("func (s *SimpleAluGenerator) ");
+    _builder.append("func (s *");
+    _builder.append(this.unit, "");
+    _builder.append(") ");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
     _builder.append(_stageMethodName, "");
     _builder.append("() {");
+    _builder.newLineIfNotEmpty();
+    return _builder;
+  }
+  
+  protected CharSequence fillArray(final VariableInformation vi, final CharSequence regFillValue) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("for i := range ");
+    CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
+    _builder.append(_idName, "");
+    _builder.append(" { ");
+    CharSequence _idName_1 = this.idName(vi, true, CommonCodeGenerator.NONE);
+    _builder.append(_idName_1, "");
+    _builder.append("[i] = ");
+    _builder.append(regFillValue, "");
+    _builder.append(" } ");
+    return _builder;
+  }
+  
+  protected CharSequence singleOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int a, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+    CharSequence _xblockexpression = null;
+    {
+      boolean _tripleEquals = (fi.inst == Instruction.bit_neg);
+      if (_tripleEquals) {
+        CharSequence _cast = this.getCast(targetSizeWithType);
+        final CharSequence assignValue = this.singleOpValue("^", _cast, a, targetSizeWithType, attributes);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+      }
+      _xblockexpression = super.singleOp(fi, op, targetSizeWithType, pos, a, attributes);
+    }
+    return _xblockexpression;
+  }
+  
+  protected CharSequence twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+    CharSequence _xblockexpression = null;
+    {
+      boolean _tripleEquals = (fi.inst == Instruction.srl);
+      if (_tripleEquals) {
+        String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+        CharSequence _doCast = this.doCast("uint64", _tempName);
+        String _plus = (_doCast + ">>");
+        String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
+        CharSequence _doCast_1 = this.doCast("uint64", _tempName_1);
+        String _plus_1 = (_plus + _doCast_1);
+        final CharSequence assignValue = this.doCast("int64", _plus_1);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+      }
+      boolean _tripleEquals_1 = (fi.inst == Instruction.sll);
+      if (_tripleEquals_1) {
+        String _tempName_2 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+        String _plus_2 = (_tempName_2 + "<<");
+        String _tempName_3 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
+        CharSequence _doCast_2 = this.doCast("uint64", _tempName_3);
+        String _plus_3 = (_plus_2 + _doCast_2);
+        final CharSequence assignValue_1 = this.doCast("int64", _plus_3);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_1);
+      }
+      _xblockexpression = super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes);
+    }
+    return _xblockexpression;
+  }
+  
+  protected CharSequence writeToNull(final String last) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("var _ = ");
+    _builder.append(last, "");
+    _builder.newLineIfNotEmpty();
     return _builder;
   }
 }
