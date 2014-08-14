@@ -388,7 +388,7 @@ public abstract class CommonCodeGenerator {
 				idName = arrayAccess(idName, calculateVariableAccessIndexArr(vi));
 			}
 			if (isPredicate(vi)) {
-				value.append(ifCondition(condition(Condition.isTrue, idName, null), returnValue(constant(ONE, true)), returnValue(constant(ZERO, true))));
+				value.append(ifCondition(condition(Condition.isTrue, idName, null), returnValue(constant(ONE, true, -1)), returnValue(constant(ZERO, true, -1))));
 			} else {
 				final CharSequence fixupValue = fixupValue(idName, getTargetSizeWithType(vi), true);
 				if (cast != null) {
@@ -416,7 +416,7 @@ public abstract class CommonCodeGenerator {
 			}
 			final StringBuilder value = new StringBuilder();
 			value.append(indent());
-			final CharSequence zeroOnePredicate = condition(Condition.isNotEqual, valueName, constant(ZERO, true));
+			final CharSequence zeroOnePredicate = condition(Condition.isNotEqual, valueName, constant(ZERO, true, -1));
 			CharSequence assignValue = isPredicate(vi) ? zeroOnePredicate : valueName;
 			if ((cast != null) && !isPredicate(vi)) {
 				assignValue = doCast(cast, assignValue);
@@ -450,7 +450,7 @@ public abstract class CommonCodeGenerator {
 				final StringBuilder value = new StringBuilder();
 				value.append(indent());
 				if (isArray(vi)) {
-					final CharSequence condition = condition(Condition.isNotEqual, regOffset(), constant(ONE.negate(), false));
+					final CharSequence condition = condition(Condition.isNotEqual, regOffset(), constant(ONE.negate(), false, -1));
 					final CharSequence assignArrayElement = assignArrayElement(vi, getArrayElement(vi, regOffset(), true, SHADOWREG), regOffset(), true, NONE, true);
 					value.append(ifCondition(condition, assignArrayElement, fillArray(vi, regFillValue())));
 				} else {
@@ -886,19 +886,19 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case const0:
-			sb.append(assignTempVar(-1, pos, NONE, constant(ZERO, true)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(ZERO, true, -1)));
 			break;
 		case const1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(ONE, true)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(ONE, true, -1)));
 			break;
 		case const2:
-			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2), true)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2), true, -1)));
 			break;
 		case constAll1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1), true)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1), true, -1)));
 			break;
 		case loadConstant:
-			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true, -1)));
 			break;
 		case loadInternal:
 			sb.append(assignTempVar(-1, pos, NONE, loadInternal(em.internals[exec.arg1], arr, NONE)));
@@ -961,8 +961,8 @@ public abstract class CommonCodeGenerator {
 			final VariableInformation currVar = createVar(tempName + "_current", internal.actualWidth, internal.info.type);
 			final CharSequence currentValue = internalWithArrayAccess(internal, arr, internal.isShadowReg ? SHADOWREG : NONE);
 			final BigInteger mask = calcMask(internal.actualWidth);
-			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not(), true);
-			sb.append(assignVariable(currVar, currentValue + " & " + writeMask, NONE, false, true, false)).append(comment("Current value"));
+			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not(), true, internal.info.width);
+			sb.append(assignVariable(currVar, doMask(currentValue, writeMask), NONE, false, true, false)).append(comment("Current value"));
 			final VariableInformation maskVar = createVar(tempName + "_mask_shift", internal.actualWidth, internal.info.type);
 			sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true, false))
 					.append(comment("Masked and shifted"));
@@ -970,6 +970,10 @@ public abstract class CommonCodeGenerator {
 			sb.append(indent());
 		}
 		return tempName;
+	}
+
+	protected CharSequence doMask(final CharSequence currentValue, final CharSequence writeMask) {
+		return currentValue + " & " + writeMask;
 	}
 
 	protected CharSequence loadInternal(InternalInformation info, List<Integer> arr, EnumSet<Attributes> attributes) {
@@ -1237,14 +1241,14 @@ public abstract class CommonCodeGenerator {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize);
-		return "(" + op + ") & " + constant(mask, true);
+		return doMask(op, constant(mask, true, -1));
 	}
 
 	protected CharSequence invertedMask(CharSequence op, int targetSize) {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize).not();
-		return "(" + op + ") & " + constant(mask, true);
+		return "(" + op + ") & " + constant(mask, true, -1);
 	}
 
 	protected BigInteger calcMask(int targetSize) {
@@ -1451,7 +1455,7 @@ public abstract class CommonCodeGenerator {
 		if (isBoolean(var, attributes)) {
 			assignValue = constantBoolean(constantValue);
 		} else {
-			assignValue = constant(constantValue, forceUnsigned);
+			assignValue = constant(constantValue, forceUnsigned, -1);
 		}
 		sb.append(doAssign(assignValue, -1, false));
 		return sb;
@@ -1464,10 +1468,16 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence constant(long constantValue, boolean forceUnsigned) {
-		return constant(BigInteger.valueOf(constantValue), forceUnsigned);
+		return constant(BigInteger.valueOf(constantValue), forceUnsigned, -1);
 	}
 
 	protected CharSequence constant(BigInteger constantValue, boolean forceUnsigned) {
+		return constant(constantValue, forceUnsigned, -1);
+	}
+
+	protected CharSequence constant(BigInteger constantValue, boolean forceUnsigned, int maxLen) {
+		if (maxLen > 0)
+			return constantVarLength(constantValue, maxLen, forceUnsigned);
 		if ((constantValue.signum() >= 0) && (constantValue.compareTo(BigInteger.TEN) < 0))
 			return constantValue.toString(10);
 		if ((constantValue.signum() < 0) && !forceUnsigned)
@@ -1476,23 +1486,32 @@ public abstract class CommonCodeGenerator {
 			return constant32Bit(constantValue.intValue());
 		if (constantValue.bitLength() <= 64)
 			return constant64Bit(constantValue.longValue());
-		return constantVarLength(constantValue);
+		return constantVarLength(constantValue, maxLen, forceUnsigned);
 	}
 
 	protected String constantSuffix() {
 		return "L";
 	}
 
-	protected CharSequence constantVarLength(BigInteger constantValue) {
-		return String.format("0x%X%s", constantValue, constantSuffix());
+	protected CharSequence constantVarLength(BigInteger constantValue, int maxLen, boolean forceUnsigned) {
+		constantValue = force(constantValue, maxLen);
+		return String.format("%#0" + ((maxLen + 3) / 4) + "X%s", constantValue, constantSuffix());
+	}
+
+	protected BigInteger force(BigInteger constantValue, int maxLen) {
+		if (constantValue.signum() < 0) {
+			final BigInteger mask = ONE.shiftLeft(maxLen).subtract(ONE);
+			return constantValue.and(mask);
+		}
+		return constantValue;
 	}
 
 	protected CharSequence constant32Bit(int intValue) {
-		return String.format("0x%08X%s", intValue, constantSuffix());
+		return String.format("%#08X%s", intValue, constantSuffix());
 	}
 
 	protected CharSequence constant64Bit(long longValue) {
-		return String.format("0x%016X%s", longValue, constantSuffix());
+		return String.format("%#016X%s", longValue, constantSuffix());
 	}
 
 	protected CharSequence fieldName(VariableInformation var, EnumSet<Attributes> attributes) {
@@ -1674,7 +1693,7 @@ public abstract class CommonCodeGenerator {
 		result.append(createProcessMethods(processes));
 		result.append(indent()).append(runTestbenchHeader());
 		final VariableInformation stepCount = createVar("stepCount", 64, Type.UINT);
-		result.append(indent()).append(assignVariable(stepCount, constant(ZERO, true), NONE, false, true, false)).append(newLine());
+		result.append(indent()).append(assignVariable(stepCount, constant(ZERO, true, -1), NONE, false, true, false)).append(newLine());
 		result.append(indent()).append(whileLoopStart(runTestBenchOuterLoopCondition(stepCount)));
 		final VariableInformation modified = createVar("modified", -1, Type.BOOL);
 		result.append(indent()).append(assignVariable(modified, constantBoolean(ZERO), NONE, false, true, false)).append(newLine());
@@ -1689,7 +1708,7 @@ public abstract class CommonCodeGenerator {
 		final VariableInformation nextTime = createVar("nextTime", 64, Type.UINT);
 		result.append(indent()).append(assignVariable(nextTime, constant(Long.MAX_VALUE, true), NONE, false, true, false)).append(newLine());
 		for (final ProcessData pd : processes.values()) {
-			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(ZERO, true));
+			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(ZERO, true, -1));
 			final CharSequence stateBlockedCondition = condition(Condition.isNotEqual, processState(pd.processName), processStale());
 			final CharSequence condition = condition(Condition.logiAnd, stateCondition, stateBlockedCondition);
 			result.append(indent()).append(ifCondition(condition, assignNextTime(nextTime, processTime(pd.processName)), null));
@@ -1806,7 +1825,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence processCondition(String processName) {
 		final CharSequence isTimeGood = condition(Condition.isGreateEqual, idName(timeName(), true, NONE), processTime(processName));
-		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(ZERO, true));
+		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(ZERO, true, -1));
 		final CharSequence isNotStale = condition(Condition.isNotEqual, processState(processName), processStale());
 		return condition(Condition.logiAnd, condition(Condition.logiAnd, isNotStale, isNotWaiting), isTimeGood);
 	}

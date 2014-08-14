@@ -1,8 +1,14 @@
 package org.pshdl.model.simulation;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
@@ -14,14 +20,22 @@ import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCodeGenerator;
 import org.pshdl.model.simulation.CommonCompilerExtension;
+import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.utils.PSAbstractCompiler;
+import org.pshdl.model.utils.services.AuxiliaryContent;
+import org.pshdl.model.utils.services.IOutputProvider;
+import org.pshdl.model.validation.Problem;
 
 @SuppressWarnings("all")
-public class GoCodeGenerator extends CommonCodeGenerator {
+public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
   private String pkg;
   
   private String unit;
   
   private CommonCompilerExtension cce;
+  
+  public GoCodeGenerator() {
+  }
   
   public GoCodeGenerator(final ExecutableModel em, final int maxCosts, final String pkg, final String unit) {
     super(em, 64, maxCosts);
@@ -704,6 +718,12 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     return _builder;
   }
   
+  protected CharSequence doMask(final CharSequence currentValue, final CharSequence writeMask) {
+    CharSequence _doCast = this.doCast("uint64", currentValue);
+    CharSequence _doMask = super.doMask(_doCast, writeMask);
+    return this.doCast("int64", _doMask);
+  }
+  
   protected CharSequence stageMethodsFooter(final int stage, final int totalStageCosts, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("}");
@@ -786,5 +806,55 @@ public class GoCodeGenerator extends CommonCodeGenerator {
     _builder.append(last, "");
     _builder.newLineIfNotEmpty();
     return _builder;
+  }
+  
+  public String getHookName() {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("Go");
+    return _builder.toString();
+  }
+  
+  public IOutputProvider.MultiOption getUsage() {
+    final Options options = new Options();
+    options.addOption("p", "pkg", true, 
+      "The package the generated source will use. If non is specified the package from the module is used");
+    String _hookName = this.getHookName();
+    String _plus = ("Options for the " + _hookName);
+    String _plus_1 = (_plus + " type:");
+    return new IOutputProvider.MultiOption(_plus_1, null, options);
+  }
+  
+  public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
+    ArrayList<PSAbstractCompiler.CompileResult> _xblockexpression = null;
+    {
+      final String moduleName = em.moduleName;
+      final int li = moduleName.lastIndexOf(".");
+      String pkg = null;
+      final String optionPkg = cli.getOptionValue("pkg");
+      boolean _tripleNotEquals = (optionPkg != null);
+      if (_tripleNotEquals) {
+        pkg = optionPkg;
+      } else {
+        if ((li != (-1))) {
+          String _substring = moduleName.substring(0, (li - 1));
+          pkg = _substring;
+        }
+      }
+      int _length = moduleName.length();
+      final String unitName = moduleName.substring((li + 1), _length);
+      _xblockexpression = GoCodeGenerator.doCompile(syntaxProblems, em, pkg, unitName);
+    }
+    return _xblockexpression;
+  }
+  
+  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName) {
+    final GoCodeGenerator comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName);
+    final String code = comp.generateMainCode();
+    final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
+    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
+    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
+    String _hookName = comp.getHookName();
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source, _hookName, true);
+    return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
 }

@@ -1,21 +1,28 @@
 package org.pshdl.model.simulation
 
-import org.pshdl.interpreter.VariableInformation
+import com.google.common.collect.Lists
 import java.math.BigInteger
 import java.util.EnumSet
-import org.pshdl.model.simulation.CommonCodeGenerator.Attributes
-import org.pshdl.interpreter.Frame
-import org.pshdl.model.simulation.CommonCodeGenerator.ProcessData
-import org.pshdl.interpreter.InternalInformation
+import java.util.Set
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
+import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
+import org.pshdl.model.utils.PSAbstractCompiler
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
+import org.pshdl.model.validation.Problem
 
-class GoCodeGenerator extends CommonCodeGenerator{
+class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider{
 	
 	String pkg 
 	String unit
 	CommonCompilerExtension cce;
+	
+	new(){}
 	
 	new(ExecutableModel em, int maxCosts, String pkg, String unit) {
 		super(em, 64, maxCosts)
@@ -50,7 +57,7 @@ func (s *«unit») updateRegs() {
 	override protected applyRegUpdates() '''s.updateRegs()
 	'''
 	
-	override protected arrayInit(VariableInformation varInfo, BigInteger initValue, EnumSet<Attributes> attributes) '''make([]«fieldType(varInfo, attributes)», «varInfo.arraySize»)'''
+	override protected arrayInit(VariableInformation varInfo, BigInteger initValue, EnumSet<CommonCodeGenerator.Attributes> attributes) '''make([]«fieldType(varInfo, attributes)», «varInfo.arraySize»)'''
 	
 	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
@@ -75,8 +82,8 @@ func (s *«unit») updateRegs() {
 	
 	override protected copyArray(VariableInformation varInfo) '''/* copy array */'''
 	
-	override protected fieldType(VariableInformation varInfo, EnumSet<Attributes> attributes) {
-		if (varInfo.dimensions.nullOrEmpty || attributes.contains(Attributes.baseType)) {
+	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		if (varInfo.dimensions.nullOrEmpty || attributes.contains(CommonCodeGenerator.Attributes.baseType)) {
 			if (isBoolean(varInfo, attributes))
 				return "bool"
 			return "int64"
@@ -206,14 +213,14 @@ func (s *«unit») skipEdge(local int64) bool {
 }
 	'''
 	
-	override protected idName(String name, boolean field, EnumSet<Attributes> attributes) {
+	override protected idName(String name, boolean field, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		val superVal=super.idName(name, field, attributes).toString.replace('$','__')
 		return superVal
 	}
 	
 	override protected fieldPrefix() '''s.'''
 	
-	override protected CharSequence createVarDeclaration(VariableInformation varInfo, EnumSet<Attributes> attributes, boolean initialize) {
+	override protected CharSequence createVarDeclaration(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean initialize) {
 		val StringBuilder sb = new StringBuilder()
 		sb.append(preField(varInfo, attributes))
 		indent++;
@@ -227,7 +234,7 @@ func (s *«unit») skipEdge(local int64) bool {
 	
 	override protected constantSuffix() ''''''
 	
-	override protected CharSequence inlineVarDecl(VariableInformation varInfo, boolean field, EnumSet<Attributes> attributes) '''var «idName(varInfo, field, attributes)» «fieldType(varInfo, attributes)»'''
+	override protected CharSequence inlineVarDecl(VariableInformation varInfo, boolean field, EnumSet<CommonCodeGenerator.Attributes> attributes) '''var «idName(varInfo, field, attributes)» «fieldType(varInfo, attributes)»'''
 	
 	override protected runMethodsFooter(boolean constant) '''}
 	'''
@@ -235,7 +242,7 @@ func (s *«unit») skipEdge(local int64) bool {
 	override protected runMethodsHeader(boolean constant) '''func (s *«unit») «IF !constant»Run«ELSE»InitConstants«ENDIF»() {
 	'''
 	
-	override protected runProcessHeader(ProcessData pd) {
+	override protected runProcessHeader(CommonCodeGenerator.ProcessData pd) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
@@ -251,6 +258,10 @@ func (s *«unit») skipEdge(local int64) bool {
 	«indent()»}
 	'''
 	
+	override protected doMask(CharSequence currentValue, CharSequence writeMask) {
+		return doCast("int64", super.doMask(doCast("uint64", currentValue), writeMask))
+	}
+	
 	override protected stageMethodsFooter(int stage, int totalStageCosts, boolean constant) '''}
 	'''
 	
@@ -259,7 +270,7 @@ func (s *«unit») skipEdge(local int64) bool {
 	
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''for i := range «idName(vi, true, NONE)» { «idName(vi, true, NONE)»[i] = «regFillValue» } '''
 	
-	override protected singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes) {
+	override protected singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (fi.inst===Instruction.bit_neg){
 			val CharSequence assignValue = singleOpValue("^", getCast(targetSizeWithType), a, targetSizeWithType, attributes);
 			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
@@ -267,7 +278,7 @@ func (s *«unit») skipEdge(local int64) bool {
 		super.singleOp(fi, op, targetSizeWithType, pos, a, attributes)
 	}
 	
-	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
+	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (fi.inst === Instruction.srl){
 			val CharSequence assignValue = doCast("int64", doCast("uint64", getTempName(leftOperand, NONE)) + ">>" +doCast("uint64", getTempName(rightOperand, NONE)))
 			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
@@ -281,5 +292,38 @@ func (s *«unit») skipEdge(local int64) bool {
 	
 	override protected writeToNull(String last) '''var _ = «last»
 	'''
+	
+	override getHookName() '''Go'''
+	
+	override getUsage() {
+		val options = new Options;
+		options.addOption('p', "pkg", true,
+			"The package the generated source will use. If non is specified the package from the module is used")
+		return new MultiOption("Options for the " + hookName + " type:", null, options)
+	}
+
+	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
+		val moduleName = em.moduleName
+		val li = moduleName.lastIndexOf('.')
+		var String pkg = null
+		val optionPkg = cli.getOptionValue("pkg")
+		if (optionPkg !== null) {
+			pkg = optionPkg
+		} else if (li != -1) {
+			pkg = moduleName.substring(0, li - 1)
+		}
+		val unitName = moduleName.substring(li + 1, moduleName.length);
+		doCompile(syntaxProblems, em, pkg, unitName);
+	}
+	
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName) {
+		val comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName)
+		val code = comp.generateMainCode
+		val sideFiles=Lists.newArrayList
+		sideFiles.addAll(comp.auxiliaryContent)
+		return Lists.newArrayList(
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
+				comp.hookName, true))
+	}
 	
 }

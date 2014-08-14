@@ -1,3 +1,4 @@
 org.pshdl.model.simulation.JavaCodeGenerator
 org.pshdl.model.simulation.DartCodeGenerator
 org.pshdl.model.simulation.CCodeGenerator
+org.pshdl.model.simulation.GoCodeGenerator
