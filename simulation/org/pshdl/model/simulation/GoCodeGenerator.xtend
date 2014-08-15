@@ -27,7 +27,7 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 	new(ExecutableModel em, int maxCosts, String pkg, String unit) {
 		super(em, 64, maxCosts)
 		this.pkg=pkg
-		this.unit=unit
+		this.unit=unit.toFirstUpper
 		cce=new CommonCompilerExtension(em, 64)
 	}
 	
@@ -50,7 +50,7 @@ func (s *«unit») updateRegs() {
 	
 	override protected doLoopStart() '''for {'''
 	
-	override protected doLoopEnd(CharSequence condition) '''	if («condition») { break }
+	override protected doLoopEnd(CharSequence condition) '''	if (!(«condition»)) { break }
 	}
 	'''
 	
@@ -71,7 +71,7 @@ func (s *«unit») updateRegs() {
 	override protected callStage(int stage, boolean constant) '''s.«stageMethodName(stage, constant)»()
 		'''
 	
-	override protected checkRegupdates() '''s.regUpdatePos == 0'''
+	override protected checkRegupdates() '''s.regUpdatePos != 0'''
 	
 	override protected checkTestbenchListener() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
@@ -281,6 +281,10 @@ func (s *«unit») skipEdge(local int64) bool {
 	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (fi.inst === Instruction.srl){
 			val CharSequence assignValue = doCast("int64", doCast("uint64", getTempName(leftOperand, NONE)) + ">>" +doCast("uint64", getTempName(rightOperand, NONE)))
+			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+		}
+		if (fi.inst === Instruction.sra){
+			val CharSequence assignValue = getTempName(leftOperand, NONE) + ">>" +doCast("uint64", getTempName(rightOperand, NONE))
 			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
 		}
 		if (fi.inst === Instruction.sll){

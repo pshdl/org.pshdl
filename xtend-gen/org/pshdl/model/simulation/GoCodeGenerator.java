@@ -13,6 +13,7 @@ import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.InternalInformation;
@@ -40,7 +41,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   public GoCodeGenerator(final ExecutableModel em, final int maxCosts, final String pkg, final String unit) {
     super(em, 64, maxCosts);
     this.pkg = pkg;
-    this.unit = unit;
+    String _firstUpper = StringExtensions.toFirstUpper(unit);
+    this.unit = _firstUpper;
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
     this.cce = _commonCompilerExtension;
   }
@@ -102,9 +104,9 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence doLoopEnd(final CharSequence condition) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("\t");
-    _builder.append("if (");
+    _builder.append("if (!(");
     _builder.append(condition, "\t");
-    _builder.append(") { break }");
+    _builder.append(")) { break }");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("}");
@@ -179,7 +181,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   
   protected CharSequence checkRegupdates() {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("s.regUpdatePos == 0");
+    _builder.append("s.regUpdatePos != 0");
     return _builder;
   }
   
@@ -785,15 +787,24 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         final CharSequence assignValue = this.doCast("int64", _plus_1);
         return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue);
       }
-      boolean _tripleEquals_1 = (fi.inst == Instruction.sll);
+      boolean _tripleEquals_1 = (fi.inst == Instruction.sra);
       if (_tripleEquals_1) {
         String _tempName_2 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-        String _plus_2 = (_tempName_2 + "<<");
+        String _plus_2 = (_tempName_2 + ">>");
         String _tempName_3 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
         CharSequence _doCast_2 = this.doCast("uint64", _tempName_3);
-        String _plus_3 = (_plus_2 + _doCast_2);
-        final CharSequence assignValue_1 = this.doCast("int64", _plus_3);
+        final CharSequence assignValue_1 = (_plus_2 + _doCast_2);
         return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_1);
+      }
+      boolean _tripleEquals_2 = (fi.inst == Instruction.sll);
+      if (_tripleEquals_2) {
+        String _tempName_4 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+        String _plus_3 = (_tempName_4 + "<<");
+        String _tempName_5 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
+        CharSequence _doCast_3 = this.doCast("uint64", _tempName_5);
+        String _plus_4 = (_plus_3 + _doCast_3);
+        final CharSequence assignValue_2 = this.doCast("int64", _plus_4);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_2);
       }
       _xblockexpression = super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes);
     }
