@@ -26,7 +26,6 @@
  ******************************************************************************/
 package org.pshdl.model.validation;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,6 +37,8 @@ import org.pshdl.model.parser.SourceInfo;
 import org.pshdl.model.utils.MetaAccess;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
+
+import com.google.common.collect.Maps;
 
 public class Problem {
 	public enum ProblemAccess implements MetaAccess<Problem> {
@@ -60,7 +61,7 @@ public class Problem {
 	public final IHDLObject context;
 	public final String info;
 	public final int pid;
-	public final Map<String, Object> meta = new HashMap<String, Object>();
+	public final Map<String, Object> meta = Maps.newLinkedHashMap();
 	public final int line;
 	public final int length;
 	public final boolean isSyntax;

@@ -188,7 +188,7 @@ public class FluidFrame {
 			final VariableInformation info = vars.get(basicName);
 			internals[e.getValue()] = new InternalInformation(name, info);
 		}
-		final Map<String, List<Frame>> lastID = Maps.newHashMap();
+		final Map<String, List<Frame>> lastID = Maps.newLinkedHashMap();
 		for (final Frame frame : res) {
 			final InternalInformation ii = internals[frame.outputId];
 			if ("#null".equals(ii.info.name)) {

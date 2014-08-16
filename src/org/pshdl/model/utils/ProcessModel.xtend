@@ -58,6 +58,7 @@ import org.pshdl.model.HDLDeclaration
 import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.extensions.StringWriteExtension
 import org.pshdl.model.HDLInstantiation
+import java.util.LinkedHashSet
 
 class ProcessModel {
 
@@ -119,7 +120,7 @@ class ProcessModel {
 		stmnt.thenDo.forEach([s|thenPM.merge(s.toProcessModel(pid))])
 		val elsePM = new ProcessModel
 		stmnt.elseDo.forEach([s|elsePM.merge(s.toProcessModel(pid))])
-		val clocks = new HashSet<HDLRegisterConfig>
+		val clocks = new LinkedHashSet<HDLRegisterConfig>
 		clocks.addAll(thenPM.clockedStatements.keySet)
 		clocks.addAll(elsePM.clockedStatements.keySet)
 		val res = new ProcessModel
@@ -134,7 +135,7 @@ class ProcessModel {
 
 	dispatch static def ProcessModel toProcessModel(HDLSwitchStatement stmnt, int pid) {
 		val Map<HDLSwitchCaseStatement, ProcessModel> pms = Maps.newLinkedHashMap
-		val clocks = new HashSet<HDLRegisterConfig>
+		val clocks = new LinkedHashSet<HDLRegisterConfig>
 		var hasUnclocked = false
 		for (HDLSwitchCaseStatement caze : stmnt.cases) {
 			val casePM = caze.toProcessModel(pid)

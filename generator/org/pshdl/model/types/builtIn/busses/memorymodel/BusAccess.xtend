@@ -31,6 +31,7 @@ import java.util.Date
 import java.util.HashSet
 import java.util.LinkedList
 import java.util.List
+import java.util.LinkedHashSet
 
 class BusAccess {
 
@@ -142,7 +143,7 @@ void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, ch
 
 	def generatePrintDef(List<Row> rows) {
 		var res = ''''''
-		val checkedRows = new HashSet<String>()
+		val checkedRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			if (!checkedRows.contains(row.name)) {
 				res = res + 
@@ -161,7 +162,7 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 
 	def generatePrint(List<Row> rows) {
 		var res = ''''''
-		val checkedRows = new HashSet<String>()
+		val checkedRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			if (!checkedRows.contains(row.name)) {
 				res = res + '''void print«row.name.toFirstUpper»(«row.name»_t *data){
@@ -197,9 +198,9 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 
 	def generateDeclarations(Unit unit, List<Row> rows) {
 		var res = ''''''
-		val checkedRows = new HashSet<String>()
+		val checkedRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
-			val checkedDefs = new HashSet<String>()
+			val checkedDefs = new LinkedHashSet<String>()
 			if (!checkedRows.contains(row.name)) {
 				res = res + '''
 					//Typedef
@@ -299,7 +300,7 @@ void setWarn(warnFunc_p warnFunction){
 
 	def generateGetterFunctions(List<Row> rows) {
 		var String res = ''''''
-		val doneRows = new HashSet<String>()
+		val doneRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			val handled = doneRows.contains(row.name)
 			if (!handled) {
@@ -403,7 +404,7 @@ int get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 
 	def generateSetterFunctions(List<Row> rows) {
 		var String res = ''''''
-		val doneRows = new HashSet<String>()
+		val doneRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			val handled = doneRows.contains(row.name)
 			if ((!handled) && row.hasWriteDefs) {

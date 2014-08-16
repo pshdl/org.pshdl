@@ -28,7 +28,6 @@ package org.pshdl.model.types.builtIn;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,12 +45,13 @@ import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.builtin.ErrorCode;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 public class HDLGenerators {
 	private static Map<String, IHDLGenerator> generators;
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
-		generators = new HashMap<String, IHDLGenerator>();
+		generators = Maps.newLinkedHashMap();
 		for (final IHDLGenerator gen : sp.getAllGenerators()) {
 			for (final String name : gen.getNames()) {
 				generators.put(name, gen);

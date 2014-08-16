@@ -26,7 +26,6 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.pshdl.model.HDLAssignment;
@@ -43,6 +42,8 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.utils.HDLQualifiedName;
+
+import com.google.common.collect.Maps;
 
 public class CommonBusCode {
 	public static HDLSwitchCaseStatement createReadCase(Row row, int reg, Map<String, Integer> intPos, Map<String, Boolean> isArray, String dataPort, HDLLiteral labelValue) {
@@ -84,7 +85,7 @@ public class CommonBusCode {
 	}
 
 	public static Map<String, Boolean> buildArrayMap(HDLInterface hdi) {
-		final Map<String, Boolean> isArray = new HashMap<String, Boolean>();
+		final Map<String, Boolean> isArray = Maps.newLinkedHashMap();
 		for (final HDLVariable var : hdi.getAllObjectsOf(HDLVariable.class, true))
 			if (var.getDimensions().size() != 0) {
 				isArray.put(var.getName(), true);

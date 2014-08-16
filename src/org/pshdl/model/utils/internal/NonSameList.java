@@ -29,12 +29,16 @@ package org.pshdl.model.utils.internal;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable {
-	private final Map<Integer, T> map = new LinkedHashMap<Integer, T>();
+	private final Map<T, T> map = Maps.newIdentityHashMap();
+	private final List<T> additions = Lists.newArrayList();
 
 	public NonSameList(Collection<T> value) {
 		super();
@@ -46,8 +50,16 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public boolean add(T item) {
-		final T old = map.put(System.identityHashCode(item), item);
-		return old != item;
+		final T old = map.put(item, item);
+		final boolean added = old != item;
+		if (added) {
+			if (old != null) {
+				System.err.println("Collision");
+			} else {
+				additions.add(item);
+			}
+		}
+		return added;
 	}
 
 	@Override
@@ -57,7 +69,7 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public boolean contains(Object arg0) {
-		return map.containsKey(System.identityHashCode(arg0));
+		return map.containsKey(arg0);
 	}
 
 	@Override
@@ -72,12 +84,17 @@ public class NonSameList<T> extends AbstractSet<T> implements Set<T>, Cloneable 
 
 	@Override
 	public Iterator<T> iterator() {
-		return map.values().iterator();
+		return additions.iterator();
 	}
 
 	@Override
 	public boolean remove(Object arg0) {
-		return map.remove(System.identityHashCode(arg0)) != null;
+		final T removedItem = map.remove(arg0);
+		final boolean removed = removedItem == arg0;
+		if (removed) {
+			additions.remove(arg0);
+		}
+		return removed;
 	}
 
 	@Override

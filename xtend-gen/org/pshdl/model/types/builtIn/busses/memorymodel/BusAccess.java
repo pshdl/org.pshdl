@@ -28,7 +28,7 @@ package org.pshdl.model.types.builtIn.busses.memorymodel;
 
 import com.google.common.base.Objects;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -310,7 +310,7 @@ public class BusAccess {
   public String generatePrintDef(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    final HashSet<String> checkedRows = new HashSet<String>();
+    final LinkedHashSet<String> checkedRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
         boolean _contains = checkedRows.contains(row.name);
@@ -349,7 +349,7 @@ public class BusAccess {
   public String generatePrint(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    final HashSet<String> checkedRows = new HashSet<String>();
+    final LinkedHashSet<String> checkedRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
         boolean _contains = checkedRows.contains(row.name);
@@ -452,10 +452,10 @@ public class BusAccess {
   public String generateDeclarations(final Unit unit, final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    final HashSet<String> checkedRows = new HashSet<String>();
+    final LinkedHashSet<String> checkedRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
-        final HashSet<String> checkedDefs = new HashSet<String>();
+        final LinkedHashSet<String> checkedDefs = new LinkedHashSet<String>();
         boolean _contains = checkedRows.contains(row.name);
         boolean _not = (!_contains);
         if (_not) {
@@ -738,7 +738,7 @@ public class BusAccess {
   public String generateGetterFunctions(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    final HashSet<String> doneRows = new HashSet<String>();
+    final LinkedHashSet<String> doneRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
         final boolean handled = doneRows.contains(row.name);
@@ -1089,7 +1089,7 @@ public class BusAccess {
   public String generateSetterFunctions(final List<Row> rows) {
     StringConcatenation _builder = new StringConcatenation();
     String res = _builder.toString();
-    final HashSet<String> doneRows = new HashSet<String>();
+    final LinkedHashSet<String> doneRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
         final boolean handled = doneRows.contains(row.name);

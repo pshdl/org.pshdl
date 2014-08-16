@@ -29,8 +29,7 @@ package org.pshdl.model.types.builtIn.busses;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +69,7 @@ import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.validation.Problem;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
 public class ABP3BusCodeGen extends CommonBusCode {
@@ -153,7 +153,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	private static HDLSwitchStatement createWriteSwitch(List<Row> rows, Map<String, Boolean> isArray) {
 		HDLSwitchStatement hsl = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("PADDR")));
 		int pos = 0;
-		final Map<String, Integer> intPos = new HashMap<String, Integer>();
+		final Map<String, Integer> intPos = Maps.newLinkedHashMap();
 		for (final Row row : rows) {
 			hsl = hsl.addCases(createWriteCase(row, pos++, intPos, isArray));
 		}
@@ -182,7 +182,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	private static HDLSwitchStatement createReadSwitch(List<Row> rows, Map<String, Boolean> isArray) {
 		HDLSwitchStatement res = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("PADDR")));
 		int pos = 0;
-		final Map<String, Integer> intPos = new HashMap<String, Integer>();
+		final Map<String, Integer> intPos = Maps.newLinkedHashMap();
 		for (final Row row : rows) {
 			final int reg = pos++;
 			res = res.addCases(createReadCase(row, reg, intPos, isArray, "PRDATA", HDLLiteral.get(reg * 4)));
@@ -193,7 +193,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, RecognitionException {
-		final Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new HashSet<Problem>(), 0);
+		final Unit unit = MemoryModelAST.parseUnit(Files.toString(new File(args[0]), Charsets.UTF_8), new LinkedHashSet<Problem>(), 0);
 		System.out.println(unit);
 		System.out.println(get("Bla", unit, MemoryModel.buildRows(unit)));
 	}

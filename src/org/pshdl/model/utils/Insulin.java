@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +121,7 @@ import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 
@@ -740,7 +740,7 @@ public class Insulin {
 		final ModificationSet ms = new ModificationSet();
 		final HDLInterfaceInstantiation[] hiis = apply.getAllObjectsOf(HDLInterfaceInstantiation.class, true);
 		for (final HDLInterfaceInstantiation hdi : hiis) {
-			final Map<String, HDLExpression> argMap = new HashMap<String, HDLExpression>();
+			final Map<String, HDLExpression> argMap = Maps.newLinkedHashMap();
 			final ArrayList<HDLArgument> arguments = hdi.getArguments();
 			for (final HDLArgument hdlArgument : arguments) {
 				argMap.put(hdlArgument.getName(), hdlArgument.getExpression());
@@ -871,7 +871,7 @@ public class Insulin {
 			// each dimensions is initialized. Because it might be possible that
 			// we don't write each dimension
 			if ((meta == null) || !ifDim.isEmpty()) {
-				meta = new HashSet<String>();
+				meta = Sets.newLinkedHashSet();
 			}
 			final Optional<HDLInterface> hIf = hi.resolveHIf();
 			if (!hIf.isPresent()) {
@@ -1657,7 +1657,7 @@ public class Insulin {
 	}
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
-		participants = new HashMap<String, IInsulinParticitant>();
+		participants = Maps.newLinkedHashMap();
 		for (final IInsulinParticitant iip : sp.getAllInsulinParticipants()) {
 			final String name = iip.getName();
 			participants.put(name, iip);

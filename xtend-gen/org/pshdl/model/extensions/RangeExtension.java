@@ -33,7 +33,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import org.pshdl.interpreter.frames.BigIntegerFrame;
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
@@ -152,8 +152,8 @@ public class RangeExtension {
     }
     HDLVariable _get_2 = hVar.get();
     HDLAnnotation _annotation = _get_2.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.range);
-    HashSet<Problem> _hashSet = new HashSet<Problem>();
-    final Optional<Range<BigInteger>> annoCheck = HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.checkRangeAnnotation(_annotation, _hashSet);
+    LinkedHashSet<Problem> _linkedHashSet = new LinkedHashSet<Problem>();
+    final Optional<Range<BigInteger>> annoCheck = HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.checkRangeAnnotation(_annotation, _linkedHashSet);
     boolean _isPresent_2 = annoCheck.isPresent();
     if (_isPresent_2) {
       return annoCheck;
@@ -165,8 +165,8 @@ public class RangeExtension {
       if ((container instanceof HDLVariableDeclaration)) {
         final HDLVariableDeclaration hvd = ((HDLVariableDeclaration) container);
         HDLAnnotation _annotation_1 = hvd.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.range);
-        HashSet<Problem> _hashSet_1 = new HashSet<Problem>();
-        final Optional<Range<BigInteger>> subAnnoCheck = HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.checkRangeAnnotation(_annotation_1, _hashSet_1);
+        LinkedHashSet<Problem> _linkedHashSet_1 = new LinkedHashSet<Problem>();
+        final Optional<Range<BigInteger>> subAnnoCheck = HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.checkRangeAnnotation(_annotation_1, _linkedHashSet_1);
         boolean _isPresent_3 = subAnnoCheck.isPresent();
         if (_isPresent_3) {
           return subAnnoCheck;

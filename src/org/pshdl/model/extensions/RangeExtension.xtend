@@ -74,6 +74,7 @@ import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.extensions.ProblemDescription.*
 import static org.pshdl.model.extensions.RangeExtension.*
+import java.util.LinkedHashSet
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -133,14 +134,14 @@ class RangeExtension {
 			obj.addMeta(DESCRIPTION, VARIABLE_NOT_RESOLVED)
 			return Optional.absent
 		}
-		val annoCheck = HDLBuiltInAnnotations.checkRangeAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range), new HashSet<Problem>())
+		val annoCheck = HDLBuiltInAnnotations.checkRangeAnnotation(hVar.get.getAnnotation(HDLBuiltInAnnotations.range), new LinkedHashSet<Problem>())
 		if (annoCheck.present)
 			return annoCheck
 		val container = hVar.get.container
 		if (container !== null) {
 			if (container instanceof HDLVariableDeclaration) {
 				val HDLVariableDeclaration hvd = container as HDLVariableDeclaration
-				val subAnnoCheck = HDLBuiltInAnnotations.checkRangeAnnotation(hvd.getAnnotation(HDLBuiltInAnnotations.range), new HashSet<Problem>())
+				val subAnnoCheck = HDLBuiltInAnnotations.checkRangeAnnotation(hvd.getAnnotation(HDLBuiltInAnnotations.range), new LinkedHashSet<Problem>())
 				if (subAnnoCheck.present)
 					return subAnnoCheck
 			}

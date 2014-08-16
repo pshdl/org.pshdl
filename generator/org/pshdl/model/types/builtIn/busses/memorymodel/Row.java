@@ -26,12 +26,13 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
+
+import com.google.common.collect.Maps;
 
 public class Row implements NamedElement {
 	public String name;
@@ -53,7 +54,7 @@ public class Row implements NamedElement {
 		this.name = name;
 	}
 
-	public final Map<String, Integer> defCount = new HashMap<String, Integer>();
+	public final Map<String, Integer> defCount = Maps.newLinkedHashMap();
 
 	public void updateInfo() {
 		int bitPos = 31;

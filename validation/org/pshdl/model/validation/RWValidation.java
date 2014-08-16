@@ -43,7 +43,6 @@ import static org.pshdl.model.validation.builtin.ErrorCode.WRITE_ACCESS_TO_IN_PO
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.pshdl.model.HDLAssignment;
@@ -72,6 +71,7 @@ import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 import org.pshdl.model.validation.builtin.ErrorCode;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 
 public class RWValidation {
 	public static void checkVariableUsage(HDLPackage unit, Set<Problem> problems) {
@@ -119,11 +119,11 @@ public class RWValidation {
 		for (final HDLInterfaceInstantiation hii : his) {
 			Set<String> readList = hii.getVar().getMeta(Init.read);
 			if (readList == null) {
-				readList = new HashSet<String>();
+				readList = Sets.newLinkedHashSet();
 			}
 			Set<String> writeList = hii.getVar().getMeta(Init.written);
 			if (writeList == null) {
-				writeList = new HashSet<String>();
+				writeList = Sets.newLinkedHashSet();
 			}
 			final Optional<HDLInterface> resolveHIf = hii.resolveHIf();
 			if (!resolveHIf.isPresent()) {
@@ -272,7 +272,7 @@ public class RWValidation {
 				if ((hdlVariable.getMeta(BLOCK_META) != null) && ((hdlVariable.getMeta(BLOCK_META) != block) && block.getProcess())) {
 					Set<HDLBlock> meta = hdlVariable.getMeta(BLOCK_META_CLASH);
 					if (meta == null) {
-						meta = new HashSet<HDLBlock>();
+						meta = Sets.newLinkedHashSet();
 					}
 					meta.add(block);
 					hdlVariable.addMeta(BLOCK_META_CLASH, meta);
@@ -289,7 +289,7 @@ public class RWValidation {
 	private static void addStringMeta(String value, HDLVariable hVar, Init init) {
 		Set<String> written = hVar.getMeta(init);
 		if (written == null) {
-			written = new HashSet<String>();
+			written = Sets.newLinkedHashSet();
 		}
 		written.add(value);
 		hVar.addMeta(init, written);

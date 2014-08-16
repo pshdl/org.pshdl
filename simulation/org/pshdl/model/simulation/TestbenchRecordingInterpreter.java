@@ -43,9 +43,9 @@ import com.google.common.collect.Maps;
 public class TestbenchRecordingInterpreter implements IHDLBigInterpreter {
 	private final IHDLInterpreter interpreter;
 	private final IHDLBigInterpreter bigInterpreter;
-	private final Map<String, BigInteger> lastVal = Maps.newHashMap();
-	private final Map<Integer, String> idxName = Maps.newHashMap();
-	private final Map<String, Integer> widths = Maps.newHashMap();
+	private final Map<String, BigInteger> lastVal = Maps.newLinkedHashMap();
+	private final Map<Integer, String> idxName = Maps.newLinkedHashMap();
+	private final Map<String, Integer> widths = Maps.newLinkedHashMap();
 	private final PrintStream printStream;
 	private final OutputType outputType;
 

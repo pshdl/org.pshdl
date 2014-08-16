@@ -27,10 +27,13 @@
 package org.pshdl.model.utils.internal;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +72,68 @@ public class Helper {
 				res.append("\n");
 			}
 			return res.toString().getBytes(Charsets.UTF_8);
+		}
+	}
+
+	public static void deleteDirectory(File directory) throws IOException {
+		// See
+		// http://stackoverflow.com/questions/8666420/how-to-recursively-delete-a-folder-without-following-symlinks
+		// Copied from
+		// http://grepcode.com/file/repo1.maven.org/maven2/commons-io/commons-io/2.1/org/apache/commons/io/FileUtils.java#FileUtils.deleteDirectory%28java.io.File%29
+		if (!directory.exists())
+			return;
+
+		if (!Files.isSymbolicLink(directory.toPath())) {
+			cleanDirectory(directory);
+		}
+
+		if (!directory.delete()) {
+			final String message = "Unable to delete directory " + directory + ".";
+			throw new IOException(message);
+		}
+	}
+
+	private static void cleanDirectory(File directory) throws IOException {
+		// Copied from
+		// http://grepcode.com/file/repo1.maven.org/maven2/commons-io/commons-io/2.1/org/apache/commons/io/FileUtils.java#FileUtils.cleanDirectory%28java.io.File%29
+		if (!directory.exists()) {
+			final String message = directory + " does not exist";
+			throw new IllegalArgumentException(message);
+		}
+
+		if (!directory.isDirectory()) {
+			final String message = directory + " is not a directory";
+			throw new IllegalArgumentException(message);
+		}
+
+		final File[] files = directory.listFiles();
+		if (files == null)
+			throw new IOException("Failed to list contents of " + directory);
+
+		IOException exception = null;
+		for (final File file : files) {
+			try {
+				forceDelete(file);
+			} catch (final IOException ioe) {
+				exception = ioe;
+			}
+		}
+
+		if (exception != null)
+			throw exception;
+	}
+
+	private static void forceDelete(File file) throws IOException {
+		if (file.isDirectory()) {
+			deleteDirectory(file);
+		} else {
+			final boolean filePresent = file.exists();
+			if (!file.delete()) {
+				if (!filePresent)
+					throw new FileNotFoundException("File does not exist: " + file);
+				final String message = "Unable to delete file: " + file;
+				throw new IOException(message);
+			}
 		}
 	}
 }

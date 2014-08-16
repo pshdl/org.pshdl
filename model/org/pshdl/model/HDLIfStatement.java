@@ -158,7 +158,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 
 	public TreeSide treeSide(IHDLObject stmnt) {
 		if (treeSides == null) {
-			treeSides = Maps.newHashMap();
+			treeSides = Maps.newLinkedHashMap();
 			for (final HDLStatement t : thenDo) {
 				final int tid = t.getID();
 				final TreeSide put = treeSides.put(tid, TreeSide.thenTree);

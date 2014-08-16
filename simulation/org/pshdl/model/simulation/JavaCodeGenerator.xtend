@@ -17,6 +17,8 @@ import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
 import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.*
+import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.model.simulation.CommonCodeGenerator.Attributes
 
 class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
@@ -129,6 +131,18 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 					«ENDIF»
 				break;
 			}
+		}
+		private long pow(long a, long n) {
+			long result = 1;
+			long p = a;
+			while (n > 0) {
+				if ((n % 2) != 0) {
+					result = result * p;
+				}
+				p = p * p;
+				n = n / 2;
+			}
+			return result;
 		}
 	'''
 
@@ -543,4 +557,9 @@ if (!tempArr.equals(«varName»))
 	}
 	
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''Arrays.fill(«vi.idName(true, NONE)», «regFillValue»);'''
+	
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
+	}
+	
 }

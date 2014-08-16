@@ -30,7 +30,6 @@ import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +49,7 @@ import org.pshdl.model.utils.SyntaxHighlighter;
 import org.pshdl.model.utils.internal.NonSameList;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * The class HDLObject contains the following fields
@@ -136,7 +136,7 @@ public abstract class HDLObject extends AbstractHDLObject implements org.pshdl.m
 		return copy;
 	}
 
-	public Map<MetaAccess<?>, Object> metaData = new HashMap<MetaAccess<?>, Object>();
+	public Map<MetaAccess<?>, Object> metaData = Maps.newLinkedHashMap();
 
 	public static class GenericMeta<T> implements MetaAccess<T> {
 

@@ -1,7 +1,12 @@
 package org.pshdl.model.simulation
 
 import com.google.common.collect.Lists
+import com.google.common.io.ByteStreams
+import com.google.common.io.Files
+import java.io.File
+import java.io.FileOutputStream
 import java.math.BigInteger
+import java.nio.charset.StandardCharsets
 import java.util.EnumSet
 import java.util.Set
 import org.apache.commons.cli.CommandLine
@@ -9,36 +14,68 @@ import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.IHDLInterpreterFactory
 import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.NativeRunner
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
-class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider{
-	
-	String pkg 
+class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
+
+	String pkg
 	String unit
 	CommonCompilerExtension cce;
-	
-	new(){}
-	
+
+	new() {
+	}
+
 	new(ExecutableModel em, int maxCosts, String pkg, String unit) {
 		super(em, 64, maxCosts)
-		this.pkg=pkg
-		this.unit=unit.toFirstUpper
-		cce=new CommonCompilerExtension(em, 64)
+		this.pkg = pkg
+		this.unit = unit.toFirstUpper
+		cce = new CommonCompilerExtension(em, 64)
 	}
-	
+
+	def public IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir){
+		val GoCodeGenerator dc = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unit);
+		val CharSequence dartCode = dc.generateMainCode();
+		val File dutFile = new File(tempDir, "TestUnit.go");
+		Files.createParentDirs(dutFile);
+		Files.write(dartCode, dutFile, StandardCharsets.UTF_8);
+		val File testRunner = new File(tempDir, "runner.go")
+		val runnerStream = typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/runner.go")
+		val fos = new FileOutputStream(testRunner)
+		try {
+			ByteStreams.copy(runnerStream, fos)
+		} finally {
+			fos.close
+		}
+		val ProcessBuilder goBuilder = new ProcessBuilder("/usr/local/go/bin/go", "build",
+			testRunner.getAbsolutePath(), dutFile.getAbsolutePath()).directory(tempDir).redirectErrorStream(true);
+		val Process goCompiler = goBuilder.start();
+		if (goCompiler.waitFor != 0) {
+			throw new RuntimeException("Compilation of Go Program failed")
+		}
+		new IHDLInterpreterFactory<NativeRunner>() {
+			override newInstance() {
+				val ProcessBuilder goBuilder = new ProcessBuilder(new File(tempDir,"runner").absolutePath).directory(tempDir).redirectErrorStream(true);
+				val Process goRunner = goBuilder.start();
+				return new NativeRunner(goRunner.getInputStream(), goRunner.getOutputStream(), em, goRunner, 5);
+			}
+		}
+	}
+
 	override protected preFieldDeclarations() '''type «unit» struct {
 	varIdx map[string]int
 
 	regUpdates   []regUpdate
 	regUpdatePos int
 	'''
-	
-	override protected postFieldDeclarations()'''}
+
+	override protected postFieldDeclarations() '''}
 func (s *«unit») updateRegs() {
 	for _, reg := range s.regUpdates {
 		switch reg.internal {
@@ -47,41 +84,43 @@ func (s *«unit») updateRegs() {
 	}
 }
 	'''
-	
+
 	override protected doLoopStart() '''for {'''
-	
+
 	override protected doLoopEnd(CharSequence condition) '''	if (!(«condition»)) { break }
 	}
 	'''
-	
+
 	override protected applyRegUpdates() '''s.updateRegs()
-	'''
-	
-	override protected arrayInit(VariableInformation varInfo, BigInteger initValue, EnumSet<CommonCodeGenerator.Attributes> attributes) '''make([]«fieldType(varInfo, attributes)», «varInfo.arraySize»)'''
-	
+		'''
+
+	override protected arrayInit(VariableInformation varInfo, BigInteger initValue,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) '''make([]«fieldType(varInfo, attributes)», «varInfo.arraySize»)'''
+
 	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
-	override protected callMethod(CharSequence methodName, CharSequence... args) '''s.«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
-	
+
+	override protected callMethod(CharSequence methodName, CharSequence... args) '''«IF inBarrier»wg.Add(1)
+«indent()»go «ENDIF»s.«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+
 	override protected callRunMethod() '''s.Run()
-	'''
-	
+		'''
+
 	override protected callStage(int stage, boolean constant) '''s.«stageMethodName(stage, constant)»()
 		'''
-	
+
 	override protected checkRegupdates() '''s.regUpdatePos != 0'''
-	
+
 	override protected checkTestbenchListener() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override protected clearRegUpdates() '''s.regUpdatePos = 0
 '''
-	
+
 	override protected copyArray(VariableInformation varInfo) '''/* copy array */'''
-	
+
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (varInfo.dimensions.nullOrEmpty || attributes.contains(CommonCodeGenerator.Attributes.baseType)) {
 			if (isBoolean(varInfo, attributes))
@@ -95,9 +134,8 @@ func (s *«unit») updateRegs() {
 	}
 
 	override protected doCast(CharSequence cast, CharSequence assignValue) '''«cast»(«assignValue»)'''
-	
-	override protected footer() 
-	'''
+
+	override protected footer() '''
 func (s *«unit») SetInputWithName(name string, value int64, arrayIdx ...int) {
 	s.SetInput(s.GetIndex(name), value, arrayIdx...)
 }
@@ -120,7 +158,7 @@ func (s *«unit») GetIndex(name string) int {
  
 func (s *«unit») GetName(idx int) string {
 	switch idx {
-	«FOR VariableInformation vi:em.variables»
+	«FOR VariableInformation vi : em.variables»
 	case «vi.varIdx»:
 		return "«vi.name»"
 	«ENDFOR»
@@ -158,17 +196,14 @@ func (s *«unit») SetDisableRegOutputLogic(enable bool) {
 }
 
 	'''
-	
-	override protected functionFooter(Frame frame) 
-	'''}
-	'''
-	
-	override protected functionHeader(Frame frame) 
-	'''func (s *«unit») «frame.frameName» (){
+
+	override protected functionFooter(Frame frame) '''}
+		'''
+
+	override protected functionHeader(Frame frame) '''func (s *«unit») «frame.frameName» (){
 '''
-	
-	override protected header() 
-	'''package «pkg»
+
+	override protected header() '''package «pkg»
  
 type regUpdate struct {
 	internal, offset int
@@ -186,7 +221,7 @@ func New«unit»WithArgs(«DISABLE_EDGES.name», «DISABLE_REG_OUTPUTLOGIC.name�
 	}
  
 	s.regUpdates = make([]regUpdate, «maxRegUpdates»)
-	s.varIdx = make(map[string]int, «em.variables.size-1»)
+	s.varIdx = make(map[string]int, «em.variables.size - 1»)
 	«FOR v : em.variables.excludeNull»
 		s.varIdx["«v.name»"] =  «varIdx.get(v.name)»
 	«ENDFOR»
@@ -211,16 +246,31 @@ func (s *«unit») skipEdge(local int64) bool {
  
 	return true
 }
+
+func pow(a int64, n int64) int64 {
+	var result int64 = 1;
+    	var p int64 = a;
+	for {
+		if (n<=0) {break}
+		if ((n % 2) != 0) {
+        	    result = result * p;
+		}
+	        p = p * p;
+	        n = n / 2;
+	}
+	return result
+}
 	'''
-	
+
 	override protected idName(String name, boolean field, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		val superVal=super.idName(name, field, attributes).toString.replace('$','__')
+		val superVal = super.idName(name, field, attributes).toString.replace('$', '__')
 		return superVal
 	}
-	
+
 	override protected fieldPrefix() '''s.'''
-	
-	override protected CharSequence createVarDeclaration(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean initialize) {
+
+	override protected CharSequence createVarDeclaration(VariableInformation varInfo,
+		EnumSet<CommonCodeGenerator.Attributes> attributes, boolean initialize) {
 		val StringBuilder sb = new StringBuilder()
 		sb.append(preField(varInfo, attributes))
 		indent++;
@@ -231,74 +281,89 @@ func (s *«unit») skipEdge(local int64) bool {
 		sb.append(postField(varInfo))
 		return sb;
 	}
-	
+
 	override protected constantSuffix() ''''''
-	
-	override protected CharSequence inlineVarDecl(VariableInformation varInfo, boolean field, EnumSet<CommonCodeGenerator.Attributes> attributes) '''var «idName(varInfo, field, attributes)» «fieldType(varInfo, attributes)»'''
-	
+
+	override protected CharSequence inlineVarDecl(VariableInformation varInfo, boolean field,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) '''var «idName(varInfo, field, attributes)» «fieldType(varInfo,
+		attributes)»'''
+
 	override protected runMethodsFooter(boolean constant) '''}
-	'''
-	
+		'''
+
 	override protected runMethodsHeader(boolean constant) '''func (s *«unit») «IF !constant»Run«ELSE»InitConstants«ENDIF»() {
-	'''
-	
+		'''
+
 	override protected runProcessHeader(CommonCodeGenerator.ProcessData pd) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override protected runTestbenchHeader() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
-	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean force, CharSequence fillValue)
+
+	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName,
+		CharSequence offset, boolean force, CharSequence fillValue) '''
+		«IF !force»if («cpyName»!=«last») «ENDIF»{
+		«indent()»	s.regUpdates[s.regUpdatePos] = regUpdate{«outputInternal.varIdx», int(«offset»), «fillValue»}
+		«indent()»	s.regUpdatePos++
+		«indent()»}
 	'''
-	«IF !force»if («cpyName»!=«last») «ENDIF»{
-	«indent()»	s.regUpdates[s.regUpdatePos] = regUpdate{«outputInternal.varIdx», int(«offset»), «fillValue»}
-	«indent()»	s.regUpdatePos++
-	«indent()»}
-	'''
-	
+
 	override protected doMask(CharSequence currentValue, CharSequence writeMask) {
 		return doCast("int64", super.doMask(doCast("uint64", currentValue), writeMask))
 	}
-	
+
 	override protected stageMethodsFooter(int stage, int totalStageCosts, boolean constant) '''}
-	'''
-	
-	override protected stageMethodsHeader(int stage, int totalStageCosts, boolean constant) '''func (s *«unit») «stageMethodName(stage,constant)»() {
-	'''
-	
-	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''for i := range «idName(vi, true, NONE)» { «idName(vi, true, NONE)»[i] = «regFillValue» } '''
-	
-	override protected singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		if (fi.inst===Instruction.bit_neg){
-			val CharSequence assignValue = singleOpValue("^", getCast(targetSizeWithType), a, targetSizeWithType, attributes);
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+		'''
+
+	override protected stageMethodsHeader(int stage, int totalStageCosts, boolean constant) '''func (s *«unit») «stageMethodName(
+		stage, constant)»() {
+		'''
+
+	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''for i := range «idName(vi, true,
+		NONE)» { «idName(vi, true, NONE)»[i] = «regFillValue» } '''
+
+	override protected singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a,
+		EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
+		if (fi.inst === Instruction.bit_neg) {
+			val CharSequence assignValue = singleOpValue("^", getCast(targetSizeWithType), a, targetSizeWithType,
+				attributes);
+			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
 		}
-		super.singleOp(fi, op, targetSizeWithType, pos, a, attributes)
+		super.singleOp(fi, op, targetSizeWithType, pos, a, attributes, doMask)
+	}
+
+	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
+		if (fi.inst === Instruction.srl) {
+			val CharSequence assignValue = doCast("int64",
+				doCast("uint64", getTempName(leftOperand, NONE)) + ">>" +
+					doCast("uint64", getTempName(rightOperand, NONE)))
+			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+		}
+		if (fi.inst === Instruction.sra) {
+			val CharSequence assignValue = getTempName(leftOperand, NONE) + ">>" +
+				doCast("uint64", getTempName(rightOperand, NONE))
+			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+		}
+		if (fi.inst === Instruction.sll) {
+			val CharSequence assignValue = doCast("int64",
+				getTempName(leftOperand, NONE) + "<<" + doCast("uint64", getTempName(rightOperand, NONE)))
+			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+		}
+		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
 	
-	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		if (fi.inst === Instruction.srl){
-			val CharSequence assignValue = doCast("int64", doCast("uint64", getTempName(leftOperand, NONE)) + ">>" +doCast("uint64", getTempName(rightOperand, NONE)))
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
-		}
-		if (fi.inst === Instruction.sra){
-			val CharSequence assignValue = getTempName(leftOperand, NONE) + ">>" +doCast("uint64", getTempName(rightOperand, NONE))
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
-		}
-		if (fi.inst === Instruction.sll){
-			val CharSequence assignValue = doCast("int64", getTempName(leftOperand, NONE) + "<<" +doCast("uint64", getTempName(rightOperand, NONE)))
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
-		}
-		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes)
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
 	}
-	
+
 	override protected writeToNull(String last) '''var _ = «last»
-	'''
-	
+		'''
+
 	override getHookName() '''Go'''
-	
+
 	override getUsage() {
 		val options = new Options;
 		options.addOption('p', "pkg", true,
@@ -319,15 +384,27 @@ func (s *«unit») skipEdge(local int64) bool {
 		val unitName = moduleName.substring(li + 1, moduleName.length);
 		doCompile(syntaxProblems, em, pkg, unitName);
 	}
-	
+
 	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName) {
 		val comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName)
 		val code = comp.generateMainCode
-		val sideFiles=Lists.newArrayList
+		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
 			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
 				comp.hookName, true))
 	}
-	
+
+	boolean inBarrier = false
+
+	override protected barrierBegin(int stage, int totalStageCosts, boolean createConstant) {
+		inBarrier = true
+		return "var wg sync.WaitGroup\n"
+	}
+
+	override protected barrierEnd(int stage, int totalStageCosts, boolean createConstant) {
+		inBarrier = false
+		return "wg.Wait"
+	}
+
 }

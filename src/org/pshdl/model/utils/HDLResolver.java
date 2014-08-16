@@ -28,7 +28,6 @@ package org.pshdl.model.utils;
 
 import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,7 @@ import org.pshdl.model.IHDLObject;
 import org.pshdl.model.extensions.ScopingExtension;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 public class HDLResolver {
 
@@ -108,7 +108,7 @@ public class HDLResolver {
 		if (enumCache == null) {
 			synchronized (this) {
 				final HDLEnumDeclaration[] enumDecl = resolveTo.getAllObjectsOf(HDLEnumDeclaration.class, false);
-				enumCache = new HashMap<HDLQualifiedName, HDLEnum>();
+				enumCache = Maps.newLinkedHashMap();
 				for (final HDLEnumDeclaration hdlEnumDeclaration : enumDecl) {
 					enumCache.put(fullNameOf(hdlEnumDeclaration.getHEnum()), hdlEnumDeclaration.getHEnum());
 				}
@@ -128,7 +128,7 @@ public class HDLResolver {
 		if (funcCache == null) {
 			synchronized (this) {
 				final HDLFunction[] enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
-				funcCache = new HashMap<HDLQualifiedName, HDLFunction>();
+				funcCache = Maps.newLinkedHashMap();
 				for (final HDLFunction hdlEnumDeclaration : enumDecl) {
 					funcCache.put(fullNameOf(hdlEnumDeclaration), hdlEnumDeclaration);
 				}
@@ -148,7 +148,7 @@ public class HDLResolver {
 		if (ifCache == null) {
 			synchronized (this) {
 				final List<HDLInterface> ifDecl = ScopingExtension.INST.doGetInterfaceDeclarations(resolveTo);
-				ifCache = new HashMap<HDLQualifiedName, HDLInterface>();
+				ifCache = Maps.newLinkedHashMap();
 				for (final HDLInterface hdlIfDeclaration : ifDecl) {
 					final HDLQualifiedName fqn = fullNameOf(hdlIfDeclaration);
 					// Usually this should not happen, but when the interface
@@ -173,7 +173,7 @@ public class HDLResolver {
 		if (typeCache == null) {
 			synchronized (this) {
 				final List<HDLType> typeDecl = doGetTypeDeclarations();
-				typeCache = new HashMap<HDLQualifiedName, HDLType>();
+				typeCache = Maps.newLinkedHashMap();
 				for (final HDLType hdlTypeDeclaration : typeDecl) {
 					if (hdlTypeDeclaration.getClassType() != HDLClass.HDLPrimitive) {
 						typeCache.put(fullNameOf(hdlTypeDeclaration), hdlTypeDeclaration);
@@ -206,7 +206,7 @@ public class HDLResolver {
 		if (variableCache == null) {
 			synchronized (this) {
 				final List<HDLVariable> varDecl = ScopingExtension.INST.doGetVariables(resolveTo);
-				variableCache = new HashMap<HDLQualifiedName, HDLVariable>();
+				variableCache = Maps.newLinkedHashMap();
 				for (final HDLVariable declVars : varDecl) {
 					variableCache.put(fullNameOf(declVars), declVars);
 				}

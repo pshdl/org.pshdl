@@ -59,7 +59,7 @@ void     pshdl_sim_setDisableEdges(bool enable);
 void     pshdl_sim_run(void);
 void     pshdl_sim_initConstants(void);
 
-uint32_t pshdl_sim_getIndex(char* name);
+int      pshdl_sim_getIndex(char* name);
 char*    pshdl_sim_getName(uint32_t idx);
 char*    pshdl_sim_getJsonDesc(void);
 uint64_t pshdl_sim_getDeltaCycle(void);

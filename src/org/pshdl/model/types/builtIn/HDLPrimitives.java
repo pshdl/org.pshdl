@@ -41,7 +41,6 @@ import java.io.File;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -69,6 +68,7 @@ import org.pshdl.model.simulation.RangeTool;
 import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.io.Files;
 
@@ -150,7 +150,7 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initBitResolution() {
-		final Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = Maps.newLinkedHashMap();
 		for (final HDLPrimitiveType left : HDLPrimitiveType.values()) {
 			if (left == BOOL) {
 				continue;
@@ -173,7 +173,7 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initArithResolution() {
-		final Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = Maps.newLinkedHashMap();
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, INTEGER, null), new HDLInferenceTriple(INT, INTEGER, INT));
@@ -197,7 +197,7 @@ public class HDLPrimitives {
 	}
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initShiftResolution() {
-		final Map<HDLInferenceTriple, HDLInferenceTriple> res = new HashMap<HDLInferenceTriple, HDLInferenceTriple>();
+		final Map<HDLInferenceTriple, HDLInferenceTriple> res = Maps.newLinkedHashMap();
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, INTEGER, null), new HDLInferenceTriple(INT, NATURAL, INT));

@@ -26,7 +26,6 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.pshdl.model.HDLAnnotation;
@@ -37,11 +36,13 @@ import org.pshdl.model.utils.services.IServiceProvider;
 import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.builtin.ErrorCode;
 
+import com.google.common.collect.Maps;
+
 public class HDLAnnotations {
 	private static Map<String, IHDLAnnotation> annotations;
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
-		annotations = new HashMap<String, IHDLAnnotation>();
+		annotations = Maps.newLinkedHashMap();
 		for (final IHDLAnnotation anno : sp.getAllAnnotations()) {
 			annotations.put(anno.name(), anno);
 			final AnnotationInformation annoInfo = anno.getAnnotationInformation();

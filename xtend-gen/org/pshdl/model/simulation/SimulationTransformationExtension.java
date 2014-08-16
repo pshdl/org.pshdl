@@ -32,8 +32,8 @@ import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import org.eclipse.xtext.xbase.lib.Conversions;
@@ -691,7 +691,7 @@ public class SimulationTransformationExtension {
     String[] _annoString = this.toAnnoString(_annotations);
     res.annotations = _annoString;
     final HDLRegisterConfig[] regConfigs = obj.<HDLRegisterConfig>getAllObjectsOf(HDLRegisterConfig.class, true);
-    final Set<HDLQualifiedName> lst = new HashSet<HDLQualifiedName>();
+    final Set<HDLQualifiedName> lst = new LinkedHashSet<HDLQualifiedName>();
     for (final HDLRegisterConfig reg : regConfigs) {
       {
         HDLExpression _rst = reg.getRst();

@@ -31,7 +31,6 @@ import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,7 @@ import org.pshdl.model.utils.internal.Helper;
 import org.pshdl.model.utils.services.AuxiliaryContent;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 
 public class MemoryModelSideFiles {
 
@@ -65,7 +65,7 @@ public class MemoryModelSideFiles {
 	}
 
 	public static byte[] builtHTML(Unit unit, List<Row> rows, boolean withDate) {
-		final Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = Maps.newLinkedHashMap();
 		options.put("{TITLE}", "Register Overview");
 		if (withDate) {
 			options.put("{DATE}", new Date().toString());
@@ -98,8 +98,8 @@ public class MemoryModelSideFiles {
 			int pos = 0;
 			Column current = null;
 			int colIndex = -1;
-			final Map<String, Integer> defIndex = new HashMap<String, Integer>();
-			final Map<String, Integer> rowIndex = new HashMap<String, Integer>();
+			final Map<String, Integer> defIndex = Maps.newLinkedHashMap();
+			final Map<String, Integer> rowIndex = Maps.newLinkedHashMap();
 			for (final Row row : rows) {
 				if ((row.column != current) || (row.colIndex != colIndex))
 					if (row.column == null) {

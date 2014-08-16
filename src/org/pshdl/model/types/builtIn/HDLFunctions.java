@@ -27,7 +27,6 @@
 package org.pshdl.model.types.builtIn;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +47,7 @@ import org.pshdl.model.utils.services.IHDLFunctionResolver;
 import org.pshdl.model.utils.services.IServiceProvider;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 public class HDLFunctions {
@@ -59,7 +59,7 @@ public class HDLFunctions {
 	private static Map<String, List<IHDLFunctionResolver>> resolvers;
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
-		resolvers = new HashMap<String, List<IHDLFunctionResolver>>();
+		resolvers = Maps.newLinkedHashMap();
 		for (final IHDLFunctionResolver resolver : sp.getAllFunctions()) {
 			final String[] names = resolver.getFunctionNames();
 			for (final String funcName : names) {

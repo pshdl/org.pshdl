@@ -272,6 +272,40 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
+    _builder.append("private long pow(long a, long n) {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("long result = 1;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("long p = a;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("while (n > 0) {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("if ((n % 2) != 0) {");
+    _builder.newLine();
+    _builder.append("\t\t\t");
+    _builder.append("result = result * p;");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("p = p * p;");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("n = n / 2;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return result;");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
     return _builder;
   }
   
@@ -1500,5 +1534,17 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append(regFillValue, "");
     _builder.append(");");
     return _builder;
+  }
+  
+  protected CharSequence pow(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean doMask) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("pow(");
+    String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+    _builder.append(_tempName, "");
+    _builder.append(", ");
+    String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
+    _builder.append(_tempName_1, "");
+    _builder.append(")");
+    return this.assignTempVar(targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
   }
 }

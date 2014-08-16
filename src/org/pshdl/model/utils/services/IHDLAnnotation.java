@@ -70,7 +70,9 @@ public interface IHDLAnnotation {
 	/**
 	 * Validates the contents of the annotation and returns a message to the
 	 * user if it is not correct
-	 * @param annotation TODO
+	 * 
+	 * @param annotation
+	 *            TODO
 	 * @return
 	 */
 	String validate(HDLAnnotation annotation);

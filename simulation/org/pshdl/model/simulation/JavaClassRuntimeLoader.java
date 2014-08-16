@@ -111,17 +111,17 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		fileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.singleton(tempDir));
 	}
 
-	public IHDLInterpreterFactory compileAndLoad(String mainClassFQN, String sourceCode, final boolean disableEdge, final boolean disableOutputLogic) throws Exception {
+	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoad(String mainClassFQN, String sourceCode, final boolean disableEdge, final boolean disableOutputLogic)
+			throws Exception {
 		final Class<?> cls = compileClass(mainClassFQN, sourceCode);
-		return new IHDLInterpreterFactory() {
+		return new IHDLInterpreterFactory<IHDLInterpreter>() {
 
 			@Override
 			public IHDLInterpreter newInstance() {
 				Constructor<?> constructor;
 				try {
 					constructor = cls.getConstructor(Boolean.TYPE, Boolean.TYPE);
-					final IHDLInterpreter instance = (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
-					return instance;
+					return (IHDLInterpreter) constructor.newInstance(disableEdge, disableOutputLogic);
 				} catch (final Exception e) {
 					throw new RuntimeException(e);
 				}

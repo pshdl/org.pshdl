@@ -30,7 +30,7 @@ import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 import static org.pshdl.model.utils.HDLQuery.isEqualTo;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,6 +44,8 @@ import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery;
+
+import com.google.common.collect.Maps;
 
 /**
  * This is used to resolve parameter to constants. When a HDLUnit has parameter
@@ -62,7 +64,7 @@ public class HDLEvaluationContext {
 	public boolean boolAsInt = false;
 
 	public HDLEvaluationContext() {
-		this(new HashMap<String, HDLExpression>());
+		this(new LinkedHashMap<String, HDLExpression>());
 	}
 
 	public HDLEvaluationContext(Map<String, HDLExpression> context) {
@@ -100,7 +102,7 @@ public class HDLEvaluationContext {
 	 * @return a HDLEvaluationContext with all parameters set to their default
 	 */
 	public static Map<HDLQualifiedName, HDLEvaluationContext> createDefault(HDLPackage pkg) {
-		final Map<HDLQualifiedName, HDLEvaluationContext> res = new HashMap<HDLQualifiedName, HDLEvaluationContext>();
+		final Map<HDLQualifiedName, HDLEvaluationContext> res = Maps.newLinkedHashMap();
 		for (final HDLUnit unit : pkg.getUnits()) {
 			final HDLEvaluationContext hec = createDefault(unit);
 			final HDLQualifiedName fullName = fullNameOf(unit);
@@ -122,7 +124,7 @@ public class HDLEvaluationContext {
 	}
 
 	private static HDLEvaluationContext createDefaultFromObj(IHDLObject unit) {
-		final Map<String, HDLExpression> c = new HashMap<String, HDLExpression>();
+		final Map<String, HDLExpression> c = Maps.newLinkedHashMap();
 		final Collection<HDLVariableDeclaration> constants = HDLQuery.select(HDLVariableDeclaration.class)//
 				.from(unit).where(HDLVariableDeclaration.fDirection)//
 				.matches(isEqualTo(HDLDirection.CONSTANT))//
@@ -152,7 +154,7 @@ public class HDLEvaluationContext {
 	}
 
 	public Map<String, HDLExpression> getMap() {
-		return new HashMap<String, HDLExpression>(context);
+		return new LinkedHashMap<String, HDLExpression>(context);
 	}
 
 	public HDLEvaluationContext set(String key, HDLExpression val) {

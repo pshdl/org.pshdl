@@ -28,7 +28,6 @@ package org.pshdl.model.types.builtIn.busses.memorymodel;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
 import org.pshdl.model.validation.Problem;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
@@ -73,8 +73,8 @@ public class MemoryModel {
 	}
 
 	public static HDLInterface buildHDLInterface(Unit unit, List<Row> rows) {
-		final Map<String, Definition> definitions = new HashMap<String, Definition>();
-		final Map<String, Integer> defDimension = new HashMap<String, Integer>();
+		final Map<String, Definition> definitions = Maps.newLinkedHashMap();
+		final Map<String, Integer> defDimension = Maps.newLinkedHashMap();
 		for (final Row row : rows) {
 			for (final NamedElement ne : row.definitions) {
 				final Definition def = (Definition) ne;

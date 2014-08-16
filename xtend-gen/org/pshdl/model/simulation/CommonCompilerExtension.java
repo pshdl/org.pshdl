@@ -27,7 +27,7 @@
 package org.pshdl.model.simulation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -39,7 +39,7 @@ import org.pshdl.interpreter.VariableInformation;
 public class CommonCompilerExtension {
   public ExecutableModel em;
   
-  public Map<String, Integer> varIdx = new HashMap<String, Integer>();
+  public Map<String, Integer> varIdx = new LinkedHashMap<String, Integer>();
   
   public CommonCompilerExtension(final ExecutableModel em, final int bitWidth) {
     this.em = em;

@@ -30,7 +30,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -168,7 +167,7 @@ public class HDLSimulator {
 			final HDLVariable processStateVar = new HDLVariable().setName("$process_state_" + fqn.getLastSegment()).setDefaultValue(HDLLiteral.get(0));
 			processStateDecl = processStateDecl.addVariables(processStateVar);
 			ms.addTo(insulin, HDLUnit.fInits, processNextTimeDecl, processStateDecl);
-			final Map<Integer, List<HDLStatement>> cases = Maps.newHashMap();
+			final Map<Integer, List<HDLStatement>> cases = Maps.newLinkedHashMap();
 			int currentCase = 0;
 			cases.put(currentCase, Lists.<HDLStatement> newArrayList());
 			for (final HDLStatement stmnt : process.getStatements()) {
@@ -502,7 +501,7 @@ public class HDLSimulator {
 	private static HDLUnit removeDoubleAssignments(HDLEvaluationContext context, HDLUnit insulin) {
 		final ModificationSet ms = new ModificationSet();
 		final HDLAssignment[] asss = insulin.getAllObjectsOf(HDLAssignment.class, true);
-		final Map<InitTuple, HDLAssignment> scopeWrites = new HashMap<InitTuple, HDLAssignment>();
+		final Map<InitTuple, HDLAssignment> scopeWrites = Maps.newLinkedHashMap();
 		for (final HDLAssignment hdlAssignment : asss) {
 			final IHDLObject container = hdlAssignment.getContainer();
 			final InitTuple it = new InitTuple(hdlAssignment.getLeft(), container);

@@ -31,7 +31,6 @@ import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider;
 import org.pshdl.model.utils.internal.Helper;
 import org.pshdl.model.utils.services.AuxiliaryContent;
 
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
 public class BusGenSideFiles {
@@ -71,10 +71,11 @@ public class BusGenSideFiles {
 		return res;
 	}
 
-	private static AuxiliaryContent wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir, boolean withDate) {
+	private static AuxiliaryContent wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir,
+			boolean withDate) {
 		final String wrapperName = unitName + WRAPPER_APPENDIX;
 		final String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
-		final Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = Maps.newLinkedHashMap();
 		options.put("{NAME}", unitName);
 		options.put("{DIRNAME}", dirName);
 		options.put("{WRAPPERNAME}", wrapperName);
@@ -179,7 +180,7 @@ public class BusGenSideFiles {
 
 	private static AuxiliaryContent paoFile(String ipcoreName, String dirName, String type, String rootDir, boolean withDate) {
 		final String relPath = dirName + "/data/" + ipcoreName + WRAPPER_APPENDIX + "_v2_1_0.pao";
-		final Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = Maps.newLinkedHashMap();
 		options.put("{NAME}", ipcoreName);
 		options.put("{TARGETFILE}", relPath);
 		options.put("{DIRNAME}", dirName);
@@ -261,7 +262,7 @@ public class BusGenSideFiles {
 			generics.append("PARAMETER C_MEM" + i + "_BASEADDR = 0xffffffff, DT = std_logic_vector, PAIR = C_MEM" + i + "_HIGHADDR, ADDRESS = BASE, BUS = SPLB");
 			generics.append("PARAMETER C_MEM" + i + "_HIGHADDR = 0x00000000, DT = std_logic_vector, PAIR = C_MEM" + i + "_BASEADDR, ADDRESS = HIGH, BUS = SPLB");
 		}
-		final Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = Maps.newLinkedHashMap();
 		options.put("{NAME}", ipcoreName);
 		if (withDate) {
 			options.put("{DATE}", new Date().toString());
@@ -269,7 +270,8 @@ public class BusGenSideFiles {
 		options.put("{PORTS}", ports.toString());
 		options.put("{GENERICS}", generics.toString());
 		try {
-			return new AuxiliaryContent(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options), true);
+			return new AuxiliaryContent(rootDir + dirName + "/data/" + ipcoreName + "_v2_1_0.mpd", Helper.processFile(BusGenSideFiles.class, bus_type + "_v2_1_0.mpd", options),
+					true);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

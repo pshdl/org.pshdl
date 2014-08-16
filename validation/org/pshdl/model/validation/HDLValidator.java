@@ -26,7 +26,6 @@
  ******************************************************************************/
 package org.pshdl.model.validation;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +37,8 @@ import org.pshdl.model.utils.Insulin;
 import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.IHDLValidator;
 import org.pshdl.model.utils.services.IServiceProvider;
+
+import com.google.common.collect.Maps;
 
 public class HDLValidator {
 
@@ -67,7 +68,7 @@ public class HDLValidator {
 	 * @param sp
 	 */
 	public static void init(CompilerInformation info, IServiceProvider sp) {
-		validators = new HashMap<Class<?>, IHDLValidator>();
+		validators = Maps.newLinkedHashMap();
 		for (final IHDLValidator gen : sp.getAllValidators()) {
 			final String name = gen.getName();
 			validators.put(gen.getErrorClass(), gen);

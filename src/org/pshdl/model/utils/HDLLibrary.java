@@ -29,7 +29,6 @@ package org.pshdl.model.utils;
 import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +54,7 @@ import org.pshdl.model.utils.services.AuxiliaryContent;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 public class HDLLibrary {
@@ -75,7 +75,7 @@ public class HDLLibrary {
 		}
 	}
 
-	private static Map<String, HDLLibrary> libs = new HashMap<String, HDLLibrary>();
+	private static Map<String, HDLLibrary> libs = Maps.newLinkedHashMap();
 
 	public static HDLLibrary getLibrary(String libURI) {
 		if (libURI == null)
@@ -409,7 +409,7 @@ public class HDLLibrary {
 		}
 	}
 
-	public Map<MetaAccess<?>, Object> metaData = new HashMap<MetaAccess<?>, Object>();
+	public Map<MetaAccess<?>, Object> metaData = Maps.newLinkedHashMap();
 
 	public void addMeta(String key, Object value) {
 		metaData.put(new GenericMeta<Object>(key, true), value);

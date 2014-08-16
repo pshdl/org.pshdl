@@ -1,7 +1,10 @@
 package org.pshdl.model.simulation
 
 import com.google.common.collect.Lists
+import com.google.common.io.Files
+import java.io.File
 import java.math.BigInteger
+import java.nio.charset.StandardCharsets
 import java.util.EnumSet
 import java.util.Set
 import org.apache.commons.cli.CommandLine
@@ -9,20 +12,25 @@ import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.IHDLInterpreterFactory
 import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.NativeRunner
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.VariableInformation.Direction
-import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.interpreter.utils.Instruction
 import org.pshdl.model.utils.PSAbstractCompiler
+import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
-class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider{
+class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 	String unitName
 	String library
 	boolean usePackageImport
 	final int epsWidth = 16;
-	new(){
+	public static String TESTRUNNER_DIR = "/Users/karstenbecker/GDrive/DartTestRunner/"
+	public static String DART_EXEC = "/Applications/dart/dart-sdk/bin/dart"
+
+	new() {
 	}
 
 	new(ExecutableModel model, String unitName, String library, boolean usePackageImport, int maxCosts) {
@@ -30,6 +38,33 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		this.unitName = unitName
 		this.library = library
 		this.usePackageImport = usePackageImport
+	}
+
+	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
+		val dc = new DartCodeGenerator(em, unitName, library, true, Integer.MAX_VALUE)
+		val dartCode = dc.generateMainCode()
+		val File binDir = new File(tempDir, "bin")
+		if (!binDir.mkdirs())
+			throw new IllegalArgumentException("Failed to create Directory " + binDir)
+		Files.write(dartCode, new File(binDir, "dut.dart"), StandardCharsets.UTF_8)
+		val testRunnerDir = new File(TESTRUNNER_DIR)
+		val testRunner = new File(testRunnerDir, "bin/darttestrunner.dart")
+		Files.copy(testRunner, new File(binDir, testRunner.getName()))
+		val yaml = new File(testRunnerDir, "pubspec.yaml")
+		Files.copy(yaml, new File(tempDir, yaml.getName()))
+		java.nio.file.Files.createSymbolicLink(new File(binDir, "packages").toPath(),
+			new File(testRunnerDir, "packages").toPath())
+		java.nio.file.Files.createSymbolicLink(new File(tempDir, "packages").toPath(),
+			new File(testRunnerDir, "packages").toPath())
+		new IHDLInterpreterFactory<NativeRunner>() {
+
+			override newInstance() {
+				val Process dartRunner = new ProcessBuilder(DART_EXEC, "bin/" + testRunner.getName(), unitName, library).
+					directory(tempDir).redirectErrorStream(true).start()
+				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5)
+			}
+
+		}
 	}
 
 	override protected constantSuffix() {
@@ -59,8 +94,8 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	override protected clearRegUpdates() '''_regUpdates.clear();
 		'''
 
-	override protected arrayInit(VariableInformation varInfo, BigInteger initValue, EnumSet<CommonCodeGenerator.Attributes> attributes) '''new «varInfo.
-		fieldType(attributes)»(«varInfo.arraySize»)'''
+	override protected arrayInit(VariableInformation varInfo, BigInteger initValue,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) '''new «varInfo.fieldType(attributes)»(«varInfo.arraySize»)'''
 
 	override protected functionFooter(Frame frame) '''}
 		'''
@@ -87,9 +122,9 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		'''
 
 	override protected copyArray(VariableInformation varInfo) {
-		val type=varInfo.fieldType(NONE)
-		return '''«varInfo.idName(true, EnumSet.of(CommonCodeGenerator.Attributes.isPrev))» = new «type».from«IF type != "List< "»List«ENDIF»(«varInfo.
-		idName(true, NONE)»);'''
+		val type = varInfo.fieldType(NONE)
+		return '''«varInfo.idName(true, EnumSet.of(CommonCodeGenerator.Attributes.isPrev))» = new «type».from«IF type !=
+			"List< "»List«ENDIF»(«varInfo.idName(true, NONE)»);'''
 	}
 
 	override protected fieldType(VariableInformation information, EnumSet<CommonCodeGenerator.Attributes> attributes) {
@@ -353,24 +388,32 @@ import '../simulation_comm.dart';
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''«vi.idName(true, NONE)».fillRange(0, «vi.
 		arraySize», «regFillValue»);'''
 
-
 	override protected signExtend(CharSequence op, int targetSizeWithType) {
 		if (targetSizeWithType.signedType)
 			return '''_signExtend(«op», «targetSizeWithType >> 1»)'''
 		return op
 	}
-	
-	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		if (fi.inst===Instruction.srl){
-			return assignTempVar(targetSizeWithType, pos, NONE, '''_srl(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)», «fi.arg1»)''')
+
+	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
+		if (fi.inst === Instruction.srl) {
+			return assignTempVar(targetSizeWithType, pos, NONE,
+				'''_srl(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)», «fi.arg1»)''', true)
 		}
-		if (fi.inst===Instruction.div){
-			val CharSequence assignValue = twoOpValue("~/", getCast(targetSizeWithType), leftOperand, rightOperand, targetSizeWithType, attributes);
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+		if (fi.inst === Instruction.div) {
+			val CharSequence assignValue = twoOpValue("~/", getCast(targetSizeWithType), leftOperand, rightOperand,
+				targetSizeWithType, attributes);
+			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
 		}
-		return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes)
+		return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
-	
+
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		return assignTempVar(targetSizeWithType, pos, NONE,
+			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
+	}
+
 	override getHookName() {
 		return "Dart"
 	}
@@ -395,15 +438,16 @@ import '../simulation_comm.dart';
 		val unitName = moduleName.substring(li + 1, moduleName.length);
 		doCompile(syntaxProblems, em, pkg, unitName, true);
 	}
-	
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean usePackageImport) {
+
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName,
+		boolean usePackageImport) {
 		val comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE)
 		val code = comp.generateMainCode
-		val sideFiles=Lists.newArrayList
+		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
 			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
 				comp.hookName, true))
 	}
-	
+
 }

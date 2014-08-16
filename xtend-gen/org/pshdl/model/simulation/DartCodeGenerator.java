@@ -3,7 +3,13 @@ package org.pshdl.model.simulation;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -12,11 +18,14 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
+import org.pshdl.interpreter.IHDLInterpreterFactory;
 import org.pshdl.interpreter.InternalInformation;
+import org.pshdl.interpreter.NativeRunner;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
 import org.pshdl.model.simulation.CommonCodeGenerator;
@@ -36,6 +45,10 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   
   private final int epsWidth = 16;
   
+  public static String TESTRUNNER_DIR = "/Users/karstenbecker/GDrive/DartTestRunner/";
+  
+  public static String DART_EXEC = "/Applications/dart/dart-sdk/bin/dart";
+  
   public DartCodeGenerator() {
   }
   
@@ -44,6 +57,63 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     this.unitName = unitName;
     this.library = library;
     this.usePackageImport = usePackageImport;
+  }
+  
+  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir) {
+    try {
+      IHDLInterpreterFactory<NativeRunner> _xblockexpression = null;
+      {
+        final DartCodeGenerator dc = new DartCodeGenerator(this.em, this.unitName, this.library, true, Integer.MAX_VALUE);
+        final String dartCode = dc.generateMainCode();
+        final File binDir = new File(tempDir, "bin");
+        boolean _mkdirs = binDir.mkdirs();
+        boolean _not = (!_mkdirs);
+        if (_not) {
+          throw new IllegalArgumentException(("Failed to create Directory " + binDir));
+        }
+        File _file = new File(binDir, "dut.dart");
+        Files.write(dartCode, _file, StandardCharsets.UTF_8);
+        final File testRunnerDir = new File(DartCodeGenerator.TESTRUNNER_DIR);
+        final File testRunner = new File(testRunnerDir, "bin/darttestrunner.dart");
+        String _name = testRunner.getName();
+        File _file_1 = new File(binDir, _name);
+        Files.copy(testRunner, _file_1);
+        final File yaml = new File(testRunnerDir, "pubspec.yaml");
+        String _name_1 = yaml.getName();
+        File _file_2 = new File(tempDir, _name_1);
+        Files.copy(yaml, _file_2);
+        File _file_3 = new File(binDir, "packages");
+        Path _path = _file_3.toPath();
+        File _file_4 = new File(testRunnerDir, "packages");
+        Path _path_1 = _file_4.toPath();
+        java.nio.file.Files.createSymbolicLink(_path, _path_1);
+        File _file_5 = new File(tempDir, "packages");
+        Path _path_2 = _file_5.toPath();
+        File _file_6 = new File(testRunnerDir, "packages");
+        Path _path_3 = _file_6.toPath();
+        java.nio.file.Files.createSymbolicLink(_path_2, _path_3);
+        _xblockexpression = new IHDLInterpreterFactory<NativeRunner>() {
+          public NativeRunner newInstance() {
+            try {
+              String _name = testRunner.getName();
+              String _plus = ("bin/" + _name);
+              ProcessBuilder _processBuilder = new ProcessBuilder(DartCodeGenerator.DART_EXEC, _plus, DartCodeGenerator.this.unitName, DartCodeGenerator.this.library);
+              ProcessBuilder _directory = _processBuilder.directory(tempDir);
+              ProcessBuilder _redirectErrorStream = _directory.redirectErrorStream(true);
+              final Process dartRunner = _redirectErrorStream.start();
+              InputStream _inputStream = dartRunner.getInputStream();
+              OutputStream _outputStream = dartRunner.getOutputStream();
+              return new NativeRunner(_inputStream, _outputStream, DartCodeGenerator.this.em, dartRunner, 5);
+            } catch (Throwable _e) {
+              throw Exceptions.sneakyThrow(_e);
+            }
+          }
+        };
+      }
+      return _xblockexpression;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
   
   protected String constantSuffix() {
@@ -181,7 +251,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append(type, "");
     _builder.append(".from");
     {
-      boolean _notEquals = (!Objects.equal(type, "List< "));
+      boolean _notEquals = (!Objects.equal(type, 
+        "List< "));
       if (_notEquals) {
         _builder.append("List");
       }
@@ -1097,7 +1168,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     return op;
   }
   
-  protected CharSequence twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+  protected CharSequence twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean doMask) {
     boolean _tripleEquals = (fi.inst == Instruction.srl);
     if (_tripleEquals) {
       StringConcatenation _builder = new StringConcatenation();
@@ -1110,15 +1181,27 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       _builder.append(", ");
       _builder.append(fi.arg1, "");
       _builder.append(")");
-      return this.assignTempVar(targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder);
+      return this.assignTempVar(targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
     }
     boolean _tripleEquals_1 = (fi.inst == Instruction.div);
     if (_tripleEquals_1) {
       CharSequence _cast = this.getCast(targetSizeWithType);
       final CharSequence assignValue = this.twoOpValue("~/", _cast, leftOperand, rightOperand, targetSizeWithType, attributes);
-      return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+      return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
     }
-    return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes);
+    return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask);
+  }
+  
+  protected CharSequence pow(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean doMask) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("pow(");
+    String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+    _builder.append(_tempName, "");
+    _builder.append(", ");
+    String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
+    _builder.append(_tempName_1, "");
+    _builder.append(")");
+    return this.assignTempVar(targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
   }
   
   public String getHookName() {

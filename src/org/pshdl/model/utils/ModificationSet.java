@@ -246,10 +246,6 @@ public class ModificationSet {
 
 	}
 
-	private <T> int getHash(T t) {
-		return System.identityHashCode(t);
-	}
-
 	private static enum ModificationType {
 		REPLACE, INSERT_BEFORE, INSERT_AFTER, ADD, REMOVE;
 	}
@@ -293,7 +289,7 @@ public class ModificationSet {
 		}
 	}
 
-	private final Map<Integer, List<Modification>> replacements = Maps.newHashMap();
+	private final Map<IHDLObject, List<Modification>> replacements = Maps.newIdentityHashMap();
 	/**
 	 * Contains the modifications that are currently applied. A modification
 	 * that is currently applied, should not be applied to avoid recursion
@@ -301,7 +297,7 @@ public class ModificationSet {
 	private final Set<Integer> currentMods = Sets.newHashSet();
 
 	private <T> List<Modification> getModifications(T object) {
-		return replacements.get(getHash(object));
+		return replacements.get(object);
 	}
 
 	/**
@@ -415,12 +411,12 @@ public class ModificationSet {
 	}
 
 	private void insert(IHDLObject subject, Modification mod) {
-		List<Modification> list = replacements.get(getHash(subject));
+		List<Modification> list = replacements.get(subject);
 		if (list == null) {
 			list = new LinkedList<ModificationSet.Modification>();
 		}
 		list.add(mod);
-		replacements.put(getHash(subject), list);
+		replacements.put(subject, list);
 	}
 
 	/**
@@ -489,7 +485,7 @@ public class ModificationSet {
 	}
 
 	private void prune(IHDLObject subject) {
-		final List<Modification> list = replacements.get(getHash(subject));
+		final List<Modification> list = replacements.get(subject);
 		if (list != null) {
 			final Iterator<Modification> iter = list.iterator();
 			while (iter.hasNext()) {

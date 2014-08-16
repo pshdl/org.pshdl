@@ -27,7 +27,6 @@
 package org.pshdl.model.types.builtIn.busses;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +62,8 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.Reference;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.utils.HDLQualifiedName;
+
+import com.google.common.collect.Maps;
 
 public class UserLogicCodeGen extends CommonBusCode {
 	public static HDLUnit get(String name, Unit unit, List<Row> rows) {
@@ -163,7 +164,7 @@ public class UserLogicCodeGen extends CommonBusCode {
 	private static HDLSwitchStatement createWriteSwitch(List<Row> rows, Map<String, Boolean> isArray) {
 		HDLSwitchStatement hsl = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("slv_reg_write_sel")));
 		int pos = 0;
-		final Map<String, Integer> intPos = new HashMap<String, Integer>();
+		final Map<String, Integer> intPos = Maps.newLinkedHashMap();
 		for (final Row row : rows) {
 			hsl = hsl.addCases(createWriteCase(row, rows.size(), pos++, intPos, isArray));
 		}
@@ -251,7 +252,7 @@ public class UserLogicCodeGen extends CommonBusCode {
 				.setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("IP2Bus_Data"))).setType(HDLAssignmentType.ASSGN).setRight(new HDLLiteral().setVal("0")));
 		HDLSwitchStatement hdlSwitchStatement = new HDLSwitchStatement().setCaseExp(new HDLVariableRef().setVar(HDLQualifiedName.create("slv_reg_read_sel")));
 		int pos = 0;
-		final Map<String, Integer> intPos = new HashMap<String, Integer>();
+		final Map<String, Integer> intPos = Maps.newLinkedHashMap();
 		final int regCount = rows.size();
 		for (final Row row : rows) {
 			final int reg = pos++;

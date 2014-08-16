@@ -107,8 +107,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -182,6 +180,7 @@ import org.pshdl.model.validation.RWValidation;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 
 public class BuiltInValidator implements IHDLValidator {
 
@@ -192,7 +191,7 @@ public class BuiltInValidator implements IHDLValidator {
 			"param", "register", "interface" };
 	public final static Set<String> keywordSet;
 	static {
-		keywordSet = new HashSet<String>();
+		keywordSet = Sets.newLinkedHashSet();
 		for (final String keyword : PSHDL_KEYWORDS) {
 			keywordSet.add(keyword);
 		}
@@ -295,7 +294,7 @@ public class BuiltInValidator implements IHDLValidator {
 			final HDLInterface hif = hIf.get();
 			final Collection<HDLVariableDeclaration> params = HDLQuery.select(HDLVariableDeclaration.class).from(hif).where(HDLVariableDeclaration.fDirection)
 					.isEqualTo(HDLDirection.PARAMETER).getAll();
-			final Map<String, HDLVariable> paramNames = Maps.newHashMap();
+			final Map<String, HDLVariable> paramNames = Maps.newLinkedHashMap();
 			for (final HDLVariableDeclaration hvd : params) {
 				for (final HDLVariable var : hvd.getVariables()) {
 					paramNames.put(var.getMeta(HDLInterfaceInstantiation.ORIG_NAME), var);
@@ -763,8 +762,8 @@ public class BuiltInValidator implements IHDLValidator {
 		for (final HDLSwitchStatement switchStatement : switches) {
 			boolean defaultFound = false;
 			final ArrayList<HDLSwitchCaseStatement> cases = switchStatement.getCases();
-			final Set<BigInteger> values = new HashSet<BigInteger>();
-			final Set<HDLQualifiedName> enums = new HashSet<HDLQualifiedName>();
+			final Set<BigInteger> values = Sets.newLinkedHashSet();
+			final Set<HDLQualifiedName> enums = Sets.newLinkedHashSet();
 			final Optional<? extends HDLType> type = TypeExtension.typeOf(switchStatement.getCaseExp());
 			if (!type.isPresent()) {
 				continue;
@@ -813,7 +812,7 @@ public class BuiltInValidator implements IHDLValidator {
 
 	private static void checkVariableNaming(HDLPackage pkg, Set<Problem> problems) {
 		final HDLVariable[] vars = pkg.getAllObjectsOf(HDLVariable.class, true);
-		final Map<String, HDLVariable> nameMap = new HashMap<String, HDLVariable>();
+		final Map<String, HDLVariable> nameMap = Maps.newLinkedHashMap();
 		for (final HDLVariable hdlVariable : vars) {
 			final HDLQualifiedName fullName = fullNameOf(hdlVariable);
 			final String lastSegment = fullName.getLastSegment();

@@ -29,19 +29,25 @@ package org.pshdl.model.simulation
 import com.google.common.base.Splitter
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
+import com.google.common.io.Files
+import java.io.File
+import java.io.IOException
 import java.math.BigInteger
+import java.nio.charset.StandardCharsets
 import java.util.EnumSet
 import java.util.HashMap
 import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.Set
+import java.util.concurrent.TimeUnit
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
 import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.NativeRunner
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
 import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess
@@ -54,10 +60,17 @@ import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
 import org.pshdl.model.utils.services.AuxiliaryContent
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
+import org.pshdl.interpreter.IHDLInterpreterFactory
+import com.google.common.io.ByteStreams
+import java.io.FileOutputStream
+import org.pshdl.model.simulation.CommonCodeGenerator.Attributes
+import java.util.LinkedHashSet
+import java.util.LinkedHashMap
 
 class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
-	CommonCompilerExtension cce
+	private CommonCompilerExtension cce
+	public static String COMPILER = "/usr/bin/clang"
 
 	new() {
 	}
@@ -65,6 +78,34 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	new(ExecutableModel em, int maxCosts) {
 		super(em, 64, maxCosts)
 		this.cce = new CommonCompilerExtension(em, 64)
+	}
+
+	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
+		val File testCFile = new File(tempDir, "test.c")
+		Files.write(generateMainCode, testCFile, StandardCharsets.UTF_8)
+		val File testRunner = new File(tempDir, "runner.c")
+		val runnerStream = typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/runner.c")
+		val fos = new FileOutputStream(testRunner)
+		try {
+			ByteStreams.copy(runnerStream, fos)
+		} finally {
+			fos.close
+		}
+		val File executable = new File(tempDir, "testExec")
+		writeAuxiliaryContents(tempDir)
+		val ProcessBuilder builder = new ProcessBuilder(COMPILER, "-I", tempDir.getAbsolutePath(), "-O3",
+			testCFile.getAbsolutePath(), testRunner.getAbsolutePath(), "-o", executable.getAbsolutePath())
+		val Process process = builder.directory(tempDir).inheritIO().start()
+		process.waitFor()
+		if (process.exitValue() != 0)
+			throw new RuntimeException("Process did not terminate with 0")
+		return new IHDLInterpreterFactory<NativeRunner>() {
+			override newInstance() {
+				val ProcessBuilder execBuilder = new ProcessBuilder(executable.getAbsolutePath())
+				val Process testExec = execBuilder.directory(tempDir).redirectErrorStream(true).start()
+				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5)
+			}
+		}
 	}
 
 	override protected applyRegUpdates() '''updateRegs();'''
@@ -200,16 +241,16 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	}
 
 	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
-		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
 		if (fi.inst === Instruction.sra) {
 			return assignTempVar(targetSizeWithType, pos, attributes,
-				'''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''')
+				'''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''', true)
 		}
 		if (fi.inst === Instruction.srl) {
 			return assignTempVar(targetSizeWithType, pos, attributes,
-				'''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''')
+				'''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''', true)
 		}
-		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes)
+		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
 
 	override protected copyArray(VariableInformation varInfo) '''memcpy(«varInfo.idName(true,
@@ -273,7 +314,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			return hash;
 		}
 		
-		uint32_t pshdl_sim_getIndex(char* name) {
+		int pshdl_sim_getIndex(char* name) {
 			uint32_t hashName=hash(name);
 			switch (hashName) {
 				«FOR Map.Entry<Integer, List<VariableInformation>> e : em.variables.excludeNull.hashed.entrySet»
@@ -298,11 +339,23 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 				«getOutputCases(null)»
 			}
 			return 0;
-		}	
+		}
+		
+		static uint64_t pow(uint64_t a, uint64_t n){
+		    uint64_t result = 1;
+		    uint64_t p = a;
+		    while (n > 0){
+		        if ((n % 2) != 0)
+		            result = result * p;
+		        p = p * p;
+		        n = n / 2;
+		    }
+		    return result;
+		}
 	'''
 
 	def Map<Integer, List<VariableInformation>> getHashed(Iterable<VariableInformation> informations) {
-		val Map<Integer, List<VariableInformation>> res = Maps.newHashMap()
+		val Map<Integer, List<VariableInformation>> res = Maps.newLinkedHashMap()
 		for (VariableInformation vi : em.variables) {
 			val hashVal = hash(vi.name)
 			val list = res.get(hashVal)
@@ -388,7 +441,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			for (a : em.annotations) {
 				if (a.startsWith("busDescription")) {
 					val value = annoSplitter.limit(2).split(a).last
-					unit = MemoryModelAST.parseUnit(value, new HashSet, 0)
+					unit = MemoryModelAST.parseUnit(value, new LinkedHashSet, 0)
 				}
 			}
 		}
@@ -398,7 +451,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	extension BusAccess ba = new BusAccess
 
 	private def generateSimEncapsuation(Unit unit, Iterable<Row> rows) {
-		val Set<String> varNames = new HashSet
+		val Set<String> varNames = new LinkedHashSet
 		rows.forEach[it.allDefs.filter[it.type !== Definition.Type.UNUSED].forEach[varNames.add(it.getName)]]
 		var res = '''
 /**
@@ -447,8 +500,8 @@ void setWarn(warnFunc_p warnFunction){
 #define «"busclk_idx"» «busIndex»
 
 '''
-		val checkedRows = new HashSet<String>()
-		val rowCounts = new HashMap<String, Integer>()
+		val checkedRows = new LinkedHashSet<String>()
+		val rowCounts = new LinkedHashMap<String, Integer>()
 		for (Row row : rows) {
 			val idx = rowCounts.get(row.name);
 			if (idx === null)
@@ -622,5 +675,9 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''memset(«vi.idName(true, NONE)», «regFillValue», «vi.
 		arraySize»);'''
+
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
+	}
 
 }

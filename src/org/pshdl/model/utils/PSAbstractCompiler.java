@@ -36,7 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -148,9 +147,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 			this.entityName = entityName;
 			this.src = src;
 			if (sideFiles != null) {
-				this.sideFiles = new HashSet<AuxiliaryContent>(sideFiles);
+				this.sideFiles = Sets.newLinkedHashSet(sideFiles);
 			} else {
-				this.sideFiles = new HashSet<AuxiliaryContent>();
+				this.sideFiles = Sets.newLinkedHashSet();
 			}
 			this.codeType = codeType;
 			this.fileName = getFileName(src, codeType, unitName);
@@ -360,7 +359,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 
 	protected CompileResult createResult(final String src, final String code, String codeType, boolean unitName) {
 		final Set<Problem> knownIssues = issues.get(src);
-		final Set<Problem> syntaxProblems = new HashSet<Problem>();
+		final Set<Problem> syntaxProblems = Sets.newLinkedHashSet();
 		if (knownIssues != null) {
 			syntaxProblems.addAll(knownIssues);
 		}

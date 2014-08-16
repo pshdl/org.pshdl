@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Formatter;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +44,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 public abstract class CommonCodeGenerator {
@@ -62,10 +61,10 @@ public abstract class CommonCodeGenerator {
 	protected static final EnumSet<Attributes> NONE = EnumSet.noneOf(Attributes.class);
 	protected final ExecutableModel em;
 	protected int indent = 0;
-	protected Map<String, Integer> varIdx = new HashMap<>();
-	protected Map<String, Integer> intIdx = new HashMap<>();
-	protected Set<String> prevMapPos = new HashSet<>();
-	protected Set<String> prevMapNeg = new HashSet<>();
+	protected Map<String, Integer> varIdx = Maps.newLinkedHashMap();
+	protected Map<String, Integer> intIdx = Maps.newLinkedHashMap();
+	protected Set<String> prevMapPos = Sets.newLinkedHashSet();
+	protected Set<String> prevMapNeg = Sets.newLinkedHashSet();
 	protected boolean hasClock;
 	protected final int bitWidth;
 	protected final int maxCosts;
@@ -726,10 +725,10 @@ public abstract class CommonCodeGenerator {
 		return targetSizeWithType;
 	}
 
-	protected StringBuilder assignTempVar(int targetSizeWithType, int pos, EnumSet<Attributes> attributes, CharSequence assignValue) {
+	protected StringBuilder assignTempVar(int targetSizeWithType, int pos, EnumSet<Attributes> attributes, CharSequence assignValue, boolean doMask) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(tempVar(pos, targetSizeWithType, attributes));
-		sb.append(doAssign(assignValue, targetSizeWithType, false));
+		sb.append(doAssign(assignValue, targetSizeWithType, doMask));
 		return sb;
 	}
 
@@ -835,7 +834,7 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case concat:
-			sb.append(assignTempVar((exec.arg1 + exec.arg2) << 1, pos, NONE, "(" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE)));
+			sb.append(assignTempVar((exec.arg1 + exec.arg2) << 1, pos, NONE, "((" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE) + ")", true));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -861,20 +860,20 @@ public abstract class CommonCodeGenerator {
 		final String tempName = getTempName(a, NONE);
 		switch (exec.inst) {
 		case bitAccessSingle:
-			sb.append(assignTempVar(2, pos, NONE, mask(tempName + " >> " + exec.arg1, 1)));
+			sb.append(assignTempVar(2, pos, NONE, mask(tempName + " >> " + exec.arg1, 1), false));
 			break;
 		case bitAccessSingleRange:
 			final int highBit = exec.arg1;
 			final int lowBit = exec.arg2;
 			final int targetSize = (highBit - lowBit) + 1;
-			sb.append(assignTempVar(targetSize << 1, pos, NONE, mask(tempName + " >> " + lowBit, targetSize)));
+			sb.append(assignTempVar(targetSize << 1, pos, NONE, mask(tempName + " >> " + lowBit, targetSize), false));
 			break;
 		case cast_int:
 			// Create a targetSizeWitType with int indication
-			sb.append(assignTempVar((Math.min(exec.arg1, exec.arg2) << 1) | 1, pos, NONE, tempName));
+			sb.append(assignTempVar((Math.min(exec.arg1, exec.arg2) << 1) | 1, pos, NONE, tempName, false));
 			break;
 		case cast_uint:
-			sb.append(assignTempVar(Math.min(exec.arg1, exec.arg2) << 1, pos, NONE, mask(tempName, Math.min(exec.arg1, exec.arg2))));
+			sb.append(assignTempVar(Math.min(exec.arg1, exec.arg2) << 1, pos, NONE, mask(tempName, Math.min(exec.arg1, exec.arg2)), false));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -886,22 +885,22 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case const0:
-			sb.append(assignTempVar(-1, pos, NONE, constant(ZERO, true, -1)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(ZERO, true, -1), false));
 			break;
 		case const1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(ONE, true, -1)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(ONE, true, -1), false));
 			break;
 		case const2:
-			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2), true, -1)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2), true, -1), false));
 			break;
 		case constAll1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1), true, -1)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1), true, -1), false));
 			break;
 		case loadConstant:
-			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true, -1)));
+			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true, -1), true));
 			break;
 		case loadInternal:
-			sb.append(assignTempVar(-1, pos, NONE, loadInternal(em.internals[exec.arg1], arr, NONE)));
+			sb.append(assignTempVar(-1, pos, NONE, loadInternal(em.internals[exec.arg1], arr, NONE), false));
 			break;
 		case writeInternal:
 			sb.append(writeInternal(em.internals[exec.arg1], getTempName(a, NONE), arr));
@@ -918,7 +917,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence assignIndexVar(List<Integer> arr, int a) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(assignTempVar(-1, arr.get(arr.size() - 1).intValue(), EnumSet.of(isArrayIndex), getTempName(a, NONE)));
+		sb.append(assignTempVar(-1, arr.get(arr.size() - 1).intValue(), EnumSet.of(isArrayIndex), getTempName(a, NONE), true));
 		return sb;
 	}
 
@@ -936,6 +935,10 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence writeInternal(InternalInformation internal, String tempName, List<Integer> arr) {
 		final StringBuilder sb = new StringBuilder();
+		CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, arr, sb);
+		if (!internal.isPred) {
+			assignValue = fixupValue(assignValue, getTargetSizeWithType(internal.info), true);
+		}
 		if (internal.isShadowReg) {
 			final String cpyName = tempName + "_cpy";
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
@@ -944,13 +947,11 @@ public abstract class CommonCodeGenerator {
 				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, arr, NONE), NONE, false, true, false)).append(newLine());
 				sb.append(indent());
 			}
-			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
-			sb.append(assignInternal(internal, tempName, arr, SHADOWREG)).append(comment("Assign value"));
+			sb.append(assignInternal(internal, assignValue, arr, SHADOWREG)).append(comment("Assign value"));
 			final CharSequence offset = calcRegUpdateOffset(arr, internal);
 			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, SHADOWREG), cpyName, offset, forceRegUpdate, tempName));
 		} else {
-			tempName = createBitAccessIfNeeded(internal, tempName, arr, sb);
-			sb.append(assignInternal(internal, tempName, arr, NONE)).append(comment("Assign value"));
+			sb.append(assignInternal(internal, assignValue, arr, NONE)).append(comment("Assign value"));
 		}
 		arr.clear();
 		return sb;
@@ -973,7 +974,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence doMask(final CharSequence currentValue, final CharSequence writeMask) {
-		return currentValue + " & " + writeMask;
+		return "(" + currentValue + ") & " + writeMask;
 	}
 
 	protected CharSequence loadInternal(InternalInformation info, List<Integer> arr, EnumSet<Attributes> attributes) {
@@ -1053,22 +1054,22 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case eq:
-			sb.append(twoOp(exec, "==", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, "==", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case not_eq:
-			sb.append(twoOp(exec, "!=", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, "!=", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case less:
-			sb.append(twoOp(exec, "<", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, "<", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case less_eq:
-			sb.append(twoOp(exec, "<=", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, "<=", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case greater:
-			sb.append(twoOp(exec, ">", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, ">", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case greater_eq:
-			sb.append(twoOp(exec, ">=", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, ">=", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -1080,13 +1081,13 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case logiNeg:
-			sb.append(singleOp(exec, "!", exec.arg1, pos, a, PREDICATE));
+			sb.append(singleOp(exec, "!", exec.arg1, pos, a, PREDICATE, false));
 			break;
 		case logiAnd:
-			sb.append(twoOp(exec, "&&", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, "&&", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case logiOr:
-			sb.append(twoOp(exec, "||", exec.arg1, pos, b, a, PREDICATE));
+			sb.append(twoOp(exec, "||", exec.arg1, pos, b, a, PREDICATE, false));
 			break;
 		case negPredicate:
 		case posPredicate:
@@ -1101,13 +1102,13 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case sll:
-			sb.append(twoOp(exec, "<<", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "<<", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case srl:
-			sb.append(twoOp(exec, ">>>", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, ">>>", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case sra:
-			sb.append(twoOp(exec, ">>", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, ">>", exec.arg1, pos, b, a, NONE, true));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -1119,46 +1120,49 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case arith_neg:
-			sb.append(singleOp(exec, "-", exec.arg1, pos, a, NONE));
+			sb.append(singleOp(exec, "-", exec.arg1, pos, a, NONE, true));
 			break;
 		case plus:
-			sb.append(twoOp(exec, "+", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "+", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case minus:
-			sb.append(twoOp(exec, "-", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "-", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case mul:
-			sb.append(twoOp(exec, "*", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "*", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case div:
-			sb.append(twoOp(exec, "/", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "/", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case mod:
-			sb.append(twoOp(exec, "%", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "%", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case pow:
-			sb.append(twoOp(exec, "%", exec.arg1, pos, b, a, NONE));
+			sb.append(pow(exec, "%", exec.arg1, pos, b, a, NONE, true));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
 		}
 		return sb;
 	}
+
+	protected abstract CharSequence pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes,
+			boolean doMask);
 
 	protected CharSequence toBitExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case bit_neg:
-			sb.append(singleOp(exec, "~", exec.arg1, pos, a, NONE));
+			sb.append(singleOp(exec, "~", exec.arg1, pos, a, NONE, true));
 			break;
 		case and:
-			sb.append(twoOp(exec, "&", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "&", exec.arg1, pos, b, a, NONE, false));
 			break;
 		case or:
-			sb.append(twoOp(exec, "|", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "|", exec.arg1, pos, b, a, NONE, true));
 			break;
 		case xor:
-			sb.append(twoOp(exec, "^", exec.arg1, pos, b, a, NONE));
+			sb.append(twoOp(exec, "^", exec.arg1, pos, b, a, NONE, true));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -1167,14 +1171,14 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes) {
+	protected CharSequence singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes, boolean doMask) {
 		final CharSequence assignValue = singleOpValue(op, getCast(targetSizeWithType), a, targetSizeWithType, attributes);
-		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+		return assignTempVar(targetSizeWithType, pos, attributes, assignValue, doMask);
 	}
 
-	protected CharSequence twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes) {
+	protected CharSequence twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
 		final CharSequence assignValue = twoOpValue(op, getCast(targetSizeWithType), leftOperand, rightOperand, targetSizeWithType, attributes);
-		return assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+		return assignTempVar(targetSizeWithType, pos, attributes, assignValue, doMask);
 	}
 
 	protected CharSequence tempVar(int pos, int targetSizeWithType, EnumSet<Attributes> attributes) {

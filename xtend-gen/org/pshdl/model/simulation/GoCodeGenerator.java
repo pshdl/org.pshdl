@@ -2,7 +2,14 @@ package org.pshdl.model.simulation;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -11,14 +18,18 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
+import org.pshdl.interpreter.IHDLInterpreterFactory;
 import org.pshdl.interpreter.InternalInformation;
+import org.pshdl.interpreter.NativeRunner;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
+import org.pshdl.model.simulation.CCodeGenerator;
 import org.pshdl.model.simulation.CommonCodeGenerator;
 import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
@@ -45,6 +56,58 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     this.unit = _firstUpper;
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
     this.cce = _commonCompilerExtension;
+  }
+  
+  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir) {
+    try {
+      IHDLInterpreterFactory<NativeRunner> _xblockexpression = null;
+      {
+        final GoCodeGenerator dc = new GoCodeGenerator(this.em, Integer.MAX_VALUE, this.pkg, this.unit);
+        final CharSequence dartCode = dc.generateMainCode();
+        final File dutFile = new File(tempDir, "TestUnit.go");
+        Files.createParentDirs(dutFile);
+        Files.write(dartCode, dutFile, StandardCharsets.UTF_8);
+        final File testRunner = new File(tempDir, "runner.go");
+        final InputStream runnerStream = CCodeGenerator.class.getResourceAsStream("/org/pshdl/model/simulation/includes/runner.go");
+        final FileOutputStream fos = new FileOutputStream(testRunner);
+        try {
+          ByteStreams.copy(runnerStream, fos);
+        } finally {
+          fos.close();
+        }
+        String _absolutePath = testRunner.getAbsolutePath();
+        String _absolutePath_1 = dutFile.getAbsolutePath();
+        ProcessBuilder _processBuilder = new ProcessBuilder("/usr/local/go/bin/go", "build", _absolutePath, _absolutePath_1);
+        ProcessBuilder _directory = _processBuilder.directory(tempDir);
+        final ProcessBuilder goBuilder = _directory.redirectErrorStream(true);
+        final Process goCompiler = goBuilder.start();
+        int _waitFor = goCompiler.waitFor();
+        boolean _notEquals = (_waitFor != 0);
+        if (_notEquals) {
+          throw new RuntimeException("Compilation of Go Program failed");
+        }
+        _xblockexpression = new IHDLInterpreterFactory<NativeRunner>() {
+          public NativeRunner newInstance() {
+            try {
+              File _file = new File(tempDir, "runner");
+              String _absolutePath = _file.getAbsolutePath();
+              ProcessBuilder _processBuilder = new ProcessBuilder(_absolutePath);
+              ProcessBuilder _directory = _processBuilder.directory(tempDir);
+              final ProcessBuilder goBuilder = _directory.redirectErrorStream(true);
+              final Process goRunner = goBuilder.start();
+              InputStream _inputStream = goRunner.getInputStream();
+              OutputStream _outputStream = goRunner.getOutputStream();
+              return new NativeRunner(_inputStream, _outputStream, GoCodeGenerator.this.em, goRunner, 5);
+            } catch (Throwable _e) {
+              throw Exceptions.sneakyThrow(_e);
+            }
+          }
+        };
+      }
+      return _xblockexpression;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
   
   protected CharSequence preFieldDeclarations() {
@@ -139,6 +202,15 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   
   protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
+    {
+      if (this.inBarrier) {
+        _builder.append("wg.Add(1)");
+        _builder.newLineIfNotEmpty();
+        CharSequence _indent = this.indent();
+        _builder.append(_indent, "");
+        _builder.append("go ");
+      }
+    }
     _builder.append("s.");
     _builder.append(methodName, "");
     _builder.append("(");
@@ -603,6 +675,44 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
+    _builder.newLine();
+    _builder.append("func pow(a int64, n int64) int64 {");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("var result int64 = 1;");
+    _builder.newLine();
+    _builder.append("    \t");
+    _builder.append("var p int64 = a;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("for {");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("if (n<=0) {break}");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("if ((n % 2) != 0) {");
+    _builder.newLine();
+    _builder.append("        \t    ");
+    _builder.append("result = result * p;");
+    _builder.newLine();
+    _builder.append("\t\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t        ");
+    _builder.append("p = p * p;");
+    _builder.newLine();
+    _builder.append("\t        ");
+    _builder.append("n = n / 2;");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("}");
+    _builder.newLine();
+    _builder.append("\t");
+    _builder.append("return result");
+    _builder.newLine();
+    _builder.append("}");
+    _builder.newLine();
     return _builder;
   }
   
@@ -748,7 +858,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence fillArray(final VariableInformation vi, final CharSequence regFillValue) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("for i := range ");
-    CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
+    CharSequence _idName = this.idName(vi, true, 
+      CommonCodeGenerator.NONE);
     _builder.append(_idName, "");
     _builder.append(" { ");
     CharSequence _idName_1 = this.idName(vi, true, CommonCodeGenerator.NONE);
@@ -759,21 +870,21 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     return _builder;
   }
   
-  protected CharSequence singleOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int a, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+  protected CharSequence singleOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int a, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean doMask) {
     CharSequence _xblockexpression = null;
     {
       boolean _tripleEquals = (fi.inst == Instruction.bit_neg);
       if (_tripleEquals) {
         CharSequence _cast = this.getCast(targetSizeWithType);
         final CharSequence assignValue = this.singleOpValue("^", _cast, a, targetSizeWithType, attributes);
-        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
       }
-      _xblockexpression = super.singleOp(fi, op, targetSizeWithType, pos, a, attributes);
+      _xblockexpression = super.singleOp(fi, op, targetSizeWithType, pos, a, attributes, doMask);
     }
     return _xblockexpression;
   }
   
-  protected CharSequence twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+  protected CharSequence twoOp(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean doMask) {
     CharSequence _xblockexpression = null;
     {
       boolean _tripleEquals = (fi.inst == Instruction.srl);
@@ -785,7 +896,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         CharSequence _doCast_1 = this.doCast("uint64", _tempName_1);
         String _plus_1 = (_plus + _doCast_1);
         final CharSequence assignValue = this.doCast("int64", _plus_1);
-        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
       }
       boolean _tripleEquals_1 = (fi.inst == Instruction.sra);
       if (_tripleEquals_1) {
@@ -794,7 +905,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         String _tempName_3 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
         CharSequence _doCast_2 = this.doCast("uint64", _tempName_3);
         final CharSequence assignValue_1 = (_plus_2 + _doCast_2);
-        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_1);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_1, true);
       }
       boolean _tripleEquals_2 = (fi.inst == Instruction.sll);
       if (_tripleEquals_2) {
@@ -804,11 +915,23 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         CharSequence _doCast_3 = this.doCast("uint64", _tempName_5);
         String _plus_4 = (_plus_3 + _doCast_3);
         final CharSequence assignValue_2 = this.doCast("int64", _plus_4);
-        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_2);
+        return this.assignTempVar(targetSizeWithType, pos, attributes, assignValue_2, true);
       }
-      _xblockexpression = super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes);
+      _xblockexpression = super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask);
     }
     return _xblockexpression;
+  }
+  
+  protected CharSequence pow(final Frame.FastInstruction fi, final String op, final int targetSizeWithType, final int pos, final int leftOperand, final int rightOperand, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean doMask) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("pow(");
+    String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+    _builder.append(_tempName, "");
+    _builder.append(", ");
+    String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
+    _builder.append(_tempName_1, "");
+    _builder.append(")");
+    return this.assignTempVar(targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
   }
   
   protected CharSequence writeToNull(final String last) {
@@ -867,5 +990,17 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source, _hookName, true);
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
+  }
+  
+  private boolean inBarrier = false;
+  
+  protected CharSequence barrierBegin(final int stage, final int totalStageCosts, final boolean createConstant) {
+    this.inBarrier = true;
+    return "var wg sync.WaitGroup\n";
+  }
+  
+  protected CharSequence barrierEnd(final int stage, final int totalStageCosts, final boolean createConstant) {
+    this.inBarrier = false;
+    return "wg.Wait";
   }
 }

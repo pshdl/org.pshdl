@@ -95,6 +95,7 @@ import static org.pshdl.model.evaluation.ConstantEvaluate.*
 import static org.pshdl.model.extensions.FullNameExtension.*
 import static org.pshdl.model.extensions.TypeExtension.*
 import static org.pshdl.model.simulation.SimulationTransformationExtension.*
+import java.util.LinkedHashSet
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -425,7 +426,7 @@ class SimulationTransformationExtension {
 		}
 		res.annotations = obj.annotations.toAnnoString
 		val regConfigs = obj.getAllObjectsOf(typeof(HDLRegisterConfig), true)
-		val Set<HDLQualifiedName> lst = new HashSet
+		val Set<HDLQualifiedName> lst = new LinkedHashSet
 		for (HDLRegisterConfig reg : regConfigs) {
 			val HDLQualifiedName rstVar = fullNameOf(reg.rst)
 			if (!lst.contains(rstVar)) {

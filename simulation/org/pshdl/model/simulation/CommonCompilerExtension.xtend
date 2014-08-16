@@ -36,10 +36,11 @@ import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
+import java.util.LinkedHashMap
 
 class CommonCompilerExtension {
 	public ExecutableModel em
-	public Map<String, Integer> varIdx = new HashMap
+	public Map<String, Integer> varIdx = new LinkedHashMap
 
 	new(ExecutableModel em, int bitWidth) {
 		this.em = em

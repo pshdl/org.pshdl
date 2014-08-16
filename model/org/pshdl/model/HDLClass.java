@@ -26,8 +26,9 @@
  ******************************************************************************/
 package org.pshdl.model;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 public enum HDLClass {
 	HDLObject(HDLObject.class), // HDLObject
@@ -94,7 +95,7 @@ public enum HDLClass {
 
 	public static synchronized HDLClass getClassFor(Class<?> clazz) {
 		if (classMap == null) {
-			classMap = new HashMap<Class<?>, HDLClass>();
+			classMap = Maps.newLinkedHashMap();
 			for (final HDLClass cl : values()) {
 				classMap.put(cl.clazz, cl);
 			}

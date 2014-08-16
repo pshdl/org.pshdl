@@ -34,7 +34,7 @@ import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -180,7 +180,7 @@ public class ProcessModel {
       }
     };
     IterableExtensions.<HDLStatement>forEach(_elseDo, _function_1);
-    final HashSet<HDLRegisterConfig> clocks = new HashSet<HDLRegisterConfig>();
+    final LinkedHashSet<HDLRegisterConfig> clocks = new LinkedHashSet<HDLRegisterConfig>();
     Set<HDLRegisterConfig> _keySet = thenPM.clockedStatements.keySet();
     clocks.addAll(_keySet);
     Set<HDLRegisterConfig> _keySet_1 = elsePM.clockedStatements.keySet();
@@ -215,7 +215,7 @@ public class ProcessModel {
   
   protected static ProcessModel _toProcessModel(final HDLSwitchStatement stmnt, final int pid) {
     final Map<HDLSwitchCaseStatement, ProcessModel> pms = Maps.<HDLSwitchCaseStatement, ProcessModel>newLinkedHashMap();
-    final HashSet<HDLRegisterConfig> clocks = new HashSet<HDLRegisterConfig>();
+    final LinkedHashSet<HDLRegisterConfig> clocks = new LinkedHashSet<HDLRegisterConfig>();
     boolean hasUnclocked = false;
     ArrayList<HDLSwitchCaseStatement> _cases = stmnt.getCases();
     for (final HDLSwitchCaseStatement caze : _cases) {
