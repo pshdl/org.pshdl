@@ -961,10 +961,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence writeInternal(InternalInformation internal, String tempName, List<Integer> arr) {
 		final StringBuilder sb = new StringBuilder();
-		CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, arr, sb);
-		if (!internal.isPred) {
-			assignValue = fixupValue(assignValue, getTargetSizeWithType(internal.info), true);
-		}
+		final CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, arr, sb);
 		if (internal.isShadowReg) {
 			final String cpyName = tempName + "_cpy";
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
@@ -1291,11 +1288,14 @@ public abstract class CommonCodeGenerator {
 			return op;
 		final CharSequence cast = getCast(targetSizeWithType);
 		final int shift = bitWidth - targetSize;
+		final String shiftPart = " << " + shift + ") >> " + shift;
 		if (shift == 0)
 			return op;
+		else if (op.toString().endsWith(shiftPart))
+			return op;
 		if ((cast != null) && (cast.length() != 0))
-			return "(" + doCast(cast, op) + " << " + shift + ") >> " + shift;
-		return "((" + op + ") << " + shift + ") >> " + shift;
+			return "(" + doCast(cast, op) + shiftPart;
+		return "((" + op + ")" + shiftPart;
 	}
 
 	protected CharSequence preFrameExecution(Frame frame) {
