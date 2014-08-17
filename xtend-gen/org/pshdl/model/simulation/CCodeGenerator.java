@@ -104,6 +104,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       try {
         ByteStreams.copy(runnerStream, fos);
       } finally {
+        runnerStream.close();
         fos.close();
       }
       final File executable = new File(tempDir, "testExec");
@@ -363,7 +364,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   public static int hash(final String str) {
     int hash = (-2128831035);
-    final byte[] bytes = str.getBytes();
+    final byte[] bytes = str.getBytes(StandardCharsets.ISO_8859_1);
     for (final byte b : bytes) {
       {
         int _bitwiseXor = (hash ^ b);

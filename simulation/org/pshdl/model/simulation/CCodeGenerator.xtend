@@ -89,6 +89,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		try {
 			ByteStreams.copy(runnerStream, fos)
 		} finally {
+			runnerStream.close
 			fos.close
 		}
 		val File executable = new File(tempDir, "testExec")
@@ -198,7 +199,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 	def static int hash(String str) {
 		var int hash = -2128831035;
-		val byte[] bytes = str.getBytes();
+		val byte[] bytes = str.getBytes(StandardCharsets.ISO_8859_1);
 		for (byte b : bytes) {
 			hash = hash.bitwiseXor(b);
 			hash = hash * 16777619;

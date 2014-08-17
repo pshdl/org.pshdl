@@ -1,3 +1,29 @@
+/**
+ * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
+ *     output suitable for implementation or simulation of it.
+ * 
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ *     This License does not grant permission to use the trade names, trademarks,
+ *     service marks, or product names of the Licensor, except as required for
+ *     reasonable and customary use in describing the origin of the Work.
+ * 
+ * Contributors:
+ *     Karsten Becker - initial API and implementation
+ */
 package org.pshdl.model.simulation;
 
 import com.google.common.base.Objects;
@@ -43,7 +69,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   
   private boolean usePackageImport;
   
-  private final int epsWidth = 16;
+  private final static int epsWidth = 16;
   
   public static String TESTRUNNER_DIR = "/Users/karstenbecker/GDrive/DartTestRunner/";
   
@@ -878,7 +904,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("\t");
         _builder.append("\t");
         _builder.append("int dc = local >> ");
-        _builder.append(this.epsWidth, "\t\t");
+        _builder.append(DartCodeGenerator.epsWidth, "\t\t");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -904,7 +930,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("\t");
         _builder.append("\t");
         _builder.append("if ((dc == _deltaCycle) && ((local & ");
-        BigInteger _calcMask = this.calcMask(this.epsWidth);
+        BigInteger _calcMask = this.calcMask(DartCodeGenerator.epsWidth);
         CharSequence _constant = this.constant(_calcMask, true);
         _builder.append(_constant, "\t\t");
         _builder.append(") == _epsCycle))");
