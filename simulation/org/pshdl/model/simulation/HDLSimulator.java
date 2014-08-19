@@ -195,7 +195,7 @@ public class HDLSimulator {
 			break;
 		case HDLFunctionCall:
 			final HDLFunctionCall hfc = (HDLFunctionCall) stmnt;
-			final Optional<HDLFunction> func = hfc.resolveName();
+			final Optional<HDLFunction> func = hfc.resolveFunction();
 			if (func.isPresent()) {
 				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(func.get());
 				final ArrayList<HDLExpression> params = hfc.getParams();

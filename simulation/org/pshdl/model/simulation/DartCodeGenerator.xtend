@@ -87,7 +87,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			override newInstance() {
 				val Process dartRunner = new ProcessBuilder(DART_EXEC, "bin/" + testRunner.getName(), unitName, library).
 					directory(tempDir).redirectErrorStream(true).start()
-				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5)
+				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5, "Dart "+library+"."+unitName)
 			}
 
 		}

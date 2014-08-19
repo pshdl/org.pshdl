@@ -438,8 +438,8 @@ public class StringWriteExtension {
     final StringBuilder sb = _xifexpression;
     String _entering = this.entering(func, highlight);
     sb.append(_entering);
-    HDLQualifiedName _nameRefName = func.getNameRefName();
-    String _string = _nameRefName.toString();
+    HDLQualifiedName _functionRefName = func.getFunctionRefName();
+    String _string = _functionRefName.toString();
     String _functionCall = highlight.functionCall(_string);
     StringBuilder _append = sb.append(_functionCall);
     _append.append("(");

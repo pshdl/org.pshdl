@@ -78,6 +78,7 @@ import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLOpExpression;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLPrimitive;
+import org.pshdl.model.HDLPrimitive.AnyPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLReference;
@@ -540,11 +541,11 @@ public class Insulin {
 		if (sub instanceof HDLUnresolvedFragmentFunction) {
 			final HDLUnresolvedFragmentFunction huf = (HDLUnresolvedFragmentFunction) sub;
 			final HDLQualifiedName funcName = HDLQualifiedName.create(huf.getFrag());
-			final Optional<HDLFunction> function = ScopingExtension.INST.resolveFunction(cFrag, funcName);
+			final Optional<Iterable<HDLFunction>> function = ScopingExtension.INST.resolveFunctionName(cFrag, funcName);
 			if (function.isPresent()) {
 				final ArrayList<HDLExpression> params = huf.getParams();
 				params.add(0, (HDLExpression) attemptResolve.get());
-				final HDLFunctionCall funcCall = new HDLFunctionCall().setName(funcName).setParams(params);
+				final HDLFunctionCall funcCall = new HDLFunctionCall().setFunction(funcName).setParams(params);
 				final Optional<HDLFunctionCall> funcOp = Optional.of(funcCall);
 				final Optional<ResolvedPart> methodChaining = tryMethodChaining(sub, funcOp);
 				if (methodChaining.isPresent())
@@ -625,7 +626,7 @@ public class Insulin {
 				}
 		} else {
 			final HDLUnresolvedFragmentFunction uff = (HDLUnresolvedFragmentFunction) uFrag;
-			final HDLFunctionCall call = new HDLFunctionCall().setName(hVar).setParams(uff.getParams());
+			final HDLFunctionCall call = new HDLFunctionCall().setFunction(hVar).setParams(uff.getParams());
 			return Optional.of(new ResolvedPart(call, sub));
 		}
 		return Optional.absent();
@@ -704,12 +705,12 @@ public class Insulin {
 			doRepeat = false;
 			final HDLFunctionCall[] functions = pkg.getAllObjectsOf(HDLFunctionCall.class, true);
 			outer: for (final HDLFunctionCall hdi : functions) {
-				final Optional<HDLFunction> function = hdi.resolveName();
+				final Optional<HDLFunction> function = hdi.resolveFunction();
 				if (function.isPresent()) {
 					final HDLFunctionCall[] subFunctions = hdi.getAllObjectsOf(HDLFunctionCall.class, true);
 					for (final HDLFunctionCall sub : subFunctions) {
 						if (sub != hdi) {
-							final Optional<HDLFunction> func = sub.resolveName();
+							final Optional<HDLFunction> func = sub.resolveFunction();
 							if (func.isPresent() && (func.get().getClassType() == HDLClass.HDLInlineFunction)) {
 								doRepeat = true;
 								continue outer;
@@ -719,8 +720,8 @@ public class Insulin {
 					switch (function.get().getClassType()) {
 					case HDLInlineFunction:
 						final HDLInlineFunction hif = (HDLInlineFunction) function.get();
-						final HDLExpression equivalenExpression = hif.getReplacementExpression(hdi);
-						ms.replace(hdi, equivalenExpression);
+						final HDLExpression equivalentExpression = hif.getReplacementExpression(hdi);
+						ms.replace(hdi, equivalentExpression);
 						break;
 					case HDLSubstituteFunction:
 						final HDLSubstituteFunction hsf = (HDLSubstituteFunction) function.get();
@@ -1223,15 +1224,16 @@ public class Insulin {
 	}
 
 	private static void foritfyFunctions(IHDLObject apply, ModificationSet ms) {
-		final HDLFunctionCall[] functions = apply.getAllObjectsOf(HDLFunctionCall.class, true);
-		for (final HDLFunctionCall function : functions) {
-			final HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
-			if (info != null) {
-				final ArrayList<HDLExpression> params = function.getParams();
-				for (int j = 0; j < params.size(); j++) {
-					final HDLExpression exp = params.get(j);
-					fortify(ms, exp, info.args[j]);
-				}
+		final HDLFunctionCall[] calls = apply.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (final HDLFunctionCall call : calls) {
+			final Optional<HDLFunction> func = HDLFunctions.resolve(call);
+			if (func.isPresent()) {
+				// final ArrayList<HDLExpression> params = call.getParams();
+				// for (int j = 0; j < params.size(); j++) {
+				// final HDLExpression exp = params.get(j);
+				// fortify(ms, exp, info.args[j]);
+				// }
+				// TODO Re-implement!
 			}
 		}
 	}
@@ -1340,7 +1342,8 @@ public class Insulin {
 			final Optional<? extends HDLType> opLeft = TypeExtension.typeOf(assignment.getLeft());
 			final HDLType leftType = opLeft.get();
 			final HDLExpression exp = assignment.getRight();
-			final HDLType rightType = TypeExtension.typeOf(exp).get();
+			final Optional<? extends HDLType> rightTypeOpt = TypeExtension.typeOf(exp);
+			final HDLType rightType = rightTypeOpt.get();
 			if (exp.getClassType() == HDLClass.HDLArrayInit) {
 				fortifyArrayInitExp(ms, leftType, (HDLArrayInit) exp);
 			} else if ((rightType.getType() == HDLPrimitiveType.BOOL) && (leftType.getType() != HDLPrimitiveType.BOOL)) {
@@ -1421,12 +1424,26 @@ public class Insulin {
 			if (BuiltInValidator.skipExp(exp))
 				return;
 			final Optional<? extends HDLType> lt = TypeExtension.typeOf(exp);
-			if (lt.isPresent() && !targetType.equals(lt.get()))
-				if (pt.getType() == HDLPrimitiveType.BOOL) {
-					makeBool(ms, exp);
-				} else {
-					cast(ms, pt, exp);
+			if (lt.isPresent()) {
+				final HDLType currentType = lt.get();
+				if (!targetType.equals(currentType)) {
+					if (targetType instanceof AnyPrimitive) {
+						final AnyPrimitive anyTarget = (AnyPrimitive) targetType;
+						if (currentType instanceof AnyPrimitive) {
+							final AnyPrimitive anyCurrent = (AnyPrimitive) currentType;
+							System.out.println("Cast any " + anyCurrent + " to any " + anyTarget);
+						} else {
+							System.out.println("Cast " + currentType + " to any " + anyTarget);
+						}
+					} else {
+						if (pt.getType() == HDLPrimitiveType.BOOL) {
+							makeBool(ms, exp);
+						} else {
+							cast(ms, pt, exp);
+						}
+					}
 				}
+			}
 		}
 	}
 

@@ -29,16 +29,19 @@ package org.pshdl.model.simulation;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.ListExtensions;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
@@ -55,6 +58,7 @@ import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLEqualityOp;
 import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLLiteral;
@@ -149,6 +153,17 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLInterfaceDeclaration obj, final HDLEvaluationContext context, final String process) {
     return new FluidFrame(obj, null);
+  }
+  
+  protected FluidFrame _toSimulationModel(final HDLFunctionCall obj, final HDLEvaluationContext context, final String process) {
+    final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(obj, context);
+    boolean _isPresent = constVal.isPresent();
+    if (_isPresent) {
+      BigInteger _get = constVal.get();
+      HDLLiteral _get_1 = HDLLiteral.get(_get);
+      return this.toSimulationModel(_get_1, context, process);
+    }
+    throw new IllegalArgumentException(("Function not constant! " + obj));
   }
   
   protected FluidFrame _toSimulationModel(final HDLEnumDeclaration obj, final HDLEvaluationContext context, final String process) {
@@ -269,6 +284,18 @@ public class SimulationTransformationExtension {
               case NATURAL:
                 vType = VariableInformation.Type.UINT;
                 break;
+              case BIT:
+                vType = VariableInformation.Type.BIT;
+                break;
+              case BITVECTOR:
+                vType = VariableInformation.Type.BIT;
+                break;
+              case BOOL:
+                vType = VariableInformation.Type.BOOL;
+                break;
+              case STRING:
+                vType = VariableInformation.Type.STRING;
+                break;
               default:
                 break;
             }
@@ -276,7 +303,26 @@ public class SimulationTransformationExtension {
         }
         ArrayList<HDLAnnotation> _annotations = hVar.getAnnotations();
         ArrayList<HDLAnnotation> _annotations_1 = obj.getAnnotations();
-        final Iterable<HDLAnnotation> allAnnos = Iterables.<HDLAnnotation>concat(_annotations, _annotations_1);
+        Iterable<HDLAnnotation> _plus = Iterables.<HDLAnnotation>concat(_annotations, _annotations_1);
+        final ArrayList<HDLAnnotation> allAnnos = Lists.<HDLAnnotation>newArrayList(_plus);
+        HDLClass _classType_2 = type.getClassType();
+        boolean _tripleEquals_3 = (_classType_2 == HDLClass.HDLEnum);
+        if (_tripleEquals_3) {
+          vType = VariableInformation.Type.ENUM;
+          final HDLEnum hEnum = ((HDLEnum) type);
+          HDLAnnotation _hDLAnnotation = new HDLAnnotation();
+          HDLAnnotation _setName = _hDLAnnotation.setName("@enumNames");
+          ArrayList<HDLVariable> _enums = hEnum.getEnums();
+          final Function1<HDLVariable, String> _function = new Function1<HDLVariable, String>() {
+            public String apply(final HDLVariable it) {
+              return it.getName();
+            }
+          };
+          List<String> _map = ListExtensions.<HDLVariable, String>map(_enums, _function);
+          String _join = IterableExtensions.join(_map, ";");
+          final HDLAnnotation enumAnno = _setName.setValue(_join);
+          allAnnos.add(enumAnno);
+        }
         String[] _annoString = this.toAnnoString(allAnnos);
         VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, clock, reset, _annoString, ((int[])Conversions.unwrapArray(dims, int.class)));
         res.addVar(_variableInformation_1);
@@ -438,7 +484,7 @@ public class SimulationTransformationExtension {
           caseFrame.add(Instruction.eq);
         } else {
           HDLExpression _label_1 = c.getLabel();
-          final Optional<BigInteger> const_ = ConstantEvaluate.valueOf(_label_1);
+          final Optional<BigInteger> const_ = ConstantEvaluate.valueOf(_label_1, context);
           int l = 0;
           boolean _isPresent = const_.isPresent();
           if (_isPresent) {
@@ -528,13 +574,13 @@ public class SimulationTransformationExtension {
     boolean _tripleNotEquals_1 = (config != null);
     if (_tripleNotEquals_1) {
       HDLReference _left = obj.getLeft();
-      String _varName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true);
+      String _varName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true, context);
       String _plus = (_varName + InternalInformation.REG_POSTFIX);
       FluidFrame _fluidFrame = new FluidFrame(obj, _plus, constant, process);
       res = _fluidFrame;
     } else {
       HDLReference _left_1 = obj.getLeft();
-      String _varName_1 = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left_1), true);
+      String _varName_1 = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left_1), true, context);
       FluidFrame _fluidFrame_1 = new FluidFrame(obj, _varName_1, constant, process);
       res = _fluidFrame_1;
     }
@@ -611,7 +657,7 @@ public class SimulationTransformationExtension {
     return _resolveVar.get();
   }
   
-  public static String getVarName(final HDLVariableRef hVar, final boolean withBits) {
+  public static String getVarName(final HDLVariableRef hVar, final boolean withBits, final HDLEvaluationContext context) {
     final StringBuilder sb = new StringBuilder();
     Optional<HDLVariable> _resolveVar = hVar.resolveVar();
     HDLVariable _get = _resolveVar.get();
@@ -620,7 +666,7 @@ public class SimulationTransformationExtension {
     ArrayList<HDLExpression> _array = hVar.getArray();
     for (final HDLExpression exp : _array) {
       {
-        final Optional<BigInteger> s = ConstantEvaluate.valueOf(exp);
+        final Optional<BigInteger> s = ConstantEvaluate.valueOf(exp, context);
         boolean _isPresent = s.isPresent();
         if (_isPresent) {
           StringBuilder _append = sb.append("[");
@@ -923,7 +969,7 @@ public class SimulationTransformationExtension {
   protected FluidFrame _toSimulationModel(final HDLVariableRef obj, final HDLEvaluationContext context, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
     Optional<HDLVariable> hVar = obj.resolveVar();
-    final String refName = SimulationTransformationExtension.getVarName(obj, false);
+    final String refName = SimulationTransformationExtension.getVarName(obj, false, context);
     boolean fixedArray = true;
     ArrayList<HDLExpression> _array = obj.getArray();
     for (final HDLExpression idx : _array) {
@@ -1025,8 +1071,23 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLLiteral obj, final HDLEvaluationContext context, final String process) {
-    final BigInteger value = obj.getValueAsBigInt();
     final FluidFrame res = new FluidFrame(obj, process);
+    boolean _and = false;
+    Boolean _str = obj.getStr();
+    boolean _tripleNotEquals = (_str != null);
+    if (!_tripleNotEquals) {
+      _and = false;
+    } else {
+      Boolean _str_1 = obj.getStr();
+      _and = (_str_1).booleanValue();
+    }
+    if (_and) {
+      String _val = obj.getVal();
+      FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.loadConstantString, _val);
+      res.add(_argumentedInstruction);
+      return res;
+    }
+    final BigInteger value = obj.getValueAsBigInt();
     boolean _equals = BigInteger.ZERO.equals(value);
     if (_equals) {
       res.add(Instruction.const0);
@@ -1044,8 +1105,8 @@ public class SimulationTransformationExtension {
     }
     final String key = value.toString();
     res.constants.put(key, value);
-    FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.loadConstant, key);
-    res.add(_argumentedInstruction);
+    FluidFrame.ArgumentedInstruction _argumentedInstruction_1 = new FluidFrame.ArgumentedInstruction(Instruction.loadConstant, key);
+    res.add(_argumentedInstruction_1);
     return res;
   }
   
@@ -1234,9 +1295,7 @@ public class SimulationTransformationExtension {
     Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(op);
     HDLType _get = _typeOf.get();
     final HDLPrimitive type = ((HDLPrimitive) _get);
-    Optional<? extends HDLType> _typeOf_1 = TypeExtension.typeOf(op);
-    HDLType _get_1 = _typeOf_1.get();
-    final Integer width = HDLPrimitives.getWidth(_get_1, context);
+    final Integer width = HDLPrimitives.getWidth(type, context);
     boolean _or = false;
     HDLPrimitive.HDLPrimitiveType _type = type.getType();
     boolean _tripleEquals = (_type == HDLPrimitive.HDLPrimitiveType.INT);
@@ -1283,6 +1342,8 @@ public class SimulationTransformationExtension {
       return _toSimulationModel((HDLAssignment)obj, context, process);
     } else if (obj instanceof HDLConcat) {
       return _toSimulationModel((HDLConcat)obj, context, process);
+    } else if (obj instanceof HDLFunctionCall) {
+      return _toSimulationModel((HDLFunctionCall)obj, context, process);
     } else if (obj instanceof HDLLiteral) {
       return _toSimulationModel((HDLLiteral)obj, context, process);
     } else if (obj instanceof HDLManip) {

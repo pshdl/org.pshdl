@@ -2,7 +2,7 @@
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
  *
- *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLFunctionCall contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>HDLQualifiedName name. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLQualifiedName function. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> params. Can be <code>null</code>.</li>
  * </ul>
  */
@@ -49,15 +49,15 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
-	 * @param name
-	 *            the value for name. Can <b>not</b> be <code>null</code>.
+	 * @param function
+	 *            the value for function. Can <b>not</b> be <code>null</code>.
 	 * @param params
 	 *            the value for params. Can be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
-	public HDLFunctionCall(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName name, @Nullable Iterable<HDLExpression> params, boolean validate) {
-		super(id, container, name, params, validate);
+	public HDLFunctionCall(int id, @Nullable IHDLObject container, @Nonnull HDLQualifiedName function, @Nullable Iterable<HDLExpression> params, boolean validate) {
+		super(id, container, function, params, validate);
 	}
 
 	public HDLFunctionCall() {
@@ -73,22 +73,22 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	}
 
 	/**
-	 * The accessor for the field name which is of type HDLQualifiedName.
+	 * The accessor for the field function which is of type HDLQualifiedName.
 	 */
-	public static HDLFieldAccess<HDLFunctionCall, HDLQualifiedName> fName = new HDLFieldAccess<HDLFunctionCall, HDLQualifiedName>("name", HDLQualifiedName.class,
+	public static HDLFieldAccess<HDLFunctionCall, HDLQualifiedName> fFunction = new HDLFieldAccess<HDLFunctionCall, HDLQualifiedName>("function", HDLQualifiedName.class,
 			HDLFieldAccess.Quantifier.ONE) {
 		@Override
 		public HDLQualifiedName getValue(HDLFunctionCall obj) {
 			if (obj == null)
 				return null;
-			return obj.getNameRefName();
+			return obj.getFunctionRefName();
 		}
 
 		@Override
 		public HDLFunctionCall setValue(HDLFunctionCall obj, HDLQualifiedName value) {
 			if (obj == null)
 				return null;
-			return obj.setName(value);
+			return obj.setFunction(value);
 		}
 	};
 	/**
@@ -114,13 +114,15 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
-		if (name == obj)
-			return fName;
+		if (function == obj)
+			return fFunction;
 		if (params.contains(obj))
 			return fParams;
 		return super.getContainingFeature(obj);
 	}
+
 	// $CONTENT-BEGIN$
+
 	// $CONTENT-END$
 
 }

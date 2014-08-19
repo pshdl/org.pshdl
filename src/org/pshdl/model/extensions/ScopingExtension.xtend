@@ -65,6 +65,9 @@ import java.util.List
 import static org.pshdl.model.extensions.ScopingExtension.*
 import com.google.common.base.Optional
 import org.pshdl.model.HDLNativeFunction
+import org.pshdl.model.HDLFunctionCall
+import org.pshdl.model.types.builtIn.HDLFunctions
+import org.pshdl.model.impl.AbstractHDLFunctionCall
 
 /**
  * The ScopingExtension allows the resolution of Enums, Interface, Variables by name
@@ -84,10 +87,21 @@ class ScopingExtension {
 		return obj.resolveVariableDefault(hVar)
 	}
 
-	def dispatch Optional<HDLFunction> resolveFunction(IHDLObject obj, HDLQualifiedName hVar) {
+	def Optional<HDLFunction> resolveFunction(AbstractHDLFunctionCall obj, HDLQualifiedName hVar) {
 		if (obj.container === null)
 			return Optional.absent
-		return obj.container.resolveFunction(hVar)
+		val candidates=obj.container.resolveFunctionName(hVar)
+		if (!candidates.present || candidates.get.empty)
+			return Optional.absent
+		val scored=HDLFunctions.scoreList(candidates.get, obj as HDLFunctionCall)
+		if (scored.nullOrEmpty)
+			return Optional.absent
+		return Optional.of(scored.first.function);
+	}
+	def dispatch Optional<Iterable<HDLFunction>> resolveFunctionName(IHDLObject obj, HDLQualifiedName hVar) {
+		if (obj.container === null)
+			return Optional.absent
+		return obj.container.resolveFunctionName(hVar)
 	}
 
 	def dispatch Optional<HDLEnum> resolveEnum(IHDLObject obj, HDLQualifiedName hEnum) {
@@ -135,7 +149,7 @@ class ScopingExtension {
 		return obj.resolver(true).resolveEnum(hEnum)
 	}
 
-	def dispatch Optional<HDLFunction> resolveFunction(HDLStatement obj, HDLQualifiedName hEnum) {
+	def dispatch Optional<Iterable<HDLFunction>> resolveFunctionName(HDLStatement obj, HDLQualifiedName hEnum) {
 		return obj.resolver(true).resolveFunction(hEnum)
 	}
 
@@ -314,7 +328,7 @@ class ScopingExtension {
 	}
 
 	//HDLPackage stuff
-	def dispatch Optional<HDLFunction> resolveFunction(HDLPackage obj, HDLQualifiedName hFunc) {
+	def dispatch Optional<Iterable<HDLFunction>> resolveFunctionName(HDLPackage obj, HDLQualifiedName hFunc) {
 		var HDLLibrary library = obj.library
 		if (library === null)
 			library = HDLLibrary.getLibrary(obj.getLibURI)
@@ -360,7 +374,7 @@ class ScopingExtension {
 		return Optional.absent
 	}
 
-	def dispatch Optional<HDLFunction> resolveFunction(HDLUnit obj, HDLQualifiedName hFunc) {
+	def dispatch Optional<Iterable<HDLFunction>> resolveFunctionName(HDLUnit obj, HDLQualifiedName hFunc) {
 		val resolveEnum = obj.resolver(false).resolveFunction(hFunc)
 		if (resolveEnum.present)
 			return resolveEnum

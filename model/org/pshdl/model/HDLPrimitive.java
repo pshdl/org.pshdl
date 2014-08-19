@@ -2,7 +2,7 @@
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
  *
- *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -286,6 +286,26 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 			}
 		}
 		return super.validateWidth(width);
+	}
+
+	public static class AnyPrimitive extends HDLPrimitive {
+
+		public AnyPrimitive(HDLPrimitiveType primitive) {
+			super(gid.incrementAndGet(), null, "#any" + primitive, null, primitive, null, false);
+		}
+
+	}
+
+	public static AnyPrimitive anyBit() {
+		return new AnyPrimitive(HDLPrimitiveType.BIT);
+	}
+
+	public static AnyPrimitive anyInt() {
+		return new AnyPrimitive(HDLPrimitiveType.INTEGER);
+	}
+
+	public static AnyPrimitive anyUint() {
+		return new AnyPrimitive(HDLPrimitiveType.NATURAL);
 	}
 	// $CONTENT-END$
 

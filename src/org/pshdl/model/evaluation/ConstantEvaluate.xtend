@@ -326,14 +326,7 @@ class ConstantEvaluate {
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLFunctionCall obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
-		val List<BigInteger> args = new LinkedList<BigInteger>
-		for (HDLExpression arg : obj.params) {
-			val Optional<BigInteger> bigVal = subEvaluate(obj, arg, context, evaled)
-			if (!bigVal.present)
-				return Optional.absent
-			args.add(bigVal.get)
-		}
-		return HDLFunctions.constantEvaluate(obj, args, context)
+		return HDLFunctions.constantEvaluate(obj, context)
 	}
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLVariableRef obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {

@@ -49,13 +49,16 @@ import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.IHDLObject;
+import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.types.builtIn.PSHDLLib;
 import org.pshdl.model.utils.services.AuxiliaryContent;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 public class HDLLibrary {
 	private static class Record {
@@ -66,12 +69,14 @@ public class HDLLibrary {
 		public final HDLQualifiedName ref;
 		public final String src;
 		public final RecordType type;
+		public final HDLFunction function;
 
-		public Record(String src, RecordType type, HDLQualifiedName ref) {
+		public Record(String src, RecordType type, HDLQualifiedName ref, HDLFunction function) {
 			super();
 			this.src = src;
 			this.type = type;
 			this.ref = ref;
+			this.function = function;
 		}
 	}
 
@@ -98,7 +103,8 @@ public class HDLLibrary {
 		libs.remove(libURI);
 	}
 
-	public final Map<HDLQualifiedName, HDLFunction> functions = new ConcurrentHashMap<HDLQualifiedName, HDLFunction>();
+	public final Multimap<HDLQualifiedName, HDLFunction> functions = Multimaps.synchronizedSetMultimap(LinkedHashMultimap.<HDLQualifiedName, HDLFunction> create());
+
 	public final Multimap<String, Record> objects = LinkedListMultimap.create();
 
 	public final Multimap<String, AuxiliaryContent> sideFiles = LinkedListMultimap.create();
@@ -111,6 +117,7 @@ public class HDLLibrary {
 
 	public HDLLibrary() {
 		addPkg(PSHDLLib.getLib(), "#PSHDLLib");
+		HDLFunctions.initLibrary(this);
 	}
 
 	/**
@@ -123,7 +130,7 @@ public class HDLLibrary {
 		checkFrozen(hEnum);
 		final HDLQualifiedName fqn = fullNameOf(hEnum);
 		types.put(fqn, hEnum);
-		addRecord(src, new Record(src, Record.RecordType.type, fqn));
+		addRecord(src, new Record(src, Record.RecordType.type, fqn, null));
 	}
 
 	private void addRecord(String src, Record record) {
@@ -146,8 +153,8 @@ public class HDLLibrary {
 	public void addFunction(HDLFunction func, String src) {
 		checkFrozen(func);
 		final HDLQualifiedName fqn = fullNameOf(func);
-		functions.put(fqn, func);
-		addRecord(src, new Record(src, Record.RecordType.function, fqn));
+		functions.put(fqn, Insulin.resolveFragments(func));
+		addRecord(src, new Record(src, Record.RecordType.function, fqn, func));
 	}
 
 	/**
@@ -160,7 +167,7 @@ public class HDLLibrary {
 		checkFrozen(hIf);
 		final HDLQualifiedName fqn = fullNameOf(hIf);
 		types.put(fqn, hIf);
-		addRecord(src, new Record(src, Record.RecordType.type, fqn));
+		addRecord(src, new Record(src, Record.RecordType.type, fqn, null));
 	}
 
 	/**
@@ -175,7 +182,7 @@ public class HDLLibrary {
 		checkFrozen(pkg);
 		for (final HDLUnit unit : pkg.getUnits()) {
 			final HDLQualifiedName uq = fullNameOf(unit);
-			addRecord(src, new Record(src, Record.RecordType.unit, uq));
+			addRecord(src, new Record(src, Record.RecordType.unit, uq, null));
 			units.put(uq, unit);
 			addInterface(unit.asInterface(), uq.toString());
 			final HDLInterface[] list = unit.getAllObjectsOf(HDLInterface.class, true);
@@ -237,12 +244,20 @@ public class HDLLibrary {
 		checkFrozen(var);
 		final HDLQualifiedName fqn = fullNameOf(var);
 		variables.put(fqn, var);
-		addRecord(src, new Record(src, Record.RecordType.variable, fqn));
+		addRecord(src, new Record(src, Record.RecordType.variable, fqn, null));
 	}
 
 	private void checkFrozen(IHDLObject hObject) {
 		if (!hObject.isFrozen())
 			throw new IllegalArgumentException("Objects need to be frozen to be added");
+	}
+
+	private <T extends IHDLObject> Optional<Iterable<T>> checkGenericImport(HDLQualifiedName type, String string, Multimap<HDLQualifiedName, T> map) {
+		final HDLQualifiedName newTypeName = new HDLQualifiedName(string).skipLast(1).append(type);
+		final Iterable<T> newType = map.get(newTypeName);
+		if (newType.iterator().hasNext())
+			return Optional.of(newType);
+		return Optional.absent();
 	}
 
 	private <T extends IHDLObject> Optional<T> checkGenericImport(HDLQualifiedName type, String string, Map<HDLQualifiedName, T> map) {
@@ -264,7 +279,7 @@ public class HDLLibrary {
 		for (final Record record : collection) {
 			switch (record.type) {
 			case function:
-				functions.remove(record.ref);
+				functions.remove(record.ref, record.function);
 				break;
 			case type:
 				types.remove(record.ref);
@@ -338,29 +353,27 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public Optional<HDLFunction> resolveFunction(Iterable<String> imports, HDLQualifiedName type) {
-		HDLFunction hdlFunction = functions.get(type);
-		if (hdlFunction == null) {
-			// System.out.println("HDLLibrary.resolve() Checking imports for:" +
-			// type + " @" + this);
-			for (final String string : imports)
-				if (string.endsWith(type.toString())) {
-					hdlFunction = functions.get(new HDLQualifiedName(string));
-					if (hdlFunction != null)
-						return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
-				}
-			Optional<HDLFunction> genericImport = checkGenericImport(type, "pshdl.*", functions);
-			if (genericImport.isPresent())
-				return genericImport;
-			for (final String string : imports)
-				if (string.endsWith(".*")) {
-					genericImport = checkGenericImport(type, string, functions);
-					if (genericImport.isPresent())
-						return genericImport;
-				}
+	public Optional<Iterable<HDLFunction>> resolveFunction(Iterable<String> imports, HDLQualifiedName type) {
+		Iterable<HDLFunction> hdlFunction = functions.get(type);
+		if (hdlFunction.iterator().hasNext())
+			return Optional.of(hdlFunction);
+		for (final String string : imports) {
+			if (string.endsWith(type.toString())) {
+				hdlFunction = functions.get(new HDLQualifiedName(string));
+				if (hdlFunction.iterator().hasNext())
+					return Optional.of(hdlFunction);
+			}
 		}
-		if (hdlFunction != null)
-			return Optional.fromNullable(Insulin.resolveFragments(hdlFunction));
+		Optional<Iterable<HDLFunction>> genericImport = checkGenericImport(type, "pshdl.*", functions);
+		if (genericImport.isPresent())
+			return genericImport;
+		for (final String string : imports) {
+			if (string.endsWith(".*")) {
+				genericImport = checkGenericImport(type, string, functions);
+				if (genericImport.isPresent())
+					return genericImport;
+			}
+		}
 		return Optional.absent();
 	}
 
@@ -460,7 +473,7 @@ public class HDLLibrary {
 				throw new IllegalArgumentException("The variable: " + vars.getName() + " does not have a declaration");
 			pkg = pkg.addDeclarations(hvd.setVariables(HDLObject.asList(vars.setName(e.getKey().toString()))));
 		}
-		for (final Entry<HDLQualifiedName, HDLFunction> e : functions.entrySet()) {
+		for (final Entry<HDLQualifiedName, HDLFunction> e : functions.entries()) {
 			if (e.getKey().getSegment(0).equals("pshdl")) {
 				continue;
 			}

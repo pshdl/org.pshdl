@@ -235,7 +235,7 @@ public class BuiltInAdvisor {
 					"Merge all write access to one process");
 		}
 		case NO_SUCH_FUNCTION: {
-			final HDLQualifiedName genName = ((HDLFunctionCall) problem.node).getNameRefName();
+			final HDLQualifiedName genName = ((HDLFunctionCall) problem.node).getFunctionRefName();
 			return new HDLAdvise(problem, "The function:" + genName + " can not be found", "The function could not be found, maybe you misspelled it.", "Double check the name",
 					"Check your imports");
 		}
@@ -292,7 +292,7 @@ public class BuiltInAdvisor {
 		case UNRESOLVED_FUNCTION:
 			final HDLFunctionCall fc = (HDLFunctionCall) problem.node;
 			final Set<String> funcIDs = HDLCore.getCompilerInformation().registeredFunctions.keySet();
-			final String functionProposal = getMatchProposal(funcIDs, "Functions", fc.getNameRefName().toString());
+			final String functionProposal = getMatchProposal(funcIDs, "Functions", fc.getFunctionRefName().toString());
 			return new HDLAdvise(problem, "The function:" + problem.node + " can not be resolved", "A function with that name can not be found", functionProposal,
 					"Check that the function is imported or fully referenced");
 		case UNSUPPORTED_TYPE_FOR_OP:

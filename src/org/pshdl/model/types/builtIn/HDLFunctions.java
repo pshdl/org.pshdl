@@ -27,125 +27,310 @@
 package org.pshdl.model.types.builtIn;
 
 import java.math.BigInteger;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedSet;
 
+import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLFunctionCall;
-import org.pshdl.model.HDLInlineFunction;
+import org.pshdl.model.HDLFunctionParameter;
+import org.pshdl.model.HDLFunctionParameter.Type;
+import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLPrimitive;
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.utils.HDLLibrary;
+import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.services.CompilerInformation;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
-import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
-import org.pshdl.model.utils.services.IHDLFunctionResolver;
 import org.pshdl.model.utils.services.IServiceProvider;
+import org.pshdl.model.utils.services.INativeFunctionProvider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 
 public class HDLFunctions {
 
 	private HDLFunctions() {
+	}
+
+	public static class FunctionScore implements Comparable<FunctionScore> {
+		public int score = 0;
+		public List<String> penalties = Lists.newArrayList();
+		public final HDLFunction function;
+
+		public FunctionScore(HDLFunction function) {
+			super();
+			this.function = function;
+		}
+
+		@Override
+		public int compareTo(FunctionScore o) {
+			return score - o.score;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((function == null) ? 0 : function.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			final FunctionScore other = (FunctionScore) obj;
+			if (function == null) {
+				if (other.function != null)
+					return false;
+			} else if (!function.equals(other.function))
+				return false;
+			return true;
+		}
+
+		public void incScore(int amount, String explain) {
+			score += amount;
+			penalties.add(explain);
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append("Score: ").append(score).append('\n');
+			for (final String string : penalties) {
+				sb.append('\t').append(string).append('\n');
+			}
+			sb.append(function).append('\n');
+			return sb.toString();
+		}
 
 	}
 
-	private static Map<String, List<IHDLFunctionResolver>> resolvers;
+	private static Multimap<HDLQualifiedName, HDLFunction> signatures;
+	private static Multimap<HDLQualifiedName, HDLFunctionImplementation> provider;
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
-		resolvers = Maps.newLinkedHashMap();
-		for (final IHDLFunctionResolver resolver : sp.getAllFunctions()) {
-			final String[] names = resolver.getFunctionNames();
-			for (final String funcName : names) {
-				List<IHDLFunctionResolver> list = resolvers.get(funcName);
-				if (list == null) {
-					list = new LinkedList<IHDLFunctionResolver>();
-					resolvers.put(funcName, list);
+		signatures = LinkedListMultimap.create();
+		provider = LinkedListMultimap.create();
+		final Collection<INativeFunctionProvider> nativeStaticProvider = sp.getAllFunctions();
+		for (final INativeFunctionProvider snfp : nativeStaticProvider) {
+			final HDLFunctionImplementation[] functionImpl = snfp.getStaticFunctions();
+			for (final HDLFunctionImplementation funcImpl : functionImpl) {
+				for (final HDLFunction hdlFunction : funcImpl.signatures()) {
+					final HDLQualifiedName fqnFunction = new HDLQualifiedName(hdlFunction.getName());
+					provider.put(fqnFunction, funcImpl);
+					signatures.put(fqnFunction, hdlFunction);
 				}
-				info.registeredFunctions.put(funcName, resolver.getFunctionInfo(funcName));
-				list.add(resolver);
 			}
-		}
-		for (final HDLFunction func : PSHDLLib.FUNCTIONS) {
-			FunctionType type;
-			switch (func.getClassType()) {
-			case HDLNativeFunction:
-				type = FunctionType.NATIVE;
-				break;
-			case HDLInlineFunction:
-				type = FunctionType.INLINE;
-				break;
-			case HDLSubstituteFunction:
-				type = FunctionType.SUBSTITUTION;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown type:" + func);
-			}
-			final FunctionInformation fi = new FunctionInformation(func.getName(), "PSHDL Standard Lib", func.toString(), null, false, type);
-			info.registeredFunctions.put(func.getName(), fi);
 		}
 	}
 
-	public static HDLTypeInferenceInfo getInferenceInfo(HDLFunctionCall function) {
-		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null) {
-			for (final IHDLFunctionResolver resolver : list) {
-				final HDLTypeInferenceInfo resolve = resolver.resolve(function);
-				if (resolve != null)
-					return resolve;
+	public static Optional<HDLFunction> resolve(HDLFunctionCall call) {
+		final Iterable<HDLFunction> list = getCandidateFunctions(call);
+		if ((list == null) || !list.iterator().hasNext())
+			return Optional.absent();
+		final SortedSet<FunctionScore> scored = scoreList(list, call);
+		final FunctionScore first = scored.first();
+		if (first.score < 1000)
+			return Optional.of(first.function);
+		return Optional.absent();
+	}
+
+	public static Iterable<HDLFunction> getCandidateFunctions(HDLFunctionCall call) {
+		return signatures.get(call.getFunctionRefName());
+	}
+
+	public static SortedSet<FunctionScore> scoreList(Iterable<HDLFunction> list, HDLFunctionCall call) {
+		final List<HDLType> types = Lists.newArrayList();
+		final SortedSet<FunctionScore> res = Sets.newTreeSet();
+		final ArrayList<HDLExpression> params = call.getParams();
+		for (final HDLExpression param : params) {
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(param);
+			if (!typeOf.isPresent()) {
+				types.add(null);
+			} else {
+				types.add(typeOf.get());
 			}
 		}
-		final Optional<HDLFunction> rFunc = function.resolveName();
-		if (rFunc.isPresent())
-			if (rFunc.get() instanceof HDLInlineFunction) {
-				final HDLInlineFunction hif = (HDLInlineFunction) rFunc.get();
-				final HDLExpression expression = hif.getReplacementExpression(function);
-				if (expression != null) {
-					final Optional<? extends HDLType> type = TypeExtension.typeOf(expression);
-					if (type.isPresent() && (type.get() instanceof HDLPrimitive)) {
-						final HDLPrimitive result = (HDLPrimitive) type.get();
-						final HDLType args[] = new HDLType[function.getParams().size()];
-						int i = 0;
-						for (final HDLExpression exp : function.getParams()) {
-							final Optional<? extends HDLType> expType = TypeExtension.typeOf(exp);
-							if (expType.isPresent()) {
-								args[i++] = expType.get();
-							} else
-								return null;
+		for (final HDLFunction hdlFunction : list) {
+			final FunctionScore funcScore = new FunctionScore(hdlFunction);
+			final ArrayList<HDLFunctionParameter> args = hdlFunction.getArgs();
+			final int missingArgs = args.size() - types.size();
+			if (missingArgs != 0) {
+				funcScore.incScore(10000 * Math.abs(missingArgs), "Missing arguments");
+				continue;
+			}
+			for (int i = 0; i < args.size(); i++) {
+				final HDLFunctionParameter arg = args.get(i);
+				final HDLType type = types.get(i);
+				checkRoughType(funcScore, arg, type, params.get(i));
+				if (funcScore.score < 1000) {
+					HDLPrimitive prim = null;
+					if (type instanceof HDLPrimitive) {
+						prim = (HDLPrimitive) type;
+					}
+					final String paramName = args.get(i).getName().getName();
+					switch (arg.getType()) {
+					case REG_BIT:
+					case ANY_BIT:
+						if ((prim != null) && !prim.isBits()) {
+							funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 						}
-						return new HDLTypeInferenceInfo(result, args);
+						break;
+					case REG_INT:
+					case ANY_INT:
+						if (prim != null) {
+							if (!prim.isBits()) {
+								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
+							} else if (!prim.isNumber()) {
+								funcScore.incScore(1000, "There is no automatic cast from this bit representation to int for parameter: " + paramName);
+							} else if ((prim.getType() != HDLPrimitiveType.INT) && (prim.getType() != HDLPrimitiveType.INTEGER)) {
+								funcScore.incScore(5, "Automatic casting from uint to int will occour for parameter: " + paramName);
+							}
+						}
+						break;
+					case REG_UINT:
+					case ANY_UINT:
+						if (prim != null) {
+							if (!prim.isBits()) {
+								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
+							} else if (!prim.isNumber()) {
+								funcScore.incScore(1000, "There is no automatic cast from this bit representation to int for parameter: " + paramName);
+							} else if ((prim.getType() != HDLPrimitiveType.UINT) && (prim.getType() != HDLPrimitiveType.NATURAL)) {
+								funcScore.incScore(50, "Automatic casting from int to uint will occour for parameter: " + paramName);
+							}
+						}
+						break;
+					case BOOL_TYPE:
+						if (prim != null) {
+							if (!prim.isBits()) {
+								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
+							} else if (prim.getType() != HDLPrimitiveType.BOOL) {
+								funcScore.incScore(100, "Automatic casting to boolean will occour for parameter: " + paramName);
+							}
+						}
+						break;
+					case STRING_TYPE:
+						if (prim != null) {
+							if (prim.getType() != HDLPrimitiveType.STRING) {
+								funcScore.incScore(1000, "There is no automatic casting to String for parameter: " + paramName);
+							}
+						}
+						break;
+					case ENUM:
+					case FUNCTION:
+					case IF:
+					case ANY_ENUM:
+					case ANY_IF:
+						break;
 					}
 				}
 			}
-		return null;
+			res.add(funcScore);
+		}
+		return res;
 	}
 
-	public static Optional<BigInteger> constantEvaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context) {
-		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null) {
-			for (final IHDLFunctionResolver resolver : list) {
-				final Optional<BigInteger> eval = resolver.evaluate(function, args, context);
-				if (eval.isPresent())
-					return eval;
+	public static int checkRoughType(FunctionScore funcScore, final HDLFunctionParameter arg, final HDLType type, HDLExpression param) {
+		switch (arg.getType()) {
+		case ANY_ENUM:
+		case ENUM:
+			if (type.getClassType() != HDLClass.HDLEnum) {
+				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to an enum for parameter: " + arg.getName().getName());
+			} else if (arg.getType() == Type.ENUM) {
+				final Optional<HDLEnum> enumSpec = arg.resolveEnumSpec();
+				if (enumSpec.isPresent()) {
+					if (!type.equals(enumSpec.get())) {
+						funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to enum " + enumSpec.get().getName() + " for parameter: " + arg.getName().getName());
+					}
+				}
 			}
+			break;
+		case ANY_IF:
+		case IF:
+			if (type.getClassType() != HDLClass.HDLInterface) {
+				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to an interface for parameter: " + arg.getName().getName());
+			} else if (arg.getType() == Type.IF) {
+				final Optional<HDLInterface> ifSpec = arg.resolveIfSpec();
+				if (ifSpec.isPresent()) {
+					final HDLInterface hIf = (HDLInterface) type;
+					if (hIf.conformsTo(ifSpec.get(), false)) {
+						funcScore.incScore(1000, "The interface :" + type.getName() + " does not conform to the interface " + ifSpec.get().getName() + " for parameter: "
+								+ arg.getName().getName());
+					}
+				}
+			}
+			break;
+		case REG_BIT:
+		case REG_INT:
+		case REG_UINT:
+		case STRING_TYPE:
+		case ANY_BIT:
+		case ANY_INT:
+		case ANY_UINT:
+		case BOOL_TYPE:
+			if (type.getClassType() != HDLClass.HDLPrimitive) {
+				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + arg.getName().getName());
+			}
+			break;
+		case FUNCTION:
+			if (!(param instanceof HDLFunction)) {
+				funcScore.incScore(1000, "Expected a function, but found:" + param + " for parameter: " + arg.getName().getName());
+			}
+			break;
+		}
+		return funcScore.score;
+	}
+
+	public static Optional<BigInteger> constantEvaluate(HDLFunctionCall call, HDLEvaluationContext context) {
+		final Optional<HDLFunction> func = call.resolveFunction();
+		if (!func.isPresent())
+			return Optional.absent();
+		final Collection<HDLFunctionImplementation> funcProvider = provider.get(FullNameExtension.fullNameOf(func.get()));
+		for (final HDLFunctionImplementation funcImpl : funcProvider) {
+			final Optional<BigInteger> value = funcImpl.getConstantValue(call, context);
+			if (value.isPresent())
+				return value;
 		}
 		return Optional.absent();
 	}
 
-	public static Optional<Range<BigInteger>> determineRange(HDLFunctionCall function, HDLEvaluationContext context) {
-		final List<IHDLFunctionResolver> list = resolvers.get(function.getNameRefName().getLastSegment());
-		if (list != null) {
-			for (final IHDLFunctionResolver resolver : list) {
-				final Range<BigInteger> eval = resolver.range(function, context);
-				if (eval != null)
-					return Optional.of(eval);
-			}
+	public static Optional<Range<BigInteger>> determineRange(HDLFunctionCall call, HDLEvaluationContext context) {
+		for (final HDLFunctionImplementation funcImpl : provider.get(call.getFunctionRefName())) {
+			final Optional<Range<BigInteger>> value = funcImpl.getRange(call, context);
+			if (value.isPresent())
+				return value;
+		}
+		return Optional.absent();
+	}
+
+	public static void initLibrary(HDLLibrary hdlLibrary) {
+		hdlLibrary.functions.putAll(signatures);
+	}
+
+	public static Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+		final HDLQualifiedName fqn = FullNameExtension.fullNameOf(function);
+		final Collection<HDLFunctionImplementation> providers = provider.get(fqn);
+		for (final HDLFunctionImplementation funcImpl : providers) {
+			final Optional<? extends HDLType> specified = funcImpl.specifyReturnType(function, call, context);
+			if (specified.isPresent())
+				return specified;
 		}
 		return Optional.absent();
 	}

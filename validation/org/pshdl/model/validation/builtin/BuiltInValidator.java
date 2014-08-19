@@ -63,7 +63,6 @@ import static org.pshdl.model.validation.builtin.ErrorCode.DIRECTION_NOT_ALLOWED
 import static org.pshdl.model.validation.builtin.ErrorCode.EQUALITY_ALWAYS_FALSE;
 import static org.pshdl.model.validation.builtin.ErrorCode.EQUALITY_ALWAYS_TRUE;
 import static org.pshdl.model.validation.builtin.ErrorCode.FOR_LOOP_RANGE_NOT_CONSTANT;
-import static org.pshdl.model.validation.builtin.ErrorCode.FUNCTION_SAME_NAME;
 import static org.pshdl.model.validation.builtin.ErrorCode.GLOBAL_CANT_REGISTER;
 import static org.pshdl.model.validation.builtin.ErrorCode.GLOBAL_NOT_CONSTANT;
 import static org.pshdl.model.validation.builtin.ErrorCode.GLOBAL_VAR_SAME_NAME;
@@ -229,7 +228,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkCombinedAssignment(pkg, problems, hContext);
 			checkAnnotations(pkg, problems, hContext);
 			checkType(pkg, problems, hContext);
-			checkProessWrite(pkg, problems, hContext);
+			checkProcessWrite(pkg, problems, hContext);
 			checkGenerators(pkg, problems, hContext);
 			checkConstantPackageDeclarations(pkg, problems, hContext);
 			checkLiteralConcat(pkg, problems);
@@ -371,17 +370,19 @@ public class BuiltInValidator implements IHDLValidator {
 		checkType(problems, pkg.getAllObjectsOf(HDLUnit.class, true));
 		checkType(problems, pkg.getAllObjectsOf(HDLInterface.class, true));
 		checkType(problems, pkg.getAllObjectsOf(HDLEnum.class, true));
-		for (final HDLObject hif : pkg.getAllObjectsOf(HDLFunction.class, true)) {
-			final HDLQualifiedName fqn = fullNameOf(hif);
-			final HDLLibrary library = hif.getLibrary();
-			final Optional<HDLFunction> resolve = library.resolveFunction(Collections.<String> emptyList(), fqn);
-			if (resolve.isPresent()) {
-				final HDLFunction type = resolve.get();
-				if (type.getID() != hif.getID()) {
-					problems.add(new Problem(FUNCTION_SAME_NAME, hif, type));
-				}
-			}
-		}
+		// for (final HDLObject hif : pkg.getAllObjectsOf(HDLFunction.class,
+		// true)) {
+		// final HDLQualifiedName fqn = fullNameOf(hif);
+		// final HDLLibrary library = hif.getLibrary();
+		// final Optional<Iterable<HDLFunction>> resolve =
+		// library.resolveFunction(Collections.<String> emptyList(), fqn);
+		// if (resolve.isPresent()) {
+		// final Iterable<HDLFunction> type = resolve.get();
+		// if (type.getID() != hif.getID()) {
+		// problems.add(new Problem(FUNCTION_SAME_NAME, hif, type));
+		// }
+		// }
+		// }
 		final HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
 		for (final HDLVariableDeclaration hvd : hvds) {
 			for (final HDLVariable hif : hvd.getVariables()) {
@@ -631,7 +632,7 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 		final HDLFunctionCall[] functionCalls = pkg.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (final HDLFunctionCall call : functionCalls) {
-			final Optional<HDLFunction> function = call.resolveName();
+			final Optional<HDLFunction> function = call.resolveFunction();
 			if (!function.isPresent()) {
 				problems.add(new Problem(UNRESOLVED_FUNCTION, call));
 			}
@@ -866,29 +867,31 @@ public class BuiltInValidator implements IHDLValidator {
 	 * number of arguments etc..
 	 */
 	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
-		final HDLFunctionCall[] functions = unit.getAllObjectsOf(HDLFunctionCall.class, true);
-		for (final HDLFunctionCall function : functions) {
-			final HDLTypeInferenceInfo info = HDLFunctions.getInferenceInfo(function);
+		final HDLFunctionCall[] calls = unit.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (final HDLFunctionCall call : calls) {
+			final Iterable<HDLFunction> info = HDLFunctions.getCandidateFunctions(call);
 			// Substitute functions don't have any interference info because
 			// they don't actually return anything
 			if (info == null) {
-				final Optional<HDLFunction> f = function.resolveName();
+				final Optional<HDLFunction> f = call.resolveFunction();
 				if (!f.isPresent()) {
-					problems.add(new Problem(NO_SUCH_FUNCTION, function));
+					problems.add(new Problem(NO_SUCH_FUNCTION, call));
 				} else {
 					final HDLFunction hdlFunction = f.get();
 					if (hdlFunction instanceof HDLSubstituteFunction) {
 						final HDLSubstituteFunction sub = (HDLSubstituteFunction) hdlFunction;
-						if (sub.getArgs().size() != function.getParams().size()) {
-							problems.add(new Problem(NO_SUCH_FUNCTION, function));
+						if (sub.getArgs().size() != call.getParams().size()) {
+							problems.add(new Problem(NO_SUCH_FUNCTION, call));
 						}
 					}
 				}
+			} else {
+
 			}
 		}
 	}
 
-	private static void checkProessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkProcessWrite(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLVariable[] vars = unit.getAllObjectsOf(HDLVariable.class, true);
 		for (final HDLVariable var : vars)
 			if (var.hasMeta(RWValidation.BLOCK_META_CLASH)) {

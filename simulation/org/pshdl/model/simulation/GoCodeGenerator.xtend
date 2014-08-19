@@ -87,9 +87,10 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 		}
 		new IHDLInterpreterFactory<NativeRunner>() {
 			override newInstance() {
-				val ProcessBuilder goBuilder = new ProcessBuilder(new File(tempDir,"runner").absolutePath).directory(tempDir).redirectErrorStream(true);
+				val runnerExecutable = new File(tempDir,"runner")
+				val ProcessBuilder goBuilder = new ProcessBuilder(runnerExecutable.absolutePath).directory(tempDir).redirectErrorStream(true);
 				val Process goRunner = goBuilder.start();
-				return new NativeRunner(goRunner.getInputStream(), goRunner.getOutputStream(), em, goRunner, 5);
+				return new NativeRunner(goRunner.getInputStream(), goRunner.getOutputStream(), em, goRunner, 5, runnerExecutable.absolutePath);
 			}
 		}
 	}

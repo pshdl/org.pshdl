@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *
- *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
- *
+ *     
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
+ * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- *
+ * 
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- *
+ * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * 
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for
+ *     service marks, or product names of the Licensor, except as required for 
  *     reasonable and customary use in describing the origin of the Work.
- *
+ * 
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -48,7 +48,7 @@ import com.google.common.collect.Iterators;
 public abstract class AbstractHDLRegisterConfig extends HDLObject {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLRegisterConfig}
-	 *
+	 * 
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param clk
@@ -166,7 +166,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the clk field. Can <b>not</b> be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nonnull
@@ -184,7 +184,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the rst field. Can <b>not</b> be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nonnull
@@ -202,7 +202,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the unresolvedClockType field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -218,7 +218,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the unresolvedResetType field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -234,7 +234,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the unresolvedSyncType field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -250,7 +250,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the clockType field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -266,7 +266,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the resetType field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -282,7 +282,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the syncType field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -298,7 +298,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the resetValue field. Can <b>not</b> be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nonnull
@@ -316,7 +316,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Get the delay field. Can be <code>null</code>.
-	 *
+	 * 
 	 * @return the field
 	 */
 	@Nullable
@@ -330,7 +330,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 *
+	 * 
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -344,7 +344,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 *
+	 * 
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -366,7 +366,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 *
+	 * 
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -379,7 +379,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 *
+	 * 
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -394,7 +394,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getClk()}.
-	 *
+	 * 
 	 * @param clk
 	 *            sets the new clk of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -411,7 +411,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getRst()}.
-	 *
+	 * 
 	 * @param rst
 	 *            sets the new rst of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -428,7 +428,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getUnresolvedClockType()}.
-	 *
+	 * 
 	 * @param unresolvedClockType
 	 *            sets the new unresolvedClockType of this object. Can be
 	 *            <code>null</code>.
@@ -445,7 +445,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getUnresolvedResetType()}.
-	 *
+	 * 
 	 * @param unresolvedResetType
 	 *            sets the new unresolvedResetType of this object. Can be
 	 *            <code>null</code>.
@@ -462,7 +462,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getUnresolvedSyncType()}.
-	 *
+	 * 
 	 * @param unresolvedSyncType
 	 *            sets the new unresolvedSyncType of this object. Can be
 	 *            <code>null</code>.
@@ -479,7 +479,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getClockType()}.
-	 *
+	 * 
 	 * @param clockType
 	 *            sets the new clockType of this object. Can be
 	 *            <code>null</code>.
@@ -496,7 +496,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getResetType()}.
-	 *
+	 * 
 	 * @param resetType
 	 *            sets the new resetType of this object. Can be
 	 *            <code>null</code>.
@@ -513,7 +513,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getSyncType()}.
-	 *
+	 * 
 	 * @param syncType
 	 *            sets the new syncType of this object. Can be <code>null</code>
 	 *            .
@@ -530,7 +530,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getResetValue()}.
-	 *
+	 * 
 	 * @param resetValue
 	 *            sets the new resetValue of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -547,7 +547,7 @@ public abstract class AbstractHDLRegisterConfig extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getDelay()}.
-	 *
+	 * 
 	 * @param delay
 	 *            sets the new delay of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLRegisterConfig} with the updated

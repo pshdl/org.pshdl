@@ -195,7 +195,7 @@ class StringWriteExtension {
 		}
 		val StringBuilder sb = if(isStatement) highlight.spacing else new StringBuilder
 		sb.append(func.entering(highlight))
-		sb.append(highlight.functionCall(func.nameRefName.toString)).append('(')
+		sb.append(highlight.functionCall(func.functionRefName.toString)).append('(')
 		sb.append('''«FOR HDLExpression p : func.params SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
 		sb.append(')')
 		if (isStatement)

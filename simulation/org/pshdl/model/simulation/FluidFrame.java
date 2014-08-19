@@ -345,12 +345,14 @@ public class FluidFrame {
 	}
 
 	private List<Frame> toFrame(FrameRegister register) {
-		final Set<Integer> internalDependencies = new LinkedHashSet<Integer>();
-		final List<BigInteger> constants = new LinkedList<BigInteger>();
+		final Set<Integer> internalDependencies = new LinkedHashSet<>();
+		final List<BigInteger> constants = new LinkedList<>();
+		final List<String> strings = new LinkedList<>();
 		int stackCount = 0;
 		int maxStackCount = -1;
 		int maxDataWidth = 0;
 		int constantIdCount = 0;
+		int stringIdCount = 0;
 		int posEdge = -1, negEdge = -1;
 		final List<Integer> posPred = new LinkedList<Integer>(), negPred = new LinkedList<Integer>();
 		final List<FastInstruction> instr = new LinkedList<FastInstruction>();
@@ -435,6 +437,10 @@ public class FluidFrame {
 				constants.add(c);
 				arg1 = constantIdCount++;
 				break;
+			case loadConstantString:
+				strings.add(ai.args[0]);
+				arg1 = stringIdCount++;
+				break;
 			case cast_uint:
 			case cast_int:
 				arg1 = Integer.parseInt(ai.args[0]);
@@ -494,8 +500,9 @@ public class FluidFrame {
 			final int[] internalDepRes = toIntArray(internalDependencies);
 			final FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
 			final BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
-			final Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts, id,
-					constant, -1, simProcess);
+			final String[] constStrings = strings.toArray(new String[strings.size()]);
+			final Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts,
+					constStrings, id, constant, -1, simProcess);
 			for (final FluidFrame ff : references) {
 				ff.toFrame(register);
 			}

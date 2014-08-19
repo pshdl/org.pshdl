@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLDirectGeneration;
@@ -39,6 +41,7 @@ import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLIfStatement;
 import org.pshdl.model.HDLInlineFunction;
@@ -58,6 +61,8 @@ import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.extensions.FullNameExtension;
+import org.pshdl.model.impl.AbstractHDLFunctionCall;
+import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQualifiedName;
@@ -95,14 +100,45 @@ public class ScopingExtension {
     return this.resolveVariableDefault(obj, hVar);
   }
   
-  protected Optional<HDLFunction> _resolveFunction(final IHDLObject obj, final HDLQualifiedName hVar) {
+  public Optional<HDLFunction> resolveFunction(final AbstractHDLFunctionCall obj, final HDLQualifiedName hVar) {
     IHDLObject _container = obj.getContainer();
     boolean _tripleEquals = (_container == null);
     if (_tripleEquals) {
       return Optional.<HDLFunction>absent();
     }
     IHDLObject _container_1 = obj.getContainer();
-    return this.resolveFunction(_container_1, hVar);
+    final Optional<Iterable<HDLFunction>> candidates = this.resolveFunctionName(_container_1, hVar);
+    boolean _or = false;
+    boolean _isPresent = candidates.isPresent();
+    boolean _not = (!_isPresent);
+    if (_not) {
+      _or = true;
+    } else {
+      Iterable<HDLFunction> _get = candidates.get();
+      boolean _isEmpty = IterableExtensions.isEmpty(_get);
+      _or = _isEmpty;
+    }
+    if (_or) {
+      return Optional.<HDLFunction>absent();
+    }
+    Iterable<HDLFunction> _get_1 = candidates.get();
+    final SortedSet<HDLFunctions.FunctionScore> scored = HDLFunctions.scoreList(_get_1, ((HDLFunctionCall) obj));
+    boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(scored);
+    if (_isNullOrEmpty) {
+      return Optional.<HDLFunction>absent();
+    }
+    HDLFunctions.FunctionScore _first = scored.first();
+    return Optional.<HDLFunction>of(_first.function);
+  }
+  
+  protected Optional<Iterable<HDLFunction>> _resolveFunctionName(final IHDLObject obj, final HDLQualifiedName hVar) {
+    IHDLObject _container = obj.getContainer();
+    boolean _tripleEquals = (_container == null);
+    if (_tripleEquals) {
+      return Optional.<Iterable<HDLFunction>>absent();
+    }
+    IHDLObject _container_1 = obj.getContainer();
+    return this.resolveFunctionName(_container_1, hVar);
   }
   
   protected Optional<HDLEnum> _resolveEnum(final IHDLObject obj, final HDLQualifiedName hEnum) {
@@ -168,7 +204,7 @@ public class ScopingExtension {
     return _resolver.resolveEnum(hEnum);
   }
   
-  protected Optional<HDLFunction> _resolveFunction(final HDLStatement obj, final HDLQualifiedName hEnum) {
+  protected Optional<Iterable<HDLFunction>> _resolveFunctionName(final HDLStatement obj, final HDLQualifiedName hEnum) {
     HDLResolver _resolver = this.resolver(obj, true);
     return _resolver.resolveFunction(hEnum);
   }
@@ -409,7 +445,7 @@ public class ScopingExtension {
     return res;
   }
   
-  protected Optional<HDLFunction> _resolveFunction(final HDLPackage obj, final HDLQualifiedName hFunc) {
+  protected Optional<Iterable<HDLFunction>> _resolveFunctionName(final HDLPackage obj, final HDLQualifiedName hFunc) {
     HDLLibrary library = obj.getLibrary();
     boolean _tripleEquals = (library == null);
     if (_tripleEquals) {
@@ -507,9 +543,9 @@ public class ScopingExtension {
     return Optional.<HDLEnum>absent();
   }
   
-  protected Optional<HDLFunction> _resolveFunction(final HDLUnit obj, final HDLQualifiedName hFunc) {
+  protected Optional<Iterable<HDLFunction>> _resolveFunctionName(final HDLUnit obj, final HDLQualifiedName hFunc) {
     HDLResolver _resolver = this.resolver(obj, false);
-    final Optional<HDLFunction> resolveEnum = _resolver.resolveFunction(hFunc);
+    final Optional<Iterable<HDLFunction>> resolveEnum = _resolver.resolveFunction(hFunc);
     boolean _isPresent = resolveEnum.isPresent();
     if (_isPresent) {
       return resolveEnum;
@@ -702,15 +738,15 @@ public class ScopingExtension {
     }
   }
   
-  public Optional<HDLFunction> resolveFunction(final IHDLObject obj, final HDLQualifiedName hFunc) {
+  public Optional<Iterable<HDLFunction>> resolveFunctionName(final IHDLObject obj, final HDLQualifiedName hFunc) {
     if (obj instanceof HDLPackage) {
-      return _resolveFunction((HDLPackage)obj, hFunc);
+      return _resolveFunctionName((HDLPackage)obj, hFunc);
     } else if (obj instanceof HDLUnit) {
-      return _resolveFunction((HDLUnit)obj, hFunc);
+      return _resolveFunctionName((HDLUnit)obj, hFunc);
     } else if (obj instanceof HDLStatement) {
-      return _resolveFunction((HDLStatement)obj, hFunc);
+      return _resolveFunctionName((HDLStatement)obj, hFunc);
     } else if (obj != null) {
-      return _resolveFunction(obj, hFunc);
+      return _resolveFunctionName(obj, hFunc);
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
         Arrays.<Object>asList(obj, hFunc).toString());

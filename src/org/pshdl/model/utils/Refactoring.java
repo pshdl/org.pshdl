@@ -390,9 +390,9 @@ public class Refactoring {
 				final HDLQualifiedName fqn = FullNameExtension.fullNameOf(hdf);
 				pkg = pkg.addDeclarations(hdf.setName(fqn.toString()));
 				final HDLQualifiedName sqfn = HDLQualifiedName.create(fqn.getLastSegment());
-				final Collection<HDLFunctionCall> allRefs = HDLQuery.select(HDLFunctionCall.class).from(subUnit).where(HDLFunctionCall.fName).isEqualTo(sqfn).getAll();
+				final Collection<HDLFunctionCall> allRefs = HDLQuery.select(HDLFunctionCall.class).from(subUnit).where(HDLFunctionCall.fFunction).isEqualTo(sqfn).getAll();
 				for (final HDLFunctionCall ref : allRefs) {
-					ms.replace(ref, ref.setName(fqn));
+					ms.replace(ref, ref.setFunction(fqn));
 				}
 			}
 			if (decl instanceof HDLInterfaceDeclaration) {

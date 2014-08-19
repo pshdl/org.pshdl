@@ -2,7 +2,7 @@
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
  *
- *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	}
 
 	public HDLFunctionCall getCall(HDLExpression... args) {
-		return new HDLFunctionCall().setName(FullNameExtension.fullNameOf(this)).setParams(Arrays.asList(args));
+		return new HDLFunctionCall().setFunction(FullNameExtension.fullNameOf(this)).setParams(Arrays.asList(args));
 	}
 	// $CONTENT-END$
 

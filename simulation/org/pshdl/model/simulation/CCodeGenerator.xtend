@@ -104,7 +104,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			override newInstance() {
 				val ProcessBuilder execBuilder = new ProcessBuilder(executable.getAbsolutePath())
 				val Process testExec = execBuilder.directory(tempDir).redirectErrorStream(true).start()
-				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5)
+				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5, executable.getAbsolutePath())
 			}
 		}
 	}

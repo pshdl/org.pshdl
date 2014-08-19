@@ -41,7 +41,7 @@ public interface IHDLFunctionResolver {
 
 	public Optional<BigInteger> evaluate(HDLFunctionCall function, List<BigInteger> args, HDLEvaluationContext context);
 
-	public Range<BigInteger> range(HDLFunctionCall function, HDLEvaluationContext context);
+	public Optional<Range<BigInteger>> range(HDLFunctionCall function, HDLEvaluationContext context);
 
 	public String[] getFunctionNames();
 

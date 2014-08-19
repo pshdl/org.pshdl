@@ -33,7 +33,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.pshdl.interpreter.frames.BigIntegerFrame;
@@ -532,21 +531,7 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLFunctionCall obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    final List<BigInteger> args = new LinkedList<BigInteger>();
-    ArrayList<HDLExpression> _params = obj.getParams();
-    for (final HDLExpression arg : _params) {
-      {
-        final Optional<BigInteger> bigVal = this.subEvaluate(obj, arg, context, evaled);
-        boolean _isPresent = bigVal.isPresent();
-        boolean _not = (!_isPresent);
-        if (_not) {
-          return Optional.<BigInteger>absent();
-        }
-        BigInteger _get = bigVal.get();
-        args.add(_get);
-      }
-    }
-    return HDLFunctions.constantEvaluate(obj, args, context);
+    return HDLFunctions.constantEvaluate(obj, context);
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLVariableRef obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {

@@ -48,7 +48,9 @@ import org.pshdl.model.IHDLObject;
 import org.pshdl.model.extensions.ScopingExtension;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 
 public class HDLResolver {
 
@@ -58,7 +60,7 @@ public class HDLResolver {
 
 	private Map<HDLQualifiedName, HDLInterface> ifCache;
 
-	private Map<HDLQualifiedName, HDLFunction> funcCache;
+	private Multimap<HDLQualifiedName, HDLFunction> funcCache;
 
 	private final IHDLObject resolveTo;
 
@@ -124,24 +126,24 @@ public class HDLResolver {
 		return ScopingExtension.INST.resolveEnum(resolveContainer, hEnum);
 	}
 
-	public Optional<HDLFunction> resolveFunction(HDLQualifiedName hEnum) {
+	public Optional<Iterable<HDLFunction>> resolveFunction(HDLQualifiedName hEnum) {
 		if (funcCache == null) {
 			synchronized (this) {
-				final HDLFunction[] enumDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
-				funcCache = Maps.newLinkedHashMap();
-				for (final HDLFunction hdlEnumDeclaration : enumDecl) {
-					funcCache.put(fullNameOf(hdlEnumDeclaration), hdlEnumDeclaration);
+				final HDLFunction[] funcDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
+				funcCache = LinkedHashMultimap.create();
+				for (final HDLFunction hdlfuncDeclaration : funcDecl) {
+					funcCache.put(fullNameOf(hdlfuncDeclaration), hdlfuncDeclaration);
 				}
 			}
 		}
 		// XXX Check if the qualifier does either match the pkg name, or is not
 		// existant
-		final HDLFunction checkCache = checkCache(hEnum, funcCache);
-		if (checkCache != null)
+		final Iterable<HDLFunction> checkCache = checkCache(hEnum, funcCache);
+		if ((checkCache != null) && checkCache.iterator().hasNext())
 			return Optional.of(checkCache);
 		if ((resolveContainer == null) || !descent)
 			return Optional.absent();
-		return ScopingExtension.INST.resolveFunction(resolveContainer, hEnum);
+		return ScopingExtension.INST.resolveFunctionName(resolveContainer, hEnum);
 	}
 
 	public Optional<HDLInterface> resolveInterface(HDLQualifiedName hIf) {
@@ -232,6 +234,17 @@ public class HDLResolver {
 		if ((container == null) || !descent)
 			return Optional.absent();
 		return ScopingExtension.INST.resolveVariable(container, var);
+	}
+
+	private <T> Iterable<T> checkCache(HDLQualifiedName var, Multimap<HDLQualifiedName, T> map) {
+		if (map.get(var) != null)
+			return map.get(var);
+		if (var.length == 1) {
+			final HDLQualifiedName fqn = resolveName.append(var);
+			if (map.get(fqn) != null)
+				return map.get(fqn);
+		}
+		return null;
 	}
 
 	private <T> T checkCache(HDLQualifiedName var, Map<HDLQualifiedName, T> map) {

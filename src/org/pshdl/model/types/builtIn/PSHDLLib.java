@@ -26,22 +26,11 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
-import java.util.Map.Entry;
-
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
-import org.pshdl.model.HDLFunction;
-import org.pshdl.model.HDLFunctionParameter;
-import org.pshdl.model.HDLFunctionParameter.RWType;
-import org.pshdl.model.HDLFunctionParameter.Type;
-import org.pshdl.model.HDLNativeFunction;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.utils.HDLCore;
-import org.pshdl.model.utils.services.CompilerInformation;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation;
-import org.pshdl.model.utils.services.CompilerInformation.FunctionInformation.FunctionType;
-import org.pshdl.model.utils.services.IServiceProvider;
 
 public class PSHDLLib {
 
@@ -53,34 +42,6 @@ public class PSHDLLib {
 	public static final HDLEnum SYNC = new HDLEnum().setName("Sync").addEnums(new HDLVariable().setName("ASYNC")).addEnums(new HDLVariable().setName("SYNC"));
 	public static final HDLEnum ASSERT = new HDLEnum().setName("Assert").addEnums(new HDLVariable().setName("FATAL")).addEnums(new HDLVariable().setName("ERROR"))
 			.addEnums(new HDLVariable().setName("WARNING")).addEnums(new HDLVariable().setName("INFO"));
-
-	public static final HDLFunction ABS_UINT = createABS(Type.ANY_UINT);
-	public static final HDLFunction ABS_INT = createABS(Type.ANY_INT);
-
-	private static HDLFunction createABS(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("abs").setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ));
-	}
-
-	public static final HDLFunction MIN_UINT = createMIN(Type.ANY_UINT);
-	public static final HDLFunction MIN_INT = createMIN(Type.ANY_INT);
-
-	private static HDLFunction createMIN(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("min").setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")).setRw(RWType.READ));
-	}
-
-	public static final HDLFunction MAX_INT = createMAX(Type.ANY_INT);
-	public static final HDLFunction MAX_UINT = createMAX(Type.ANY_UINT);
-
-	private static HDLFunction createMAX(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("max").setReturnType(new HDLFunctionParameter().setType(type).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("a")).setRw(RWType.READ))
-				.addArgs(new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName("b")).setRw(RWType.READ));
-	}
-
-	public static final HDLFunction[] FUNCTIONS = new HDLFunction[] { MIN_UINT, MAX_UINT, ABS_UINT, MIN_INT, MAX_INT, ABS_INT };
 
 	private static HDLPackage LIB = null;
 	private static Object LIB_LOCK = new Object();
@@ -94,14 +55,6 @@ public class PSHDLLib {
 				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ACTIVE));
 				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(SYNC));
 				pkg = pkg.addDeclarations(new HDLEnumDeclaration().setHEnum(ASSERT));
-				for (final HDLFunction func : FUNCTIONS) {
-					pkg = pkg.addDeclarations(func);
-				}
-				final CompilerInformation info = HDLCore.getCompilerInformation();
-				for (final Entry<String, FunctionInformation> e : info.registeredFunctions.entrySet())
-					if (e.getValue().type == FunctionType.NATIVE) {
-						pkg = pkg.addDeclarations(new HDLNativeFunction().setName(e.getValue().name).setSimOnly(e.getValue().simulationOnly));
-					}
 				pkg.freeze(null);
 				LIB = pkg;
 			}
@@ -110,7 +63,7 @@ public class PSHDLLib {
 	}
 
 	public static void main(String[] args) {
-		HDLCore.init(new IServiceProvider.ServiceLoaderProvider());
+		HDLCore.defaultInit();
 		final HDLPackage lib2 = getLib();
 		System.out.println(lib2.toString());
 		lib2.validateAllFields(null, true);

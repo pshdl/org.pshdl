@@ -961,7 +961,10 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence writeInternal(InternalInformation internal, String tempName, List<Integer> arr) {
 		final StringBuilder sb = new StringBuilder();
-		final CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, arr, sb);
+		CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, arr, sb);
+		if (!internal.isPred) {
+			assignValue = fixupValue(assignValue, getTargetSizeWithType(internal.info), true);
+		}
 		if (internal.isShadowReg) {
 			final String cpyName = tempName + "_cpy";
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;

@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
 public interface IServiceProvider {
 	public Collection<IHDLAnnotation> getAllAnnotations();
 
-	public Collection<IHDLFunctionResolver> getAllFunctions();
+	public Collection<INativeFunctionProvider> getAllFunctions();
 
 	public Collection<IHDLGenerator> getAllGenerators();
 
@@ -61,10 +61,10 @@ public interface IServiceProvider {
 		}
 
 		@Override
-		public Collection<IHDLFunctionResolver> getAllFunctions() {
-			final ServiceLoader<IHDLFunctionResolver> functions = ServiceLoader.load(IHDLFunctionResolver.class);
-			final List<IHDLFunctionResolver> res = new LinkedList<IHDLFunctionResolver>();
-			for (final IHDLFunctionResolver func : functions) {
+		public Collection<INativeFunctionProvider> getAllFunctions() {
+			final ServiceLoader<INativeFunctionProvider> functions = ServiceLoader.load(INativeFunctionProvider.class);
+			final List<INativeFunctionProvider> res = new LinkedList<>();
+			for (final INativeFunctionProvider func : functions) {
 				res.add(func);
 			}
 			return res;

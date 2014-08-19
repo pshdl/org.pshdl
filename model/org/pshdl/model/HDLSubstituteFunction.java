@@ -2,7 +2,7 @@
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
  *
- *     Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
+ *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -113,23 +113,16 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 	public HDLStatement[] getReplacementStatements(HDLFunctionCall hdi) {
 		final ArrayList<HDLFunctionParameter> args = getArgs();
 		final ArrayList<HDLExpression> params = hdi.getParams();
-		return createStatements(args, params, hdi);
-	}
-
-	public static final String META = "INLINED_FROM";
-
-	private HDLStatement[] createStatements(ArrayList<HDLFunctionParameter> args, Iterable<HDLExpression> params, IHDLObject origin) {
 		final HDLStatement[] res = new HDLStatement[getStmnts().size()];
 		int pos = 0;
 		for (final HDLStatement stmnt : getStmnts()) {
-			res[pos++] = substitute(args, params, stmnt, origin);
+			res[pos++] = substitute(args, params, stmnt, hdi);
 		}
 		return res;
 	}
 
-	public HDLStatement[] getReplacementExpressionArgs(IHDLObject origin, HDLExpression... args) {
-		return createStatements(getArgs(), asList(args), origin);
-	}
+	public static final String META = "INLINED_FROM";
+
 	// $CONTENT-END$
 
 }
