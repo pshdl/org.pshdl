@@ -53,8 +53,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 
 	new(){
 	}
-	new(ExecutableModel em, String packageName, String unitName, int maxCosts) {
-		super(em, 64, maxCosts)
+	new(ExecutableModel em, String packageName, String unitName, int maxCosts, boolean purgeAlias) {
+		super(em, 64, maxCosts, purgeAlias)
 		this.packageName = packageName
 		this.unitName = unitName
 	}
@@ -113,7 +113,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		public String getName(int idx) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
-					case «varIdx.get(v.name)»: return "«v.name»";
+					case «v.getVarIdx(false)»: return "«v.name»";
 				«ENDFOR»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
@@ -198,13 +198,13 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 				this.«DISABLE_EDGES.name»=«DISABLE_EDGES.name»;
 				this.«DISABLE_REG_OUTPUTLOGIC.name»=«DISABLE_REG_OUTPUTLOGIC.name»;
 				«FOR v : em.variables.excludeNull»
-					varIdx.put("«v.name»", «varIdx.get(v.name)»);
+					varIdx.put("«v.name»", «v.getVarIdx(purgeAliases)»);
 				«ENDFOR»
 			}
 		«ELSE»
 			public «unitName»() {
 				«FOR v : em.variables.excludeNull»
-					varIdx.put("«v.name»", «varIdx.get(v.name)»);
+					varIdx.put("«v.name»", «v.getVarIdx(purgeAliases)»);
 				«ENDFOR»
 			}
 			public «unitName»(boolean «DISABLE_EDGES.name», boolean «DISABLE_REG_OUTPUTLOGIC.name») {
@@ -339,7 +339,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 
 import org.pshdl.interpreter.IChangeListener;
 import org.pshdl.interpreter.IHDLInterpreter;
-import java.math.BigInteger;
+import java.util.Arrays;
 
 public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implements IHDLInterpreter{
 	«fieldDeclarations(false, true)»
@@ -355,7 +355,7 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 		this.module=module;
 		this.listeners=listeners;
 		«IF useInterface»
-		«FOR varInfo : em.variables.excludeNull»
+		«FOR varInfo : em.variables.excludeNullAndAlias»
 			«varInfo.idName(true, NONE)»_idx=module.getIndex("«varInfo.name»");
 		«ENDFOR»
 	«ENDIF»
@@ -364,7 +364,7 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 	@Override
 	public void run() {
 		module.run();
-		«FOR varInfo : em.variables.excludeNull»
+		«FOR varInfo : em.variables.excludeNullAndAlias»
 			«val CharSequence varName = varInfo.idName(true, NONE)»
 			«IF useInterface»
 				«varInfo.changedNotificationInterface»
@@ -464,7 +464,7 @@ public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implem
 boolean[] tempArr=new boolean[«vi.arraySize»];
 for (int i=0;i<«vi.arraySize»;i++)
 	tempArr[i]=module.getOutputLong(«varName»_idx)!=0;
-if (!tempArr.equals(«varName»))
+if (!Arrays.equals(tempArr,«varName»))
 	for (IChangeListener listener:listeners)
 		listener.valueChangedPredicateArray(getDeltaCycle(), "«vi.name»", «varName», tempArr, «varNameUpdate», -1);
 }
@@ -474,7 +474,7 @@ if (!tempArr.equals(«varName»))
 long[] tempArr=new long[«vi.arraySize»];
 for (int i=0;i<«vi.arraySize»;i++)
 	tempArr[i]=module.getOutputLong(«varName»_idx, i);
-if (!tempArr.equals(«varName»))
+if (!Arrays.equals(tempArr,«varName»))
 	for (IChangeListener listener:listeners)
 		listener.valueChangedLongArray(getDeltaCycle(), "«vi.name»", «varName», tempArr);
 }
@@ -569,11 +569,11 @@ if (!tempArr.equals(«varName»))
 			pkg = moduleName.substring(0, li - 1)
 		}
 		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName);
+		doCompile(syntaxProblems, em, pkg, unitName, false);
 	}
 	
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName) {
-		val comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE)
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean purgeAlias) {
+		val comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE, purgeAlias)
 		val code = comp.generateMainCode
 		val sideFiles=Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)

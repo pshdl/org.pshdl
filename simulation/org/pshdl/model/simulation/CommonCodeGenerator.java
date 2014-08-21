@@ -87,28 +87,29 @@ public abstract class CommonCodeGenerator {
 	protected static final EnumSet<Attributes> NONE = EnumSet.noneOf(Attributes.class);
 	protected final ExecutableModel em;
 	protected int indent = 0;
-	protected Map<String, Integer> varIdx = Maps.newLinkedHashMap();
-	protected Map<String, Integer> intIdx = Maps.newLinkedHashMap();
-	protected Set<String> prevMapPos = Sets.newLinkedHashSet();
-	protected Set<String> prevMapNeg = Sets.newLinkedHashSet();
-	protected boolean hasClock;
+	protected final Map<String, Integer> varIdx = Maps.newLinkedHashMap();
+	protected final Set<String> prevMapPos = Sets.newLinkedHashSet();
+	protected final Set<String> prevMapNeg = Sets.newLinkedHashSet();
+	protected final boolean hasClock;
 	protected final int bitWidth;
 	protected final int maxCosts;
+	protected final boolean purgeAliases;
 
 	protected CommonCodeGenerator() {
 		em = null;
 		bitWidth = 64;
 		maxCosts = Integer.MAX_VALUE;
+		hasClock = false;
+		purgeAliases = false;
 	}
 
-	protected CommonCodeGenerator(ExecutableModel em, int bitWidth, int maxCosts) {
+	protected CommonCodeGenerator(ExecutableModel em, int bitWidth, int maxCosts, boolean purgeAliases) {
 		this.em = em;
 		this.bitWidth = bitWidth;
+		this.maxCosts = maxCosts;
+		this.purgeAliases = purgeAliases;
 		for (int i = 0; i < em.variables.length; i++) {
 			varIdx.put(em.variables[i].name, i);
-		}
-		for (int i = 0; i < em.internals.length; i++) {
-			intIdx.put(em.internals[i].fullName, i);
 		}
 		for (final Frame f : em.frames) {
 			if (f.edgeNegDepRes != -1) {
@@ -119,11 +120,13 @@ public abstract class CommonCodeGenerator {
 			}
 		}
 		this.hasClock = !prevMapPos.isEmpty() || !prevMapNeg.isEmpty();
-		this.maxCosts = maxCosts;
 	}
 
 	protected InternalInformation asInternal(int id) {
-		return em.internals[id];
+		final InternalInformation internal = em.internals[id];
+		if (purgeAliases && (internal.aliasID != -1))
+			return em.internals[internal.aliasID];
+		return internal;
 	}
 
 	public String generateMainCode() {
@@ -274,6 +277,9 @@ public abstract class CommonCodeGenerator {
 		}
 		for (final Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
 			final Frame frame = iterator.next();
+			if (purgeAliases && frame.isRename()) {
+				continue;
+			}
 			stageCosts += estimateFrameCosts(frame);
 			sb.append(predicateCheckedFrameCall(frame));
 			if ((stageCosts > maxCosts) && iterator.hasNext()) {
@@ -316,23 +322,23 @@ public abstract class CommonCodeGenerator {
 		final List<CharSequence> predicates = Lists.newArrayList();
 		final List<Integer> arr = Collections.emptyList();
 		if (frame.edgeNegDepRes != -1) {
-			predicates.add(internalWithArrayAccess(em.internals[frame.edgeNegDepRes], arr, EnumSet.of(isNegEdgeActive)));
-			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgeNegDepRes], arr, EnumSet.of(isNegEdgeHandled)));
+			predicates.add(internalWithArrayAccess(asInternal(frame.edgeNegDepRes), arr, EnumSet.of(isNegEdgeActive)));
+			predicates.add("!" + internalWithArrayAccess(asInternal(frame.edgeNegDepRes), arr, EnumSet.of(isNegEdgeHandled)));
 		}
 		if (frame.edgePosDepRes != -1) {
-			predicates.add(internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isPosEdgeActive)));
-			predicates.add("!" + internalWithArrayAccess(em.internals[frame.edgePosDepRes], arr, EnumSet.of(isPosEdgeHandled)));
+			predicates.add(internalWithArrayAccess(asInternal(frame.edgePosDepRes), arr, EnumSet.of(isPosEdgeActive)));
+			predicates.add("!" + internalWithArrayAccess(asInternal(frame.edgePosDepRes), arr, EnumSet.of(isPosEdgeHandled)));
 		}
 		if (frame.predNegDepRes != null) {
 			for (final int pred : frame.predNegDepRes) {
-				predicates.add("!" + internalWithArrayAccess(em.internals[pred], arr, PREDICATE));
-				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
+				predicates.add("!" + internalWithArrayAccess(asInternal(pred), arr, PREDICATE));
+				predicates.add(internalWithArrayAccess(asInternal(pred), arr, EnumSet.of(isPredFresh)));
 			}
 		}
 		if (frame.predPosDepRes != null) {
 			for (final int pred : frame.predPosDepRes) {
-				predicates.add(internalWithArrayAccess(em.internals[pred], arr, PREDICATE));
-				predicates.add(internalWithArrayAccess(em.internals[pred], arr, EnumSet.of(isPredFresh)));
+				predicates.add(internalWithArrayAccess(asInternal(pred), arr, PREDICATE));
+				predicates.add(internalWithArrayAccess(asInternal(pred), arr, EnumSet.of(isPredFresh)));
 			}
 		}
 		return callFrameWithPredicates(frame, predicates);
@@ -358,7 +364,7 @@ public abstract class CommonCodeGenerator {
 		if (predicates != null) {
 			for (final int pred : predicates) {
 				if ((pred != -1) && !handledPredicates.contains(pred)) {
-					sb.append(indent()).append(updatePredicate(pred, positive)).append(newLine());
+					sb.append(indent()).append(updatePredicateFreshness(pred, positive)).append(newLine());
 					handledPredicates.add(pred);
 				}
 			}
@@ -366,13 +372,13 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence updatePredicate(int pred, boolean positive) {
+	protected CharSequence updatePredicateFreshness(int pred, boolean positive) {
 		final StringBuilder sb = new StringBuilder();
 		final List<Integer> arr = Collections.emptyList();
-		final InternalInformation internal = em.internals[pred];
+		final InternalInformation internal = asInternal(pred);
 		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, UPDATE);
 		final CharSequence isFresh = condition(Condition.isEqual, updateInternal, idName(TIMESTAMP, true, NONE));
-		sb.append(assignInternal(em.internals[pred], isFresh, arr, EnumSet.of(Attributes.isPredFresh)));
+		sb.append(assignInternal(asInternal(pred), isFresh, arr, EnumSet.of(Attributes.isPredFresh)));
 		return sb;
 	}
 
@@ -388,7 +394,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence updateHandledClk(int edgeDepRes, boolean posEdge) {
 		final List<Integer> arr = Collections.emptyList();
-		final InternalInformation internal = em.internals[edgeDepRes];
+		final InternalInformation internal = asInternal(edgeDepRes);
 		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, UPDATE);
 		final StringBuilder sb = new StringBuilder();
 		sb.append(assignInternal(internal, skipEdge(updateInternal), arr, EnumSet.of(posEdge ? isPosEdgeHandled : isNegEdgeHandled)));
@@ -402,9 +408,14 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence getOutputCases(CharSequence cast) {
 		indent++;
 		final StringBuilder result = new StringBuilder();
-		for (final VariableInformation vi : em.variables) {
+		final VariableInformation[] variables = em.variables;
+		for (int i = 0; i < variables.length; i++) {
+			VariableInformation vi = variables[i];
 			if (isNull(vi)) {
 				continue;
+			}
+			if (purgeAliases && (vi.aliasVar != null)) {
+				vi = vi.aliasVar;
 			}
 			final StringBuilder value = new StringBuilder();
 			value.append(indent());
@@ -422,7 +433,7 @@ public abstract class CommonCodeGenerator {
 					value.append(returnValue(fixupValue));
 				}
 			}
-			result.append(makeCase(constant(varIdx.get(vi.name), true), value, false));
+			result.append(makeCase(constant(i, true), value, false));
 		}
 		indent--;
 		return result;
@@ -435,9 +446,14 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence setInputCases(CharSequence valueName, CharSequence cast) {
 		indent++;
 		final StringBuilder result = new StringBuilder();
-		for (final VariableInformation vi : em.variables) {
+		final VariableInformation[] variables = em.variables;
+		for (int i = 0; i < variables.length; i++) {
+			VariableInformation vi = variables[i];
 			if (isNull(vi)) {
 				continue;
+			}
+			if (purgeAliases && (vi.aliasVar != null)) {
+				vi = vi.aliasVar;
 			}
 			final StringBuilder value = new StringBuilder();
 			value.append(indent());
@@ -457,7 +473,7 @@ public abstract class CommonCodeGenerator {
 					value.append(newLine()).append(indent()).append(assignArrayElement(vi, assignValue, calculateVariableAccessIndexArr(vi), true, SHADOWREG, !isPredicate(vi)));
 				}
 			}
-			result.append(makeCase(constant(varIdx.get(vi.name), true), value, true));
+			result.append(makeCase(constant(i, true), value, true));
 		}
 		indent--;
 		return result;
@@ -521,7 +537,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence updateEdge(int edgeDepRes, boolean posEdge) {
 		final List<Integer> arr = Collections.emptyList();
-		final InternalInformation internal = em.internals[edgeDepRes];
+		final InternalInformation internal = asInternal(edgeDepRes);
 		final CharSequence prevInternal = internalWithArrayAccess(internal, arr, EnumSet.of(isPrev));
 		final CharSequence currInternal = internalWithArrayAccess(internal, arr, NONE);
 		final StringBuilder value = new StringBuilder();
@@ -647,6 +663,9 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence frames() {
 		final StringBuilder sb = new StringBuilder();
 		for (final Frame frame : em.frames) {
+			if (purgeAliases && frame.isRename()) {
+				continue;
+			}
 			sb.append(indent()).append(functionHeader(frame));
 			sb.append(preFrameExecution(frame));
 			sb.append(frameExecution(frame));
@@ -688,11 +707,17 @@ public abstract class CommonCodeGenerator {
 		final VariableInformation varInfo = outputInternal.info;
 		if (!isNull(varInfo)) {
 			sb.append(writeInternal(outputInternal, last, arr)).append(newLine());
-			if (outputInternal.isPred) {
-				sb.append(indent()).append(assignInternal(outputInternal, idName(TIMESTAMP, true, NONE), arr, UPDATE)).append(comment("update timestamp"));
-			}
+			sb.append(updatePrediateTimestamp(arr, outputInternal));
 		} else {
 			sb.append(writeToNull(last));
+		}
+		return sb;
+	}
+
+	protected CharSequence updatePrediateTimestamp(final List<Integer> arr, final InternalInformation outputInternal) {
+		final StringBuilder sb = new StringBuilder();
+		if (outputInternal.isPred) {
+			sb.append(indent()).append(assignInternal(outputInternal, idName(TIMESTAMP, true, NONE), arr, UPDATE)).append(comment("update timestamp"));
 		}
 		return sb;
 	}
@@ -873,7 +898,7 @@ public abstract class CommonCodeGenerator {
 		switch (exec.inst) {
 		case isFallingEdge:
 		case isRisingEdge:
-			sb.append(assignInternal(em.internals[exec.arg1], idName(TIMESTAMP, true, NONE), arr, EnumSet.of(Attributes.isUpdate)));
+			sb.append(assignInternal(asInternal(exec.arg1), idName(TIMESTAMP, true, NONE), arr, EnumSet.of(Attributes.isUpdate)));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
@@ -926,10 +951,10 @@ public abstract class CommonCodeGenerator {
 			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true, -1), true));
 			break;
 		case loadInternal:
-			sb.append(assignTempVar(-1, pos, NONE, loadInternal(em.internals[exec.arg1], arr, NONE), false));
+			sb.append(assignTempVar(-1, pos, NONE, loadInternal(asInternal(exec.arg1), arr, NONE), false));
 			break;
 		case writeInternal:
-			sb.append(writeInternal(em.internals[exec.arg1], getTempName(a, NONE), arr));
+			sb.append(writeInternal(asInternal(exec.arg1), getTempName(a, NONE), arr));
 			break;
 		case pushAddIndex:
 			sb.append(assignIndexVar(arr, a));
@@ -1341,6 +1366,9 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		preFieldDeclaration();
 		for (final VariableInformation var : excludeNull(em.variables)) {
+			if (purgeAliases && (var.aliasVar != null)) {
+				continue;
+			}
 			if (hasPrev(var) && includePrivate) {
 				sb.append(indent()).append(createVarDeclaration(var, EnumSet.of(isPrev), initialize)).append(newLine());
 				if (prevMapPos.contains(var.name)) {
@@ -1626,10 +1654,12 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected int getVarIdx(InternalInformation ii) {
-		return getVarIdx(ii.info);
+		return getVarIdx(ii.info, purgeAliases);
 	}
 
-	protected int getVarIdx(VariableInformation vi) {
+	protected int getVarIdx(VariableInformation vi, boolean aliased) {
+		if (aliased && (vi.aliasVar != null))
+			return varIdx.get(vi.aliasVar.name);
 		return varIdx.get(vi.name);
 	}
 
@@ -1651,6 +1681,16 @@ public abstract class CommonCodeGenerator {
 
 	protected Iterable<VariableInformation> excludeNull(VariableInformation... vars) {
 		return excludeNull(Lists.newArrayList(vars));
+	}
+
+	protected Iterable<VariableInformation> excludeNullAndAlias(Iterable<VariableInformation> vars) {
+		return Iterables.filter(vars, new Predicate<VariableInformation>() {
+
+			@Override
+			public boolean apply(VariableInformation input) {
+				return !isNull(input) && (input.aliasVar == null);
+			}
+		});
 	}
 
 	protected Iterable<VariableInformation> excludeNull(Iterable<VariableInformation> vars) {

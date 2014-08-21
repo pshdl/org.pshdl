@@ -58,16 +58,15 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 	new() {
 	}
 
-	new(ExecutableModel em, int maxCosts, String pkg, String unit) {
-		super(em, 64, maxCosts)
+	new(ExecutableModel em, int maxCosts, String pkg, String unit, boolean purgeAlias) {
+		super(em, 64, maxCosts,purgeAlias)
 		this.pkg = pkg
 		this.unit = unit.toFirstUpper
 		cce = new CommonCompilerExtension(em, 64)
 	}
 
 	def public IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir){
-		val GoCodeGenerator dc = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unit);
-		val CharSequence dartCode = dc.generateMainCode();
+		val CharSequence dartCode = generateMainCode();
 		val File dutFile = new File(tempDir, "TestUnit.go");
 		Files.createParentDirs(dutFile);
 		Files.write(dartCode, dutFile, StandardCharsets.UTF_8);
@@ -98,13 +97,14 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 	override protected preFieldDeclarations() '''type «unit» struct {
 	varIdx map[string]int
 
-	regUpdates   []regUpdate
+	regUpdates   [«maxRegUpdates»]regUpdate
 	regUpdatePos int
 	'''
 
 	override protected postFieldDeclarations() '''}
 func (s *«unit») updateRegs() {
-	for _, reg := range s.regUpdates {
+	for i:=0; i<s.regUpdatePos; i++ {
+		reg:=s.regUpdates[i]
 		switch reg.internal {
 		«updateRegCases»
 		}
@@ -186,7 +186,7 @@ func (s *«unit») GetIndex(name string) int {
 func (s *«unit») GetName(idx int) string {
 	switch idx {
 	«FOR VariableInformation vi : em.variables»
-	case «vi.varIdx»:
+	case «vi.getVarIdx(false)»:
 		return "«vi.name»"
 	«ENDFOR»
 	default:
@@ -247,10 +247,9 @@ func New«unit»WithArgs(«DISABLE_EDGES.name», «DISABLE_REG_OUTPUTLOGIC.name�
 		«DISABLE_REG_OUTPUTLOGIC.name»: «DISABLE_REG_OUTPUTLOGIC.name»,
 	}
  
-	s.regUpdates = make([]regUpdate, «maxRegUpdates»)
 	s.varIdx = make(map[string]int, «em.variables.size - 1»)
 	«FOR v : em.variables.excludeNull»
-		s.varIdx["«v.name»"] =  «varIdx.get(v.name)»
+		s.varIdx["«v.name»"] =  «v.getVarIdx(purgeAliases)»
 	«ENDFOR»
 	«FOR v : em.variables.filter[array]»
 		«v.idName(true, NONE)» = make([]int64, «v.arraySize»)
@@ -409,11 +408,11 @@ func pow(a int64, n int64) int64 {
 			pkg = moduleName.substring(0, li - 1)
 		}
 		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName);
+		doCompile(syntaxProblems, em, pkg, unitName, false);
 	}
 
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName) {
-		val comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName)
+	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean purgeAlias) {
+		val comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName, purgeAlias)
 		val code = comp.generateMainCode
 		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)

@@ -59,16 +59,15 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	new() {
 	}
 
-	new(ExecutableModel model, String unitName, String library, boolean usePackageImport, int maxCosts) {
-		super(model, -1, maxCosts)
+	new(ExecutableModel model, String unitName, String library, boolean usePackageImport, int maxCosts, boolean purgeAlias) {
+		super(model, -1, maxCosts, purgeAlias)
 		this.unitName = unitName
 		this.library = library
 		this.usePackageImport = usePackageImport
 	}
 
 	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
-		val dc = new DartCodeGenerator(em, unitName, library, true, Integer.MAX_VALUE)
-		val dartCode = dc.generateMainCode()
+		val dartCode = generateMainCode()
 		val File binDir = new File(tempDir, "bin")
 		if (!binDir.mkdirs())
 			throw new IllegalArgumentException("Failed to create Directory " + binDir)
@@ -200,7 +199,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	String getName(int idx) {
 		switch (idx) {
 			«FOR v : em.variables»
-				case «varIdx.get(v.name)»: return "«v.name.replaceAll("[\\$]", "\\\\\\$")»";
+				case «v.getVarIdx(false)»: return "«v.name.replaceAll("[\\$]", "\\\\\\$")»";
 			«ENDFOR»
 			default:
 				throw new ArgumentError("Not a valid index: $idx");
@@ -223,6 +222,11 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	set «DISABLE_EDGES.name»(bool newVal) => «DISABLE_EDGES.idName(true, NONE)»=newVal;
 	bool get «DISABLE_REG_OUTPUTLOGIC.name» => «DISABLE_REG_OUTPUTLOGIC.idName(true, NONE)»;
 	set «DISABLE_REG_OUTPUTLOGIC.name»(bool newVal) => «DISABLE_REG_OUTPUTLOGIC.idName(true, NONE)»=newVal;
+	
+	«FOR VariableInformation vi: em.variables.excludeNull»
+	int get «vi.name.idName(false, NONE)» => «vi.name.idName(true, NONE)»;
+	set «vi.name.idName(false, NONE)»(int newVal) => «vi.name.idName(true, NONE)»=newVal;
+	«ENDFOR»
 	
 	«description»
 }
@@ -314,7 +318,7 @@ class «unitName» extends DartInterpreter{
 	
 	Map<String, int> _varIdx={
 		«FOR v : em.variables SEPARATOR ','»
-			"«v.name.replaceAll("[\\$]", "\\\\\\$")»": «varIdx.get(v.name)»
+			"«v.name.replaceAll("[\\$]", "\\\\\\$")»": «v.getVarIdx(purgeAliases)»
 		«ENDFOR»
 	};
 	
@@ -462,12 +466,12 @@ import '../simulation_comm.dart';
 			pkg = moduleName.substring(0, li - 1)
 		}
 		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName, true);
+		doCompile(syntaxProblems, em, pkg, unitName, true, false);
 	}
 
 	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName,
-		boolean usePackageImport) {
-		val comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE)
+		boolean usePackageImport, boolean purgeAlias) {
+		val comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE, purgeAlias)
 		val code = comp.generateMainCode
 		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)

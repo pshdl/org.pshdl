@@ -81,7 +81,8 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 	public MultiOption getUsage() {
 		final Options options = new Options();
 		options.addOption(new Option("o", "outputDir", true, "Specify the directory to which the files will be written, default is: src-gen/psex/[type]"));
-		options.addOption(new Option("noEm", "disable the output of the byte-code .em file"));
+		options.addOption(new Option("em", "enable the output of the byte-code .em file"));
+		options.addOption(new Option("allSignals", "disable the removal of redundant variables"));
 		options.addOption(new Option("ir", "dump the intermediate PSHDL code"));
 		options.addOption(OptionBuilder.withArgName(listTypes("|"))
 				.withDescription("The output type to generate. Valid options are: " + listTypes(", ") + ". Each type may require additional command line arguments").hasArg()
@@ -141,8 +142,8 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 			if (!dir.mkdirs())
 				throw new IllegalArgumentException("Failed to create direcory:" + dir);
 		}
-		final ExecutableModel em = createExecutable(unit, src, cli.hasOption("ir"));
-		if (!cli.hasOption("noEm")) {
+		final ExecutableModel em = createExecutable(unit, src, cli.hasOption("ir"), !cli.hasOption("allSignals"));
+		if (cli.hasOption("em")) {
 			IOUtil.writeExecutableModel(System.currentTimeMillis(), em, new File(dir, unitName.toString() + ".em"));
 		}
 		if (type != null) {
@@ -155,7 +156,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		return null;
 	}
 
-	public static ExecutableModel createExecutable(HDLUnit unit, String src, boolean dumpIntermediate) throws CycleException {
+	public static ExecutableModel createExecutable(HDLUnit unit, String src, boolean dumpIntermediate, boolean purgeAliases) throws CycleException {
 		final HDLEvaluationContext context = HDLEvaluationContext.createDefault(unit);
 		final HDLUnit simulationModel = HDLSimulator.createSimulationModel(unit, context, src, '_');
 		if (dumpIntermediate) {
@@ -169,7 +170,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		final HDLQualifiedName fqn = FullNameExtension.fullNameOf(simulationModel);
 		final ExecutableModel em = model.getExecutable(fqn.toString(), src);
 		try {
-			em.sortTopological();
+			em.sortTopological(purgeAliases);
 		} catch (final CycleException e) {
 			e.model = em;
 			throw e;
@@ -181,7 +182,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		final HDLUnit findUnit = findUnit(name);
 		if (findUnit == null)
 			throw new IllegalArgumentException("No unit with name:" + name);
-		return createExecutable(findUnit, src, false);
+		return createExecutable(findUnit, src, false, true);
 	}
 
 }

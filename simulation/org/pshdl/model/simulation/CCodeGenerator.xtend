@@ -75,8 +75,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	new() {
 	}
 
-	new(ExecutableModel em, int maxCosts) {
-		super(em, 64, maxCosts)
+	new(ExecutableModel em, int maxCosts, boolean purgeAliases) {
+		super(em, 64, maxCosts, purgeAliases)
 		this.cce = new CommonCompilerExtension(em, 64)
 	}
 
@@ -274,7 +274,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		char* pshdl_sim_getName(uint32_t idx) {
 			switch (idx) {
 				«FOR v : em.variables.excludeNull»
-					case «varIdx.get(v.name)»: return "«v.name»";
+					case «v.getVarIdx(false)»: return "«v.name»";
 				«ENDFOR»
 			}
 			return 0;
@@ -322,7 +322,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 					case «constant32Bit(e.key)»:
 						«FOR VariableInformation vi : e.value» 
 							if (strcmp(name, "«vi.name»") == 0)
-								return «vi.varIdx»;
+								return «vi.getVarIdx(purgeAliases)»;
 						«ENDFOR»
 						return -1; //so close...
 				«ENDFOR»
@@ -420,7 +420,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 «FOR VariableInformation vi : em.variables.excludeNull»
 	///Use this index define to access <tt> «vi.name.replaceAll("\\@", "\\\\@")» </tt> via getOutput/setInput methods
-	#define «vi.defineName» «vi.varIdx»
+	#define «vi.defineName» «vi.getVarIdx(purgeAliases)»
 «ENDFOR»
 
 «fieldDeclarations(false, false).toString.split("\n").map["extern" + it].join("\n")»
@@ -661,8 +661,8 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		return new MultiOption(null, null, options)
 	}
 
-	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems) {
-		val comp = new CCodeGenerator(em, Integer.MAX_VALUE)
+	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems, boolean purgeAliases) {
+		val comp = new CCodeGenerator(em, Integer.MAX_VALUE, purgeAliases)
 		val List<AuxiliaryContent> sideFiles = Lists.newLinkedList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
@@ -671,7 +671,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
-		doCompile(em, syntaxProblems)
+		doCompile(em, syntaxProblems, false)
 	}
 
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''memset(«vi.idName(true, NONE)», «regFillValue», «vi.

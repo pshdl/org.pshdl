@@ -59,8 +59,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   public JavaCodeGenerator() {
   }
   
-  public JavaCodeGenerator(final ExecutableModel em, final String packageName, final String unitName, final int maxCosts) {
-    super(em, 64, maxCosts);
+  public JavaCodeGenerator(final ExecutableModel em, final String packageName, final String unitName, final int maxCosts, final boolean purgeAlias) {
+    super(em, 64, maxCosts, purgeAlias);
     this.packageName = packageName;
     this.unitName = unitName;
   }
@@ -188,8 +188,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       for(final VariableInformation v : _excludeNull) {
         _builder.append("\t\t");
         _builder.append("case ");
-        Integer _get = this.varIdx.get(v.name);
-        _builder.append(_get, "\t\t");
+        int _varIdx = this.getVarIdx(v, false);
+        _builder.append(_varIdx, "\t\t");
         _builder.append(": return \"");
         _builder.append(v.name, "\t\t");
         _builder.append("\";");
@@ -446,8 +446,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             _builder.append("varIdx.put(\"");
             _builder.append(v.name, "\t");
             _builder.append("\", ");
-            Integer _get = this.varIdx.get(v.name);
-            _builder.append(_get, "\t");
+            int _varIdx = this.getVarIdx(v, this.purgeAliases);
+            _builder.append(_varIdx, "\t");
             _builder.append(");");
             _builder.newLineIfNotEmpty();
           }
@@ -466,8 +466,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             _builder.append("varIdx.put(\"");
             _builder.append(v_1.name, "\t");
             _builder.append("\", ");
-            Integer _get_1 = this.varIdx.get(v_1.name);
-            _builder.append(_get_1, "\t");
+            int _varIdx_1 = this.getVarIdx(v_1, this.purgeAliases);
+            _builder.append(_varIdx_1, "\t");
             _builder.append(");");
             _builder.newLineIfNotEmpty();
           }
@@ -806,7 +806,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.newLine();
     _builder.append("import org.pshdl.interpreter.IHDLInterpreter;");
     _builder.newLine();
-    _builder.append("import java.math.BigInteger;");
+    _builder.append("import java.util.Arrays;");
     _builder.newLine();
     _builder.newLine();
     _builder.append("public class ");
@@ -882,8 +882,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if (useInterface) {
         {
-          Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
-          for(final VariableInformation varInfo_1 : _excludeNull_1) {
+          Iterable<VariableInformation> _excludeNullAndAlias = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
+          for(final VariableInformation varInfo_1 : _excludeNullAndAlias) {
             _builder.append("\t\t");
             CharSequence _idName_1 = this.idName(varInfo_1, true, CommonCodeGenerator.NONE);
             _builder.append(_idName_1, "\t\t");
@@ -910,8 +910,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("module.run();");
     _builder.newLine();
     {
-      Iterable<VariableInformation> _excludeNull_2 = this.excludeNull(this.em.variables);
-      for(final VariableInformation varInfo_2 : _excludeNull_2) {
+      Iterable<VariableInformation> _excludeNullAndAlias_1 = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
+      for(final VariableInformation varInfo_2 : _excludeNullAndAlias_1) {
         _builder.append("\t\t");
         final CharSequence varName = this.idName(varInfo_2, true, CommonCodeGenerator.NONE);
         _builder.newLineIfNotEmpty();
@@ -1209,7 +1209,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder_2.append(varName, "\t");
         _builder_2.append("_idx)!=0;");
         _builder_2.newLineIfNotEmpty();
-        _builder_2.append("if (!tempArr.equals(");
+        _builder_2.append("if (!Arrays.equals(tempArr,");
         _builder_2.append(varName, "");
         _builder_2.append("))");
         _builder_2.newLineIfNotEmpty();
@@ -1247,7 +1247,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder_3.append(varName, "\t");
         _builder_3.append("_idx, i);");
         _builder_3.newLineIfNotEmpty();
-        _builder_3.append("if (!tempArr.equals(");
+        _builder_3.append("if (!Arrays.equals(tempArr,");
         _builder_3.append(varName, "");
         _builder_3.append("))");
         _builder_3.newLineIfNotEmpty();
@@ -1535,13 +1535,13 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       }
       int _length = moduleName.length();
       final String unitName = moduleName.substring((li + 1), _length);
-      _xblockexpression = JavaCodeGenerator.doCompile(syntaxProblems, em, pkg, unitName);
+      _xblockexpression = JavaCodeGenerator.doCompile(syntaxProblems, em, pkg, unitName, false);
     }
     return _xblockexpression;
   }
   
-  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName) {
-    final JavaCodeGenerator comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE);
+  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean purgeAlias) {
+    final JavaCodeGenerator comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE, purgeAlias);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
     Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();

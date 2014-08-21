@@ -1228,11 +1228,12 @@ public class Insulin {
 		for (final HDLFunctionCall call : calls) {
 			final Optional<HDLFunction> func = HDLFunctions.resolve(call);
 			if (func.isPresent()) {
-				// final ArrayList<HDLExpression> params = call.getParams();
-				// for (int j = 0; j < params.size(); j++) {
-				// final HDLExpression exp = params.get(j);
-				// fortify(ms, exp, info.args[j]);
-				// }
+				final ArrayList<HDLExpression> params = call.getParams();
+				final ArrayList<HDLFunctionParameter> args = func.get().getArgs();
+				for (int j = 0; j < params.size(); j++) {
+					final HDLExpression exp = params.get(j);
+					fortify(ms, exp, TypeExtension.typeOf(args.get(j)).get());
+				}
 				// TODO Re-implement!
 			}
 		}
