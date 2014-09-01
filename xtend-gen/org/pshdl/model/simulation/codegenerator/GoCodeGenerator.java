@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  */
-package org.pshdl.model.simulation;
+package org.pshdl.model.simulation.codegenerator;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -55,10 +55,11 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.NativeRunner;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
-import org.pshdl.model.simulation.CCodeGenerator;
-import org.pshdl.model.simulation.CommonCodeGenerator;
-import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.simulation.codegenerator.CCodeGenerator;
+import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator;
+import org.pshdl.model.simulation.codegenerator.CommonCompilerExtension;
+import org.pshdl.model.simulation.codegenerator.GoCodeGeneratorParameter;
 import org.pshdl.model.utils.PSAbstractCompiler;
 import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.utils.services.IOutputProvider;
@@ -75,12 +76,12 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   public GoCodeGenerator() {
   }
   
-  public GoCodeGenerator(final ExecutableModel em, final int maxCosts, final String pkg, final String unit, final boolean purgeAlias) {
-    super(em, 64, maxCosts, purgeAlias);
-    this.pkg = pkg;
-    String _firstUpper = StringExtensions.toFirstUpper(unit);
+  public GoCodeGenerator(final GoCodeGeneratorParameter parameter) {
+    super(parameter);
+    this.pkg = parameter.packageName;
+    String _firstUpper = StringExtensions.toFirstUpper(parameter.unitName);
     this.unit = _firstUpper;
-    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(this.em, 64);
     this.cce = _commonCompilerExtension;
   }
   
@@ -985,36 +986,19 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   }
   
   public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    ArrayList<PSAbstractCompiler.CompileResult> _xblockexpression = null;
-    {
-      final String moduleName = em.moduleName;
-      final int li = moduleName.lastIndexOf(".");
-      String pkg = null;
-      final String optionPkg = cli.getOptionValue("pkg");
-      boolean _tripleNotEquals = (optionPkg != null);
-      if (_tripleNotEquals) {
-        pkg = optionPkg;
-      } else {
-        if ((li != (-1))) {
-          String _substring = moduleName.substring(0, (li - 1));
-          pkg = _substring;
-        }
-      }
-      int _length = moduleName.length();
-      final String unitName = moduleName.substring((li + 1), _length);
-      _xblockexpression = GoCodeGenerator.doCompile(syntaxProblems, em, pkg, unitName, false);
-    }
-    return _xblockexpression;
+    GoCodeGeneratorParameter _goCodeGeneratorParameter = new GoCodeGeneratorParameter(em);
+    return GoCodeGenerator.doCompile(syntaxProblems, _goCodeGeneratorParameter);
   }
   
-  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean purgeAlias) {
-    final GoCodeGenerator comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName, purgeAlias);
+  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final GoCodeGeneratorParameter parameter) {
+    final GoCodeGenerator comp = new GoCodeGenerator(parameter);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
     Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
     Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
     String _hookName = comp.getHookName();
-    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source, _hookName, true);
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles, 
+      parameter.em.source, _hookName, true);
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
   

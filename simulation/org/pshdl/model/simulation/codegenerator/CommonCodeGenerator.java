@@ -24,21 +24,21 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-package org.pshdl.model.simulation;
+package org.pshdl.model.simulation.codegenerator;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isArrayIndex;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isNegEdgeActive;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isNegEdgeHandled;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPosEdgeActive;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPosEdgeHandled;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPredFresh;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPredicate;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPrev;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isPublic;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isShadowReg;
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.isUpdate;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isArrayIndex;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isNegEdgeActive;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isNegEdgeHandled;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isPosEdgeActive;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isPosEdgeHandled;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isPredFresh;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isPredicate;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isPrev;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isPublic;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isShadowReg;
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.isUpdate;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,15 +103,15 @@ public abstract class CommonCodeGenerator {
 		purgeAliases = false;
 	}
 
-	protected CommonCodeGenerator(ExecutableModel em, int bitWidth, int maxCosts, boolean purgeAliases) {
-		this.em = em;
-		this.bitWidth = bitWidth;
-		this.maxCosts = maxCosts;
-		this.purgeAliases = purgeAliases;
-		for (int i = 0; i < em.variables.length; i++) {
-			varIdx.put(em.variables[i].name, i);
+	protected CommonCodeGenerator(CommonCodeGeneratorParameter parameterObject) {
+		this.em = parameterObject.em;
+		this.bitWidth = parameterObject.bitWidth;
+		this.maxCosts = parameterObject.maxCosts;
+		this.purgeAliases = parameterObject.purgeAliases;
+		for (int i = 0; i < parameterObject.em.variables.length; i++) {
+			varIdx.put(parameterObject.em.variables[i].name, i);
 		}
-		for (final Frame f : em.frames) {
+		for (final Frame f : parameterObject.em.frames) {
 			if (f.edgeNegDepRes != -1) {
 				prevMapNeg.add(asInternal(f.edgeNegDepRes).info.name);
 			}
@@ -167,9 +167,9 @@ public abstract class CommonCodeGenerator {
 	protected StringBuilder createStageMethods(final Multimap<Integer, Frame> schedulingStage, int maxStage, final boolean createConstant) {
 		final List<Integer> selectedScheduleStage = Lists.newArrayList();
 		final StringBuilder sb = new StringBuilder();
-		final List<Integer> handledPredicates = Lists.newArrayList();
-		final List<Integer> handledNegEdges = Lists.newArrayList();
-		final List<Integer> handledPosEdges = Lists.newArrayList();
+		final Set<Integer> handledPredicates = Sets.newLinkedHashSet();
+		final Set<Integer> handledNegEdges = Sets.newLinkedHashSet();
+		final Set<Integer> handledPosEdges = Sets.newLinkedHashSet();
 
 		for (int i = 0; i <= maxStage; i++) {
 			final Collection<Frame> frames = schedulingStage.get(i);
@@ -242,7 +242,7 @@ public abstract class CommonCodeGenerator {
 	protected abstract CharSequence clearRegUpdates();
 
 	protected CharSequence createStageMethods(final Multimap<Integer, Frame> schedulingStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
-			final List<Integer> handledPredicates, List<Integer> handledNegEdges, List<Integer> handledPosEdges) {
+			final Set<Integer> handledPredicates, Set<Integer> handledNegEdges, Set<Integer> handledPosEdges) {
 		final StringBuilder sb = new StringBuilder();
 		for (final int stage : selectedScheduleStage) {
 			final Collection<Frame> stageFrames = schedulingStage.get(stage);
@@ -260,8 +260,8 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence createStageMethod(final boolean createConstant, final List<Integer> handledPredicates, final int stage, final List<Frame> matchingFrames,
-			int totalStageCosts, List<Integer> handledNegEdges, List<Integer> handledPosEdges) {
+	protected CharSequence createStageMethod(final boolean createConstant, final Set<Integer> handledPredicates, final int stage, final List<Frame> matchingFrames,
+			int totalStageCosts, Set<Integer> handledNegEdges, Set<Integer> handledPosEdges) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(indent()).append(stageMethodsHeader(stage, totalStageCosts, createConstant));
 		indent++;
@@ -359,7 +359,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence handlePredicates(List<Integer> handledPredicates, boolean positive, int[] predicates) {
+	protected CharSequence handlePredicates(Set<Integer> handledPredicates, boolean positive, int[] predicates) {
 		final StringBuilder sb = new StringBuilder();
 		if (predicates != null) {
 			for (final int pred : predicates) {
@@ -382,7 +382,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence handleEdge(final List<Integer> handledEdges, final boolean posEdge, final int edgeDepRes) {
+	protected CharSequence handleEdge(final Set<Integer> handledEdges, final boolean posEdge, final int edgeDepRes) {
 		final StringBuilder sb = new StringBuilder();
 		if ((edgeDepRes != -1) && !handledEdges.contains(edgeDepRes)) {
 			sb.append(indent()).append(updateEdge(edgeDepRes, posEdge)).append(newLine());
@@ -1729,7 +1729,9 @@ public abstract class CommonCodeGenerator {
 
 	protected class ProcessData {
 		public List<Frame> frames = Lists.newArrayList();
-		public final List<Integer> handledPredicates = Lists.newArrayList(), handledNegEdge = Lists.newArrayList(), handledPosEdge = Lists.newArrayList();
+		public final Set<Integer> handledPredicates = Sets.newLinkedHashSet();
+		public final Set<Integer> handledNegEdge = Sets.newLinkedHashSet();
+		public final Set<Integer> handledPosEdge = Sets.newLinkedHashSet();
 		public final StringBuilder predicates = new StringBuilder();
 		public final StringBuilder calls = new StringBuilder();
 		public final String processName;

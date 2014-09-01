@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  */
-package org.pshdl.model.simulation;
+package org.pshdl.model.simulation.codegenerator;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -63,10 +63,11 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.NativeRunner;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
-import org.pshdl.model.simulation.CommonCodeGenerator;
-import org.pshdl.model.simulation.CommonCompilerExtension;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
 import org.pshdl.model.simulation.SimulationTransformationExtension;
+import org.pshdl.model.simulation.codegenerator.CCodeGeneratorParameter;
+import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator;
+import org.pshdl.model.simulation.codegenerator.CommonCompilerExtension;
 import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
@@ -87,9 +88,9 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   public CCodeGenerator() {
   }
   
-  public CCodeGenerator(final ExecutableModel em, final int maxCosts, final boolean purgeAliases) {
-    super(em, 64, maxCosts, purgeAliases);
-    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(em, 64);
+  public CCodeGenerator(final CCodeGeneratorParameter parameter) {
+    super(parameter);
+    CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(this.em, 64);
     this.cce = _commonCompilerExtension;
   }
   
@@ -1617,20 +1618,21 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     return new IOutputProvider.MultiOption(null, null, options);
   }
   
-  public static List<PSAbstractCompiler.CompileResult> doCompile(final ExecutableModel em, final Set<Problem> syntaxProblems, final boolean purgeAliases) {
-    final CCodeGenerator comp = new CCodeGenerator(em, Integer.MAX_VALUE, purgeAliases);
+  public static List<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final CCodeGeneratorParameter parameter) {
+    final CCodeGenerator comp = new CCodeGenerator(parameter);
     final List<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newLinkedList();
     Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
     Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
     String _generateMainCode = comp.generateMainCode();
     String _string = _generateMainCode.toString();
     String _hookName = comp.getHookName();
-    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, em.moduleName, sideFiles, em.source, _hookName, true);
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, parameter.em.moduleName, sideFiles, parameter.em.source, _hookName, true);
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
   
   public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    return CCodeGenerator.doCompile(em, syntaxProblems, false);
+    CCodeGeneratorParameter _cCodeGeneratorParameter = new CCodeGeneratorParameter(em);
+    return CCodeGenerator.doCompile(syntaxProblems, _cCodeGeneratorParameter);
   }
   
   protected CharSequence fillArray(final VariableInformation vi, final CharSequence regFillValue) {

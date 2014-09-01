@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-package org.pshdl.model.simulation
+package org.pshdl.model.simulation.codegenerator
 
 import com.google.common.collect.Lists
 import com.google.common.io.Files
@@ -44,9 +44,48 @@ import org.pshdl.interpreter.NativeRunner
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.VariableInformation.Direction
 import org.pshdl.interpreter.utils.Instruction
+import org.pshdl.model.simulation.ITypeOuptutProvider
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
+
+import static org.pshdl.model.simulation.codegenerator.DartCodeGenerator.*
+
+class DartCodeGeneratorParameter extends CommonCodeGeneratorParameter {
+	@Option(description="The name of the library that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
+	public String library;
+	@Option(description="The name of the struct. If not specified, the name of the module will be used", optionName="pkg", hasArg=true)
+	public String unitName;
+	@Option(description="When present the code will try to locate simulation_comm.dart locally, instead of importing it as pacakge", optionName="localImport", hasArg=false)
+	public boolean useLocalImport = false;
+
+	new(ExecutableModel em) {
+		super(em, -1)
+		val moduleName = em.moduleName
+		val li = moduleName.lastIndexOf('.')
+		this.library = null
+		if (li != -1) {
+			this.library = moduleName.substring(0, li - 1)
+		}
+		this.unitName = moduleName.substring(li + 1, moduleName.length);
+	}
+
+	public def DartCodeGeneratorParameter setLibrary(String library) {
+		this.library = library
+		return this
+	}
+
+	public def DartCodeGeneratorParameter setUnitName(String unitName) {
+		this.unitName = unitName
+		return this
+	}
+
+	public def DartCodeGeneratorParameter setUseLocalImport(boolean useLocalImport) {
+		this.useLocalImport = useLocalImport
+		return this
+	}
+
+}
 
 class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 	String unitName
@@ -59,11 +98,11 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	new() {
 	}
 
-	new(ExecutableModel model, String unitName, String library, boolean usePackageImport, int maxCosts, boolean purgeAlias) {
-		super(model, -1, maxCosts, purgeAlias)
-		this.unitName = unitName
-		this.library = library
-		this.usePackageImport = usePackageImport
+	new(DartCodeGeneratorParameter parameter) {
+		super(parameter)
+		this.unitName = parameter.unitName
+		this.library = parameter.library
+		this.usePackageImport = !parameter.useLocalImport
 	}
 
 	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
@@ -86,7 +125,8 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			override newInstance() {
 				val Process dartRunner = new ProcessBuilder(DART_EXEC, "bin/" + testRunner.getName(), unitName, library).
 					directory(tempDir).redirectErrorStream(true).start()
-				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5, "Dart "+library+"."+unitName)
+				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5,
+					"Dart " + library + "." + unitName)
 			}
 
 		}
@@ -223,7 +263,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	bool get «DISABLE_REG_OUTPUTLOGIC.name» => «DISABLE_REG_OUTPUTLOGIC.idName(true, NONE)»;
 	set «DISABLE_REG_OUTPUTLOGIC.name»(bool newVal) => «DISABLE_REG_OUTPUTLOGIC.idName(true, NONE)»=newVal;
 	
-	«FOR VariableInformation vi: em.variables.excludeNull»
+	«FOR VariableInformation vi : em.variables.excludeNull»
 	int get «vi.name.idName(false, NONE)» => «vi.name.idName(true, NONE)»;
 	set «vi.name.idName(false, NONE)»(int newVal) => «vi.name.idName(true, NONE)»=newVal;
 	«ENDFOR»
@@ -439,7 +479,7 @@ import '../simulation_comm.dart';
 	}
 
 	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
-		int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
 		return assignTempVar(targetSizeWithType, pos, NONE,
 			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
@@ -456,28 +496,17 @@ import '../simulation_comm.dart';
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
-		val moduleName = em.moduleName
-		val li = moduleName.lastIndexOf('.')
-		var String pkg = null
-		val optionPkg = cli.getOptionValue("pkg")
-		if (optionPkg !== null) {
-			pkg = optionPkg
-		} else if (li != -1) {
-			pkg = moduleName.substring(0, li - 1)
-		}
-		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName, true, false);
+		doCompile(syntaxProblems, new DartCodeGeneratorParameter(em));
 	}
 
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName,
-		boolean usePackageImport, boolean purgeAlias) {
-		val comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE, purgeAlias)
+	def static doCompile(Set<Problem> syntaxProblems, DartCodeGeneratorParameter parameter) {
+		val comp = new DartCodeGenerator(parameter)
 		val code = comp.generateMainCode
 		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
-				comp.hookName, true))
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles,
+				parameter.em.source, comp.hookName, true))
 	}
 
 }

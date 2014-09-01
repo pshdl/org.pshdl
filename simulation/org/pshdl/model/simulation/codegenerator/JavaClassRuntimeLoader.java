@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-package org.pshdl.model.simulation;
+package org.pshdl.model.simulation.codegenerator;
 
 import java.io.File;
 import java.io.StringWriter;

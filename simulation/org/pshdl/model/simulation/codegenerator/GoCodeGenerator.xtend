@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-package org.pshdl.model.simulation
+package org.pshdl.model.simulation.codegenerator
 
 import com.google.common.collect.Lists
 import com.google.common.io.ByteStreams
@@ -45,9 +45,43 @@ import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.NativeRunner
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
+import org.pshdl.model.simulation.ITypeOuptutProvider
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
+
+class GoCodeGeneratorParameter extends CommonCodeGeneratorParameter {
+	@Option(description="The name of the library that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
+	public String packageName="main";
+	@Option(description="The name of the struct. If not specified, the name of the module will be used", optionName="pkg", hasArg=true)
+	public String unitName="TestUnit";
+	
+	public def static nativeRunner(ExecutableModel em){
+		new GoCodeGeneratorParameter(em).setPackageName("main").setUnitName("TestUnit")
+	}
+
+	new(ExecutableModel em) {
+		super(em, 64)
+		val moduleName = em.moduleName
+		val li = moduleName.lastIndexOf('.')
+		this.packageName = null
+		if (li != -1) {
+			this.packageName = moduleName.substring(0, li - 1)
+		}
+		this.unitName = moduleName.substring(li + 1, moduleName.length);
+	}
+
+	public def GoCodeGeneratorParameter setPackageName(String packageName) {
+		this.packageName = packageName
+		return this
+	}
+
+	public def GoCodeGeneratorParameter setUnitName(String unitName) {
+		this.unitName = unitName
+		return this
+	}
+
+}
 
 class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
@@ -58,14 +92,14 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 	new() {
 	}
 
-	new(ExecutableModel em, int maxCosts, String pkg, String unit, boolean purgeAlias) {
-		super(em, 64, maxCosts,purgeAlias)
-		this.pkg = pkg
-		this.unit = unit.toFirstUpper
+	new(GoCodeGeneratorParameter parameter) {
+		super(parameter)
+		this.pkg = parameter.packageName
+		this.unit = parameter.unitName.toFirstUpper
 		cce = new CommonCompilerExtension(em, 64)
 	}
 
-	def public IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir){
+	def public IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
 		val CharSequence dartCode = generateMainCode();
 		val File dutFile = new File(tempDir, "TestUnit.go");
 		Files.createParentDirs(dutFile);
@@ -86,10 +120,12 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 		}
 		new IHDLInterpreterFactory<NativeRunner>() {
 			override newInstance() {
-				val runnerExecutable = new File(tempDir,"runner")
-				val ProcessBuilder goBuilder = new ProcessBuilder(runnerExecutable.absolutePath).directory(tempDir).redirectErrorStream(true);
+				val runnerExecutable = new File(tempDir, "runner")
+				val ProcessBuilder goBuilder = new ProcessBuilder(runnerExecutable.absolutePath).directory(tempDir).
+					redirectErrorStream(true);
 				val Process goRunner = goBuilder.start();
-				return new NativeRunner(goRunner.getInputStream(), goRunner.getOutputStream(), em, goRunner, 5, runnerExecutable.absolutePath);
+				return new NativeRunner(goRunner.getInputStream(), goRunner.getOutputStream(), em, goRunner, 5,
+					runnerExecutable.absolutePath);
 			}
 		}
 	}
@@ -380,9 +416,11 @@ func pow(a int64, n int64) int64 {
 		}
 		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
-	
-	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
-		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
+
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
+		return assignTempVar(targetSizeWithType, pos, NONE,
+			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
 
 	override protected writeToNull(String last) '''var _ = «last»
@@ -398,27 +436,17 @@ func pow(a int64, n int64) int64 {
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
-		val moduleName = em.moduleName
-		val li = moduleName.lastIndexOf('.')
-		var String pkg = null
-		val optionPkg = cli.getOptionValue("pkg")
-		if (optionPkg !== null) {
-			pkg = optionPkg
-		} else if (li != -1) {
-			pkg = moduleName.substring(0, li - 1)
-		}
-		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName, false);
+		doCompile(syntaxProblems, new GoCodeGeneratorParameter(em));
 	}
 
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean purgeAlias) {
-		val comp = new GoCodeGenerator(em, Integer.MAX_VALUE, pkg, unitName, purgeAlias)
+	def static doCompile(Set<Problem> syntaxProblems, GoCodeGeneratorParameter parameter) {
+		val comp = new GoCodeGenerator(parameter)
 		val code = comp.generateMainCode
 		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
-				comp.hookName, true))
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles,
+				parameter.em.source, comp.hookName, true))
 	}
 
 	boolean inBarrier = false

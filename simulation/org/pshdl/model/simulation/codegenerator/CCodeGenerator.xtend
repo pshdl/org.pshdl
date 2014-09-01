@@ -24,32 +24,35 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-package org.pshdl.model.simulation
+package org.pshdl.model.simulation.codegenerator
 
 import com.google.common.base.Splitter
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
+import com.google.common.io.ByteStreams
 import com.google.common.io.Files
 import java.io.File
-import java.io.IOException
+import java.io.FileOutputStream
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.EnumSet
-import java.util.HashMap
-import java.util.HashSet
+import java.util.LinkedHashMap
+import java.util.LinkedHashSet
 import java.util.List
 import java.util.Map
 import java.util.Set
-import java.util.concurrent.TimeUnit
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.IHDLInterpreterFactory
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.NativeRunner
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.utils.Instruction
+import org.pshdl.model.simulation.ITypeOuptutProvider
+import org.pshdl.model.simulation.SimulationTransformationExtension
 import org.pshdl.model.types.builtIn.busses.memorymodel.BusAccess
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel
@@ -60,12 +63,12 @@ import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
 import org.pshdl.model.utils.services.AuxiliaryContent
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
-import org.pshdl.interpreter.IHDLInterpreterFactory
-import com.google.common.io.ByteStreams
-import java.io.FileOutputStream
-import org.pshdl.model.simulation.CommonCodeGenerator.Attributes
-import java.util.LinkedHashSet
-import java.util.LinkedHashMap
+
+class CCodeGeneratorParameter extends CommonCodeGeneratorParameter{
+	new (ExecutableModel em){
+		super(em, 64)
+	}
+}
 
 class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
@@ -75,8 +78,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	new() {
 	}
 
-	new(ExecutableModel em, int maxCosts, boolean purgeAliases) {
-		super(em, 64, maxCosts, purgeAliases)
+	new(CCodeGeneratorParameter parameter) {
+		super(parameter)
 		this.cce = new CommonCompilerExtension(em, 64)
 	}
 
@@ -661,23 +664,23 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		return new MultiOption(null, null, options)
 	}
 
-	static def List<CompileResult> doCompile(ExecutableModel em, Set<Problem> syntaxProblems, boolean purgeAliases) {
-		val comp = new CCodeGenerator(em, Integer.MAX_VALUE, purgeAliases)
+	static def List<CompileResult> doCompile(Set<Problem> syntaxProblems, CCodeGeneratorParameter parameter) {
+		val comp = new CCodeGenerator(parameter)
 		val List<AuxiliaryContent> sideFiles = Lists.newLinkedList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
-			new CompileResult(syntaxProblems, comp.generateMainCode.toString, em.moduleName, sideFiles, em.source,
+			new CompileResult(syntaxProblems, comp.generateMainCode.toString, parameter.em.moduleName, sideFiles, parameter.em.source,
 				comp.hookName, true));
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
-		doCompile(em, syntaxProblems, false)
+		doCompile(syntaxProblems, new CCodeGeneratorParameter(em))
 	}
 
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''memset(«vi.idName(true, NONE)», «regFillValue», «vi.
 		arraySize»);'''
 
-	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
 		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
 	}
 

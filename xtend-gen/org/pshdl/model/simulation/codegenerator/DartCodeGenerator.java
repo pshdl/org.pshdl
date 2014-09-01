@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  */
-package org.pshdl.model.simulation;
+package org.pshdl.model.simulation.codegenerator;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
@@ -54,8 +54,9 @@ import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.NativeRunner;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.utils.Instruction;
-import org.pshdl.model.simulation.CommonCodeGenerator;
 import org.pshdl.model.simulation.ITypeOuptutProvider;
+import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator;
+import org.pshdl.model.simulation.codegenerator.DartCodeGeneratorParameter;
 import org.pshdl.model.utils.PSAbstractCompiler;
 import org.pshdl.model.utils.services.AuxiliaryContent;
 import org.pshdl.model.utils.services.IOutputProvider;
@@ -78,11 +79,11 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   public DartCodeGenerator() {
   }
   
-  public DartCodeGenerator(final ExecutableModel model, final String unitName, final String library, final boolean usePackageImport, final int maxCosts, final boolean purgeAlias) {
-    super(model, (-1), maxCosts, purgeAlias);
-    this.unitName = unitName;
-    this.library = library;
-    this.usePackageImport = usePackageImport;
+  public DartCodeGenerator(final DartCodeGeneratorParameter parameter) {
+    super(parameter);
+    this.unitName = parameter.unitName;
+    this.library = parameter.library;
+    this.usePackageImport = (!parameter.useLocalImport);
   }
   
   public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir) {
@@ -128,7 +129,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
               final Process dartRunner = _redirectErrorStream.start();
               InputStream _inputStream = dartRunner.getInputStream();
               OutputStream _outputStream = dartRunner.getOutputStream();
-              return new NativeRunner(_inputStream, _outputStream, DartCodeGenerator.this.em, dartRunner, 5, ((("Dart " + DartCodeGenerator.this.library) + ".") + DartCodeGenerator.this.unitName));
+              return new NativeRunner(_inputStream, _outputStream, DartCodeGenerator.this.em, dartRunner, 5, 
+                ((("Dart " + DartCodeGenerator.this.library) + ".") + DartCodeGenerator.this.unitName));
             } catch (Throwable _e) {
               throw Exceptions.sneakyThrow(_e);
             }
@@ -1269,36 +1271,19 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   public List<PSAbstractCompiler.CompileResult> invoke(final CommandLine cli, final ExecutableModel em, final Set<Problem> syntaxProblems) throws Exception {
-    ArrayList<PSAbstractCompiler.CompileResult> _xblockexpression = null;
-    {
-      final String moduleName = em.moduleName;
-      final int li = moduleName.lastIndexOf(".");
-      String pkg = null;
-      final String optionPkg = cli.getOptionValue("pkg");
-      boolean _tripleNotEquals = (optionPkg != null);
-      if (_tripleNotEquals) {
-        pkg = optionPkg;
-      } else {
-        if ((li != (-1))) {
-          String _substring = moduleName.substring(0, (li - 1));
-          pkg = _substring;
-        }
-      }
-      int _length = moduleName.length();
-      final String unitName = moduleName.substring((li + 1), _length);
-      _xblockexpression = DartCodeGenerator.doCompile(syntaxProblems, em, pkg, unitName, true, false);
-    }
-    return _xblockexpression;
+    DartCodeGeneratorParameter _dartCodeGeneratorParameter = new DartCodeGeneratorParameter(em);
+    return DartCodeGenerator.doCompile(syntaxProblems, _dartCodeGeneratorParameter);
   }
   
-  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final ExecutableModel em, final String pkg, final String unitName, final boolean usePackageImport, final boolean purgeAlias) {
-    final DartCodeGenerator comp = new DartCodeGenerator(em, unitName, pkg, usePackageImport, Integer.MAX_VALUE, purgeAlias);
+  public static ArrayList<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final DartCodeGeneratorParameter parameter) {
+    final DartCodeGenerator comp = new DartCodeGenerator(parameter);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
     Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
     Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
     String _hookName = comp.getHookName();
-    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source, _hookName, true);
+    PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles, 
+      parameter.em.source, _hookName, true);
     return Lists.<PSAbstractCompiler.CompileResult>newArrayList(_compileResult);
   }
 }

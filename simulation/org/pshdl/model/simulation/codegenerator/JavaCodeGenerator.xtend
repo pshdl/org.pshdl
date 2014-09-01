@@ -24,39 +24,80 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-package org.pshdl.model.simulation
+package org.pshdl.model.simulation.codegenerator
 
 import com.google.common.collect.Lists
+import com.google.common.collect.Sets
 import java.math.BigInteger
 import java.util.Collections
 import java.util.EnumSet
+import java.util.Iterator
 import java.util.List
 import java.util.Set
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
+import org.pshdl.interpreter.Frame.FastInstruction
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.VariableInformation
+import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
-import static org.pshdl.model.simulation.CommonCodeGenerator.Attributes.*
-import org.pshdl.interpreter.Frame.FastInstruction
-import org.pshdl.model.simulation.CommonCodeGenerator.Attributes
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.*
+import com.google.common.collect.Maps
+import java.util.Map
+import com.google.common.collect.Multimap
+import com.google.common.collect.LinkedHashMultimap
+import javax.annotation.MatchesPattern.Checker
+import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter
+import org.pshdl.model.simulation.ITypeOuptutProvider
+import org.pshdl.model.simulation.HDLSimulator
+import java.util.Random
+
+class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
+	@Option(description="The name of the package that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
+	public String packageName;
+	@Option(description="The name of the java class. If not specified, the name of the module will be used", optionName="pkg", hasArg=true)
+	public String unitName;
+
+	new(ExecutableModel em) {
+		super(em, 64)
+		val moduleName = em.moduleName
+		val li = moduleName.lastIndexOf('.')
+		this.packageName = null
+		if (li != -1) {
+			this.packageName = moduleName.substring(0, li - 1)
+		}
+		this.unitName = moduleName.substring(li + 1, moduleName.length);
+	}
+
+	public def JavaCodeGeneratorParameter setPackageName(String packageName) {
+		this.packageName = packageName
+		return this
+	}
+
+	public def JavaCodeGeneratorParameter setUnitName(String unitName) {
+		this.unitName = unitName
+		return this
+	}
+
+}
 
 class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
 	String packageName
 	String unitName
 
-	new(){
+	new() {
 	}
-	new(ExecutableModel em, String packageName, String unitName, int maxCosts, boolean purgeAlias) {
-		super(em, 64, maxCosts, purgeAlias)
-		this.packageName = packageName
-		this.unitName = unitName
+
+	new(JavaCodeGeneratorParameter parameter) {
+		super(parameter)
+		this.packageName = parameter.packageName
+		this.unitName = parameter.unitName
 	}
 
 	override protected void postBody() {
@@ -148,17 +189,20 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			switch (feature) {
 				case disableOutputRegs:
 					«IF hasClock»
-					«DISABLE_REG_OUTPUTLOGIC.name» = (boolean) value;
+						«DISABLE_REG_OUTPUTLOGIC.name» = (boolean) value;
 					«ENDIF»
 				break;
 				case disableEdges:
 					«IF hasClock»
-					«DISABLE_EDGES.name» = (boolean) value;
+						«DISABLE_EDGES.name» = (boolean) value;
 					«ENDIF»
 				break;
 			}
 		}
-		private long pow(long a, long n) {
+		
+		«makeThreads»
+		
+		private static long pow(long a, long n) {
 			long result = 1;
 			long p = a;
 			while (n > 0) {
@@ -172,11 +216,181 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		}
 	'''
 
+	int executionCores = 2
+
+	static class ExecutionPhase {
+		static int globalID = 0
+		public final int id = globalID++
+		public final StringBuilder executionCore = new StringBuilder
+
+		public int stage
+
+		new(int stage) {
+			this.stage = stage
+		}
+
+		public def declare() '''
+			«field»
+			public final void «methodName»(){
+				«executionCore»
+				execPhase«id» = «TIMESTAMP.name»;
+			}
+		'''
+
+		public def methodName() '''stage«String.format("%03x", stage)»phase«String.format("%04x", id)»'''
+
+		public def call() '''
+			if (execPhase«id» != «TIMESTAMP.name»){
+				«methodName»();
+			}
+		'''
+
+		public def field() '''long execPhase«id»=-1;
+			'''
+	}
+	Random r=new Random()
+	def makeThreads() {
+		val Set<Integer> handledNegEdges = Sets.newLinkedHashSet
+		val Set<Integer> handledPosEdges = Sets.newLinkedHashSet
+		val Set<Integer> handledPredicates = Sets.newLinkedHashSet
+		val Multimap<Integer, Frame> stageFrames = LinkedHashMultimap.create
+		em.frames.filter[!constant].forEach[stageFrames.put(it.scheduleStage, it)]
+		var int maxStage = stageFrames.keySet.sort.last
+		val ctrlThread = new StringBuilder
+		val phaseMethods = new StringBuilder
+		val List<StringBuilder> execution = Lists.newArrayListWithCapacity(executionCores)
+		for (int i : 0 ..< executionCores) {
+			execution.add(new StringBuilder)
+		}
+		for (int stage : 0 ..< maxStage) {
+			val matchingFrames = stageFrames.get(stage)
+			if (!matchingFrames.nullOrEmpty) {
+				for (Frame frame : matchingFrames) {
+					val negEdge = handleEdge(handledNegEdges, false, frame.edgeNegDepRes)
+					if (!negEdge.toString.empty) {
+						ctrlThread.append(negEdge)
+					}
+					val posEdge = handleEdge(handledPosEdges, true, frame.edgePosDepRes)
+					if (!posEdge.toString.empty) {
+						ctrlThread.append(posEdge)
+					}
+					val negPred = handlePredicates(handledPredicates, false, frame.predNegDepRes)
+					if (!negPred.toString.empty) {
+						ctrlThread.append(negPred)
+					}
+					val posPred = handlePredicates(handledPredicates, true, frame.predPosDepRes)
+					if (!posPred.toString.empty) {
+						ctrlThread.append(posPred)
+					}
+				}
+				addBarrier(ctrlThread, execution, "Predicates for stage:" + stage, stage)
+				var int totalCosts = 0
+				var ExecutionPhase current = new ExecutionPhase(stage)
+				val List<ExecutionPhase> phases = Lists.newArrayList(current)
+				for (val Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
+					val Frame frame = iterator.next()
+					if (!(purgeAliases && frame.isRename())) {
+						totalCosts += estimateFrameCosts(frame)
+						val call = predicateCheckedFrameCall(frame)
+						current.executionCore.append(call)
+						if (totalCosts > 10 && iterator.hasNext) {
+							totalCosts=0
+							current = new ExecutionPhase(stage)
+							phases.add(current)
+						}
+					}
+				}
+				phaseMethods.append(phases.map[declare].join)
+				ctrlThread.append(phases.map[call].join)
+				for (int i : 0 ..< executionCores) {
+					Collections.shuffle(phases, r)
+					execution.get(i).append(phases.map[call].join)
+				}
+			}
+		}
+
+		val StringBuilder res = new StringBuilder
+		for (int tid : 0 ..< executionCores) {
+			res.append(
+				'''
+					private final Thread thread«tid»=new Thread(){
+						public void run(){
+							long startingTimeStamp;
+							while(true){
+								while (phase==-1){}
+								startingTimeStamp=timeStamp;
+								«execution.get(tid)»
+								//System.out.println("Execution of thread «tid» done");
+							}
+						}
+					};
+				'''
+			)
+		}
+		res.append(
+			'''
+				«phaseMethods»
+			
+				private volatile int phase=-1;
+				public void initParallel() {
+					phase=-1;
+					«FOR int tid : 0 ..< executionCores»
+						thread«tid».setDaemon(true);
+						thread«tid».start();
+					«ENDFOR»
+				}
+				public void parallelExecution(){
+					phase=-1;
+					«ctrlThread»
+					phase=-1;
+					//System.out.println("Done");
+				}
+			''')
+	}
+
+	def addBarrier(StringBuilder master, List<StringBuilder> slaves, String stageName, int stage) {
+		for (i : 0 ..< slaves.size) {
+			val slave = slaves.get(i)
+			slave.append(
+				'''
+					//«stageName»
+					//System.out.println("Thread «i» waiting for next phase «stageName»");
+					while (phase < «stage») {
+					}
+					if (startingTimeStamp!=timeStamp)
+						break;
+				''')
+		}
+		master.append(
+			'''
+				//System.out.println("Entering stage: «stageName»");
+				try{
+					Thread.sleep(1);
+				} catch(Exception e){
+				}
+				phase=«stage»;
+			''')
+	}
+
+	def schedule(List<Integer> threadLoad, List<StringBuilder> threadExecution, int costs, CharSequence execution) {
+		var min = Integer.MAX_VALUE
+		var tid = -1
+		for (Integer i : 0 ..< threadLoad.size) {
+			val load = threadLoad.get(i)
+			if (load <= min) {
+				min = load
+				tid = i
+			}
+		}
+		threadLoad.set(tid, threadLoad.get(tid) + costs);
+		threadExecution.get(tid).append(execution)
+	}
+
 	override protected header() '''
 		«IF packageName !== null»package «packageName»;«ENDIF»
 		«imports»
 		
-		public class «unitName»
+		public final class «unitName»
 		 implements «IF !em.annotations.nullOrEmpty && em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»
 		{
 			private Map<String, Integer> varIdx=new HashMap<String, Integer>();
@@ -229,11 +443,10 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		«ENDIF»
 	'''
 
-
 	override protected makeCase(CharSequence caseLabel, CharSequence value, boolean includeBreak) {
-		super.makeCase(caseLabel.toString.replaceAll("L",""), value, includeBreak)
+		super.makeCase(caseLabel.toString.replaceAll("L", ""), value, includeBreak)
 	}
-	
+
 	def protected copyRegs() '''
 		private void updateRegs() {
 			for (RegUpdate reg : regUpdates) {
@@ -248,6 +461,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		import java.util.*;
 		import org.pshdl.interpreter.*;
 		import java.util.concurrent.*;
+		import java.util.concurrent.locks.*;
 	'''
 
 	override protected calculateVariableAccessIndex(List<Integer> arr, VariableInformation varInfo) {
@@ -257,7 +471,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		return "(int)(" + res + ")"
 	}
 
-	override protected arrayInit(VariableInformation varInfo, BigInteger zero, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+	override protected arrayInit(VariableInformation varInfo, BigInteger zero,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		val attrClone = attributes.clone
 		attrClone.add(baseType)
 		return '''new «varInfo.fieldType(attrClone)»[«varInfo.arraySize»]'''
@@ -287,40 +502,63 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	override protected stageMethodsFooter(int stage, int stageCosts, boolean constant) '''}
 		'''
 
+	int threadID = 0
+	int currentStage = 0
+
 	override protected barrierBegin(int stage, int totalStageCosts, boolean constant) {
-		val res = '''List<Callable<Void>> calls=new ArrayList<Callable<Void>>();
-	«indent()»calls.add(new Callable<Void>() {
-	«indent()»@Override public Void call() {
+		threadID = 0
+		currentStage = stage
+		val res = '''}
+		public void t«threadID»s_«stage»(){
 	'''
-		indent += 2;
 		return res
 	}
 
 	override protected barrierEnd(int stage, int totalStageCosts, boolean constant) {
-		indent -= 2;
-		val res = '''return null;
-«indent()»}
-«indent()»});
-«indent()»try {
-«indent()»	mainPool.invokeAll(calls);
-«indent()»} catch (final InterruptedException e) {
-«indent()»	new RuntimeException(e);
-«indent()»}
+		val res = '''}
+		volatile int phase_«stage»=0;
+		«FOR int i : 0 ..< threadID»
+		volatile int thread_«i»_«stage»=0;
+		volatile int thread_sl_«i»_«stage»=0;
+		«ENDFOR»
+		public void executeStage«stage»(){
+			«FOR int i : 0 ..< threadID»
+			Thread t«i»=new Thread(){
+				public void run(){
+					while(true){
+						t«i»s_«stage»();
+						thread_«i»_«stage»++;
+						while(thread_«i»_«stage» != phase_«stage»){
+							thread_sl_«i»_«stage»++;
+						}
+					}
+				}
+			};
+			t«i».start();
+			«ENDFOR»
+			while (true){
+				final long start = System.nanoTime();
+				for (int i=0;i<1000;i++){
+					«FOR int i : 0 ..< threadID»
+					while(thread_«i»_«stage»==phase_«stage»){}
+					«ENDFOR»
+					phase_«stage»++;
+				}
+				final long end = System.nanoTime();
+				System.out.println("Took: "+(end-start)/1000.+" ns "+«FOR int i : 0 ..< threadID SEPARATOR '+" "+'»thread_sl_«i»_«stage»«ENDFOR»);
+				«FOR int i : 0 ..< threadID»
+					thread_sl_«i»_«stage»=0;
+				«ENDFOR»
+			}
 '''
 		return res
 	}
 
 	override protected barrier() {
-		indent -= 2
-		val res = '''
-				return null;
-			«indent()»	}
-			«indent()»});
-			calls.add(new Callable<Void>() {
-			«indent()»@Override public Void call() {
+		threadID++
+		return '''}
+		public void t«threadID»s_«currentStage»(){
 		'''
-		indent += 2
-		return res
 	}
 
 	override protected stageMethodsHeader(int stage, int stageCosts, boolean constant) '''public void «stageMethodName(
@@ -495,8 +733,8 @@ if (!Arrays.equals(tempArr,«varName»))
 			} else {
 				return '''if (module.«varName» != «varName»)
 	for (IChangeListener listener:listeners)
-		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.constant(true)»«ENDIF», module.«varName»«IF vi.
-					width != 64» & «vi.width.calcMask.constant(true)»«ENDIF»);
+		listener.valueChangedLong(getDeltaCycle(), "«vi.name»", «varName»«IF vi.width != 64» & «vi.width.calcMask.
+					constant(true)»«ENDIF», module.«varName»«IF vi.width != 64» & «vi.width.calcMask.constant(true)»«ENDIF»);
 				'''
 			}
 		} else {
@@ -559,33 +797,30 @@ if (!Arrays.equals(tempArr,«varName»))
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
-		val moduleName = em.moduleName
-		val li = moduleName.lastIndexOf('.')
-		var String pkg = null
+		val javaParam = new JavaCodeGeneratorParameter(em)
 		val optionPkg = cli.getOptionValue("pkg")
 		if (optionPkg !== null) {
-			pkg = optionPkg
-		} else if (li != -1) {
-			pkg = moduleName.substring(0, li - 1)
+			javaParam.packageName = optionPkg
 		}
-		val unitName = moduleName.substring(li + 1, moduleName.length);
-		doCompile(syntaxProblems, em, pkg, unitName, false);
+		doCompile(syntaxProblems, javaParam);
 	}
-	
-	def static doCompile(Set<Problem> syntaxProblems, ExecutableModel em, String pkg, String unitName, boolean purgeAlias) {
-		val comp = new JavaCodeGenerator(em, pkg, unitName, Integer.MAX_VALUE, purgeAlias)
+
+	def static doCompile(Set<Problem> syntaxProblems, JavaCodeGeneratorParameter parameter) {
+		val comp = new JavaCodeGenerator(parameter)
 		val code = comp.generateMainCode
-		val sideFiles=Lists.newArrayList
+		val sideFiles = Lists.newArrayList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
-			new PSAbstractCompiler.CompileResult(syntaxProblems, code, em.moduleName, sideFiles, em.source,
-				comp.hookName, true))
+			new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles,
+				parameter.em.source, comp.hookName, true))
 	}
-	
+
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''Arrays.fill(«vi.idName(true, NONE)», «regFillValue»);'''
-	
-	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
-		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
+
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		return assignTempVar(targetSizeWithType, pos, NONE,
+			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
-	
+
 }
