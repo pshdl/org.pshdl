@@ -62,6 +62,8 @@ class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	public String packageName;
 	@Option(description="The name of the java class. If not specified, the name of the module will be used", optionName="pkg", hasArg=true)
 	public String unitName;
+	
+	public int executionCores=0
 
 	new(ExecutableModel em) {
 		super(em, 64)
@@ -90,6 +92,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 
 	String packageName
 	String unitName
+	int executionCores = 2
+	boolean hasPow=false
 
 	new() {
 	}
@@ -98,6 +102,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		super(parameter)
 		this.packageName = parameter.packageName
 		this.unitName = parameter.unitName
+		this.executionCores = parameter.executionCores
 	}
 
 	override protected void postBody() {
@@ -124,10 +129,6 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		contains(CommonCodeGenerator.Attributes.isPublic)»public«ELSE»private«ENDIF» '''
 
 	override protected footer() '''
-	«hdlInterpreter»
-}'''
-
-	def protected hdlInterpreter() '''
 		@Override
 		public void setInput(String name, long value, int... arrayIdx) {
 			setInput(getIndex(name), value, arrayIdx);
@@ -199,9 +200,10 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 				break;
 			}
 		}
-		
+		«IF executionCores!=0»
 		«makeThreads»
-		
+		«ENDIF»
+		«IF hasPow»
 		private static long pow(long a, long n) {
 			long result = 1;
 			long p = a;
@@ -214,9 +216,9 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			}
 			return result;
 		}
+		«ENDIF»
+		}
 	'''
-
-	int executionCores = 2
 
 	static class ExecutionPhase {
 		static int globalID = 0
@@ -289,7 +291,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 				val List<ExecutionPhase> phases = Lists.newArrayList(current)
 				for (val Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
 					val Frame frame = iterator.next()
-					if (!(purgeAliases && frame.isRename())) {
+					if (!(purgeAliases && frame.isRename(em))) {
 						totalCosts += estimateFrameCosts(frame)
 						val call = predicateCheckedFrameCall(frame)
 						current.executionCore.append(call)
@@ -819,6 +821,7 @@ if (!Arrays.equals(tempArr,«varName»))
 
 	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+		hasPow=true
 		return assignTempVar(targetSizeWithType, pos, NONE,
 			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}

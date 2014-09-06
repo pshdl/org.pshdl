@@ -46,50 +46,6 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterUnit(@NotNull MemoryModelParser.UnitContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
-	public void exitUnit(@NotNull MemoryModelParser.UnitContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
-	public void enterWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
-	public void exitWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
 	public void enterDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) {
 	}
 
@@ -102,6 +58,28 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 */
 	@Override
 	public void exitDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void enterConstant(@NotNull MemoryModelParser.ConstantContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitConstant(@NotNull MemoryModelParser.ConstantContext ctx) {
 	}
 
 	/**
@@ -178,50 +156,6 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
-	public void exitColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
-	public void enterRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
-	public void exitRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
-	@Override
 	public void enterType(@NotNull MemoryModelParser.TypeContext ctx) {
 	}
 
@@ -266,6 +200,50 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
+	public void enterRow(@NotNull MemoryModelParser.RowContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitRow(@NotNull MemoryModelParser.RowContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void enterFilling(@NotNull MemoryModelParser.FillingContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitFilling(@NotNull MemoryModelParser.FillingContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
 	public void enterMemory(@NotNull MemoryModelParser.MemoryContext ctx) {
 	}
 
@@ -288,7 +266,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterRow(@NotNull MemoryModelParser.RowContext ctx) {
+	public void enterUnit(@NotNull MemoryModelParser.UnitContext ctx) {
 	}
 
 	/**
@@ -299,7 +277,73 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitRow(@NotNull MemoryModelParser.RowContext ctx) {
+	public void exitUnit(@NotNull MemoryModelParser.UnitContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void enterWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void enterColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void enterRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void exitRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
 	}
 
 	/**

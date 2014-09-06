@@ -86,6 +86,7 @@ import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_LABEL_NOT_CONS
 import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_LABEL_WRONG_ENUM;
 import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_MULTIPLE_DEFAULT;
 import static org.pshdl.model.validation.builtin.ErrorCode.SWITCH_NO_DEFAULT;
+import static org.pshdl.model.validation.builtin.ErrorCode.TYPE_INVALID_PRIMITIVE;
 import static org.pshdl.model.validation.builtin.ErrorCode.TYPE_SAME_NAME;
 import static org.pshdl.model.validation.builtin.ErrorCode.UNKNOWN_RANGE;
 import static org.pshdl.model.validation.builtin.ErrorCode.UNRESOLVED_ENUM;
@@ -162,7 +163,6 @@ import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.RangeTool;
 import org.pshdl.model.types.builtIn.HDLAnnotations;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.types.builtIn.HDLGenerators;
 import org.pshdl.model.types.builtIn.HDLPrimitives;
 import org.pshdl.model.utils.HDLLibrary;
@@ -656,9 +656,6 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkAssignments(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLAssignment[] asss = pkg.getAllObjectsOf(HDLAssignment.class, true);
 		for (final HDLAssignment ass : asss) {
-			if (skipExp(ass)) {
-				continue;
-			}
 			final HDLEvaluationContext context = getContext(hContext, ass);
 			checkAss(ass, ass.getLeft(), ass.getRight(), problems, context);
 		}
@@ -858,7 +855,11 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkGenerators(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLDirectGeneration[] generators = unit.getAllObjectsOf(HDLDirectGeneration.class, true);
 		for (final HDLDirectGeneration hdg : generators) {
-			HDLGenerators.validate(hdg, problems, getContext(hContext, hdg));
+			if (HDLGenerators.validate(hdg, problems, getContext(hContext, hdg))) {
+				if (hdg.getHIf() == null) {
+					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg));
+				}
+			}
 		}
 	}
 
@@ -869,24 +870,9 @@ public class BuiltInValidator implements IHDLValidator {
 	private static void checkFunctionCalls(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLFunctionCall[] calls = unit.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (final HDLFunctionCall call : calls) {
-			final Iterable<HDLFunction> info = HDLFunctions.getCandidateFunctions(call);
-			// Substitute functions don't have any interference info because
-			// they don't actually return anything
-			if (info == null) {
-				final Optional<HDLFunction> f = call.resolveFunction();
-				if (!f.isPresent()) {
-					problems.add(new Problem(NO_SUCH_FUNCTION, call));
-				} else {
-					final HDLFunction hdlFunction = f.get();
-					if (hdlFunction instanceof HDLSubstituteFunction) {
-						final HDLSubstituteFunction sub = (HDLSubstituteFunction) hdlFunction;
-						if (sub.getArgs().size() != call.getParams().size()) {
-							problems.add(new Problem(NO_SUCH_FUNCTION, call));
-						}
-					}
-				}
-			} else {
-
+			final Optional<HDLFunction> function = call.resolveFunction();
+			if (!function.isPresent()) {
+				problems.add(new Problem(NO_SUCH_FUNCTION, call));
 			}
 		}
 	}
@@ -900,6 +886,53 @@ public class BuiltInValidator implements IHDLValidator {
 	}
 
 	private static void checkType(HDLPackage unit, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+		final HDLVariableDeclaration[] hvds = unit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+		for (final HDLVariableDeclaration hvd : hvds) {
+			final Optional<? extends HDLType> type = hvd.resolveType();
+			if (type.isPresent()) {
+				final HDLType hdlType = type.get();
+				if (hdlType instanceof HDLPrimitive) {
+					final HDLPrimitive primType = (HDLPrimitive) hdlType;
+					switch (primType.getType()) {
+					case BIT:
+					case INTEGER:
+					case NATURAL:
+						break;
+					case STRING:
+						if (primType.getWidth() != null) {
+							problems.add(new Problem(TYPE_INVALID_PRIMITIVE, hvd, "Strings can not have a width"));
+						}
+						break;
+					case BOOL:
+						if (primType.getWidth() != null) {
+							problems.add(new Problem(TYPE_INVALID_PRIMITIVE, hvd, "Booleans can not have a width"));
+						}
+						break;
+					case BITVECTOR:
+					case INT:
+					case UINT:
+						final Optional<Range<BigInteger>> rangeOpt = RangeExtension.rangeOf(primType.getWidth());
+						if (rangeOpt.isPresent()) {
+							final Range<BigInteger> range = rangeOpt.get();
+							if (!range.hasLowerBound()) {
+								problems.add(new Problem(ErrorCode.TYPE_NEGATIVE_WIDTH, hvd));
+							} else {
+								final BigInteger le = range.lowerEndpoint();
+								if (le.compareTo(BigInteger.ZERO) < 0) {
+									problems.add(new Problem(ErrorCode.TYPE_NEGATIVE_WIDTH, hvd));
+								} else if (le.equals(BigInteger.ZERO) && range.hasUpperBound() && range.upperEndpoint().equals(BigInteger.ZERO)) {
+									problems.add(new Problem(ErrorCode.TYPE_ZERO_WIDTH, hvd));
+								} else if (le.equals(BigInteger.ZERO)) {
+									problems.add(new Problem(ErrorCode.TYPE_POSSIBLY_ZERO_WIDTH, hvd));
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+
 		final HDLOpExpression[] ops = unit.getAllObjectsOf(HDLOpExpression.class, true);
 		for (final HDLOpExpression ope : ops) {
 			if (skipExp(ope)) {

@@ -31,6 +31,7 @@ import com.google.common.collect.Range
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.HashSet
+import java.util.LinkedHashSet
 import org.pshdl.interpreter.frames.BigIntegerFrame
 import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArithOp
@@ -74,7 +75,6 @@ import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.extensions.ProblemDescription.*
 import static org.pshdl.model.extensions.RangeExtension.*
-import java.util.LinkedHashSet
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -121,7 +121,10 @@ class RangeExtension {
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLLiteral obj, HDLEvaluationContext context) {
-		return Optional.of(RangeTool.createRange(obj.valueAsBigInt, obj.valueAsBigInt))
+		val bigVal = obj.valueAsBigInt
+		if (bigVal === null)
+			return Optional.absent
+		return Optional.of(RangeTool.createRange(bigVal, bigVal))
 	}
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLVariableRef obj, HDLEvaluationContext context) {

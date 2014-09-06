@@ -182,7 +182,7 @@ psFuncSpec :
 	psFuncParamWithRW RULE_ID dims+=psFuncOptArray*
 ;
 psFuncParamWithRW: 
-	psFuncParamRWType? psFuncParamType
+	(psFuncParamRWType? | constant='const'?) psFuncParamType
 ;
 psFuncOptArray:
 	('[' psExpression? ']')

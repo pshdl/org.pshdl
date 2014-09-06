@@ -210,13 +210,6 @@ public class MemoryModel {
 		for (NamedElement decl : row.definitions) {
 			if (decl instanceof Reference) {
 				final Reference ref = (Reference) decl;
-				if ("fill".equals(ref.name)) {
-					if (fillFound)
-						throw new IllegalArgumentException("Can not have more than one fill");
-					fillFound = true;
-					definitions.add(unusedFill);
-					continue;
-				}
 				decl = unit.resolve(ref);
 			}
 			if (decl instanceof Alias) {
@@ -225,6 +218,13 @@ public class MemoryModel {
 			}
 			if (decl instanceof Definition) {
 				final Definition def = (Definition) decl;
+				if ((def.type == Type.UNUSED) && (def.width < 0)) {
+					if (fillFound)
+						throw new IllegalArgumentException("Can not have more than one fill");
+					fillFound = true;
+					definitions.add(unusedFill);
+					continue;
+				}
 				usedSize += handleDefinition(definitions, def);
 			}
 		}

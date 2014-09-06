@@ -149,10 +149,10 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			unit = MemoryModelAST.parseUnit(getContentStream(hdl), problems, lineOffset);
 			if (!validate(unit, problems, lineOffset))
 				return Optional.absent();
+			return Optional.of(unit);
 		} catch (final IOException e) {
 			return Optional.absent();
 		}
-		return Optional.of(unit);
 	}
 
 	private int getLineOffset(HDLDirectGeneration hdl) {
@@ -346,7 +346,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	}
 
 	@Override
-	public void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
+	public boolean validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
+		boolean hasError = false;
 		if (!hdg.getInclude()) {
 			problems.add(new Problem(ErrorCode.GENERATOR_WARNING, hdg, "The " + hdg.getGeneratorID()
 					+ " generator assumes to be included. Not including it means that all ports need to be exported manually."));
@@ -356,37 +357,47 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				getRegCount(hdg);
 			} catch (final Exception e) {
 				problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+				hasError = true;
 			}
 		} else {
-			parse(hdg, problems);
-			if (problems.size() == 0) {
+			final Set<Problem> subParse = Sets.newLinkedHashSet();
+			parse(hdg, subParse);
+			if (subParse.isEmpty()) {
 				final String name = fullNameOf(hdg).append(hdg.getIfName()).toString();
 				try {
 					final Optional<HDLInterface> intf = createInterface(hdg, name);
 					if (!intf.isPresent()) {
 						problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "Failed to generate interface from description"));
+						hasError = true;
 					}
 				} catch (final Exception e) {
 					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, e.getMessage()));
+					hasError = true;
 				}
+			} else {
+				problems.addAll(subParse);
 			}
 		}
 		final HDLUnit unit = hdg.getContainer(HDLUnit.class);
 		if (unit == null) {
 			problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "Generator needs to be included in a module"));
+			hasError = true;
 		} else {
 			final ArrayList<HDLVariableDeclaration> ports = unit.asInterface().getPorts();
 			for (final HDLVariableDeclaration port : ports) {
 				if (port.getDirection() == HDLDirection.INOUT) {
 					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, port, "The generator " + hdg.getGeneratorID()
 							+ " does not support generating the required files for ports with inout direction"));
+					hasError = true;
 				}
 			}
 		}
 		final String version = getVersion(hdg);
 		if (!version.matches("v\\d_\\d\\d_[a-z]")) {
 			problems.add(new Problem(ErrorCode.GENERATOR_ERROR, hdg, "The version string:" + version + " is not valid. It has to be of the format v[0-9]_[0-9][0-9]_[a-z]"));
+			hasError = true;
 		}
+		return !hasError;
 	}
 
 	@Override

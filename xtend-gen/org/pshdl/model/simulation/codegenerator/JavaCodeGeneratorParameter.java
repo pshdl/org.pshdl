@@ -27,38 +27,38 @@
 package org.pshdl.model.simulation.codegenerator;
 
 import org.pshdl.interpreter.ExecutableModel;
-import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter;
-import org.pshdl.model.simulation.codegenerator.Option;
 
 @SuppressWarnings("all")
 public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
-  @Option(description = "The name of the package that should be declared. If unspecified, the package of the module will be used", optionName = "pkg", hasArg = true)
-  public String packageName;
-  
-  @Option(description = "The name of the java class. If not specified, the name of the module will be used", optionName = "pkg", hasArg = true)
-  public String unitName;
-  
-  public JavaCodeGeneratorParameter(final ExecutableModel em) {
-    super(em, 64);
-    final String moduleName = em.moduleName;
-    final int li = moduleName.lastIndexOf(".");
-    this.packageName = null;
-    if ((li != (-1))) {
-      String _substring = moduleName.substring(0, (li - 1));
-      this.packageName = _substring;
-    }
-    int _length = moduleName.length();
-    String _substring_1 = moduleName.substring((li + 1), _length);
-    this.unitName = _substring_1;
-  }
-  
-  public JavaCodeGeneratorParameter setPackageName(final String packageName) {
-    this.packageName = packageName;
-    return this;
-  }
-  
-  public JavaCodeGeneratorParameter setUnitName(final String unitName) {
-    this.unitName = unitName;
-    return this;
-  }
+	@Option(description = "The name of the package that should be declared. If unspecified, the package of the module will be used", optionName = "pkg", hasArg = true)
+	public String packageName;
+
+	@Option(description = "The name of the java class. If not specified, the name of the module will be used", optionName = "pkg", hasArg = true)
+	public String unitName;
+
+	public int executionCores = 0;
+
+	public JavaCodeGeneratorParameter(final ExecutableModel em) {
+		super(em, 64);
+		final String moduleName = em.moduleName;
+		final int li = moduleName.lastIndexOf(".");
+		this.packageName = null;
+		if ((li != (-1))) {
+			final String _substring = moduleName.substring(0, (li - 1));
+			this.packageName = _substring;
+		}
+		final int _length = moduleName.length();
+		final String _substring_1 = moduleName.substring((li + 1), _length);
+		this.unitName = _substring_1;
+	}
+
+	public JavaCodeGeneratorParameter setPackageName(final String packageName) {
+		this.packageName = packageName;
+		return this;
+	}
+
+	public JavaCodeGeneratorParameter setUnitName(final String unitName) {
+		this.unitName = unitName;
+		return this;
+	}
 }

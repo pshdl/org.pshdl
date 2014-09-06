@@ -55,6 +55,7 @@ import org.pshdl.model.HDLLiteral.HDLLiteralPresentation
 import org.pshdl.model.HDLManip
 import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
+import org.pshdl.model.HDLPrimitive.AnyPrimitive
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLRegisterConfig
@@ -74,7 +75,6 @@ import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
 
 import static org.pshdl.model.extensions.TypeExtension.*
-import org.pshdl.model.HDLPrimitive.AnyPrimitive
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
@@ -326,7 +326,11 @@ class TypeExtension {
 		val type = hVar.get.cachedType;
 		if (!type.present)
 			return Optional.absent
-		return Optional.of((type.get as HDLPrimitive).setWidth(width))
+		val pType = type.get
+		if (pType instanceof HDLPrimitive) {
+			return Optional.of((pType).setWidth(width))
+		}
+		return type
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLArithOp aop) {

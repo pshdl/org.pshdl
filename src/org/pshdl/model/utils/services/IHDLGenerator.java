@@ -118,7 +118,7 @@ public interface IHDLGenerator {
 	 *            a context for constant evaluations
 	 */
 	@Nonnull
-	public void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context);
+	public boolean validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context);
 
 	/**
 	 * Retrieves a (maybe empty List) of {@link HDLVariableDeclaration} that

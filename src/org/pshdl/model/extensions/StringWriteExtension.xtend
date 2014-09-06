@@ -751,7 +751,7 @@ class StringWriteExtension {
 		}
 		if (hdg.include)
 			sb.append("include").append(highlight.simpleSpace)
-		sb.append(highlight.interfaceName(hdg.HIf.name)).append(highlight.simpleSpace).append(
+		sb.append(highlight.interfaceName(hdg.ifName)).append(highlight.simpleSpace).append(
 			highlight.varName(hdg.^var)).append("=")
 		sb.append(highlight.simpleSpace).append(highlight.keyword("generate")).append(highlight.simpleSpace).
 			append(highlight.generatorID(hdg.generatorID))

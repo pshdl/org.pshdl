@@ -277,7 +277,7 @@ public abstract class CommonCodeGenerator {
 		}
 		for (final Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
 			final Frame frame = iterator.next();
-			if (purgeAliases && frame.isRename()) {
+			if (purgeAliases && frame.isRename(em)) {
 				continue;
 			}
 			stageCosts += estimateFrameCosts(frame);
@@ -663,7 +663,7 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence frames() {
 		final StringBuilder sb = new StringBuilder();
 		for (final Frame frame : em.frames) {
-			if (purgeAliases && frame.isRename()) {
+			if (purgeAliases && frame.isRename(em)) {
 				continue;
 			}
 			sb.append(indent()).append(functionHeader(frame));
@@ -888,7 +888,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(assignTempVar((exec.arg1 + exec.arg2) << 1, pos, NONE, "((" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE) + ")", true));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -901,7 +901,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(assignInternal(asInternal(exec.arg1), idName(TIMESTAMP, true, NONE), arr, EnumSet.of(Attributes.isUpdate)));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -927,7 +927,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(assignTempVar(Math.min(exec.arg1, exec.arg2) << 1, pos, NONE, mask(tempName, Math.min(exec.arg1, exec.arg2)), false));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -961,7 +961,7 @@ public abstract class CommonCodeGenerator {
 			// sb.append('''int a«arr.last»=(int)t«a»;''')
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -1105,25 +1105,25 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case eq:
-			sb.append(twoOp(exec, "==", exec.arg1, pos, b, a, PREDICATE, false));
+			sb.append(twoOp(exec, "==", 2, pos, b, a, PREDICATE, false));
 			break;
 		case not_eq:
-			sb.append(twoOp(exec, "!=", exec.arg1, pos, b, a, PREDICATE, false));
+			sb.append(twoOp(exec, "!=", 2, pos, b, a, PREDICATE, false));
 			break;
 		case less:
-			sb.append(twoOp(exec, "<", exec.arg1, pos, b, a, PREDICATE, false));
+			sb.append(twoOp(exec, "<", 2, pos, b, a, PREDICATE, false));
 			break;
 		case less_eq:
-			sb.append(twoOp(exec, "<=", exec.arg1, pos, b, a, PREDICATE, false));
+			sb.append(twoOp(exec, "<=", 2, pos, b, a, PREDICATE, false));
 			break;
 		case greater:
-			sb.append(twoOp(exec, ">", exec.arg1, pos, b, a, PREDICATE, false));
+			sb.append(twoOp(exec, ">", 2, pos, b, a, PREDICATE, false));
 			break;
 		case greater_eq:
-			sb.append(twoOp(exec, ">=", exec.arg1, pos, b, a, PREDICATE, false));
+			sb.append(twoOp(exec, ">=", 2, pos, b, a, PREDICATE, false));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -1144,7 +1144,7 @@ public abstract class CommonCodeGenerator {
 		case posPredicate:
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -1162,7 +1162,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(twoOp(exec, ">>", exec.arg1, pos, b, a, NONE, true));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -1192,7 +1192,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(pow(exec, "%", exec.arg1, pos, b, a, NONE, true));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
 	}
@@ -1216,7 +1216,7 @@ public abstract class CommonCodeGenerator {
 			sb.append(twoOp(exec, "^", exec.arg1, pos, b, a, NONE, true));
 			break;
 		default:
-			throw new IllegalArgumentException("Did not instruction:" + exec + " here");
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 
 		return sb;
@@ -1556,7 +1556,8 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence constantVarLength(BigInteger constantValue, int maxLen, boolean forceUnsigned) {
 		constantValue = force(constantValue, maxLen);
-		return String.format("%#0" + ((maxLen + 3) / 4) + "X%s", constantValue, constantSuffix());
+		final int width = Math.min(1, (maxLen + 3) / 4);
+		return String.format("%#0" + width + "X%s", constantValue, constantSuffix());
 	}
 
 	protected BigInteger force(BigInteger constantValue, int maxLen) {

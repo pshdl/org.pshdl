@@ -48,6 +48,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>HDLVariable name. Can be <code>null</code>.</li>
  * <li>HDLExpression width. Can be <code>null</code>.</li>
  * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
+ * <li>Boolean constant. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
 public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
@@ -75,13 +76,15 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	 *            the value for width. Can be <code>null</code>.
 	 * @param dim
 	 *            the value for dim. Can be <code>null</code>.
+	 * @param constant
+	 *            the value for constant. Can <b>not</b> be <code>null</code>.
 	 * @param validate
 	 *            if <code>true</code> the parameters will be validated.
 	 */
 	public HDLFunctionParameter(int id, @Nullable IHDLObject container, @Nullable RWType rw, @Nonnull Type type, @Nullable HDLQualifiedName enumSpec,
 			@Nullable HDLQualifiedName ifSpec, @Nullable Iterable<HDLFunctionParameter> funcSpec, @Nullable HDLFunctionParameter funcReturnSpec, @Nullable HDLVariable name,
-			@Nullable HDLExpression width, @Nullable Iterable<HDLExpression> dim, boolean validate) {
-		super(id, container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, validate);
+			@Nullable HDLExpression width, @Nullable Iterable<HDLExpression> dim, @Nonnull Boolean constant, boolean validate) {
+		super(id, container, rw, type, enumSpec, ifSpec, funcSpec, funcReturnSpec, name, width, dim, constant, validate);
 	}
 
 	public HDLFunctionParameter() {
@@ -316,6 +319,25 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			return obj.setDim(value);
 		}
 	};
+	/**
+	 * The accessor for the field constant which is of type Boolean.
+	 */
+	public static HDLFieldAccess<HDLFunctionParameter, Boolean> fConstant = new HDLFieldAccess<HDLFunctionParameter, Boolean>("constant", Boolean.class,
+			HDLFieldAccess.Quantifier.ONE) {
+		@Override
+		public Boolean getValue(HDLFunctionParameter obj) {
+			if (obj == null)
+				return null;
+			return obj.getConstant();
+		}
+
+		@Override
+		public HDLFunctionParameter setValue(HDLFunctionParameter obj, Boolean value) {
+			if (obj == null)
+				return null;
+			return obj.setConstant(value);
+		}
+	};
 
 	@Override
 	public HDLFieldAccess<?, ?> getContainingFeature(Object obj) {
@@ -337,6 +359,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			return fWidth;
 		if (dim.contains(obj))
 			return fDim;
+		if (constant == obj)
+			return fConstant;
 		return super.getContainingFeature(obj);
 	}
 

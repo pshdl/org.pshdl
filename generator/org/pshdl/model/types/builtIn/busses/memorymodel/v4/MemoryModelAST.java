@@ -53,6 +53,7 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.Ali
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ColumnContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DeclarationContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DefinitionContext;
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.FillingContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.MemoryContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ReferenceContext;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.RowContext;
@@ -75,6 +76,22 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		final String id = ctx.ID().getText();
 		decl = new Alias(id);
 		obj = decl;
+	}
+
+	// @Override
+	// public void enterConstant(ConstantContext ctx) {
+	// // TODO Auto-generated method stub
+	// super.enterConstant(ctx);
+	// }
+
+	@Override
+	public void enterFilling(FillingContext ctx) {
+		final Definition definition = new Definition();
+		if (ctx.width() != null) {
+			definition.width = Integer.parseInt(ctx.width().getText());
+		}
+		obj = definition;
+		addNamedElement(definition);
 	}
 
 	@Override
@@ -101,7 +118,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		if (ctx.width() != null) {
 			def.width = Integer.parseInt(ctx.width().getText());
 		}
-		for (final TerminalNode dim : ctx.INT()) {
+		for (final TerminalNode dim : ctx.NUMBER()) {
 			def.dimensions.add(Integer.parseInt(dim.getText()));
 		}
 		final WarnTypeContext warnType = ctx.warnType();
@@ -145,7 +162,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 	public void enterReference(ReferenceContext ctx) {
 		final String id = ctx.ID().getText();
 		final Reference ref = new Reference(id);
-		for (final TerminalNode dim : ctx.INT()) {
+		for (final TerminalNode dim : ctx.NUMBER()) {
 			ref.dimensions.add(Integer.parseInt(dim.getText()));
 		}
 		obj = ref;

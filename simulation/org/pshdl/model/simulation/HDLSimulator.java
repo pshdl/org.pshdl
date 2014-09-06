@@ -29,7 +29,6 @@ package org.pshdl.model.simulation;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -363,19 +362,11 @@ public class HDLSimulator {
 			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(ifExp, context);
 			if (valueOf.isPresent()) {
 				if (valueOf.get().equals(BigInteger.ZERO)) {
-					final HDLIfStatement emptyThen = hif.setThenDo(Collections.<HDLStatement> emptyList());
-					if (emptyThen.getElseDo().isEmpty()) {
-						ms.remove(hif);
-					} else {
-						ms.replace(hif, emptyThen);
-					}
+					final ArrayList<HDLStatement> elseDo = hif.getElseDo();
+					ms.replace(hif, elseDo.toArray(new HDLStatement[elseDo.size()]));
 				} else {
-					final HDLIfStatement emptyElse = hif.setElseDo(Collections.<HDLStatement> emptyList());
-					if (emptyElse.getThenDo().isEmpty()) {
-						ms.remove(hif);
-					} else {
-						ms.replace(hif, emptyElse);
-					}
+					final ArrayList<HDLStatement> thenDo = hif.getThenDo();
+					ms.replace(hif, thenDo.toArray(new HDLStatement[thenDo.size()]));
 				}
 			}
 		}

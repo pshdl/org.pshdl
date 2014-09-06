@@ -1102,19 +1102,39 @@ public class Insulin {
 			unit.resetMeta(SignalInserted.ClkInserted);
 			final HDLRegisterConfig[] regs = unit.getAllObjectsOf(HDLRegisterConfig.class, true);
 			for (final HDLRegisterConfig reg : regs) {
-				if (!(reg.getClk() instanceof HDLVariableRef)) {
-					final HDLVariable tempClock = new HDLVariable().setName(getTempName("clock", "buf")).setDefaultValue(reg.getClk());
-					ms.insertBefore(reg.getContainer(HDLStatement.class), new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).addVariables(tempClock));
-					ms.replace(reg.getClk(), tempClock.asHDLRef());
+				final HDLExpression clk = reg.getClk();
+				// If the signal is an expression or so
+				if (clk instanceof HDLVariableRef) {
+					final HDLVariableRef clkRef = (HDLVariableRef) clk;
+					// If the signal has bit or array references (which are not
+					// allowed in VHDL)
+					if (!clkRef.getBits().isEmpty() || !clkRef.getArray().isEmpty()) {
+						createTempBit(ms, reg, clk, "clock");
+					}
+				} else {
+					createTempBit(ms, reg, clk, "clock");
 				}
-				if (!(reg.getRst() instanceof HDLVariableRef)) {
-					final HDLVariable tempReset = new HDLVariable().setName(getTempName("reset", "buf")).setDefaultValue(reg.getRst());
-					ms.insertBefore(reg, new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).addVariables(tempReset));
-					ms.replace(reg.getClk(), tempReset.asHDLRef());
+				final HDLExpression rst = reg.getRst();
+				// If the signal is an expression or so
+				if (rst instanceof HDLVariableRef) {
+					final HDLVariableRef rstRef = (HDLVariableRef) rst;
+					// If the signal has bit or array references (which are not
+					// allowed in VHDL)
+					if (!rstRef.getBits().isEmpty() || !rstRef.getArray().isEmpty()) {
+						createTempBit(ms, reg, rst, "reset");
+					}
+				} else {
+					createTempBit(ms, reg, rst, "reset");
 				}
 			}
 		}
 		return ms.apply(apply);
+	}
+
+	protected static void createTempBit(final ModificationSet ms, final HDLRegisterConfig reg, final HDLExpression signalExpression, String prefix) {
+		final HDLVariable tempClock = new HDLVariable().setName(getTempName(prefix, "buf")).setDefaultValue(signalExpression.copyFiltered(CopyFilter.DEEP_META));
+		ms.insertBefore(reg.getContainer(HDLStatement.class), new HDLVariableDeclaration().setType(HDLPrimitive.getBit()).addVariables(tempClock));
+		ms.replacePrune(signalExpression, tempClock.asHDLRef());
 	}
 
 	private static HDLVariable extractVar(HDLObject apply, HDLBuiltInAnnotations annotation) {

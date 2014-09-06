@@ -61,7 +61,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * @param arguments
 	 *            the value for arguments. Can be <code>null</code>.
 	 * @param hIf
-	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
+	 *            the value for hIf. Can be <code>null</code>.
 	 * @param generatorID
 	 *            the value for generatorID. Can <b>not</b> be <code>null</code>
 	 *            .
@@ -74,7 +74,7 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 *            if <code>true</code> the parameters will be validated.
 	 */
 	public AbstractHDLDirectGeneration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
-			@Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf, @Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include,
+			@Nullable Iterable<HDLArgument> arguments, @Nullable HDLInterface hIf, @Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include,
 			boolean validate) {
 		super(id, container, annotations, var, arguments, validate);
 		if (validate) {
@@ -110,18 +110,16 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	protected final HDLInterface hIf;
 
 	/**
-	 * Get the hIf field. Can <b>not</b> be <code>null</code>.
+	 * Get the hIf field. Can be <code>null</code>.
 	 * 
 	 * @return the field
 	 */
-	@Nonnull
+	@Nullable
 	public HDLInterface getHIf() {
 		return hIf;
 	}
 
 	protected HDLInterface validateHIf(HDLInterface hIf) {
-		if (hIf == null)
-			throw new IllegalArgumentException("The field hIf can not be null!");
 		return hIf;
 	}
 
@@ -408,13 +406,12 @@ public abstract class AbstractHDLDirectGeneration extends HDLInstantiation {
 	 * Setter for the field {@link #getHIf()}.
 	 * 
 	 * @param hIf
-	 *            sets the new hIf of this object. Can <b>not</b> be
-	 *            <code>null</code>.
+	 *            sets the new hIf of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLDirectGeneration} with the updated
 	 *         hIf field.
 	 */
 	@Nonnull
-	public HDLDirectGeneration setHIf(@Nonnull HDLInterface hIf) {
+	public HDLDirectGeneration setHIf(@Nullable HDLInterface hIf) {
 		hIf = validateHIf(hIf);
 		final HDLDirectGeneration res = new HDLDirectGeneration(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, false);
 		return res;

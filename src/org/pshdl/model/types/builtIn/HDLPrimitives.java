@@ -295,12 +295,6 @@ public class HDLPrimitives {
 		sb.append("\n</table>");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.pshdl.model.types.builtIn.IHDLPrimitive#getArithOpType(de
-	 * .tuhh.ict.pshdl.model.HDLArithOp)
-	 */
 	public HDLTypeInferenceInfo getArithOpType(HDLArithOp op) {
 		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(op.getLeft());
 		if (!typeOfLeft.isPresent())
@@ -434,6 +428,8 @@ public class HDLPrimitives {
 				return leftW;
 			if ((leftW == null) && (rightW != null))
 				return rightW;
+			if (leftW.equals(rightW))
+				return leftW;
 			return HDLBuiltInFunctions.MAX_UINT.getCall(leftW, rightW);
 		case MUL:
 			if ((leftW == null) && (rightW == null))

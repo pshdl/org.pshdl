@@ -42,6 +42,7 @@ import org.pshdl.model.HDLFunctionParameter.Type;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.FullNameExtension;
@@ -49,8 +50,8 @@ import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.services.CompilerInformation;
-import org.pshdl.model.utils.services.IServiceProvider;
 import org.pshdl.model.utils.services.INativeFunctionProvider;
+import org.pshdl.model.utils.services.IServiceProvider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.LinkedListMultimap;
@@ -178,24 +179,37 @@ public class HDLFunctions {
 			}
 			for (int i = 0; i < args.size(); i++) {
 				final HDLFunctionParameter arg = args.get(i);
+				final HDLExpression param = params.get(i);
+				switch (arg.getRw()) {
+				case READ:
+				case RETURN:
+					break;
+				case READWRITE:
+				case WRITE:
+					if (param instanceof HDLReference) {
+						funcScore.incScore(10000, "The argument for " + arg.getName().getName() + " needs to be a reference as it is written.");
+					}
+					break;
+				}
+
 				final HDLType type = types.get(i);
-				checkRoughType(funcScore, arg, type, params.get(i));
+				checkRoughType(funcScore, arg, type, param);
 				if (funcScore.score < 1000) {
 					HDLPrimitive prim = null;
 					if (type instanceof HDLPrimitive) {
 						prim = (HDLPrimitive) type;
 					}
 					final String paramName = args.get(i).getName().getName();
-					switch (arg.getType()) {
-					case REG_BIT:
-					case ANY_BIT:
-						if ((prim != null) && !prim.isBits()) {
-							funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
-						}
-						break;
-					case REG_INT:
-					case ANY_INT:
-						if (prim != null) {
+					if (prim != null) {
+						switch (arg.getType()) {
+						case REG_BIT:
+						case ANY_BIT:
+							if (!prim.isBits()) {
+								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
+							}
+							break;
+						case REG_INT:
+						case ANY_INT:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							} else if (!prim.isNumber()) {
@@ -203,11 +217,9 @@ public class HDLFunctions {
 							} else if ((prim.getType() != HDLPrimitiveType.INT) && (prim.getType() != HDLPrimitiveType.INTEGER)) {
 								funcScore.incScore(5, "Automatic casting from uint to int will occour for parameter: " + paramName);
 							}
-						}
-						break;
-					case REG_UINT:
-					case ANY_UINT:
-						if (prim != null) {
+							break;
+						case REG_UINT:
+						case ANY_UINT:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							} else if (!prim.isNumber()) {
@@ -215,30 +227,26 @@ public class HDLFunctions {
 							} else if ((prim.getType() != HDLPrimitiveType.UINT) && (prim.getType() != HDLPrimitiveType.NATURAL)) {
 								funcScore.incScore(50, "Automatic casting from int to uint will occour for parameter: " + paramName);
 							}
-						}
-						break;
-					case BOOL_TYPE:
-						if (prim != null) {
+							break;
+						case BOOL_TYPE:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							} else if (prim.getType() != HDLPrimitiveType.BOOL) {
 								funcScore.incScore(100, "Automatic casting to boolean will occour for parameter: " + paramName);
 							}
-						}
-						break;
-					case STRING_TYPE:
-						if (prim != null) {
+							break;
+						case STRING_TYPE:
 							if (prim.getType() != HDLPrimitiveType.STRING) {
 								funcScore.incScore(1000, "There is no automatic casting to String for parameter: " + paramName);
 							}
+							break;
+						case ENUM:
+						case FUNCTION:
+						case IF:
+						case ANY_ENUM:
+						case ANY_IF:
+							break;
 						}
-						break;
-					case ENUM:
-					case FUNCTION:
-					case IF:
-					case ANY_ENUM:
-					case ANY_IF:
-						break;
 					}
 				}
 			}
@@ -248,6 +256,10 @@ public class HDLFunctions {
 	}
 
 	public static int checkRoughType(FunctionScore funcScore, final HDLFunctionParameter arg, final HDLType type, HDLExpression param) {
+		if (type == null) {
+			funcScore.incScore(1000, "Unkonwn type can not be cast to a bit representation for parameter: " + arg.getName().getName());
+			return funcScore.score;
+		}
 		switch (arg.getType()) {
 		case ANY_ENUM:
 		case ENUM:

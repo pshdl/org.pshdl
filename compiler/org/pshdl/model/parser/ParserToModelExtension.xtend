@@ -592,11 +592,14 @@ class ParserToModelExtension {
 			res = res.setRw(HDLFunctionParameter$RWType.getOp(context.psFuncParamRWType.text))
 		else
 			res = res.setRw(HDLFunctionParameter$RWType.READ)
+		if (context.constant!==null){
+			res=res.setConstant(true)
+		}
 		return res
 	}
 
 	def dispatch HDLFunctionParameter toHDL(PsFuncParamTypeContext context, boolean isStatement) {
-		var res = new HDLFunctionParameter
+		var res = new HDLFunctionParameter().setConstant(false)
 		switch (x:context) {
 			case x.ANY_INT !== null:
 				res = res.setType(Type.ANY_INT)

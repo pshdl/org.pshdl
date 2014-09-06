@@ -151,6 +151,8 @@ public class Definition implements NamedElement {
 		final String w = width != -1 ? "<" + width + ">" : "";
 		final String lowerCase = type.name().toLowerCase();
 		final String rwString = rw != null ? rw + " " : "";
+		if (type == Type.UNUSED)
+			return name + w + ";";
 		return rwString + reg + lowerCase + w + " " + name + sb + " " + warn + ";";
 	}
 

@@ -27,11 +27,10 @@
 package org.pshdl.model.simulation.codegenerator;
 
 import org.pshdl.interpreter.ExecutableModel;
-import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter;
 
 @SuppressWarnings("all")
 public class CCodeGeneratorParameter extends CommonCodeGeneratorParameter {
-  public CCodeGeneratorParameter(final ExecutableModel em) {
-    super(em, 64);
-  }
+	public CCodeGeneratorParameter(final ExecutableModel em) {
+		super(em, 64);
+	}
 }

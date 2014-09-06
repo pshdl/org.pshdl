@@ -92,13 +92,12 @@ public class HDLGenerators {
 		return Optional.absent();
 	}
 
-	public static void validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
+	public static boolean validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
 		final IHDLGenerator generator = generators.get(hdg.getGeneratorID());
-		if (generator != null) {
-			generator.validate(hdg, problems, context);
-		} else {
-			problems.add(new Problem(ErrorCode.GENERATOR_NOT_KNOWN, hdg));
-		}
+		if (generator != null)
+			return generator.validate(hdg, problems, context);
+		problems.add(new Problem(ErrorCode.GENERATOR_NOT_KNOWN, hdg));
+		return false;
 	}
 
 	public static Collection<IHDLGenerator> getAllGenerators() {

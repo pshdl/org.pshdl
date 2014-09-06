@@ -32,16 +32,27 @@ declaration
 	:	(
 			(row) | 
 			(column) | 
-			(alias)
+			(alias)  |
+			(constant)
 		) ;
 	
 row
 	:
 		'row' ID '{' 
 		(
+			(filling)    |
 			(definition) | 
 			(reference)
 		)* '}';
+
+constant
+	:
+		'const' ID? value=(NUMBER | '$date' | '$time' | '$checkSum') ';';
+
+filling
+	:
+		'fill' ('<' width '>')? ';';
+
 column 
 	:	
 		'column' ID '{' (reference)* '}';
@@ -62,7 +73,7 @@ definition
 		type
 		('<' width '>')? 
 		ID 
-		('[' INT ']')* 
+		('[' NUMBER ']')* 
 		(warnType)?
 		';';
 warnType
@@ -71,20 +82,24 @@ warnType
 		'error'|
 		'limit');
 rwStatus:	('r' | 'w' | 'rw');
-width	:	INT;
+width	:	NUMBER;
 type	
 	:
 		('int' | 'uint' | 'bit');
 reference
 	:	
 		ID
-		('[' INT ']')* ';';
+		('[' NUMBER ']')* ';';
 
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
 
-INT :	'0'..'9'+
-    ;
+NUMBER :
+	'0b' ( '0' | '1' | '_')+ |
+	'0x' ( 'a' .. 'f' | 'A' .. 'F' | '0' .. '9' | '_')+ |
+	'1' .. '9' ( '0' .. '9' | '_' )+ |
+	'0' .. '9'
+;
 
 COMMENT
     :   ('//' ~('\n'|'\r')* '\r'? '\n' 

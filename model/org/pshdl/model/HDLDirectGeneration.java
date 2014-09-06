@@ -40,7 +40,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
- * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
+ * <li>HDLInterface hIf. Can be <code>null</code>.</li>
  * <li>String generatorID. Can <b>not</b> be <code>null</code>.</li>
  * <li>String generatorContent. Can <b>not</b> be <code>null</code>.</li>
  * <li>Boolean include. Can <b>not</b> be <code>null</code>.</li>
@@ -59,7 +59,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * @param arguments
 	 *            the value for arguments. Can be <code>null</code>.
 	 * @param hIf
-	 *            the value for hIf. Can <b>not</b> be <code>null</code>.
+	 *            the value for hIf. Can be <code>null</code>.
 	 * @param generatorID
 	 *            the value for generatorID. Can <b>not</b> be <code>null</code>
 	 *            .
@@ -72,7 +72,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 *            if <code>true</code> the parameters will be validated.
 	 */
 	public HDLDirectGeneration(int id, @Nullable IHDLObject container, @Nullable Iterable<HDLAnnotation> annotations, @Nonnull HDLVariable var,
-			@Nullable Iterable<HDLArgument> arguments, @Nonnull HDLInterface hIf, @Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include,
+			@Nullable Iterable<HDLArgument> arguments, @Nullable HDLInterface hIf, @Nonnull String generatorID, @Nonnull String generatorContent, @Nonnull Boolean include,
 			boolean validate) {
 		super(id, container, annotations, var, arguments, hIf, generatorID, generatorContent, include, validate);
 	}
@@ -93,7 +93,7 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	 * The accessor for the field hIf which is of type HDLInterface.
 	 */
 	public static HDLFieldAccess<HDLDirectGeneration, HDLInterface> fHIf = new HDLFieldAccess<HDLDirectGeneration, HDLInterface>("hIf", HDLInterface.class,
-			HDLFieldAccess.Quantifier.ONE) {
+			HDLFieldAccess.Quantifier.ZERO_OR_ONE) {
 		@Override
 		public HDLInterface getValue(HDLDirectGeneration obj) {
 			if (obj == null)

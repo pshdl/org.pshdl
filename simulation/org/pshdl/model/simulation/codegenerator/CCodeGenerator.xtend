@@ -64,8 +64,8 @@ import org.pshdl.model.utils.services.AuxiliaryContent
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
-class CCodeGeneratorParameter extends CommonCodeGeneratorParameter{
-	new (ExecutableModel em){
+class CCodeGeneratorParameter extends CommonCodeGeneratorParameter {
+	new(ExecutableModel em) {
 		super(em, 64)
 	}
 }
@@ -73,6 +73,7 @@ class CCodeGeneratorParameter extends CommonCodeGeneratorParameter{
 class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider {
 
 	private CommonCompilerExtension cce
+	private boolean hasPow = false
 	public static String COMPILER = "/usr/bin/clang"
 
 	new() {
@@ -107,7 +108,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			override newInstance() {
 				val ProcessBuilder execBuilder = new ProcessBuilder(executable.getAbsolutePath())
 				val Process testExec = execBuilder.directory(tempDir).redirectErrorStream(true).start()
-				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5, executable.getAbsolutePath())
+				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5,
+					executable.getAbsolutePath())
 			}
 		}
 	}
@@ -246,13 +248,25 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
-		if (fi.inst === Instruction.sra) {
-			return assignTempVar(targetSizeWithType, pos, attributes,
-				'''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''', true)
-		}
-		if (fi.inst === Instruction.srl) {
-			return assignTempVar(targetSizeWithType, pos, attributes,
-				'''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''', true)
+		switch (fi.inst) {
+			case Instruction.sra:
+				return assignTempVar(targetSizeWithType, pos, attributes,
+					'''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''', true)
+			case Instruction.srl:
+				return assignTempVar(targetSizeWithType, pos, attributes,
+					'''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''', true)
+			case Instruction.less:
+				return assignTempVar(targetSizeWithType, pos, attributes,
+					'''(int64_t)«getTempName(leftOperand, NONE)» < (int64_t)«getTempName(rightOperand, NONE)»''', true)
+			case Instruction.less_eq:
+				return assignTempVar(targetSizeWithType, pos, attributes,
+					'''(int64_t)«getTempName(leftOperand, NONE)» <= (int64_t)«getTempName(rightOperand, NONE)»''', true)
+			case Instruction.greater:
+				return assignTempVar(targetSizeWithType, pos, attributes,
+					'''(int64_t)«getTempName(leftOperand, NONE)» > (int64_t)«getTempName(rightOperand, NONE)»''', true)
+			case Instruction.greater_eq:
+				return assignTempVar(targetSizeWithType, pos, attributes,
+					'''(int64_t)«getTempName(leftOperand, NONE)» >= (int64_t)«getTempName(rightOperand, NONE)»''', true)
 		}
 		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
@@ -311,7 +325,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		static uint32_t hash(char* str){
 			size_t len=strlen(str);
 			uint32_t hash = 2166136261;
-			for (int i=0;i<len;i++){
+			int i;
+			for (i=0;i<len;i++){
 			   	hash = hash ^ str[i];
 			   	hash = hash * 16777619;
 			   }
@@ -344,18 +359,19 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			}
 			return 0;
 		}
-		
-		static uint64_t pow(uint64_t a, uint64_t n){
-		    uint64_t result = 1;
-		    uint64_t p = a;
-		    while (n > 0){
-		        if ((n % 2) != 0)
-		            result = result * p;
-		        p = p * p;
-		        n = n / 2;
-		    }
-		    return result;
-		}
+		«IF hasPow»
+			static uint64_t pshdl_sim_pow(uint64_t a, uint64_t n){
+			    uint64_t result = 1;
+			    uint64_t p = a;
+			    while (n > 0){
+			        if ((n % 2) != 0)
+			            result = result * p;
+			        p = p * p;
+			        n = n / 2;
+			    }
+			    return result;
+			}
+		«ENDIF»
 	'''
 
 	def Map<Integer, List<VariableInformation>> getHashed(Iterable<VariableInformation> informations) {
@@ -669,8 +685,8 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		val List<AuxiliaryContent> sideFiles = Lists.newLinkedList
 		sideFiles.addAll(comp.auxiliaryContent)
 		return Lists.newArrayList(
-			new CompileResult(syntaxProblems, comp.generateMainCode.toString, parameter.em.moduleName, sideFiles, parameter.em.source,
-				comp.hookName, true));
+			new CompileResult(syntaxProblems, comp.generateMainCode.toString, parameter.em.moduleName, sideFiles,
+				parameter.em.source, comp.hookName, true));
 	}
 
 	override invoke(CommandLine cli, ExecutableModel em, Set<Problem> syntaxProblems) throws Exception {
@@ -680,8 +696,11 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''memset(«vi.idName(true, NONE)», «regFillValue», «vi.
 		arraySize»);'''
 
-	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
-		return assignTempVar(targetSizeWithType, pos, NONE,'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''' , true)
+	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
+		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
+		hasPow = true
+		return assignTempVar(targetSizeWithType, pos, NONE,
+			'''pshdl_sim_pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
 
 }

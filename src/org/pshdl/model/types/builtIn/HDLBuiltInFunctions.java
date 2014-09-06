@@ -341,8 +341,12 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 				HDLPrimitive posType, HDLPrimitive posTypeNoWidth, HDLEvaluationContext context) {
 			switch (arg1Type.getType()) {
 			case INT:
+				if (arg0Width.equals(arg1Width))
+					return Optional.of(HDLPrimitive.getInt().setWidth(arg0Width));
 				return Optional.of(HDLPrimitive.getInt().setWidth(MAX_UINT.getCall(arg0Width, arg1Width)));
 			case UINT:
+				if (arg0Width.equals(arg1Width))
+					return Optional.of(HDLPrimitive.getInt().setWidth(arg0Width));
 				return Optional.of(posType.setWidth(MAX_UINT.getCall(arg0Width, arg1Width)));
 			case INTEGER:
 				posType = HDLPrimitive.getInt();
