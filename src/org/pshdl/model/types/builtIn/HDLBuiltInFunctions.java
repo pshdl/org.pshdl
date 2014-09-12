@@ -33,28 +33,44 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.pshdl.model.HDLAssignment;
+import org.pshdl.model.HDLEnum;
+import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLFunctionParameter.Type;
+import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLNativeFunction;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
+import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLSwitchCaseStatement;
+import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLType;
+import org.pshdl.model.HDLVariable;
+import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
+import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.RangeExtension;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.simulation.RangeTool;
 import org.pshdl.model.types.builtIn.HDLFunctionImplementation.HDLDefaultFunctionImpl;
+import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.Insulin;
+import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.services.INativeFunctionProvider;
+import org.pshdl.model.validation.Problem;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 import com.google.common.math.BigIntegerMath;
 
 public class HDLBuiltInFunctions implements INativeFunctionProvider {
@@ -366,6 +382,59 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 		}
 	}
 
+	public static class OrdinalFunction extends HDLDefaultFunctionImpl {
+
+		public OrdinalFunction() {
+			super(true, true);
+		}
+
+		@Override
+		public void transform(HDLFunctionCall call, HDLEvaluationContext context, ModificationSet ms) {
+			if (call.getParams().isEmpty())
+				return;
+			final HDLExpression enumRef = call.getParams().get(0);
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(enumRef);
+			final HDLEnum enumType = (HDLEnum) typeOf.get();
+			final HDLQualifiedName hEnum = FullNameExtension.fullNameOf(enumType);
+			HDLSwitchStatement switchStmnt = new HDLSwitchStatement().setCaseExp(enumRef);
+			final HDLVariable tmpVar = new HDLVariable().setName(Insulin.getTempName("func", "ordinal"));
+			final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getNatural()).addVariables(tmpVar);
+			int pos = 0;
+			for (final HDLVariable e : enumType.getEnums()) {
+				HDLSwitchCaseStatement caseStatement = new HDLSwitchCaseStatement().setLabel(new HDLEnumRef().setVar(e.asRef()).setHEnum(hEnum));
+				caseStatement = caseStatement.addDos(new HDLAssignment().setLeft(tmpVar.asHDLRef()).setRight(HDLLiteral.get(pos)));
+				switchStmnt = switchStmnt.addCases(caseStatement);
+				pos++;
+			}
+			switchStmnt = switchStmnt.addCases(new HDLSwitchCaseStatement());
+			ms.replace(call, tmpVar.asHDLRef());
+			ms.insertBefore(call.getContainer(HDLStatement.class), hvd, switchStmnt);
+		}
+
+		@Override
+		public Set<Problem> validateCall(HDLFunctionCall call, HDLEvaluationContext context) {
+			if (call.getParams().isEmpty())
+				return Sets.newHashSet(new Problem(ErrorCode.FUNCTION_NOT_ENOUGH_PARAMETER, call));
+			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(call.getParams().get(0));
+			if (!typeOf.isPresent())
+				return Sets.newHashSet(new Problem(ErrorCode.UNRESOLVED_TYPE, call));
+			if (!(typeOf.get() instanceof HDLEnum))
+				return Sets.newHashSet(new Problem(ErrorCode.UNSUPPORTED_TYPE_FOR_OP, call));
+			return super.validateCall(call, context);
+		}
+
+		@Override
+		public String getDocumentation(HDLFunction function) {
+			return "Returns the ordinal of the given enum. The enumeration starts at 0";
+		}
+
+		@Override
+		public HDLFunction[] signatures() {
+			return new HDLFunction[] { ORDINAL };
+		}
+
+	}
+
 	public static class Log2class extends HDLDefaultFunctionImpl {
 
 		public Log2class() {
@@ -448,6 +517,13 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 
 	}
 
+	public static final HDLFunction ORDINAL = (HDLFunction) createOrdinal().freeze(null);
+
+	public static HDLNativeFunction createOrdinal() {
+		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.ordinal.name()).setReturnType(returnType(Type.REG_UINT))
+				.addArgs(param(Type.ANY_ENUM, "e"));
+	}
+
 	public static final HDLFunction HIGHZ = (HDLFunction) createHighZ().freeze(null);
 
 	public static HDLNativeFunction createHighZ() {
@@ -498,7 +574,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 	}
 
 	public static enum BuiltInFunctions {
-		highZ, min, max, abs, log2ceil, log2floor, assertThat
+		highZ, min, max, abs, log2ceil, log2floor, assertThat, ordinal
 	}
 
 	public static BuiltInFunctions getFuncEnum(HDLFunctionCall function) {
@@ -523,7 +599,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 
 	@Override
 	public HDLFunctionImplementation[] getStaticFunctions() {
-		return new HDLFunctionImplementation[] { new AbsFunction(), new AssertThat(), new HighZFunction(), new Log2class(), new MinMaxFunction() };
+		return new HDLFunctionImplementation[] { new AbsFunction(), new AssertThat(), new HighZFunction(), new Log2class(), new MinMaxFunction(), new OrdinalFunction() };
 	}
 
 }

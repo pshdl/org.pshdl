@@ -212,9 +212,6 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		return hash;
 	}
 
-	override protected writeToNull(String last) '''(void)«last»; //Write to #null
-		'''
-
 	override protected runMethodsFooter(boolean constant) '''}
 		'''
 
@@ -280,17 +277,17 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 	def protected helperMethods() '''
 		void pshdl_sim_setInput(uint32_t idx, uint64_t value) {
-			pshdl_sim_setInputArray(idx, value, ((void *)0));
+			pshdl_sim_setInputArray(idx, value, 0);
 		}
-		void pshdl_sim_setInputArray(uint32_t idx, uint64_t value, uint32_t arrayIdx[]) {
+		void pshdl_sim_setInputArray(uint32_t idx, uint64_t value, uint32_t offset) {
 			switch (idx) {
-				«setInputCases("value", null)»
+				«setInputCases("value", null, EnumSet.of(Attributes.useArrayOffset))»
 			}
 		}
 		
 		char* pshdl_sim_getName(uint32_t idx) {
 			switch (idx) {
-				«FOR v : em.variables.excludeNull»
+				«FOR v : em.variables»
 					case «v.getVarIdx(false)»: return "«v.name»";
 				«ENDFOR»
 			}
@@ -336,7 +333,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		int pshdl_sim_getIndex(char* name) {
 			uint32_t hashName=hash(name);
 			switch (hashName) {
-				«FOR Map.Entry<Integer, List<VariableInformation>> e : em.variables.excludeNull.hashed.entrySet»
+				«FOR Map.Entry<Integer, List<VariableInformation>> e : em.variables.hashed.entrySet»
 					case «constant32Bit(e.key)»:
 						«FOR VariableInformation vi : e.value» 
 							if (strcmp(name, "«vi.name»") == 0)
@@ -350,15 +347,16 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		}
 		
 		uint64_t pshdl_sim_getOutput(uint32_t idx) {
-			return pshdl_sim_getOutputArray(idx, ((void *)0));
+			return pshdl_sim_getOutputArray(idx, 0);
 		}
 		
-		uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t arrayIdx[]) {
+		uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t offset) {
 			switch (idx) {
-				«getOutputCases(null)»
+				«getOutputCases(null, EnumSet.of(Attributes.useArrayOffset))»
 			}
 			return 0;
 		}
+		
 		«IF hasPow»
 			static uint64_t pshdl_sim_pow(uint64_t a, uint64_t n){
 			    uint64_t result = 1;
@@ -413,15 +411,21 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	}
 
 	override getAuxiliaryContent() {
-		val generic_h = new AuxiliaryContent("pshdl_generic_sim.h",
-			typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h"), true)
-		val specific_h = new AuxiliaryContent(headerName() + ".h", specificHeader.toString)
-		val res = Lists.newArrayList(generic_h, specific_h)
-		val simEncapsulation = generateSimEncapsuation
-		if (simEncapsulation !== null) {
-			res.add(new AuxiliaryContent("simEncapsulation.c", simEncapsulation))
+		val generic_hStream = typeof(CCodeGenerator).getResourceAsStream(
+			"/org/pshdl/model/simulation/includes/pshdl_generic_sim.h")
+		try {
+			val generic_h = new AuxiliaryContent("pshdl_generic_sim.h", generic_hStream, true)
+
+			val specific_h = new AuxiliaryContent(headerName() + ".h", specificHeader.toString)
+			val res = Lists.newArrayList(generic_h, specific_h)
+			val simEncapsulation = generateSimEncapsuation
+			if (simEncapsulation !== null) {
+				res.add(new AuxiliaryContent("simEncapsulation.c", simEncapsulation))
+			}
+			return res
+		} finally {
+			generic_hStream.close
 		}
-		return res
 	}
 
 	def protected headerName() {
@@ -437,7 +441,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 #define _«headerName»_h_
 #include "pshdl_generic_sim.h"
 
-«FOR VariableInformation vi : em.variables.excludeNull»
+«FOR VariableInformation vi : em.variables»
 	///Use this index define to access <tt> «vi.name.replaceAll("\\@", "\\\\@")» </tt> via getOutput/setInput methods
 	#define «vi.defineName» «vi.getVarIdx(purgeAliases)»
 «ENDFOR»

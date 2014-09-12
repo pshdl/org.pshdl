@@ -186,8 +186,8 @@ class SimulationTransformationExtension {
 		var newProcess = process
 		if (newProcess === null && simAnno !== null)
 			newProcess = "ONCE"
-		val FluidFrame res = new FluidFrame(obj, "#null", false, newProcess)
-		res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
+		val FluidFrame res = new FluidFrame(obj, null, false, newProcess)
+//		res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
 		var Direction dir
 		switch (obj.direction) {
 			case IN: dir = Direction.IN
@@ -244,7 +244,7 @@ class SimulationTransformationExtension {
 			createInit(config, obj, context, res, true, process);
 			if (config.syncType === HDLRegSyncType.ASYNC)
 				createInit(config, obj, context, res, false, process);
-			res.add(const0)
+//			res.add(const0)
 		}
 		return res
 	}

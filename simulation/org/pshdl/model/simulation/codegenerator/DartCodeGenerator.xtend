@@ -226,7 +226,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 
 	override protected footer() '''	void setVar(int idx, dynamic value, {int offset}) {
 		switch (idx) {
-			«setInputCases("value", null)»
+			«setInputCases("value", null, EnumSet.of(Attributes.useArrayOffset))»
 			default:
 				throw new ArgumentError("Not a valid index: $idx");
 		}
@@ -248,7 +248,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	
 	dynamic getVar(int idx, {int offset}) {
 		switch (idx) {
-			«getOutputCases(null)»
+			«getOutputCases(null, EnumSet.of(Attributes.useArrayOffset))»
 			default:
 				throw new ArgumentError("Not a valid index: $idx");
 		}
@@ -263,7 +263,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	bool get «DISABLE_REG_OUTPUTLOGIC.name» => «DISABLE_REG_OUTPUTLOGIC.idName(true, NONE)»;
 	set «DISABLE_REG_OUTPUTLOGIC.name»(bool newVal) => «DISABLE_REG_OUTPUTLOGIC.idName(true, NONE)»=newVal;
 	
-	«FOR VariableInformation vi : em.variables.excludeNull»
+	«FOR VariableInformation vi : em.variables»
 	int get «vi.name.idName(false, NONE)» => «vi.name.idName(true, NONE)»;
 	set «vi.name.idName(false, NONE)»(int newVal) => «vi.name.idName(true, NONE)»=newVal;
 	«ENDFOR»

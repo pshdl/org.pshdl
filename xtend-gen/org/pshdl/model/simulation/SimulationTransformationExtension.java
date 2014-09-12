@@ -225,10 +225,7 @@ public class SimulationTransformationExtension {
 		if (_and) {
 			newProcess = "ONCE";
 		}
-		final FluidFrame res = new FluidFrame(obj, "#null", false, newProcess);
-		final VariableInformation _variableInformation = new VariableInformation(VariableInformation.Direction.INTERNAL, "#null", 1, VariableInformation.Type.BIT, false, false,
-				false, null);
-		res.addVar(_variableInformation);
+		final FluidFrame res = new FluidFrame(obj, null, false, newProcess);
 		VariableInformation.Direction dir = null;
 		final HDLVariableDeclaration.HDLDirection _direction = obj.getDirection();
 		if (_direction != null) {
@@ -326,9 +323,9 @@ public class SimulationTransformationExtension {
 					allAnnos.add(enumAnno);
 				}
 				final String[] _annoString = this.toAnnoString(allAnnos);
-				final VariableInformation _variableInformation_1 = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, clock, reset, _annoString,
+				final VariableInformation _variableInformation = new VariableInformation(dir, varName, (width).intValue(), vType, isReg, clock, reset, _annoString,
 						((int[]) Conversions.unwrapArray(dims, int.class)));
-				res.addVar(_variableInformation_1);
+				res.addVar(_variableInformation);
 			}
 		}
 		if (isReg) {
@@ -368,7 +365,6 @@ public class SimulationTransformationExtension {
 			if (_tripleEquals_5) {
 				this.createInit(config, obj, context, res, false, process);
 			}
-			res.add(Instruction.const0);
 		}
 		return res;
 	}

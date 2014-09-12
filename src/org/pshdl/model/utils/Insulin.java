@@ -66,7 +66,6 @@ import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLFunctionParameter.Type;
 import org.pshdl.model.HDLIfStatement;
-import org.pshdl.model.HDLInlineFunction;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLInterfaceRef;
@@ -87,7 +86,6 @@ import org.pshdl.model.HDLResolvedRef;
 import org.pshdl.model.HDLShiftOp;
 import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import org.pshdl.model.HDLStatement;
-import org.pshdl.model.HDLSubstituteFunction;
 import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLTernary;
@@ -717,19 +715,7 @@ public class Insulin {
 							}
 						}
 					}
-					switch (function.get().getClassType()) {
-					case HDLInlineFunction:
-						final HDLInlineFunction hif = (HDLInlineFunction) function.get();
-						final HDLExpression equivalentExpression = hif.getReplacementExpression(hdi);
-						ms.replace(hdi, equivalentExpression);
-						break;
-					case HDLSubstituteFunction:
-						final HDLSubstituteFunction hsf = (HDLSubstituteFunction) function.get();
-						final HDLStatement[] statements = hsf.getReplacementStatements(hdi);
-						ms.replace(hdi, statements);
-						break;
-					default:
-					}
+					HDLFunctions.transform(hdi, null, ms);
 				}
 			}
 			pkg = ms.apply(pkg);

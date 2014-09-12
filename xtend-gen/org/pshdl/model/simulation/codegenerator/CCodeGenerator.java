@@ -391,16 +391,6 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 	}
 
 	@Override
-	protected CharSequence writeToNull(final String last) {
-		final StringConcatenation _builder = new StringConcatenation();
-		_builder.append("(void)");
-		_builder.append(last, "");
-		_builder.append("; //Write to #null");
-		_builder.newLineIfNotEmpty();
-		return _builder;
-	}
-
-	@Override
 	protected CharSequence runMethodsFooter(final boolean constant) {
 		final StringConcatenation _builder = new StringConcatenation();
 		_builder.append("}");
@@ -611,17 +601,18 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 		_builder.append("void pshdl_sim_setInput(uint32_t idx, uint64_t value) {");
 		_builder.newLine();
 		_builder.append("\t");
-		_builder.append("pshdl_sim_setInputArray(idx, value, ((void *)0));");
+		_builder.append("pshdl_sim_setInputArray(idx, value, 0);");
 		_builder.newLine();
 		_builder.append("}");
 		_builder.newLine();
-		_builder.append("void pshdl_sim_setInputArray(uint32_t idx, uint64_t value, uint32_t arrayIdx[]) {");
+		_builder.append("void pshdl_sim_setInputArray(uint32_t idx, uint64_t value, uint32_t offset) {");
 		_builder.newLine();
 		_builder.append("\t");
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		_builder.append("\t\t");
-		final CharSequence _setInputCases = this.setInputCases("value", null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.useArrayOffset);
+		final CharSequence _setInputCases = this.setInputCases("value", null, _of);
 		_builder.append(_setInputCases, "\t\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t");
@@ -636,8 +627,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		{
-			final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-			for (final VariableInformation v : _excludeNull) {
+			for (final VariableInformation v : this.em.variables) {
 				_builder.append("\t\t");
 				_builder.append("case ");
 				final int _varIdx = this.getVarIdx(v, false);
@@ -753,8 +743,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 		_builder.append("switch (hashName) {");
 		_builder.newLine();
 		{
-			final Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
-			final Map<Integer, List<VariableInformation>> _hashed = this.getHashed(_excludeNull_1);
+			final Map<Integer, List<VariableInformation>> _hashed = this.getHashed(((Iterable<VariableInformation>) Conversions.doWrapArray(this.em.variables)));
 			final Set<Map.Entry<Integer, List<VariableInformation>>> _entrySet = _hashed.entrySet();
 			for (final Map.Entry<Integer, List<VariableInformation>> e : _entrySet) {
 				_builder.append("\t\t");
@@ -804,18 +793,19 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 		_builder.append("uint64_t pshdl_sim_getOutput(uint32_t idx) {");
 		_builder.newLine();
 		_builder.append("\t");
-		_builder.append("return pshdl_sim_getOutputArray(idx, ((void *)0));");
+		_builder.append("return pshdl_sim_getOutputArray(idx, 0);");
 		_builder.newLine();
 		_builder.append("}");
 		_builder.newLine();
 		_builder.newLine();
-		_builder.append("uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t arrayIdx[]) {");
+		_builder.append("uint64_t pshdl_sim_getOutputArray(uint32_t idx, uint32_t offset) {");
 		_builder.newLine();
 		_builder.append("\t");
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		_builder.append("\t\t");
-		final CharSequence _outputCases = this.getOutputCases(null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.useArrayOffset);
+		final CharSequence _outputCases = this.getOutputCases(null, _of_1);
 		_builder.append(_outputCases, "\t\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t");
@@ -825,6 +815,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 		_builder.append("return 0;");
 		_builder.newLine();
 		_builder.append("}");
+		_builder.newLine();
 		_builder.newLine();
 		{
 			if (this.hasPow) {
@@ -942,21 +933,25 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 	@Override
 	public Iterable<AuxiliaryContent> getAuxiliaryContent() {
 		try {
-			final InputStream _resourceAsStream = CCodeGenerator.class.getResourceAsStream("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h");
-			final AuxiliaryContent generic_h = new AuxiliaryContent("pshdl_generic_sim.h", _resourceAsStream, true);
-			final String _headerName = this.headerName();
-			final String _plus = (_headerName + ".h");
-			final CharSequence _specificHeader = this.getSpecificHeader();
-			final String _string = _specificHeader.toString();
-			final AuxiliaryContent specific_h = new AuxiliaryContent(_plus, _string);
-			final ArrayList<AuxiliaryContent> res = Lists.<AuxiliaryContent> newArrayList(generic_h, specific_h);
-			final String simEncapsulation = this.generateSimEncapsuation();
-			final boolean _tripleNotEquals = (simEncapsulation != null);
-			if (_tripleNotEquals) {
-				final AuxiliaryContent _auxiliaryContent = new AuxiliaryContent("simEncapsulation.c", simEncapsulation);
-				res.add(_auxiliaryContent);
+			final InputStream generic_hStream = CCodeGenerator.class.getResourceAsStream("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h");
+			try {
+				final AuxiliaryContent generic_h = new AuxiliaryContent("pshdl_generic_sim.h", generic_hStream, true);
+				final String _headerName = this.headerName();
+				final String _plus = (_headerName + ".h");
+				final CharSequence _specificHeader = this.getSpecificHeader();
+				final String _string = _specificHeader.toString();
+				final AuxiliaryContent specific_h = new AuxiliaryContent(_plus, _string);
+				final ArrayList<AuxiliaryContent> res = Lists.<AuxiliaryContent> newArrayList(generic_h, specific_h);
+				final String simEncapsulation = this.generateSimEncapsuation();
+				final boolean _tripleNotEquals = (simEncapsulation != null);
+				if (_tripleNotEquals) {
+					final AuxiliaryContent _auxiliaryContent = new AuxiliaryContent("simEncapsulation.c", simEncapsulation);
+					res.add(_auxiliaryContent);
+				}
+				return res;
+			} finally {
+				generic_hStream.close();
 			}
-			return res;
 		} catch (final Throwable _e) {
 			throw Exceptions.sneakyThrow(_e);
 		}
@@ -996,8 +991,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
 		_builder.newLine();
 		_builder.newLine();
 		{
-			final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-			for (final VariableInformation vi : _excludeNull) {
+			for (final VariableInformation vi : this.em.variables) {
 				_builder.append("///Use this index define to access <tt> ");
 				final String _replaceAll = vi.name.replaceAll("\\@", "\\\\@");
 				_builder.append(_replaceAll, "");

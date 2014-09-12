@@ -919,7 +919,11 @@ public class BuiltInValidator implements IHDLValidator {
 							} else {
 								final BigInteger le = range.lowerEndpoint();
 								if (le.compareTo(BigInteger.ZERO) < 0) {
-									problems.add(new Problem(ErrorCode.TYPE_NEGATIVE_WIDTH, hvd));
+									if (range.hasUpperBound() && (range.upperEndpoint().compareTo(BigInteger.ZERO) < 0)) {
+										problems.add(new Problem(ErrorCode.TYPE_NEGATIVE_WIDTH, hvd));
+									} else {
+										problems.add(new Problem(ErrorCode.TYPE_POSSIBLY_NEGATIVE_WIDTH, hvd));
+									}
 								} else if (le.equals(BigInteger.ZERO) && range.hasUpperBound() && range.upperEndpoint().equals(BigInteger.ZERO)) {
 									problems.add(new Problem(ErrorCode.TYPE_ZERO_WIDTH, hvd));
 								} else if (le.equals(BigInteger.ZERO)) {
@@ -942,9 +946,6 @@ public class BuiltInValidator implements IHDLValidator {
 		}
 		final HDLManip[] manips = unit.getAllObjectsOf(HDLManip.class, true);
 		for (final HDLManip manip : manips) {
-			if (skipExp(manip)) {
-				continue;
-			}
 			final Optional<? extends HDLType> targetType = TypeExtension.typeOf(manip.getTarget());
 			if (targetType.isPresent()) {
 				final HDLType tt = targetType.get();
@@ -983,6 +984,20 @@ public class BuiltInValidator implements IHDLValidator {
 					}
 					break;
 				case CAST:
+					final HDLType castTo = manip.getCastTo();
+					if (castTo instanceof HDLInterface) {
+						if (!(tt instanceof HDLInterface)) {
+							problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not cast from interface to non interface type:" + castTo));
+						}
+					}
+					if (castTo instanceof HDLEnum) {
+						problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Enums can not be casted to anything"));
+					}
+					if (castTo instanceof HDLPrimitive) {
+						if (!(tt instanceof HDLPrimitive)) {
+							problems.add(new Problem(UNSUPPORTED_TYPE_FOR_OP, manip, "Can not cast from primitve to non primitive type:" + castTo));
+						}
+					}
 					break;
 				}
 			}

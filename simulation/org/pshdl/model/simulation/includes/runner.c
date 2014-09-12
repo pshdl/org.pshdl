@@ -15,7 +15,7 @@
 
 
 int main(int argc, const char *argv[]) {
-  uint32_t idx, offset[1];
+  uint32_t idx, offset;
   uint64_t value;
   char line[1024];
   printf("#Ready\n");
@@ -32,7 +32,7 @@ int main(int argc, const char *argv[]) {
         printf(">an\n");
         break;
       case 'a':
-        sscanf(&line[2], "%d %d %llx", &idx, offset, &value);
+        sscanf(&line[2], "%d %d %llx", &idx, &offset, &value);
         assert(value == pshdl_sim_getOutputArray(idx, offset));
         printf(">aa\n");
         break;
@@ -77,8 +77,8 @@ int main(int argc, const char *argv[]) {
         printf(">gn %d %llx\n", idx, pshdl_sim_getOutput(idx));
         break;
       case 'a':
-        sscanf(&line[2], "%d %d", &idx, offset);
-        printf(">ga %d %d %llx\n", idx, offset[0],
+        sscanf(&line[2], "%d %d", &idx, &offset);
+        printf(">ga %d %d %llx\n", idx, offset,
                pshdl_sim_getOutputArray(idx, offset));
         break;
       }
@@ -108,13 +108,9 @@ int main(int argc, const char *argv[]) {
         printf(">sn\n");
         break;
       case 'a':
-        sscanf(&line[2], "%d %d %llx", &idx, offset, &value);
-        printf("#Setting %d[%d] to %llx\n", idx, offset[0], value);
-#ifndef OLDGENERATOR
+        sscanf(&line[2], "%d %d %llx", &idx, &offset, &value);
+        printf("#Setting %d[%d] to %llx\n", idx, offset, value);
         pshdl_sim_setInputArray(idx, value, offset);
-#else
-        pshdl_sim_setInput(idx, value, offset[0]);
-#endif
         printf(">sa\n");
         break;
       }

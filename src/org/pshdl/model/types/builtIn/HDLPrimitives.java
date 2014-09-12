@@ -544,6 +544,8 @@ public class HDLPrimitives {
 		final Optional<? extends HDLType> typeOfLeft = TypeExtension.typeOf(target);
 		if (!typeOfLeft.isPresent())
 			return createError("cast", manip);
+		if (!(typeOfLeft.get() instanceof HDLPrimitive))
+			return createError("cast", manip);
 		final HDLPrimitive determineType = (HDLPrimitive) typeOfLeft.get();
 		switch (manip.getType()) {
 		case CAST:

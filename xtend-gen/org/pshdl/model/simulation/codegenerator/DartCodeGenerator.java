@@ -425,7 +425,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		_builder.append("\t\t\t");
-		final CharSequence _setInputCases = this.setInputCases("value", null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.useArrayOffset);
+		final CharSequence _setInputCases = this.setInputCases("value", null, _of);
 		_builder.append(_setInputCases, "\t\t\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t\t\t");
@@ -493,7 +494,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		_builder.append("\t\t\t");
-		final CharSequence _outputCases = this.getOutputCases(null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.useArrayOffset);
+		final CharSequence _outputCases = this.getOutputCases(null, _of_1);
 		_builder.append(_outputCases, "\t\t\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t\t\t");
@@ -558,8 +560,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("\t");
 		_builder.newLine();
 		{
-			final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-			for (final VariableInformation vi : _excludeNull) {
+			for (final VariableInformation vi : this.em.variables) {
 				_builder.append("\t");
 				_builder.append("int get ");
 				final CharSequence _idName_4 = this.idName(vi.name, false, CommonCodeGenerator.NONE);

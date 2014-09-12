@@ -374,7 +374,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
 		_builder.append("switch idx {");
 		_builder.newLine();
 		_builder.append("\t");
-		final CharSequence _setInputCases = this.setInputCases("value", null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.isArrayArg);
+		final CharSequence _setInputCases = this.setInputCases("value", null, _of);
 		_builder.append(_setInputCases, "\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t");
@@ -468,7 +469,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
 		_builder.append("switch idx {");
 		_builder.newLine();
 		_builder.append("\t");
-		final CharSequence _outputCases = this.getOutputCases(null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.isArrayArg);
+		final CharSequence _outputCases = this.getOutputCases(null, _of_1);
 		_builder.append(_outputCases, "\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t");
@@ -626,13 +628,11 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
 		_builder.append("\t");
 		_builder.append("s.varIdx = make(map[string]int, ");
 		final int _size = ((List<VariableInformation>) Conversions.doWrapArray(this.em.variables)).size();
-		final int _minus = (_size - 1);
-		_builder.append(_minus, "\t");
+		_builder.append(_size, "\t");
 		_builder.append(")");
 		_builder.newLineIfNotEmpty();
 		{
-			final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-			for (final VariableInformation v : _excludeNull) {
+			for (final VariableInformation v : this.em.variables) {
 				_builder.append("\t");
 				_builder.append("s.varIdx[\"");
 				_builder.append(v.name, "\t");
@@ -997,15 +997,6 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
 		_builder.append(_tempName_1, "");
 		_builder.append(")");
 		return this.assignTempVar(targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
-	}
-
-	@Override
-	protected CharSequence writeToNull(final String last) {
-		final StringConcatenation _builder = new StringConcatenation();
-		_builder.append("var _ = ");
-		_builder.append(last, "");
-		_builder.newLineIfNotEmpty();
-		return _builder;
 	}
 
 	@Override

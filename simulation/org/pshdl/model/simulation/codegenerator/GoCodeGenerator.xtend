@@ -205,7 +205,7 @@ func (s *«unit») SetInputWithName(name string, value int64, arrayIdx ...int) {
  
 func (s *«unit») SetInput(idx int, value int64, arrayIdx ...int) {
 	switch idx {
-	«setInputCases("value", null)»
+	«setInputCases("value", null, EnumSet.of(Attributes.isArrayArg))»
 	default:
 		panic("Not a valid index")
 	}
@@ -236,7 +236,7 @@ func (s *«unit») GetOutputWithName(name string, arrayIdx ...int) int64 {
  
 func (s *«unit») GetOutput(idx int, arrayIdx ...int) int64 {
 	switch idx {
-	«getOutputCases(null)»
+	«getOutputCases(null, EnumSet.of(Attributes.isArrayArg))»
 	default:
 		panic("Not a valid index:")
 	}
@@ -283,8 +283,8 @@ func New«unit»WithArgs(«DISABLE_EDGES.name», «DISABLE_REG_OUTPUTLOGIC.name�
 		«DISABLE_REG_OUTPUTLOGIC.name»: «DISABLE_REG_OUTPUTLOGIC.name»,
 	}
  
-	s.varIdx = make(map[string]int, «em.variables.size - 1»)
-	«FOR v : em.variables.excludeNull»
+	s.varIdx = make(map[string]int, «em.variables.size»)
+	«FOR v : em.variables»
 		s.varIdx["«v.name»"] =  «v.getVarIdx(purgeAliases)»
 	«ENDFOR»
 	«FOR v : em.variables.filter[array]»
@@ -422,9 +422,6 @@ func pow(a int64, n int64) int64 {
 		return assignTempVar(targetSizeWithType, pos, NONE,
 			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
-
-	override protected writeToNull(String last) '''var _ = «last»
-		'''
 
 	override getHookName() '''Go'''
 

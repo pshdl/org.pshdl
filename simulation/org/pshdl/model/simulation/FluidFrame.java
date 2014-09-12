@@ -141,11 +141,7 @@ public class FluidFrame {
 	public FluidFrame(IHDLObject owner, String outputName, boolean constant, String simProcess) {
 		this.owner = owner;
 		this.id = gid.incrementAndGet();
-		if (outputName != null) {
-			this.outputName = outputName;
-		} else {
-			this.outputName = Integer.toString(id);
-		}
+		this.outputName = outputName;
 		this.constant = constant;
 		this.simProcess = simProcess;
 	}
@@ -190,38 +186,40 @@ public class FluidFrame {
 		}
 		final Map<String, List<Frame>> lastID = Maps.newLinkedHashMap();
 		for (final Frame frame : res) {
-			final InternalInformation ii = internals[frame.outputId];
-			if ("#null".equals(ii.info.name)) {
-				continue;
-			}
-			LinkedList<Frame> lID = (LinkedList<Frame>) lastID.get(ii.info.name);
-			if (lID != null) {
-				final Iterator<Frame> iterator = lID.descendingIterator();
-				final PredicateChain pred = getPredicate(internals, frame);
-				while (iterator.hasNext()) {
-					final Frame previous = iterator.next();
-					final PredicateChain predPrev = getPredicate(internals, previous);
-					if ((pred == null) || (predPrev == null) || pred.equals(predPrev)) {
-						frame.executionDep = previous.uniqueID;
-						break;
-					}
-					if (!predPrev.isMutual(pred)) {
-						frame.executionDep = previous.uniqueID;
-						break;
-					}
-					// System.out.println(pred + " -> \n" + predPrev);
+			for (final int outputId : frame.outputIds) {
+				final InternalInformation ii = internals[outputId];
+				if ("#null".equals(ii.info.name)) {
+					continue;
 				}
-			} else {
-				lID = new LinkedList<Frame>();
-				lastID.put(ii.info.name, lID);
+				LinkedList<Frame> lID = (LinkedList<Frame>) lastID.get(ii.info.name);
+				if (lID != null) {
+					final Iterator<Frame> iterator = lID.descendingIterator();
+					final PredicateChain pred = getPredicate(internals, frame);
+					while (iterator.hasNext()) {
+						final Frame previous = iterator.next();
+						final PredicateChain predPrev = getPredicate(internals, previous);
+						if ((pred == null) || (predPrev == null) || pred.equals(predPrev)) {
+							frame.executionDep = previous.uniqueID;
+							break;
+						}
+						if (!predPrev.isMutual(pred)) {
+							frame.executionDep = previous.uniqueID;
+							break;
+						}
+						// System.out.println(pred + " -> \n" + predPrev);
+					}
+				} else {
+					lID = new LinkedList<Frame>();
+					lastID.put(ii.info.name, lID);
+				}
+				int maxData = 0;
+				for (final int i : frame.internalDependencies) {
+					maxData = Math.max(internals[i].actualWidth, maxData);
+				}
+				maxData = Math.max(ii.actualWidth, maxData);
+				frame.maxDataWidth = Math.max(frame.maxDataWidth, maxData);
+				lID.add(frame);
 			}
-			int maxData = 0;
-			for (final int i : frame.internalDependencies) {
-				maxData = Math.max(internals[i].actualWidth, maxData);
-			}
-			maxData = Math.max(ii.actualWidth, maxData);
-			frame.maxDataWidth = Math.max(frame.maxDataWidth, maxData);
-			lID.add(frame);
 		}
 		final VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
 		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars, moduleName, source, annotations);
@@ -326,10 +324,12 @@ public class FluidFrame {
 	}
 
 	private void registerFrame(FrameRegister register) {
-		if (outputName.endsWith(InternalInformation.REG_POSTFIX)) {
-			register.registerInternal(InternalInformation.stripReg(outputName));
+		if (outputName != null) {
+			if (outputName.endsWith(InternalInformation.REG_POSTFIX)) {
+				register.registerInternal(InternalInformation.stripReg(outputName));
+			}
+			register.registerInternal(outputName);
 		}
-		register.registerInternal(outputName);
 		for (final FluidFrame entry : references) {
 			entry.registerFrame(register);
 		}
@@ -496,7 +496,10 @@ public class FluidFrame {
 		}
 		final List<Frame> res = new LinkedList<Frame>();
 		if (hasInstructions()) {
-			final int outputId = register.registerInternal(outputName);
+			int outputId[] = new int[0];
+			if (outputName != null) {
+				outputId = new int[] { register.registerInternal(outputName) };
+			}
 			final int[] internalDepRes = toIntArray(internalDependencies);
 			final FastInstruction[] instArray = instr.toArray(new FastInstruction[instr.size()]);
 			final BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
@@ -583,7 +586,7 @@ public class FluidFrame {
 	}
 
 	public void createPredVar() {
-		vars.put(outputName, new VariableInformation(Direction.INTERNAL, outputName, 1, Type.BIT, false, false, false, null));
+		vars.put(outputName, new VariableInformation(Direction.INTERNAL, outputName, 1, Type.BOOL, false, false, false, null));
 	}
 
 	public void addVar(VariableInformation information) {

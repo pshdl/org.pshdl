@@ -39,16 +39,20 @@ import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLFunctionParameter.Type;
+import org.pshdl.model.HDLInlineFunction;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.HDLReference;
+import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLSubstituteFunction;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
+import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.INativeFunctionProvider;
 import org.pshdl.model.utils.services.IServiceProvider;
@@ -321,6 +325,33 @@ public class HDLFunctions {
 				return value;
 		}
 		return Optional.absent();
+	}
+
+	public static void transform(HDLFunctionCall call, HDLEvaluationContext context, ModificationSet ms) {
+		final Optional<HDLFunction> function = call.resolveFunction();
+		if (!function.isPresent())
+			return;
+		switch (function.get().getClassType()) {
+		case HDLInlineFunction:
+			final HDLInlineFunction hif = (HDLInlineFunction) function.get();
+			final HDLExpression equivalentExpression = hif.getReplacementExpression(call);
+			ms.replace(call, equivalentExpression);
+			break;
+		case HDLSubstituteFunction:
+			final HDLSubstituteFunction hsf = (HDLSubstituteFunction) function.get();
+			final HDLStatement[] statements = hsf.getReplacementStatements(call);
+			ms.replace(call, statements);
+			break;
+		case HDLNativeFunction:
+			final Collection<HDLFunctionImplementation> funcProvider = provider.get(FullNameExtension.fullNameOf(function.get()));
+			for (final HDLFunctionImplementation funcImpl : funcProvider) {
+				funcImpl.transform(call, context, ms);
+				return;
+			}
+			break;
+		default:
+			throw new IllegalArgumentException("Unexpected type:" + function.get().getClassType());
+		}
 	}
 
 	public static Optional<Range<BigInteger>> determineRange(HDLFunctionCall call, HDLEvaluationContext context) {

@@ -26,14 +26,20 @@
  ******************************************************************************/
 package org.pshdl.model.simulation.codegenerator
 
+import com.google.common.collect.LinkedHashMultimap
 import com.google.common.collect.Lists
+import com.google.common.collect.Maps
+import com.google.common.collect.Multimap
 import com.google.common.collect.Sets
 import java.math.BigInteger
 import java.util.Collections
 import java.util.EnumSet
 import java.util.Iterator
 import java.util.List
+import java.util.Map
+import java.util.Random
 import java.util.Set
+import javax.annotation.MatchesPattern.Checker
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
@@ -41,21 +47,15 @@ import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.VariableInformation
+import org.pshdl.model.simulation.HDLSimulator
+import org.pshdl.model.simulation.ITypeOuptutProvider
 import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes
+import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
 import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.*
-import com.google.common.collect.Maps
-import java.util.Map
-import com.google.common.collect.Multimap
-import com.google.common.collect.LinkedHashMultimap
-import javax.annotation.MatchesPattern.Checker
-import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter
-import org.pshdl.model.simulation.ITypeOuptutProvider
-import org.pshdl.model.simulation.HDLSimulator
-import java.util.Random
 
 class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	@Option(description="The name of the package that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
@@ -92,7 +92,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 
 	String packageName
 	String unitName
-	int executionCores = 2
+	int executionCores = 0
 	boolean hasPow=false
 
 	new() {
@@ -137,7 +137,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		@Override
 		public void setInput(int idx, long value, int... arrayIdx) {
 			switch (idx) {
-				«setInputCases("value", null)»
+				«setInputCases("value", null, EnumSet.of(Attributes.isArrayArg))»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
 			}
@@ -151,10 +151,12 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			return idx;
 		}
 		
+«««		«FOR v: em.variables»«getterSetter(v, if (v.aliasVar!==null) v.aliasVar else v)»«ENDFOR»
+		
 		@Override
 		public String getName(int idx) {
 			switch (idx) {
-				«FOR v : em.variables.excludeNull»
+				«FOR v : em.variables»
 					case «v.getVarIdx(false)»: return "«v.name»";
 				«ENDFOR»
 				default:
@@ -170,7 +172,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		@Override
 		public long getOutputLong(int idx, int... arrayIdx) {
 			switch (idx) {
-				«getOutputCases(null)»
+				«getOutputCases(null, EnumSet.of(Attributes.isArrayArg))»
 				default:
 					throw new IllegalArgumentException("Not a valid index:" + idx);
 			}
@@ -219,6 +221,26 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		«ENDIF»
 		}
 	'''
+	
+	protected def getterSetter(VariableInformation v, VariableInformation aliased)
+		'''
+		public «v.fieldType(NONE)» get«v.idName(false, NONE).toString.toFirstUpper»(){
+			«IF aliased.predicate || aliased.array»
+			return «aliased.idName(true, NONE)»;
+			«ELSE»
+			return «aliased.idName(true, NONE).fixupValue(aliased.targetSizeWithType, true)»;
+			«ENDIF»
+		}
+		
+		public void set«v.idName(false, NONE).toString.toFirstUpper»(«v.fieldType(NONE)» newVal){
+			«IF aliased.predicate || aliased.array»
+			«aliased.idName(true, NONE)»=newVal;
+			«ELSE»
+			«aliased.idName(true, NONE)»=«"newVal".fixupValue(aliased.targetSizeWithType, true)»;
+			«ENDIF»
+		}
+		'''
+	
 
 	static class ExecutionPhase {
 		static int globalID = 0
@@ -413,13 +435,13 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			public «unitName»(boolean «DISABLE_EDGES.name», boolean «DISABLE_REG_OUTPUTLOGIC.name») {
 				this.«DISABLE_EDGES.name»=«DISABLE_EDGES.name»;
 				this.«DISABLE_REG_OUTPUTLOGIC.name»=«DISABLE_REG_OUTPUTLOGIC.name»;
-				«FOR v : em.variables.excludeNull»
+				«FOR v : em.variables»
 					varIdx.put("«v.name»", «v.getVarIdx(purgeAliases)»);
 				«ENDFOR»
 			}
 		«ELSE»
 			public «unitName»() {
-				«FOR v : em.variables.excludeNull»
+				«FOR v : em.variables»
 					varIdx.put("«v.name»", «v.getVarIdx(purgeAliases)»);
 				«ENDFOR»
 			}
@@ -466,8 +488,9 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		import java.util.concurrent.locks.*;
 	'''
 
-	override protected calculateVariableAccessIndex(List<Integer> arr, VariableInformation varInfo) {
-		val res = super.calculateVariableAccessIndex(arr, varInfo)
+	override protected calculateVariableAccessIndex(List<Integer> arr, VariableInformation varInfo,
+		EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		val res = super.calculateVariableAccessIndex(arr, varInfo, attributes)
 		if (res.length === 0)
 			return res
 		return "(int)(" + res + ")"
@@ -584,7 +607,7 @@ import java.util.Arrays;
 public class «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName» implements IHDLInterpreter{
 	«fieldDeclarations(false, true)»
 	«IF useInterface»
-		«FOR varInfo : em.variables.excludeNull»
+		«FOR varInfo : em.variables»
 			int «varInfo.idName(true, NONE)»_idx;
 		«ENDFOR»
 	«ENDIF»

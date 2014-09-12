@@ -170,7 +170,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		final HDLQualifiedName fqn = FullNameExtension.fullNameOf(simulationModel);
 		final ExecutableModel em = model.getExecutable(fqn.toString(), src);
 		try {
-			em.sortTopological(purgeAliases);
+			em.sortTopological();
 		} catch (final CycleException e) {
 			e.model = em;
 			throw e;

@@ -45,6 +45,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
+import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.InternalInformation;
@@ -145,7 +146,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 
 	private String unitName;
 
-	private int executionCores = 2;
+	private int executionCores = 0;
 
 	private boolean hasPow = false;
 
@@ -229,7 +230,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		_builder.append("\t\t");
-		final CharSequence _setInputCases = this.setInputCases("value", null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.isArrayArg);
+		final CharSequence _setInputCases = this.setInputCases("value", null, _of);
 		_builder.append(_setInputCases, "\t\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t\t");
@@ -263,6 +265,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("}");
 		_builder.newLine();
 		_builder.newLine();
+		_builder.newLine();
 		_builder.append("@Override");
 		_builder.newLine();
 		_builder.append("public String getName(int idx) {");
@@ -271,8 +274,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		{
-			final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-			for (final VariableInformation v : _excludeNull) {
+			for (final VariableInformation v : this.em.variables) {
 				_builder.append("\t\t");
 				_builder.append("case ");
 				final int _varIdx = this.getVarIdx(v, false);
@@ -313,7 +315,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("switch (idx) {");
 		_builder.newLine();
 		_builder.append("\t\t");
-		final CharSequence _outputCases = this.getOutputCases(null);
+		final EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes> of(CommonCodeGenerator.Attributes.isArrayArg);
+		final CharSequence _outputCases = this.getOutputCases(null, _of_1);
 		_builder.append(_outputCases, "\t\t");
 		_builder.newLineIfNotEmpty();
 		_builder.append("\t\t");
@@ -428,6 +431,90 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 				_builder.newLine();
 				_builder.append("}");
 				_builder.newLine();
+			}
+		}
+		_builder.append("}");
+		_builder.newLine();
+		return _builder;
+	}
+
+	protected CharSequence getterSetter(final VariableInformation v, final VariableInformation aliased) {
+		final StringConcatenation _builder = new StringConcatenation();
+		_builder.append("public ");
+		final CharSequence _fieldType = this.fieldType(v, CommonCodeGenerator.NONE);
+		_builder.append(_fieldType, "");
+		_builder.append(" get");
+		final CharSequence _idName = this.idName(v, false, CommonCodeGenerator.NONE);
+		final String _string = _idName.toString();
+		final String _firstUpper = StringExtensions.toFirstUpper(_string);
+		_builder.append(_firstUpper, "");
+		_builder.append("(){");
+		_builder.newLineIfNotEmpty();
+		{
+			boolean _or = false;
+			final boolean _isPredicate = this.isPredicate(aliased);
+			if (_isPredicate) {
+				_or = true;
+			} else {
+				final boolean _isArray = this.isArray(aliased);
+				_or = _isArray;
+			}
+			if (_or) {
+				_builder.append("\t");
+				_builder.append("return ");
+				final CharSequence _idName_1 = this.idName(aliased, true, CommonCodeGenerator.NONE);
+				_builder.append(_idName_1, "\t");
+				_builder.append(";");
+				_builder.newLineIfNotEmpty();
+			} else {
+				_builder.append("\t");
+				_builder.append("return ");
+				final CharSequence _idName_2 = this.idName(aliased, true, CommonCodeGenerator.NONE);
+				final int _targetSizeWithType = this.getTargetSizeWithType(aliased);
+				final CharSequence _fixupValue = this.fixupValue(_idName_2, _targetSizeWithType, true);
+				_builder.append(_fixupValue, "\t");
+				_builder.append(";");
+				_builder.newLineIfNotEmpty();
+			}
+		}
+		_builder.append("}");
+		_builder.newLine();
+		_builder.newLine();
+		_builder.append("public void set");
+		final CharSequence _idName_3 = this.idName(v, false, CommonCodeGenerator.NONE);
+		final String _string_1 = _idName_3.toString();
+		final String _firstUpper_1 = StringExtensions.toFirstUpper(_string_1);
+		_builder.append(_firstUpper_1, "");
+		_builder.append("(");
+		final CharSequence _fieldType_1 = this.fieldType(v, CommonCodeGenerator.NONE);
+		_builder.append(_fieldType_1, "");
+		_builder.append(" newVal){");
+		_builder.newLineIfNotEmpty();
+		{
+			boolean _or_1 = false;
+			final boolean _isPredicate_1 = this.isPredicate(aliased);
+			if (_isPredicate_1) {
+				_or_1 = true;
+			} else {
+				final boolean _isArray_1 = this.isArray(aliased);
+				_or_1 = _isArray_1;
+			}
+			if (_or_1) {
+				_builder.append("\t");
+				final CharSequence _idName_4 = this.idName(aliased, true, CommonCodeGenerator.NONE);
+				_builder.append(_idName_4, "\t");
+				_builder.append("=newVal;");
+				_builder.newLineIfNotEmpty();
+			} else {
+				_builder.append("\t");
+				final CharSequence _idName_5 = this.idName(aliased, true, CommonCodeGenerator.NONE);
+				_builder.append(_idName_5, "\t");
+				_builder.append("=");
+				final int _targetSizeWithType_1 = this.getTargetSizeWithType(aliased);
+				final CharSequence _fixupValue_1 = this.fixupValue("newVal", _targetSizeWithType_1, true);
+				_builder.append(_fixupValue_1, "\t");
+				_builder.append(";");
+				_builder.newLineIfNotEmpty();
 			}
 		}
 		_builder.append("}");
@@ -866,8 +953,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 				_builder.append(";");
 				_builder.newLineIfNotEmpty();
 				{
-					final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-					for (final VariableInformation v : _excludeNull) {
+					for (final VariableInformation v : this.em.variables) {
 						_builder.append("\t");
 						_builder.append("varIdx.put(\"");
 						_builder.append(v.name, "\t");
@@ -886,8 +972,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 				_builder.append("() {");
 				_builder.newLineIfNotEmpty();
 				{
-					final Iterable<VariableInformation> _excludeNull_1 = this.excludeNull(this.em.variables);
-					for (final VariableInformation v_1 : _excludeNull_1) {
+					for (final VariableInformation v_1 : this.em.variables) {
 						_builder.append("\t");
 						_builder.append("varIdx.put(\"");
 						_builder.append(v_1.name, "\t");
@@ -1012,8 +1097,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 	}
 
 	@Override
-	protected CharSequence calculateVariableAccessIndex(final List<Integer> arr, final VariableInformation varInfo) {
-		final CharSequence res = super.calculateVariableAccessIndex(arr, varInfo);
+	protected CharSequence calculateVariableAccessIndex(final List<Integer> arr, final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		final CharSequence res = super.calculateVariableAccessIndex(arr, varInfo, attributes);
 		final int _length = res.length();
 		final boolean _tripleEquals = (_length == 0);
 		if (_tripleEquals)
@@ -1398,8 +1483,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		{
 			if (useInterface) {
 				{
-					final Iterable<VariableInformation> _excludeNull = this.excludeNull(this.em.variables);
-					for (final VariableInformation varInfo : _excludeNull) {
+					for (final VariableInformation varInfo : this.em.variables) {
 						_builder.append("\t");
 						_builder.append("int ");
 						final CharSequence _idName = this.idName(varInfo, true, CommonCodeGenerator.NONE);

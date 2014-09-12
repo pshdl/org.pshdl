@@ -520,6 +520,22 @@ public class BuiltInAdvisor {
 		case REGISTER_UNKNOWN_ARGUMENT_VALUE:
 			return new HDLAdvise(problem, "Invalid value, allowed values are:" + problem.info, "Only the " + problem.info
 					+ " are valid for the description of the register config.", "Change the expression to either of:" + problem.info);
+		case FUNCTION_NOT_ENOUGH_PARAMETER:
+			return new HDLAdvise(problem, "The function does not have the expected number of parameters." + problem.info, "");
+		case TYPE_INVALID_PRIMITIVE:
+			return new HDLAdvise(problem, "The declared primitive is invalid: " + problem.info, "");
+		case TYPE_NEGATIVE_WIDTH:
+			return new HDLAdvise(problem, "The declared primitve does have a negative width", "The width of a primitive can never be negative.",
+					"Use uint parameter for parameterized width", "Ensure that the number will always be positive");
+		case TYPE_POSSIBLY_NEGATIVE_WIDTH:
+			return new HDLAdvise(problem, "The declared primitve could possibly have a negative width", "The width of a primitive can never be negative.",
+					"Use uint parameter for parameterized width", "Ensure that the number will always be positive", "Apply a @range annotation to declare expected values");
+		case TYPE_ZERO_WIDTH:
+			return new HDLAdvise(problem, "The declared primitve does have a zero width", "The width of a primitive can never be zero.",
+					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation to declare that the parameter will always be greater zero");
+		case TYPE_POSSIBLY_ZERO_WIDTH:
+			return new HDLAdvise(problem, "The declared primitve could possibly have a zero width", "The width of a primitive can never be zero.",
+					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation to declare that the parameter will always be greater zero");
 		}
 		return null;
 	}
