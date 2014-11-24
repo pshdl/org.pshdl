@@ -108,6 +108,7 @@ import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnno
 import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.types.builtIn.HDLGenerators;
 import org.pshdl.model.types.builtIn.HDLPrimitives;
+import org.pshdl.model.utils.HDLQuery.Result;
 import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
 import org.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
