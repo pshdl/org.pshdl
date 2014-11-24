@@ -1154,7 +1154,16 @@ public class Insulin {
 		if (!hasMeta) {
 			final HDLUnit unit = (HDLUnit) container;
 			container.setMeta(signalInserted);
-			if (HDLQuery.select(HDLVariable.class).from(unit).where(HDLVariable.fName).isEqualTo(defVar.getName()).getFirst() == null) {
+			final Result<HDLVariable, String> declarations = HDLQuery.select(HDLVariable.class).from(unit).where(HDLVariable.fName).isEqualTo(defVar.getName());
+			boolean insertDeclaration = true;
+			for (final HDLVariable hvar : declarations.getAll()) {
+				if (hvar.getContainer().getClassType() == HDLClass.HDLEnum) {
+					continue;
+				}
+				insertDeclaration = false;
+				break;
+			}
+			if (insertDeclaration) {
 				final HDLStatement statement = unit.getStatements().get(0);
 				final HDLPrimitive bit = HDLPrimitive.getBit();
 				ms.insertBefore(statement, new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(bit).addVariables(defVar));

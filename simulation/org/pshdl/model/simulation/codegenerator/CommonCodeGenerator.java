@@ -1575,7 +1575,10 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence constantVarLength(BigInteger constantValue, int maxLen, boolean forceUnsigned) {
 		constantValue = force(constantValue, maxLen);
-		final int width = Math.min(1, (maxLen + 3) / 4);
+		int width = (maxLen + 3) / 4;
+		if (width == 0) {
+			width = 1;
+		}
 		return String.format("%#0" + width + "X%s", constantValue, constantSuffix());
 	}
 
