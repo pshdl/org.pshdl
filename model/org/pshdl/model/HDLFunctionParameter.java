@@ -124,8 +124,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	}
 
 	public static enum Type {
-		ANY_INT("int<>"), ANY_UINT("uint<>"), ANY_BIT("bit<>"), ANY_IF("interface<>"), ANY_ENUM("enum<>"), IF("interface"), ENUM("enum"), FUNCTION("function"), REG_BIT("bit"), REG_UINT(
-				"uint"), REG_INT("int"), STRING_TYPE("string"), BOOL_TYPE("bool");
+		PARAM_ANY_INT("int<>"), PARAM_ANY_UINT("uint<>"), PARAM_ANY_BIT("bit<>"), PARAM_ANY_IF("interface<>"), PARAM_ANY_ENUM("enum<>"), PARAM_IF("interface"), PARAM_ENUM("enum"), PARAM_FUNCTION(
+				"function"), PARAM_BIT("bit"), PARAM_UINT("uint"), PARAM_INT("int"), PARAM_STRING("string"), PARAM_BOOL("bool");
 		String str;
 
 		Type(String op) {

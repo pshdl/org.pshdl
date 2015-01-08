@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -55,7 +55,7 @@ import org.pshdl.model.utils.ModificationSet;
 public abstract class HDLFunction extends AbstractHDLFunction {
 	/**
 	 * Constructs a new instance of {@link HDLFunction}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -172,14 +172,14 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			}
 			final HDLExpression arg = argIter.next();
 			switch (param.getType()) {
-			case ANY_BIT:
-			case ANY_INT:
-			case ANY_UINT:
-			case BOOL_TYPE:
-			case REG_BIT:
-			case REG_INT:
-			case REG_UINT:
-			case STRING_TYPE:
+			case PARAM_ANY_BIT:
+			case PARAM_ANY_INT:
+			case PARAM_ANY_UINT:
+			case PARAM_BOOL:
+			case PARAM_BIT:
+			case PARAM_INT:
+			case PARAM_UINT:
+			case PARAM_STRING:
 				final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef())
 						.getAll();
 				for (final HDLVariableRef argRef : allArgRefs) {
@@ -203,11 +203,11 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 					}
 				}
 				break;
-			case ENUM:
-			case ANY_ENUM:
+			case PARAM_ENUM:
+			case PARAM_ANY_ENUM:
 				break;
-			case IF:
-			case ANY_IF:
+			case PARAM_IF:
+			case PARAM_ANY_IF:
 				final Collection<HDLInterfaceRef> allIfRefs = HDLQuery.select(HDLInterfaceRef.class).from(orig).where(HDLInterfaceRef.fHIf).isEqualTo(param.getName().asRef())
 						.getAll();
 				for (final HDLInterfaceRef argRef : allIfRefs) {
@@ -215,7 +215,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 					msExp.replace(argRef, argRef.setHIf(fqn));
 				}
 				break;
-			case FUNCTION:
+			case PARAM_FUNCTION:
 				break;
 			}
 		}

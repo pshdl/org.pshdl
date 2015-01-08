@@ -113,7 +113,7 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 			fos.close
 		}
 		val ProcessBuilder goBuilder = new ProcessBuilder("/usr/local/go/bin/go", "build",
-			testRunner.getAbsolutePath(), dutFile.getAbsolutePath()).directory(tempDir).redirectErrorStream(true);
+			testRunner.getAbsolutePath(), dutFile.getAbsolutePath()).directory(tempDir).redirectErrorStream(true).inheritIO;
 		val Process goCompiler = goBuilder.start();
 		if (goCompiler.waitFor != 0) {
 			throw new RuntimeException("Compilation of Go Program failed")

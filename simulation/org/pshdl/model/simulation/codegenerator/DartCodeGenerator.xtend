@@ -305,10 +305,12 @@ Description get description=>new Description(
 		val reset = if(v.isReset) ", reset:true" else ""
 		var type = "INVALID"
 		switch (v.type) {
-			case VariableInformation.Type.BIT: type = "Port.TYPE_BIT"
-			case VariableInformation.Type.INT: type = "Port.TYPE_INT"
-			case VariableInformation.Type.UINT: type = "Port.TYPE_UINT"
-			case VariableInformation.Type.BOOL: type = "Port.TYPE_BOOL"
+			case BIT: type = "Port.TYPE_BIT"
+			case INT: type = "Port.TYPE_INT"
+			case UINT: type = "Port.TYPE_UINT"
+			case BOOL: type = "Port.TYPE_BOOL"
+			case STRING: type = "Port.TYPE_STRING"
+			case ENUM: type = "Port.TYPE_ENUM"
 		}
 		'''new Port(«varIdx.get(v.name)», "«v.name.replaceAll("[\\$]", "\\\\\\$")»", «v.width», «type»«dims»«clock»«reset»)'''
 	}

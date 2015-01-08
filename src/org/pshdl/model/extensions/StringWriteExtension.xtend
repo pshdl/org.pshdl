@@ -210,11 +210,11 @@ class StringWriteExtension {
 			sb.append(func.rw)
 		sb.append(func.type)
 		switch (func.type) {
-			case HDLFunctionParameter$Type.ENUM:
+			case HDLFunctionParameter$Type.PARAM_ENUM:
 				sb.append('<').append(highlight.enumRefType(func.enumSpecRefName.toString)).append('>')
-			case HDLFunctionParameter$Type.^IF:
+			case HDLFunctionParameter$Type.PARAM_IF:
 				sb.append('<').append(highlight.enumRefType(func.enumSpecRefName.toString)).append('>')
-			case HDLFunctionParameter$Type.FUNCTION: {
+			case HDLFunctionParameter$Type.PARAM_FUNCTION: {
 				sb.append(
 					'''<«FOR HDLFunctionParameter p : func.funcSpec SEPARATOR ','»«p.toString(highlight)»«ENDFOR»''')
 				if (func.funcReturnSpec !== null)

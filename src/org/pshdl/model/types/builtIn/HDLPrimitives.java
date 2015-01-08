@@ -28,6 +28,8 @@ package org.pshdl.model.types.builtIn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.pshdl.model.HDLArithOp.HDLArithOpType.PLUS;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.ANY_INT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.ANY_UINT;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BIT;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BITVECTOR;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BOOL;
@@ -174,23 +176,45 @@ public class HDLPrimitives {
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initArithResolution() {
 		final Map<HDLInferenceTriple, HDLInferenceTriple> res = Maps.newLinkedHashMap();
+		res.put(new HDLInferenceTriple(ANY_INT, ANY_INT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, INT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, ANY_UINT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, UINT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, INTEGER, null), new HDLInferenceTriple(INT, INTEGER, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, NATURAL, null), new HDLInferenceTriple(INT, INTEGER, INT));
+
+		res.put(new HDLInferenceTriple(INT, ANY_INT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(INT, ANY_UINT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(INT, INTEGER, null), new HDLInferenceTriple(INT, INTEGER, INT));
 		res.put(new HDLInferenceTriple(INT, NATURAL, null), new HDLInferenceTriple(INT, INTEGER, INT));
 
+		res.put(new HDLInferenceTriple(INTEGER, ANY_INT, null), new HDLInferenceTriple(INTEGER, INT, INT));
 		res.put(new HDLInferenceTriple(INTEGER, INT, null), new HDLInferenceTriple(INTEGER, INT, INT));
+		res.put(new HDLInferenceTriple(INTEGER, ANY_UINT, null), new HDLInferenceTriple(INTEGER, INT, INT));
 		res.put(new HDLInferenceTriple(INTEGER, UINT, null), new HDLInferenceTriple(INTEGER, INT, INT));
 		res.put(new HDLInferenceTriple(INTEGER, INTEGER, null), new HDLInferenceTriple(INTEGER, INTEGER, INTEGER));
 		res.put(new HDLInferenceTriple(INTEGER, NATURAL, null), new HDLInferenceTriple(INTEGER, INTEGER, INTEGER));
 
+		res.put(new HDLInferenceTriple(ANY_UINT, ANY_INT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(ANY_UINT, INT, null), new HDLInferenceTriple(INT, INT, INT));
+		res.put(new HDLInferenceTriple(ANY_UINT, INTEGER, null), new HDLInferenceTriple(INT, INTEGER, INT));
+		res.put(new HDLInferenceTriple(ANY_UINT, ANY_UINT, null), new HDLInferenceTriple(UINT, UINT, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, UINT, null), new HDLInferenceTriple(UINT, UINT, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, NATURAL, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+
+		res.put(new HDLInferenceTriple(UINT, ANY_INT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(UINT, INT, null), new HDLInferenceTriple(INT, INT, INT));
 		res.put(new HDLInferenceTriple(UINT, INTEGER, null), new HDLInferenceTriple(INT, INTEGER, INT));
+		res.put(new HDLInferenceTriple(UINT, ANY_UINT, null), new HDLInferenceTriple(UINT, UINT, UINT));
 		res.put(new HDLInferenceTriple(UINT, UINT, null), new HDLInferenceTriple(UINT, UINT, UINT));
 		res.put(new HDLInferenceTriple(UINT, NATURAL, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
 
+		res.put(new HDLInferenceTriple(NATURAL, ANY_INT, null), new HDLInferenceTriple(INTEGER, INT, INT));
 		res.put(new HDLInferenceTriple(NATURAL, INT, null), new HDLInferenceTriple(INTEGER, INT, INT));
 		res.put(new HDLInferenceTriple(NATURAL, INTEGER, null), new HDLInferenceTriple(INTEGER, INTEGER, INTEGER));
+		res.put(new HDLInferenceTriple(NATURAL, ANY_UINT, null), new HDLInferenceTriple(NATURAL, UINT, UINT));
 		res.put(new HDLInferenceTriple(NATURAL, UINT, null), new HDLInferenceTriple(NATURAL, UINT, UINT));
 		res.put(new HDLInferenceTriple(NATURAL, NATURAL, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
 		return res;
@@ -198,34 +222,60 @@ public class HDLPrimitives {
 
 	private static Map<HDLInferenceTriple, HDLInferenceTriple> initShiftResolution() {
 		final Map<HDLInferenceTriple, HDLInferenceTriple> res = Maps.newLinkedHashMap();
+		res.put(new HDLInferenceTriple(ANY_INT, ANY_INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, ANY_UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, INTEGER, null), new HDLInferenceTriple(INT, NATURAL, INT));
+		res.put(new HDLInferenceTriple(ANY_INT, NATURAL, null), new HDLInferenceTriple(INT, NATURAL, INT));
+
+		res.put(new HDLInferenceTriple(INT, ANY_INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, INT, null), new HDLInferenceTriple(INT, NATURAL, INT));
+		res.put(new HDLInferenceTriple(INT, ANY_UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, UINT, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, INTEGER, null), new HDLInferenceTriple(INT, NATURAL, INT));
 		res.put(new HDLInferenceTriple(INT, NATURAL, null), new HDLInferenceTriple(INT, NATURAL, INT));
 
+		res.put(new HDLInferenceTriple(INTEGER, ANY_INT, null), new HDLInferenceTriple(INTEGER, NATURAL, INTEGER));
 		res.put(new HDLInferenceTriple(INTEGER, INT, null), new HDLInferenceTriple(INTEGER, NATURAL, INTEGER));
+		res.put(new HDLInferenceTriple(INTEGER, ANY_UINT, null), new HDLInferenceTriple(INTEGER, NATURAL, INTEGER));
 		res.put(new HDLInferenceTriple(INTEGER, UINT, null), new HDLInferenceTriple(INTEGER, NATURAL, INTEGER));
 		res.put(new HDLInferenceTriple(INTEGER, INTEGER, null), new HDLInferenceTriple(INTEGER, NATURAL, INTEGER));
 		res.put(new HDLInferenceTriple(INTEGER, NATURAL, null), new HDLInferenceTriple(INTEGER, NATURAL, INTEGER));
 
+		res.put(new HDLInferenceTriple(ANY_UINT, ANY_INT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, INT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, ANY_UINT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, UINT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, INTEGER, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(ANY_UINT, NATURAL, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+
+		res.put(new HDLInferenceTriple(UINT, ANY_INT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
 		res.put(new HDLInferenceTriple(UINT, INT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
-		res.put(new HDLInferenceTriple(UINT, INTEGER, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(UINT, ANY_UINT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
 		res.put(new HDLInferenceTriple(UINT, UINT, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
+		res.put(new HDLInferenceTriple(UINT, INTEGER, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
 		res.put(new HDLInferenceTriple(UINT, NATURAL, null), new HDLInferenceTriple(UINT, NATURAL, UINT));
 
+		res.put(new HDLInferenceTriple(NATURAL, ANY_INT, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
 		res.put(new HDLInferenceTriple(NATURAL, INT, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
-		res.put(new HDLInferenceTriple(NATURAL, INTEGER, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
+		res.put(new HDLInferenceTriple(NATURAL, ANY_UINT, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
 		res.put(new HDLInferenceTriple(NATURAL, UINT, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
+		res.put(new HDLInferenceTriple(NATURAL, INTEGER, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
 		res.put(new HDLInferenceTriple(NATURAL, NATURAL, null), new HDLInferenceTriple(NATURAL, NATURAL, NATURAL));
 
+		res.put(new HDLInferenceTriple(BIT, ANY_INT, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
 		res.put(new HDLInferenceTriple(BIT, INT, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
-		res.put(new HDLInferenceTriple(BIT, INTEGER, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
+		res.put(new HDLInferenceTriple(BIT, ANY_UINT, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
 		res.put(new HDLInferenceTriple(BIT, UINT, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
+		res.put(new HDLInferenceTriple(BIT, INTEGER, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
 		res.put(new HDLInferenceTriple(BIT, NATURAL, null), new HDLInferenceTriple(BIT, NATURAL, BIT));
 
-		res.put(new HDLInferenceTriple(BITVECTOR, INT, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
-		res.put(new HDLInferenceTriple(BITVECTOR, INTEGER, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
+		res.put(new HDLInferenceTriple(BITVECTOR, ANY_INT, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
 		res.put(new HDLInferenceTriple(BITVECTOR, UINT, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
+		res.put(new HDLInferenceTriple(BITVECTOR, ANY_INT, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
+		res.put(new HDLInferenceTriple(BITVECTOR, UINT, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
+		res.put(new HDLInferenceTriple(BITVECTOR, INTEGER, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
 		res.put(new HDLInferenceTriple(BITVECTOR, NATURAL, null), new HDLInferenceTriple(BITVECTOR, NATURAL, BITVECTOR));
 		return res;
 	}
@@ -554,9 +604,11 @@ public class HDLPrimitives {
 			return new HDLTypeInferenceInfo((HDLPrimitive) castTo, determineType);
 		case ARITH_NEG:
 			switch (determineType.getType()) {
+			case ANY_INT:
 			case INT:
 			case INTEGER:
 				return new HDLTypeInferenceInfo(determineType, determineType);
+			case ANY_UINT:
 			case UINT:
 				return new HDLTypeInferenceInfo(determineType.setType(INT), determineType.setType(INT));
 			case NATURAL:
@@ -565,6 +617,7 @@ public class HDLPrimitives {
 			case BITVECTOR:
 			case BOOL:
 			case STRING:
+			case ANY_BIT:
 				final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
 				hdi.error = "Arithmetic negation does not support bit/boolean/string operands";
 				return hdi;
@@ -573,10 +626,13 @@ public class HDLPrimitives {
 		case BIT_NEG:
 			switch (determineType.getType()) {
 			case INT:
+			case ANY_INT:
 			case INTEGER:
 			case UINT:
+			case ANY_UINT:
 			case NATURAL:
 			case BIT:
+			case ANY_BIT:
 			case BITVECTOR:
 				return new HDLTypeInferenceInfo(determineType, determineType);
 			case BOOL:
@@ -589,10 +645,13 @@ public class HDLPrimitives {
 		case LOGIC_NEG:
 			switch (determineType.getType()) {
 			case INT:
+			case ANY_INT:
 			case INTEGER:
 			case UINT:
+			case ANY_UINT:
 			case NATURAL:
 			case BITVECTOR:
+			case ANY_BIT:
 			case STRING:
 				final HDLTypeInferenceInfo hdi = new HDLTypeInferenceInfo(null, determineType);
 				hdi.error = "Logic negation does not support bit/string operands";
@@ -617,8 +676,10 @@ public class HDLPrimitives {
 		case BOOL:
 		case BIT:
 		case BITVECTOR:
+		case ANY_BIT:
 		case STRING:
 			return Optional.absent();
+		case ANY_INT:
 		case INT: {
 			final Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())
@@ -627,6 +688,7 @@ public class HDLPrimitives {
 		}
 		case INTEGER:
 			return Optional.of(intRange(BigInteger.valueOf(32)));
+		case ANY_UINT:
 		case UINT: {
 			final Optional<BigInteger> bitWidth = ConstantEvaluate.valueOf(pt.getWidth(), context);
 			if (!bitWidth.isPresent())

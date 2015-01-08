@@ -100,6 +100,7 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 
 	@Override
 	public String invoke(CommandLine cli) throws Exception {
+		@SuppressWarnings("unchecked")
 		final List<String> argList = cli.getArgList();
 		if (argList.size() == 0) {
 			getUsage().printHelp(System.out);

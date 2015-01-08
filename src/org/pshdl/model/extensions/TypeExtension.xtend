@@ -245,42 +245,43 @@ class TypeExtension {
 
 	def dispatch Optional<? extends HDLType> determineType(HDLFunctionParameter param) {
 		switch (param.type) {
-			case ANY_BIT: return Optional.of(HDLPrimitive.anyBit)
-			case ANY_INT: return Optional.of(HDLPrimitive.anyInt)
-			case ANY_UINT: return Optional.of(HDLPrimitive.anyUint)
-			case ANY_ENUM: return Optional.of(HDLEnum.anyEnum)
-			case ANY_IF: return Optional.of(HDLInterface.anyInterface)
-			case BOOL_TYPE:
+			case PARAM_ANY_BIT: return Optional.of(HDLPrimitive.anyBit)
+			case PARAM_ANY_INT: return Optional.of(HDLPrimitive.anyInt)
+			case PARAM_ANY_UINT: return Optional.of(HDLPrimitive.anyUint)
+			case PARAM_ANY_ENUM: return Optional.of(HDLEnum.anyEnum)
+			case PARAM_ANY_IF: return Optional.of(HDLInterface.anyInterface)
+			case PARAM_BOOL:
 				return Optional.of(HDLPrimitive.getBool)
-			case ENUM:
+			case PARAM_ENUM:
 				return param.resolveEnumSpec
-			case FUNCTION: {
+			case PARAM_FUNCTION: {
 				return Optional.absent
 			}
-			case ^IF:
+			case PARAM_IF:
 				return param.resolveIfSpec
-			case REG_BIT:{
+			case PARAM_BIT:{
 				if(param.width === null) 
 					return Optional.of(HDLPrimitive.getBit) 
 				else 
 					return Optional.of(HDLPrimitive.getBitvector.setWidth(param.width))
 			}
-			case REG_INT: {
+			case PARAM_INT: {
 				if(param.width === null) 
 					return Optional.of(HDLPrimitive.getInteger) 
 				else 
 					return Optional.of(HDLPrimitive.getInt.setWidth(param.width))
 			}
-			case REG_UINT: {
+			case PARAM_UINT: {
 				if(param.width === null) 
 					return Optional.of(HDLPrimitive.getNatural) 
 				else 
 					return Optional.of(HDLPrimitive.getUint.setWidth(param.width))
 			}
-			case STRING_TYPE: {
+			case PARAM_STRING: {
 				return Optional.of(HDLPrimitive.getString)
 			}
 		}
+		return Optional.absent
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLLiteral lit) {
@@ -289,9 +290,14 @@ class TypeExtension {
 		if (lit.presentation === HDLLiteral.HDLLiteralPresentation.BOOL)
 			return Optional.of(HDLPrimitive.getBool)
 		val BigInteger bigVal = lit.valueAsBigInt
-		if (bigVal.bitLength > 31)
-			return Optional.of(HDLPrimitive.uint.setWidth(HDLLiteral.get(bigVal.bitLength)))
-		return Optional.of(HDLPrimitive.target(!lit.negative))
+		if (bigVal.bitLength > 31){
+			if (lit.negative)
+				return Optional.of(HDLPrimitive.anyInt)
+			return Optional.of(HDLPrimitive.anyUint)
+		}
+		if (lit.negative)
+			return Optional.of(HDLPrimitive.integer)
+		return Optional.of(HDLPrimitive.natural)
 	}
 
 	def dispatch Optional<? extends HDLType> determineType(HDLVariableRef ref) {

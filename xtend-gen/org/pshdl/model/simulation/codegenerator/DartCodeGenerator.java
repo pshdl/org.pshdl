@@ -725,6 +725,12 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           case BOOL:
             type = "Port.TYPE_BOOL";
             break;
+          case STRING:
+            type = "Port.TYPE_STRING";
+            break;
+          case ENUM:
+            type = "Port.TYPE_ENUM";
+            break;
           default:
             break;
         }

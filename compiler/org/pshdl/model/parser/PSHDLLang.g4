@@ -312,12 +312,11 @@ psPrimitive :
 ;
 
 psPrimitiveType :
-	'int' | 'uint' | 'bit' | 'bool' | 'string'
+	'int' | 'uint' | 'bit' | 'bool' | 'string' | ANY_INT | ANY_UINT | ANY_BIT | 'uint32' | 'int32'
 ;
 
 psWidth :
 	'<' psExpression '>'
-	|	'<' '>' {notifyErrorListeners(MISSING_WIDTH);}
 ;
 
 psInterfaceDeclaration :
@@ -388,6 +387,8 @@ ANY_ENUM:'enum<>';
 BIT:'bit';
 INT:'int';
 UINT:'uint';
+INT32:'int32';
+UINT32:'uint32';
 STRING:'string';
 BOOL:'bool';
 ENUM:'enum';

@@ -43,7 +43,6 @@ import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attri
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -102,7 +101,7 @@ public abstract class CommonCodeGenerator {
 		bitWidth = 64;
 		maxCosts = Integer.MAX_VALUE;
 		hasClock = false;
-		purgeAliases = false;
+		purgeAliases = true;
 	}
 
 	protected CommonCodeGenerator(CommonCodeGeneratorParameter parameterObject) {
@@ -322,25 +321,24 @@ public abstract class CommonCodeGenerator {
 			return sb;
 		}
 		final List<CharSequence> predicates = Lists.newArrayList();
-		final List<Integer> arr = Collections.emptyList();
 		if (frame.edgeNegDepRes != -1) {
-			predicates.add(internalWithArrayAccess(asInternal(frame.edgeNegDepRes), arr, EnumSet.of(isNegEdgeActive)));
-			predicates.add("!" + internalWithArrayAccess(asInternal(frame.edgeNegDepRes), arr, EnumSet.of(isNegEdgeHandled)));
+			predicates.add(internalWithArrayAccess(asInternal(frame.edgeNegDepRes), EnumSet.of(isNegEdgeActive)));
+			predicates.add("!" + internalWithArrayAccess(asInternal(frame.edgeNegDepRes), EnumSet.of(isNegEdgeHandled)));
 		}
 		if (frame.edgePosDepRes != -1) {
-			predicates.add(internalWithArrayAccess(asInternal(frame.edgePosDepRes), arr, EnumSet.of(isPosEdgeActive)));
-			predicates.add("!" + internalWithArrayAccess(asInternal(frame.edgePosDepRes), arr, EnumSet.of(isPosEdgeHandled)));
+			predicates.add(internalWithArrayAccess(asInternal(frame.edgePosDepRes), EnumSet.of(isPosEdgeActive)));
+			predicates.add("!" + internalWithArrayAccess(asInternal(frame.edgePosDepRes), EnumSet.of(isPosEdgeHandled)));
 		}
 		if (frame.predNegDepRes != null) {
 			for (final int pred : frame.predNegDepRes) {
-				predicates.add("!" + internalWithArrayAccess(asInternal(pred), arr, PREDICATE));
-				predicates.add(internalWithArrayAccess(asInternal(pred), arr, EnumSet.of(isPredFresh)));
+				predicates.add("!" + internalWithArrayAccess(asInternal(pred), PREDICATE));
+				predicates.add(internalWithArrayAccess(asInternal(pred), EnumSet.of(isPredFresh)));
 			}
 		}
 		if (frame.predPosDepRes != null) {
 			for (final int pred : frame.predPosDepRes) {
-				predicates.add(internalWithArrayAccess(asInternal(pred), arr, PREDICATE));
-				predicates.add(internalWithArrayAccess(asInternal(pred), arr, EnumSet.of(isPredFresh)));
+				predicates.add(internalWithArrayAccess(asInternal(pred), PREDICATE));
+				predicates.add(internalWithArrayAccess(asInternal(pred), EnumSet.of(isPredFresh)));
 			}
 		}
 		return callFrameWithPredicates(frame, predicates);
@@ -376,11 +374,10 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence updatePredicateFreshness(int pred, boolean positive) {
 		final StringBuilder sb = new StringBuilder();
-		final List<Integer> arr = Collections.emptyList();
 		final InternalInformation internal = asInternal(pred);
-		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, UPDATE);
+		final CharSequence updateInternal = internalWithArrayAccess(internal, UPDATE);
 		final CharSequence isFresh = condition(Condition.isEqual, updateInternal, idName(TIMESTAMP, true, NONE));
-		sb.append(assignInternal(asInternal(pred), isFresh, arr, EnumSet.of(Attributes.isPredFresh)));
+		sb.append(assignInternal(asInternal(pred), isFresh, EnumSet.of(Attributes.isPredFresh)));
 		return sb;
 	}
 
@@ -395,11 +392,10 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence updateHandledClk(int edgeDepRes, boolean posEdge) {
-		final List<Integer> arr = Collections.emptyList();
 		final InternalInformation internal = asInternal(edgeDepRes);
-		final CharSequence updateInternal = internalWithArrayAccess(internal, arr, UPDATE);
+		final CharSequence updateInternal = internalWithArrayAccess(internal, UPDATE);
 		final StringBuilder sb = new StringBuilder();
-		sb.append(assignInternal(internal, skipEdge(updateInternal), arr, EnumSet.of(posEdge ? isPosEdgeHandled : isNegEdgeHandled)));
+		sb.append(assignInternal(internal, skipEdge(updateInternal), EnumSet.of(posEdge ? isPosEdgeHandled : isNegEdgeHandled)));
 		return sb;
 	}
 
@@ -419,7 +415,8 @@ public abstract class CommonCodeGenerator {
 			}
 			final StringBuilder value = new StringBuilder();
 			value.append(indent());
-			final CharSequence internal = loadInternal(ii, dimList(ii), attributes);
+			loadDimensionInternal(ii);
+			final CharSequence internal = loadInternal(ii, attributes);
 			if (ii.isPred) {
 				value.append(ifCondition(internal, returnValue("1"), returnValue("0")));
 			} else {
@@ -429,6 +426,12 @@ public abstract class CommonCodeGenerator {
 		}
 		indent--;
 		return result;
+	}
+
+	protected void loadDimensionInternal(InternalInformation ii) {
+		final InternalPushInfo ip = new InternalPushInfo(ii, false);
+		ip.pushedIndices.addAll(dimList(ii));
+		pushInfo.put(ii.info.name, ip);
 	}
 
 	protected CharSequence returnValue(CharSequence value) {
@@ -452,15 +455,16 @@ public abstract class CommonCodeGenerator {
 			if ((cast != null) && !ii.isPred) {
 				assignValue = doCast(cast, assignValue);
 			}
-			value.append(writeInternal(ii, assignValue.toString(), dimList(ii), attributes));
+			loadDimensionInternal(ii);
+			value.append(writeInternal(ii, assignValue.toString(), attributes));
 			result.append(makeCase(constant(i, true), value, true));
 		}
 		indent--;
 		return result;
 	}
 
-	private List<Integer> dimList(InternalInformation ii) {
-		final ArrayList<Integer> res = new ArrayList<Integer>();
+	private Stack<Integer> dimList(InternalInformation ii) {
+		final Stack<Integer> res = new Stack<>();
 		for (int i = 0; i < ii.arrayIdx.length; i++) {
 			if (ii.arrayIdx[i] < 0) {
 				res.add(-(i + 1));
@@ -527,17 +531,16 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence updateEdge(int edgeDepRes, boolean posEdge) {
-		final List<Integer> arr = Collections.emptyList();
 		final InternalInformation internal = asInternal(edgeDepRes);
-		final CharSequence prevInternal = internalWithArrayAccess(internal, arr, EnumSet.of(isPrev));
-		final CharSequence currInternal = internalWithArrayAccess(internal, arr, NONE);
+		final CharSequence prevInternal = internalWithArrayAccess(internal, EnumSet.of(isPrev));
+		final CharSequence currInternal = internalWithArrayAccess(internal, NONE);
 		final StringBuilder value = new StringBuilder();
 		if (posEdge) {
 			value.append("((").append(prevInternal).append(" == 0) || ").append(idName(DISABLE_EDGES, true, NONE)).append(") && (").append(currInternal).append(" == 1)");
 		} else {
 			value.append("((").append(prevInternal).append(" == 1) || ").append(idName(DISABLE_EDGES, true, NONE)).append(") && (").append(currInternal).append(" == 0)");
 		}
-		return assignInternal(internal, value, arr, EnumSet.of(posEdge ? isPosEdgeActive : isNegEdgeActive));
+		return assignInternal(internal, value, EnumSet.of(posEdge ? isPosEdgeActive : isNegEdgeActive));
 	}
 
 	protected CharSequence barrierBegin(int stage, int totalStageCosts, boolean createConstant) {
@@ -666,12 +669,78 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
+	public static class InternalPushInfo {
+		public final InternalInformation internal;
+		public final boolean isBitAccess;
+		public final List<Integer> pushedIndices = Lists.newArrayList();
+
+		public InternalPushInfo(InternalInformation internal, boolean isBitAccess) {
+			super();
+			this.internal = internal;
+			this.isBitAccess = isBitAccess;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((internal == null) ? 0 : internal.hashCode());
+			result = (prime * result) + (isBitAccess ? 1231 : 1237);
+			result = (prime * result) + ((pushedIndices == null) ? 0 : pushedIndices.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			final InternalPushInfo other = (InternalPushInfo) obj;
+			if (internal == null) {
+				if (other.internal != null)
+					return false;
+			} else if (!internal.equals(other.internal))
+				return false;
+			if (isBitAccess != other.isBitAccess)
+				return false;
+			if (pushedIndices == null) {
+				if (other.pushedIndices != null)
+					return false;
+			} else if (!pushedIndices.equals(other.pushedIndices))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder builder = new StringBuilder();
+			builder.append("InternalPushInfo [internal=");
+			builder.append(internal);
+			builder.append(", isBitAccess=");
+			builder.append(isBitAccess);
+			builder.append(", pushedIndices=");
+			builder.append(pushedIndices);
+			builder.append("]");
+			return builder.toString();
+		}
+
+	}
+
+	/**
+	 * Key is name of VariableInfo
+	 */
+	protected final Map<String, InternalPushInfo> pushInfo = Maps.newHashMap();
+	protected int arrPos;
+
 	protected CharSequence frameExecution(Frame frame) {
 		final StringBuilder sb = new StringBuilder();
 		int pos = 0;
-		int arrPos = 0;
+		arrPos = -1;
 		final Stack<Integer> stack = new Stack<>();
-		final List<Integer> arr = Lists.newArrayList();
+		pushInfo.clear();
 		for (final FastInstruction instruction : frame.instructions) {
 			int a = 0;
 			int b = 0;
@@ -685,9 +754,15 @@ public abstract class CommonCodeGenerator {
 				stack.push(pos);
 			}
 			if (instruction.inst == Instruction.pushAddIndex) {
-				arr.add(arrPos++);
+				final InternalInformation ii = em.internals[instruction.arg1];
+				InternalPushInfo ipi = pushInfo.get(ii.info.name);
+				if (ipi == null) {
+					ipi = new InternalPushInfo(ii, instruction.arg2 == 1);
+					pushInfo.put(ii.info.name, ipi);
+				}
+				ipi.pushedIndices.add(++arrPos);
 			}
-			sb.append(indent()).append(toExpression(instruction, frame, pos, a, b, arr, arrPos));
+			sb.append(indent()).append(toExpression(instruction, frame, pos, a, b));
 			if (instruction.inst != Instruction.pushAddIndex) {
 				pos++;
 			}
@@ -697,33 +772,34 @@ public abstract class CommonCodeGenerator {
 			for (final int outputId : frame.outputIds) {
 				final InternalInformation outputInternal = asInternal(outputId);
 				sb.append(indent());
-				sb.append(writeInternal(outputInternal, last, arr, NONE)).append(newLine());
-				sb.append(updatePrediateTimestamp(arr, outputInternal));
+				sb.append(writeInternal(outputInternal, last, NONE)).append(newLine());
+				sb.append(updatePrediateTimestamp(outputInternal));
 			}
 		}
 		return sb;
 	}
 
-	protected CharSequence updatePrediateTimestamp(final List<Integer> arr, final InternalInformation outputInternal) {
+	protected CharSequence updatePrediateTimestamp(final InternalInformation outputInternal) {
 		final StringBuilder sb = new StringBuilder();
 		if (outputInternal.isPred) {
-			sb.append(indent()).append(assignInternal(outputInternal, idName(TIMESTAMP, true, NONE), arr, UPDATE)).append(comment("update timestamp"));
+			sb.append(indent()).append(assignInternal(outputInternal, idName(TIMESTAMP, true, NONE), UPDATE)).append(comment("update timestamp"));
 		}
 		return sb;
 	}
 
-	protected CharSequence calcRegUpdateOffset(final List<Integer> arr, final InternalInformation outputInternal) {
+	protected CharSequence calcRegUpdateOffset(final InternalInformation outputInternal) {
 		CharSequence offset = "0";
 		final VariableInformation varInfo = outputInternal.info;
 		if (isArray(varInfo)) {
-			if (outputInternal.fixedArray && arr.isEmpty()) {
+			final InternalPushInfo ip = pushInfo.get(outputInternal.fullName);
+			if (outputInternal.fixedArray && ((ip == null) || ip.pushedIndices.isEmpty())) {
 				if (outputInternal.arrayIdx.length != varInfo.dimensions.length) {
 					offset = "-1";
 				} else {
 					offset = Integer.toString(calculateFixedAccesIndex(outputInternal));
 				}
 			} else {
-				offset = calculateVariableAccessIndex(arr, varInfo, NONE);
+				offset = calculateVariableAccessIndex(varInfo, NONE);
 			}
 		}
 		return offset;
@@ -732,9 +808,9 @@ public abstract class CommonCodeGenerator {
 	protected abstract CharSequence scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName, CharSequence offset, boolean force,
 			CharSequence fillValue);
 
-	protected CharSequence assignInternal(InternalInformation output, CharSequence value, List<Integer> arr, EnumSet<Attributes> attributes) {
+	protected CharSequence assignInternal(InternalInformation output, CharSequence value, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(internalWithArrayAccess(output, arr, attributes));
+		sb.append(internalWithArrayAccess(output, attributes));
 		int targetSizeWithType = output.actualWidth << 1;
 		if (output.info.type == Type.INT) {
 			targetSizeWithType++;
@@ -807,21 +883,21 @@ public abstract class CommonCodeGenerator {
 		return stringBuilder;
 	}
 
-	protected CharSequence toExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case cast_int:
 		case cast_uint:
 		case bitAccessSingle:
 		case bitAccessSingleRange:
-			sb.append(toCastExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toCastExpression(exec, frame, pos, a, b));
 			break;
 		case isFallingEdge:
 		case isRisingEdge:
-			sb.append(toEdgeExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toEdgeExpression(exec, frame, pos, a, b));
 			break;
 		case concat:
-			sb.append(toConcatExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toConcatExpression(exec, frame, pos, a, b));
 			break;
 		case const0:
 		case const1:
@@ -831,13 +907,13 @@ public abstract class CommonCodeGenerator {
 		case loadInternal:
 		case writeInternal:
 		case pushAddIndex:
-			sb.append(toLoadStoreExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toLoadStoreExpression(exec, frame, pos, a, b));
 			break;
 		case bit_neg:
 		case and:
 		case or:
 		case xor:
-			sb.append(toBitExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toBitExpression(exec, frame, pos, a, b));
 			break;
 		case plus:
 		case minus:
@@ -846,12 +922,12 @@ public abstract class CommonCodeGenerator {
 		case mod:
 		case pow:
 		case arith_neg:
-			sb.append(toArithExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toArithExpression(exec, frame, pos, a, b));
 			break;
 		case sll:
 		case srl:
 		case sra:
-			sb.append(toShiftExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toShiftExpression(exec, frame, pos, a, b));
 			break;
 		case eq:
 		case not_eq:
@@ -859,14 +935,14 @@ public abstract class CommonCodeGenerator {
 		case less_eq:
 		case greater:
 		case greater_eq:
-			sb.append(toEqualityExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toEqualityExpression(exec, frame, pos, a, b));
 			break;
 		case logiAnd:
 		case logiNeg:
 		case logiOr:
 		case negPredicate:
 		case posPredicate:
-			sb.append(toPredicateExpression(exec, frame, pos, a, b, arr, arrPos));
+			sb.append(toPredicateExpression(exec, frame, pos, a, b));
 			break;
 		case noop:
 			break;
@@ -875,7 +951,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toConcatExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toConcatExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case concat:
@@ -887,12 +963,12 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toEdgeExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toEdgeExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case isFallingEdge:
 		case isRisingEdge:
-			sb.append(assignInternal(asInternal(exec.arg1), idName(TIMESTAMP, true, NONE), arr, EnumSet.of(Attributes.isUpdate)));
+			sb.append(assignInternal(asInternal(exec.arg1), idName(TIMESTAMP, true, NONE), EnumSet.of(Attributes.isUpdate)));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
@@ -900,7 +976,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toCastExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toCastExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		final String tempName = getTempName(a, NONE);
 		switch (exec.inst) {
@@ -926,7 +1002,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toLoadStoreExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toLoadStoreExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case const0:
@@ -944,14 +1020,20 @@ public abstract class CommonCodeGenerator {
 		case loadConstant:
 			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true, -1), true));
 			break;
-		case loadInternal:
-			sb.append(assignTempVar(-1, pos, NONE, loadInternal(asInternal(exec.arg1), arr, NONE), false));
+		case loadInternal: {
+			final InternalInformation asInternal = asInternal(exec.arg1);
+			sb.append(assignTempVar(-1, pos, NONE, loadInternal(asInternal, NONE), false));
+			pushInfo.remove(asInternal.info.name);
 			break;
-		case writeInternal:
-			sb.append(writeInternal(asInternal(exec.arg1), getTempName(a, NONE), arr, NONE));
+		}
+		case writeInternal: {
+			final InternalInformation asInternal = asInternal(exec.arg1);
+			sb.append(writeInternal(asInternal, getTempName(a, NONE), NONE));
+			pushInfo.remove(asInternal.info.name);
 			break;
+		}
 		case pushAddIndex:
-			sb.append(assignIndexVar(arr, a));
+			sb.append(assignIndexVar(a));
 			// sb.append('''int a«arr.last»=(int)t«a»;''')
 			break;
 		default:
@@ -960,9 +1042,9 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence assignIndexVar(List<Integer> arr, int a) {
+	protected CharSequence assignIndexVar(int a) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(assignTempVar(-1, arr.get(arr.size() - 1).intValue(), EnumSet.of(isArrayIndex), getTempName(a, NONE), true));
+		sb.append(assignTempVar(-1, arrPos, EnumSet.of(isArrayIndex), getTempName(a, NONE), true));
 		return sb;
 	}
 
@@ -978,9 +1060,9 @@ public abstract class CommonCodeGenerator {
 		}
 	}
 
-	protected CharSequence writeInternal(InternalInformation internal, String tempName, List<Integer> arr, EnumSet<Attributes> attributes) {
+	protected CharSequence writeInternal(InternalInformation internal, String tempName, EnumSet<Attributes> attributes) {
 		final StringBuilder sb = new StringBuilder();
-		CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, arr, sb);
+		CharSequence assignValue = createBitAccessIfNeeded(internal, tempName, sb);
 		if (!internal.isPred) {
 			assignValue = fixupValue(assignValue, getTargetSizeWithType(internal.info), true);
 		}
@@ -989,18 +1071,20 @@ public abstract class CommonCodeGenerator {
 			final boolean forceRegUpdate = internal.fixedArray && internal.isFillArray;
 			if (!forceRegUpdate) {
 				final VariableInformation cpyVar = createVar(cpyName, internal.actualWidth, internal.info.type);
-				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, arr, append(NONE, attributes)), append(NONE, attributes), false, true, false)).append(newLine());
+				sb.append(assignVariable(cpyVar, internalWithArrayAccess(internal, append(NONE, attributes)), append(NONE, attributes), false, true, false)).append(newLine());
 				sb.append(indent());
 			}
-			sb.append(assignInternal(internal, assignValue, arr, append(SHADOWREG, attributes))).append(comment("Assign value"));
-			final CharSequence offset = calcRegUpdateOffset(arr, internal);
-			sb.append(indent()).append(
-					scheduleShadowReg(internal, internalWithArrayAccess(internal, arr, append(SHADOWREG, attributes)), cpyName, offset, forceRegUpdate, tempName));
+			sb.append(assignInternal(internal, assignValue, append(SHADOWREG, attributes))).append(comment("Assign value"));
+			final CharSequence offset = calcRegUpdateOffset(internal);
+			sb.append(indent()).append(scheduleShadowReg(internal, internalWithArrayAccess(internal, append(SHADOWREG, attributes)), cpyName, offset, forceRegUpdate, tempName));
 		} else {
-			sb.append(assignInternal(internal, assignValue, arr, append(NONE, attributes))).append(comment("Assign value"));
+			sb.append(assignInternal(internal, assignValue, append(NONE, attributes))).append(comment("Assign value"));
 		}
-		arr.clear();
 		return sb;
+	}
+
+	protected Stack<Integer> clone(Stack<Integer> arr) {
+		return (Stack<Integer>) arr.clone();
 	}
 
 	private EnumSet<Attributes> append(EnumSet<Attributes> input, EnumSet<Attributes> attributes) {
@@ -1019,10 +1103,10 @@ public abstract class CommonCodeGenerator {
 		return clone;
 	}
 
-	protected String createBitAccessIfNeeded(InternalInformation internal, String tempName, List<Integer> arr, final StringBuilder sb) {
+	protected String createBitAccessIfNeeded(InternalInformation internal, String tempName, final StringBuilder sb) {
 		if (internal.actualWidth != internal.info.width) {
 			final VariableInformation currVar = createVar(idName(internal.fullName, false, NONE) + tempName + "_current", internal.actualWidth, internal.info.type);
-			final CharSequence currentValue = internalWithArrayAccess(internal, arr, internal.isShadowReg ? SHADOWREG : NONE);
+			final CharSequence currentValue = internalWithArrayAccess(internal, internal.isShadowReg ? SHADOWREG : NONE);
 			final BigInteger mask = calcMask(internal.actualWidth);
 			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not(), true, internal.info.width);
 			sb.append(assignVariable(currVar, doMask(currentValue, writeMask), NONE, false, true, false)).append(comment("Current value"));
@@ -1039,8 +1123,8 @@ public abstract class CommonCodeGenerator {
 		return "(" + currentValue + ") & " + writeMask;
 	}
 
-	protected CharSequence loadInternal(InternalInformation info, List<Integer> arr, EnumSet<Attributes> attributes) {
-		final CharSequence internalWithArray = internalWithArrayAccess(info, arr, attributes);
+	protected CharSequence loadInternal(InternalInformation info, EnumSet<Attributes> attributes) {
+		final CharSequence internalWithArray = internalWithArrayAccess(info, attributes);
 		if (info.actualWidth == info.info.width)
 			return internalWithArray;
 		return bitAccess(internalWithArray, info);
@@ -1052,15 +1136,15 @@ public abstract class CommonCodeGenerator {
 		return mask(internalWithArray + " >> " + info.bitEnd, info.actualWidth);
 	}
 
-	protected CharSequence internalWithArrayAccess(InternalInformation internal, List<Integer> arr, EnumSet<Attributes> attributes) {
+	protected CharSequence internalWithArrayAccess(InternalInformation internal, EnumSet<Attributes> attributes) {
 		final CharSequence varName = idName(internal, true, attributes);
 		final VariableInformation varInfo = internal.info;
 		final StringBuilder sb = new StringBuilder();
 		if (isArray(varInfo)) {
-			if (internal.fixedArray && arr.isEmpty()) {
+			if (internal.fixedArray) {
 				sb.append(fixedArrayAccess(varName, calculateFixedAccesIndex(internal)));
 			} else {
-				sb.append(arrayAccess(varName, calculateVariableAccessIndex(arr, varInfo, attributes)));
+				sb.append(arrayAccess(varName, calculateVariableAccessIndex(varInfo, attributes)));
 			}
 		} else {
 			sb.append(varName);
@@ -1070,31 +1154,35 @@ public abstract class CommonCodeGenerator {
 
 	protected int calculateFixedAccesIndex(InternalInformation internal) {
 		int idx = 0;
-		final int lastIndex = internal.arrayIdx.length - 1;
-		for (int i = 0; i < lastIndex; i++) {
-			idx += internal.info.dimensions[i] * internal.arrayIdx[i];
-		}
-		if (lastIndex >= 0) {
-			idx += internal.arrayIdx[lastIndex];
+		final int[] access = internal.arrayIdx;
+		final int[] dims = internal.info.dimensions;
+		final int lastIndex = access.length - 1;
+		int rowSize = 1;
+		for (int i = lastIndex; i >= 0; i--) {
+			idx += rowSize * access[i];
+			rowSize *= dims[i];
 		}
 		return idx;
 	}
 
-	protected CharSequence calculateVariableAccessIndex(List<Integer> arr, final VariableInformation varInfo, EnumSet<Attributes> attributes) {
+	protected CharSequence calculateVariableAccessIndex(final VariableInformation varInfo, EnumSet<Attributes> attributes) {
 		if (attributes.contains(Attributes.useArrayOffset))
 			return "offset";
-		final int lastIndex = arr.size() - 1;
 		final StringBuilder arrayAccess = new StringBuilder();
-		for (int i = 0; i < lastIndex; i++) {
-			if (i != 0) {
+		final InternalPushInfo pi = pushInfo.get(varInfo.name);
+		final List<Integer> access = pi.pushedIndices;
+		final int[] dims = varInfo.dimensions;
+		if (dims.length != access.size())
+			throw new IllegalArgumentException("Did not push enough dimensions for " + varInfo);
+		final int lastIndex = access.size() - 1;
+		int rowSize = 1;
+		for (int i = lastIndex; i >= 0; i--) {
+			if (i != lastIndex) {
 				arrayAccess.append(" + ");
 			}
-			arrayAccess.append(Integer.toString(varInfo.dimensions[i]) + " * " + getTempName(arr.get(i), append(EnumSet.of(isArrayIndex), attributes)));
+			arrayAccess.append(rowSize + " * " + getTempName(access.get(i), append(EnumSet.of(isArrayIndex), attributes)));
+			rowSize *= dims[i];
 		}
-		if (lastIndex != 0) {
-			arrayAccess.append(" + ");
-		}
-		arrayAccess.append(getTempName(arr.get(lastIndex), append(EnumSet.of(isArrayIndex), attributes)));
 		return arrayAccess;
 	}
 
@@ -1119,7 +1207,7 @@ public abstract class CommonCodeGenerator {
 		return "t" + pos;
 	}
 
-	protected CharSequence toEqualityExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toEqualityExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case eq:
@@ -1146,7 +1234,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toPredicateExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toPredicateExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case logiNeg:
@@ -1167,7 +1255,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toShiftExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toShiftExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case sll:
@@ -1185,7 +1273,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
-	protected CharSequence toArithExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toArithExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case arith_neg:
@@ -1218,7 +1306,7 @@ public abstract class CommonCodeGenerator {
 	protected abstract CharSequence pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes,
 			boolean doMask);
 
-	protected CharSequence toBitExpression(FastInstruction exec, Frame frame, int pos, int a, int b, List<Integer> arr, int arrPos) {
+	protected CharSequence toBitExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case bit_neg:

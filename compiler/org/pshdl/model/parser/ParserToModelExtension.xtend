@@ -271,7 +271,7 @@ class ParserToModelExtension {
 	def dispatch HDLType toHDL(PsPrimitiveContext context, boolean isStatement) {
 		if (context.psQualifiedName !== null)
 			return new HDLEnum().setName(context.psQualifiedName.toName).attachContext(context)
-		val HDLPrimitiveType pt = HDLPrimitiveType.valueOf(context.psPrimitiveType.text.toUpperCase)
+		val HDLPrimitiveType pt = HDLPrimitiveType.getOp(context.psPrimitiveType.text)
 		val HDLExpression width = context.psWidth?.toHDL(false) as HDLExpression
 		return new HDLPrimitive().setType(pt.getResultingType(width)).setWidth(width).attachContext(context)
 	}
@@ -410,7 +410,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLPrimitive toHDL(PsCastContext context, boolean isStatement) {
-		val HDLPrimitiveType pt = HDLPrimitiveType.valueOf(context.psPrimitiveType.text.toUpperCase)
+		val HDLPrimitiveType pt = HDLPrimitiveType.getOp(context.psPrimitiveType.text)
 		val HDLExpression width = context.psWidth?.toHDL(false) as HDLExpression
 		return new HDLPrimitive().setType(pt.getResultingType(width)).setWidth(width).attachContext(context)
 	}
@@ -602,35 +602,35 @@ class ParserToModelExtension {
 		var res = new HDLFunctionParameter().setConstant(false)
 		switch (x:context) {
 			case x.ANY_INT !== null:
-				res = res.setType(Type.ANY_INT)
+				res = res.setType(Type.PARAM_ANY_INT)
 			case x.ANY_UINT !== null:
-				res = res.setType(Type.ANY_UINT)
+				res = res.setType(Type.PARAM_ANY_UINT)
 			case x.ANY_BIT !== null:
-				res = res.setType(Type.ANY_BIT)
+				res = res.setType(Type.PARAM_ANY_BIT)
 			case x.INT !== null:
-				res = res.setType(Type.REG_INT)
+				res = res.setType(Type.PARAM_INT)
 			case x.UINT !== null:
-				res = res.setType(Type.REG_UINT)
+				res = res.setType(Type.PARAM_UINT)
 			case x.BIT !== null:
-				res = res.setType(Type.REG_BIT)
+				res = res.setType(Type.PARAM_BIT)
 			case x.BOOL !== null:
-				res = res.setType(Type.BOOL_TYPE)
+				res = res.setType(Type.PARAM_BOOL)
 			case x.STRING !== null:
-				res = res.setType(Type.STRING_TYPE)
+				res = res.setType(Type.PARAM_STRING)
 			case x.ANY_IF !== null:
-				res = res.setType(Type.ANY_IF)
+				res = res.setType(Type.PARAM_ANY_IF)
 			case x.ANY_ENUM !== null:
-				res = res.setType(Type.ANY_ENUM)
+				res = res.setType(Type.PARAM_ANY_ENUM)
 			case x.INTERFACE !== null: {
-				res = res.setType(^Type.^IF)
+				res = res.setType(Type.PARAM_IF)
 				res = res.setIfSpec(x.psQualifiedName.toFQNName)
 			}
 			case x.ENUM !== null: {
-				res = res.setType(^Type.ENUM)
+				res = res.setType(Type.PARAM_ENUM)
 				res = res.setEnumSpec(x.psQualifiedName.toFQNName)
 			}
 			case x.FUNCTION !== null: {
-				res = res.setType(^Type.FUNCTION)
+				res = res.setType(Type.PARAM_FUNCTION)
 				res = res.setFuncSpec(x.psFuncParamWithRW.map[toHDL(false) as HDLFunctionParameter])
 				if (x.psFuncParamType !== null)
 					res = res.setFuncReturnSpec(x.psFuncParamType.toHDL(false) as HDLFunctionParameter)

@@ -49,6 +49,11 @@ import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLExpression;
+import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLFunctionParameter;
+import org.pshdl.model.HDLFunctionParameter.RWType;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLInterfaceInstantiation;
@@ -57,6 +62,7 @@ import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLResolvedRef;
+import org.pshdl.model.HDLStatement;
 import org.pshdl.model.HDLUnresolvedFragment;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
@@ -247,43 +253,68 @@ public class RWValidation {
 				if (!var.isPresent()) {
 					continue;
 				}
-				final IHDLObject container = ass.getContainer();
-				final HDLVariable hdlVariable = var.get();
-				if (ref instanceof HDLInterfaceRef) {
-					final HDLInterfaceRef hir = (HDLInterfaceRef) ref;
-					final Optional<HDLVariable> hVar = hir.resolveHIf();
-					if (hVar.isPresent()) {
-						incMeta(hVar.get(), IntegerMeta.ACCESS);
-						addStringMeta(hdlVariable.getName(), hVar.get(), Init.written);
-						if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
-							addStringMeta(hir.getVarRefName().getLastSegment(), hVar.get(), Init.full);
-						}
-					}
-				} else {
-					if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
-						hdlVariable.addMeta(Init.full, Collections.singleton(hdlVariable.getName()));
-					}
-					incMeta(hdlVariable, IntegerMeta.WRITE_COUNT);
-				}
-				HDLBlock block = ass.getContainer(HDLBlock.class);
-				if (block == null) {
-					block = UNIT_BLOCK;
-				}
-				if ((hdlVariable.getMeta(BLOCK_META) != null) && ((hdlVariable.getMeta(BLOCK_META) != block) && block.getProcess())) {
-					Set<HDLBlock> meta = hdlVariable.getMeta(BLOCK_META_CLASH);
-					if (meta == null) {
-						meta = Sets.newLinkedHashSet();
-					}
-					meta.add(block);
-					hdlVariable.addMeta(BLOCK_META_CLASH, meta);
-				}
-				hdlVariable.addMeta(BLOCK_META, block);
+				incrementWrite(var.get(), ref, ass);
 			}
 		}
 		final Collection<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();
 		for (final HDLVariable var : defVal) {
 			incMeta(var, IntegerMeta.WRITE_COUNT);
 		}
+		final HDLFunctionCall[] functions = orig.getAllObjectsOf(HDLFunctionCall.class, true);
+		for (final HDLFunctionCall call : functions) {
+			final Optional<HDLFunction> functionOpt = call.resolveFunction();
+			if (functionOpt.isPresent()) {
+				final HDLFunction function = functionOpt.get();
+				final ArrayList<HDLFunctionParameter> args = function.getArgs();
+				for (int i = 0; i < args.size(); i++) {
+					final HDLFunctionParameter hdlFunctionParameter = args.get(i);
+					if ((hdlFunctionParameter.getRw() == RWType.READWRITE) || (hdlFunctionParameter.getRw() == RWType.WRITE)) {
+						final HDLExpression param = call.getParams().get(i);
+						if (param instanceof HDLVariableRef) {
+							final HDLVariableRef ref = (HDLVariableRef) param;
+							final Optional<HDLVariable> varOpt = ref.resolveVar();
+							if (varOpt.isPresent()) {
+								incrementWrite(varOpt.get(), ref, call.getContainer(HDLStatement.class));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private static void incrementWrite(HDLVariable hdlVariable, HDLVariableRef ref, HDLStatement stmnt) {
+		final IHDLObject container = stmnt.getContainer();
+		if (ref instanceof HDLInterfaceRef) {
+			final HDLInterfaceRef hir = (HDLInterfaceRef) ref;
+			final Optional<HDLVariable> hVar = hir.resolveHIf();
+			if (hVar.isPresent()) {
+				incMeta(hVar.get(), IntegerMeta.ACCESS);
+				addStringMeta(hdlVariable.getName(), hVar.get(), Init.written);
+				if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
+					addStringMeta(hir.getVarRefName().getLastSegment(), hVar.get(), Init.full);
+				}
+			}
+		} else {
+			if ((container != null) && (container.getClassType() == HDLClass.HDLUnit) && (ref.getArray().size() == 0) && (ref.getBits().size() == 0)) {
+				hdlVariable.addMeta(Init.full, Collections.singleton(hdlVariable.getName()));
+			}
+			incMeta(hdlVariable, IntegerMeta.WRITE_COUNT);
+		}
+		HDLBlock block = stmnt.getContainer(HDLBlock.class);
+		if (block == null) {
+			block = UNIT_BLOCK;
+		}
+		if ((hdlVariable.getMeta(BLOCK_META) != null) && ((hdlVariable.getMeta(BLOCK_META) != block) && block.getProcess())) {
+			Set<HDLBlock> meta = hdlVariable.getMeta(BLOCK_META_CLASH);
+			if (meta == null) {
+				meta = Sets.newLinkedHashSet();
+			}
+			meta.add(block);
+			hdlVariable.addMeta(BLOCK_META_CLASH, meta);
+		}
+		hdlVariable.addMeta(BLOCK_META, block);
+
 	}
 
 	private static void addStringMeta(String value, HDLVariable hVar, Init init) {

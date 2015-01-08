@@ -948,7 +948,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             _builder.append("varIdx.put(\"");
             _builder.append(v.name, "\t");
             _builder.append("\", ");
-            int _varIdx = this.getVarIdx(v, this.purgeAliases);
+            int _varIdx = this.getVarIdx(v, false);
             _builder.append(_varIdx, "\t");
             _builder.append(");");
             _builder.newLineIfNotEmpty();
@@ -967,7 +967,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             _builder.append("varIdx.put(\"");
             _builder.append(v_1.name, "\t");
             _builder.append("\", ");
-            int _varIdx_1 = this.getVarIdx(v_1, this.purgeAliases);
+            int _varIdx_1 = this.getVarIdx(v_1, false);
             _builder.append(_varIdx_1, "\t");
             _builder.append(");");
             _builder.newLineIfNotEmpty();
@@ -1085,8 +1085,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     return _builder;
   }
   
-  protected CharSequence calculateVariableAccessIndex(final List<Integer> arr, final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
-    final CharSequence res = super.calculateVariableAccessIndex(arr, varInfo, attributes);
+  protected CharSequence calculateVariableAccessIndex(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
+    final CharSequence res = super.calculateVariableAccessIndex(varInfo, attributes);
     int _length = res.length();
     boolean _tripleEquals = (_length == 0);
     if (_tripleEquals) {

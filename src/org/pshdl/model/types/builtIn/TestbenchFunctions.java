@@ -58,34 +58,34 @@ public class TestbenchFunctions extends HDLDefaultFunctionImpl implements INativ
 		return new HDLNativeFunction()
 				.setSimOnly(true)
 				.setName("pshdl." + SimulationFunctions.pulse.name())
-				.setReturnType(new HDLFunctionParameter().setType(Type.BOOL_TYPE).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(Type.REG_BIT).setName(new HDLVariable().setName("toggleExpression")).setRw(RWType.WRITE))
-				.addArgs(new HDLFunctionParameter().setType(Type.ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ))
+				.setReturnType(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_BIT).setName(new HDLVariable().setName("toggleExpression")).setRw(RWType.WRITE))
+				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ))
 				.addArgs(
-						new HDLFunctionParameter().setType(Type.ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
+						new HDLFunctionParameter().setType(Type.PARAM_ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
 								.setRw(RWType.READ));
 	}
 
 	private static HDLFunction createWait() {
 		return new HDLNativeFunction().setSimOnly(true).setName("pshdl." + SimulationFunctions.wait.name())
-				.setReturnType(new HDLFunctionParameter().setType(Type.BOOL_TYPE).setRw(RWType.RETURN));
+				.setReturnType(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setRw(RWType.RETURN));
 	}
 
 	private static HDLFunction createWaitFor() {
 		return new HDLNativeFunction()
 				.setSimOnly(true)
 				.setName("pshdl." + SimulationFunctions.waitFor.name())
-				.setReturnType(new HDLFunctionParameter().setType(Type.BOOL_TYPE).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(Type.ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ))
+				.setReturnType(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ).setConstant(true))
 				.addArgs(
-						new HDLFunctionParameter().setType(Type.ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
+						new HDLFunctionParameter().setType(Type.PARAM_ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
 								.setRw(RWType.READ));
 	}
 
 	private static HDLFunction createWaitUntil() {
 		return new HDLNativeFunction().setSimOnly(true).setName("pshdl." + SimulationFunctions.waitUntil.name())
-				.setReturnType(new HDLFunctionParameter().setType(Type.BOOL_TYPE).setRw(RWType.RETURN))
-				.addArgs(new HDLFunctionParameter().setType(Type.BOOL_TYPE).setName(new HDLVariable().setName("expression")).setRw(RWType.READ));
+				.setReturnType(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setRw(RWType.RETURN))
+				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setName(new HDLVariable().setName("expression")).setRw(RWType.READ));
 	}
 
 	@Override

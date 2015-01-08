@@ -206,14 +206,14 @@ public class HDLFunctions {
 					final String paramName = args.get(i).getName().getName();
 					if (prim != null) {
 						switch (arg.getType()) {
-						case REG_BIT:
-						case ANY_BIT:
+						case PARAM_BIT:
+						case PARAM_ANY_BIT:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							}
 							break;
-						case REG_INT:
-						case ANY_INT:
+						case PARAM_INT:
+						case PARAM_ANY_INT:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							} else if (!prim.isNumber()) {
@@ -222,8 +222,8 @@ public class HDLFunctions {
 								funcScore.incScore(5, "Automatic casting from uint to int will occour for parameter: " + paramName);
 							}
 							break;
-						case REG_UINT:
-						case ANY_UINT:
+						case PARAM_UINT:
+						case PARAM_ANY_UINT:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							} else if (!prim.isNumber()) {
@@ -232,23 +232,23 @@ public class HDLFunctions {
 								funcScore.incScore(50, "Automatic casting from int to uint will occour for parameter: " + paramName);
 							}
 							break;
-						case BOOL_TYPE:
+						case PARAM_BOOL:
 							if (!prim.isBits()) {
 								funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + paramName);
 							} else if (prim.getType() != HDLPrimitiveType.BOOL) {
 								funcScore.incScore(100, "Automatic casting to boolean will occour for parameter: " + paramName);
 							}
 							break;
-						case STRING_TYPE:
+						case PARAM_STRING:
 							if (prim.getType() != HDLPrimitiveType.STRING) {
 								funcScore.incScore(1000, "There is no automatic casting to String for parameter: " + paramName);
 							}
 							break;
-						case ENUM:
-						case FUNCTION:
-						case IF:
-						case ANY_ENUM:
-						case ANY_IF:
+						case PARAM_ENUM:
+						case PARAM_FUNCTION:
+						case PARAM_IF:
+						case PARAM_ANY_ENUM:
+						case PARAM_ANY_IF:
 							break;
 						}
 					}
@@ -265,11 +265,11 @@ public class HDLFunctions {
 			return funcScore.score;
 		}
 		switch (arg.getType()) {
-		case ANY_ENUM:
-		case ENUM:
+		case PARAM_ANY_ENUM:
+		case PARAM_ENUM:
 			if (type.getClassType() != HDLClass.HDLEnum) {
 				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to an enum for parameter: " + arg.getName().getName());
-			} else if (arg.getType() == Type.ENUM) {
+			} else if (arg.getType() == Type.PARAM_ENUM) {
 				final Optional<HDLEnum> enumSpec = arg.resolveEnumSpec();
 				if (enumSpec.isPresent()) {
 					if (!type.equals(enumSpec.get())) {
@@ -278,11 +278,11 @@ public class HDLFunctions {
 				}
 			}
 			break;
-		case ANY_IF:
-		case IF:
+		case PARAM_ANY_IF:
+		case PARAM_IF:
 			if (type.getClassType() != HDLClass.HDLInterface) {
 				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to an interface for parameter: " + arg.getName().getName());
-			} else if (arg.getType() == Type.IF) {
+			} else if (arg.getType() == Type.PARAM_IF) {
 				final Optional<HDLInterface> ifSpec = arg.resolveIfSpec();
 				if (ifSpec.isPresent()) {
 					final HDLInterface hIf = (HDLInterface) type;
@@ -293,19 +293,19 @@ public class HDLFunctions {
 				}
 			}
 			break;
-		case REG_BIT:
-		case REG_INT:
-		case REG_UINT:
-		case STRING_TYPE:
-		case ANY_BIT:
-		case ANY_INT:
-		case ANY_UINT:
-		case BOOL_TYPE:
+		case PARAM_BIT:
+		case PARAM_INT:
+		case PARAM_UINT:
+		case PARAM_STRING:
+		case PARAM_ANY_BIT:
+		case PARAM_ANY_INT:
+		case PARAM_ANY_UINT:
+		case PARAM_BOOL:
 			if (type.getClassType() != HDLClass.HDLPrimitive) {
 				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + arg.getName().getName());
 			}
 			break;
-		case FUNCTION:
+		case PARAM_FUNCTION:
 			if (!(param instanceof HDLFunction)) {
 				funcScore.incScore(1000, "Expected a function, but found:" + param + " for parameter: " + arg.getName().getName());
 			}

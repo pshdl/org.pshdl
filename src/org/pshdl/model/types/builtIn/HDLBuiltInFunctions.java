@@ -520,53 +520,53 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 	public static final HDLFunction ORDINAL = (HDLFunction) createOrdinal().freeze(null);
 
 	public static HDLNativeFunction createOrdinal() {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.ordinal.name()).setReturnType(returnType(Type.REG_UINT))
-				.addArgs(param(Type.ANY_ENUM, "e"));
+		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.ordinal.name()).setReturnType(returnType(Type.PARAM_UINT))
+				.addArgs(param(Type.PARAM_ANY_ENUM, "e"));
 	}
 
 	public static final HDLFunction HIGHZ = (HDLFunction) createHighZ().freeze(null);
 
 	public static HDLNativeFunction createHighZ() {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.highZ.name()).setReturnType(returnType(Type.ANY_BIT));
+		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.highZ.name()).setReturnType(returnType(Type.PARAM_ANY_BIT));
 	}
 
 	public static final HDLFunction ASSERT = (HDLFunction) createAssert().freeze(null);
 
 	public static HDLNativeFunction createAssert() {
 		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.assertThat.name())//
-				.addArgs(param(Type.BOOL_TYPE, "assumption"))//
-				.addArgs(param(Type.ENUM, "assert").setEnumSpec(PSHDLLib.ASSERT.asRef()))//
-				.addArgs(param(Type.STRING_TYPE, "message"))//
+				.addArgs(param(Type.PARAM_BOOL, "assumption"))//
+				.addArgs(param(Type.PARAM_ENUM, "assert").setEnumSpec(PSHDLLib.ASSERT.asRef()))//
+				.addArgs(param(Type.PARAM_STRING, "message"))//
 		;
 	}
 
-	public static final HDLFunction ABS_UINT = (HDLFunction) createABS(Type.ANY_UINT).freeze(null);
-	public static final HDLFunction ABS_INT = (HDLFunction) createABS(Type.ANY_INT).freeze(null);
+	public static final HDLFunction ABS_UINT = (HDLFunction) createABS(Type.PARAM_ANY_UINT).freeze(null);
+	public static final HDLFunction ABS_INT = (HDLFunction) createABS(Type.PARAM_ANY_INT).freeze(null);
 
 	private static HDLFunction createABS(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.abs.name()).setReturnType(returnType(Type.ANY_UINT)).addArgs(param(type, "a"));
+		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.abs.name()).setReturnType(returnType(Type.PARAM_ANY_UINT)).addArgs(param(type, "a"));
 	}
 
-	public static final HDLFunction LOG2CEIL_UINT = (HDLFunction) createLog2(Type.ANY_UINT, "ceil").freeze(null);
-	public static final HDLFunction LOG2CEIL_INT = (HDLFunction) createLog2(Type.ANY_INT, "ceil").freeze(null);
-	public static final HDLFunction LOG2FLOOR_UINT = (HDLFunction) createLog2(Type.ANY_UINT, "floor").freeze(null);
-	public static final HDLFunction LOG2FLOOR_INT = (HDLFunction) createLog2(Type.ANY_INT, "floor").freeze(null);
+	public static final HDLFunction LOG2CEIL_UINT = (HDLFunction) createLog2(Type.PARAM_ANY_UINT, "ceil").freeze(null);
+	public static final HDLFunction LOG2CEIL_INT = (HDLFunction) createLog2(Type.PARAM_ANY_INT, "ceil").freeze(null);
+	public static final HDLFunction LOG2FLOOR_UINT = (HDLFunction) createLog2(Type.PARAM_ANY_UINT, "floor").freeze(null);
+	public static final HDLFunction LOG2FLOOR_INT = (HDLFunction) createLog2(Type.PARAM_ANY_INT, "floor").freeze(null);
 
 	private static HDLFunction createLog2(Type type, String rounding) {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.valueOf("log2" + rounding).name()).setReturnType(returnType(Type.REG_UINT))
+		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.valueOf("log2" + rounding).name()).setReturnType(returnType(Type.PARAM_UINT))
 				.addArgs(param(type, "a"));
 	}
 
-	public static final HDLFunction MIN_UINT = (HDLFunction) createMIN(Type.ANY_UINT).freeze(null);
-	public static final HDLFunction MIN_INT = (HDLFunction) createMIN(Type.ANY_INT).freeze(null);
+	public static final HDLFunction MIN_UINT = (HDLFunction) createMIN(Type.PARAM_ANY_UINT).freeze(null);
+	public static final HDLFunction MIN_INT = (HDLFunction) createMIN(Type.PARAM_ANY_INT).freeze(null);
 
 	private static HDLFunction createMIN(Type type) {
 		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.min.name()).setReturnType(returnType(type)).addArgs(param(type, "a"))
 				.addArgs(param(type, "b"));
 	}
 
-	public static final HDLFunction MAX_INT = (HDLFunction) createMAX(Type.ANY_INT).freeze(null);
-	public static final HDLFunction MAX_UINT = (HDLFunction) createMAX(Type.ANY_UINT).freeze(null);
+	public static final HDLFunction MAX_INT = (HDLFunction) createMAX(Type.PARAM_ANY_INT).freeze(null);
+	public static final HDLFunction MAX_UINT = (HDLFunction) createMAX(Type.PARAM_ANY_UINT).freeze(null);
 
 	private static HDLFunction createMAX(Type type) {
 		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.max.name()).setReturnType(returnType(type)).addArgs(param(type, "a"))

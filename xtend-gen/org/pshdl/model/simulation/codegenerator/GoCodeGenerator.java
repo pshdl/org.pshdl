@@ -105,7 +105,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         String _absolutePath_1 = dutFile.getAbsolutePath();
         ProcessBuilder _processBuilder = new ProcessBuilder("/usr/local/go/bin/go", "build", _absolutePath, _absolutePath_1);
         ProcessBuilder _directory = _processBuilder.directory(tempDir);
-        final ProcessBuilder goBuilder = _directory.redirectErrorStream(true);
+        ProcessBuilder _redirectErrorStream = _directory.redirectErrorStream(true);
+        final ProcessBuilder goBuilder = _redirectErrorStream.inheritIO();
         final Process goCompiler = goBuilder.start();
         int _waitFor = goCompiler.waitFor();
         boolean _notEquals = (_waitFor != 0);

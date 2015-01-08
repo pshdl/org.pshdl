@@ -179,8 +179,22 @@ public class Insulin {
 					final IHDLObject container = hdlVariable.getContainer();
 					if (container instanceof HDLVariableDeclaration) {
 						final HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
-						final HDLVariable newVar = hdlVariable.setDefaultValue(null).addAnnotations(HDLBuiltInAnnotations.VHDLLatchable.create(null));
-						ms.replace(hdlExport, hvd.setVariables(HDLObject.asList(newVar)));
+						final HDLVariable newVar = hdlVariable.setDefaultValue(null).addAnnotations(HDLBuiltInAnnotations.VHDLLatchable.create(null))
+								.addAnnotations(HDLBuiltInAnnotations.genSignal.create("export"));
+						switch (hvd.getDirection()) {
+						case IN:
+
+							break;
+						case INOUT:
+						case OUT:
+						case CONSTANT:
+						case PARAMETER:
+							ms.replace(hdlExport, hvd.setVariables(HDLObject.asList(newVar.setDefaultValue(rr))));
+							break;
+						case HIDDEN:
+						case INTERNAL:
+							throw new IllegalArgumentException("Can not export for loop iterator and internal variables");
+						}
 					}
 				}
 			}
@@ -580,7 +594,7 @@ public class Insulin {
 					return Optional.of(new ResolvedPart(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()), sub));
 				final HDLFunctionParameter funcPar = variable.getContainer(HDLFunctionParameter.class);
 				if (funcPar != null) {
-					if (funcPar.getType() == Type.IF) {
+					if (funcPar.getType() == Type.PARAM_IF) {
 						final Optional<HDLInterface> resolveInterface = ScopingExtension.INST.resolveInterface(funcPar, funcPar.getIfSpecRefName());
 						if (resolveInterface.isPresent()) {
 							final HDLQualifiedName typeName = fullNameOf(resolveInterface.get());
@@ -589,7 +603,7 @@ public class Insulin {
 							return Optional.of(new ResolvedPart(hir, ssub));
 						}
 					}
-					if (funcPar.getType() == Type.ENUM) {
+					if (funcPar.getType() == Type.PARAM_ENUM) {
 						final Optional<HDLEnum> resolveEnum = ScopingExtension.INST.resolveEnum(funcPar, funcPar.getEnumSpecRefName());
 						if (resolveEnum.isPresent()) {
 							final HDLQualifiedName typeName = fullNameOf(resolveEnum.get());
@@ -933,6 +947,9 @@ public class Insulin {
 					case INTEGER:
 					case NATURAL:
 					case UINT:
+					case ANY_BIT:
+					case ANY_INT:
+					case ANY_UINT:
 						return HDLLiteral.get(0);
 					}
 				}

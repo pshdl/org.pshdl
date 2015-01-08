@@ -480,7 +480,7 @@ public class StringWriteExtension {
     HDLFunctionParameter.Type _type_1 = func.getType();
     if (_type_1 != null) {
       switch (_type_1) {
-        case ENUM:
+        case PARAM_ENUM:
           StringBuilder _append = sb.append("<");
           HDLQualifiedName _enumSpecRefName = func.getEnumSpecRefName();
           String _string = _enumSpecRefName.toString();
@@ -488,7 +488,7 @@ public class StringWriteExtension {
           StringBuilder _append_1 = _append.append(_enumRefType);
           _append_1.append(">");
           break;
-        case IF:
+        case PARAM_IF:
           StringBuilder _append_2 = sb.append("<");
           HDLQualifiedName _enumSpecRefName_1 = func.getEnumSpecRefName();
           String _string_1 = _enumSpecRefName_1.toString();
@@ -496,7 +496,7 @@ public class StringWriteExtension {
           StringBuilder _append_3 = _append_2.append(_enumRefType_1);
           _append_3.append(">");
           break;
-        case FUNCTION:
+        case PARAM_FUNCTION:
           StringConcatenation _builder = new StringConcatenation();
           _builder.append("<");
           {

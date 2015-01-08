@@ -56,6 +56,7 @@ import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
 import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.*
+import java.util.Stack
 
 class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	@Option(description="The name of the package that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
@@ -436,13 +437,13 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 				this.«DISABLE_EDGES.name»=«DISABLE_EDGES.name»;
 				this.«DISABLE_REG_OUTPUTLOGIC.name»=«DISABLE_REG_OUTPUTLOGIC.name»;
 				«FOR v : em.variables»
-					varIdx.put("«v.name»", «v.getVarIdx(purgeAliases)»);
+					varIdx.put("«v.name»", «v.getVarIdx(false)»);
 				«ENDFOR»
 			}
 		«ELSE»
 			public «unitName»() {
 				«FOR v : em.variables»
-					varIdx.put("«v.name»", «v.getVarIdx(purgeAliases)»);
+					varIdx.put("«v.name»", «v.getVarIdx(false)»);
 				«ENDFOR»
 			}
 			public «unitName»(boolean «DISABLE_EDGES.name», boolean «DISABLE_REG_OUTPUTLOGIC.name») {
@@ -488,9 +489,9 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		import java.util.concurrent.locks.*;
 	'''
 
-	override protected calculateVariableAccessIndex(List<Integer> arr, VariableInformation varInfo,
+	override protected calculateVariableAccessIndex(VariableInformation varInfo,
 		EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		val res = super.calculateVariableAccessIndex(arr, varInfo, attributes)
+		val res = super.calculateVariableAccessIndex(varInfo, attributes)
 		if (res.length === 0)
 			return res
 		return "(int)(" + res + ")"

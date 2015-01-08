@@ -186,6 +186,10 @@ public class CommonCompilerExtension {
           return 2;
         case BOOL:
           return 3;
+        case STRING:
+          return 4;
+        case ENUM:
+          return 5;
         default:
           break;
       }

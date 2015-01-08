@@ -359,8 +359,7 @@ public class ParserToModelExtension {
     }
     PSHDLLangParser.PsPrimitiveTypeContext _psPrimitiveType = context.psPrimitiveType();
     String _text = _psPrimitiveType.getText();
-    String _upperCase = _text.toUpperCase();
-    final HDLPrimitive.HDLPrimitiveType pt = HDLPrimitive.HDLPrimitiveType.valueOf(_upperCase);
+    final HDLPrimitive.HDLPrimitiveType pt = HDLPrimitive.HDLPrimitiveType.getOp(_text);
     PSHDLLangParser.PsWidthContext _psWidth = context.psWidth();
     IHDLObject _hDL = null;
     if (_psWidth!=null) {
@@ -663,8 +662,7 @@ public class ParserToModelExtension {
   protected HDLPrimitive _toHDL(final PSHDLLangParser.PsCastContext context, final boolean isStatement) {
     PSHDLLangParser.PsPrimitiveTypeContext _psPrimitiveType = context.psPrimitiveType();
     String _text = _psPrimitiveType.getText();
-    String _upperCase = _text.toUpperCase();
-    final HDLPrimitive.HDLPrimitiveType pt = HDLPrimitive.HDLPrimitiveType.valueOf(_upperCase);
+    final HDLPrimitive.HDLPrimitiveType pt = HDLPrimitive.HDLPrimitiveType.getOp(_text);
     PSHDLLangParser.PsWidthContext _psWidth = context.psWidth();
     IHDLObject _hDL = null;
     if (_psWidth!=null) {
@@ -1141,7 +1139,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals = (_ANY_INT != null);
       if (_tripleNotEquals) {
         _matched=true;
-        HDLFunctionParameter _setType = res.setType(HDLFunctionParameter.Type.ANY_INT);
+        HDLFunctionParameter _setType = res.setType(HDLFunctionParameter.Type.PARAM_ANY_INT);
         res = _setType;
       }
     }
@@ -1150,7 +1148,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_1 = (_ANY_UINT != null);
       if (_tripleNotEquals_1) {
         _matched=true;
-        HDLFunctionParameter _setType_1 = res.setType(HDLFunctionParameter.Type.ANY_UINT);
+        HDLFunctionParameter _setType_1 = res.setType(HDLFunctionParameter.Type.PARAM_ANY_UINT);
         res = _setType_1;
       }
     }
@@ -1159,7 +1157,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_2 = (_ANY_BIT != null);
       if (_tripleNotEquals_2) {
         _matched=true;
-        HDLFunctionParameter _setType_2 = res.setType(HDLFunctionParameter.Type.ANY_BIT);
+        HDLFunctionParameter _setType_2 = res.setType(HDLFunctionParameter.Type.PARAM_ANY_BIT);
         res = _setType_2;
       }
     }
@@ -1168,7 +1166,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_3 = (_INT != null);
       if (_tripleNotEquals_3) {
         _matched=true;
-        HDLFunctionParameter _setType_3 = res.setType(HDLFunctionParameter.Type.REG_INT);
+        HDLFunctionParameter _setType_3 = res.setType(HDLFunctionParameter.Type.PARAM_INT);
         res = _setType_3;
       }
     }
@@ -1177,7 +1175,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_4 = (_UINT != null);
       if (_tripleNotEquals_4) {
         _matched=true;
-        HDLFunctionParameter _setType_4 = res.setType(HDLFunctionParameter.Type.REG_UINT);
+        HDLFunctionParameter _setType_4 = res.setType(HDLFunctionParameter.Type.PARAM_UINT);
         res = _setType_4;
       }
     }
@@ -1186,7 +1184,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_5 = (_BIT != null);
       if (_tripleNotEquals_5) {
         _matched=true;
-        HDLFunctionParameter _setType_5 = res.setType(HDLFunctionParameter.Type.REG_BIT);
+        HDLFunctionParameter _setType_5 = res.setType(HDLFunctionParameter.Type.PARAM_BIT);
         res = _setType_5;
       }
     }
@@ -1195,7 +1193,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_6 = (_BOOL != null);
       if (_tripleNotEquals_6) {
         _matched=true;
-        HDLFunctionParameter _setType_6 = res.setType(HDLFunctionParameter.Type.BOOL_TYPE);
+        HDLFunctionParameter _setType_6 = res.setType(HDLFunctionParameter.Type.PARAM_BOOL);
         res = _setType_6;
       }
     }
@@ -1204,7 +1202,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_7 = (_STRING != null);
       if (_tripleNotEquals_7) {
         _matched=true;
-        HDLFunctionParameter _setType_7 = res.setType(HDLFunctionParameter.Type.STRING_TYPE);
+        HDLFunctionParameter _setType_7 = res.setType(HDLFunctionParameter.Type.PARAM_STRING);
         res = _setType_7;
       }
     }
@@ -1213,7 +1211,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_8 = (_ANY_IF != null);
       if (_tripleNotEquals_8) {
         _matched=true;
-        HDLFunctionParameter _setType_8 = res.setType(HDLFunctionParameter.Type.ANY_IF);
+        HDLFunctionParameter _setType_8 = res.setType(HDLFunctionParameter.Type.PARAM_ANY_IF);
         res = _setType_8;
       }
     }
@@ -1222,7 +1220,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_9 = (_ANY_ENUM != null);
       if (_tripleNotEquals_9) {
         _matched=true;
-        HDLFunctionParameter _setType_9 = res.setType(HDLFunctionParameter.Type.ANY_ENUM);
+        HDLFunctionParameter _setType_9 = res.setType(HDLFunctionParameter.Type.PARAM_ANY_ENUM);
         res = _setType_9;
       }
     }
@@ -1231,7 +1229,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_10 = (_INTERFACE != null);
       if (_tripleNotEquals_10) {
         _matched=true;
-        HDLFunctionParameter _setType_10 = res.setType(HDLFunctionParameter.Type.IF);
+        HDLFunctionParameter _setType_10 = res.setType(HDLFunctionParameter.Type.PARAM_IF);
         res = _setType_10;
         PSHDLLangParser.PsQualifiedNameContext _psQualifiedName = x.psQualifiedName();
         HDLQualifiedName _fQNName = this.toFQNName(_psQualifiedName);
@@ -1244,7 +1242,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_11 = (_ENUM != null);
       if (_tripleNotEquals_11) {
         _matched=true;
-        HDLFunctionParameter _setType_11 = res.setType(HDLFunctionParameter.Type.ENUM);
+        HDLFunctionParameter _setType_11 = res.setType(HDLFunctionParameter.Type.PARAM_ENUM);
         res = _setType_11;
         PSHDLLangParser.PsQualifiedNameContext _psQualifiedName_1 = x.psQualifiedName();
         HDLQualifiedName _fQNName_1 = this.toFQNName(_psQualifiedName_1);
@@ -1257,7 +1255,7 @@ public class ParserToModelExtension {
       boolean _tripleNotEquals_12 = (_FUNCTION != null);
       if (_tripleNotEquals_12) {
         _matched=true;
-        HDLFunctionParameter _setType_12 = res.setType(HDLFunctionParameter.Type.FUNCTION);
+        HDLFunctionParameter _setType_12 = res.setType(HDLFunctionParameter.Type.PARAM_FUNCTION);
         res = _setType_12;
         List<PSHDLLangParser.PsFuncParamWithRWContext> _psFuncParamWithRW = x.psFuncParamWithRW();
         final Function1<PSHDLLangParser.PsFuncParamWithRWContext, HDLFunctionParameter> _function = new Function1<PSHDLLangParser.PsFuncParamWithRWContext, HDLFunctionParameter>() {

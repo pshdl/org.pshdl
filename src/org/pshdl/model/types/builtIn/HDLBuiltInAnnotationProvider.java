@@ -59,6 +59,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 */
 		autoInterface,
 		/**
+		 * Exported signal, the assigned signal is to be exported. This is an
+		 * internal annotation
+		 */
+		exportedSignal,
+		/**
 		 * Generated signal
 		 */
 		genSignal,
@@ -291,6 +296,9 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case autoInterface:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
 						"Units that have this Annotation will get an interface declaration atop it's declaration", null);
+			case exportedSignal:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
+						"This is an internal annotation to show that the assigned value is to be exported", null);
 			case VHDLLatchable:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
 						"This annotation causes the default initialization to 0 to be omitted. This MAY cause a latch to be created.", null);

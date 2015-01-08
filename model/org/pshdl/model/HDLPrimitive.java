@@ -1,31 +1,34 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
 package org.pshdl.model;
 
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.ANY_BIT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.ANY_INT;
+import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.ANY_UINT;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BIT;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.BITVECTOR;
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.INT;
@@ -41,7 +44,6 @@ import javax.annotation.Nullable;
 import org.pshdl.model.extensions.StringWriteExtension;
 import org.pshdl.model.impl.AbstractHDLPrimitive;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
-import org.pshdl.model.utils.MetaAccess;
 import org.pshdl.model.utils.SyntaxHighlighter;
 
 /**
@@ -57,7 +59,7 @@ import org.pshdl.model.utils.SyntaxHighlighter;
 public class HDLPrimitive extends AbstractHDLPrimitive {
 	/**
 	 * Constructs a new instance of {@link HDLPrimitive}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -89,7 +91,8 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	public static enum HDLPrimitiveType {
-		INT("int"), UINT("uint"), INTEGER("int"), NATURAL("uint"), BIT("bit"), BITVECTOR("bit"), BOOL("bool"), STRING("string");
+		INT("int"), ANY_INT("int<>"), INTEGER("int32"), UINT("uint"), ANY_UINT("uint<>"), NATURAL("uint32"), BIT("bit"), ANY_BIT("bit<>"), BITVECTOR("bit"), BOOL("bool"), STRING(
+				"string");
 		String str;
 
 		HDLPrimitiveType(String op) {
@@ -162,31 +165,6 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	// $CONTENT-BEGIN$
 
-	public static enum TargetMeta implements MetaAccess<Boolean> {
-		TARGET;
-
-		@Override
-		public boolean inherit() {
-			return true;
-		}
-	}
-
-	public static HDLPrimitive target(boolean positive) {
-		if (positive) {
-			final HDLPrimitive natural = getNatural();
-			natural.addMeta(TargetMeta.TARGET, true);
-			return natural;
-		}
-		final HDLPrimitive integer = getInteger();
-		integer.addMeta(TargetMeta.TARGET, true);
-		return integer;
-	}
-
-	public static boolean isTargetMatching(HDLPrimitive prim) {
-		final Boolean meta = prim.getMeta(TargetMeta.TARGET);
-		return meta == null ? false : meta;
-	}
-
 	@Override
 	protected String validateName(String name) {
 		if (this.name == null)
@@ -253,40 +231,26 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		return true;
 	}
 
-	private static final EnumSet<HDLPrimitiveType> numbers = EnumSet.of(INT, INTEGER, UINT, NATURAL);
+	private static final EnumSet<HDLPrimitiveType> numbers = EnumSet.of(INT, INTEGER, UINT, NATURAL, ANY_INT, ANY_UINT);
 
 	public boolean isNumber() {
 		return numbers.contains(getType());
 	}
 
-	private static final EnumSet<HDLPrimitiveType> bits = EnumSet.of(INT, INTEGER, UINT, NATURAL, BIT, BITVECTOR);
+	private static final EnumSet<HDLPrimitiveType> bits = EnumSet.of(INT, INTEGER, UINT, NATURAL, BIT, BITVECTOR, ANY_INT, ANY_UINT, ANY_BIT);
 
 	public boolean isBits() {
 		return bits.contains(getType());
 	}
 
-	@Override
-	protected HDLExpression validateWidth(HDLExpression width) {
-		// if (getType() != null) {
-		// switch (getType()) {
-		// case BIT:
-		// case BOOL:
-		// case INTEGER:
-		// case NATURAL:
-		// case STRING:
-		// if (width != null)
-		// throw new IllegalArgumentException("Width should be null, but is:" +
-		// width);
-		// break;
-		// case BITVECTOR:
-		// case INT:
-		// case UINT:
-		// if (width == null)
-		// throw new IllegalArgumentException("Width can not be null");
-		// break;
-		// }
-		// }
-		return super.validateWidth(width);
+	private static final EnumSet<HDLPrimitiveType> any = EnumSet.of(ANY_INT, ANY_UINT, ANY_BIT);
+
+	public boolean isAny() {
+		return any.contains(getType());
+	}
+
+	public static boolean isAny(HDLPrimitiveType type) {
+		return any.contains(type);
 	}
 
 	public static class AnyPrimitive extends HDLPrimitive {
@@ -298,16 +262,35 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 	}
 
 	public static AnyPrimitive anyBit() {
-		return new AnyPrimitive(HDLPrimitiveType.BIT);
+		return new AnyPrimitive(HDLPrimitiveType.ANY_BIT);
 	}
 
 	public static AnyPrimitive anyInt() {
-		return new AnyPrimitive(HDLPrimitiveType.INTEGER);
+		return new AnyPrimitive(HDLPrimitiveType.ANY_INT);
 	}
 
 	public static AnyPrimitive anyUint() {
-		return new AnyPrimitive(HDLPrimitiveType.NATURAL);
+		return new AnyPrimitive(HDLPrimitiveType.ANY_UINT);
 	}
+
+	public static boolean isTargetMatching(HDLPrimitive lType) {
+		switch (lType.type) {
+		case ANY_BIT:
+		case ANY_INT:
+		case ANY_UINT:
+			return true;
+		case BIT:
+		case BITVECTOR:
+		case BOOL:
+		case INT:
+		case INTEGER:
+		case NATURAL:
+		case STRING:
+		case UINT:
+		}
+		return false;
+	}
+
 	// $CONTENT-END$
 
 }

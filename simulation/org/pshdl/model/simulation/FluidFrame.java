@@ -403,6 +403,14 @@ public class FluidFrame {
 				arg1 = internalId;
 				break;
 			}
+			case pushAddIndex: {
+				final Integer internalId = register.registerInternal(ai.args[0]);
+				if (internalId == null)
+					throw new IllegalArgumentException(ai.toString());
+				arg1 = internalId;
+				arg2 = Integer.parseInt(ai.args[1]);
+				break;
+			}
 			case writeInternal:
 			case loadInternal:
 				Integer internalId = register.getInternal(toFullRef(ai));

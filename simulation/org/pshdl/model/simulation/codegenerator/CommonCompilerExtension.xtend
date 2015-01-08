@@ -75,6 +75,8 @@ class CommonCompilerExtension {
 			case INT: return 1
 			case UINT: return 2
 			case BOOL: return 3
+			case STRING: return 4
+			case ENUM: return 5
 		}
 	}
 

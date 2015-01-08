@@ -361,31 +361,31 @@ public class TypeExtension {
     HDLFunctionParameter.Type _type = param.getType();
     if (_type != null) {
       switch (_type) {
-        case ANY_BIT:
+        case PARAM_ANY_BIT:
           HDLPrimitive.AnyPrimitive _anyBit = HDLPrimitive.anyBit();
           return Optional.<HDLPrimitive.AnyPrimitive>of(_anyBit);
-        case ANY_INT:
+        case PARAM_ANY_INT:
           HDLPrimitive.AnyPrimitive _anyInt = HDLPrimitive.anyInt();
           return Optional.<HDLPrimitive.AnyPrimitive>of(_anyInt);
-        case ANY_UINT:
+        case PARAM_ANY_UINT:
           HDLPrimitive.AnyPrimitive _anyUint = HDLPrimitive.anyUint();
           return Optional.<HDLPrimitive.AnyPrimitive>of(_anyUint);
-        case ANY_ENUM:
+        case PARAM_ANY_ENUM:
           HDLEnum.AnyEnum _anyEnum = HDLEnum.anyEnum();
           return Optional.<HDLEnum.AnyEnum>of(_anyEnum);
-        case ANY_IF:
+        case PARAM_ANY_IF:
           HDLInterface.AnyInterface _anyInterface = HDLInterface.anyInterface();
           return Optional.<HDLInterface.AnyInterface>of(_anyInterface);
-        case BOOL_TYPE:
+        case PARAM_BOOL:
           HDLPrimitive _bool = HDLPrimitive.getBool();
           return Optional.<HDLPrimitive>of(_bool);
-        case ENUM:
+        case PARAM_ENUM:
           return param.resolveEnumSpec();
-        case FUNCTION:
+        case PARAM_FUNCTION:
           return Optional.<HDLType>absent();
-        case IF:
+        case PARAM_IF:
           return param.resolveIfSpec();
-        case REG_BIT:
+        case PARAM_BIT:
           HDLExpression _width = param.getWidth();
           boolean _tripleEquals = (_width == null);
           if (_tripleEquals) {
@@ -397,7 +397,7 @@ public class TypeExtension {
             HDLPrimitive _setWidth = _bitvector.setWidth(_width_1);
             return Optional.<HDLPrimitive>of(_setWidth);
           }
-        case REG_INT:
+        case PARAM_INT:
           HDLExpression _width_2 = param.getWidth();
           boolean _tripleEquals_1 = (_width_2 == null);
           if (_tripleEquals_1) {
@@ -409,7 +409,7 @@ public class TypeExtension {
             HDLPrimitive _setWidth_1 = _int.setWidth(_width_3);
             return Optional.<HDLPrimitive>of(_setWidth_1);
           }
-        case REG_UINT:
+        case PARAM_UINT:
           HDLExpression _width_4 = param.getWidth();
           boolean _tripleEquals_2 = (_width_4 == null);
           if (_tripleEquals_2) {
@@ -421,14 +421,14 @@ public class TypeExtension {
             HDLPrimitive _setWidth_2 = _uint.setWidth(_width_5);
             return Optional.<HDLPrimitive>of(_setWidth_2);
           }
-        case STRING_TYPE:
+        case PARAM_STRING:
           HDLPrimitive _string = HDLPrimitive.getString();
           return Optional.<HDLPrimitive>of(_string);
         default:
           break;
       }
     }
-    return null;
+    return Optional.<HDLType>absent();
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLLiteral lit) {
@@ -447,16 +447,21 @@ public class TypeExtension {
     int _bitLength = bigVal.bitLength();
     boolean _greaterThan = (_bitLength > 31);
     if (_greaterThan) {
-      HDLPrimitive _uint = HDLPrimitive.getUint();
-      int _bitLength_1 = bigVal.bitLength();
-      HDLLiteral _get = HDLLiteral.get(_bitLength_1);
-      HDLPrimitive _setWidth = _uint.setWidth(_get);
-      return Optional.<HDLPrimitive>of(_setWidth);
+      boolean _isNegative = lit.isNegative();
+      if (_isNegative) {
+        HDLPrimitive.AnyPrimitive _anyInt = HDLPrimitive.anyInt();
+        return Optional.<HDLPrimitive.AnyPrimitive>of(_anyInt);
+      }
+      HDLPrimitive.AnyPrimitive _anyUint = HDLPrimitive.anyUint();
+      return Optional.<HDLPrimitive.AnyPrimitive>of(_anyUint);
     }
-    boolean _isNegative = lit.isNegative();
-    boolean _not = (!_isNegative);
-    HDLPrimitive _target = HDLPrimitive.target(_not);
-    return Optional.<HDLPrimitive>of(_target);
+    boolean _isNegative_1 = lit.isNegative();
+    if (_isNegative_1) {
+      HDLPrimitive _integer = HDLPrimitive.getInteger();
+      return Optional.<HDLPrimitive>of(_integer);
+    }
+    HDLPrimitive _natural = HDLPrimitive.getNatural();
+    return Optional.<HDLPrimitive>of(_natural);
   }
   
   protected Optional<? extends HDLType> _determineType(final HDLVariableRef ref) {

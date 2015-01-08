@@ -40,7 +40,9 @@ import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRegisterConfig;
+import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLUnit;
 import org.pshdl.model.HDLUnresolvedFragment;
 import org.pshdl.model.HDLUnresolvedFragmentFunction;
@@ -57,6 +59,7 @@ import org.pshdl.model.utils.internal.LevenshteinDistance.Score;
 import org.pshdl.model.validation.HDLValidator.HDLAdvise;
 import org.pshdl.model.validation.Problem;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 
@@ -102,12 +105,12 @@ public class BuiltInAdvisor {
 			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			String[] solutions;
 			if (!arrayRange.isConnected(accessRange)) {
-				solutions = new String[] { "Cast the index to uint with:(uint<>)" + problem.node };
+				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
 			} else {
 				solutions = new String[] {
-						"Cast the index to uint with:(uint<>)" + problem.node,
+						"Cast the index to uint with:(uint)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") annotation to define a range" };
+								+ "\") or @range(\">=0\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The bit access could possibly become negative", "The given bit access has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
@@ -122,7 +125,7 @@ public class BuiltInAdvisor {
 				solutions = new String[] {
 						"Cast the index to uint with:(uint)" + problem.node,
 						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") annotation to define a range" };
+								+ "\") or @range(\">=0\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
@@ -131,19 +134,25 @@ public class BuiltInAdvisor {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
 			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			final Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
+			String rangeAnnotation = "@range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint() + "\")";
+			if (accessRange.lowerEndpoint().compareTo(commonRange.lowerEndpoint()) <= 0) {
+				rangeAnnotation += " or @range(\" <= " + accessRange.upperEndpoint() + "\")";
+			}
 			return new HDLAdvise(problem, "The bit access can exceed the variables' capacity", "The given bit access has a possible range of:" + accessRange
 					+ " while the highest index of the variable is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
-					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
-							+ "\") Annotation to indicate the expected range");
+					"Downcast the index to a suitable size", "Use the " + rangeAnnotation + " annotation to indicate the expected range");
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
 			final Range<BigInteger> arrayRange = problem.getMeta(BuiltInValidator.ARRAY_RANGE);
 			final Range<BigInteger> commonRange = arrayRange.intersection(accessRange);
+			String rangeAnnotation = "@range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint() + "\")";
+			if (accessRange.lowerEndpoint().compareTo(commonRange.lowerEndpoint()) <= 0) {
+				rangeAnnotation += " or @range(\" <= " + accessRange.upperEndpoint() + "\")";
+			}
 			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
 					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
-					"Downcast the index to a suitable size", "Use the @range(\"" + commonRange.lowerEndpoint() + ";" + commonRange.upperEndpoint()
-							+ "\") Annotation to indicate the expected range");
+					"Downcast the index to a suitable size", "Use the " + rangeAnnotation + " annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			return new HDLAdvise(problem, "The dimensions of assignment do not match", "When an array is assigned to another array, the size of the dimension need to match.",
@@ -462,11 +471,12 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "Variables starting with $ are not recommended",
 					"Variables starting with $ are used for internal/automatically generated signals. Using such a variable may cause a name collision",
 					"Rename your variable to something without $ in the beginning");
-		case BOOL_NEGATE_NUMERIC_NOT_SUPPORTED:
+		case BOOL_NEGATE_NUMERIC_NOT_SUPPORTED: {
 			final HDLManip node = (HDLManip) problem.node;
 			return new HDLAdvise(problem, "Logic negate does not support numbers",
 					"The logical negate is intended for negating booleans, while it can also use a single bit, you probably want to use the binary invert ~.", "Use ~"
 							+ node.getTarget());
+		}
 		case CLOCK_NOT_BIT:
 			return new HDLAdvise(problem, "The clock needs to be of type bit",
 					"A clock can only be a single bit variable. It is not advised to use the output of a combinatorical logic as clock as this may impact timing",
@@ -524,18 +534,51 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The function does not have the expected number of parameters." + problem.info, "");
 		case TYPE_INVALID_PRIMITIVE:
 			return new HDLAdvise(problem, "The declared primitive is invalid: " + problem.info, "");
-		case TYPE_NEGATIVE_WIDTH:
+		case TYPE_NEGATIVE_WIDTH: {
+			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) problem.node;
+			String width = "the width";
+			final Optional<? extends HDLType> type = hvd.resolveType();
+			if (type.isPresent()) {
+				final HDLPrimitive hdlType = (HDLPrimitive) type.get();
+				width = hdlType.getWidth().toString();
+			}
 			return new HDLAdvise(problem, "The declared primitve does have a negative width", "The width of a primitive can never be negative.",
-					"Use uint parameter for parameterized width", "Ensure that the number will always be positive");
-		case TYPE_POSSIBLY_NEGATIVE_WIDTH:
+					"Use uint parameter for parameterized width", "Ensure that " + width + " will always be positive");
+		}
+		case TYPE_POSSIBLY_NEGATIVE_WIDTH: {
+			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) problem.node;
+			String width = "";
+			final Optional<? extends HDLType> type = hvd.resolveType();
+			if (type.isPresent()) {
+				final HDLPrimitive hdlType = (HDLPrimitive) type.get();
+				width = " to " + hdlType.getWidth().toString();
+			}
 			return new HDLAdvise(problem, "The declared primitve could possibly have a negative width", "The width of a primitive can never be negative.",
-					"Use uint parameter for parameterized width", "Ensure that the number will always be positive", "Apply a @range annotation to declare expected values");
-		case TYPE_ZERO_WIDTH:
+					"Use uint parameter for parameterized width", "Ensure that the number will always be positive", "Apply a @range(\">0\") annotation" + width
+							+ " to declare expected values");
+		}
+		case TYPE_ZERO_WIDTH: {
+			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) problem.node;
+			String width = "";
+			final Optional<? extends HDLType> type = hvd.resolveType();
+			if (type.isPresent()) {
+				final HDLPrimitive hdlType = (HDLPrimitive) type.get();
+				width = " to " + hdlType.getWidth().toString();
+			}
 			return new HDLAdvise(problem, "The declared primitve does have a zero width", "The width of a primitive can never be zero.",
-					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation to declare that the parameter will always be greater zero");
-		case TYPE_POSSIBLY_ZERO_WIDTH:
+					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation" + width + " to declare that the parameter will always be greater zero");
+		}
+		case TYPE_POSSIBLY_ZERO_WIDTH: {
+			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) problem.node;
+			String width = "";
+			final Optional<? extends HDLType> type = hvd.resolveType();
+			if (type.isPresent()) {
+				final HDLPrimitive hdlType = (HDLPrimitive) type.get();
+				width = " to " + hdlType.getWidth().toString();
+			}
 			return new HDLAdvise(problem, "The declared primitve could possibly have a zero width", "The width of a primitive can never be zero.",
-					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation to declare that the parameter will always be greater zero");
+					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation" + width + " to declare that the parameter will always be greater zero");
+		}
 		}
 		return null;
 	}
