@@ -188,7 +188,7 @@ class TypeExtension {
 				//This can happen when we have invalid concatenations
 				return Optional.absent
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType.PLUS).setRight(tWidth)
-			width = HDLPrimitives.simplifyWidth(cat, width)
+			width = HDLPrimitives.simplifyWidth(cat, width, null)
 		}
 		return Optional.of(HDLPrimitive.bitvector.setWidth(width).setContainer(cat))
 	}
@@ -321,10 +321,10 @@ class TypeExtension {
 		if (bits.size == 1 && bits.get(0).from === null)
 			return Optional.of(HDLPrimitive.bit)
 		val Iterator<HDLRange> iter = bits.iterator
-		var HDLExpression width = HDLPrimitives.simplifyWidth(ref, iter.next.width)
+		var HDLExpression width = HDLPrimitives.simplifyWidth(ref, iter.next.width, null)
 		while (iter.hasNext) {
 			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType.PLUS).setRight(iter.next.width)
-			width = HDLPrimitives.simplifyWidth(ref, width)
+			width = HDLPrimitives.simplifyWidth(ref, width, null)
 		}
 		val hVar = ref.resolveVar
 		if (!hVar.present)

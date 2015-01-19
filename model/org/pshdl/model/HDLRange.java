@@ -185,13 +185,13 @@ public class HDLRange extends AbstractHDLRange {
 			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(getTo());
 			if (valueOf.isPresent() && BigInteger.ZERO.equals(valueOf.get())) {
 				final HDLArithOp simpleWith = new HDLArithOp().setLeft(f).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
-				return HDLPrimitives.simplifyWidth(this, simpleWith);
+				return HDLPrimitives.simplifyWidth(this, simpleWith, null);
 			}
 		}
 		final HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
 		final HDLExpression absRange = HDLBuiltInFunctions.ABS_UINT.getCall(rangeDist);
 		final HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
-		return HDLPrimitives.simplifyWidth(this, width);
+		return HDLPrimitives.simplifyWidth(this, width, null);
 	}
 
 	public HDLRange normalize() {

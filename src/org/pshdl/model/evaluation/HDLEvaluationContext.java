@@ -62,6 +62,8 @@ public class HDLEvaluationContext {
 	private final Map<String, HDLExpression> context;
 	public boolean enumAsInt = false;
 	public boolean boolAsInt = false;
+	public boolean ignoreConstantRefs = false;
+	public boolean ignoreParameterRefs = false;
 
 	public HDLEvaluationContext() {
 		this(new LinkedHashMap<String, HDLExpression>());

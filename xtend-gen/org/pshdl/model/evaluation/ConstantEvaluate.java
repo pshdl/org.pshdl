@@ -546,6 +546,16 @@ public class ConstantEvaluate {
         HDLVariableDeclaration.HDLDirection _direction = hVar.getDirection();
         boolean _equals = Objects.equal(_direction, HDLVariableDeclaration.HDLDirection.CONSTANT);
         if (_equals) {
+          boolean _and = false;
+          boolean _tripleNotEquals = (context != null);
+          if (!_tripleNotEquals) {
+            _and = false;
+          } else {
+            _and = context.ignoreConstantRefs;
+          }
+          if (_and) {
+            return Optional.<BigInteger>absent();
+          }
           final HDLExpression defVal = hVar.getDefaultValue();
           ArrayList<HDLExpression> _array_1 = obj.getArray();
           return this.arrayDefValue(defVal, _array_1, context, evaled);
@@ -599,6 +609,16 @@ public class ConstantEvaluate {
     final HDLVariableDeclaration.HDLDirection dir = _get_2.getDirection();
     boolean _equals_1 = Objects.equal(dir, HDLVariableDeclaration.HDLDirection.CONSTANT);
     if (_equals_1) {
+      boolean _and_1 = false;
+      boolean _tripleNotEquals_1 = (context != null);
+      if (!_tripleNotEquals_1) {
+        _and_1 = false;
+      } else {
+        _and_1 = context.ignoreConstantRefs;
+      }
+      if (_and_1) {
+        return Optional.<BigInteger>absent();
+      }
       HDLVariable _get_3 = hVar_1.get();
       HDLExpression _defaultValue = _get_3.getDefaultValue();
       final Optional<BigInteger> subEval = this.subEvaluate(obj, _defaultValue, context, evaled);
@@ -612,6 +632,11 @@ public class ConstantEvaluate {
     if (_equals_2) {
       boolean _tripleEquals = (context == null);
       if (_tripleEquals) {
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
+        obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
+        return Optional.<BigInteger>absent();
+      }
+      if (context.ignoreParameterRefs) {
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return Optional.<BigInteger>absent();

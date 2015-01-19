@@ -271,7 +271,7 @@ public class TypeExtension {
         HDLArithOp _setType = _setLeft.setType(HDLArithOp.HDLArithOpType.PLUS);
         HDLArithOp _setRight = _setType.setRight(tWidth);
         width = _setRight;
-        HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(cat, width);
+        HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(cat, width, null);
         width = _simplifyWidth;
       }
     }
@@ -514,7 +514,7 @@ public class TypeExtension {
     final Iterator<HDLRange> iter = bits.iterator();
     HDLRange _next = iter.next();
     HDLExpression _width = _next.getWidth();
-    HDLExpression width = HDLPrimitives.simplifyWidth(ref, _width);
+    HDLExpression width = HDLPrimitives.simplifyWidth(ref, _width, null);
     while (iter.hasNext()) {
       {
         HDLArithOp _hDLArithOp = new HDLArithOp();
@@ -524,7 +524,7 @@ public class TypeExtension {
         HDLExpression _width_1 = _next_1.getWidth();
         HDLArithOp _setRight = _setType.setRight(_width_1);
         width = _setRight;
-        HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(ref, width);
+        HDLExpression _simplifyWidth = HDLPrimitives.simplifyWidth(ref, width, null);
         width = _simplifyWidth;
       }
     }

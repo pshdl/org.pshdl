@@ -385,18 +385,18 @@ public class HDLPrimitives {
 		}
 
 		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);
-		final HDLExpression width = simplifyWidth(op, getWidth(op, type, info));
+		final HDLExpression width = simplifyWidth(op, getWidth(op, type, info), null);
 		info.result = new HDLPrimitive().setType(triple.result).setWidth(width);
 		return normalize(info, op);
 	}
 
-	public static HDLExpression simplifyWidth(HDLObject container, HDLExpression width) {
+	public static HDLExpression simplifyWidth(HDLObject container, HDLExpression width, HDLEvaluationContext context) {
 		if (width == null)
 			return null;
 		width = width.copyDeepFrozen(container);
-		final Optional<BigInteger> newW = ConstantEvaluate.valueOf(width, null);
+		final Optional<BigInteger> newW = ConstantEvaluate.valueOf(width, context);
 		if (newW.isPresent()) {
-			width = new HDLLiteral().setVal(newW.get().toString());
+			width = HDLLiteral.get(newW.get());
 		}
 		return width;
 	}

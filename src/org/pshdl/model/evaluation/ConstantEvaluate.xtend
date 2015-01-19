@@ -335,6 +335,8 @@ class ConstantEvaluate {
 			if (hVarOpt.present) {
 				val hVar = hVarOpt.get
 				if (hVar.direction == CONSTANT) {
+					if (context!==null && context.ignoreConstantRefs)
+						return Optional.absent
 					val defVal = hVar.defaultValue
 					return arrayDefValue(defVal, obj.array, context, evaled)
 				}
@@ -369,6 +371,8 @@ class ConstantEvaluate {
 		evaled.add(fqn)
 		val HDLDirection dir = hVar.get.direction
 		if (dir == CONSTANT){
+			if (context!==null && context.ignoreConstantRefs)
+				return Optional.absent
 			val subEval = subEvaluate(obj, hVar.get.defaultValue, context, evaled)
 			if (subEval.present)
 				evaled.remove(fqn)
@@ -377,6 +381,11 @@ class ConstantEvaluate {
 
 		if (dir == PARAMETER) {
 			if (context === null) {
+				obj.addMeta(SOURCE, obj)
+				obj.addMeta(DESCRIPTION, CAN_NOT_USE_PARAMETER)
+				return Optional.absent
+			}
+			if (context.ignoreParameterRefs) {
 				obj.addMeta(SOURCE, obj)
 				obj.addMeta(DESCRIPTION, CAN_NOT_USE_PARAMETER)
 				return Optional.absent

@@ -52,7 +52,6 @@ import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
-import org.pshdl.model.IHDLObject;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.FullNameExtension;
@@ -93,17 +92,21 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 
 		@Override
 		public HDLFunction[] signatures() {
-			return new HDLFunction[] { HIGHZ };
+			return new HDLFunction[] { HIGHZ, HIGHZ_BW };
 		}
 
 		@Override
 		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
-			final IHDLObject container = call.getContainer();
-			if (container instanceof HDLAssignment) {
-				final HDLAssignment ass = (HDLAssignment) container;
-				return TypeExtension.typeOf(ass.getLeft());
+			if (call.getParams().isEmpty())
+				return Optional.of(HDLPrimitive.getBit());
+			final HDLExpression expression = call.getParams().get(0);
+			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(expression, context);
+			if (valueOf.isPresent()) {
+				final BigInteger val = valueOf.get();
+				if (val.equals(BigInteger.ONE))
+					return Optional.of(HDLPrimitive.getBit());
 			}
-			return Optional.absent();
+			return Optional.of(HDLPrimitive.getBitvector().setWidth(expression));
 		}
 
 	}
@@ -528,6 +531,13 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 
 	public static HDLNativeFunction createHighZ() {
 		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.highZ.name()).setReturnType(returnType(Type.PARAM_ANY_BIT));
+	}
+
+	public static final HDLFunction HIGHZ_BW = (HDLFunction) createHighZ().freeze(null);
+
+	public static HDLNativeFunction createHighZ_BW() {
+		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.highZ.name()).setReturnType(returnType(Type.PARAM_ANY_BIT))
+				.addArgs(param(Type.PARAM_UINT, "width"));
 	}
 
 	public static final HDLFunction ASSERT = (HDLFunction) createAssert().freeze(null);

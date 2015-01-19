@@ -59,11 +59,24 @@ public class SourceInfo {
 			this.endPosInLine = startPosInLine;
 		}
 		if (tokens != null) {
-			this.length = tokens.getText(context.getSourceInterval()).length();
+			final String tokenText = tokens.getText(context.getSourceInterval());
+			this.length = tokenText.length();
 			final List<Token> hidden = tokens.getHiddenTokensToLeft(context.start.getTokenIndex(), PSHDLLangLexer.COMMENTS);
 			if (hidden != null) {
 				for (final Token token : hidden) {
-					comments.add(token.getText());
+					final String text = token.getText();
+					if (!text.startsWith("///<") && !text.startsWith("/**<")) {
+						comments.add(text);
+					}
+				}
+			}
+			final List<Token> hiddenRight = tokens.getHiddenTokensToRight(context.stop.getTokenIndex(), PSHDLLangLexer.COMMENTS);
+			if (hiddenRight != null) {
+				for (final Token token : hiddenRight) {
+					final String text = token.getText();
+					if (text.startsWith("///<") || text.startsWith("/**<")) {
+						comments.add(text);
+					}
 				}
 			}
 		} else {
