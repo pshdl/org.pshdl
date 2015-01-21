@@ -93,7 +93,7 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 	};
 	/**
 	 * The accessor for the field params which is of type
-	 * ArrayList<HDLExpression>.
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLFunctionCall, ArrayList<HDLExpression>>("params", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

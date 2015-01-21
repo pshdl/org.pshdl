@@ -77,7 +77,8 @@ public class HDLEnum extends AbstractHDLEnum {
 	}
 
 	/**
-	 * The accessor for the field enums which is of type ArrayList<HDLVariable>.
+	 * The accessor for the field enums which is of type
+	 * ArrayList&lt;HDLVariable&gt;.
 	 */
 	public static HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>> fEnums = new HDLFieldAccess<HDLEnum, ArrayList<HDLVariable>>("enums", HDLVariable.class,
 			HDLFieldAccess.Quantifier.ONE_OR_MORE) {

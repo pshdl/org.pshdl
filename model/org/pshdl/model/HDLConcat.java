@@ -72,7 +72,7 @@ public class HDLConcat extends AbstractHDLConcat {
 
 	/**
 	 * The accessor for the field cats which is of type
-	 * ArrayList<HDLExpression>.
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>> fCats = new HDLFieldAccess<HDLConcat, ArrayList<HDLExpression>>("cats", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ONE_OR_MORE) {

@@ -92,7 +92,7 @@ public class HDLSwitchStatement extends AbstractHDLSwitchStatement {
 	};
 	/**
 	 * The accessor for the field cases which is of type
-	 * ArrayList<HDLSwitchCaseStatement>.
+	 * ArrayList&lt;HDLSwitchCaseStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>> fCases = new HDLFieldAccess<HDLSwitchStatement, ArrayList<HDLSwitchCaseStatement>>("cases",
 			HDLSwitchCaseStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

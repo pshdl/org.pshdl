@@ -224,7 +224,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	};
 	/**
 	 * The accessor for the field funcSpec which is of type
-	 * ArrayList<HDLFunctionParameter>.
+	 * ArrayList&lt;HDLFunctionParameter&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLFunctionParameter>> fFuncSpec = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLFunctionParameter>>(
 			"funcSpec", HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -301,7 +301,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 		}
 	};
 	/**
-	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
+	 * The accessor for the field dim which is of type
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLFunctionParameter, ArrayList<HDLExpression>>("dim",
 			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

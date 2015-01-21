@@ -194,7 +194,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	};
 	/**
 	 * The accessor for the field variables which is of type
-	 * ArrayList<HDLVariable>.
+	 * ArrayList&lt;HDLVariable&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>> fVariables = new HDLFieldAccess<HDLVariableDeclaration, ArrayList<HDLVariable>>("variables",
 			HDLVariable.class, HDLFieldAccess.Quantifier.ONE_OR_MORE) {

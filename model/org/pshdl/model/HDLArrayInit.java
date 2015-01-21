@@ -68,7 +68,8 @@ public class HDLArrayInit extends AbstractHDLArrayInit {
 	}
 
 	/**
-	 * The accessor for the field exp which is of type ArrayList<HDLExpression>.
+	 * The accessor for the field exp which is of type
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLArrayInit, ArrayList<HDLExpression>> fExp = new HDLFieldAccess<HDLArrayInit, ArrayList<HDLExpression>>("exp", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

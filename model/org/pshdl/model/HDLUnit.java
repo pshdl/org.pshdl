@@ -118,7 +118,7 @@ public class HDLUnit extends AbstractHDLUnit {
 
 	/**
 	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>.
+	 * ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLUnit, ArrayList<HDLAnnotation>>("annotations", HDLAnnotation.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -173,7 +173,8 @@ public class HDLUnit extends AbstractHDLUnit {
 		}
 	};
 	/**
-	 * The accessor for the field imports which is of type ArrayList<String>.
+	 * The accessor for the field imports which is of type
+	 * ArrayList&lt;String&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<String>> fImports = new HDLFieldAccess<HDLUnit, ArrayList<String>>("imports", String.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -193,7 +194,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	};
 	/**
 	 * The accessor for the field inits which is of type
-	 * ArrayList<HDLStatement>.
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fInits = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("inits", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -213,7 +214,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	};
 	/**
 	 * The accessor for the field statements which is of type
-	 * ArrayList<HDLStatement>.
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLUnit, ArrayList<HDLStatement>>("statements", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -251,7 +252,7 @@ public class HDLUnit extends AbstractHDLUnit {
 	};
 	/**
 	 * The accessor for the field extend which is of type
-	 * ArrayList<HDLQualifiedName>.
+	 * ArrayList&lt;HDLQualifiedName&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>> fExtend = new HDLFieldAccess<HDLUnit, ArrayList<HDLQualifiedName>>("extend", HDLQualifiedName.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

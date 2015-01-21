@@ -106,7 +106,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 	};
 	/**
 	 * The accessor for the field args which is of type
-	 * ArrayList<HDLFunctionParameter>.
+	 * ArrayList&lt;HDLFunctionParameter&gt;.
 	 */
 	public static HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>> fArgs = new HDLFieldAccess<HDLFunction, ArrayList<HDLFunctionParameter>>("args",
 			HDLFunctionParameter.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

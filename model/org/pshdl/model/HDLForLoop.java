@@ -78,7 +78,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 	}
 
 	/**
-	 * The accessor for the field range which is of type ArrayList<HDLRange>.
+	 * The accessor for the field range which is of type
+	 * ArrayList&lt;HDLRange&gt;.
 	 */
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>> fRange = new HDLFieldAccess<HDLForLoop, ArrayList<HDLRange>>("range", HDLRange.class,
 			HDLFieldAccess.Quantifier.ONE_OR_MORE) {
@@ -115,7 +116,8 @@ public class HDLForLoop extends AbstractHDLForLoop {
 		}
 	};
 	/**
-	 * The accessor for the field dos which is of type ArrayList<HDLStatement>.
+	 * The accessor for the field dos which is of type
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>> fDos = new HDLFieldAccess<HDLForLoop, ArrayList<HDLStatement>>("dos", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

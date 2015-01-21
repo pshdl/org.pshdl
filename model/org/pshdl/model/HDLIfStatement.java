@@ -99,7 +99,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	};
 	/**
 	 * The accessor for the field thenDo which is of type
-	 * ArrayList<HDLStatement>.
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fThenDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("thenDo", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -119,7 +119,7 @@ public class HDLIfStatement extends AbstractHDLIfStatement {
 	};
 	/**
 	 * The accessor for the field elseDo which is of type
-	 * ArrayList<HDLStatement>.
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>> fElseDo = new HDLFieldAccess<HDLIfStatement, ArrayList<HDLStatement>>("elseDo", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

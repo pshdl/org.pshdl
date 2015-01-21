@@ -106,7 +106,7 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	};
 	/**
 	 * The accessor for the field ifArray which is of type
-	 * ArrayList<HDLExpression>.
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>> fIfArray = new HDLFieldAccess<HDLInterfaceRef, ArrayList<HDLExpression>>("ifArray",
 			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

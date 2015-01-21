@@ -121,7 +121,7 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 	};
 	/**
 	 * The accessor for the field array which is of type
-	 * ArrayList<HDLExpression>.
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>> fArray = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLExpression>>("array",
 			HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -140,7 +140,8 @@ public class HDLUnresolvedFragment extends AbstractHDLUnresolvedFragment impleme
 		}
 	};
 	/**
-	 * The accessor for the field bits which is of type ArrayList<HDLRange>.
+	 * The accessor for the field bits which is of type
+	 * ArrayList&lt;HDLRange&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>> fBits = new HDLFieldAccess<HDLUnresolvedFragment, ArrayList<HDLRange>>("bits", HDLRange.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

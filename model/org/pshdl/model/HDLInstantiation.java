@@ -77,7 +77,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 
 	/**
 	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>.
+	 * ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLAnnotation>>("annotations",
 			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -115,7 +115,7 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	};
 	/**
 	 * The accessor for the field arguments which is of type
-	 * ArrayList<HDLArgument>.
+	 * ArrayList&lt;HDLArgument&gt;.
 	 */
 	public static HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>> fArguments = new HDLFieldAccess<HDLInstantiation, ArrayList<HDLArgument>>("arguments",
 			HDLArgument.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

@@ -69,7 +69,7 @@ public abstract class HDLDeclaration extends AbstractHDLDeclaration {
 
 	/**
 	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>.
+	 * ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLDeclaration, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLDeclaration, ArrayList<HDLAnnotation>>("annotations",
 			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

@@ -116,7 +116,8 @@ public class HDLPackage extends AbstractHDLPackage {
 		}
 	};
 	/**
-	 * The accessor for the field units which is of type ArrayList<HDLUnit>.
+	 * The accessor for the field units which is of type
+	 * ArrayList&lt;HDLUnit&gt;.
 	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>> fUnits = new HDLFieldAccess<HDLPackage, ArrayList<HDLUnit>>("units", HDLUnit.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -136,7 +137,7 @@ public class HDLPackage extends AbstractHDLPackage {
 	};
 	/**
 	 * The accessor for the field declarations which is of type
-	 * ArrayList<HDLDeclaration>.
+	 * ArrayList&lt;HDLDeclaration&gt;.
 	 */
 	public static HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>> fDeclarations = new HDLFieldAccess<HDLPackage, ArrayList<HDLDeclaration>>("declarations",
 			HDLDeclaration.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

@@ -87,7 +87,7 @@ public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragment
 
 	/**
 	 * The accessor for the field params which is of type
-	 * ArrayList<HDLExpression>.
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLUnresolvedFragmentFunction, ArrayList<HDLExpression>> fParams = new HDLFieldAccess<HDLUnresolvedFragmentFunction, ArrayList<HDLExpression>>(
 			"params", HDLExpression.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

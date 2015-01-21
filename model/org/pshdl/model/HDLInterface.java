@@ -81,7 +81,7 @@ public class HDLInterface extends AbstractHDLInterface {
 
 	/**
 	 * The accessor for the field ports which is of type
-	 * ArrayList<HDLVariableDeclaration>.
+	 * ArrayList&lt;HDLVariableDeclaration&gt;.
 	 */
 	public static HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>> fPorts = new HDLFieldAccess<HDLInterface, ArrayList<HDLVariableDeclaration>>("ports",
 			HDLVariableDeclaration.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

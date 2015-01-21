@@ -92,7 +92,8 @@ public abstract class HDLType extends AbstractHDLType {
 		}
 	};
 	/**
-	 * The accessor for the field dim which is of type ArrayList<HDLExpression>.
+	 * The accessor for the field dim which is of type
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLType, ArrayList<HDLExpression>> fDim = new HDLFieldAccess<HDLType, ArrayList<HDLExpression>>("dim", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

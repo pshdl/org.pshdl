@@ -83,7 +83,7 @@ public class HDLSubstituteFunction extends AbstractHDLSubstituteFunction {
 
 	/**
 	 * The accessor for the field stmnts which is of type
-	 * ArrayList<HDLStatement>.
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>> fStmnts = new HDLFieldAccess<HDLSubstituteFunction, ArrayList<HDLStatement>>("stmnts",
 			HDLStatement.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

@@ -101,7 +101,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	};
 	/**
 	 * The accessor for the field dimensions which is of type
-	 * ArrayList<HDLExpression>.
+	 * ArrayList&lt;HDLExpression&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>> fDimensions = new HDLFieldAccess<HDLVariable, ArrayList<HDLExpression>>("dimensions", HDLExpression.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
@@ -140,7 +140,7 @@ public class HDLVariable extends AbstractHDLVariable {
 	};
 	/**
 	 * The accessor for the field annotations which is of type
-	 * ArrayList<HDLAnnotation>.
+	 * ArrayList&lt;HDLAnnotation&gt;.
 	 */
 	public static HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>> fAnnotations = new HDLFieldAccess<HDLVariable, ArrayList<HDLAnnotation>>("annotations",
 			HDLAnnotation.class, HDLFieldAccess.Quantifier.ZERO_OR_MORE) {

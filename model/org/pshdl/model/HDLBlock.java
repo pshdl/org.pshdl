@@ -91,7 +91,7 @@ public class HDLBlock extends AbstractHDLBlock {
 	};
 	/**
 	 * The accessor for the field statements which is of type
-	 * ArrayList<HDLStatement>.
+	 * ArrayList&lt;HDLStatement&gt;.
 	 */
 	public static HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>> fStatements = new HDLFieldAccess<HDLBlock, ArrayList<HDLStatement>>("statements", HDLStatement.class,
 			HDLFieldAccess.Quantifier.ZERO_OR_MORE) {
