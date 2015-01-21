@@ -37,9 +37,9 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLDirectGeneration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLArgument> arguments. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLArgument&gt; arguments. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can be <code>null</code>.</li>
  * <li>String generatorID. Can <b>not</b> be <code>null</code>.</li>
  * <li>String generatorContent. Can <b>not</b> be <code>null</code>.</li>

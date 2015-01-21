@@ -51,7 +51,7 @@ import org.pshdl.model.utils.SyntaxHighlighter;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
  * <li>HDLPrimitiveType type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLExpression width. Can be <code>null</code>.</li>
  * </ul>

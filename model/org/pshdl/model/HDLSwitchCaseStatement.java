@@ -38,7 +38,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression label. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> dos. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; dos. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLSwitchCaseStatement extends AbstractHDLSwitchCaseStatement {

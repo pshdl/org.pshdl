@@ -43,8 +43,8 @@ import com.google.common.collect.Maps;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLVariableDeclaration> ports. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLVariableDeclaration&gt; ports. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLInterface extends AbstractHDLInterface {

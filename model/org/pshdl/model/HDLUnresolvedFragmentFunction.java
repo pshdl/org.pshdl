@@ -40,10 +40,10 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String frag. Can <b>not</b> be <code>null</code>.</li>
  * <li>Boolean isStatement. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> array. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLRange> bits. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; array. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLRange&gt; bits. Can be <code>null</code>.</li>
  * <li>HDLUnresolvedFragment sub. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> params. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; params. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLUnresolvedFragmentFunction extends AbstractHDLUnresolvedFragmentFunction {

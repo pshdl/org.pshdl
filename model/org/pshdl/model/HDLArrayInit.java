@@ -37,7 +37,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLArrayInit contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> exp. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; exp. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLArrayInit extends AbstractHDLArrayInit {

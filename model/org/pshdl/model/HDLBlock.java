@@ -39,7 +39,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>Boolean process. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; statements. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLBlock extends AbstractHDLBlock {

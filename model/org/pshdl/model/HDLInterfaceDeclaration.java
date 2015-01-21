@@ -36,7 +36,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLInterfaceDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>HDLInterface hIf. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */

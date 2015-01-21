@@ -42,8 +42,8 @@ import com.google.common.collect.Maps;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLExpression ifExp. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> thenDo. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> elseDo. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; thenDo. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; elseDo. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLIfStatement extends AbstractHDLIfStatement {

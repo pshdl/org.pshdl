@@ -37,7 +37,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLDeclaration contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * </ul>
  */
 public abstract class HDLDeclaration extends AbstractHDLDeclaration {

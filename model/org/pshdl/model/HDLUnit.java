@@ -63,14 +63,14 @@ import com.google.common.collect.Sets;
  * The class HDLUnit contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<String> imports. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> inits. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> statements. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;String&gt; imports. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; inits. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; statements. Can be <code>null</code>.</li>
  * <li>Boolean simulation. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLQualifiedName> extend. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLQualifiedName&gt; extend. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLUnit extends AbstractHDLUnit {

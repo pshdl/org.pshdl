@@ -40,7 +40,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName function. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> params. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; params. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLStatement {

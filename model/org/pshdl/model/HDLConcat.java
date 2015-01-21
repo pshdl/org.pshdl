@@ -38,7 +38,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLConcat contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> cats. Can <b>not</b> be <code>null</code>,
+ * <li>ArrayList&lt;HDLExpression&gt; cats. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * </ul>
  */

@@ -46,9 +46,9 @@ import org.pshdl.model.utils.ModificationSet;
  * The class HDLFunction contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLAnnotation> annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLFunctionParameter> args. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; args. Can be <code>null</code>.</li>
  * <li>HDLFunctionParameter returnType. Can be <code>null</code>.</li>
  * </ul>
  */

@@ -39,8 +39,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLVariable> enums. Can <b>not</b> be <code>null</code>,
+ * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLVariable&gt; enums. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * </ul>
  */

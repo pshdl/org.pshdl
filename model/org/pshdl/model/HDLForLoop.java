@@ -39,10 +39,10 @@ import org.pshdl.model.utils.Insulin;
  * The class HDLForLoop contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLRange> range. Can <b>not</b> be <code>null</code>,
+ * <li>ArrayList&lt;HDLRange&gt; range. Can <b>not</b> be <code>null</code>,
  * additionally the collection must contain at least one element.</li>
  * <li>HDLVariable param. Can <b>not</b> be <code>null</code>.</li>
- * <li>ArrayList<HDLStatement> dos. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLStatement&gt; dos. Can be <code>null</code>.</li>
  * </ul>
  */
 public class HDLForLoop extends AbstractHDLForLoop {

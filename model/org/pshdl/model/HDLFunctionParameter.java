@@ -43,11 +43,12 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>Type type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName enumSpec. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName ifSpec. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLFunctionParameter> funcSpec. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLFunctionParameter&gt; funcSpec. Can be <code>null</code>.
+ * </li>
  * <li>HDLFunctionParameter funcReturnSpec. Can be <code>null</code>.</li>
  * <li>HDLVariable name. Can be <code>null</code>.</li>
  * <li>HDLExpression width. Can be <code>null</code>.</li>
- * <li>ArrayList<HDLExpression> dim. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
  * <li>Boolean constant. Can <b>not</b> be <code>null</code>.</li>
  * </ul>
  */
