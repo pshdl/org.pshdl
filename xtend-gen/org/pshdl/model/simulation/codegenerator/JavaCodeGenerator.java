@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -48,7 +49,6 @@ import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -534,12 +534,12 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         }
       };
       Iterable<Frame> _filter = IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(this.em.frames)), _function);
-      final Procedure1<Frame> _function_1 = new Procedure1<Frame>() {
-        public void apply(final Frame it) {
+      final Consumer<Frame> _function_1 = new Consumer<Frame>() {
+        public void accept(final Frame it) {
           stageFrames.put(Integer.valueOf(it.scheduleStage), it);
         }
       };
-      IterableExtensions.<Frame>forEach(_filter, _function_1);
+      _filter.forEach(_function_1);
       Set<Integer> _keySet = stageFrames.keySet();
       List<Integer> _sort = IterableExtensions.<Integer>sort(_keySet);
       int maxStage = (int) IterableExtensions.<Integer>last(_sort);
