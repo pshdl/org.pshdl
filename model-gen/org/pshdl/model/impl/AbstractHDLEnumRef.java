@@ -147,7 +147,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	}
 
 	/**
-	 * Setter for the field {@link #getVar()}.
+	 * Setter for the field {@link #getVarRefName()}.
 	 * 
 	 * @param var
 	 *            sets the new var of this object. Can <b>not</b> be
@@ -163,7 +163,7 @@ public abstract class AbstractHDLEnumRef extends HDLResolvedRef {
 	}
 
 	/**
-	 * Setter for the field {@link #getHEnum()}.
+	 * Setter for the field {@link #getHEnumRefName()}.
 	 * 
 	 * @param hEnum
 	 *            sets the new hEnum of this object. Can <b>not</b> be

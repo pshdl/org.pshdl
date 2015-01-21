@@ -191,7 +191,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	}
 
 	/**
-	 * Setter for the field {@link #getVar()}.
+	 * Setter for the field {@link #getVarRefName()}.
 	 * 
 	 * @param var
 	 *            sets the new var of this object. Can <b>not</b> be
@@ -355,7 +355,7 @@ public abstract class AbstractHDLInterfaceRef extends HDLVariableRef {
 	}
 
 	/**
-	 * Setter for the field {@link #getHIf()}.
+	 * Setter for the field {@link #getHIfRefName()}.
 	 * 
 	 * @param hIf
 	 *            sets the new hIf of this object. Can <b>not</b> be

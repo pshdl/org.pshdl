@@ -696,7 +696,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	/**
-	 * Setter for the field {@link #getExtend()}.
+	 * Setter for the field {@link #getExtendRefName()}.
 	 * 
 	 * @param extend
 	 *            sets the new extend of this object. Can be <code>null</code>.
@@ -710,11 +710,11 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	/**
-	 * Adds a new value to the field {@link #getExtend()}.
+	 * Adds a new value to the field {@link #getExtendRefName()}.
 	 * 
 	 * @param newExtend
 	 *            the value that should be added to the field
-	 *            {@link #getExtend()}
+	 *            {@link #getExtendRefName()}
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
 	 */
 	@Nonnull
@@ -728,11 +728,11 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	/**
-	 * Removes a value from the field {@link #getExtend()}.
+	 * Removes a value from the field {@link #getExtendRefName()}.
 	 * 
 	 * @param newExtend
 	 *            the value that should be removed from the field
-	 *            {@link #getExtend()}
+	 *            {@link #getExtendRefName()}
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
 	 */
 	@Nonnull
@@ -746,11 +746,11 @@ public abstract class AbstractHDLUnit extends HDLObject {
 	}
 
 	/**
-	 * Removes a value from the field {@link #getExtend()}.
+	 * Removes a value from the field {@link #getExtendRefName()}.
 	 * 
 	 * @param idx
 	 *            the index of the value that should be removed from the field
-	 *            {@link #getExtend()}
+	 *            {@link #getExtendRefName()}
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
 	 */
 	@Nonnull

@@ -381,7 +381,7 @@ public abstract class AbstractHDLVariableDeclaration extends HDLDeclaration {
 	}
 
 	/**
-	 * Setter for the field {@link #getType()}.
+	 * Setter for the field {@link #getTypeRefName()}.
 	 * 
 	 * @param type
 	 *            sets the new type of this object. Can <b>not</b> be

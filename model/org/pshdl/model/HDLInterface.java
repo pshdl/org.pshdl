@@ -119,7 +119,8 @@ public class HDLInterface extends AbstractHDLInterface {
 	 * @param complementDirection
 	 *            if <code>true</code> the directions of this interface will be
 	 *            inverted
-	 * @return
+	 * @return <code>true</code> when all of this ports can be found in the
+	 *         given interface
 	 */
 	public boolean conformsTo(HDLInterface hdlInterface, boolean complementDirection) {
 		final ArrayList<HDLVariableDeclaration> thisPorts = getPorts();

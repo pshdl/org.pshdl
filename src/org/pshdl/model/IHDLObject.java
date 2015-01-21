@@ -46,14 +46,14 @@ public interface IHDLObject {
 	 *
 	 * @param filter
 	 *            an implementation of the {@link CopyFilter} such as
-	 *            {@link CopyFilter.DeepCloneFilter}
+	 *            {@link org.pshdl.model.utils.CopyFilter.DeepCloneFilter}
 	 * @return the newly created copy
 	 */
 	public abstract IHDLObject copyFiltered(CopyFilter filter);
 
 	/**
-	 * Applies {@link CopyFilter.DeepCloneFilter} and calls
-	 * {@link #freeze(IHDLObject)} afterwards on the copy
+	 * Applies {@link org.pshdl.model.utils.CopyFilter.DeepCloneFilter} and
+	 * calls {@link #freeze(IHDLObject)} afterwards on the copy
 	 *
 	 * @param container
 	 *            the new {@link IHDLObject} that should become the container of

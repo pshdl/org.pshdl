@@ -120,11 +120,11 @@ public class HDLQualifiedName implements Comparable<HDLQualifiedName> {
 	}
 
 	/**
-	 * Prints the Qualified name using c as separator
+	 * Returns the Qualified name using c as separator
 	 *
 	 * @param c
 	 *            the separator
-	 * @return
+	 * @return the Qualified name using c as separator
 	 */
 	@Nonnull
 	public String toString(char c) {

@@ -442,7 +442,7 @@ public class ModificationSet {
 	 * nothing needs to be done
 	 *
 	 * @param orig
-	 * @return
+	 * @return a modified {@link IHDLObject} object
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends IHDLObject> T apply(T orig) {
@@ -459,7 +459,8 @@ public class ModificationSet {
 	 * that should replace the subject
 	 *
 	 * @param reg
-	 * @return
+	 * @return an object that is scheduled to replace the oject or
+	 *         <code>null</code>
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends IHDLObject> T getReplacement(T reg) {

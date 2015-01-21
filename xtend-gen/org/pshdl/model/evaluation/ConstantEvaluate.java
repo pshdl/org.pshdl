@@ -93,7 +93,7 @@ public class ConstantEvaluate {
    * Attempts to determine a constant that the given Expression can be replaced with. If parameter are encountered,
    * the provided context is used to retrieve a value for them.
    * 
-   * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
+   * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
    */
   public static Optional<BigInteger> valueOf(final HDLExpression exp, final HDLEvaluationContext context) {
     boolean _tripleEquals = (exp == null);

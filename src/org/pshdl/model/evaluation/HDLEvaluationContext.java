@@ -52,7 +52,7 @@ import com.google.common.collect.Maps;
  * ports, they can be initialized with a constant. However this constant does
  * not need to be the value the unit is instantiated with. This context stores a
  * mapping for those parameters to the actual value. See
- * {@link ConstantEvaluate#constantEvaluate(IHDLObject, HDLEvaluationContext)}
+ * {@link ConstantEvaluate#constantEvaluate(IHDLObject, HDLEvaluationContext, java.util.Set)}
  *
  * @author Karsten Becker
  *
@@ -99,8 +99,8 @@ public class HDLEvaluationContext {
 	 * Generates a default context where all parameter are assumed to be the
 	 * constant they are initialized with
 	 *
-	 * @param unit
-	 *            the unit to create the context for
+	 * @param pkg
+	 *            the package to create the context for
 	 * @return a HDLEvaluationContext with all parameters set to their default
 	 */
 	public static Map<HDLQualifiedName, HDLEvaluationContext> createDefault(HDLPackage pkg) {

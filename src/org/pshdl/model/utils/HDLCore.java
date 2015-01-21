@@ -52,8 +52,9 @@ import com.google.common.io.ByteStreams;
  * {@link IHDLAnnotation}, {@link IHDLGenerator}, {@link IHDLValidator},
  * {@link IHDLFunctionResolver} and {@link IHDLAnnotationProvider}. Those
  * services are added via an {@link IServiceProvider}. The default
- * {@link IServiceProvider}, {@link IServiceProvider.ServiceLoaderProvider} uses
- * the {@link ServiceLoader} facility of the JRE
+ * {@link IServiceProvider},
+ * {@link org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider}
+ * uses the {@link ServiceLoader} facility of the JRE
  *
  * @author Karsten Becker
  *

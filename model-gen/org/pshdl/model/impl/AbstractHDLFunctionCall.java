@@ -180,7 +180,7 @@ public abstract class AbstractHDLFunctionCall extends HDLObject implements HDLEx
 	}
 
 	/**
-	 * Setter for the field {@link #getFunction()}.
+	 * Setter for the field {@link #getFunctionRefName()}.
 	 * 
 	 * @param function
 	 *            sets the new function of this object. Can <b>not</b> be

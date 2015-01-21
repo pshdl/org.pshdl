@@ -63,17 +63,17 @@ public interface IHDLAnnotation {
 	/**
 	 * Returns the name of the annotation without the @ symbol
 	 *
-	 * @return
+	 * @return the name of the annotation without the @ symbol
 	 */
 	String name();
 
 	/**
 	 * Validates the contents of the annotation and returns a message to the
 	 * user if it is not correct
-	 * 
+	 *
 	 * @param annotation
-	 *            TODO
-	 * @return
+	 * @return <code>null</code> when the validation was successful or a String
+	 *         with an error when not
 	 */
 	String validate(HDLAnnotation annotation);
 

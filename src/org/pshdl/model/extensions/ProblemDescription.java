@@ -56,7 +56,7 @@ public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 	/**
 	 * This annotation can be used to find out what caused the evaluation to
 	 * fail. When this marker can be found, also check
-	 * {@link ProblemDescription.DESCRIPTION}
+	 * {@link ProblemDescription#DESCRIPTION}
 	 */
 	public static final GenericMeta<IHDLObject> SOURCE = new GenericMeta<IHDLObject>("SOURCE", true);
 

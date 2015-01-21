@@ -435,7 +435,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	}
 
 	/**
-	 * Setter for the field {@link #getEnumSpec()}.
+	 * Setter for the field {@link #getEnumSpecRefName()}.
 	 * 
 	 * @param enumSpec
 	 *            sets the new enumSpec of this object. Can be <code>null</code>
@@ -451,7 +451,7 @@ public abstract class AbstractHDLFunctionParameter extends HDLObject {
 	}
 
 	/**
-	 * Setter for the field {@link #getIfSpec()}.
+	 * Setter for the field {@link #getIfSpecRefName()}.
 	 * 
 	 * @param ifSpec
 	 *            sets the new ifSpec of this object. Can be <code>null</code>.

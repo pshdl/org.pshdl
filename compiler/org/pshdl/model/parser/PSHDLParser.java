@@ -216,8 +216,6 @@ public class PSHDLParser {
 	 *
 	 * @param input
 	 *            the String to parse and convert
-	 * @param libURI
-	 *            the library URI to retrieve a registered {@link HDLLibrary}
 	 * @param syntaxProblems
 	 *            a HashSet where syntax problems will be added to
 	 * @return a {@link HDLPackage} if successful, <code>null</code>l otherwise

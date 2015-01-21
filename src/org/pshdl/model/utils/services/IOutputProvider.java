@@ -121,7 +121,7 @@ public interface IOutputProvider {
 	 * Invokes this {@link IOutputProvider} and passes the given arguments to
 	 * it.
 	 *
-	 * @param args
+	 * @param cli
 	 *            the arguments excluding the hook
 	 * @return an explanation of what went wrong or <code>null</code> if it was
 	 *         successful

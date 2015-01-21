@@ -69,6 +69,7 @@ import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*
 import static org.pshdl.model.extensions.ProblemDescription.*
+import org.pshdl.model.extensions.ProblemDescription
 
 /**
  * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link org.pshdl.model.IHDLObject}. Of course
@@ -94,7 +95,7 @@ class ConstantEvaluate {
 	 * Attempts to determine a constant that the given Expression can be replaced with. If parameter are encountered, 
 	 * the provided context is used to retrieve a value for them.
 	 * 
-	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription.DESCRIPTION} Meta annotations
+	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
 	 */
 	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
 		if (exp === null)

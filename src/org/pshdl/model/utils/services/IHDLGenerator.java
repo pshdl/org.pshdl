@@ -143,7 +143,7 @@ public interface IHDLGenerator {
 	 *
 	 * @param name
 	 *            the generator ID to get the information for.
-	 * @return
+	 * @return information about the registered Generator
 	 */
 	@Nonnull
 	public GeneratorInformation getGeneratorInfo(String name);

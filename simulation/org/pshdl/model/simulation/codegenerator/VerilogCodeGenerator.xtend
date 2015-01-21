@@ -94,13 +94,13 @@ endmodule;
 		end
 	'''
 
-	override protected updatePrediateTimestamp(Stack<Integer> arr, InternalInformation outputInternal) ''''''
+	override protected updatePrediateTimestamp(InternalInformation outputInternal) ''''''
 
 	override protected fixupValue(CharSequence assignValue, int targetSizeWithType, boolean doMask) {
 		return assignValue
 	}
 
-	override protected toCastExpression(FastInstruction exec, Frame frame, int pos, int a, int b, Stack<Integer> arr,
+	def protected toCastExpression(FastInstruction exec, Frame frame, int pos, int a, int b,
 		int arrPos) {
 		val StringBuilder sb = new StringBuilder();
 		val String tempName = getTempName(a, NONE);
@@ -131,7 +131,7 @@ endmodule;
 		return sb;
 	}
 
-	override protected toEdgeExpression(FastInstruction exec, Frame frame, int pos, int a, int b, Stack<Integer> arr,
+	def protected toEdgeExpression(FastInstruction exec, Frame frame, int pos, int a, int b, 
 		int arrPos) ''''''
 
 	override protected handlePredicates(Set<Integer> handledPredicates, boolean positive, int[] predicates) ''''''

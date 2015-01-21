@@ -327,7 +327,7 @@ public abstract class AbstractHDLInterfaceInstantiation extends HDLInstantiation
 	}
 
 	/**
-	 * Setter for the field {@link #getHIf()}.
+	 * Setter for the field {@link #getHIfRefName()}.
 	 * 
 	 * @param hIf
 	 *            sets the new hIf of this object. Can <b>not</b> be

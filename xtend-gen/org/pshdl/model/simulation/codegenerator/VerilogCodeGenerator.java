@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
@@ -246,7 +245,7 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
     return _builder;
   }
   
-  protected CharSequence updatePrediateTimestamp(final Stack<Integer> arr, final InternalInformation outputInternal) {
+  protected CharSequence updatePrediateTimestamp(final InternalInformation outputInternal) {
     StringConcatenation _builder = new StringConcatenation();
     return _builder;
   }
@@ -255,7 +254,7 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
     return assignValue;
   }
   
-  protected StringBuilder toCastExpression(final Frame.FastInstruction exec, final Frame frame, final int pos, final int a, final int b, final Stack<Integer> arr, final int arrPos) {
+  protected StringBuilder toCastExpression(final Frame.FastInstruction exec, final Frame frame, final int pos, final int a, final int b, final int arrPos) {
     final StringBuilder sb = new StringBuilder();
     final String tempName = this.getTempName(a, CommonCodeGenerator.NONE);
     final Instruction _switchValue = exec.inst;
@@ -320,7 +319,7 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
     return sb;
   }
   
-  protected CharSequence toEdgeExpression(final Frame.FastInstruction exec, final Frame frame, final int pos, final int a, final int b, final Stack<Integer> arr, final int arrPos) {
+  protected CharSequence toEdgeExpression(final Frame.FastInstruction exec, final Frame frame, final int pos, final int a, final int b, final int arrPos) {
     StringConcatenation _builder = new StringConcatenation();
     return _builder;
   }

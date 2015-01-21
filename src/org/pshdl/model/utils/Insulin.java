@@ -977,10 +977,7 @@ public class Insulin {
 	 * @param synchedArray
 	 *            if <code>true</code> the defaultValue will become the same
 	 *            dimension accesses as the variable
-	 * @param interfaceDim
-	 *            if <code>true</code> the ref parameter will be treated as
-	 *            HDLIinterfaceRef and gets the interface array filled
-	 * @return
+	 * @return a loop that initializes the array
 	 */
 	public static HDLStatement createArrayForLoop(List<HDLExpression> ifDim, List<HDLExpression> varDim, int i, HDLExpression defaultValue, HDLVariableRef ref, boolean synchedArray) {
 		final boolean interfaceDim = i < ifDim.size();
@@ -1037,12 +1034,12 @@ public class Insulin {
 	 * references with it. It also inserts the clk and rst signals into the
 	 * HDLUnit if needed.
 	 *
-	 * @param unit
-	 * @return
+	 * @param inputObject
+	 * @return a modified inputUnit
 	 */
-	public static <T extends IHDLObject> T generateClkAndReset(T apply) {
+	public static <T extends IHDLObject> T generateClkAndReset(T inputObject) {
 		final ModificationSet ms = new ModificationSet();
-		final HDLUnit[] units = apply.getAllObjectsOf(HDLUnit.class, true);
+		final HDLUnit[] units = inputObject.getAllObjectsOf(HDLUnit.class, true);
 		for (final HDLUnit unit : units) {
 			HDLVariable defClkVar = HDLRegisterConfig.defaultClk(false).addAnnotations(HDLBuiltInAnnotations.clock.create(null));
 			HDLVariable defRstVar = HDLRegisterConfig.defaultRst(false).addAnnotations(HDLBuiltInAnnotations.reset.create(null));
@@ -1132,7 +1129,7 @@ public class Insulin {
 				}
 			}
 		}
-		return ms.apply(apply);
+		return ms.apply(inputObject);
 	}
 
 	protected static void createTempBit(final ModificationSet ms, final HDLRegisterConfig reg, final HDLExpression signalExpression, String prefix) {

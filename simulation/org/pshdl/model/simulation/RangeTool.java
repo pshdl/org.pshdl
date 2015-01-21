@@ -126,7 +126,7 @@ public class RangeTool {
 	 *
 	 * @param value
 	 *            a list of RangeVal Objects that need to be split
-	 * @return
+	 * @return a new Set with BigInteger ranges that don't overlap
 	 */
 	public static SortedSet<Range<BigInteger>> split(List<RangeVal> value) {
 		preSort(value);

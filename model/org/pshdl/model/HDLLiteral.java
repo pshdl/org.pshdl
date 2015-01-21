@@ -174,7 +174,7 @@ public class HDLLiteral extends AbstractHDLLiteral {
 	 * Generate a literal with the given Value as decimal
 	 *
 	 * @param val
-	 * @return
+	 * @return the {@link HDLLiteral} of the number
 	 */
 	public static @Nonnull HDLLiteral get(long val) {
 		return new HDLLiteral().setStr(false).setVal(Long.toString(val));

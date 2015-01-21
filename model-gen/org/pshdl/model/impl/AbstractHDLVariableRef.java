@@ -183,7 +183,7 @@ public abstract class AbstractHDLVariableRef extends HDLResolvedRef {
 	}
 
 	/**
-	 * Setter for the field {@link #getVar()}.
+	 * Setter for the field {@link #getVarRefName()}.
 	 * 
 	 * @param var
 	 *            sets the new var of this object. Can <b>not</b> be

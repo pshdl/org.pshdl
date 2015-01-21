@@ -175,7 +175,8 @@ public class HDLRange extends AbstractHDLRange {
 	 * Calculates the width of the Expression as if it used as a downto (the
 	 * most common case when the width is needed)
 	 *
-	 * @return
+	 * @return an simplified Expression of the width as if it was used in a
+	 *         downto
 	 */
 	public HDLExpression getWidth() {
 		final HDLExpression f = getFrom();
