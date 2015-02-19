@@ -133,6 +133,17 @@ class SimulationTransformationExtension {
 		return frame
 	}
 
+	def dispatch FluidFrame toSimulationModelPred(HDLBlock obj, ArgumentedInstruction predicate,
+		HDLEvaluationContext context, String process) {
+		var newProcess = process
+		if (obj.process)
+			newProcess = FullNameExtension.fullNameOf(obj).lastSegment.replaceAll('@', '')
+		val frame = new FluidFrame(obj, null, false, newProcess)
+		for (HDLStatement stmnt : obj.statements) {
+			frame.addReferencedFrame(stmnt.toSimulationModelPred(predicate, context, frame.simProcess))
+		}
+		return frame
+	}
 	def dispatch FluidFrame toSimulationModelPred(HDLStatement obj, ArgumentedInstruction predicate,
 		HDLEvaluationContext context, String process) {
 		var res = obj.toSimulationModel(context, process)

@@ -142,6 +142,24 @@ public class SimulationTransformationExtension {
     return frame;
   }
   
+  protected FluidFrame _toSimulationModelPred(final HDLBlock obj, final FluidFrame.ArgumentedInstruction predicate, final HDLEvaluationContext context, final String process) {
+    String newProcess = process;
+    Boolean _process = obj.getProcess();
+    if ((_process).booleanValue()) {
+      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
+      String _lastSegment = _fullNameOf.getLastSegment();
+      String _replaceAll = _lastSegment.replaceAll("@", "");
+      newProcess = _replaceAll;
+    }
+    final FluidFrame frame = new FluidFrame(obj, null, false, newProcess);
+    ArrayList<HDLStatement> _statements = obj.getStatements();
+    for (final HDLStatement stmnt : _statements) {
+      FluidFrame _simulationModelPred = this.toSimulationModelPred(stmnt, predicate, context, frame.simProcess);
+      frame.addReferencedFrame(_simulationModelPred);
+    }
+    return frame;
+  }
+  
   protected FluidFrame _toSimulationModelPred(final HDLStatement obj, final FluidFrame.ArgumentedInstruction predicate, final HDLEvaluationContext context, final String process) {
     FluidFrame res = this.toSimulationModel(obj, context, process);
     boolean _hasInstructions = res.hasInstructions();
@@ -1432,7 +1450,9 @@ public class SimulationTransformationExtension {
   }
   
   public FluidFrame toSimulationModelPred(final HDLStatement obj, final FluidFrame.ArgumentedInstruction predicate, final HDLEvaluationContext context, final String process) {
-    if (obj instanceof HDLSwitchStatement) {
+    if (obj instanceof HDLBlock) {
+      return _toSimulationModelPred((HDLBlock)obj, predicate, context, process);
+    } else if (obj instanceof HDLSwitchStatement) {
       return _toSimulationModelPred((HDLSwitchStatement)obj, predicate, context, process);
     } else if (obj != null) {
       return _toSimulationModelPred(obj, predicate, context, process);

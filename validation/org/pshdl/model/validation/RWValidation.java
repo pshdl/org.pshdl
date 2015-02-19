@@ -211,8 +211,14 @@ public class RWValidation {
 		}
 	}
 
+	/**
+	 * The last process that wrote to the variable
+	 */
 	public static final GenericMeta<HDLBlock> BLOCK_META = new GenericMeta<HDLBlock>("BLOCK_META", true);
 
+	/**
+	 * Processes that are colliding in write access
+	 */
 	public static final GenericMeta<Set<HDLBlock>> BLOCK_META_CLASH = new GenericMeta<Set<HDLBlock>>("BLOCK_META_CLASH", true);
 
 	/**
@@ -301,7 +307,7 @@ public class RWValidation {
 			}
 			incMeta(hdlVariable, IntegerMeta.WRITE_COUNT);
 		}
-		HDLBlock block = stmnt.getContainer(HDLBlock.class);
+		HDLBlock block = getProcess(stmnt);
 		if (block == null) {
 			block = UNIT_BLOCK;
 		}
@@ -315,6 +321,13 @@ public class RWValidation {
 		}
 		hdlVariable.addMeta(BLOCK_META, block);
 
+	}
+
+	private static HDLBlock getProcess(HDLStatement stmnt) {
+		final HDLBlock container = stmnt.getContainer(HDLBlock.class);
+		if ((container != null) && (container.getProcess() != null) && (container.getProcess() == false))
+			return getProcess(container);
+		return container;
 	}
 
 	private static void addStringMeta(String value, HDLVariable hVar, Init init) {

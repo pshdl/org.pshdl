@@ -371,8 +371,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     final byte[] bytes = str.getBytes(StandardCharsets.ISO_8859_1);
     for (final byte b : bytes) {
       {
-        int _bitwiseXor = (hash ^ b);
-        hash = _bitwiseXor;
+        hash = (hash ^ b);
         hash = (hash * 16777619);
       }
     }
