@@ -410,14 +410,12 @@ class SimulationTransformationExtension {
 	
 	def createPushIndexBits(ArrayList<HDLRange> array, HDLEvaluationContext context, FluidFrame res, String process, String assignmentVarName) {
 		var fixedBit = true
-		for (HDLRange idx : array) {
-			val fromVal = valueOf(idx.from, context)
-			if (fromVal.present && fromVal==-1bi)
+		for (HDLRange idx : array) 
+			if (!valueOf(idx.to, context).present)
 				fixedBit = false
-			}
 		if (!fixedBit)
 			for (HDLRange idx : array) {
-				res.append(idx.toSimulationModel(context, process));
+				res.append(idx.to.toSimulationModel(context, process));
 				res.add(new ArgumentedInstruction(pushAddIndex, assignmentVarName, "1"))
 			}
 	}
@@ -452,7 +450,11 @@ class SimulationTransformationExtension {
 		}
 		if (withBits) {
 			for (HDLRange exp : hVar.bits) {
-				sb.append('{').append(exp).append('}')
+				val s = valueOf(exp.to, context)
+				if (s.present)
+					sb.append('{').append(exp).append('}')
+				else
+					sb.append('{-1}')
 			}
 		}
 		return sb.toString
@@ -582,6 +584,7 @@ class SimulationTransformationExtension {
 		var hVar = obj.resolveVar
 		val String refName = obj.getVarName(false, context)
 		createPushIndex(obj.array, context, res, process, refName)
+		createPushIndexBits(obj.bits, context, res, process, refName)
 		var fixedArray = true
 		for (HDLExpression idx : obj.array)
 			if (!valueOf(idx, context).present)

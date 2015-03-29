@@ -981,7 +981,16 @@ public abstract class CommonCodeGenerator {
 		final String tempName = getTempName(a, NONE);
 		switch (exec.inst) {
 		case bitAccessSingle:
-			sb.append(assignTempVar(2, pos, NONE, mask(tempName + " >> " + exec.arg1, 1), false));
+			if (exec.arg1 == -1) {
+				final InternalInformation internal = asInternal(exec.arg2);
+				final String varName = internal.info.name;
+				final InternalPushInfo pi = pushInfo.get(varName);
+				final Integer idx = pi.pushedIndices.get(0);
+				sb.append(assignTempVar(2, pos, NONE, mask(shiftRightDynamic(tempName, idx), 1), false));
+				pushInfo.remove(varName);
+			} else {
+				sb.append(assignTempVar(2, pos, NONE, mask(tempName + " >> " + exec.arg1, 1), false));
+			}
 			break;
 		case bitAccessSingleRange:
 			final int highBit = exec.arg1;
@@ -1000,6 +1009,14 @@ public abstract class CommonCodeGenerator {
 			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
 		}
 		return sb;
+	}
+
+	protected String shiftLeftDynamic(final CharSequence tempName, final Integer idx) {
+		return tempName + " << " + getTempName(idx, EnumSet.of(isArrayIndex));
+	}
+
+	protected String shiftRightDynamic(final CharSequence tempName, final Integer idx) {
+		return tempName + " >> " + getTempName(idx, EnumSet.of(isArrayIndex));
 	}
 
 	protected CharSequence toLoadStoreExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
@@ -1023,7 +1040,11 @@ public abstract class CommonCodeGenerator {
 		case loadInternal: {
 			final InternalInformation asInternal = asInternal(exec.arg1);
 			sb.append(assignTempVar(-1, pos, NONE, loadInternal(asInternal, NONE), false));
-			pushInfo.remove(asInternal.info.name);
+			final String varName = asInternal.info.name;
+			final InternalPushInfo pi = pushInfo.get(varName);
+			if ((pi != null) && !pi.isBitAccess) {
+				pushInfo.remove(varName);
+			}
 			break;
 		}
 		case writeInternal: {
@@ -1109,14 +1130,28 @@ public abstract class CommonCodeGenerator {
 			final CharSequence currentValue = internalWithArrayAccess(internal, internal.isShadowReg ? SHADOWREG : NONE);
 			final BigInteger mask = calcMask(internal.actualWidth);
 			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not(), true, internal.info.width);
-			sb.append(assignVariable(currVar, doMask(currentValue, writeMask), NONE, false, true, false)).append(comment("Current value"));
 			final VariableInformation maskVar = createVar(idName(internal.fullName, false, NONE) + tempName + "_mask_shift", internal.actualWidth, internal.info.type);
-			sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true, false))
-					.append(comment("Masked and shifted"));
+			if (internal.bitStart == -1) {
+				final InternalPushInfo pi = pushInfo.get(internal.info.name);
+				final Integer idx = pi.pushedIndices.get(0);
+				CharSequence dynMask = dynamicMask(idx);
+				dynMask = doMask(currentValue, dynMask);
+				sb.append(assignVariable(currVar, dynMask, NONE, false, true, false)).append(comment("Current value"));
+				final String assignValue = "(" + mask(tempName, internal.actualWidth) + ")";
+				sb.append(indent()).append(assignVariable(maskVar, shiftLeftDynamic(assignValue, idx), NONE, false, true, false)).append(comment("Masked and shifted"));
+			} else {
+				sb.append(assignVariable(currVar, doMask(currentValue, writeMask), NONE, false, true, false)).append(comment("Current value"));
+				sb.append(indent()).append(assignVariable(maskVar, "(" + mask(tempName, internal.actualWidth) + ") << " + internal.bitEnd, NONE, false, true, false))
+						.append(comment("Masked and shifted"));
+			}
 			tempName = "(" + currVar.name + " | " + maskVar.name + ")";
 			sb.append(indent());
 		}
 		return tempName;
+	}
+
+	protected String dynamicMask(final Integer idx) {
+		return "((~(" + shiftLeftDynamic(constant(1, true), idx) + "))-1)";
 	}
 
 	protected CharSequence doMask(final CharSequence currentValue, final CharSequence writeMask) {
@@ -1131,8 +1166,14 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence bitAccess(CharSequence internalWithArray, InternalInformation info) {
-		if (info.actualWidth == 1)
+		if (info.actualWidth == 1) {
+			if (info.bitStart == -1) {
+				final InternalPushInfo pi = pushInfo.get(info.info.name);
+				final Integer idx = pi.pushedIndices.get(0);
+				return mask(shiftRightDynamic(internalWithArray, idx), 1);
+			}
 			return mask(internalWithArray + " >> " + info.bitStart, 1);
+		}
 		return mask(internalWithArray + " >> " + info.bitEnd, info.actualWidth);
 	}
 

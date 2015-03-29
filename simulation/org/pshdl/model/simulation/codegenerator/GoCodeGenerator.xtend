@@ -112,7 +112,7 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 		} finally {
 			fos.close
 		}
-		val ProcessBuilder goBuilder = new ProcessBuilder("/usr/local/go/bin/go", "build",
+		val ProcessBuilder goBuilder = new ProcessBuilder("/usr/local/bin/go", "build",
 			testRunner.getAbsolutePath(), dutFile.getAbsolutePath()).directory(tempDir).redirectErrorStream(true).inheritIO;
 		val Process goCompiler = goBuilder.start();
 		if (goCompiler.waitFor != 0) {
@@ -147,6 +147,12 @@ func (s *«unit») updateRegs() {
 	}
 }
 	'''
+
+	override protected String dynamicMask(Integer idx) {
+		return "((^(" + shiftLeftDynamic(constant(1, true), idx) + "))-1)";
+	}
+	override protected shiftRightDynamic(CharSequence tempName, Integer idx) '''«tempName» >> uint(«getTempName(idx, EnumSet.of(Attributes.isArrayIndex))»)'''
+	override protected shiftLeftDynamic(CharSequence tempName, Integer idx) '''«tempName» << uint(«getTempName(idx, EnumSet.of(Attributes.isArrayIndex))»)'''
 
 	override protected doLoopStart() '''for {'''
 

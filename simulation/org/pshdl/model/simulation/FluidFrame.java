@@ -431,8 +431,13 @@ public class FluidFrame {
 							arg1 = Integer.parseInt(split[0]);
 							arg2 = Integer.parseInt(split[1]);
 						} else {
-							i = Instruction.bitAccessSingle;
-							arg1 = Integer.parseInt(ai.args[1]);
+							try {
+								i = Instruction.bitAccessSingle;
+								arg1 = Integer.parseInt(ai.args[1]);
+							} catch (final NumberFormatException e) {
+								arg1 = -1;
+								arg2 = internalId;
+							}
 						}
 					} else {
 						arg1 = internalId;

@@ -103,7 +103,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         }
         String _absolutePath = testRunner.getAbsolutePath();
         String _absolutePath_1 = dutFile.getAbsolutePath();
-        ProcessBuilder _processBuilder = new ProcessBuilder("/usr/local/go/bin/go", "build", _absolutePath, _absolutePath_1);
+        ProcessBuilder _processBuilder = new ProcessBuilder("/usr/local/bin/go", "build", _absolutePath, _absolutePath_1);
         ProcessBuilder _directory = _processBuilder.directory(tempDir);
         ProcessBuilder _redirectErrorStream = _directory.redirectErrorStream(true);
         final ProcessBuilder goBuilder = _redirectErrorStream.inheritIO();
@@ -190,6 +190,35 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append("}");
     _builder.newLine();
     return _builder;
+  }
+  
+  protected String dynamicMask(final Integer idx) {
+    CharSequence _constant = this.constant(1, true);
+    String _shiftLeftDynamic = this.shiftLeftDynamic(_constant, idx);
+    String _plus = ("((^(" + _shiftLeftDynamic);
+    return (_plus + "))-1)");
+  }
+  
+  protected String shiftRightDynamic(final CharSequence tempName, final Integer idx) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(tempName, "");
+    _builder.append(" >> uint(");
+    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayIndex);
+    String _tempName = this.getTempName((idx).intValue(), _of);
+    _builder.append(_tempName, "");
+    _builder.append(")");
+    return _builder.toString();
+  }
+  
+  protected String shiftLeftDynamic(final CharSequence tempName, final Integer idx) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(tempName, "");
+    _builder.append(" << uint(");
+    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayIndex);
+    String _tempName = this.getTempName((idx).intValue(), _of);
+    _builder.append(_tempName, "");
+    _builder.append(")");
+    return _builder.toString();
   }
   
   protected CharSequence doLoopStart() {

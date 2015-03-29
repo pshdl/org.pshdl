@@ -540,16 +540,18 @@ public class HDLSimulator {
 		final HDLRange[] ranges = insulin.getAllObjectsOf(HDLRange.class, true);
 		for (final HDLRange hdlRange : ranges) {
 			final Optional<BigInteger> toBig = ConstantEvaluate.valueOf(hdlRange.getTo(), context);
-			if (!toBig.isPresent())
-				throw new IllegalArgumentException("Given the context it should always be non null");
-			final HDLExpression from = hdlRange.getFrom();
-			if (from != null) {
-				final Optional<BigInteger> fromBig = ConstantEvaluate.valueOf(from, context);
-				if (!fromBig.isPresent())
-					throw new IllegalArgumentException("Given the context it should always be non null");
-				ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig.get())).setTo(HDLLiteral.get(toBig.get())));
+			if (toBig.isPresent()) {
+				final HDLExpression from = hdlRange.getFrom();
+				if (from != null) {
+					final Optional<BigInteger> fromBig = ConstantEvaluate.valueOf(from, context);
+					if (!fromBig.isPresent())
+						throw new IllegalArgumentException("Given the context it should always be non null");
+					ms.replace(hdlRange, hdlRange.setFrom(HDLLiteral.get(fromBig.get())).setTo(HDLLiteral.get(toBig.get())));
+				} else {
+					ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig.get())));
+				}
 			} else {
-				ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(toBig.get())));
+				// ms.replace(hdlRange, hdlRange.setTo(HDLLiteral.get(-1)));
 			}
 		}
 		return ms.apply(insulin);

@@ -70,12 +70,14 @@ public class SourceInfo {
 					}
 				}
 			}
-			final List<Token> hiddenRight = tokens.getHiddenTokensToRight(context.stop.getTokenIndex(), PSHDLLangLexer.COMMENTS);
-			if (hiddenRight != null) {
-				for (final Token token : hiddenRight) {
-					final String text = token.getText();
-					if (text.startsWith("///<") || text.startsWith("/**<")) {
-						comments.add(text);
+			if (context.stop != null) {
+				final List<Token> hiddenRight = tokens.getHiddenTokensToRight(context.stop.getTokenIndex(), PSHDLLangLexer.COMMENTS);
+				if (hiddenRight != null) {
+					for (final Token token : hiddenRight) {
+						final String text = token.getText();
+						if (text.startsWith("///<") || text.startsWith("/**<")) {
+							comments.add(text);
+						}
 					}
 				}
 			}

@@ -647,27 +647,19 @@ public class SimulationTransformationExtension {
   public void createPushIndexBits(final ArrayList<HDLRange> array, final HDLEvaluationContext context, final FluidFrame res, final String process, final String assignmentVarName) {
     boolean fixedBit = true;
     for (final HDLRange idx : array) {
-      {
-        HDLExpression _from = idx.getFrom();
-        final Optional<BigInteger> fromVal = ConstantEvaluate.valueOf(_from, context);
-        boolean _and = false;
-        boolean _isPresent = fromVal.isPresent();
-        if (!_isPresent) {
-          _and = false;
-        } else {
-          BigInteger _minus = BigInteger.ONE.negate();
-          boolean _equals = Objects.equal(fromVal, _minus);
-          _and = _equals;
-        }
-        if (_and) {
-          fixedBit = false;
-        }
+      HDLExpression _to = idx.getTo();
+      Optional<BigInteger> _valueOf = ConstantEvaluate.valueOf(_to, context);
+      boolean _isPresent = _valueOf.isPresent();
+      boolean _not = (!_isPresent);
+      if (_not) {
+        fixedBit = false;
       }
     }
     if ((!fixedBit)) {
       for (final HDLRange idx_1 : array) {
         {
-          FluidFrame _simulationModel = this.toSimulationModel(idx_1, context, process);
+          HDLExpression _to_1 = idx_1.getTo();
+          FluidFrame _simulationModel = this.toSimulationModel(_to_1, context, process);
           res.append(_simulationModel);
           FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.pushAddIndex, assignmentVarName, "1");
           res.add(_argumentedInstruction);
@@ -730,9 +722,18 @@ public class SimulationTransformationExtension {
     if (withBits) {
       ArrayList<HDLRange> _bits = hVar.getBits();
       for (final HDLRange exp_1 : _bits) {
-        StringBuilder _append = sb.append("{");
-        StringBuilder _append_1 = _append.append(exp_1);
-        _append_1.append("}");
+        {
+          HDLExpression _to = exp_1.getTo();
+          final Optional<BigInteger> s = ConstantEvaluate.valueOf(_to, context);
+          boolean _isPresent = s.isPresent();
+          if (_isPresent) {
+            StringBuilder _append = sb.append("{");
+            StringBuilder _append_1 = _append.append(exp_1);
+            _append_1.append("}");
+          } else {
+            sb.append("{-1}");
+          }
+        }
       }
     }
     return sb.toString();
@@ -1070,6 +1071,8 @@ public class SimulationTransformationExtension {
     final String refName = SimulationTransformationExtension.getVarName(obj, false, context);
     ArrayList<HDLExpression> _array = obj.getArray();
     this.createPushIndex(_array, context, res, process, refName);
+    ArrayList<HDLRange> _bits = obj.getBits();
+    this.createPushIndexBits(_bits, context, res, process, refName);
     boolean fixedArray = true;
     ArrayList<HDLExpression> _array_1 = obj.getArray();
     for (final HDLExpression idx : _array_1) {
@@ -1080,17 +1083,17 @@ public class SimulationTransformationExtension {
         fixedArray = false;
       }
     }
-    ArrayList<HDLRange> _bits = obj.getBits();
-    int _size = _bits.size();
+    ArrayList<HDLRange> _bits_1 = obj.getBits();
+    int _size = _bits_1.size();
     int _plus = (_size + 1);
     final ArrayList<String> bits = new ArrayList<String>(_plus);
     bits.add(refName);
-    ArrayList<HDLRange> _bits_1 = obj.getBits();
-    boolean _isEmpty = _bits_1.isEmpty();
+    ArrayList<HDLRange> _bits_2 = obj.getBits();
+    boolean _isEmpty = _bits_2.isEmpty();
     boolean _not_1 = (!_isEmpty);
     if (_not_1) {
-      ArrayList<HDLRange> _bits_2 = obj.getBits();
-      for (final HDLRange r : _bits_2) {
+      ArrayList<HDLRange> _bits_3 = obj.getBits();
+      for (final HDLRange r : _bits_3) {
         String _string = r.toString();
         bits.add(_string);
       }
