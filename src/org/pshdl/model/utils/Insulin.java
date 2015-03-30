@@ -169,8 +169,12 @@ public class Insulin {
 	public static <T extends IHDLObject> T fixAnyTypeDeclarations(T pkg) {
 		T res = pkg;
 		boolean done = true;
+		int count = 0;
 		do {
 			done = true;
+			count++;
+			if (count > 50)
+				throw new RuntimeException("Failed to solve any-types for 50 cycles, giving up");
 			final ModificationSet ms = new ModificationSet();
 			final HDLVariableDeclaration[] declarations = res.getAllObjectsOf(HDLVariableDeclaration.class, true);
 			for (final HDLVariableDeclaration hvd : declarations) {
@@ -190,6 +194,8 @@ public class Insulin {
 			}
 			res = ms.apply(res);
 			res = removeAnyTypes(res);
+			final HDLPackage container = (res instanceof HDLPackage) ? (HDLPackage) res : res.getContainer(HDLPackage.class);
+			container.updateLibrary();
 		} while (!done);
 		return res;
 	}

@@ -28,6 +28,7 @@ package org.pshdl.model.utils;
 
 import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -509,6 +510,20 @@ public class HDLLibrary {
 			pkg = pkg.addUnits(unit.setName(e.getKey().toString()));
 		}
 		return pkg.copyDeepFrozen(null);
+	}
+
+	public void updatePackage(HDLPackage hdlPackage) {
+		final ArrayList<HDLUnit> units = hdlPackage.getUnits();
+		for (final HDLUnit hdlUnit : units) {
+			final HDLQualifiedName unitFQN = fullNameOf(hdlUnit);
+			for (final Record record : objects.values()) {
+				if (record.ref.equals(unitFQN)) {
+					addPkg(hdlPackage, record.src);
+					return;
+				}
+			}
+		}
+		throw new IllegalArgumentException("Did not find package source");
 	}
 
 }
