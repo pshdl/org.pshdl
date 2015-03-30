@@ -183,7 +183,7 @@ public class Insulin {
 					if (tt.isPresent()) {
 						final HDLPrimitive hdlType = (HDLPrimitive) tt.get();
 						if (!hdlType.isAny()) {
-							ms.replace(hvd, hvd.setType(hdlType));
+							ms.replace(hvd, hvd.setType(anyCastType(primitive, defaultValue)));
 						}
 					}
 				}
