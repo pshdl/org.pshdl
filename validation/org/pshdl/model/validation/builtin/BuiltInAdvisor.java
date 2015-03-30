@@ -40,6 +40,7 @@ import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRegisterConfig;
 import org.pshdl.model.HDLType;
@@ -579,6 +580,28 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "The declared primitve could possibly have a zero width", "The width of a primitive can never be zero.",
 					"Ensure that the number will always be greater 0", "Apply a @range(\">0\") annotation" + width + " to declare that the parameter will always be greater zero");
 		}
+		case ANY_TYPE_ONLY_DEFAULT:
+			return new HDLAdvise(problem, "Only default assignments allowed",
+					"Variables with a declared any-type are only allowed to have one assignment. And this assignment has to be done at the declaration", "Remove the assignment");
+		case ANY_TYPE_REQUIRES_DEFAULT:
+			return new HDLAdvise(problem, "Default assignment required",
+					"Variables with a declared any-type are only allowed to have one assignment. And this assignment has to be done at the declaration", "Add a default value");
+		case ONLY_ONE_VARIABLE_WITH_ANY:
+			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) problem.node;
+			final StringBuilder sb = new StringBuilder();
+			for (final HDLVariable var : hvd.getVariables()) {
+				sb.append(hvd.setVariables(HDLObject.asList(var))).append(";\n");
+			}
+			return new HDLAdvise(problem, "Any type declaration can only have one variable",
+					"For any-types only one variable can be declared as each variable might have different widths", "Split up the declaration:\n" + sb);
+		case DEPRECATED_TYPE:
+			final HDLPrimitive primNode = (HDLPrimitive) problem.node;
+			final String type = primNode.getType().toString().replace("32", "");
+			return new HDLAdvise(
+					problem,
+					type + " (without width) is deprecated use " + primNode.getType(),
+					"It is not immediately clear what size int/uint had when no width was specified. With the renaming this has been chaned to make it clear to the developer what he is doing",
+					"change " + type + " to " + primNode.getType());
 		}
 		return null;
 	}

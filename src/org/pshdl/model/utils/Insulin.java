@@ -77,7 +77,6 @@ import org.pshdl.model.HDLObject.GenericMeta;
 import org.pshdl.model.HDLOpExpression;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLPrimitive;
-import org.pshdl.model.HDLPrimitive.AnyPrimitive;
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType;
 import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLReference;
@@ -138,6 +137,7 @@ public class Insulin {
 		for (final IInsulinParticitant part : participants.values()) {
 			apply = part.preInsulin(apply, src);
 		}
+		apply = fixAnyTypeDeclarations(apply);
 		apply = inlineConstants(apply);
 		apply = convertIncRecRanges(apply);
 		apply = handlePostfixOp(apply);
@@ -156,6 +156,7 @@ public class Insulin {
 		apply = fixMultiDimAssignments(apply);
 		apply = fixDoubleNegate(apply);
 		apply = fortifyType(apply);
+		apply = removeAnyTypes(apply);
 		apply = resolveFragments(apply);
 		for (final IInsulinParticitant part : participants.values()) {
 			apply = part.postInsulin(apply, src);
@@ -163,6 +164,83 @@ public class Insulin {
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	public static <T extends IHDLObject> T fixAnyTypeDeclarations(T pkg) {
+		T res = pkg;
+		boolean done = true;
+		do {
+			done = true;
+			final ModificationSet ms = new ModificationSet();
+			final HDLVariableDeclaration[] declarations = res.getAllObjectsOf(HDLVariableDeclaration.class, true);
+			for (final HDLVariableDeclaration hvd : declarations) {
+				final HDLPrimitive primitive = hvd.getPrimitive();
+				if ((primitive != null) && primitive.isAny()) {
+					done = false;
+					final HDLVariable var = hvd.getVariables().get(0);
+					final HDLExpression defaultValue = var.getDefaultValue();
+					final Optional<? extends HDLType> tt = TypeExtension.typeOf(defaultValue);
+					if (tt.isPresent()) {
+						final HDLPrimitive hdlType = (HDLPrimitive) tt.get();
+						if (!hdlType.isAny()) {
+							ms.replace(hvd, hvd.setType(hdlType));
+						}
+					}
+				}
+			}
+			res = ms.apply(res);
+			res = removeAnyTypes(res);
+		} while (!done);
+		return res;
+	}
+
+	public static <T extends IHDLObject> T removeAnyTypes(T pkg) {
+		final ModificationSet ms = new ModificationSet();
+		final Collection<HDLManip> all = HDLQuery.select(HDLManip.class).from(pkg).where(HDLManip.fType).isEqualTo(HDLManipType.CAST).getAll();
+		for (final HDLManip hdlManip : all) {
+			final HDLType castTo = hdlManip.getCastTo();
+			if (castTo instanceof HDLPrimitive) {
+				final HDLPrimitive castAnyType = (HDLPrimitive) castTo;
+				if (castAnyType.isAny()) {
+					final HDLExpression target = hdlManip.getTarget();
+					ms.replace(hdlManip, hdlManip.setCastTo(anyCastType(castAnyType, target)));
+				}
+			}
+		}
+		return ms.apply(pkg);
+	}
+
+	private static HDLPrimitive anyCastType(final HDLPrimitive castAnyType, final HDLExpression target) {
+		HDLPrimitive newPrimType = null;
+		final Optional<? extends HDLType> tt = TypeExtension.typeOf(target);
+		final HDLType expressionType = tt.get();
+		final HDLPrimitive expressionPrim = (HDLPrimitive) expressionType;
+		HDLPrimitiveType newType = null;
+		switch (castAnyType.getType()) {
+		case ANY_BIT:
+			if (expressionType.getWidth() == null) {
+				newType = HDLPrimitiveType.BIT;
+			} else {
+				newType = HDLPrimitiveType.BITVECTOR;
+			}
+			break;
+		case ANY_INT:
+			if (expressionType.getWidth() == null) {
+				newType = HDLPrimitiveType.INTEGER;
+			} else {
+				newType = HDLPrimitiveType.INT;
+			}
+			break;
+		case ANY_UINT:
+			if (expressionType.getWidth() == null) {
+				newType = HDLPrimitiveType.NATURAL;
+			} else {
+				newType = HDLPrimitiveType.UINT;
+			}
+			break;
+		}
+		newPrimType = expressionPrim.setType(newType);
+		return newPrimType;
 	}
 
 	public static <T extends IHDLObject> T handleExports(T pkg) {
@@ -1441,7 +1519,11 @@ public class Insulin {
 	}
 
 	private static void cast(ModificationSet ms, HDLPrimitive targetType, HDLExpression exp) {
-		ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(targetType).setTarget(exp));
+		if (HDLPrimitive.isAny(targetType.getType())) {
+			ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(anyCastType(targetType, exp)).setTarget(exp));
+		} else {
+			ms.replace(exp, new HDLManip().setType(HDLManipType.CAST).setCastTo(targetType).setTarget(exp));
+		}
 	}
 
 	private static void makeBool(ModificationSet ms, HDLExpression exp) {
@@ -1458,14 +1540,8 @@ public class Insulin {
 			if (lt.isPresent()) {
 				final HDLType currentType = lt.get();
 				if (!targetType.equals(currentType)) {
-					if (targetType instanceof AnyPrimitive) {
-						final AnyPrimitive anyTarget = (AnyPrimitive) targetType;
-						if (currentType instanceof AnyPrimitive) {
-							final AnyPrimitive anyCurrent = (AnyPrimitive) currentType;
-							System.out.println("Cast any " + anyCurrent + " to any " + anyTarget);
-						} else {
-							System.out.println("Cast " + currentType + " to any " + anyTarget);
-						}
+					if (pt.isAny()) {
+						System.out.println("Fortify " + currentType + " to any " + pt);
 					} else {
 						if (pt.getType() == HDLPrimitiveType.BOOL) {
 							makeBool(ms, exp);

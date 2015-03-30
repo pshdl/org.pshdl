@@ -47,6 +47,7 @@ import org.pshdl.model.HDLReference;
 import org.pshdl.model.HDLStatement;
 import org.pshdl.model.HDLSubstituteFunction;
 import org.pshdl.model.HDLType;
+import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.TypeExtension;
@@ -293,14 +294,21 @@ public class HDLFunctions {
 				}
 			}
 			break;
-		case PARAM_BIT:
 		case PARAM_INT:
 		case PARAM_UINT:
-		case PARAM_STRING:
-		case PARAM_ANY_BIT:
 		case PARAM_ANY_INT:
 		case PARAM_ANY_UINT:
 		case PARAM_BOOL:
+			if ((arg.getConstant() != null) && arg.getConstant()) {
+				final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(param, null);
+				if (!valueOf.isPresent()) {
+					funcScore.incScore(1000, "The argument:" + param + " is not constant");
+				}
+			}
+			//$FALL-THROUGH$
+		case PARAM_BIT:
+		case PARAM_STRING:
+		case PARAM_ANY_BIT:
 			if (type.getClassType() != HDLClass.HDLPrimitive) {
 				funcScore.incScore(1000, "Can not cast from:" + type.getName() + " to a bit representation for parameter: " + arg.getName().getName());
 			}

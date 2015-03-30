@@ -54,6 +54,7 @@ import org.pshdl.model.HDLFunctionParameter.RWType
 import org.pshdl.model.HDLFunctionParameter.Type
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInlineFunction
+import org.pshdl.model.HDLInstantiation
 import org.pshdl.model.HDLInterface
 import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.HDLInterfaceInstantiation
@@ -149,7 +150,7 @@ import org.pshdl.model.parser.PSHDLLangParser.PsVariableRefContext
 import org.pshdl.model.parser.PSHDLLangParser.PsWidthContext
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
-import org.pshdl.model.HDLInstantiation
+import org.pshdl.model.HDLObject.GenericMeta
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -268,12 +269,21 @@ class ParserToModelExtension {
 		return context.psArrayInitSub.toHDL(false).attachContext(context)
 	}
 
+	public final static GenericMeta<Boolean> isDeprecatedDeclaration=new GenericMeta<Boolean>("isDeprecatedDeclaration", true)
+
 	def dispatch HDLType toHDL(PsPrimitiveContext context, boolean isStatement) {
 		if (context.psQualifiedName !== null)
 			return new HDLEnum().setName(context.psQualifiedName.toName).attachContext(context)
 		val HDLPrimitiveType pt = HDLPrimitiveType.getOp(context.psPrimitiveType.text)
 		val HDLExpression width = context.psWidth?.toHDL(false) as HDLExpression
-		return new HDLPrimitive().setType(pt.getResultingType(width)).setWidth(width).attachContext(context)
+		val result = new HDLPrimitive().setType(pt.getResultingType(width)).setWidth(width).attachContext(context)
+		if (pt===HDLPrimitiveType.INT && width===null){
+			result.meta = isDeprecatedDeclaration			
+		}
+		if (pt===HDLPrimitiveType.UINT && width===null){
+			result.meta = isDeprecatedDeclaration			
+		}
+		return result
 	}
 
 	def dispatch HDLVariable toHDL(PsDeclAssignmentContext context, boolean isStatement) {

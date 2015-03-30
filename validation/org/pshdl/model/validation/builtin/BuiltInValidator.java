@@ -160,6 +160,7 @@ import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.extensions.RangeExtension;
 import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.parser.ParserToModelExtension;
 import org.pshdl.model.simulation.RangeTool;
 import org.pshdl.model.types.builtIn.HDLAnnotations;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
@@ -370,19 +371,7 @@ public class BuiltInValidator implements IHDLValidator {
 		checkType(problems, pkg.getAllObjectsOf(HDLUnit.class, true));
 		checkType(problems, pkg.getAllObjectsOf(HDLInterface.class, true));
 		checkType(problems, pkg.getAllObjectsOf(HDLEnum.class, true));
-		// for (final HDLObject hif : pkg.getAllObjectsOf(HDLFunction.class,
-		// true)) {
-		// final HDLQualifiedName fqn = fullNameOf(hif);
-		// final HDLLibrary library = hif.getLibrary();
-		// final Optional<Iterable<HDLFunction>> resolve =
-		// library.resolveFunction(Collections.<String> emptyList(), fqn);
-		// if (resolve.isPresent()) {
-		// final Iterable<HDLFunction> type = resolve.get();
-		// if (type.getID() != hif.getID()) {
-		// problems.add(new Problem(FUNCTION_SAME_NAME, hif, type));
-		// }
-		// }
-		// }
+
 		final HDLVariableDeclaration[] hvds = pkg.getAllObjectsOf(HDLVariableDeclaration.class, false);
 		for (final HDLVariableDeclaration hvd : hvds) {
 			for (final HDLVariable hif : hvd.getVariables()) {
@@ -893,6 +882,9 @@ public class BuiltInValidator implements IHDLValidator {
 				final HDLType hdlType = type.get();
 				if (hdlType instanceof HDLPrimitive) {
 					final HDLPrimitive primType = (HDLPrimitive) hdlType;
+					if (primType.hasMeta(ParserToModelExtension.isDeprecatedDeclaration)) {
+						problems.add(new Problem(ErrorCode.DEPRECATED_TYPE, primType));
+					}
 					switch (primType.getType()) {
 					case BIT:
 					case INTEGER:
@@ -929,6 +921,23 @@ public class BuiltInValidator implements IHDLValidator {
 								} else if (le.equals(BigInteger.ZERO)) {
 									problems.add(new Problem(ErrorCode.TYPE_POSSIBLY_ZERO_WIDTH, hvd));
 								}
+							}
+						}
+						break;
+					case ANY_BIT:
+					case ANY_INT:
+					case ANY_UINT:
+						if (hvd.getVariables().size() != 1) {
+							problems.add(new Problem(ErrorCode.ONLY_ONE_VARIABLE_WITH_ANY, hvd));
+						}
+						final HDLVariable variable = hvd.getVariables().get(0);
+						if (variable.getDefaultValue() == null) {
+							problems.add(new Problem(ErrorCode.ANY_TYPE_REQUIRES_DEFAULT, variable));
+						}
+						final Collection<HDLVariableRef> refs = HDLQuery.getVarRefs(unit, variable);
+						for (final HDLVariableRef ref : refs) {
+							if (ref.getContainingFeature() == HDLAssignment.fLeft) {
+								problems.add(new Problem(ErrorCode.ANY_TYPE_ONLY_DEFAULT, ref.getContainer()));
 							}
 						}
 						break;

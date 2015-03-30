@@ -59,6 +59,7 @@ import org.pshdl.model.HDLInterfaceInstantiation;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLNativeFunction;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLPrimitive;
 import org.pshdl.model.HDLRange;
@@ -347,6 +348,8 @@ public class ParserToModelExtension {
     return this.<IHDLObject>attachContext(_hDL, context);
   }
   
+  public final static HDLObject.GenericMeta<Boolean> isDeprecatedDeclaration = new HDLObject.GenericMeta<Boolean>("isDeprecatedDeclaration", true);
+  
   protected HDLType _toHDL(final PSHDLLangParser.PsPrimitiveContext context, final boolean isStatement) {
     PSHDLLangParser.PsQualifiedNameContext _psQualifiedName = context.psQualifiedName();
     boolean _tripleNotEquals = (_psQualifiedName != null);
@@ -370,7 +373,30 @@ public class ParserToModelExtension {
     HDLPrimitive.HDLPrimitiveType _resultingType = this.getResultingType(pt, width);
     HDLPrimitive _setType = _hDLPrimitive.setType(_resultingType);
     HDLPrimitive _setWidth = _setType.setWidth(width);
-    return this.<HDLPrimitive>attachContext(_setWidth, context);
+    final HDLPrimitive result = this.<HDLPrimitive>attachContext(_setWidth, context);
+    boolean _and = false;
+    boolean _tripleEquals = (pt == HDLPrimitive.HDLPrimitiveType.INT);
+    if (!_tripleEquals) {
+      _and = false;
+    } else {
+      boolean _tripleEquals_1 = (width == null);
+      _and = _tripleEquals_1;
+    }
+    if (_and) {
+      result.setMeta(ParserToModelExtension.isDeprecatedDeclaration);
+    }
+    boolean _and_1 = false;
+    boolean _tripleEquals_2 = (pt == HDLPrimitive.HDLPrimitiveType.UINT);
+    if (!_tripleEquals_2) {
+      _and_1 = false;
+    } else {
+      boolean _tripleEquals_3 = (width == null);
+      _and_1 = _tripleEquals_3;
+    }
+    if (_and_1) {
+      result.setMeta(ParserToModelExtension.isDeprecatedDeclaration);
+    }
+    return result;
   }
   
   protected HDLVariable _toHDL(final PSHDLLangParser.PsDeclAssignmentContext context, final boolean isStatement) {
