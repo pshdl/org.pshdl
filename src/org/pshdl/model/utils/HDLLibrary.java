@@ -523,7 +523,6 @@ public class HDLLibrary {
 				}
 			}
 		}
-		throw new IllegalArgumentException("Did not find package source");
 	}
 
 }

@@ -1146,6 +1146,17 @@ public class BuiltInValidator implements IHDLValidator {
 					final HDLPrimitive prim = (HDLPrimitive) typeOf.get();
 					if (prim.isNumber()) {
 						problems.add(new Problem(code, exp, contextNode, null));
+					} else {
+						final HDLVariableRef[] refs = exp.getAllObjectsOf(HDLVariableRef.class, true);
+						for (final HDLVariableRef hdlReference : refs) {
+							final Optional<HDLVariable> resolveVar = hdlReference.resolveVar();
+							if (resolveVar.isPresent()) {
+								final HDLDirection direction = resolveVar.get().getDirection();
+								if (direction != HDLDirection.CONSTANT) {
+									problems.add(new Problem(code, exp, contextNode, null));
+								}
+							}
+						}
 					}
 				}
 			} else {
