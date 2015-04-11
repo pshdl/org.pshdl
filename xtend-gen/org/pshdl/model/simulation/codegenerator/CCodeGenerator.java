@@ -45,7 +45,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -55,6 +54,7 @@ import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -1039,8 +1039,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   private String generateSimEncapsuation(final Unit unit, final Iterable<Row> rows) {
     final Set<String> varNames = new LinkedHashSet<String>();
-    final Consumer<Row> _function = new Consumer<Row>() {
-      public void accept(final Row it) {
+    final Procedure1<Row> _function = new Procedure1<Row>() {
+      public void apply(final Row it) {
         List<Definition> _allDefs = CCodeGenerator.this.ba.allDefs(it);
         final Function1<Definition, Boolean> _function = new Function1<Definition, Boolean>() {
           public Boolean apply(final Definition it) {
@@ -1048,16 +1048,16 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
           }
         };
         Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
-        final Consumer<Definition> _function_1 = new Consumer<Definition>() {
-          public void accept(final Definition it) {
+        final Procedure1<Definition> _function_1 = new Procedure1<Definition>() {
+          public void apply(final Definition it) {
             String _name = it.getName();
             varNames.add(_name);
           }
         };
-        _filter.forEach(_function_1);
+        IterableExtensions.<Definition>forEach(_filter, _function_1);
       }
     };
-    rows.forEach(_function);
+    IterableExtensions.<Row>forEach(rows, _function);
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("/**");
     _builder.newLine();
