@@ -223,12 +223,16 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		«IF !force»if («cpyName»!=«last»)
 		«indent()»	«ENDIF»{
 		«indent()»		static regUpdate_t reg;
-		«indent()»		reg.internal=«outputInternal.varIdx»;
-		«indent()»		reg.offset=(int)«offset»;
+		«indent()»		reg.internal=«outputInternal.regIdx»;
+		«indent()»		reg.offset=(int)(«offset»);
 		«indent()»		reg.fillValue=«fillValue»;
 		«indent()»		regUpdates[regUpdatePos++]=reg;
 		«indent()»	}
 	'''
+
+	def regIdx(InternalInformation information) {
+		regIdx.get(information.info.name)
+	}
 
 	override protected stageMethodsFooter(int stage, int totalStageCosts, boolean constant) '''}
 		'''
@@ -264,6 +268,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 			case Instruction.greater_eq:
 				return assignTempVar(targetSizeWithType, pos, attributes,
 					'''(int64_t)«getTempName(leftOperand, NONE)» >= (int64_t)«getTempName(rightOperand, NONE)»''', true)
+			default: {
+			}
 		}
 		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}

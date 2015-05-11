@@ -424,15 +424,15 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     CharSequence _indent_2 = this.indent();
     _builder.append(_indent_2, "");
     _builder.append("\t\treg.internal=");
-    int _varIdx = this.getVarIdx(outputInternal);
-    _builder.append(_varIdx, "");
+    Integer _regIdx = this.regIdx(outputInternal);
+    _builder.append(_regIdx, "");
     _builder.append(";");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_3 = this.indent();
     _builder.append(_indent_3, "");
-    _builder.append("\t\treg.offset=(int)");
+    _builder.append("\t\treg.offset=(int)(");
     _builder.append(offset, "");
-    _builder.append(";");
+    _builder.append(");");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_4 = this.indent();
     _builder.append(_indent_4, "");
@@ -449,6 +449,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("\t}");
     _builder.newLineIfNotEmpty();
     return _builder;
+  }
+  
+  public Integer regIdx(final InternalInformation information) {
+    return this.regIdx.get(information.info.name);
   }
   
   protected CharSequence stageMethodsFooter(final int stage, final int totalStageCosts, final boolean constant) {
@@ -538,6 +542,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
           default:
             break;
         }
+      } else {
       }
       _xblockexpression = super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask);
     }

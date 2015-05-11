@@ -828,12 +828,12 @@ public class SimulationTransformationExtension {
           res.add(Instruction.logiNeg);
           break;
         case CAST:
-          HDLType _castTo = obj.getCastTo();
-          final HDLPrimitive prim = ((HDLPrimitive) _castTo);
           HDLExpression _target_1 = obj.getTarget();
           Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(_target_1);
           HDLType _get = _typeOf.get();
           final HDLPrimitive current = ((HDLPrimitive) _get);
+          HDLType _castTo = obj.getCastTo();
+          final HDLPrimitive target = ((HDLPrimitive) _castTo);
           boolean _or = false;
           boolean _or_1 = false;
           HDLPrimitive.HDLPrimitiveType _type_1 = current.getType();
@@ -842,146 +842,165 @@ public class SimulationTransformationExtension {
             _or_1 = true;
           } else {
             HDLPrimitive.HDLPrimitiveType _type_2 = current.getType();
-            boolean _tripleEquals_1 = (_type_2 == HDLPrimitive.HDLPrimitiveType.ANY_UINT);
+            boolean _tripleEquals_1 = (_type_2 == HDLPrimitive.HDLPrimitiveType.INT);
             _or_1 = _tripleEquals_1;
           }
           if (_or_1) {
             _or = true;
           } else {
             HDLPrimitive.HDLPrimitiveType _type_3 = current.getType();
-            boolean _tripleEquals_2 = (_type_3 == HDLPrimitive.HDLPrimitiveType.ANY_BIT);
+            boolean _tripleEquals_2 = (_type_3 == HDLPrimitive.HDLPrimitiveType.INTEGER);
             _or = _tripleEquals_2;
           }
-          final boolean isAny = _or;
-          int _xifexpression = (int) 0;
-          if (isAny) {
-            _xifexpression = (-1);
+          final boolean isCurrentInt = _or;
+          boolean _or_2 = false;
+          boolean _or_3 = false;
+          HDLPrimitive.HDLPrimitiveType _type_4 = current.getType();
+          boolean _tripleEquals_3 = (_type_4 == HDLPrimitive.HDLPrimitiveType.ANY_BIT);
+          if (_tripleEquals_3) {
+            _or_3 = true;
           } else {
-            _xifexpression = this.getWidth(current, context);
-          }
-          final int currentWidth = _xifexpression;
-          int primWidth = this.getWidth(prim, context);
-          HDLPrimitive.HDLPrimitiveType _type_4 = prim.getType();
-          boolean _matched = false;
-          if (!_matched) {
-            boolean _or_2 = false;
-            boolean _or_3 = false;
             HDLPrimitive.HDLPrimitiveType _type_5 = current.getType();
-            boolean _tripleEquals_3 = (_type_5 == HDLPrimitive.HDLPrimitiveType.INTEGER);
-            if (_tripleEquals_3) {
-              _or_3 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_6 = current.getType();
-              boolean _tripleEquals_4 = (_type_6 == HDLPrimitive.HDLPrimitiveType.INT);
-              _or_3 = _tripleEquals_4;
-            }
-            if (_or_3) {
-              _or_2 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_7 = current.getType();
-              boolean _tripleEquals_5 = (_type_7 == HDLPrimitive.HDLPrimitiveType.ANY_INT);
-              _or_2 = _tripleEquals_5;
-            }
-            if (_or_2) {
-              _matched=true;
-              if ((!isAny)) {
-                String _string_2 = Integer.toString(primWidth);
-                String _string_3 = Integer.toString(currentWidth);
-                FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_2, _string_3);
-                res.instructions.add(_argumentedInstruction_2);
-              }
-              boolean _and = false;
-              HDLPrimitive.HDLPrimitiveType _type_8 = prim.getType();
-              boolean _tripleNotEquals = (_type_8 != HDLPrimitive.HDLPrimitiveType.INTEGER);
-              if (!_tripleNotEquals) {
-                _and = false;
-              } else {
-                HDLPrimitive.HDLPrimitiveType _type_9 = prim.getType();
-                boolean _tripleNotEquals_1 = (_type_9 != HDLPrimitive.HDLPrimitiveType.INT);
-                _and = _tripleNotEquals_1;
-              }
-              if (_and) {
-                String _string_4 = Integer.toString(primWidth);
-                String _string_5 = Integer.toString(primWidth);
-                FluidFrame.ArgumentedInstruction _argumentedInstruction_3 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_4, _string_5);
-                res.instructions.add(_argumentedInstruction_3);
-              }
-            }
+            boolean _tripleEquals_4 = (_type_5 == HDLPrimitive.HDLPrimitiveType.BIT);
+            _or_3 = _tripleEquals_4;
           }
-          if (!_matched) {
-            boolean _or_4 = false;
-            boolean _or_5 = false;
-            boolean _or_6 = false;
-            boolean _or_7 = false;
-            boolean _or_8 = false;
-            HDLPrimitive.HDLPrimitiveType _type_10 = current.getType();
-            boolean _tripleEquals_6 = (_type_10 == HDLPrimitive.HDLPrimitiveType.ANY_UINT);
-            if (_tripleEquals_6) {
-              _or_8 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_11 = current.getType();
-              boolean _tripleEquals_7 = (_type_11 == HDLPrimitive.HDLPrimitiveType.UINT);
-              _or_8 = _tripleEquals_7;
+          if (_or_3) {
+            _or_2 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_6 = current.getType();
+            boolean _tripleEquals_5 = (_type_6 == HDLPrimitive.HDLPrimitiveType.BITVECTOR);
+            _or_2 = _tripleEquals_5;
+          }
+          final boolean isCurrentBit = _or_2;
+          boolean _or_4 = false;
+          boolean _or_5 = false;
+          HDLPrimitive.HDLPrimitiveType _type_7 = current.getType();
+          boolean _tripleEquals_6 = (_type_7 == HDLPrimitive.HDLPrimitiveType.ANY_UINT);
+          if (_tripleEquals_6) {
+            _or_5 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_8 = current.getType();
+            boolean _tripleEquals_7 = (_type_8 == HDLPrimitive.HDLPrimitiveType.UINT);
+            _or_5 = _tripleEquals_7;
+          }
+          if (_or_5) {
+            _or_4 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_9 = current.getType();
+            boolean _tripleEquals_8 = (_type_9 == HDLPrimitive.HDLPrimitiveType.NATURAL);
+            _or_4 = _tripleEquals_8;
+          }
+          final boolean isCurrentUint = _or_4;
+          boolean _or_6 = false;
+          boolean _or_7 = false;
+          HDLPrimitive.HDLPrimitiveType _type_10 = target.getType();
+          boolean _tripleEquals_9 = (_type_10 == HDLPrimitive.HDLPrimitiveType.ANY_INT);
+          if (_tripleEquals_9) {
+            _or_7 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_11 = target.getType();
+            boolean _tripleEquals_10 = (_type_11 == HDLPrimitive.HDLPrimitiveType.INT);
+            _or_7 = _tripleEquals_10;
+          }
+          if (_or_7) {
+            _or_6 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_12 = target.getType();
+            boolean _tripleEquals_11 = (_type_12 == HDLPrimitive.HDLPrimitiveType.INTEGER);
+            _or_6 = _tripleEquals_11;
+          }
+          final boolean isTargetInt = _or_6;
+          boolean _or_8 = false;
+          boolean _or_9 = false;
+          HDLPrimitive.HDLPrimitiveType _type_13 = target.getType();
+          boolean _tripleEquals_12 = (_type_13 == HDLPrimitive.HDLPrimitiveType.ANY_UINT);
+          if (_tripleEquals_12) {
+            _or_9 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_14 = target.getType();
+            boolean _tripleEquals_13 = (_type_14 == HDLPrimitive.HDLPrimitiveType.UINT);
+            _or_9 = _tripleEquals_13;
+          }
+          if (_or_9) {
+            _or_8 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_15 = target.getType();
+            boolean _tripleEquals_14 = (_type_15 == HDLPrimitive.HDLPrimitiveType.NATURAL);
+            _or_8 = _tripleEquals_14;
+          }
+          final boolean isTargetUint = _or_8;
+          boolean _or_10 = false;
+          boolean _or_11 = false;
+          HDLPrimitive.HDLPrimitiveType _type_16 = target.getType();
+          boolean _tripleEquals_15 = (_type_16 == HDLPrimitive.HDLPrimitiveType.ANY_BIT);
+          if (_tripleEquals_15) {
+            _or_11 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_17 = target.getType();
+            boolean _tripleEquals_16 = (_type_17 == HDLPrimitive.HDLPrimitiveType.BIT);
+            _or_11 = _tripleEquals_16;
+          }
+          if (_or_11) {
+            _or_10 = true;
+          } else {
+            HDLPrimitive.HDLPrimitiveType _type_18 = target.getType();
+            boolean _tripleEquals_17 = (_type_18 == HDLPrimitive.HDLPrimitiveType.BITVECTOR);
+            _or_10 = _tripleEquals_17;
+          }
+          final boolean isTargetBit = _or_10;
+          final int currentWidth = this.getWidth(current, context);
+          int targetWidth = this.getWidth(target, context);
+          if (isCurrentInt) {
+            String _string_2 = Integer.toString(targetWidth);
+            String _string_3 = Integer.toString(currentWidth);
+            FluidFrame.ArgumentedInstruction _argumentedInstruction_2 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_2, _string_3);
+            res.instructions.add(_argumentedInstruction_2);
+            if (isTargetUint) {
+              String _string_4 = Integer.toString(targetWidth);
+              String _string_5 = Integer.toString(targetWidth);
+              FluidFrame.ArgumentedInstruction _argumentedInstruction_3 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_4, _string_5);
+              res.instructions.add(_argumentedInstruction_3);
             }
-            if (_or_8) {
-              _or_7 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_12 = current.getType();
-              boolean _tripleEquals_8 = (_type_12 == HDLPrimitive.HDLPrimitiveType.NATURAL);
-              _or_7 = _tripleEquals_8;
-            }
-            if (_or_7) {
-              _or_6 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_13 = current.getType();
-              boolean _tripleEquals_9 = (_type_13 == HDLPrimitive.HDLPrimitiveType.ANY_BIT);
-              _or_6 = _tripleEquals_9;
-            }
-            if (_or_6) {
-              _or_5 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_14 = current.getType();
-              boolean _tripleEquals_10 = (_type_14 == HDLPrimitive.HDLPrimitiveType.BIT);
-              _or_5 = _tripleEquals_10;
-            }
-            if (_or_5) {
-              _or_4 = true;
-            } else {
-              HDLPrimitive.HDLPrimitiveType _type_15 = current.getType();
-              boolean _tripleEquals_11 = (_type_15 == HDLPrimitive.HDLPrimitiveType.BITVECTOR);
-              _or_4 = _tripleEquals_11;
-            }
-            if (_or_4) {
-              _matched=true;
-              if ((!isAny)) {
-                String _string_6 = Integer.toString(primWidth);
-                String _string_7 = Integer.toString(currentWidth);
-                FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_6, _string_7);
-                res.instructions.add(_argumentedInstruction_4);
-              }
-              boolean _or_9 = false;
-              HDLPrimitive.HDLPrimitiveType _type_16 = prim.getType();
-              boolean _tripleEquals_12 = (_type_16 == HDLPrimitive.HDLPrimitiveType.INTEGER);
-              if (_tripleEquals_12) {
-                _or_9 = true;
-              } else {
-                HDLPrimitive.HDLPrimitiveType _type_17 = prim.getType();
-                boolean _tripleEquals_13 = (_type_17 == HDLPrimitive.HDLPrimitiveType.INT);
-                _or_9 = _tripleEquals_13;
-              }
-              if (_or_9) {
-                String _string_8 = Integer.toString(primWidth);
-                String _string_9 = Integer.toString(primWidth);
+          } else {
+            if (isCurrentUint) {
+              String _string_6 = Integer.toString(targetWidth);
+              String _string_7 = Integer.toString(currentWidth);
+              FluidFrame.ArgumentedInstruction _argumentedInstruction_4 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_6, _string_7);
+              res.instructions.add(_argumentedInstruction_4);
+              if (isTargetInt) {
+                String _string_8 = Integer.toString(targetWidth);
+                String _string_9 = Integer.toString(targetWidth);
                 FluidFrame.ArgumentedInstruction _argumentedInstruction_5 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_8, _string_9);
                 res.instructions.add(_argumentedInstruction_5);
               }
+            } else {
+              if (isCurrentBit) {
+                if (isTargetInt) {
+                  String _string_10 = Integer.toString(targetWidth);
+                  String _string_11 = Integer.toString(currentWidth);
+                  FluidFrame.ArgumentedInstruction _argumentedInstruction_6 = new FluidFrame.ArgumentedInstruction(Instruction.cast_int, _string_10, _string_11);
+                  res.instructions.add(_argumentedInstruction_6);
+                } else {
+                  boolean _or_12 = false;
+                  if (isTargetUint) {
+                    _or_12 = true;
+                  } else {
+                    _or_12 = isTargetBit;
+                  }
+                  if (_or_12) {
+                    String _string_12 = Integer.toString(targetWidth);
+                    String _string_13 = Integer.toString(currentWidth);
+                    FluidFrame.ArgumentedInstruction _argumentedInstruction_7 = new FluidFrame.ArgumentedInstruction(Instruction.cast_uint, _string_12, _string_13);
+                    res.instructions.add(_argumentedInstruction_7);
+                  }
+                }
+              } else {
+                HDLPrimitive.HDLPrimitiveType _type_19 = target.getType();
+                String _plus = ("Cast to type:" + _type_19);
+                String _plus_1 = (_plus + " not supported");
+                throw new IllegalArgumentException(_plus_1);
+              }
             }
-          }
-          if (!_matched) {
-            HDLPrimitive.HDLPrimitiveType _type_18 = prim.getType();
-            String _plus = ("Cast to type:" + _type_18);
-            String _plus_1 = (_plus + " not supported");
-            throw new IllegalArgumentException(_plus_1);
           }
           break;
         default:

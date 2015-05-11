@@ -144,6 +144,7 @@ class SimulationTransformationExtension {
 		}
 		return frame
 	}
+
 	def dispatch FluidFrame toSimulationModelPred(HDLStatement obj, ArgumentedInstruction predicate,
 		HDLEvaluationContext context, String process) {
 		var res = obj.toSimulationModel(context, process)
@@ -188,12 +189,12 @@ class SimulationTransformationExtension {
 		}
 		return res
 	}
-	
+
 	def addDynamicIdx(String string) {
-		if (string.endsWith(InternalInformation.REG_POSTFIX)){
-			return string.replace(InternalInformation.REG_POSTFIX, "[-1]"+InternalInformation.REG_POSTFIX)
+		if (string.endsWith(InternalInformation.REG_POSTFIX)) {
+			return string.replace(InternalInformation.REG_POSTFIX, "[-1]" + InternalInformation.REG_POSTFIX)
 		}
-		return string+"[-1]"
+		return string + "[-1]"
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context, String process) {
@@ -382,7 +383,7 @@ class SimulationTransformationExtension {
 		var HDLRegisterConfig config = hVar.registerConfig
 		var assignmentVarName = getVarName(obj.left as HDLVariableRef, true, context)
 		if (config !== null)
-			assignmentVarName=assignmentVarName + InternalInformation.REG_POSTFIX
+			assignmentVarName = assignmentVarName + InternalInformation.REG_POSTFIX
 		var res = new FluidFrame(obj, assignmentVarName, constant, process)
 		if (config !== null) {
 			config = config.normalize
@@ -407,10 +408,11 @@ class SimulationTransformationExtension {
 		}
 		return res
 	}
-	
-	def createPushIndexBits(ArrayList<HDLRange> array, HDLEvaluationContext context, FluidFrame res, String process, String assignmentVarName) {
+
+	def createPushIndexBits(ArrayList<HDLRange> array, HDLEvaluationContext context, FluidFrame res, String process,
+		String assignmentVarName) {
 		var fixedBit = true
-		for (HDLRange idx : array) 
+		for (HDLRange idx : array)
 			if (!valueOf(idx.to, context).present)
 				fixedBit = false
 		if (!fixedBit)
@@ -419,7 +421,9 @@ class SimulationTransformationExtension {
 				res.add(new ArgumentedInstruction(pushAddIndex, assignmentVarName, "1"))
 			}
 	}
-	def createPushIndex(ArrayList<HDLExpression> array, HDLEvaluationContext context, FluidFrame res, String process, String assignmentVarName) {
+
+	def createPushIndex(ArrayList<HDLExpression> array, HDLEvaluationContext context, FluidFrame res, String process,
+		String assignmentVarName) {
 		var fixedArray = true
 		for (HDLExpression idx : array)
 			if (!valueOf(idx, context).present)
@@ -517,39 +521,46 @@ class SimulationTransformationExtension {
 			case LOGIC_NEG:
 				res.add(logiNeg)
 			case CAST: {
-				val HDLPrimitive prim = obj.castTo as HDLPrimitive
 				val HDLPrimitive current = typeOf(obj.target).get as HDLPrimitive
-				val isAny = current.type === ANY_INT || current.type === ANY_UINT || current.type === ANY_BIT
-				val int currentWidth = if(isAny) -1 else getWidth(current, context)
-				var int primWidth = getWidth(prim, context)
-				switch (prim.type) {
-					case current.type === INTEGER || current.type === INT || current.type === ANY_INT: {
-						//Ensure correct signedness
-						if (!isAny)
-							res.instructions.add(
-								new ArgumentedInstruction(cast_int, Integer.toString(primWidth),
-									Integer.toString(currentWidth)))
-						if (prim.type !== INTEGER && prim.type !== INT) {
-							res.instructions.add(
-								new ArgumentedInstruction(cast_uint, Integer.toString(primWidth),
-									Integer.toString(primWidth)))
-						}
+				val HDLPrimitive target = obj.castTo as HDLPrimitive
+				val isCurrentInt = current.type === ANY_INT || current.type === INT || current.type === INTEGER
+				val isCurrentBit = current.type === ANY_BIT || current.type === BIT || current.type === BITVECTOR
+				val isCurrentUint = current.type === ANY_UINT || current.type === UINT || current.type === NATURAL
+				val isTargetInt = target.type === ANY_INT || target.type === INT || target.type === INTEGER
+				val isTargetUint = target.type === ANY_UINT || target.type === UINT || target.type === NATURAL
+				val isTargetBit = target.type === ANY_BIT || target.type === BIT || target.type === BITVECTOR
+				val int currentWidth = getWidth(current, context)
+				var int targetWidth = getWidth(target, context)
+				if (isCurrentInt) {
+					res.instructions.add(
+						new ArgumentedInstruction(cast_int, Integer.toString(targetWidth),
+							Integer.toString(currentWidth)))
+					if (isTargetUint) {
+						res.instructions.add(
+							new ArgumentedInstruction(cast_uint, Integer.toString(targetWidth),
+								Integer.toString(targetWidth)))
 					}
-					case current.type === ANY_UINT || current.type === UINT || current.type === NATURAL || current.type === ANY_BIT || current.type === BIT ||
-						current.type === BITVECTOR: {
-						if (!isAny)
-							res.instructions.add(
-								new ArgumentedInstruction(cast_uint, Integer.toString(primWidth),
-									Integer.toString(currentWidth)))
-						if (prim.type === INTEGER || prim.type === INT) {
-							res.instructions.add(
-								new ArgumentedInstruction(cast_int, Integer.toString(primWidth),
-									Integer.toString(primWidth)))
-						}
+				} else if (isCurrentUint) {
+					res.instructions.add(
+						new ArgumentedInstruction(cast_uint, Integer.toString(targetWidth),
+							Integer.toString(currentWidth)))
+					if (isTargetInt) {
+						res.instructions.add(
+							new ArgumentedInstruction(cast_int, Integer.toString(targetWidth),
+								Integer.toString(targetWidth)))
 					}
-					default:
-						throw new IllegalArgumentException("Cast to type:" + prim.type + " not supported")
-				}
+				} else if (isCurrentBit) {
+					if (isTargetInt) {
+						res.instructions.add(
+							new ArgumentedInstruction(cast_int, Integer.toString(targetWidth),
+								Integer.toString(currentWidth)))
+					} else if (isTargetUint || isTargetBit) {
+						res.instructions.add(
+							new ArgumentedInstruction(cast_uint, Integer.toString(targetWidth),
+								Integer.toString(currentWidth)))
+					}
+				} else
+					throw new IllegalArgumentException("Cast to type:" + target.type + " not supported")
 			}
 		}
 		return res

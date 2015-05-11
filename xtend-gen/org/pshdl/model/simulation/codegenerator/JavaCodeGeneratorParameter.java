@@ -26,6 +26,8 @@
  */
 package org.pshdl.model.simulation.codegenerator;
 
+import com.google.common.base.Objects;
+import org.eclipse.xtend2.lib.StringConcatenation;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter;
 import org.pshdl.model.simulation.codegenerator.Option;
@@ -46,7 +48,7 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
     final int li = moduleName.lastIndexOf(".");
     this.packageName = null;
     if ((li != (-1))) {
-      String _substring = moduleName.substring(0, (li - 1));
+      String _substring = moduleName.substring(0, li);
       this.packageName = _substring;
     }
     int _length = moduleName.length();
@@ -62,5 +64,40 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
   public JavaCodeGeneratorParameter setUnitName(final String unitName) {
     this.unitName = unitName;
     return this;
+  }
+  
+  public String javaChangeAdapterName(final boolean useInterface) {
+    boolean _equals = Objects.equal(this.packageName, null);
+    if (_equals) {
+      return this.changeAdapterName(useInterface);
+    }
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(this.packageName, "");
+    _builder.append(".");
+    String _changeAdapterName = this.changeAdapterName(useInterface);
+    _builder.append(_changeAdapterName, "");
+    return _builder.toString();
+  }
+  
+  public String changeAdapterName(final boolean useInterface) {
+    String _xifexpression = null;
+    if (useInterface) {
+      _xifexpression = "GenericChangeAdapter";
+    } else {
+      _xifexpression = "ChangeAdapter";
+    }
+    return (_xifexpression + this.unitName);
+  }
+  
+  public String javaClassName() {
+    boolean _equals = Objects.equal(this.packageName, null);
+    if (_equals) {
+      return this.unitName;
+    }
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append(this.packageName, "");
+    _builder.append(".");
+    _builder.append(this.unitName, "");
+    return _builder.toString();
   }
 }

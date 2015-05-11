@@ -28,6 +28,9 @@
 #ifndef _pshdl_generic_sim_h_
 #define _pshdl_generic_sim_h_
 
+#include <stdbool.h>
+#include <stdint.h>
+
 /**
  * This methods allows the access of any variable that is not an array, declared 
  * within the PSHDL module.

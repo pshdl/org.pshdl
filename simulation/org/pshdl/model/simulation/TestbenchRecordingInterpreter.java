@@ -314,4 +314,9 @@ public class TestbenchRecordingInterpreter implements IHDLBigInterpreter {
 	public void initConstants() {
 		interpreter.initConstants();
 	}
+
+	@Override
+	public VariableInformation[] getVariableInformation() {
+		return interpreter.getVariableInformation();
+	}
 }

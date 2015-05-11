@@ -172,7 +172,11 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName,
 		CharSequence offset, boolean forceRegUpdate, CharSequence fillValue) '''
 	«IF !forceRegUpdate»if («cpyName»!=«last»)
-	«indent()»	«ENDIF»_regUpdates.add(new RegUpdate(«outputInternal.varIdx», «offset», «fillValue»));'''
+	«indent()»	«ENDIF»_regUpdates.add(new RegUpdate(«outputInternal.regIdx», «offset», «fillValue»));'''
+	
+	def regIdx(InternalInformation information) {
+		regIdx.get(information.info.name)
+	}
 
 	override protected runMethodsHeader(boolean constant) '''void «IF !constant»run«ELSE»initConstants«ENDIF»() {
 		'''

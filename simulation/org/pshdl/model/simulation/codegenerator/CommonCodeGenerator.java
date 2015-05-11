@@ -89,12 +89,14 @@ public abstract class CommonCodeGenerator {
 	protected final ExecutableModel em;
 	protected int indent = 0;
 	protected final Map<String, Integer> varIdx = Maps.newLinkedHashMap();
+	protected final Map<String, Integer> regIdx = Maps.newLinkedHashMap();
 	protected final Set<String> prevMapPos = Sets.newLinkedHashSet();
 	protected final Set<String> prevMapNeg = Sets.newLinkedHashSet();
 	protected final boolean hasClock;
 	protected final int bitWidth;
 	protected final int maxCosts;
 	protected final boolean purgeAliases;
+	protected CommonCodeGeneratorParameter parameter;
 
 	protected CommonCodeGenerator() {
 		em = null;
@@ -105,14 +107,20 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CommonCodeGenerator(CommonCodeGeneratorParameter parameterObject) {
+		this.parameter = parameterObject;
 		this.em = parameterObject.em;
 		this.bitWidth = parameterObject.bitWidth;
 		this.maxCosts = parameterObject.maxCosts;
 		this.purgeAliases = parameterObject.purgeAliases;
-		for (int i = 0; i < parameterObject.em.variables.length; i++) {
-			varIdx.put(parameterObject.em.variables[i].name, i);
+		int regIdx = 0;
+		for (int i = 0; i < em.variables.length; i++) {
+			final VariableInformation vi = em.variables[i];
+			varIdx.put(vi.name, i);
+			if (vi.isRegister) {
+				this.regIdx.put(vi.name, regIdx++);
+			}
 		}
-		for (final Frame f : parameterObject.em.frames) {
+		for (final Frame f : em.frames) {
 			if (f.edgeNegDepRes != -1) {
 				prevMapNeg.add(asInternal(f.edgeNegDepRes).info.name);
 			}
@@ -121,6 +129,10 @@ public abstract class CommonCodeGenerator {
 			}
 		}
 		this.hasClock = !prevMapPos.isEmpty() || !prevMapNeg.isEmpty();
+	}
+
+	public CommonCodeGeneratorParameter getParameter() {
+		return parameter;
 	}
 
 	protected InternalInformation asInternal(int id) {
@@ -491,7 +503,7 @@ public abstract class CommonCodeGenerator {
 				} else {
 					value.append(assignVariable(vi, idName(vi, true, SHADOWREG), NONE, true, false, false));
 				}
-				result.append(makeCase(constant(varIdx.get(vi.name), true), value, true));
+				result.append(makeCase(constant(regIdx.get(vi.name), true), value, true));
 			}
 		}
 		indent--;
@@ -1510,10 +1522,22 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence fieldDeclarations(boolean includePrivate, boolean initialize) {
+		return fieldDeclarations(includePrivate, initialize, new Predicate<VariableInformation>() {
+
+			@Override
+			public boolean apply(VariableInformation var) {
+				if (purgeAliases && (var.aliasVar != null))
+					return false;
+				return true;
+			}
+		});
+	}
+
+	protected CharSequence fieldDeclarations(boolean includePrivate, boolean initialize, Predicate<VariableInformation> filter) {
 		final StringBuilder sb = new StringBuilder();
 		preFieldDeclaration();
 		for (final VariableInformation var : em.variables) {
-			if (purgeAliases && (var.aliasVar != null)) {
+			if (!filter.apply(var)) {
 				continue;
 			}
 			if (hasPrev(var) && includePrivate) {

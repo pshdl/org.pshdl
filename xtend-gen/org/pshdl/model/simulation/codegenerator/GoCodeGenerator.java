@@ -868,8 +868,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     CharSequence _indent = this.indent();
     _builder.append(_indent, "");
     _builder.append("\ts.regUpdates[s.regUpdatePos] = regUpdate{");
-    int _varIdx = this.getVarIdx(outputInternal);
-    _builder.append(_varIdx, "");
+    Integer _regIdx = this.regIdx(outputInternal);
+    _builder.append(_regIdx, "");
     _builder.append(", int(");
     _builder.append(offset, "");
     _builder.append("), ");
@@ -885,6 +885,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append("}");
     _builder.newLineIfNotEmpty();
     return _builder;
+  }
+  
+  public Integer regIdx(final InternalInformation information) {
+    return this.regIdx.get(information.info.name);
   }
   
   protected CharSequence doMask(final CharSequence currentValue, final CharSequence writeMask) {

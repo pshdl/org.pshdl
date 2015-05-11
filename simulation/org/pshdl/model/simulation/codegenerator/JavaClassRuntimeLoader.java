@@ -158,14 +158,25 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		return tempDir;
 	}
 
-	public IHDLInterpreter compileAndLoadChangeAdapter(String mainClassFQN, String sourceCode, IHDLInterpreter mainInterpreter, IChangeListener... listeners) throws Exception {
+	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoadChangeAdapter(String mainClassFQN, String sourceCode, final IHDLInterpreter mainInterpreter,
+			final IChangeListener... listeners) throws Exception {
 		final Class<?> adapterClass = compileClass(mainClassFQN, sourceCode);
-		Constructor<?> constructor = null;
-		try {
-			constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
-		} catch (final Exception e) {
-			constructor = adapterClass.getConstructor(IHDLInterpreter.class, IChangeListener[].class);
-		}
-		return (IHDLInterpreter) constructor.newInstance(mainInterpreter, listeners);
+		return new IHDLInterpreterFactory<IHDLInterpreter>() {
+
+			@Override
+			public IHDLInterpreter newInstance() {
+				try {
+					Constructor<?> constructor = null;
+					try {
+						constructor = adapterClass.getConstructor(mainInterpreter.getClass(), IChangeListener[].class);
+					} catch (final Exception e) {
+						constructor = adapterClass.getConstructor(IHDLInterpreter.class, IChangeListener[].class);
+					}
+					return (IHDLInterpreter) constructor.newInstance(mainInterpreter, listeners);
+				} catch (final Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
 	}
 }

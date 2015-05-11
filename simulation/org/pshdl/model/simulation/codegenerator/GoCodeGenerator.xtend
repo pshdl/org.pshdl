@@ -373,10 +373,14 @@ func pow(a int64, n int64) int64 {
 	override protected scheduleShadowReg(InternalInformation outputInternal, CharSequence last, CharSequence cpyName,
 		CharSequence offset, boolean force, CharSequence fillValue) '''
 		«IF !force»if («cpyName»!=«last») «ENDIF»{
-		«indent()»	s.regUpdates[s.regUpdatePos] = regUpdate{«outputInternal.varIdx», int(«offset»), «fillValue»}
+		«indent()»	s.regUpdates[s.regUpdatePos] = regUpdate{«outputInternal.regIdx», int(«offset»), «fillValue»}
 		«indent()»	s.regUpdatePos++
 		«indent()»}
 	'''
+	
+	def regIdx(InternalInformation information) {
+		regIdx.get(information.info.name)
+	}
 
 	override protected doMask(CharSequence currentValue, CharSequence writeMask) {
 		return doCast("int64", super.doMask(doCast("uint64", currentValue), writeMask))

@@ -219,14 +219,18 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       }
     }
     _builder.append("_regUpdates.add(new RegUpdate(");
-    int _varIdx = this.getVarIdx(outputInternal);
-    _builder.append(_varIdx, "");
+    Integer _regIdx = this.regIdx(outputInternal);
+    _builder.append(_regIdx, "");
     _builder.append(", ");
     _builder.append(offset, "");
     _builder.append(", ");
     _builder.append(fillValue, "");
     _builder.append("));");
     return _builder;
+  }
+  
+  public Integer regIdx(final InternalInformation information) {
+    return this.regIdx.get(information.info.name);
   }
   
   protected CharSequence runMethodsHeader(final boolean constant) {
