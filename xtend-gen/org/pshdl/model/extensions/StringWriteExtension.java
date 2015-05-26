@@ -30,6 +30,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArgument;
@@ -78,6 +79,7 @@ import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
+import org.pshdl.model.parser.SourceInfo;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.SyntaxHighlighter;
 
@@ -140,7 +142,19 @@ public class StringWriteExtension {
   }
   
   public String entering(final IHDLObject init, final SyntaxHighlighter highlighter) {
-    return highlighter.entering(init);
+    final List<String> comments = init.<List<String>>getMeta(SourceInfo.COMMENT);
+    final StringBuilder sb = new StringBuilder();
+    boolean _tripleNotEquals = (comments != null);
+    if (_tripleNotEquals) {
+      for (final String comment : comments) {
+        String _comment = highlighter.comment(comment);
+        StringBuilder _append = sb.append(_comment);
+        String _newLine = highlighter.newLine();
+        _append.append(_newLine);
+      }
+    }
+    String _entering = highlighter.entering(init);
+    return (sb + _entering);
   }
   
   protected String _toString(final HDLAnnotation anno, final SyntaxHighlighter highlight) {

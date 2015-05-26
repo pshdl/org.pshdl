@@ -111,7 +111,7 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		fileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.singleton(tempDir));
 	}
 
-	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoad(String mainClassFQN, String sourceCode, final boolean disableEdge, final boolean disableOutputLogic)
+	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoad(String mainClassFQN, CharSequence sourceCode, final boolean disableEdge, final boolean disableOutputLogic)
 			throws Exception {
 		final Class<?> cls = compileClass(mainClassFQN, sourceCode);
 		return new IHDLInterpreterFactory<IHDLInterpreter>() {
@@ -129,7 +129,7 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		};
 	}
 
-	public Class<?> compileClass(String mainClassFQN, String sourceCode) throws Exception {
+	public Class<?> compileClass(String mainClassFQN, CharSequence sourceCode) throws Exception {
 		final String pathName = mainClassFQN.replace('.', File.separatorChar) + ".java";
 		final File sourceFile = new File(tempDir, pathName);
 		final File pkgDir = sourceFile.getParentFile();
@@ -158,7 +158,7 @@ public class JavaClassRuntimeLoader implements AutoCloseable {
 		return tempDir;
 	}
 
-	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoadChangeAdapter(String mainClassFQN, String sourceCode, final IHDLInterpreter mainInterpreter,
+	public IHDLInterpreterFactory<IHDLInterpreter> compileAndLoadChangeAdapter(String mainClassFQN, CharSequence sourceCode, final IHDLInterpreter mainInterpreter,
 			final IChangeListener... listeners) throws Exception {
 		final Class<?> adapterClass = compileClass(mainClassFQN, sourceCode);
 		return new IHDLInterpreterFactory<IHDLInterpreter>() {

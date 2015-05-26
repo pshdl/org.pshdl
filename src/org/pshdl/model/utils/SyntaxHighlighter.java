@@ -270,4 +270,10 @@ public class SyntaxHighlighter {
 	public String primitiveType(String prim) {
 		return keyword(prim);
 	}
+
+	public String comment(String string) {
+		if (string.contains("\n"))
+			return "/*" + newLine() + string + newLine() + "*/";
+		return "//" + string;
+	}
 }

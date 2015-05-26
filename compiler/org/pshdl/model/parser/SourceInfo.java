@@ -33,10 +33,15 @@ import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.pshdl.model.HDLObject.GenericMeta;
+import org.pshdl.model.IHDLObject;
+import org.pshdl.model.utils.MetaAccess;
+
+import com.google.common.collect.Lists;
 
 public class SourceInfo {
 
-	public static final GenericMeta<SourceInfo> INFO = new GenericMeta<SourceInfo>("SourceInfo", true);
+	public static final MetaAccess<SourceInfo> INFO = new GenericMeta<>("SourceInfo", true);
+	public static final MetaAccess<List<String>> COMMENT = new GenericMeta<>("Comment", true);
 
 	public final ParserRuleContext context;
 	public final int startLine, endLine;
@@ -84,6 +89,15 @@ public class SourceInfo {
 		} else {
 			this.length = -1;
 		}
+	}
+
+	public static void addComment(IHDLObject vInterface, String comment) {
+		List<String> comments = vInterface.getMeta(SourceInfo.COMMENT);
+		if (comments == null) {
+			comments = Lists.newArrayList();
+			vInterface.addMeta(SourceInfo.COMMENT, comments);
+		}
+		comments.add(comment);
 	}
 
 	@Override

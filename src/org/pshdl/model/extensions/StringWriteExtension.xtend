@@ -79,6 +79,7 @@ import org.pshdl.model.utils.SyntaxHighlighter.Context
 import static org.pshdl.model.extensions.StringWriteExtension.*
 import org.pshdl.model.HDLInstantiation
 import org.pshdl.model.HDLExport
+import org.pshdl.model.parser.SourceInfo
 
 class StringWriteExtension {
 
@@ -115,7 +116,14 @@ class StringWriteExtension {
 	}
 
 	def entering(IHDLObject init, SyntaxHighlighter highlighter) {
-		return highlighter.entering(init)
+		val comments=init.getMeta(SourceInfo.COMMENT)
+		val sb=new StringBuilder
+		if (comments!==null){
+			for (String comment:comments){
+				sb.append(highlighter.comment(comment)).append(highlighter.newLine)
+			}	
+		}
+		return sb+highlighter.entering(init)
 	}
 
 	def dispatch String toString(HDLAnnotation anno, SyntaxHighlighter highlight) {
