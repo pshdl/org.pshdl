@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="serviceProvider" name="PSHDL ServiceLoader" schema="schema/serviceProvider.exsd"/>
+   <extension
+         point="org.pshdl.serviceProvider">
+      <ServiceClass
+            class="org.pshdl.model.simulation.ITypeOuptutProvider"
+            implementation="org.pshdl.model.simulation.codegenerator.JavaCodeGenerator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.simulation.ITypeOuptutProvider"
+            implementation="org.pshdl.model.simulation.codegenerator.DartCodeGenerator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.simulation.ITypeOuptutProvider"
+            implementation="org.pshdl.model.simulation.codegenerator.CCodeGenerator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.IHDLAnnotationProvider"
+            implementation="org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.IHDLAnnotationProvider"
+            implementation="org.pshdl.model.types.builtIn.busses.BusGenerator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.simulation.ITypeOuptutProvider"
+            implementation="org.pshdl.model.simulation.codegenerator.GoCodeGenerator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.IHDLGenerator"
+            implementation="org.pshdl.model.types.builtIn.busses.BusGenerator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.IHDLValidator"
+            implementation="org.pshdl.model.validation.builtin.BuiltInValidator">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.INativeFunctionProvider"
+            implementation="org.pshdl.model.types.builtIn.HDLBuiltInFunctions">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.INativeFunctionProvider"
+            implementation="org.pshdl.model.types.builtIn.TestbenchFunctions">
+      </ServiceClass>
+      <ServiceClass
+            class="org.pshdl.model.utils.services.IOutputProvider"
+            implementation="org.pshdl.model.simulation.PStoEXCompiler">
+      </ServiceClass>
+   </extension>
+
+</plugin>

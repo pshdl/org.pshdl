@@ -228,14 +228,12 @@ public class RWValidation {
 		/**
 		 * Ports where each bit, each dimension is fully assigned
 		 */
-		full,
-		/**
-		 * Ports that are at least written once, even if just partially
-		 */
-		written,
-		/**
-		 * Ports that are at least read once, even if just partially
-		 */
+		full, /**
+				 * Ports that are at least written once, even if just partially
+				 */
+		written, /**
+					 * Ports that are at least read once, even if just partially
+					 */
 		read;
 
 		@Override
@@ -280,7 +278,12 @@ public class RWValidation {
 							final HDLVariableRef ref = (HDLVariableRef) param;
 							final Optional<HDLVariable> varOpt = ref.resolveVar();
 							if (varOpt.isPresent()) {
-								incrementWrite(varOpt.get(), ref, call.getContainer(HDLStatement.class));
+								final HDLStatement container = call.getContainer(HDLStatement.class);
+								if (container == null) {
+									incrementWrite(varOpt.get(), ref, call);
+								} else {
+									incrementWrite(varOpt.get(), ref, container);
+								}
 							}
 						}
 					}

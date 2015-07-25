@@ -119,8 +119,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 
 		@Override
 		public String getDocumentation(HDLFunction function) {
-			return "Logs something when the assertion is false.\n"
-					+ "An assert of level INFO will simply print something on the console. This is equivalent to NOTE in VHDL.\n"
+			return "Logs something when the assertion is false.\n" + "An assert of level INFO will simply print something on the console. This is equivalent to NOTE in VHDL.\n"
 					+ "An assert of level WARNING will print something on the console and probably highlight it. This is equivalent to WARNING in VHDL.\n"
 					+ "An assert of level ERROR will print something on the console and probably highlight it. It might also stop the simulation. This is equivalent to ERROR in VHDL.\n"
 					+ "An assert of level FATAL will stop the simulation and print something on the console. This is equivalent to FAILURE in VHDL.\n";
@@ -327,7 +326,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 			case NATURAL:
 				return createWidthTypeNoWidth(call, arg1Type, arg1Width, HDLPrimitive.getUint(), HDLPrimitive.getNatural(), context);
 			default:
-				throw new IllegalArgumentException("Can not specify call:" + call);
+				return Optional.absent();
 			}
 
 		}
@@ -547,7 +546,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 				.addArgs(param(Type.PARAM_BOOL, "assumption"))//
 				.addArgs(param(Type.PARAM_ENUM, "assert").setEnumSpec(PSHDLLib.ASSERT.asRef()))//
 				.addArgs(param(Type.PARAM_STRING, "message"))//
-		;
+				;
 	}
 
 	public static final HDLFunction ABS_UINT = (HDLFunction) createABS(Type.PARAM_ANY_UINT).freeze(null);

@@ -75,33 +75,54 @@ public class PSAbstractCompiler implements AutoCloseable {
 	 *
 	 */
 	public static final class NullListener implements ICompilationListener {
+
 		@Override
-		public boolean startModule(String src, HDLPackage parse) {
-			return true;
+		public boolean useSource(String src, HDLPackage parse, Collection<Problem> collection, boolean hasError) {
+			return !hasError;
 		}
 
 		@Override
-		public boolean useSource(String src, Collection<Problem> collection, boolean hasError) {
-			return !hasError;
+		public void caughtException(Exception e, String src, HDLPackage parse) throws Exception {
+			throw e;
+		}
+
+		@Override
+		public boolean validate(String src, Set<Problem> set, HDLPackage pkg) {
+			return true;
 		}
 
 	}
 
+	public static final class SimpleListener implements ICompilationListener {
+
+		@Override
+		public boolean useSource(String src, HDLPackage parse, Collection<Problem> collection, boolean hasError) {
+			System.out.println("Compiling:" + new File(src).getName());
+			if (hasError) {
+				System.out.println("Skipping " + src + " because it has errors");
+			}
+			return !hasError;
+		}
+
+		@Override
+		public void caughtException(Exception e, String src, HDLPackage parse) throws Exception {
+			System.err.println("An Exception occured when processing " + src);
+			e.printStackTrace();
+		}
+
+		@Override
+		public boolean validate(String src, Set<Problem> set, HDLPackage pkg) {
+			return true;
+		}
+	}
+
 	public interface ICompilationListener {
 
-		/**
-		 * Check whether you want to continue compiling this source
-		 *
-		 * @param src
-		 *            the src location of this file
-		 * @param parse
-		 *            the model before running {@link Insulin}
-		 * @return <code>true</code> to continue with the compilation,
-		 *         <code>false</code> otherwise
-		 */
-		boolean startModule(String src, HDLPackage parse);
+		boolean useSource(String src, HDLPackage parse, Collection<Problem> collection, boolean hasError);
 
-		boolean useSource(String src, Collection<Problem> collection, boolean hasError);
+		void caughtException(Exception e, String src, HDLPackage parse) throws Exception;
+
+		boolean validate(String src, Set<Problem> set, HDLPackage pkg);
 
 	}
 
@@ -331,7 +352,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 
 	public List<CompileResult> compile(ICompilationListener listener) throws Exception {
 		if (!validated) {
-			validatePackages();
+			validatePackages(listener);
 		}
 		if (listener == null) {
 			listener = new NullListener();
@@ -340,18 +361,20 @@ public class PSAbstractCompiler implements AutoCloseable {
 		synchronized (srcs) {
 			for (final String src : srcs) {
 				final Collection<Problem> issue = issues.get(src);
-				if (issue != null)
-					if (listener.useSource(src, issue, hasError(issue))) {
-						final HDLPackage parse = pkgs.get(src);
-						if (parse != null)
-							if (listener.startModule(src, parse)) {
-								res.add(doCompile(src, parse));
-							} else {
-								res.add(createResult(src, null, null, false));
-							}
+				if (issue != null) {
+					final HDLPackage parse = pkgs.get(src);
+					if ((parse != null) && listener.useSource(src, parse, issue, hasError(issue))) {
+						try {
+							res.add(doCompile(src, parse));
+						} catch (final Exception e) {
+							listener.caughtException(e, src, parse);
+						}
 					} else {
 						res.add(createResult(src, null, null, false));
 					}
+				} else {
+					res.add(createResult(src, null, null, false));
+				}
 			}
 		}
 		return res;
@@ -443,6 +466,8 @@ public class PSAbstractCompiler implements AutoCloseable {
 	}
 
 	public boolean hasError(Collection<Problem> syntaxProblems) {
+		if (syntaxProblems == null)
+			return false;
 		final boolean error = false;
 		if (syntaxProblems.size() != 0) {
 			for (final Problem problem : syntaxProblems) {
@@ -480,29 +505,37 @@ public class PSAbstractCompiler implements AutoCloseable {
 		return hasError(validate);
 	}
 
+	public boolean validatePackages() throws Exception {
+		return validatePackages(new NullListener());
+	}
+
 	/**
 	 *
+	 * @param listener
 	 * @return <code>true</code> when at least one error has been found
 	 * @throws Exception
 	 */
-	public boolean validatePackages() throws Exception {
+	public boolean validatePackages(ICompilationListener listener) throws Exception {
 		validated = true;
 		boolean validationError = false;
 		if (service != null)
-			return validatePackagesMultiThreaded();
+			return validatePackagesMultiThreaded(listener);
 		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
-			if (singleValidate(e)) {
+			if (singleValidate(e, listener)) {
 				validationError = true;
 			}
 		}
 		return validationError;
 	}
 
-	private boolean singleValidate(final Entry<String, HDLPackage> e) throws Exception {
-		final Set<Problem> localProblems = Sets.newHashSet();
-		final boolean error = validateFile(e.getValue(), localProblems);
+	private boolean singleValidate(final Entry<String, HDLPackage> e, ICompilationListener listener) throws Exception {
 		final String src = e.getKey();
 		final Set<Problem> set = issues.get(src);
+		final HDLPackage pkg = e.getValue();
+		if (!listener.validate(src, set, pkg))
+			return hasError(set);
+		final Set<Problem> localProblems = Sets.newHashSet();
+		final boolean error = validateFile(pkg, localProblems);
 		if (set != null) {
 			final Iterator<Problem> iterator = set.iterator();
 			while (iterator.hasNext()) {
@@ -518,14 +551,14 @@ public class PSAbstractCompiler implements AutoCloseable {
 		return error;
 	}
 
-	protected boolean validatePackagesMultiThreaded() throws Exception {
+	protected boolean validatePackagesMultiThreaded(final ICompilationListener listener) throws Exception {
 		final List<Future<Void>> futures = Lists.newArrayListWithCapacity(pkgs.size());
 		for (final Entry<String, HDLPackage> e : pkgs.entrySet()) {
 			futures.add(service.submit(new Callable<Void>() {
 
 				@Override
 				public Void call() throws Exception {
-					singleValidate(e);
+					singleValidate(e, listener);
 					return null;
 				}
 
