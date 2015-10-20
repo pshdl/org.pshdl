@@ -17,6 +17,7 @@ import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.ProcessData
 import java.util.List
 import java.util.Set
 import java.util.Stack
+import org.pshdl.interpreter.VariableInformation.Type
 
 class VerilogCodeGenerator extends CommonCodeGenerator {
 
@@ -106,22 +107,22 @@ endmodule;
 		val String tempName = getTempName(a, NONE);
 		switch (exec.inst) {
 			case bitAccessSingle: {
-				sb.append(assignTempVar(2, pos, NONE, '''«tempName»[«exec.arg1»]''', false));
+				sb.append(assignTempVar(Type.BIT, 2, pos, NONE, '''«tempName»[«exec.arg1»]''', false));
 			}
 			case bitAccessSingleRange: {
 				val int highBit = exec.arg1;
 				val int lowBit = exec.arg2;
 				val int targetSize = (highBit - lowBit) + 1;
-				sb.append(assignTempVar(targetSize << 1, pos, NONE, '''«tempName»[«exec.arg1»:«exec.arg2»]''', false));
+				sb.append(assignTempVar(Type.BIT, targetSize << 1, pos, NONE, '''«tempName»[«exec.arg1»:«exec.arg2»]''', false));
 			}
 			case cast_int: {
 				sb.append(
-					assignTempVar((Math.min(exec.arg1, exec.arg2) << 1).bitwiseOr(1), pos, NONE,
+					assignTempVar(Type.INT, (Math.min(exec.arg1, exec.arg2) << 1).bitwiseOr(1), pos, NONE,
 						'''«tempName»[«Math.min(exec.arg1, exec.arg2) - 1»:0]''', false));
 			}
 			case cast_uint: {
 				sb.append(
-					assignTempVar(Math.min(exec.arg1, exec.arg2) << 1, pos, NONE,
+					assignTempVar(Type.UINT, Math.min(exec.arg1, exec.arg2) << 1, pos, NONE,
 						'''«tempName»[«Math.min(exec.arg1, exec.arg2) - 1»:0]''', false));
 			}
 			default: {

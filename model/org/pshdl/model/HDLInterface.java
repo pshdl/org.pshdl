@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -44,13 +44,14 @@ import com.google.common.collect.Maps;
  * <li>IHDLObject container. Can be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLExpression&gt; dim. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLVariableDeclaration&gt; ports. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLVariableDeclaration&gt; ports. Can be <code>null</code>.
+ * </li>
  * </ul>
  */
 public class HDLInterface extends AbstractHDLInterface {
 	/**
 	 * Constructs a new instance of {@link HDLInterface}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param name
@@ -106,7 +107,6 @@ public class HDLInterface extends AbstractHDLInterface {
 			return fPorts;
 		return super.getContainingFeature(obj);
 	}
-
 	// $CONTENT-BEGIN$
 
 	/**

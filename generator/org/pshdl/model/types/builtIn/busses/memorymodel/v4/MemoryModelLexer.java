@@ -127,6 +127,7 @@ public class MemoryModelLexer extends Lexer {
 			+ "\u00f6\7\61\2\2\u00f5\u00dd\3\2\2\2\u00f5\u00ea\3\2\2\2\u00f6\u00f7\3" + "\2\2\2\u00f7\u00f8\b\37\2\2\u00f8>\3\2\2\2\u00f9\u00fa\t\b\2\2\u00fa\u00fb"
 			+ "\3\2\2\2\u00fb\u00fc\b \2\2\u00fc@\3\2\2\2\f\2\u00c1\u00ca\u00d2\u00d8" + "\u00db\u00e3\u00e7\u00f0\u00f5\3\b\2\2";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

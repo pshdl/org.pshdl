@@ -49,7 +49,8 @@ import com.google.common.base.Optional;
  * The class HDLInterfaceInstantiation contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
+ * </li>
  * <li>HDLVariable var. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLArgument&gt; arguments. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName hIf. Can <b>not</b> be <code>null</code>.</li>
@@ -115,7 +116,6 @@ public class HDLInterfaceInstantiation extends AbstractHDLInterfaceInstantiation
 			return fHIf;
 		return super.getContainingFeature(obj);
 	}
-
 	// $CONTENT-BEGIN$
 
 	public static GenericMeta<String> ORIG_NAME = new GenericMeta<String>("ORIG_NAME", true);

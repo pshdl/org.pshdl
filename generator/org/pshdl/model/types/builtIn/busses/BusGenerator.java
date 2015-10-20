@@ -177,8 +177,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				final NamedElement decl = unit.declarations.get(ref.getName());
 				if ((decl == null) && !"fill".equals(ref.name)) {
 					final String message = "Can not resolve the reference to object:" + ref.name;
-					problems.add(new Problem(BusErrors.invalid_reference, message, ref.token.getLine() + lineOffset, ref.token.getCharPositionInLine(), ref.token.getText()
-							.length(), ref.token.getStartIndex()));
+					problems.add(new Problem(BusErrors.invalid_reference, message, ref.token.getLine() + lineOffset, ref.token.getCharPositionInLine(),
+							ref.token.getText().length(), ref.token.getStartIndex()));
 					hasError = true;
 				}
 			}
@@ -349,8 +349,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	public boolean validate(HDLDirectGeneration hdg, Set<Problem> problems, HDLEvaluationContext context) {
 		boolean hasError = false;
 		if (!hdg.getInclude()) {
-			problems.add(new Problem(ErrorCode.GENERATOR_WARNING, hdg, "The " + hdg.getGeneratorID()
-					+ " generator assumes to be included. Not including it means that all ports need to be exported manually."));
+			problems.add(new Problem(ErrorCode.GENERATOR_WARNING, hdg,
+					"The " + hdg.getGeneratorID() + " generator assumes to be included. Not including it means that all ports need to be exported manually."));
 		}
 		if (hdg.getGeneratorContent().length() == 0) {
 			try {
@@ -386,8 +386,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			final ArrayList<HDLVariableDeclaration> ports = unit.asInterface().getPorts();
 			for (final HDLVariableDeclaration port : ports) {
 				if (port.getDirection() == HDLDirection.INOUT) {
-					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, port, "The generator " + hdg.getGeneratorID()
-							+ " does not support generating the required files for ports with inout direction"));
+					problems.add(new Problem(ErrorCode.GENERATOR_ERROR, port,
+							"The generator " + hdg.getGeneratorID() + " does not support generating the required files for ports with inout direction"));
 					hasError = true;
 				}
 			}
@@ -427,8 +427,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 
 	@Override
 	public GeneratorInformation getGeneratorInfo(String name) {
-		final GeneratorInformation gi = new GeneratorInformation(BusGenerator.class.getSimpleName(), name, "Generate the infrastructure to create a pcore for the " + name
-				+ " bus. This generator should always be included.");
+		final GeneratorInformation gi = new GeneratorInformation(BusGenerator.class.getSimpleName(), name,
+				"Generate the infrastructure to create a pcore for the " + name + " bus. This generator should always be included.");
 		gi.arguments.put("regCount",
 				"This parameter is mandatory. It indicates how many sw registers should be accessible in the ip core. The number can be a constant or a string");
 		gi.arguments.put("version", "The version ID to use for the generated pcore");

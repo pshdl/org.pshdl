@@ -228,12 +228,14 @@ public class RWValidation {
 		/**
 		 * Ports where each bit, each dimension is fully assigned
 		 */
-		full, /**
-				 * Ports that are at least written once, even if just partially
-				 */
-		written, /**
-					 * Ports that are at least read once, even if just partially
-					 */
+		full,
+		/**
+		 * Ports that are at least written once, even if just partially
+		 */
+		written,
+		/**
+		 * Ports that are at least read once, even if just partially
+		 */
 		read;
 
 		@Override

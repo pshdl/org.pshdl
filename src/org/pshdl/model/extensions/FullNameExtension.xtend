@@ -48,6 +48,7 @@ import org.pshdl.model.IHDLObject
 import org.pshdl.model.utils.HDLQualifiedName
 
 import static org.pshdl.model.extensions.FullNameExtension.*
+import org.pshdl.model.HDLFunctionCall
 
 /**
  * The FullNameExtension provides a {@link HDLQualifiedName} for every IHDLObject. 
@@ -194,6 +195,15 @@ class FullNameExtension {
 		if (!varRef.present)
 			return null
 		return varRef.get.fullName
+	}
+	def dispatch HDLQualifiedName getFullName(HDLFunctionCall call) {
+		val cached=call.getMeta(FULLNAME)
+		if (cached !== null)
+			return cached
+		val callRef = call.resolveFunction
+		if (!callRef.present)
+			return null
+		return callRef.get.fullName
 	}
 	
 	def dispatch HDLQualifiedName getFullName(HDLVariable unit) {

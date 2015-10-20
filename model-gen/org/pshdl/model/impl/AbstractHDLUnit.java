@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -43,6 +43,7 @@ import org.pshdl.model.HDLUnit;
 import org.pshdl.model.IHDLObject;
 import org.pshdl.model.extensions.ScopingExtension;
 import org.pshdl.model.utils.CopyFilter;
+import org.pshdl.model.utils.HDLCodeGenerationException;
 import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.validation.Problem;
@@ -56,7 +57,9 @@ import com.google.common.collect.Lists;
 public abstract class AbstractHDLUnit extends HDLObject {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLUnit}
-	 * 
+	 *
+	 * @param id
+	 *            a unique number for each instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -157,7 +160,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the annotations field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -175,7 +178,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the libURI field. Can <b>not</b> be <code>null</code>.
-	 * 
+	 *
 	 * @return the field
 	 */
 	@Nonnull
@@ -193,7 +196,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the name field. Can <b>not</b> be <code>null</code>.
-	 * 
+	 *
 	 * @return the field
 	 */
 	@Nonnull
@@ -211,7 +214,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the imports field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -229,7 +232,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the inits field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -247,7 +250,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the statements field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -265,7 +268,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Get the simulation field. Can <b>not</b> be <code>null</code>.
-	 * 
+	 *
 	 * @return the field
 	 */
 	@Nonnull
@@ -281,7 +284,13 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	protected final ArrayList<HDLQualifiedName> extend;
 
-	@Nullable
+	public HDLInterface resolveExtendForced(int index, String stage) {
+		final Optional<HDLInterface> opt = resolveExtend(index);
+		if (opt.isPresent())
+			return opt.get();
+		throw new HDLCodeGenerationException(this, "failed to resolve:" + extend.get(index), stage);
+	}
+
 	public Optional<HDLInterface> resolveExtend(int index) {
 		if (!frozen)
 			throw new IllegalArgumentException("Object not frozen");
@@ -300,7 +309,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -313,7 +322,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -333,7 +342,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -346,7 +355,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 * 
+	 *
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -361,7 +370,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getAnnotations()}.
-	 * 
+	 *
 	 * @param annotations
 	 *            sets the new annotations of this object. Can be
 	 *            <code>null</code>.
@@ -377,7 +386,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Adds a new value to the field {@link #getAnnotations()}.
-	 * 
+	 *
 	 * @param newAnnotations
 	 *            the value that should be added to the field
 	 *            {@link #getAnnotations()}
@@ -396,7 +405,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getAnnotations()}.
-	 * 
+	 *
 	 * @param newAnnotations
 	 *            the value that should be removed from the field
 	 *            {@link #getAnnotations()}
@@ -415,7 +424,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getAnnotations()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getAnnotations()}
@@ -432,7 +441,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getLibURI()}.
-	 * 
+	 *
 	 * @param libURI
 	 *            sets the new libURI of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -447,7 +456,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getName()}.
-	 * 
+	 *
 	 * @param name
 	 *            sets the new name of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -462,7 +471,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getImports()}.
-	 * 
+	 *
 	 * @param imports
 	 *            sets the new imports of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnit} with the updated imports field.
@@ -476,7 +485,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Adds a new value to the field {@link #getImports()}.
-	 * 
+	 *
 	 * @param newImports
 	 *            the value that should be added to the field
 	 *            {@link #getImports()}
@@ -494,7 +503,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getImports()}.
-	 * 
+	 *
 	 * @param newImports
 	 *            the value that should be removed from the field
 	 *            {@link #getImports()}
@@ -512,7 +521,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getImports()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getImports()}
@@ -528,7 +537,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getInits()}.
-	 * 
+	 *
 	 * @param inits
 	 *            sets the new inits of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnit} with the updated inits field.
@@ -542,7 +551,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Adds a new value to the field {@link #getInits()}.
-	 * 
+	 *
 	 * @param newInits
 	 *            the value that should be added to the field
 	 *            {@link #getInits()}
@@ -560,7 +569,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getInits()}.
-	 * 
+	 *
 	 * @param newInits
 	 *            the value that should be removed from the field
 	 *            {@link #getInits()}
@@ -578,7 +587,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getInits()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getInits()}
@@ -594,7 +603,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getStatements()}.
-	 * 
+	 *
 	 * @param statements
 	 *            sets the new statements of this object. Can be
 	 *            <code>null</code>.
@@ -610,7 +619,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Adds a new value to the field {@link #getStatements()}.
-	 * 
+	 *
 	 * @param newStatements
 	 *            the value that should be added to the field
 	 *            {@link #getStatements()}
@@ -629,7 +638,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getStatements()}.
-	 * 
+	 *
 	 * @param newStatements
 	 *            the value that should be removed from the field
 	 *            {@link #getStatements()}
@@ -648,7 +657,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getStatements()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getStatements()}
@@ -665,7 +674,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getSimulation()}.
-	 * 
+	 *
 	 * @param simulation
 	 *            sets the new simulation of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -681,7 +690,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getSimulation()}.
-	 * 
+	 *
 	 * @param simulation
 	 *            sets the new simulation of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -697,7 +706,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Setter for the field {@link #getExtendRefName()}.
-	 * 
+	 *
 	 * @param extend
 	 *            sets the new extend of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLUnit} with the updated extend field.
@@ -711,7 +720,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Adds a new value to the field {@link #getExtendRefName()}.
-	 * 
+	 *
 	 * @param newExtend
 	 *            the value that should be added to the field
 	 *            {@link #getExtendRefName()}
@@ -729,7 +738,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getExtendRefName()}.
-	 * 
+	 *
 	 * @param newExtend
 	 *            the value that should be removed from the field
 	 *            {@link #getExtendRefName()}
@@ -747,7 +756,7 @@ public abstract class AbstractHDLUnit extends HDLObject {
 
 	/**
 	 * Removes a value from the field {@link #getExtendRefName()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getExtendRefName()}

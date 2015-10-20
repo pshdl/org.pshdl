@@ -84,9 +84,10 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		options.addOption(new Option("em", "enable the output of the byte-code .em file"));
 		options.addOption(new Option("allSignals", "disable the removal of redundant variables"));
 		options.addOption(new Option("ir", "dump the intermediate PSHDL code"));
-		options.addOption(OptionBuilder.withArgName(listTypes("|"))
-				.withDescription("The output type to generate. Valid options are: " + listTypes(", ") + ". Each type may require additional command line arguments").hasArg()
-				.create("type"));
+		OptionBuilder.withArgName(listTypes("|"));
+		OptionBuilder.withDescription("The output type to generate. Valid options are: " + listTypes(", ") + ". Each type may require additional command line arguments");
+		OptionBuilder.hasArg();
+		options.addOption(OptionBuilder.create("type"));
 		final MultiOption mo = new MultiOption(getHookName() + " usage: [OPTIONS] MODULE <files>", null, options);
 		for (final ITypeOuptutProvider ito : providers.values()) {
 			mo.subs.add(ito.getUsage());

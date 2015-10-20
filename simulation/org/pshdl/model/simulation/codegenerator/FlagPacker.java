@@ -11,14 +11,14 @@ import com.google.common.primitives.Ints;
 
 public class FlagPacker {
 
-	int[][] inputSet = new int[][] {//
-	{ 1, 7, 9, 13 }, //
-			{ 1, 5, 9, 13 },//
-			{ 7, 8, 9, 13 },//
+	int[][] inputSet = new int[][] { //
+			{ 1, 7, 9, 13 }, //
+			{ 1, 5, 9, 13 }, //
+			{ 7, 8, 9, 13 }, //
 			{ 1, 5 },//
 	};
-	int[] assignmentSet = new int[] {//
-	0, // 0
+	int[] assignmentSet = new int[] { //
+			0, // 0
 			1, // 1
 			2, // 2
 			10, // 3

@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *
+ * 
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- *
+ * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- *
+ * 
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- *
+ * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * 
  *     This License does not grant permission to use the trade names, trademarks,
  *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- *
+ * 
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -47,10 +47,14 @@ import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.FunctionInformation
 import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.ParameterInformation
 import org.pshdl.interpreter.VariableInformation
+import org.pshdl.interpreter.VariableInformation.Type
 import org.pshdl.model.simulation.HDLSimulator
 import org.pshdl.model.simulation.ITypeOuptutProvider
+import org.pshdl.model.simulation.SimulationTransformationExtension
 import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes
 import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter
 import org.pshdl.model.utils.PSAbstractCompiler
@@ -64,8 +68,10 @@ class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	public String packageName;
 	@Option(description="The name of the java class. If not specified, the name of the module will be used", optionName="pkg", hasArg=true)
 	public String unitName;
-	
-	public int executionCores=0
+	@Option(description="Generate a JUnit based test-bench", optionName="junit", hasArg=false)
+	public boolean junit = false;
+
+	public int executionCores = 0
 
 	new(ExecutableModel em) {
 		super(em, 64)
@@ -83,23 +89,28 @@ class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 		return this
 	}
 
+	public def JavaCodeGeneratorParameter setJUnitGeneration(boolean generateJUnit) {
+		this.junit = generateJUnit
+		return this
+	}
+
 	public def JavaCodeGeneratorParameter setUnitName(String unitName) {
 		this.unitName = unitName
 		return this
 	}
-	
-	public def String javaChangeAdapterName(boolean useInterface){
-		if (packageName==null)
+
+	public def String javaChangeAdapterName(boolean useInterface) {
+		if (packageName == null)
 			return changeAdapterName(useInterface)
 		return '''«packageName».«changeAdapterName(useInterface)»'''
 	}
-	
-	public def String changeAdapterName(boolean useInterface){
-		return (if (useInterface) "GenericChangeAdapter"  else "ChangeAdapter")+unitName
+
+	public def String changeAdapterName(boolean useInterface) {
+		return (if(useInterface) "GenericChangeAdapter" else "ChangeAdapter") + unitName
 	}
-	
-	public def String javaClassName(){
-		if (packageName==null)
+
+	public def String javaClassName() {
+		if (packageName == null)
 			return unitName
 		return '''«packageName».«unitName»'''
 	}
@@ -111,7 +122,8 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	String packageName
 	String unitName
 	int executionCores = 0
-	boolean hasPow=false
+	boolean junit = false
+	boolean hasPow = false
 
 	new() {
 	}
@@ -121,10 +133,10 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		this.packageName = parameter.packageName
 		this.unitName = parameter.unitName
 		this.executionCores = parameter.executionCores
+		this.junit = parameter.junit
 	}
 
-
-	override JavaCodeGeneratorParameter getParameter(){
+	override JavaCodeGeneratorParameter getParameter() {
 		return super.parameter as JavaCodeGeneratorParameter
 	}
 
@@ -137,15 +149,15 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	}
 
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		if (!varInfo.array || attributes.contains(baseType)) {
-			if (isBoolean(varInfo, attributes))
-				return "boolean"
-			return "long"
-		} else {
-			if (isBoolean(varInfo, attributes))
-				return "boolean[]"
-			return "long[]"
+		var res = "long"
+		if (varInfo.type === Type.STRING)
+			res = "String"
+		if (isBoolean(varInfo, attributes))
+			res = "boolean"
+		if (varInfo.array && !attributes.contains(baseType)) {
+			return res + "[]"
 		}
+		return res
 	}
 
 	override protected preField(VariableInformation x, EnumSet<CommonCodeGenerator.Attributes> attributes) '''«IF attributes.
@@ -174,16 +186,16 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			return idx;
 		}
 		
-«««		«FOR v: em.variables»«getterSetter(v, if (v.aliasVar!==null) v.aliasVar else v)»«ENDFOR»
+		«««		«FOR v: em.variables»«getterSetter(v, if (v.aliasVar!==null) v.aliaVVrr else v)»«ENDFOR»
 		
 		@Override
 		public String getName(int idx) {
 			switch (idx) {
-				«FOR v : em.variables»
-					case «v.getVarIdx(false)»: return "«v.name»";
-				«ENDFOR»
-				default:
-					throw new IllegalArgumentException("Not a valid index:" + idx);
+			«FOR v : em.variables»
+			case «v.getVarIdx(false)»: return "«v.name»";
+		«ENDFOR»
+			default:
+				throw new IllegalArgumentException("Not a valid index:" + idx);
 			}
 		}
 		
@@ -209,12 +221,13 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		@Override
 		public void close(){
 		}
+		
 		@Override
 		public VariableInformation[] getVariableInformation(){
 			VariableInformation[] res=new VariableInformation[«em.variables.length»];
 			«var int count=0»
 			«FOR v : em.variables»
-				res[«count++»]=new VariableInformation(VariableInformation.Direction.«v.dir», "«v.name»", «v.width», VariableInformation.Type.«v.type», «v.isRegister», «v.isClock», «v.isReset», new String[]{«v.annotations?.join('"',",",'"',[it])»}, new int[]{«v.dimensions?.join(",")»});
+				res[«count++»]=new VariableInformation(VariableInformation.Direction.«v.dir.name», "«v.name»", «v.width», VariableInformation.Type.«v.type.name», «v.isRegister», «v.isClock», «v.isReset», new String[]{«v.annotations?.join('"',",",'"',[it])»}, new int[]{«v.dimensions?.join(",")»});
 			«ENDFOR»
 			return res;
 		}
@@ -235,44 +248,71 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			}
 		}
 		«IF executionCores!=0»
-		«makeThreads»
+			«makeThreads»
 		«ENDIF»
 		«IF hasPow»
-		private static long pow(long a, long n) {
-			long result = 1;
-			long p = a;
-			while (n > 0) {
-				if ((n % 2) != 0) {
-					result = result * p;
+			private static long pow(long a, long n) {
+				long result = 1;
+				long p = a;
+				while (n > 0) {
+					if ((n % 2) != 0) {
+						result = result * p;
+					}
+					p = p * p;
+					n = n / 2;
 				}
-				p = p * p;
-				n = n / 2;
+				return result;
 			}
-			return result;
-		}
+		«ENDIF»
+		
+		«IF !em.functions.empty»
+			public JavaPSHDLLib pshdl=new JavaPSHDLLib(this);
+			«generateInlineMethods»
 		«ENDIF»
 		}
 	'''
-	
-	protected def getterSetter(VariableInformation v, VariableInformation aliased)
-		'''
+
+	def generateInlineMethods() {
+		val StringBuilder sb = new StringBuilder
+		for (FunctionInformation fi : em.functions) {
+			if (fi.name.startsWith("pshdl.")) {
+				sb.
+					append('''
+					private «fi.returnType.toJava» «fi.signature»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»«pi.toJava» p«pi.name.toFirstUpper»«ENDFOR»){
+						«IF fi.returnType!==null»return «ENDIF»pshdl.«fi.name.substring(fi.name.lastIndexOf('.')+1)»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»p«pi.name.toFirstUpper»«ENDFOR»);
+					}''')
+			}
+		}
+		return sb
+	}
+
+	def toJava(ParameterInformation information) {
+		if (information === null)
+			return "void"
+		if (information.type === ParameterInformation.Type.PARAM_BOOL)
+			return "boolean"
+		if (information.type === ParameterInformation.Type.PARAM_STRING)
+			return "String"
+		return "long"
+	}
+
+	protected def getterSetter(VariableInformation v, VariableInformation aliased) '''
 		public «v.fieldType(NONE)» get«v.idName(false, NONE).toString.toFirstUpper»(){
 			«IF aliased.predicate || aliased.array»
-			return «aliased.idName(true, NONE)»;
+				return «aliased.idName(true, NONE)»;
 			«ELSE»
-			return «aliased.idName(true, NONE).fixupValue(aliased.targetSizeWithType, true)»;
+				return «aliased.idName(true, NONE).fixupValue(aliased.targetSizeWithType, true)»;
 			«ENDIF»
 		}
 		
 		public void set«v.idName(false, NONE).toString.toFirstUpper»(«v.fieldType(NONE)» newVal){
 			«IF aliased.predicate || aliased.array»
-			«aliased.idName(true, NONE)»=newVal;
+				«aliased.idName(true, NONE)»=newVal;
 			«ELSE»
-			«aliased.idName(true, NONE)»=«"newVal".fixupValue(aliased.targetSizeWithType, true)»;
+				«aliased.idName(true, NONE)»=«"newVal".fixupValue(aliased.targetSizeWithType, true)»;
 			«ENDIF»
 		}
-		'''
-	
+	'''
 
 	static class ExecutionPhase {
 		static int globalID = 0
@@ -302,9 +342,11 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		'''
 
 		public def field() '''long execPhase«id»=-1;
-			'''
+		'''
 	}
-	Random r=new Random()
+
+	Random r = new Random()
+
 	def makeThreads() {
 		val Set<Integer> handledNegEdges = Sets.newLinkedHashSet
 		val Set<Integer> handledPosEdges = Sets.newLinkedHashSet
@@ -350,7 +392,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 						val call = predicateCheckedFrameCall(frame)
 						current.executionCore.append(call)
 						if (totalCosts > 10 && iterator.hasNext) {
-							totalCosts=0
+							totalCosts = 0
 							current = new ExecutionPhase(stage)
 							phases.add(current)
 						}
@@ -401,7 +443,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 					phase=-1;
 					//System.out.println("Done");
 				}
-			''')
+		''')
 	}
 
 	def addBarrier(StringBuilder master, List<StringBuilder> slaves, String stageName, int stage) {
@@ -409,23 +451,23 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			val slave = slaves.get(i)
 			slave.append(
 				'''
-					//«stageName»
-					//System.out.println("Thread «i» waiting for next phase «stageName»");
-					while (phase < «stage») {
-					}
-					if (startingTimeStamp!=timeStamp)
-						break;
-				''')
+				//«stageName»
+				//System.out.println("Thread «i» waiting for next phase «stageName»");
+				while (phase < «stage») {
+				}
+				if (startingTimeStamp!=timeStamp)
+					break;
+			''')
 		}
 		master.append(
 			'''
-				//System.out.println("Entering stage: «stageName»");
-				try{
-					Thread.sleep(1);
-				} catch(Exception e){
-				}
-				phase=«stage»;
-			''')
+			//System.out.println("Entering stage: «stageName»");
+			try{
+				Thread.sleep(1);
+			} catch(Exception e){
+			}
+			phase=«stage»;
+		''')
 	}
 
 	def schedule(List<Integer> threadLoad, List<StringBuilder> threadExecution, int costs, CharSequence execution) {
@@ -451,7 +493,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		{
 			private Map<String, Integer> varIdx=new HashMap<String, Integer>();
 	'''
-	
+
 	protected def isTestbench() {
 		!em.annotations.nullOrEmpty && em.annotations.contains(HDLSimulator.TB_UNIT.name.substring(1))
 	}
@@ -520,6 +562,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	def protected getImports() '''
 		import java.util.*;
 		import org.pshdl.interpreter.*;
+		import org.pshdl.interpreter.JavaPSHDLLib.TimeUnit;
 		import java.util.concurrent.*;
 		import java.util.concurrent.locks.*;
 	'''
@@ -540,7 +583,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	}
 
 	override protected functionFooter(Frame frame) '''}
-		'''
+	'''
 
 	override protected functionHeader(Frame frame) '''
 		private final void «frame.frameName»() {
@@ -554,18 +597,18 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	def regIdx(InternalInformation information) {
 		regIdx.get(information.info.name)
 	}
-	
+
 	override protected runMethodsHeader(boolean constant) '''public void «IF !constant»run«ELSE»initConstants«ENDIF»() {
-		'''
+	'''
 
 	override protected runMethodsFooter(boolean constant) '''}
-		'''
+	'''
 
 	override protected callStage(int stage, boolean constant) '''«stageMethodName(stage, constant)»();
-		'''
+	'''
 
 	override protected stageMethodsFooter(int stage, int stageCosts, boolean constant) '''}
-		'''
+	'''
 
 	int threadID = 0
 	int currentStage = 0
@@ -628,7 +671,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 
 	override protected stageMethodsHeader(int stage, int stageCosts, boolean constant) '''public void «stageMethodName(
 		stage, constant)»(){
-		'''
+	'''
 
 	override protected applyRegUpdates() {
 		return "updateRegs();"
@@ -638,9 +681,19 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		return "!regUpdates.isEmpty()"
 	}
 
-	def CharSequence createChangeAdapter(boolean useInterface, Predicate<VariableInformation> filter) '''«IF packageName !== null»package «packageName»;«ENDIF»
+	def CharSequence createChangeAdapter(
+		boolean useInterface,
+		Predicate<VariableInformation> filter
+	) '''«IF packageName !== null»package «packageName»;«ENDIF»
 import org.pshdl.interpreter.*;
+import org.pshdl.interpreter.JavaPSHDLLib.TimeUnit;
 import java.util.Arrays;
+
+/**
+«FOR anno: em.annotations»
+ * «anno»
+«ENDFOR»
+*/
 
 public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useInterface)» implements «IF isTestbench()»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»{
 	«fieldDeclarations(false, true, filter)»
@@ -650,10 +703,10 @@ public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useIn
 		«ENDFOR»
 	«ENDIF»
 	
-	private «IF useInterface»IHDLInterpreter«ELSE»«(parameter as JavaCodeGeneratorParameter).javaClassName»«ENDIF» module;
+	private «getInterpreterClassName(useInterface)» module;
 	private IChangeListener[] listeners;
 	private VariableInformation[] varInfos;
-	public «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName»(«IF useInterface»IHDLInterpreter«ELSE»«(parameter as JavaCodeGeneratorParameter).javaClassName»«ENDIF» module, IChangeListener ... listeners) {
+	public «IF useInterface»Generic«ENDIF»ChangeAdapter«unitName»(«getInterpreterClassName(useInterface)» module, IChangeListener ... listeners) {
 		this.module=module;
 		this.listeners=listeners;
 		this.varInfos=module.getVariableInformation();
@@ -749,6 +802,7 @@ public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useIn
 	}
 	
 	«IF isTestbench»
+		«timeMethods»
 		@Override
 		public void runTestbench(long maxTime, long maxSteps, ITestbenchStepListener listener, Runnable main){
 			if (main == null)
@@ -759,12 +813,18 @@ public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useIn
 	«ENDIF»
 }
 '''
-
+	
+	def getInterpreterClassName(boolean useInterface) '''«IF useInterface»«IF isTestbench»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»«ELSE»«(parameter as JavaCodeGeneratorParameter).javaClassName»«ENDIF»'''
 	def protected changedNotificationInterface(VariableInformation vi) {
 		val varName = vi.idName(true, NONE)
 		if (!vi.array) {
 			if (vi.predicate) {
-				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				val varNameUpdate = vi.idName(
+					true,
+					EnumSet.of(
+						isUpdate
+					)
+				)
 				return '''if ((module.getOutputLong(«varName»_idx)!=0) != «varName»)
 	for (IChangeListener listener:listeners)
 		listener.valueChangedPredicate(getDeltaCycle(), varInfos[«vi.idx»], «vi.idx», «varName», (module.getOutputLong(«varName»_idx)!=0), «varNameUpdate», -1);
@@ -777,7 +837,12 @@ public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useIn
 			}
 		} else {
 			if (vi.predicate) {
-				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				val varNameUpdate = vi.idName(
+					true,
+					EnumSet.of(
+						isUpdate
+					)
+				)
 				return '''{
 boolean[] tempArr=new boolean[«vi.arraySize»];
 for (int i=0;i<«vi.arraySize»;i++)
@@ -800,7 +865,7 @@ if (!Arrays.equals(tempArr,«varName»))
 			}
 		}
 	}
-	
+
 	def getIdx(VariableInformation information) {
 		return getVarIdx(information, false)
 	}
@@ -809,7 +874,12 @@ if (!Arrays.equals(tempArr,«varName»))
 		val varName = vi.idName(true, NONE)
 		if (!vi.array) {
 			if (vi.predicate) {
-				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				val varNameUpdate = vi.idName(
+					true,
+					EnumSet.of(
+						isUpdate
+					)
+				)
 				return '''if (module.«varName» != «varName»)
 	for (IChangeListener listener:listeners)
 		listener.valueChangedPredicate(getDeltaCycle(), varInfos[«vi.idx»], «vi.idx», «varName», module.«varName», «varNameUpdate», module.«varNameUpdate»);
@@ -823,7 +893,12 @@ if (!Arrays.equals(tempArr,«varName»))
 			}
 		} else {
 			if (vi.predicate) {
-				val varNameUpdate = vi.idName(true, EnumSet.of(isUpdate))
+				val varNameUpdate = vi.idName(
+					true,
+					EnumSet.of(
+						isUpdate
+					)
+				)
 				return '''if (!module.«varName».equals(«varName»))
 	for (IChangeListener listener:listeners)
 		listener.valueChangedPredicateArray(getDeltaCycle(), varInfos[«vi.idx»], «vi.idx», «varName», module.«varName», «varNameUpdate», module.«varNameUpdate»);
@@ -838,19 +913,23 @@ if (!Arrays.equals(tempArr,«varName»))
 	}
 
 	override protected clearRegUpdates() '''regUpdates.clear();
-		'''
+	'''
 
 	override protected copyArray(VariableInformation varInfo) '''System.arraycopy(«varInfo.idName(true, NONE)», 0, «varInfo.
 		idName(true, EnumSet.of(CommonCodeGenerator.Attributes.isPrev))», 0, «varInfo.arraySize»);
-		'''
+	'''
 
-	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
+	override protected assignNextTime(VariableInformation nextTime,
+		CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
 		name», «currentProcessTime»);'''
 
-	override protected callMethod(CharSequence methodName, CharSequence... args) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+	override protected callMethod(
+		CharSequence methodName,
+		CharSequence... args
+	) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() '''doRun.run();
-		'''
+	'''
 
 	override protected checkTestbenchListener() '''«indent()»if (listener!=null && !listener.nextStep(«varByName("$time").
 		idName(true, NONE)», stepCount))
@@ -860,14 +939,32 @@ if (!Arrays.equals(tempArr,«varName»))
 	override protected runProcessHeader(CommonCodeGenerator.ProcessData pd) {
 		indent++
 		'''private boolean «processMethodName(pd)»() {
-			'''
+		'''
 	}
 
 	override protected runTestbenchHeader() {
 		indent++
-		'''public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener, Runnable main) {
-		Runnable doRun=(main==null?this:main);
+		'''«timeMethods»
+		@Override
+		public void runTestbench(long maxTime, long maxSteps, IHDLTestbenchInterpreter.ITestbenchStepListener listener, Runnable main) {
+			Runnable doRun=(main==null?this:main);
 			'''
+	}
+	
+	def timeMethods() '''		@Override
+		public TimeUnit getTimeBase(){
+			return TimeUnit.«getAnnoValue("TimeBase")»;
+		}
+		
+		@Override
+		public long getTime(){
+			return «fieldName(timeName, NONE)»;
+		}
+	'''
+	
+	protected def getAnnoValue(String anno) {
+		val foundAnno = em.annotations.findFirst[startsWith(anno)]
+		return foundAnno.substring(foundAnno.indexOf(SimulationTransformationExtension.ANNO_VALUE_SEP)+1)
 	}
 
 	override getHookName() {
@@ -900,13 +997,14 @@ if (!Arrays.equals(tempArr,«varName»))
 				parameter.em.source, comp.hookName, true))
 	}
 
-	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''Arrays.fill(«vi.idName(true, NONE)», «regFillValue»);'''
+	override protected fillArray(VariableInformation vi,
+		CharSequence regFillValue) '''Arrays.fill(«vi.idName(true, NONE)», «regFillValue»);'''
 
 	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
-		hasPow=true
-		return assignTempVar(targetSizeWithType, pos, NONE,
-			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
+		hasPow = true
+		return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos,
+			NONE, '''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
 
 }

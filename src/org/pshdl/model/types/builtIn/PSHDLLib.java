@@ -26,6 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn;
 
+import org.pshdl.interpreter.JavaPSHDLLib.Active;
+import org.pshdl.interpreter.JavaPSHDLLib.Assert;
+import org.pshdl.interpreter.JavaPSHDLLib.Edge;
+import org.pshdl.interpreter.JavaPSHDLLib.Sync;
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLPackage;
@@ -36,11 +40,10 @@ public class PSHDLLib {
 
 	public static final HDLEnum TIMEUNIT = new HDLEnum().setName("TimeUnit").addEnums(new HDLVariable().setName("FS")).addEnums(new HDLVariable().setName("PS"))
 			.addEnums(new HDLVariable().setName("NS")).addEnums(new HDLVariable().setName("US")).addEnums(new HDLVariable().setName("MS")).addEnums(new HDLVariable().setName("S"));
-	public static final HDLEnum EDGE = new HDLEnum().setName("Edge").addEnums(new HDLVariable().setName("RISING")).addEnums(new HDLVariable().setName("FALLING"));
-	public static final HDLEnum ACTIVE = new HDLEnum().setName("Active").addEnums(new HDLVariable().setName("LOW")).addEnums(new HDLVariable().setName("HIGH"));
-	public static final HDLEnum SYNC = new HDLEnum().setName("Sync").addEnums(new HDLVariable().setName("ASYNC")).addEnums(new HDLVariable().setName("SYNC"));
-	public static final HDLEnum ASSERT = new HDLEnum().setName("Assert").addEnums(new HDLVariable().setName("FATAL")).addEnums(new HDLVariable().setName("ERROR"))
-			.addEnums(new HDLVariable().setName("WARNING")).addEnums(new HDLVariable().setName("INFO"));
+	public static final HDLEnum EDGE = fromEnum(Edge.class);
+	public static final HDLEnum ACTIVE = fromEnum(Active.class);
+	public static final HDLEnum SYNC = fromEnum(Sync.class);
+	public static final HDLEnum ASSERT = fromEnum(Assert.class);
 
 	private static HDLPackage LIB = null;
 	private static Object LIB_LOCK = new Object();
@@ -59,6 +62,16 @@ public class PSHDLLib {
 			}
 		}
 		return LIB;
+	}
+
+	private static <S extends Enum<?>> HDLEnum fromEnum(Class<S> fromEnum) {
+		final String name = fromEnum.getName();
+		final String hdlName = name.substring(name.lastIndexOf('$') + 1);
+		HDLEnum hdlEnum = new HDLEnum().setName(hdlName);
+		for (final Enum e : fromEnum.getEnumConstants()) {
+			hdlEnum = hdlEnum.addEnums(new HDLVariable().setName(e.name()));
+		}
+		return hdlEnum;
 	}
 
 	public static void main(String[] args) {

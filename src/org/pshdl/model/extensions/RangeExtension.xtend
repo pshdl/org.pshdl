@@ -75,6 +75,7 @@ import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.extensions.ProblemDescription.*
 import static org.pshdl.model.extensions.RangeExtension.*
+import org.pshdl.model.utils.HDLCodeGenerationException
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -95,6 +96,12 @@ class RangeExtension {
 		return rangeOf(obj, null)
 	}
 
+	def static Range<BigInteger> rangeOfForced(HDLExpression obj, HDLEvaluationContext context, String stage) {
+		val opt=rangeOf(obj, context)
+		if (opt.present)
+			return opt.get
+		throw new HDLCodeGenerationException(obj, "Unable to determine value range of "+obj, stage)
+	}
 	/**
 	 * Attempts to determine the range of an {@link HDLExpression}. If not successful check ProblemDescription 
 	 * Meta for information.
@@ -197,6 +204,12 @@ class RangeExtension {
 		return rangeOf(obj, null)
 	}
 
+	def static Range<BigInteger> rangeOfForced(HDLRange obj, HDLEvaluationContext context, String stage) {
+		val opt=rangeOf(obj, context)
+		if (opt.present)
+			return opt.get
+		throw new HDLCodeGenerationException(obj, "Unable to determine value range of "+obj, stage)
+	}
 	def static Optional<Range<BigInteger>> rangeOf(HDLRange obj, HDLEvaluationContext context) {
 		val Optional<Range<BigInteger>> to = rangeOf(obj.to, context)
 		if (!to.present)
@@ -393,8 +406,6 @@ class RangeExtension {
 				if (type instanceof HDLPrimitive) {
 					val Optional<Range<BigInteger>> castRange = HDLPrimitives.getInstance.getValueRange(
 						type as HDLPrimitive, context)
-					if (!right.present)
-						return Optional.absent
 					if (type.type == HDLPrimitiveType.INTEGER) {
 						return Optional.of(HDLPrimitives.intRange(32bi).intersection(right.get))
 					}

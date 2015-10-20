@@ -55,15 +55,11 @@ public class TestbenchFunctions extends HDLDefaultFunctionImpl implements INativ
 	public static HDLFunction PULSE = (HDLFunction) createPulse().freeze(null);
 
 	private static HDLFunction createPulse() {
-		return new HDLNativeFunction()
-				.setSimOnly(true)
-				.setName("pshdl." + SimulationFunctions.pulse.name())
+		return new HDLNativeFunction().setSimOnly(true).setName("pshdl." + SimulationFunctions.pulse.name())
 				.setReturnType(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setRw(RWType.RETURN))
 				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_BIT).setName(new HDLVariable().setName("toggleExpression")).setRw(RWType.WRITE))
-				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ))
-				.addArgs(
-						new HDLFunctionParameter().setType(Type.PARAM_ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
-								.setRw(RWType.READ));
+				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ)).addArgs(new HDLFunctionParameter()
+						.setType(Type.PARAM_ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit")).setRw(RWType.READ));
 	}
 
 	private static HDLFunction createWait() {
@@ -72,14 +68,11 @@ public class TestbenchFunctions extends HDLDefaultFunctionImpl implements INativ
 	}
 
 	private static HDLFunction createWaitFor() {
-		return new HDLNativeFunction()
-				.setSimOnly(true)
-				.setName("pshdl." + SimulationFunctions.waitFor.name())
+		return new HDLNativeFunction().setSimOnly(true).setName("pshdl." + SimulationFunctions.waitFor.name())
 				.setReturnType(new HDLFunctionParameter().setType(Type.PARAM_BOOL).setRw(RWType.RETURN))
 				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_ANY_UINT).setName(new HDLVariable().setName("amount")).setRw(RWType.READ).setConstant(true))
-				.addArgs(
-						new HDLFunctionParameter().setType(Type.PARAM_ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
-								.setRw(RWType.READ));
+				.addArgs(new HDLFunctionParameter().setType(Type.PARAM_ENUM).setEnumSpec(new HDLQualifiedName("pshdl.TimeUnit")).setName(new HDLVariable().setName("timeUnit"))
+						.setRw(RWType.READ));
 	}
 
 	private static HDLFunction createWaitUntil() {

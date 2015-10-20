@@ -67,8 +67,8 @@ public class ModificationSet {
 				for (final Modification modification : mods) {
 					if (modification.type == ModificationType.REPLACE) {
 						if (modification.with.size() > 1)
-							throw new IllegalArgumentException("Can not replace with more than one object into a single node feature:" + feature + " of "
-									+ container.getClassType());
+							throw new IllegalArgumentException(
+									"Can not replace with more than one object into a single node feature:" + feature + " of " + container.getClassType());
 						if (currentMods.contains(modification.modificationID)) {
 							continue;
 						}

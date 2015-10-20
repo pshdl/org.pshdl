@@ -368,6 +368,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 							res.add(doCompile(src, parse));
 						} catch (final Exception e) {
 							listener.caughtException(e, src, parse);
+							res.add(createResult(src, null, null, false));
 						}
 					} else {
 						res.add(createResult(src, null, null, false));

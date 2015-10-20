@@ -51,7 +51,7 @@ public enum ProblemDescription implements MetaAccess<ProblemDescription> {
 	// Ranges
 	BOOLEAN_NOT_SUPPORTED_FOR_RANGES, BIT_NOT_SUPPORTED_FOR_RANGES, ZERO_DIVIDE, POSSIBLY_ZERO_DIVIDE,
 	// Others
-	NON_PRIMITVE_TYPE_NOT_EVALUATED, CAN_NOT_USE_PARAMETER;
+	NON_PRIMITVE_TYPE_NOT_EVALUATED, CAN_NOT_USE_PARAMETER, FAILED_TO_RESOLVE_ENUM;
 
 	/**
 	 * This annotation can be used to find out what caused the evaluation to

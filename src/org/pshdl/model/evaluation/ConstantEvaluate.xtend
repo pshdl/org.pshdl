@@ -56,6 +56,7 @@ import org.pshdl.model.HDLVariableDeclaration.HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.extensions.FullNameExtension
+import org.pshdl.model.extensions.ProblemDescription
 import org.pshdl.model.extensions.TypeExtension
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
@@ -69,7 +70,7 @@ import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*
 import static org.pshdl.model.extensions.ProblemDescription.*
-import org.pshdl.model.extensions.ProblemDescription
+import org.pshdl.model.utils.HDLCodeGenerationException
 
 /**
  * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link org.pshdl.model.IHDLObject}. Of course
@@ -97,6 +98,12 @@ class ConstantEvaluate {
 	 * 
 	 * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
 	 */
+	def static BigInteger valueOfForced(HDLExpression exp, HDLEvaluationContext context, String stage) {
+		val opt=valueOf(exp, context)
+		if (opt.present)
+			return opt.get
+		throw new HDLCodeGenerationException(exp, "Failed to evaluate '"+exp+"' to a constant", stage)
+	}
 	def static Optional<BigInteger> valueOf(HDLExpression exp, HDLEvaluationContext context) {
 		if (exp === null)
 			return Optional.absent
@@ -434,8 +441,15 @@ class ConstantEvaluate {
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLEnumRef obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		if (context !== null && context.enumAsInt) {
-			val hEnum = obj.resolveHEnum.get
-			val hVar = obj.resolveVar.get
+			val resolveHEnum = obj.resolveHEnum
+			val resolveVar = obj.resolveVar
+			if (!resolveHEnum.present || !resolveVar.present){
+				obj.addMeta(SOURCE, obj)
+				obj.addMeta(DESCRIPTION, FAILED_TO_RESOLVE_ENUM)				
+				return Optional.absent
+			}
+			val hEnum = resolveHEnum.get
+			val hVar = resolveVar.get
 			return Optional.of(BigInteger.valueOf(hEnum.enums.indexOf(hVar)))
 		}
 		obj.addMeta(SOURCE, obj)

@@ -42,7 +42,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String pkg. Can be <code>null</code>.</li>
  * <li>ArrayList&lt;HDLUnit&gt; units. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLDeclaration&gt; declarations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLDeclaration&gt; declarations. Can be <code>null</code>.
+ * </li>
  * </ul>
  */
 public class HDLPackage extends AbstractHDLPackage {

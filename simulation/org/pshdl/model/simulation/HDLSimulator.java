@@ -37,7 +37,10 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.pshdl.interpreter.JavaPSHDLLib.TimeUnit;
 import org.pshdl.model.HDLAnnotation;
+import org.pshdl.model.HDLArithOp;
+import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLArrayInit;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
@@ -105,7 +108,6 @@ public class HDLSimulator {
 		insulin = unrollForLoops(context, insulin);
 		insulin = createBitRanges(context, insulin);
 		insulin = literalBitRanges(context, insulin);
-		insulin = convertBooleanLiterals(context, insulin);
 		insulin = convertTernary(context, insulin);
 		insulin = removeDoubleAssignments(context, insulin);
 		insulin = removeDeadLeaves(context, insulin);
@@ -135,12 +137,54 @@ public class HDLSimulator {
 	 */
 	private static HDLUnit createTestbenchModel(HDLUnit unit, HDLEvaluationContext context, String src, char separator) {
 		HDLUnit insulin = Insulin.transform(unit, src);
+		insulin = rewriteTimeBase(insulin);
 		insulin = addTimeVar(insulin);
 		insulin = rewriteProcesses(insulin);
 		insulin = annotateVariableDeclarations(insulin);
 		insulin = insulin.addAnnotations(TB_UNIT).copyDeepFrozen(insulin.getContainer());
 		insulin.validateAllFields(insulin.getContainer(), true);
 		return createRegularSimModel(insulin, context, src, separator);
+	}
+
+	/**
+	 * Brings all waitFor calls to the smallest time unit. It also adds a
+	 * TimeBase annotation.
+	 *
+	 * @param insulin
+	 * @return
+	 */
+	private static HDLUnit rewriteTimeBase(HDLUnit insulin) {
+		final Collection<HDLFunctionCall> waits = HDLQuery.select(HDLFunctionCall.class).from(insulin).whereObj().fullNameIs(HDLQualifiedName.create("pshdl", "waitFor")).getAll();
+		int minBase = Integer.MAX_VALUE;
+		final HDLEvaluationContext enumContext = new HDLEvaluationContext();
+		enumContext.enumAsInt = true;
+		for (final HDLFunctionCall call : waits) {
+			final HDLExpression timeUnit = call.getParams().get(1);
+			final Optional<BigInteger> timeUnitValue = ConstantEvaluate.valueOf(timeUnit, enumContext);
+			if (timeUnitValue.isPresent()) {
+				minBase = Math.min(timeUnitValue.get().intValue(), minBase);
+			}
+		}
+		if (minBase == Integer.MAX_VALUE)
+			return insulin;
+		final ModificationSet ms = new ModificationSet();
+		ms.addTo(insulin, HDLUnit.fAnnotations, new HDLAnnotation().setName("@TimeBase").setValue(TimeUnit.values()[minBase].name()));
+		for (final HDLFunctionCall call : waits) {
+			final HDLExpression arg = call.getParams().get(0);
+			HDLExpression amount = arg;
+			final HDLExpression timeUnit = call.getParams().get(1);
+			final Optional<BigInteger> timeUnitValue = ConstantEvaluate.valueOf(timeUnit, enumContext);
+			if (timeUnitValue.isPresent()) {
+				final int timeBaseInt = timeUnitValue.get().intValue();
+				for (int i = minBase; i < timeBaseInt; i++) {
+					amount = new HDLArithOp().setLeft(amount).setType(HDLArithOpType.MUL).setRight(HDLLiteral.get(1000));
+				}
+				if (arg != amount) {
+					ms.replace(arg, amount);
+				}
+			}
+		}
+		return ms.apply(insulin);
 	}
 
 	private static HDLUnit annotateVariableDeclarations(HDLUnit insulin) {
@@ -332,20 +376,6 @@ public class HDLSimulator {
 		return ms.apply(insulin);
 	}
 
-	private static HDLUnit convertBooleanLiterals(HDLEvaluationContext context, HDLUnit insulin) {
-		final ModificationSet ms = new ModificationSet();
-		final HDLLiteral[] literals = insulin.getAllObjectsOf(HDLLiteral.class, true);
-		for (final HDLLiteral hdlLiteral : literals) {
-			final String val = hdlLiteral.getVal();
-			if (HDLLiteral.TRUE.equals(val)) {
-				ms.replace(hdlLiteral, HDLLiteral.get(1));
-			}
-			if (HDLLiteral.FALSE.equals(val)) {
-				ms.replace(hdlLiteral, HDLLiteral.get(0));
-			}
-		}
-		return ms.apply(insulin);
-	}
 
 	private static HDLUnit getSingleUnit(final HDLPackage pkg) {
 		final ArrayList<HDLUnit> units = pkg.getUnits();
@@ -668,14 +698,14 @@ public class HDLSimulator {
 			final ModificationSet ms = new ModificationSet();
 			for (final HDLForLoop loop : loops) {
 				final HDLVariable param = loop.getParam();
-				final Optional<Range<BigInteger>> r = RangeExtension.rangeOf(loop.getRange().get(0), context);
+				final Range<BigInteger> r = RangeExtension.rangeOfForced(loop.getRange().get(0), context, "PSEX");
 				final List<HDLStatement> newStmnts = new ArrayList<HDLStatement>();
 				for (final HDLStatement stmnt : loop.getDos()) {
 					final Collection<HDLVariableRef> refs = HDLQuery.select(HDLVariableRef.class).from(stmnt).where(HDLResolvedRef.fVar).lastSegmentIs(param.getName()).getAll();
 					if (refs.size() == 0) {
 						newStmnts.add(stmnt);
 					} else {
-						BigInteger counter = r.get().lowerEndpoint();
+						BigInteger counter = r.lowerEndpoint();
 						do {
 							final ModificationSet stmntMs = new ModificationSet();
 							for (final HDLVariableRef ref : refs) {
@@ -683,7 +713,7 @@ public class HDLSimulator {
 							}
 							newStmnts.add(stmntMs.apply(stmnt));
 							counter = counter.add(BigInteger.ONE);
-						} while (counter.compareTo(r.get().upperEndpoint()) <= 0);
+						} while (counter.compareTo(r.upperEndpoint()) <= 0);
 					}
 				}
 				ms.replace(loop, newStmnts.toArray(new HDLStatement[0]));

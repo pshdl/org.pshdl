@@ -288,8 +288,8 @@ public class HDLFunctions {
 				if (ifSpec.isPresent()) {
 					final HDLInterface hIf = (HDLInterface) type;
 					if (hIf.conformsTo(ifSpec.get(), false)) {
-						funcScore.incScore(1000, "The interface :" + type.getName() + " does not conform to the interface " + ifSpec.get().getName() + " for parameter: "
-								+ arg.getName().getName());
+						funcScore.incScore(1000,
+								"The interface :" + type.getName() + " does not conform to the interface " + ifSpec.get().getName() + " for parameter: " + arg.getName().getName());
 					}
 				}
 			}

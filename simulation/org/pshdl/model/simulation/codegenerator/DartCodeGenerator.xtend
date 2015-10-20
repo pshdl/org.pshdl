@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *
+ * 
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- *
+ * 
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- *
+ * 
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- *
+ * 
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * 
  *     This License does not grant permission to use the trade names, trademarks,
  *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- *
+ * 
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -123,8 +123,8 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		new IHDLInterpreterFactory<NativeRunner>() {
 
 			override newInstance() {
-				val Process dartRunner = new ProcessBuilder(DART_EXEC, "bin/" + testRunner.getName(), unitName, library).
-					directory(tempDir).redirectErrorStream(true).start()
+				val Process dartRunner = new ProcessBuilder(DART_EXEC, "bin/" + testRunner.getName(), unitName,
+					library).directory(tempDir).redirectErrorStream(true).start()
 				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5,
 					"Dart " + library + "." + unitName)
 			}
@@ -157,13 +157,14 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	}
 
 	override protected clearRegUpdates() '''_regUpdates.clear();
-		'''
+	'''
 
 	override protected arrayInit(VariableInformation varInfo, BigInteger initValue,
-		EnumSet<CommonCodeGenerator.Attributes> attributes) '''new «varInfo.fieldType(attributes)»(«varInfo.arraySize»)'''
+		EnumSet<CommonCodeGenerator.Attributes> attributes
+	) '''new «varInfo.fieldType(attributes)»(«varInfo.arraySize»)'''
 
 	override protected functionFooter(Frame frame) '''}
-		'''
+	'''
 
 	override protected functionHeader(Frame frame) '''
 		void _«frame.frameName»() {
@@ -173,22 +174,22 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		CharSequence offset, boolean forceRegUpdate, CharSequence fillValue) '''
 	«IF !forceRegUpdate»if («cpyName»!=«last»)
 	«indent()»	«ENDIF»_regUpdates.add(new RegUpdate(«outputInternal.regIdx», «offset», «fillValue»));'''
-	
+
 	def regIdx(InternalInformation information) {
 		regIdx.get(information.info.name)
 	}
 
 	override protected runMethodsHeader(boolean constant) '''void «IF !constant»run«ELSE»initConstants«ENDIF»() {
-		'''
+	'''
 
 	override protected runMethodsFooter(boolean constant) '''}
-		'''
+	'''
 
 	override protected callStage(int stage, boolean constant) '''_«stageMethodName(stage, constant)»();
-		'''
+	'''
 
 	override protected stageMethodsFooter(int stage, int stageCosts, boolean constant) '''}
-		'''
+	'''
 
 	override protected copyArray(VariableInformation varInfo) {
 		val type = varInfo.fieldType(NONE)
@@ -434,15 +435,18 @@ import '../simulation_comm.dart';
 
 	override protected stageMethodsHeader(int stage, int stageCosts, boolean constant) '''void _«stageMethodName(
 		stage, constant)»(){
-		'''
+	'''
 
-	override protected assignNextTime(VariableInformation nextTime, CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
+	override protected assignNextTime(VariableInformation nextTime,
+		CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
 		name», «currentProcessTime»);'''
 
-	override protected callMethod(CharSequence methodName, CharSequence... args) '''_«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+	override protected callMethod(CharSequence methodName,
+		CharSequence... args
+	) '''_«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() '''run();
-		'''
+	'''
 
 	override protected checkTestbenchListener() '''«indent()»if (listener!=null && !listener.nextStep(«varByName("$time").
 		idName(true, NONE)», stepCount))
@@ -452,16 +456,17 @@ import '../simulation_comm.dart';
 	override protected runProcessHeader(CommonCodeGenerator.ProcessData pd) {
 		indent++
 		'''bool _«processMethodName(pd)»() {
-			'''
+		'''
 	}
 
 	override protected runTestbenchHeader() {
 		indent++
 		'''void runTestbench(int maxTime, int maxSteps, ITestbenchStepListener listener) {
-			'''
+		'''
 	}
 
-	override protected fillArray(VariableInformation vi, CharSequence regFillValue) '''«vi.idName(true, NONE)».fillRange(0, «vi.
+	override protected fillArray(VariableInformation vi,
+		CharSequence regFillValue) '''«vi.idName(true, NONE)».fillRange(0, «vi.
 		arraySize», «regFillValue»);'''
 
 	override protected signExtend(CharSequence op, int targetSizeWithType) {
@@ -473,21 +478,22 @@ import '../simulation_comm.dart';
 	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
 		if (fi.inst === Instruction.srl) {
-			return assignTempVar(targetSizeWithType, pos, NONE,
-				'''_srl(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)», «fi.arg1»)''', true)
+			return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos,
+				NONE, '''_srl(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)», «fi.arg1»)''', true)
 		}
 		if (fi.inst === Instruction.div) {
 			val CharSequence assignValue = twoOpValue("~/", getCast(targetSizeWithType), leftOperand, rightOperand,
 				targetSizeWithType, attributes);
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+			return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes,
+				assignValue, true);
 		}
 		return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
 
 	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
-		return assignTempVar(targetSizeWithType, pos, NONE,
-			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
+		return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos,
+			NONE, '''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
 
 	override getHookName() {

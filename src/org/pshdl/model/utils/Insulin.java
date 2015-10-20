@@ -712,21 +712,19 @@ public class Insulin {
 				return Optional.of(new ResolvedPart(variable.asHDLRef().setArray(uFrag.getArray()).setBits(uFrag.getBits()), sub));
 			}
 			final Optional<HDLEnum> enumRaw = ScopingExtension.INST.resolveEnum(uFrag, hVar);
-			if (enumRaw.isPresent())
-				if (sub != null) {
-					final HDLQualifiedName typeName = fullNameOf(enumRaw.get());
+			if (enumRaw.isPresent() && (sub != null)) {
+				final HDLQualifiedName typeName = fullNameOf(enumRaw.get());
+				final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
+				return Optional.of(new ResolvedPart(enumRef, ssub));
+			}
+			final Optional<? extends HDLType> typeRaw = ScopingExtension.INST.resolveType(uFrag, hVar);
+			if (typeRaw.isPresent() && (sub != null)) {
+				final HDLQualifiedName typeName = fullNameOf(typeRaw.get());
+				if (typeRaw.get() instanceof HDLEnum) {
 					final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
 					return Optional.of(new ResolvedPart(enumRef, ssub));
 				}
-			final Optional<? extends HDLType> typeRaw = ScopingExtension.INST.resolveType(uFrag, hVar);
-			if (typeRaw.isPresent())
-				if (sub != null) {
-					final HDLQualifiedName typeName = fullNameOf(typeRaw.get());
-					if (typeRaw.get() instanceof HDLEnum) {
-						final HDLEnumRef enumRef = new HDLEnumRef().setHEnum(typeName).setVar(typeName.append(sub.getFrag()));
-						return Optional.of(new ResolvedPart(enumRef, ssub));
-					}
-				}
+			}
 		} else {
 			final HDLUnresolvedFragmentFunction uff = (HDLUnresolvedFragmentFunction) uFrag;
 			final HDLFunctionCall call = new HDLFunctionCall().setFunction(hVar).setParams(uff.getParams());

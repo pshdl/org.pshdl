@@ -401,7 +401,7 @@ func pow(a int64, n int64) int64 {
 		if (fi.inst === Instruction.bit_neg) {
 			val CharSequence assignValue = singleOpValue("^", getCast(targetSizeWithType), a, targetSizeWithType,
 				attributes);
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+			return assignTempVar(typeFromTargetSize(targetSizeWithType),targetSizeWithType, pos, attributes, assignValue, true);
 		}
 		super.singleOp(fi, op, targetSizeWithType, pos, a, attributes, doMask)
 	}
@@ -412,24 +412,24 @@ func pow(a int64, n int64) int64 {
 			val CharSequence assignValue = doCast("int64",
 				doCast("uint64", getTempName(leftOperand, NONE)) + ">>" +
 					doCast("uint64", getTempName(rightOperand, NONE)))
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+			return assignTempVar(typeFromTargetSize(targetSizeWithType),targetSizeWithType, pos, attributes, assignValue, true);
 		}
 		if (fi.inst === Instruction.sra) {
 			val CharSequence assignValue = getTempName(leftOperand, NONE) + ">>" +
 				doCast("uint64", getTempName(rightOperand, NONE))
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+			return assignTempVar(typeFromTargetSize(targetSizeWithType),targetSizeWithType, pos, attributes, assignValue, true);
 		}
 		if (fi.inst === Instruction.sll) {
 			val CharSequence assignValue = doCast("int64",
 				getTempName(leftOperand, NONE) + "<<" + doCast("uint64", getTempName(rightOperand, NONE)))
-			return assignTempVar(targetSizeWithType, pos, attributes, assignValue, true);
+			return assignTempVar(typeFromTargetSize(targetSizeWithType),targetSizeWithType, pos, attributes, assignValue, true);
 		}
 		super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask)
 	}
 
 	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
-		return assignTempVar(targetSizeWithType, pos, NONE,
+		return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, NONE,
 			'''pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
 

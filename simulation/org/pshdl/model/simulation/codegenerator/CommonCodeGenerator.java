@@ -57,6 +57,7 @@ import java.util.Stack;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.Frame.FastInstruction;
+import org.pshdl.interpreter.FunctionInformation;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
@@ -187,17 +188,28 @@ public abstract class CommonCodeGenerator {
 		for (int i = 0; i <= maxStage; i++) {
 			final Collection<Frame> frames = schedulingStage.get(i);
 			for (final Frame frame : frames) {
+				if (isRedundantFrame(frame)) {
+					continue;
+				}
 				if (frame.constant == createConstant) {
 					selectedScheduleStage.add(i);
 					break;
 				}
 			}
 		}
-
-		sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates, handledNegEdges, handledPosEdges));
-
+		if (!selectedScheduleStage.isEmpty()) {
+			sb.append(createStageMethods(schedulingStage, createConstant, selectedScheduleStage, handledPredicates, handledNegEdges, handledPosEdges));
+		}
+		// Create postFunc Stage if necessary
+		if (!createConstant) {
+			sb.append(createStageMethods(schedulingStage, createConstant, Arrays.asList(-1), handledPredicates, handledNegEdges, handledPosEdges));
+		}
 		createRunMethod(schedulingStage, maxStage, createConstant, selectedScheduleStage, sb);
 		return sb;
+	}
+
+	private boolean isRedundantFrame(final Frame frame) {
+		return purgeAliases && frame.isRename(em);
 	}
 
 	protected void createRunMethod(final Multimap<Integer, Frame> schedulingStage, int maxStage, final boolean createConstant, final List<Integer> selectedScheduleStage,
@@ -207,35 +219,40 @@ public abstract class CommonCodeGenerator {
 		sb.append(indent()).append(assignConstant(EPS_CYCLE, ZERO, NONE, true)).append(newLine());
 		if (!createConstant) {
 			sb.append(indent()).append(incVar(DELTA_CYCLE)).append(newLine());
-		}
-		if (!createConstant && hasClock) {
-			sb.append(indent()).append(doLoopStart()).append(newLine());
-			indent++;
-			sb.append(indent()).append(clearRegUpdates()).append(newLine());
+			if (hasClock) {
+				sb.append(indent()).append(doLoopStart()).append(newLine());
+				indent++;
+				sb.append(indent()).append(clearRegUpdates()).append(newLine());
+			}
 		}
 		sb.append(indent()).append(assignVariable(TIMESTAMP, "(" + idName(DELTA_CYCLE, true, NONE) + " << 16) | " + idName(EPS_CYCLE, true, NONE), NONE, true, false, false))
 				.append(newLine());
 		for (final Integer stage : selectedScheduleStage) {
 			sb.append(indent()).append(callStage(stage, createConstant));
 		}
-		if (!createConstant && hasClock) {
-			sb.append(indent()).append(applyRegUpdates()).append(newLine());
-			sb.append(indent()).append(incVar(EPS_CYCLE)).append(newLine());
-			final StringBuilder condition = new StringBuilder();
-			condition.append(checkRegupdates());
-			condition.append(" && !").append(idName(DISABLE_REG_OUTPUTLOGIC, true, NONE));
-			indent--;
-			sb.append(indent()).append(doLoopEnd(condition)).append(newLine());
-			for (final String prev : prevMapNeg) {
-				final VariableInformation var = em.variables[varIdx.get(prev)];
-				copyPrev(sb, var);
-			}
-			for (final String prev : prevMapPos) {
-				if (prevMapNeg.contains(prev)) {
-					continue;
+		if (!createConstant) {
+			if (hasClock) {
+				sb.append(indent()).append(applyRegUpdates()).append(newLine());
+				sb.append(indent()).append(incVar(EPS_CYCLE)).append(newLine());
+				final StringBuilder condition = new StringBuilder();
+				condition.append(checkRegupdates());
+				condition.append(" && !").append(idName(DISABLE_REG_OUTPUTLOGIC, true, NONE));
+				indent--;
+				sb.append(indent()).append(doLoopEnd(condition)).append(newLine());
+				for (final String prev : prevMapNeg) {
+					final VariableInformation var = em.variables[varIdx.get(prev)];
+					copyPrev(sb, var);
 				}
-				final VariableInformation var = em.variables[varIdx.get(prev)];
-				copyPrev(sb, var);
+				for (final String prev : prevMapPos) {
+					if (prevMapNeg.contains(prev)) {
+						continue;
+					}
+					final VariableInformation var = em.variables[varIdx.get(prev)];
+					copyPrev(sb, var);
+				}
+			}
+			if (schedulingStage.containsKey(-1)) {
+				sb.append(indent()).append(callStage(-1, false));
 			}
 		}
 		indent--;
@@ -265,6 +282,9 @@ public abstract class CommonCodeGenerator {
 				if (frame.constant != createConstant) {
 					continue;
 				}
+				if (isRedundantFrame(frame)) {
+					continue;
+				}
 				matchingFrames.add(frame);
 				totalStageCosts += estimateFrameCosts(frame);
 			}
@@ -290,7 +310,7 @@ public abstract class CommonCodeGenerator {
 		}
 		for (final Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
 			final Frame frame = iterator.next();
-			if (purgeAliases && frame.isRename(em)) {
+			if (isRedundantFrame(frame)) {
 				continue;
 			}
 			stageCosts += estimateFrameCosts(frame);
@@ -462,7 +482,7 @@ public abstract class CommonCodeGenerator {
 			}
 			final StringBuilder value = new StringBuilder();
 			value.append(indent());
-			final CharSequence zeroOnePredicate = condition(Condition.isNotEqual, valueName, constant(ZERO, true, -1));
+			final CharSequence zeroOnePredicate = condition(Condition.isNotEqual, valueName, constant(Type.UINT, ZERO, true, -1));
 			CharSequence assignValue = ii.isPred ? zeroOnePredicate : valueName;
 			if ((cast != null) && !ii.isPred) {
 				assignValue = doCast(cast, assignValue);
@@ -497,7 +517,7 @@ public abstract class CommonCodeGenerator {
 				final StringBuilder value = new StringBuilder();
 				value.append(indent());
 				if (isArray(vi)) {
-					final CharSequence condition = condition(Condition.isNotEqual, regOffset(), constant(ONE.negate(), false, -1));
+					final CharSequence condition = condition(Condition.isNotEqual, regOffset(), constant(Type.UINT, ONE.negate(), false, -1));
 					final CharSequence assignArrayElement = assignArrayElement(vi, getArrayElement(vi, regOffset(), true, SHADOWREG), regOffset(), true, NONE, true);
 					value.append(ifCondition(condition, assignArrayElement, fillArray(vi, regFillValue())));
 				} else {
@@ -669,7 +689,7 @@ public abstract class CommonCodeGenerator {
 	protected CharSequence frames() {
 		final StringBuilder sb = new StringBuilder();
 		for (final Frame frame : em.frames) {
-			if (purgeAliases && frame.isRename(em)) {
+			if (isRedundantFrame(frame)) {
 				continue;
 			}
 			sb.append(indent()).append(functionHeader(frame));
@@ -762,9 +782,6 @@ public abstract class CommonCodeGenerator {
 			if (instruction.inst.pop > 1) {
 				b = stack.pop();
 			}
-			if (instruction.inst.push > 0) {
-				stack.push(pos);
-			}
 			if (instruction.inst == Instruction.pushAddIndex) {
 				final InternalInformation ii = em.internals[instruction.arg1];
 				InternalPushInfo ipi = pushInfo.get(ii.info.name);
@@ -774,7 +791,16 @@ public abstract class CommonCodeGenerator {
 				}
 				ipi.pushedIndices.add(++arrPos);
 			}
-			sb.append(indent()).append(toExpression(instruction, frame, pos, a, b));
+			if (instruction.inst == Instruction.invokeFunction) {
+				sb.append(indent());
+				sb.append(toInvokeFunction(instruction, frame, pos, stack));
+				sb.append(comment(instruction.toString(em)));
+			} else {
+				sb.append(indent()).append(toExpression(instruction, frame, pos, a, b));
+			}
+			if (instruction.inst.push > 0) {
+				stack.push(pos);
+			}
 			if (instruction.inst != Instruction.pushAddIndex) {
 				pos++;
 			}
@@ -858,9 +884,9 @@ public abstract class CommonCodeGenerator {
 		return targetSizeWithType;
 	}
 
-	protected StringBuilder assignTempVar(int targetSizeWithType, int pos, EnumSet<Attributes> attributes, CharSequence assignValue, boolean doMask) {
+	protected StringBuilder assignTempVar(Type type, int targetSizeWithType, int pos, EnumSet<Attributes> attributes, CharSequence assignValue, boolean doMask) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(tempVar(pos, targetSizeWithType, attributes));
+		sb.append(tempVar(type, pos, targetSizeWithType, attributes));
 		sb.append(doAssign(assignValue, targetSizeWithType, doMask));
 		return sb;
 	}
@@ -957,17 +983,53 @@ public abstract class CommonCodeGenerator {
 			sb.append(toPredicateExpression(exec, frame, pos, a, b));
 			break;
 		case noop:
+		case invokeFunction: // handled outside
+			break;
+		case loadConstantString:
+			sb.append(loadConstantString(exec, frame, pos));
 			break;
 		}
 		sb.append(comment(exec.toString(em)));
 		return sb;
 	}
 
+	protected CharSequence loadConstantString(FastInstruction exec, Frame frame, int pos) {
+		final StringBuilder sb = new StringBuilder();
+		switch (exec.inst) {
+		case loadConstantString:
+			sb.append(assignTempVar(Type.STRING, -1, pos, NONE, getString(frame.constantStrings[exec.arg1]), false));
+			break;
+		default:
+			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
+		}
+		return sb;
+	}
+
+	protected CharSequence getString(String string) {
+		return '"' + string + '"';
+	}
+
+	protected CharSequence toInvokeFunction(FastInstruction exec, Frame frame, int pos, Stack<Integer> stack) {
+		final FunctionInformation fi = em.functions[exec.arg1];
+		final String[] args = new String[exec.arg2];
+		for (int i = exec.arg2 - 1; i >= 0; i--) {
+			final Integer pop = stack.pop();
+			args[i] = getTempName(pop, NONE);
+		}
+		final CharSequence funcCall = callMethod(getFunctionName(fi), args);
+		return funcCall + getStatementSeparator();
+	}
+
+	protected String getFunctionName(final FunctionInformation fi) {
+		return fi.signature();
+	}
+
 	protected CharSequence toConcatExpression(FastInstruction exec, Frame frame, int pos, int a, int b) {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case concat:
-			sb.append(assignTempVar((exec.arg1 + exec.arg2) << 1, pos, NONE, "((" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE) + ")", true));
+			sb.append(
+					assignTempVar(Type.BIT, (exec.arg1 + exec.arg2) << 1, pos, NONE, "((" + getTempName(b, NONE) + " << " + exec.arg2 + ") | " + getTempName(a, NONE) + ")", true));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
@@ -998,24 +1060,24 @@ public abstract class CommonCodeGenerator {
 				final String varName = internal.info.name;
 				final InternalPushInfo pi = pushInfo.get(varName);
 				final Integer idx = pi.pushedIndices.get(0);
-				sb.append(assignTempVar(2, pos, NONE, mask(shiftRightDynamic(tempName, idx), 1), false));
+				sb.append(assignTempVar(Type.BIT, 2, pos, NONE, mask(shiftRightDynamic(tempName, idx), 1), false));
 				pushInfo.remove(varName);
 			} else {
-				sb.append(assignTempVar(2, pos, NONE, mask(tempName + " >> " + exec.arg1, 1), false));
+				sb.append(assignTempVar(Type.BIT, 2, pos, NONE, mask(tempName + " >> " + exec.arg1, 1), false));
 			}
 			break;
 		case bitAccessSingleRange:
 			final int highBit = exec.arg1;
 			final int lowBit = exec.arg2;
 			final int targetSize = (highBit - lowBit) + 1;
-			sb.append(assignTempVar(targetSize << 1, pos, NONE, mask(tempName + " >> " + lowBit, targetSize), false));
+			sb.append(assignTempVar(Type.BIT, targetSize << 1, pos, NONE, mask(tempName + " >> " + lowBit, targetSize), false));
 			break;
 		case cast_int:
 			// Create a targetSizeWitType with int indication
-			sb.append(assignTempVar((Math.min(exec.arg1, exec.arg2) << 1) | 1, pos, NONE, tempName, false));
+			sb.append(assignTempVar(Type.INT, (Math.min(exec.arg1, exec.arg2) << 1) | 1, pos, NONE, tempName, false));
 			break;
 		case cast_uint:
-			sb.append(assignTempVar(Math.min(exec.arg1, exec.arg2) << 1, pos, NONE, mask(tempName, Math.min(exec.arg1, exec.arg2)), false));
+			sb.append(assignTempVar(Type.UINT, Math.min(exec.arg1, exec.arg2) << 1, pos, NONE, mask(tempName, Math.min(exec.arg1, exec.arg2)), false));
 			break;
 		default:
 			throw new IllegalArgumentException("Did not expect instruction:" + exec + " here");
@@ -1035,23 +1097,24 @@ public abstract class CommonCodeGenerator {
 		final StringBuilder sb = new StringBuilder();
 		switch (exec.inst) {
 		case const0:
-			sb.append(assignTempVar(-1, pos, NONE, constant(ZERO, true, -1), false));
+			sb.append(assignTempVar(Type.UINT, -1, pos, NONE, constant(Type.UINT, ZERO, true, -1), false));
 			break;
 		case const1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(ONE, true, -1), false));
+			sb.append(assignTempVar(Type.UINT, -1, pos, NONE, constant(Type.UINT, ONE, true, -1), false));
 			break;
 		case const2:
-			sb.append(assignTempVar(-1, pos, NONE, constant(BigInteger.valueOf(2), true, -1), false));
+			sb.append(assignTempVar(Type.UINT, -1, pos, NONE, constant(Type.UINT, BigInteger.valueOf(2), true, -1), false));
 			break;
 		case constAll1:
-			sb.append(assignTempVar(-1, pos, NONE, constant(calcMask(exec.arg1), true, -1), false));
+			sb.append(assignTempVar(Type.UINT, -1, pos, NONE, constant(Type.UINT, calcMask(exec.arg1), true, -1), false));
 			break;
 		case loadConstant:
-			sb.append(assignTempVar(-1, pos, NONE, constant(frame.constants[exec.arg1], true, -1), true));
+			final Type type = Type.values()[exec.arg2];
+			sb.append(assignTempVar(type, -1, pos, NONE, constant(type, frame.constants[exec.arg1], true, -1), type != Type.BOOL));
 			break;
 		case loadInternal: {
 			final InternalInformation asInternal = asInternal(exec.arg1);
-			sb.append(assignTempVar(-1, pos, NONE, loadInternal(asInternal, NONE), false));
+			sb.append(assignTempVar(asInternal.info.type, -1, pos, NONE, loadInternal(asInternal, NONE), false));
 			final String varName = asInternal.info.name;
 			final InternalPushInfo pi = pushInfo.get(varName);
 			if ((pi != null) && !pi.isBitAccess) {
@@ -1077,7 +1140,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence assignIndexVar(int a) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(assignTempVar(-1, arrPos, EnumSet.of(isArrayIndex), getTempName(a, NONE), true));
+		sb.append(assignTempVar(Type.UINT, -1, arrPos, EnumSet.of(isArrayIndex), getTempName(a, NONE), true));
 		return sb;
 	}
 
@@ -1141,7 +1204,7 @@ public abstract class CommonCodeGenerator {
 			final VariableInformation currVar = createVar(idName(internal.fullName, false, NONE) + tempName + "_current", internal.actualWidth, internal.info.type);
 			final CharSequence currentValue = internalWithArrayAccess(internal, internal.isShadowReg ? SHADOWREG : NONE);
 			final BigInteger mask = calcMask(internal.actualWidth);
-			final CharSequence writeMask = constant(mask.shiftLeft(internal.bitEnd).not(), true, internal.info.width);
+			final CharSequence writeMask = constant(Type.UINT, mask.shiftLeft(internal.bitEnd).not(), true, internal.info.width);
 			final VariableInformation maskVar = createVar(idName(internal.fullName, false, NONE) + tempName + "_mask_shift", internal.actualWidth, internal.info.type);
 			if (internal.bitStart == -1) {
 				final InternalPushInfo pi = pushInfo.get(internal.info.name);
@@ -1383,23 +1446,24 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence singleOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int a, EnumSet<Attributes> attributes, boolean doMask) {
 		final CharSequence assignValue = singleOpValue(op, getCast(targetSizeWithType), a, targetSizeWithType, attributes);
-		return assignTempVar(targetSizeWithType, pos, attributes, assignValue, doMask);
+		return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue, doMask);
 	}
 
-	protected CharSequence twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes, boolean doMask) {
+	protected Type typeFromTargetSize(int targetSizeWithType) {
+		return isSignedType(targetSizeWithType) ? Type.INT : Type.UINT;
+	}
+
+	protected CharSequence twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand, int rightOperand, EnumSet<Attributes> attributes,
+			boolean doMask) {
 		final CharSequence assignValue = twoOpValue(op, getCast(targetSizeWithType), leftOperand, rightOperand, targetSizeWithType, attributes);
-		return assignTempVar(targetSizeWithType, pos, attributes, assignValue, doMask);
+		return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue, doMask);
 	}
 
-	protected CharSequence tempVar(int pos, int targetSizeWithType, EnumSet<Attributes> attributes) {
+	protected CharSequence tempVar(Type type, int pos, int targetSizeWithType, EnumSet<Attributes> attributes) {
 		final int width = targetSizeWithType >> 1;
-		Type type = Type.UINT;
 		if (attributes.contains(isPredicate)) {
 			type = Type.BOOL;
 			attributes = filterPredicate(attributes);
-		}
-		if (isSignedType(targetSizeWithType)) {
-			type = Type.INT;
 		}
 		final VariableInformation var = createVar(getTempName(pos, attributes), width, type);
 		final StringBuilder sb = new StringBuilder();
@@ -1455,14 +1519,14 @@ public abstract class CommonCodeGenerator {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize);
-		return doMask(op, constant(mask, true, -1));
+		return doMask(op, constant(Type.UINT, mask, true, -1));
 	}
 
 	protected CharSequence invertedMask(CharSequence op, int targetSize) {
 		if (targetSize == bitWidth)
 			return op;
 		final BigInteger mask = calcMask(targetSize).not();
-		return "(" + op + ") & " + constant(mask, true, -1);
+		return "(" + op + ") & " + constant(Type.UINT, mask, true, -1);
 	}
 
 	protected BigInteger calcMask(int targetSize) {
@@ -1657,8 +1721,7 @@ public abstract class CommonCodeGenerator {
 				attributes.contains(isNegEdgeHandled) || //
 				attributes.contains(isNegEdgeActive) || //
 				attributes.contains(isPredFresh) //
-				)
-				&& !attributes.contains(isUpdate);
+		) && !attributes.contains(isUpdate);
 	}
 
 	protected int getArraySize(VariableInformation vi) {
@@ -1672,6 +1735,8 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence stageMethodName(int stage, boolean constant) {
+		if (stage == -1)
+			return "postFuncStage";
 		if (constant)
 			return "const_stage" + String.format("%04d", stage);
 		return "stage" + String.format("%04d", stage);
@@ -1688,7 +1753,7 @@ public abstract class CommonCodeGenerator {
 		if (isBoolean(var, attributes)) {
 			assignValue = constantBoolean(constantValue);
 		} else {
-			assignValue = constant(constantValue, forceUnsigned, -1);
+			assignValue = constant(Type.UINT, constantValue, forceUnsigned, -1);
 		}
 		sb.append(doAssign(assignValue, -1, false));
 		return sb;
@@ -1701,14 +1766,20 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence constant(long constantValue, boolean forceUnsigned) {
-		return constant(BigInteger.valueOf(constantValue), forceUnsigned, -1);
+		return constant(Type.UINT, BigInteger.valueOf(constantValue), forceUnsigned, -1);
 	}
 
 	protected CharSequence constant(BigInteger constantValue, boolean forceUnsigned) {
-		return constant(constantValue, forceUnsigned, -1);
+		return constant(Type.UINT, constantValue, forceUnsigned, -1);
 	}
 
 	protected CharSequence constant(BigInteger constantValue, boolean forceUnsigned, int maxLen) {
+		return constant(Type.UINT, constantValue, forceUnsigned, maxLen);
+	}
+
+	protected CharSequence constant(Type type, BigInteger constantValue, boolean forceUnsigned, int maxLen) {
+		if (type == Type.BOOL)
+			return constantBoolean(constantValue);
 		if (maxLen > 0)
 			return constantVarLength(constantValue, maxLen, forceUnsigned);
 		if ((constantValue.signum() >= 0) && (constantValue.compareTo(BigInteger.TEN) < 0))
@@ -1927,7 +1998,7 @@ public abstract class CommonCodeGenerator {
 		result.append(createProcessMethods(processes));
 		result.append(indent()).append(runTestbenchHeader());
 		final VariableInformation stepCount = createVar("stepCount", 64, Type.UINT);
-		result.append(indent()).append(assignVariable(stepCount, constant(ZERO, true, -1), NONE, false, true, false)).append(newLine());
+		result.append(indent()).append(assignVariable(stepCount, constant(Type.UINT, ZERO, true, -1), NONE, false, true, false)).append(newLine());
 		result.append(indent()).append(whileLoopStart(runTestBenchOuterLoopCondition(stepCount)));
 		final VariableInformation modified = createVar("modified", -1, Type.BOOL);
 		result.append(indent()).append(assignVariable(modified, constantBoolean(ZERO), NONE, false, true, false)).append(newLine());
@@ -1942,7 +2013,7 @@ public abstract class CommonCodeGenerator {
 		final VariableInformation nextTime = createVar("nextTime", 64, Type.UINT);
 		result.append(indent()).append(assignVariable(nextTime, constant(Long.MAX_VALUE, true), NONE, false, true, false)).append(newLine());
 		for (final ProcessData pd : processes.values()) {
-			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(ZERO, true, -1));
+			final CharSequence stateCondition = condition(Condition.isGreateEqual, processState(pd.processName), constant(Type.UINT, ZERO, true, -1));
 			final CharSequence stateBlockedCondition = condition(Condition.isNotEqual, processState(pd.processName), processStale());
 			final CharSequence condition = condition(Condition.logiAnd, stateCondition, stateBlockedCondition);
 			result.append(indent()).append(ifCondition(condition, assignNextTime(nextTime, processTime(pd.processName)), null));
@@ -2059,7 +2130,7 @@ public abstract class CommonCodeGenerator {
 
 	protected CharSequence processCondition(String processName) {
 		final CharSequence isTimeGood = condition(Condition.isGreateEqual, idName(timeName(), true, NONE), processTime(processName));
-		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(ZERO, true, -1));
+		final CharSequence isNotWaiting = condition(Condition.isGreateEqual, processState(processName), constant(Type.UINT, ZERO, true, -1));
 		final CharSequence isNotStale = condition(Condition.isNotEqual, processState(processName), processStale());
 		return condition(Condition.logiAnd, condition(Condition.logiAnd, isNotStale, isNotWaiting), isTimeGood);
 	}

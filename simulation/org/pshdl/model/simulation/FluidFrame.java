@@ -45,6 +45,7 @@ import java.util.regex.Pattern;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
 import org.pshdl.interpreter.Frame.FastInstruction;
+import org.pshdl.interpreter.FunctionInformation;
 import org.pshdl.interpreter.InternalInformation;
 import org.pshdl.interpreter.VariableInformation;
 import org.pshdl.interpreter.VariableInformation.Direction;
@@ -85,9 +86,12 @@ public class FluidFrame {
 	}
 
 	private static class FrameRegister {
-		public final Set<String> inputs = new LinkedHashSet<String>();
+		public final Set<String> inputs = new LinkedHashSet<>();
 		private int internalIdCounter = 0;
-		public final Map<String, Integer> internalIds = new LinkedHashMap<String, Integer>();
+		public final Map<String, Integer> internalIds = new LinkedHashMap<>();
+		private int functionIdCounter = 0;
+		public final Map<String, Integer> functionIds = new LinkedHashMap<>();
+		public final Map<String, FunctionInformation> functions = new LinkedHashMap<>();
 
 		public Integer getInternal(String in) {
 			return internalIds.get(in);
@@ -105,6 +109,20 @@ public class FluidFrame {
 			return registerInternal(string);
 		}
 
+		public void registerFunctions(Map<String, FunctionInformation> funcs) {
+			for (final FunctionInformation fi : funcs.values()) {
+				final String signature = fi.signature();
+				if (functionIds.get(signature) == null) {
+					functionIds.put(signature, functionIdCounter++);
+					functions.put(signature, fi);
+				}
+			}
+		}
+
+		public Integer getFunction(String signature) {
+			return functionIds.get(signature);
+		}
+
 	}
 
 	/**
@@ -120,15 +138,16 @@ public class FluidFrame {
 	/**
 	 * All constants by name
 	 */
-	public final Map<String, BigInteger> constants = new LinkedHashMap<String, BigInteger>();
+	public final Map<String, BigInteger> constants = new LinkedHashMap<>();
 
-	public final LinkedList<ArgumentedInstruction> instructions = new LinkedList<ArgumentedInstruction>();
+	public final LinkedList<ArgumentedInstruction> instructions = new LinkedList<>();
 	public String outputName;
 	public final boolean constant;
 	public final String simProcess;
 
-	public final Set<FluidFrame> references = new LinkedHashSet<FluidFrame>();
-	public final Map<String, VariableInformation> vars = new TreeMap<String, VariableInformation>();
+	public final Set<FluidFrame> references = new LinkedHashSet<>();
+	public final Map<String, VariableInformation> vars = new TreeMap<>();
+	public final Map<String, FunctionInformation> funcs = new TreeMap<>();
 
 	public String[] annotations;
 
@@ -184,6 +203,10 @@ public class FluidFrame {
 			final VariableInformation info = vars.get(basicName);
 			internals[e.getValue()] = new InternalInformation(name, info);
 		}
+		final FunctionInformation fFuncs[] = new FunctionInformation[register.functionIdCounter];
+		for (final Entry<String, Integer> entry : register.functionIds.entrySet()) {
+			fFuncs[entry.getValue()] = register.functions.get(entry.getKey());
+		}
 		final Map<String, List<Frame>> lastID = Maps.newLinkedHashMap();
 		for (final Frame frame : res) {
 			for (final int outputId : frame.outputIds) {
@@ -222,7 +245,7 @@ public class FluidFrame {
 			}
 		}
 		final VariableInformation[] fVars = vars.values().toArray(new VariableInformation[vars.values().size()]);
-		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars, moduleName, source, annotations);
+		return new ExecutableModel(res.toArray(new Frame[res.size()]), internals, fVars, fFuncs, moduleName, source, annotations);
 	}
 
 	private static class PredicateChain {
@@ -330,6 +353,7 @@ public class FluidFrame {
 			}
 			register.registerInternal(outputName);
 		}
+		register.registerFunctions(funcs);
 		for (final FluidFrame entry : references) {
 			entry.registerFrame(register);
 		}
@@ -353,6 +377,7 @@ public class FluidFrame {
 		int maxDataWidth = 0;
 		int constantIdCount = 0;
 		int stringIdCount = 0;
+		boolean isFuncStatement = false;
 		int posEdge = -1, negEdge = -1;
 		final List<Integer> posPred = new LinkedList<Integer>(), negPred = new LinkedList<Integer>();
 		final List<FastInstruction> instr = new LinkedList<FastInstruction>();
@@ -449,6 +474,7 @@ public class FluidFrame {
 				maxDataWidth = Math.max(c.bitLength(), maxDataWidth);
 				constants.add(c);
 				arg1 = constantIdCount++;
+				arg2 = Integer.parseInt(ai.args[1]);
 				break;
 			case loadConstantString:
 				strings.add(ai.args[0]);
@@ -471,6 +497,14 @@ public class FluidFrame {
 				break;
 			case bitAccessSingle:
 				arg1 = Integer.parseInt(ai.args[0]);
+				break;
+			case invokeFunction:
+				arg1 = register.getFunction(ai.args[0]);
+				final FunctionInformation fi = funcs.get(ai.args[0]);
+				if (fi.isStatement) {
+					isFuncStatement = true;
+				}
+				arg2 = Integer.parseInt(ai.args[1]);
 				break;
 			case bitAccessSingleRange:
 				arg1 = Integer.parseInt(ai.args[0]);
@@ -495,8 +529,6 @@ public class FluidFrame {
 					throw new IllegalArgumentException("missing targetSizeWithType for:" + ai);
 				arg1 = Integer.parseInt(ai.args[0]);
 				break;
-			default:
-				break;
 			}
 			if ((i.argCount > 0) && (arg1 == null))
 				throw new IllegalArgumentException("Missing argument 1 in instruction:" + i + " from instruction:" + ai);
@@ -518,7 +550,7 @@ public class FluidFrame {
 			final BigInteger[] consts = constants.toArray(new BigInteger[constants.size()]);
 			final String[] constStrings = strings.toArray(new String[strings.size()]);
 			final Frame frame = new Frame(instArray, internalDepRes, toIntArray(posPred), toIntArray(negPred), posEdge, negEdge, outputId, maxDataWidth, maxStackCount, consts,
-					constStrings, id, constant, -1, simProcess);
+					constStrings, id, constant, -1, simProcess, isFuncStatement);
 			for (final FluidFrame ff : references) {
 				ff.toFrame(register);
 			}
@@ -593,9 +625,9 @@ public class FluidFrame {
 		gid.set(0);
 	}
 
-	public void addConstant(String refName, BigInteger bVal) {
+	public void addConstant(String refName, BigInteger bVal, Type type) {
 		constants.put(refName, bVal);
-		instructions.add(new ArgumentedInstruction(Instruction.loadConstant, refName));
+		instructions.add(new ArgumentedInstruction(Instruction.loadConstant, refName, Integer.toString(type.ordinal())));
 	}
 
 	public void createPredVar() {

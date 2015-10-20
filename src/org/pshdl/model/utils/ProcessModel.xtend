@@ -161,9 +161,9 @@ class ProcessModel {
 	dispatch static def ProcessModel toProcessModel(HDLAssignment stmnt, int pid) {
 		val HDLReference ref = stmnt.left
 		if (ref instanceof HDLUnresolvedFragment)
-			throw new RuntimeException("Not implemented for HDLUnresolvedFragment:" + stmnt)
+			throw new HDLCodeGenerationException(ref, "Can't resolve the given reference:"+ref,"PSEX")
 		val HDLResolvedRef rRef = ref as HDLResolvedRef;
-		val hVar = rRef.resolveVar.get
+		val hVar = rRef.resolveVarForced("PSEX")
 		val regConfig = hVar.registerConfig
 		if (hVar.registerConfig !== null)
 			return new ProcessModel().addClocked(regConfig, stmnt)

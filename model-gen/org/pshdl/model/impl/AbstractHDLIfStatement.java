@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -49,7 +49,9 @@ import com.google.common.collect.Lists;
 public abstract class AbstractHDLIfStatement extends HDLCompound {
 	/**
 	 * Constructs a new instance of {@link AbstractHDLIfStatement}
-	 * 
+	 *
+	 * @param id
+	 *            a unique number for each instance
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param ifExp
@@ -103,7 +105,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Get the ifExp field. Can <b>not</b> be <code>null</code>.
-	 * 
+	 *
 	 * @return the field
 	 */
 	@Nonnull
@@ -121,7 +123,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Get the thenDo field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -139,7 +141,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Get the elseDo field. Can be <code>null</code>.
-	 * 
+	 *
 	 * @return a clone of the field. Will never return <code>null</code>.
 	 */
 	@Nonnull
@@ -155,7 +157,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -168,7 +170,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Creates a copy of this class with the same fields.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -182,7 +184,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Creates a deep copy of this class with the same fields and freezes it.
-	 * 
+	 *
 	 * @return a new instance of this class.
 	 */
 	@Override
@@ -195,7 +197,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getContainer()}.
-	 * 
+	 *
 	 * @param container
 	 *            sets the new container of this object. Can be
 	 *            <code>null</code>.
@@ -210,7 +212,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getIfExp()}.
-	 * 
+	 *
 	 * @param ifExp
 	 *            sets the new ifExp of this object. Can <b>not</b> be
 	 *            <code>null</code>.
@@ -226,7 +228,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getThenDo()}.
-	 * 
+	 *
 	 * @param thenDo
 	 *            sets the new thenDo of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLIfStatement} with the updated thenDo
@@ -241,7 +243,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Adds a new value to the field {@link #getThenDo()}.
-	 * 
+	 *
 	 * @param newThenDo
 	 *            the value that should be added to the field
 	 *            {@link #getThenDo()}
@@ -260,7 +262,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Removes a value from the field {@link #getThenDo()}.
-	 * 
+	 *
 	 * @param newThenDo
 	 *            the value that should be removed from the field
 	 *            {@link #getThenDo()}
@@ -279,7 +281,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Removes a value from the field {@link #getThenDo()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getThenDo()}
@@ -296,7 +298,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Setter for the field {@link #getElseDo()}.
-	 * 
+	 *
 	 * @param elseDo
 	 *            sets the new elseDo of this object. Can be <code>null</code>.
 	 * @return a new instance of {@link HDLIfStatement} with the updated elseDo
@@ -311,7 +313,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Adds a new value to the field {@link #getElseDo()}.
-	 * 
+	 *
 	 * @param newElseDo
 	 *            the value that should be added to the field
 	 *            {@link #getElseDo()}
@@ -330,7 +332,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Removes a value from the field {@link #getElseDo()}.
-	 * 
+	 *
 	 * @param newElseDo
 	 *            the value that should be removed from the field
 	 *            {@link #getElseDo()}
@@ -349,7 +351,7 @@ public abstract class AbstractHDLIfStatement extends HDLCompound {
 
 	/**
 	 * Removes a value from the field {@link #getElseDo()}.
-	 * 
+	 *
 	 * @param idx
 	 *            the index of the value that should be removed from the field
 	 *            {@link #getElseDo()}

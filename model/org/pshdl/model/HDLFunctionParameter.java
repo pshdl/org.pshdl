@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,8 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
  * The class HDLFunctionParameter contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>RWType rw. If <code>null</code>, {@link RWType#READ} is used as default.</li>
+ * <li>RWType rw. If <code>null</code>, {@link RWType#READ} is used as default.
+ * </li>
  * <li>Type type. Can <b>not</b> be <code>null</code>.</li>
  * <li>HDLQualifiedName enumSpec. Can be <code>null</code>.</li>
  * <li>HDLQualifiedName ifSpec. Can be <code>null</code>.</li>
@@ -55,7 +56,7 @@ import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	/**
 	 * Constructs a new instance of {@link HDLFunctionParameter}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param rw
@@ -125,8 +126,8 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	}
 
 	public static enum Type {
-		PARAM_ANY_INT("int<>"), PARAM_ANY_UINT("uint<>"), PARAM_ANY_BIT("bit<>"), PARAM_ANY_IF("interface<>"), PARAM_ANY_ENUM("enum<>"), PARAM_IF("interface"), PARAM_ENUM("enum"), PARAM_FUNCTION(
-				"function"), PARAM_BIT("bit"), PARAM_UINT("uint"), PARAM_INT("int"), PARAM_STRING("string"), PARAM_BOOL("bool");
+		PARAM_ANY_INT("int<>"), PARAM_ANY_UINT("uint<>"), PARAM_ANY_BIT("bit<>"), PARAM_ANY_IF("interface<>"), PARAM_ANY_ENUM("enum<>"), PARAM_IF("interface"), PARAM_ENUM(
+				"enum"), PARAM_FUNCTION("function"), PARAM_BIT("bit"), PARAM_UINT("uint"), PARAM_INT("int"), PARAM_STRING("string"), PARAM_BOOL("bool");
 		String str;
 
 		Type(String op) {
@@ -365,10 +366,17 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 			return fConstant;
 		return super.getContainingFeature(obj);
 	}
-
 	// $CONTENT-BEGIN$
+
+	@Override
+	public Boolean getConstant() {
+		if (constant == null)
+			return false;
+		return super.getConstant();
+	}
+
 	public static HDLFunctionParameter returnType(Type type) {
-		return new HDLFunctionParameter().setType(type).setRw(RWType.RETURN);
+		return new HDLFunctionParameter().setConstant(false).setType(type).setRw(RWType.RETURN);
 	}
 
 	public static HDLFunctionParameter param(Type type, String paramName) {
@@ -376,7 +384,7 @@ public class HDLFunctionParameter extends AbstractHDLFunctionParameter {
 	}
 
 	public static HDLFunctionParameter param(Type type, String paramName, RWType rwType) {
-		return new HDLFunctionParameter().setType(type).setName(new HDLVariable().setName(paramName)).setRw(rwType);
+		return new HDLFunctionParameter().setConstant(false).setType(type).setName(new HDLVariable().setName(paramName)).setRw(rwType);
 	}
 
 	public static final HDLExpression EMPTY_ARR() {

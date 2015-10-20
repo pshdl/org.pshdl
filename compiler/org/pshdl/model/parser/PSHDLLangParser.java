@@ -79,12 +79,12 @@ public class PSHDLLangParser extends Parser {
 			RULE_psInterfaceExtends = 61, RULE_psInterfaceDecl = 62, RULE_psPortDeclaration = 63, RULE_psQualifiedName = 64;
 	public static final String[] ruleNames = { "psModel", "psUnit", "psExtends", "psImports", "psQualifiedNameImport", "psBlock", "psProcess", "psInstantiation",
 			"psInterfaceInstantiation", "psDirectGeneration", "psPassedArguments", "psArgument", "psCast", "psExpression", "psValue", "psBitAccess", "psAccessRange",
-			"psVariableRef", "psRefPart", "psVariable", "psStatement", "psFunctionDeclaration", "psInlineFunction", "psSubstituteFunction", "psNativeFunction",
-			"psFuncRecturnType", "psFuncParam", "psFuncSpec", "psFuncParamWithRW", "psFuncOptArray", "psFuncParamRWType", "psFuncParamType", "psFunction", "psFuncArgs",
-			"psAssignmentOrFunc", "psAssignmentOp", "psCompoundStatement", "psIfStatement", "psSimpleBlock", "psForStatement", "psSwitchStatement", "psCaseStatements",
-			"psDeclaration", "psDeclarationType", "psTypeDeclaration", "psEnumDeclaration", "psEnum", "psVariableDeclaration", "psDeclAssignment", "psArrayInit",
-			"psArrayInitSubParens", "psArrayInitSub", "psArray", "psDirection", "psAnnotation", "psAnnotationType", "psPrimitive", "psPrimitiveType", "psWidth",
-			"psInterfaceDeclaration", "psInterface", "psInterfaceExtends", "psInterfaceDecl", "psPortDeclaration", "psQualifiedName" };
+			"psVariableRef", "psRefPart", "psVariable", "psStatement", "psFunctionDeclaration", "psInlineFunction", "psSubstituteFunction", "psNativeFunction", "psFuncRecturnType",
+			"psFuncParam", "psFuncSpec", "psFuncParamWithRW", "psFuncOptArray", "psFuncParamRWType", "psFuncParamType", "psFunction", "psFuncArgs", "psAssignmentOrFunc",
+			"psAssignmentOp", "psCompoundStatement", "psIfStatement", "psSimpleBlock", "psForStatement", "psSwitchStatement", "psCaseStatements", "psDeclaration",
+			"psDeclarationType", "psTypeDeclaration", "psEnumDeclaration", "psEnum", "psVariableDeclaration", "psDeclAssignment", "psArrayInit", "psArrayInitSubParens",
+			"psArrayInitSub", "psArray", "psDirection", "psAnnotation", "psAnnotationType", "psPrimitive", "psPrimitiveType", "psWidth", "psInterfaceDeclaration", "psInterface",
+			"psInterfaceExtends", "psInterfaceDecl", "psPortDeclaration", "psQualifiedName" };
 
 	@Override
 	public String getGrammarFileName() {
@@ -191,8 +191,8 @@ public class PSHDLLangParser extends Parser {
 				setState(140);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16) | (1L << 18) | (1L << 19) | (1L << 26)
-						| (1L << 29) | (1L << 32) | (1L << 33) | (1L << 38))) != 0))
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16) | (1L << 18) | (1L << 19) | (1L << 26) | (1L << 29)
+						| (1L << 32) | (1L << 33) | (1L << 38))) != 0))
 						|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78)) | (1L << (BIT - 78))
 								| (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78)) | (1L << (BOOL - 78))
 								| (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (MODULE - 78)) | (1L << (TESTBENCH - 78)))) != 0))) {
@@ -294,150 +294,148 @@ public class PSHDLLangParser extends Parser {
 			setState(194);
 			switch (getInterpreter().adaptivePredict(_input, 11, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(146);
+				enterOuterAlt(_localctx, 1); {
+				setState(146);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 11) {
+					{
+						{
+							setState(143);
+							psAnnotation();
+						}
+					}
+					setState(148);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 11) {
-						{
-							{
-								setState(143);
-								psAnnotation();
-							}
-						}
-						setState(148);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(149);
-					_localctx.unitType = _input.LT(1);
-					_la = _input.LA(1);
-					if (!((_la == MODULE) || (_la == TESTBENCH))) {
-						_localctx.unitType = _errHandler.recoverInline(this);
-					}
-					consume();
-					setState(150);
-					psInterface();
-					setState(152);
-					_la = _input.LA(1);
-					if (_la == 21) {
-						{
-							setState(151);
-							psExtends();
-						}
-					}
-
-					setState(154);
-					match(3);
-					setState(158);
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-					while (_la == 43) {
-						{
-							{
-								setState(155);
-								psImports();
-							}
-						}
-						setState(160);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(164);
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-					while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16)
-							| (1L << 17) | (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
-							|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78))
-									| (1L << (BIT - 78)) | (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78))
-									| (1L << (BOOL - 78)) | (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
-						{
-							{
-								setState(161);
-								psBlock();
-							}
-						}
-						setState(166);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(167);
-					match(22);
 				}
+				setState(149);
+				_localctx.unitType = _input.LT(1);
+				_la = _input.LA(1);
+				if (!((_la == MODULE) || (_la == TESTBENCH))) {
+					_localctx.unitType = _errHandler.recoverInline(this);
+				}
+				consume();
+				setState(150);
+				psInterface();
+				setState(152);
+				_la = _input.LA(1);
+				if (_la == 21) {
+					{
+						setState(151);
+						psExtends();
+					}
+				}
+
+				setState(154);
+				match(3);
+				setState(158);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 43) {
+					{
+						{
+							setState(155);
+							psImports();
+						}
+					}
+					setState(160);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(164);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16) | (1L << 17)
+						| (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
+						|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78)) | (1L << (BIT - 78))
+								| (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78)) | (1L << (BOOL - 78))
+								| (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
+					{
+						{
+							setState(161);
+							psBlock();
+						}
+					}
+					setState(166);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(167);
+				match(22);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(172);
+				enterOuterAlt(_localctx, 2); {
+				setState(172);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 11) {
+					{
+						{
+							setState(169);
+							psAnnotation();
+						}
+					}
+					setState(174);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 11) {
-						{
-							{
-								setState(169);
-								psAnnotation();
-							}
-						}
-						setState(174);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(175);
-					_localctx.unitType = _input.LT(1);
-					_la = _input.LA(1);
-					if (!((_la == MODULE) || (_la == TESTBENCH))) {
-						_localctx.unitType = _errHandler.recoverInline(this);
-					}
-					consume();
-					setState(177);
-					_la = _input.LA(1);
-					if (_la == 21) {
-						{
-							setState(176);
-							psExtends();
-						}
-					}
-
-					setState(179);
-					match(3);
-					setState(183);
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-					while (_la == 43) {
-						{
-							{
-								setState(180);
-								psImports();
-							}
-						}
-						setState(185);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(189);
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-					while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16)
-							| (1L << 17) | (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
-							|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78))
-									| (1L << (BIT - 78)) | (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78))
-									| (1L << (BOOL - 78)) | (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
-						{
-							{
-								setState(186);
-								psBlock();
-							}
-						}
-						setState(191);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(192);
-					match(22);
-					notifyErrorListeners(MISSING_NAME);
 				}
+				setState(175);
+				_localctx.unitType = _input.LT(1);
+				_la = _input.LA(1);
+				if (!((_la == MODULE) || (_la == TESTBENCH))) {
+					_localctx.unitType = _errHandler.recoverInline(this);
+				}
+				consume();
+				setState(177);
+				_la = _input.LA(1);
+				if (_la == 21) {
+					{
+						setState(176);
+						psExtends();
+					}
+				}
+
+				setState(179);
+				match(3);
+				setState(183);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 43) {
+					{
+						{
+							setState(180);
+							psImports();
+						}
+					}
+					setState(185);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(189);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16) | (1L << 17)
+						| (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
+						|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78)) | (1L << (BIT - 78))
+								| (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78)) | (1L << (BOOL - 78))
+								| (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
+					{
+						{
+							setState(186);
+							psBlock();
+						}
+					}
+					setState(191);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(192);
+				match(22);
+				notifyErrorListeners(MISSING_NAME);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -557,26 +555,24 @@ public class PSHDLLangParser extends Parser {
 			setState(213);
 			switch (getInterpreter().adaptivePredict(_input, 13, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(205);
-					match(43);
-					setState(206);
-					psQualifiedNameImport();
-					setState(207);
-					match(20);
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(205);
+				match(43);
+				setState(206);
+				psQualifiedNameImport();
+				setState(207);
+				match(20);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(209);
-					match(43);
-					setState(210);
-					psQualifiedNameImport();
-					notifyErrorListeners(MISSING_SEMI);
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(209);
+				match(43);
+				setState(210);
+				psQualifiedNameImport();
+				notifyErrorListeners(MISSING_SEMI);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -731,58 +727,57 @@ public class PSHDLLangParser extends Parser {
 			case ENUM:
 			case INTERFACE:
 			case RULE_ID:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(222);
-					switch (getInterpreter().adaptivePredict(_input, 15, _ctx)) {
-					case 1: {
-						setState(219);
-						psDeclaration();
-					}
-						break;
-
-					case 2: {
-						setState(220);
-						psInstantiation();
-					}
-						break;
-
-					case 3: {
-						setState(221);
-						psStatement();
-					}
-						break;
-					}
+				enterOuterAlt(_localctx, 1); {
+				setState(222);
+				switch (getInterpreter().adaptivePredict(_input, 15, _ctx)) {
+				case 1: {
+					setState(219);
+					psDeclaration();
 				}
+					break;
+
+				case 2: {
+					setState(220);
+					psInstantiation();
+				}
+					break;
+
+				case 3: {
+					setState(221);
+					psStatement();
+				}
+					break;
+				}
+			}
 				break;
 			case 3:
-				enterOuterAlt(_localctx, 2);
+				enterOuterAlt(_localctx, 2); {
 				{
-					{
-						setState(224);
-						match(3);
-						setState(228);
+					setState(224);
+					match(3);
+					setState(228);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					while (((((_la) & ~0x3f) == 0)
+							&& (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16) | (1L << 17) | (1L << 18)
+									| (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
+							|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78))
+									| (1L << (BIT - 78)) | (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78))
+									| (1L << (BOOL - 78)) | (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
+						{
+							{
+								setState(225);
+								psBlock();
+							}
+						}
+						setState(230);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
-						while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16)
-								| (1L << 17) | (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
-								|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78))
-										| (1L << (BIT - 78)) | (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78))
-										| (1L << (BOOL - 78)) | (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
-							{
-								{
-									setState(225);
-									psBlock();
-								}
-							}
-							setState(230);
-							_errHandler.sync(this);
-							_la = _input.LA(1);
-						}
-						setState(231);
-						match(22);
 					}
+					setState(231);
+					match(22);
 				}
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -1010,62 +1005,60 @@ public class PSHDLLangParser extends Parser {
 			setState(274);
 			switch (getInterpreter().adaptivePredict(_input, 25, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(254);
-					psQualifiedName();
-					setState(255);
-					psVariable();
-					setState(257);
-					_la = _input.LA(1);
-					if (_la == 36) {
-						{
-							setState(256);
-							psArray();
-						}
+				enterOuterAlt(_localctx, 1); {
+				setState(254);
+				psQualifiedName();
+				setState(255);
+				psVariable();
+				setState(257);
+				_la = _input.LA(1);
+				if (_la == 36) {
+					{
+						setState(256);
+						psArray();
 					}
-
-					setState(260);
-					_la = _input.LA(1);
-					if (_la == 6) {
-						{
-							setState(259);
-							psPassedArguments();
-						}
-					}
-
-					setState(262);
-					match(20);
 				}
+
+				setState(260);
+				_la = _input.LA(1);
+				if (_la == 6) {
+					{
+						setState(259);
+						psPassedArguments();
+					}
+				}
+
+				setState(262);
+				match(20);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(264);
-					psQualifiedName();
-					setState(265);
-					psVariable();
-					setState(267);
-					_la = _input.LA(1);
-					if (_la == 36) {
-						{
-							setState(266);
-							psArray();
-						}
+				enterOuterAlt(_localctx, 2); {
+				setState(264);
+				psQualifiedName();
+				setState(265);
+				psVariable();
+				setState(267);
+				_la = _input.LA(1);
+				if (_la == 36) {
+					{
+						setState(266);
+						psArray();
 					}
-
-					setState(270);
-					_la = _input.LA(1);
-					if (_la == 6) {
-						{
-							setState(269);
-							psPassedArguments();
-						}
-					}
-
-					notifyErrorListeners(MISSING_SEMI);
 				}
+
+				setState(270);
+				_la = _input.LA(1);
+				if (_la == 6) {
+					{
+						setState(269);
+						psPassedArguments();
+					}
+				}
+
+				notifyErrorListeners(MISSING_SEMI);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -1133,92 +1126,90 @@ public class PSHDLLangParser extends Parser {
 			setState(308);
 			switch (getInterpreter().adaptivePredict(_input, 32, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(277);
-					_la = _input.LA(1);
-					if (_la == 5) {
-						{
-							setState(276);
-							_localctx.isInclude = match(5);
-						}
+				enterOuterAlt(_localctx, 1); {
+				setState(277);
+				_la = _input.LA(1);
+				if (_la == 5) {
+					{
+						setState(276);
+						_localctx.isInclude = match(5);
 					}
-
-					setState(279);
-					psInterface();
-					setState(280);
-					psVariable();
-					setState(281);
-					match(ASSGN);
-					setState(282);
-					match(15);
-					setState(283);
-					match(RULE_ID);
-					setState(285);
-					_la = _input.LA(1);
-					if (_la == 6) {
-						{
-							setState(284);
-							psPassedArguments();
-						}
-					}
-
-					setState(288);
-					_la = _input.LA(1);
-					if (_la == RULE_GENERATOR_CONTENT) {
-						{
-							setState(287);
-							match(RULE_GENERATOR_CONTENT);
-						}
-					}
-
-					setState(290);
-					match(20);
 				}
+
+				setState(279);
+				psInterface();
+				setState(280);
+				psVariable();
+				setState(281);
+				match(ASSGN);
+				setState(282);
+				match(15);
+				setState(283);
+				match(RULE_ID);
+				setState(285);
+				_la = _input.LA(1);
+				if (_la == 6) {
+					{
+						setState(284);
+						psPassedArguments();
+					}
+				}
+
+				setState(288);
+				_la = _input.LA(1);
+				if (_la == RULE_GENERATOR_CONTENT) {
+					{
+						setState(287);
+						match(RULE_GENERATOR_CONTENT);
+					}
+				}
+
+				setState(290);
+				match(20);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(293);
-					_la = _input.LA(1);
-					if (_la == 5) {
-						{
-							setState(292);
-							_localctx.isInclude = match(5);
-						}
+				enterOuterAlt(_localctx, 2); {
+				setState(293);
+				_la = _input.LA(1);
+				if (_la == 5) {
+					{
+						setState(292);
+						_localctx.isInclude = match(5);
 					}
-
-					setState(295);
-					psInterface();
-					setState(296);
-					psVariable();
-					setState(297);
-					match(ASSGN);
-					setState(298);
-					match(15);
-					setState(299);
-					match(RULE_ID);
-					setState(301);
-					_la = _input.LA(1);
-					if (_la == 6) {
-						{
-							setState(300);
-							psPassedArguments();
-						}
-					}
-
-					setState(304);
-					_la = _input.LA(1);
-					if (_la == RULE_GENERATOR_CONTENT) {
-						{
-							setState(303);
-							match(RULE_GENERATOR_CONTENT);
-						}
-					}
-
-					notifyErrorListeners(MISSING_SEMI);
 				}
+
+				setState(295);
+				psInterface();
+				setState(296);
+				psVariable();
+				setState(297);
+				match(ASSGN);
+				setState(298);
+				match(15);
+				setState(299);
+				match(RULE_ID);
+				setState(301);
+				_la = _input.LA(1);
+				if (_la == 6) {
+					{
+						setState(300);
+						psPassedArguments();
+					}
+				}
+
+				setState(304);
+				_la = _input.LA(1);
+				if (_la == RULE_GENERATOR_CONTENT) {
+					{
+						setState(303);
+						match(RULE_GENERATOR_CONTENT);
+					}
+				}
+
+				notifyErrorListeners(MISSING_SEMI);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -2242,27 +2233,24 @@ public class PSHDLLangParser extends Parser {
 			setState(397);
 			switch (_input.LA(1)) {
 			case RULE_PS_LITERAL_TERMINAL:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(394);
-					match(RULE_PS_LITERAL_TERMINAL);
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(394);
+				match(RULE_PS_LITERAL_TERMINAL);
+			}
 				break;
 			case 25:
 			case 34:
 			case RULE_ID:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(395);
-					psVariableRef();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(395);
+				psVariableRef();
+			}
 				break;
 			case RULE_STRING:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(396);
-					match(RULE_STRING);
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(396);
+				match(RULE_STRING);
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -2486,43 +2474,40 @@ public class PSHDLLangParser extends Parser {
 			setState(429);
 			switch (_input.LA(1)) {
 			case RULE_ID:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(419);
-					psRefPart();
-					setState(424);
-					_errHandler.sync(this);
-					_alt = getInterpreter().adaptivePredict(_input, 43, _ctx);
-					while ((_alt != 2) && (_alt != ATN.INVALID_ALT_NUMBER)) {
-						if (_alt == 1) {
+				enterOuterAlt(_localctx, 1); {
+				setState(419);
+				psRefPart();
+				setState(424);
+				_errHandler.sync(this);
+				_alt = getInterpreter().adaptivePredict(_input, 43, _ctx);
+				while ((_alt != 2) && (_alt != ATN.INVALID_ALT_NUMBER)) {
+					if (_alt == 1) {
+						{
 							{
-								{
-									setState(420);
-									match(28);
-									setState(421);
-									psRefPart();
-								}
+								setState(420);
+								match(28);
+								setState(421);
+								psRefPart();
 							}
 						}
-						setState(426);
-						_errHandler.sync(this);
-						_alt = getInterpreter().adaptivePredict(_input, 43, _ctx);
 					}
+					setState(426);
+					_errHandler.sync(this);
+					_alt = getInterpreter().adaptivePredict(_input, 43, _ctx);
 				}
+			}
 				break;
 			case 34:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(427);
-					_localctx.isClk = match(34);
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(427);
+				_localctx.isClk = match(34);
+			}
 				break;
 			case 25:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(428);
-					_localctx.isRst = match(25);
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(428);
+				_localctx.isRst = match(25);
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -2719,27 +2704,24 @@ public class PSHDLLangParser extends Parser {
 			case 4:
 			case 23:
 			case 27:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(443);
-					psCompoundStatement();
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(443);
+				psCompoundStatement();
+			}
 				break;
 			case 17:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(444);
-					psProcess();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(444);
+				psProcess();
+			}
 				break;
 			case 25:
 			case 34:
 			case RULE_ID:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(445);
-					psAssignmentOrFunc();
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(445);
+				psAssignmentOrFunc();
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -2799,25 +2781,22 @@ public class PSHDLLangParser extends Parser {
 			switch (_input.LA(1)) {
 			case 13:
 			case 16:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(448);
-					psNativeFunction();
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(448);
+				psNativeFunction();
+			}
 				break;
 			case 19:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(449);
-					psInlineFunction();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(449);
+				psInlineFunction();
+			}
 				break;
 			case 33:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(450);
-					psSubstituteFunction();
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(450);
+				psSubstituteFunction();
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -3637,189 +3616,176 @@ public class PSHDLLangParser extends Parser {
 			setState(583);
 			switch (_input.LA(1)) {
 			case ANY_INT:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(537);
-					match(ANY_INT);
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(537);
+				match(ANY_INT);
+			}
 				break;
 			case ANY_UINT:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(538);
-					match(ANY_UINT);
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(538);
+				match(ANY_UINT);
+			}
 				break;
 			case ANY_BIT:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(539);
-					match(ANY_BIT);
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(539);
+				match(ANY_BIT);
+			}
 				break;
 			case ANY_IF:
-				enterOuterAlt(_localctx, 4);
-				{
-					setState(540);
-					match(ANY_IF);
-				}
+				enterOuterAlt(_localctx, 4); {
+				setState(540);
+				match(ANY_IF);
+			}
 				break;
 			case ANY_ENUM:
-				enterOuterAlt(_localctx, 5);
-				{
-					setState(541);
-					match(ANY_ENUM);
-				}
+				enterOuterAlt(_localctx, 5); {
+				setState(541);
+				match(ANY_ENUM);
+			}
 				break;
 			case BOOL:
-				enterOuterAlt(_localctx, 6);
-				{
-					setState(542);
-					match(BOOL);
-				}
+				enterOuterAlt(_localctx, 6); {
+				setState(542);
+				match(BOOL);
+			}
 				break;
 			case STRING:
-				enterOuterAlt(_localctx, 7);
-				{
-					setState(543);
-					match(STRING);
-				}
+				enterOuterAlt(_localctx, 7); {
+				setState(543);
+				match(STRING);
+			}
 				break;
 			case BIT:
-				enterOuterAlt(_localctx, 8);
+				enterOuterAlt(_localctx, 8); {
 				{
-					{
-						setState(544);
-						match(BIT);
-						setState(546);
-						_la = _input.LA(1);
-						if (_la == LESS) {
-							{
-								setState(545);
-								psWidth();
-							}
+					setState(544);
+					match(BIT);
+					setState(546);
+					_la = _input.LA(1);
+					if (_la == LESS) {
+						{
+							setState(545);
+							psWidth();
 						}
-
 					}
+
 				}
+			}
 				break;
 			case UINT:
-				enterOuterAlt(_localctx, 9);
+				enterOuterAlt(_localctx, 9); {
 				{
-					{
-						setState(548);
-						match(UINT);
-						setState(550);
-						_la = _input.LA(1);
-						if (_la == LESS) {
-							{
-								setState(549);
-								psWidth();
-							}
+					setState(548);
+					match(UINT);
+					setState(550);
+					_la = _input.LA(1);
+					if (_la == LESS) {
+						{
+							setState(549);
+							psWidth();
 						}
-
 					}
+
 				}
+			}
 				break;
 			case INT:
-				enterOuterAlt(_localctx, 10);
+				enterOuterAlt(_localctx, 10); {
 				{
-					{
-						setState(552);
-						match(INT);
-						setState(554);
-						_la = _input.LA(1);
-						if (_la == LESS) {
-							{
-								setState(553);
-								psWidth();
-							}
+					setState(552);
+					match(INT);
+					setState(554);
+					_la = _input.LA(1);
+					if (_la == LESS) {
+						{
+							setState(553);
+							psWidth();
 						}
-
 					}
+
 				}
+			}
 				break;
 			case INTERFACE:
-				enterOuterAlt(_localctx, 11);
+				enterOuterAlt(_localctx, 11); {
 				{
-					{
-						setState(556);
-						match(INTERFACE);
-						setState(557);
-						match(LESS);
-						setState(558);
-						psQualifiedName();
-						setState(559);
-						match(GREATER);
-					}
+					setState(556);
+					match(INTERFACE);
+					setState(557);
+					match(LESS);
+					setState(558);
+					psQualifiedName();
+					setState(559);
+					match(GREATER);
 				}
+			}
 				break;
 			case ENUM:
-				enterOuterAlt(_localctx, 12);
+				enterOuterAlt(_localctx, 12); {
 				{
-					{
-						setState(561);
-						match(ENUM);
-						setState(562);
-						match(LESS);
-						setState(563);
-						psQualifiedName();
-						setState(564);
-						match(GREATER);
-					}
+					setState(561);
+					match(ENUM);
+					setState(562);
+					match(LESS);
+					setState(563);
+					psQualifiedName();
+					setState(564);
+					match(GREATER);
 				}
+			}
 				break;
 			case FUNCTION:
-				enterOuterAlt(_localctx, 13);
+				enterOuterAlt(_localctx, 13); {
 				{
-					{
-						setState(566);
-						match(FUNCTION);
-						setState(567);
-						match(LESS);
-						setState(576);
-						_la = _input.LA(1);
-						if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << MUL) | (1L << PLUS))) != 0))
-								|| (((((_la - 75)) & ~0x3f) == 0) && (((1L << (_la - 75)) & ((1L << (ARITH_NEG - 75)) | (1L << (ANY_INT - 75)) | (1L << (ANY_UINT - 75))
-										| (1L << (ANY_BIT - 75)) | (1L << (ANY_IF - 75)) | (1L << (ANY_ENUM - 75)) | (1L << (BIT - 75)) | (1L << (INT - 75)) | (1L << (UINT - 75))
-										| (1L << (STRING - 75)) | (1L << (BOOL - 75)) | (1L << (ENUM - 75)) | (1L << (INTERFACE - 75)) | (1L << (FUNCTION - 75)))) != 0))) {
-							{
-								setState(568);
-								psFuncParamWithRW();
-								setState(573);
+					setState(566);
+					match(FUNCTION);
+					setState(567);
+					match(LESS);
+					setState(576);
+					_la = _input.LA(1);
+					if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << MUL) | (1L << PLUS))) != 0))
+							|| (((((_la - 75)) & ~0x3f) == 0) && (((1L << (_la - 75)) & ((1L << (ARITH_NEG - 75)) | (1L << (ANY_INT - 75)) | (1L << (ANY_UINT - 75))
+									| (1L << (ANY_BIT - 75)) | (1L << (ANY_IF - 75)) | (1L << (ANY_ENUM - 75)) | (1L << (BIT - 75)) | (1L << (INT - 75)) | (1L << (UINT - 75))
+									| (1L << (STRING - 75)) | (1L << (BOOL - 75)) | (1L << (ENUM - 75)) | (1L << (INTERFACE - 75)) | (1L << (FUNCTION - 75)))) != 0))) {
+						{
+							setState(568);
+							psFuncParamWithRW();
+							setState(573);
+							_errHandler.sync(this);
+							_la = _input.LA(1);
+							while (_la == 8) {
+								{
+									{
+										setState(569);
+										match(8);
+										setState(570);
+										psFuncParamWithRW();
+									}
+								}
+								setState(575);
 								_errHandler.sync(this);
 								_la = _input.LA(1);
-								while (_la == 8) {
-									{
-										{
-											setState(569);
-											match(8);
-											setState(570);
-											psFuncParamWithRW();
-										}
-									}
-									setState(575);
-									_errHandler.sync(this);
-									_la = _input.LA(1);
-								}
 							}
 						}
-
-						setState(580);
-						_la = _input.LA(1);
-						if (_la == 37) {
-							{
-								setState(578);
-								match(37);
-								setState(579);
-								_localctx.returnType = psFuncParamType();
-							}
-						}
-
-						setState(582);
-						match(GREATER);
 					}
+
+					setState(580);
+					_la = _input.LA(1);
+					if (_la == 37) {
+						{
+							setState(578);
+							match(37);
+							setState(579);
+							_localctx.returnType = psFuncParamType();
+						}
+					}
+
+					setState(582);
+					match(GREATER);
 				}
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -4009,48 +3975,46 @@ public class PSHDLLangParser extends Parser {
 			setState(616);
 			switch (getInterpreter().adaptivePredict(_input, 73, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(600);
-					psVariableRef();
-					setState(604);
-					_la = _input.LA(1);
-					if ((((((_la - 63)) & ~0x3f) == 0) && (((1L << (_la - 63)) & ((1L << (ASSGN - 63)) | (1L << (ADD_ASSGN - 63)) | (1L << (SUB_ASSGN - 63))
-							| (1L << (MUL_ASSGN - 63)) | (1L << (DIV_ASSGN - 63)) | (1L << (MOD_ASSGN - 63)) | (1L << (AND_ASSGN - 63)) | (1L << (XOR_ASSGN - 63))
-							| (1L << (OR_ASSGN - 63)) | (1L << (SLL_ASSGN - 63)) | (1L << (SRL_ASSGN - 63)) | (1L << (SRA_ASSGN - 63)))) != 0))) {
-						{
-							setState(601);
-							psAssignmentOp();
-							setState(602);
-							psExpression(0);
-						}
+				enterOuterAlt(_localctx, 1); {
+				setState(600);
+				psVariableRef();
+				setState(604);
+				_la = _input.LA(1);
+				if ((((((_la - 63)) & ~0x3f) == 0) && (((1L << (_la - 63)) & ((1L << (ASSGN - 63)) | (1L << (ADD_ASSGN - 63)) | (1L << (SUB_ASSGN - 63)) | (1L << (MUL_ASSGN - 63))
+						| (1L << (DIV_ASSGN - 63)) | (1L << (MOD_ASSGN - 63)) | (1L << (AND_ASSGN - 63)) | (1L << (XOR_ASSGN - 63)) | (1L << (OR_ASSGN - 63))
+						| (1L << (SLL_ASSGN - 63)) | (1L << (SRL_ASSGN - 63)) | (1L << (SRA_ASSGN - 63)))) != 0))) {
+					{
+						setState(601);
+						psAssignmentOp();
+						setState(602);
+						psExpression(0);
 					}
-
-					setState(606);
-					match(20);
 				}
+
+				setState(606);
+				match(20);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(608);
-					psVariableRef();
-					setState(612);
-					_la = _input.LA(1);
-					if ((((((_la - 63)) & ~0x3f) == 0) && (((1L << (_la - 63)) & ((1L << (ASSGN - 63)) | (1L << (ADD_ASSGN - 63)) | (1L << (SUB_ASSGN - 63))
-							| (1L << (MUL_ASSGN - 63)) | (1L << (DIV_ASSGN - 63)) | (1L << (MOD_ASSGN - 63)) | (1L << (AND_ASSGN - 63)) | (1L << (XOR_ASSGN - 63))
-							| (1L << (OR_ASSGN - 63)) | (1L << (SLL_ASSGN - 63)) | (1L << (SRL_ASSGN - 63)) | (1L << (SRA_ASSGN - 63)))) != 0))) {
-						{
-							setState(609);
-							psAssignmentOp();
-							setState(610);
-							psExpression(0);
-						}
+				enterOuterAlt(_localctx, 2); {
+				setState(608);
+				psVariableRef();
+				setState(612);
+				_la = _input.LA(1);
+				if ((((((_la - 63)) & ~0x3f) == 0) && (((1L << (_la - 63)) & ((1L << (ASSGN - 63)) | (1L << (ADD_ASSGN - 63)) | (1L << (SUB_ASSGN - 63)) | (1L << (MUL_ASSGN - 63))
+						| (1L << (DIV_ASSGN - 63)) | (1L << (MOD_ASSGN - 63)) | (1L << (AND_ASSGN - 63)) | (1L << (XOR_ASSGN - 63)) | (1L << (OR_ASSGN - 63))
+						| (1L << (SLL_ASSGN - 63)) | (1L << (SRL_ASSGN - 63)) | (1L << (SRA_ASSGN - 63)))) != 0))) {
+					{
+						setState(609);
+						psAssignmentOp();
+						setState(610);
+						psExpression(0);
 					}
-
-					notifyErrorListeners(MISSING_SEMI);
 				}
+
+				notifyErrorListeners(MISSING_SEMI);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -4158,25 +4122,22 @@ public class PSHDLLangParser extends Parser {
 			setState(623);
 			switch (_input.LA(1)) {
 			case 23:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(620);
-					psIfStatement();
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(620);
+				psIfStatement();
+			}
 				break;
 			case 4:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(621);
-					psForStatement();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(621);
+				psForStatement();
+			}
 				break;
 			case 27:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(622);
-					psSwitchStatement();
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(622);
+				psSwitchStatement();
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -4238,52 +4199,50 @@ public class PSHDLLangParser extends Parser {
 			setState(643);
 			switch (getInterpreter().adaptivePredict(_input, 77, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(625);
-					match(23);
-					setState(626);
-					match(6);
-					setState(627);
-					psExpression(0);
-					setState(628);
-					match(40);
-					setState(629);
-					_localctx.ifBlk = psSimpleBlock();
-					setState(632);
-					switch (getInterpreter().adaptivePredict(_input, 75, _ctx)) {
-					case 1: {
-						setState(630);
-						match(39);
-						setState(631);
-						_localctx.elseBlk = psSimpleBlock();
-					}
-						break;
-					}
+				enterOuterAlt(_localctx, 1); {
+				setState(625);
+				match(23);
+				setState(626);
+				match(6);
+				setState(627);
+				psExpression(0);
+				setState(628);
+				match(40);
+				setState(629);
+				_localctx.ifBlk = psSimpleBlock();
+				setState(632);
+				switch (getInterpreter().adaptivePredict(_input, 75, _ctx)) {
+				case 1: {
+					setState(630);
+					match(39);
+					setState(631);
+					_localctx.elseBlk = psSimpleBlock();
 				}
+					break;
+				}
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(634);
-					match(23);
-					setState(635);
-					psExpression(0);
-					setState(636);
-					_localctx.ifBlk = psSimpleBlock();
-					setState(639);
-					switch (getInterpreter().adaptivePredict(_input, 76, _ctx)) {
-					case 1: {
-						setState(637);
-						match(39);
-						setState(638);
-						_localctx.elseBlk = psSimpleBlock();
-					}
-						break;
-					}
-					notifyErrorListeners(MISSING_IFPAREN);
+				enterOuterAlt(_localctx, 2); {
+				setState(634);
+				match(23);
+				setState(635);
+				psExpression(0);
+				setState(636);
+				_localctx.ifBlk = psSimpleBlock();
+				setState(639);
+				switch (getInterpreter().adaptivePredict(_input, 76, _ctx)) {
+				case 1: {
+					setState(637);
+					match(39);
+					setState(638);
+					_localctx.elseBlk = psSimpleBlock();
 				}
+					break;
+				}
+				notifyErrorListeners(MISSING_IFPAREN);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -4337,39 +4296,37 @@ public class PSHDLLangParser extends Parser {
 			setState(654);
 			switch (getInterpreter().adaptivePredict(_input, 79, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(645);
-					match(3);
-					setState(649);
+				enterOuterAlt(_localctx, 1); {
+				setState(645);
+				match(3);
+				setState(649);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16) | (1L << 17)
+						| (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
+						|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78)) | (1L << (BIT - 78))
+								| (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78)) | (1L << (BOOL - 78))
+								| (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
+					{
+						{
+							setState(646);
+							psBlock();
+						}
+					}
+					setState(651);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 3) | (1L << 4) | (1L << 5) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 14) | (1L << 16)
-							| (1L << 17) | (1L << 18) | (1L << 19) | (1L << 23) | (1L << 25) | (1L << 26) | (1L << 27) | (1L << 29) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 38))) != 0))
-							|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78))
-									| (1L << (BIT - 78)) | (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78))
-									| (1L << (BOOL - 78)) | (1L << (ENUM - 78)) | (1L << (INTERFACE - 78)) | (1L << (RULE_ID - 78)))) != 0))) {
-						{
-							{
-								setState(646);
-								psBlock();
-							}
-						}
-						setState(651);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(652);
-					match(22);
 				}
+				setState(652);
+				match(22);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(653);
-					psBlock();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(653);
+				psBlock();
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -4747,27 +4704,24 @@ public class PSHDLLangParser extends Parser {
 			setState(702);
 			switch (getInterpreter().adaptivePredict(_input, 85, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(699);
-					psVariableDeclaration();
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(699);
+				psVariableDeclaration();
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(700);
-					psTypeDeclaration();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(700);
+				psTypeDeclaration();
+			}
 				break;
 
 			case 3:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(701);
-					psFunctionDeclaration();
-				}
+				enterOuterAlt(_localctx, 3); {
+				setState(701);
+				psFunctionDeclaration();
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -4820,18 +4774,16 @@ public class PSHDLLangParser extends Parser {
 			setState(706);
 			switch (_input.LA(1)) {
 			case INTERFACE:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(704);
-					psInterfaceDeclaration();
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(704);
+				psInterfaceDeclaration();
+			}
 				break;
 			case ENUM:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(705);
-					psEnumDeclaration();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(705);
+				psEnumDeclaration();
+			}
 				break;
 			default:
 				throw new NoViableAltException(this);
@@ -5035,138 +4987,134 @@ public class PSHDLLangParser extends Parser {
 			setState(780);
 			switch (getInterpreter().adaptivePredict(_input, 95, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(727);
-					_la = _input.LA(1);
-					if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 26) | (1L << 29) | (1L << 32) | (1L << 38))) != 0))) {
+				enterOuterAlt(_localctx, 1); {
+				setState(727);
+				_la = _input.LA(1);
+				if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 26) | (1L << 29) | (1L << 32) | (1L << 38))) != 0))) {
+					{
+						setState(726);
+						psDirection();
+					}
+				}
+
+				setState(729);
+				psPrimitive();
+				setState(730);
+				psDeclAssignment();
+				setState(735);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 8) {
+					{
 						{
-							setState(726);
-							psDirection();
+							setState(731);
+							match(8);
+							setState(732);
+							psDeclAssignment();
 						}
 					}
-
-					setState(729);
-					psPrimitive();
-					setState(730);
-					psDeclAssignment();
-					setState(735);
+					setState(737);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 8) {
-						{
-							{
-								setState(731);
-								match(8);
-								setState(732);
-								psDeclAssignment();
-							}
-						}
-						setState(737);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					setState(738);
-					match(20);
 				}
+				setState(738);
+				match(20);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(740);
-					psDirection();
-					setState(741);
-					psDeclAssignment();
-					setState(746);
+				enterOuterAlt(_localctx, 2); {
+				setState(740);
+				psDirection();
+				setState(741);
+				psDeclAssignment();
+				setState(746);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 8) {
+					{
+						{
+							setState(742);
+							match(8);
+							setState(743);
+							psDeclAssignment();
+						}
+					}
+					setState(748);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 8) {
-						{
-							{
-								setState(742);
-								match(8);
-								setState(743);
-								psDeclAssignment();
-							}
-						}
-						setState(748);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					notifyErrorListeners(MISSING_TYPE);
-					setState(750);
-					match(20);
 				}
+				notifyErrorListeners(MISSING_TYPE);
+				setState(750);
+				match(20);
+			}
 				break;
 
 			case 3:
-				enterOuterAlt(_localctx, 3);
-				{
-					setState(752);
-					psPrimitive();
-					setState(753);
-					psDirection();
-					setState(754);
-					psDeclAssignment();
-					setState(759);
+				enterOuterAlt(_localctx, 3); {
+				setState(752);
+				psPrimitive();
+				setState(753);
+				psDirection();
+				setState(754);
+				psDeclAssignment();
+				setState(759);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 8) {
+					{
+						{
+							setState(755);
+							match(8);
+							setState(756);
+							psDeclAssignment();
+						}
+					}
+					setState(761);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 8) {
-						{
-							{
-								setState(755);
-								match(8);
-								setState(756);
-								psDeclAssignment();
-							}
-						}
-						setState(761);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					notifyErrorListeners(WRONG_ORDER);
-					setState(763);
-					match(20);
 				}
+				notifyErrorListeners(WRONG_ORDER);
+				setState(763);
+				match(20);
+			}
 				break;
 
 			case 4:
-				enterOuterAlt(_localctx, 4);
-				{
-					setState(766);
-					_la = _input.LA(1);
-					if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 26) | (1L << 29) | (1L << 32) | (1L << 38))) != 0))) {
+				enterOuterAlt(_localctx, 4); {
+				setState(766);
+				_la = _input.LA(1);
+				if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 26) | (1L << 29) | (1L << 32) | (1L << 38))) != 0))) {
+					{
+						setState(765);
+						psDirection();
+					}
+				}
+
+				setState(768);
+				psPrimitive();
+				setState(769);
+				psDeclAssignment();
+				setState(774);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 8) {
+					{
 						{
-							setState(765);
-							psDirection();
+							setState(770);
+							match(8);
+							setState(771);
+							psDeclAssignment();
 						}
 					}
-
-					setState(768);
-					psPrimitive();
-					setState(769);
-					psDeclAssignment();
-					setState(774);
+					setState(776);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 8) {
-						{
-							{
-								setState(770);
-								match(8);
-								setState(771);
-								psDeclAssignment();
-							}
-						}
-						setState(776);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
-					notifyErrorListeners(MISSING_SEMI);
-					setState(778);
-					match(20);
 				}
+				notifyErrorListeners(MISSING_SEMI);
+				setState(778);
+				match(20);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -5318,19 +5266,17 @@ public class PSHDLLangParser extends Parser {
 			setState(798);
 			switch (getInterpreter().adaptivePredict(_input, 99, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(796);
-					psExpression(0);
-				}
+				enterOuterAlt(_localctx, 1); {
+				setState(796);
+				psExpression(0);
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(797);
-					psArrayInitSubParens();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(797);
+				psArrayInitSubParens();
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -5440,35 +5386,33 @@ public class PSHDLLangParser extends Parser {
 			setState(813);
 			switch (getInterpreter().adaptivePredict(_input, 101, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(804);
-					psExpression(0);
-					setState(809);
+				enterOuterAlt(_localctx, 1); {
+				setState(804);
+				psExpression(0);
+				setState(809);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la == 8) {
+					{
+						{
+							setState(805);
+							match(8);
+							setState(806);
+							psExpression(0);
+						}
+					}
+					setState(811);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la == 8) {
-						{
-							{
-								setState(805);
-								match(8);
-								setState(806);
-								psExpression(0);
-							}
-						}
-						setState(811);
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					}
 				}
+			}
 				break;
 
 			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(812);
-					psArrayInitSubParens();
-				}
+				enterOuterAlt(_localctx, 2); {
+				setState(812);
+				psArrayInitSubParens();
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -5773,145 +5717,143 @@ public class PSHDLLangParser extends Parser {
 			setState(868);
 			switch (getInterpreter().adaptivePredict(_input, 113, _ctx)) {
 			case 1:
-				enterOuterAlt(_localctx, 1);
-				{
-					setState(838);
-					_la = _input.LA(1);
-					if (_la == 14) {
-						{
-							setState(834);
-							_localctx.isRegister = match(14);
-							setState(836);
-							_la = _input.LA(1);
-							if (_la == 6) {
-								{
-									setState(835);
-									psPassedArguments();
-								}
-							}
-
-						}
-					}
-
-					setState(849);
-					switch (_input.LA(1)) {
-					case ANY_INT:
-					case ANY_UINT:
-					case ANY_BIT:
-					case BIT:
-					case INT:
-					case UINT:
-					case INT32:
-					case UINT32:
-					case STRING:
-					case BOOL: {
-						setState(840);
-						psPrimitiveType();
-						setState(842);
-						_la = _input.LA(1);
-						if (_la == LESS) {
-							{
-								setState(841);
-								psWidth();
-							}
-						}
-
-					}
-						break;
-					case 18:
-					case ENUM: {
-						setState(846);
-						switch (_input.LA(1)) {
-						case ENUM: {
-							setState(844);
-							_localctx.isEnum = match(ENUM);
-						}
-							break;
-						case 18: {
-							setState(845);
-							_localctx.isRecord = match(18);
-						}
-							break;
-						default:
-							throw new NoViableAltException(this);
-						}
-						setState(848);
-						psQualifiedName();
-					}
-						break;
-					default:
-						throw new NoViableAltException(this);
-					}
-				}
-				break;
-
-			case 2:
-				enterOuterAlt(_localctx, 2);
-				{
-					setState(860);
-					switch (_input.LA(1)) {
-					case ANY_INT:
-					case ANY_UINT:
-					case ANY_BIT:
-					case BIT:
-					case INT:
-					case UINT:
-					case INT32:
-					case UINT32:
-					case STRING:
-					case BOOL: {
-						setState(851);
-						psPrimitiveType();
-						setState(853);
-						_la = _input.LA(1);
-						if (_la == LESS) {
-							{
-								setState(852);
-								psWidth();
-							}
-						}
-
-					}
-						break;
-					case 18:
-					case ENUM: {
-						setState(857);
-						switch (_input.LA(1)) {
-						case ENUM: {
-							setState(855);
-							_localctx.isEnum = match(ENUM);
-						}
-							break;
-						case 18: {
-							setState(856);
-							_localctx.isRecord = match(18);
-						}
-							break;
-						default:
-							throw new NoViableAltException(this);
-						}
-						setState(859);
-						psQualifiedName();
-					}
-						break;
-					default:
-						throw new NoViableAltException(this);
-					}
+				enterOuterAlt(_localctx, 1); {
+				setState(838);
+				_la = _input.LA(1);
+				if (_la == 14) {
 					{
-						setState(862);
+						setState(834);
 						_localctx.isRegister = match(14);
-						setState(864);
+						setState(836);
 						_la = _input.LA(1);
 						if (_la == 6) {
 							{
-								setState(863);
+								setState(835);
 								psPassedArguments();
 							}
 						}
 
 					}
-					notifyErrorListeners(WRONG_ORDER);
 				}
+
+				setState(849);
+				switch (_input.LA(1)) {
+				case ANY_INT:
+				case ANY_UINT:
+				case ANY_BIT:
+				case BIT:
+				case INT:
+				case UINT:
+				case INT32:
+				case UINT32:
+				case STRING:
+				case BOOL: {
+					setState(840);
+					psPrimitiveType();
+					setState(842);
+					_la = _input.LA(1);
+					if (_la == LESS) {
+						{
+							setState(841);
+							psWidth();
+						}
+					}
+
+				}
+					break;
+				case 18:
+				case ENUM: {
+					setState(846);
+					switch (_input.LA(1)) {
+					case ENUM: {
+						setState(844);
+						_localctx.isEnum = match(ENUM);
+					}
+						break;
+					case 18: {
+						setState(845);
+						_localctx.isRecord = match(18);
+					}
+						break;
+					default:
+						throw new NoViableAltException(this);
+					}
+					setState(848);
+					psQualifiedName();
+				}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+			}
+				break;
+
+			case 2:
+				enterOuterAlt(_localctx, 2); {
+				setState(860);
+				switch (_input.LA(1)) {
+				case ANY_INT:
+				case ANY_UINT:
+				case ANY_BIT:
+				case BIT:
+				case INT:
+				case UINT:
+				case INT32:
+				case UINT32:
+				case STRING:
+				case BOOL: {
+					setState(851);
+					psPrimitiveType();
+					setState(853);
+					_la = _input.LA(1);
+					if (_la == LESS) {
+						{
+							setState(852);
+							psWidth();
+						}
+					}
+
+				}
+					break;
+				case 18:
+				case ENUM: {
+					setState(857);
+					switch (_input.LA(1)) {
+					case ENUM: {
+						setState(855);
+						_localctx.isEnum = match(ENUM);
+					}
+						break;
+					case 18: {
+						setState(856);
+						_localctx.isRecord = match(18);
+					}
+						break;
+					default:
+						throw new NoViableAltException(this);
+					}
+					setState(859);
+					psQualifiedName();
+				}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				{
+					setState(862);
+					_localctx.isRegister = match(14);
+					setState(864);
+					_la = _input.LA(1);
+					if (_la == 6) {
+						{
+							setState(863);
+							psPassedArguments();
+						}
+					}
+
+				}
+				notifyErrorListeners(WRONG_ORDER);
+			}
 				break;
 			}
 		} catch (final RecognitionException re) {
@@ -6273,8 +6215,9 @@ public class PSHDLLangParser extends Parser {
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 9) | (1L << 11) | (1L << 14) | (1L << 18) | (1L << 26) | (1L << 29) | (1L << 32) | (1L << 38))) != 0))
-						|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78)) & ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78)) | (1L << (BIT - 78))
-								| (1L << (INT - 78)) | (1L << (UINT - 78)) | (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78)) | (1L << (BOOL - 78)) | (1L << (ENUM - 78)))) != 0))) {
+						|| (((((_la - 78)) & ~0x3f) == 0) && (((1L << (_la - 78))
+								& ((1L << (ANY_INT - 78)) | (1L << (ANY_UINT - 78)) | (1L << (ANY_BIT - 78)) | (1L << (BIT - 78)) | (1L << (INT - 78)) | (1L << (UINT - 78))
+										| (1L << (INT32 - 78)) | (1L << (UINT32 - 78)) | (1L << (STRING - 78)) | (1L << (BOOL - 78)) | (1L << (ENUM - 78)))) != 0))) {
 					{
 						{
 							setState(895);
@@ -6670,6 +6613,7 @@ public class PSHDLLangParser extends Parser {
 			+ "\u0281\u0285\u028b\u0290\u02a2\u02aa\u02b0\u02b6\u02bb\u02c0\u02c4\u02c9" + "\u02d1\u02d9\u02e1\u02ec\u02f9\u0300\u0308\u030e\u0313\u0318\u031c\u0320"
 			+ "\u032b\u032f\u0337\u033f\u0346\u0348\u034c\u0350\u0353\u0357\u035b\u035e" + "\u0362\u0366\u0372\u037d\u0384\u038c\u0396";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

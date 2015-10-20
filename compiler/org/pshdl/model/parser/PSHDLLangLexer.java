@@ -271,6 +271,7 @@ public class PSHDLLangLexer extends Lexer {
 			+ "\u02eb\3\2\2\2\u02eb\u02ec\3\2\2\2\u02ec\u02ed\bi\4\2\u02ed\u00d2\3\2" + "\2\2\24\2\u027c\u0284\u028a\u0296\u029c\u02a2\u02ab\u02ad\u02b4\u02b6"
 			+ "\u02ba\u02c2\u02d0\u02dc\u02e0\u02e3\u02ea\5\3f\2\3h\3\3i\4";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

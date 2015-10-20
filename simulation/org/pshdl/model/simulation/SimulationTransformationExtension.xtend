@@ -100,11 +100,19 @@ import static org.pshdl.model.evaluation.ConstantEvaluate.*
 import static org.pshdl.model.extensions.FullNameExtension.*
 import static org.pshdl.model.extensions.TypeExtension.*
 import static org.pshdl.model.simulation.SimulationTransformationExtension.*
+import org.pshdl.interpreter.FunctionInformation
+import org.pshdl.model.HDLFunctionParameter
+import org.pshdl.interpreter.ParameterInformation
+import org.pshdl.interpreter.ParameterInformation.RWType
+import org.pshdl.model.HDLType
+import org.pshdl.model.extensions.TypeExtension
+import org.pshdl.model.utils.HDLCodeGenerationException
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
 
 	public static final char ANNO_VALUE_SEP = '|'
+	private static final String PSEX_STAGE = "PSEX"
 
 	def static FluidFrame simulationModelOf(HDLUnit obj, HDLEvaluationContext context) {
 		return INST.toSimulationModelUnit(obj, context.withEnumAndBool(true, true))
@@ -153,7 +161,8 @@ class SimulationTransformationExtension {
 		return res
 	}
 
-	def dispatch FluidFrame toSimulationModel(HDLInterfaceDeclaration obj, HDLEvaluationContext context, String process) {
+	def dispatch FluidFrame toSimulationModel(HDLInterfaceDeclaration obj, HDLEvaluationContext context,
+		String process) {
 		return new FluidFrame(obj, null)
 	}
 
@@ -162,7 +171,37 @@ class SimulationTransformationExtension {
 		if (constVal.present) {
 			return HDLLiteral.get(constVal.get).toSimulationModel(context, process)
 		}
-		throw new IllegalArgumentException("Function not constant! " + obj)
+		val res = new FluidFrame(obj, process)
+		for (HDLExpression e : obj.params) {
+			res.append(e.toSimulationModel(context, process))
+		}
+		val func = obj.resolveFunctionForced(PSEX_STAGE)
+		val returnType = func.returnType.toParameterInformation(context)
+		val args = func.args?.map[toParameterInformation(context)]
+		val isStatement = obj.getContainer(HDLStatement) === null
+		val fi = new FunctionInformation(func.name, isStatement, returnType, args, func.annotations.toAnnoString)
+		val sig = fi.signature
+		res.funcs.put(sig, fi)
+		res.add(new ArgumentedInstruction(invokeFunction, sig, if(args === null) "0" else args.length.toString))
+		return res
+	}
+
+	def ParameterInformation toParameterInformation(HDLFunctionParameter parameter, HDLEvaluationContext context) {
+		if (parameter === null)
+			return null
+		val rwType = RWType.getOp(parameter.rw.toString)
+		val type = ParameterInformation.Type.getOp(parameter.type.toString)
+		val enumSpecRefName = parameter.enumSpecRefName?.toString
+		val ifSpec = parameter.ifSpecRefName?.toString
+		val funcSpec = parameter.funcSpec?.map[toParameterInformation(context)]
+		val funcReturnSpec = parameter.funcReturnSpec?.toParameterInformation(context)
+		val name = parameter.name.name
+		val widthOpt = valueOf(parameter.width, context)
+		val width = if(widthOpt.present) widthOpt.get.intValue else -1
+		val dims = parameter.dim?.map[valueOfForced(it, context, PSEX_STAGE).intValue]
+		val boolean const = parameter.constant
+		return new ParameterInformation(rwType, type, enumSpecRefName, ifSpec, funcSpec, funcReturnSpec, name, width,
+			dims, const)
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLEnumDeclaration obj, HDLEvaluationContext context, String process) {
@@ -197,8 +236,9 @@ class SimulationTransformationExtension {
 		return string + "[-1]"
 	}
 
-	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context, String process) {
-		val type = obj.resolveType.get
+	def dispatch FluidFrame toSimulationModel(HDLVariableDeclaration obj, HDLEvaluationContext context,
+		String process) {
+		val type = obj.resolveTypeForced(PSEX_STAGE)
 		var width = if(type.classType === HDLClass.HDLPrimitive) HDLPrimitives.getWidth(type, context) else 32
 		val isReg = obj.register !== null
 		val simAnno = obj.getAnnotation(HDLSimulator.TB_VAR.name)
@@ -207,7 +247,7 @@ class SimulationTransformationExtension {
 			newProcess = "ONCE"
 		val FluidFrame res = new FluidFrame(obj, null, false, newProcess)
 
-		//		res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
+		// res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
 		var Direction dir
 		switch (obj.direction) {
 			case IN: dir = Direction.IN
@@ -221,23 +261,10 @@ class SimulationTransformationExtension {
 			val varName = fullNameOf(hVar).toString
 			val dims = new LinkedList<Integer>()
 			for (HDLExpression dim : hVar.dimensions)
-				dims.add(valueOf(dim, context).get.intValue)
-			var vType = Type.BIT
-			if (type.classType === HDLClass.HDLPrimitive) {
-				switch ((type as HDLPrimitive).type) {
-					case INT: vType = Type.INT
-					case INTEGER: vType = Type.INT
-					case UINT: vType = Type.UINT
-					case NATURAL: vType = Type.UINT
-					case BIT: vType = Type.BIT
-					case BITVECTOR: vType = Type.BIT
-					case BOOL: vType = Type.BOOL
-					case STRING: vType = Type.STRING
-				}
-			}
+				dims.add(valueOfForced(dim, context, PSEX_STAGE).intValue)
+			var vType = asType(type)
 			val allAnnos = Lists.newArrayList(hVar.annotations + obj.annotations)
 			if (type.classType === HDLClass.HDLEnum) {
-				vType = Type.ENUM
 				val HDLEnum hEnum = type as HDLEnum
 				val enumAnno = new HDLAnnotation().setName("@enumNames").setValue(hEnum.enums.map[name].join(";"))
 				allAnnos.add(enumAnno)
@@ -265,9 +292,32 @@ class SimulationTransformationExtension {
 			if (config.syncType === HDLRegSyncType.ASYNC)
 				createInit(config, obj, context, res, false, process);
 
-		//			res.add(const0)
+		// res.add(const0)
 		}
 		return res
+	}
+
+	def asType(HDLType type) {
+		var Type vType = Type.BIT
+		if (type.classType === HDLClass.HDLPrimitive) {
+			switch ((type as HDLPrimitive).type) {
+				case ANY_INT: vType = Type.INT
+				case INT: vType = Type.INT
+				case INTEGER: vType = Type.INT
+				case ANY_UINT: vType = Type.UINT
+				case UINT: vType = Type.UINT
+				case NATURAL: vType = Type.UINT
+				case ANY_BIT: vType = Type.BIT
+				case BIT: vType = Type.BIT
+				case BITVECTOR: vType = Type.BIT
+				case BOOL: vType = Type.BOOL
+				case STRING: vType = Type.STRING
+			}
+		}
+		if (type.classType === HDLClass.HDLEnum) {
+			vType = Type.ENUM
+		}
+		return vType
 	}
 
 	def String[] toAnnoString(Iterable<HDLAnnotation> annotations) {
@@ -309,7 +359,7 @@ class SimulationTransformationExtension {
 		val name = fullNameOf(obj).toString;
 		val res = obj.caseExp.toSimulationModel(context, process)
 		res.setName(name)
-		val type = typeOf(obj.caseExp).get
+		val type = typeOfForced(obj.caseExp, PSEX_STAGE)
 		val width = if(type.classType === HDLClass.HDLPrimitive) HDLPrimitives.getWidth(type, context) else 32
 		res.addVar(new VariableInformation(Direction.INTERNAL, name, width, Type.BIT, false, false, false, null))
 		for (HDLSwitchCaseStatement c : obj.cases) {
@@ -323,9 +373,7 @@ class SimulationTransformationExtension {
 					if (cSub != c)
 						caseFrame.add(new ArgumentedInstruction(negPredicate, fullNameOf(cSub).toString))
 				}
-				caseFrame.add(const1)
-				caseFrame.add(const1)
-				caseFrame.add(eq)
+				caseFrame.addConstant("true", BigInteger.ONE, Type.BOOL);
 			} else {
 				val const = valueOf(c.label, context)
 				var int l
@@ -340,7 +388,7 @@ class SimulationTransformationExtension {
 					}
 				}
 				caseFrame.add(new ArgumentedInstruction(loadInternal, name))
-				caseFrame.addConstant("label", BigInteger.valueOf(l))
+				caseFrame.addConstant("label", BigInteger.valueOf(l), Type.UINT)
 				caseFrame.add(eq)
 			}
 			for (d : c.dos) {
@@ -353,8 +401,8 @@ class SimulationTransformationExtension {
 	}
 
 	def asInt(HDLEnumRef ref) {
-		val hEnum = ref.resolveHEnum.get
-		val hVar = ref.resolveVar.get
+		val hEnum = ref.resolveHEnumForced(PSEX_STAGE)
+		val hVar = ref.resolveVarForced(PSEX_STAGE)
 		return hEnum.enums.indexOf(hVar)
 	}
 
@@ -469,11 +517,13 @@ class SimulationTransformationExtension {
 		val Iterator<HDLExpression> iter = obj.cats.iterator
 		val init = iter.next
 		res.append(init.toSimulationModel(context, process))
-		var int owidth = HDLPrimitives.getWidth(typeOf(init).get, context)
+		val initType=typeOfForced(init, PSEX_STAGE)
+		var int owidth = HDLPrimitives.getWidth(initType, context)
 		while (iter.hasNext) {
 			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context, process))
-			val int width = HDLPrimitives.getWidth(typeOf(exp).get, context)
+			val expType=typeOfForced(exp, PSEX_STAGE)
+			val int width = HDLPrimitives.getWidth(expType, context)
 			res.add(new ArgumentedInstruction(concat, owidth.toString, width.toString))
 			owidth = owidth + width
 		}
@@ -521,7 +571,7 @@ class SimulationTransformationExtension {
 			case LOGIC_NEG:
 				res.add(logiNeg)
 			case CAST: {
-				val HDLPrimitive current = typeOf(obj.target).get as HDLPrimitive
+				val HDLPrimitive current = typeOfForced(obj.target, PSEX_STAGE) as HDLPrimitive
 				val HDLPrimitive target = obj.castTo as HDLPrimitive
 				val isCurrentInt = current.type === ANY_INT || current.type === INT || current.type === INTEGER
 				val isCurrentBit = current.type === ANY_BIT || current.type === BIT || current.type === BITVECTOR
@@ -583,16 +633,15 @@ class SimulationTransformationExtension {
 
 	def dispatch FluidFrame toSimulationModel(HDLEnumRef obj, HDLEvaluationContext context, String process) {
 		val res = new FluidFrame(obj, process)
-		val hEnum = obj.resolveHEnum.get
-		val hVar = obj.resolveVar.get
+		val hEnum = obj.resolveHEnumForced(PSEX_STAGE)
+		val hVar = obj.resolveVarForced(PSEX_STAGE)
 		val idx = hEnum.enums.indexOf(hVar)
-		res.addConstant(fullNameOf(hVar).toString, BigInteger.valueOf(idx))
+		res.addConstant(fullNameOf(hVar).toString, BigInteger.valueOf(idx), Type.ENUM)
 		return res
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context, String process) {
 		val FluidFrame res = new FluidFrame(obj, process)
-		var hVar = obj.resolveVar
 		val String refName = obj.getVarName(false, context)
 		createPushIndex(obj.array, context, res, process, refName)
 		createPushIndexBits(obj.bits, context, res, process, refName)
@@ -607,7 +656,8 @@ class SimulationTransformationExtension {
 				bits.add(r.toString)
 			}
 		}
-		val HDLDirection dir = hVar.get.direction
+		var resVar = obj.resolveVarForced(PSEX_STAGE)
+		val HDLDirection dir = resVar.direction
 		switch (dir) {
 			case INTERNAL:
 				res.add(new ArgumentedInstruction(loadInternal, bits))
@@ -615,11 +665,8 @@ class SimulationTransformationExtension {
 				if (!fixedArray)
 					res.add(new ArgumentedInstruction(loadInternal, bits))
 				else {
-					val Optional<BigInteger> bVal = valueOf(obj, context)
-					if (!bVal.present)
-						throw new IllegalArgumentException("Const/param should be constant")
-					else
-						res.addConstant(refName, bVal.get)
+					val bVal = valueOfForced(obj, context, PSEX_STAGE)
+					res.addConstant(refName, bVal, asType(TypeExtension.typeOfForced(resVar, PSEX_STAGE)))
 				}
 			}
 			case IN: {
@@ -636,11 +683,21 @@ class SimulationTransformationExtension {
 
 	def dispatch FluidFrame toSimulationModel(HDLLiteral obj, HDLEvaluationContext context, String process) {
 		val FluidFrame res = new FluidFrame(obj, process)
-		if (obj.str !== null && obj.str) {
-			res.add(new ArgumentedInstruction(loadConstantString, obj.^val))
-			return res
-		}
-
+		if (obj.str !== null) {
+			if (obj.str) {
+				res.add(new ArgumentedInstruction(loadConstantString, obj.^val))
+				return res
+			} else {
+				if (HDLLiteral.FALSE == obj.^val){
+					res.addConstant(obj.^val, 0bi, Type.BOOL)
+					return res
+				}
+				if (HDLLiteral.TRUE == obj.^val) {
+					res.addConstant(obj.^val, 1bi, Type.BOOL)
+					return res						
+				}
+			}
+		} 
 		val BigInteger value = obj.valueAsBigInt
 		if (0bi.equals(value)) {
 			res.add(const0)
@@ -654,10 +711,7 @@ class SimulationTransformationExtension {
 			res.add(const2)
 			return res
 		}
-
-		val String key = value.toString
-		res.constants.put(key, value)
-		res.add(new ArgumentedInstruction(loadConstant, key))
+		res.addConstant(value.toString, value, Type.INT)
 		return res
 	}
 
@@ -738,8 +792,8 @@ class SimulationTransformationExtension {
 			case SLL:
 				res.add(new ArgumentedInstruction(sll, width.toString))
 			case SRA: {
-				val type = typeOf(obj.left)
-				val prim = type.get as HDLPrimitive
+				val type = typeOfForced(obj.left, PSEX_STAGE)
+				val prim = type as HDLPrimitive
 				if (prim.type === INTEGER || prim.type === INT)
 					res.add(new ArgumentedInstruction(sra, width.toString))
 				else
@@ -756,7 +810,7 @@ class SimulationTransformationExtension {
 		val width = HDLPrimitives.getWidth(type, context)
 		if (type.type === HDLPrimitiveType.INT || type.type === HDLPrimitiveType.INTEGER)
 			return (width << 1).bitwiseOr(1)
-		return (width << 1)
+		return ( width << 1)
 	}
 
 }

@@ -70,9 +70,7 @@ public class BuiltInAdvisor {
 		switch ((ErrorCode) problem.code) {
 		case ANNOTATION_INVALID:
 			final String annoName = ((HDLAnnotation) problem.node).getName();
-			return new HDLAdvise(
-					problem,
-					"The String you provided is incorrect for this annotation: " + problem.info,
+			return new HDLAdvise(problem, "The String you provided is incorrect for this annotation: " + problem.info,
 					"Some annotations can have additional information. Those are stated as a String in double quotes. The interpretation of this String is depending on the Annotation. The String you provided however was not correct.",
 					"Check the message for information what might be incorrect", "Check the documentation for the " + annoName + " Annotation");
 		case ANNOTATION_UNKNOWN: {
@@ -108,10 +106,8 @@ public class BuiltInAdvisor {
 			if (!arrayRange.isConnected(accessRange)) {
 				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
 			} else {
-				solutions = new String[] {
-						"Cast the index to uint with:(uint)" + problem.node,
-						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") or @range(\">=0\") annotation to define a range" };
+				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node, "Manually declare a range for the index with the @range(\""
+						+ arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint() + "\") or @range(\">=0\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The bit access could possibly become negative", "The given bit access has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
@@ -123,10 +119,8 @@ public class BuiltInAdvisor {
 			if (!arrayRange.isConnected(accessRange)) {
 				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node };
 			} else {
-				solutions = new String[] {
-						"Cast the index to uint with:(uint)" + problem.node,
-						"Manually declare a range for the index with the @range(\"" + arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint()
-								+ "\") or @range(\">=0\") annotation to define a range" };
+				solutions = new String[] { "Cast the index to uint with:(uint)" + problem.node, "Manually declare a range for the index with the @range(\""
+						+ arrayRange.lowerEndpoint() + ";" + arrayRange.upperEndpoint() + "\") or @range(\">=0\") annotation to define a range" };
 			}
 			return new HDLAdvise(problem, "The array index could possibly become negative", "The given array index has a possible negative value (" + accessRange.lowerEndpoint()
 					+ "), even tough it does not need to become negative by design, it would be possible. This might indicate a programming error", solutions);
@@ -139,9 +133,10 @@ public class BuiltInAdvisor {
 			if (accessRange.lowerEndpoint().compareTo(commonRange.lowerEndpoint()) <= 0) {
 				rangeAnnotation += " or @range(\" <= " + accessRange.upperEndpoint() + "\")";
 			}
-			return new HDLAdvise(problem, "The bit access can exceed the variables' capacity", "The given bit access has a possible range of:" + accessRange
-					+ " while the highest index of the variable is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
-					"Downcast the index to a suitable size", "Use the " + rangeAnnotation + " annotation to indicate the expected range");
+			return new HDLAdvise(problem, "The bit access can exceed the variables' capacity",
+					"The given bit access has a possible range of:" + accessRange + " while the highest index of the variable is " + arrayRange.upperEndpoint(),
+					"Limit the possible range by masking with &", "Downcast the index to a suitable size",
+					"Use the " + rangeAnnotation + " annotation to indicate the expected range");
 		}
 		case ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS: {
 			final Range<BigInteger> accessRange = problem.getMeta(BuiltInValidator.ACCESS_RANGE);
@@ -151,9 +146,10 @@ public class BuiltInAdvisor {
 			if (accessRange.lowerEndpoint().compareTo(commonRange.lowerEndpoint()) <= 0) {
 				rangeAnnotation += " or @range(\" <= " + accessRange.upperEndpoint() + "\")";
 			}
-			return new HDLAdvise(problem, "The array index can exceed its capacity", "The given array index has a possible range of:" + accessRange
-					+ " while the highest index of the array is " + arrayRange.upperEndpoint(), "Limit the possible range by masking with &",
-					"Downcast the index to a suitable size", "Use the " + rangeAnnotation + " annotation to indicate the expected range");
+			return new HDLAdvise(problem, "The array index can exceed its capacity",
+					"The given array index has a possible range of:" + accessRange + " while the highest index of the array is " + arrayRange.upperEndpoint(),
+					"Limit the possible range by masking with &", "Downcast the index to a suitable size",
+					"Use the " + rangeAnnotation + " annotation to indicate the expected range");
 		}
 		case ARRAY_REFERENCE_NOT_SAME_DIMENSIONS:
 			return new HDLAdvise(problem, "The dimensions of assignment do not match", "When an array is assigned to another array, the size of the dimension need to match.",
@@ -175,9 +171,7 @@ public class BuiltInAdvisor {
 		case EQUALITY_ALWAYS_TRUE:
 			return new HDLAdvise(problem, "This equality is always true.", "This behaviour might be desired, but it might also indicate a programming error.");
 		case FOR_LOOP_RANGE_NOT_CONSTANT:
-			return new HDLAdvise(
-					problem,
-					"The range of this for loop can not be statically determined",
+			return new HDLAdvise(problem, "The range of this for loop can not be statically determined",
 					"A for loop need to have known boundaries. Those boundaries can be derived from parameters or constants. Variables however are not allowed as their value is not known statically.",
 					"Instead of using variables, use parameter and constants");
 		case GENERATOR_ERROR:
@@ -211,15 +205,15 @@ public class BuiltInAdvisor {
 		case INTERFACE_OUT_WRITTEN: {
 			final HDLVariable var = (HDLVariable) problem.context;
 			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
-			return new HDLAdvise(problem, "The out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is written", "It appears that the port "
-					+ var.getName() + " is written to, altough it is marked as out port", "Remove the write access");
+			return new HDLAdvise(problem, "The out port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is written",
+					"It appears that the port " + var.getName() + " is written to, altough it is marked as out port", "Remove the write access");
 		}
 		case INTERFACE_UNUSED_PORT: {
 			final HDLVariable var = (HDLVariable) problem.context;
 			final HDLInterfaceInstantiation hii = (HDLInterfaceInstantiation) problem.node;
-			return new HDLAdvise(problem, "The port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is never read or written", "It appears that the port "
-					+ var.getName() + " is neither read, nor written to. You might want to check wether this is intentional", "Remove the port if it is not necessary",
-					"Do something useful with it");
+			return new HDLAdvise(problem, "The port: " + var.getName() + " of the instance: " + hii.getVar().getName() + " is never read or written",
+					"It appears that the port " + var.getName() + " is neither read, nor written to. You might want to check wether this is intentional",
+					"Remove the port if it is not necessary", "Do something useful with it");
 		}
 		case INTERNAL_SIGNAL_READ_BUT_NEVER_WRITTEN: {
 			final HDLVariable var = (HDLVariable) problem.node;
@@ -264,7 +258,8 @@ public class BuiltInAdvisor {
 		}
 		case PARAMETER_OR_CONSTANT_NEVER_READ: {
 			final HDLVariable var = (HDLVariable) problem.node;
-			return new HDLAdvise(problem, "The constant:" + var.getName() + " is never read", "Declaring constants and not reading them is not very useful.", "Use it", "Remove it");
+			return new HDLAdvise(problem, "The constant:" + var.getName() + " is never read", "Declaring constants and not reading them is not very useful.", "Use it",
+					"Remove it");
 		}
 		case UNRESOLVED_ENUM: {
 			return new HDLAdvise(problem, "The enum:" + problem.node + " can not be resolved",
@@ -293,9 +288,7 @@ public class BuiltInAdvisor {
 				final Set<String> vars = collectVariables(uf);
 				similiarProposal = getMatchProposal(vars, "Variables", uf.getFrag());
 			}
-			return new HDLAdvise(
-					problem,
-					"The fragment:" + problem.node + " can not be resolved",
+			return new HDLAdvise(problem, "The fragment:" + problem.node + " can not be resolved",
 					"Fragments are unrecognized references to something. It could be a function, an enum or a variable. The compiler was however unable to properly determine what it is.",
 					"If you want to reference a variable check that the spelling is correct and that the variable is visible in this scope", similiarProposal);
 		}
@@ -348,12 +341,10 @@ public class BuiltInAdvisor {
 					"Assign it to a new internal variable", "Change the direction to inout");
 		case ARRAY_REFERENCE_TOO_MANY_DIMENSIONS:
 			return new HDLAdvise(problem, "The reference contains more array dimensions than the declared type",
-					"A variable that is declared with just one dimension, can not be access with two or more",
-					"Check that the declared type has the expected number of dimensione", "Remove one of more array acceses");
+					"A variable that is declared with just one dimension, can not be access with two or more", "Check that the declared type has the expected number of dimensione",
+					"Remove one of more array acceses");
 		case ASSIGNMENT_NOT_SUPPORTED:
-			return new HDLAdvise(
-					problem,
-					problem.info,
+			return new HDLAdvise(problem, problem.info,
 					"Some types can not be automatically converted, you thus need to cast the right hand side explicitly.\nUnintended conversions can happen for example if you access the bits of an int/uint the result will be bit, or the result of concatenation is also bit.",
 					"Convert the type explicitly by casting it", "Check that the assignment target has the expected type");
 		case ASSIGNMENT_CLIPPING_WILL_OCCUR:
@@ -368,9 +359,7 @@ public class BuiltInAdvisor {
 					"Literals and primitives without width don't have a known width, they can thus not be used to be concatenated as the resulting size would be unclear",
 					"Explicitly cast the expresion to give it a known width example (bit<18>)" + problem.node);
 		case SWITCH_CASE_NEEDS_WIDTH:
-			return new HDLAdvise(
-					problem,
-					"The expression used for a switch needs to have a fixed width",
+			return new HDLAdvise(problem, "The expression used for a switch needs to have a fixed width",
 					"Switch expression can not work on epxressions which do not have a known width with the exception of enums. This width needs to be constant, parameterized width are also not allowed.",
 					"Cast the expression to a constant width");
 		case SWITCH_LABEL_DUPLICATE:
@@ -433,9 +422,7 @@ public class BuiltInAdvisor {
 			return new HDLAdvise(problem, "A global variable can not be a register", "Global variables can only be constant",
 					"Declare the variable as constant and remove the register keyword");
 		case RANGE_NOT_DOWN:
-			return new HDLAdvise(
-					problem,
-					"Range not of direction down",
+			return new HDLAdvise(problem, "Range not of direction down",
 					"All variables in PSHDL have their LSB at index 0, thus ranges that access bits need to have a 'down' direction. This means that the first index is bigger or equal to the second index",
 					"Ensure that for a range {a:b} a >= b", "Annotate either index with a '@range' annotation to help the compiler");
 		case RANGE_NOT_UP:
@@ -443,9 +430,7 @@ public class BuiltInAdvisor {
 					"Loops do have a range that counts upwards. This means that the first index must be smaller or equal to the second index",
 					"Ensure that for a range {a:b} a <= b");
 		case RANGE_OVERLAP:
-			return new HDLAdvise(
-					problem,
-					"The boundaries of the range expression can possibly overlap",
+			return new HDLAdvise(problem, "The boundaries of the range expression can possibly overlap",
 					"The compiler can not guarantee that for all combinations of inputs for the range results in an appropriate direction. As both sides are seen independently, ranges of type {A+x:A} can not be determined when A or x is a parameter.",
 					"Convert ranges of type {A+x:A} to {A+:x}", "Convert ranges of type {A:A-x} to {A-:x}", "Annotate the variable with @range to guarantee a certain input range");
 		case UNKNOWN_RANGE:
@@ -463,9 +448,7 @@ public class BuiltInAdvisor {
 		case TYPE_SAME_NAME:
 			return new HDLAdvise(problem, "A type with this name already exists", "Type names have to be unique", "Rename this type or the other");
 		case CONSTANT_WIDTH_MISMATCH:
-			return new HDLAdvise(
-					problem,
-					"Constant expression is losing bits",
+			return new HDLAdvise(problem, "Constant expression is losing bits",
 					"In most operations the type is determined from the left operand. The expression is cast to this type, which is smaller than the constant given. The result is a loss of information",
 					"Cast the left-handside to a sufficently large type");
 		case VARIABLE_NAME_NOT_RECOMMENDED:
@@ -475,8 +458,8 @@ public class BuiltInAdvisor {
 		case BOOL_NEGATE_NUMERIC_NOT_SUPPORTED: {
 			final HDLManip node = (HDLManip) problem.node;
 			return new HDLAdvise(problem, "Logic negate does not support numbers",
-					"The logical negate is intended for negating booleans, while it can also use a single bit, you probably want to use the binary invert ~.", "Use ~"
-							+ node.getTarget());
+					"The logical negate is intended for negating booleans, while it can also use a single bit, you probably want to use the binary invert ~.",
+					"Use ~" + node.getTarget());
 		}
 		case CLOCK_NOT_BIT:
 			return new HDLAdvise(problem, "The clock needs to be of type bit",
@@ -495,9 +478,7 @@ public class BuiltInAdvisor {
 					"A reset can only be a single bit variable. It is not advised to use the output of a combinatorical logic as clock as this may impact the timing.",
 					"Assign the value to a single bit variable");
 		case SWITCH_CASE_NEEDS_CONSTANT_WIDTH:
-			return new HDLAdvise(
-					problem,
-					"The switch expression needs to have a known width",
+			return new HDLAdvise(problem, "The switch expression needs to have a known width",
 					"The width of the switch expression needs to be constant. That means that it can not work on parameterized values as these are only known when the module is instanciated.",
 					"Create a new signal with a fixed width and use that as the switch expression");
 		case PARAMETER_NOT_FOUND: {
@@ -518,19 +499,20 @@ public class BuiltInAdvisor {
 				}
 			}
 			return new HDLAdvise(problem, "The parameter '" + arg.getName() + "' does not exist",
-					"In the interface that you instantiate, a variable declaration of type parameter with that name could not be found.", getMatchProposal(validNames,
-							"Parameters", arg.getName()));
+					"In the interface that you instantiate, a variable declaration of type parameter with that name could not be found.",
+					getMatchProposal(validNames, "Parameters", arg.getName()));
 		}
 		case REGISTER_UNKNOWN_ARGUMENT: {
 			final HDLArgument arg = (HDLArgument) problem.node;
-			return new HDLAdvise(problem, "The parameter '" + arg.getName() + "' does not exist", "", getMatchProposal(HDLRegisterConfig.VALID_PARAMS, "Parameters", arg.getName()));
+			return new HDLAdvise(problem, "The parameter '" + arg.getName() + "' does not exist", "",
+					getMatchProposal(HDLRegisterConfig.VALID_PARAMS, "Parameters", arg.getName()));
 		}
 		case DIRECTION_NOT_ALLOWED_IN_SCOPE:
 			return new HDLAdvise(problem, "Direction not allowed in sub scope",
 					"A variable of direction 'in', 'out', 'inout' and 'param' is only allowed outside of scopes like for-loops, if-statements, etc..");
 		case REGISTER_UNKNOWN_ARGUMENT_VALUE:
-			return new HDLAdvise(problem, "Invalid value, allowed values are:" + problem.info, "Only the " + problem.info
-					+ " are valid for the description of the register config.", "Change the expression to either of:" + problem.info);
+			return new HDLAdvise(problem, "Invalid value, allowed values are:" + problem.info,
+					"Only the " + problem.info + " are valid for the description of the register config.", "Change the expression to either of:" + problem.info);
 		case FUNCTION_NOT_ENOUGH_PARAMETER:
 			return new HDLAdvise(problem, "The function does not have the expected number of parameters." + problem.info, "");
 		case TYPE_INVALID_PRIMITIVE:
@@ -555,8 +537,8 @@ public class BuiltInAdvisor {
 				width = " to " + hdlType.getWidth().toString();
 			}
 			return new HDLAdvise(problem, "The declared primitve could possibly have a negative width", "The width of a primitive can never be negative.",
-					"Use uint parameter for parameterized width", "Ensure that the number will always be positive", "Apply a @range(\">0\") annotation" + width
-							+ " to declare expected values");
+					"Use uint parameter for parameterized width", "Ensure that the number will always be positive",
+					"Apply a @range(\">0\") annotation" + width + " to declare expected values");
 		}
 		case TYPE_ZERO_WIDTH: {
 			final HDLVariableDeclaration hvd = (HDLVariableDeclaration) problem.node;
@@ -597,9 +579,7 @@ public class BuiltInAdvisor {
 		case DEPRECATED_TYPE:
 			final HDLPrimitive primNode = (HDLPrimitive) problem.node;
 			final String type = primNode.getType().toString().replace("32", "");
-			return new HDLAdvise(
-					problem,
-					type + " (without width) is deprecated use " + primNode.getType(),
+			return new HDLAdvise(problem, type + " (without width) is deprecated use " + primNode.getType(),
 					"It is not immediately clear what size int/uint had when no width was specified. With the renaming this has been chaned to make it clear to the developer what he is doing",
 					"change " + type + " to " + primNode.getType());
 		}

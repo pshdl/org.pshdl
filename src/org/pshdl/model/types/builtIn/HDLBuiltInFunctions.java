@@ -395,8 +395,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 			if (call.getParams().isEmpty())
 				return;
 			final HDLExpression enumRef = call.getParams().get(0);
-			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(enumRef);
-			final HDLEnum enumType = (HDLEnum) typeOf.get();
+			final HDLEnum enumType = (HDLEnum) TypeExtension.typeOfForced(enumRef, "Insulin");
 			final HDLQualifiedName hEnum = FullNameExtension.fullNameOf(enumType);
 			HDLSwitchStatement switchStmnt = new HDLSwitchStatement().setCaseExp(enumRef);
 			final HDLVariable tmpVar = new HDLVariable().setName(Insulin.getTempName("func", "ordinal"));

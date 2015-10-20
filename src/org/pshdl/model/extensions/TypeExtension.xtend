@@ -75,13 +75,21 @@ import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
 
 import static org.pshdl.model.extensions.TypeExtension.*
+import org.pshdl.model.utils.HDLCodeGenerationException
+import org.pshdl.model.utils.HDLCore
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
 
+	def static HDLType typeOfForced(IHDLObject obj, String stage) {
+		val res=typeOf(obj)
+		if (res.present)
+			return res.get
+		throw new HDLCodeGenerationException(obj, "Failed to resolve type of:"+obj, stage)
+	}
 	def static Optional<? extends HDLType> typeOf(IHDLObject obj) {
 		if (!obj.isFrozen)
-			throw new IllegalArgumentException("Target needs to be frozen")
+			throw new HDLCodeGenerationException(obj, "The object is not frozen","TYPE")
 		cachedType(obj)
 	}
 

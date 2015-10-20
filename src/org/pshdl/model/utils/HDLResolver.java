@@ -37,6 +37,7 @@ import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLRegisterConfig;
 import org.pshdl.model.HDLStatement;
@@ -76,7 +77,11 @@ public class HDLResolver {
 		super();
 		this.resolveTo = resolveTo;
 		this.resolveContainer = resolveTo.getContainer();
-		this.resolveName = fullNameOf(resolveTo);
+		if (resolveTo instanceof HDLFunctionCall) {
+			this.resolveName = fullNameOf(resolveContainer);
+		} else {
+			this.resolveName = fullNameOf(resolveTo);
+		}
 		this.descent = descent;
 	}
 
@@ -126,7 +131,7 @@ public class HDLResolver {
 		return ScopingExtension.INST.resolveEnum(resolveContainer, hEnum);
 	}
 
-	public Optional<Iterable<HDLFunction>> resolveFunction(HDLQualifiedName hEnum) {
+	public Optional<Iterable<HDLFunction>> resolveFunction(HDLQualifiedName funcName) {
 		if (funcCache == null) {
 			synchronized (this) {
 				final HDLFunction[] funcDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
@@ -138,12 +143,12 @@ public class HDLResolver {
 		}
 		// XXX Check if the qualifier does either match the pkg name, or is not
 		// existant
-		final Iterable<HDLFunction> checkCache = checkCache(hEnum, funcCache);
+		final Iterable<HDLFunction> checkCache = checkCache(funcName, funcCache);
 		if ((checkCache != null) && checkCache.iterator().hasNext())
 			return Optional.of(checkCache);
 		if ((resolveContainer == null) || !descent)
 			return Optional.absent();
-		return ScopingExtension.INST.resolveFunctionName(resolveContainer, hEnum);
+		return ScopingExtension.INST.resolveFunctionName(resolveContainer, funcName);
 	}
 
 	public Optional<HDLInterface> resolveInterface(HDLQualifiedName hIf) {

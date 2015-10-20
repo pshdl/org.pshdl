@@ -110,7 +110,7 @@ public class PSHDLParser {
 			}
 			if ((e == null) && PSHDLLangParser.WRONG_ORDER.equals(msg)) {
 				error = SyntaxErrors.WrongOrder;
-				msg = "The order for variable declarations is «direction?» «type» «register?» «name»";
+				msg = "The order for variable declarations is «direction?» «register?» «type» «name»";
 			}
 			if ((e == null) && PSHDLLangParser.MISSING_WIDTH.equals(msg)) {
 				error = SyntaxErrors.MissingWidth;

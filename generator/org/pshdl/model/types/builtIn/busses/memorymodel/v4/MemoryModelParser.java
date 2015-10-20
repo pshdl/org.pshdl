@@ -1194,6 +1194,7 @@ public class MemoryModelParser extends Parser {
 			+ "\4\2\2\u0092\u008f\3\2\2\2\u0093\u0096\3\2\2\2\u0094\u0092\3\2\2\2\u0094" + "\u0095\3\2\2\2\u0095\u0097\3\2\2\2\u0096\u0094\3\2\2\2\u0097\u0098\7\30"
 			+ "\2\2\u0098\35\3\2\2\2\22!*\62\64;EOY[els{\177\u0084\u0094";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

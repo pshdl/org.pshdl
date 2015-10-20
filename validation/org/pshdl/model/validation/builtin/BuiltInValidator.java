@@ -190,6 +190,7 @@ public class BuiltInValidator implements IHDLValidator {
 			"package", "testbench", "int", "if", "in", "default", "enum", "const", "module", "inline", "generate", "bool", "simulation", "uint", "case", "inout", "substitute",
 			"param", "register", "interface" };
 	public final static Set<String> keywordSet;
+
 	static {
 		keywordSet = Sets.newLinkedHashSet();
 		for (final String keyword : PSHDL_KEYWORDS) {
@@ -761,8 +762,8 @@ public class BuiltInValidator implements IHDLValidator {
 					problems.add(new Problem(SWITCH_CASE_NEEDS_WIDTH, switchStatement.getCaseExp()));
 				}
 				final Optional<BigInteger> width = ConstantEvaluate.valueOf(primitive.getWidth(), null);
-				if (!width.isPresent()
-						&& ((primitive.getType() == HDLPrimitiveType.INT) || (primitive.getType() == HDLPrimitiveType.UINT) || (primitive.getType() == HDLPrimitiveType.BITVECTOR))) {
+				if (!width.isPresent() && ((primitive.getType() == HDLPrimitiveType.INT) || (primitive.getType() == HDLPrimitiveType.UINT)
+						|| (primitive.getType() == HDLPrimitiveType.BITVECTOR))) {
 					problems.add(new Problem(SWITCH_CASE_NEEDS_CONSTANT_WIDTH, switchStatement.getCaseExp()));
 				}
 			}
@@ -1309,7 +1310,8 @@ public class BuiltInValidator implements IHDLValidator {
 	 * @param bit
 	 *            when true bit access errors will be reported
 	 */
-	private static void checkAccessBoundaries(Range<BigInteger> accessRange, Range<BigInteger> declaredRange, Set<Problem> problems, IHDLObject arr, HDLVariableRef ref, boolean bit) {
+	private static void checkAccessBoundaries(Range<BigInteger> accessRange, Range<BigInteger> declaredRange, Set<Problem> problems, IHDLObject arr, HDLVariableRef ref,
+			boolean bit) {
 		// Reduce the declaredRange to the index limits
 		Range<BigInteger> indexRange;
 		if (declaredRange.hasUpperBound()) {
@@ -1334,11 +1336,11 @@ public class BuiltInValidator implements IHDLValidator {
 		// Check whether the index and the access have at least something in
 		// common (index 0..5 access 7..9)
 		if (!indexRange.isConnected(accessRange)) {
-			problems.add(new Problem(bit ? BIT_ACCESS_OUT_OF_BOUNDS : ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange)
-					.addMeta(ARRAY_RANGE, indexRange));
+			problems.add(
+					new Problem(bit ? BIT_ACCESS_OUT_OF_BOUNDS : ARRAY_INDEX_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(ARRAY_RANGE, indexRange));
 		} else if (accessRange.hasUpperBound() && indexRange.hasUpperBound() && (accessRange.upperEndpoint().compareTo(indexRange.upperEndpoint()) > 0)) {
-			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_OUT_OF_BOUNDS : ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange).addMeta(
-					ARRAY_RANGE, indexRange));
+			problems.add(new Problem(bit ? BIT_ACCESS_POSSIBLY_OUT_OF_BOUNDS : ARRAY_INDEX_POSSIBLY_OUT_OF_BOUNDS, arr, ref, info).addMeta(ACCESS_RANGE, accessRange)
+					.addMeta(ARRAY_RANGE, indexRange));
 		}
 	}
 

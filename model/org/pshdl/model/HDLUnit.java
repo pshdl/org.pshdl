@@ -1,26 +1,26 @@
 /*******************************************************************************
  * PSHDL is a library and (trans-)compiler for PSHDL input. It generates
  *     output suitable for implementation or simulation of it.
- *     
+ *
  *     Copyright (C) 2014 Karsten Becker (feedback (at) pshdl (dot) org)
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *     This License does not grant permission to use the trade names, trademarks,
- *     service marks, or product names of the Licensor, except as required for 
+ *     service marks, or product names of the Licensor, except as required for
  *     reasonable and customary use in describing the origin of the Work.
- * 
+ *
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
@@ -42,6 +42,7 @@ import javax.annotation.Nullable;
 
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.ConstantEvaluate;
+import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.impl.AbstractHDLUnit;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
@@ -63,7 +64,8 @@ import com.google.common.collect.Sets;
  * The class HDLUnit contains the following fields
  * <ul>
  * <li>IHDLObject container. Can be <code>null</code>.</li>
- * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.</li>
+ * <li>ArrayList&lt;HDLAnnotation&gt; annotations. Can be <code>null</code>.
+ * </li>
  * <li>String libURI. Can <b>not</b> be <code>null</code>.</li>
  * <li>String name. Can <b>not</b> be <code>null</code>.</li>
  * <li>ArrayList&lt;String&gt; imports. Can be <code>null</code>.</li>
@@ -76,7 +78,7 @@ import com.google.common.collect.Sets;
 public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
-	 * 
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations
@@ -302,8 +304,15 @@ public class HDLUnit extends AbstractHDLUnit {
 		unitIF = new HDLInterface().setName(fullName.toString());
 		final Map<String, HDLVariableDeclaration> decls = Maps.newLinkedHashMap();
 		final HDLVariableDeclaration hvds[] = getAllObjectsOf(HDLVariableDeclaration.class, true);
-		for (final HDLVariableDeclaration hvd : hvds)
+		for (HDLVariableDeclaration hvd : hvds)
 			if (hvd.getContainer(HDLInterface.class) == null) {
+				if (hvd.getPrimitive() == null) {
+					final Optional<? extends HDLType> resolveType = hvd.resolveType();
+					if (resolveType.isPresent()) {
+						final HDLType type = resolveType.get();
+						hvd = hvd.setType(FullNameExtension.fullNameOf(type));
+					}
+				}
 				addDecl(HDLObject.asList(hvd), decls);
 			}
 		final HDLDirectGeneration[] generators = getAllObjectsOf(HDLDirectGeneration.class, true);

@@ -63,6 +63,9 @@ import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
 import org.pshdl.model.utils.services.AuxiliaryContent
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
+import org.pshdl.interpreter.VariableInformation.Type
+import org.pshdl.interpreter.FunctionInformation
+import org.pshdl.interpreter.ParameterInformation
 
 class CCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	new(ExecutableModel em) {
@@ -132,6 +135,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 	override protected clearRegUpdates() '''regUpdatePos=0;'''
 
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
+		if (varInfo.type==Type.STRING)
+			return "char*"
 		if (isBoolean(varInfo, attributes))
 			return "bool"
 		return "uint64_t"
@@ -175,6 +180,8 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 #include "pshdl_generic_sim.h"
 #include "«headerName».h"
 
+«generateInlineMethods»
+
 «IF hasClock»
 	/// Don't use this
 	typedef struct regUpdate {
@@ -189,7 +196,25 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 «ENDIF»
 
 '''
-
+	def generateInlineMethods() {
+		val StringBuilder sb = new StringBuilder
+		for (FunctionInformation fi : em.functions) {
+				sb.
+					append('''extern «fi.returnType.toC» «fi.signature»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»«pi.toC» p«pi.name.toFirstUpper»«ENDFOR»);''')
+		}
+		return sb
+	}
+	
+	def toC(ParameterInformation information) {
+		if (information === null)
+			return "void"
+		if (information.type === ParameterInformation.Type.PARAM_BOOL)
+			return "bool"
+		if (information.type === ParameterInformation.Type.PARAM_STRING)
+			return "char*"
+		return "uint64_t"
+	}
+	
 	def protected copyRegs() '''
 		static void updateRegs() {
 			int i;
@@ -249,24 +274,25 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 
 	override protected twoOp(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
+			val type=typeFromTargetSize(targetSizeWithType)
 		switch (fi.inst) {
 			case Instruction.sra:
-				return assignTempVar(targetSizeWithType, pos, attributes,
+				return assignTempVar(type, targetSizeWithType, pos, attributes,
 					'''((int64_t)«getTempName(leftOperand, NONE)») >> «getTempName(rightOperand, NONE)»''', true)
 			case Instruction.srl:
-				return assignTempVar(targetSizeWithType, pos, attributes,
+				return assignTempVar(type, targetSizeWithType, pos, attributes,
 					'''«getTempName(leftOperand, NONE)» >> «getTempName(rightOperand, NONE)»''', true)
 			case Instruction.less:
-				return assignTempVar(targetSizeWithType, pos, attributes,
+				return assignTempVar(type, targetSizeWithType, pos, attributes,
 					'''(int64_t)«getTempName(leftOperand, NONE)» < (int64_t)«getTempName(rightOperand, NONE)»''', true)
 			case Instruction.less_eq:
-				return assignTempVar(targetSizeWithType, pos, attributes,
+				return assignTempVar(type, targetSizeWithType, pos, attributes,
 					'''(int64_t)«getTempName(leftOperand, NONE)» <= (int64_t)«getTempName(rightOperand, NONE)»''', true)
 			case Instruction.greater:
-				return assignTempVar(targetSizeWithType, pos, attributes,
+				return assignTempVar(type, targetSizeWithType, pos, attributes,
 					'''(int64_t)«getTempName(leftOperand, NONE)» > (int64_t)«getTempName(rightOperand, NONE)»''', true)
 			case Instruction.greater_eq:
-				return assignTempVar(targetSizeWithType, pos, attributes,
+				return assignTempVar(type, targetSizeWithType, pos, attributes,
 					'''(int64_t)«getTempName(leftOperand, NONE)» >= (int64_t)«getTempName(rightOperand, NONE)»''', true)
 			default: {
 			}
@@ -709,7 +735,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	override protected pow(FastInstruction fi, String op, int targetSizeWithType, int pos, int leftOperand,
 		int rightOperand, EnumSet<CommonCodeGenerator.Attributes> attributes, boolean doMask) {
 		hasPow = true
-		return assignTempVar(targetSizeWithType, pos, NONE,
+		return assignTempVar(typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, NONE,
 			'''pshdl_sim_pow(«getTempName(leftOperand, NONE)», «getTempName(rightOperand, NONE)»)''', true)
 	}
 
