@@ -533,6 +533,9 @@ public class PSAbstractCompiler implements AutoCloseable {
 		final String src = e.getKey();
 		final Set<Problem> set = issues.get(src);
 		final HDLPackage pkg = e.getValue();
+		if (listener == null) {
+			listener = new NullListener();
+		}
 		if (!listener.validate(src, set, pkg))
 			return hasError(set);
 		final Set<Problem> localProblems = Sets.newHashSet();

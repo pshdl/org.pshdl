@@ -71,7 +71,7 @@ public class HDLResolver {
 
 	private IHDLObject resolveContainer;
 
-	private HDLQualifiedName resolveName;
+	private HDLQualifiedName resolveName = HDLQualifiedName.EMPTY;
 
 	public HDLResolver(IHDLObject resolveTo, boolean descent) {
 		super();
@@ -81,6 +81,9 @@ public class HDLResolver {
 			this.resolveName = fullNameOf(resolveContainer);
 		} else {
 			this.resolveName = fullNameOf(resolveTo);
+		}
+		if (this.resolveName == null) {
+			this.resolveName = HDLQualifiedName.EMPTY;
 		}
 		this.descent = descent;
 	}
