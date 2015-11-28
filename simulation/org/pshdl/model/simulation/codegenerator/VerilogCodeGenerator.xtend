@@ -5,18 +5,13 @@ import com.google.common.collect.LinkedListMultimap
 import com.google.common.collect.Multimap
 import java.math.BigInteger
 import java.util.EnumSet
-import java.util.Map
+import java.util.Set
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.VariableInformation.Direction
-import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes
-import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.ProcessData
-import java.util.List
-import java.util.Set
-import java.util.Stack
 import org.pshdl.interpreter.VariableInformation.Type
 
 class VerilogCodeGenerator extends CommonCodeGenerator {

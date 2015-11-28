@@ -46,10 +46,13 @@ import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
 import org.pshdl.interpreter.Frame
 import org.pshdl.interpreter.Frame.FastInstruction
+import org.pshdl.interpreter.FunctionInformation
 import org.pshdl.interpreter.IHDLInterpreterFactory
 import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.NativeRunner
+import org.pshdl.interpreter.ParameterInformation
 import org.pshdl.interpreter.VariableInformation
+import org.pshdl.interpreter.VariableInformation.Type
 import org.pshdl.interpreter.utils.Instruction
 import org.pshdl.model.simulation.ITypeOuptutProvider
 import org.pshdl.model.simulation.SimulationTransformationExtension
@@ -63,9 +66,6 @@ import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
 import org.pshdl.model.utils.services.AuxiliaryContent
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
-import org.pshdl.interpreter.VariableInformation.Type
-import org.pshdl.interpreter.FunctionInformation
-import org.pshdl.interpreter.ParameterInformation
 
 class CCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	new(ExecutableModel em) {

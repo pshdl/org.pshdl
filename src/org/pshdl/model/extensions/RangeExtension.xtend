@@ -30,12 +30,9 @@ import com.google.common.base.Optional
 import com.google.common.collect.Range
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.util.HashSet
 import java.util.LinkedHashSet
 import org.pshdl.interpreter.frames.BigIntegerFrame
-import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArithOp
-import org.pshdl.model.HDLArithOp.HDLArithOpType
 import org.pshdl.model.HDLBitOp
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLEnumRef
@@ -45,37 +42,25 @@ import org.pshdl.model.HDLForLoop
 import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.HDLLiteral
 import org.pshdl.model.HDLManip
-import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLShiftOp
-import org.pshdl.model.HDLStatement
 import org.pshdl.model.HDLType
 import org.pshdl.model.HDLUnresolvedFragment
-import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration
 import org.pshdl.model.HDLVariableRef
-import org.pshdl.model.IHDLObject
 import org.pshdl.model.evaluation.ConstantEvaluate
 import org.pshdl.model.evaluation.HDLEvaluationContext
-import org.pshdl.model.parser.PSHDLParser
 import org.pshdl.model.simulation.RangeTool
-import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.HDLCodeGenerationException
 import org.pshdl.model.utils.Insulin
 import org.pshdl.model.validation.Problem
 
-import static java.math.BigInteger.*
-import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
-import static org.pshdl.model.HDLBitOp.HDLBitOpType.*
-import static org.pshdl.model.HDLManip.HDLManipType.*
-import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.extensions.ProblemDescription.*
-import static org.pshdl.model.extensions.RangeExtension.*
-import org.pshdl.model.utils.HDLCodeGenerationException
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting

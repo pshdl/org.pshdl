@@ -27,13 +27,12 @@
 package org.pshdl.model.extensions
 
 import java.util.Iterator
-import javax.annotation.Nonnull
 import org.pshdl.model.HDLBlock
 import org.pshdl.model.HDLEnum
-import org.pshdl.model.HDLEnumDeclaration
 import org.pshdl.model.HDLEnumRef
 import org.pshdl.model.HDLForLoop
 import org.pshdl.model.HDLFunction
+import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInterface
 import org.pshdl.model.HDLObject
@@ -46,9 +45,6 @@ import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.utils.HDLQualifiedName
-
-import static org.pshdl.model.extensions.FullNameExtension.*
-import org.pshdl.model.HDLFunctionCall
 
 /**
  * The FullNameExtension provides a {@link HDLQualifiedName} for every IHDLObject. 
@@ -242,9 +238,9 @@ class FullNameExtension {
 				val HDLIfStatement ifStmnt=obj.container as HDLIfStatement
 				val side=ifStmnt.treeSide(obj)
 				switch (side){
-					case HDLIfStatement$TreeSide.thenTree: 
+					case HDLIfStatement.TreeSide.thenTree: 
 						return new HDLQualifiedName(fn.toString+"p")
-					case HDLIfStatement$TreeSide.elseTree: 
+					case HDLIfStatement.TreeSide.elseTree: 
 						return new HDLQualifiedName(fn.toString+"n")
 				}
 			}			

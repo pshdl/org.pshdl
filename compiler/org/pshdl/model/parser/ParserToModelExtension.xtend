@@ -32,12 +32,9 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.pshdl.model.HDLAnnotation
 import org.pshdl.model.HDLArgument
 import org.pshdl.model.HDLArithOp
-import org.pshdl.model.HDLArithOp.HDLArithOpType
 import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLAssignment
-import org.pshdl.model.HDLAssignment.HDLAssignmentType
 import org.pshdl.model.HDLBitOp
-import org.pshdl.model.HDLBitOp.HDLBitOpType
 import org.pshdl.model.HDLBlock
 import org.pshdl.model.HDLConcat
 import org.pshdl.model.HDLDeclaration
@@ -45,12 +42,9 @@ import org.pshdl.model.HDLDirectGeneration
 import org.pshdl.model.HDLEnum
 import org.pshdl.model.HDLEnumDeclaration
 import org.pshdl.model.HDLEqualityOp
-import org.pshdl.model.HDLEqualityOp.HDLEqualityOpType
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLForLoop
-import org.pshdl.model.HDLFunction
 import org.pshdl.model.HDLFunctionParameter
-import org.pshdl.model.HDLFunctionParameter.RWType
 import org.pshdl.model.HDLFunctionParameter.Type
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInlineFunction
@@ -60,8 +54,8 @@ import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.HDLInterfaceInstantiation
 import org.pshdl.model.HDLLiteral
 import org.pshdl.model.HDLManip
-import org.pshdl.model.HDLManip.HDLManipType
 import org.pshdl.model.HDLNativeFunction
+import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPackage
 import org.pshdl.model.HDLPrimitive
 import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
@@ -69,7 +63,6 @@ import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLReference
 import org.pshdl.model.HDLRegisterConfig
 import org.pshdl.model.HDLShiftOp
-import org.pshdl.model.HDLShiftOp.HDLShiftOpType
 import org.pshdl.model.HDLStatement
 import org.pshdl.model.HDLSubstituteFunction
 import org.pshdl.model.HDLSwitchCaseStatement
@@ -150,7 +143,6 @@ import org.pshdl.model.parser.PSHDLLangParser.PsVariableRefContext
 import org.pshdl.model.parser.PSHDLLangParser.PsWidthContext
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
-import org.pshdl.model.HDLObject.GenericMeta
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -345,42 +337,42 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitLogOrContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.LOGI_OR)
+		var res = new HDLBitOp().setType(HDLBitOp.HDLBitOpType.LOGI_OR)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitLogAndContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.LOGI_AND)
+		var res = new HDLBitOp().setType(HDLBitOp.HDLBitOpType.LOGI_AND)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitXorContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.XOR)
+		var res = new HDLBitOp().setType(HDLBitOp.HDLBitOpType.XOR)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitOrContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.OR)
+		var res = new HDLBitOp().setType(HDLBitOp.HDLBitOpType.OR)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLBitOp toHDL(PsBitAndContext context, boolean isStatement) {
-		var res = new HDLBitOp().setType(HDLBitOp$HDLBitOpType.AND)
+		var res = new HDLBitOp().setType(HDLBitOp.HDLBitOpType.AND)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
 		return res.attachContext(context)
 	}
 
 	def dispatch HDLShiftOp toHDL(PsShiftContext context, boolean isStatement) {
-		val type = HDLShiftOp$HDLShiftOpType.getOp(context.op.text)
+		val type = HDLShiftOp.HDLShiftOpType.getOp(context.op.text)
 		var res = new HDLShiftOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -388,7 +380,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLEqualityOp toHDL(PsEqualityCompContext context, boolean isStatement) {
-		val type = HDLEqualityOp$HDLEqualityOpType.getOp(context.op.text)
+		val type = HDLEqualityOp.HDLEqualityOpType.getOp(context.op.text)
 		var res = new HDLEqualityOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -396,7 +388,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLEqualityOp toHDL(PsEqualityContext context, boolean isStatement) {
-		val type = HDLEqualityOp$HDLEqualityOpType.getOp(context.op.text)
+		val type = HDLEqualityOp.HDLEqualityOpType.getOp(context.op.text)
 		var res = new HDLEqualityOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -404,7 +396,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLArithOp toHDL(PsMulContext context, boolean isStatement) {
-		val type = HDLArithOp$HDLArithOpType.getOp(context.op.text)
+		val type = HDLArithOp.HDLArithOpType.getOp(context.op.text)
 		var res = new HDLArithOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -412,7 +404,7 @@ class ParserToModelExtension {
 	}
 
 	def dispatch HDLArithOp toHDL(PsAddContext context, boolean isStatement) {
-		val type = HDLArithOp$HDLArithOpType.getOp(context.op.text)
+		val type = HDLArithOp.HDLArithOpType.getOp(context.op.text)
 		var res = new HDLArithOp().setType(type)
 		res = res.setLeft(context.psExpression(0).toHDL(false) as HDLExpression)
 		res = res.setRight(context.psExpression(1).toHDL(false) as HDLExpression)
@@ -428,16 +420,16 @@ class ParserToModelExtension {
 	def dispatch HDLManip toHDL(PsManipContext context, boolean isStatement) {
 		var res = new HDLManip().setTarget(context.psExpression.toHDL(false) as HDLExpression)
 		if (context.psCast !== null) {
-			res = res.setType(HDLManip$HDLManipType.CAST)
+			res = res.setType(HDLManip.HDLManipType.CAST)
 			res = res.setCastTo(context.psCast.toHDL(false) as HDLType)
 		} else {
 			switch (context.type.type) {
 				case PSHDLLangLexer.LOGIC_NEG:
-					res = res.setType(HDLManip$HDLManipType.LOGIC_NEG)
+					res = res.setType(HDLManip.HDLManipType.LOGIC_NEG)
 				case PSHDLLangLexer.ARITH_NEG:
-					res = res.setType(HDLManip$HDLManipType.ARITH_NEG)
+					res = res.setType(HDLManip.HDLManipType.ARITH_NEG)
 				case PSHDLLangLexer.BIT_NEG:
-					res = res.setType(HDLManip$HDLManipType.BIT_NEG)
+					res = res.setType(HDLManip.HDLManipType.BIT_NEG)
 			}
 		}
 		return res.attachContext(context)
@@ -574,7 +566,7 @@ class ParserToModelExtension {
 
 	def dispatch HDLFunctionParameter toHDL(PsFuncRecturnTypeContext context, boolean isStatement) {
 		var res = context.psFuncParamType.toHDL(isStatement) as HDLFunctionParameter
-		res = res.setRw(HDLFunctionParameter$RWType.RETURN)
+		res = res.setRw(HDLFunctionParameter.RWType.RETURN)
 		res = res.setDim(
 			context.dims.map[
 				if (it.psExpression !== null)
@@ -599,9 +591,9 @@ class ParserToModelExtension {
 	def dispatch HDLFunctionParameter toHDL(PsFuncParamWithRWContext context, boolean isStatement) {
 		var res = context.psFuncParamType.toHDL(isStatement) as HDLFunctionParameter
 		if (context.psFuncParamRWType !== null)
-			res = res.setRw(HDLFunctionParameter$RWType.getOp(context.psFuncParamRWType.text))
+			res = res.setRw(HDLFunctionParameter.RWType.getOp(context.psFuncParamRWType.text))
 		else
-			res = res.setRw(HDLFunctionParameter$RWType.READ)
+			res = res.setRw(HDLFunctionParameter.RWType.READ)
 		if (context.constant!==null){
 			res=res.setConstant(true)
 		}
@@ -789,7 +781,7 @@ class ParserToModelExtension {
 	def dispatch IHDLObject toHDL(PsAssignmentOrFuncContext context, boolean isStatement) {
 		var hVar = context.psVariableRef.toHDL(isStatement) as HDLReference
 		if (context.psAssignmentOp !== null) {
-			val type = HDLAssignment$HDLAssignmentType.getOp(context.psAssignmentOp.text)
+			val type = HDLAssignment.HDLAssignmentType.getOp(context.psAssignmentOp.text)
 			if (hVar instanceof HDLUnresolvedFragment)
 				hVar = hVar.setIsStatement(false)
 			var ass = new HDLAssignment().setLeft(hVar).setType(type)

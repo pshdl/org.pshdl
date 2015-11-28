@@ -26,17 +26,17 @@
  ******************************************************************************/
 package org.pshdl.model.simulation
 
-import com.google.common.base.Optional
 import com.google.common.collect.Lists
 import java.math.BigInteger
 import java.util.ArrayList
-import java.util.HashSet
 import java.util.Iterator
 import java.util.LinkedHashSet
 import java.util.LinkedList
-import java.util.List
 import java.util.Set
+import org.pshdl.interpreter.FunctionInformation
 import org.pshdl.interpreter.InternalInformation
+import org.pshdl.interpreter.ParameterInformation
+import org.pshdl.interpreter.ParameterInformation.RWType
 import org.pshdl.interpreter.VariableInformation
 import org.pshdl.interpreter.VariableInformation.Direction
 import org.pshdl.interpreter.VariableInformation.Type
@@ -54,6 +54,7 @@ import org.pshdl.model.HDLEnumRef
 import org.pshdl.model.HDLEqualityOp
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLFunctionCall
+import org.pshdl.model.HDLFunctionParameter
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.HDLLiteral
@@ -69,7 +70,7 @@ import org.pshdl.model.HDLShiftOp
 import org.pshdl.model.HDLStatement
 import org.pshdl.model.HDLSwitchCaseStatement
 import org.pshdl.model.HDLSwitchStatement
-import org.pshdl.model.HDLTernary
+import org.pshdl.model.HDLType
 import org.pshdl.model.HDLUnit
 import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.HDLVariable
@@ -80,33 +81,20 @@ import org.pshdl.model.IHDLObject
 import org.pshdl.model.evaluation.ConstantEvaluate
 import org.pshdl.model.evaluation.HDLEvaluationContext
 import org.pshdl.model.extensions.FullNameExtension
-import org.pshdl.model.simulation.FluidFrame
+import org.pshdl.model.extensions.TypeExtension
 import org.pshdl.model.simulation.FluidFrame.ArgumentedInstruction
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
-import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.HDLCodeGenerationException
 import org.pshdl.model.utils.HDLQualifiedName
 
 import static org.pshdl.interpreter.utils.Instruction.*
-import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
-import static org.pshdl.model.HDLBitOp.HDLBitOpType.*
-import static org.pshdl.model.HDLEqualityOp.HDLEqualityOpType.*
-import static org.pshdl.model.HDLManip.HDLManipType.*
 import static org.pshdl.model.HDLPrimitive.HDLPrimitiveType.*
 import static org.pshdl.model.HDLRegisterConfig.HDLRegClockType.*
-import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*
 import static org.pshdl.model.evaluation.ConstantEvaluate.*
 import static org.pshdl.model.extensions.FullNameExtension.*
 import static org.pshdl.model.extensions.TypeExtension.*
-import static org.pshdl.model.simulation.SimulationTransformationExtension.*
-import org.pshdl.interpreter.FunctionInformation
-import org.pshdl.model.HDLFunctionParameter
-import org.pshdl.interpreter.ParameterInformation
-import org.pshdl.interpreter.ParameterInformation.RWType
-import org.pshdl.model.HDLType
-import org.pshdl.model.extensions.TypeExtension
-import org.pshdl.model.utils.HDLCodeGenerationException
 
 class SimulationTransformationExtension {
 	private static SimulationTransformationExtension INST = new SimulationTransformationExtension
@@ -276,11 +264,11 @@ class SimulationTransformationExtension {
 			val config = obj.register.normalize
 			val rst = config.rst
 			val String rstName = fullNameOf(rst).toString
-			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType.HIGH)
+			if (config.resetType === HDLRegisterConfig.HDLRegResetActiveType.HIGH)
 				res.add(new ArgumentedInstruction(posPredicate, rstName))
 			else
 				res.add(new ArgumentedInstruction(negPredicate, rstName))
-			if (config.syncType === HDLRegisterConfig$HDLRegSyncType.SYNC) {
+			if (config.syncType === HDLRegisterConfig.HDLRegSyncType.SYNC) {
 				val HDLExpression clk = config.clk
 				val String name = fullNameOf(clk).toString
 				if (config.clockType === RISING)
@@ -443,7 +431,7 @@ class SimulationTransformationExtension {
 				res.add(new ArgumentedInstruction(isFallingEdge, name))
 			val rst = config.rst
 			val String rstName = fullNameOf(rst).toString
-			if (config.resetType === HDLRegisterConfig$HDLRegResetActiveType.HIGH)
+			if (config.resetType === HDLRegisterConfig.HDLRegResetActiveType.HIGH)
 				res.add(new ArgumentedInstruction(negPredicate, rstName))
 			else
 				res.add(new ArgumentedInstruction(posPredicate, rstName))
@@ -517,12 +505,12 @@ class SimulationTransformationExtension {
 		val Iterator<HDLExpression> iter = obj.cats.iterator
 		val init = iter.next
 		res.append(init.toSimulationModel(context, process))
-		val initType=typeOfForced(init, PSEX_STAGE)
+		val initType = typeOfForced(init, PSEX_STAGE)
 		var int owidth = HDLPrimitives.getWidth(initType, context)
 		while (iter.hasNext) {
 			val HDLExpression exp = iter.next
 			res.append(exp.toSimulationModel(context, process))
-			val expType=typeOfForced(exp, PSEX_STAGE)
+			val expType = typeOfForced(exp, PSEX_STAGE)
 			val int width = HDLPrimitives.getWidth(expType, context)
 			res.add(new ArgumentedInstruction(concat, owidth.toString, width.toString))
 			owidth = owidth + width
@@ -686,16 +674,16 @@ class SimulationTransformationExtension {
 				res.add(new ArgumentedInstruction(loadConstantString, obj.^val))
 				return res
 			} else {
-				if (HDLLiteral.FALSE == obj.^val){
+				if (HDLLiteral.FALSE == obj.^val) {
 					res.addConstant(obj.^val, 0bi, Type.BOOL)
 					return res
 				}
 				if (HDLLiteral.TRUE == obj.^val) {
 					res.addConstant(obj.^val, 1bi, Type.BOOL)
-					return res						
+					return res
 				}
 			}
-		} 
+		}
 		val BigInteger value = obj.valueAsBigInt
 		if (0bi.equals(value)) {
 			res.add(const0)

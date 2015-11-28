@@ -27,15 +27,11 @@
 package org.pshdl.model.extensions
 
 import com.google.common.base.Optional
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
 import java.math.BigInteger
 import java.util.ArrayList
 import java.util.Iterator
 import java.util.List
 import org.pshdl.model.HDLArithOp
-import org.pshdl.model.HDLArithOp.HDLArithOpType
 import org.pshdl.model.HDLArrayInit
 import org.pshdl.model.HDLBitOp
 import org.pshdl.model.HDLClass
@@ -51,12 +47,10 @@ import org.pshdl.model.HDLInlineFunction
 import org.pshdl.model.HDLInterface
 import org.pshdl.model.HDLInterfaceInstantiation
 import org.pshdl.model.HDLLiteral
-import org.pshdl.model.HDLLiteral.HDLLiteralPresentation
 import org.pshdl.model.HDLManip
 import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
 import org.pshdl.model.HDLPrimitive.AnyPrimitive
-import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 import org.pshdl.model.HDLRange
 import org.pshdl.model.HDLRegisterConfig
 import org.pshdl.model.HDLShiftOp
@@ -69,14 +63,11 @@ import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.HDLCodeGenerationException
 import org.pshdl.model.utils.HDLProblemException
 import org.pshdl.model.utils.Insulin
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
-
-import static org.pshdl.model.extensions.TypeExtension.*
-import org.pshdl.model.utils.HDLCodeGenerationException
-import org.pshdl.model.utils.HDLCore
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
@@ -195,7 +186,7 @@ class TypeExtension {
 			if (tWidth === null)
 				//This can happen when we have invalid concatenations
 				return Optional.absent
-			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType.PLUS).setRight(tWidth)
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOp.HDLArithOpType.PLUS).setRight(tWidth)
 			width = HDLPrimitives.simplifyWidth(cat, width, null)
 		}
 		return Optional.of(HDLPrimitive.bitvector.setWidth(width).setContainer(cat))
@@ -218,7 +209,7 @@ class TypeExtension {
 
 	def static dispatch HDLExpression getWidth(HDLPrimitive type) {
 		val HDLExpression width = type.width
-		if (type.type == HDLPrimitive$HDLPrimitiveType.BIT)
+		if (type.type == HDLPrimitive.HDLPrimitiveType.BIT)
 			return HDLLiteral.get(1)
 		return width
 	}
@@ -331,7 +322,7 @@ class TypeExtension {
 		val Iterator<HDLRange> iter = bits.iterator
 		var HDLExpression width = HDLPrimitives.simplifyWidth(ref, iter.next.width, null)
 		while (iter.hasNext) {
-			width = new HDLArithOp().setLeft(width).setType(HDLArithOp$HDLArithOpType.PLUS).setRight(iter.next.width)
+			width = new HDLArithOp().setLeft(width).setType(HDLArithOp.HDLArithOpType.PLUS).setRight(iter.next.width)
 			width = HDLPrimitives.simplifyWidth(ref, width, null)
 		}
 		val hVar = ref.resolveVar

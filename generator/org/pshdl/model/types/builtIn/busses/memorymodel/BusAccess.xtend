@@ -26,9 +26,6 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel
 
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.HashSet
 import java.util.LinkedList
 import java.util.List
 import java.util.LinkedHashSet

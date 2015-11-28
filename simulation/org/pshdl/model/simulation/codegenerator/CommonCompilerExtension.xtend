@@ -26,17 +26,11 @@
  ******************************************************************************/
 package org.pshdl.model.simulation.codegenerator
 
-import java.math.BigInteger
 import java.util.ArrayList
-import java.util.HashMap
-import java.util.List
+import java.util.LinkedHashMap
 import java.util.Map
 import org.pshdl.interpreter.ExecutableModel
-import org.pshdl.interpreter.Frame
-import org.pshdl.interpreter.InternalInformation
 import org.pshdl.interpreter.VariableInformation
-import org.pshdl.interpreter.utils.Instruction
-import java.util.LinkedHashMap
 
 class CommonCompilerExtension {
 	public ExecutableModel em

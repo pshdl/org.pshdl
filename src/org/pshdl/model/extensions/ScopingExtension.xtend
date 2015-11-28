@@ -26,6 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.extensions
 
+import com.google.common.base.Optional
+import java.util.Collections
+import java.util.LinkedList
+import java.util.List
 import org.pshdl.model.HDLAssignment
 import org.pshdl.model.HDLBlock
 import org.pshdl.model.HDLDirectGeneration
@@ -33,13 +37,15 @@ import org.pshdl.model.HDLEnum
 import org.pshdl.model.HDLEnumDeclaration
 import org.pshdl.model.HDLForLoop
 import org.pshdl.model.HDLFunction
+import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLInlineFunction
 import org.pshdl.model.HDLInterface
 import org.pshdl.model.HDLInterfaceDeclaration
 import org.pshdl.model.HDLInterfaceInstantiation
+import org.pshdl.model.HDLNativeFunction
 import org.pshdl.model.HDLObject
-import org.pshdl.model.HDLObject$GenericMeta
+import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPackage
 import org.pshdl.model.HDLStatement
 import org.pshdl.model.HDLSubstituteFunction
@@ -50,6 +56,8 @@ import org.pshdl.model.HDLUnit
 import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration
 import org.pshdl.model.IHDLObject
+import org.pshdl.model.impl.AbstractHDLFunctionCall
+import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLProblemException
 import org.pshdl.model.utils.HDLQualifiedName
@@ -58,16 +66,6 @@ import org.pshdl.model.utils.HDLResolver
 import org.pshdl.model.utils.MetaAccess
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
-import java.util.Collections
-import java.util.LinkedList
-import java.util.List
-
-import static org.pshdl.model.extensions.ScopingExtension.*
-import com.google.common.base.Optional
-import org.pshdl.model.HDLNativeFunction
-import org.pshdl.model.HDLFunctionCall
-import org.pshdl.model.types.builtIn.HDLFunctions
-import org.pshdl.model.impl.AbstractHDLFunctionCall
 
 /**
  * The ScopingExtension allows the resolution of Enums, Interface, Variables by name
@@ -248,7 +246,7 @@ class ScopingExtension {
 		return HDLResolver.getallVariableDeclarations(obj.statements)
 	}
 
-	def dispatch Optional<HDLEnum> resolveEnum(HDLAssignment obj, org.pshdl.model.utils.HDLQualifiedName hEnum) {
+	def dispatch Optional<HDLEnum> resolveEnum(HDLAssignment obj, HDLQualifiedName hEnum) {
 		if (obj.container === null)
 			throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_ENUM, obj, "for hEnum:" + hEnum))
 		return obj.container.resolveEnum(hEnum)

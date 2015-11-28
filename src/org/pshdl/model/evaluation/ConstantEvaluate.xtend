@@ -29,8 +29,6 @@ package org.pshdl.model.evaluation
 import com.google.common.base.Optional
 import com.google.common.collect.Sets
 import java.math.BigInteger
-import java.util.ArrayList
-import java.util.LinkedList
 import java.util.List
 import java.util.Set
 import org.pshdl.interpreter.frames.BigIntegerFrame
@@ -43,15 +41,12 @@ import org.pshdl.model.HDLEqualityOp
 import org.pshdl.model.HDLExpression
 import org.pshdl.model.HDLFunctionCall
 import org.pshdl.model.HDLLiteral
-import org.pshdl.model.HDLLiteral.HDLLiteralPresentation
 import org.pshdl.model.HDLManip
-import org.pshdl.model.HDLObject.GenericMeta
 import org.pshdl.model.HDLPrimitive
 import org.pshdl.model.HDLShiftOp
 import org.pshdl.model.HDLTernary
 import org.pshdl.model.HDLType
 import org.pshdl.model.HDLUnresolvedFragment
-import org.pshdl.model.HDLVariable
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection
 import org.pshdl.model.HDLVariableRef
 import org.pshdl.model.IHDLObject
@@ -60,22 +55,17 @@ import org.pshdl.model.extensions.ProblemDescription
 import org.pshdl.model.extensions.TypeExtension
 import org.pshdl.model.types.builtIn.HDLFunctions
 import org.pshdl.model.types.builtIn.HDLPrimitives
+import org.pshdl.model.utils.HDLCodeGenerationException
 import org.pshdl.model.utils.HDLQualifiedName
 import org.pshdl.model.utils.Insulin
 
-import static org.pshdl.model.HDLArithOp.HDLArithOpType.*
-import static org.pshdl.model.HDLBitOp.HDLBitOpType.*
-import static org.pshdl.model.HDLEqualityOp.HDLEqualityOpType.*
-import static org.pshdl.model.HDLManip.HDLManipType.*
-import static org.pshdl.model.HDLShiftOp.HDLShiftOpType.*
 import static org.pshdl.model.HDLVariableDeclaration.HDLDirection.*
 import static org.pshdl.model.extensions.ProblemDescription.*
-import org.pshdl.model.utils.HDLCodeGenerationException
 
 /**
- * This class allows to attempt to resolve a {@link java.math.BigInteger} value for any {@link org.pshdl.model.IHDLObject}. Of course
+ * This class allows to attempt to resolve a {@link BigInteger} value for any {@link IHDLObject}. Of course
  * this only works when the given IHDLObject is truly constant. Parameters are not considered constant, unless
- * they can be found in the given {@link org.pshdl.model.evaluation.HDLEvaluationContext}.
+ * they can be found in the given {@link HDLEvaluationContext}.
  * 
  * @author Karsten Becker
  */
@@ -140,9 +130,9 @@ class ConstantEvaluate {
 
 	def dispatch Optional<BigInteger> constantEvaluate(HDLLiteral obj, HDLEvaluationContext context, Set<HDLQualifiedName> evaled) {
 		switch (obj.presentation) {
-			case HDLLiteral$HDLLiteralPresentation.STR:
+			case HDLLiteral.HDLLiteralPresentation.STR:
 				return Optional.absent
-			case HDLLiteral$HDLLiteralPresentation.BOOL: {
+			case HDLLiteral.HDLLiteralPresentation.BOOL: {
 				if (context !== null && context.boolAsInt) {
 					return boolInt(!obj.equals(HDLLiteral.^false))
 				}

@@ -27,38 +27,32 @@
 package org.pshdl.model.utils
 
 import com.google.common.collect.LinkedListMultimap
+import com.google.common.collect.Lists
+import com.google.common.collect.Maps
 import com.google.common.collect.Multimap
-import com.google.common.collect.Sets
-import java.util.LinkedHashMap
+import java.util.ArrayList
+import java.util.Collection
+import java.util.LinkedHashSet
+import java.util.List
 import java.util.Map
-import java.util.Set
-import org.pshdl.model.HDLRegisterConfig
-import org.pshdl.model.HDLStatement
-import org.pshdl.model.HDLAssignment
-import org.pshdl.model.HDLReference
-import org.pshdl.model.HDLUnresolvedFragment
-import org.pshdl.model.HDLResolvedRef
-import org.pshdl.model.HDLBlock
 import java.util.concurrent.atomic.AtomicInteger
+import org.pshdl.model.HDLAssignment
+import org.pshdl.model.HDLBlock
+import org.pshdl.model.HDLDeclaration
 import org.pshdl.model.HDLForLoop
+import org.pshdl.model.HDLFunctionCall
+import org.pshdl.model.HDLIfStatement
+import org.pshdl.model.HDLInstantiation
+import org.pshdl.model.HDLReference
+import org.pshdl.model.HDLRegisterConfig
+import org.pshdl.model.HDLResolvedRef
+import org.pshdl.model.HDLStatement
 import org.pshdl.model.HDLSwitchCaseStatement
 import org.pshdl.model.HDLSwitchStatement
-import java.util.LinkedList
-import java.util.HashSet
-import com.google.common.collect.Maps
-import com.google.common.collect.Lists
-import java.util.List
-import org.pshdl.model.utils.HDLQuery.HDLFieldAccess
-import java.util.ArrayList
-import org.pshdl.model.IHDLObject
-import java.util.Collection
-import org.pshdl.model.HDLIfStatement
 import org.pshdl.model.HDLUnit
-import org.pshdl.model.HDLDeclaration
-import org.pshdl.model.HDLFunctionCall
+import org.pshdl.model.HDLUnresolvedFragment
 import org.pshdl.model.extensions.StringWriteExtension
-import org.pshdl.model.HDLInstantiation
-import java.util.LinkedHashSet
+import org.pshdl.model.utils.HDLQuery.HDLFieldAccess
 
 class ProcessModel {
 

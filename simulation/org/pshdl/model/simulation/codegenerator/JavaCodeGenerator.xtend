@@ -29,7 +29,6 @@ package org.pshdl.model.simulation.codegenerator
 import com.google.common.base.Predicate
 import com.google.common.collect.LinkedHashMultimap
 import com.google.common.collect.Lists
-import com.google.common.collect.Maps
 import com.google.common.collect.Multimap
 import com.google.common.collect.Sets
 import java.math.BigInteger
@@ -37,11 +36,8 @@ import java.util.Collections
 import java.util.EnumSet
 import java.util.Iterator
 import java.util.List
-import java.util.Map
 import java.util.Random
 import java.util.Set
-import java.util.Stack
-import javax.annotation.MatchesPattern.Checker
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.Options
 import org.pshdl.interpreter.ExecutableModel
@@ -55,12 +51,11 @@ import org.pshdl.interpreter.VariableInformation.Type
 import org.pshdl.model.simulation.HDLSimulator
 import org.pshdl.model.simulation.ITypeOuptutProvider
 import org.pshdl.model.simulation.SimulationTransformationExtension
-import org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes
-import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
+import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.*
 import static org.pshdl.model.simulation.codegenerator.CommonCodeGenerator.Attributes.*
 
 class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
