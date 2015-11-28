@@ -8,3 +8,4 @@ PSHDLCompiler.jar
 /target
 *.versionsBackup
 cov-int
+*.xtendbin

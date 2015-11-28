@@ -623,12 +623,10 @@ class SimulationTransformationExtension {
 			case current.type === INTEGER || current.type === NATURAL:
 				return 32
 			case current.type === INT || current.type === UINT || current.type === BITVECTOR: {
-				val res = valueOf(current.width, context)
-				if (res.present)
-					return res.get.intValue
+				return valueOfForced(current.width, context, "PSEX").intValue
 			}
 		}
-		throw new IllegalArgumentException(current + " is not a valid type");
+		throw new HDLCodeGenerationException(current, current + " width is unknown", "PSEX");
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLEnumRef obj, HDLEvaluationContext context, String process) {
@@ -676,7 +674,7 @@ class SimulationTransformationExtension {
 				res.add(new ArgumentedInstruction(loadInternal, bits))
 			}
 			default:
-				throw new IllegalArgumentException("Did not expect obj here" + dir)
+				throw new HDLCodeGenerationException(obj, "Failed to resolve direction:" + dir, "PSEX")
 		}
 		return res
 	}

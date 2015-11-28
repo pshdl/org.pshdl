@@ -431,12 +431,8 @@ public class HDLUnit extends AbstractHDLUnit {
 					final String name = var.getName();
 					final HDLVariableDeclaration otherDecl = decls.get(name);
 					if (otherDecl != null) {
-						final Optional<? extends HDLType> otherType = otherDecl.resolveType();
-						final Optional<? extends HDLType> thisType = hvd.resolveType();
-						if (otherType.isPresent() && thisType.isPresent()) {
-							if (!otherType.get().equals(otherType.get()))
-								throw new IllegalArgumentException("Exported types of " + name + " don't match:" + otherType.get() + " and " + thisType.get());
-						}
+						// This is very likely a re-declaration of an existing
+						// variable. It will be indicated as an error
 					} else {
 						decls.put(name, hvd.setVariables(HDLObject.asList(var)));
 					}
