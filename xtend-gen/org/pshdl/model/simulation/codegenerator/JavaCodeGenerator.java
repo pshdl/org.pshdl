@@ -41,7 +41,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Consumer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -50,6 +49,7 @@ import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -706,13 +706,13 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         }
       };
       Iterable<Frame> _filter = IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(this.em.frames)), _function);
-      final Consumer<Frame> _function_1 = new Consumer<Frame>() {
+      final Procedure1<Frame> _function_1 = new Procedure1<Frame>() {
         @Override
-        public void accept(final Frame it) {
+        public void apply(final Frame it) {
           stageFrames.put(Integer.valueOf(it.scheduleStage), it);
         }
       };
-      _filter.forEach(_function_1);
+      IterableExtensions.<Frame>forEach(_filter, _function_1);
       Set<Integer> _keySet = stageFrames.keySet();
       List<Integer> _sort = IterableExtensions.<Integer>sort(_keySet);
       int maxStage = (int) IterableExtensions.<Integer>last(_sort);
@@ -1676,8 +1676,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (useInterface) {
         {
           Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo : _filter) {
@@ -1733,8 +1733,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         {
           Iterable<VariableInformation> _excludeNullAndAlias = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
           Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias, new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo_1 : _filter_1) {
@@ -1766,8 +1766,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       Iterable<VariableInformation> _excludeNullAndAlias_1 = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias_1, new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(VariableInformation arg0) {
-            return filter.apply(arg0);
+          public Boolean apply(VariableInformation p) {
+            return filter.apply(p);
           }
       });
       for(final VariableInformation varInfo_2 : _filter_2) {
