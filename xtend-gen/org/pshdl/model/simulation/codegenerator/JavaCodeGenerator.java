@@ -1676,8 +1676,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (useInterface) {
         {
           Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation p) {
-                return filter.apply(p);
+              public Boolean apply(VariableInformation arg0) {
+                return filter.apply(arg0);
               }
           });
           for(final VariableInformation varInfo : _filter) {
@@ -1733,8 +1733,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         {
           Iterable<VariableInformation> _excludeNullAndAlias = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
           Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias, new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation p) {
-                return filter.apply(p);
+              public Boolean apply(VariableInformation arg0) {
+                return filter.apply(arg0);
               }
           });
           for(final VariableInformation varInfo_1 : _filter_1) {
@@ -1766,8 +1766,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       Iterable<VariableInformation> _excludeNullAndAlias_1 = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias_1, new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(VariableInformation p) {
-            return filter.apply(p);
+          public Boolean apply(VariableInformation arg0) {
+            return filter.apply(arg0);
           }
       });
       for(final VariableInformation varInfo_2 : _filter_2) {
