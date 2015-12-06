@@ -76,7 +76,6 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 		return "psex";
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public MultiOption getUsage() {
 		final Options options = new Options();

@@ -206,6 +206,11 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 				break;
 			case PARAM_ENUM:
 			case PARAM_ANY_ENUM:
+				final Collection<HDLVariableRef> allEnum = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef()).getAll();
+				for (final HDLVariableRef argRef : allEnum) {
+					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
+					msExp.replace(argRef, exp);
+				}
 				break;
 			case PARAM_IF:
 			case PARAM_ANY_IF:

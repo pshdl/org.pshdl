@@ -134,7 +134,7 @@ public class HDLResolver {
 		return ScopingExtension.INST.resolveEnum(resolveContainer, hEnum);
 	}
 
-	public Optional<Iterable<HDLFunction>> resolveFunction(HDLQualifiedName funcName) {
+	public Optional<? extends Iterable<HDLFunction>> resolveFunctionCall(HDLFunctionCall call, HDLQualifiedName funcName) {
 		if (funcCache == null) {
 			synchronized (this) {
 				final HDLFunction[] funcDecl = resolveTo.getAllObjectsOf(HDLFunction.class, false);
@@ -151,7 +151,7 @@ public class HDLResolver {
 			return Optional.of(checkCache);
 		if ((resolveContainer == null) || !descent)
 			return Optional.absent();
-		return ScopingExtension.INST.resolveFunctionName(resolveContainer, funcName);
+		return ScopingExtension.INST.resolveFunctionCall(resolveContainer, call, funcName);
 	}
 
 	public Optional<HDLInterface> resolveInterface(HDLQualifiedName hIf) {

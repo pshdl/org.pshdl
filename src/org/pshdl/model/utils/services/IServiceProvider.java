@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
 public interface IServiceProvider {
 	public Collection<IHDLAnnotation> getAllAnnotations();
 
-	public Collection<INativeFunctionProvider> getAllFunctions();
+	public Collection<INativeFunctionProvider> getAllNativeFunctionProvider();
 
 	public Collection<IHDLGenerator> getAllGenerators();
 
@@ -61,7 +61,7 @@ public interface IServiceProvider {
 		}
 
 		@Override
-		public Collection<INativeFunctionProvider> getAllFunctions() {
+		public Collection<INativeFunctionProvider> getAllNativeFunctionProvider() {
 			final ServiceLoader<INativeFunctionProvider> functions = ServiceLoader.load(INativeFunctionProvider.class);
 			final List<INativeFunctionProvider> res = new LinkedList<>();
 			for (final INativeFunctionProvider func : functions) {
@@ -106,5 +106,17 @@ public interface IServiceProvider {
 			return res;
 		}
 
+		@Override
+		public Collection<IDynamicFunctionProvider> getAllDynamicFunctionProvider() {
+			final ServiceLoader<IDynamicFunctionProvider> functions = ServiceLoader.load(IDynamicFunctionProvider.class);
+			final List<IDynamicFunctionProvider> res = new LinkedList<>();
+			for (final IDynamicFunctionProvider func : functions) {
+				res.add(func);
+			}
+			return res;
+		}
+
 	}
+
+	public Collection<IDynamicFunctionProvider> getAllDynamicFunctionProvider();
 }

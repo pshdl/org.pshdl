@@ -659,6 +659,12 @@ public abstract class CommonCodeGenerator {
 			case srl:
 				res += 2;
 				break;
+			case invokeFunction:
+				res += 10;
+				break;
+			case loadConstantString:
+				res += 1;
+				break;
 			}
 		}
 		return res;
@@ -1179,6 +1185,7 @@ public abstract class CommonCodeGenerator {
 		return sb;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Stack<Integer> clone(Stack<Integer> arr) {
 		return (Stack<Integer>) arr.clone();
 	}
@@ -1188,14 +1195,6 @@ public abstract class CommonCodeGenerator {
 			return input;
 		final EnumSet<Attributes> clone = input.clone();
 		clone.addAll(attributes);
-		return clone;
-	}
-
-	private EnumSet<Attributes> append(EnumSet<Attributes> input, Attributes[] attributes) {
-		if (attributes == null)
-			return input;
-		final EnumSet<Attributes> clone = input.clone();
-		clone.addAll(Arrays.asList(attributes));
 		return clone;
 	}
 

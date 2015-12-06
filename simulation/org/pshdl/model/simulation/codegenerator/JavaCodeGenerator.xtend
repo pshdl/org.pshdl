@@ -190,7 +190,7 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 			case «v.getVarIdx(false)»: return "«v.name»";
 		«ENDFOR»
 			default:
-				throw new IllegalArgumentException("Not a valid index:" + idx);
+			throw new IllegalArgumentException("Not a valid index:" + idx);
 			}
 		}
 		
@@ -271,11 +271,19 @@ class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		val StringBuilder sb = new StringBuilder
 		for (FunctionInformation fi : em.functions) {
 			if (fi.name.startsWith("pshdl.")) {
-				sb.
-					append('''
-					private «fi.returnType.toJava» «fi.signature»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»«pi.toJava» p«pi.name.toFirstUpper»«ENDFOR»){
-						«IF fi.returnType!==null»return «ENDIF»pshdl.«fi.name.substring(fi.name.lastIndexOf('.')+1)»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»p«pi.name.toFirstUpper»«ENDFOR»);
-					}''')
+				if (fi.name.endsWith("printf")) {
+					sb.
+						append('''
+						private «fi.returnType.toJava» «fi.signature»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»«pi.toJava» p«pi.name.toFirstUpper»«ENDFOR»){
+							new org.pshdl.interpreter.utils.PSHDLFormatter(System.out, p«fi.parameter.head.name.toFirstUpper»).format(«FOR ParameterInformation pi : fi.parameter.drop(1) SEPARATOR ', '»p«pi.name.toFirstUpper»«ENDFOR»);
+						}''')
+				} else {
+					sb.
+						append('''
+						private «fi.returnType.toJava» «fi.signature»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»«pi.toJava» p«pi.name.toFirstUpper»«ENDFOR»){
+							«IF fi.returnType!==null»return «ENDIF»pshdl.«fi.name.substring(fi.name.lastIndexOf('.')+1)»(«FOR ParameterInformation pi : fi.parameter SEPARATOR ', '»p«pi.name.toFirstUpper»«ENDFOR»);
+						}''')
+				}
 			}
 		}
 		return sb
@@ -685,7 +693,7 @@ import org.pshdl.interpreter.JavaPSHDLLib.TimeUnit;
 import java.util.Arrays;
 
 /**
-«FOR anno: em.annotations»
+«FOR anno : em.annotations»
  * «anno»
 «ENDFOR»
 */
@@ -808,17 +816,21 @@ public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useIn
 	«ENDIF»
 }
 '''
-	
-	def getInterpreterClassName(boolean useInterface) '''«IF useInterface»«IF isTestbench»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»«ELSE»«(parameter as JavaCodeGeneratorParameter).javaClassName»«ENDIF»'''
+
+	def getInterpreterClassName(
+		boolean useInterface
+	) '''«IF useInterface»«IF isTestbench»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»«ELSE»«(parameter as JavaCodeGeneratorParameter).javaClassName»«ENDIF»'''
+
 	def protected changedNotificationInterface(VariableInformation vi) {
 		val varName = vi.idName(true, NONE)
 		if (!vi.array) {
 			if (vi.predicate) {
 				val varNameUpdate = vi.idName(
 					true,
-					EnumSet.of(
-						isUpdate
-					)
+					EnumSet.
+						of(
+							isUpdate
+						)
 				)
 				return '''if ((module.getOutputLong(«varName»_idx)!=0) != «varName»)
 	for (IChangeListener listener:listeners)
@@ -834,9 +846,10 @@ public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useIn
 			if (vi.predicate) {
 				val varNameUpdate = vi.idName(
 					true,
-					EnumSet.of(
-						isUpdate
-					)
+					EnumSet.
+						of(
+							isUpdate
+						)
 				)
 				return '''{
 boolean[] tempArr=new boolean[«vi.arraySize»];
@@ -871,9 +884,10 @@ if (!Arrays.equals(tempArr,«varName»))
 			if (vi.predicate) {
 				val varNameUpdate = vi.idName(
 					true,
-					EnumSet.of(
-						isUpdate
-					)
+					EnumSet.
+						of(
+							isUpdate
+						)
 				)
 				return '''if (module.«varName» != «varName»)
 	for (IChangeListener listener:listeners)
@@ -890,9 +904,10 @@ if (!Arrays.equals(tempArr,«varName»))
 			if (vi.predicate) {
 				val varNameUpdate = vi.idName(
 					true,
-					EnumSet.of(
-						isUpdate
-					)
+					EnumSet.
+						of(
+							isUpdate
+						)
 				)
 				return '''if (!module.«varName».equals(«varName»))
 	for (IChangeListener listener:listeners)
@@ -945,7 +960,7 @@ if (!Arrays.equals(tempArr,«varName»))
 			Runnable doRun=(main==null?this:main);
 			'''
 	}
-	
+
 	def timeMethods() '''		@Override
 		public TimeUnit getTimeBase(){
 			return TimeUnit.«getAnnoValue("TimeBase")»;
@@ -956,10 +971,10 @@ if (!Arrays.equals(tempArr,«varName»))
 			return «fieldName(timeName, NONE)»;
 		}
 	'''
-	
+
 	protected def getAnnoValue(String anno) {
 		val foundAnno = em.annotations.findFirst[startsWith(anno)]
-		return foundAnno.substring(foundAnno.indexOf(SimulationTransformationExtension.ANNO_VALUE_SEP)+1)
+		return foundAnno.substring(foundAnno.indexOf(SimulationTransformationExtension.ANNO_VALUE_SEP) + 1)
 	}
 
 	override getHookName() {

@@ -29,6 +29,7 @@ package org.pshdl.model.utils;
 import static org.pshdl.model.extensions.FullNameExtension.fullNameOf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.pshdl.model.HDLDeclaration;
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLInterfaceDeclaration;
 import org.pshdl.model.HDLObject;
@@ -147,9 +149,9 @@ public class HDLLibrary {
 
 	/**
 	 * Adds the given function to the library so that it can be resolved by
-	 * {@link #resolveFunction(Iterable, HDLQualifiedName)}
 	 *
 	 * @param func
+	 * @param src
 	 */
 	public void addFunction(HDLFunction func, String src) {
 		checkFrozen(func);
@@ -163,6 +165,7 @@ public class HDLLibrary {
 	 * {@link #resolve(Iterable, HDLQualifiedName)}
 	 *
 	 * @param hIf
+	 * @param src
 	 */
 	public void addInterface(HDLInterface hIf, String src) {
 		checkFrozen(hIf);
@@ -354,25 +357,33 @@ public class HDLLibrary {
 	 *            the fqn or local name of the type to look for
 	 * @return the type if found
 	 */
-	public Optional<Iterable<HDLFunction>> resolveFunction(Iterable<String> imports, HDLQualifiedName type) {
+	public Optional<? extends Iterable<HDLFunction>> resolveFunction(Iterable<String> imports, HDLFunctionCall call, HDLQualifiedName type) {
 		Iterable<HDLFunction> hdlFunction = functions.get(type);
 		if (hdlFunction.iterator().hasNext())
 			return Optional.of(hdlFunction);
 		for (final String string : imports) {
 			if (string.endsWith(type.toString())) {
-				hdlFunction = functions.get(new HDLQualifiedName(string));
+				final HDLQualifiedName fqnFunc = new HDLQualifiedName(string);
+				hdlFunction = functions.get(fqnFunc);
 				if (hdlFunction.iterator().hasNext())
 					return Optional.of(hdlFunction);
+				final Optional<HDLFunction> nativeFunction = HDLFunctions.resolveNativeFunction(fqnFunc, call);
+				if (nativeFunction.isPresent())
+					return Optional.of(Arrays.asList(nativeFunction.get()));
 			}
 		}
 		Optional<Iterable<HDLFunction>> genericImport = checkGenericImport(type, "pshdl.*", functions);
 		if (genericImport.isPresent())
 			return genericImport;
+		final Optional<HDLFunction> nativeFunction = HDLFunctions.resolveNativeFunction(new HDLQualifiedName("pshdl." + type.toString()), call);
+		if (nativeFunction.isPresent())
+			return Optional.of(Arrays.asList(nativeFunction.get()));
 		for (final String string : imports) {
 			if (string.endsWith(".*")) {
 				genericImport = checkGenericImport(type, string, functions);
 				if (genericImport.isPresent())
 					return genericImport;
+
 			}
 		}
 		return Optional.absent();

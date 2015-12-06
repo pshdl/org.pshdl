@@ -302,7 +302,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("\t");
     _builder.append("default:");
     _builder.newLine();
-    _builder.append("\t\t");
+    _builder.append("\t");
     _builder.append("throw new IllegalArgumentException(\"Not a valid index:\" + idx);");
     _builder.newLine();
     _builder.append("\t");
@@ -534,60 +534,113 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     for (final FunctionInformation fi : this.em.functions) {
       boolean _startsWith = fi.name.startsWith("pshdl.");
       if (_startsWith) {
-        StringConcatenation _builder = new StringConcatenation();
-        _builder.append("private ");
-        String _java = this.toJava(fi.returnType);
-        _builder.append(_java, "");
-        _builder.append(" ");
-        String _signature = fi.signature();
-        _builder.append(_signature, "");
-        _builder.append("(");
-        {
-          boolean _hasElements = false;
-          for(final ParameterInformation pi : fi.parameter) {
-            if (!_hasElements) {
-              _hasElements = true;
-            } else {
-              _builder.appendImmediate(", ", "");
+        boolean _endsWith = fi.name.endsWith("printf");
+        if (_endsWith) {
+          StringConcatenation _builder = new StringConcatenation();
+          _builder.append("private ");
+          String _java = this.toJava(fi.returnType);
+          _builder.append(_java, "");
+          _builder.append(" ");
+          String _signature = fi.signature();
+          _builder.append(_signature, "");
+          _builder.append("(");
+          {
+            boolean _hasElements = false;
+            for(final ParameterInformation pi : fi.parameter) {
+              if (!_hasElements) {
+                _hasElements = true;
+              } else {
+                _builder.appendImmediate(", ", "");
+              }
+              String _java_1 = this.toJava(pi);
+              _builder.append(_java_1, "");
+              _builder.append(" p");
+              String _firstUpper = StringExtensions.toFirstUpper(pi.name);
+              _builder.append(_firstUpper, "");
             }
-            String _java_1 = this.toJava(pi);
-            _builder.append(_java_1, "");
-            _builder.append(" p");
-            String _firstUpper = StringExtensions.toFirstUpper(pi.name);
-            _builder.append(_firstUpper, "");
           }
-        }
-        _builder.append("){");
-        _builder.newLineIfNotEmpty();
-        _builder.append("\t");
-        {
-          if ((fi.returnType != null)) {
-            _builder.append("return ");
-          }
-        }
-        _builder.append("pshdl.");
-        int _lastIndexOf = fi.name.lastIndexOf(".");
-        int _plus = (_lastIndexOf + 1);
-        String _substring = fi.name.substring(_plus);
-        _builder.append(_substring, "\t");
-        _builder.append("(");
-        {
-          boolean _hasElements_1 = false;
-          for(final ParameterInformation pi_1 : fi.parameter) {
-            if (!_hasElements_1) {
-              _hasElements_1 = true;
-            } else {
-              _builder.appendImmediate(", ", "\t");
+          _builder.append("){");
+          _builder.newLineIfNotEmpty();
+          _builder.append("\t");
+          _builder.append("new org.pshdl.interpreter.utils.PSHDLFormatter(System.out, p");
+          ParameterInformation _head = IterableExtensions.<ParameterInformation>head(((Iterable<ParameterInformation>)Conversions.doWrapArray(fi.parameter)));
+          String _firstUpper_1 = StringExtensions.toFirstUpper(_head.name);
+          _builder.append(_firstUpper_1, "\t");
+          _builder.append(").format(");
+          {
+            Iterable<ParameterInformation> _drop = IterableExtensions.<ParameterInformation>drop(((Iterable<ParameterInformation>)Conversions.doWrapArray(fi.parameter)), 1);
+            boolean _hasElements_1 = false;
+            for(final ParameterInformation pi_1 : _drop) {
+              if (!_hasElements_1) {
+                _hasElements_1 = true;
+              } else {
+                _builder.appendImmediate(", ", "\t");
+              }
+              _builder.append("p");
+              String _firstUpper_2 = StringExtensions.toFirstUpper(pi_1.name);
+              _builder.append(_firstUpper_2, "\t");
             }
-            _builder.append("p");
-            String _firstUpper_1 = StringExtensions.toFirstUpper(pi_1.name);
-            _builder.append(_firstUpper_1, "\t");
           }
+          _builder.append(");");
+          _builder.newLineIfNotEmpty();
+          _builder.append("}");
+          sb.append(_builder);
+        } else {
+          StringConcatenation _builder_1 = new StringConcatenation();
+          _builder_1.append("private ");
+          String _java_2 = this.toJava(fi.returnType);
+          _builder_1.append(_java_2, "");
+          _builder_1.append(" ");
+          String _signature_1 = fi.signature();
+          _builder_1.append(_signature_1, "");
+          _builder_1.append("(");
+          {
+            boolean _hasElements_2 = false;
+            for(final ParameterInformation pi_2 : fi.parameter) {
+              if (!_hasElements_2) {
+                _hasElements_2 = true;
+              } else {
+                _builder_1.appendImmediate(", ", "");
+              }
+              String _java_3 = this.toJava(pi_2);
+              _builder_1.append(_java_3, "");
+              _builder_1.append(" p");
+              String _firstUpper_3 = StringExtensions.toFirstUpper(pi_2.name);
+              _builder_1.append(_firstUpper_3, "");
+            }
+          }
+          _builder_1.append("){");
+          _builder_1.newLineIfNotEmpty();
+          _builder_1.append("\t");
+          {
+            if ((fi.returnType != null)) {
+              _builder_1.append("return ");
+            }
+          }
+          _builder_1.append("pshdl.");
+          int _lastIndexOf = fi.name.lastIndexOf(".");
+          int _plus = (_lastIndexOf + 1);
+          String _substring = fi.name.substring(_plus);
+          _builder_1.append(_substring, "\t");
+          _builder_1.append("(");
+          {
+            boolean _hasElements_3 = false;
+            for(final ParameterInformation pi_3 : fi.parameter) {
+              if (!_hasElements_3) {
+                _hasElements_3 = true;
+              } else {
+                _builder_1.appendImmediate(", ", "\t");
+              }
+              _builder_1.append("p");
+              String _firstUpper_4 = StringExtensions.toFirstUpper(pi_3.name);
+              _builder_1.append(_firstUpper_4, "\t");
+            }
+          }
+          _builder_1.append(");");
+          _builder_1.newLineIfNotEmpty();
+          _builder_1.append("}");
+          sb.append(_builder_1);
         }
-        _builder.append(");");
-        _builder.newLineIfNotEmpty();
-        _builder.append("}");
-        sb.append(_builder);
       }
     }
     return sb;
@@ -1676,8 +1729,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (useInterface) {
         {
           Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo : _filter) {
@@ -1733,8 +1786,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         {
           Iterable<VariableInformation> _excludeNullAndAlias = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
           Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias, new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo_1 : _filter_1) {
@@ -1766,8 +1819,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       Iterable<VariableInformation> _excludeNullAndAlias_1 = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias_1, new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(VariableInformation arg0) {
-            return filter.apply(arg0);
+          public Boolean apply(VariableInformation p) {
+            return filter.apply(p);
           }
       });
       for(final VariableInformation varInfo_2 : _filter_2) {

@@ -41,7 +41,10 @@ import org.pshdl.model.HDLEnumRef;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLFunctionCall;
+import org.pshdl.model.HDLFunctionParameter;
+import org.pshdl.model.HDLFunctionParameter.RWType;
 import org.pshdl.model.HDLFunctionParameter.Type;
+import org.pshdl.model.HDLInterface;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLNativeFunction;
 import org.pshdl.model.HDLPrimitive;
@@ -62,6 +65,7 @@ import org.pshdl.model.types.builtIn.HDLFunctionImplementation.HDLDefaultFunctio
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.Insulin;
 import org.pshdl.model.utils.ModificationSet;
+import org.pshdl.model.utils.services.IDynamicFunctionProvider;
 import org.pshdl.model.utils.services.INativeFunctionProvider;
 import org.pshdl.model.validation.Problem;
 import org.pshdl.model.validation.builtin.ErrorCode;
@@ -72,7 +76,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import com.google.common.math.BigIntegerMath;
 
-public class HDLBuiltInFunctions implements INativeFunctionProvider {
+public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFunctionProvider {
 
 	public static class HighZFunction extends HDLDefaultFunctionImpl {
 
@@ -521,27 +525,25 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 	public static final HDLFunction ORDINAL = (HDLFunction) createOrdinal().freeze(null);
 
 	public static HDLNativeFunction createOrdinal() {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.ordinal.name()).setReturnType(returnType(Type.PARAM_UINT))
-				.addArgs(param(Type.PARAM_ANY_ENUM, "e"));
+		return basicFunc(BuiltInFunctions.ordinal).setReturnType(returnType(Type.PARAM_UINT)).addArgs(param(Type.PARAM_ANY_ENUM, "e"));
 	}
 
 	public static final HDLFunction HIGHZ = (HDLFunction) createHighZ().freeze(null);
 
 	public static HDLNativeFunction createHighZ() {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.highZ.name()).setReturnType(returnType(Type.PARAM_ANY_BIT));
+		return basicFunc(BuiltInFunctions.highZ).setReturnType(returnType(Type.PARAM_ANY_BIT));
 	}
 
 	public static final HDLFunction HIGHZ_BW = (HDLFunction) createHighZ().freeze(null);
 
 	public static HDLNativeFunction createHighZ_BW() {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.highZ.name()).setReturnType(returnType(Type.PARAM_ANY_BIT))
-				.addArgs(param(Type.PARAM_UINT, "width"));
+		return basicFunc(BuiltInFunctions.highZ).setReturnType(returnType(Type.PARAM_ANY_BIT)).addArgs(param(Type.PARAM_UINT, "width"));
 	}
 
 	public static final HDLFunction ASSERT = (HDLFunction) createAssert().freeze(null);
 
 	public static HDLNativeFunction createAssert() {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.assertThat.name())//
+		return basicFunc(BuiltInFunctions.assertThat)//
 				.addArgs(param(Type.PARAM_BOOL, "assumption"))//
 				.addArgs(param(Type.PARAM_ENUM, "assert").setEnumSpec(PSHDLLib.ASSERT.asRef()))//
 				.addArgs(param(Type.PARAM_STRING, "message"))//
@@ -552,7 +554,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 	public static final HDLFunction ABS_INT = (HDLFunction) createABS(Type.PARAM_ANY_INT).freeze(null);
 
 	private static HDLFunction createABS(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.abs.name()).setReturnType(returnType(Type.PARAM_ANY_UINT)).addArgs(param(type, "a"));
+		return basicFunc(BuiltInFunctions.abs).setReturnType(returnType(Type.PARAM_ANY_UINT)).addArgs(param(type, "a"));
 	}
 
 	public static final HDLFunction LOG2CEIL_UINT = (HDLFunction) createLog2(Type.PARAM_ANY_UINT, "ceil").freeze(null);
@@ -569,20 +571,26 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 	public static final HDLFunction MIN_INT = (HDLFunction) createMIN(Type.PARAM_ANY_INT).freeze(null);
 
 	private static HDLFunction createMIN(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.min.name()).setReturnType(returnType(type)).addArgs(param(type, "a"))
-				.addArgs(param(type, "b"));
+		return basicFunc(BuiltInFunctions.min).setReturnType(returnType(type)).addArgs(param(type, "a")).addArgs(param(type, "b"));
 	}
 
 	public static final HDLFunction MAX_INT = (HDLFunction) createMAX(Type.PARAM_ANY_INT).freeze(null);
 	public static final HDLFunction MAX_UINT = (HDLFunction) createMAX(Type.PARAM_ANY_UINT).freeze(null);
 
 	private static HDLFunction createMAX(Type type) {
-		return new HDLNativeFunction().setSimOnly(false).setName("pshdl." + BuiltInFunctions.max.name()).setReturnType(returnType(type)).addArgs(param(type, "a"))
-				.addArgs(param(type, "b"));
+		return basicFunc(BuiltInFunctions.max).setReturnType(returnType(type)).addArgs(param(type, "a")).addArgs(param(type, "b"));
+	}
+
+	private static HDLNativeFunction basicFunc(BuiltInFunctions name) {
+		return new HDLNativeFunction().setSimOnly(false).setName(name.qfn().toString());
 	}
 
 	public static enum BuiltInFunctions {
-		highZ, min, max, abs, log2ceil, log2floor, assertThat, ordinal
+		highZ, min, max, abs, log2ceil, log2floor, assertThat, ordinal, printf;
+
+		public HDLQualifiedName qfn() {
+			return HDLQualifiedName.create("pshdl", name());
+		}
 	}
 
 	public static BuiltInFunctions getFuncEnum(HDLFunctionCall function) {
@@ -608,6 +616,101 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider {
 	@Override
 	public HDLFunctionImplementation[] getStaticFunctions() {
 		return new HDLFunctionImplementation[] { new AbsFunction(), new AssertThat(), new HighZFunction(), new Log2class(), new MinMaxFunction(), new OrdinalFunction() };
+	}
+
+	@Override
+	public Optional<? extends HDLFunctionImplementation> getFunctionFor(HDLFunctionCall call, HDLQualifiedName fqn) {
+		switch (fqn.toString()) {
+		case "pshdl.printf":
+			return Optional.of(new PrintFunction(call.getParams()));
+		}
+		return Optional.absent();
+	}
+
+	public class PrintFunction extends HDLDefaultFunctionImpl {
+
+		private final Iterable<HDLExpression> args;
+		private HDLFunction signature;
+
+		public PrintFunction(Iterable<HDLExpression> arguments) {
+			super(true, true);
+			this.args = arguments;
+			HDLFunction sig = basicFunc(BuiltInFunctions.printf);
+			int pos = 0;
+			for (final HDLExpression hdlExpression : arguments) {
+				final HDLVariable name = new HDLVariable().setName("param" + (pos++));
+				HDLFunctionParameter param = new HDLFunctionParameter().setConstant(false).setRw(RWType.READ).setName(name);
+				final Optional<? extends HDLType> optType = TypeExtension.typeOf(hdlExpression);
+				if (!optType.isPresent())
+					// Handle function references
+					return;
+				final HDLType type = optType.get();
+				if (type instanceof HDLInterface) {
+					final HDLInterface hIf = (HDLInterface) type;
+					param = param.setType(Type.PARAM_IF).setIfSpec(hIf.asRef());
+				} else if (type instanceof HDLPrimitive) {
+					final HDLPrimitive primitive = (HDLPrimitive) type;
+					switch (primitive.getType()) {
+					case ANY_BIT:
+						param = param.setType(Type.PARAM_ANY_BIT);
+						break;
+					case ANY_INT:
+						param = param.setType(Type.PARAM_ANY_INT);
+						break;
+					case ANY_UINT:
+						param = param.setType(Type.PARAM_ANY_UINT);
+						break;
+					case BIT:
+						param = param.setType(Type.PARAM_BIT);
+						break;
+					case BITVECTOR:
+						param = param.setType(Type.PARAM_BIT).setWidth(primitive.getWidth());
+						break;
+					case BOOL:
+						param = param.setType(Type.PARAM_BOOL);
+						break;
+					case INT:
+						param = param.setType(Type.PARAM_INT).setWidth(primitive.getWidth());
+						break;
+					case INTEGER:
+						param = param.setType(Type.PARAM_INT);
+						break;
+					case NATURAL:
+						param = param.setType(Type.PARAM_UINT);
+						break;
+					case STRING:
+						param = param.setType(Type.PARAM_STRING);
+						break;
+					case UINT:
+						param = param.setType(Type.PARAM_UINT).setWidth(primitive.getWidth());
+						break;
+					}
+				} else if (type instanceof HDLEnum) {
+					final HDLEnum hdlEnum = (HDLEnum) type;
+					param = param.setType(Type.PARAM_ENUM).setEnumSpec(hdlEnum.asRef());
+				}
+				sig = sig.addArgs(param);
+			}
+			signature = sig;
+		}
+
+		@Override
+		public String getDocumentation(HDLFunction function) {
+			return "Prints the arguments formatted";
+		}
+
+		@Override
+		public HDLFunction[] signatures() {
+			if (signature == null)
+				return new HDLFunction[0];// This should actually never happen
+			return new HDLFunction[] { signature };
+		}
+
+	}
+
+	@Override
+	public HDLQualifiedName[] getDynamicFunctions() {
+		return new HDLQualifiedName[] { BuiltInFunctions.printf.qfn() };
 	}
 
 }

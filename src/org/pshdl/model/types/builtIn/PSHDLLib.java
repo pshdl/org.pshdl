@@ -30,6 +30,7 @@ import org.pshdl.interpreter.JavaPSHDLLib.Active;
 import org.pshdl.interpreter.JavaPSHDLLib.Assert;
 import org.pshdl.interpreter.JavaPSHDLLib.Edge;
 import org.pshdl.interpreter.JavaPSHDLLib.Sync;
+import org.pshdl.interpreter.JavaPSHDLLib.TimeUnit;
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLPackage;
@@ -38,8 +39,7 @@ import org.pshdl.model.utils.HDLCore;
 
 public class PSHDLLib {
 
-	public static final HDLEnum TIMEUNIT = new HDLEnum().setName("TimeUnit").addEnums(new HDLVariable().setName("FS")).addEnums(new HDLVariable().setName("PS"))
-			.addEnums(new HDLVariable().setName("NS")).addEnums(new HDLVariable().setName("US")).addEnums(new HDLVariable().setName("MS")).addEnums(new HDLVariable().setName("S"));
+	public static final HDLEnum TIMEUNIT = fromEnum(TimeUnit.class);
 	public static final HDLEnum EDGE = fromEnum(Edge.class);
 	public static final HDLEnum ACTIVE = fromEnum(Active.class);
 	public static final HDLEnum SYNC = fromEnum(Sync.class);
@@ -68,7 +68,7 @@ public class PSHDLLib {
 		final String name = fromEnum.getName();
 		final String hdlName = name.substring(name.lastIndexOf('$') + 1);
 		HDLEnum hdlEnum = new HDLEnum().setName(hdlName);
-		for (final Enum e : fromEnum.getEnumConstants()) {
+		for (final Enum<?> e : fromEnum.getEnumConstants()) {
 			hdlEnum = hdlEnum.addEnums(new HDLVariable().setName(e.name()));
 		}
 		return hdlEnum;

@@ -35,9 +35,9 @@ import org.pshdl.model.types.builtIn.HDLAnnotations;
 import org.pshdl.model.types.builtIn.HDLFunctions;
 import org.pshdl.model.types.builtIn.HDLGenerators;
 import org.pshdl.model.utils.services.CompilerInformation;
+import org.pshdl.model.utils.services.IDynamicFunctionProvider;
 import org.pshdl.model.utils.services.IHDLAnnotation;
 import org.pshdl.model.utils.services.IHDLAnnotationProvider;
-import org.pshdl.model.utils.services.IHDLFunctionResolver;
 import org.pshdl.model.utils.services.IHDLGenerator;
 import org.pshdl.model.utils.services.IHDLValidator;
 import org.pshdl.model.utils.services.IServiceProvider;
@@ -50,7 +50,7 @@ import com.google.common.io.ByteStreams;
 /**
  * HDLCore is the central place to register custom services like
  * {@link IHDLAnnotation}, {@link IHDLGenerator}, {@link IHDLValidator},
- * {@link IHDLFunctionResolver} and {@link IHDLAnnotationProvider}. Those
+ * {@link IDynamicFunctionProvider} and {@link IHDLAnnotationProvider}. Those
  * services are added via an {@link IServiceProvider}. The default
  * {@link IServiceProvider},
  * {@link org.pshdl.model.utils.services.IServiceProvider.ServiceLoaderProvider}

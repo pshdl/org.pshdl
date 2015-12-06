@@ -55,6 +55,7 @@ import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.ModificationSet;
 import org.pshdl.model.utils.services.CompilerInformation;
+import org.pshdl.model.utils.services.IDynamicFunctionProvider;
 import org.pshdl.model.utils.services.INativeFunctionProvider;
 import org.pshdl.model.utils.services.IServiceProvider;
 
@@ -130,11 +131,20 @@ public class HDLFunctions {
 
 	private static Multimap<HDLQualifiedName, HDLFunction> signatures;
 	private static Multimap<HDLQualifiedName, HDLFunctionImplementation> provider;
+	private static Multimap<HDLQualifiedName, IDynamicFunctionProvider> dynamicProvider;
 
 	public static void init(CompilerInformation info, IServiceProvider sp) {
 		signatures = LinkedListMultimap.create();
 		provider = LinkedListMultimap.create();
-		final Collection<INativeFunctionProvider> nativeStaticProvider = sp.getAllFunctions();
+		dynamicProvider = LinkedListMultimap.create();
+		final Collection<IDynamicFunctionProvider> dyns = sp.getAllDynamicFunctionProvider();
+		for (final IDynamicFunctionProvider dynProv : dyns) {
+			final HDLQualifiedName[] registeredNames = dynProv.getDynamicFunctions();
+			for (final HDLQualifiedName hdlQualifiedName : registeredNames) {
+				dynamicProvider.put(hdlQualifiedName, dynProv);
+			}
+		}
+		final Collection<INativeFunctionProvider> nativeStaticProvider = sp.getAllNativeFunctionProvider();
 		for (final INativeFunctionProvider snfp : nativeStaticProvider) {
 			final HDLFunctionImplementation[] functionImpl = snfp.getStaticFunctions();
 			for (final HDLFunctionImplementation funcImpl : functionImpl) {
@@ -147,9 +157,9 @@ public class HDLFunctions {
 		}
 	}
 
-	public static Optional<HDLFunction> resolve(HDLFunctionCall call) {
-		final Iterable<HDLFunction> list = getCandidateFunctions(call);
-		if ((list == null) || !list.iterator().hasNext())
+	public static Optional<HDLFunction> resolveNativeFunction(HDLQualifiedName functionRefName, HDLFunctionCall call) {
+		final Iterable<HDLFunction> list = getCandidateFunctions(functionRefName, call);
+		if (!list.iterator().hasNext())
 			return Optional.absent();
 		final SortedSet<FunctionScore> scored = scoreList(list, call);
 		final FunctionScore first = scored.first();
@@ -158,8 +168,20 @@ public class HDLFunctions {
 		return Optional.absent();
 	}
 
-	public static Iterable<HDLFunction> getCandidateFunctions(HDLFunctionCall call) {
-		return signatures.get(call.getFunctionRefName());
+	public static Iterable<HDLFunction> getCandidateFunctions(HDLQualifiedName functionRefName, HDLFunctionCall call) {
+		final List<HDLFunction> res = Lists.newArrayList();
+		final Collection<IDynamicFunctionProvider> dyamics = dynamicProvider.get(functionRefName);
+		for (final IDynamicFunctionProvider provider : dyamics) {
+			final Optional<? extends HDLFunctionImplementation> optFunc = provider.getFunctionFor(call, functionRefName);
+			if (optFunc.isPresent()) {
+				final HDLFunction[] hdlFunctions = optFunc.get().signatures();
+				for (final HDLFunction hdlFunction : hdlFunctions) {
+					res.add(hdlFunction);
+				}
+			}
+		}
+		res.addAll(signatures.get(functionRefName));
+		return res;
 	}
 
 	public static SortedSet<FunctionScore> scoreList(Iterable<HDLFunction> list, HDLFunctionCall call) {
@@ -191,7 +213,7 @@ public class HDLFunctions {
 					break;
 				case READWRITE:
 				case WRITE:
-					if (param instanceof HDLReference) {
+					if (!(param instanceof HDLReference)) {
 						funcScore.incScore(10000, "The argument for " + arg.getName().getName() + " needs to be a reference as it is written.");
 					}
 					break;

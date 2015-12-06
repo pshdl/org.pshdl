@@ -1352,7 +1352,7 @@ public class Insulin {
 	private static void foritfyFunctions(IHDLObject apply, ModificationSet ms) {
 		final HDLFunctionCall[] calls = apply.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (final HDLFunctionCall call : calls) {
-			final Optional<HDLFunction> func = HDLFunctions.resolve(call);
+			final Optional<HDLFunction> func = HDLFunctions.resolveNativeFunction(call.getFunctionRefName(), call);
 			if (func.isPresent()) {
 				final ArrayList<HDLExpression> params = call.getParams();
 				final ArrayList<HDLFunctionParameter> args = func.get().getArgs();
