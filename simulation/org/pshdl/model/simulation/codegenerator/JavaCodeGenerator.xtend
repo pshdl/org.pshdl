@@ -933,7 +933,7 @@ if (!Arrays.equals(tempArr,«varName»))
 		CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
 		name», «currentProcessTime»);'''
 
-	override protected callMethod(
+	override protected callMethod(boolean pshdlFunction,
 		CharSequence methodName,
 		CharSequence... args
 	) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''

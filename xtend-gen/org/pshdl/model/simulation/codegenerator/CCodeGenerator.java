@@ -99,20 +99,15 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     this.cce = _commonCompilerExtension;
   }
   
-  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir) {
+  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir, final NativeRunner.IRunListener listener) {
     try {
       final File testCFile = new File(tempDir, "test.c");
       String _generateMainCode = this.generateMainCode();
       Files.write(_generateMainCode, testCFile, StandardCharsets.UTF_8);
       final File testRunner = new File(tempDir, "runner.c");
-      final InputStream runnerStream = CCodeGenerator.class.getResourceAsStream("/org/pshdl/model/simulation/includes/runner.c");
-      final FileOutputStream fos = new FileOutputStream(testRunner);
-      try {
-        ByteStreams.copy(runnerStream, fos);
-      } finally {
-        runnerStream.close();
-        fos.close();
-      }
+      this.copyFile("/org/pshdl/model/simulation/includes/runner.c", testRunner);
+      final File testGenericLibHeader = new File(tempDir, "pshdl_generic_sim.h");
+      this.copyFile("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h", testGenericLibHeader);
       final File executable = new File(tempDir, "testExec");
       this.writeAuxiliaryContents(tempDir);
       String _absolutePath = tempDir.getAbsolutePath();
@@ -124,10 +119,9 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       ProcessBuilder _inheritIO = _directory.inheritIO();
       final Process process = _inheritIO.start();
       process.waitFor();
-      int _exitValue = process.exitValue();
-      boolean _notEquals = (_exitValue != 0);
-      if (_notEquals) {
-        throw new RuntimeException("Process did not terminate with 0");
+      final int exitValue = process.exitValue();
+      if ((exitValue != 0)) {
+        throw new RuntimeException(("Process did not terminate with 0, was " + Integer.valueOf(exitValue)));
       }
       return new IHDLInterpreterFactory<NativeRunner>() {
         @Override
@@ -141,12 +135,33 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
             InputStream _inputStream = testExec.getInputStream();
             OutputStream _outputStream = testExec.getOutputStream();
             String _absolutePath_1 = executable.getAbsolutePath();
-            return new NativeRunner(_inputStream, _outputStream, CCodeGenerator.this.em, testExec, 5, _absolutePath_1);
+            return new NativeRunner(_inputStream, _outputStream, CCodeGenerator.this.em, testExec, 5, _absolutePath_1, listener);
           } catch (Throwable _e) {
             throw Exceptions.sneakyThrow(_e);
           }
         }
       };
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  public long copyFile(final String fileToCopy, final File testRunner) {
+    try {
+      long _xblockexpression = (long) 0;
+      {
+        final InputStream runnerStream = CCodeGenerator.class.getResourceAsStream(fileToCopy);
+        final FileOutputStream fos = new FileOutputStream(testRunner);
+        long _xtrycatchfinallyexpression = (long) 0;
+        try {
+          _xtrycatchfinallyexpression = ByteStreams.copy(runnerStream, fos);
+        } finally {
+          runnerStream.close();
+          fos.close();
+        }
+        _xblockexpression = _xtrycatchfinallyexpression;
+      }
+      return _xblockexpression;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }
@@ -400,7 +415,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       return "bool";
     }
     if ((information.type == ParameterInformation.Type.PARAM_STRING)) {
-      return "char*";
+      return "const char*";
     }
     return "uint64_t";
   }
@@ -1700,7 +1715,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   }
   
   @Override
-  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
+  protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append(methodName, "");
     _builder.append("(");

@@ -26,6 +26,7 @@
  */
 package org.pshdl.model.simulation.codegenerator;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
@@ -85,7 +86,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     this.cce = _commonCompilerExtension;
   }
   
-  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir) {
+  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir, final NativeRunner.IRunListener listener) {
     try {
       IHDLInterpreterFactory<NativeRunner> _xblockexpression = null;
       {
@@ -126,7 +127,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
               InputStream _inputStream = goRunner.getInputStream();
               OutputStream _outputStream = goRunner.getOutputStream();
               String _absolutePath_1 = runnerExecutable.getAbsolutePath();
-              return new NativeRunner(_inputStream, _outputStream, GoCodeGenerator.this.em, goRunner, 5, _absolutePath_1);
+              return new NativeRunner(_inputStream, _outputStream, GoCodeGenerator.this.em, goRunner, 5, _absolutePath_1, listener);
             } catch (Throwable _e) {
               throw Exceptions.sneakyThrow(_e);
             }
@@ -275,18 +276,21 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   }
   
   @Override
-  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
+  protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
     {
       if (this.inBarrier) {
         _builder.append("wg.Add(1)");
-        _builder.newLineIfNotEmpty();
         CharSequence _indent = this.indent();
         _builder.append(_indent, "");
         _builder.append("go ");
       }
     }
-    _builder.append("s.");
+    {
+      if ((!pshdlFunction)) {
+        _builder.append("s.");
+      }
+    }
     _builder.append(methodName, "");
     _builder.append("(");
     {
@@ -365,12 +369,20 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
       _or = _contains;
     }
     if (_or) {
+      boolean _equals = Objects.equal(varInfo.type, VariableInformation.Type.STRING);
+      if (_equals) {
+        return "string";
+      }
       boolean _isBoolean = this.isBoolean(varInfo, attributes);
       if (_isBoolean) {
         return "bool";
       }
       return "int64";
     } else {
+      boolean _equals_1 = Objects.equal(varInfo.type, VariableInformation.Type.STRING);
+      if (_equals_1) {
+        return "[]string";
+      }
       boolean _isBoolean_1 = this.isBoolean(varInfo, attributes);
       if (_isBoolean_1) {
         return "[]bool";

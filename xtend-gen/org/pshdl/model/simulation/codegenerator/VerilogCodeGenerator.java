@@ -460,7 +460,7 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
   }
   
   @Override
-  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
+  protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     throw new UnsupportedOperationException("TODO: auto-generated method stub");
   }
   

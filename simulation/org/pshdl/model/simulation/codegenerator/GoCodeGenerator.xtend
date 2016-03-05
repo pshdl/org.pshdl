@@ -49,6 +49,8 @@ import org.pshdl.model.simulation.ITypeOuptutProvider
 import org.pshdl.model.utils.PSAbstractCompiler
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
+import org.pshdl.interpreter.NativeRunner.IRunListener
+import org.pshdl.interpreter.VariableInformation.Type
 
 class GoCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	@Option(description="The name of the library that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
@@ -99,7 +101,7 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 		cce = new CommonCompilerExtension(em, 64)
 	}
 
-	def public IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
+	def public IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir, IRunListener listener) {
 		val CharSequence dartCode = generateMainCode();
 		val File dutFile = new File(tempDir, "TestUnit.go");
 		Files.createParentDirs(dutFile);
@@ -125,7 +127,7 @@ class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider
 					redirectErrorStream(true);
 				val Process goRunner = goBuilder.start();
 				return new NativeRunner(goRunner.getInputStream(), goRunner.getOutputStream(), em, goRunner, 5,
-					runnerExecutable.absolutePath);
+					runnerExecutable.absolutePath, listener);
 			}
 		}
 	}
@@ -170,8 +172,10 @@ func (s *«unit») updateRegs() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 
-	override protected callMethod(CharSequence methodName, CharSequence... args) '''«IF inBarrier»wg.Add(1)
-«indent()»go «ENDIF»s.«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+	override protected callMethod(boolean pshdlFunction,
+		CharSequence methodName,
+		 CharSequence... args
+	) '''«IF inBarrier»wg.Add(1)«indent()»go «ENDIF»«IF !pshdlFunction»s.«ENDIF»«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() '''s.Run()
 		'''
@@ -192,10 +196,14 @@ func (s *«unit») updateRegs() {
 
 	override protected fieldType(VariableInformation varInfo, EnumSet<CommonCodeGenerator.Attributes> attributes) {
 		if (varInfo.dimensions.nullOrEmpty || attributes.contains(CommonCodeGenerator.Attributes.baseType)) {
+			if (varInfo.type == Type.STRING)
+				return "string"
 			if (isBoolean(varInfo, attributes))
 				return "bool"
 			return "int64"
 		} else {
+			if (varInfo.type == Type.STRING)
+				return "[]string"
 			if (isBoolean(varInfo, attributes))
 				return "[]bool"
 			return "[]int64"

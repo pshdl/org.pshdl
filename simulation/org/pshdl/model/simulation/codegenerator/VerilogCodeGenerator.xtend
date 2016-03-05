@@ -187,7 +187,7 @@ endmodule;
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 
-	override protected callMethod(CharSequence methodName, CharSequence... args) {
+	override protected callMethod(boolean pshdlFunction, CharSequence methodName, CharSequence... args) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 

@@ -50,6 +50,7 @@ import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
 
 import static org.pshdl.model.simulation.codegenerator.DartCodeGenerator.*
+import org.pshdl.interpreter.NativeRunner.IRunListener
 
 class DartCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	@Option(description="The name of the library that should be declared. If unspecified, the package of the module will be used", optionName="pkg", hasArg=true)
@@ -105,7 +106,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		this.usePackageImport = !parameter.useLocalImport
 	}
 
-	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
+	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir, IRunListener listener) {
 		val dartCode = generateMainCode()
 		val File binDir = new File(tempDir, "bin")
 		if (!binDir.mkdirs())
@@ -126,7 +127,7 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 				val Process dartRunner = new ProcessBuilder(DART_EXEC, "bin/" + testRunner.getName(), unitName,
 					library).directory(tempDir).redirectErrorStream(true).start()
 				return new NativeRunner(dartRunner.getInputStream(), dartRunner.getOutputStream(), em, dartRunner, 5,
-					"Dart " + library + "." + unitName)
+					"Dart " + library + "." + unitName, listener)
 			}
 
 		}
@@ -441,9 +442,10 @@ import '../simulation_comm.dart';
 		CharSequence currentProcessTime) '''«nextTime.name»=Math.min(«nextTime.
 		name», «currentProcessTime»);'''
 
-	override protected callMethod(CharSequence methodName,
+	override protected callMethod(boolean pshdlFunction, 
+		CharSequence methodName,
 		CharSequence... args
-	) '''_«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+	) '''«IF !pshdlFunction»_«ENDIF»«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() '''run();
 	'''

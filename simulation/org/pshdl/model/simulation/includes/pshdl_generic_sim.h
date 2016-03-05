@@ -68,4 +68,6 @@ char*    pshdl_sim_getJsonDesc(void);
 uint64_t pshdl_sim_getDeltaCycle(void);
 uint32_t pshdl_sim_getVarCount(void);
 
+void pshdl_assertThat_bool_EAssert_s(bool assumption, uint64_t assertLevel, const char* message);
+
 #endif

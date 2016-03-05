@@ -432,7 +432,7 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence skipEdge(CharSequence updateInternal) {
-		return callMethod("skipEdge", updateInternal);
+		return callMethod(false, "skipEdge", updateInternal);
 	}
 
 	protected CharSequence getOutputCases(CharSequence cast, EnumSet<Attributes> attributes) {
@@ -673,7 +673,7 @@ public abstract class CommonCodeGenerator {
 	protected abstract CharSequence callStage(int stage, boolean constant);
 
 	protected CharSequence callFrame(Frame f) {
-		return callMethod(getFrameName(f)) + ";\n";
+		return callMethod(false, getFrameName(f)) + ";\n";
 	}
 
 	protected abstract CharSequence stageMethodsHeader(int stage, int totalStageCosts, boolean constant);
@@ -1022,7 +1022,7 @@ public abstract class CommonCodeGenerator {
 			final Integer pop = stack.pop();
 			args[i] = getTempName(pop, NONE);
 		}
-		final CharSequence funcCall = callMethod(getFunctionName(fi), args);
+		final CharSequence funcCall = callMethod(true, getFunctionName(fi), args);
 		return funcCall + getStatementSeparator();
 	}
 
@@ -2082,14 +2082,14 @@ public abstract class CommonCodeGenerator {
 	}
 
 	protected CharSequence callProcessMethod(ProcessData pd) {
-		return callMethod(processMethodName(pd));
+		return callMethod(false, processMethodName(pd));
 	}
 
 	public String processMethodName(ProcessData pd) {
 		return "runProcess" + pd.processName;
 	}
 
-	protected abstract CharSequence callMethod(CharSequence methodName, CharSequence... args);
+	protected abstract CharSequence callMethod(boolean pshdlFunction, CharSequence methodName, CharSequence... args);
 
 	protected CharSequence createProcessMethods(final Map<String, ProcessData> processes) {
 		final StringBuilder result = new StringBuilder();

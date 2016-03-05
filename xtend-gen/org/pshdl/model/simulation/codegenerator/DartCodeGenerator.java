@@ -86,7 +86,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     this.usePackageImport = (!parameter.useLocalImport);
   }
   
-  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir) {
+  public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir, final NativeRunner.IRunListener listener) {
     try {
       IHDLInterpreterFactory<NativeRunner> _xblockexpression = null;
       {
@@ -132,7 +132,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
               InputStream _inputStream = dartRunner.getInputStream();
               OutputStream _outputStream = dartRunner.getOutputStream();
               return new NativeRunner(_inputStream, _outputStream, DartCodeGenerator.this.em, dartRunner, 5, 
-                ((("Dart " + DartCodeGenerator.this.library) + ".") + DartCodeGenerator.this.unitName));
+                ((("Dart " + DartCodeGenerator.this.library) + ".") + DartCodeGenerator.this.unitName), listener);
             } catch (Throwable _e) {
               throw Exceptions.sneakyThrow(_e);
             }
@@ -1127,9 +1127,13 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   @Override
-  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
+  protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("_");
+    {
+      if ((!pshdlFunction)) {
+        _builder.append("_");
+      }
+    }
     _builder.append(methodName, "");
     _builder.append("(");
     {

@@ -7,12 +7,21 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <assert.h>
 #include "pshdl_generic_sim.h"
 
-
+void pshdl_assertThat_bool_EAssert_s(bool assumption, uint64_t assertLevel,
+		const char* message) {
+	if (!assumption) {
+		fprintf(stderr, "as %llu '%s'\n", assertLevel, message);
+		if (assertLevel < 2) {
+			exit(assertLevel+1);
+		}
+	}
+}
 
 int main(int argc, const char *argv[]) {
   uint32_t idx, offset;

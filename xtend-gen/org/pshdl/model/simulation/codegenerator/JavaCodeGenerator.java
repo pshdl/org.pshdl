@@ -2458,7 +2458,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   @Override
-  protected CharSequence callMethod(final CharSequence methodName, final CharSequence... args) {
+  protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append(methodName, "");
     _builder.append("(");

@@ -66,6 +66,7 @@ import org.pshdl.model.utils.PSAbstractCompiler.CompileResult
 import org.pshdl.model.utils.services.AuxiliaryContent
 import org.pshdl.model.utils.services.IOutputProvider.MultiOption
 import org.pshdl.model.validation.Problem
+import org.pshdl.interpreter.NativeRunner.IRunListener
 
 class CCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	new(ExecutableModel em) {
@@ -87,33 +88,43 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		this.cce = new CommonCompilerExtension(em, 64)
 	}
 
-	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir) {
+	def IHDLInterpreterFactory<NativeRunner> createInterpreter(File tempDir, IRunListener listener) {
 		val File testCFile = new File(tempDir, "test.c")
 		Files.write(generateMainCode, testCFile, StandardCharsets.UTF_8)
 		val File testRunner = new File(tempDir, "runner.c")
-		val runnerStream = typeof(CCodeGenerator).getResourceAsStream("/org/pshdl/model/simulation/includes/runner.c")
+		copyFile("/org/pshdl/model/simulation/includes/runner.c", testRunner)
+//		val File testGenericLib = new File(tempDir, "pshdl_generic_sim.c")
+//		copyFile("/org/pshdl/model/simulation/includes/pshdl_generic_sim.c", testGenericLib)
+		val File testGenericLibHeader = new File(tempDir, "pshdl_generic_sim.h")
+		copyFile("/org/pshdl/model/simulation/includes/pshdl_generic_sim.h", testGenericLibHeader)
+		val File executable = new File(tempDir, "testExec")
+		writeAuxiliaryContents(tempDir)
+		val ProcessBuilder builder = new ProcessBuilder(COMPILER, "-I", tempDir.absolutePath, "-O3",
+			testCFile.absolutePath, testRunner.absolutePath, "-o", executable.absolutePath)
+		val Process process = builder.directory(tempDir).inheritIO().start()
+		process.waitFor()
+		val exitValue = process.exitValue()
+		if (exitValue != 0) {		
+			throw new RuntimeException("Process did not terminate with 0, was "+exitValue)
+		}
+		return new IHDLInterpreterFactory<NativeRunner>() {
+			override newInstance() {
+				val ProcessBuilder execBuilder = new ProcessBuilder(executable.getAbsolutePath())
+				val Process testExec = execBuilder.directory(tempDir).redirectErrorStream(true).start()
+				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5,
+					executable.getAbsolutePath(), listener)
+			}
+		}
+	}
+	
+	def copyFile(String fileToCopy, File testRunner) {
+		val runnerStream = typeof(CCodeGenerator).getResourceAsStream(fileToCopy)
 		val fos = new FileOutputStream(testRunner)
 		try {
 			ByteStreams.copy(runnerStream, fos)
 		} finally {
 			runnerStream.close
 			fos.close
-		}
-		val File executable = new File(tempDir, "testExec")
-		writeAuxiliaryContents(tempDir)
-		val ProcessBuilder builder = new ProcessBuilder(COMPILER, "-I", tempDir.getAbsolutePath(), "-O3",
-			testCFile.getAbsolutePath(), testRunner.getAbsolutePath(), "-o", executable.getAbsolutePath())
-		val Process process = builder.directory(tempDir).inheritIO().start()
-		process.waitFor()
-		if (process.exitValue() != 0)
-			throw new RuntimeException("Process did not terminate with 0")
-		return new IHDLInterpreterFactory<NativeRunner>() {
-			override newInstance() {
-				val ProcessBuilder execBuilder = new ProcessBuilder(executable.getAbsolutePath())
-				val Process testExec = execBuilder.directory(tempDir).redirectErrorStream(true).start()
-				return new NativeRunner(testExec.getInputStream(), testExec.getOutputStream(), em, testExec, 5,
-					executable.getAbsolutePath())
-			}
 		}
 	}
 
@@ -211,7 +222,7 @@ class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvider 
 		if (information.type === ParameterInformation.Type.PARAM_BOOL)
 			return "bool"
 		if (information.type === ParameterInformation.Type.PARAM_STRING)
-			return "char*"
+			return "const char*"
 		return "uint64_t"
 	}
 	
@@ -689,7 +700,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 
-	override protected callMethod(CharSequence methodName, CharSequence... args) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
+	override protected callMethod(boolean pshdlFunction, CharSequence methodName, CharSequence... args) '''«methodName»(«IF args !== null»«FOR CharSequence arg : args SEPARATOR ','»«arg»«ENDFOR»«ENDIF»)'''
 
 	override protected callRunMethod() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")

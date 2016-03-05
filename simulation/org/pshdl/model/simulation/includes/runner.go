@@ -133,6 +133,15 @@ func main() {
 	os.Exit(2)
 }
 
+func pshdl_assertThat_bool_EAssert_s(expr bool, assertIdx int64, msg string){
+	if (!expr) {
+		fmt.Fprintf(os.Stderr, "as %d %s\n", assertIdx, msg)
+		if (assertIdx < 2) {
+				os.Exit(int(assertIdx + 1))
+		}
+	}
+}
+
 func assert(expr bool) {
 	if !expr {
 		_, file, line, _ := runtime.Caller(1)
