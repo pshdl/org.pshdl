@@ -317,7 +317,7 @@ class TypeExtension {
 			} else
 				return Optional.absent
 		}
-		if (bits.size == 1 && bits.get(0).from === null)
+		if (bits.size == 1 && bits.get(0).isBit)
 			return Optional.of(HDLPrimitive.bit)
 		val Iterator<HDLRange> iter = bits.iterator
 		var HDLExpression width = HDLPrimitives.simplifyWidth(ref, iter.next.width, null)

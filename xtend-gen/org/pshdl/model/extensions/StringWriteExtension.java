@@ -968,9 +968,28 @@ public class StringWriteExtension {
     builder.append(_keyword);
     String _simpleSpace = highlight.simpleSpace();
     builder.append(_simpleSpace);
-    HDLExpression _exportRef = export.getExportRef();
-    String _string = this.toString(_exportRef, highlight);
-    builder.append(_string);
+    HDLQualifiedName _hIfRefName = export.getHIfRefName();
+    String _lastSegment = _hIfRefName.getLastSegment();
+    String _interfaceRef = highlight.interfaceRef(_lastSegment);
+    builder.append(_interfaceRef);
+    HDLQualifiedName _varRefName = export.getVarRefName();
+    boolean _tripleNotEquals = (_varRefName != null);
+    if (_tripleNotEquals) {
+      builder.append(".");
+      HDLVariableRef _hDLVariableRef = new HDLVariableRef();
+      HDLQualifiedName _varRefName_1 = export.getVarRefName();
+      HDLVariableRef _setVar = _hDLVariableRef.setVar(_varRefName_1);
+      StringBuilder _varRef = this.varRef(_setVar, highlight);
+      builder.append(_varRef);
+    }
+    String _match = export.getMatch();
+    boolean _tripleNotEquals_1 = (_match != null);
+    if (_tripleNotEquals_1) {
+      builder.append(".");
+      String _match_1 = export.getMatch();
+      String _exportMatch = highlight.exportMatch(_match_1);
+      builder.append(_exportMatch);
+    }
     builder.append(";");
     String _leaving = this.leaving(export, highlight);
     builder.append(_leaving);

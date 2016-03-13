@@ -150,8 +150,20 @@ psVariable :
 	RULE_ID
 ;
 
+psVariableMatch: 
+	psVariable (('*' | '?') psVariableMatch?)
+;
+
 psStatement :
-	psCompoundStatement | psProcess | psAssignmentOrFunc 
+	psCompoundStatement | psProcess | psAssignmentOrFunc | psExport
+;
+
+psGroupMatch:
+	'/' psVariable '/'
+;
+
+psExport :
+	'export' instance=psVariable ('.' (portMatch=psVariableMatch | groupMatch=psGroupMatch))? ';'
 ;
 
 psFunctionDeclaration :
@@ -411,7 +423,7 @@ fragment
     IDCHARFIRST : '$' | 'a' .. 'z' | 'A' .. 'Z';
 fragment
     IDCHAR : IDCHARFIRST | '_' | '0' .. '9';
-
+	
 RULE_ID :
 	IDCHARFIRST IDCHAR*
 ;

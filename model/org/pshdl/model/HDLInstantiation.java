@@ -48,6 +48,9 @@ public abstract class HDLInstantiation extends AbstractHDLInstantiation {
 	/**
 	 * Constructs a new instance of {@link HDLInstantiation}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations

@@ -44,6 +44,9 @@ public class HDLArrayInit extends AbstractHDLArrayInit {
 	/**
 	 * Constructs a new instance of {@link HDLArrayInit}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param exp

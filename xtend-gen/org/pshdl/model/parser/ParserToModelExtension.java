@@ -47,6 +47,7 @@ import org.pshdl.model.HDLDirectGeneration;
 import org.pshdl.model.HDLEnum;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLEqualityOp;
+import org.pshdl.model.HDLExport;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunctionParameter;
@@ -1692,9 +1693,41 @@ public class ParserToModelExtension {
       IHDLObject _hDL_2 = this.toHDL(_psProcess_1, true);
       return this.<IHDLObject>attachContext(_hDL_2, context);
     }
+    PSHDLLangParser.PsExportContext _psExport = context.psExport();
+    boolean _tripleNotEquals_3 = (_psExport != null);
+    if (_tripleNotEquals_3) {
+      PSHDLLangParser.PsExportContext _psExport_1 = context.psExport();
+      IHDLObject _hDL_3 = this.toHDL(_psExport_1, true);
+      return this.<IHDLObject>attachContext(_hDL_3, context);
+    }
     Class<? extends PSHDLLangParser.PsStatementContext> _class = context.getClass();
     String _plus = ("Unhandled type:" + _class);
     throw new IllegalArgumentException(_plus);
+  }
+  
+  protected IHDLObject _toHDL(final PSHDLLangParser.PsExportContext context, final boolean isStatement) {
+    HDLExport _hDLExport = new HDLExport();
+    PSHDLLangParser.PsVariableContext _psVariable = context.psVariable();
+    String _name = this.toName(_psVariable);
+    HDLQualifiedName _hDLQualifiedName = new HDLQualifiedName(_name);
+    HDLExport export = _hDLExport.setHIf(_hDLQualifiedName);
+    PSHDLLangParser.PsVariableMatchContext _psVariableMatch = context.psVariableMatch();
+    boolean _tripleNotEquals = (_psVariableMatch != null);
+    if (_tripleNotEquals) {
+      PSHDLLangParser.PsVariableMatchContext _psVariableMatch_1 = context.psVariableMatch();
+      String _text = _psVariableMatch_1.getText();
+      HDLExport _setMatch = export.setMatch(_text);
+      export = _setMatch;
+    }
+    PSHDLLangParser.PsGroupMatchContext _psGroupMatch = context.psGroupMatch();
+    boolean _tripleNotEquals_1 = (_psGroupMatch != null);
+    if (_tripleNotEquals_1) {
+      PSHDLLangParser.PsGroupMatchContext _psGroupMatch_1 = context.psGroupMatch();
+      String _text_1 = _psGroupMatch_1.getText();
+      HDLExport _setMatch_1 = export.setMatch(_text_1);
+      export = _setMatch_1;
+    }
+    return this.<HDLExport>attachContext(export, context);
   }
   
   protected IHDLObject _toHDL(final PSHDLLangParser.PsAssignmentOrFuncContext context, final boolean isStatement) {
@@ -1846,6 +1879,8 @@ public class ParserToModelExtension {
       return _toHDL((PSHDLLangParser.PsEnumContext)context, isStatement);
     } else if (context instanceof PSHDLLangParser.PsEnumDeclarationContext) {
       return _toHDL((PSHDLLangParser.PsEnumDeclarationContext)context, isStatement);
+    } else if (context instanceof PSHDLLangParser.PsExportContext) {
+      return _toHDL((PSHDLLangParser.PsExportContext)context, isStatement);
     } else if (context instanceof PSHDLLangParser.PsExpressionContext) {
       return _toHDL((PSHDLLangParser.PsExpressionContext)context, isStatement);
     } else if (context instanceof PSHDLLangParser.PsForStatementContext) {

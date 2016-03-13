@@ -43,12 +43,14 @@ import static org.pshdl.model.validation.builtin.ErrorCode.WRITE_ACCESS_TO_IN_PO
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLAssignment.HDLAssignmentType;
 import org.pshdl.model.HDLBlock;
 import org.pshdl.model.HDLClass;
+import org.pshdl.model.HDLExport;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLFunction;
 import org.pshdl.model.HDLFunctionCall;
@@ -77,6 +79,7 @@ import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 import org.pshdl.model.validation.builtin.ErrorCode;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class RWValidation {
@@ -174,7 +177,7 @@ public class RWValidation {
 	}
 
 	public static void annotateReadCount(IHDLObject orig) {
-		final HDLReference[] list = orig.getAllObjectsOf(HDLReference.class, true);
+		final HDLReference[] list = getReferences(orig);
 		for (final HDLReference ref : list) {
 			if (BuiltInValidator.skipExp(ref)) {
 				continue;
@@ -209,6 +212,22 @@ public class RWValidation {
 				}
 			}
 		}
+	}
+
+	private static HDLReference[] getReferences(IHDLObject orig) {
+		HDLReference[] list = orig.getAllObjectsOf(HDLReference.class, true);
+		final HDLExport[] exports = orig.getAllObjectsOf(HDLExport.class, true);
+		if (exports.length != 0) {
+			final List<HDLReference> references = Lists.newArrayList(list);
+			for (final HDLExport hdlExport : exports) {
+				final Optional<ArrayList<HDLInterfaceRef>> refs = hdlExport.resolveVariables();
+				if (refs.isPresent()) {
+					references.addAll(refs.get());
+				}
+			}
+			list = references.toArray(new HDLReference[references.size()]);
+		}
+		return list;
 	}
 
 	/**
@@ -265,6 +284,21 @@ public class RWValidation {
 		final Collection<HDLVariable> defVal = HDLQuery.select(HDLVariable.class).from(orig).where(HDLVariable.fDefaultValue).isNotEqualTo(null).getAll();
 		for (final HDLVariable var : defVal) {
 			incMeta(var, IntegerMeta.WRITE_COUNT);
+		}
+		final HDLExport[] exports = orig.getAllObjectsOf(HDLExport.class, true);
+		for (final HDLExport hdlExport : exports) {
+			final Optional<ArrayList<HDLInterfaceRef>> exportRefOpt = hdlExport.resolveVariables();
+			if (exportRefOpt.isPresent()) {
+				for (final HDLInterfaceRef hirRef : exportRefOpt.get()) {
+					final Optional<HDLVariable> resolveVar = hirRef.resolveVar();
+					if (resolveVar.isPresent()) {
+						final HDLVariable variable = resolveVar.get();
+						if ((variable.getDirection() == HDLDirection.IN) || (variable.getDirection() == HDLDirection.INOUT)) {
+							incrementWrite(variable, hirRef, hdlExport);
+						}
+					}
+				}
+			}
 		}
 		final HDLFunctionCall[] functions = orig.getAllObjectsOf(HDLFunctionCall.class, true);
 		for (final HDLFunctionCall call : functions) {

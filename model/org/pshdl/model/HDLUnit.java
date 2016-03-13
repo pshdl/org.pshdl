@@ -43,7 +43,6 @@ import javax.annotation.Nullable;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.extensions.FullNameExtension;
-import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.impl.AbstractHDLUnit;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 import org.pshdl.model.types.builtIn.HDLGenerators;
@@ -78,6 +77,9 @@ import com.google.common.collect.Sets;
 public class HDLUnit extends AbstractHDLUnit {
 	/**
 	 * Constructs a new instance of {@link HDLUnit}
+	 *
+	 * @param id
+	 *            a unique ID for this particular node
 	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
@@ -326,22 +328,17 @@ public class HDLUnit extends AbstractHDLUnit {
 		}
 		final HDLExport[] exports = getAllObjectsOf(HDLExport.class, true);
 		for (final HDLExport hdlExport : exports) {
-			final HDLExpression exportRef = hdlExport.getExportRef();
-			final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(exportRef);
-			if (typeOf.isPresent()) {
-				final HDLType type = typeOf.get();
-				if (type instanceof HDLInterface) {
-					final HDLInterface hIf = (HDLInterface) type;
-					addDecl(hIf.getPorts(), decls);
-					continue;
+			final Optional<ArrayList<HDLInterfaceRef>> variables = hdlExport.resolveVariables();
+			if (variables.isPresent()) {
+				final List<HDLVariableDeclaration> varDecls = Lists.newArrayList();
+				for (final HDLInterfaceRef hirRef : variables.get()) {
+					final Optional<HDLVariable> resolveVar = hirRef.resolveVar();
+					if (resolveVar.isPresent()) {
+						varDecls.add(new HDLVariableDeclaration().addAnnotations(HDLBuiltInAnnotations.exportedSignal.create(null))
+								.setVariables(Collections.singleton(resolveVar.get())));
+					}
 				}
-				final HDLResolvedRef ref = exportRef.getAllObjectsOf(HDLResolvedRef.class, true)[0];
-				final Optional<HDLVariable> resolveVar = ref.resolveVar();
-				if (resolveVar.isPresent()) {
-					final HDLVariable variable = resolveVar.get();
-					final HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(type).addVariables(variable);
-					addDecl(Collections.singletonList(hvd), decls);
-				}
+				addDecl(varDecls, decls);
 			}
 		}
 		// TODO export and generic hook for Portadditions

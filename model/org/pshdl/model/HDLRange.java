@@ -54,6 +54,9 @@ public class HDLRange extends AbstractHDLRange {
 	/**
 	 * Constructs a new instance of {@link HDLRange}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param from
@@ -189,6 +192,10 @@ public class HDLRange extends AbstractHDLRange {
 				return HDLPrimitives.simplifyWidth(this, simpleWith, null);
 			}
 		}
+		if (getInc() != null)
+			return getInc();
+		if (getDec() != null)
+			return getDec();
 		final HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
 		final HDLExpression absRange = HDLBuiltInFunctions.ABS_UINT.getCall(rangeDist);
 		final HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
@@ -199,6 +206,12 @@ public class HDLRange extends AbstractHDLRange {
 		if (getTo().equals(getFrom()))
 			return setFrom(null);
 		return this;
+	}
+
+	public boolean isBit() {
+		if ((getInc() == null) && (getDec() == null) && (getFrom() == null))
+			return true;
+		return false;
 	}
 	// $CONTENT-END$
 

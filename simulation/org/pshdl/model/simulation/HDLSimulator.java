@@ -376,7 +376,6 @@ public class HDLSimulator {
 		return ms.apply(insulin);
 	}
 
-
 	private static HDLUnit getSingleUnit(final HDLPackage pkg) {
 		final ArrayList<HDLUnit> units = pkg.getUnits();
 		if (units.size() != 1)

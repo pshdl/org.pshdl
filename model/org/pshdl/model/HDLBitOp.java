@@ -45,6 +45,9 @@ public class HDLBitOp extends AbstractHDLBitOp {
 	/**
 	 * Constructs a new instance of {@link HDLBitOp}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param left

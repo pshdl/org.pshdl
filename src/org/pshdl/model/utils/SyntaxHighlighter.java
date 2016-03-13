@@ -276,4 +276,8 @@ public class SyntaxHighlighter {
 			return "/*" + newLine() + string + newLine() + "*/";
 		return "//" + string;
 	}
+
+	public String exportMatch(String string) {
+		return string;
+	}
 }

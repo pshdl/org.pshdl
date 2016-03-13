@@ -378,7 +378,15 @@ class StringWriteExtension {
 		builder.append(export.entering(highlight))
 		builder.append(highlight.keyword("export"))
 		builder.append(highlight.simpleSpace)
-		builder.append(export.exportRef.toString(highlight))
+		builder.append(highlight.interfaceRef(export.HIfRefName.lastSegment))
+		if (export.varRefName !== null){
+			builder.append('.')
+			builder.append(varRef(new HDLVariableRef().^var = export.varRefName, highlight))
+		}
+		if (export.match !== null){
+			builder.append('.')
+			builder.append(highlight.exportMatch(export.match))			
+		}
 		builder.append(';')
 		builder.append(export.leaving(highlight))
 		return builder.toString

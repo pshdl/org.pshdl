@@ -55,6 +55,10 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 
 	public static enum HDLBuiltInAnnotations implements IHDLAnnotation {
 		/**
+		 * This annotation can be used to logically group ports by name
+		 */
+		portGroup,
+		/**
 		 * Automatically generate an interface for the HDLUnit
 		 */
 		autoInterface,
@@ -326,6 +330,9 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case VHDLComponent:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(),
 						"Designates an interface that should be instantiated as component rather than as entity", null);
+			case portGroup:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(), "Adds a signal to a logical group of signals",
+						"a simple group name. Should be a simple identifier");
 			}
 			throw new IllegalArgumentException("Forgot to implement AnnotationInformation for:" + this);
 		}

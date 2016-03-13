@@ -49,7 +49,6 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.parser.PSHDLLangParser.PsExpressionContext;
@@ -100,7 +99,7 @@ public class PSHDLParser {
 		}
 
 		@Override
-		public void syntaxError(Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, String msg, @Nullable RecognitionException e) {
+		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
 			int length = -1;
 			int totalOffset = -1;
 			SyntaxErrors error = SyntaxErrors.OtherException;

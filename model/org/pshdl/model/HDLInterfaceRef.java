@@ -53,6 +53,9 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	/**
 	 * Constructs a new instance of {@link HDLInterfaceRef}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param var
@@ -136,7 +139,6 @@ public class HDLInterfaceRef extends AbstractHDLInterfaceRef {
 	// $CONTENT-BEGIN$
 
 	@Override
-	@Nullable
 	public Optional<HDLVariable> resolveVar() {
 		final Optional<HDLVariable> resolveHIf = resolveHIf();
 		if (!resolveHIf.isPresent())

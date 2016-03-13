@@ -143,6 +143,9 @@ import org.pshdl.model.parser.PSHDLLangParser.PsVariableRefContext
 import org.pshdl.model.parser.PSHDLLangParser.PsWidthContext
 import org.pshdl.model.utils.HDLLibrary
 import org.pshdl.model.utils.HDLQualifiedName
+import org.pshdl.model.parser.PSHDLLangParser.PsExportContext
+import org.pshdl.model.HDLExport
+import org.pshdl.model.HDLInterfaceRef
 
 class ParserToModelExtension {
 	private BufferedTokenStream tokens
@@ -775,9 +778,20 @@ class ParserToModelExtension {
 			return context.psCompoundStatement.toHDL(true).attachContext(context)
 		if (context.psProcess !== null)
 			return context.psProcess.toHDL(true).attachContext(context)
+		if (context.psExport !== null)
+			return context.psExport.toHDL(true).attachContext(context)
 		throw new IllegalArgumentException("Unhandled type:" + context.getClass());
 	}
 
+	def dispatch IHDLObject toHDL(PsExportContext context, boolean isStatement) {
+		var export = new HDLExport().setHIf(new HDLQualifiedName(context.psVariable.toName))
+		if (context.psVariableMatch !== null)
+			export=export.setMatch(context.psVariableMatch.text)
+		if (context.psGroupMatch !== null)
+			export=export.setMatch(context.psGroupMatch.text)
+		return export.attachContext(context);
+	}
+	
 	def dispatch IHDLObject toHDL(PsAssignmentOrFuncContext context, boolean isStatement) {
 		var hVar = context.psVariableRef.toHDL(isStatement) as HDLReference
 		if (context.psAssignmentOp !== null) {

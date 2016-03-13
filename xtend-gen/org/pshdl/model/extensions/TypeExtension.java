@@ -510,9 +510,8 @@ public class TypeExtension {
       _and = false;
     } else {
       HDLRange _get_1 = bits.get(0);
-      HDLExpression _from = _get_1.getFrom();
-      boolean _tripleEquals = (_from == null);
-      _and = _tripleEquals;
+      boolean _isBit = _get_1.isBit();
+      _and = _isBit;
     }
     if (_and) {
       HDLPrimitive _bit = HDLPrimitive.getBit();

@@ -252,34 +252,16 @@ public class Insulin {
 		final ModificationSet ms = new ModificationSet();
 		final HDLExport[] exports = pkg.getAllObjectsOf(HDLExport.class, true);
 		for (final HDLExport hdlExport : exports) {
-			final HDLExpression ref = hdlExport.getExportRef();
-			if (ref instanceof HDLResolvedRef) {
-				final HDLResolvedRef rr = (HDLResolvedRef) ref;
-				final Optional<HDLVariable> resolveVar = rr.resolveVar();
-				if (resolveVar.isPresent()) {
-					final HDLVariable hdlVariable = resolveVar.get();
-					hdlVariable.setMeta(IS_EXPORT);
-					final IHDLObject container = hdlVariable.getContainer();
-					if (container instanceof HDLVariableDeclaration) {
-						final HDLVariableDeclaration hvd = (HDLVariableDeclaration) container;
-						final HDLVariable newVar = hdlVariable.setDefaultValue(null).addAnnotations(HDLBuiltInAnnotations.VHDLLatchable.create(null))
-								.addAnnotations(HDLBuiltInAnnotations.genSignal.create("export"));
-						switch (hvd.getDirection()) {
-						case IN:
-
-							break;
-						case INOUT:
-						case OUT:
-						case CONSTANT:
-						case PARAMETER:
-							ms.replace(hdlExport, hvd.setVariables(HDLObject.asList(newVar.setDefaultValue(rr))));
-							break;
-						case HIDDEN:
-						case INTERNAL:
-							throw new IllegalArgumentException("Can not export for loop iterator and internal variables");
-						}
+			if (hdlExport.getMatch() != null) {
+				final List<HDLExport> exportSingles = Lists.newArrayList();
+				final Optional<ArrayList<HDLInterfaceRef>> variables = hdlExport.resolveVariables();
+				if (variables.isPresent()) {
+					final ArrayList<HDLInterfaceRef> exportRefs = variables.get();
+					for (final HDLInterfaceRef hiRef : exportRefs) {
+						exportSingles.add(new HDLExport().setHIf(hiRef.getHIfRefName()).setVar(hiRef.getVarRefName()));
 					}
 				}
+				ms.replace(hdlExport, exportSingles.toArray(new HDLExport[exportSingles.size()]));
 			}
 		}
 		return ms.apply(pkg);
@@ -290,11 +272,13 @@ public class Insulin {
 		final HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
 		for (final HDLRange hdlRange : ranges) {
 			if (hdlRange.getInc() != null) {
-				final HDLArithOp incD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.PLUS).setRight(hdlRange.getInc());
+				final HDLArithOp right = new HDLArithOp().setLeft(hdlRange.getInc()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				final HDLArithOp incD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.PLUS).setRight(right);
 				ms.replace(hdlRange, new HDLRange().setFrom(incD).setTo(hdlRange.getTo()));
 			}
 			if (hdlRange.getDec() != null) {
-				final HDLArithOp decD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.MINUS).setRight(hdlRange.getDec());
+				final HDLArithOp right = new HDLArithOp().setLeft(hdlRange.getDec()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				final HDLArithOp decD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.MINUS).setRight(right);
 				ms.replace(hdlRange, new HDLRange().setFrom(hdlRange.getTo()).setTo(decD));
 			}
 		}
@@ -643,20 +627,22 @@ public class Insulin {
 		final HDLUnresolvedFragment sub = cFrag.getSub();
 		if (sub instanceof HDLUnresolvedFragmentFunction) {
 			final HDLUnresolvedFragmentFunction huf = (HDLUnresolvedFragmentFunction) sub;
-			final HDLQualifiedName funcName = HDLQualifiedName.create(huf.getFrag());
-			final Optional<Iterable<HDLFunction>> function = ScopingExtension.INST.resolveFunctionName(cFrag, funcName);
-			if (function.isPresent()) {
-				final ArrayList<HDLExpression> params = huf.getParams();
-				params.add(0, (HDLExpression) attemptResolve.get());
-				final HDLFunctionCall funcCall = new HDLFunctionCall().setFunction(funcName).setParams(params);
-				final Optional<HDLFunctionCall> funcOp = Optional.of(funcCall);
-				final Optional<ResolvedPart> methodChaining = tryMethodChaining(sub, funcOp);
-				if (methodChaining.isPresent())
-					return methodChaining;
-				if (funcOp.isPresent())
-					return Optional.of(new ResolvedPart(funcOp.get(), sub.getSub()));
-				return Optional.absent();
-			}
+			/*
+			 * final HDLQualifiedName funcName =
+			 * HDLQualifiedName.create(huf.getFrag()); final
+			 * Optional<Iterable<HDLFunction>> function =
+			 * ScopingExtension.INST.resolveFunctionName(cFrag, funcName); if
+			 * (function.isPresent()) { final ArrayList<HDLExpression> params =
+			 * huf.getParams(); params.add(0, (HDLExpression)
+			 * attemptResolve.get()); final HDLFunctionCall funcCall = new
+			 * HDLFunctionCall().setFunction(funcName).setParams(params); final
+			 * Optional<HDLFunctionCall> funcOp = Optional.of(funcCall); final
+			 * Optional<ResolvedPart> methodChaining = tryMethodChaining(sub,
+			 * funcOp); if (methodChaining.isPresent()) return methodChaining;
+			 * if (funcOp.isPresent()) return Optional.of(new
+			 * ResolvedPart(funcOp.get(), sub.getSub())); return
+			 * Optional.absent(); }
+			 */
 		}
 		return Optional.absent();
 	}

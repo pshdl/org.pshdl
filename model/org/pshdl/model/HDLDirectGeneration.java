@@ -51,6 +51,9 @@ public class HDLDirectGeneration extends AbstractHDLDirectGeneration {
 	/**
 	 * Constructs a new instance of {@link HDLDirectGeneration}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param annotations

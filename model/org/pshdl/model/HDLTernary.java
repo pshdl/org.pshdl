@@ -45,6 +45,9 @@ public class HDLTernary extends AbstractHDLTernary {
 	/**
 	 * Constructs a new instance of {@link HDLTernary}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param ifExpr

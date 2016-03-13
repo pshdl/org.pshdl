@@ -40,6 +40,9 @@ public abstract class HDLCompound extends AbstractHDLCompound {
 	/**
 	 * Constructs a new instance of {@link HDLCompound}
 	 *
+	 * @param id
+	 *            a unique ID for this particular node
+	 *
 	 * @param container
 	 *            the value for container. Can be <code>null</code>.
 	 * @param validate
