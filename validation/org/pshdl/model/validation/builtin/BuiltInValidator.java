@@ -72,9 +72,12 @@ import static org.pshdl.model.validation.builtin.ErrorCode.NO_SUCH_FUNCTION;
 import static org.pshdl.model.validation.builtin.ErrorCode.ONLY_ONE_CLOCK_ANNOTATION_ALLOWED;
 import static org.pshdl.model.validation.builtin.ErrorCode.ONLY_ONE_RESET_ANNOTATION_ALLOWED;
 import static org.pshdl.model.validation.builtin.ErrorCode.PARAMETER_NOT_FOUND;
+import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_CONSTANT;
 import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_DOWN;
 import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_NOT_UP;
 import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_OVERLAP;
+import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_POSSIBLY_ZERO_OR_NEGATIVE;
+import static org.pshdl.model.validation.builtin.ErrorCode.RANGE_ZERO_OR_NEGATIVE;
 import static org.pshdl.model.validation.builtin.ErrorCode.REGISTER_UNKNOWN_ARGUMENT;
 import static org.pshdl.model.validation.builtin.ErrorCode.REGISTER_UNKNOWN_ARGUMENT_VALUE;
 import static org.pshdl.model.validation.builtin.ErrorCode.RESET_NOT_BIT;
@@ -225,7 +228,7 @@ public class BuiltInValidator implements IHDLValidator {
 			checkConstantEquals(pkg, problems, hContext);
 			checkBitAccess(pkg, problems, hContext);
 			// TODO Validate value ranges, check for 0 divide
-			checkRangeDirections(pkg, problems, hContext);
+			checkRanges(pkg, problems, hContext);
 			// TODO Check for POW only power of 2
 			checkCombinedAssignment(pkg, problems, hContext);
 			checkAnnotations(pkg, problems, hContext);
@@ -506,18 +509,27 @@ public class BuiltInValidator implements IHDLValidator {
 	 * Check that the from range is of the right correction. That is from>to for
 	 * variables and to>from for loops
 	 */
-	private static void checkRangeDirections(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
+	private static void checkRanges(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {
 		final HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
 		for (final HDLRange hdlRange : ranges) {
-			// If it is a single range, there is no direction :)
 			final HDLExpression from = hdlRange.getFrom();
-			if (from == null) {
-				continue;
-			}
 			if (skipExp(hdlRange)) {
 				continue;
 			}
 			final HDLEvaluationContext context = getContext(hContext, hdlRange);
+			if (from == null) {
+				if (hdlRange.getInc() != null) {
+					if (checkRangeAddendum(hdlRange, problems, hdlRange.getInc(), context)) {
+						continue;
+					}
+				}
+				if (hdlRange.getDec() != null) {
+					if (checkRangeAddendum(hdlRange, problems, hdlRange.getDec(), context)) {
+						continue;
+					}
+				}
+				continue;
+			}
 			// For loop ranges are up to
 			final Optional<Range<BigInteger>> fromRangeOf = RangeExtension.rangeOf(from, context);
 			if (!fromRangeOf.isPresent()) {
@@ -542,6 +554,28 @@ public class BuiltInValidator implements IHDLValidator {
 				problems.add(new Problem(RANGE_NOT_DOWN, hdlRange));
 			}
 		}
+	}
+
+	private static boolean checkRangeAddendum(HDLRange hdlRange, Set<Problem> problems, HDLExpression inc, HDLEvaluationContext context) {
+		final Optional<BigInteger> incValOpt = ConstantEvaluate.valueOf(inc, context);
+		if (incValOpt.isPresent()) {
+			if (incValOpt.get().compareTo(BigInteger.ONE) < 0) {
+				problems.add(new Problem(RANGE_ZERO_OR_NEGATIVE, inc));
+				return true;
+			}
+		} else {
+			problems.add(new Problem(RANGE_NOT_CONSTANT, inc));
+			return true;
+		}
+		final Optional<Range<BigInteger>> incRange = RangeExtension.rangeOf(inc);
+		if (incRange.isPresent()) {
+			final Range<BigInteger> range = incRange.get();
+			if (range.lowerEndpoint().compareTo(BigInteger.ONE) < 0) {
+				problems.add(new Problem(RANGE_POSSIBLY_ZERO_OR_NEGATIVE, inc));
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void checkBitAccess(HDLPackage pkg, Set<Problem> problems, Map<HDLQualifiedName, HDLEvaluationContext> hContext) {

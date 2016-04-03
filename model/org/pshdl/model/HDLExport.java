@@ -204,8 +204,10 @@ public class HDLExport extends AbstractHDLExport {
 		return (HDLInterfaceRef) new HDLInterfaceRef().setHIf(hifRef).setVar(hdlVariable.asRef()).freeze(this);
 	}
 
-	public HDLInterfaceRef toInterfaceRef() {
-		return (HDLInterfaceRef) new HDLInterfaceRef().setHIf(getHIfRefName()).setVar(getVarRefName()).freeze(this);
+	public Optional<HDLInterfaceRef> toInterfaceRef() {
+		if (getVarRefName() == null)
+			return Optional.absent();
+		return Optional.of((HDLInterfaceRef) new HDLInterfaceRef().setHIf(getHIfRefName()).setVar(getVarRefName()).freeze(this));
 	}
 
 	// $CONTENT-END$

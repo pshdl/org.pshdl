@@ -31,7 +31,6 @@ import java.math.BigInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.impl.AbstractHDLRange;
 import org.pshdl.model.types.builtIn.HDLBuiltInFunctions;
@@ -184,11 +183,11 @@ public class HDLRange extends AbstractHDLRange {
 	public HDLExpression getWidth() {
 		final HDLExpression f = getFrom();
 		if (f == null)
-			return new HDLLiteral().setVal("1");
+			return HDLLiteral.get(1);
 		if (getTo() != null) {
 			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(getTo());
 			if (valueOf.isPresent() && BigInteger.ZERO.equals(valueOf.get())) {
-				final HDLArithOp simpleWith = new HDLArithOp().setLeft(f).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+				final HDLArithOp simpleWith = HDLArithOp.add(f, 1);
 				return HDLPrimitives.simplifyWidth(this, simpleWith, null);
 			}
 		}
@@ -196,9 +195,9 @@ public class HDLRange extends AbstractHDLRange {
 			return getInc();
 		if (getDec() != null)
 			return getDec();
-		final HDLArithOp rangeDist = new HDLArithOp().setLeft(f).setType(HDLArithOpType.MINUS).setRight(getTo());
+		final HDLArithOp rangeDist = HDLArithOp.subtract(f, getTo());
 		final HDLExpression absRange = HDLBuiltInFunctions.ABS_UINT.getCall(rangeDist);
-		final HDLArithOp width = new HDLArithOp().setLeft(absRange).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+		final HDLArithOp width = HDLArithOp.add(absRange, 1);
 		return HDLPrimitives.simplifyWidth(this, width, null);
 	}
 

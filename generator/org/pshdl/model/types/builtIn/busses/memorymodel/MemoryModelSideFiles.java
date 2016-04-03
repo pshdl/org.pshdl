@@ -83,11 +83,11 @@ public class MemoryModelSideFiles {
 
 	public static String tableHeader() {
 		try (final Formatter formatter = new Formatter()) {
-			formatter.format("<TH><TD>Offset</TD>");
+			formatter.format("<td>Offset</td>");
 			for (int i = 0; i < Unit.rowWidth; i++) {
-				formatter.format("<TD>%d</TD>", Unit.rowWidth - i - 1);
+				formatter.format("<td>%d</td>", Unit.rowWidth - i - 1);
 			}
-			formatter.format("<TD>Row</TD></TH>");
+			formatter.format("<td>Row</td>");
 			return formatter.toString();
 		}
 	}
@@ -105,31 +105,37 @@ public class MemoryModelSideFiles {
 					if (row.column == null) {
 						current = null;
 						colIndex = -1;
-						formatter.format("<TR><TD colspan='%d' class='columnHeader'>%s</TD></TR>%n", Unit.rowWidth + 2, "Without Column");
+						formatter.format("<tr><td colspan='%d' class='columnHeader'>%s</td></tr>%n", Unit.rowWidth + 2, "Without Column");
 					} else {
 						current = row.column;
 						colIndex = row.colIndex;
-						formatter.format("<TR><TD colspan='%d' class='columnHeader'>%s [%d]</TD></TR>%n", Unit.rowWidth + 2, row.column.name, row.colIndex);
+						formatter.format("<tr><td colspan='%d' class='columnHeader'>%s [%d]</td></tr>%n", Unit.rowWidth + 2, row.column.name, row.colIndex);
 					}
-				formatter.format("<TR>");
-				formatter.format("<TD class='offset'>%d [0x%02x]</TD>", pos * mul, pos * mul);
+				formatter.format("<tr>");
+				formatter.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
 				for (final NamedElement dec : row.definitions) {
 					final Definition def = (Definition) dec;
 					final Integer integer = getAndInc(defIndex, def.name);
 					final int size = MemoryModel.getSize(def);
 					if (def.type != Type.UNUSED) {
-						final String toolTip = String.format(
-								"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
-								(def.bitPos - size) + 1, (1 << size) - 1, (pos * mul) / 4);
-						formatter.format("<TD colspan='%d' title='%s' class='field %s %s'>%s [%d]</TD>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name,
+						final String toolTip;
+						if (size == 32) {
+							toolTip = String.format("Width:%d Shift:%d Mask:%08X &#10read: base[%4$d];&#10write: base[%4$d]=newVal", size, (def.bitPos - size) + 1,
+									(1l << size) - 1, (pos * mul) / 4);
+						} else {
+							toolTip = String.format(
+									"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
+									(def.bitPos - size) + 1, (1l << size) - 1, (pos * mul) / 4);
+						}
+						formatter.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name,
 								integer);
 					} else {
-						formatter.format("<TD colspan='%d' class='field %s %s'>%s</TD>", size, def.rw + "Style", "", def.name);
+						formatter.format("<td colspan='%d' class='field %s %s'>%s</td>", size, def.rw + "Style", "", def.name);
 					}
 
 				}
 				final Integer integer = getAndInc(rowIndex, row.name);
-				formatter.format("<TD class='rowInfo'>%s [%d]</TD></TR>%n", row.name, integer);
+				formatter.format("<td class='rowInfo'>%s [%d]</td></tr>%n", row.name, integer);
 				pos++;
 			}
 			return formatter.toString();

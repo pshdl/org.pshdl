@@ -377,11 +377,11 @@ public class HDLPrimitives {
 		HDLPrimitive newRType = rType.setType(triple.right);
 		if ((triple.left == INT) && (triple.right == UINT)) {
 			final HDLExpression rTypeWidth = checkNotNull(newRType.getWidth(), "The type should have been Integer or natural if width equals null");
-			newRType = newRType.setWidth(new HDLArithOp().setLeft(rTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
+			newRType = newRType.setWidth(HDLArithOp.add(rTypeWidth, 1));
 		}
 		if ((triple.left == UINT) && (triple.right == INT)) {
 			final HDLExpression lTypeWidth = checkNotNull(newLType.getWidth(), "The type should have been Integer or natural if width equals null");
-			newLType = newLType.setWidth(new HDLArithOp().setLeft(lTypeWidth).setType(PLUS).setRight(HDLLiteral.get(1)));
+			newLType = newLType.setWidth(HDLArithOp.add(lTypeWidth, 1));
 		}
 
 		final HDLTypeInferenceInfo info = new HDLTypeInferenceInfo(null, newLType, newRType);

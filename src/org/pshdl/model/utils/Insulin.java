@@ -252,7 +252,7 @@ public class Insulin {
 		final ModificationSet ms = new ModificationSet();
 		final HDLExport[] exports = pkg.getAllObjectsOf(HDLExport.class, true);
 		for (final HDLExport hdlExport : exports) {
-			if (hdlExport.getMatch() != null) {
+			if ((hdlExport.getMatch() != null) || (hdlExport.getVarRefName() == null)) {
 				final List<HDLExport> exportSingles = Lists.newArrayList();
 				final Optional<ArrayList<HDLInterfaceRef>> variables = hdlExport.resolveVariables();
 				if (variables.isPresent()) {
@@ -272,13 +272,13 @@ public class Insulin {
 		final HDLRange[] ranges = pkg.getAllObjectsOf(HDLRange.class, true);
 		for (final HDLRange hdlRange : ranges) {
 			if (hdlRange.getInc() != null) {
-				final HDLArithOp right = new HDLArithOp().setLeft(hdlRange.getInc()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-				final HDLArithOp incD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.PLUS).setRight(right);
+				final HDLArithOp right = HDLArithOp.subtract(hdlRange.getInc(), 1);
+				final HDLArithOp incD = HDLArithOp.add(hdlRange.getTo(), right);
 				ms.replace(hdlRange, new HDLRange().setFrom(incD).setTo(hdlRange.getTo()));
 			}
 			if (hdlRange.getDec() != null) {
-				final HDLArithOp right = new HDLArithOp().setLeft(hdlRange.getDec()).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
-				final HDLArithOp decD = new HDLArithOp().setLeft(hdlRange.getTo()).setType(HDLArithOpType.MINUS).setRight(right);
+				final HDLArithOp right = HDLArithOp.subtract(hdlRange.getDec(), 1);
+				final HDLArithOp decD = HDLArithOp.subtract(hdlRange.getTo(), right);
 				ms.replace(hdlRange, new HDLRange().setFrom(hdlRange.getTo()).setTo(decD));
 			}
 		}
@@ -436,7 +436,7 @@ public class Insulin {
 			final HDLRegisterConfig undelayedReg = delayedReg.setDelay(null);
 			ms.replace(delayedReg, undelayedReg);
 			HDLForLoop loop = HDLForLoop.tempLoop(HDLLiteral.get(1), delay);
-			final HDLArithOp delayPlusOne = new HDLArithOp().setLeft(delay).setType(HDLArithOpType.PLUS).setRight(HDLLiteral.get(1));
+			final HDLArithOp delayPlusOne = HDLArithOp.add(delay, 1);
 			final HDLVariableDeclaration hvd = delayedReg.getContainer(HDLVariableDeclaration.class);
 			for (final HDLVariable var : hvd.getVariables()) {
 				ms.replace(var, var.setDefaultValue(null));
@@ -479,7 +479,7 @@ public class Insulin {
 				arrayZero.add(0, HDLLiteral.get(0));
 				ms.insertAfter(hvd, new HDLAssignment().setLeft(var.asHDLRef()).setRight(dlyRef.setArray(arrayZero)));
 				final HDLVariableRef dim = loop.getParam().asHDLRef();
-				final HDLArithOp dimMinusOne = new HDLArithOp().setLeft(dim).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1));
+				final HDLArithOp dimMinusOne = HDLArithOp.subtract(dim, 1);
 				final ArrayList<HDLExpression> arrayDimMinOne = dlyRef.getArray();
 				arrayDimMinOne.add(0, dimMinusOne);
 				final ArrayList<HDLExpression> arrayDim = dlyRef.getArray();
@@ -1066,7 +1066,7 @@ public class Insulin {
 		if (i == (varDim.size() + ifDim.size()))
 			return new HDLAssignment().setLeft(ref).setRight(defaultValue);
 		final HDLExpression dim = interfaceDim ? ifDim.get(i) : varDim.get(i - ifDim.size());
-		final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(dim).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
+		final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(HDLArithOp.subtract(dim, 1));
 		final HDLVariable param = new HDLVariable().setName(getTempName("init", null));
 		final HDLForLoop loop = new HDLForLoop().setRange(HDLObject.asList(range)).setParam(param);
 		final HDLVariableRef paramRef = new HDLVariableRef().setVar(param.asRef());

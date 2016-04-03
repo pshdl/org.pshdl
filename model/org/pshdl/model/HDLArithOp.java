@@ -124,7 +124,23 @@ public class HDLArithOp extends AbstractHDLArithOp {
 			return fType;
 		return super.getContainingFeature(obj);
 	}
+
 	// $CONTENT-BEGIN$
+	public static HDLArithOp add(HDLExpression a, long b) {
+		return add(a, HDLLiteral.get(b));
+	}
+
+	public static HDLArithOp add(HDLExpression a, HDLExpression b) {
+		return new HDLArithOp().setLeft(a).setType(HDLArithOpType.PLUS).setRight(b);
+	}
+
+	public static HDLArithOp subtract(HDLExpression a, long b) {
+		return add(a, HDLLiteral.get(b));
+	}
+
+	public static HDLArithOp subtract(HDLExpression a, HDLExpression b) {
+		return new HDLArithOp().setLeft(a).setType(HDLArithOpType.MINUS).setRight(b);
+	}
 	// $CONTENT-END$
 
 }

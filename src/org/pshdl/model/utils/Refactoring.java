@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.pshdl.model.HDLArithOp;
-import org.pshdl.model.HDLArithOp.HDLArithOpType;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLDeclaration;
@@ -329,7 +328,7 @@ public class Refactoring {
 			final HDLQualifiedName iterName = iterNames.get(i);
 			final HDLVariable loopName = new HDLVariable().setName(iterName.toString());
 			final HDLExpression loopTarget = outerDims.get(i);
-			final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(new HDLArithOp().setLeft(loopTarget).setType(HDLArithOpType.MINUS).setRight(HDLLiteral.get(1)));
+			final HDLRange range = new HDLRange().setFrom(HDLLiteral.get(0)).setTo(HDLArithOp.subtract(loopTarget, 1));
 			final HDLUnit derefed = dereferenceRefs(apply);
 			final List<HDLStatement> combined = derefed.getInits();
 			combined.addAll(derefed.getStatements());

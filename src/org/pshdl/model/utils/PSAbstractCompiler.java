@@ -454,6 +454,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 						System.out.println("\t\t\t" + help);
 					}
 				} else {
+					System.out.println("\t\tErrorCode:" + p.code);
 					if (p.info != null) {
 						System.out.println("\t\t" + p.info);
 					}
