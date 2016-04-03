@@ -1,6 +1,6 @@
 --    PSHDL is a library and (trans-)compiler for PSHDL input. It generates
 --    output suitable for implementation or simulation of it.
---    
+--
 --    Copyright (C) 2013 Karsten Becker (feedback (at) pshdl (dot) org)
 --
 --    This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 --    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 --    This License does not grant permission to use the trade names, trademarks,
---    service marks, or product names of the Licensor, except as required for 
+--    service marks, or product names of the Licensor, except as required for
 --    reasonable and customary use in describing the origin of the Work.
 --
 --Contributors:
@@ -74,7 +74,7 @@ package body ShiftOps is
   begin
     return std_logic_vector(sllUint(unsigned(arg),s));
   end sllBitvector;
-  
+
   function sraBit(arg: std_logic; s:natural) return std_logic is
   begin
     --The MSB is the bit itself, so it is returned
@@ -96,7 +96,7 @@ package body ShiftOps is
     end if;
     return '0';
   end sllBit;
-  
+
   function srlUint(arg: unsigned; s:natural) return unsigned is
   begin
     return SHIFT_RIGHT(arg,s);
@@ -111,7 +111,7 @@ package body ShiftOps is
   begin
     return SHIFT_LEFT(arg,s);
   end sllUint;
-  
+
   function srlInt(arg: signed; s:natural) return signed is
   begin
     return SIGNED(SHIFT_RIGHT(UNSIGNED(ARG), s));
@@ -126,7 +126,7 @@ package body ShiftOps is
   begin
     return SHIFT_LEFT(arg,s);
   end sllInt;
-  
+
   function srlInteger(arg: integer; s:natural) return integer is
   begin
     return to_integer(SHIFT_RIGHT(to_UNSIGNED(ARG,32), s));
@@ -141,7 +141,7 @@ package body ShiftOps is
   begin
     return to_integer(SHIFT_LEFT(to_SIGNED(arg,32),s));
   end sllInteger;
-  
+
   function srlNatural(arg: natural; s:natural) return natural is
   begin
     return to_integer(SHIFT_RIGHT(to_UNSIGNED(ARG,32), s));
@@ -156,7 +156,7 @@ package body ShiftOps is
   begin
     return to_integer(SHIFT_LEFT(to_UNSIGNED(arg,32),s));
   end sllNatural;
-end; 
+end;
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -166,14 +166,14 @@ package Casts is
     function max (LEFT, RIGHT: INTEGER) return INTEGER ;
 
     function min (LEFT, RIGHT: INTEGER) return INTEGER ;
-    
+
     function boolToBit(ARG: boolean) return std_logic;
     function boolToBitvector(ARG: boolean) return std_logic_vector;
     function boolToInt(ARG: boolean) return signed;
     function boolToUint(ARG: boolean) return unsigned;
     function boolToInteger(ARG: boolean) return integer;
     function boolToNatural(ARG: boolean) return natural;
-    
+
     function intToUint (ARG : signed) return unsigned;
     function intToBit (ARG : signed) return std_logic;
     function intToBitvector (ARG : signed) return std_logic_vector;
@@ -409,7 +409,7 @@ package body Casts is
     begin
         return to_integer(signed(ARG));
     end;
-    
+
 
     function bitvectorToInt (ARG : unsigned) return signed is
     begin
@@ -434,7 +434,7 @@ package body Casts is
     begin
         return to_integer(signed(ARG));
     end;
-    
+
 
     function integerToInt (ARG : integer) return signed is
     begin
@@ -665,7 +665,7 @@ package body Types is
       end loop;
         return bitCount;
     end log2ceil;
-    
+
     function log2floor (L: POSITIVE) return NATURAL is
     variable bitCount : natural;
     variable i: unsigned(31 downto 0);
@@ -689,9 +689,10 @@ package body Types is
     begin
         return intToInteger(resizeInteger(L,32) xor resizeInteger(R,32));
     end "xor";
-    
+
     function "and" (L: INTEGER; R: INTEGER) return INTEGER is
     begin
         return intToInteger(resizeInteger(L,32) and resizeInteger(R,32));
     end "and";
+
 end;
