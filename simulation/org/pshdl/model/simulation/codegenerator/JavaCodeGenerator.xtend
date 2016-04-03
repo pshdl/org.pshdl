@@ -692,11 +692,13 @@ import org.pshdl.interpreter.*;
 import org.pshdl.interpreter.JavaPSHDLLib.TimeUnit;
 import java.util.Arrays;
 
+«IF em.annotations !== null»
 /**
 «FOR anno : em.annotations»
  * «anno»
 «ENDFOR»
 */
+«ENDIF»
 
 public class «(parameter as JavaCodeGeneratorParameter).changeAdapterName(useInterface)» implements «IF isTestbench()»IHDLTestbenchInterpreter«ELSE»IHDLInterpreter«ENDIF»{
 	«fieldDeclarations(false, true, filter)»

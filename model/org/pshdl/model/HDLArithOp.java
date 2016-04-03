@@ -135,7 +135,7 @@ public class HDLArithOp extends AbstractHDLArithOp {
 	}
 
 	public static HDLArithOp subtract(HDLExpression a, long b) {
-		return add(a, HDLLiteral.get(b));
+		return subtract(a, HDLLiteral.get(b));
 	}
 
 	public static HDLArithOp subtract(HDLExpression a, HDLExpression b) {

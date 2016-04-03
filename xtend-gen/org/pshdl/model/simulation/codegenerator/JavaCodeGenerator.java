@@ -1695,17 +1695,21 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("import java.util.Arrays;");
     _builder.newLine();
     _builder.newLine();
-    _builder.append("/**");
-    _builder.newLine();
     {
-      for(final String anno : this.em.annotations) {
-        _builder.append("* ");
-        _builder.append(anno, "");
-        _builder.newLineIfNotEmpty();
+      if ((this.em.annotations != null)) {
+        _builder.append("/**");
+        _builder.newLine();
+        {
+          for(final String anno : this.em.annotations) {
+            _builder.append("* ");
+            _builder.append(anno, "");
+            _builder.newLineIfNotEmpty();
+          }
+        }
+        _builder.append("*/");
+        _builder.newLine();
       }
     }
-    _builder.append("*/");
-    _builder.newLine();
     _builder.newLine();
     _builder.append("public class ");
     String _changeAdapterName = ((JavaCodeGeneratorParameter) this.parameter).changeAdapterName(useInterface);
