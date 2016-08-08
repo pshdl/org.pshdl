@@ -61,6 +61,7 @@ import org.pshdl.model.utils.Insulin
 import org.pshdl.model.validation.Problem
 
 import static org.pshdl.model.extensions.ProblemDescription.*
+import org.pshdl.model.HDLManip.HDLManipType
 
 /**
  * The RangeExtensions can determine what values an expression can possible have. This is useful for detecting
@@ -383,8 +384,19 @@ class RangeExtension {
 
 	def dispatch Optional<Range<BigInteger>> determineRange(HDLManip obj, HDLEvaluationContext context) {
 		val Optional<Range<BigInteger>> right = obj.target.determineRange(context)
-		if (!right.present)
+		if (!right.present){
+			if (obj.type === HDLManipType.CAST){
+				val newTypeOpt=TypeExtension.typeOf(obj)
+				if (newTypeOpt.present && newTypeOpt.get instanceof HDLPrimitive){
+					var HDLPrimitive prim=newTypeOpt.get as HDLPrimitive
+					if (prim.isAny){
+						prim = Insulin.anyCastType(prim, obj.target)
+					}
+					return HDLPrimitives.getInstance.getValueRange(prim, context)
+				}
+			}			
 			return Optional.absent
+		}
 		switch (obj.type) {
 			case CAST: {
 				val HDLType type = obj.castTo

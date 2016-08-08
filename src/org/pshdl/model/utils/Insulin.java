@@ -216,7 +216,7 @@ public class Insulin {
 		return ms.apply(pkg);
 	}
 
-	private static HDLPrimitive anyCastType(final HDLPrimitive castAnyType, final HDLExpression target) {
+	public static HDLPrimitive anyCastType(final HDLPrimitive castAnyType, final HDLExpression target) {
 		HDLPrimitive newPrimType = null;
 		final HDLType expressionType = getTypeOf(target);
 		final HDLPrimitive expressionPrim = (HDLPrimitive) expressionType;
@@ -828,16 +828,18 @@ public class Insulin {
 			for (final HDLVariableDeclaration hvd : hIf.get().getPorts())
 				if (hvd.getDirection() == HDLDirection.PARAMETER) {
 					HDLVariableDeclaration newHVD = new HDLVariableDeclaration().setType(hvd.resolveType().get()).setDirection(HDLDirection.CONSTANT);
-					for (HDLVariable var : hvd.getVariables())
+					for (final HDLVariable var : hvd.getVariables())
 						if (!ScopingExtension.INST.resolveVariable(hdi, HDLQualifiedName.create(var.getName())).isPresent()) {
 							String argName = var.getMeta(HDLInterfaceInstantiation.ORIG_NAME);
 							if (argName == null) {
 								argName = var.getName();
 							}
+							HDLVariable varCopy = var.copyDeepFrozen(var.getContainer());
+							varCopy.removeMeta(HDLInterfaceInstantiation.ORIG_NAME);
 							if (argMap.get(argName) != null) {
-								var = var.setDefaultValue(argMap.get(argName));
+								varCopy = varCopy.setDefaultValue(argMap.get(argName));
 							}
-							newHVD = newHVD.addVariables(var);
+							newHVD = newHVD.addVariables(varCopy);
 						}
 					if (!newHVD.getVariables().isEmpty()) {
 						ms.insertBefore(hdi, newHVD);

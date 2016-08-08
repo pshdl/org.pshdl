@@ -1094,14 +1094,7 @@ public class BusAccess {
     for (final Row row : rows) {
       {
         final boolean handled = doneRows.contains(row.name);
-        boolean _and = false;
-        if (!(!handled)) {
-          _and = false;
-        } else {
-          boolean _hasWriteDefs = this.hasWriteDefs(row);
-          _and = _hasWriteDefs;
-        }
-        if (_and) {
+        if (((!handled) && this.hasWriteDefs(row))) {
           CharSequence _generateSetterFunction = this.generateSetterFunction(row, rows);
           String _plus = (res + _generateSetterFunction);
           res = _plus;

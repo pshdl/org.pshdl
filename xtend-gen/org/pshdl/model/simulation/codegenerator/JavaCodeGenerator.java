@@ -192,16 +192,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     if (_isBoolean) {
       res = "boolean";
     }
-    boolean _and = false;
-    boolean _isArray = this.isArray(varInfo);
-    if (!_isArray) {
-      _and = false;
-    } else {
-      boolean _contains = attributes.contains(CommonCodeGenerator.Attributes.baseType);
-      boolean _not = (!_contains);
-      _and = _not;
-    }
-    if (_and) {
+    if ((this.isArray(varInfo) && (!attributes.contains(CommonCodeGenerator.Attributes.baseType)))) {
       return (res + "[]");
     }
     return res;
@@ -672,15 +663,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("(){");
     _builder.newLineIfNotEmpty();
     {
-      boolean _or = false;
-      boolean _isPredicate = this.isPredicate(aliased);
-      if (_isPredicate) {
-        _or = true;
-      } else {
-        boolean _isArray = this.isArray(aliased);
-        _or = _isArray;
-      }
-      if (_or) {
+      if ((this.isPredicate(aliased) || this.isArray(aliased))) {
         _builder.append("\t");
         _builder.append("return ");
         CharSequence _idName_1 = this.idName(aliased, true, CommonCodeGenerator.NONE);
@@ -712,15 +695,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append(" newVal){");
     _builder.newLineIfNotEmpty();
     {
-      boolean _or_1 = false;
-      boolean _isPredicate_1 = this.isPredicate(aliased);
-      if (_isPredicate_1) {
-        _or_1 = true;
-      } else {
-        boolean _isArray_1 = this.isArray(aliased);
-        _or_1 = _isArray_1;
-      }
-      if (_or_1) {
+      if ((this.isPredicate(aliased) || this.isArray(aliased))) {
         _builder.append("\t");
         CharSequence _idName_4 = this.idName(aliased, true, CommonCodeGenerator.NONE);
         _builder.append(_idName_4, "\t");
@@ -823,28 +798,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             for (final Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
               {
                 final Frame frame_1 = iterator.next();
-                boolean _and = false;
-                if (!this.purgeAliases) {
-                  _and = false;
-                } else {
-                  boolean _isRename = frame_1.isRename(this.em);
-                  _and = _isRename;
-                }
-                boolean _not_1 = (!_and);
+                boolean _not_1 = (!(this.purgeAliases && frame_1.isRename(this.em)));
                 if (_not_1) {
                   int _talCosts = totalCosts;
                   int _estimateFrameCosts = this.estimateFrameCosts(frame_1);
                   totalCosts = (_talCosts + _estimateFrameCosts);
                   final CharSequence call = this.predicateCheckedFrameCall(frame_1);
                   current.executionCore.append(call);
-                  boolean _and_1 = false;
-                  if (!(totalCosts > 10)) {
-                    _and_1 = false;
-                  } else {
-                    boolean _hasNext = iterator.hasNext();
-                    _and_1 = _hasNext;
-                  }
-                  if (_and_1) {
+                  if (((totalCosts > 10) && iterator.hasNext())) {
                     totalCosts = 0;
                     JavaCodeGenerator.ExecutionPhase _executionPhase = new JavaCodeGenerator.ExecutionPhase(stage);
                     current = _executionPhase;
@@ -1105,18 +1066,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   protected boolean isTestbench() {
-    boolean _and = false;
-    boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(this.em.annotations)));
-    boolean _not = (!_isNullOrEmpty);
-    if (!_not) {
-      _and = false;
-    } else {
-      String _name = HDLSimulator.TB_UNIT.getName();
-      String _substring = _name.substring(1);
-      boolean _contains = ((List<String>)Conversions.doWrapArray(this.em.annotations)).contains(_substring);
-      _and = _contains;
-    }
-    return _and;
+    return ((!IterableExtensions.isNullOrEmpty(((Iterable<?>)Conversions.doWrapArray(this.em.annotations)))) && ((List<String>)Conversions.doWrapArray(this.em.annotations)).contains(HDLSimulator.TB_UNIT.getName().substring(1)));
   }
   
   @Override

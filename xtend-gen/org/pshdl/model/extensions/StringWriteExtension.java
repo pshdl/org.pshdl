@@ -361,15 +361,7 @@ public class StringWriteExtension {
     String _string = this.toString(_left, highlight);
     _append.append(_string);
     final HDLBitOp.HDLBitOpType type = bitOp.getType();
-    boolean _or = false;
-    boolean _equals = Objects.equal(type, HDLBitOp.HDLBitOpType.LOGI_AND);
-    if (_equals) {
-      _or = true;
-    } else {
-      boolean _equals_1 = Objects.equal(type, HDLBitOp.HDLBitOpType.LOGI_OR);
-      _or = _equals_1;
-    }
-    if (_or) {
+    if ((Objects.equal(type, HDLBitOp.HDLBitOpType.LOGI_AND) || Objects.equal(type, HDLBitOp.HDLBitOpType.LOGI_OR))) {
       String _simpleSpace = highlight.simpleSpace();
       StringBuilder _append_1 = sb.append(_simpleSpace);
       String _string_1 = type.toString();
@@ -422,11 +414,9 @@ public class StringWriteExtension {
     IHDLObject _container = func.getContainer();
     final IHDLObject container = _container;
     boolean _matched = false;
-    if (!_matched) {
-      if (container instanceof HDLBlock) {
-        _matched=true;
-        isStatement = true;
-      }
+    if (container instanceof HDLBlock) {
+      _matched=true;
+      isStatement = true;
     }
     if (!_matched) {
       if (container instanceof HDLStatement) {
@@ -555,13 +545,11 @@ public class StringWriteExtension {
     ArrayList<HDLExpression> _dim = func.getDim();
     for (final HDLExpression d : _dim) {
       boolean _matched = false;
-      if (!_matched) {
-        if (d instanceof HDLLiteral) {
-          Boolean _str = ((HDLLiteral)d).getStr();
-          if (_str) {
-            _matched=true;
-            sb.append("[]");
-          }
+      if (d instanceof HDLLiteral) {
+        Boolean _str = ((HDLLiteral)d).getStr();
+        if (_str) {
+          _matched=true;
+          sb.append("[]");
         }
       }
       if (!_matched) {
@@ -1497,18 +1485,7 @@ public class StringWriteExtension {
       _append_5.append(_string_2);
       first = false;
     } else {
-      boolean _and = false;
-      HDLRegisterConfig.HDLRegClockType _clockType = reg.getClockType();
-      boolean _tripleNotEquals_1 = (_clockType != null);
-      if (!_tripleNotEquals_1) {
-        _and = false;
-      } else {
-        HDLRegisterConfig.HDLRegClockType _clockType_1 = reg.getClockType();
-        HDLRegisterConfig.HDLRegClockType _clockType_2 = defaultReg.getClockType();
-        boolean _tripleNotEquals_2 = (_clockType_1 != _clockType_2);
-        _and = _tripleNotEquals_2;
-      }
-      if (_and) {
+      if (((reg.getClockType() != null) && (reg.getClockType() != defaultReg.getClockType()))) {
         if ((!first)) {
           params.append(", ");
         }
@@ -1518,16 +1495,16 @@ public class StringWriteExtension {
         String _enumRefType = highlight.enumRefType("Edge");
         StringBuilder _append_8 = _append_7.append(_enumRefType);
         StringBuilder _append_9 = _append_8.append(".");
-        HDLRegisterConfig.HDLRegClockType _clockType_3 = reg.getClockType();
-        String _string_3 = _clockType_3.toString();
+        HDLRegisterConfig.HDLRegClockType _clockType = reg.getClockType();
+        String _string_3 = _clockType.toString();
         String _enumRefVar = highlight.enumRefVar(_string_3);
         _append_9.append(_enumRefVar);
         first = false;
       }
     }
     HDLExpression _unresolvedSyncType = reg.getUnresolvedSyncType();
-    boolean _tripleNotEquals_3 = (_unresolvedSyncType != null);
-    if (_tripleNotEquals_3) {
+    boolean _tripleNotEquals_1 = (_unresolvedSyncType != null);
+    if (_tripleNotEquals_1) {
       if ((!first)) {
         params.append(", ");
       }
@@ -1539,18 +1516,7 @@ public class StringWriteExtension {
       _append_11.append(_string_4);
       first = false;
     } else {
-      boolean _and_1 = false;
-      HDLRegisterConfig.HDLRegSyncType _syncType = reg.getSyncType();
-      boolean _tripleNotEquals_4 = (_syncType != null);
-      if (!_tripleNotEquals_4) {
-        _and_1 = false;
-      } else {
-        HDLRegisterConfig.HDLRegSyncType _syncType_1 = reg.getSyncType();
-        HDLRegisterConfig.HDLRegSyncType _syncType_2 = defaultReg.getSyncType();
-        boolean _tripleNotEquals_5 = (_syncType_1 != _syncType_2);
-        _and_1 = _tripleNotEquals_5;
-      }
-      if (_and_1) {
+      if (((reg.getSyncType() != null) && (reg.getSyncType() != defaultReg.getSyncType()))) {
         if ((!first)) {
           params.append(", ");
         }
@@ -1560,16 +1526,16 @@ public class StringWriteExtension {
         String _enumRefType_1 = highlight.enumRefType("Sync");
         StringBuilder _append_14 = _append_13.append(_enumRefType_1);
         StringBuilder _append_15 = _append_14.append(".");
-        HDLRegisterConfig.HDLRegSyncType _syncType_3 = reg.getSyncType();
-        String _string_5 = _syncType_3.toString();
+        HDLRegisterConfig.HDLRegSyncType _syncType = reg.getSyncType();
+        String _string_5 = _syncType.toString();
         String _enumRefVar_1 = highlight.enumRefVar(_string_5);
         _append_15.append(_enumRefVar_1);
         first = false;
       }
     }
     HDLExpression _unresolvedResetType = reg.getUnresolvedResetType();
-    boolean _tripleNotEquals_6 = (_unresolvedResetType != null);
-    if (_tripleNotEquals_6) {
+    boolean _tripleNotEquals_2 = (_unresolvedResetType != null);
+    if (_tripleNotEquals_2) {
       if ((!first)) {
         params.append(", ");
       }
@@ -1581,18 +1547,7 @@ public class StringWriteExtension {
       _append_17.append(_string_6);
       first = false;
     } else {
-      boolean _and_2 = false;
-      HDLRegisterConfig.HDLRegResetActiveType _resetType = reg.getResetType();
-      boolean _tripleNotEquals_7 = (_resetType != null);
-      if (!_tripleNotEquals_7) {
-        _and_2 = false;
-      } else {
-        HDLRegisterConfig.HDLRegResetActiveType _resetType_1 = reg.getResetType();
-        HDLRegisterConfig.HDLRegResetActiveType _resetType_2 = defaultReg.getResetType();
-        boolean _tripleNotEquals_8 = (_resetType_1 != _resetType_2);
-        _and_2 = _tripleNotEquals_8;
-      }
-      if (_and_2) {
+      if (((reg.getResetType() != null) && (reg.getResetType() != defaultReg.getResetType()))) {
         if ((!first)) {
           params.append(", ");
         }
@@ -1602,8 +1557,8 @@ public class StringWriteExtension {
         String _enumRefType_2 = highlight.enumRefType("Active");
         StringBuilder _append_20 = _append_19.append(_enumRefType_2);
         StringBuilder _append_21 = _append_20.append(".");
-        HDLRegisterConfig.HDLRegResetActiveType _resetType_3 = reg.getResetType();
-        String _string_7 = _resetType_3.toString();
+        HDLRegisterConfig.HDLRegResetActiveType _resetType = reg.getResetType();
+        String _string_7 = _resetType.toString();
         String _enumRefVar_2 = highlight.enumRefVar(_string_7);
         _append_21.append(_enumRefVar_2);
         first = false;
