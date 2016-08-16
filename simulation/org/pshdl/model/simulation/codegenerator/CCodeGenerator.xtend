@@ -662,7 +662,7 @@ int set«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Defin
 		return 0;
 	uint32_t offset[1]={index};
 	«FOR Definition ne : row.writeDefs»
-		«row.generateConditions(ne)»
+		«row.generateConditions("", ne)»
 	«ENDFOR»
 	«FOR Definition d : row.writeDefs»
 	pshdl_sim_setInputArray(«d.name.getDefineNameString», «d.name», offset);
