@@ -54,8 +54,8 @@ public class CommonBusCode {
 			final Definition def = (Definition) ne;
 			final int size = MemoryModel.getSize(def);
 			if ((def.rw == RWType.rw) || (def.rw == RWType.r)) {
-				HDLVariableRef source = new HDLVariableRef().setVar(HDLQualifiedName.create(def.name));
-				source = createRef(intPos, isArray, def, source);
+				HDLVariableRef source = new HDLVariableRef().setVar(HDLQualifiedName.create(def.getName(row)));
+				source = createRef(intPos, isArray, def, source, row);
 				final HDLRange range = getRange(bitPos, size);
 				label = label.addDos(new HDLAssignment().setLeft(target.addBits(range)).setType(HDLAssignmentType.ASSGN).setRight(source));
 			}
@@ -64,14 +64,15 @@ public class CommonBusCode {
 		return label;
 	}
 
-	public static HDLVariableRef createRef(Map<String, Integer> intPos, Map<String, Boolean> isArray, Definition def, HDLVariableRef source) {
-		if (isArray.get(def.name)) {
-			Integer integer = intPos.get(def.name);
+	public static HDLVariableRef createRef(Map<String, Integer> intPos, Map<String, Boolean> isArray, Definition def, HDLVariableRef source, Row row) {
+		final String name = def.getName(row);
+		if (isArray.get(name)) {
+			Integer integer = intPos.get(name);
 			if (integer == null) {
 				integer = 0;
 			}
 			source = source.addArray(HDLLiteral.get(integer));
-			intPos.put(def.name, ++integer);
+			intPos.put(name, ++integer);
 		}
 		return source;
 	}

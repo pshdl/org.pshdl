@@ -65,11 +65,16 @@ public interface IHDLGenerator {
 	public static class HDLGenerationInfo {
 		public List<AuxiliaryContent> files = new LinkedList<AuxiliaryContent>();
 		public final HDLUnit unit;
+		public final String version;
+		public final String prefix;
 
-		public HDLGenerationInfo(HDLUnit unit) {
+		public HDLGenerationInfo(HDLUnit unit, String version, String prefix) {
 			super();
 			this.unit = unit;
+			this.version = version;
+			this.prefix = prefix;
 		}
+
 	}
 
 	/**

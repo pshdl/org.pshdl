@@ -263,33 +263,35 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				}
 			}
 			final String version = getVersion(hdl);
+			final String prefix = getPrefix(hdl);
 			final List<Row> rows = MemoryModel.buildRows(unit);
 			final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
 			final List<AuxiliaryContent> sideFiles = new LinkedList<AuxiliaryContent>();
 			sideFiles.add(new AuxiliaryContent(hdl.getVar().getName() + "Map.html", html, true));
 			final HDLUnit containerUnit = hdl.getContainer(HDLUnit.class);
-			sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, true));
+			sideFiles.addAll(MemoryModelSideFiles.getSideFiles(containerUnit, unit, rows, version, prefix, true));
 			if (hdl.getGeneratorID().equalsIgnoreCase("plb")) {
-				HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows));
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.plb", unit, rows), version, prefix);
 				hdgi = annotateSignals(hdgi, unit);
-				sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, false, true));
+				sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, hdgi, false, true));
 				hdgi.files.addAll(sideFiles);
 				return Optional.of(hdgi);
 			}
 			if (hdl.getGeneratorID().equalsIgnoreCase("axi")) {
-				HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows));
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(UserLogicCodeGen.get("org.axi", unit, rows), version, prefix);
 				hdgi = annotateSignals(hdgi, unit);
-				sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, version, true, true));
+				sideFiles.addAll(BusGenSideFiles.getSideFiles(containerUnit, rows.size(), memCount, hdgi, true, true));
 				hdgi.files.addAll(sideFiles);
 				return Optional.of(hdgi);
 			}
 			if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
-				HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows));
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows), version, prefix);
 				hdgi = annotateSignals(hdgi, unit);
 				hdgi.files.addAll(sideFiles);
 				return Optional.of(hdgi);
 			}
 		} catch (final Exception e) {
+			e.printStackTrace();
 			return Optional.absent();
 		}
 		throw new IllegalArgumentException("Can not handle generator ID:" + hdl.getGeneratorID());
@@ -318,7 +320,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				ms.replace(hdlVariable, hdlVariable.addAnnotations(busTagetSignal.create(row)));
 			}
 		}
-		final HDLGenerationInfo hdgiRef = new HDLGenerationInfo(ms.apply(hdlUnit));
+		final HDLGenerationInfo hdgiRef = new HDLGenerationInfo(ms.apply(hdlUnit), hdgi.version, hdgi.prefix);
 		hdgiRef.files = hdgi.files;
 		return hdgiRef;
 	}
@@ -338,6 +340,13 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			if ("version".equals(arg.getName()))
 				return ((HDLLiteral) arg.getExpression()).getVal();
 		return "v1_00_a";
+	}
+
+	private String getPrefix(HDLDirectGeneration hdl) {
+		for (final HDLArgument arg : hdl.getArguments())
+			if ("prefix".equals(arg.getName()))
+				return ((HDLLiteral) arg.getExpression()).getVal();
+		return "";
 	}
 
 	@Override

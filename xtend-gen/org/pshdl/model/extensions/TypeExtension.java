@@ -192,7 +192,17 @@ public class TypeExtension {
     for (final HDLExpression exp : _exp_2) {
       {
         final Optional<? extends HDLType> sub = TypeExtension.cachedType(exp);
-        if ((sub.isPresent() && (!sub.get().equals(res)))) {
+        boolean _and = false;
+        boolean _isPresent = sub.isPresent();
+        if (!_isPresent) {
+          _and = false;
+        } else {
+          HDLType _get_1 = sub.get();
+          boolean _equals_1 = _get_1.equals(res);
+          boolean _not = (!_equals_1);
+          _and = _not;
+        }
+        if (_and) {
           return sub;
         }
       }
@@ -333,10 +343,18 @@ public class TypeExtension {
     }
     HDLFunctionParameter _returnType_1 = func.getReturnType();
     final Optional<? extends HDLType> returnType = this.determineType(_returnType_1);
-    if ((returnType.isPresent() && (returnType.get() instanceof HDLPrimitive.AnyPrimitive))) {
+    boolean _and = false;
+    boolean _isPresent_1 = returnType.isPresent();
+    if (!_isPresent_1) {
+      _and = false;
+    } else {
+      HDLType _get = returnType.get();
+      _and = (_get instanceof HDLPrimitive.AnyPrimitive);
+    }
+    if (_and) {
       final Optional<? extends HDLType> specified = HDLFunctions.specifyReturnType(func, call, null);
-      boolean _isPresent_1 = specified.isPresent();
-      if (_isPresent_1) {
+      boolean _isPresent_2 = specified.isPresent();
+      if (_isPresent_2) {
         return specified;
       }
     }
@@ -482,7 +500,17 @@ public class TypeExtension {
         return Optional.<HDLType>absent();
       }
     }
-    if (((bits.size() == 1) && bits.get(0).isBit())) {
+    boolean _and = false;
+    int _size_1 = bits.size();
+    boolean _equals_1 = (_size_1 == 1);
+    if (!_equals_1) {
+      _and = false;
+    } else {
+      HDLRange _get_1 = bits.get(0);
+      boolean _isBit = _get_1.isBit();
+      _and = _isBit;
+    }
+    if (_and) {
       HDLPrimitive _bit = HDLPrimitive.getBit();
       return Optional.<HDLPrimitive>of(_bit);
     }
@@ -506,8 +534,8 @@ public class TypeExtension {
     if (_not) {
       return Optional.<HDLType>absent();
     }
-    HDLVariable _get_1 = hVar.get();
-    final Optional<? extends HDLType> type_1 = TypeExtension.cachedType(_get_1);
+    HDLVariable _get_2 = hVar.get();
+    final Optional<? extends HDLType> type_1 = TypeExtension.cachedType(_get_2);
     boolean _isPresent_3 = type_1.isPresent();
     boolean _not_1 = (!_isPresent_3);
     if (_not_1) {

@@ -44,6 +44,7 @@ import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider;
 import org.pshdl.model.utils.internal.Helper;
 import org.pshdl.model.utils.services.AuxiliaryContent;
+import org.pshdl.model.utils.services.IHDLGenerator.HDLGenerationInfo;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
@@ -52,16 +53,16 @@ public class BusGenSideFiles {
 
 	public static final String WRAPPER_APPENDIX = "core";
 
-	public static List<AuxiliaryContent> getSideFiles(HDLUnit unit, int regCount, int memCount, String version, boolean axi, boolean withDate) {
+	public static List<AuxiliaryContent> getSideFiles(HDLUnit unit, int regCount, int memCount, HDLGenerationInfo hdgi, boolean axi, boolean withDate) {
 		final List<AuxiliaryContent> res = new LinkedList<AuxiliaryContent>();
 		final String unitName = fullNameOf(unit).toString('_').toLowerCase();
 		final String ipcorename = unitName + WRAPPER_APPENDIX;
-		final String dirName = ipcorename + "_" + version;
+		final String dirName = ipcorename + "_" + hdgi.version;
 		final String type = axi ? "axi" : "plb";
 		final String pCore = "pcores/";
 		res.add(mpdFile(unit, ipcorename, dirName, type, pCore, memCount, withDate));
 		res.add(paoFile(unitName, dirName, type, pCore, withDate));
-		res.add(wrapperFile(unit, unitName, dirName, version, regCount, memCount, type, pCore, withDate));
+		res.add(wrapperFile(unit, unitName, dirName, hdgi, regCount, memCount, type, pCore, withDate));
 		res.add(new AuxiliaryContent(pCore + dirName + "/hdl/vhdl/" + unitName + ".vhd", AuxiliaryContent.THIS, true));
 		try (InputStream stream = BusGenSideFiles.class.getResourceAsStream("/pshdl_pkg.vhd")) {
 			res.add(new AuxiliaryContent(pCore + dirName + "/hdl/vhdl/pshdl_pkg.vhd", ByteStreams.toByteArray(stream), true));
@@ -71,7 +72,7 @@ public class BusGenSideFiles {
 		return res;
 	}
 
-	private static AuxiliaryContent wrapperFile(HDLUnit unit, String unitName, String dirName, String version, int regCount, int memCount, String type, String rootDir,
+	private static AuxiliaryContent wrapperFile(HDLUnit unit, String unitName, String dirName, HDLGenerationInfo hdgi, int regCount, int memCount, String type, String rootDir,
 			boolean withDate) {
 		final String wrapperName = unitName + WRAPPER_APPENDIX;
 		final String relPath = dirName + "/hdl/vhdl/" + wrapperName + ".vhd";
@@ -79,7 +80,7 @@ public class BusGenSideFiles {
 		options.put("{NAME}", unitName);
 		options.put("{DIRNAME}", dirName);
 		options.put("{WRAPPERNAME}", wrapperName);
-		options.put("{VERSION}", version.replaceAll("_", "."));
+		options.put("{VERSION}", hdgi.version.replaceAll("_", "."));
 		if (withDate) {
 			options.put("{DATE}", new Date().toString());
 		}

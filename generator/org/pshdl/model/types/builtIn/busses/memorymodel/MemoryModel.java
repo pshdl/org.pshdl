@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.pshdl.model.HDLInterface;
@@ -60,8 +61,8 @@ public class MemoryModel {
 		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows, true);
 		if (builtHTML == null)
 			throw new IllegalArgumentException("buildHTML returned null");
-		System.out.println(new BusAccess().generateAccessC(rows, true));
-		System.out.println(new BusAccess().generateAccessH(unit, rows, true));
+		System.out.println(new BusAccess().generateAccessC(rows, "test", true));
+		System.out.println(new BusAccess().generateAccessH(unit, "test", rows, true));
 		// // SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
 		// for (SideFile sideFile : cFiles) {
 		// System.out.println(sideFile.relPath);
@@ -78,7 +79,7 @@ public class MemoryModel {
 		for (final Row row : rows) {
 			for (final NamedElement ne : row.definitions) {
 				final Definition def = (Definition) ne;
-				final String name = def.name;
+				final String name = def.getName(row);
 				final Definition stockDef = definitions.get(name);
 				if ((stockDef != null) && !def.equals(stockDef) && (def.type != Type.UNUSED))
 					throw new IllegalArgumentException("Two definitions with same name exist, but their type differs:" + def + " vs " + stockDef);
@@ -93,7 +94,9 @@ public class MemoryModel {
 			}
 		}
 		HDLInterface hdi = new HDLInterface();
-		for (final Definition def : definitions.values()) {
+		for (final Entry<String, Definition> entry : definitions.entrySet()) {
+			final Definition def = entry.getValue();
+			final String name = entry.getKey();
 			HDLPrimitive type = null;
 			switch (def.type) {
 			case BIT:
@@ -135,8 +138,8 @@ public class MemoryModel {
 				hdv = hdv.setDirection(HDLDirection.OUT);
 				break;
 			}
-			HDLVariable var = new HDLVariable().setName(def.name);
-			final Integer dim = defDimension.get(def.name);
+			HDLVariable var = new HDLVariable().setName(name);
+			final Integer dim = defDimension.get(name);
 			if (dim != 1) {
 				var = var.addDimensions(HDLLiteral.get(dim));
 			}

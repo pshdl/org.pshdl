@@ -1156,12 +1156,14 @@ public class ParserToModelExtension {
     HDLFunctionParameter res = _hDLFunctionParameter.setConstant(false);
     final PSHDLLangParser.PsFuncParamTypeContext x = context;
     boolean _matched = false;
-    TerminalNode _ANY_INT = x.ANY_INT();
-    boolean _tripleNotEquals = (_ANY_INT != null);
-    if (_tripleNotEquals) {
-      _matched=true;
-      HDLFunctionParameter _setType = res.setType(HDLFunctionParameter.Type.PARAM_ANY_INT);
-      res = _setType;
+    if (!_matched) {
+      TerminalNode _ANY_INT = x.ANY_INT();
+      boolean _tripleNotEquals = (_ANY_INT != null);
+      if (_tripleNotEquals) {
+        _matched=true;
+        HDLFunctionParameter _setType = res.setType(HDLFunctionParameter.Type.PARAM_ANY_INT);
+        res = _setType;
+      }
     }
     if (!_matched) {
       TerminalNode _ANY_UINT = x.ANY_UINT();

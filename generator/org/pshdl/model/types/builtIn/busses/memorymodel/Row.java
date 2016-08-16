@@ -62,12 +62,13 @@ public class Row implements NamedElement {
 			final Definition def = (Definition) ne;
 			def.bitPos = bitPos;
 			bitPos -= MemoryModel.getSize(def);
-			Integer integer = defCount.get(def.name);
+			final String rowName = def.getName(this);
+			Integer integer = defCount.get(rowName);
 			if (integer == null) {
 				integer = 0;
 			}
 			def.arrayIndex = integer;
-			defCount.put(def.name, ++integer);
+			defCount.put(rowName, ++integer);
 		}
 	}
 

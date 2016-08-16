@@ -69,38 +69,20 @@ typedef enum {
  */
 typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row, char *msg);
 
-/**
- * This methods allows the user to set a custom warning handler. Usually this is used
- * in conjunction with the implementation provided in BusPrint.h.
- *
- * @param warnFunction the new function to use for error reporting
- *
- * Example Usage:
- * @code
- *    #include "BusPrint.h"
- *    setWarn(defaultPrintfWarn);
- * @endcode
- */
-void setWarn(warnFunc_p warnFunction);
-
-/**
- * The variable holding the current warning handler
- */
-extern warnFunc_p warn;
 
 #endif	
 '''
 
-	def generatePrintC(Unit unit, List<Row> rows, boolean withDate) '''/**
+	def generatePrintC(Unit unit, String prefix, List<Row> rows, boolean withDate) '''/**
  * @file
  * @brief Provides utility methods for printing structs defined by BusAccess.h
  */
 
 #include <stdio.h>
-#include "BusAccess.h"
-#include "BusPrint.h"
+#include "«prefix»BusAccess.h"
+#include "«prefix»BusPrint.h"
 
-void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg) {
+void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg) {
     switch (t) {
         case error:
             printf("ERROR for value 0x%llx of definition %s of row %s %s\n",value ,def,row,msg);
@@ -116,29 +98,29 @@ void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, ch
     }
     
 }
-«generatePrint(rows)»
+«generatePrint(rows, prefix)»
 '''
 
-	def generatePrintH(Unit unit, List<Row> rows, boolean withDate) '''/**
+	def generatePrintH(Unit unit, String prefix, List<Row> rows, boolean withDate) '''/**
  * @file
  * @brief Provides utility methods for printing structs defined by BusAccess.h
  */
 
-#ifndef BusPrint_h
-#define BusPrint_h
+#ifndef «prefix»BusPrint_h
+#define «prefix»BusPrint_h
 
-#include "BusAccess.h"
+#include "«prefix»BusAccess.h"
 /**
  * An implementation of the warn handler that prints the warning to stdout
  */
-void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg);
+void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg);
 
-«generatePrintDef(rows)»
+«generatePrintDef(rows, prefix)»
 #endif
 
 '''
 
-	def generatePrintDef(List<Row> rows) {
+	def generatePrintDef(List<Row> rows, String prefix) {
 		var res = ''''''
 		val checkedRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
@@ -149,7 +131,7 @@ void defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, ch
  * Prints the values within the «row.name» struct
  * @param data a non-null pointer to the struct
  */
-void print«row.name.toFirstUpper»(«row.name»_t *data);
+void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name»_t *data);
 '''
 			}
 			checkedRows.add(row.name);
@@ -157,12 +139,12 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 		return res;
 	}
 
-	def generatePrint(List<Row> rows) {
+	def generatePrint(List<Row> rows, String prefix) {
 		var res = ''''''
 		val checkedRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			if (!checkedRows.contains(row.name)) {
-				res = res + '''void print«row.name.toFirstUpper»(«row.name»_t *data){
+				res = res + '''void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name»_t *data){
     printf("«row.name.toFirstUpper» «FOR Definition d : row.allDefs» «d.name»: 0x%0«Math.ceil(
 					MemoryModel.getSize(d) / 4f).intValue»x«ENDFOR»\n"«FOR Definition d : row.allDefs», data->«row.
 					getVarNameIndex(d)»«ENDFOR»);
@@ -174,7 +156,7 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 		return res;
 	}
 
-	def generateAccessH(Unit unit, List<Row> rows, boolean withDate) '''/**
+	def generateAccessH(Unit unit, String prefix, List<Row> rows,  boolean withDate) '''/**
  * @file
  * @brief this file defines methods and structs for accessing and storing the memory mapped registers.
  * This file was generated from the following definition.
@@ -183,17 +165,36 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
  \endverbatim
  */
 
-#ifndef BusDefinitions_h
-#define BusDefinitions_h
+#ifndef «prefix»BusDefinitions_h
+#define «prefix»BusDefinitions_h
 
 #include "BusStdDefinitions.h"
 
-«generateDeclarations(unit, rows)»
+/**
+ * This methods allows the user to set a custom warning handler. Usually this is used
+ * in conjunction with the implementation provided in BusPrint.h.
+ *
+ * @param warnFunction the new function to use for error reporting
+ *
+ * Example Usage:
+ * @code
+ *    #include "«prefix»BusPrint.h"
+ *    «prefix.prefix»setWarn(defaultPrintfWarn);
+ * @endcode
+ */
+void «prefix.prefix»setWarn(warnFunc_p warnFunction);
+
+/**
+ * The variable holding the current warning handler
+ */
+extern warnFunc_p «prefix.prefix»warn;
+
+«generateDeclarations(unit, prefix, rows)»
 
 #endif
 '''
 
-	def generateDeclarations(Unit unit, List<Row> rows) {
+	def generateDeclarations(Unit unit, String prefix, List<Row> rows) {
 		var res = ''''''
 		val checkedRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
@@ -204,29 +205,29 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 					/**
 					 * This struct stores all fields that are declared within row «row.name»
 					 */
-					typedef struct «row.name» {
+					typedef struct «prefix.prefix»«row.name» {
 						«FOR Definition d : row.allDefs»«IF !checkedDefs.contains(d.name)»«IF checkedDefs.add(d.name)»«ENDIF»
 						///Field «d.name» within row «row.name»
 						«d.busType»	«row.getVarNameArray(d)»;
 						«ENDIF»«ENDFOR»
-					} «row.name»_t;
+					} «prefix.prefix»«row.name»_t;
 				'''
 				if (row.hasWriteDefs)
 					res = res + '''
 						// Setter
 						«setterDirectDoc(row, rows, true)»
-						int set«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.writeDefs»«getParameter(
+						int «prefix.prefix»set«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.writeDefs»«getParameter(
 							row, definition, false)»«ENDFOR»);
 						«setterDoc(row, rows, true)»
-						int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t *newVal);
+						int «prefix.prefix»set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «prefix.prefix»«row.name»_t *newVal);
 					'''
 				res = res + '''
 					//Getter
 					«getterDirectDoc(row, rows, true)»
-					int get«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.allDefs»«getParameter(
+					int «prefix.prefix»get«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.allDefs»«getParameter(
 						row, definition, true)»«ENDFOR»);
 					«getterDoc(row, rows, true)»
-					int get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t *result);
+					int «prefix.prefix»get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «prefix.prefix»«row.name»_t *result);
 				'''
 				checkedRows.add(row.name)
 			}
@@ -237,12 +238,12 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 					val Column col = ne as Column;
 					res = res + '''
 						///This struct stores all rows defined in colum «col.name»
-						typedef struct «col.name» {
+						typedef struct «prefix.prefix»«col.name» {
 							«FOR NamedElement neRow : col.rows»
 								///Struct for row «neRow.name»
 								«neRow.name»_t «neRow.name»;
 							«ENDFOR»
-						} «col.name»_t;
+						} «prefix.prefix»«col.name»_t;
 					'''
 				}
 			}
@@ -250,7 +251,7 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
 		return res
 	}
 
-	def generateAccessC(List<Row> rows, boolean withDate) '''/**
+	def generateAccessC(List<Row> rows, String prefix, boolean withDate) '''/**
  * @brief Provides access to the memory mapped registers
  * 
  * For each type of row there are methods for setting/getting the values
@@ -259,70 +260,80 @@ void print«row.name.toFirstUpper»(«row.name»_t *data);
  */
  
 #include <stdint.h>
-#include "BusAccess.h"
+#include "«prefix»BusAccess.h"
 #include "BusStdDefinitions.h"
 
 /**
  * This method provides a null implementation of the warning functionality. You
  * can use it to provide your own error handling, or you can use the implementation
- * provided in BusPrint.h
+ * provided in «prefix»BusPrint.h
  */
-static void defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){
+static void «prefix.prefix»defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){
 }
 
-warnFunc_p warn=defaultWarn;
+warnFunc_p «prefix.prefix»warn=«prefix.prefix»defaultWarn;
 
 /**
  * This methods allows the user to set a custom warning function. Usually this is used
- * in conjunction with the implementation provided in BusPrint.h.
+ * in conjunction with the implementation provided in «prefix»BusPrint.h.
  *
  * @param warnFunction the new function to use for error reporting
  *
  * Example Usage:
  * @code
- *    #include "BusPrint.h"
- *    setWarn(defaultPrintfWarn);
+ *    #include "«prefix»BusPrint.h"
+ *    «prefix.prefix»setWarn(«prefix»defaultPrintfWarn);
  * @endcode
  */
-void setWarn(warnFunc_p warnFunction){
-    warn=warnFunction;
+void «prefix.prefix»setWarn(warnFunc_p warnFunction){
+    «prefix.prefix»warn=warnFunction;
 }
 
 //Setter functions
-«generateSetterFunctions(rows)»
+«generateSetterFunctions(rows, prefix)»
 
 //Getter functions
-«generateGetterFunctions(rows)»
+«generateGetterFunctions(rows, prefix)»
 '''
+	
+	def getPrefix(String string) {
+		if (string=="")
+			return ""
+		return string+"_"
+	}
 
-	def generateGetterFunctions(List<Row> rows) {
+	def generateGetterFunctions(List<Row> rows, String prefix) {
 		var String res = ''''''
 		val doneRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			val handled = doneRows.contains(row.name)
 			if (!handled) {
-				res = res + generateGetterFunction(row, rows)
+				res = res + generateGetterFunction(row, prefix, rows)
 			}
 			doneRows.add(row.name)
 		}
 		return res
 	}
 
-	def generateGetterFunction(Row row, List<Row> rows) '''
+	def generateGetterFunction(Row row, String prefix, List<Row> rows) '''
 «getterDirectDoc(row, rows, false)»
-int get«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.
+int «prefix.prefix»get«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition definition : row.
 		allDefs»«getParameter(row, definition, true)»«ENDFOR»){
 	uint32_t val=0;
-	«row.generateAddressReadSwitch(rows)»
+	«row.generateAddressReadSwitch(prefix, rows)»
 	«FOR Definition d : row.allDefs»
+	«IF d.width == 32»
+	*«row.getVarName(d)»=val;
+	«ELSE»
 	*«row.getVarName(d)»=(val >> «d.shiftVal») & «d.maxValueHex»;
+	«ENDIF»
 	«ENDFOR»
 	return 1;
 }
 
 «getterDoc(row, rows, false)»
-int get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t *result){
-	return get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.getVarNameIndex(d)»«ENDFOR»);
+int «prefix.prefix»get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «prefix.prefix»«row.name»_t *result){
+	return «prefix.prefix»get«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.allDefs», &result->«row.getVarNameIndex(d)»«ENDFOR»);
 }
 '''
 
@@ -399,35 +410,35 @@ int get«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		return d.bitPos - (size - 1)
 	}
 
-	def generateSetterFunctions(List<Row> rows) {
+	def generateSetterFunctions(List<Row> rows, String prefix) {
 		var String res = ''''''
 		val doneRows = new LinkedHashSet<String>()
 		for (Row row : rows) {
 			val handled = doneRows.contains(row.name)
 			if ((!handled) && row.hasWriteDefs) {
-				res = res + generateSetterFunction(row, rows)
+				res = res + generateSetterFunction(row, prefix, rows)
 			}
 			doneRows.add(row.name)
 		}
 		return res
 	}
 
-	def generateSetterFunction(Row row, List<Row> rows) '''
+	def generateSetterFunction(Row row, String prefix, List<Row> rows) '''
 «setterDirectDoc(row, rows, false)»
-int set«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition d : row.writeDefs»«row.
+int «prefix.prefix»set«row.name.toFirstUpper»Direct(uint32_t *base, uint32_t index«FOR Definition d : row.writeDefs»«row.
 		getParameter(d, false)»«ENDFOR»){
 	«FOR Definition ne : row.writeDefs»
-		«row.generateConditions(ne)»
+		«row.generateConditions(prefix, ne)»
 	«ENDFOR»
 	uint32_t newVal=«FOR Definition d : row.writeDefs»«d.shifted(row)»«ENDFOR» 0;
 	«row.generateAddressSwitch(rows)»
-	warn(invalidIndex, index, "", "«row.name»", "");
+	«prefix.prefix»warn(invalidIndex, index, "", "«row.name»", "");
 	return 0;
 }
 
 «setterDoc(row, rows, false)»
-int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t *newVal) {
-	return set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.getVarNameIndex(d)»«ENDFOR»);
+int «prefix.prefix»set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «prefix.prefix»«row.name»_t *newVal) {
+	return «prefix.prefix»set«row.name.toFirstUpper»Direct(base, index«FOR Definition d : row.writeDefs», newVal->«row.getVarNameIndex(d)»«ENDFOR»);
 }
 '''
 
@@ -490,7 +501,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		return res
 	}
 
-	def generateAddressReadSwitch(Row row, List<Row> rows) {
+	def generateAddressReadSwitch(Row row, String prefix, List<Row> rows) {
 		var idx = 0
 		var rIdx = 0
 		var res = '''switch (index) {
@@ -506,7 +517,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		}
 		res = res + '''
 			default:
-				warn(invalidIndex, index, "", "«row.name»", ""); 
+				«prefix.prefix»warn(invalidIndex, index, "", "«row.name»", ""); 
 				return 0;
 			}
 		'''
@@ -532,7 +543,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 		return res
 	}
 
-	def generateConditions(Row row, Definition d) '''
+	def generateConditions(Row row, String prefix, Definition d) '''
 		«IF d.width == 32»
 		«««		Required because maxValue overflows..		
 		«ELSEIF d.warn == Definition$WarnType.silentLimit»
@@ -546,12 +557,12 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 			«ENDIF»
 		«ELSEIF d.warn == Definition$WarnType.limit»
 			if («row.getVarName(d)» > «d.maxValueHex») {
-				warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueHex»");
+				«prefix.prefix»warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueHex»");
 				«row.getVarName(d)»=«d.maxValueHex»;
 			}
 			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
-					warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueNegHex»");
+					«prefix.prefix»warn(limit, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "using «d.maxValueNegHex»");
 					«row.getVarName(d)»=«d.maxValueNegHex»;
 				}
 			«ENDIF»
@@ -566,12 +577,12 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 			«ENDIF»
 		«ELSEIF d.warn == Definition$WarnType.mask»
 			if («row.getVarName(d)» > «d.maxValueHex») {
-				warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueHex»");
+				«prefix.prefix»warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueHex»");
 				«row.getVarName(d)»&=«d.maxValueHex»;
 			}
 			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
-					warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueNegHex»");
+					«prefix.prefix»warn(mask, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "masking with «d.maxValueNegHex»");
 					«row.getVarName(d)»&=«d.maxValueNegHex»;
 				}
 			«ENDIF»
@@ -586,12 +597,12 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 			«ENDIF»
 		«ELSEIF d.warn == Definition$WarnType.error»
 			if («row.getVarName(d)» > «d.maxValueHex») {
-				warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
+				«prefix.prefix»warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
 				return 0;
 			}
 			«IF d.type == Definition$Type.INT»
 				if («row.getVarName(d)» < «d.maxValueNegHex») {
-					warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
+					«prefix.prefix»warn(error, «row.getVarName(d)», "«row.getVarNameIndex(d)»", "«row.name»", "returning with 0");
 					return 0;
 				}
 			«ENDIF»
@@ -607,18 +618,18 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	}
 
 	def getMaxValueHex(Definition d) {
-		"0x" + Integer.toHexString(d.maxValue)
+		"0x" + Long.toHexString(d.maxValue)
 	}
 
 	def getMaxValueNegHex(Definition d) {
-		"-0x" + Integer.toHexString(d.maxValue + 1)
+		"-0x" + Long.toHexString(d.maxValue + 1)
 	}
 
 	def getMaxValue(Definition d) {
 		if (d.type != Definition$Type.INT) {
-			return (1 << MemoryModel.getSize(d)) - 1
+			return (1l << MemoryModel.getSize(d)) - 1
 		} else {
-			return (1 << (MemoryModel.getSize(d) - 1)) - 1
+			return (1l << (MemoryModel.getSize(d) - 1)) - 1
 		}
 	}
 
@@ -627,7 +638,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	}
 
 	def getVarName(Row row, Definition d) {
-		val dim = row.defCount.get(d.name)
+		val dim = row.defCount.get(d.getName(row))
 		if (dim == 1) {
 			return d.name
 		} else {
@@ -636,7 +647,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	}
 
 	def getVarNameIndex(Row row, Definition d) {
-		val dim = row.defCount.get(d.name)
+		val dim = row.defCount.get(d.getName(row))
 		if (dim == 1) {
 			return d.name
 		} else {
@@ -645,7 +656,7 @@ int set«row.name.toFirstUpper»(uint32_t *base, uint32_t index, «row.name»_t 
 	}
 
 	def getVarNameArray(Row row, Definition d) {
-		val dim = row.defCount.get(d.name)
+		val dim = row.defCount.get(d.getName(row))
 		if (dim == 1) {
 			return d.name
 		} else {

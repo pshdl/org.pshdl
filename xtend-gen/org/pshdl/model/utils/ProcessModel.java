@@ -192,7 +192,17 @@ public class ProcessModel {
     Set<HDLRegisterConfig> _keySet_1 = elsePM.clockedStatements.keySet();
     clocks.addAll(_keySet_1);
     final ProcessModel res = new ProcessModel();
-    if (((!thenPM.unclockedStatements.isEmpty()) || (!elsePM.unclockedStatements.isEmpty()))) {
+    boolean _or = false;
+    boolean _isEmpty = thenPM.unclockedStatements.isEmpty();
+    boolean _not = (!_isEmpty);
+    if (_not) {
+      _or = true;
+    } else {
+      boolean _isEmpty_1 = elsePM.unclockedStatements.isEmpty();
+      boolean _not_1 = (!_isEmpty_1);
+      _or = _not_1;
+    }
+    if (_or) {
       Collection<HDLStatement> _unclocked = thenPM.getUnclocked(pid);
       HDLIfStatement _setThenDo = stmnt.setThenDo(_unclocked);
       Collection<HDLStatement> _unclocked_1 = elsePM.getUnclocked(pid);

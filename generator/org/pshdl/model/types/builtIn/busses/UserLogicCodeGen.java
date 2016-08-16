@@ -141,8 +141,8 @@ public class UserLogicCodeGen extends CommonBusCode {
 			final Definition def = (Definition) ne;
 			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
 				final int size = MemoryModel.getSize(def);
-				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.name));
-				target = createRef(intPos, isArray, def, target);
+				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.getName(row)));
+				target = createRef(intPos, isArray, def, target, row);
 				boolean done = false;
 				int targetIdx = size - 1;
 				// a[i]{16:9}=Bus2IP_Data{31:24};

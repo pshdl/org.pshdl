@@ -129,6 +129,10 @@ public class Definition implements NamedElement {
 		return name;
 	}
 
+	public String getName(Row row) {
+		return row.name + '_' + name;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

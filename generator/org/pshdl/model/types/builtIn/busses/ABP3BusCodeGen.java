@@ -101,22 +101,21 @@ public class ABP3BusCodeGen extends CommonBusCode {
 						.addVariables(new HDLVariable().setName("PWDATA")))
 				.addStatements(new HDLVariableDeclaration().setRegister(HDLRegisterConfig.defaultConfig().setClockType(HDLRegClockType.FALLING)).setDirection(HDLDirection.OUT)
 						.setType(HDLQualifiedName.create("#bit<32>"))
-						.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32"))).addVariables(
-								new HDLVariable().setName("PRDATA")))
+						.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BITVECTOR).setWidth(new HDLLiteral().setVal("32")))
+						.addVariables(new HDLVariable().setName("PRDATA")))
 				.addStatements(
 						new HDLVariableDeclaration().setDirection(HDLDirection.OUT).setType(HDLQualifiedName.create("#bit"))
 								.setPrimitive(new HDLPrimitive().setName("#primitive").setType(HDLPrimitiveType.BIT)).addVariables(
-										new HDLVariable().setName("PREADY")
-												.setDefaultValue(new HDLLiteral().setVal("1"))))
+										new HDLVariable().setName("PREADY").setDefaultValue(new HDLLiteral().setVal("1"))))
 				.addStatements(
 						new HDLVariableDeclaration().setDirection(HDLDirection.OUT)
 								.setType(
-										HDLQualifiedName
-												.create("#bit"))
+										HDLQualifiedName.create("#bit"))
 								.setPrimitive(
-										new HDLPrimitive().setName("#primitive")
-												.setType(
-														HDLPrimitiveType.BIT))
+										new HDLPrimitive()
+												.setName(
+														"#primitive")
+												.setType(HDLPrimitiveType.BIT))
 								.addVariables(
 										new HDLVariable()
 												.setName(
@@ -172,8 +171,8 @@ public class ABP3BusCodeGen extends CommonBusCode {
 			final Definition def = (Definition) ne;
 			final int size = MemoryModel.getSize(def);
 			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
-				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.name));
-				target = createRef(intPos, isArray, def, target);
+				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.getName(row)));
+				target = createRef(intPos, isArray, def, target, row);
 				final HDLRange range = getRange(bitPos, size);
 				label = label.addDos(new HDLAssignment().setLeft(target).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(range)));
 			}
