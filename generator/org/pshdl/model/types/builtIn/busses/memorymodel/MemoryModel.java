@@ -46,6 +46,7 @@ import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
 import org.pshdl.model.validation.Problem;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -152,7 +153,11 @@ public class MemoryModel {
 	public static List<Row> buildRows(Unit unit) {
 		final List<Row> rows = new LinkedList<Row>();
 		for (final Reference ref : unit.memory.references) {
-			final NamedElement declaration = unit.resolve(ref);
+			final Optional<NamedElement> optRes = unit.resolve(ref);
+			if (!optRes.isPresent()) {
+				continue;
+			}
+			final NamedElement declaration = optRes.get();
 			if (ref.dimensions.size() != 0) {
 				for (final Integer num : ref.dimensions) {
 					for (int i = 0; i < num; i++) {
@@ -187,7 +192,10 @@ public class MemoryModel {
 		}
 		if (declaration instanceof Reference) {
 			final Reference ref = (Reference) declaration;
-			final NamedElement decl = unit.resolve(ref);
+			final Optional<NamedElement> optRes = unit.resolve(ref);
+			if (!optRes.isPresent())
+				throw new IllegalArgumentException("Reference not a row, column or reference:" + declaration);
+			final NamedElement decl = optRes.get();
 			if (ref.dimensions.size() != 0) {
 				for (final Integer num : ref.dimensions) {
 					for (int i = 0; i < num; i++) {
@@ -213,7 +221,11 @@ public class MemoryModel {
 		for (NamedElement decl : row.definitions) {
 			if (decl instanceof Reference) {
 				final Reference ref = (Reference) decl;
-				decl = unit.resolve(ref);
+				final Optional<NamedElement> optRes = unit.resolve(ref);
+				if (!optRes.isPresent()) {
+					continue;
+				}
+				decl = optRes.get();
 			}
 			if (decl instanceof Alias) {
 				final Alias alias = (Alias) decl;
@@ -232,9 +244,9 @@ public class MemoryModel {
 			}
 		}
 		if (usedSize > Unit.rowWidth)
-			throw new IllegalArgumentException("The row:" + row.name + " has more bits (" + usedSize + ") than a row has bits.");
+			throw new IllegalArgumentException("The row:" + row.getName() + " has more bits (" + usedSize + ") than a row has bits.");
 		if ((usedSize != Unit.rowWidth) && (fillFound == false))
-			throw new IllegalArgumentException("The row:" + row.name + " has a size of:" + usedSize + " but does not contain a fill");
+			throw new IllegalArgumentException("The row:" + row.getName() + " has a size of:" + usedSize + " but does not contain a fill");
 		if (usedSize == Unit.rowWidth) {
 			definitions.remove(unusedFill);
 		}
@@ -252,7 +264,11 @@ public class MemoryModel {
 				final Reference ref = (Reference) declaration;
 				if ("fill".equals(ref.name))
 					throw new IllegalArgumentException("Fill not allowed in reference");
-				declaration = unit.resolve(ref);
+				final Optional<NamedElement> optRes = unit.resolve(ref);
+				if (!optRes.isPresent()) {
+					continue;
+				}
+				declaration = optRes.get();
 			}
 			if (declaration instanceof Alias) {
 				final Alias alias = (Alias) declaration;

@@ -29,6 +29,8 @@ package org.pshdl.model.types.builtIn.busses.memorymodel;
 import org.antlr.v4.runtime.Token;
 
 public interface NamedElement {
+	public String getSimpleName();
+
 	public String getName();
 
 	public void setLocation(Token start);

@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from MemoryModel.g4 by ANTLR 4.2.2
+// Generated from MemoryModel.g4 by ANTLR 4.5.3
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
 import java.util.List;
@@ -33,8 +33,11 @@ import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
@@ -45,27 +48,60 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class MemoryModelParser extends Parser {
+	static {
+		RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION);
+	}
+
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache = new PredictionContextCache();
-	public static final int T__26 = 1, T__25 = 2, T__24 = 3, T__23 = 4, T__22 = 5, T__21 = 6, T__20 = 7, T__19 = 8, T__18 = 9, T__17 = 10, T__16 = 11, T__15 = 12, T__14 = 13,
-			T__13 = 14, T__12 = 15, T__11 = 16, T__10 = 17, T__9 = 18, T__8 = 19, T__7 = 20, T__6 = 21, T__5 = 22, T__4 = 23, T__3 = 24, T__2 = 25, T__1 = 26, T__0 = 27, ID = 28,
-			NUMBER = 29, COMMENT = 30, WS = 31;
-	public static final String[] tokenNames = { "<INVALID>", "'column'", "']'", "'row'", "'mask'", "'rw'", "'register'", "'$checkSum'", "'['", "'<'", "'int'", "'w'", "'$time'",
-			"'{'", "'silent'", "'}'", "'uint'", "'error'", "'memory'", "'limit'", "'fill'", "'r'", "';'", "'alias'", "'const'", "'>'", "'$date'", "'bit'", "ID", "NUMBER",
-			"COMMENT", "WS" };
-	public static final int RULE_unit = 0, RULE_declaration = 1, RULE_row = 2, RULE_constant = 3, RULE_filling = 4, RULE_column = 5, RULE_alias = 6, RULE_memory = 7,
-			RULE_definition = 8, RULE_warnType = 9, RULE_rwStatus = 10, RULE_width = 11, RULE_type = 12, RULE_reference = 13;
-	public static final String[] ruleNames = { "unit", "declaration", "row", "constant", "filling", "column", "alias", "memory", "definition", "warnType", "rwStatus", "width",
-			"type", "reference" };
+	public static final int T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14,
+			T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, T__26 = 27, T__27 = 28,
+			ID = 29, NUMBER = 30, COMMENT = 31, WS = 32;
+	public static final int RULE_unit = 0, RULE_declaration = 1, RULE_row = 2, RULE_rowID = 3, RULE_constant = 4, RULE_filling = 5, RULE_column = 6, RULE_alias = 7,
+			RULE_memory = 8, RULE_definition = 9, RULE_warnType = 10, RULE_rwStatus = 11, RULE_width = 12, RULE_type = 13, RULE_reference = 14;
+	public static final String[] ruleNames = { "unit", "declaration", "row", "rowID", "constant", "filling", "column", "alias", "memory", "definition", "warnType", "rwStatus",
+			"width", "type", "reference" };
+
+	private static final String[] _LITERAL_NAMES = { null, "'row'", "'{'", "'}'", "'^'", "'const'", "'$date'", "'$time'", "'$checkSum'", "';'", "'fill'", "'<'", "'>'", "'column'",
+			"'alias'", "'memory'", "'register'", "'['", "']'", "'silent'", "'mask'", "'error'", "'limit'", "'r'", "'w'", "'rw'", "'int'", "'uint'", "'bit'" };
+	private static final String[] _SYMBOLIC_NAMES = { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, "ID", "NUMBER", "COMMENT", "WS" };
+	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+	/**
+	 * @deprecated Use {@link #VOCABULARY} instead.
+	 */
+	@Deprecated
+	public static final String[] tokenNames;
+	static {
+		tokenNames = new String[_SYMBOLIC_NAMES.length];
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = VOCABULARY.getLiteralName(i);
+			if (tokenNames[i] == null) {
+				tokenNames[i] = VOCABULARY.getSymbolicName(i);
+			}
+
+			if (tokenNames[i] == null) {
+				tokenNames[i] = "<INVALID>";
+			}
+		}
+	}
+
+	@Override
+	@Deprecated
+	public String[] getTokenNames() {
+		return tokenNames;
+	}
+
+	@Override
+
+	public Vocabulary getVocabulary() {
+		return VOCABULARY;
+	}
 
 	@Override
 	public String getGrammarFileName() {
 		return "MemoryModel.g4";
-	}
-
-	@Override
-	public String[] getTokenNames() {
-		return tokenNames;
 	}
 
 	@Override
@@ -132,22 +168,22 @@ public class MemoryModelParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(31);
+				setState(33);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 1) | (1L << 3) | (1L << 23) | (1L << 24))) != 0))) {
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__0) | (1L << T__4) | (1L << T__12) | (1L << T__13))) != 0))) {
 					{
 						{
-							setState(28);
+							setState(30);
 							declaration();
 						}
 					}
-					setState(33);
+					setState(35);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
 				{
-					setState(34);
+					setState(36);
 					memory();
 				}
 			}
@@ -166,16 +202,16 @@ public class MemoryModelParser extends Parser {
 			return getRuleContext(RowContext.class, 0);
 		}
 
-		public ConstantContext constant() {
-			return getRuleContext(ConstantContext.class, 0);
+		public ColumnContext column() {
+			return getRuleContext(ColumnContext.class, 0);
 		}
 
 		public AliasContext alias() {
 			return getRuleContext(AliasContext.class, 0);
 		}
 
-		public ColumnContext column() {
-			return getRuleContext(ColumnContext.class, 0);
+		public ConstantContext constant() {
+			return getRuleContext(ConstantContext.class, 0);
 		}
 
 		public DeclarationContext(ParserRuleContext parent, int invokingState) {
@@ -208,32 +244,32 @@ public class MemoryModelParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(40);
+				setState(42);
 				switch (_input.LA(1)) {
-				case 3: {
+				case T__0: {
 					{
-						setState(36);
+						setState(38);
 						row();
 					}
 				}
 					break;
-				case 1: {
+				case T__12: {
 					{
-						setState(37);
+						setState(39);
 						column();
 					}
 				}
 					break;
-				case 23: {
+				case T__13: {
 					{
-						setState(38);
+						setState(40);
 						alias();
 					}
 				}
 					break;
-				case 24: {
+				case T__4: {
 					{
-						setState(39);
+						setState(41);
 						constant();
 					}
 				}
@@ -253,6 +289,18 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public static class RowContext extends ParserRuleContext {
+		public RowIDContext rowID() {
+			return getRuleContext(RowIDContext.class, 0);
+		}
+
+		public List<FillingContext> filling() {
+			return getRuleContexts(FillingContext.class);
+		}
+
+		public FillingContext filling(int i) {
+			return getRuleContext(FillingContext.class, i);
+		}
+
 		public List<DefinitionContext> definition() {
 			return getRuleContexts(DefinitionContext.class);
 		}
@@ -261,24 +309,12 @@ public class MemoryModelParser extends Parser {
 			return getRuleContext(DefinitionContext.class, i);
 		}
 
-		public FillingContext filling(int i) {
-			return getRuleContext(FillingContext.class, i);
-		}
-
-		public TerminalNode ID() {
-			return getToken(MemoryModelParser.ID, 0);
+		public List<ReferenceContext> reference() {
+			return getRuleContexts(ReferenceContext.class);
 		}
 
 		public ReferenceContext reference(int i) {
 			return getRuleContext(ReferenceContext.class, i);
-		}
-
-		public List<FillingContext> filling() {
-			return getRuleContexts(FillingContext.class);
-		}
-
-		public List<ReferenceContext> reference() {
-			return getRuleContexts(ReferenceContext.class);
 		}
 
 		public RowContext(ParserRuleContext parent, int invokingState) {
@@ -312,38 +348,38 @@ public class MemoryModelParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(42);
-				match(3);
-				setState(43);
-				match(ID);
 				setState(44);
-				match(13);
-				setState(50);
+				match(T__0);
+				setState(45);
+				rowID();
+				setState(46);
+				match(T__1);
+				setState(52);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 5) | (1L << 11) | (1L << 20) | (1L << 21) | (1L << ID))) != 0))) {
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__9) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << ID))) != 0))) {
 					{
-						setState(48);
+						setState(50);
 						switch (_input.LA(1)) {
-						case 20: {
+						case T__9: {
 							{
-								setState(45);
+								setState(47);
 								filling();
 							}
 						}
 							break;
-						case 5:
-						case 11:
-						case 21: {
+						case T__22:
+						case T__23:
+						case T__24: {
 							{
-								setState(46);
+								setState(48);
 								definition();
 							}
 						}
 							break;
 						case ID: {
 							{
-								setState(47);
+								setState(49);
 								reference();
 							}
 						}
@@ -352,12 +388,70 @@ public class MemoryModelParser extends Parser {
 							throw new NoViableAltException(this);
 						}
 					}
-					setState(52);
+					setState(54);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(53);
-				match(15);
+				setState(55);
+				match(T__2);
+			}
+		} catch (final RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		} finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class RowIDContext extends ParserRuleContext {
+		public TerminalNode ID() {
+			return getToken(MemoryModelParser.ID, 0);
+		}
+
+		public RowIDContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+
+		@Override
+		public int getRuleIndex() {
+			return RULE_rowID;
+		}
+
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if (listener instanceof MemoryModelListener) {
+				((MemoryModelListener) listener).enterRowID(this);
+			}
+		}
+
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if (listener instanceof MemoryModelListener) {
+				((MemoryModelListener) listener).exitRowID(this);
+			}
+		}
+	}
+
+	public final RowIDContext rowID() throws RecognitionException {
+		final RowIDContext _localctx = new RowIDContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_rowID);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+				setState(58);
+				_la = _input.LA(1);
+				if (_la == T__3) {
+					{
+						setState(57);
+						match(T__3);
+					}
+				}
+
+				setState(60);
+				match(ID);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -372,12 +466,12 @@ public class MemoryModelParser extends Parser {
 	public static class ConstantContext extends ParserRuleContext {
 		public Token value;
 
-		public TerminalNode ID() {
-			return getToken(MemoryModelParser.ID, 0);
-		}
-
 		public TerminalNode NUMBER() {
 			return getToken(MemoryModelParser.NUMBER, 0);
+		}
+
+		public TerminalNode ID() {
+			return getToken(MemoryModelParser.ID, 0);
 		}
 
 		public ConstantContext(ParserRuleContext parent, int invokingState) {
@@ -406,31 +500,32 @@ public class MemoryModelParser extends Parser {
 
 	public final ConstantContext constant() throws RecognitionException {
 		final ConstantContext _localctx = new ConstantContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_constant);
+		enterRule(_localctx, 8, RULE_constant);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(55);
-				match(24);
-				setState(57);
+				setState(62);
+				match(T__4);
+				setState(64);
 				_la = _input.LA(1);
 				if (_la == ID) {
 					{
-						setState(56);
+						setState(63);
 						match(ID);
 					}
 				}
 
-				setState(59);
+				setState(66);
 				_localctx.value = _input.LT(1);
 				_la = _input.LA(1);
-				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 7) | (1L << 12) | (1L << 26) | (1L << NUMBER))) != 0)))) {
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << NUMBER))) != 0)))) {
 					_localctx.value = _errHandler.recoverInline(this);
+				} else {
+					consume();
 				}
-				consume();
-				setState(60);
-				match(22);
+				setState(67);
+				match(T__8);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -473,28 +568,28 @@ public class MemoryModelParser extends Parser {
 
 	public final FillingContext filling() throws RecognitionException {
 		final FillingContext _localctx = new FillingContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_filling);
+		enterRule(_localctx, 10, RULE_filling);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(62);
-				match(20);
-				setState(67);
+				setState(69);
+				match(T__9);
+				setState(74);
 				_la = _input.LA(1);
-				if (_la == 9) {
+				if (_la == T__10) {
 					{
-						setState(63);
-						match(9);
-						setState(64);
+						setState(70);
+						match(T__10);
+						setState(71);
 						width();
-						setState(65);
-						match(25);
+						setState(72);
+						match(T__11);
 					}
 				}
 
-				setState(69);
-				match(22);
+				setState(76);
+				match(T__8);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -511,12 +606,12 @@ public class MemoryModelParser extends Parser {
 			return getToken(MemoryModelParser.ID, 0);
 		}
 
-		public ReferenceContext reference(int i) {
-			return getRuleContext(ReferenceContext.class, i);
-		}
-
 		public List<ReferenceContext> reference() {
 			return getRuleContexts(ReferenceContext.class);
+		}
+
+		public ReferenceContext reference(int i) {
+			return getRuleContext(ReferenceContext.class, i);
 		}
 
 		public ColumnContext(ParserRuleContext parent, int invokingState) {
@@ -545,33 +640,33 @@ public class MemoryModelParser extends Parser {
 
 	public final ColumnContext column() throws RecognitionException {
 		final ColumnContext _localctx = new ColumnContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_column);
+		enterRule(_localctx, 12, RULE_column);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(71);
-				match(1);
-				setState(72);
+				setState(78);
+				match(T__12);
+				setState(79);
 				match(ID);
-				setState(73);
-				match(13);
-				setState(77);
+				setState(80);
+				match(T__1);
+				setState(84);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la == ID) {
 					{
 						{
-							setState(74);
+							setState(81);
 							reference();
 						}
 					}
-					setState(79);
+					setState(86);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(80);
-				match(15);
+				setState(87);
+				match(T__2);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -584,6 +679,10 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public static class AliasContext extends ParserRuleContext {
+		public TerminalNode ID() {
+			return getToken(MemoryModelParser.ID, 0);
+		}
+
 		public List<DefinitionContext> definition() {
 			return getRuleContexts(DefinitionContext.class);
 		}
@@ -592,16 +691,12 @@ public class MemoryModelParser extends Parser {
 			return getRuleContext(DefinitionContext.class, i);
 		}
 
-		public TerminalNode ID() {
-			return getToken(MemoryModelParser.ID, 0);
+		public List<ReferenceContext> reference() {
+			return getRuleContexts(ReferenceContext.class);
 		}
 
 		public ReferenceContext reference(int i) {
 			return getRuleContext(ReferenceContext.class, i);
-		}
-
-		public List<ReferenceContext> reference() {
-			return getRuleContexts(ReferenceContext.class);
 		}
 
 		public AliasContext(ParserRuleContext parent, int invokingState) {
@@ -630,36 +725,36 @@ public class MemoryModelParser extends Parser {
 
 	public final AliasContext alias() throws RecognitionException {
 		final AliasContext _localctx = new AliasContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_alias);
+		enterRule(_localctx, 14, RULE_alias);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(82);
-				match(23);
-				setState(83);
-				match(ID);
-				setState(84);
-				match(13);
 				setState(89);
+				match(T__13);
+				setState(90);
+				match(ID);
+				setState(91);
+				match(T__1);
+				setState(96);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 5) | (1L << 11) | (1L << 21) | (1L << ID))) != 0))) {
+				while (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << ID))) != 0))) {
 					{
-						setState(87);
+						setState(94);
 						switch (_input.LA(1)) {
-						case 5:
-						case 11:
-						case 21: {
+						case T__22:
+						case T__23:
+						case T__24: {
 							{
-								setState(85);
+								setState(92);
 								definition();
 							}
 						}
 							break;
 						case ID: {
 							{
-								setState(86);
+								setState(93);
 								reference();
 							}
 						}
@@ -668,12 +763,12 @@ public class MemoryModelParser extends Parser {
 							throw new NoViableAltException(this);
 						}
 					}
-					setState(91);
+					setState(98);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(92);
-				match(15);
+				setState(99);
+				match(T__2);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -686,12 +781,12 @@ public class MemoryModelParser extends Parser {
 	}
 
 	public static class MemoryContext extends ParserRuleContext {
-		public ReferenceContext reference(int i) {
-			return getRuleContext(ReferenceContext.class, i);
-		}
-
 		public List<ReferenceContext> reference() {
 			return getRuleContexts(ReferenceContext.class);
+		}
+
+		public ReferenceContext reference(int i) {
+			return getRuleContext(ReferenceContext.class, i);
 		}
 
 		public MemoryContext(ParserRuleContext parent, int invokingState) {
@@ -720,31 +815,31 @@ public class MemoryModelParser extends Parser {
 
 	public final MemoryContext memory() throws RecognitionException {
 		final MemoryContext _localctx = new MemoryContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_memory);
+		enterRule(_localctx, 16, RULE_memory);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(94);
-				match(18);
-				setState(95);
-				match(13);
-				setState(99);
+				setState(101);
+				match(T__14);
+				setState(102);
+				match(T__1);
+				setState(106);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la == ID) {
 					{
 						{
-							setState(96);
+							setState(103);
 							reference();
 						}
 					}
-					setState(101);
+					setState(108);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(102);
-				match(15);
+				setState(109);
+				match(T__2);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -763,28 +858,28 @@ public class MemoryModelParser extends Parser {
 			return getRuleContext(RwStatusContext.class, 0);
 		}
 
-		public WarnTypeContext warnType() {
-			return getRuleContext(WarnTypeContext.class, 0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class, 0);
 		}
 
 		public TerminalNode ID() {
 			return getToken(MemoryModelParser.ID, 0);
 		}
 
-		public TerminalNode NUMBER(int i) {
-			return getToken(MemoryModelParser.NUMBER, i);
-		}
-
-		public TypeContext type() {
-			return getRuleContext(TypeContext.class, 0);
+		public WidthContext width() {
+			return getRuleContext(WidthContext.class, 0);
 		}
 
 		public List<TerminalNode> NUMBER() {
 			return getTokens(MemoryModelParser.NUMBER);
 		}
 
-		public WidthContext width() {
-			return getRuleContext(WidthContext.class, 0);
+		public TerminalNode NUMBER(int i) {
+			return getToken(MemoryModelParser.NUMBER, i);
+		}
+
+		public WarnTypeContext warnType() {
+			return getRuleContext(WarnTypeContext.class, 0);
 		}
 
 		public DefinitionContext(ParserRuleContext parent, int invokingState) {
@@ -813,68 +908,68 @@ public class MemoryModelParser extends Parser {
 
 	public final DefinitionContext definition() throws RecognitionException {
 		final DefinitionContext _localctx = new DefinitionContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_definition);
+		enterRule(_localctx, 18, RULE_definition);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(104);
+				setState(111);
 				rwStatus();
-				setState(106);
-				_la = _input.LA(1);
-				if (_la == 6) {
-					{
-						setState(105);
-						_localctx.hasRegister = match(6);
-					}
-				}
-
-				setState(108);
-				type();
 				setState(113);
 				_la = _input.LA(1);
-				if (_la == 9) {
+				if (_la == T__15) {
 					{
-						setState(109);
-						match(9);
-						setState(110);
-						width();
-						setState(111);
-						match(25);
+						setState(112);
+						_localctx.hasRegister = match(T__15);
 					}
 				}
 
 				setState(115);
+				type();
+				setState(120);
+				_la = _input.LA(1);
+				if (_la == T__10) {
+					{
+						setState(116);
+						match(T__10);
+						setState(117);
+						width();
+						setState(118);
+						match(T__11);
+					}
+				}
+
+				setState(122);
 				match(ID);
-				setState(121);
+				setState(128);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la == 8) {
+				while (_la == T__16) {
 					{
 						{
-							setState(116);
-							match(8);
-							setState(117);
+							setState(123);
+							match(T__16);
+							setState(124);
 							match(NUMBER);
-							setState(118);
-							match(2);
+							setState(125);
+							match(T__17);
 						}
 					}
-					setState(123);
+					setState(130);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(125);
+				setState(132);
 				_la = _input.LA(1);
-				if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 4) | (1L << 14) | (1L << 17) | (1L << 19))) != 0))) {
+				if (((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21))) != 0))) {
 					{
-						setState(124);
+						setState(131);
 						warnType();
 					}
 				}
 
-				setState(127);
-				match(22);
+				setState(134);
+				match(T__8);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -916,27 +1011,28 @@ public class MemoryModelParser extends Parser {
 
 	public final WarnTypeContext warnType() throws RecognitionException {
 		final WarnTypeContext _localctx = new WarnTypeContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_warnType);
+		enterRule(_localctx, 20, RULE_warnType);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(130);
+				setState(137);
 				_la = _input.LA(1);
-				if (_la == 14) {
+				if (_la == T__18) {
 					{
-						setState(129);
-						_localctx.silent = match(14);
+						setState(136);
+						_localctx.silent = match(T__18);
 					}
 				}
 
-				setState(132);
+				setState(139);
 				_localctx.typeString = _input.LT(1);
 				_la = _input.LA(1);
-				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 4) | (1L << 17) | (1L << 19))) != 0)))) {
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__19) | (1L << T__20) | (1L << T__21))) != 0)))) {
 					_localctx.typeString = _errHandler.recoverInline(this);
+				} else {
+					consume();
 				}
-				consume();
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -975,17 +1071,18 @@ public class MemoryModelParser extends Parser {
 
 	public final RwStatusContext rwStatus() throws RecognitionException {
 		final RwStatusContext _localctx = new RwStatusContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_rwStatus);
+		enterRule(_localctx, 22, RULE_rwStatus);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(134);
+				setState(141);
 				_la = _input.LA(1);
-				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 5) | (1L << 11) | (1L << 21))) != 0)))) {
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__22) | (1L << T__23) | (1L << T__24))) != 0)))) {
 					_errHandler.recoverInline(this);
+				} else {
+					consume();
 				}
-				consume();
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -1028,11 +1125,11 @@ public class MemoryModelParser extends Parser {
 
 	public final WidthContext width() throws RecognitionException {
 		final WidthContext _localctx = new WidthContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_width);
+		enterRule(_localctx, 24, RULE_width);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(136);
+				setState(143);
 				match(NUMBER);
 			}
 		} catch (final RecognitionException re) {
@@ -1072,17 +1169,18 @@ public class MemoryModelParser extends Parser {
 
 	public final TypeContext type() throws RecognitionException {
 		final TypeContext _localctx = new TypeContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_type);
+		enterRule(_localctx, 26, RULE_type);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(138);
+				setState(145);
 				_la = _input.LA(1);
-				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << 10) | (1L << 16) | (1L << 27))) != 0)))) {
+				if (!(((((_la) & ~0x3f) == 0) && (((1L << _la) & ((1L << T__25) | (1L << T__26) | (1L << T__27))) != 0)))) {
 					_errHandler.recoverInline(this);
+				} else {
+					consume();
 				}
-				consume();
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -1099,12 +1197,12 @@ public class MemoryModelParser extends Parser {
 			return getToken(MemoryModelParser.ID, 0);
 		}
 
-		public TerminalNode NUMBER(int i) {
-			return getToken(MemoryModelParser.NUMBER, i);
-		}
-
 		public List<TerminalNode> NUMBER() {
 			return getTokens(MemoryModelParser.NUMBER);
+		}
+
+		public TerminalNode NUMBER(int i) {
+			return getToken(MemoryModelParser.NUMBER, i);
 		}
 
 		public ReferenceContext(ParserRuleContext parent, int invokingState) {
@@ -1133,33 +1231,33 @@ public class MemoryModelParser extends Parser {
 
 	public final ReferenceContext reference() throws RecognitionException {
 		final ReferenceContext _localctx = new ReferenceContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_reference);
+		enterRule(_localctx, 28, RULE_reference);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-				setState(140);
+				setState(147);
 				match(ID);
-				setState(146);
+				setState(153);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la == 8) {
+				while (_la == T__16) {
 					{
 						{
-							setState(141);
-							match(8);
-							setState(142);
+							setState(148);
+							match(T__16);
+							setState(149);
 							match(NUMBER);
-							setState(143);
-							match(2);
+							setState(150);
+							match(T__17);
 						}
 					}
-					setState(148);
+					setState(155);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(149);
-				match(22);
+				setState(156);
+				match(T__8);
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;
@@ -1171,30 +1269,30 @@ public class MemoryModelParser extends Parser {
 		return _localctx;
 	}
 
-	public static final String _serializedATN = "\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3!\u009a\4\2\t\2\4"
-			+ "\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t" + "\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\3\2\7\2 \n\2\f\2\16\2#\13\2\3"
-			+ "\2\3\2\3\3\3\3\3\3\3\3\5\3+\n\3\3\4\3\4\3\4\3\4\3\4\3\4\7\4\63\n\4\f\4" + "\16\4\66\13\4\3\4\3\4\3\5\3\5\5\5<\n\5\3\5\3\5\3\5\3\6\3\6\3\6\3\6\3\6"
-			+ "\5\6F\n\6\3\6\3\6\3\7\3\7\3\7\3\7\7\7N\n\7\f\7\16\7Q\13\7\3\7\3\7\3\b" + "\3\b\3\b\3\b\3\b\7\bZ\n\b\f\b\16\b]\13\b\3\b\3\b\3\t\3\t\3\t\7\td\n\t"
-			+ "\f\t\16\tg\13\t\3\t\3\t\3\n\3\n\5\nm\n\n\3\n\3\n\3\n\3\n\3\n\5\nt\n\n" + "\3\n\3\n\3\n\3\n\7\nz\n\n\f\n\16\n}\13\n\3\n\5\n\u0080\n\n\3\n\3\n\3\13"
-			+ "\5\13\u0085\n\13\3\13\3\13\3\f\3\f\3\r\3\r\3\16\3\16\3\17\3\17\3\17\3" + "\17\7\17\u0093\n\17\f\17\16\17\u0096\13\17\3\17\3\17\3\17\2\2\20\2\4\6"
-			+ "\b\n\f\16\20\22\24\26\30\32\34\2\6\6\2\t\t\16\16\34\34\37\37\5\2\6\6\23" + "\23\25\25\5\2\7\7\r\r\27\27\5\2\f\f\22\22\35\35\u009e\2!\3\2\2\2\4*\3"
-			+ "\2\2\2\6,\3\2\2\2\b9\3\2\2\2\n@\3\2\2\2\fI\3\2\2\2\16T\3\2\2\2\20`\3\2" + "\2\2\22j\3\2\2\2\24\u0084\3\2\2\2\26\u0088\3\2\2\2\30\u008a\3\2\2\2\32"
-			+ "\u008c\3\2\2\2\34\u008e\3\2\2\2\36 \5\4\3\2\37\36\3\2\2\2 #\3\2\2\2!\37" + "\3\2\2\2!\"\3\2\2\2\"$\3\2\2\2#!\3\2\2\2$%\5\20\t\2%\3\3\2\2\2&+\5\6\4"
-			+ "\2\'+\5\f\7\2(+\5\16\b\2)+\5\b\5\2*&\3\2\2\2*\'\3\2\2\2*(\3\2\2\2*)\3" + "\2\2\2+\5\3\2\2\2,-\7\5\2\2-.\7\36\2\2.\64\7\17\2\2/\63\5\n\6\2\60\63"
-			+ "\5\22\n\2\61\63\5\34\17\2\62/\3\2\2\2\62\60\3\2\2\2\62\61\3\2\2\2\63\66" + "\3\2\2\2\64\62\3\2\2\2\64\65\3\2\2\2\65\67\3\2\2\2\66\64\3\2\2\2\678\7"
-			+ "\21\2\28\7\3\2\2\29;\7\32\2\2:<\7\36\2\2;:\3\2\2\2;<\3\2\2\2<=\3\2\2\2" + "=>\t\2\2\2>?\7\30\2\2?\t\3\2\2\2@E\7\26\2\2AB\7\13\2\2BC\5\30\r\2CD\7"
-			+ "\33\2\2DF\3\2\2\2EA\3\2\2\2EF\3\2\2\2FG\3\2\2\2GH\7\30\2\2H\13\3\2\2\2" + "IJ\7\3\2\2JK\7\36\2\2KO\7\17\2\2LN\5\34\17\2ML\3\2\2\2NQ\3\2\2\2OM\3\2"
-			+ "\2\2OP\3\2\2\2PR\3\2\2\2QO\3\2\2\2RS\7\21\2\2S\r\3\2\2\2TU\7\31\2\2UV" + "\7\36\2\2V[\7\17\2\2WZ\5\22\n\2XZ\5\34\17\2YW\3\2\2\2YX\3\2\2\2Z]\3\2"
-			+ "\2\2[Y\3\2\2\2[\\\3\2\2\2\\^\3\2\2\2][\3\2\2\2^_\7\21\2\2_\17\3\2\2\2" + "`a\7\24\2\2ae\7\17\2\2bd\5\34\17\2cb\3\2\2\2dg\3\2\2\2ec\3\2\2\2ef\3\2"
-			+ "\2\2fh\3\2\2\2ge\3\2\2\2hi\7\21\2\2i\21\3\2\2\2jl\5\26\f\2km\7\b\2\2l" + "k\3\2\2\2lm\3\2\2\2mn\3\2\2\2ns\5\32\16\2op\7\13\2\2pq\5\30\r\2qr\7\33"
-			+ "\2\2rt\3\2\2\2so\3\2\2\2st\3\2\2\2tu\3\2\2\2u{\7\36\2\2vw\7\n\2\2wx\7" + "\37\2\2xz\7\4\2\2yv\3\2\2\2z}\3\2\2\2{y\3\2\2\2{|\3\2\2\2|\177\3\2\2\2"
-			+ "}{\3\2\2\2~\u0080\5\24\13\2\177~\3\2\2\2\177\u0080\3\2\2\2\u0080\u0081" + "\3\2\2\2\u0081\u0082\7\30\2\2\u0082\23\3\2\2\2\u0083\u0085\7\20\2\2\u0084"
-			+ "\u0083\3\2\2\2\u0084\u0085\3\2\2\2\u0085\u0086\3\2\2\2\u0086\u0087\t\3" + "\2\2\u0087\25\3\2\2\2\u0088\u0089\t\4\2\2\u0089\27\3\2\2\2\u008a\u008b"
-			+ "\7\37\2\2\u008b\31\3\2\2\2\u008c\u008d\t\5\2\2\u008d\33\3\2\2\2\u008e" + "\u0094\7\36\2\2\u008f\u0090\7\n\2\2\u0090\u0091\7\37\2\2\u0091\u0093\7"
-			+ "\4\2\2\u0092\u008f\3\2\2\2\u0093\u0096\3\2\2\2\u0094\u0092\3\2\2\2\u0094" + "\u0095\3\2\2\2\u0095\u0097\3\2\2\2\u0096\u0094\3\2\2\2\u0097\u0098\7\30"
-			+ "\2\2\u0098\35\3\2\2\2\22!*\62\64;EOY[els{\177\u0084\u0094";
+	public static final String _serializedATN = "\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\"\u00a1\4\2\t\2\4"
+			+ "\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t" + "\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\7\2\"\n\2\f\2\16"
+			+ "\2%\13\2\3\2\3\2\3\3\3\3\3\3\3\3\5\3-\n\3\3\4\3\4\3\4\3\4\3\4\3\4\7\4" + "\65\n\4\f\4\16\48\13\4\3\4\3\4\3\5\5\5=\n\5\3\5\3\5\3\6\3\6\5\6C\n\6\3"
+			+ "\6\3\6\3\6\3\7\3\7\3\7\3\7\3\7\5\7M\n\7\3\7\3\7\3\b\3\b\3\b\3\b\7\bU\n" + "\b\f\b\16\bX\13\b\3\b\3\b\3\t\3\t\3\t\3\t\3\t\7\ta\n\t\f\t\16\td\13\t"
+			+ "\3\t\3\t\3\n\3\n\3\n\7\nk\n\n\f\n\16\nn\13\n\3\n\3\n\3\13\3\13\5\13t\n" + "\13\3\13\3\13\3\13\3\13\3\13\5\13{\n\13\3\13\3\13\3\13\3\13\7\13\u0081"
+			+ "\n\13\f\13\16\13\u0084\13\13\3\13\5\13\u0087\n\13\3\13\3\13\3\f\5\f\u008c" + "\n\f\3\f\3\f\3\r\3\r\3\16\3\16\3\17\3\17\3\20\3\20\3\20\3\20\7\20\u009a"
+			+ "\n\20\f\20\16\20\u009d\13\20\3\20\3\20\3\20\2\2\21\2\4\6\b\n\f\16\20\22" + "\24\26\30\32\34\36\2\6\4\2\b\n  \3\2\26\30\3\2\31\33\3\2\34\36\u00a5\2"
+			+ "#\3\2\2\2\4,\3\2\2\2\6.\3\2\2\2\b<\3\2\2\2\n@\3\2\2\2\fG\3\2\2\2\16P\3" + "\2\2\2\20[\3\2\2\2\22g\3\2\2\2\24q\3\2\2\2\26\u008b\3\2\2\2\30\u008f\3"
+			+ "\2\2\2\32\u0091\3\2\2\2\34\u0093\3\2\2\2\36\u0095\3\2\2\2 \"\5\4\3\2!" + " \3\2\2\2\"%\3\2\2\2#!\3\2\2\2#$\3\2\2\2$&\3\2\2\2%#\3\2\2\2&\'\5\22\n"
+			+ "\2\'\3\3\2\2\2(-\5\6\4\2)-\5\16\b\2*-\5\20\t\2+-\5\n\6\2,(\3\2\2\2,)\3" + "\2\2\2,*\3\2\2\2,+\3\2\2\2-\5\3\2\2\2./\7\3\2\2/\60\5\b\5\2\60\66\7\4"
+			+ "\2\2\61\65\5\f\7\2\62\65\5\24\13\2\63\65\5\36\20\2\64\61\3\2\2\2\64\62" + "\3\2\2\2\64\63\3\2\2\2\658\3\2\2\2\66\64\3\2\2\2\66\67\3\2\2\2\679\3\2"
+			+ "\2\28\66\3\2\2\29:\7\5\2\2:\7\3\2\2\2;=\7\6\2\2<;\3\2\2\2<=\3\2\2\2=>" + "\3\2\2\2>?\7\37\2\2?\t\3\2\2\2@B\7\7\2\2AC\7\37\2\2BA\3\2\2\2BC\3\2\2"
+			+ "\2CD\3\2\2\2DE\t\2\2\2EF\7\13\2\2F\13\3\2\2\2GL\7\f\2\2HI\7\r\2\2IJ\5" + "\32\16\2JK\7\16\2\2KM\3\2\2\2LH\3\2\2\2LM\3\2\2\2MN\3\2\2\2NO\7\13\2\2"
+			+ "O\r\3\2\2\2PQ\7\17\2\2QR\7\37\2\2RV\7\4\2\2SU\5\36\20\2TS\3\2\2\2UX\3" + "\2\2\2VT\3\2\2\2VW\3\2\2\2WY\3\2\2\2XV\3\2\2\2YZ\7\5\2\2Z\17\3\2\2\2["
+			+ "\\\7\20\2\2\\]\7\37\2\2]b\7\4\2\2^a\5\24\13\2_a\5\36\20\2`^\3\2\2\2`_" + "\3\2\2\2ad\3\2\2\2b`\3\2\2\2bc\3\2\2\2ce\3\2\2\2db\3\2\2\2ef\7\5\2\2f"
+			+ "\21\3\2\2\2gh\7\21\2\2hl\7\4\2\2ik\5\36\20\2ji\3\2\2\2kn\3\2\2\2lj\3\2" + "\2\2lm\3\2\2\2mo\3\2\2\2nl\3\2\2\2op\7\5\2\2p\23\3\2\2\2qs\5\30\r\2rt"
+			+ "\7\22\2\2sr\3\2\2\2st\3\2\2\2tu\3\2\2\2uz\5\34\17\2vw\7\r\2\2wx\5\32\16" + "\2xy\7\16\2\2y{\3\2\2\2zv\3\2\2\2z{\3\2\2\2{|\3\2\2\2|\u0082\7\37\2\2"
+			+ "}~\7\23\2\2~\177\7 \2\2\177\u0081\7\24\2\2\u0080}\3\2\2\2\u0081\u0084" + "\3\2\2\2\u0082\u0080\3\2\2\2\u0082\u0083\3\2\2\2\u0083\u0086\3\2\2\2\u0084"
+			+ "\u0082\3\2\2\2\u0085\u0087\5\26\f\2\u0086\u0085\3\2\2\2\u0086\u0087\3" + "\2\2\2\u0087\u0088\3\2\2\2\u0088\u0089\7\13\2\2\u0089\25\3\2\2\2\u008a"
+			+ "\u008c\7\25\2\2\u008b\u008a\3\2\2\2\u008b\u008c\3\2\2\2\u008c\u008d\3" + "\2\2\2\u008d\u008e\t\3\2\2\u008e\27\3\2\2\2\u008f\u0090\t\4\2\2\u0090"
+			+ "\31\3\2\2\2\u0091\u0092\7 \2\2\u0092\33\3\2\2\2\u0093\u0094\t\5\2\2\u0094" + "\35\3\2\2\2\u0095\u009b\7\37\2\2\u0096\u0097\7\23\2\2\u0097\u0098\7 \2"
+			+ "\2\u0098\u009a\7\24\2\2\u0099\u0096\3\2\2\2\u009a\u009d\3\2\2\2\u009b" + "\u0099\3\2\2\2\u009b\u009c\3\2\2\2\u009c\u009e\3\2\2\2\u009d\u009b\3\2"
+			+ "\2\2\u009e\u009f\7\13\2\2\u009f\37\3\2\2\2\23#,\64\66<BLV`blsz\u0082\u0086" + "\u008b\u009b";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
-
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

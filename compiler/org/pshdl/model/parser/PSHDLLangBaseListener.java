@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from PSHDLLang.g4 by ANTLR 4.5.2
+// Generated from PSHDLLang.g4 by ANTLR 4.5.3
 package org.pshdl.model.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;

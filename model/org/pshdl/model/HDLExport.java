@@ -160,6 +160,7 @@ public class HDLExport extends AbstractHDLExport {
 		final HDLQualifiedName hifRef = hIfVar.asRef();
 		if (getVarRefName() != null) {
 			final HDLInterfaceRef hir = new HDLInterfaceRef().setHIf(hifRef).setVar(getVarRefName());
+			hir.freeze(this);
 			return Optional.of(Lists.newArrayList(hir));
 		}
 		final Optional<? extends HDLType> typeOf = TypeExtension.typeOf(hIfVar);

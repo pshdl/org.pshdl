@@ -547,7 +547,7 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 				.addArgs(param(Type.PARAM_BOOL, "assumption"))//
 				.addArgs(param(Type.PARAM_ENUM, "assert").setEnumSpec(PSHDLLib.ASSERT.asRef()))//
 				.addArgs(param(Type.PARAM_STRING, "message"))//
-				;
+		;
 	}
 
 	public static final HDLFunction ABS_UINT = (HDLFunction) createABS(Type.PARAM_ANY_UINT).freeze(null);

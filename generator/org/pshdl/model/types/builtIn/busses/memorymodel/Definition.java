@@ -130,7 +130,9 @@ public class Definition implements NamedElement {
 	}
 
 	public String getName(Row row) {
-		return row.name + '_' + name;
+		if (row.isHidden())
+			return name;
+		return row.getSimpleName() + '_' + name;
 	}
 
 	@Override
@@ -176,5 +178,10 @@ public class Definition implements NamedElement {
 	@Override
 	public void setLocation(Token start) {
 		this.token = start;
+	}
+
+	@Override
+	public String getSimpleName() {
+		return getName();
 	}
 }

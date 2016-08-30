@@ -366,7 +366,7 @@ public class HDLRegisterConfig extends AbstractHDLRegisterConfig {
 				.setRst(DEF_RST_REF())//
 				.setResetValue(HDLLiteral.get(0))//
 				.normalize()//
-				;
+		;
 	}
 
 	@Nonnull

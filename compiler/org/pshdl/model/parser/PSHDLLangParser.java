@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from PSHDLLang.g4 by ANTLR 4.5.2
+// Generated from PSHDLLang.g4 by ANTLR 4.5.3
 package org.pshdl.model.parser;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class PSHDLLangParser extends Parser {
 	static {
-		RuntimeMetaData.checkVersion("4.5.2", RuntimeMetaData.VERSION);
+		RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION);
 	}
 
 	protected static final DFA[] _decisionToDFA;
@@ -106,7 +106,6 @@ public class PSHDLLangParser extends Parser {
 	 */
 	@Deprecated
 	public static final String[] tokenNames;
-
 	static {
 		tokenNames = new String[_SYMBOLIC_NAMES.length];
 		for (int i = 0; i < tokenNames.length; i++) {
@@ -6878,7 +6877,6 @@ public class PSHDLLangParser extends Parser {
 			+ "\u02f4\u02fc\u0307\u0314\u031b\u0323\u0329\u032e\u0333\u0337\u033b\u0346" + "\u034a\u0352\u035a\u0361\u0363\u0367\u036b\u036e\u0372\u0376\u0379\u037d"
 			+ "\u0381\u038d\u0398\u039f\u03a7\u03b1";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
-
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

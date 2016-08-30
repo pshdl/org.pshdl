@@ -24,11 +24,10 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from MemoryModel.g4 by ANTLR 4.2.2
+// Generated from MemoryModel.g4 by ANTLR 4.5.3
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -46,7 +45,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) {
+	public void enterUnit(MemoryModelParser.UnitContext ctx) {
 	}
 
 	/**
@@ -57,7 +56,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitDeclaration(@NotNull MemoryModelParser.DeclarationContext ctx) {
+	public void exitUnit(MemoryModelParser.UnitContext ctx) {
 	}
 
 	/**
@@ -68,7 +67,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterConstant(@NotNull MemoryModelParser.ConstantContext ctx) {
+	public void enterDeclaration(MemoryModelParser.DeclarationContext ctx) {
 	}
 
 	/**
@@ -79,7 +78,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitConstant(@NotNull MemoryModelParser.ConstantContext ctx) {
+	public void exitDeclaration(MemoryModelParser.DeclarationContext ctx) {
 	}
 
 	/**
@@ -90,7 +89,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterDefinition(@NotNull MemoryModelParser.DefinitionContext ctx) {
+	public void enterRow(MemoryModelParser.RowContext ctx) {
 	}
 
 	/**
@@ -101,7 +100,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitDefinition(@NotNull MemoryModelParser.DefinitionContext ctx) {
+	public void exitRow(MemoryModelParser.RowContext ctx) {
 	}
 
 	/**
@@ -112,7 +111,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterAlias(@NotNull MemoryModelParser.AliasContext ctx) {
+	public void enterRowID(MemoryModelParser.RowIDContext ctx) {
 	}
 
 	/**
@@ -123,7 +122,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitAlias(@NotNull MemoryModelParser.AliasContext ctx) {
+	public void exitRowID(MemoryModelParser.RowIDContext ctx) {
 	}
 
 	/**
@@ -134,7 +133,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterWidth(@NotNull MemoryModelParser.WidthContext ctx) {
+	public void enterConstant(MemoryModelParser.ConstantContext ctx) {
 	}
 
 	/**
@@ -145,7 +144,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitWidth(@NotNull MemoryModelParser.WidthContext ctx) {
+	public void exitConstant(MemoryModelParser.ConstantContext ctx) {
 	}
 
 	/**
@@ -156,7 +155,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterType(@NotNull MemoryModelParser.TypeContext ctx) {
+	public void enterFilling(MemoryModelParser.FillingContext ctx) {
 	}
 
 	/**
@@ -167,7 +166,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitType(@NotNull MemoryModelParser.TypeContext ctx) {
+	public void exitFilling(MemoryModelParser.FillingContext ctx) {
 	}
 
 	/**
@@ -178,7 +177,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterReference(@NotNull MemoryModelParser.ReferenceContext ctx) {
+	public void enterColumn(MemoryModelParser.ColumnContext ctx) {
 	}
 
 	/**
@@ -189,7 +188,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitReference(@NotNull MemoryModelParser.ReferenceContext ctx) {
+	public void exitColumn(MemoryModelParser.ColumnContext ctx) {
 	}
 
 	/**
@@ -200,7 +199,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterRow(@NotNull MemoryModelParser.RowContext ctx) {
+	public void enterAlias(MemoryModelParser.AliasContext ctx) {
 	}
 
 	/**
@@ -211,7 +210,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitRow(@NotNull MemoryModelParser.RowContext ctx) {
+	public void exitAlias(MemoryModelParser.AliasContext ctx) {
 	}
 
 	/**
@@ -222,7 +221,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterFilling(@NotNull MemoryModelParser.FillingContext ctx) {
+	public void enterMemory(MemoryModelParser.MemoryContext ctx) {
 	}
 
 	/**
@@ -233,7 +232,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitFilling(@NotNull MemoryModelParser.FillingContext ctx) {
+	public void exitMemory(MemoryModelParser.MemoryContext ctx) {
 	}
 
 	/**
@@ -244,7 +243,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterMemory(@NotNull MemoryModelParser.MemoryContext ctx) {
+	public void enterDefinition(MemoryModelParser.DefinitionContext ctx) {
 	}
 
 	/**
@@ -255,7 +254,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitMemory(@NotNull MemoryModelParser.MemoryContext ctx) {
+	public void exitDefinition(MemoryModelParser.DefinitionContext ctx) {
 	}
 
 	/**
@@ -266,7 +265,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterUnit(@NotNull MemoryModelParser.UnitContext ctx) {
+	public void enterWarnType(MemoryModelParser.WarnTypeContext ctx) {
 	}
 
 	/**
@@ -277,7 +276,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitUnit(@NotNull MemoryModelParser.UnitContext ctx) {
+	public void exitWarnType(MemoryModelParser.WarnTypeContext ctx) {
 	}
 
 	/**
@@ -288,7 +287,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
+	public void enterRwStatus(MemoryModelParser.RwStatusContext ctx) {
 	}
 
 	/**
@@ -299,7 +298,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitWarnType(@NotNull MemoryModelParser.WarnTypeContext ctx) {
+	public void exitRwStatus(MemoryModelParser.RwStatusContext ctx) {
 	}
 
 	/**
@@ -310,7 +309,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
+	public void enterWidth(MemoryModelParser.WidthContext ctx) {
 	}
 
 	/**
@@ -321,7 +320,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitColumn(@NotNull MemoryModelParser.ColumnContext ctx) {
+	public void exitWidth(MemoryModelParser.WidthContext ctx) {
 	}
 
 	/**
@@ -332,7 +331,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
+	public void enterType(MemoryModelParser.TypeContext ctx) {
 	}
 
 	/**
@@ -343,7 +342,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitRwStatus(@NotNull MemoryModelParser.RwStatusContext ctx) {
+	public void exitType(MemoryModelParser.TypeContext ctx) {
 	}
 
 	/**
@@ -354,7 +353,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void enterEveryRule(@NotNull ParserRuleContext ctx) {
+	public void enterReference(MemoryModelParser.ReferenceContext ctx) {
 	}
 
 	/**
@@ -365,7 +364,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void exitEveryRule(@NotNull ParserRuleContext ctx) {
+	public void exitReference(MemoryModelParser.ReferenceContext ctx) {
 	}
 
 	/**
@@ -376,7 +375,7 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void visitTerminal(@NotNull TerminalNode node) {
+	public void enterEveryRule(ParserRuleContext ctx) {
 	}
 
 	/**
@@ -387,6 +386,28 @@ public class MemoryModelBaseListener implements MemoryModelListener {
 	 * </p>
 	 */
 	@Override
-	public void visitErrorNode(@NotNull ErrorNode node) {
+	public void exitEveryRule(ParserRuleContext ctx) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void visitTerminal(TerminalNode node) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation does nothing.
+	 * </p>
+	 */
+	@Override
+	public void visitErrorNode(ErrorNode node) {
 	}
 }

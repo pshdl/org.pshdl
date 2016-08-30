@@ -66,4 +66,9 @@ public class Memory implements NamedElement {
 	public void setLocation(Token start) {
 		this.token = start;
 	}
+
+	@Override
+	public String getSimpleName() {
+		return getName();
+	}
 }

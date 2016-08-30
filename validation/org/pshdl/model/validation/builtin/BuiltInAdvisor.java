@@ -375,9 +375,11 @@ public class BuiltInAdvisor {
 					"All switch statements require a default case. This is to avoid missed cases which lead to an incomplete description", "Add a default case");
 		case VARIABLE_KEYWORD_NAME:
 			return new HDLAdvise(problem, "The variable name is a keyword in PSHDL", "Keywords can not be used as variable names as the parser would fail", "Rename the variable");
-		case VARIABLE_SAME_NAME:
-			return new HDLAdvise(problem, "A variable with this name already exists", "The compiler can not tell those variables apart as they have the exact same name",
-					"Rename either variable");
+		case VARIABLE_SAME_NAME: {
+			final HDLVariable var = (HDLVariable) problem.node;
+			return new HDLAdvise(problem, "A variable with of name " + var.getName() + " already exists",
+					"The compiler can not tell those variables apart as they have the exact same name", "Rename either variable");
+		}
 		case VARIABLE_SAME_NAME_DIFFERENT_CASE: {
 			final HDLVariable other = (HDLVariable) problem.context;
 			final HDLVariable var = (HDLVariable) problem.node;

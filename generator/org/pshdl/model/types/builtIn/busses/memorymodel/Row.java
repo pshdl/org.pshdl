@@ -35,7 +35,7 @@ import org.antlr.v4.runtime.Token;
 import com.google.common.collect.Maps;
 
 public class Row implements NamedElement {
-	public String name;
+	public final String name;
 	public Column column;
 	public List<NamedElement> definitions = new LinkedList<NamedElement>();
 	public int colIndex;
@@ -74,6 +74,13 @@ public class Row implements NamedElement {
 
 	@Override
 	public String getName() {
+		return getSimpleName();
+	}
+
+	@Override
+	public String getSimpleName() {
+		if (!isHidden())
+			return name.substring(1);
 		return name;
 	}
 
@@ -93,5 +100,9 @@ public class Row implements NamedElement {
 	@Override
 	public void setLocation(Token start) {
 		this.token = start;
+	}
+
+	public boolean isHidden() {
+		return name.charAt(0) != '^';
 	}
 }

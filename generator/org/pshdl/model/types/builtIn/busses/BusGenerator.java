@@ -308,7 +308,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				final Row row = (Row) value;
 				for (final NamedElement def : row.definitions) {
 					final String dName = def.getName();
-					mm.put(dName, row.name);
+					mm.put(dName, row.getName());
 				}
 			}
 		}

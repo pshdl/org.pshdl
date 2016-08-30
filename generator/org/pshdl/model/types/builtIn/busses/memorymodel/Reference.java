@@ -69,4 +69,9 @@ public class Reference implements NamedElement {
 		this.token = start;
 	}
 
+	@Override
+	public String getSimpleName() {
+		return getName();
+	}
+
 }

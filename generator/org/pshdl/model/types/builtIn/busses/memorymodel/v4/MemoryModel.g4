@@ -38,12 +38,15 @@ declaration
 	
 row
 	:
-		'row' ID '{' 
+		'row' rowID '{' 
 		(
 			(filling)    |
 			(definition) | 
 			(reference)
 		)* '}';
+
+rowID:
+	'^'? ID;
 
 constant
 	:

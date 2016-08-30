@@ -123,7 +123,7 @@ public class MemoryModelSideFiles {
 					if (def.type != Type.UNUSED) {
 						final String toolTip;
 						if (size == 32) {
-							toolTip = String.format("Width:%d Shift:%d Mask:%08X &#10read: base[%4$d];&#10write: base[%4$d]=newVal", size, (def.bitPos - size) + 1,
+							toolTip = String.format("Width:%d Shift:%d Mask:%08X &#10;read: base[%4$d];&#10;write: base[%4$d]=newVal", size, (def.bitPos - size) + 1,
 									(1l << size) - 1, (pos * mul) / 4);
 						} else {
 							toolTip = String.format(
@@ -137,8 +137,8 @@ public class MemoryModelSideFiles {
 					}
 
 				}
-				final Integer integer = getAndInc(rowIndex, row.name);
-				formatter.format("<td class='rowInfo'>%s [%d]</td></tr>%n", row.name, integer);
+				final Integer integer = getAndInc(rowIndex, row.getName());
+				formatter.format("<td class='rowInfo'>%s [%d]</td></tr>%n", row.getName(), integer);
 				pos++;
 			}
 			return formatter.toString();

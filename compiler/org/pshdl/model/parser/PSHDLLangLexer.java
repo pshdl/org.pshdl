@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from PSHDLLang.g4 by ANTLR 4.5.2
+// Generated from PSHDLLang.g4 by ANTLR 4.5.3
 package org.pshdl.model.parser;
 
 import org.antlr.v4.runtime.CharStream;
@@ -42,7 +42,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class PSHDLLangLexer extends Lexer {
 	static {
-		RuntimeMetaData.checkVersion("4.5.2", RuntimeMetaData.VERSION);
+		RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION);
 	}
 
 	protected static final DFA[] _decisionToDFA;
@@ -85,7 +85,6 @@ public class PSHDLLangLexer extends Lexer {
 	 */
 	@Deprecated
 	public static final String[] tokenNames;
-
 	static {
 		tokenNames = new String[_SYMBOLIC_NAMES.length];
 		for (int i = 0; i < tokenNames.length; i++) {
@@ -311,7 +310,6 @@ public class PSHDLLangLexer extends Lexer {
 			+ "\u02f3\3\2\2\2\u02f3\u02f1\3\2\2\2\u02f3\u02f4\3\2\2\2\u02f4\u02f5\3\2" + "\2\2\u02f5\u02f6\bj\4\2\u02f6\u00d4\3\2\2\2\24\2\u0285\u028d\u0293\u029f"
 			+ "\u02a5\u02ab\u02b4\u02b6\u02bd\u02bf\u02c3\u02cb\u02d9\u02e5\u02e9\u02ec" + "\u02f3\5\3g\2\3i\3\3j\4";
 	public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
-
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

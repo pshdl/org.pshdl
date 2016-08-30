@@ -96,7 +96,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 
 	@Override
 	public void enterRow(RowContext ctx) {
-		final String id = ctx.ID().getText();
+		final String id = ctx.rowID().getText();
 		decl = new Row(id);
 		obj = decl;
 	}

@@ -87,6 +87,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 */
 		range,
 		/**
+		 * Combine multiple variables to multiple read write ports. Those ports
+		 * need to have the same memory id
+		 */
+		memory,
+		/**
 		 * The name of the type that should be used instead of an automatically
 		 * created type during VHDL code generation. The name should start with
 		 * VHDL.
@@ -107,7 +112,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 		 * as default in the value in the declaration, instead of describing a
 		 * reset behaviour.
 		 */
-		VHDLNoExplicitReset;
+		VHDLNoExplicitReset,
+		/**
+		 * Internal annotation to designate shared variables
+		 */
+		sharedVar;
 		@Override
 		public String toString() {
 			return "@" + name();
@@ -129,6 +138,7 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case genSignal:
 			case VHDLLatchable:
 			case VHDLNoExplicitReset:
+			case exportedSignal:
 			case reset:
 			case clock:
 				if (value != null)
@@ -155,6 +165,14 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case VHDLType:
 				if (value == null)
 					return this + " expects an argument with the name of the VHDL entity to use.";
+				break;
+			case portGroup:
+				if (value == null)
+					return this + " expects an argument with the name of group to use.";
+				break;
+			case memory:
+				if (value == null)
+					return this + " expects an argument with the name of memory to use.";
 				break;
 			}
 			return null;
@@ -333,6 +351,11 @@ public class HDLBuiltInAnnotationProvider implements IHDLAnnotationProvider {
 			case portGroup:
 				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(), "Adds a signal to a logical group of signals",
 						"a simple group name. Should be a simple identifier");
+			case memory:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(), "Adds a signal to a logical group of memory",
+						"a simple memory name. Should be a simple identifier");
+			case sharedVar:
+				return new AnnotationInformation(HDLBuiltInAnnotationProvider.class.getSimpleName(), toString(), "Builtin annotation to designed shared variables", null);
 			}
 			throw new IllegalArgumentException("Forgot to implement AnnotationInformation for:" + this);
 		}

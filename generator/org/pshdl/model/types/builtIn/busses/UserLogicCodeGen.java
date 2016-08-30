@@ -49,14 +49,10 @@ import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.HDLVariableRef;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Column;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Memory;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Reference;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.utils.HDLQualifiedName;
@@ -221,41 +217,4 @@ public class UserLogicCodeGen extends CommonBusCode {
 		return hdlSwitchStatement;
 	}
 
-	public static Unit createAdderBus(int regCount) {
-		final Definition a = new Definition("a", true, RWType.rw, Type.UINT, 16);
-		final Definition b = new Definition("b", true, RWType.rw, Type.UINT, 16);
-		final Definition result = new Definition("result", true, RWType.rw, Type.UINT, 16);
-		final Row rowIn = new Row("input", null, a, b);
-		final Row rowOut = new Row("output", null, new Reference("fill"), result);
-		final Column col = new Column("adder");
-		col.rows.add(rowIn);
-		col.rows.add(rowOut);
-		final Memory mem = new Memory(new Reference("adder", regCount));
-		final Unit unit = new Unit();
-		unit.declarations.put("input", rowIn);
-		unit.declarations.put("output", rowOut);
-		unit.declarations.put("adder", col);
-		unit.memory = mem;
-		return unit;
-	}
-
-	public static Unit create(int regCount) {
-		final Definition a = new Definition("a", true, RWType.rw, Type.BIT, 17);
-		final Definition b = new Definition("b", true, RWType.rw, Type.BIT, 5);
-		final Definition c = new Definition("c", true, RWType.rw, Type.BIT, 8);
-		final Definition d = new Definition("d", true, RWType.rw, Type.BIT, 2);
-		final Row row = new Row("reg", null, a, b, c, d);
-		final Memory mem = new Memory(new Reference("reg", regCount));
-		final Unit unit = new Unit();
-		unit.declarations.put("reg", row);
-		unit.memory = mem;
-		return unit;
-	}
-
-	public static void main(String[] args) {
-		// Unit defaultUnit = BusGenerator.createDefaultUnit(5);
-		final Unit defaultUnit = createAdderBus(3);
-		final HDLUnit unit = get("Bla", defaultUnit, MemoryModel.buildRows(defaultUnit));
-		System.out.println(unit);
-	}
 }

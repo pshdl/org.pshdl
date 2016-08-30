@@ -241,7 +241,7 @@ extern warnFunc_p «prefix.prefix»warn;
 						typedef struct «prefix.prefix»«col.name» {
 							«FOR NamedElement neRow : col.rows»
 								///Struct for row «neRow.name»
-								«neRow.name»_t «neRow.name»;
+								«neRow.simpleName»_t «neRow.simpleName»;
 							«ENDFOR»
 						} «prefix.prefix»«col.name»_t;
 					'''

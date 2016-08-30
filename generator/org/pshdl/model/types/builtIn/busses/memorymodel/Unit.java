@@ -29,6 +29,8 @@ package org.pshdl.model.types.builtIn.busses.memorymodel;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 public class Unit {
 	public Map<String, NamedElement> declarations = new LinkedHashMap<String, NamedElement>();
 	public Memory memory;
@@ -58,10 +60,10 @@ public class Unit {
 		return fullString.replaceAll("\\s+", " ").replaceAll("\\s*([\\{\\};])\\s*", "$1");
 	}
 
-	public NamedElement resolve(Reference ref) {
+	public Optional<NamedElement> resolve(Reference ref) {
 		final NamedElement decl = declarations.get(ref.getName());
 		if (decl == null)
-			throw new IllegalArgumentException("Can not resolve reference:" + ref.name);
-		return decl;
+			return Optional.absent();
+		return Optional.of(decl);
 	}
 }
