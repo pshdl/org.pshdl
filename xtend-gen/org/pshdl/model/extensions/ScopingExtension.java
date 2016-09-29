@@ -80,19 +80,11 @@ public class ScopingExtension {
   public static ScopingExtension INST = new ScopingExtension();
   
   public Optional<HDLVariable> resolveVariableDefault(final IHDLObject obj, final HDLQualifiedName hVar) {
-    boolean _or = false;
-    if ((obj == null)) {
-      _or = true;
-    } else {
-      IHDLObject _container = obj.getContainer();
-      boolean _tripleEquals = (_container == null);
-      _or = _tripleEquals;
-    }
-    if (_or) {
+    if (((obj == null) || (obj.getContainer() == null))) {
       return Optional.<HDLVariable>absent();
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveVariable(_container_1, hVar);
+    IHDLObject _container = obj.getContainer();
+    return this.resolveVariable(_container, hVar);
   }
   
   protected Optional<HDLVariable> _resolveVariable(final IHDLObject obj, final HDLQualifiedName hVar) {
@@ -108,29 +100,12 @@ public class ScopingExtension {
     final HDLFunctionCall call = ((HDLFunctionCall) obj);
     IHDLObject _container_1 = obj.getContainer();
     final Optional<? extends Iterable<HDLFunction>> candidates = this.resolveFunctionCall(_container_1, call, hVar);
-    boolean _or = false;
-    boolean _isPresent = candidates.isPresent();
-    boolean _not = (!_isPresent);
-    if (_not) {
-      _or = true;
-    } else {
-      Iterable<HDLFunction> _get = candidates.get();
-      boolean _isEmpty = IterableExtensions.isEmpty(_get);
-      _or = _isEmpty;
-    }
-    if (_or) {
+    if (((!candidates.isPresent()) || IterableExtensions.isEmpty(candidates.get()))) {
       return Optional.<HDLFunction>absent();
     }
-    Iterable<HDLFunction> _get_1 = candidates.get();
-    final SortedSet<HDLFunctions.FunctionScore> scored = HDLFunctions.scoreList(_get_1, call);
-    boolean _or_1 = false;
-    boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(scored);
-    if (_isNullOrEmpty) {
-      _or_1 = true;
-    } else {
-      _or_1 = (scored.first().score > 1000);
-    }
-    if (_or_1) {
+    Iterable<HDLFunction> _get = candidates.get();
+    final SortedSet<HDLFunctions.FunctionScore> scored = HDLFunctions.scoreList(_get, call);
+    if ((IterableExtensions.isNullOrEmpty(scored) || (scored.first().score > 1000))) {
       return Optional.<HDLFunction>absent();
     }
     HDLFunctions.FunctionScore _first = scored.first();
@@ -460,15 +435,7 @@ public class ScopingExtension {
   
   protected Optional<HDLEnum> _resolveEnum(final HDLPackage obj, final HDLQualifiedName hEnum) {
     final Optional<? extends HDLType> res = this.resolveType(obj, hEnum);
-    boolean _and = false;
-    boolean _isPresent = res.isPresent();
-    if (!_isPresent) {
-      _and = false;
-    } else {
-      HDLType _get = res.get();
-      _and = (_get instanceof HDLEnum);
-    }
-    if (_and) {
+    if ((res.isPresent() && (res.get() instanceof HDLEnum))) {
       return ((Optional<HDLEnum>) res);
     }
     return Optional.<HDLEnum>absent();
@@ -476,15 +443,7 @@ public class ScopingExtension {
   
   protected Optional<HDLInterface> _resolveInterface(final HDLPackage obj, final HDLQualifiedName hIf) {
     final Optional<? extends HDLType> res = this.resolveType(obj, hIf);
-    boolean _and = false;
-    boolean _isPresent = res.isPresent();
-    if (!_isPresent) {
-      _and = false;
-    } else {
-      HDLType _get = res.get();
-      _and = (_get instanceof HDLInterface);
-    }
-    if (_and) {
+    if ((res.isPresent() && (res.get() instanceof HDLInterface))) {
       return ((Optional<HDLInterface>) res);
     }
     return Optional.<HDLInterface>absent();
@@ -528,15 +487,7 @@ public class ScopingExtension {
       return resolveEnum;
     }
     final Optional<? extends HDLType> res = this.resolveType(obj, hEnum);
-    boolean _and = false;
-    boolean _isPresent_1 = res.isPresent();
-    if (!_isPresent_1) {
-      _and = false;
-    } else {
-      HDLType _get = res.get();
-      _and = (_get instanceof HDLEnum);
-    }
-    if (_and) {
+    if ((res.isPresent() && (res.get() instanceof HDLEnum))) {
       return ((Optional<HDLEnum>) res);
     }
     return Optional.<HDLEnum>absent();
@@ -574,15 +525,7 @@ public class ScopingExtension {
       return resolveInterface;
     }
     final Optional<? extends HDLType> res = this.resolveType(obj, hIf);
-    boolean _and = false;
-    boolean _isPresent_1 = res.isPresent();
-    if (!_isPresent_1) {
-      _and = false;
-    } else {
-      HDLType _get = res.get();
-      _and = (_get instanceof HDLInterface);
-    }
-    if (_and) {
+    if ((res.isPresent() && (res.get() instanceof HDLInterface))) {
       return ((Optional<HDLInterface>) res);
     }
     return Optional.<HDLInterface>absent();
