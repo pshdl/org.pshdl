@@ -46,6 +46,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -55,7 +56,6 @@ import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -1087,11 +1087,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     CharSequence _fieldDeclarations = this.fieldDeclarations(false, false);
     String _string = _fieldDeclarations.toString();
     String[] _split = _string.split("\n");
-    final Function1<String, String> _function = new Function1<String, String>() {
-      @Override
-      public String apply(final String it) {
-        return ("extern" + it);
-      }
+    final Function1<String, String> _function = (String it) -> {
+      return ("extern" + it);
     };
     List<String> _map = ListExtensions.<String, String>map(((List<String>)Conversions.doWrapArray(_split)), _function);
     String _join = IterableExtensions.join(_map, "\n");
@@ -1140,28 +1137,19 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   private String generateSimEncapsuation(final Unit unit, final Iterable<Row> rows) {
     final Set<String> varNames = new LinkedHashSet<String>();
-    final Procedure1<Row> _function = new Procedure1<Row>() {
-      @Override
-      public void apply(final Row it) {
-        List<Definition> _allDefs = CCodeGenerator.this.ba.allDefs(it);
-        final Function1<Definition, Boolean> _function = new Function1<Definition, Boolean>() {
-          @Override
-          public Boolean apply(final Definition it) {
-            return Boolean.valueOf((it.type != Definition.Type.UNUSED));
-          }
-        };
-        Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
-        final Procedure1<Definition> _function_1 = new Procedure1<Definition>() {
-          @Override
-          public void apply(final Definition it) {
-            String _name = it.getName();
-            varNames.add(_name);
-          }
-        };
-        IterableExtensions.<Definition>forEach(_filter, _function_1);
-      }
+    final Consumer<Row> _function = (Row it) -> {
+      List<Definition> _allDefs = this.ba.allDefs(it);
+      final Function1<Definition, Boolean> _function_1 = (Definition it_1) -> {
+        return Boolean.valueOf((it_1.type != Definition.Type.UNUSED));
+      };
+      Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function_1);
+      final Consumer<Definition> _function_2 = (Definition it_1) -> {
+        String _name = it_1.getName();
+        varNames.add(_name);
+      };
+      _filter.forEach(_function_2);
     };
-    IterableExtensions.<Row>forEach(rows, _function);
+    rows.forEach(_function);
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("/**");
     _builder.newLine();

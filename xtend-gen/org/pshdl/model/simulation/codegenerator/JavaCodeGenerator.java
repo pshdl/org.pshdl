@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -49,7 +50,6 @@ import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.interpreter.Frame;
@@ -392,11 +392,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         String[] _annotations = v_1.annotations;
         String _join = null;
         if (((Iterable<String>)Conversions.doWrapArray(_annotations))!=null) {
-          final Function1<String, CharSequence> _function = new Function1<String, CharSequence>() {
-            @Override
-            public CharSequence apply(final String it) {
-              return it;
-            }
+          final Function1<String, CharSequence> _function = (String it) -> {
+            return it;
           };
           _join=IterableExtensions.<String>join(((Iterable<String>)Conversions.doWrapArray(_annotations)), "\"", ",", "\"", _function);
         }
@@ -727,20 +724,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       final Set<Integer> handledPosEdges = Sets.<Integer>newLinkedHashSet();
       final Set<Integer> handledPredicates = Sets.<Integer>newLinkedHashSet();
       final Multimap<Integer, Frame> stageFrames = LinkedHashMultimap.<Integer, Frame>create();
-      final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
-        @Override
-        public Boolean apply(final Frame it) {
-          return Boolean.valueOf((!it.constant));
-        }
+      final Function1<Frame, Boolean> _function = (Frame it) -> {
+        return Boolean.valueOf((!it.constant));
       };
       Iterable<Frame> _filter = IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(this.em.frames)), _function);
-      final Procedure1<Frame> _function_1 = new Procedure1<Frame>() {
-        @Override
-        public void apply(final Frame it) {
-          stageFrames.put(Integer.valueOf(it.scheduleStage), it);
-        }
+      final Consumer<Frame> _function_1 = (Frame it) -> {
+        stageFrames.put(Integer.valueOf(it.scheduleStage), it);
       };
-      IterableExtensions.<Frame>forEach(_filter, _function_1);
+      _filter.forEach(_function_1);
       Set<Integer> _keySet = stageFrames.keySet();
       List<Integer> _sort = IterableExtensions.<Integer>sort(_keySet);
       int maxStage = (int) IterableExtensions.<Integer>last(_sort);
@@ -814,20 +805,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
                 }
               }
             }
-            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_2 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-              @Override
-              public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                return it.declare();
-              }
+            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_2 = (JavaCodeGenerator.ExecutionPhase it) -> {
+              return it.declare();
             };
             List<CharSequence> _map = ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_2);
             String _join = IterableExtensions.join(_map);
             phaseMethods.append(_join);
-            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_3 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-              @Override
-              public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                return it.call();
-              }
+            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_3 = (JavaCodeGenerator.ExecutionPhase it) -> {
+              return it.call();
             };
             List<CharSequence> _map_1 = ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_3);
             String _join_1 = IterableExtensions.join(_map_1);
@@ -837,11 +822,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
               {
                 Collections.shuffle(phases, this.r);
                 StringBuilder _get = execution.get(i_1);
-                final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_4 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-                  @Override
-                  public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                    return it.call();
-                  }
+                final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_4 = (JavaCodeGenerator.ExecutionPhase it) -> {
+                  return it.call();
                 };
                 List<CharSequence> _map_2 = ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_4);
                 String _join_2 = IterableExtensions.join(_map_2);
@@ -2539,11 +2521,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   protected String getAnnoValue(final String anno) {
-    final Function1<String, Boolean> _function = new Function1<String, Boolean>() {
-      @Override
-      public Boolean apply(final String it) {
-        return Boolean.valueOf(it.startsWith(anno));
-      }
+    final Function1<String, Boolean> _function = (String it) -> {
+      return Boolean.valueOf(it.startsWith(anno));
     };
     final String foundAnno = IterableExtensions.<String>findFirst(((Iterable<String>)Conversions.doWrapArray(this.em.annotations)), _function);
     int _indexOf = foundAnno.indexOf(SimulationTransformationExtension.ANNO_VALUE_SEP);
