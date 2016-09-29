@@ -26,12 +26,15 @@
  ******************************************************************************/
 package org.pshdl.model.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLEnumRef;
+import org.pshdl.model.HDLExport;
 import org.pshdl.model.HDLInterfaceRef;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableRef;
@@ -42,6 +45,7 @@ import org.pshdl.model.utils.internal.NonSameList;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 
 public class HDLQuery {
 	public static abstract class HDLFieldAccess<T extends IHDLObject, K> {
@@ -321,8 +325,16 @@ public class HDLQuery {
 
 	public static Collection<HDLInterfaceRef> getInterfaceRefs(IHDLObject obj, HDLVariable hdlVariable) {
 		final HDLQualifiedName asRef = hdlVariable.asRef();
-		final Collection<HDLInterfaceRef> refs = HDLQuery.select(HDLInterfaceRef.class).from(obj).where(HDLInterfaceRef.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll();
-		for (final Iterator<HDLInterfaceRef> iterator = refs.iterator(); iterator.hasNext();) {
+		final List<HDLInterfaceRef> allRefs = Lists.newArrayList();
+		allRefs.addAll(HDLQuery.select(HDLInterfaceRef.class).from(obj).where(HDLInterfaceRef.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll());
+		final Collection<HDLExport> exRefs = HDLQuery.select(HDLExport.class).from(obj).where(HDLExport.fHIf).lastSegmentIs(asRef.getLastSegment()).getAll();
+		for (final HDLExport export : exRefs) {
+			final Optional<ArrayList<HDLInterfaceRef>> variables = export.resolveVariables();
+			if (variables.isPresent()) {
+				allRefs.addAll(variables.get());
+			}
+		}
+		for (final Iterator<HDLInterfaceRef> iterator = allRefs.iterator(); iterator.hasNext();) {
 			final HDLInterfaceRef hir = iterator.next();
 			final Optional<HDLVariable> resolveHIf = hir.resolveHIf();
 			if (resolveHIf.isPresent()) {
@@ -336,7 +348,7 @@ public class HDLQuery {
 				}
 			}
 		}
-		return refs;
+		return allRefs;
 	}
 
 }

@@ -361,6 +361,10 @@ public class SimulationTransformationExtension {
 			newProcess = "ONCE";
 		}
 		final FluidFrame res = new FluidFrame(obj, null, false, newProcess);
+		final HDLAnnotation _annotation = obj.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.memory);
+		final boolean _tripleNotEquals = (_annotation != null);
+		if (_tripleNotEquals)
+			return res;
 		VariableInformation.Direction dir = null;
 		final HDLVariableDeclaration.HDLDirection _direction = obj.getDirection();
 		if (_direction != null) {
@@ -384,10 +388,10 @@ public class SimulationTransformationExtension {
 		final ArrayList<HDLVariable> _variables = obj.getVariables();
 		for (final HDLVariable hVar : _variables) {
 			{
-				final HDLAnnotation _annotation = hVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.clock);
-				final boolean clock = (_annotation != null);
-				final HDLAnnotation _annotation_1 = hVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.reset);
-				final boolean reset = (_annotation_1 != null);
+				final HDLAnnotation _annotation_1 = hVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.clock);
+				final boolean clock = (_annotation_1 != null);
+				final HDLAnnotation _annotation_2 = hVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.reset);
+				final boolean reset = (_annotation_2 != null);
 				final HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
 				final String varName = _fullNameOf.toString();
 				final LinkedList<Integer> dims = new LinkedList<Integer>();
@@ -546,6 +550,10 @@ public class SimulationTransformationExtension {
 
 	public void createInit(final HDLRegisterConfig config, final HDLVariableDeclaration obj, final HDLEvaluationContext context, final FluidFrame res, final boolean toReg,
 			final String process) {
+		final HDLAnnotation _annotation = obj.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.memory);
+		final boolean _tripleNotEquals = (_annotation != null);
+		if (_tripleNotEquals)
+			return;
 		final HDLExpression _resetValue = config.getResetValue();
 		if ((_resetValue instanceof HDLArrayInit)) {
 			final ArrayList<HDLVariable> _variables = obj.getVariables();
@@ -712,13 +720,16 @@ public class SimulationTransformationExtension {
 		final boolean _tripleNotEquals = (_type != HDLAssignment.HDLAssignmentType.ASSGN);
 		if (_tripleNotEquals)
 			throw new IllegalArgumentException("Did not expect a combined assignment");
-		final HDLReference left = obj.getLeft();
+		HDLReference left = obj.getLeft();
+		if ((left instanceof HDLVariableRef)) {
+			final HDLVariableRef _redirectRef = this.redirectRef(((HDLVariableRef) left));
+			left = _redirectRef;
+		}
 		final HDLVariable hVar = this.resolveVar(left);
 		final HDLVariableDeclaration.HDLDirection _direction = hVar.getDirection();
 		final boolean constant = (_direction == HDLVariableDeclaration.HDLDirection.CONSTANT);
 		HDLRegisterConfig config = hVar.getRegisterConfig();
-		final HDLReference _left = obj.getLeft();
-		String assignmentVarName = SimulationTransformationExtension.getVarName(((HDLVariableRef) _left), true, context);
+		String assignmentVarName = SimulationTransformationExtension.getVarName(((HDLVariableRef) left), true, context);
 		if ((config != null)) {
 			assignmentVarName = (assignmentVarName + InternalInformation.REG_POSTFIX);
 		}
@@ -755,10 +766,9 @@ public class SimulationTransformationExtension {
 		final FluidFrame _simulationModel = this.toSimulationModel(_right, context, process);
 		res.append(_simulationModel);
 		if ((left instanceof HDLVariableRef)) {
-			final HDLVariableRef variableRef = ((HDLVariableRef) left);
-			final ArrayList<HDLExpression> _array = variableRef.getArray();
+			final ArrayList<HDLExpression> _array = ((HDLVariableRef) left).getArray();
 			this.createPushIndex(_array, context, res, process, assignmentVarName);
-			final ArrayList<HDLRange> _bits = variableRef.getBits();
+			final ArrayList<HDLRange> _bits = ((HDLVariableRef) left).getBits();
 			this.createPushIndexBits(_bits, context, res, process, assignmentVarName);
 		}
 		return res;
@@ -815,15 +825,17 @@ public class SimulationTransformationExtension {
 	public HDLVariable resolveVar(final HDLReference reference) {
 		if ((reference instanceof HDLUnresolvedFragment))
 			throw new RuntimeException("Can not use unresolved fragments");
-		final Optional<HDLVariable> _resolveVar = ((HDLResolvedRef) reference).resolveVar();
-		return _resolveVar.get();
+		if ((reference instanceof HDLVariableRef)) {
+			final HDLVariableRef newRef = this.redirectRef(((HDLVariableRef) reference));
+			return newRef.resolveVarForced("PSEX");
+		}
+		return ((HDLResolvedRef) reference).resolveVarForced("PSEX");
 	}
 
 	public static String getVarName(final HDLVariableRef hVar, final boolean withBits, final HDLEvaluationContext context) {
 		final StringBuilder sb = new StringBuilder();
-		final Optional<HDLVariable> _resolveVar = hVar.resolveVar();
-		final HDLVariable _get = _resolveVar.get();
-		final HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(_get);
+		final HDLVariable _resolveVarForced = hVar.resolveVarForced("PSEX");
+		final HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(_resolveVarForced);
 		sb.append(_fullNameOf);
 		final ArrayList<HDLExpression> _array = hVar.getArray();
 		for (final HDLExpression exp : _array) {
@@ -832,8 +844,8 @@ public class SimulationTransformationExtension {
 				final boolean _isPresent = s.isPresent();
 				if (_isPresent) {
 					final StringBuilder _append = sb.append("[");
-					final BigInteger _get_1 = s.get();
-					final StringBuilder _append_1 = _append.append(_get_1);
+					final BigInteger _get = s.get();
+					final StringBuilder _append_1 = _append.append(_get);
 					_append_1.append("]");
 				} else {
 					sb.append("[-1]");
@@ -1061,7 +1073,8 @@ public class SimulationTransformationExtension {
 		return res;
 	}
 
-	protected FluidFrame _toSimulationModel(final HDLVariableRef obj, final HDLEvaluationContext context, final String process) {
+	protected FluidFrame _toSimulationModel(final HDLVariableRef varRef, final HDLEvaluationContext context, final String process) {
+		final HDLVariableRef obj = this.redirectRef(varRef);
 		final FluidFrame res = new FluidFrame(obj, process);
 		final String refName = SimulationTransformationExtension.getVarName(obj, false, context);
 		final ArrayList<HDLExpression> _array = obj.getArray();
@@ -1093,7 +1106,7 @@ public class SimulationTransformationExtension {
 				bits.add(_string);
 			}
 		}
-		final HDLVariable resVar = obj.resolveVarForced(SimulationTransformationExtension.PSEX_STAGE);
+		final HDLVariable resVar = obj.resolveVarForced("PSEX");
 		final HDLVariableDeclaration.HDLDirection dir = resVar.getDirection();
 		boolean _matched = false;
 		if (Objects.equal(dir, HDLVariableDeclaration.HDLDirection.INTERNAL)) {
@@ -1136,6 +1149,22 @@ public class SimulationTransformationExtension {
 		if (!_matched)
 			throw new HDLCodeGenerationException(obj, ("Failed to resolve direction:" + dir), "PSEX");
 		return res;
+	}
+
+	public HDLVariableRef redirectRef(final HDLVariableRef varRef) {
+		final HDLVariable resVar = varRef.resolveVarForced(SimulationTransformationExtension.PSEX_STAGE);
+		final HDLAnnotation memAnno = resVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.memory);
+		HDLVariableRef obj = varRef;
+		if ((memAnno != null)) {
+			final String _value = memAnno.getValue();
+			final HDLQualifiedName _create = HDLQualifiedName.create(_value);
+			final HDLVariableRef _setVar = varRef.setVar(_create);
+			obj = _setVar;
+			final IHDLObject _container = varRef.getContainer();
+			final HDLVariableRef _copyDeepFrozen = obj.copyDeepFrozen(_container);
+			obj = _copyDeepFrozen;
+		}
+		return obj;
 	}
 
 	protected FluidFrame _toSimulationModel(final HDLLiteral obj, final HDLEvaluationContext context, final String process) {

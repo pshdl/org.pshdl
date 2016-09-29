@@ -234,6 +234,9 @@ class SimulationTransformationExtension {
 		if (newProcess === null && simAnno !== null)
 			newProcess = "ONCE"
 		val FluidFrame res = new FluidFrame(obj, null, false, newProcess)
+		// Memory variables are ignored
+		if (obj.getAnnotation(HDLBuiltInAnnotations.memory) !== null)
+			return res
 
 		// res.addVar(new VariableInformation(Direction.INTERNAL, "#null", 1, Type.BIT, false, false, false, null))
 		var Direction dir
@@ -244,13 +247,13 @@ class SimulationTransformationExtension {
 			default: dir = Direction.INTERNAL
 		}
 		for (HDLVariable hVar : obj.variables) {
-			var clock = hVar.getAnnotation(HDLBuiltInAnnotations.clock) !== null
-			var reset = hVar.getAnnotation(HDLBuiltInAnnotations.reset) !== null
+			val clock = hVar.getAnnotation(HDLBuiltInAnnotations.clock) !== null
+			val reset = hVar.getAnnotation(HDLBuiltInAnnotations.reset) !== null
 			val varName = fullNameOf(hVar).toString
 			val dims = new LinkedList<Integer>()
 			for (HDLExpression dim : hVar.dimensions)
 				dims.add(valueOfForced(dim, context, PSEX_STAGE).intValue)
-			var vType = asType(type)
+			val vType = asType(type)
 			val allAnnos = Lists.newArrayList(hVar.annotations + obj.annotations)
 			if (type.classType === HDLClass.HDLEnum) {
 				val HDLEnum hEnum = type as HDLEnum
@@ -316,6 +319,8 @@ class SimulationTransformationExtension {
 
 	def void createInit(HDLRegisterConfig config, HDLVariableDeclaration obj, HDLEvaluationContext context,
 		FluidFrame res, boolean toReg, String process) {
+		if (obj.getAnnotation(HDLBuiltInAnnotations.memory) !== null)
+			return;
 		if (config.resetValue instanceof HDLArrayInit) {
 			for (HDLVariable hVar : obj.variables) {
 				res.add(const0)
@@ -413,11 +418,14 @@ class SimulationTransformationExtension {
 	def dispatch FluidFrame toSimulationModel(HDLAssignment obj, HDLEvaluationContext context, String process) {
 		if (obj.type !== HDLAssignment.HDLAssignmentType.ASSGN)
 			throw new IllegalArgumentException("Did not expect a combined assignment")
-		val HDLReference left = obj.left
+		var HDLReference left = obj.left
+		if (left instanceof HDLVariableRef) {
+			left = (left as HDLVariableRef).redirectRef
+		}
 		val HDLVariable hVar = left.resolveVar
 		val constant = hVar.direction === CONSTANT
 		var HDLRegisterConfig config = hVar.registerConfig
-		var assignmentVarName = getVarName(obj.left as HDLVariableRef, true, context)
+		var assignmentVarName = getVarName(left as HDLVariableRef, true, context)
 		if (config !== null)
 			assignmentVarName = assignmentVarName + InternalInformation.REG_POSTFIX
 		var res = new FluidFrame(obj, assignmentVarName, constant, process)
@@ -438,9 +446,8 @@ class SimulationTransformationExtension {
 		}
 		res.append(obj.right.toSimulationModel(context, process))
 		if (left instanceof HDLVariableRef) {
-			val HDLVariableRef variableRef = left as HDLVariableRef
-			createPushIndex(variableRef.array, context, res, process, assignmentVarName)
-			createPushIndexBits(variableRef.bits, context, res, process, assignmentVarName)
+			createPushIndex(left.array, context, res, process, assignmentVarName)
+			createPushIndexBits(left.bits, context, res, process, assignmentVarName)
 		}
 		return res
 	}
@@ -474,12 +481,16 @@ class SimulationTransformationExtension {
 	def HDLVariable resolveVar(HDLReference reference) {
 		if (reference instanceof HDLUnresolvedFragment)
 			throw new RuntimeException("Can not use unresolved fragments")
-		return (reference as HDLResolvedRef).resolveVar.get
+		if (reference instanceof HDLVariableRef) {
+			val newRef = reference.redirectRef
+			return newRef.resolveVarForced("PSEX")
+		}
+		return (reference as HDLResolvedRef).resolveVarForced("PSEX")
 	}
 
 	def static String getVarName(HDLVariableRef hVar, boolean withBits, HDLEvaluationContext context) {
 		val StringBuilder sb = new StringBuilder
-		sb.append(fullNameOf(hVar.resolveVar.get))
+		sb.append(fullNameOf(hVar.resolveVarForced("PSEX")))
 		for (HDLExpression exp : hVar.array) {
 			val s = valueOf(exp, context)
 			if (s.present)
@@ -626,7 +637,8 @@ class SimulationTransformationExtension {
 		return res
 	}
 
-	def dispatch FluidFrame toSimulationModel(HDLVariableRef obj, HDLEvaluationContext context, String process) {
+	def dispatch FluidFrame toSimulationModel(HDLVariableRef varRef, HDLEvaluationContext context, String process) {
+		val obj = varRef.redirectRef
 		val FluidFrame res = new FluidFrame(obj, process)
 		val String refName = obj.getVarName(false, context)
 		createPushIndex(obj.array, context, res, process, refName)
@@ -642,7 +654,7 @@ class SimulationTransformationExtension {
 				bits.add(r.toString)
 			}
 		}
-		var resVar = obj.resolveVarForced(PSEX_STAGE)
+		val resVar = obj.resolveVarForced("PSEX")
 		val HDLDirection dir = resVar.direction
 		switch (dir) {
 			case INTERNAL:
@@ -665,6 +677,17 @@ class SimulationTransformationExtension {
 				throw new HDLCodeGenerationException(obj, "Failed to resolve direction:" + dir, "PSEX")
 		}
 		return res
+	}
+
+	def redirectRef(HDLVariableRef varRef) {
+		val resVar = varRef.resolveVarForced(PSEX_STAGE)
+		val memAnno = resVar.getAnnotation(HDLBuiltInAnnotations.memory)
+		var obj = varRef
+		if (memAnno !== null) {
+			obj = (varRef.^var = HDLQualifiedName.create(memAnno.value))
+			obj = obj.copyDeepFrozen(varRef.container)
+		}
+		return obj
 	}
 
 	def dispatch FluidFrame toSimulationModel(HDLLiteral obj, HDLEvaluationContext context, String process) {

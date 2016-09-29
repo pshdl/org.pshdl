@@ -124,11 +124,16 @@ public class PStoEXCompiler extends PSAbstractCompiler implements IOutputProvide
 				return "The file: " + source + " can not be found";
 			files.add(source);
 		}
-		if (addFiles(files))
+		if (addFiles(files)) {
+			printErrors();
 			return "Exiting because of syntax errors in the input";
+		}
 		System.out.println("Validating:");
-		if (validatePackages())
+		final boolean hasError = validatePackages();
+		printErrors();
+		if (hasError)
 			return "Exiting because of errors in the input";
+		System.out.println("Validation complete");
 		final HDLUnit unit = findUnit(unitName);
 		if (unit == null)
 			return "Unit: " + unitName + " not found";

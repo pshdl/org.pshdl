@@ -35,9 +35,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -85,6 +87,7 @@ import org.pshdl.model.HDLResolvedRef;
 import org.pshdl.model.HDLShiftOp;
 import org.pshdl.model.HDLShiftOp.HDLShiftOpType;
 import org.pshdl.model.HDLStatement;
+import org.pshdl.model.HDLSubstituteFunction;
 import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLSwitchStatement;
 import org.pshdl.model.HDLTernary;
@@ -119,8 +122,10 @@ import org.pshdl.model.validation.builtin.BuiltInValidator;
 import org.pshdl.model.validation.builtin.BuiltInValidator.IntegerMeta;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 
@@ -158,12 +163,172 @@ public class Insulin {
 		apply = fortifyType(apply);
 		apply = removeAnyTypes(apply);
 		apply = resolveFragments(apply);
+		apply = prepareMemory(apply);
 		for (final IInsulinParticitant part : participants.values()) {
 			apply = part.postInsulin(apply, src);
 		}
 		apply.validateAllFields(orig.getContainer(), false);
 		apply.setMeta(insulated);
 		return apply;
+	}
+
+	private static <T extends IHDLObject> T prepareMemory(T apply) {
+		final ModificationSet ms = new ModificationSet();
+		final HDLUnit[] units;
+		if (apply instanceof HDLUnit) {
+			units = new HDLUnit[] { (HDLUnit) apply };
+		} else {
+			units = apply.getAllObjectsOf(HDLUnit.class, false);
+		}
+		for (final HDLUnit hdlUnit : units) {
+			final HDLVariableDeclaration[] hvds = hdlUnit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+			final Multimap<String, HDLVariableDeclaration> memoryMap = ArrayListMultimap.create();
+			for (final HDLVariableDeclaration hvd : hvds) {
+				final HDLAnnotation anno = hvd.getAnnotation(HDLBuiltInAnnotations.memory);
+				if (anno != null) {
+					memoryMap.put(anno.getValue(), hvd);
+				}
+			}
+			for (final Entry<String, Collection<HDLVariableDeclaration>> memMapEntry : memoryMap.asMap().entrySet()) {
+				final Collection<HDLVariableDeclaration> mem_hvds = memMapEntry.getValue();
+				final Iterator<HDLVariableDeclaration> iterator = mem_hvds.iterator();
+				iterator.hasNext();
+				final HDLVariableDeclaration first = iterator.next();
+				BigInteger thinnest = ConstantEvaluate.valueOfForced(first.getPrimitive().getWidth(), null, "Insulin");
+				BigInteger deepest = ConstantEvaluate.valueOfForced(first.getVariables().get(0).getDimensions().get(0), null, "Insulin");
+				while (iterator.hasNext()) {
+					final HDLVariableDeclaration other = iterator.next();
+					final BigInteger other_width = ConstantEvaluate.valueOfForced(other.getPrimitive().getWidth(), null, "Insulin");
+					final BigInteger other_depth = ConstantEvaluate.valueOfForced(other.getVariables().get(0).getDimensions().get(0), null, "Insulin");
+					if (thinnest.compareTo(other_width) > 0) {
+						thinnest = other_width;
+					}
+					if (deepest.compareTo(other_depth) < 0) {
+						deepest = other_depth;
+					}
+				}
+				// Create the shared variable memory
+				HDLVariableDeclaration shared = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(thinnest)))
+						.addAnnotations(HDLBuiltInAnnotations.sharedVar.create(null));
+				shared = shared.addVariables(new HDLVariable().setName(memMapEntry.getKey()).addDimensions(HDLLiteral.get(deepest)));
+				ms.insertBefore(first, shared);
+				final int memDepth = deepest.intValue();
+				final int memWidth = thinnest.intValue();
+				for (final HDLVariableDeclaration hvd : mem_hvds) {
+					final BigInteger other_width = ConstantEvaluate.valueOfForced(hvd.getPrimitive().getWidth(), null, "Insulin");
+					final int ratio = other_width.divide(thinnest).intValue();
+					// Only one variable per declaration
+					// Writes have to be registers
+					final HDLVariable variable = hvd.getVariables().get(0);
+					for (final HDLVariableRef ref : HDLQuery.getVarRefs(hdlUnit, variable)) {
+						final HDLAssignment assignment = ref.getContainer(HDLAssignment.class);
+						if (assignment.getLeft() == ref) {
+							// Other writes don't need fixing because they are
+							// registers
+							if (ratio != 1) {
+								fixMemWrites(ms, memDepth, memWidth, ratio, ref, assignment);
+							}
+						} else {
+							fixMemReads(ms, memDepth, memWidth, ratio, ref, assignment, hvd);
+						}
+					}
+				}
+			}
+		}
+		final T fixedMems = ms.apply(apply);
+		return fixedMems;
+	}
+
+	private static void fixMemReads(final ModificationSet ms, int memDepth, final int memWidth, final int ratio, final HDLVariableRef ref, final HDLAssignment assignment,
+			final HDLVariableDeclaration hvd) {
+		// Introduce a temporary read variable to generate
+		// the register to read from
+		final HDLVariable tempReadVar = new HDLVariable().setName(getTempName(null, "readMem"));
+		final HDLVariableDeclaration tempDecl = hvd.setVariables(Collections.singletonList(tempReadVar))
+				.setAnnotations(Collections.singletonList(HDLBuiltInAnnotations.VHDLNoExplicitReset.create(null)));
+		ms.insertAfter(hvd, tempDecl);
+		ms.replace(assignment, assignment.setRight(tempReadVar.asHDLRef()));
+		if (ratio == 1) {
+			final HDLAssignment origAss = new HDLAssignment().setType(HDLAssignmentType.ASSGN).setLeft(tempReadVar.asHDLRef()).setRight(ref);
+			ms.insertAfter(assignment, origAss);
+			return;
+		}
+		final HDLExpression addr = unwrapUintAddrCast(ref, memDepth, ratio);
+		final int bits = log2(ratio);
+		HDLVariableRef memRef;
+		if (assignment.getRight() == ref) {
+			memRef = tempReadVar.asHDLRef();
+		} else {
+			memRef = createTempVar(ms, assignment, assignment.getRight()).asHDLRef();
+		}
+		final HDLVariableRef emptyRef = ref.setArray(Collections.<HDLExpression> emptyList());
+		final List<HDLAssignment> newAssignments = Lists.newArrayList();
+		final HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(bits)));
+		for (int i = 0; i < ratio; i++) {
+			final HDLConcat concatedAddr = new HDLConcat().addCats(addr).addCats(cast.setTarget(HDLLiteral.get(ratio - 1 - i)));
+			final HDLExpression newAddress = new HDLManip().setCastTo(HDLPrimitive.getNatural()).setType(HDLManipType.CAST).setTarget(concatedAddr);
+			final HDLRange bitRange = new HDLRange().setFrom(HDLLiteral.get(((i + 1) * memWidth) - 1)).setTo(HDLLiteral.get(i * memWidth));
+			final HDLReference left = memRef.addBits(bitRange);
+			newAssignments.add(new HDLAssignment().setRight(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setLeft(left));
+		}
+		ms.insertAfter(assignment, newAssignments.toArray(new HDLAssignment[newAssignments.size()]));
+	}
+
+	public static HDLExpression unwrapUintAddrCast(final HDLVariableRef ref, int memDepth, int ratio) {
+		HDLExpression addr = ref.getArray().get(0);
+		// Unwrap the target casts added earlier in Insulin
+		// Unwrap the fortified uint32 cast
+		final HDLPrimitive addrWidth = HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(log2(memDepth / ratio)));
+		if (addr instanceof HDLManip) {
+			final HDLManip cast = (HDLManip) addr;
+			addr = cast.setCastTo(addrWidth);
+		} else {
+			addr = new HDLManip().setType(HDLManipType.CAST).setTarget(addr).setCastTo(addrWidth);
+		}
+		return addr;
+	}
+
+	public static HDLVariable createTempVar(final ModificationSet ms, final IHDLObject placeBefore, final HDLExpression assValue) {
+		final HDLType assType = TypeExtension.typeOfForced(assValue, "Insulin");
+		final HDLVariable tmpVar = new HDLVariable().setName(getTempName(null, "mem"));
+		final HDLAssignment tmpAss = new HDLAssignment().setLeft(tmpVar.asHDLRef()).setType(HDLAssignmentType.ASSGN).setRight(assValue);
+		final HDLVariableDeclaration tmpDecl = new HDLVariableDeclaration().addVariables(tmpVar).setType(assType);
+		ms.addTo(assValue.getContainer(HDLUnit.class), HDLUnit.fInits, tmpDecl, tmpAss);
+		return tmpVar;
+	}
+
+	private static void fixMemWrites(final ModificationSet ms, final int memDepth, final int memWidth, final int ratio, final HDLVariableRef ref, final HDLAssignment assignment) {
+		// Ratio needs to be power of 2
+		// Assignment needs to reference
+		final int bits = log2(ratio);
+		final HDLExpression addr = unwrapUintAddrCast(ref, memDepth, ratio);
+
+		// Create bit signal assignment if not reference
+		HDLVariableRef reference;
+		if (assignment.getRight() instanceof HDLVariableRef) {
+			reference = (HDLVariableRef) assignment.getRight();
+		} else {
+			reference = createTempVar(ms, assignment, assignment.getRight()).asHDLRef();
+		}
+		final HDLVariableRef emptyRef = ref.setArray(Collections.<HDLExpression> emptyList());
+		final List<HDLAssignment> newAssignments = Lists.newArrayList();
+		final HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(bits)));
+		for (int i = 0; i < ratio; i++) {
+			final HDLConcat concatedAddr = new HDLConcat().addCats(addr).addCats(cast.setTarget(HDLLiteral.get(ratio - 1 - i)));
+			final HDLExpression newAddress = new HDLManip().setCastTo(HDLPrimitive.getNatural()).setType(HDLManipType.CAST).setTarget(concatedAddr);
+			final HDLRange bitRange = new HDLRange().setFrom(HDLLiteral.get(((i + 1) * memWidth) - 1)).setTo(HDLLiteral.get(i * memWidth));
+			final HDLExpression right = reference.addBits(bitRange);
+			newAssignments.add(new HDLAssignment().setLeft(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setRight(right));
+		}
+		ms.replace(assignment, newAssignments.toArray(new HDLAssignment[newAssignments.size()]));
+	}
+
+	private static int log2(int ratio) {
+		for (int i = 0; i < 32; i++) {
+			if (ratio <= (1 << i))
+				return i;
+		}
+		return -1;
 	}
 
 	public static <T extends IHDLObject> T fixAnyTypeDeclarations(T pkg) {
@@ -293,13 +458,19 @@ public class Insulin {
 					.getAll();
 			for (final HDLVariableDeclaration hvd : allHVDs) {
 				final ArrayList<HDLVariable> newVars = Lists.newArrayList();
+				final List<HDLAssignment> defaults = Lists.newArrayList();
 				for (final HDLVariable var : hvd.getVariables()) {
 					final HDLQualifiedName fqn = FullNameExtension.fullNameOf(var);
 					final String newName = '$' + fqn.getLocalPart().toString('_').replace("@", "");
 					Refactoring.renameVariable(var, new HDLQualifiedName(newName), hdlUnit, ms);
-					newVars.add(var.setName(newName));
+					final HDLVariable newVar = var.setName(newName).setDefaultValue(null);
+					newVars.add(newVar);
+					if (var.getDefaultValue() != null) {
+						final HDLAssignment ass = new HDLAssignment().setLeft(newVar.asHDLRef()).setRight(var.getDefaultValue());
+						defaults.add(ass);
+					}
 				}
-				ms.remove(hvd);
+				ms.replace(hvd, defaults.toArray(new HDLAssignment[defaults.size()]));
 				ms.addTo(hdlUnit, HDLUnit.fInits, hvd.setVariables(newVars));
 			}
 		}
@@ -575,7 +746,7 @@ public class Insulin {
 			fqn = fqn.append(cFrag.getFrag());
 			final Optional<ResolvedPart> attemptResolve = attemptResolve(cFrag, fqn);
 			if (attemptResolve.isPresent()) {
-				final Optional<ResolvedPart> methodChaining = tryMethodChaining(cFrag, Optional.of(attemptResolve.get().obj));
+				final Optional<ResolvedPart> methodChaining = tryMethodChaining(cFrag, attemptResolve.get().obj);
 				if (methodChaining.isPresent())
 					return methodChaining;
 				return attemptResolve;
@@ -623,28 +794,28 @@ public class Insulin {
 		return Optional.absent();
 	}
 
-	private static Optional<ResolvedPart> tryMethodChaining(HDLUnresolvedFragment cFrag, Optional<? extends IHDLObject> attemptResolve) {
+	private static Optional<ResolvedPart> tryMethodChaining(HDLUnresolvedFragment cFrag, IHDLObject resolvedArgument) {
 		final HDLUnresolvedFragment sub = cFrag.getSub();
 		if (sub instanceof HDLUnresolvedFragmentFunction) {
 			final HDLUnresolvedFragmentFunction huf = (HDLUnresolvedFragmentFunction) sub;
-			/*
-			 * final HDLQualifiedName funcName =
-			 * HDLQualifiedName.create(huf.getFrag()); final
-			 * Optional<Iterable<HDLFunction>> function =
-			 * ScopingExtension.INST.resolveFunctionName(cFrag, funcName); if
-			 * (function.isPresent()) { final ArrayList<HDLExpression> params =
-			 * huf.getParams(); params.add(0, (HDLExpression)
-			 * attemptResolve.get()); final HDLFunctionCall funcCall = new
-			 * HDLFunctionCall().setFunction(funcName).setParams(params); final
-			 * Optional<HDLFunctionCall> funcOp = Optional.of(funcCall); final
-			 * Optional<ResolvedPart> methodChaining = tryMethodChaining(sub,
-			 * funcOp); if (methodChaining.isPresent()) return methodChaining;
-			 * if (funcOp.isPresent()) return Optional.of(new
-			 * ResolvedPart(funcOp.get(), sub.getSub())); return
-			 * Optional.absent(); }
-			 */
+			final ArrayList<HDLExpression> params = huf.getParams();
+			params.add(0, cFrag.setSub(null));
+			HDLFunctionCall call = new HDLFunctionCall().setFunction(HDLQualifiedName.create(huf.getFrag())).setParams(params);
+			if (sub.getSub() instanceof HDLUnresolvedFragmentFunction) {
+				call = addSubCall((HDLUnresolvedFragmentFunction) sub.getSub(), call);
+			}
+			return Optional.of(new ResolvedPart(call, null));
 		}
 		return Optional.absent();
+	}
+
+	private static HDLFunctionCall addSubCall(HDLUnresolvedFragmentFunction sub, HDLFunctionCall call) {
+		final ArrayList<HDLExpression> params = sub.getParams();
+		params.add(0, call);
+		final HDLFunctionCall newCall = new HDLFunctionCall().setFunction(HDLQualifiedName.create(sub.getFrag())).setParams(params);
+		if (sub.getSub() instanceof HDLUnresolvedFragmentFunction)
+			return addSubCall((HDLUnresolvedFragmentFunction) sub.getSub(), newCall);
+		return newCall;
 	}
 
 	public static class ResolvedPart {
@@ -987,6 +1158,8 @@ public class Insulin {
 
 	private static void generateInit(List<HDLExpression> ifDim, List<HDLExpression> varDim, ModificationSet ms, HDLVariable var, IHDLObject container, HDLExpression defaultValue,
 			HDLVariableRef setVar) {
+		if (var.getAnnotation(HDLBuiltInAnnotations.memory) != null)
+			return;
 		boolean synchedArray = false;
 		if (defaultValue instanceof HDLVariableRef) {
 			final HDLVariableRef ref = (HDLVariableRef) defaultValue;
@@ -1096,20 +1269,38 @@ public class Insulin {
 			// This can happen if the container is HDLPackage for example for
 			// global constants
 			return;
+		switch (container.getClassType()) {
+		case HDLUnit:
+			final HDLUnit unit = (HDLUnit) container;
+			ms.addTo(unit, HDLUnit.fInits, stmnt);
+			return;
+		case HDLBlock:
+			final HDLBlock block = (HDLBlock) container;
+			ms.insertBefore(block.getStatements().get(0), stmnt);
+			return;
+		case HDLForLoop:
+			final HDLForLoop loop = (HDLForLoop) container;
+			ms.insertBefore(loop.getDos().get(0), stmnt);
+			return;
+		case HDLSwitchCaseStatement:
+			final HDLSwitchCaseStatement cases = (HDLSwitchCaseStatement) container;
+			ms.insertBefore(cases.getDos().get(0), stmnt);
+			return;
+		case HDLSubstituteFunction:
+			final HDLSubstituteFunction subFunc = (HDLSubstituteFunction) container;
+			ms.insertBefore(subFunc.getStmnts().get(0), stmnt);
+			return;
+		case HDLIfStatement:
+			final HDLIfStatement ifStmnt = (HDLIfStatement) container;
+			// TODO Need to find solution to do this properly
+			insertFirstStatement(ms, container.getContainer(), stmnt);
+			return;
+		case HDLInterface:
+			return;
+		}
 		if ((container.getClassType() != HDLClass.HDLUnit) && (container.getClassType() != HDLClass.HDLBlock)) {
 			insertFirstStatement(ms, container.getContainer(), stmnt);
 			return;
-		}
-		if (container instanceof HDLInterface)
-			return;
-		if (container instanceof HDLUnit) {
-			final HDLUnit unit = (HDLUnit) container;
-			ms.addTo(unit, HDLUnit.fInits, stmnt);
-		}
-		if (container instanceof HDLBlock) {
-			final HDLBlock block = (HDLBlock) container;
-			final HDLStatement statement = block.getStatements().get(0);
-			ms.insertBefore(statement, stmnt);
 		}
 	}
 

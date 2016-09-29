@@ -66,6 +66,7 @@ import org.pshdl.model.utils.HDLResolver
 import org.pshdl.model.utils.MetaAccess
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
+import org.pshdl.model.HDLExport
 
 /**
  * The ScopingExtension allows the resolution of Enums, Interface, Variables by name
@@ -200,7 +201,7 @@ class ScopingExtension {
 	def dispatch  List<HDLVariable> doGetVariables(HDLDirectGeneration gen) {
 		return Collections.singletonList(gen.getVar)
 	}
-
+	
 	def dispatch List<HDLVariable> doGetVariables(HDLInlineFunction obj) {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		for (v : obj.args)

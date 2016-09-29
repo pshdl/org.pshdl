@@ -464,6 +464,7 @@ public class PSAbstractCompiler implements AutoCloseable {
 				}
 			}
 		}
+		System.out.flush();
 		return hasError;
 	}
 

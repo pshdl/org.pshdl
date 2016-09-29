@@ -357,15 +357,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
 
 	@Override
 	protected CharSequence fieldType(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
-		boolean _or = false;
-		final boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>) Conversions.doWrapArray(varInfo.dimensions)));
-		if (_isNullOrEmpty) {
-			_or = true;
-		} else {
-			final boolean _contains = attributes.contains(CommonCodeGenerator.Attributes.baseType);
-			_or = _contains;
-		}
-		if (_or) {
+		if ((IterableExtensions.isNullOrEmpty(((Iterable<?>) Conversions.doWrapArray(varInfo.dimensions))) || attributes.contains(CommonCodeGenerator.Attributes.baseType))) {
 			final boolean _equals = Objects.equal(varInfo.type, VariableInformation.Type.STRING);
 			if (_equals)
 				return "string";

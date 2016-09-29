@@ -261,7 +261,7 @@ public class StringWriteExtension {
 		final String sb = _xifexpression;
 		final String _entering = this.entering(frag, highlight);
 		final String _plus = (sb + _entering);
-		final String _stringFrag = this.toStringFrag(frag, highlight);
+		final String _stringFrag = this.toStringFrag(frag, highlight, false);
 		final String _plus_1 = (_plus + _stringFrag);
 		final StringConcatenation _builder = new StringConcatenation();
 		_builder.append("(");
@@ -280,6 +280,14 @@ public class StringWriteExtension {
 		}
 		_builder.append(")");
 		String res = (_plus_1 + _builder);
+		final HDLUnresolvedFragment _sub = frag.getSub();
+		final boolean _tripleNotEquals = (_sub != null);
+		if (_tripleNotEquals) {
+			final HDLUnresolvedFragment _sub_1 = frag.getSub();
+			final String _string_1 = this.toString(_sub_1, highlight);
+			final String _plus_2 = ((res + ".") + _string_1);
+			res = _plus_2;
+		}
 		final Boolean _isStatement_1 = frag.getIsStatement();
 		if ((_isStatement_1).booleanValue()) {
 			res = (res + ";");
@@ -290,7 +298,7 @@ public class StringWriteExtension {
 
 	protected String _toString(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight) {
 		final String _entering = this.entering(frag, highlight);
-		final String _stringFrag = this.toStringFrag(frag, highlight);
+		final String _stringFrag = this.toStringFrag(frag, highlight, true);
 		String string = (_entering + _stringFrag);
 		final Boolean _isStatement = frag.getIsStatement();
 		if ((_isStatement).booleanValue()) {
@@ -300,7 +308,7 @@ public class StringWriteExtension {
 		return (string + _leaving);
 	}
 
-	public String toStringFrag(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight) {
+	public String toStringFrag(final HDLUnresolvedFragment frag, final SyntaxHighlighter highlight, final boolean doSub) {
 		final StringBuilder sb = new StringBuilder();
 		final String _frag = frag.getFrag();
 		sb.append(_frag);
@@ -342,12 +350,10 @@ public class StringWriteExtension {
 			}
 		}
 		sb.append(_builder_1);
-		final HDLUnresolvedFragment _sub = frag.getSub();
-		final boolean _tripleNotEquals = (_sub != null);
-		if (_tripleNotEquals) {
+		if ((doSub && (frag.getSub() != null))) {
 			final StringBuilder _append = sb.append(".");
-			final HDLUnresolvedFragment _sub_1 = frag.getSub();
-			final String _string_2 = this.toString(_sub_1, highlight);
+			final HDLUnresolvedFragment _sub = frag.getSub();
+			final String _string_2 = this.toString(_sub, highlight);
 			_append.append(_string_2);
 		}
 		return sb.toString();

@@ -2741,24 +2741,22 @@ public class PSHDLLangParser extends Parser {
 			{
 				setState(449);
 				psVariable();
-				{
-					setState(450);
-					_la = _input.LA(1);
-					if (!((_la == T__14) || (_la == MUL))) {
-						_errHandler.recoverInline(this);
-					} else {
-						consume();
-					}
-					setState(452);
-					_la = _input.LA(1);
-					if (_la == RULE_ID) {
-						{
-							setState(451);
-							psVariableMatch();
-						}
-					}
-
+				setState(450);
+				_la = _input.LA(1);
+				if (!((_la == T__14) || (_la == MUL))) {
+					_errHandler.recoverInline(this);
+				} else {
+					consume();
 				}
+				setState(452);
+				_la = _input.LA(1);
+				if (_la == RULE_ID) {
+					{
+						setState(451);
+						psVariableMatch();
+					}
+				}
+
 			}
 		} catch (final RecognitionException re) {
 			_localctx.exception = re;

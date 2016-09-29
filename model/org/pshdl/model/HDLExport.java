@@ -35,8 +35,11 @@ import javax.annotation.Nullable;
 import org.pshdl.model.extensions.TypeExtension;
 import org.pshdl.model.impl.AbstractHDLExport;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
+import org.pshdl.model.utils.HDLProblemException;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+import org.pshdl.model.validation.Problem;
+import org.pshdl.model.validation.builtin.ErrorCode;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -209,6 +212,16 @@ public class HDLExport extends AbstractHDLExport {
 		if (getVarRefName() == null)
 			return Optional.absent();
 		return Optional.of((HDLInterfaceRef) new HDLInterfaceRef().setHIf(getHIfRefName()).setVar(getVarRefName()).freeze(this));
+	}
+
+	@Override
+	public void validateAllFields(IHDLObject expectedParent, boolean checkResolve) {
+		validateHIf(getHIfRefName());
+		if (checkResolve && (getHIfRefName() != null))
+			if (!resolveHIf().isPresent())
+				throw new HDLProblemException(new Problem(ErrorCode.UNRESOLVED_REFERENCE, this, "to:" + getHIfRefName()));
+		validateVar(getVarRefName());
+		validateMatch(getMatch());
 	}
 
 	// $CONTENT-END$

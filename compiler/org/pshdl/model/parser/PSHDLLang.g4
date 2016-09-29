@@ -151,7 +151,7 @@ psVariable :
 ;
 
 psVariableMatch: 
-	psVariable (('*' | '?') psVariableMatch?)
+	psVariable ('*' | '?') psVariableMatch?
 ;
 
 psStatement :

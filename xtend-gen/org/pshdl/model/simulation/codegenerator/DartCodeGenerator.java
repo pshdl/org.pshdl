@@ -319,16 +319,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		if (_isBoolean) {
 			jt = "bool";
 		}
-		boolean _and = false;
-		final boolean _isArray = this.isArray(information);
-		if (!_isArray) {
-			_and = false;
-		} else {
-			final boolean _contains = attributes.contains(CommonCodeGenerator.Attributes.baseType);
-			final boolean _not = (!_contains);
-			_and = _not;
-		}
-		if (_and) {
+		if ((this.isArray(information) && (!attributes.contains(CommonCodeGenerator.Attributes.baseType)))) {
 			final boolean _equals = Objects.equal(jt, "bool");
 			if (_equals) {
 				final StringConcatenation _builder = new StringConcatenation();

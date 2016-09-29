@@ -35,13 +35,16 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.pshdl.model.HDLAnnotation;
 import org.pshdl.model.HDLArithOp;
 import org.pshdl.model.HDLAssignment;
 import org.pshdl.model.HDLClass;
 import org.pshdl.model.HDLDeclaration;
 import org.pshdl.model.HDLEnumDeclaration;
 import org.pshdl.model.HDLEnumRef;
+import org.pshdl.model.HDLExport;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLForLoop;
 import org.pshdl.model.HDLFunction;
@@ -52,6 +55,7 @@ import org.pshdl.model.HDLInterfaceRef;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLManip.HDLManipType;
+import org.pshdl.model.HDLObject;
 import org.pshdl.model.HDLOpExpression;
 import org.pshdl.model.HDLPackage;
 import org.pshdl.model.HDLRange;
@@ -67,10 +71,12 @@ import org.pshdl.model.IHDLObject;
 import org.pshdl.model.evaluation.ConstantEvaluate;
 import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 public class Refactoring {
@@ -255,7 +261,8 @@ public class Refactoring {
 
 	public static <T extends IHDLObject> void renameVariable(HDLVariable hdlVariable, HDLQualifiedName newName, T obj, ModificationSet ms) {
 		ms.replace(hdlVariable, hdlVariable.setName(newName.getLastSegment()));
-		final HDLClass classType = hdlVariable.getContainer().getClassType();
+		final IHDLObject container = hdlVariable.getContainer();
+		final HDLClass classType = container.getClassType();
 		switch (classType) {
 		case HDLEnum:
 			final Collection<HDLEnumRef> enumRefs = HDLQuery.getEnumRefs(obj, hdlVariable);
@@ -298,11 +305,21 @@ public class Refactoring {
 		}
 		subUnit = addArrayReference(subUnit, outerDims, iterNames);
 		subUnit = addNewDimensions(subUnit, outerDims);
-		subUnit = changeDirection(subUnit);
+		final ModificationSet res = new ModificationSet();
+		final HDLExport[] exports = container.getAllObjectsOf(HDLExport.class, true);
+		final Set<String> exportedVars = Sets.newHashSet();
+		for (final HDLExport hdlExport : exports) {
+			final ArrayList<HDLInterfaceRef> variables = hdlExport.resolveVariables().get();
+			for (final HDLInterfaceRef hir : variables) {
+				final HDLVariable variable = hir.resolveVarForced("PSEX");
+				exportedVars.add(hir.getHIfRefName().getLastSegment() + "_" + variable.getName());
+			}
+			res.remove(hdlExport);
+		}
+		subUnit = changeDirection(subUnit, exportedVars);
 		subUnit = dereferenceRefs(subUnit);
 		subUnit = Insulin.generateClkAndReset(subUnit);
 
-		final ModificationSet res = new ModificationSet();
 		final Collection<HDLInterfaceRef> ifRefs = HDLQuery.getInterfaceRefs(container, hiVar);
 		for (final HDLInterfaceRef hir : ifRefs) {
 			final HDLQualifiedName newName = HDLQualifiedName.create(prefix + separator + hir.getVarRefName().getLastSegment());
@@ -442,7 +459,7 @@ public class Refactoring {
 		return subMS.apply(subUnit);
 	}
 
-	private static HDLUnit changeDirection(HDLUnit subUnit) {
+	private static HDLUnit changeDirection(HDLUnit subUnit, Set<String> exportedVars) {
 		final ModificationSet subMS = new ModificationSet();
 		final HDLVariableDeclaration[] hvds = subUnit.getAllObjectsOf(HDLVariableDeclaration.class, true);
 		for (final HDLVariableDeclaration hvd : hvds) {
@@ -450,7 +467,23 @@ public class Refactoring {
 			case IN:
 			case OUT:
 			case INOUT:
-				subMS.replace(hvd, hvd.setDirection(HDLDirection.INTERNAL));
+				final List<HDLVariable> alteredVars = Lists.newArrayList();
+				final List<HDLVariable> exportVars = Lists.newArrayList();
+				for (final HDLVariable var : hvd.getVariables()) {
+					if (!exportedVars.contains(var.getName())) {
+						alteredVars.add(var);
+					} else {
+						exportVars.add(var);
+					}
+				}
+				if (!alteredVars.isEmpty()) {
+					subMS.insertBefore(hvd, hvd.setDirection(HDLDirection.INTERNAL).setVariables(alteredVars));
+				}
+				if (!exportVars.isEmpty()) {
+					subMS.replace(hvd, hvd.setVariables(exportVars));
+				} else {
+					subMS.remove(hvd);
+				}
 				break;
 			default:
 				break;
@@ -496,6 +529,15 @@ public class Refactoring {
 				newName = prefix + '_' + hdlVariable.getName();
 			} else {
 				newName = prefix + separator + hdlVariable.getName();
+			}
+			if (hdlVariable.getAnnotation(HDLBuiltInAnnotations.sharedVar) != null) {
+				final HDLVariableDeclaration[] hdvs = subUnit.getAllObjectsOf(HDLVariableDeclaration.class, true);
+				for (final HDLVariableDeclaration hvd : hdvs) {
+					final HDLAnnotation anno = hvd.getAnnotation(HDLBuiltInAnnotations.memory);
+					if (anno != null) {
+						subMS.replace(hvd, hvd.setAnnotations(HDLObject.asList(anno.setValue(newName))));
+					}
+				}
 			}
 			Refactoring.renameVariable(hdlVariable, HDLQualifiedName.create(newName), subUnit, subMS);
 		}

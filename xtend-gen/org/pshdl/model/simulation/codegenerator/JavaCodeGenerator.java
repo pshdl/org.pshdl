@@ -192,16 +192,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		if (_isBoolean) {
 			res = "boolean";
 		}
-		boolean _and = false;
-		final boolean _isArray = this.isArray(varInfo);
-		if (!_isArray) {
-			_and = false;
-		} else {
-			final boolean _contains = attributes.contains(CommonCodeGenerator.Attributes.baseType);
-			final boolean _not = (!_contains);
-			_and = _not;
-		}
-		if (_and)
+		if ((this.isArray(varInfo) && (!attributes.contains(CommonCodeGenerator.Attributes.baseType))))
 			return (res + "[]");
 		return res;
 	}
@@ -669,15 +660,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append("(){");
 		_builder.newLineIfNotEmpty();
 		{
-			boolean _or = false;
-			final boolean _isPredicate = this.isPredicate(aliased);
-			if (_isPredicate) {
-				_or = true;
-			} else {
-				final boolean _isArray = this.isArray(aliased);
-				_or = _isArray;
-			}
-			if (_or) {
+			if ((this.isPredicate(aliased) || this.isArray(aliased))) {
 				_builder.append("\t");
 				_builder.append("return ");
 				final CharSequence _idName_1 = this.idName(aliased, true, CommonCodeGenerator.NONE);
@@ -709,15 +692,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 		_builder.append(" newVal){");
 		_builder.newLineIfNotEmpty();
 		{
-			boolean _or_1 = false;
-			final boolean _isPredicate_1 = this.isPredicate(aliased);
-			if (_isPredicate_1) {
-				_or_1 = true;
-			} else {
-				final boolean _isArray_1 = this.isArray(aliased);
-				_or_1 = _isArray_1;
-			}
-			if (_or_1) {
+			if ((this.isPredicate(aliased) || this.isArray(aliased))) {
 				_builder.append("\t");
 				final CharSequence _idName_4 = this.idName(aliased, true, CommonCodeGenerator.NONE);
 				_builder.append(_idName_4, "\t");
@@ -820,28 +795,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 						for (final Iterator<Frame> iterator = matchingFrames.iterator(); iterator.hasNext();) {
 							{
 								final Frame frame_1 = iterator.next();
-								boolean _and = false;
-								if (!this.purgeAliases) {
-									_and = false;
-								} else {
-									final boolean _isRename = frame_1.isRename(this.em);
-									_and = _isRename;
-								}
-								final boolean _not_1 = (!_and);
+								final boolean _not_1 = (!(this.purgeAliases && frame_1.isRename(this.em)));
 								if (_not_1) {
 									final int _talCosts = totalCosts;
 									final int _estimateFrameCosts = this.estimateFrameCosts(frame_1);
 									totalCosts = (_talCosts + _estimateFrameCosts);
 									final CharSequence call = this.predicateCheckedFrameCall(frame_1);
 									current.executionCore.append(call);
-									boolean _and_1 = false;
-									if (!(totalCosts > 10)) {
-										_and_1 = false;
-									} else {
-										final boolean _hasNext = iterator.hasNext();
-										_and_1 = _hasNext;
-									}
-									if (_and_1) {
+									if (((totalCosts > 10) && iterator.hasNext())) {
 										totalCosts = 0;
 										final JavaCodeGenerator.ExecutionPhase _executionPhase = new JavaCodeGenerator.ExecutionPhase(stage);
 										current = _executionPhase;
@@ -1102,18 +1063,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 	}
 
 	protected boolean isTestbench() {
-		boolean _and = false;
-		final boolean _isNullOrEmpty = IterableExtensions.isNullOrEmpty(((Iterable<?>) Conversions.doWrapArray(this.em.annotations)));
-		final boolean _not = (!_isNullOrEmpty);
-		if (!_not) {
-			_and = false;
-		} else {
-			final String _name = HDLSimulator.TB_UNIT.getName();
-			final String _substring = _name.substring(1);
-			final boolean _contains = ((List<String>) Conversions.doWrapArray(this.em.annotations)).contains(_substring);
-			_and = _contains;
-		}
-		return _and;
+		return ((!IterableExtensions.isNullOrEmpty(((Iterable<?>) Conversions.doWrapArray(this.em.annotations))))
+				&& ((List<String>) Conversions.doWrapArray(this.em.annotations)).contains(HDLSimulator.TB_UNIT.getName().substring(1)));
 	}
 
 	@Override
@@ -1732,8 +1683,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 					final Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation> filter(
 							((Iterable<VariableInformation>) Conversions.doWrapArray(this.em.variables)), new Function1<VariableInformation, Boolean>() {
 								@Override
-								public Boolean apply(VariableInformation arg0) {
-									return filter.apply(arg0);
+								public Boolean apply(VariableInformation p) {
+									return filter.apply(p);
 								}
 							});
 					for (final VariableInformation varInfo : _filter) {
@@ -1792,8 +1743,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 					final Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation> filter(_excludeNullAndAlias,
 							new Function1<VariableInformation, Boolean>() {
 								@Override
-								public Boolean apply(VariableInformation arg0) {
-									return filter.apply(arg0);
+								public Boolean apply(VariableInformation p) {
+									return filter.apply(p);
 								}
 							});
 					for (final VariableInformation varInfo_1 : _filter_1) {
@@ -1826,8 +1777,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
 			final Iterable<VariableInformation> _excludeNullAndAlias_1 = this.excludeNullAndAlias(((Iterable<VariableInformation>) Conversions.doWrapArray(this.em.variables)));
 			final Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation> filter(_excludeNullAndAlias_1, new Function1<VariableInformation, Boolean>() {
 				@Override
-				public Boolean apply(VariableInformation arg0) {
-					return filter.apply(arg0);
+				public Boolean apply(VariableInformation p) {
+					return filter.apply(p);
 				}
 			});
 			for (final VariableInformation varInfo_2 : _filter_2) {
