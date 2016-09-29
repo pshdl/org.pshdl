@@ -29,7 +29,6 @@ package org.pshdl.model.parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -81,6 +80,9 @@ import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableDeclaration;
 import org.pshdl.model.HDLVariableRef;
 import org.pshdl.model.IHDLObject;
+import org.pshdl.model.parser.PSHDLLangLexer;
+import org.pshdl.model.parser.PSHDLLangParser;
+import org.pshdl.model.parser.SourceInfo;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.HDLQualifiedName;
 
@@ -1154,12 +1156,14 @@ public class ParserToModelExtension {
     HDLFunctionParameter res = _hDLFunctionParameter.setConstant(false);
     final PSHDLLangParser.PsFuncParamTypeContext x = context;
     boolean _matched = false;
-    TerminalNode _ANY_INT = x.ANY_INT();
-    boolean _tripleNotEquals = (_ANY_INT != null);
-    if (_tripleNotEquals) {
-      _matched=true;
-      HDLFunctionParameter _setType = res.setType(HDLFunctionParameter.Type.PARAM_ANY_INT);
-      res = _setType;
+    if (!_matched) {
+      TerminalNode _ANY_INT = x.ANY_INT();
+      boolean _tripleNotEquals = (_ANY_INT != null);
+      if (_tripleNotEquals) {
+        _matched=true;
+        HDLFunctionParameter _setType = res.setType(HDLFunctionParameter.Type.PARAM_ANY_INT);
+        res = _setType;
+      }
     }
     if (!_matched) {
       TerminalNode _ANY_UINT = x.ANY_UINT();
