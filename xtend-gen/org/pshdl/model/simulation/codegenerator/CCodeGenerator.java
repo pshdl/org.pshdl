@@ -1283,30 +1283,37 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     final LinkedHashMap<String, Integer> rowCounts = new LinkedHashMap<String, Integer>();
     for (final Row row : rows) {
       {
-        final Integer idx = rowCounts.get(row.name);
+        String _name = row.getName();
+        final Integer idx = rowCounts.get(_name);
         if ((idx == null)) {
-          rowCounts.put(row.name, Integer.valueOf(1));
+          String _name_1 = row.getName();
+          rowCounts.put(_name_1, Integer.valueOf(1));
         } else {
-          rowCounts.put(row.name, Integer.valueOf(((idx).intValue() + 1)));
+          String _name_2 = row.getName();
+          rowCounts.put(_name_2, Integer.valueOf(((idx).intValue() + 1)));
         }
       }
     }
     for (final Row row_1 : rows) {
-      boolean _contains = checkedRows.contains(row_1.name);
+      String _name = row_1.getName();
+      boolean _contains = checkedRows.contains(_name);
       boolean _not = (!_contains);
       if (_not) {
         boolean _hasWriteDefs = this.ba.hasWriteDefs(row_1);
         if (_hasWriteDefs) {
-          Integer _get = rowCounts.get(row_1.name);
+          String _name_1 = row_1.getName();
+          Integer _get = rowCounts.get(_name_1);
           CharSequence _simSetter = this.simSetter(row_1, (_get).intValue());
           String _plus = (res + _simSetter);
           res = _plus;
         }
-        Integer _get_1 = rowCounts.get(row_1.name);
+        String _name_2 = row_1.getName();
+        Integer _get_1 = rowCounts.get(_name_2);
         CharSequence _simGetter = this.simGetter(row_1, (_get_1).intValue());
         String _plus_1 = (res + _simGetter);
         res = _plus_1;
-        checkedRows.add(row_1.name);
+        String _name_3 = row_1.getName();
+        checkedRows.add(_name_3);
       }
     }
     return res;
@@ -1346,7 +1353,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append(" ");
     _builder.append("* Directly retrieve the fields of row ");
-    _builder.append(row.name, " ");
+    String _name = row.getName();
+    _builder.append(_name, " ");
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
@@ -1395,7 +1403,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int get");
-    String _firstUpper = StringExtensions.toFirstUpper(row.name);
+    String _name_1 = row.getName();
+    String _firstUpper = StringExtensions.toFirstUpper(_name_1);
     _builder.append(_firstUpper, "");
     _builder.append("Direct(uint32_t *base, uint32_t index");
     {
@@ -1437,7 +1446,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append(" ");
     _builder.append("* Retrieve the fields of row ");
-    _builder.append(row.name, " ");
+    String _name_2 = row.getName();
+    _builder.append(_name_2, " ");
     _builder.append(" into the struct.");
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
@@ -1477,15 +1487,18 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int get");
-    String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+    String _name_3 = row.getName();
+    String _firstUpper_1 = StringExtensions.toFirstUpper(_name_3);
     _builder.append(_firstUpper_1, "");
     _builder.append("(uint32_t *base, uint32_t index, ");
-    _builder.append(row.name, "");
+    String _name_4 = row.getName();
+    _builder.append(_name_4, "");
     _builder.append("_t *result){");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("return get");
-    String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+    String _name_5 = row.getName();
+    String _firstUpper_2 = StringExtensions.toFirstUpper(_name_5);
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
@@ -1561,7 +1574,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int set");
-    String _firstUpper = StringExtensions.toFirstUpper(row.name);
+    String _name = row.getName();
+    String _firstUpper = StringExtensions.toFirstUpper(_name);
     _builder.append(_firstUpper, "");
     _builder.append("Direct(uint32_t *base, uint32_t index");
     {
@@ -1683,15 +1697,18 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int set");
-    String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+    String _name_1 = row.getName();
+    String _firstUpper_1 = StringExtensions.toFirstUpper(_name_1);
     _builder.append(_firstUpper_1, "");
     _builder.append("(uint32_t *base, uint32_t index, ");
-    _builder.append(row.name, "");
+    String _name_2 = row.getName();
+    _builder.append(_name_2, "");
     _builder.append("_t *newVal) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("return set");
-    String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+    String _name_3 = row.getName();
+    String _firstUpper_2 = StringExtensions.toFirstUpper(_name_3);
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {

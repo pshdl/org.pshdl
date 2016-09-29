@@ -281,7 +281,8 @@ public class BusAccess {
     final LinkedHashSet<String> checkedRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
-        boolean _contains = checkedRows.contains(row.name);
+        String _name = row.getName();
+        boolean _contains = checkedRows.contains(_name);
         boolean _not = (!_contains);
         if (_not) {
           StringConcatenation _builder_1 = new StringConcatenation();
@@ -289,7 +290,8 @@ public class BusAccess {
           _builder_1.newLine();
           _builder_1.append(" ");
           _builder_1.append("* Prints the values within the ");
-          _builder_1.append(row.name, " ");
+          String _name_1 = row.getName();
+          _builder_1.append(_name_1, " ");
           _builder_1.append(" struct");
           _builder_1.newLineIfNotEmpty();
           _builder_1.append(" ");
@@ -302,18 +304,21 @@ public class BusAccess {
           String _prefix = this.getPrefix(prefix);
           _builder_1.append(_prefix, "");
           _builder_1.append("print");
-          String _firstUpper = StringExtensions.toFirstUpper(row.name);
+          String _name_2 = row.getName();
+          String _firstUpper = StringExtensions.toFirstUpper(_name_2);
           _builder_1.append(_firstUpper, "");
           _builder_1.append("(");
           String _prefix_1 = this.getPrefix(prefix);
           _builder_1.append(_prefix_1, "");
-          _builder_1.append(row.name, "");
+          String _name_3 = row.getName();
+          _builder_1.append(_name_3, "");
           _builder_1.append("_t *data);");
           _builder_1.newLineIfNotEmpty();
           String _plus = (res + _builder_1);
           res = _plus;
         }
-        checkedRows.add(row.name);
+        String _name_4 = row.getName();
+        checkedRows.add(_name_4);
       }
     }
     return res;
@@ -325,7 +330,8 @@ public class BusAccess {
     final LinkedHashSet<String> checkedRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
-        boolean _contains = checkedRows.contains(row.name);
+        String _name = row.getName();
+        boolean _contains = checkedRows.contains(_name);
         boolean _not = (!_contains);
         if (_not) {
           StringConcatenation _builder_1 = new StringConcatenation();
@@ -333,17 +339,20 @@ public class BusAccess {
           String _prefix = this.getPrefix(prefix);
           _builder_1.append(_prefix, "");
           _builder_1.append("print");
-          String _firstUpper = StringExtensions.toFirstUpper(row.name);
+          String _name_1 = row.getName();
+          String _firstUpper = StringExtensions.toFirstUpper(_name_1);
           _builder_1.append(_firstUpper, "");
           _builder_1.append("(");
           String _prefix_1 = this.getPrefix(prefix);
           _builder_1.append(_prefix_1, "");
-          _builder_1.append(row.name, "");
+          String _name_2 = row.getName();
+          _builder_1.append(_name_2, "");
           _builder_1.append("_t *data){");
           _builder_1.newLineIfNotEmpty();
           _builder_1.append("    ");
           _builder_1.append("printf(\"");
-          String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+          String _name_3 = row.getName();
+          String _firstUpper_1 = StringExtensions.toFirstUpper(_name_3);
           _builder_1.append(_firstUpper_1, "    ");
           _builder_1.append(" ");
           {
@@ -376,7 +385,8 @@ public class BusAccess {
           String _plus = (res + _builder_1);
           res = _plus;
         }
-        checkedRows.add(row.name);
+        String _name_4 = row.getName();
+        checkedRows.add(_name_4);
       }
     }
     return res;
@@ -498,7 +508,8 @@ public class BusAccess {
     for (final Row row : rows) {
       {
         final LinkedHashSet<String> checkedDefs = new LinkedHashSet<String>();
-        boolean _contains = checkedRows.contains(row.name);
+        String _name = row.getName();
+        boolean _contains = checkedRows.contains(_name);
         boolean _not = (!_contains);
         if (_not) {
           StringConcatenation _builder_1 = new StringConcatenation();
@@ -508,7 +519,8 @@ public class BusAccess {
           _builder_1.newLine();
           _builder_1.append(" ");
           _builder_1.append("* This struct stores all fields that are declared within row ");
-          _builder_1.append(row.name, " ");
+          String _name_1 = row.getName();
+          _builder_1.append(_name_1, " ");
           _builder_1.newLineIfNotEmpty();
           _builder_1.append(" ");
           _builder_1.append("*/");
@@ -516,7 +528,8 @@ public class BusAccess {
           _builder_1.append("typedef struct ");
           String _prefix = this.getPrefix(prefix);
           _builder_1.append(_prefix, "");
-          _builder_1.append(row.name, "");
+          String _name_2 = row.getName();
+          _builder_1.append(_name_2, "");
           _builder_1.append(" {");
           _builder_1.newLineIfNotEmpty();
           {
@@ -535,7 +548,8 @@ public class BusAccess {
                   _builder_1.append("///Field ");
                   _builder_1.append(d.name, "\t");
                   _builder_1.append(" within row ");
-                  _builder_1.append(row.name, "\t");
+                  String _name_3 = row.getName();
+                  _builder_1.append(_name_3, "\t");
                   _builder_1.newLineIfNotEmpty();
                   _builder_1.append("\t");
                   CharSequence _busType = this.getBusType(d);
@@ -552,7 +566,8 @@ public class BusAccess {
           _builder_1.append("} ");
           String _prefix_1 = this.getPrefix(prefix);
           _builder_1.append(_prefix_1, "");
-          _builder_1.append(row.name, "");
+          String _name_4 = row.getName();
+          _builder_1.append(_name_4, "");
           _builder_1.append("_t;");
           _builder_1.newLineIfNotEmpty();
           String _plus = (res + _builder_1);
@@ -569,7 +584,8 @@ public class BusAccess {
             String _prefix_2 = this.getPrefix(prefix);
             _builder_2.append(_prefix_2, "");
             _builder_2.append("set");
-            String _firstUpper = StringExtensions.toFirstUpper(row.name);
+            String _name_5 = row.getName();
+            String _firstUpper = StringExtensions.toFirstUpper(_name_5);
             _builder_2.append(_firstUpper, "");
             _builder_2.append("Direct(uint32_t *base, uint32_t index");
             {
@@ -588,12 +604,14 @@ public class BusAccess {
             String _prefix_3 = this.getPrefix(prefix);
             _builder_2.append(_prefix_3, "");
             _builder_2.append("set");
-            String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+            String _name_6 = row.getName();
+            String _firstUpper_1 = StringExtensions.toFirstUpper(_name_6);
             _builder_2.append(_firstUpper_1, "");
             _builder_2.append("(uint32_t *base, uint32_t index, ");
             String _prefix_4 = this.getPrefix(prefix);
             _builder_2.append(_prefix_4, "");
-            _builder_2.append(row.name, "");
+            String _name_7 = row.getName();
+            _builder_2.append(_name_7, "");
             _builder_2.append("_t *newVal);");
             _builder_2.newLineIfNotEmpty();
             String _plus_1 = (res + _builder_2);
@@ -609,7 +627,8 @@ public class BusAccess {
           String _prefix_5 = this.getPrefix(prefix);
           _builder_3.append(_prefix_5, "");
           _builder_3.append("get");
-          String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+          String _name_8 = row.getName();
+          String _firstUpper_2 = StringExtensions.toFirstUpper(_name_8);
           _builder_3.append(_firstUpper_2, "");
           _builder_3.append("Direct(uint32_t *base, uint32_t index");
           {
@@ -628,17 +647,20 @@ public class BusAccess {
           String _prefix_6 = this.getPrefix(prefix);
           _builder_3.append(_prefix_6, "");
           _builder_3.append("get");
-          String _firstUpper_3 = StringExtensions.toFirstUpper(row.name);
+          String _name_9 = row.getName();
+          String _firstUpper_3 = StringExtensions.toFirstUpper(_name_9);
           _builder_3.append(_firstUpper_3, "");
           _builder_3.append("(uint32_t *base, uint32_t index, ");
           String _prefix_7 = this.getPrefix(prefix);
           _builder_3.append(_prefix_7, "");
-          _builder_3.append(row.name, "");
+          String _name_10 = row.getName();
+          _builder_3.append(_name_10, "");
           _builder_3.append("_t *result);");
           _builder_3.newLineIfNotEmpty();
           String _plus_2 = (res + _builder_3);
           res = _plus_2;
-          checkedRows.add(row.name);
+          String _name_11 = row.getName();
+          checkedRows.add(_name_11);
         }
       }
     }
@@ -842,13 +864,15 @@ public class BusAccess {
     final LinkedHashSet<String> doneRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
-        final boolean handled = doneRows.contains(row.name);
+        String _name = row.getName();
+        final boolean handled = doneRows.contains(_name);
         if ((!handled)) {
           CharSequence _generateGetterFunction = this.generateGetterFunction(row, prefix, rows);
           String _plus = (res + _generateGetterFunction);
           res = _plus;
         }
-        doneRows.add(row.name);
+        String _name_1 = row.getName();
+        doneRows.add(_name_1);
       }
     }
     return res;
@@ -863,7 +887,8 @@ public class BusAccess {
     String _prefix = this.getPrefix(prefix);
     _builder.append(_prefix, "");
     _builder.append("get");
-    String _firstUpper = StringExtensions.toFirstUpper(row.name);
+    String _name = row.getName();
+    String _firstUpper = StringExtensions.toFirstUpper(_name);
     _builder.append(_firstUpper, "");
     _builder.append("Direct(uint32_t *base, uint32_t index");
     {
@@ -923,12 +948,14 @@ public class BusAccess {
     String _prefix_1 = this.getPrefix(prefix);
     _builder.append(_prefix_1, "");
     _builder.append("get");
-    String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+    String _name_1 = row.getName();
+    String _firstUpper_1 = StringExtensions.toFirstUpper(_name_1);
     _builder.append(_firstUpper_1, "");
     _builder.append("(uint32_t *base, uint32_t index, ");
     String _prefix_2 = this.getPrefix(prefix);
     _builder.append(_prefix_2, "");
-    _builder.append(row.name, "");
+    String _name_2 = row.getName();
+    _builder.append(_name_2, "");
     _builder.append("_t *result){");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -936,7 +963,8 @@ public class BusAccess {
     String _prefix_3 = this.getPrefix(prefix);
     _builder.append(_prefix_3, "\t");
     _builder.append("get");
-    String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+    String _name_3 = row.getName();
+    String _firstUpper_2 = StringExtensions.toFirstUpper(_name_3);
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
@@ -1012,7 +1040,9 @@ public class BusAccess {
     final Function1<Row, Boolean> _function = new Function1<Row, Boolean>() {
       @Override
       public Boolean apply(final Row it) {
-        return Boolean.valueOf(Objects.equal(it.name, row.name));
+        String _name = it.getName();
+        String _name_1 = row.getName();
+        return Boolean.valueOf(Objects.equal(_name, _name_1));
       }
     };
     Iterable<Row> _filter = IterableExtensions.<Row>filter(rows, _function);
@@ -1030,7 +1060,8 @@ public class BusAccess {
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
     _builder.append("* Retrieve the fields of row ");
-    _builder.append(row.name, " ");
+    String _name = row.getName();
+    _builder.append(_name, " ");
     _builder.append(" into the struct.");
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
@@ -1151,7 +1182,8 @@ public class BusAccess {
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
     _builder.append("* Directly retrieve the fields of row ");
-    _builder.append(row.name, " ");
+    String _name = row.getName();
+    _builder.append(_name, " ");
     _builder.append(".");
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
@@ -1216,20 +1248,15 @@ public class BusAccess {
     final LinkedHashSet<String> doneRows = new LinkedHashSet<String>();
     for (final Row row : rows) {
       {
-        final boolean handled = doneRows.contains(row.name);
-        boolean _and = false;
-        if (!(!handled)) {
-          _and = false;
-        } else {
-          boolean _hasWriteDefs = this.hasWriteDefs(row);
-          _and = _hasWriteDefs;
-        }
-        if (_and) {
+        String _name = row.getName();
+        final boolean handled = doneRows.contains(_name);
+        if (((!handled) && this.hasWriteDefs(row))) {
           CharSequence _generateSetterFunction = this.generateSetterFunction(row, prefix, rows);
           String _plus = (res + _generateSetterFunction);
           res = _plus;
         }
-        doneRows.add(row.name);
+        String _name_1 = row.getName();
+        doneRows.add(_name_1);
       }
     }
     return res;
@@ -1244,7 +1271,8 @@ public class BusAccess {
     String _prefix = this.getPrefix(prefix);
     _builder.append(_prefix, "");
     _builder.append("set");
-    String _firstUpper = StringExtensions.toFirstUpper(row.name);
+    String _name = row.getName();
+    String _firstUpper = StringExtensions.toFirstUpper(_name);
     _builder.append(_firstUpper, "");
     _builder.append("Direct(uint32_t *base, uint32_t index");
     {
@@ -1284,7 +1312,8 @@ public class BusAccess {
     String _prefix_1 = this.getPrefix(prefix);
     _builder.append(_prefix_1, "\t");
     _builder.append("warn(invalidIndex, index, \"\", \"");
-    _builder.append(row.name, "\t");
+    String _name_1 = row.getName();
+    _builder.append(_name_1, "\t");
     _builder.append("\", \"\");");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -1300,12 +1329,14 @@ public class BusAccess {
     String _prefix_2 = this.getPrefix(prefix);
     _builder.append(_prefix_2, "");
     _builder.append("set");
-    String _firstUpper_1 = StringExtensions.toFirstUpper(row.name);
+    String _name_2 = row.getName();
+    String _firstUpper_1 = StringExtensions.toFirstUpper(_name_2);
     _builder.append(_firstUpper_1, "");
     _builder.append("(uint32_t *base, uint32_t index, ");
     String _prefix_3 = this.getPrefix(prefix);
     _builder.append(_prefix_3, "");
-    _builder.append(row.name, "");
+    String _name_3 = row.getName();
+    _builder.append(_name_3, "");
     _builder.append("_t *newVal) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -1313,7 +1344,8 @@ public class BusAccess {
     String _prefix_4 = this.getPrefix(prefix);
     _builder.append(_prefix_4, "\t");
     _builder.append("set");
-    String _firstUpper_2 = StringExtensions.toFirstUpper(row.name);
+    String _name_4 = row.getName();
+    String _firstUpper_2 = StringExtensions.toFirstUpper(_name_4);
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
@@ -1457,7 +1489,9 @@ public class BusAccess {
     String res = _builder.toString();
     for (final Row r : rows) {
       {
-        boolean _equals = r.name.equals(row.name);
+        String _name = r.getName();
+        String _name_1 = row.getName();
+        boolean _equals = _name.equals(_name_1);
         if (_equals) {
           StringConcatenation _builder_1 = new StringConcatenation();
           _builder_1.append("case ");
@@ -1480,7 +1514,8 @@ public class BusAccess {
     String _prefix = this.getPrefix(prefix);
     _builder_1.append(_prefix, "\t");
     _builder_1.append("warn(invalidIndex, index, \"\", \"");
-    _builder_1.append(row.name, "\t");
+    String _name = row.getName();
+    _builder_1.append(_name, "\t");
     _builder_1.append("\", \"\"); ");
     _builder_1.newLineIfNotEmpty();
     _builder_1.append("\t");
@@ -1502,7 +1537,9 @@ public class BusAccess {
     String res = _builder.toString();
     for (final Row r : rows) {
       {
-        boolean _equals = r.name.equals(row.name);
+        String _name = r.getName();
+        String _name_1 = row.getName();
+        boolean _equals = _name.equals(_name_1);
         if (_equals) {
           StringConcatenation _builder_1 = new StringConcatenation();
           _builder_1.append("case ");
@@ -1595,7 +1632,8 @@ public class BusAccess {
             String _varNameIndex = this.getVarNameIndex(row, d);
             _builder.append(_varNameIndex, "\t");
             _builder.append("\", \"");
-            _builder.append(row.name, "\t");
+            String _name = row.getName();
+            _builder.append(_name, "\t");
             _builder.append("\", \"using ");
             String _maxValueHex_3 = this.getMaxValueHex(d);
             _builder.append(_maxValueHex_3, "\t");
@@ -1632,7 +1670,8 @@ public class BusAccess {
                 String _varNameIndex_1 = this.getVarNameIndex(row, d);
                 _builder.append(_varNameIndex_1, "\t");
                 _builder.append("\", \"");
-                _builder.append(row.name, "\t");
+                String _name_1 = row.getName();
+                _builder.append(_name_1, "\t");
                 _builder.append("\", \"using ");
                 String _maxValueNegHex_3 = this.getMaxValueNegHex(d);
                 _builder.append(_maxValueNegHex_3, "\t");
@@ -1715,7 +1754,8 @@ public class BusAccess {
                 String _varNameIndex_2 = this.getVarNameIndex(row, d);
                 _builder.append(_varNameIndex_2, "\t");
                 _builder.append("\", \"");
-                _builder.append(row.name, "\t");
+                String _name_2 = row.getName();
+                _builder.append(_name_2, "\t");
                 _builder.append("\", \"masking with ");
                 String _maxValueHex_8 = this.getMaxValueHex(d);
                 _builder.append(_maxValueHex_8, "\t");
@@ -1752,7 +1792,8 @@ public class BusAccess {
                     String _varNameIndex_3 = this.getVarNameIndex(row, d);
                     _builder.append(_varNameIndex_3, "\t");
                     _builder.append("\", \"");
-                    _builder.append(row.name, "\t");
+                    String _name_3 = row.getName();
+                    _builder.append(_name_3, "\t");
                     _builder.append("\", \"masking with ");
                     String _maxValueNegHex_8 = this.getMaxValueNegHex(d);
                     _builder.append(_maxValueNegHex_8, "\t");
@@ -1825,7 +1866,8 @@ public class BusAccess {
                     String _varNameIndex_4 = this.getVarNameIndex(row, d);
                     _builder.append(_varNameIndex_4, "\t");
                     _builder.append("\", \"");
-                    _builder.append(row.name, "\t");
+                    String _name_4 = row.getName();
+                    _builder.append(_name_4, "\t");
                     _builder.append("\", \"returning with 0\");");
                     _builder.newLineIfNotEmpty();
                     _builder.append("\t");
@@ -1854,7 +1896,8 @@ public class BusAccess {
                         String _varNameIndex_5 = this.getVarNameIndex(row, d);
                         _builder.append(_varNameIndex_5, "\t");
                         _builder.append("\", \"");
-                        _builder.append(row.name, "\t");
+                        String _name_5 = row.getName();
+                        _builder.append(_name_5, "\t");
                         _builder.append("\", \"returning with 0\");");
                         _builder.newLineIfNotEmpty();
                         _builder.append("\t");

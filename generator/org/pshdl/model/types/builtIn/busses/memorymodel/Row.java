@@ -35,7 +35,7 @@ import org.antlr.v4.runtime.Token;
 import com.google.common.collect.Maps;
 
 public class Row implements NamedElement {
-	public final String name;
+	private final String name;
 	public Column column;
 	public List<NamedElement> definitions = new LinkedList<NamedElement>();
 	public int colIndex;
@@ -70,6 +70,10 @@ public class Row implements NamedElement {
 			def.arrayIndex = integer;
 			defCount.put(rowName, ++integer);
 		}
+	}
+
+	public String getOrigName() {
+		return name;
 	}
 
 	@Override

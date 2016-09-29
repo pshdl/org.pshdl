@@ -214,7 +214,7 @@ public class MemoryModel {
 	private static Row normalize(Unit unit, Row row) {
 		int usedSize = 0;
 		boolean fillFound = false;
-		final Row res = new Row(row.name);
+		final Row res = new Row(row.getOrigName());
 		final List<Definition> definitions = new LinkedList<Definition>();
 		final Definition unusedFill = new Definition();
 		unusedFill.name = "unused";

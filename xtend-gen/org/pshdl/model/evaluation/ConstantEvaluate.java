@@ -163,13 +163,7 @@ public class ConstantEvaluate {
         case STR:
           return Optional.<BigInteger>absent();
         case BOOL:
-          boolean _and = false;
-          if (!(context != null)) {
-            _and = false;
-          } else {
-            _and = context.boolAsInt;
-          }
-          if (_and) {
+          if (((context != null) && context.boolAsInt)) {
             HDLLiteral _false = HDLLiteral.getFalse();
             boolean _equals = obj.equals(_false);
             boolean _not = (!_equals);
@@ -552,13 +546,7 @@ public class ConstantEvaluate {
         HDLVariableDeclaration.HDLDirection _direction = hVar.getDirection();
         boolean _equals = Objects.equal(_direction, HDLVariableDeclaration.HDLDirection.CONSTANT);
         if (_equals) {
-          boolean _and = false;
-          if (!(context != null)) {
-            _and = false;
-          } else {
-            _and = context.ignoreConstantRefs;
-          }
-          if (_and) {
+          if (((context != null) && context.ignoreConstantRefs)) {
             return Optional.<BigInteger>absent();
           }
           final HDLExpression defVal = hVar.getDefaultValue();
@@ -579,23 +567,15 @@ public class ConstantEvaluate {
       return Optional.<BigInteger>absent();
     }
     final Optional<? extends HDLType> type = TypeExtension.typeOf(obj);
-    boolean _or = false;
-    boolean _isPresent_1 = type.isPresent();
-    boolean _not = (!_isPresent_1);
-    if (_not) {
-      _or = true;
-    } else {
-      _or = (!(type.get() instanceof HDLPrimitive));
-    }
-    if (_or) {
+    if (((!type.isPresent()) || (!(type.get() instanceof HDLPrimitive)))) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.TYPE_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
     final Optional<HDLVariable> hVar_1 = obj.resolveVar();
-    boolean _isPresent_2 = hVar_1.isPresent();
-    boolean _not_1 = (!_isPresent_2);
-    if (_not_1) {
+    boolean _isPresent_1 = hVar_1.isPresent();
+    boolean _not = (!_isPresent_1);
+    if (_not) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<BigInteger>absent();
@@ -614,20 +594,14 @@ public class ConstantEvaluate {
     final HDLVariableDeclaration.HDLDirection dir = _get_2.getDirection();
     boolean _equals_1 = Objects.equal(dir, HDLVariableDeclaration.HDLDirection.CONSTANT);
     if (_equals_1) {
-      boolean _and_1 = false;
-      if (!(context != null)) {
-        _and_1 = false;
-      } else {
-        _and_1 = context.ignoreConstantRefs;
-      }
-      if (_and_1) {
+      if (((context != null) && context.ignoreConstantRefs)) {
         return Optional.<BigInteger>absent();
       }
       HDLVariable _get_3 = hVar_1.get();
       HDLExpression _defaultValue = _get_3.getDefaultValue();
       final Optional<BigInteger> subEval = this.subEvaluate(obj, _defaultValue, context, evaled);
-      boolean _isPresent_3 = subEval.isPresent();
-      if (_isPresent_3) {
+      boolean _isPresent_2 = subEval.isPresent();
+      if (_isPresent_2) {
         evaled.remove(fqn);
       }
       return subEval;
@@ -653,15 +627,15 @@ public class ConstantEvaluate {
         return Optional.<BigInteger>absent();
       }
       final Optional<BigInteger> cRefEval = this.constantEvaluate(cRef, context, evaled);
-      boolean _isPresent_4 = cRefEval.isPresent();
-      boolean _not_2 = (!_isPresent_4);
-      if (_not_2) {
+      boolean _isPresent_3 = cRefEval.isPresent();
+      boolean _not_1 = (!_isPresent_3);
+      if (_not_1) {
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, cRef);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();
       }
-      boolean _isPresent_5 = cRefEval.isPresent();
-      if (_isPresent_5) {
+      boolean _isPresent_4 = cRefEval.isPresent();
+      if (_isPresent_4) {
         evaled.remove(fqn);
       }
       return cRefEval;
@@ -703,26 +677,10 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLEnumRef obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    boolean _and = false;
-    if (!(context != null)) {
-      _and = false;
-    } else {
-      _and = context.enumAsInt;
-    }
-    if (_and) {
+    if (((context != null) && context.enumAsInt)) {
       final Optional<HDLEnum> resolveHEnum = obj.resolveHEnum();
       final Optional<HDLVariable> resolveVar = obj.resolveVar();
-      boolean _or = false;
-      boolean _isPresent = resolveHEnum.isPresent();
-      boolean _not = (!_isPresent);
-      if (_not) {
-        _or = true;
-      } else {
-        boolean _isPresent_1 = resolveVar.isPresent();
-        boolean _not_1 = (!_isPresent_1);
-        _or = _not_1;
-      }
-      if (_or) {
+      if (((!resolveHEnum.isPresent()) || (!resolveVar.isPresent()))) {
         obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.FAILED_TO_RESOLVE_ENUM);
         return Optional.<BigInteger>absent();
