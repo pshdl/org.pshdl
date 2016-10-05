@@ -200,8 +200,11 @@ public class SimulationTransformationExtension {
     ArrayList<HDLFunctionParameter> _args = func.getArgs();
     List<ParameterInformation> _map = null;
     if (_args!=null) {
-      final Function1<HDLFunctionParameter, ParameterInformation> _function = (HDLFunctionParameter it) -> {
-        return this.toParameterInformation(it, context);
+      final Function1<HDLFunctionParameter, ParameterInformation> _function = new Function1<HDLFunctionParameter, ParameterInformation>() {
+        @Override
+        public ParameterInformation apply(final HDLFunctionParameter it) {
+          return SimulationTransformationExtension.this.toParameterInformation(it, context);
+        }
       };
       _map=ListExtensions.<HDLFunctionParameter, ParameterInformation>map(_args, _function);
     }
@@ -251,8 +254,11 @@ public class SimulationTransformationExtension {
     ArrayList<HDLFunctionParameter> _funcSpec = parameter.getFuncSpec();
     List<ParameterInformation> _map = null;
     if (_funcSpec!=null) {
-      final Function1<HDLFunctionParameter, ParameterInformation> _function = (HDLFunctionParameter it) -> {
-        return this.toParameterInformation(it, context);
+      final Function1<HDLFunctionParameter, ParameterInformation> _function = new Function1<HDLFunctionParameter, ParameterInformation>() {
+        @Override
+        public ParameterInformation apply(final HDLFunctionParameter it) {
+          return SimulationTransformationExtension.this.toParameterInformation(it, context);
+        }
       };
       _map=ListExtensions.<HDLFunctionParameter, ParameterInformation>map(_funcSpec, _function);
     }
@@ -279,9 +285,12 @@ public class SimulationTransformationExtension {
     ArrayList<HDLExpression> _dim = parameter.getDim();
     List<Integer> _map_1 = null;
     if (_dim!=null) {
-      final Function1<HDLExpression, Integer> _function_1 = (HDLExpression it) -> {
-        BigInteger _valueOfForced = ConstantEvaluate.valueOfForced(it, context, SimulationTransformationExtension.PSEX_STAGE);
-        return Integer.valueOf(_valueOfForced.intValue());
+      final Function1<HDLExpression, Integer> _function_1 = new Function1<HDLExpression, Integer>() {
+        @Override
+        public Integer apply(final HDLExpression it) {
+          BigInteger _valueOfForced = ConstantEvaluate.valueOfForced(it, context, SimulationTransformationExtension.PSEX_STAGE);
+          return Integer.valueOf(_valueOfForced.intValue());
+        }
       };
       _map_1=ListExtensions.<HDLExpression, Integer>map(_dim, _function_1);
     }
@@ -404,8 +413,11 @@ public class SimulationTransformationExtension {
           HDLAnnotation _hDLAnnotation = new HDLAnnotation();
           HDLAnnotation _setName = _hDLAnnotation.setName("@enumNames");
           ArrayList<HDLVariable> _enums = hEnum.getEnums();
-          final Function1<HDLVariable, String> _function = (HDLVariable it) -> {
-            return it.getName();
+          final Function1<HDLVariable, String> _function = new Function1<HDLVariable, String>() {
+            @Override
+            public String apply(final HDLVariable it) {
+              return it.getName();
+            }
           };
           List<String> _map = ListExtensions.<HDLVariable, String>map(_enums, _function);
           String _join = IterableExtensions.join(_map, ";");
@@ -513,21 +525,24 @@ public class SimulationTransformationExtension {
   }
   
   public String[] toAnnoString(final Iterable<HDLAnnotation> annotations) {
-    final Function1<HDLAnnotation, String> _function = (HDLAnnotation it) -> {
-      String _xifexpression = null;
-      String _value = it.getValue();
-      boolean _tripleEquals = (_value == null);
-      if (_tripleEquals) {
-        String _name = it.getName();
-        _xifexpression = _name.substring(1);
-      } else {
-        String _name_1 = it.getName();
-        String _substring = _name_1.substring(1);
-        String _plus = (_substring + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
-        String _value_1 = it.getValue();
-        _xifexpression = (_plus + _value_1);
+    final Function1<HDLAnnotation, String> _function = new Function1<HDLAnnotation, String>() {
+      @Override
+      public String apply(final HDLAnnotation it) {
+        String _xifexpression = null;
+        String _value = it.getValue();
+        boolean _tripleEquals = (_value == null);
+        if (_tripleEquals) {
+          String _name = it.getName();
+          _xifexpression = _name.substring(1);
+        } else {
+          String _name_1 = it.getName();
+          String _substring = _name_1.substring(1);
+          String _plus = (_substring + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
+          String _value_1 = it.getValue();
+          _xifexpression = (_plus + _value_1);
+        }
+        return _xifexpression;
       }
-      return _xifexpression;
     };
     return ((String[])Conversions.unwrapArray(IterableExtensions.<HDLAnnotation, String>map(annotations, _function), String.class));
   }

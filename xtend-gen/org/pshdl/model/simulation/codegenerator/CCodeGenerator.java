@@ -1087,8 +1087,11 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     CharSequence _fieldDeclarations = this.fieldDeclarations(false, false);
     String _string = _fieldDeclarations.toString();
     String[] _split = _string.split("\n");
-    final Function1<String, String> _function = (String it) -> {
-      return ("extern" + it);
+    final Function1<String, String> _function = new Function1<String, String>() {
+      @Override
+      public String apply(final String it) {
+        return ("extern" + it);
+      }
     };
     List<String> _map = ListExtensions.<String, String>map(((List<String>)Conversions.doWrapArray(_split)), _function);
     String _join = IterableExtensions.join(_map, "\n");
@@ -1137,17 +1140,26 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   private String generateSimEncapsuation(final Unit unit, final Iterable<Row> rows) {
     final Set<String> varNames = new LinkedHashSet<String>();
-    final Consumer<Row> _function = (Row it) -> {
-      List<Definition> _allDefs = this.ba.allDefs(it);
-      final Function1<Definition, Boolean> _function_1 = (Definition it_1) -> {
-        return Boolean.valueOf((it_1.type != Definition.Type.UNUSED));
-      };
-      Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function_1);
-      final Consumer<Definition> _function_2 = (Definition it_1) -> {
-        String _name = it_1.getName();
-        varNames.add(_name);
-      };
-      _filter.forEach(_function_2);
+    final Consumer<Row> _function = new Consumer<Row>() {
+      @Override
+      public void accept(final Row it) {
+        List<Definition> _allDefs = CCodeGenerator.this.ba.allDefs(it);
+        final Function1<Definition, Boolean> _function = new Function1<Definition, Boolean>() {
+          @Override
+          public Boolean apply(final Definition it) {
+            return Boolean.valueOf((it.type != Definition.Type.UNUSED));
+          }
+        };
+        Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
+        final Consumer<Definition> _function_1 = new Consumer<Definition>() {
+          @Override
+          public void accept(final Definition it) {
+            String _name = it.getName();
+            varNames.add(_name);
+          }
+        };
+        _filter.forEach(_function_1);
+      }
     };
     rows.forEach(_function);
     StringConcatenation _builder = new StringConcatenation();

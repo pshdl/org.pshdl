@@ -684,8 +684,11 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
       }
     }
     {
-      final Function1<VariableInformation, Boolean> _function = (VariableInformation it) -> {
-        return Boolean.valueOf(this.isArray(it));
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+        @Override
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf(GoCodeGenerator.this.isArray(it));
+        }
       };
       Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
       for(final VariableInformation v_1 : _filter) {

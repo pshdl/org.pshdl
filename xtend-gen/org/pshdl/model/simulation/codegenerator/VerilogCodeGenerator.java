@@ -59,8 +59,11 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
     _builder.append("(");
     _builder.newLineIfNotEmpty();
     {
-      final Function1<VariableInformation, Boolean> _function = (VariableInformation it) -> {
-        return Boolean.valueOf((it.dir != VariableInformation.Direction.INTERNAL));
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+        @Override
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf((it.dir != VariableInformation.Direction.INTERNAL));
+        }
       };
       Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
       boolean _hasElements = false;
@@ -170,12 +173,18 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("always @(");
     Collection<Frame> _get = this.writes.get(internal);
-    final Function1<Frame, Set<CharSequence>> _function = (Frame it) -> {
-      final Function1<Integer, CharSequence> _function_1 = (Integer it_1) -> {
-        return this.sensitiviyName(it_1);
-      };
-      List<CharSequence> _map = ListExtensions.<Integer, CharSequence>map(((List<Integer>)Conversions.doWrapArray(it.internalDependencies)), _function_1);
-      return IterableExtensions.<CharSequence>toSet(_map);
+    final Function1<Frame, Set<CharSequence>> _function = new Function1<Frame, Set<CharSequence>>() {
+      @Override
+      public Set<CharSequence> apply(final Frame it) {
+        final Function1<Integer, CharSequence> _function = new Function1<Integer, CharSequence>() {
+          @Override
+          public CharSequence apply(final Integer it) {
+            return VerilogCodeGenerator.this.sensitiviyName(it);
+          }
+        };
+        List<CharSequence> _map = ListExtensions.<Integer, CharSequence>map(((List<Integer>)Conversions.doWrapArray(it.internalDependencies)), _function);
+        return IterableExtensions.<CharSequence>toSet(_map);
+      }
     };
     Iterable<Set<CharSequence>> _map = IterableExtensions.<Frame, Set<CharSequence>>map(_get, _function);
     Iterable<CharSequence> _flatten = Iterables.<CharSequence>concat(_map);
@@ -189,13 +198,19 @@ public class VerilogCodeGenerator extends CommonCodeGenerator {
       Collection<Frame> _get_1 = this.writes.get(internal);
       for(final Frame f : _get_1) {
         _builder.append("\t");
-        final Function1<Integer, String> _function_1 = (Integer it) -> {
-          CharSequence _sensitiviyName = this.sensitiviyName(it);
-          return (_sensitiviyName + " == 0");
+        final Function1<Integer, String> _function_1 = new Function1<Integer, String>() {
+          @Override
+          public String apply(final Integer it) {
+            CharSequence _sensitiviyName = VerilogCodeGenerator.this.sensitiviyName(it);
+            return (_sensitiviyName + " == 0");
+          }
         };
         List<String> _map_1 = ListExtensions.<Integer, String>map(((List<Integer>)Conversions.doWrapArray(f.predNegDepRes)), _function_1);
-        final Function1<Integer, CharSequence> _function_2 = (Integer it) -> {
-          return this.sensitiviyName(it);
+        final Function1<Integer, CharSequence> _function_2 = new Function1<Integer, CharSequence>() {
+          @Override
+          public CharSequence apply(final Integer it) {
+            return VerilogCodeGenerator.this.sensitiviyName(it);
+          }
         };
         List<CharSequence> _map_2 = ListExtensions.<Integer, CharSequence>map(((List<Integer>)Conversions.doWrapArray(f.predPosDepRes)), _function_2);
         final Iterable<CharSequence> predSet = Iterables.<CharSequence>concat(_map_1, _map_2);

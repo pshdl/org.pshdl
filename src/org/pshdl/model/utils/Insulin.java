@@ -1513,9 +1513,11 @@ public class Insulin {
 			for (final HDLExpression hdlExpression : catExp) {
 				final HDLPrimitive typeOf = (HDLPrimitive) getTypeOf(hdlExpression);
 				switch (typeOf.getType()) {
-				case BIT:
 				case BITVECTOR:
 					continue;
+				case BIT:
+					cast(ms, typeOf.setType(HDLPrimitiveType.BITVECTOR).setWidth(HDLLiteral.get(1)), hdlExpression);
+					break;
 				case INT:
 				case UINT:
 					cast(ms, typeOf.setType(HDLPrimitiveType.BITVECTOR), hdlExpression);
