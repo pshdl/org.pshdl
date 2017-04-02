@@ -1025,10 +1025,13 @@ public class BusAccess {
   }
   
   public int count(final List<Row> rows, final Row row) {
-    final Function1<Row, Boolean> _function = (Row it) -> {
-      String _name = it.getName();
-      String _name_1 = row.getName();
-      return Boolean.valueOf(Objects.equal(_name, _name_1));
+    final Function1<Row, Boolean> _function = new Function1<Row, Boolean>() {
+      @Override
+      public Boolean apply(final Row it) {
+        String _name = it.getName();
+        String _name_1 = row.getName();
+        return Boolean.valueOf(Objects.equal(_name, _name_1));
+      }
     };
     return ((Object[])Conversions.unwrapArray(IterableExtensions.<Row>filter(rows, _function), Object.class)).length;
   }
@@ -1894,8 +1897,11 @@ public class BusAccess {
   }
   
   public boolean hasWriteDefs(final Row row) {
-    final Function1<NamedElement, Boolean> _function = (NamedElement it) -> {
-      return Boolean.valueOf(this.hasWrite(it));
+    final Function1<NamedElement, Boolean> _function = new Function1<NamedElement, Boolean>() {
+      @Override
+      public Boolean apply(final NamedElement it) {
+        return Boolean.valueOf(BusAccess.this.hasWrite(it));
+      }
     };
     NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(row.definitions, _function);
     return (_findFirst != null);

@@ -554,8 +554,11 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function = (VariableInformation it) -> {
-        return Boolean.valueOf((it.dir == VariableInformation.Direction.IN));
+      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
+        @Override
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf((it.dir == VariableInformation.Direction.IN));
+        }
       };
       Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
       boolean _hasElements = false;
@@ -575,8 +578,11 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function_1 = (VariableInformation it) -> {
-        return Boolean.valueOf((it.dir == VariableInformation.Direction.INOUT));
+      final Function1<VariableInformation, Boolean> _function_1 = new Function1<VariableInformation, Boolean>() {
+        @Override
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf((it.dir == VariableInformation.Direction.INOUT));
+        }
       };
       Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_1);
       boolean _hasElements_1 = false;
@@ -596,8 +602,11 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function_2 = (VariableInformation it) -> {
-        return Boolean.valueOf((it.dir == VariableInformation.Direction.OUT));
+      final Function1<VariableInformation, Boolean> _function_2 = new Function1<VariableInformation, Boolean>() {
+        @Override
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf((it.dir == VariableInformation.Direction.OUT));
+        }
       };
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_2);
       boolean _hasElements_2 = false;
@@ -617,8 +626,11 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function_3 = (VariableInformation it) -> {
-        return Boolean.valueOf((it.dir == VariableInformation.Direction.INTERNAL));
+      final Function1<VariableInformation, Boolean> _function_3 = new Function1<VariableInformation, Boolean>() {
+        @Override
+        public Boolean apply(final VariableInformation it) {
+          return Boolean.valueOf((it.dir == VariableInformation.Direction.INTERNAL));
+        }
       };
       Iterable<VariableInformation> _filter_3 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_3);
       boolean _hasElements_3 = false;
