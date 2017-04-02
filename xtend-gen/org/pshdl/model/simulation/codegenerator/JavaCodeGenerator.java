@@ -85,11 +85,11 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     public CharSequence declare() {
       StringConcatenation _builder = new StringConcatenation();
       CharSequence _field = this.field();
-      _builder.append(_field, "");
+      _builder.append(_field);
       _builder.newLineIfNotEmpty();
       _builder.append("public final void ");
       CharSequence _methodName = this.methodName();
-      _builder.append(_methodName, "");
+      _builder.append(_methodName);
       _builder.append("(){");
       _builder.newLineIfNotEmpty();
       _builder.append("\t");
@@ -111,19 +111,19 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("stage");
       String _format = String.format("%03x", Integer.valueOf(this.stage));
-      _builder.append(_format, "");
+      _builder.append(_format);
       _builder.append("phase");
       String _format_1 = String.format("%04x", Integer.valueOf(this.id));
-      _builder.append(_format_1, "");
+      _builder.append(_format_1);
       return _builder;
     }
     
     public CharSequence call() {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("if (execPhase");
-      _builder.append(this.id, "");
+      _builder.append(this.id);
       _builder.append(" != ");
-      _builder.append(CommonCodeGenerator.TIMESTAMP.name, "");
+      _builder.append(CommonCodeGenerator.TIMESTAMP.name);
       _builder.append("){");
       _builder.newLineIfNotEmpty();
       _builder.append("\t");
@@ -139,7 +139,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     public CharSequence field() {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("long execPhase");
-      _builder.append(this.id, "");
+      _builder.append(this.id);
       _builder.append("=-1;");
       _builder.newLineIfNotEmpty();
       return _builder;
@@ -234,8 +234,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("switch (idx) {");
     _builder.newLine();
     _builder.append("\t\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg);
-    CharSequence _setInputCases = this.setInputCases("value", null, _of);
+    CharSequence _setInputCases = this.setInputCases("value", null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg));
     _builder.append(_setInputCases, "\t\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
@@ -320,8 +319,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("switch (idx) {");
     _builder.newLine();
     _builder.append("\t\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg);
-    CharSequence _outputCases = this.getOutputCases(null, _of_1);
+    CharSequence _outputCases = this.getOutputCases(null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg));
     _builder.append(_outputCases, "\t\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t\t");
@@ -392,11 +390,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         String[] _annotations = v_1.annotations;
         String _join = null;
         if (((Iterable<String>)Conversions.doWrapArray(_annotations))!=null) {
-          final Function1<String, CharSequence> _function = new Function1<String, CharSequence>() {
-            @Override
-            public CharSequence apply(final String it) {
-              return it;
-            }
+          final Function1<String, CharSequence> _function = (String it) -> {
+            return it;
           };
           _join=IterableExtensions.<String>join(((Iterable<String>)Conversions.doWrapArray(_annotations)), "\"", ",", "\"", _function);
         }
@@ -461,7 +456,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if ((this.executionCores != 0)) {
         StringBuilder _makeThreads = this.makeThreads();
-        _builder.append(_makeThreads, "");
+        _builder.append(_makeThreads);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -511,7 +506,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("public JavaPSHDLLib pshdl=new JavaPSHDLLib(this);");
         _builder.newLine();
         StringBuilder _generateInlineMethods = this.generateInlineMethods();
-        _builder.append(_generateInlineMethods, "");
+        _builder.append(_generateInlineMethods);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -530,10 +525,10 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           StringConcatenation _builder = new StringConcatenation();
           _builder.append("private ");
           String _java = this.toJava(fi.returnType);
-          _builder.append(_java, "");
+          _builder.append(_java);
           _builder.append(" ");
           String _signature = fi.signature();
-          _builder.append(_signature, "");
+          _builder.append(_signature);
           _builder.append("(");
           {
             boolean _hasElements = false;
@@ -544,18 +539,17 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
                 _builder.appendImmediate(", ", "");
               }
               String _java_1 = this.toJava(pi);
-              _builder.append(_java_1, "");
+              _builder.append(_java_1);
               _builder.append(" p");
               String _firstUpper = StringExtensions.toFirstUpper(pi.name);
-              _builder.append(_firstUpper, "");
+              _builder.append(_firstUpper);
             }
           }
           _builder.append("){");
           _builder.newLineIfNotEmpty();
           _builder.append("\t");
           _builder.append("new org.pshdl.interpreter.utils.PSHDLFormatter(System.out, p");
-          ParameterInformation _head = IterableExtensions.<ParameterInformation>head(((Iterable<ParameterInformation>)Conversions.doWrapArray(fi.parameter)));
-          String _firstUpper_1 = StringExtensions.toFirstUpper(_head.name);
+          String _firstUpper_1 = StringExtensions.toFirstUpper(IterableExtensions.<ParameterInformation>head(((Iterable<ParameterInformation>)Conversions.doWrapArray(fi.parameter))).name);
           _builder.append(_firstUpper_1, "\t");
           _builder.append(").format(");
           {
@@ -580,10 +574,10 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           StringConcatenation _builder_1 = new StringConcatenation();
           _builder_1.append("private ");
           String _java_2 = this.toJava(fi.returnType);
-          _builder_1.append(_java_2, "");
+          _builder_1.append(_java_2);
           _builder_1.append(" ");
           String _signature_1 = fi.signature();
-          _builder_1.append(_signature_1, "");
+          _builder_1.append(_signature_1);
           _builder_1.append("(");
           {
             boolean _hasElements_2 = false;
@@ -594,10 +588,10 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
                 _builder_1.appendImmediate(", ", "");
               }
               String _java_3 = this.toJava(pi_2);
-              _builder_1.append(_java_3, "");
+              _builder_1.append(_java_3);
               _builder_1.append(" p");
               String _firstUpper_3 = StringExtensions.toFirstUpper(pi_2.name);
-              _builder_1.append(_firstUpper_3, "");
+              _builder_1.append(_firstUpper_3);
             }
           }
           _builder_1.append("){");
@@ -654,28 +648,24 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("public ");
     CharSequence _fieldType = this.fieldType(v, CommonCodeGenerator.NONE);
-    _builder.append(_fieldType, "");
+    _builder.append(_fieldType);
     _builder.append(" get");
-    CharSequence _idName = this.idName(v, false, CommonCodeGenerator.NONE);
-    String _string = _idName.toString();
-    String _firstUpper = StringExtensions.toFirstUpper(_string);
-    _builder.append(_firstUpper, "");
+    String _firstUpper = StringExtensions.toFirstUpper(this.idName(v, false, CommonCodeGenerator.NONE).toString());
+    _builder.append(_firstUpper);
     _builder.append("(){");
     _builder.newLineIfNotEmpty();
     {
       if ((this.isPredicate(aliased) || this.isArray(aliased))) {
         _builder.append("\t");
         _builder.append("return ");
-        CharSequence _idName_1 = this.idName(aliased, true, CommonCodeGenerator.NONE);
-        _builder.append(_idName_1, "\t");
+        CharSequence _idName = this.idName(aliased, true, CommonCodeGenerator.NONE);
+        _builder.append(_idName, "\t");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
       } else {
         _builder.append("\t");
         _builder.append("return ");
-        CharSequence _idName_2 = this.idName(aliased, true, CommonCodeGenerator.NONE);
-        int _targetSizeWithType = this.getTargetSizeWithType(aliased);
-        CharSequence _fixupValue = this.fixupValue(_idName_2, _targetSizeWithType, true);
+        CharSequence _fixupValue = this.fixupValue(this.idName(aliased, true, CommonCodeGenerator.NONE), this.getTargetSizeWithType(aliased), true);
         _builder.append(_fixupValue, "\t");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
@@ -685,29 +675,26 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.newLine();
     _builder.newLine();
     _builder.append("public void set");
-    CharSequence _idName_3 = this.idName(v, false, CommonCodeGenerator.NONE);
-    String _string_1 = _idName_3.toString();
-    String _firstUpper_1 = StringExtensions.toFirstUpper(_string_1);
-    _builder.append(_firstUpper_1, "");
+    String _firstUpper_1 = StringExtensions.toFirstUpper(this.idName(v, false, CommonCodeGenerator.NONE).toString());
+    _builder.append(_firstUpper_1);
     _builder.append("(");
     CharSequence _fieldType_1 = this.fieldType(v, CommonCodeGenerator.NONE);
-    _builder.append(_fieldType_1, "");
+    _builder.append(_fieldType_1);
     _builder.append(" newVal){");
     _builder.newLineIfNotEmpty();
     {
       if ((this.isPredicate(aliased) || this.isArray(aliased))) {
         _builder.append("\t");
-        CharSequence _idName_4 = this.idName(aliased, true, CommonCodeGenerator.NONE);
-        _builder.append(_idName_4, "\t");
+        CharSequence _idName_1 = this.idName(aliased, true, CommonCodeGenerator.NONE);
+        _builder.append(_idName_1, "\t");
         _builder.append("=newVal;");
         _builder.newLineIfNotEmpty();
       } else {
         _builder.append("\t");
-        CharSequence _idName_5 = this.idName(aliased, true, CommonCodeGenerator.NONE);
-        _builder.append(_idName_5, "\t");
+        CharSequence _idName_2 = this.idName(aliased, true, CommonCodeGenerator.NONE);
+        _builder.append(_idName_2, "\t");
         _builder.append("=");
-        int _targetSizeWithType_1 = this.getTargetSizeWithType(aliased);
-        CharSequence _fixupValue_1 = this.fixupValue("newVal", _targetSizeWithType_1, true);
+        CharSequence _fixupValue_1 = this.fixupValue("newVal", this.getTargetSizeWithType(aliased), true);
         _builder.append(_fixupValue_1, "\t");
         _builder.append(";");
         _builder.newLineIfNotEmpty();
@@ -727,23 +714,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       final Set<Integer> handledPosEdges = Sets.<Integer>newLinkedHashSet();
       final Set<Integer> handledPredicates = Sets.<Integer>newLinkedHashSet();
       final Multimap<Integer, Frame> stageFrames = LinkedHashMultimap.<Integer, Frame>create();
-      final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
-        @Override
-        public Boolean apply(final Frame it) {
-          return Boolean.valueOf((!it.constant));
-        }
+      final Function1<Frame, Boolean> _function = (Frame it) -> {
+        return Boolean.valueOf((!it.constant));
       };
-      Iterable<Frame> _filter = IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(this.em.frames)), _function);
-      final Consumer<Frame> _function_1 = new Consumer<Frame>() {
-        @Override
-        public void accept(final Frame it) {
-          stageFrames.put(Integer.valueOf(it.scheduleStage), it);
-        }
+      final Consumer<Frame> _function_1 = (Frame it) -> {
+        stageFrames.put(Integer.valueOf(it.scheduleStage), it);
       };
-      _filter.forEach(_function_1);
-      Set<Integer> _keySet = stageFrames.keySet();
-      List<Integer> _sort = IterableExtensions.<Integer>sort(_keySet);
-      int maxStage = (int) IterableExtensions.<Integer>last(_sort);
+      IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(this.em.frames)), _function).forEach(_function_1);
+      int maxStage = (int) IterableExtensions.<Integer>last(IterableExtensions.<Integer>sort(stageFrames.keySet()));
       final StringBuilder ctrlThread = new StringBuilder();
       final StringBuilder phaseMethods = new StringBuilder();
       final List<StringBuilder> execution = Lists.<StringBuilder>newArrayListWithCapacity(this.executionCores);
@@ -762,29 +740,25 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             for (final Frame frame : matchingFrames) {
               {
                 final CharSequence negEdge = this.handleEdge(handledNegEdges, false, frame.edgeNegDepRes);
-                String _string = negEdge.toString();
-                boolean _isEmpty = _string.isEmpty();
+                boolean _isEmpty = negEdge.toString().isEmpty();
                 boolean _not_1 = (!_isEmpty);
                 if (_not_1) {
                   ctrlThread.append(negEdge);
                 }
                 final CharSequence posEdge = this.handleEdge(handledPosEdges, true, frame.edgePosDepRes);
-                String _string_1 = posEdge.toString();
-                boolean _isEmpty_1 = _string_1.isEmpty();
+                boolean _isEmpty_1 = posEdge.toString().isEmpty();
                 boolean _not_2 = (!_isEmpty_1);
                 if (_not_2) {
                   ctrlThread.append(posEdge);
                 }
                 final CharSequence negPred = this.handlePredicates(handledPredicates, false, frame.predNegDepRes);
-                String _string_2 = negPred.toString();
-                boolean _isEmpty_2 = _string_2.isEmpty();
+                boolean _isEmpty_2 = negPred.toString().isEmpty();
                 boolean _not_3 = (!_isEmpty_2);
                 if (_not_3) {
                   ctrlThread.append(negPred);
                 }
                 final CharSequence posPred = this.handlePredicates(handledPredicates, true, frame.predPosDepRes);
-                String _string_3 = posPred.toString();
-                boolean _isEmpty_3 = _string_3.isEmpty();
+                boolean _isEmpty_3 = posPred.toString().isEmpty();
                 boolean _not_4 = (!_isEmpty_3);
                 if (_not_4) {
                   ctrlThread.append(posPred);
@@ -814,38 +788,22 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
                 }
               }
             }
-            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_2 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-              @Override
-              public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                return it.declare();
-              }
+            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_2 = (JavaCodeGenerator.ExecutionPhase it) -> {
+              return it.declare();
             };
-            List<CharSequence> _map = ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_2);
-            String _join = IterableExtensions.join(_map);
-            phaseMethods.append(_join);
-            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_3 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-              @Override
-              public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                return it.call();
-              }
+            phaseMethods.append(IterableExtensions.join(ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_2)));
+            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_3 = (JavaCodeGenerator.ExecutionPhase it) -> {
+              return it.call();
             };
-            List<CharSequence> _map_1 = ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_3);
-            String _join_1 = IterableExtensions.join(_map_1);
-            ctrlThread.append(_join_1);
+            ctrlThread.append(IterableExtensions.join(ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_3)));
             ExclusiveRange _doubleDotLessThan_2 = new ExclusiveRange(0, this.executionCores, true);
             for (final int i_1 : _doubleDotLessThan_2) {
               {
                 Collections.shuffle(phases, this.r);
-                StringBuilder _get = execution.get(i_1);
-                final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_4 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-                  @Override
-                  public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                    return it.call();
-                  }
+                final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_4 = (JavaCodeGenerator.ExecutionPhase it) -> {
+                  return it.call();
                 };
-                List<CharSequence> _map_2 = ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_4);
-                String _join_2 = IterableExtensions.join(_map_2);
-                _get.append(_join_2);
+                execution.get(i_1).append(IterableExtensions.join(ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_4)));
               }
             }
           }
@@ -856,7 +814,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       for (final int tid : _doubleDotLessThan_2) {
         StringConcatenation _builder = new StringConcatenation();
         _builder.append("private final Thread thread");
-        _builder.append(tid, "");
+        _builder.append(tid);
         _builder.append("=new Thread(){");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -958,16 +916,16 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           final StringBuilder slave = slaves.get((i).intValue());
           StringConcatenation _builder = new StringConcatenation();
           _builder.append("//");
-          _builder.append(stageName, "");
+          _builder.append(stageName);
           _builder.newLineIfNotEmpty();
           _builder.append("//System.out.println(\"Thread ");
-          _builder.append(i, "");
+          _builder.append(i);
           _builder.append(" waiting for next phase ");
-          _builder.append(stageName, "");
+          _builder.append(stageName);
           _builder.append("\");");
           _builder.newLineIfNotEmpty();
           _builder.append("while (phase < ");
-          _builder.append(stage, "");
+          _builder.append(stage);
           _builder.append(") {");
           _builder.newLineIfNotEmpty();
           _builder.append("}");
@@ -982,7 +940,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       }
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("//System.out.println(\"Entering stage: ");
-      _builder.append(stageName, "");
+      _builder.append(stageName);
       _builder.append("\");");
       _builder.newLineIfNotEmpty();
       _builder.append("try{");
@@ -995,7 +953,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       _builder.append("}");
       _builder.newLine();
       _builder.append("phase=");
-      _builder.append(stage, "");
+      _builder.append(stage);
       _builder.append(";");
       _builder.newLineIfNotEmpty();
       _xblockexpression = master.append(_builder);
@@ -1022,8 +980,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       Integer _get = threadLoad.get(tid);
       int _plus = ((_get).intValue() + costs);
       threadLoad.set(tid, Integer.valueOf(_plus));
-      StringBuilder _get_1 = threadExecution.get(tid);
-      _xblockexpression = _get_1.append(execution);
+      _xblockexpression = threadExecution.get(tid).append(execution);
     }
     return _xblockexpression;
   }
@@ -1034,17 +991,17 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if ((this.packageName != null)) {
         _builder.append("package ");
-        _builder.append(this.packageName, "");
+        _builder.append(this.packageName);
         _builder.append(";");
       }
     }
     _builder.newLineIfNotEmpty();
     CharSequence _imports = this.getImports();
-    _builder.append(_imports, "");
+    _builder.append(_imports);
     _builder.newLineIfNotEmpty();
     _builder.newLine();
     _builder.append("public final class ");
-    _builder.append(this.unitName, "");
+    _builder.append(this.unitName);
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
     _builder.append("implements ");
@@ -1090,7 +1047,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("*/");
         _builder.newLine();
         _builder.append("public ");
-        _builder.append(this.unitName, "");
+        _builder.append(this.unitName);
         _builder.append("() {");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -1106,11 +1063,11 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.newLine();
         _builder.newLine();
         _builder.append("public ");
-        _builder.append(this.unitName, "");
+        _builder.append(this.unitName);
         _builder.append("(boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name);
         _builder.append(", boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name);
         _builder.append(") {");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -1143,7 +1100,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.newLine();
       } else {
         _builder.append("public ");
-        _builder.append(this.unitName, "");
+        _builder.append(this.unitName);
         _builder.append("() {");
         _builder.newLineIfNotEmpty();
         {
@@ -1161,11 +1118,11 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("}");
         _builder.newLine();
         _builder.append("public ");
-        _builder.append(this.unitName, "");
+        _builder.append(this.unitName);
         _builder.append("(boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "");
+        _builder.append(CommonCodeGenerator.DISABLE_EDGES.name);
         _builder.append(", boolean ");
-        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "");
+        _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name);
         _builder.append(") {");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -1219,7 +1176,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.newLine();
         _builder.newLine();
         CharSequence _copyRegs = this.copyRegs();
-        _builder.append(_copyRegs, "");
+        _builder.append(_copyRegs);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -1228,9 +1185,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   
   @Override
   protected CharSequence makeCase(final CharSequence caseLabel, final CharSequence value, final boolean includeBreak) {
-    String _string = caseLabel.toString();
-    String _replaceAll = _string.replaceAll("L", "");
-    return super.makeCase(_replaceAll, value, includeBreak);
+    return super.makeCase(caseLabel.toString().replaceAll("L", ""), value, includeBreak);
   }
   
   protected CharSequence copyRegs() {
@@ -1291,10 +1246,10 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("new ");
     CharSequence _fieldType = this.fieldType(varInfo, attrClone);
-    _builder.append(_fieldType, "");
+    _builder.append(_fieldType);
     _builder.append("[");
     int _arraySize = this.getArraySize(varInfo);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append("]");
     return _builder;
   }
@@ -1312,7 +1267,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("private final void ");
     CharSequence _frameName = this.getFrameName(frame);
-    _builder.append(_frameName, "");
+    _builder.append(_frameName);
     _builder.append("() {");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -1324,23 +1279,23 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if ((!forceRegUpdate)) {
         _builder.append("if (");
-        _builder.append(cpyName, "");
+        _builder.append(cpyName);
         _builder.append("!=");
-        _builder.append(last, "");
+        _builder.append(last);
         _builder.append(")");
         _builder.newLineIfNotEmpty();
         CharSequence _indent = this.indent();
-        _builder.append(_indent, "");
+        _builder.append(_indent);
         _builder.append("\t");
       }
     }
     _builder.append("regUpdates.add(new RegUpdate(");
     Integer _regIdx = this.regIdx(outputInternal);
-    _builder.append(_regIdx, "");
+    _builder.append(_regIdx);
     _builder.append(", ");
-    _builder.append(offset, "");
+    _builder.append(offset);
     _builder.append(", ");
-    _builder.append(fillValue, "");
+    _builder.append(fillValue);
     _builder.append("));");
     return _builder;
   }
@@ -1377,7 +1332,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   protected CharSequence callStage(final int stage, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("();");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -1612,7 +1567,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("public void ");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("(){");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -1633,7 +1588,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if ((this.packageName != null)) {
         _builder.append("package ");
-        _builder.append(this.packageName, "");
+        _builder.append(this.packageName);
         _builder.append(";");
       }
     }
@@ -1652,7 +1607,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         {
           for(final String anno : this.em.annotations) {
             _builder.append("* ");
-            _builder.append(anno, "");
+            _builder.append(anno);
             _builder.newLineIfNotEmpty();
           }
         }
@@ -1663,7 +1618,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.newLine();
     _builder.append("public class ");
     String _changeAdapterName = ((JavaCodeGeneratorParameter) this.parameter).changeAdapterName(useInterface);
-    _builder.append(_changeAdapterName, "");
+    _builder.append(_changeAdapterName);
     _builder.append(" implements ");
     {
       boolean _isTestbench = this.isTestbench();
@@ -1683,8 +1638,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (useInterface) {
         {
           Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo : _filter) {
@@ -1738,10 +1693,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if (useInterface) {
         {
-          Iterable<VariableInformation> _excludeNullAndAlias = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
-          Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias, new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+          Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables))), new Function1<VariableInformation, Boolean>() {
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo_1 : _filter_1) {
@@ -1771,10 +1725,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("module.run();");
     _builder.newLine();
     {
-      Iterable<VariableInformation> _excludeNullAndAlias_1 = this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
-      Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(_excludeNullAndAlias_1, new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(VariableInformation arg0) {
-            return filter.apply(arg0);
+      Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables))), new Function1<VariableInformation, Boolean>() {
+          public Boolean apply(VariableInformation p) {
+            return filter.apply(p);
           }
       });
       for(final VariableInformation varInfo_2 : _filter_2) {
@@ -2063,7 +2016,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         }
       } else {
         String _javaClassName = ((JavaCodeGeneratorParameter) this.parameter).javaClassName();
-        _builder.append(_javaClassName, "");
+        _builder.append(_javaClassName);
       }
     }
     return _builder;
@@ -2076,15 +2029,15 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     if (_not) {
       boolean _isPredicate = this.isPredicate(vi);
       if (_isPredicate) {
-        EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(
-          CommonCodeGenerator.Attributes.isUpdate);
         final CharSequence varNameUpdate = this.idName(vi, 
-          true, _of);
+          true, 
+          EnumSet.<CommonCodeGenerator.Attributes>of(
+            CommonCodeGenerator.Attributes.isUpdate));
         StringConcatenation _builder = new StringConcatenation();
         _builder.append("if ((module.getOutputLong(");
-        _builder.append(varName, "");
+        _builder.append(varName);
         _builder.append("_idx)!=0) != ");
-        _builder.append(varName, "");
+        _builder.append(varName);
         _builder.append(")");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -2109,9 +2062,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       } else {
         StringConcatenation _builder_1 = new StringConcatenation();
         _builder_1.append("if (module.getOutputLong(");
-        _builder_1.append(varName, "");
+        _builder_1.append(varName);
         _builder_1.append("_idx) != ");
-        _builder_1.append(varName, "");
+        _builder_1.append(varName);
         _builder_1.append(")");
         _builder_1.newLineIfNotEmpty();
         _builder_1.append("\t");
@@ -2135,21 +2088,21 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     } else {
       boolean _isPredicate_1 = this.isPredicate(vi);
       if (_isPredicate_1) {
-        EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(
-          CommonCodeGenerator.Attributes.isUpdate);
         final CharSequence varNameUpdate_1 = this.idName(vi, 
-          true, _of_1);
+          true, 
+          EnumSet.<CommonCodeGenerator.Attributes>of(
+            CommonCodeGenerator.Attributes.isUpdate));
         StringConcatenation _builder_2 = new StringConcatenation();
         _builder_2.append("{");
         _builder_2.newLine();
         _builder_2.append("boolean[] tempArr=new boolean[");
         int _arraySize = this.getArraySize(vi);
-        _builder_2.append(_arraySize, "");
+        _builder_2.append(_arraySize);
         _builder_2.append("];");
         _builder_2.newLineIfNotEmpty();
         _builder_2.append("for (int i=0;i<");
         int _arraySize_1 = this.getArraySize(vi);
-        _builder_2.append(_arraySize_1, "");
+        _builder_2.append(_arraySize_1);
         _builder_2.append(";i++)");
         _builder_2.newLineIfNotEmpty();
         _builder_2.append("\t");
@@ -2158,7 +2111,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder_2.append("_idx)!=0;");
         _builder_2.newLineIfNotEmpty();
         _builder_2.append("if (!Arrays.equals(tempArr,");
-        _builder_2.append(varName, "");
+        _builder_2.append(varName);
         _builder_2.append("))");
         _builder_2.newLineIfNotEmpty();
         _builder_2.append("\t");
@@ -2186,12 +2139,12 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder_3.newLine();
         _builder_3.append("long[] tempArr=new long[");
         int _arraySize_2 = this.getArraySize(vi);
-        _builder_3.append(_arraySize_2, "");
+        _builder_3.append(_arraySize_2);
         _builder_3.append("];");
         _builder_3.newLineIfNotEmpty();
         _builder_3.append("for (int i=0;i<");
         int _arraySize_3 = this.getArraySize(vi);
-        _builder_3.append(_arraySize_3, "");
+        _builder_3.append(_arraySize_3);
         _builder_3.append(";i++)");
         _builder_3.newLineIfNotEmpty();
         _builder_3.append("\t");
@@ -2200,7 +2153,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder_3.append("_idx, i);");
         _builder_3.newLineIfNotEmpty();
         _builder_3.append("if (!Arrays.equals(tempArr,");
-        _builder_3.append(varName, "");
+        _builder_3.append(varName);
         _builder_3.append("))");
         _builder_3.newLineIfNotEmpty();
         _builder_3.append("\t");
@@ -2235,15 +2188,15 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     if (_not) {
       boolean _isPredicate = this.isPredicate(vi);
       if (_isPredicate) {
-        EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(
-          CommonCodeGenerator.Attributes.isUpdate);
         final CharSequence varNameUpdate = this.idName(vi, 
-          true, _of);
+          true, 
+          EnumSet.<CommonCodeGenerator.Attributes>of(
+            CommonCodeGenerator.Attributes.isUpdate));
         StringConcatenation _builder = new StringConcatenation();
         _builder.append("if (module.");
-        _builder.append(varName, "");
+        _builder.append(varName);
         _builder.append(" != ");
-        _builder.append(varName, "");
+        _builder.append(varName);
         _builder.append(")");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
@@ -2270,9 +2223,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       } else {
         StringConcatenation _builder_1 = new StringConcatenation();
         _builder_1.append("if (module.");
-        _builder_1.append(varName, "");
+        _builder_1.append(varName);
         _builder_1.append(" != ");
-        _builder_1.append(varName, "");
+        _builder_1.append(varName);
         _builder_1.append(")");
         _builder_1.newLineIfNotEmpty();
         _builder_1.append("\t");
@@ -2290,8 +2243,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         {
           if ((vi.width != 64)) {
             _builder_1.append(" & ");
-            BigInteger _calcMask = this.calcMask(vi.width);
-            CharSequence _constant = this.constant(_calcMask, true);
+            CharSequence _constant = this.constant(this.calcMask(vi.width), true);
             _builder_1.append(_constant, "\t\t");
           }
         }
@@ -2300,8 +2252,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         {
           if ((vi.width != 64)) {
             _builder_1.append(" & ");
-            BigInteger _calcMask_1 = this.calcMask(vi.width);
-            CharSequence _constant_1 = this.constant(_calcMask_1, true);
+            CharSequence _constant_1 = this.constant(this.calcMask(vi.width), true);
             _builder_1.append(_constant_1, "\t\t");
           }
         }
@@ -2312,15 +2263,15 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     } else {
       boolean _isPredicate_1 = this.isPredicate(vi);
       if (_isPredicate_1) {
-        EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(
-          CommonCodeGenerator.Attributes.isUpdate);
         final CharSequence varNameUpdate_1 = this.idName(vi, 
-          true, _of_1);
+          true, 
+          EnumSet.<CommonCodeGenerator.Attributes>of(
+            CommonCodeGenerator.Attributes.isUpdate));
         StringConcatenation _builder_2 = new StringConcatenation();
         _builder_2.append("if (!module.");
-        _builder_2.append(varName, "");
+        _builder_2.append(varName);
         _builder_2.append(".equals(");
-        _builder_2.append(varName, "");
+        _builder_2.append(varName);
         _builder_2.append("))");
         _builder_2.newLineIfNotEmpty();
         _builder_2.append("\t");
@@ -2347,9 +2298,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       } else {
         StringConcatenation _builder_3 = new StringConcatenation();
         _builder_3.append("if (!module.");
-        _builder_3.append(varName, "");
+        _builder_3.append(varName);
         _builder_3.append(".equals(");
-        _builder_3.append(varName, "");
+        _builder_3.append(varName);
         _builder_3.append("))");
         _builder_3.newLineIfNotEmpty();
         _builder_3.append("\t");
@@ -2386,14 +2337,13 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("System.arraycopy(");
     CharSequence _idName = this.idName(varInfo, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    _builder.append(_idName);
     _builder.append(", 0, ");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev);
-    CharSequence _idName_1 = this.idName(varInfo, true, _of);
-    _builder.append(_idName_1, "");
+    CharSequence _idName_1 = this.idName(varInfo, true, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev));
+    _builder.append(_idName_1);
     _builder.append(", 0, ");
     int _arraySize = this.getArraySize(varInfo);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append(");");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -2402,11 +2352,11 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   @Override
   protected CharSequence assignNextTime(final VariableInformation nextTime, final CharSequence currentProcessTime) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(nextTime.name, "");
+    _builder.append(nextTime.name);
     _builder.append("=Math.min(");
-    _builder.append(nextTime.name, "");
+    _builder.append(nextTime.name);
     _builder.append(", ");
-    _builder.append(currentProcessTime, "");
+    _builder.append(currentProcessTime);
     _builder.append(");");
     return _builder;
   }
@@ -2414,7 +2364,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   @Override
   protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(methodName, "");
+    _builder.append(methodName);
     _builder.append("(");
     {
       if ((args != null)) {
@@ -2426,7 +2376,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             } else {
               _builder.appendImmediate(",", "");
             }
-            _builder.append(arg, "");
+            _builder.append(arg);
           }
         }
       }
@@ -2447,15 +2397,14 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   protected CharSequence checkTestbenchListener() {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _indent = this.indent();
-    _builder.append(_indent, "");
+    _builder.append(_indent);
     _builder.append("if (listener!=null && !listener.nextStep(");
-    VariableInformation _varByName = this.varByName("$time");
-    CharSequence _idName = this.idName(_varByName, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    CharSequence _idName = this.idName(this.varByName("$time"), true, CommonCodeGenerator.NONE);
+    _builder.append(_idName);
     _builder.append(", stepCount))");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_1 = this.indent();
-    _builder.append(_indent_1, "");
+    _builder.append(_indent_1);
     _builder.append("\tbreak;");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -2469,7 +2418,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("private boolean ");
       String _processMethodName = this.processMethodName(pd);
-      _builder.append(_processMethodName, "");
+      _builder.append(_processMethodName);
       _builder.append("() {");
       _builder.newLineIfNotEmpty();
       _xblockexpression = _builder;
@@ -2484,7 +2433,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       this.indent++;
       StringConcatenation _builder = new StringConcatenation();
       CharSequence _timeMethods = this.timeMethods();
-      _builder.append(_timeMethods, "");
+      _builder.append(_timeMethods);
       _builder.newLineIfNotEmpty();
       _builder.append("\t\t");
       _builder.append("@Override");
@@ -2527,8 +2476,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.newLine();
     _builder.append("\t\t\t");
     _builder.append("return ");
-    VariableInformation _timeName = this.timeName();
-    CharSequence _fieldName = this.fieldName(_timeName, CommonCodeGenerator.NONE);
+    CharSequence _fieldName = this.fieldName(this.timeName(), CommonCodeGenerator.NONE);
     _builder.append(_fieldName, "\t\t\t");
     _builder.append(";");
     _builder.newLineIfNotEmpty();
@@ -2539,11 +2487,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   protected String getAnnoValue(final String anno) {
-    final Function1<String, Boolean> _function = new Function1<String, Boolean>() {
-      @Override
-      public Boolean apply(final String it) {
-        return Boolean.valueOf(it.startsWith(anno));
-      }
+    final Function1<String, Boolean> _function = (String it) -> {
+      return Boolean.valueOf(it.startsWith(anno));
     };
     final String foundAnno = IterableExtensions.<String>findFirst(((Iterable<String>)Conversions.doWrapArray(this.em.annotations)), _function);
     int _indexOf = foundAnno.indexOf(SimulationTransformationExtension.ANNO_VALUE_SEP);
@@ -2585,8 +2530,7 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     final JavaCodeGenerator comp = new JavaCodeGenerator(parameter);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
-    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
-    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
+    Iterables.<AuxiliaryContent>addAll(sideFiles, comp.getAuxiliaryContent());
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles, 
       parameter.em.source, _hookName, true);
@@ -2598,9 +2542,9 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("Arrays.fill(");
     CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    _builder.append(_idName);
     _builder.append(", ");
-    _builder.append(regFillValue, "");
+    _builder.append(regFillValue);
     _builder.append(");");
     return _builder;
   }
@@ -2612,10 +2556,10 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("pow(");
     String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName, "");
+    _builder.append(_tempName);
     _builder.append(", ");
     String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName_1, "");
+    _builder.append(_tempName_1);
     _builder.append(")");
     return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, 
       CommonCodeGenerator.NONE, _builder, true);

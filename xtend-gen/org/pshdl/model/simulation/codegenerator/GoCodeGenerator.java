@@ -80,8 +80,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   public GoCodeGenerator(final GoCodeGeneratorParameter parameter) {
     super(parameter);
     this.pkg = parameter.packageName;
-    String _firstUpper = StringExtensions.toFirstUpper(parameter.unitName);
-    this.unit = _firstUpper;
+    this.unit = StringExtensions.toFirstUpper(parameter.unitName);
     CommonCompilerExtension _commonCompilerExtension = new CommonCompilerExtension(this.em, 64);
     this.cce = _commonCompilerExtension;
   }
@@ -104,10 +103,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         }
         String _absolutePath = testRunner.getAbsolutePath();
         String _absolutePath_1 = dutFile.getAbsolutePath();
-        ProcessBuilder _processBuilder = new ProcessBuilder("/usr/local/bin/go", "build", _absolutePath, _absolutePath_1);
-        ProcessBuilder _directory = _processBuilder.directory(tempDir);
-        ProcessBuilder _redirectErrorStream = _directory.redirectErrorStream(true);
-        final ProcessBuilder goBuilder = _redirectErrorStream.inheritIO();
+        final ProcessBuilder goBuilder = new ProcessBuilder("/usr/local/bin/go", "build", _absolutePath, _absolutePath_1).directory(tempDir).redirectErrorStream(true).inheritIO();
         final Process goCompiler = goBuilder.start();
         int _waitFor = goCompiler.waitFor();
         boolean _notEquals = (_waitFor != 0);
@@ -120,9 +116,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
             try {
               final File runnerExecutable = new File(tempDir, "runner");
               String _absolutePath = runnerExecutable.getAbsolutePath();
-              ProcessBuilder _processBuilder = new ProcessBuilder(_absolutePath);
-              ProcessBuilder _directory = _processBuilder.directory(tempDir);
-              final ProcessBuilder goBuilder = _directory.redirectErrorStream(true);
+              final ProcessBuilder goBuilder = new ProcessBuilder(_absolutePath).directory(tempDir).redirectErrorStream(true);
               final Process goRunner = goBuilder.start();
               InputStream _inputStream = goRunner.getInputStream();
               OutputStream _outputStream = goRunner.getOutputStream();
@@ -144,7 +138,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence preFieldDeclarations() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("type ");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(" struct {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -169,7 +163,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append("}");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") updateRegs() {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -198,8 +192,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   
   @Override
   protected String dynamicMask(final Integer idx) {
-    CharSequence _constant = this.constant(1, true);
-    String _shiftLeftDynamic = this.shiftLeftDynamic(_constant, idx);
+    String _shiftLeftDynamic = this.shiftLeftDynamic(this.constant(1, true), idx);
     String _plus = ("((^(" + _shiftLeftDynamic);
     return (_plus + "))-1)");
   }
@@ -207,11 +200,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   @Override
   protected String shiftRightDynamic(final CharSequence tempName, final Integer idx) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(tempName, "");
+    _builder.append(tempName);
     _builder.append(" >> uint(");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayIndex);
-    String _tempName = this.getTempName((idx).intValue(), _of);
-    _builder.append(_tempName, "");
+    String _tempName = this.getTempName((idx).intValue(), EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayIndex));
+    _builder.append(_tempName);
     _builder.append(")");
     return _builder.toString();
   }
@@ -219,11 +211,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   @Override
   protected String shiftLeftDynamic(final CharSequence tempName, final Integer idx) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(tempName, "");
+    _builder.append(tempName);
     _builder.append(" << uint(");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayIndex);
-    String _tempName = this.getTempName((idx).intValue(), _of);
-    _builder.append(_tempName, "");
+    String _tempName = this.getTempName((idx).intValue(), EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayIndex));
+    _builder.append(_tempName);
     _builder.append(")");
     return _builder.toString();
   }
@@ -262,10 +253,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("make([]");
     CharSequence _fieldType = this.fieldType(varInfo, attributes);
-    _builder.append(_fieldType, "");
+    _builder.append(_fieldType);
     _builder.append(", ");
     int _arraySize = this.getArraySize(varInfo);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append(")");
     return _builder;
   }
@@ -282,7 +273,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
       if (this.inBarrier) {
         _builder.append("wg.Add(1)");
         CharSequence _indent = this.indent();
-        _builder.append(_indent, "");
+        _builder.append(_indent);
         _builder.append("go ");
       }
     }
@@ -291,7 +282,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
         _builder.append("s.");
       }
     }
-    _builder.append(methodName, "");
+    _builder.append(methodName);
     _builder.append("(");
     {
       if ((args != null)) {
@@ -303,7 +294,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
             } else {
               _builder.appendImmediate(",", "");
             }
-            _builder.append(arg, "");
+            _builder.append(arg);
           }
         }
       }
@@ -325,7 +316,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("s.");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("()");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -386,9 +377,9 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   @Override
   protected CharSequence doCast(final CharSequence cast, final CharSequence assignValue) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(cast, "");
+    _builder.append(cast);
     _builder.append("(");
-    _builder.append(assignValue, "");
+    _builder.append(assignValue);
     _builder.append(")");
     return _builder;
   }
@@ -397,7 +388,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence footer() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") SetInputWithName(name string, value int64, arrayIdx ...int) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -408,15 +399,14 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") SetInput(idx int, value int64, arrayIdx ...int) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("switch idx {");
     _builder.newLine();
     _builder.append("\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg);
-    CharSequence _setInputCases = this.setInputCases("value", null, _of);
+    CharSequence _setInputCases = this.setInputCases("value", null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg));
     _builder.append(_setInputCases, "\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -433,7 +423,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") GetIndex(name string) int {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -456,7 +446,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") GetName(idx int) string {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -492,7 +482,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") GetOutputWithName(name string, arrayIdx ...int) int64 {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -503,15 +493,14 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") GetOutput(idx int, arrayIdx ...int) int64 {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("switch idx {");
     _builder.newLine();
     _builder.append("\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg);
-    CharSequence _outputCases = this.getOutputCases(null, _of_1);
+    CharSequence _outputCases = this.getOutputCases(null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isArrayArg));
     _builder.append(_outputCases, "\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -528,7 +517,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") GetDeltaCycle() int64 {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -538,7 +527,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.newLine();
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") GetJsonDesc() string {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -551,7 +540,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.newLine();
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") SetDisableEdge(enable bool) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -564,7 +553,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") SetDisableRegOutputLogic(enable bool) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -590,10 +579,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence functionHeader(final Frame frame) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") ");
     CharSequence _frameName = this.getFrameName(frame);
-    _builder.append(_frameName, "");
+    _builder.append(_frameName);
     _builder.append(" (){");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -603,7 +592,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence header() {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("package ");
-    _builder.append(this.pkg, "");
+    _builder.append(this.pkg);
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
     _builder.newLine();
@@ -620,9 +609,9 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func New");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append("() *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(" {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -635,13 +624,13 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append(" ");
     _builder.newLine();
     _builder.append("func New");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append("WithArgs(");
-    _builder.append(CommonCodeGenerator.DISABLE_EDGES.name, "");
+    _builder.append(CommonCodeGenerator.DISABLE_EDGES.name);
     _builder.append(", ");
-    _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name, "");
+    _builder.append(CommonCodeGenerator.DISABLE_REG_OUTPUTLOGIC.name);
     _builder.append(" bool) *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(" {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -684,11 +673,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
       }
     }
     {
-      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
-        @Override
-        public Boolean apply(final VariableInformation it) {
-          return Boolean.valueOf(GoCodeGenerator.this.isArray(it));
-        }
+      final Function1<VariableInformation, Boolean> _function = (VariableInformation it) -> {
+        return Boolean.valueOf(this.isArray(it));
       };
       Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
       for(final VariableInformation v_1 : _filter) {
@@ -721,7 +707,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.newLine();
     _builder.newLine();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") skipEdge(local int64) bool {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -803,9 +789,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   
   @Override
   protected CharSequence idName(final String name, final boolean field, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
-    CharSequence _idName = super.idName(name, field, attributes);
-    String _string = _idName.toString();
-    final String superVal = _string.replace("$", "__");
+    final String superVal = super.idName(name, field, attributes).toString().replace("$", "__");
     return superVal;
   }
   
@@ -819,19 +803,13 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   @Override
   protected CharSequence createVarDeclaration(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes, final boolean initialize) {
     final StringBuilder sb = new StringBuilder();
-    CharSequence _preField = this.preField(varInfo, attributes);
-    sb.append(_preField);
+    sb.append(this.preField(varInfo, attributes));
     this.indent++;
-    CharSequence _indent = this.indent();
-    sb.append(_indent);
+    sb.append(this.indent());
     this.indent--;
-    CharSequence _idName = this.idName(varInfo, false, attributes);
-    StringBuilder _append = sb.append(_idName);
-    _append.append(" ");
-    CharSequence _fieldType = this.fieldType(varInfo, attributes);
-    sb.append(_fieldType);
-    CharSequence _postField = this.postField(varInfo);
-    sb.append(_postField);
+    sb.append(this.idName(varInfo, false, attributes)).append(" ");
+    sb.append(this.fieldType(varInfo, attributes));
+    sb.append(this.postField(varInfo));
     return sb;
   }
   
@@ -846,10 +824,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("var ");
     CharSequence _idName = this.idName(varInfo, field, attributes);
-    _builder.append(_idName, "");
+    _builder.append(_idName);
     _builder.append(" ");
     CharSequence _fieldType = this.fieldType(varInfo, attributes);
-    _builder.append(_fieldType, "");
+    _builder.append(_fieldType);
     return _builder;
   }
   
@@ -865,7 +843,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence runMethodsHeader(final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") ");
     {
       if ((!constant)) {
@@ -895,31 +873,31 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     {
       if ((!force)) {
         _builder.append("if (");
-        _builder.append(cpyName, "");
+        _builder.append(cpyName);
         _builder.append("!=");
-        _builder.append(last, "");
+        _builder.append(last);
         _builder.append(") ");
       }
     }
     _builder.append("{");
     _builder.newLineIfNotEmpty();
     CharSequence _indent = this.indent();
-    _builder.append(_indent, "");
+    _builder.append(_indent);
     _builder.append("\ts.regUpdates[s.regUpdatePos] = regUpdate{");
     Integer _regIdx = this.regIdx(outputInternal);
-    _builder.append(_regIdx, "");
+    _builder.append(_regIdx);
     _builder.append(", int(");
-    _builder.append(offset, "");
+    _builder.append(offset);
     _builder.append("), ");
-    _builder.append(fillValue, "");
+    _builder.append(fillValue);
     _builder.append("}");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_1 = this.indent();
-    _builder.append(_indent_1, "");
+    _builder.append(_indent_1);
     _builder.append("\ts.regUpdatePos++");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_2 = this.indent();
-    _builder.append(_indent_2, "");
+    _builder.append(_indent_2);
     _builder.append("}");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -931,9 +909,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   
   @Override
   protected CharSequence doMask(final CharSequence currentValue, final CharSequence writeMask) {
-    CharSequence _doCast = this.doCast("uint64", currentValue);
-    CharSequence _doMask = super.doMask(_doCast, writeMask);
-    return this.doCast("int64", _doMask);
+    return this.doCast("int64", super.doMask(this.doCast("uint64", currentValue), writeMask));
   }
   
   @Override
@@ -948,10 +924,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
   protected CharSequence stageMethodsHeader(final int stage, final int totalStageCosts, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("func (s *");
-    _builder.append(this.unit, "");
+    _builder.append(this.unit);
     _builder.append(") ");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("() {");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -963,12 +939,12 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     _builder.append("for i := range ");
     CharSequence _idName = this.idName(vi, true, 
       CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    _builder.append(_idName);
     _builder.append(" { ");
     CharSequence _idName_1 = this.idName(vi, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName_1, "");
+    _builder.append(_idName_1);
     _builder.append("[i] = ");
-    _builder.append(regFillValue, "");
+    _builder.append(regFillValue);
     _builder.append(" } ");
     return _builder;
   }
@@ -978,10 +954,8 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     CharSequence _xblockexpression = null;
     {
       if ((fi.inst == Instruction.bit_neg)) {
-        CharSequence _cast = this.getCast(targetSizeWithType);
-        final CharSequence assignValue = this.singleOpValue("^", _cast, a, targetSizeWithType, attributes);
-        VariableInformation.Type _typeFromTargetSize = this.typeFromTargetSize(targetSizeWithType);
-        return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, attributes, assignValue, true);
+        final CharSequence assignValue = this.singleOpValue("^", this.getCast(targetSizeWithType), a, targetSizeWithType, attributes);
+        return this.assignTempVar(this.typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue, true);
       }
       _xblockexpression = super.singleOp(fi, op, targetSizeWithType, pos, a, attributes, doMask);
     }
@@ -993,34 +967,27 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     CharSequence _xblockexpression = null;
     {
       if ((fi.inst == Instruction.srl)) {
-        String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-        CharSequence _doCast = this.doCast("uint64", _tempName);
+        CharSequence _doCast = this.doCast("uint64", this.getTempName(leftOperand, CommonCodeGenerator.NONE));
         String _plus = (_doCast + ">>");
-        String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-        CharSequence _doCast_1 = this.doCast("uint64", _tempName_1);
+        CharSequence _doCast_1 = this.doCast("uint64", this.getTempName(rightOperand, CommonCodeGenerator.NONE));
         String _plus_1 = (_plus + _doCast_1);
         final CharSequence assignValue = this.doCast("int64", _plus_1);
-        VariableInformation.Type _typeFromTargetSize = this.typeFromTargetSize(targetSizeWithType);
-        return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, attributes, assignValue, true);
+        return this.assignTempVar(this.typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue, true);
       }
       if ((fi.inst == Instruction.sra)) {
-        String _tempName_2 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-        String _plus_2 = (_tempName_2 + ">>");
-        String _tempName_3 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-        CharSequence _doCast_2 = this.doCast("uint64", _tempName_3);
+        String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+        String _plus_2 = (_tempName + ">>");
+        CharSequence _doCast_2 = this.doCast("uint64", this.getTempName(rightOperand, CommonCodeGenerator.NONE));
         final CharSequence assignValue_1 = (_plus_2 + _doCast_2);
-        VariableInformation.Type _typeFromTargetSize_1 = this.typeFromTargetSize(targetSizeWithType);
-        return this.assignTempVar(_typeFromTargetSize_1, targetSizeWithType, pos, attributes, assignValue_1, true);
+        return this.assignTempVar(this.typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue_1, true);
       }
       if ((fi.inst == Instruction.sll)) {
-        String _tempName_4 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-        String _plus_3 = (_tempName_4 + "<<");
-        String _tempName_5 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-        CharSequence _doCast_3 = this.doCast("uint64", _tempName_5);
+        String _tempName_1 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
+        String _plus_3 = (_tempName_1 + "<<");
+        CharSequence _doCast_3 = this.doCast("uint64", this.getTempName(rightOperand, CommonCodeGenerator.NONE));
         String _plus_4 = (_plus_3 + _doCast_3);
         final CharSequence assignValue_2 = this.doCast("int64", _plus_4);
-        VariableInformation.Type _typeFromTargetSize_2 = this.typeFromTargetSize(targetSizeWithType);
-        return this.assignTempVar(_typeFromTargetSize_2, targetSizeWithType, pos, attributes, assignValue_2, true);
+        return this.assignTempVar(this.typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue_2, true);
       }
       _xblockexpression = super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask);
     }
@@ -1033,10 +1000,10 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("pow(");
     String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName, "");
+    _builder.append(_tempName);
     _builder.append(", ");
     String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName_1, "");
+    _builder.append(_tempName_1);
     _builder.append(")");
     return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
   }
@@ -1069,8 +1036,7 @@ public class GoCodeGenerator extends CommonCodeGenerator implements ITypeOuptutP
     final GoCodeGenerator comp = new GoCodeGenerator(parameter);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
-    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
-    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
+    Iterables.<AuxiliaryContent>addAll(sideFiles, comp.getAuxiliaryContent());
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles, 
       parameter.em.source, _hookName, true);

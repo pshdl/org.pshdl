@@ -39,9 +39,7 @@ public class GoCodeGeneratorParameter extends CommonCodeGeneratorParameter {
   public String unitName = "TestUnit";
   
   public static GoCodeGeneratorParameter nativeRunner(final ExecutableModel em) {
-    GoCodeGeneratorParameter _goCodeGeneratorParameter = new GoCodeGeneratorParameter(em);
-    GoCodeGeneratorParameter _setPackageName = _goCodeGeneratorParameter.setPackageName("main");
-    return _setPackageName.setUnitName("TestUnit");
+    return new GoCodeGeneratorParameter(em).setPackageName("main").setUnitName("TestUnit");
   }
   
   public GoCodeGeneratorParameter(final ExecutableModel em) {
@@ -50,12 +48,9 @@ public class GoCodeGeneratorParameter extends CommonCodeGeneratorParameter {
     final int li = moduleName.lastIndexOf(".");
     this.packageName = null;
     if ((li != (-1))) {
-      String _substring = moduleName.substring(0, (li - 1));
-      this.packageName = _substring;
+      this.packageName = moduleName.substring(0, (li - 1));
     }
-    int _length = moduleName.length();
-    String _substring_1 = moduleName.substring((li + 1), _length);
-    this.unitName = _substring_1;
+    this.unitName = moduleName.substring((li + 1), moduleName.length());
   }
   
   public GoCodeGeneratorParameter setPackageName(final String packageName) {

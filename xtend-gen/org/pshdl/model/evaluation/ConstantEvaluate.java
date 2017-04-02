@@ -32,7 +32,6 @@ import com.google.common.collect.Sets;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.pshdl.interpreter.frames.BigIntegerFrame;
@@ -49,7 +48,6 @@ import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLLiteral;
 import org.pshdl.model.HDLManip;
 import org.pshdl.model.HDLPrimitive;
-import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLShiftOp;
 import org.pshdl.model.HDLTernary;
 import org.pshdl.model.HDLType;
@@ -86,8 +84,7 @@ public class ConstantEvaluate {
    * @return an absent {@link Optional} if not successful check the SOURCE and {@link ProblemDescription#DESCRIPTION} Meta annotations
    */
   public static Optional<BigInteger> valueOf(final HDLExpression exp) {
-    HashSet<HDLQualifiedName> _newHashSet = Sets.<HDLQualifiedName>newHashSet();
-    return ConstantEvaluate.INST.constantEvaluate(exp, null, _newHashSet);
+    return ConstantEvaluate.INST.constantEvaluate(exp, null, Sets.<HDLQualifiedName>newHashSet());
   }
   
   /**
@@ -109,8 +106,7 @@ public class ConstantEvaluate {
     if ((exp == null)) {
       return Optional.<BigInteger>absent();
     }
-    HashSet<HDLQualifiedName> _newHashSet = Sets.<HDLQualifiedName>newHashSet();
-    return ConstantEvaluate.INST.constantEvaluate(exp, context, _newHashSet);
+    return ConstantEvaluate.INST.constantEvaluate(exp, context, Sets.<HDLQualifiedName>newHashSet());
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLUnresolvedFragment obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
@@ -120,10 +116,7 @@ public class ConstantEvaluate {
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    Insulin.ResolvedPart _get = type.get();
-    IHDLObject _container = obj.getContainer();
-    IHDLObject _copyDeepFrozen = _get.obj.copyDeepFrozen(_container);
-    return this.constantEvaluate(_copyDeepFrozen, context, evaled);
+    return this.constantEvaluate(type.get().obj.copyDeepFrozen(obj.getContainer()), context, evaled);
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLArrayInit obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
@@ -137,21 +130,16 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLTernary obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    HDLExpression _ifExpr = obj.getIfExpr();
-    final Optional<BigInteger> res = this.constantEvaluate(_ifExpr, context, evaled);
+    final Optional<BigInteger> res = this.constantEvaluate(obj.getIfExpr(), context, evaled);
     boolean _isPresent = res.isPresent();
     if (_isPresent) {
-      BigInteger _get = res.get();
-      boolean _equals = BigInteger.ZERO.equals(_get);
+      boolean _equals = BigInteger.ZERO.equals(res.get());
       if (_equals) {
-        HDLExpression _elseExpr = obj.getElseExpr();
-        return this.constantEvaluate(_elseExpr, context, evaled);
+        return this.constantEvaluate(obj.getElseExpr(), context, evaled);
       }
-      HDLExpression _thenExpr = obj.getThenExpr();
-      return this.constantEvaluate(_thenExpr, context, evaled);
+      return this.constantEvaluate(obj.getThenExpr(), context, evaled);
     }
-    HDLExpression _ifExpr_1 = obj.getIfExpr();
-    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _ifExpr_1);
+    obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj.getIfExpr());
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
     return Optional.<BigInteger>absent();
   }
@@ -164,8 +152,7 @@ public class ConstantEvaluate {
           return Optional.<BigInteger>absent();
         case BOOL:
           if (((context != null) && context.boolAsInt)) {
-            HDLLiteral _false = HDLLiteral.getFalse();
-            boolean _equals = obj.equals(_false);
+            boolean _equals = obj.equals(HDLLiteral.getFalse());
             boolean _not = (!_equals);
             return ConstantEvaluate.boolInt(_not);
           }
@@ -174,13 +161,11 @@ public class ConstantEvaluate {
           break;
       }
     }
-    BigInteger _valueAsBigInt = obj.getValueAsBigInt();
-    return Optional.<BigInteger>of(_valueAsBigInt);
+    return Optional.<BigInteger>of(obj.getValueAsBigInt());
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLManip obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    HDLExpression _target = obj.getTarget();
-    final Optional<BigInteger> eval = this.subEvaluate(obj, _target, context, evaled);
+    final Optional<BigInteger> eval = this.subEvaluate(obj, obj.getTarget(), context, evaled);
     boolean _isPresent = eval.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
@@ -190,21 +175,14 @@ public class ConstantEvaluate {
     if (_type != null) {
       switch (_type) {
         case ARITH_NEG:
-          BigInteger _get = eval.get();
-          BigInteger _negate = _get.negate();
-          return Optional.<BigInteger>of(_negate);
+          return Optional.<BigInteger>of(eval.get().negate());
         case BIT_NEG:
-          BigInteger _get_1 = eval.get();
-          BigInteger _not_1 = _get_1.not();
-          return Optional.<BigInteger>of(_not_1);
+          return Optional.<BigInteger>of(eval.get().not());
         case LOGIC_NEG:
-          HDLExpression _target_1 = obj.getTarget();
-          final Optional<BigInteger> const_ = this.constantEvaluate(_target_1, context, evaled);
+          final Optional<BigInteger> const_ = this.constantEvaluate(obj.getTarget(), context, evaled);
           boolean _isPresent_1 = const_.isPresent();
           if (_isPresent_1) {
-            BigInteger _get_2 = const_.get();
-            boolean _equals = _get_2.equals(BigInteger.ZERO);
-            return ConstantEvaluate.boolInt(_equals);
+            return ConstantEvaluate.boolInt(const_.get().equals(BigInteger.ZERO));
           }
           return Optional.<BigInteger>absent();
         case CAST:
@@ -214,23 +192,16 @@ public class ConstantEvaluate {
             HDLExpression _width = prim.getWidth();
             boolean _tripleNotEquals = (_width != null);
             if (_tripleNotEquals) {
-              HDLExpression _width_1 = prim.getWidth();
-              final Optional<BigInteger> width = this.constantEvaluate(_width_1, context, evaled);
+              final Optional<BigInteger> width = this.constantEvaluate(prim.getWidth(), context, evaled);
               boolean _isPresent_2 = width.isPresent();
               if (_isPresent_2) {
-                BigInteger _get_3 = eval.get();
-                BigInteger _get_4 = width.get();
-                int _intValue = _get_4.intValue();
-                BigInteger _shiftLeft = BigInteger.ONE.shiftLeft(_intValue);
-                BigInteger _mod = _get_3.mod(_shiftLeft);
-                return Optional.<BigInteger>of(_mod);
+                return Optional.<BigInteger>of(eval.get().mod(BigInteger.ONE.shiftLeft(width.get().intValue())));
               }
               return Optional.<BigInteger>absent();
             }
             return eval;
           }
-          HDLExpression _target_2 = obj.getTarget();
-          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _target_2);
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj.getTarget());
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.NON_PRIMITVE_TYPE_NOT_EVALUATED);
           return Optional.<BigInteger>absent();
         default:
@@ -259,24 +230,15 @@ public class ConstantEvaluate {
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
           return Optional.<BigInteger>absent();
         }
-        HDLType _get = type.get();
-        HDLExpression _width = _get.getWidth();
-        final Optional<BigInteger> width = this.constantEvaluate(_width, context, evaled);
+        final Optional<BigInteger> width = this.constantEvaluate(type.get().getWidth(), context, evaled);
         boolean _isPresent_2 = width.isPresent();
         boolean _not_2 = (!_isPresent_2);
         if (_not_2) {
-          HDLType _get_1 = type.get();
-          HDLExpression _width_1 = _get_1.getWidth();
-          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _width_1);
+          obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, type.get().getWidth());
           obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_WIDTH_DID_NOT_EVALUATE);
           return Optional.<BigInteger>absent();
         }
-        BigInteger _get_2 = width.get();
-        int _intValue = _get_2.intValue();
-        BigInteger _shiftLeft = sum.shiftLeft(_intValue);
-        BigInteger _get_3 = im.get();
-        BigInteger _or = _shiftLeft.or(_get_3);
-        sum = _or;
+        sum = sum.shiftLeft(width.get().intValue()).or(im.get());
       }
     }
     return Optional.<BigInteger>of(sum);
@@ -298,15 +260,13 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLArithOp obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    HDLExpression _left = obj.getLeft();
-    final Optional<BigInteger> leftVal = this.subEvaluate(obj, _left, context, evaled);
+    final Optional<BigInteger> leftVal = this.subEvaluate(obj, obj.getLeft(), context, evaled);
     boolean _isPresent = leftVal.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    HDLExpression _right = obj.getRight();
-    final Optional<BigInteger> rightVal = this.subEvaluate(obj, _right, context, evaled);
+    final Optional<BigInteger> rightVal = this.subEvaluate(obj, obj.getRight(), context, evaled);
     boolean _isPresent_1 = rightVal.isPresent();
     boolean _not_1 = (!_isPresent_1);
     if (_not_1) {
@@ -316,36 +276,17 @@ public class ConstantEvaluate {
     if (_type != null) {
       switch (_type) {
         case DIV:
-          BigInteger _get = leftVal.get();
-          BigInteger _get_1 = rightVal.get();
-          BigInteger _divide = _get.divide(_get_1);
-          return Optional.<BigInteger>of(_divide);
+          return Optional.<BigInteger>of(leftVal.get().divide(rightVal.get()));
         case MUL:
-          BigInteger _get_2 = leftVal.get();
-          BigInteger _get_3 = rightVal.get();
-          BigInteger _multiply = _get_2.multiply(_get_3);
-          return Optional.<BigInteger>of(_multiply);
+          return Optional.<BigInteger>of(leftVal.get().multiply(rightVal.get()));
         case MINUS:
-          BigInteger _get_4 = leftVal.get();
-          BigInteger _get_5 = rightVal.get();
-          BigInteger _subtract = _get_4.subtract(_get_5);
-          return Optional.<BigInteger>of(_subtract);
+          return Optional.<BigInteger>of(leftVal.get().subtract(rightVal.get()));
         case PLUS:
-          BigInteger _get_6 = leftVal.get();
-          BigInteger _get_7 = rightVal.get();
-          BigInteger _add = _get_6.add(_get_7);
-          return Optional.<BigInteger>of(_add);
+          return Optional.<BigInteger>of(leftVal.get().add(rightVal.get()));
         case MOD:
-          BigInteger _get_8 = leftVal.get();
-          BigInteger _get_9 = rightVal.get();
-          BigInteger _remainder = _get_8.remainder(_get_9);
-          return Optional.<BigInteger>of(_remainder);
+          return Optional.<BigInteger>of(leftVal.get().remainder(rightVal.get()));
         case POW:
-          BigInteger _get_10 = leftVal.get();
-          BigInteger _get_11 = rightVal.get();
-          int _intValue = _get_11.intValue();
-          BigInteger _pow = _get_10.pow(_intValue);
-          return Optional.<BigInteger>of(_pow);
+          return Optional.<BigInteger>of(leftVal.get().pow(rightVal.get().intValue()));
         default:
           break;
       }
@@ -354,15 +295,13 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLBitOp obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    HDLExpression _left = obj.getLeft();
-    final Optional<BigInteger> leftVal = this.subEvaluate(obj, _left, context, evaled);
+    final Optional<BigInteger> leftVal = this.subEvaluate(obj, obj.getLeft(), context, evaled);
     boolean _isPresent = leftVal.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    HDLExpression _right = obj.getRight();
-    final Optional<BigInteger> rightVal = this.subEvaluate(obj, _right, context, evaled);
+    final Optional<BigInteger> rightVal = this.subEvaluate(obj, obj.getRight(), context, evaled);
     boolean _isPresent_1 = rightVal.isPresent();
     boolean _not_1 = (!_isPresent_1);
     if (_not_1) {
@@ -372,34 +311,21 @@ public class ConstantEvaluate {
     if (_type != null) {
       switch (_type) {
         case AND:
-          BigInteger _get = leftVal.get();
-          BigInteger _get_1 = rightVal.get();
-          BigInteger _and = _get.and(_get_1);
-          return Optional.<BigInteger>of(_and);
+          return Optional.<BigInteger>of(leftVal.get().and(rightVal.get()));
         case OR:
-          BigInteger _get_2 = leftVal.get();
-          BigInteger _get_3 = rightVal.get();
-          BigInteger _or = _get_2.or(_get_3);
-          return Optional.<BigInteger>of(_or);
+          return Optional.<BigInteger>of(leftVal.get().or(rightVal.get()));
         case XOR:
-          BigInteger _get_4 = leftVal.get();
-          BigInteger _get_5 = rightVal.get();
-          BigInteger _xor = _get_4.xor(_get_5);
-          return Optional.<BigInteger>of(_xor);
+          return Optional.<BigInteger>of(leftVal.get().xor(rightVal.get()));
         case LOGI_AND:
-          BigInteger _get_6 = leftVal.get();
-          boolean _equals = BigInteger.ZERO.equals(_get_6);
+          boolean _equals = BigInteger.ZERO.equals(leftVal.get());
           final boolean l = (!_equals);
-          BigInteger _get_7 = rightVal.get();
-          boolean _equals_1 = BigInteger.ZERO.equals(_get_7);
+          boolean _equals_1 = BigInteger.ZERO.equals(rightVal.get());
           final boolean r = (!_equals_1);
           return ConstantEvaluate.boolInt((l && r));
         case LOGI_OR:
-          BigInteger _get_8 = leftVal.get();
-          boolean _equals_2 = BigInteger.ZERO.equals(_get_8);
+          boolean _equals_2 = BigInteger.ZERO.equals(leftVal.get());
           final boolean l_1 = (!_equals_2);
-          BigInteger _get_9 = rightVal.get();
-          boolean _equals_3 = BigInteger.ZERO.equals(_get_9);
+          boolean _equals_3 = BigInteger.ZERO.equals(rightVal.get());
           final boolean r_1 = (!_equals_3);
           return ConstantEvaluate.boolInt((l_1 || r_1));
         default:
@@ -410,15 +336,13 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLEqualityOp obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    HDLExpression _left = obj.getLeft();
-    final Optional<BigInteger> leftVal = this.subEvaluate(obj, _left, context, evaled);
+    final Optional<BigInteger> leftVal = this.subEvaluate(obj, obj.getLeft(), context, evaled);
     boolean _isPresent = leftVal.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    HDLExpression _right = obj.getRight();
-    final Optional<BigInteger> rightVal = this.subEvaluate(obj, _right, context, evaled);
+    final Optional<BigInteger> rightVal = this.subEvaluate(obj, obj.getRight(), context, evaled);
     boolean _isPresent_1 = rightVal.isPresent();
     boolean _not_1 = (!_isPresent_1);
     if (_not_1) {
@@ -428,38 +352,25 @@ public class ConstantEvaluate {
     if (_type != null) {
       switch (_type) {
         case EQ:
-          BigInteger _get = leftVal.get();
-          BigInteger _get_1 = rightVal.get();
-          boolean _equals = _get.equals(_get_1);
-          return ConstantEvaluate.boolInt(_equals);
+          return ConstantEvaluate.boolInt(leftVal.get().equals(rightVal.get()));
         case NOT_EQ:
-          BigInteger _get_2 = leftVal.get();
-          BigInteger _get_3 = rightVal.get();
-          boolean _equals_1 = _get_2.equals(_get_3);
-          boolean _not_2 = (!_equals_1);
+          boolean _equals = leftVal.get().equals(rightVal.get());
+          boolean _not_2 = (!_equals);
           return ConstantEvaluate.boolInt(_not_2);
         case GREATER:
-          BigInteger _get_4 = leftVal.get();
-          BigInteger _get_5 = rightVal.get();
-          int _compareTo = _get_4.compareTo(_get_5);
+          int _compareTo = leftVal.get().compareTo(rightVal.get());
           boolean _greaterThan = (_compareTo > 0);
           return ConstantEvaluate.boolInt(_greaterThan);
         case GREATER_EQ:
-          BigInteger _get_6 = leftVal.get();
-          BigInteger _get_7 = rightVal.get();
-          int _compareTo_1 = _get_6.compareTo(_get_7);
+          int _compareTo_1 = leftVal.get().compareTo(rightVal.get());
           boolean _greaterEqualsThan = (_compareTo_1 >= 0);
           return ConstantEvaluate.boolInt(_greaterEqualsThan);
         case LESS:
-          BigInteger _get_8 = leftVal.get();
-          BigInteger _get_9 = rightVal.get();
-          int _compareTo_2 = _get_8.compareTo(_get_9);
+          int _compareTo_2 = leftVal.get().compareTo(rightVal.get());
           boolean _lessThan = (_compareTo_2 < 0);
           return ConstantEvaluate.boolInt(_lessThan);
         case LESS_EQ:
-          BigInteger _get_10 = leftVal.get();
-          BigInteger _get_11 = rightVal.get();
-          int _compareTo_3 = _get_10.compareTo(_get_11);
+          int _compareTo_3 = leftVal.get().compareTo(rightVal.get());
           boolean _lessEqualsThan = (_compareTo_3 <= 0);
           return ConstantEvaluate.boolInt(_lessEqualsThan);
         default:
@@ -470,15 +381,13 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLShiftOp obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    HDLExpression _left = obj.getLeft();
-    final Optional<BigInteger> leftVal = this.subEvaluate(obj, _left, context, evaled);
+    final Optional<BigInteger> leftVal = this.subEvaluate(obj, obj.getLeft(), context, evaled);
     boolean _isPresent = leftVal.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return Optional.<BigInteger>absent();
     }
-    HDLExpression _right = obj.getRight();
-    final Optional<BigInteger> rightVal = this.subEvaluate(obj, _right, context, evaled);
+    final Optional<BigInteger> rightVal = this.subEvaluate(obj, obj.getRight(), context, evaled);
     boolean _isPresent_1 = rightVal.isPresent();
     boolean _not_1 = (!_isPresent_1);
     if (_not_1) {
@@ -488,41 +397,27 @@ public class ConstantEvaluate {
     if (_type != null) {
       switch (_type) {
         case SLL:
-          BigInteger _get = leftVal.get();
-          BigInteger _get_1 = rightVal.get();
-          int _intValue = _get_1.intValue();
-          BigInteger _shiftLeft = _get.shiftLeft(_intValue);
-          return Optional.<BigInteger>of(_shiftLeft);
+          return Optional.<BigInteger>of(leftVal.get().shiftLeft(rightVal.get().intValue()));
         case SRA:
-          BigInteger _get_2 = leftVal.get();
-          BigInteger _get_3 = rightVal.get();
-          int _intValue_1 = _get_3.intValue();
-          BigInteger _shiftRight = _get_2.shiftRight(_intValue_1);
-          return Optional.<BigInteger>of(_shiftRight);
+          return Optional.<BigInteger>of(leftVal.get().shiftRight(rightVal.get().intValue()));
         case SRL:
           final BigInteger l = leftVal.get();
           int _signum = l.signum();
           boolean _lessThan = (_signum < 0);
           if (_lessThan) {
-            HDLExpression _left_1 = obj.getLeft();
-            final Optional<? extends HDLType> t = TypeExtension.typeOf(_left_1);
+            final Optional<? extends HDLType> t = TypeExtension.typeOf(obj.getLeft());
             boolean _isPresent_2 = t.isPresent();
             if (_isPresent_2) {
-              HDLType _get_4 = t.get();
-              final Integer width = HDLPrimitives.getWidth(_get_4, context);
+              final Integer width = HDLPrimitives.getWidth(t.get(), context);
               if ((width != null)) {
-                BigInteger _get_5 = rightVal.get();
-                final int shiftWidth = _get_5.intValue();
+                final int shiftWidth = rightVal.get().intValue();
                 final BigInteger res = BigIntegerFrame.srl(l, (width).intValue(), shiftWidth);
                 return Optional.<BigInteger>of(res);
               }
             }
             return Optional.<BigInteger>absent();
           }
-          BigInteger _get_6 = rightVal.get();
-          int _intValue_2 = _get_6.intValue();
-          BigInteger _shiftRight_1 = l.shiftRight(_intValue_2);
-          return Optional.<BigInteger>of(_shiftRight_1);
+          return Optional.<BigInteger>of(l.shiftRight(rightVal.get().intValue()));
         default:
           break;
       }
@@ -535,8 +430,7 @@ public class ConstantEvaluate {
   }
   
   protected Optional<BigInteger> _constantEvaluate(final HDLVariableRef obj, final HDLEvaluationContext context, final Set<HDLQualifiedName> evaled) {
-    ArrayList<HDLExpression> _array = obj.getArray();
-    int _size = _array.size();
+    int _size = obj.getArray().size();
     boolean _notEquals = (_size != 0);
     if (_notEquals) {
       final Optional<HDLVariable> hVarOpt = obj.resolveVar();
@@ -550,16 +444,14 @@ public class ConstantEvaluate {
             return Optional.<BigInteger>absent();
           }
           final HDLExpression defVal = hVar.getDefaultValue();
-          ArrayList<HDLExpression> _array_1 = obj.getArray();
-          return this.arrayDefValue(defVal, _array_1, context, evaled);
+          return this.arrayDefValue(defVal, obj.getArray(), context, evaled);
         }
       }
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ARRAY_ACCESS_NOT_SUPPORTED_FOR_CONSTANTS);
       return Optional.<BigInteger>absent();
     }
-    ArrayList<HDLRange> _bits = obj.getBits();
-    int _size_1 = _bits.size();
+    int _size_1 = obj.getBits().size();
     boolean _notEquals_1 = (_size_1 != 0);
     if (_notEquals_1) {
       obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
@@ -580,26 +472,21 @@ public class ConstantEvaluate {
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.VARIABLE_NOT_RESOLVED);
       return Optional.<BigInteger>absent();
     }
-    HDLVariable _get = hVar_1.get();
-    final HDLQualifiedName fqn = FullNameExtension.fullNameOf(_get);
+    final HDLQualifiedName fqn = FullNameExtension.fullNameOf(hVar_1.get());
     boolean _contains = evaled.contains(fqn);
     if (_contains) {
-      HDLVariable _get_1 = hVar_1.get();
-      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _get_1);
+      obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, hVar_1.get());
       obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CONSTANT_EVAL_LOOP);
       return Optional.<BigInteger>absent();
     }
     evaled.add(fqn);
-    HDLVariable _get_2 = hVar_1.get();
-    final HDLVariableDeclaration.HDLDirection dir = _get_2.getDirection();
+    final HDLVariableDeclaration.HDLDirection dir = hVar_1.get().getDirection();
     boolean _equals_1 = Objects.equal(dir, HDLVariableDeclaration.HDLDirection.CONSTANT);
     if (_equals_1) {
       if (((context != null) && context.ignoreConstantRefs)) {
         return Optional.<BigInteger>absent();
       }
-      HDLVariable _get_3 = hVar_1.get();
-      HDLExpression _defaultValue = _get_3.getDefaultValue();
-      final Optional<BigInteger> subEval = this.subEvaluate(obj, _defaultValue, context, evaled);
+      final Optional<BigInteger> subEval = this.subEvaluate(obj, hVar_1.get().getDefaultValue(), context, evaled);
       boolean _isPresent_2 = subEval.isPresent();
       if (_isPresent_2) {
         evaled.remove(fqn);
@@ -618,11 +505,9 @@ public class ConstantEvaluate {
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.CAN_NOT_USE_PARAMETER);
         return Optional.<BigInteger>absent();
       }
-      HDLVariable _get_4 = hVar_1.get();
-      final HDLExpression cRef = context.get(_get_4);
+      final HDLExpression cRef = context.get(hVar_1.get());
       if ((cRef == null)) {
-        HDLVariable _get_5 = hVar_1.get();
-        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, _get_5);
+        obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, hVar_1.get());
         obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.SUBEXPRESSION_DID_NOT_EVALUATE_IN_THIS_CONTEXT);
         return Optional.<BigInteger>absent();
       }
@@ -651,27 +536,20 @@ public class ConstantEvaluate {
       if (_isEmpty) {
         return Optional.<BigInteger>absent();
       }
-      HDLExpression _get = expressions.get(0);
-      final Optional<BigInteger> idx = ConstantEvaluate.valueOf(_get, context);
+      final Optional<BigInteger> idx = ConstantEvaluate.valueOf(expressions.get(0), context);
       boolean _isPresent = idx.isPresent();
       boolean _not = (!_isPresent);
       if (_not) {
         return Optional.<BigInteger>absent();
       }
       final HDLArrayInit arr = ((HDLArrayInit) expression);
-      BigInteger _get_1 = idx.get();
-      final int idxValue = _get_1.intValue();
-      ArrayList<HDLExpression> _exp = arr.getExp();
-      int _size = _exp.size();
+      final int idxValue = idx.get().intValue();
+      int _size = arr.getExp().size();
       boolean _lessThan = (_size < idxValue);
       if (_lessThan) {
         return Optional.<BigInteger>of(BigInteger.ZERO);
       }
-      ArrayList<HDLExpression> _exp_1 = arr.getExp();
-      HDLExpression _get_2 = _exp_1.get(idxValue);
-      int _size_1 = expressions.size();
-      List<HDLExpression> _subList = expressions.subList(1, _size_1);
-      return this.arrayDefValue(_get_2, _subList, context, evaled);
+      return this.arrayDefValue(arr.getExp().get(idxValue), expressions.subList(1, expressions.size()), context, evaled);
     }
     return this.constantEvaluate(expression, context, evaled);
   }
@@ -687,10 +565,7 @@ public class ConstantEvaluate {
       }
       final HDLEnum hEnum = resolveHEnum.get();
       final HDLVariable hVar = resolveVar.get();
-      ArrayList<HDLVariable> _enums = hEnum.getEnums();
-      int _indexOf = _enums.indexOf(hVar);
-      BigInteger _valueOf = BigInteger.valueOf(_indexOf);
-      return Optional.<BigInteger>of(_valueOf);
+      return Optional.<BigInteger>of(BigInteger.valueOf(hEnum.getEnums().indexOf(hVar)));
     }
     obj.<IHDLObject>addMeta(ProblemDescription.SOURCE, obj);
     obj.<ProblemDescription>addMeta(ProblemDescription.DESCRIPTION, ProblemDescription.ENUMS_NOT_SUPPORTED_FOR_CONSTANTS);

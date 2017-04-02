@@ -51,12 +51,9 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
     final int li = moduleName.lastIndexOf(".");
     this.packageName = null;
     if ((li != (-1))) {
-      String _substring = moduleName.substring(0, li);
-      this.packageName = _substring;
+      this.packageName = moduleName.substring(0, li);
     }
-    int _length = moduleName.length();
-    String _substring_1 = moduleName.substring((li + 1), _length);
-    this.unitName = _substring_1;
+    this.unitName = moduleName.substring((li + 1), moduleName.length());
   }
   
   public JavaCodeGeneratorParameter setPackageName(final String packageName) {
@@ -80,10 +77,10 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
       return this.changeAdapterName(useInterface);
     }
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(this.packageName, "");
+    _builder.append(this.packageName);
     _builder.append(".");
     String _changeAdapterName = this.changeAdapterName(useInterface);
-    _builder.append(_changeAdapterName, "");
+    _builder.append(_changeAdapterName);
     return _builder.toString();
   }
   
@@ -103,9 +100,9 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
       return this.unitName;
     }
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(this.packageName, "");
+    _builder.append(this.packageName);
     _builder.append(".");
-    _builder.append(this.unitName, "");
+    _builder.append(this.unitName);
     return _builder.toString();
   }
 }

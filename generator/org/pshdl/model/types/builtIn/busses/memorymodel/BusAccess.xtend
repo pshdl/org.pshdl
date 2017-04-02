@@ -85,16 +85,16 @@ typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row
 void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg) {
     switch (t) {
         case error:
-            printf("ERROR for value 0x%llx of definition %s of row %s %s\n",value ,def,row,msg);
+            printf("ERROR for value 0x%llx of definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
             break;
         case limit:
-            printf("Limited value 0x%llx for definition %s of row %s %s\n",value ,def,row,msg);
+            printf("Limited value 0x%llx for definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
             break;
         case mask:
-            printf("Masked value 0x%llx for definition %s of row %s %s\n",value ,def,row,msg);
+            printf("Masked value 0x%llx for definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
             break;
         case invalidIndex:
-            printf("The index 0x%llx is not valid for the column %s %s\n", value, row, msg);
+            printf("The index 0x%llx is not valid for the column %s %s"PSHDL_NL, value, row, msg);
     }
     
 }
@@ -110,6 +110,11 @@ void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *d
 #define «prefix»BusPrint_h
 
 #include "«prefix»BusAccess.h"
+
+#ifndef PSHDL_NL
+#define PSHDL_NL "\n"
+#endif
+
 /**
  * An implementation of the warn handler that prints the warning to stdout
  */
@@ -146,7 +151,7 @@ void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name
 			if (!checkedRows.contains(row.name)) {
 				res = res + '''void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name»_t *data){
     printf("«row.name.toFirstUpper» «FOR Definition d : row.allDefs» «d.name»: 0x%0«Math.ceil(
-					MemoryModel.getSize(d) / 4f).intValue»x«ENDFOR»\n"«FOR Definition d : row.allDefs», data->«row.
+					MemoryModel.getSize(d) / 4f).intValue»x«ENDFOR»"PSHDL_NL«FOR Definition d : row.allDefs», data->«row.
 					getVarNameIndex(d)»«ENDFOR»);
 }
 '''

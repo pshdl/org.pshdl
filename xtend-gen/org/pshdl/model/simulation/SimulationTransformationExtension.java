@@ -103,8 +103,7 @@ public class SimulationTransformationExtension {
   private final static String PSEX_STAGE = "PSEX";
   
   public static FluidFrame simulationModelOf(final HDLUnit obj, final HDLEvaluationContext context) {
-    HDLEvaluationContext _withEnumAndBool = context.withEnumAndBool(true, true);
-    return SimulationTransformationExtension.INST.toSimulationModelUnit(obj, _withEnumAndBool);
+    return SimulationTransformationExtension.INST.toSimulationModelUnit(obj, context.withEnumAndBool(true, true));
   }
   
   protected FluidFrame _toSimulationModel(final IHDLObject obj, final HDLEvaluationContext context, final String process) {
@@ -135,16 +134,12 @@ public class SimulationTransformationExtension {
     String newProcess = process;
     Boolean _process = obj.getProcess();
     if ((_process).booleanValue()) {
-      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-      String _lastSegment = _fullNameOf.getLastSegment();
-      String _replaceAll = _lastSegment.replaceAll("@", "");
-      newProcess = _replaceAll;
+      newProcess = FullNameExtension.fullNameOf(obj).getLastSegment().replaceAll("@", "");
     }
     final FluidFrame frame = new FluidFrame(obj, null, false, newProcess);
     ArrayList<HDLStatement> _statements = obj.getStatements();
     for (final HDLStatement stmnt : _statements) {
-      FluidFrame _simulationModel = this.toSimulationModel(stmnt, context, frame.simProcess);
-      frame.addReferencedFrame(_simulationModel);
+      frame.addReferencedFrame(this.toSimulationModel(stmnt, context, frame.simProcess));
     }
     return frame;
   }
@@ -153,16 +148,12 @@ public class SimulationTransformationExtension {
     String newProcess = process;
     Boolean _process = obj.getProcess();
     if ((_process).booleanValue()) {
-      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-      String _lastSegment = _fullNameOf.getLastSegment();
-      String _replaceAll = _lastSegment.replaceAll("@", "");
-      newProcess = _replaceAll;
+      newProcess = FullNameExtension.fullNameOf(obj).getLastSegment().replaceAll("@", "");
     }
     final FluidFrame frame = new FluidFrame(obj, null, false, newProcess);
     ArrayList<HDLStatement> _statements = obj.getStatements();
     for (final HDLStatement stmnt : _statements) {
-      FluidFrame _simulationModelPred = this.toSimulationModelPred(stmnt, predicate, context, frame.simProcess);
-      frame.addReferencedFrame(_simulationModelPred);
+      frame.addReferencedFrame(this.toSimulationModelPred(stmnt, predicate, context, frame.simProcess));
     }
     return frame;
   }
@@ -184,27 +175,20 @@ public class SimulationTransformationExtension {
     final Optional<BigInteger> constVal = ConstantEvaluate.valueOf(obj, context);
     boolean _isPresent = constVal.isPresent();
     if (_isPresent) {
-      BigInteger _get = constVal.get();
-      HDLLiteral _get_1 = HDLLiteral.get(_get);
-      return this.toSimulationModel(_get_1, context, process);
+      return this.toSimulationModel(HDLLiteral.get(constVal.get()), context, process);
     }
     final FluidFrame res = new FluidFrame(obj, process);
     ArrayList<HDLExpression> _params = obj.getParams();
     for (final HDLExpression e : _params) {
-      FluidFrame _simulationModel = this.toSimulationModel(e, context, process);
-      res.append(_simulationModel);
+      res.append(this.toSimulationModel(e, context, process));
     }
     final HDLFunction func = obj.resolveFunctionForced(SimulationTransformationExtension.PSEX_STAGE);
-    HDLFunctionParameter _returnType = func.getReturnType();
-    final ParameterInformation returnType = this.toParameterInformation(_returnType, context);
+    final ParameterInformation returnType = this.toParameterInformation(func.getReturnType(), context);
     ArrayList<HDLFunctionParameter> _args = func.getArgs();
     List<ParameterInformation> _map = null;
     if (_args!=null) {
-      final Function1<HDLFunctionParameter, ParameterInformation> _function = new Function1<HDLFunctionParameter, ParameterInformation>() {
-        @Override
-        public ParameterInformation apply(final HDLFunctionParameter it) {
-          return SimulationTransformationExtension.this.toParameterInformation(it, context);
-        }
+      final Function1<HDLFunctionParameter, ParameterInformation> _function = (HDLFunctionParameter it) -> {
+        return this.toParameterInformation(it, context);
       };
       _map=ListExtensions.<HDLFunctionParameter, ParameterInformation>map(_args, _function);
     }
@@ -212,8 +196,7 @@ public class SimulationTransformationExtension {
     HDLStatement _container = obj.<HDLStatement>getContainer(HDLStatement.class);
     final boolean isStatement = (_container == null);
     String _name = func.getName();
-    ArrayList<HDLAnnotation> _annotations = func.getAnnotations();
-    String[] _annoString = this.toAnnoString(_annotations);
+    String[] _annoString = this.toAnnoString(func.getAnnotations());
     final FunctionInformation fi = new FunctionInformation(_name, isStatement, returnType, ((ParameterInformation[])Conversions.unwrapArray(args, ParameterInformation.class)), _annoString);
     final String sig = fi.signature();
     res.funcs.put(sig, fi);
@@ -221,8 +204,7 @@ public class SimulationTransformationExtension {
     if ((args == null)) {
       _xifexpression = "0";
     } else {
-      int _length = ((Object[])Conversions.unwrapArray(args, Object.class)).length;
-      _xifexpression = Integer.valueOf(_length).toString();
+      _xifexpression = Integer.valueOf(((Object[])Conversions.unwrapArray(args, Object.class)).length).toString();
     }
     FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.invokeFunction, sig, _xifexpression);
     res.add(_argumentedInstruction);
@@ -233,32 +215,25 @@ public class SimulationTransformationExtension {
     if ((parameter == null)) {
       return null;
     }
-    HDLFunctionParameter.RWType _rw = parameter.getRw();
-    String _string = _rw.toString();
-    final ParameterInformation.RWType rwType = ParameterInformation.RWType.getOp(_string);
-    HDLFunctionParameter.Type _type = parameter.getType();
-    String _string_1 = _type.toString();
-    final ParameterInformation.Type type = ParameterInformation.Type.getOp(_string_1);
+    final ParameterInformation.RWType rwType = ParameterInformation.RWType.getOp(parameter.getRw().toString());
+    final ParameterInformation.Type type = ParameterInformation.Type.getOp(parameter.getType().toString());
     HDLQualifiedName _enumSpecRefName = parameter.getEnumSpecRefName();
-    String _string_2 = null;
+    String _string = null;
     if (_enumSpecRefName!=null) {
-      _string_2=_enumSpecRefName.toString();
+      _string=_enumSpecRefName.toString();
     }
-    final String enumSpecRefName = _string_2;
+    final String enumSpecRefName = _string;
     HDLQualifiedName _ifSpecRefName = parameter.getIfSpecRefName();
-    String _string_3 = null;
+    String _string_1 = null;
     if (_ifSpecRefName!=null) {
-      _string_3=_ifSpecRefName.toString();
+      _string_1=_ifSpecRefName.toString();
     }
-    final String ifSpec = _string_3;
+    final String ifSpec = _string_1;
     ArrayList<HDLFunctionParameter> _funcSpec = parameter.getFuncSpec();
     List<ParameterInformation> _map = null;
     if (_funcSpec!=null) {
-      final Function1<HDLFunctionParameter, ParameterInformation> _function = new Function1<HDLFunctionParameter, ParameterInformation>() {
-        @Override
-        public ParameterInformation apply(final HDLFunctionParameter it) {
-          return SimulationTransformationExtension.this.toParameterInformation(it, context);
-        }
+      final Function1<HDLFunctionParameter, ParameterInformation> _function = (HDLFunctionParameter it) -> {
+        return this.toParameterInformation(it, context);
       };
       _map=ListExtensions.<HDLFunctionParameter, ParameterInformation>map(_funcSpec, _function);
     }
@@ -269,15 +244,12 @@ public class SimulationTransformationExtension {
       _parameterInformation=this.toParameterInformation(_funcReturnSpec, context);
     }
     final ParameterInformation funcReturnSpec = _parameterInformation;
-    HDLVariable _name = parameter.getName();
-    final String name = _name.getName();
-    HDLExpression _width = parameter.getWidth();
-    final Optional<BigInteger> widthOpt = ConstantEvaluate.valueOf(_width, context);
+    final String name = parameter.getName().getName();
+    final Optional<BigInteger> widthOpt = ConstantEvaluate.valueOf(parameter.getWidth(), context);
     int _xifexpression = (int) 0;
     boolean _isPresent = widthOpt.isPresent();
     if (_isPresent) {
-      BigInteger _get = widthOpt.get();
-      _xifexpression = _get.intValue();
+      _xifexpression = widthOpt.get().intValue();
     } else {
       _xifexpression = (-1);
     }
@@ -285,12 +257,8 @@ public class SimulationTransformationExtension {
     ArrayList<HDLExpression> _dim = parameter.getDim();
     List<Integer> _map_1 = null;
     if (_dim!=null) {
-      final Function1<HDLExpression, Integer> _function_1 = new Function1<HDLExpression, Integer>() {
-        @Override
-        public Integer apply(final HDLExpression it) {
-          BigInteger _valueOfForced = ConstantEvaluate.valueOfForced(it, context, SimulationTransformationExtension.PSEX_STAGE);
-          return Integer.valueOf(_valueOfForced.intValue());
-        }
+      final Function1<HDLExpression, Integer> _function_1 = (HDLExpression it) -> {
+        return Integer.valueOf(ConstantEvaluate.valueOfForced(it, context, SimulationTransformationExtension.PSEX_STAGE).intValue());
       };
       _map_1=ListExtensions.<HDLExpression, Integer>map(_dim, _function_1);
     }
@@ -305,8 +273,7 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModelInit(final HDLExpression obj, final HDLEvaluationContext context, final String varName, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
-    FluidFrame _simulationModel = this.toSimulationModel(obj, context, process);
-    res.append(_simulationModel);
+    res.append(this.toSimulationModel(obj, context, process));
     FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.writeInternal, varName);
     res.add(_argumentedInstruction);
     return res;
@@ -318,14 +285,10 @@ public class SimulationTransformationExtension {
     ArrayList<HDLExpression> _exp = obj.getExp();
     for (final HDLExpression exp : _exp) {
       {
-        HDLLiteral _get = HDLLiteral.get(pos);
-        FluidFrame _simulationModel = this.toSimulationModel(_get, context, process);
-        res.append(_simulationModel);
+        res.append(this.toSimulationModel(HDLLiteral.get(pos), context, process));
         FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.pushAddIndex, varName, "0");
         res.add(_argumentedInstruction);
-        String _addDynamicIdx = this.addDynamicIdx(varName);
-        FluidFrame _simulationModelInit = this.toSimulationModelInit(exp, context, _addDynamicIdx, process);
-        res.append(_simulationModelInit);
+        res.append(this.toSimulationModelInit(exp, context, this.addDynamicIdx(varName), process));
         pos = (pos + 1);
       }
     }
@@ -353,8 +316,7 @@ public class SimulationTransformationExtension {
     Integer width = _xifexpression;
     HDLRegisterConfig _register = obj.getRegister();
     final boolean isReg = (_register != null);
-    String _name = HDLSimulator.TB_VAR.getName();
-    final HDLAnnotation simAnno = obj.getAnnotation(_name);
+    final HDLAnnotation simAnno = obj.getAnnotation(HDLSimulator.TB_VAR.getName());
     String newProcess = process;
     if (((newProcess == null) && (simAnno != null))) {
       newProcess = "ONCE";
@@ -392,14 +354,11 @@ public class SimulationTransformationExtension {
         final boolean clock = (_annotation_1 != null);
         HDLAnnotation _annotation_2 = hVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.reset);
         final boolean reset = (_annotation_2 != null);
-        HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
-        final String varName = _fullNameOf.toString();
+        final String varName = FullNameExtension.fullNameOf(hVar).toString();
         final LinkedList<Integer> dims = new LinkedList<Integer>();
         ArrayList<HDLExpression> _dimensions = hVar.getDimensions();
         for (final HDLExpression dim : _dimensions) {
-          BigInteger _valueOfForced = ConstantEvaluate.valueOfForced(dim, context, SimulationTransformationExtension.PSEX_STAGE);
-          int _intValue = _valueOfForced.intValue();
-          dims.add(Integer.valueOf(_intValue));
+          dims.add(Integer.valueOf(ConstantEvaluate.valueOfForced(dim, context, SimulationTransformationExtension.PSEX_STAGE).intValue()));
         }
         final VariableInformation.Type vType = this.asType(type);
         ArrayList<HDLAnnotation> _annotations = hVar.getAnnotations();
@@ -410,18 +369,10 @@ public class SimulationTransformationExtension {
         boolean _tripleEquals_1 = (_classType_1 == HDLClass.HDLEnum);
         if (_tripleEquals_1) {
           final HDLEnum hEnum = ((HDLEnum) type);
-          HDLAnnotation _hDLAnnotation = new HDLAnnotation();
-          HDLAnnotation _setName = _hDLAnnotation.setName("@enumNames");
-          ArrayList<HDLVariable> _enums = hEnum.getEnums();
-          final Function1<HDLVariable, String> _function = new Function1<HDLVariable, String>() {
-            @Override
-            public String apply(final HDLVariable it) {
-              return it.getName();
-            }
+          final Function1<HDLVariable, String> _function = (HDLVariable it) -> {
+            return it.getName();
           };
-          List<String> _map = ListExtensions.<HDLVariable, String>map(_enums, _function);
-          String _join = IterableExtensions.join(_map, ";");
-          final HDLAnnotation enumAnno = _setName.setValue(_join);
+          final HDLAnnotation enumAnno = new HDLAnnotation().setName("@enumNames").setValue(IterableExtensions.join(ListExtensions.<HDLVariable, String>map(hEnum.getEnums(), _function), ";"));
           allAnnos.add(enumAnno);
         }
         String[] _annoString = this.toAnnoString(allAnnos);
@@ -430,11 +381,9 @@ public class SimulationTransformationExtension {
       }
     }
     if (isReg) {
-      HDLRegisterConfig _register_1 = obj.getRegister();
-      final HDLRegisterConfig config = _register_1.normalize();
+      final HDLRegisterConfig config = obj.getRegister().normalize();
       final HDLExpression rst = config.getRst();
-      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(rst);
-      final String rstName = _fullNameOf.toString();
+      final String rstName = FullNameExtension.fullNameOf(rst).toString();
       HDLRegisterConfig.HDLRegResetActiveType _resetType = config.getResetType();
       boolean _tripleEquals_1 = (_resetType == HDLRegisterConfig.HDLRegResetActiveType.HIGH);
       if (_tripleEquals_1) {
@@ -448,8 +397,7 @@ public class SimulationTransformationExtension {
       boolean _tripleEquals_2 = (_syncType == HDLRegisterConfig.HDLRegSyncType.SYNC);
       if (_tripleEquals_2) {
         final HDLExpression clk = config.getClk();
-        HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(clk);
-        final String name = _fullNameOf_1.toString();
+        final String name = FullNameExtension.fullNameOf(clk).toString();
         HDLRegisterConfig.HDLRegClockType _clockType = config.getClockType();
         boolean _tripleEquals_3 = (_clockType == HDLRegisterConfig.HDLRegClockType.RISING);
         if (_tripleEquals_3) {
@@ -525,24 +473,19 @@ public class SimulationTransformationExtension {
   }
   
   public String[] toAnnoString(final Iterable<HDLAnnotation> annotations) {
-    final Function1<HDLAnnotation, String> _function = new Function1<HDLAnnotation, String>() {
-      @Override
-      public String apply(final HDLAnnotation it) {
-        String _xifexpression = null;
-        String _value = it.getValue();
-        boolean _tripleEquals = (_value == null);
-        if (_tripleEquals) {
-          String _name = it.getName();
-          _xifexpression = _name.substring(1);
-        } else {
-          String _name_1 = it.getName();
-          String _substring = _name_1.substring(1);
-          String _plus = (_substring + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
-          String _value_1 = it.getValue();
-          _xifexpression = (_plus + _value_1);
-        }
-        return _xifexpression;
+    final Function1<HDLAnnotation, String> _function = (HDLAnnotation it) -> {
+      String _xifexpression = null;
+      String _value = it.getValue();
+      boolean _tripleEquals = (_value == null);
+      if (_tripleEquals) {
+        _xifexpression = it.getName().substring(1);
+      } else {
+        String _substring = it.getName().substring(1);
+        String _plus = (_substring + Character.valueOf(SimulationTransformationExtension.ANNO_VALUE_SEP));
+        String _value_1 = it.getValue();
+        _xifexpression = (_plus + _value_1);
       }
+      return _xifexpression;
     };
     return ((String[])Conversions.unwrapArray(IterableExtensions.<HDLAnnotation, String>map(annotations, _function), String.class));
   }
@@ -559,8 +502,7 @@ public class SimulationTransformationExtension {
       for (final HDLVariable hVar : _variables) {
         {
           res.add(Instruction.const0);
-          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
-          String varName = _fullNameOf.toString();
+          String varName = FullNameExtension.fullNameOf(hVar).toString();
           if (toReg) {
             varName = (varName + InternalInformation.REG_POSTFIX);
           }
@@ -568,18 +510,15 @@ public class SimulationTransformationExtension {
           res.add(_argumentedInstruction);
           HDLExpression _resetValue_1 = config.getResetValue();
           final HDLArrayInit arr = ((HDLArrayInit) _resetValue_1);
-          FluidFrame _simulationModelInit = this.toSimulationModelInit(arr, context, varName, process);
-          res.append(_simulationModelInit);
+          res.append(this.toSimulationModelInit(arr, context, varName, process));
         }
       }
     } else {
-      HDLExpression _resetValue_1 = config.getResetValue();
-      final FluidFrame resetFrame = this.toSimulationModel(_resetValue_1, context, process);
+      final FluidFrame resetFrame = this.toSimulationModel(config.getResetValue(), context, process);
       ArrayList<HDLVariable> _variables_1 = obj.getVariables();
       for (final HDLVariable hVar_1 : _variables_1) {
         {
-          HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar_1);
-          String varName = _fullNameOf.toString();
+          String varName = FullNameExtension.fullNameOf(hVar_1).toString();
           if (toReg) {
             varName = (varName + InternalInformation.REG_POSTFIX);
           }
@@ -596,13 +535,10 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModelPred(final HDLSwitchStatement obj, final FluidFrame.ArgumentedInstruction predicate, final HDLEvaluationContext context, final String process) {
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-    final String name = _fullNameOf.toString();
-    HDLExpression _caseExp = obj.getCaseExp();
-    final FluidFrame res = this.toSimulationModel(_caseExp, context, process);
+    final String name = FullNameExtension.fullNameOf(obj).toString();
+    final FluidFrame res = this.toSimulationModel(obj.getCaseExp(), context, process);
     res.setName(name);
-    HDLExpression _caseExp_1 = obj.getCaseExp();
-    final HDLType type = TypeExtension.typeOfForced(_caseExp_1, SimulationTransformationExtension.PSEX_STAGE);
+    final HDLType type = TypeExtension.typeOfForced(obj.getCaseExp(), SimulationTransformationExtension.PSEX_STAGE);
     Integer _xifexpression = null;
     HDLClass _classType = type.getClassType();
     boolean _tripleEquals = (_classType == HDLClass.HDLPrimitive);
@@ -617,8 +553,7 @@ public class SimulationTransformationExtension {
     ArrayList<HDLSwitchCaseStatement> _cases = obj.getCases();
     for (final HDLSwitchCaseStatement c : _cases) {
       {
-        HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(c);
-        final String cName = _fullNameOf_1.toString();
+        final String cName = FullNameExtension.fullNameOf(c).toString();
         final FluidFrame caseFrame = new FluidFrame(obj, (InternalInformation.PRED_PREFIX + cName), false, process);
         if ((predicate != null)) {
           caseFrame.add(predicate);
@@ -631,39 +566,32 @@ public class SimulationTransformationExtension {
           for (final HDLSwitchCaseStatement cSub : _cases_1) {
             boolean _notEquals = (!Objects.equal(cSub, c));
             if (_notEquals) {
-              HDLQualifiedName _fullNameOf_2 = FullNameExtension.fullNameOf(cSub);
-              String _string = _fullNameOf_2.toString();
+              String _string = FullNameExtension.fullNameOf(cSub).toString();
               FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.negPredicate, _string);
               caseFrame.add(_argumentedInstruction);
             }
           }
           caseFrame.addConstant("true", BigInteger.ONE, VariableInformation.Type.BOOL);
         } else {
-          HDLExpression _label_1 = c.getLabel();
-          final Optional<BigInteger> const_ = ConstantEvaluate.valueOf(_label_1, context);
+          final Optional<BigInteger> const_ = ConstantEvaluate.valueOf(c.getLabel(), context);
           int l = 0;
           boolean _isPresent = const_.isPresent();
           if (_isPresent) {
-            BigInteger _get = const_.get();
-            int _intValue = _get.intValue();
-            l = _intValue;
+            l = const_.get().intValue();
           } else {
-            HDLExpression _label_2 = c.getLabel();
-            HDLClass _classType_1 = _label_2.getClassType();
+            HDLClass _classType_1 = c.getLabel().getClassType();
             boolean _tripleEquals_2 = (_classType_1 == HDLClass.HDLEnumRef);
             if (_tripleEquals_2) {
-              HDLExpression _label_3 = c.getLabel();
-              final HDLEnumRef ref = ((HDLEnumRef) _label_3);
-              int _asInt = this.asInt(ref);
-              l = _asInt;
+              HDLExpression _label_1 = c.getLabel();
+              final HDLEnumRef ref = ((HDLEnumRef) _label_1);
+              l = this.asInt(ref);
             } else {
               throw new IllegalArgumentException("Unsupported label type");
             }
           }
           FluidFrame.ArgumentedInstruction _argumentedInstruction_1 = new FluidFrame.ArgumentedInstruction(Instruction.loadInternal, name);
           caseFrame.add(_argumentedInstruction_1);
-          BigInteger _valueOf = BigInteger.valueOf(l);
-          caseFrame.addConstant("label", _valueOf, VariableInformation.Type.UINT);
+          caseFrame.addConstant("label", BigInteger.valueOf(l), VariableInformation.Type.UINT);
           caseFrame.add(Instruction.eq);
         }
         ArrayList<HDLStatement> _dos = c.getDos();
@@ -683,15 +611,12 @@ public class SimulationTransformationExtension {
   public int asInt(final HDLEnumRef ref) {
     final HDLEnum hEnum = ref.resolveHEnumForced(SimulationTransformationExtension.PSEX_STAGE);
     final HDLVariable hVar = ref.resolveVarForced(SimulationTransformationExtension.PSEX_STAGE);
-    ArrayList<HDLVariable> _enums = hEnum.getEnums();
-    return _enums.indexOf(hVar);
+    return hEnum.getEnums().indexOf(hVar);
   }
   
   protected FluidFrame _toSimulationModel(final HDLIfStatement obj, final HDLEvaluationContext context, final String process) {
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-    final String name = _fullNameOf.toString();
-    HDLExpression _ifExp = obj.getIfExp();
-    final FluidFrame ifModel = this.toSimulationModel(_ifExp, context, process);
+    final String name = FullNameExtension.fullNameOf(obj).toString();
+    final FluidFrame ifModel = this.toSimulationModel(obj.getIfExp(), context, process);
     ifModel.setName((InternalInformation.PRED_PREFIX + name));
     ifModel.createPredVar();
     ArrayList<HDLStatement> _thenDo = obj.getThenDo();
@@ -721,8 +646,7 @@ public class SimulationTransformationExtension {
     }
     HDLReference left = obj.getLeft();
     if ((left instanceof HDLVariableRef)) {
-      HDLVariableRef _redirectRef = this.redirectRef(((HDLVariableRef) left));
-      left = _redirectRef;
+      left = this.redirectRef(((HDLVariableRef) left));
     }
     final HDLVariable hVar = this.resolveVar(left);
     HDLVariableDeclaration.HDLDirection _direction = hVar.getDirection();
@@ -734,11 +658,9 @@ public class SimulationTransformationExtension {
     }
     FluidFrame res = new FluidFrame(obj, assignmentVarName, constant, process);
     if ((config != null)) {
-      HDLRegisterConfig _normalize = config.normalize();
-      config = _normalize;
+      config = config.normalize();
       final HDLExpression clk = config.getClk();
-      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(clk);
-      final String name = _fullNameOf.toString();
+      final String name = FullNameExtension.fullNameOf(clk).toString();
       HDLRegisterConfig.HDLRegClockType _clockType = config.getClockType();
       boolean _equals = Objects.equal(_clockType, HDLRegisterConfig.HDLRegClockType.RISING);
       if (_equals) {
@@ -749,8 +671,7 @@ public class SimulationTransformationExtension {
         res.add(_argumentedInstruction_1);
       }
       final HDLExpression rst = config.getRst();
-      HDLQualifiedName _fullNameOf_1 = FullNameExtension.fullNameOf(rst);
-      final String rstName = _fullNameOf_1.toString();
+      final String rstName = FullNameExtension.fullNameOf(rst).toString();
       HDLRegisterConfig.HDLRegResetActiveType _resetType = config.getResetType();
       boolean _tripleEquals = (_resetType == HDLRegisterConfig.HDLRegResetActiveType.HIGH);
       if (_tripleEquals) {
@@ -761,14 +682,10 @@ public class SimulationTransformationExtension {
         res.add(_argumentedInstruction_3);
       }
     }
-    HDLExpression _right = obj.getRight();
-    FluidFrame _simulationModel = this.toSimulationModel(_right, context, process);
-    res.append(_simulationModel);
+    res.append(this.toSimulationModel(obj.getRight(), context, process));
     if ((left instanceof HDLVariableRef)) {
-      ArrayList<HDLExpression> _array = ((HDLVariableRef)left).getArray();
-      this.createPushIndex(_array, context, res, process, assignmentVarName);
-      ArrayList<HDLRange> _bits = ((HDLVariableRef)left).getBits();
-      this.createPushIndexBits(_bits, context, res, process, assignmentVarName);
+      this.createPushIndex(((HDLVariableRef)left).getArray(), context, res, process, assignmentVarName);
+      this.createPushIndexBits(((HDLVariableRef)left).getBits(), context, res, process, assignmentVarName);
     }
     return res;
   }
@@ -776,9 +693,7 @@ public class SimulationTransformationExtension {
   public void createPushIndexBits(final ArrayList<HDLRange> array, final HDLEvaluationContext context, final FluidFrame res, final String process, final String assignmentVarName) {
     boolean fixedBit = true;
     for (final HDLRange idx : array) {
-      HDLExpression _to = idx.getTo();
-      Optional<BigInteger> _valueOf = ConstantEvaluate.valueOf(_to, context);
-      boolean _isPresent = _valueOf.isPresent();
+      boolean _isPresent = ConstantEvaluate.valueOf(idx.getTo(), context).isPresent();
       boolean _not = (!_isPresent);
       if (_not) {
         fixedBit = false;
@@ -787,9 +702,7 @@ public class SimulationTransformationExtension {
     if ((!fixedBit)) {
       for (final HDLRange idx_1 : array) {
         {
-          HDLExpression _to_1 = idx_1.getTo();
-          FluidFrame _simulationModel = this.toSimulationModel(_to_1, context, process);
-          res.append(_simulationModel);
+          res.append(this.toSimulationModel(idx_1.getTo(), context, process));
           FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.pushAddIndex, assignmentVarName, "1");
           res.add(_argumentedInstruction);
         }
@@ -800,8 +713,7 @@ public class SimulationTransformationExtension {
   public void createPushIndex(final ArrayList<HDLExpression> array, final HDLEvaluationContext context, final FluidFrame res, final String process, final String assignmentVarName) {
     boolean fixedArray = true;
     for (final HDLExpression idx : array) {
-      Optional<BigInteger> _valueOf = ConstantEvaluate.valueOf(idx, context);
-      boolean _isPresent = _valueOf.isPresent();
+      boolean _isPresent = ConstantEvaluate.valueOf(idx, context).isPresent();
       boolean _not = (!_isPresent);
       if (_not) {
         fixedArray = false;
@@ -810,8 +722,7 @@ public class SimulationTransformationExtension {
     if ((!fixedArray)) {
       for (final HDLExpression idx_1 : array) {
         {
-          FluidFrame _simulationModel = this.toSimulationModel(idx_1, context, process);
-          res.append(_simulationModel);
+          res.append(this.toSimulationModel(idx_1, context, process));
           FluidFrame.ArgumentedInstruction _argumentedInstruction = new FluidFrame.ArgumentedInstruction(Instruction.pushAddIndex, assignmentVarName, "0");
           res.add(_argumentedInstruction);
         }
@@ -832,19 +743,14 @@ public class SimulationTransformationExtension {
   
   public static String getVarName(final HDLVariableRef hVar, final boolean withBits, final HDLEvaluationContext context) {
     final StringBuilder sb = new StringBuilder();
-    HDLVariable _resolveVarForced = hVar.resolveVarForced("PSEX");
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(_resolveVarForced);
-    sb.append(_fullNameOf);
+    sb.append(FullNameExtension.fullNameOf(hVar.resolveVarForced("PSEX")));
     ArrayList<HDLExpression> _array = hVar.getArray();
     for (final HDLExpression exp : _array) {
       {
         final Optional<BigInteger> s = ConstantEvaluate.valueOf(exp, context);
         boolean _isPresent = s.isPresent();
         if (_isPresent) {
-          StringBuilder _append = sb.append("[");
-          BigInteger _get = s.get();
-          StringBuilder _append_1 = _append.append(_get);
-          _append_1.append("]");
+          sb.append("[").append(s.get()).append("]");
         } else {
           sb.append("[-1]");
         }
@@ -854,13 +760,10 @@ public class SimulationTransformationExtension {
       ArrayList<HDLRange> _bits = hVar.getBits();
       for (final HDLRange exp_1 : _bits) {
         {
-          HDLExpression _to = exp_1.getTo();
-          final Optional<BigInteger> s = ConstantEvaluate.valueOf(_to, context);
+          final Optional<BigInteger> s = ConstantEvaluate.valueOf(exp_1.getTo(), context);
           boolean _isPresent = s.isPresent();
           if (_isPresent) {
-            StringBuilder _append = sb.append("{");
-            StringBuilder _append_1 = _append.append(exp_1);
-            _append_1.append("}");
+            sb.append("{").append(exp_1).append("}");
           } else {
             sb.append("{-1}");
           }
@@ -872,18 +775,15 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLConcat obj, final HDLEvaluationContext context, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
-    ArrayList<HDLExpression> _cats = obj.getCats();
-    final Iterator<HDLExpression> iter = _cats.iterator();
+    final Iterator<HDLExpression> iter = obj.getCats().iterator();
     final HDLExpression init = iter.next();
-    FluidFrame _simulationModel = this.toSimulationModel(init, context, process);
-    res.append(_simulationModel);
+    res.append(this.toSimulationModel(init, context, process));
     final HDLType initType = TypeExtension.typeOfForced(init, SimulationTransformationExtension.PSEX_STAGE);
     int owidth = (HDLPrimitives.getWidth(initType, context)).intValue();
     while (iter.hasNext()) {
       {
         final HDLExpression exp = iter.next();
-        FluidFrame _simulationModel_1 = this.toSimulationModel(exp, context, process);
-        res.append(_simulationModel_1);
+        res.append(this.toSimulationModel(exp, context, process));
         final HDLType expType = TypeExtension.typeOfForced(exp, SimulationTransformationExtension.PSEX_STAGE);
         final int width = (HDLPrimitives.getWidth(expType, context)).intValue();
         String _string = Integer.valueOf(owidth).toString();
@@ -900,23 +800,18 @@ public class SimulationTransformationExtension {
     final FluidFrame res = new FluidFrame(obj, null);
     ArrayList<HDLStatement> _inits = obj.getInits();
     for (final HDLStatement stmnt : _inits) {
-      FluidFrame _simulationModel = this.toSimulationModel(stmnt, context, null);
-      res.addReferencedFrame(_simulationModel);
+      res.addReferencedFrame(this.toSimulationModel(stmnt, context, null));
     }
     ArrayList<HDLStatement> _statements = obj.getStatements();
     for (final HDLStatement stmnt_1 : _statements) {
-      FluidFrame _simulationModel_1 = this.toSimulationModel(stmnt_1, context, null);
-      res.addReferencedFrame(_simulationModel_1);
+      res.addReferencedFrame(this.toSimulationModel(stmnt_1, context, null));
     }
-    ArrayList<HDLAnnotation> _annotations = obj.getAnnotations();
-    String[] _annoString = this.toAnnoString(_annotations);
-    res.annotations = _annoString;
+    res.annotations = this.toAnnoString(obj.getAnnotations());
     final HDLRegisterConfig[] regConfigs = obj.<HDLRegisterConfig>getAllObjectsOf(HDLRegisterConfig.class, true);
     final Set<HDLQualifiedName> lst = new LinkedHashSet<HDLQualifiedName>();
     for (final HDLRegisterConfig reg : regConfigs) {
       {
-        HDLExpression _rst = reg.getRst();
-        final HDLQualifiedName rstVar = FullNameExtension.fullNameOf(_rst);
+        final HDLQualifiedName rstVar = FullNameExtension.fullNameOf(reg.getRst());
         boolean _contains = lst.contains(rstVar);
         boolean _not = (!_contains);
         if (_not) {
@@ -936,8 +831,7 @@ public class SimulationTransformationExtension {
   }
   
   protected FluidFrame _toSimulationModel(final HDLManip obj, final HDLEvaluationContext context, final String process) {
-    HDLExpression _target = obj.getTarget();
-    final FluidFrame res = this.toSimulationModel(_target, context, process);
+    final FluidFrame res = this.toSimulationModel(obj.getTarget(), context, process);
     HDLManip.HDLManipType _type = obj.getType();
     if (_type != null) {
       switch (_type) {
@@ -957,8 +851,7 @@ public class SimulationTransformationExtension {
           res.add(Instruction.logiNeg);
           break;
         case CAST:
-          HDLExpression _target_1 = obj.getTarget();
-          HDLType _typeOfForced = TypeExtension.typeOfForced(_target_1, SimulationTransformationExtension.PSEX_STAGE);
+          HDLType _typeOfForced = TypeExtension.typeOfForced(obj.getTarget(), SimulationTransformationExtension.PSEX_STAGE);
           final HDLPrimitive current = ((HDLPrimitive) _typeOfForced);
           HDLType _castTo = obj.getCastTo();
           final HDLPrimitive target = ((HDLPrimitive) _castTo);
@@ -1040,9 +933,7 @@ public class SimulationTransformationExtension {
     if (!_matched) {
       if ((((current.getType() == HDLPrimitive.HDLPrimitiveType.INT) || (current.getType() == HDLPrimitive.HDLPrimitiveType.UINT)) || (current.getType() == HDLPrimitive.HDLPrimitiveType.BITVECTOR))) {
         _matched=true;
-        HDLExpression _width = current.getWidth();
-        BigInteger _valueOfForced = ConstantEvaluate.valueOfForced(_width, context, "PSEX");
-        return _valueOfForced.intValue();
+        return ConstantEvaluate.valueOfForced(current.getWidth(), context, "PSEX").intValue();
       }
     }
     String _plus = (current + " width is unknown");
@@ -1053,12 +944,8 @@ public class SimulationTransformationExtension {
     final FluidFrame res = new FluidFrame(obj, process);
     final HDLEnum hEnum = obj.resolveHEnumForced(SimulationTransformationExtension.PSEX_STAGE);
     final HDLVariable hVar = obj.resolveVarForced(SimulationTransformationExtension.PSEX_STAGE);
-    ArrayList<HDLVariable> _enums = hEnum.getEnums();
-    final int idx = _enums.indexOf(hVar);
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hVar);
-    String _string = _fullNameOf.toString();
-    BigInteger _valueOf = BigInteger.valueOf(idx);
-    res.addConstant(_string, _valueOf, VariableInformation.Type.ENUM);
+    final int idx = hEnum.getEnums().indexOf(hVar);
+    res.addConstant(FullNameExtension.fullNameOf(hVar).toString(), BigInteger.valueOf(idx), VariableInformation.Type.ENUM);
     return res;
   }
   
@@ -1066,33 +953,27 @@ public class SimulationTransformationExtension {
     final HDLVariableRef obj = this.redirectRef(varRef);
     final FluidFrame res = new FluidFrame(obj, process);
     final String refName = SimulationTransformationExtension.getVarName(obj, false, context);
-    ArrayList<HDLExpression> _array = obj.getArray();
-    this.createPushIndex(_array, context, res, process, refName);
-    ArrayList<HDLRange> _bits = obj.getBits();
-    this.createPushIndexBits(_bits, context, res, process, refName);
+    this.createPushIndex(obj.getArray(), context, res, process, refName);
+    this.createPushIndexBits(obj.getBits(), context, res, process, refName);
     boolean fixedArray = true;
-    ArrayList<HDLExpression> _array_1 = obj.getArray();
-    for (final HDLExpression idx : _array_1) {
-      Optional<BigInteger> _valueOf = ConstantEvaluate.valueOf(idx, context);
-      boolean _isPresent = _valueOf.isPresent();
+    ArrayList<HDLExpression> _array = obj.getArray();
+    for (final HDLExpression idx : _array) {
+      boolean _isPresent = ConstantEvaluate.valueOf(idx, context).isPresent();
       boolean _not = (!_isPresent);
       if (_not) {
         fixedArray = false;
       }
     }
-    ArrayList<HDLRange> _bits_1 = obj.getBits();
-    int _size = _bits_1.size();
+    int _size = obj.getBits().size();
     int _plus = (_size + 1);
     final ArrayList<String> bits = new ArrayList<String>(_plus);
     bits.add(refName);
-    ArrayList<HDLRange> _bits_2 = obj.getBits();
-    boolean _isEmpty = _bits_2.isEmpty();
+    boolean _isEmpty = obj.getBits().isEmpty();
     boolean _not_1 = (!_isEmpty);
     if (_not_1) {
-      ArrayList<HDLRange> _bits_3 = obj.getBits();
-      for (final HDLRange r : _bits_3) {
-        String _string = r.toString();
-        bits.add(_string);
+      ArrayList<HDLRange> _bits = obj.getBits();
+      for (final HDLRange r : _bits) {
+        bits.add(r.toString());
       }
     }
     final HDLVariable resVar = obj.resolveVarForced("PSEX");
@@ -1111,9 +992,7 @@ public class SimulationTransformationExtension {
           res.add(_argumentedInstruction_1);
         } else {
           final BigInteger bVal = ConstantEvaluate.valueOfForced(obj, context, SimulationTransformationExtension.PSEX_STAGE);
-          HDLType _typeOfForced = TypeExtension.typeOfForced(resVar, SimulationTransformationExtension.PSEX_STAGE);
-          VariableInformation.Type _asType = this.asType(_typeOfForced);
-          res.addConstant(refName, bVal, _asType);
+          res.addConstant(refName, bVal, this.asType(TypeExtension.typeOfForced(resVar, SimulationTransformationExtension.PSEX_STAGE)));
         }
       }
     }
@@ -1142,13 +1021,8 @@ public class SimulationTransformationExtension {
     final HDLAnnotation memAnno = resVar.getAnnotation(HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations.memory);
     HDLVariableRef obj = varRef;
     if ((memAnno != null)) {
-      String _value = memAnno.getValue();
-      HDLQualifiedName _create = HDLQualifiedName.create(_value);
-      HDLVariableRef _setVar = varRef.setVar(_create);
-      obj = _setVar;
-      IHDLObject _container = varRef.getContainer();
-      HDLVariableRef _copyDeepFrozen = obj.copyDeepFrozen(_container);
-      obj = _copyDeepFrozen;
+      obj = varRef.setVar(HDLQualifiedName.create(memAnno.getValue()));
+      obj = obj.copyDeepFrozen(varRef.getContainer());
     }
     return obj;
   }
@@ -1168,15 +1042,13 @@ public class SimulationTransformationExtension {
         String _val_1 = obj.getVal();
         boolean _equals = Objects.equal(HDLLiteral.FALSE, _val_1);
         if (_equals) {
-          String _val_2 = obj.getVal();
-          res.addConstant(_val_2, BigInteger.ZERO, VariableInformation.Type.BOOL);
+          res.addConstant(obj.getVal(), BigInteger.ZERO, VariableInformation.Type.BOOL);
           return res;
         }
-        String _val_3 = obj.getVal();
-        boolean _equals_1 = Objects.equal(HDLLiteral.TRUE, _val_3);
+        String _val_2 = obj.getVal();
+        boolean _equals_1 = Objects.equal(HDLLiteral.TRUE, _val_2);
         if (_equals_1) {
-          String _val_4 = obj.getVal();
-          res.addConstant(_val_4, BigInteger.ONE, VariableInformation.Type.BOOL);
+          res.addConstant(obj.getVal(), BigInteger.ONE, VariableInformation.Type.BOOL);
           return res;
         }
       }
@@ -1197,19 +1069,14 @@ public class SimulationTransformationExtension {
       res.add(Instruction.const2);
       return res;
     }
-    String _string = value.toString();
-    res.addConstant(_string, value, VariableInformation.Type.INT);
+    res.addConstant(value.toString(), value, VariableInformation.Type.INT);
     return res;
   }
   
   protected FluidFrame _toSimulationModel(final HDLEqualityOp obj, final HDLEvaluationContext context, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
-    HDLExpression _left = obj.getLeft();
-    FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
-    res.append(_simulationModel);
-    HDLExpression _right = obj.getRight();
-    FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context, process);
-    res.append(_simulationModel_1);
+    res.append(this.toSimulationModel(obj.getLeft(), context, process));
+    res.append(this.toSimulationModel(obj.getRight(), context, process));
     HDLEqualityOp.HDLEqualityOpType _type = obj.getType();
     if (_type != null) {
       switch (_type) {
@@ -1240,12 +1107,8 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLBitOp obj, final HDLEvaluationContext context, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
-    HDLExpression _left = obj.getLeft();
-    FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
-    res.append(_simulationModel);
-    HDLExpression _right = obj.getRight();
-    FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context, process);
-    res.append(_simulationModel_1);
+    res.append(this.toSimulationModel(obj.getLeft(), context, process));
+    res.append(this.toSimulationModel(obj.getRight(), context, process));
     HDLBitOp.HDLBitOpType _type = obj.getType();
     if (_type != null) {
       switch (_type) {
@@ -1282,12 +1145,8 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLArithOp obj, final HDLEvaluationContext context, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
-    HDLExpression _left = obj.getLeft();
-    FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
-    res.append(_simulationModel);
-    HDLExpression _right = obj.getRight();
-    FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context, process);
-    res.append(_simulationModel_1);
+    res.append(this.toSimulationModel(obj.getLeft(), context, process));
+    res.append(this.toSimulationModel(obj.getRight(), context, process));
     final int width = this.targetSizeWithType(obj, context);
     HDLArithOp.HDLArithOpType _type = obj.getType();
     if (_type != null) {
@@ -1331,12 +1190,8 @@ public class SimulationTransformationExtension {
   
   protected FluidFrame _toSimulationModel(final HDLShiftOp obj, final HDLEvaluationContext context, final String process) {
     final FluidFrame res = new FluidFrame(obj, process);
-    HDLExpression _left = obj.getLeft();
-    FluidFrame _simulationModel = this.toSimulationModel(_left, context, process);
-    res.append(_simulationModel);
-    HDLExpression _right = obj.getRight();
-    FluidFrame _simulationModel_1 = this.toSimulationModel(_right, context, process);
-    res.append(_simulationModel_1);
+    res.append(this.toSimulationModel(obj.getLeft(), context, process));
+    res.append(this.toSimulationModel(obj.getRight(), context, process));
     final int width = this.targetSizeWithType(obj, context);
     HDLShiftOp.HDLShiftOpType _type = obj.getType();
     if (_type != null) {
@@ -1347,8 +1202,7 @@ public class SimulationTransformationExtension {
           res.add(_argumentedInstruction);
           break;
         case SRA:
-          HDLExpression _left_1 = obj.getLeft();
-          final HDLType type = TypeExtension.typeOfForced(_left_1, SimulationTransformationExtension.PSEX_STAGE);
+          final HDLType type = TypeExtension.typeOfForced(obj.getLeft(), SimulationTransformationExtension.PSEX_STAGE);
           final HDLPrimitive prim = ((HDLPrimitive) type);
           if (((prim.getType() == HDLPrimitive.HDLPrimitiveType.INTEGER) || (prim.getType() == HDLPrimitive.HDLPrimitiveType.INT))) {
             String _string_1 = Integer.valueOf(width).toString();
@@ -1373,8 +1227,7 @@ public class SimulationTransformationExtension {
   }
   
   public int targetSizeWithType(final HDLExpression op, final HDLEvaluationContext context) {
-    Optional<? extends HDLType> _typeOf = TypeExtension.typeOf(op);
-    HDLType _get = _typeOf.get();
+    HDLType _get = TypeExtension.typeOf(op).get();
     final HDLPrimitive type = ((HDLPrimitive) _get);
     final Integer width = HDLPrimitives.getWidth(type, context);
     if (((type.getType() == HDLPrimitive.HDLPrimitiveType.INT) || (type.getType() == HDLPrimitive.HDLPrimitiveType.INTEGER))) {

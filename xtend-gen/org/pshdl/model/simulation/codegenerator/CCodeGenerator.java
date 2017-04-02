@@ -102,8 +102,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   public IHDLInterpreterFactory<NativeRunner> createInterpreter(final File tempDir, final NativeRunner.IRunListener listener) {
     try {
       final File testCFile = new File(tempDir, "test.c");
-      String _generateMainCode = this.generateMainCode();
-      Files.write(_generateMainCode, testCFile, StandardCharsets.UTF_8);
+      Files.write(this.generateMainCode(), testCFile, StandardCharsets.UTF_8);
       final File testRunner = new File(tempDir, "runner.c");
       this.copyFile("/org/pshdl/model/simulation/includes/runner.c", testRunner);
       final File testGenericLibHeader = new File(tempDir, "pshdl_generic_sim.h");
@@ -115,9 +114,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       String _absolutePath_2 = testRunner.getAbsolutePath();
       String _absolutePath_3 = executable.getAbsolutePath();
       final ProcessBuilder builder = new ProcessBuilder(CCodeGenerator.COMPILER, "-I", _absolutePath, "-O3", _absolutePath_1, _absolutePath_2, "-o", _absolutePath_3);
-      ProcessBuilder _directory = builder.directory(tempDir);
-      ProcessBuilder _inheritIO = _directory.inheritIO();
-      final Process process = _inheritIO.start();
+      final Process process = builder.directory(tempDir).inheritIO().start();
       process.waitFor();
       final int exitValue = process.exitValue();
       if ((exitValue != 0)) {
@@ -129,9 +126,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
           try {
             String _absolutePath = executable.getAbsolutePath();
             final ProcessBuilder execBuilder = new ProcessBuilder(_absolutePath);
-            ProcessBuilder _directory = execBuilder.directory(tempDir);
-            ProcessBuilder _redirectErrorStream = _directory.redirectErrorStream(true);
-            final Process testExec = _redirectErrorStream.start();
+            final Process testExec = execBuilder.directory(tempDir).redirectErrorStream(true).start();
             InputStream _inputStream = testExec.getInputStream();
             OutputStream _outputStream = testExec.getOutputStream();
             String _absolutePath_1 = executable.getAbsolutePath();
@@ -178,10 +173,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence assignArrayInit(final VariableInformation hvar, final BigInteger initValue, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _fieldName = this.fieldName(hvar, attributes);
-    _builder.append(_fieldName, "");
+    _builder.append(_fieldName);
     _builder.append("[");
     int _arraySize = this.getArraySize(hvar);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append("];");
     return _builder;
   }
@@ -195,7 +190,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence callStage(final int stage, final boolean constant) {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("();");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -232,13 +227,13 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence justDeclare(final VariableInformation varInfo, final EnumSet<CommonCodeGenerator.Attributes> attributes) {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _fieldName = this.fieldName(varInfo, attributes);
-    _builder.append(_fieldName, "");
+    _builder.append(_fieldName);
     {
       boolean _isArray = this.isArray(varInfo);
       if (_isArray) {
         _builder.append("[");
         int _arraySize = this.getArraySize(varInfo);
-        _builder.append(_arraySize, "");
+        _builder.append(_arraySize);
         _builder.append("]");
       }
     }
@@ -250,7 +245,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence footer() {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _helperMethods = this.helperMethods();
-    _builder.append(_helperMethods, "");
+    _builder.append(_helperMethods);
     _builder.newLineIfNotEmpty();
     return _builder;
   }
@@ -296,7 +291,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
         _builder.append("}");
         _builder.newLine();
         CharSequence _copyRegs = this.copyRegs();
-        _builder.append(_copyRegs, "");
+        _builder.append(_copyRegs);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -316,7 +311,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("static void ");
     CharSequence _frameName = this.getFrameName(frame);
-    _builder.append(_frameName, "");
+    _builder.append(_frameName);
     _builder.append("() {");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -335,12 +330,12 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append("#include \"");
     String _headerName = this.headerName();
-    _builder.append(_headerName, "");
+    _builder.append(_headerName);
     _builder.append(".h\"");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
     StringBuilder _generateInlineMethods = this.generateInlineMethods();
-    _builder.append(_generateInlineMethods, "");
+    _builder.append(_generateInlineMethods);
     _builder.newLineIfNotEmpty();
     _builder.newLine();
     {
@@ -363,7 +358,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
         _builder.newLine();
         _builder.append("static regUpdate_t regUpdates[");
         int _maxRegUpdates = this.maxRegUpdates();
-        _builder.append(_maxRegUpdates, "");
+        _builder.append(_maxRegUpdates);
         _builder.append("];");
         _builder.newLineIfNotEmpty();
         _builder.append("static int regUpdatePos=0;");
@@ -381,10 +376,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("extern ");
       String _c = this.toC(fi.returnType);
-      _builder.append(_c, "");
+      _builder.append(_c);
       _builder.append(" ");
       String _signature = fi.signature();
-      _builder.append(_signature, "");
+      _builder.append(_signature);
       _builder.append("(");
       {
         boolean _hasElements = false;
@@ -395,10 +390,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
             _builder.appendImmediate(", ", "");
           }
           String _c_1 = this.toC(pi);
-          _builder.append(_c_1, "");
+          _builder.append(_c_1);
           _builder.append(" p");
           String _firstUpper = StringExtensions.toFirstUpper(pi.name);
-          _builder.append(_firstUpper, "");
+          _builder.append(_firstUpper);
         }
       }
       _builder.append(");");
@@ -493,47 +488,47 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     {
       if ((!force)) {
         _builder.append("if (");
-        _builder.append(cpyName, "");
+        _builder.append(cpyName);
         _builder.append("!=");
-        _builder.append(last, "");
+        _builder.append(last);
         _builder.append(")");
         _builder.newLineIfNotEmpty();
         CharSequence _indent = this.indent();
-        _builder.append(_indent, "");
+        _builder.append(_indent);
         _builder.append("\t");
       }
     }
     _builder.append("{");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_1 = this.indent();
-    _builder.append(_indent_1, "");
+    _builder.append(_indent_1);
     _builder.append("\t\tstatic regUpdate_t reg;");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_2 = this.indent();
-    _builder.append(_indent_2, "");
+    _builder.append(_indent_2);
     _builder.append("\t\treg.internal=");
     Integer _regIdx = this.regIdx(outputInternal);
-    _builder.append(_regIdx, "");
+    _builder.append(_regIdx);
     _builder.append(";");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_3 = this.indent();
-    _builder.append(_indent_3, "");
+    _builder.append(_indent_3);
     _builder.append("\t\treg.offset=(int)(");
-    _builder.append(offset, "");
+    _builder.append(offset);
     _builder.append(");");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_4 = this.indent();
-    _builder.append(_indent_4, "");
+    _builder.append(_indent_4);
     _builder.append("\t\treg.fillValue=");
-    _builder.append(fillValue, "");
+    _builder.append(fillValue);
     _builder.append(";");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_5 = this.indent();
-    _builder.append(_indent_5, "");
+    _builder.append(_indent_5);
     _builder.append("\t\tregUpdates[regUpdatePos++]=reg;");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_6 = this.indent();
-    _builder.append(_indent_6, "");
+    _builder.append(_indent_6);
     _builder.append("\t}");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -556,7 +551,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("static void ");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("(){");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -583,54 +578,54 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
             StringConcatenation _builder = new StringConcatenation();
             _builder.append("((int64_t)");
             String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-            _builder.append(_tempName, "");
+            _builder.append(_tempName);
             _builder.append(") >> ");
             String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-            _builder.append(_tempName_1, "");
+            _builder.append(_tempName_1);
             return this.assignTempVar(type, targetSizeWithType, pos, attributes, _builder, true);
           case srl:
             StringConcatenation _builder_1 = new StringConcatenation();
             String _tempName_2 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-            _builder_1.append(_tempName_2, "");
+            _builder_1.append(_tempName_2);
             _builder_1.append(" >> ");
             String _tempName_3 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-            _builder_1.append(_tempName_3, "");
+            _builder_1.append(_tempName_3);
             return this.assignTempVar(type, targetSizeWithType, pos, attributes, _builder_1, true);
           case less:
             StringConcatenation _builder_2 = new StringConcatenation();
             _builder_2.append("(int64_t)");
             String _tempName_4 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-            _builder_2.append(_tempName_4, "");
+            _builder_2.append(_tempName_4);
             _builder_2.append(" < (int64_t)");
             String _tempName_5 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-            _builder_2.append(_tempName_5, "");
+            _builder_2.append(_tempName_5);
             return this.assignTempVar(type, targetSizeWithType, pos, attributes, _builder_2, true);
           case less_eq:
             StringConcatenation _builder_3 = new StringConcatenation();
             _builder_3.append("(int64_t)");
             String _tempName_6 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-            _builder_3.append(_tempName_6, "");
+            _builder_3.append(_tempName_6);
             _builder_3.append(" <= (int64_t)");
             String _tempName_7 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-            _builder_3.append(_tempName_7, "");
+            _builder_3.append(_tempName_7);
             return this.assignTempVar(type, targetSizeWithType, pos, attributes, _builder_3, true);
           case greater:
             StringConcatenation _builder_4 = new StringConcatenation();
             _builder_4.append("(int64_t)");
             String _tempName_8 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-            _builder_4.append(_tempName_8, "");
+            _builder_4.append(_tempName_8);
             _builder_4.append(" > (int64_t)");
             String _tempName_9 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-            _builder_4.append(_tempName_9, "");
+            _builder_4.append(_tempName_9);
             return this.assignTempVar(type, targetSizeWithType, pos, attributes, _builder_4, true);
           case greater_eq:
             StringConcatenation _builder_5 = new StringConcatenation();
             _builder_5.append("(int64_t)");
             String _tempName_10 = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-            _builder_5.append(_tempName_10, "");
+            _builder_5.append(_tempName_10);
             _builder_5.append(" >= (int64_t)");
             String _tempName_11 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-            _builder_5.append(_tempName_11, "");
+            _builder_5.append(_tempName_11);
             return this.assignTempVar(type, targetSizeWithType, pos, attributes, _builder_5, true);
           default:
             break;
@@ -646,15 +641,15 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence copyArray(final VariableInformation varInfo) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("memcpy(");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev);
-    CharSequence _idName = this.idName(varInfo, true, _of);
-    _builder.append(_idName, "");
+    CharSequence _idName = this.idName(varInfo, true, 
+      EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev));
+    _builder.append(_idName);
     _builder.append(", ");
     CharSequence _idName_1 = this.idName(varInfo, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName_1, "");
+    _builder.append(_idName_1);
     _builder.append(", ");
     int _arraySize = this.getArraySize(varInfo);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append(");");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -689,8 +684,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("switch (idx) {");
     _builder.newLine();
     _builder.append("\t\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset);
-    CharSequence _setInputCases = this.setInputCases("value", null, _of);
+    CharSequence _setInputCases = this.setInputCases("value", null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset));
     _builder.append(_setInputCases, "\t\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -727,7 +721,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append("static char* jsonDesc=\"");
     String _jSONDescription = this.cce.getJSONDescription();
-    _builder.append(_jSONDescription, "");
+    _builder.append(_jSONDescription);
     _builder.append("\";");
     _builder.newLineIfNotEmpty();
     _builder.append("char* pshdl_sim_getJsonDesc(){");
@@ -821,13 +815,11 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("switch (hashName) {");
     _builder.newLine();
     {
-      Map<Integer, List<VariableInformation>> _hashed = this.getHashed(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)));
-      Set<Map.Entry<Integer, List<VariableInformation>>> _entrySet = _hashed.entrySet();
+      Set<Map.Entry<Integer, List<VariableInformation>>> _entrySet = this.getHashed(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables))).entrySet();
       for(final Map.Entry<Integer, List<VariableInformation>> e : _entrySet) {
         _builder.append("\t\t");
         _builder.append("case ");
-        Integer _key = e.getKey();
-        CharSequence _constant32Bit = this.constant32Bit((_key).intValue());
+        CharSequence _constant32Bit = this.constant32Bit((e.getKey()).intValue());
         _builder.append(_constant32Bit, "\t\t");
         _builder.append(":");
         _builder.newLineIfNotEmpty();
@@ -882,8 +874,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("switch (idx) {");
     _builder.newLine();
     _builder.append("\t\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset);
-    CharSequence _outputCases = this.getOutputCases(null, _of_1);
+    CharSequence _outputCases = this.getOutputCases(null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset));
     _builder.append(_outputCases, "\t\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
@@ -940,8 +931,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
         final int hashVal = CCodeGenerator.hash(vi.name);
         final List<VariableInformation> list = res.get(Integer.valueOf(hashVal));
         if ((list == null)) {
-          ArrayList<VariableInformation> _newArrayList = Lists.<VariableInformation>newArrayList(vi);
-          res.put(Integer.valueOf(hashVal), _newArrayList);
+          res.put(Integer.valueOf(hashVal), Lists.<VariableInformation>newArrayList(vi));
         } else {
           list.add(vi);
         }
@@ -972,15 +962,15 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       _builder.append("#pragma omp parallel sections");
       _builder.newLine();
       CharSequence _indent_1 = this.indent();
-      _builder.append(_indent_1, "");
+      _builder.append(_indent_1);
       _builder.append("{");
       _builder.newLineIfNotEmpty();
       CharSequence _indent_2 = this.indent();
-      _builder.append(_indent_2, "");
+      _builder.append(_indent_2);
       _builder.append("#pragma omp section");
       _builder.newLineIfNotEmpty();
       CharSequence _indent_3 = this.indent();
-      _builder.append(_indent_3, "");
+      _builder.append(_indent_3);
       _builder.append("{");
       _builder.newLineIfNotEmpty();
       _xblockexpression = _builder;
@@ -999,7 +989,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       _builder.append("}");
       _builder.newLine();
       CharSequence _indent_1 = this.indent();
-      _builder.append(_indent_1, "");
+      _builder.append(_indent_1);
       _builder.append("}");
       _builder.newLineIfNotEmpty();
       _xblockexpression = _builder;
@@ -1016,8 +1006,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
         final AuxiliaryContent generic_h = new AuxiliaryContent("pshdl_generic_sim.h", generic_hStream, true);
         String _headerName = this.headerName();
         String _plus = (_headerName + ".h");
-        CharSequence _specificHeader = this.getSpecificHeader();
-        String _string = _specificHeader.toString();
+        String _string = this.getSpecificHeader().toString();
         final AuxiliaryContent specific_h = new AuxiliaryContent(_plus, _string);
         final ArrayList<AuxiliaryContent> res = Lists.<AuxiliaryContent>newArrayList(generic_h, specific_h);
         final String simEncapsulation = this.generateSimEncapsuation();
@@ -1056,12 +1045,12 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append("#ifndef _");
     String _headerName = this.headerName();
-    _builder.append(_headerName, "");
+    _builder.append(_headerName);
     _builder.append("_h_");
     _builder.newLineIfNotEmpty();
     _builder.append("#define _");
     String _headerName_1 = this.headerName();
-    _builder.append(_headerName_1, "");
+    _builder.append(_headerName_1);
     _builder.append("_h_");
     _builder.newLineIfNotEmpty();
     _builder.append("#include \"pshdl_generic_sim.h\"");
@@ -1071,31 +1060,24 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
       for(final VariableInformation vi : this.em.variables) {
         _builder.append("///Use this index define to access <tt> ");
         String _replaceAll = vi.name.replaceAll("\\@", "\\\\@");
-        _builder.append(_replaceAll, "");
+        _builder.append(_replaceAll);
         _builder.append(" </tt> via getOutput/setInput methods");
         _builder.newLineIfNotEmpty();
         _builder.append("#define ");
         CharSequence _defineName = this.getDefineName(vi);
-        _builder.append(_defineName, "");
+        _builder.append(_defineName);
         _builder.append(" ");
         int _varIdx = this.getVarIdx(vi, this.purgeAliases);
-        _builder.append(_varIdx, "");
+        _builder.append(_varIdx);
         _builder.newLineIfNotEmpty();
       }
     }
     _builder.newLine();
-    CharSequence _fieldDeclarations = this.fieldDeclarations(false, false);
-    String _string = _fieldDeclarations.toString();
-    String[] _split = _string.split("\n");
-    final Function1<String, String> _function = new Function1<String, String>() {
-      @Override
-      public String apply(final String it) {
-        return ("extern" + it);
-      }
+    final Function1<String, String> _function = (String it) -> {
+      return ("extern" + it);
     };
-    List<String> _map = ListExtensions.<String, String>map(((List<String>)Conversions.doWrapArray(_split)), _function);
-    String _join = IterableExtensions.join(_map, "\n");
-    _builder.append(_join, "");
+    String _join = IterableExtensions.join(ListExtensions.<String, String>map(((List<String>)Conversions.doWrapArray(this.fieldDeclarations(false, false).toString().split("\n"))), _function), "\n");
+    _builder.append(_join);
     _builder.newLineIfNotEmpty();
     _builder.newLine();
     _builder.append("#endif");
@@ -1108,8 +1090,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     if ((unit == null)) {
       return null;
     }
-    List<Row> _buildRows = MemoryModel.buildRows(unit);
-    return this.generateSimEncapsuation(unit, _buildRows);
+    return this.generateSimEncapsuation(unit, MemoryModel.buildRows(unit));
   }
   
   public Unit getUnit(final ExecutableModel model) {
@@ -1120,12 +1101,9 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
         for (final String a : this.em.annotations) {
           boolean _startsWith = a.startsWith("busDescription");
           if (_startsWith) {
-            Splitter _limit = annoSplitter.limit(2);
-            Iterable<String> _split = _limit.split(a);
-            final String value = IterableExtensions.<String>last(_split);
+            final String value = IterableExtensions.<String>last(annoSplitter.limit(2).split(a));
             LinkedHashSet<Problem> _linkedHashSet = new LinkedHashSet<Problem>();
-            Unit _parseUnit = MemoryModelAST.parseUnit(value, _linkedHashSet, 0);
-            unit = _parseUnit;
+            unit = MemoryModelAST.parseUnit(value, _linkedHashSet, 0);
           }
         }
       }
@@ -1140,26 +1118,14 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   
   private String generateSimEncapsuation(final Unit unit, final Iterable<Row> rows) {
     final Set<String> varNames = new LinkedHashSet<String>();
-    final Consumer<Row> _function = new Consumer<Row>() {
-      @Override
-      public void accept(final Row it) {
-        List<Definition> _allDefs = CCodeGenerator.this.ba.allDefs(it);
-        final Function1<Definition, Boolean> _function = new Function1<Definition, Boolean>() {
-          @Override
-          public Boolean apply(final Definition it) {
-            return Boolean.valueOf((it.type != Definition.Type.UNUSED));
-          }
-        };
-        Iterable<Definition> _filter = IterableExtensions.<Definition>filter(_allDefs, _function);
-        final Consumer<Definition> _function_1 = new Consumer<Definition>() {
-          @Override
-          public void accept(final Definition it) {
-            String _name = it.getName();
-            varNames.add(_name);
-          }
-        };
-        _filter.forEach(_function_1);
-      }
+    final Consumer<Row> _function = (Row it) -> {
+      final Function1<Definition, Boolean> _function_1 = (Definition it_1) -> {
+        return Boolean.valueOf((it_1.type != Definition.Type.UNUSED));
+      };
+      final Consumer<Definition> _function_2 = (Definition it_1) -> {
+        varNames.add(it_1.getName());
+      };
+      IterableExtensions.<Definition>filter(this.ba.allDefs(it), _function_1).forEach(_function_2);
     };
     rows.forEach(_function);
     StringConcatenation _builder = new StringConcatenation();
@@ -1200,7 +1166,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append("#include \"");
     String _headerName = this.headerName();
-    _builder.append(_headerName, "");
+    _builder.append(_headerName);
     _builder.append(".h\"");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
@@ -1272,10 +1238,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("///The index of the Clock that is toggled for each setting");
     _builder.newLine();
     _builder.append("#define ");
-    _builder.append("busclk_idx", "");
+    _builder.append("busclk_idx");
     _builder.append(" ");
     int _busIndex = this.getBusIndex();
-    _builder.append(_busIndex, "");
+    _builder.append(_busIndex);
     _builder.newLineIfNotEmpty();
     _builder.newLine();
     String res = _builder.toString();
@@ -1283,37 +1249,28 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     final LinkedHashMap<String, Integer> rowCounts = new LinkedHashMap<String, Integer>();
     for (final Row row : rows) {
       {
-        String _name = row.getName();
-        final Integer idx = rowCounts.get(_name);
+        final Integer idx = rowCounts.get(row.getName());
         if ((idx == null)) {
-          String _name_1 = row.getName();
-          rowCounts.put(_name_1, Integer.valueOf(1));
+          rowCounts.put(row.getName(), Integer.valueOf(1));
         } else {
-          String _name_2 = row.getName();
-          rowCounts.put(_name_2, Integer.valueOf(((idx).intValue() + 1)));
+          rowCounts.put(row.getName(), Integer.valueOf(((idx).intValue() + 1)));
         }
       }
     }
     for (final Row row_1 : rows) {
-      String _name = row_1.getName();
-      boolean _contains = checkedRows.contains(_name);
+      boolean _contains = checkedRows.contains(row_1.getName());
       boolean _not = (!_contains);
       if (_not) {
         boolean _hasWriteDefs = this.ba.hasWriteDefs(row_1);
         if (_hasWriteDefs) {
-          String _name_1 = row_1.getName();
-          Integer _get = rowCounts.get(_name_1);
-          CharSequence _simSetter = this.simSetter(row_1, (_get).intValue());
+          CharSequence _simSetter = this.simSetter(row_1, (rowCounts.get(row_1.getName())).intValue());
           String _plus = (res + _simSetter);
           res = _plus;
         }
-        String _name_2 = row_1.getName();
-        Integer _get_1 = rowCounts.get(_name_2);
-        CharSequence _simGetter = this.simGetter(row_1, (_get_1).intValue());
+        CharSequence _simGetter = this.simGetter(row_1, (rowCounts.get(row_1.getName())).intValue());
         String _plus_1 = (res + _simGetter);
         res = _plus_1;
-        String _name_3 = row_1.getName();
-        checkedRows.add(_name_3);
+        checkedRows.add(row_1.getName());
       }
     }
     return res;
@@ -1330,20 +1287,16 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   protected CharSequence getDefineName(final VariableInformation vi) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("PSHDL_SIM_");
-    CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
-    String _string = _idName.toString();
-    String _upperCase = _string.toUpperCase();
-    _builder.append(_upperCase, "");
+    String _upperCase = this.idName(vi, true, CommonCodeGenerator.NONE).toString().toUpperCase();
+    _builder.append(_upperCase);
     return _builder;
   }
   
   protected CharSequence getDefineNameString(final String s) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("PSHDL_SIM_");
-    CharSequence _idName = this.idName(((this.em.moduleName + ".") + s), true, CommonCodeGenerator.NONE);
-    String _string = _idName.toString();
-    String _upperCase = _string.toUpperCase();
-    _builder.append(_upperCase, "");
+    String _upperCase = this.idName(((this.em.moduleName + ".") + s), true, CommonCodeGenerator.NONE).toString().toUpperCase();
+    _builder.append(_upperCase);
     return _builder;
   }
   
@@ -1403,15 +1356,14 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int get");
-    String _name_1 = row.getName();
-    String _firstUpper = StringExtensions.toFirstUpper(_name_1);
-    _builder.append(_firstUpper, "");
+    String _firstUpper = StringExtensions.toFirstUpper(row.getName());
+    _builder.append(_firstUpper);
     _builder.append("Direct(uint32_t *base, uint32_t index");
     {
       List<Definition> _allDefs_1 = this.ba.allDefs(row);
       for(final Definition definition : _allDefs_1) {
         String _parameter = this.ba.getParameter(row, definition, true);
-        _builder.append(_parameter, "");
+        _builder.append(_parameter);
       }
     }
     _builder.append("){");
@@ -1446,8 +1398,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.newLine();
     _builder.append(" ");
     _builder.append("* Retrieve the fields of row ");
-    String _name_2 = row.getName();
-    _builder.append(_name_2, " ");
+    String _name_1 = row.getName();
+    _builder.append(_name_1, " ");
     _builder.append(" into the struct.");
     _builder.newLineIfNotEmpty();
     _builder.append(" ");
@@ -1487,18 +1439,16 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int get");
-    String _name_3 = row.getName();
-    String _firstUpper_1 = StringExtensions.toFirstUpper(_name_3);
-    _builder.append(_firstUpper_1, "");
+    String _firstUpper_1 = StringExtensions.toFirstUpper(row.getName());
+    _builder.append(_firstUpper_1);
     _builder.append("(uint32_t *base, uint32_t index, ");
-    String _name_4 = row.getName();
-    _builder.append(_name_4, "");
+    String _name_2 = row.getName();
+    _builder.append(_name_2);
     _builder.append("_t *result){");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("return get");
-    String _name_5 = row.getName();
-    String _firstUpper_2 = StringExtensions.toFirstUpper(_name_5);
+    String _firstUpper_2 = StringExtensions.toFirstUpper(row.getName());
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
@@ -1574,15 +1524,14 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int set");
-    String _name = row.getName();
-    String _firstUpper = StringExtensions.toFirstUpper(_name);
-    _builder.append(_firstUpper, "");
+    String _firstUpper = StringExtensions.toFirstUpper(row.getName());
+    _builder.append(_firstUpper);
     _builder.append("Direct(uint32_t *base, uint32_t index");
     {
       List<Definition> _writeDefs = this.ba.writeDefs(row);
       for(final Definition definition : _writeDefs) {
         String _parameter = this.ba.getParameter(row, definition, false);
-        _builder.append(_parameter, "");
+        _builder.append(_parameter);
       }
     }
     _builder.append("){");
@@ -1697,18 +1646,16 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     _builder.append("*/");
     _builder.newLine();
     _builder.append("int set");
-    String _name_1 = row.getName();
-    String _firstUpper_1 = StringExtensions.toFirstUpper(_name_1);
-    _builder.append(_firstUpper_1, "");
+    String _firstUpper_1 = StringExtensions.toFirstUpper(row.getName());
+    _builder.append(_firstUpper_1);
     _builder.append("(uint32_t *base, uint32_t index, ");
-    String _name_2 = row.getName();
-    _builder.append(_name_2, "");
+    String _name = row.getName();
+    _builder.append(_name);
     _builder.append("_t *newVal) {");
     _builder.newLineIfNotEmpty();
     _builder.append("\t");
     _builder.append("return set");
-    String _name_3 = row.getName();
-    String _firstUpper_2 = StringExtensions.toFirstUpper(_name_3);
+    String _firstUpper_2 = StringExtensions.toFirstUpper(row.getName());
     _builder.append(_firstUpper_2, "\t");
     _builder.append("Direct(base, index");
     {
@@ -1734,7 +1681,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   @Override
   protected CharSequence callMethod(final boolean pshdlFunction, final CharSequence methodName, final CharSequence... args) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(methodName, "");
+    _builder.append(methodName);
     _builder.append("(");
     {
       if ((args != null)) {
@@ -1746,7 +1693,7 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
             } else {
               _builder.appendImmediate(",", "");
             }
-            _builder.append(arg, "");
+            _builder.append(arg);
           }
         }
       }
@@ -1789,10 +1736,8 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
   public static List<PSAbstractCompiler.CompileResult> doCompile(final Set<Problem> syntaxProblems, final CCodeGeneratorParameter parameter) {
     final CCodeGenerator comp = new CCodeGenerator(parameter);
     final List<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newLinkedList();
-    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
-    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
-    String _generateMainCode = comp.generateMainCode();
-    String _string = _generateMainCode.toString();
+    Iterables.<AuxiliaryContent>addAll(sideFiles, comp.getAuxiliaryContent());
+    String _string = comp.generateMainCode().toString();
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, _string, parameter.em.moduleName, sideFiles, 
       parameter.em.source, _hookName, true);
@@ -1810,12 +1755,12 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("memset(");
     CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    _builder.append(_idName);
     _builder.append(", ");
-    _builder.append(regFillValue, "");
+    _builder.append(regFillValue);
     _builder.append(", ");
     int _arraySize = this.getArraySize(vi);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append(");");
     return _builder;
   }
@@ -1827,10 +1772,10 @@ public class CCodeGenerator extends CommonCodeGenerator implements ITypeOuptutPr
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("pshdl_sim_pow(");
     String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName, "");
+    _builder.append(_tempName);
     _builder.append(", ");
     String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName_1, "");
+    _builder.append(_tempName_1);
     _builder.append(")");
     return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, CommonCodeGenerator.NONE, _builder, true);
   }

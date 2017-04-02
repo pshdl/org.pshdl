@@ -35,7 +35,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -108,27 +107,18 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         String _name_1 = yaml.getName();
         File _file_2 = new File(tempDir, _name_1);
         Files.copy(yaml, _file_2);
-        File _file_3 = new File(binDir, "packages");
-        Path _path = _file_3.toPath();
-        File _file_4 = new File(testRunnerDir, "packages");
-        Path _path_1 = _file_4.toPath();
-        java.nio.file.Files.createSymbolicLink(_path, _path_1);
-        File _file_5 = new File(tempDir, "packages");
-        Path _path_2 = _file_5.toPath();
-        File _file_6 = new File(testRunnerDir, "packages");
-        Path _path_3 = _file_6.toPath();
-        java.nio.file.Files.createSymbolicLink(_path_2, _path_3);
+        java.nio.file.Files.createSymbolicLink(new File(binDir, "packages").toPath(), 
+          new File(testRunnerDir, "packages").toPath());
+        java.nio.file.Files.createSymbolicLink(new File(tempDir, "packages").toPath(), 
+          new File(testRunnerDir, "packages").toPath());
         _xblockexpression = new IHDLInterpreterFactory<NativeRunner>() {
           @Override
           public NativeRunner newInstance() {
             try {
               String _name = testRunner.getName();
               String _plus = ("bin/" + _name);
-              ProcessBuilder _processBuilder = new ProcessBuilder(DartCodeGenerator.DART_EXEC, _plus, DartCodeGenerator.this.unitName, 
-                DartCodeGenerator.this.library);
-              ProcessBuilder _directory = _processBuilder.directory(tempDir);
-              ProcessBuilder _redirectErrorStream = _directory.redirectErrorStream(true);
-              final Process dartRunner = _redirectErrorStream.start();
+              final Process dartRunner = new ProcessBuilder(DartCodeGenerator.DART_EXEC, _plus, DartCodeGenerator.this.unitName, 
+                DartCodeGenerator.this.library).directory(tempDir).redirectErrorStream(true).start();
               InputStream _inputStream = dartRunner.getInputStream();
               OutputStream _outputStream = dartRunner.getOutputStream();
               return new NativeRunner(_inputStream, _outputStream, DartCodeGenerator.this.em, dartRunner, 5, 
@@ -188,10 +178,10 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("new ");
     CharSequence _fieldType = this.fieldType(varInfo, attributes);
-    _builder.append(_fieldType, "");
+    _builder.append(_fieldType);
     _builder.append("(");
     int _arraySize = this.getArraySize(varInfo);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append(")");
     return _builder;
   }
@@ -209,7 +199,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("void _");
     CharSequence _frameName = this.getFrameName(frame);
-    _builder.append(_frameName, "");
+    _builder.append(_frameName);
     _builder.append("() {");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -221,23 +211,23 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if ((!forceRegUpdate)) {
         _builder.append("if (");
-        _builder.append(cpyName, "");
+        _builder.append(cpyName);
         _builder.append("!=");
-        _builder.append(last, "");
+        _builder.append(last);
         _builder.append(")");
         _builder.newLineIfNotEmpty();
         CharSequence _indent = this.indent();
-        _builder.append(_indent, "");
+        _builder.append(_indent);
         _builder.append("\t");
       }
     }
     _builder.append("_regUpdates.add(new RegUpdate(");
     Integer _regIdx = this.regIdx(outputInternal);
-    _builder.append(_regIdx, "");
+    _builder.append(_regIdx);
     _builder.append(", ");
-    _builder.append(offset, "");
+    _builder.append(offset);
     _builder.append(", ");
-    _builder.append(fillValue, "");
+    _builder.append(fillValue);
     _builder.append("));");
     return _builder;
   }
@@ -275,7 +265,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("_");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("();");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -293,11 +283,10 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   protected CharSequence copyArray(final VariableInformation varInfo) {
     final CharSequence type = this.fieldType(varInfo, CommonCodeGenerator.NONE);
     StringConcatenation _builder = new StringConcatenation();
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev);
-    CharSequence _idName = this.idName(varInfo, true, _of);
-    _builder.append(_idName, "");
+    CharSequence _idName = this.idName(varInfo, true, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.isPrev));
+    _builder.append(_idName);
     _builder.append(" = new ");
-    _builder.append(type, "");
+    _builder.append(type);
     _builder.append(".from");
     {
       boolean _notEquals = (!Objects.equal(type, 
@@ -308,7 +297,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     }
     _builder.append("(");
     CharSequence _idName_1 = this.idName(varInfo, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName_1, "");
+    _builder.append(_idName_1);
     _builder.append(");");
     return _builder;
   }
@@ -325,7 +314,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (_equals) {
         StringConcatenation _builder = new StringConcatenation();
         _builder.append("List<");
-        _builder.append(jt, "");
+        _builder.append(jt);
         _builder.append(">");
         return _builder;
       }
@@ -371,7 +360,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       }
       StringConcatenation _builder_9 = new StringConcatenation();
       _builder_9.append("List<");
-      _builder_9.append(jt, "");
+      _builder_9.append(jt);
       _builder_9.append(">");
       return _builder_9;
     }
@@ -393,8 +382,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("switch (idx) {");
     _builder.newLine();
     _builder.append("\t\t\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset);
-    CharSequence _setInputCases = this.setInputCases("value", null, _of);
+    CharSequence _setInputCases = this.setInputCases("value", null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset));
     _builder.append(_setInputCases, "\t\t\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t\t\t");
@@ -462,8 +450,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("switch (idx) {");
     _builder.newLine();
     _builder.append("\t\t\t");
-    EnumSet<CommonCodeGenerator.Attributes> _of_1 = EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset);
-    CharSequence _outputCases = this.getOutputCases(null, _of_1);
+    CharSequence _outputCases = this.getOutputCases(null, EnumSet.<CommonCodeGenerator.Attributes>of(CommonCodeGenerator.Attributes.useArrayOffset));
     _builder.append(_outputCases, "\t\t\t");
     _builder.newLineIfNotEmpty();
     _builder.append("\t\t\t");
@@ -567,11 +554,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function = new Function1<VariableInformation, Boolean>() {
-        @Override
-        public Boolean apply(final VariableInformation it) {
-          return Boolean.valueOf((it.dir == VariableInformation.Direction.IN));
-        }
+      final Function1<VariableInformation, Boolean> _function = (VariableInformation it) -> {
+        return Boolean.valueOf((it.dir == VariableInformation.Direction.IN));
       };
       Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function);
       boolean _hasElements = false;
@@ -582,7 +566,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           _builder.appendImmediate(",", "");
         }
         CharSequence _asPort = this.asPort(v);
-        _builder.append(_asPort, "");
+        _builder.append(_asPort);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -591,11 +575,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function_1 = new Function1<VariableInformation, Boolean>() {
-        @Override
-        public Boolean apply(final VariableInformation it) {
-          return Boolean.valueOf((it.dir == VariableInformation.Direction.INOUT));
-        }
+      final Function1<VariableInformation, Boolean> _function_1 = (VariableInformation it) -> {
+        return Boolean.valueOf((it.dir == VariableInformation.Direction.INOUT));
       };
       Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_1);
       boolean _hasElements_1 = false;
@@ -606,7 +587,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           _builder.appendImmediate(",", "");
         }
         CharSequence _asPort_1 = this.asPort(v_1);
-        _builder.append(_asPort_1, "");
+        _builder.append(_asPort_1);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -615,11 +596,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function_2 = new Function1<VariableInformation, Boolean>() {
-        @Override
-        public Boolean apply(final VariableInformation it) {
-          return Boolean.valueOf((it.dir == VariableInformation.Direction.OUT));
-        }
+      final Function1<VariableInformation, Boolean> _function_2 = (VariableInformation it) -> {
+        return Boolean.valueOf((it.dir == VariableInformation.Direction.OUT));
       };
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_2);
       boolean _hasElements_2 = false;
@@ -630,7 +608,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           _builder.appendImmediate(",", "");
         }
         CharSequence _asPort_2 = this.asPort(v_2);
-        _builder.append(_asPort_2, "");
+        _builder.append(_asPort_2);
         _builder.newLineIfNotEmpty();
       }
     }
@@ -639,11 +617,8 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.append("[");
     _builder.newLine();
     {
-      final Function1<VariableInformation, Boolean> _function_3 = new Function1<VariableInformation, Boolean>() {
-        @Override
-        public Boolean apply(final VariableInformation it) {
-          return Boolean.valueOf((it.dir == VariableInformation.Direction.INTERNAL));
-        }
+      final Function1<VariableInformation, Boolean> _function_3 = (VariableInformation it) -> {
+        return Boolean.valueOf((it.dir == VariableInformation.Direction.INTERNAL));
       };
       Iterable<VariableInformation> _filter_3 = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), _function_3);
       boolean _hasElements_3 = false;
@@ -654,12 +629,12 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
           _builder.appendImmediate(",", "");
         }
         CharSequence _asPort_3 = this.asPort(v_3);
-        _builder.append(_asPort_3, "");
+        _builder.append(_asPort_3);
         _builder.newLineIfNotEmpty();
       }
     }
     _builder.append("], _varIdx, \"");
-    _builder.append(this.em.moduleName, "");
+    _builder.append(this.em.moduleName);
     _builder.append("\");");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -681,7 +656,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             } else {
               _builder.appendImmediate(",", "");
             }
-            _builder.append(i, "");
+            _builder.append(i);
           }
         }
         _builder.append("]");
@@ -730,17 +705,17 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       StringConcatenation _builder_1 = new StringConcatenation();
       _builder_1.append("new Port(");
       Integer _get = this.varIdx.get(v.name);
-      _builder_1.append(_get, "");
+      _builder_1.append(_get);
       _builder_1.append(", \"");
       String _replaceAll = v.name.replaceAll("[\\$]", "\\\\\\$");
-      _builder_1.append(_replaceAll, "");
+      _builder_1.append(_replaceAll);
       _builder_1.append("\", ");
-      _builder_1.append(v.width, "");
+      _builder_1.append(v.width);
       _builder_1.append(", ");
-      _builder_1.append(type, "");
-      _builder_1.append(dims, "");
-      _builder_1.append(clock, "");
-      _builder_1.append(reset, "");
+      _builder_1.append(type);
+      _builder_1.append(dims);
+      _builder_1.append(clock);
+      _builder_1.append(reset);
       _builder_1.append(")");
       _xblockexpression = _builder_1;
     }
@@ -753,13 +728,13 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     {
       if ((this.library != null)) {
         _builder.append("library ");
-        _builder.append(this.library, "");
+        _builder.append(this.library);
         _builder.append(";");
       }
     }
     _builder.newLineIfNotEmpty();
     CharSequence _imports = this.getImports(this.usePackageImport);
-    _builder.append(_imports, "");
+    _builder.append(_imports);
     _builder.newLineIfNotEmpty();
     _builder.append("void main(List<String> args, SendPort replyTo){");
     _builder.newLine();
@@ -861,7 +836,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       }
     }
     _builder.append("class ");
-    _builder.append(this.unitName, "");
+    _builder.append(this.unitName);
     _builder.append(" extends DartInterpreter{");
     _builder.newLineIfNotEmpty();
     {
@@ -955,8 +930,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("\t");
         _builder.append("\t");
         _builder.append("if ((dc == _deltaCycle) && ((local & ");
-        BigInteger _calcMask = this.calcMask(DartCodeGenerator.epsWidth);
-        CharSequence _constant = this.constant(_calcMask, true);
+        CharSequence _constant = this.constant(this.calcMask(DartCodeGenerator.epsWidth), true);
         _builder.append(_constant, "\t\t");
         _builder.append(") == _epsCycle))");
         _builder.newLineIfNotEmpty();
@@ -1099,7 +1073,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("void _");
     CharSequence _stageMethodName = this.stageMethodName(stage, constant);
-    _builder.append(_stageMethodName, "");
+    _builder.append(_stageMethodName);
     _builder.append("(){");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -1108,11 +1082,11 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   @Override
   protected CharSequence assignNextTime(final VariableInformation nextTime, final CharSequence currentProcessTime) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append(nextTime.name, "");
+    _builder.append(nextTime.name);
     _builder.append("=Math.min(");
-    _builder.append(nextTime.name, "");
+    _builder.append(nextTime.name);
     _builder.append(", ");
-    _builder.append(currentProcessTime, "");
+    _builder.append(currentProcessTime);
     _builder.append(");");
     return _builder;
   }
@@ -1125,7 +1099,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         _builder.append("_");
       }
     }
-    _builder.append(methodName, "");
+    _builder.append(methodName);
     _builder.append("(");
     {
       if ((args != null)) {
@@ -1137,7 +1111,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
             } else {
               _builder.appendImmediate(",", "");
             }
-            _builder.append(arg, "");
+            _builder.append(arg);
           }
         }
       }
@@ -1158,15 +1132,14 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   protected CharSequence checkTestbenchListener() {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _indent = this.indent();
-    _builder.append(_indent, "");
+    _builder.append(_indent);
     _builder.append("if (listener!=null && !listener.nextStep(");
-    VariableInformation _varByName = this.varByName("$time");
-    CharSequence _idName = this.idName(_varByName, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    CharSequence _idName = this.idName(this.varByName("$time"), true, CommonCodeGenerator.NONE);
+    _builder.append(_idName);
     _builder.append(", stepCount))");
     _builder.newLineIfNotEmpty();
     CharSequence _indent_1 = this.indent();
-    _builder.append(_indent_1, "");
+    _builder.append(_indent_1);
     _builder.append("\tbreak;");
     _builder.newLineIfNotEmpty();
     return _builder;
@@ -1180,7 +1153,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("bool _");
       String _processMethodName = this.processMethodName(pd);
-      _builder.append(_processMethodName, "");
+      _builder.append(_processMethodName);
       _builder.append("() {");
       _builder.newLineIfNotEmpty();
       _xblockexpression = _builder;
@@ -1205,12 +1178,12 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   protected CharSequence fillArray(final VariableInformation vi, final CharSequence regFillValue) {
     StringConcatenation _builder = new StringConcatenation();
     CharSequence _idName = this.idName(vi, true, CommonCodeGenerator.NONE);
-    _builder.append(_idName, "");
+    _builder.append(_idName);
     _builder.append(".fillRange(0, ");
     int _arraySize = this.getArraySize(vi);
-    _builder.append(_arraySize, "");
+    _builder.append(_arraySize);
     _builder.append(", ");
-    _builder.append(regFillValue, "");
+    _builder.append(regFillValue);
     _builder.append(");");
     return _builder;
   }
@@ -1221,9 +1194,9 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     if (_isSignedType) {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("_signExtend(");
-      _builder.append(op, "");
+      _builder.append(op);
       _builder.append(", ");
-      _builder.append((targetSizeWithType >> 1), "");
+      _builder.append((targetSizeWithType >> 1));
       _builder.append(")");
       return _builder;
     }
@@ -1237,21 +1210,19 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("_srl(");
       String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-      _builder.append(_tempName, "");
+      _builder.append(_tempName);
       _builder.append(", ");
       String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-      _builder.append(_tempName_1, "");
+      _builder.append(_tempName_1);
       _builder.append(", ");
-      _builder.append(fi.arg1, "");
+      _builder.append(fi.arg1);
       _builder.append(")");
       return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, 
         CommonCodeGenerator.NONE, _builder, true);
     }
     if ((fi.inst == Instruction.div)) {
-      CharSequence _cast = this.getCast(targetSizeWithType);
-      final CharSequence assignValue = this.twoOpValue("~/", _cast, leftOperand, rightOperand, targetSizeWithType, attributes);
-      VariableInformation.Type _typeFromTargetSize_1 = this.typeFromTargetSize(targetSizeWithType);
-      return this.assignTempVar(_typeFromTargetSize_1, targetSizeWithType, pos, attributes, assignValue, true);
+      final CharSequence assignValue = this.twoOpValue("~/", this.getCast(targetSizeWithType), leftOperand, rightOperand, targetSizeWithType, attributes);
+      return this.assignTempVar(this.typeFromTargetSize(targetSizeWithType), targetSizeWithType, pos, attributes, assignValue, true);
     }
     return super.twoOp(fi, op, targetSizeWithType, pos, leftOperand, rightOperand, attributes, doMask);
   }
@@ -1262,10 +1233,10 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("pow(");
     String _tempName = this.getTempName(leftOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName, "");
+    _builder.append(_tempName);
     _builder.append(", ");
     String _tempName_1 = this.getTempName(rightOperand, CommonCodeGenerator.NONE);
-    _builder.append(_tempName_1, "");
+    _builder.append(_tempName_1);
     _builder.append(")");
     return this.assignTempVar(_typeFromTargetSize, targetSizeWithType, pos, 
       CommonCodeGenerator.NONE, _builder, true);
@@ -1297,8 +1268,7 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     final DartCodeGenerator comp = new DartCodeGenerator(parameter);
     final String code = comp.generateMainCode();
     final ArrayList<AuxiliaryContent> sideFiles = Lists.<AuxiliaryContent>newArrayList();
-    Iterable<AuxiliaryContent> _auxiliaryContent = comp.getAuxiliaryContent();
-    Iterables.<AuxiliaryContent>addAll(sideFiles, _auxiliaryContent);
+    Iterables.<AuxiliaryContent>addAll(sideFiles, comp.getAuxiliaryContent());
     String _hookName = comp.getHookName();
     PSAbstractCompiler.CompileResult _compileResult = new PSAbstractCompiler.CompileResult(syntaxProblems, code, parameter.em.moduleName, sideFiles, 
       parameter.em.source, _hookName, true);

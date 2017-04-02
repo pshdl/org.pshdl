@@ -86,8 +86,7 @@ public class FullNameExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals = (_container != null);
     if (_tripleNotEquals) {
-      IHDLObject _container_1 = obj.getContainer();
-      final Iterator<IHDLObject> iterator = _container_1.iterator();
+      final Iterator<IHDLObject> iterator = obj.getContainer().iterator();
       while (iterator.hasNext()) {
         {
           final IHDLObject hdlObject = iterator.next();
@@ -237,8 +236,7 @@ public class FullNameExtension {
     if (_not) {
       return null;
     }
-    HDLVariable _get = varRef.get();
-    return this.getFullName(_get);
+    return this.getFullName(varRef.get());
   }
   
   protected HDLQualifiedName _getFullName(final HDLVariableRef ref) {
@@ -252,8 +250,7 @@ public class FullNameExtension {
     if (_not) {
       return null;
     }
-    HDLVariable _get = varRef.get();
-    return this.getFullName(_get);
+    return this.getFullName(varRef.get());
   }
   
   protected HDLQualifiedName _getFullName(final HDLFunctionCall call) {
@@ -267,8 +264,7 @@ public class FullNameExtension {
     if (_not) {
       return null;
     }
-    HDLFunction _get = callRef.get();
-    return this.getFullName(_get);
+    return this.getFullName(callRef.get());
   }
   
   protected HDLQualifiedName _getFullName(final HDLVariable unit) {
@@ -290,8 +286,7 @@ public class FullNameExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals = (_container != null);
     if (_tripleNotEquals) {
-      IHDLObject _container_1 = obj.getContainer();
-      return this.getFullName(_container_1);
+      return this.getFullName(obj.getContainer());
     }
     return HDLQualifiedName.EMPTY;
   }
@@ -304,8 +299,7 @@ public class FullNameExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals = (_container != null);
     if (_tripleNotEquals) {
-      IHDLObject _container_1 = obj.getContainer();
-      return this.getFullName(_container_1);
+      return this.getFullName(obj.getContainer());
     }
     return HDLQualifiedName.EMPTY;
   }
@@ -318,12 +312,11 @@ public class FullNameExtension {
     IHDLObject _container = obj.getContainer();
     boolean _tripleNotEquals = (_container != null);
     if (_tripleNotEquals) {
+      final HDLQualifiedName fn = this.getFullName(obj.getContainer());
       IHDLObject _container_1 = obj.getContainer();
-      final HDLQualifiedName fn = this.getFullName(_container_1);
-      IHDLObject _container_2 = obj.getContainer();
-      if ((_container_2 instanceof HDLIfStatement)) {
-        IHDLObject _container_3 = obj.getContainer();
-        final HDLIfStatement ifStmnt = ((HDLIfStatement) _container_3);
+      if ((_container_1 instanceof HDLIfStatement)) {
+        IHDLObject _container_2 = obj.getContainer();
+        final HDLIfStatement ifStmnt = ((HDLIfStatement) _container_2);
         final HDLIfStatement.TreeSide side = ifStmnt.treeSide(obj);
         if (side != null) {
           switch (side) {

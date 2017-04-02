@@ -83,8 +83,7 @@ public class ScopingExtension {
     if (((obj == null) || (obj.getContainer() == null))) {
       return Optional.<HDLVariable>absent();
     }
-    IHDLObject _container = obj.getContainer();
-    return this.resolveVariable(_container, hVar);
+    return this.resolveVariable(obj.getContainer(), hVar);
   }
   
   protected Optional<HDLVariable> _resolveVariable(final IHDLObject obj, final HDLQualifiedName hVar) {
@@ -98,18 +97,15 @@ public class ScopingExtension {
       return Optional.<HDLFunction>absent();
     }
     final HDLFunctionCall call = ((HDLFunctionCall) obj);
-    IHDLObject _container_1 = obj.getContainer();
-    final Optional<? extends Iterable<HDLFunction>> candidates = this.resolveFunctionCall(_container_1, call, hVar);
+    final Optional<? extends Iterable<HDLFunction>> candidates = this.resolveFunctionCall(obj.getContainer(), call, hVar);
     if (((!candidates.isPresent()) || IterableExtensions.isEmpty(candidates.get()))) {
       return Optional.<HDLFunction>absent();
     }
-    Iterable<HDLFunction> _get = candidates.get();
-    final SortedSet<HDLFunctions.FunctionScore> scored = HDLFunctions.scoreList(_get, call);
+    final SortedSet<HDLFunctions.FunctionScore> scored = HDLFunctions.scoreList(candidates.get(), call);
     if ((IterableExtensions.isNullOrEmpty(scored) || (scored.first().score > 1000))) {
       return Optional.<HDLFunction>absent();
     }
-    HDLFunctions.FunctionScore _first = scored.first();
-    return Optional.<HDLFunction>of(_first.function);
+    return Optional.<HDLFunction>of(scored.first().function);
   }
   
   protected Optional<? extends Iterable<HDLFunction>> _resolveFunctionCall(final IHDLObject obj, final HDLFunctionCall call, final HDLQualifiedName hVar) {
@@ -118,8 +114,7 @@ public class ScopingExtension {
     if (_tripleEquals) {
       return Optional.<Iterable<HDLFunction>>absent();
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveFunctionCall(_container_1, call, hVar);
+    return this.resolveFunctionCall(obj.getContainer(), call, hVar);
   }
   
   protected Optional<HDLEnum> _resolveEnum(final IHDLObject obj, final HDLQualifiedName hEnum) {
@@ -128,8 +123,7 @@ public class ScopingExtension {
     if (_tripleEquals) {
       return Optional.<HDLEnum>absent();
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveEnum(_container_1, hEnum);
+    return this.resolveEnum(obj.getContainer(), hEnum);
   }
   
   protected Optional<? extends HDLType> _resolveType(final IHDLObject obj, final HDLQualifiedName type) {
@@ -138,8 +132,7 @@ public class ScopingExtension {
     if (_tripleEquals) {
       return Optional.<HDLType>absent();
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveType(_container_1, type);
+    return this.resolveType(obj.getContainer(), type);
   }
   
   protected Optional<HDLInterface> _resolveInterface(final IHDLObject obj, final HDLQualifiedName hIf) {
@@ -148,8 +141,7 @@ public class ScopingExtension {
     if (_tripleEquals) {
       return Optional.<HDLInterface>absent();
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveInterface(_container_1, hIf);
+    return this.resolveInterface(obj.getContainer(), hIf);
   }
   
   private static MetaAccess<HDLResolver> RESOLVER = new HDLObject.GenericMeta<HDLResolver>("RESOLVER", false);
@@ -165,60 +157,43 @@ public class ScopingExtension {
   }
   
   protected Optional<? extends HDLType> _resolveType(final HDLStatement obj, final HDLQualifiedName hVar) {
-    HDLResolver _resolver = this.resolver(obj, true);
-    return _resolver.resolveType(hVar);
+    return this.resolver(obj, true).resolveType(hVar);
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLStatement obj, final HDLQualifiedName hVar) {
-    HDLResolver _resolver = this.resolver(obj, true);
-    return _resolver.resolveVariable(hVar);
+    return this.resolver(obj, true).resolveVariable(hVar);
   }
   
   protected Optional<HDLInterface> _resolveInterface(final HDLStatement obj, final HDLQualifiedName hIf) {
-    HDLResolver _resolver = this.resolver(obj, true);
-    return _resolver.resolveInterface(hIf);
+    return this.resolver(obj, true).resolveInterface(hIf);
   }
   
   protected Optional<HDLEnum> _resolveEnum(final HDLStatement obj, final HDLQualifiedName hEnum) {
-    HDLResolver _resolver = this.resolver(obj, true);
-    return _resolver.resolveEnum(hEnum);
+    return this.resolver(obj, true).resolveEnum(hEnum);
   }
   
   protected Optional<? extends Iterable<HDLFunction>> _resolveFunctionCall(final HDLStatement obj, final HDLFunctionCall call, final HDLQualifiedName hEnum) {
-    HDLResolver _resolver = this.resolver(obj, true);
-    return _resolver.resolveFunctionCall(call, hEnum);
+    return this.resolver(obj, true).resolveFunctionCall(call, hEnum);
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLIfStatement obj) {
     final List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
-    ArrayList<HDLStatement> _thenDo = obj.getThenDo();
-    List<HDLEnumDeclaration> _allEnumDeclarations = HDLResolver.getallEnumDeclarations(_thenDo);
-    res.addAll(_allEnumDeclarations);
-    ArrayList<HDLStatement> _elseDo = obj.getElseDo();
-    List<HDLEnumDeclaration> _allEnumDeclarations_1 = HDLResolver.getallEnumDeclarations(_elseDo);
-    res.addAll(_allEnumDeclarations_1);
+    res.addAll(HDLResolver.getallEnumDeclarations(obj.getThenDo()));
+    res.addAll(HDLResolver.getallEnumDeclarations(obj.getElseDo()));
     return res;
   }
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLIfStatement obj) {
     final List<HDLInterface> res = new LinkedList<HDLInterface>();
-    ArrayList<HDLStatement> _thenDo = obj.getThenDo();
-    List<HDLInterface> _allInterfaceDeclarations = HDLResolver.getallInterfaceDeclarations(_thenDo);
-    res.addAll(_allInterfaceDeclarations);
-    ArrayList<HDLStatement> _elseDo = obj.getElseDo();
-    List<HDLInterface> _allInterfaceDeclarations_1 = HDLResolver.getallInterfaceDeclarations(_elseDo);
-    res.addAll(_allInterfaceDeclarations_1);
+    res.addAll(HDLResolver.getallInterfaceDeclarations(obj.getThenDo()));
+    res.addAll(HDLResolver.getallInterfaceDeclarations(obj.getElseDo()));
     return res;
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLIfStatement obj) {
     final List<HDLVariable> res = new LinkedList<HDLVariable>();
-    ArrayList<HDLStatement> _thenDo = obj.getThenDo();
-    List<HDLVariable> _allVariableDeclarations = HDLResolver.getallVariableDeclarations(_thenDo);
-    res.addAll(_allVariableDeclarations);
-    ArrayList<HDLStatement> _elseDo = obj.getElseDo();
-    List<HDLVariable> _allVariableDeclarations_1 = HDLResolver.getallVariableDeclarations(_elseDo);
-    res.addAll(_allVariableDeclarations_1);
+    res.addAll(HDLResolver.getallVariableDeclarations(obj.getThenDo()));
+    res.addAll(HDLResolver.getallVariableDeclarations(obj.getElseDo()));
     return res;
   }
   
@@ -244,21 +219,18 @@ public class ScopingExtension {
     if (_tripleEquals) {
       return Collections.<HDLInterface>emptyList();
     }
-    HDLInterface _hIf_1 = gen.getHIf();
-    return Collections.<HDLInterface>singletonList(_hIf_1);
+    return Collections.<HDLInterface>singletonList(gen.getHIf());
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLDirectGeneration gen) {
-    HDLVariable _var = gen.getVar();
-    return Collections.<HDLVariable>singletonList(_var);
+    return Collections.<HDLVariable>singletonList(gen.getVar());
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLInlineFunction obj) {
     final List<HDLVariable> res = new LinkedList<HDLVariable>();
     ArrayList<HDLFunctionParameter> _args = obj.getArgs();
     for (final HDLFunctionParameter v : _args) {
-      HDLVariable _name = v.getName();
-      res.add(_name);
+      res.add(v.getName());
     }
     return res;
   }
@@ -267,8 +239,7 @@ public class ScopingExtension {
     final List<HDLVariable> res = new LinkedList<HDLVariable>();
     ArrayList<HDLFunctionParameter> _args = obj.getArgs();
     for (final HDLFunctionParameter v : _args) {
-      HDLVariable _name = v.getName();
-      res.add(_name);
+      res.add(v.getName());
     }
     return res;
   }
@@ -277,45 +248,36 @@ public class ScopingExtension {
     final List<HDLVariable> res = new LinkedList<HDLVariable>();
     ArrayList<HDLFunctionParameter> _args = obj.getArgs();
     for (final HDLFunctionParameter v : _args) {
-      HDLVariable _name = v.getName();
-      res.add(_name);
+      res.add(v.getName());
     }
     return res;
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLForLoop obj) {
-    ArrayList<HDLStatement> _dos = obj.getDos();
-    return HDLResolver.getallEnumDeclarations(_dos);
+    return HDLResolver.getallEnumDeclarations(obj.getDos());
   }
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLForLoop obj) {
-    ArrayList<HDLStatement> _dos = obj.getDos();
-    return HDLResolver.getallInterfaceDeclarations(_dos);
+    return HDLResolver.getallInterfaceDeclarations(obj.getDos());
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLForLoop obj) {
     final List<HDLVariable> res = new LinkedList<HDLVariable>();
-    ArrayList<HDLStatement> _dos = obj.getDos();
-    List<HDLVariable> _allVariableDeclarations = HDLResolver.getallVariableDeclarations(_dos);
-    res.addAll(_allVariableDeclarations);
-    HDLVariable _param = obj.getParam();
-    res.add(_param);
+    res.addAll(HDLResolver.getallVariableDeclarations(obj.getDos()));
+    res.add(obj.getParam());
     return res;
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLBlock obj) {
-    ArrayList<HDLStatement> _statements = obj.getStatements();
-    return HDLResolver.getallEnumDeclarations(_statements);
+    return HDLResolver.getallEnumDeclarations(obj.getStatements());
   }
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLBlock obj) {
-    ArrayList<HDLStatement> _statements = obj.getStatements();
-    return HDLResolver.getallInterfaceDeclarations(_statements);
+    return HDLResolver.getallInterfaceDeclarations(obj.getStatements());
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLBlock obj) {
-    ArrayList<HDLStatement> _statements = obj.getStatements();
-    return HDLResolver.getallVariableDeclarations(_statements);
+    return HDLResolver.getallVariableDeclarations(obj.getStatements());
   }
   
   protected Optional<HDLEnum> _resolveEnum(final HDLAssignment obj, final HDLQualifiedName hEnum) {
@@ -325,8 +287,7 @@ public class ScopingExtension {
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_ENUM, obj, ("for hEnum:" + hEnum));
       throw new HDLProblemException(_problem);
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveEnum(_container_1, hEnum);
+    return this.resolveEnum(obj.getContainer(), hEnum);
   }
   
   protected Optional<HDLInterface> _resolveInterface(final HDLAssignment obj, final HDLQualifiedName hIf) {
@@ -336,8 +297,7 @@ public class ScopingExtension {
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_INTERFACE, obj, ("for interface:" + hIf));
       throw new HDLProblemException(_problem);
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveInterface(_container_1, hIf);
+    return this.resolveInterface(obj.getContainer(), hIf);
   }
   
   protected Optional<? extends HDLType> _resolveType(final HDLAssignment obj, final HDLQualifiedName hVar) {
@@ -347,8 +307,7 @@ public class ScopingExtension {
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_TYPE, obj, ("for type:" + hVar));
       throw new HDLProblemException(_problem);
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveType(_container_1, hVar);
+    return this.resolveType(obj.getContainer(), hVar);
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLAssignment obj, final HDLQualifiedName hVar) {
@@ -358,8 +317,7 @@ public class ScopingExtension {
       Problem _problem = new Problem(ErrorCode.UNRESOLVED_VARIABLE, obj, ("for hVariable:" + hVar));
       throw new HDLProblemException(_problem);
     }
-    IHDLObject _container_1 = obj.getContainer();
-    return this.resolveVariable(_container_1, hVar);
+    return this.resolveVariable(obj.getContainer(), hVar);
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLEnumDeclaration obj) {
@@ -367,8 +325,7 @@ public class ScopingExtension {
   }
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLInterfaceDeclaration obj) {
-    HDLInterface _hIf = obj.getHIf();
-    return Collections.<HDLInterface>singletonList(_hIf);
+    return Collections.<HDLInterface>singletonList(obj.getHIf());
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLVariableDeclaration obj) {
@@ -376,31 +333,26 @@ public class ScopingExtension {
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLInterfaceInstantiation obj) {
-    HDLVariable _var = obj.getVar();
-    return Collections.<HDLVariable>singletonList(_var);
+    return Collections.<HDLVariable>singletonList(obj.getVar());
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLSwitchCaseStatement obj) {
-    ArrayList<HDLStatement> _dos = obj.getDos();
-    return HDLResolver.getallEnumDeclarations(_dos);
+    return HDLResolver.getallEnumDeclarations(obj.getDos());
   }
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLSwitchCaseStatement obj) {
-    ArrayList<HDLStatement> _dos = obj.getDos();
-    return HDLResolver.getallInterfaceDeclarations(_dos);
+    return HDLResolver.getallInterfaceDeclarations(obj.getDos());
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLSwitchCaseStatement obj) {
-    ArrayList<HDLStatement> _dos = obj.getDos();
-    return HDLResolver.getallVariableDeclarations(_dos);
+    return HDLResolver.getallVariableDeclarations(obj.getDos());
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLSwitchStatement obj) {
     final List<HDLEnumDeclaration> res = new LinkedList<HDLEnumDeclaration>();
     ArrayList<HDLSwitchCaseStatement> _cases = obj.getCases();
     for (final HDLSwitchCaseStatement c : _cases) {
-      List<HDLEnumDeclaration> _doGetEnumDeclarations = this.doGetEnumDeclarations(c);
-      res.addAll(_doGetEnumDeclarations);
+      res.addAll(this.doGetEnumDeclarations(c));
     }
     return res;
   }
@@ -409,8 +361,7 @@ public class ScopingExtension {
     final List<HDLInterface> res = new LinkedList<HDLInterface>();
     ArrayList<HDLSwitchCaseStatement> _cases = obj.getCases();
     for (final HDLSwitchCaseStatement c : _cases) {
-      List<HDLInterface> _doGetInterfaceDeclarations = this.doGetInterfaceDeclarations(c);
-      res.addAll(_doGetInterfaceDeclarations);
+      res.addAll(this.doGetInterfaceDeclarations(c));
     }
     return res;
   }
@@ -419,8 +370,7 @@ public class ScopingExtension {
     final List<HDLVariable> res = new LinkedList<HDLVariable>();
     ArrayList<HDLSwitchCaseStatement> _cases = obj.getCases();
     for (final HDLSwitchCaseStatement c : _cases) {
-      List<HDLVariable> _doGetVariables = this.doGetVariables(c);
-      res.addAll(_doGetVariables);
+      res.addAll(this.doGetVariables(c));
     }
     return res;
   }
@@ -429,8 +379,7 @@ public class ScopingExtension {
     HDLLibrary library = obj.getLibrary();
     String _pkg = obj.getPkg();
     String _plus = (_pkg + ".*");
-    Iterable<String> _asList = HDLObject.<String>asList(_plus);
-    return library.resolveFunction(_asList, call, hFunc);
+    return library.resolveFunction(HDLObject.<String>asList(_plus), call, hFunc);
   }
   
   protected Optional<HDLEnum> _resolveEnum(final HDLPackage obj, final HDLQualifiedName hEnum) {
@@ -454,14 +403,11 @@ public class ScopingExtension {
     HDLLibrary _library = obj.getLibrary();
     boolean _tripleEquals = (_library == null);
     if (_tripleEquals) {
-      String _libURI = obj.getLibURI();
-      HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
-      library = _library_1;
+      library = HDLLibrary.getLibrary(obj.getLibURI());
     }
     String _pkg = obj.getPkg();
     String _plus = (_pkg + ".*");
-    Iterable<String> _asList = HDLObject.<String>asList(_plus);
-    return library.resolve(_asList, type);
+    return library.resolve(HDLObject.<String>asList(_plus), type);
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLPackage obj, final HDLQualifiedName hVar) {
@@ -469,19 +415,15 @@ public class ScopingExtension {
     HDLLibrary _library = obj.getLibrary();
     boolean _tripleEquals = (_library == null);
     if (_tripleEquals) {
-      String _libURI = obj.getLibURI();
-      HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
-      library = _library_1;
+      library = HDLLibrary.getLibrary(obj.getLibURI());
     }
     String _pkg = obj.getPkg();
     String _plus = (_pkg + ".*");
-    Iterable<String> _asList = HDLObject.<String>asList(_plus);
-    return library.resolveVariable(_asList, hVar);
+    return library.resolveVariable(HDLObject.<String>asList(_plus), hVar);
   }
   
   protected Optional<HDLEnum> _resolveEnum(final HDLUnit obj, final HDLQualifiedName hEnum) {
-    HDLResolver _resolver = this.resolver(obj, false);
-    final Optional<HDLEnum> resolveEnum = _resolver.resolveEnum(hEnum);
+    final Optional<HDLEnum> resolveEnum = this.resolver(obj, false).resolveEnum(hEnum);
     boolean _isPresent = resolveEnum.isPresent();
     if (_isPresent) {
       return resolveEnum;
@@ -494,8 +436,7 @@ public class ScopingExtension {
   }
   
   protected Optional<? extends Iterable<HDLFunction>> _resolveFunctionCall(final HDLUnit obj, final HDLFunctionCall call, final HDLQualifiedName hFunc) {
-    HDLResolver _resolver = this.resolver(obj, false);
-    final Optional<? extends Iterable<HDLFunction>> resolveEnum = _resolver.resolveFunctionCall(call, hFunc);
+    final Optional<? extends Iterable<HDLFunction>> resolveEnum = this.resolver(obj, false).resolveFunctionCall(call, hFunc);
     boolean _isPresent = resolveEnum.isPresent();
     if (_isPresent) {
       return resolveEnum;
@@ -504,22 +445,15 @@ public class ScopingExtension {
     HDLLibrary _library = obj.getLibrary();
     boolean _tripleEquals = (_library == null);
     if (_tripleEquals) {
-      String _libURI = obj.getLibURI();
-      HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
-      library = _library_1;
+      library = HDLLibrary.getLibrary(obj.getLibURI());
     }
     final ArrayList<String> newImports = obj.getImports();
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-    HDLQualifiedName _skipLast = _fullNameOf.skipLast(1);
-    HDLQualifiedName _append = _skipLast.append("*");
-    String _string = _append.toString();
-    newImports.add(_string);
+    newImports.add(FullNameExtension.fullNameOf(obj).skipLast(1).append("*").toString());
     return library.resolveFunction(newImports, call, hFunc);
   }
   
   protected Optional<HDLInterface> _resolveInterface(final HDLUnit obj, final HDLQualifiedName hIf) {
-    HDLResolver _resolver = this.resolver(obj, false);
-    final Optional<HDLInterface> resolveInterface = _resolver.resolveInterface(hIf);
+    final Optional<HDLInterface> resolveInterface = this.resolver(obj, false).resolveInterface(hIf);
     boolean _isPresent = resolveInterface.isPresent();
     if (_isPresent) {
       return resolveInterface;
@@ -532,8 +466,7 @@ public class ScopingExtension {
   }
   
   protected Optional<? extends HDLType> _resolveType(final HDLUnit obj, final HDLQualifiedName type) {
-    HDLResolver _resolver = this.resolver(obj, false);
-    final Optional<? extends HDLType> resolveType = _resolver.resolveType(type);
+    final Optional<? extends HDLType> resolveType = this.resolver(obj, false).resolveType(type);
     boolean _isPresent = resolveType.isPresent();
     if (_isPresent) {
       return resolveType;
@@ -542,22 +475,15 @@ public class ScopingExtension {
     HDLLibrary _library = obj.getLibrary();
     boolean _tripleEquals = (_library == null);
     if (_tripleEquals) {
-      String _libURI = obj.getLibURI();
-      HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
-      library = _library_1;
+      library = HDLLibrary.getLibrary(obj.getLibURI());
     }
     final ArrayList<String> newImports = obj.getImports();
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-    HDLQualifiedName _skipLast = _fullNameOf.skipLast(1);
-    HDLQualifiedName _append = _skipLast.append("*");
-    String _string = _append.toString();
-    newImports.add(_string);
+    newImports.add(FullNameExtension.fullNameOf(obj).skipLast(1).append("*").toString());
     return library.resolve(newImports, type);
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLUnit obj, final HDLQualifiedName hVar) {
-    HDLResolver _resolver = this.resolver(obj, false);
-    final Optional<HDLVariable> hdlVariable = _resolver.resolveVariable(hVar);
+    final Optional<HDLVariable> hdlVariable = this.resolver(obj, false).resolveVariable(hVar);
     boolean _isPresent = hdlVariable.isPresent();
     if (_isPresent) {
       return hdlVariable;
@@ -566,56 +492,38 @@ public class ScopingExtension {
     HDLLibrary _library = obj.getLibrary();
     boolean _tripleEquals = (_library == null);
     if (_tripleEquals) {
-      String _libURI = obj.getLibURI();
-      HDLLibrary _library_1 = HDLLibrary.getLibrary(_libURI);
-      library = _library_1;
+      library = HDLLibrary.getLibrary(obj.getLibURI());
     }
     final ArrayList<String> newImports = obj.getImports();
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(obj);
-    HDLQualifiedName _skipLast = _fullNameOf.skipLast(1);
-    HDLQualifiedName _append = _skipLast.append("*");
-    String _string = _append.toString();
-    newImports.add(_string);
+    newImports.add(FullNameExtension.fullNameOf(obj).skipLast(1).append("*").toString());
     return library.resolveVariable(newImports, hVar);
   }
   
   protected List<HDLEnumDeclaration> _doGetEnumDeclarations(final HDLUnit obj) {
-    ArrayList<HDLStatement> _inits = obj.getInits();
-    final List<HDLEnumDeclaration> res = HDLResolver.getallEnumDeclarations(_inits);
-    ArrayList<HDLStatement> _statements = obj.getStatements();
-    List<HDLEnumDeclaration> _allEnumDeclarations = HDLResolver.getallEnumDeclarations(_statements);
-    res.addAll(_allEnumDeclarations);
+    final List<HDLEnumDeclaration> res = HDLResolver.getallEnumDeclarations(obj.getInits());
+    res.addAll(HDLResolver.getallEnumDeclarations(obj.getStatements()));
     return res;
   }
   
   protected List<HDLInterface> _doGetInterfaceDeclarations(final HDLUnit obj) {
-    ArrayList<HDLStatement> _inits = obj.getInits();
-    final List<HDLInterface> res = HDLResolver.getallInterfaceDeclarations(_inits);
-    ArrayList<HDLStatement> _statements = obj.getStatements();
-    List<HDLInterface> _allInterfaceDeclarations = HDLResolver.getallInterfaceDeclarations(_statements);
-    res.addAll(_allInterfaceDeclarations);
+    final List<HDLInterface> res = HDLResolver.getallInterfaceDeclarations(obj.getInits());
+    res.addAll(HDLResolver.getallInterfaceDeclarations(obj.getStatements()));
     return res;
   }
   
   protected List<HDLVariable> _doGetVariables(final HDLUnit obj) {
-    ArrayList<HDLStatement> _inits = obj.getInits();
-    final List<HDLVariable> res = HDLResolver.getallVariableDeclarations(_inits);
-    ArrayList<HDLStatement> _statements = obj.getStatements();
-    List<HDLVariable> _allVariableDeclarations = HDLResolver.getallVariableDeclarations(_statements);
-    res.addAll(_allVariableDeclarations);
+    final List<HDLVariable> res = HDLResolver.getallVariableDeclarations(obj.getInits());
+    res.addAll(HDLResolver.getallVariableDeclarations(obj.getStatements()));
     return res;
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLInterface hIf, final HDLQualifiedName hVar) {
-    String _lastSegment = hVar.getLastSegment();
-    final HDLVariable resolved = ScopingExtension.getVariable(hIf, _lastSegment);
+    final HDLVariable resolved = ScopingExtension.getVariable(hIf, hVar.getLastSegment());
     if ((resolved != null)) {
       if ((hVar.length == 1)) {
         return Optional.<HDLVariable>of(resolved);
       }
-      HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hIf);
-      HDLQualifiedName _skipLast = hVar.skipLast(1);
-      boolean _equals = _fullNameOf.equals(_skipLast);
+      boolean _equals = FullNameExtension.fullNameOf(hIf).equals(hVar.skipLast(1));
       if (_equals) {
         return Optional.<HDLVariable>of(resolved);
       }
@@ -624,24 +532,16 @@ public class ScopingExtension {
   }
   
   private static HDLVariable getVariable(final HDLInterface hIf, final String lastSegment) {
-    HDLQuery.Source<HDLVariable> _select = HDLQuery.<HDLVariable>select(HDLVariable.class);
-    HDLQuery.Selector<HDLVariable> _from = _select.from(hIf);
-    HDLQuery.FieldSelector<HDLVariable, String> _where = _from.<String>where(HDLVariable.fName);
-    HDLQuery.Result<HDLVariable, String> _lastSegmentIs = _where.lastSegmentIs(lastSegment);
-    return _lastSegmentIs.getFirst();
+    return HDLQuery.<HDLVariable>select(HDLVariable.class).from(hIf).<String>where(HDLVariable.fName).lastSegmentIs(lastSegment).getFirst();
   }
   
   protected Optional<HDLVariable> _resolveVariable(final HDLEnum hEnum, final HDLQualifiedName hVar) {
     if ((hVar.length == 1)) {
-      String _lastSegment = hVar.getLastSegment();
-      return ScopingExtension.getVariable(hEnum, _lastSegment);
+      return ScopingExtension.getVariable(hEnum, hVar.getLastSegment());
     }
-    HDLQualifiedName _fullNameOf = FullNameExtension.fullNameOf(hEnum);
-    HDLQualifiedName _skipLast = hVar.skipLast(1);
-    boolean _equals = _fullNameOf.equals(_skipLast);
+    boolean _equals = FullNameExtension.fullNameOf(hEnum).equals(hVar.skipLast(1));
     if (_equals) {
-      String _lastSegment_1 = hVar.getLastSegment();
-      return ScopingExtension.getVariable(hEnum, _lastSegment_1);
+      return ScopingExtension.getVariable(hEnum, hVar.getLastSegment());
     }
     return this.resolveVariable(hEnum, hVar);
   }
@@ -649,8 +549,7 @@ public class ScopingExtension {
   public static Optional<HDLVariable> getVariable(final HDLEnum hEnum, final String lastSegment) {
     ArrayList<HDLVariable> _enums = hEnum.getEnums();
     for (final HDLVariable hVar : _enums) {
-      String _name = hVar.getName();
-      boolean _equals = _name.equals(lastSegment);
+      boolean _equals = hVar.getName().equals(lastSegment);
       if (_equals) {
         return Optional.<HDLVariable>of(hVar);
       }

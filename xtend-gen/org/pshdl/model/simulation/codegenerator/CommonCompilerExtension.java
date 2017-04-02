@@ -46,8 +46,7 @@ public class CommonCompilerExtension {
     int _length = em.variables.length;
     ExclusiveRange _doubleDotLessThan = new ExclusiveRange(0, _length, true);
     for (final Integer i : _doubleDotLessThan) {
-      VariableInformation _get = em.variables[(i).intValue()];
-      this.varIdx.put(_get.name, i);
+      this.varIdx.put(em.variables[(i).intValue()].name, i);
     }
   }
   
@@ -61,20 +60,16 @@ public class CommonCompilerExtension {
       if (_switchValue != null) {
         switch (_switchValue) {
           case IN:
-            String _port = this.toPort(vi);
-            inVar.add(_port);
+            inVar.add(this.toPort(vi));
             break;
           case INOUT:
-            String _port_1 = this.toPort(vi);
-            inOutVar.add(_port_1);
+            inOutVar.add(this.toPort(vi));
             break;
           case OUT:
-            String _port_2 = this.toPort(vi);
-            outVar.add(_port_2);
+            outVar.add(this.toPort(vi));
             break;
           case INTERNAL:
-            String _port_3 = this.toPort(vi);
-            intVar.add(_port_3);
+            intVar.add(this.toPort(vi));
             break;
           default:
             break;
@@ -83,7 +78,7 @@ public class CommonCompilerExtension {
     }
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("{\\\"moduleName\\\":\\\"");
-    _builder.append(this.em.moduleName, "");
+    _builder.append(this.em.moduleName);
     _builder.append("\\\",\\\"inPorts\\\":[");
     {
       boolean _hasElements = false;
@@ -93,7 +88,7 @@ public class CommonCompilerExtension {
         } else {
           _builder.appendImmediate(",", "");
         }
-        _builder.append(port, "");
+        _builder.append(port);
       }
     }
     _builder.append("],\\\"inOutPorts\\\":[");
@@ -105,7 +100,7 @@ public class CommonCompilerExtension {
         } else {
           _builder.appendImmediate(",", "");
         }
-        _builder.append(port_1, "");
+        _builder.append(port_1);
       }
     }
     _builder.append("],\\\"outPorts\\\":[");
@@ -117,7 +112,7 @@ public class CommonCompilerExtension {
         } else {
           _builder.appendImmediate(",", "");
         }
-        _builder.append(port_2, "");
+        _builder.append(port_2);
       }
     }
     _builder.append("],\\\"internalPorts\\\":[");
@@ -129,7 +124,7 @@ public class CommonCompilerExtension {
         } else {
           _builder.appendImmediate(",", "");
         }
-        _builder.append(port_3, "");
+        _builder.append(port_3);
       }
     }
     _builder.append("],\\\"nameIdx\\\":{");
@@ -144,10 +139,10 @@ public class CommonCompilerExtension {
         }
         _builder.append("\\\"");
         String _key = entry.getKey();
-        _builder.append(_key, "");
+        _builder.append(_key);
         _builder.append("\\\":");
         Integer _value = entry.getValue();
-        _builder.append(_value, "");
+        _builder.append(_value);
       }
     }
     _builder.append("}}");
@@ -158,18 +153,18 @@ public class CommonCompilerExtension {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("{\\\"idx\\\":");
     Integer _get = this.varIdx.get(vi.name);
-    _builder.append(_get, "");
+    _builder.append(_get);
     _builder.append(",\\\"name\\\":\\\"");
-    _builder.append(vi.name, "");
+    _builder.append(vi.name);
     _builder.append("\\\",\\\"width\\\":");
-    _builder.append(vi.width, "");
+    _builder.append(vi.width);
     _builder.append(",\\\"clock\\\": ");
-    _builder.append(vi.isClock, "");
+    _builder.append(vi.isClock);
     _builder.append(",\\\"reset\\\":");
-    _builder.append(vi.isReset, "");
+    _builder.append(vi.isReset);
     _builder.append(",\\\"type\\\":");
     int _bitJsonType = this.bitJsonType(vi);
-    _builder.append(_bitJsonType, "");
+    _builder.append(_bitJsonType);
     _builder.append("}");
     return _builder.toString();
   }

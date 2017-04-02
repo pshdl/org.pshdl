@@ -47,12 +47,9 @@ public class DartCodeGeneratorParameter extends CommonCodeGeneratorParameter {
     final int li = moduleName.lastIndexOf(".");
     this.library = null;
     if ((li != (-1))) {
-      String _substring = moduleName.substring(0, (li - 1));
-      this.library = _substring;
+      this.library = moduleName.substring(0, (li - 1));
     }
-    int _length = moduleName.length();
-    String _substring_1 = moduleName.substring((li + 1), _length);
-    this.unitName = _substring_1;
+    this.unitName = moduleName.substring((li + 1), moduleName.length());
   }
   
   public DartCodeGeneratorParameter setLibrary(final String library) {
