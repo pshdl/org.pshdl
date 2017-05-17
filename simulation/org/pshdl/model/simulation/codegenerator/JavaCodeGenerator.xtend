@@ -95,7 +95,7 @@ class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	}
 
 	public def String javaChangeAdapterName(boolean useInterface) {
-		if (packageName == null)
+		if (packageName === null)
 			return changeAdapterName(useInterface)
 		return '''«packageName».«changeAdapterName(useInterface)»'''
 	}
@@ -105,7 +105,7 @@ class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
 	}
 
 	public def String javaClassName() {
-		if (packageName == null)
+		if (packageName === null)
 			return unitName
 		return '''«packageName».«unitName»'''
 	}

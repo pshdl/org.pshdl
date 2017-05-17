@@ -390,11 +390,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         String[] _annotations = v_1.annotations;
         String _join = null;
         if (((Iterable<String>)Conversions.doWrapArray(_annotations))!=null) {
-          final Function1<String, CharSequence> _function = new Function1<String, CharSequence>() {
-            @Override
-            public CharSequence apply(final String it) {
-              return it;
-            }
+          final Function1<String, CharSequence> _function = (String it) -> {
+            return it;
           };
           _join=IterableExtensions.<String>join(((Iterable<String>)Conversions.doWrapArray(_annotations)), "\"", ",", "\"", _function);
         }
@@ -717,17 +714,11 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       final Set<Integer> handledPosEdges = Sets.<Integer>newLinkedHashSet();
       final Set<Integer> handledPredicates = Sets.<Integer>newLinkedHashSet();
       final Multimap<Integer, Frame> stageFrames = LinkedHashMultimap.<Integer, Frame>create();
-      final Function1<Frame, Boolean> _function = new Function1<Frame, Boolean>() {
-        @Override
-        public Boolean apply(final Frame it) {
-          return Boolean.valueOf((!it.constant));
-        }
+      final Function1<Frame, Boolean> _function = (Frame it) -> {
+        return Boolean.valueOf((!it.constant));
       };
-      final Consumer<Frame> _function_1 = new Consumer<Frame>() {
-        @Override
-        public void accept(final Frame it) {
-          stageFrames.put(Integer.valueOf(it.scheduleStage), it);
-        }
+      final Consumer<Frame> _function_1 = (Frame it) -> {
+        stageFrames.put(Integer.valueOf(it.scheduleStage), it);
       };
       IterableExtensions.<Frame>filter(((Iterable<Frame>)Conversions.doWrapArray(this.em.frames)), _function).forEach(_function_1);
       int maxStage = (int) IterableExtensions.<Integer>last(IterableExtensions.<Integer>sort(stageFrames.keySet()));
@@ -797,29 +788,20 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
                 }
               }
             }
-            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_2 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-              @Override
-              public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                return it.declare();
-              }
+            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_2 = (JavaCodeGenerator.ExecutionPhase it) -> {
+              return it.declare();
             };
             phaseMethods.append(IterableExtensions.join(ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_2)));
-            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_3 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-              @Override
-              public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                return it.call();
-              }
+            final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_3 = (JavaCodeGenerator.ExecutionPhase it) -> {
+              return it.call();
             };
             ctrlThread.append(IterableExtensions.join(ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_3)));
             ExclusiveRange _doubleDotLessThan_2 = new ExclusiveRange(0, this.executionCores, true);
             for (final int i_1 : _doubleDotLessThan_2) {
               {
                 Collections.shuffle(phases, this.r);
-                final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_4 = new Function1<JavaCodeGenerator.ExecutionPhase, CharSequence>() {
-                  @Override
-                  public CharSequence apply(final JavaCodeGenerator.ExecutionPhase it) {
-                    return it.call();
-                  }
+                final Function1<JavaCodeGenerator.ExecutionPhase, CharSequence> _function_4 = (JavaCodeGenerator.ExecutionPhase it) -> {
+                  return it.call();
                 };
                 execution.get(i_1).append(IterableExtensions.join(ListExtensions.<JavaCodeGenerator.ExecutionPhase, CharSequence>map(phases, _function_4)));
               }
@@ -1656,8 +1638,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (useInterface) {
         {
           Iterable<VariableInformation> _filter = IterableExtensions.<VariableInformation>filter(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables)), new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo : _filter) {
@@ -1712,8 +1694,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
       if (useInterface) {
         {
           Iterable<VariableInformation> _filter_1 = IterableExtensions.<VariableInformation>filter(this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables))), new Function1<VariableInformation, Boolean>() {
-              public Boolean apply(VariableInformation arg0) {
-                return filter.apply(arg0);
+              public Boolean apply(VariableInformation p) {
+                return filter.apply(p);
               }
           });
           for(final VariableInformation varInfo_1 : _filter_1) {
@@ -1744,8 +1726,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
     _builder.newLine();
     {
       Iterable<VariableInformation> _filter_2 = IterableExtensions.<VariableInformation>filter(this.excludeNullAndAlias(((Iterable<VariableInformation>)Conversions.doWrapArray(this.em.variables))), new Function1<VariableInformation, Boolean>() {
-          public Boolean apply(VariableInformation arg0) {
-            return filter.apply(arg0);
+          public Boolean apply(VariableInformation p) {
+            return filter.apply(p);
           }
       });
       for(final VariableInformation varInfo_2 : _filter_2) {
@@ -2505,11 +2487,8 @@ public class JavaCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   }
   
   protected String getAnnoValue(final String anno) {
-    final Function1<String, Boolean> _function = new Function1<String, Boolean>() {
-      @Override
-      public Boolean apply(final String it) {
-        return Boolean.valueOf(it.startsWith(anno));
-      }
+    final Function1<String, Boolean> _function = (String it) -> {
+      return Boolean.valueOf(it.startsWith(anno));
     };
     final String foundAnno = IterableExtensions.<String>findFirst(((Iterable<String>)Conversions.doWrapArray(this.em.annotations)), _function);
     int _indexOf = foundAnno.indexOf(SimulationTransformationExtension.ANNO_VALUE_SEP);

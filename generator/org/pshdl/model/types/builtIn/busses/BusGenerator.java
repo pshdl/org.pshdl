@@ -132,7 +132,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	}
 
 	private Optional<HDLInterface> createInterface(HDLDirectGeneration hdl, String name) {
-		final Optional<Unit> unitOpt = parse(hdl, Sets.<Problem> newHashSet());
+		final Optional<Unit> unitOpt = parse(hdl, Sets.<Problem>newHashSet());
 		if (unitOpt.isPresent()) {
 			final Unit unit = unitOpt.get();
 			final List<Row> rows = MemoryModel.buildRows(unit);
@@ -264,6 +264,8 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			}
 			final String version = getVersion(hdl);
 			final String prefix = getPrefix(hdl);
+			boolean defaultClock = getClock(hdl);
+			boolean defaultReset = getReset(hdl);
 			final List<Row> rows = MemoryModel.buildRows(unit);
 			final byte[] html = MemoryModelSideFiles.builtHTML(unit, rows, true);
 			final List<AuxiliaryContent> sideFiles = new LinkedList<AuxiliaryContent>();
@@ -285,7 +287,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 				return Optional.of(hdgi);
 			}
 			if (hdl.getGeneratorID().equalsIgnoreCase("apb")) {
-				HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows), version, prefix);
+				HDLGenerationInfo hdgi = new HDLGenerationInfo(ABP3BusCodeGen.get("org.apb", unit, rows, defaultClock, defaultReset), version, prefix);
 				hdgi = annotateSignals(hdgi, unit);
 				hdgi.files.addAll(sideFiles);
 				return Optional.of(hdgi);
@@ -347,6 +349,20 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 			if ("prefix".equals(arg.getName()))
 				return ((HDLLiteral) arg.getExpression()).getVal();
 		return "";
+	}
+
+	private boolean getClock(HDLDirectGeneration hdl) {
+		for (final HDLArgument arg : hdl.getArguments())
+			if ("defaultClock".equals(arg.getName()))
+				return !((HDLLiteral) arg.getExpression()).getVal().equals(HDLLiteral.FALSE);
+		return true;
+	}
+
+	private boolean getReset(HDLDirectGeneration hdl) {
+		for (final HDLArgument arg : hdl.getArguments())
+			if ("defaultReset".equals(arg.getName()))
+				return !((HDLLiteral) arg.getExpression()).getVal().equals(HDLLiteral.FALSE);
+		return true;
 	}
 
 	@Override

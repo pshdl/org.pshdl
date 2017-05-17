@@ -238,7 +238,7 @@ public class HDLVariableDeclaration extends AbstractHDLVariableDeclaration {
 	public Optional<? extends HDLType> resolveType() {
 		final HDLPrimitive prim = getPrimitive();
 		if (prim != null)
-			return Optional.<HDLType> of(prim);
+			return Optional.<HDLType>of(prim);
 		return super.resolveType();
 	}
 

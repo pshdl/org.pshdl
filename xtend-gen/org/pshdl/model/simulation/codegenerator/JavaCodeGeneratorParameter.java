@@ -26,7 +26,6 @@
  */
 package org.pshdl.model.simulation.codegenerator;
 
-import com.google.common.base.Objects;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.pshdl.interpreter.ExecutableModel;
 import org.pshdl.model.simulation.codegenerator.CommonCodeGeneratorParameter;
@@ -72,8 +71,7 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
   }
   
   public String javaChangeAdapterName(final boolean useInterface) {
-    boolean _equals = Objects.equal(this.packageName, null);
-    if (_equals) {
+    if ((this.packageName == null)) {
       return this.changeAdapterName(useInterface);
     }
     StringConcatenation _builder = new StringConcatenation();
@@ -95,8 +93,7 @@ public class JavaCodeGeneratorParameter extends CommonCodeGeneratorParameter {
   }
   
   public String javaClassName() {
-    boolean _equals = Objects.equal(this.packageName, null);
-    if (_equals) {
+    if ((this.packageName == null)) {
       return this.unitName;
     }
     StringConcatenation _builder = new StringConcatenation();

@@ -183,12 +183,20 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 		return new HDLPrimitive().setType(HDLPrimitiveType.INT).setName("#int<?>");
 	}
 
+	public static HDLPrimitive getInt(int width) {
+		return new HDLPrimitive().setType(HDLPrimitiveType.INT).setName("#int<?>").setWidth(HDLLiteral.get(width));
+	}
+
 	public static HDLPrimitive getInteger() {
 		return new HDLPrimitive().setType(HDLPrimitiveType.INTEGER).setName("#int");
 	}
 
 	public static HDLPrimitive getUint() {
 		return new HDLPrimitive().setType(HDLPrimitiveType.UINT).setName("#uint<?>");
+	}
+
+	public static HDLPrimitive getUint(int width) {
+		return new HDLPrimitive().setType(HDLPrimitiveType.UINT).setName("#uint<?>").setWidth(HDLLiteral.get(width));
 	}
 
 	public static HDLPrimitive getNatural() {
@@ -209,6 +217,10 @@ public class HDLPrimitive extends AbstractHDLPrimitive {
 
 	public static HDLPrimitive getBitvector() {
 		return new HDLPrimitive().setType(HDLPrimitiveType.BITVECTOR).setName("#bit<?>");
+	}
+
+	public static HDLPrimitive getBitvector(int width) {
+		return new HDLPrimitive().setType(HDLPrimitiveType.BITVECTOR).setName("#bit<?>").setWidth(HDLLiteral.get(width));
 	}
 
 	@Override
