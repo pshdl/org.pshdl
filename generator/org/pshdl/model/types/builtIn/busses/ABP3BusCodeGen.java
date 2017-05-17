@@ -66,11 +66,10 @@ public class ABP3BusCodeGen extends CommonBusCode {
 		HDLVariableDeclaration pclk = new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()).addVariables(pclkVar);
 		if (defaultClock)
 			pclk = pclk.addAnnotations(HDLBuiltInAnnotations.clock.create(null));
-		HDLVariableDeclaration preset = new HDLVariableDeclaration().setDirection(HDLDirection.INTERNAL).setType(HDLPrimitive.getBit()).addVariables(new HDLVariable()
-				.setName("rst").setDefaultValue(new HDLManip().setType(HDLManipType.BIT_NEG).setTarget(new HDLVariableRef().setVar(HDLQualifiedName.create("PRESETn")))));
-		if (defaultReset)
-			preset = preset.addAnnotations(HDLBuiltInAnnotations.reset.create(null));
 		HDLVariable presetVar = new HDLVariable().setName("PRESETn");
+		HDLVariableDeclaration preset = new HDLVariableDeclaration().setDirection(HDLDirection.INTERNAL).setType(HDLPrimitive.getBit())
+				.addAnnotations(HDLBuiltInAnnotations.reset.create(null))
+				.addVariables(new HDLVariable().setName("rst").setDefaultValue(new HDLManip().setType(HDLManipType.BIT_NEG).setTarget(presetVar.asHDLRef())));
 		HDLUnit res = new HDLUnit().setName(name).addStatements(pclk)
 				.addStatements(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()).addVariables(presetVar))
 				.addStatements(new HDLVariableDeclaration().setDirection(HDLDirection.IN).setType(HDLPrimitive.getBit()).addVariables(new HDLVariable().setName("PENABLE")))
@@ -119,6 +118,8 @@ public class ABP3BusCodeGen extends CommonBusCode {
 								.addThenDo(createReadSwitch(rows, isArray)).addElseDo(new HDLAssignment().setLeft(new HDLVariableRef().setVar(HDLQualifiedName.create("PRDATA")))
 										.setType(HDLAssignmentType.ASSGN).setRight(new HDLLiteral().setVal("0"))))
 				.setSimulation(false);
+		if (defaultReset)
+			res = res.addStatements(preset);
 		for (final HDLVariableDeclaration port : hdi.getPorts()) {
 			res = res.addStatements(port.setDirection(HDLDirection.INTERNAL).setRegister(createRegister(defaultClock, pclkVar, defaultReset, presetVar)));
 		}
