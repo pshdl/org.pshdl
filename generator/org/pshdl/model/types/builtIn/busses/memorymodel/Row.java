@@ -69,7 +69,7 @@ public class Row implements NamedElement {
 				case date: {
 					Calendar cal = Calendar.getInstance();
 					c.value = toHex(cal.get(Calendar.DAY_OF_MONTH));
-					c.value |= toHex(cal.get(Calendar.MONTH + 1)) << 8;
+					c.value |= toHex(cal.get(Calendar.MONTH) + 1) << 8;
 					c.value |= toHex(cal.get(Calendar.YEAR)) << 16;
 					break;
 				}
@@ -117,7 +117,11 @@ public class Row implements NamedElement {
 	}
 
 	public static void main(String[] args) {
-		System.out.printf("%08x", (toHex(1011) << 0) | (toHex(1981) << 16));
+		Calendar cal = Calendar.getInstance();
+		int value = toHex(cal.get(Calendar.DAY_OF_MONTH));
+		value |= toHex(cal.get(Calendar.MONTH) + 1) << 8;
+		value |= toHex(cal.get(Calendar.YEAR)) << 16;
+		System.out.printf("%08X", value);
 	}
 
 	public String getOrigName() {

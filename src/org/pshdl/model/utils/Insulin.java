@@ -106,10 +106,8 @@ import org.pshdl.model.extensions.FullNameExtension;
 import org.pshdl.model.extensions.RangeExtension;
 import org.pshdl.model.extensions.ScopingExtension;
 import org.pshdl.model.extensions.TypeExtension;
+import org.pshdl.model.types.builtIn.*;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations;
-import org.pshdl.model.types.builtIn.HDLFunctions;
-import org.pshdl.model.types.builtIn.HDLGenerators;
-import org.pshdl.model.types.builtIn.HDLPrimitives;
 import org.pshdl.model.utils.HDLQuery.Result;
 import org.pshdl.model.utils.services.CompilerInformation;
 import org.pshdl.model.utils.services.HDLTypeInferenceInfo;
@@ -194,42 +192,61 @@ public class Insulin {
 				final Iterator<HDLVariableDeclaration> iterator = mem_hvds.iterator();
 				iterator.hasNext();
 				final HDLVariableDeclaration first = iterator.next();
-				BigInteger thinnest = ConstantEvaluate.valueOfForced(first.getPrimitive().getWidth(), null, "Insulin");
-				BigInteger deepest = ConstantEvaluate.valueOfForced(first.getVariables().get(0).getDimensions().get(0), null, "Insulin");
-				while (iterator.hasNext()) {
-					final HDLVariableDeclaration other = iterator.next();
-					final BigInteger other_width = ConstantEvaluate.valueOfForced(other.getPrimitive().getWidth(), null, "Insulin");
-					final BigInteger other_depth = ConstantEvaluate.valueOfForced(other.getVariables().get(0).getDimensions().get(0), null, "Insulin");
-					if (thinnest.compareTo(other_width) > 0) {
-						thinnest = other_width;
+				HDLExpression sharedWidth = first.getPrimitive().getWidth();
+				HDLExpression sharedDepth = first.getVariables().get(0).getDimensions().get(0);
+				Optional<BigInteger> thinnest = ConstantEvaluate.valueOf(sharedWidth, null);
+				Optional<BigInteger> deepest = ConstantEvaluate.valueOf(sharedDepth, null);
+				boolean knownRelation = thinnest.isPresent() && deepest.isPresent();
+				if (knownRelation) {
+					BigInteger thinnestVal = thinnest.get();
+					BigInteger deepestVal = deepest.get();
+					while (iterator.hasNext()) {
+						final HDLVariableDeclaration other = iterator.next();
+						final Optional<BigInteger> other_width = ConstantEvaluate.valueOf(other.getPrimitive().getWidth(), null);
+						final Optional<BigInteger> other_depth = ConstantEvaluate.valueOf(other.getVariables().get(0).getDimensions().get(0), null);
+						if (!(other_width.isPresent() && other_depth.isPresent())) {
+							knownRelation = false;
+							break;
+						}
+						if (thinnestVal.compareTo(other_width.get()) > 0) {
+							thinnestVal = other_width.get();
+							thinnest = other_width;
+						}
+						if (deepestVal.compareTo(other_depth.get()) < 0) {
+							deepestVal = other_depth.get();
+							deepest = other_depth;
+						}
 					}
-					if (deepest.compareTo(other_depth) < 0) {
-						deepest = other_depth;
-					}
+					sharedWidth = HDLLiteral.get(thinnestVal);
+					sharedDepth = HDLLiteral.get(deepestVal);
 				}
 				// Create the shared variable memory
-				HDLVariableDeclaration shared = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(thinnest)))
+				HDLVariableDeclaration shared = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(sharedWidth))
 						.addAnnotations(HDLBuiltInAnnotations.sharedVar.create(null));
-				shared = shared.addVariables(new HDLVariable().setName(memMapEntry.getKey()).addDimensions(HDLLiteral.get(deepest)));
+				shared = shared.addVariables(new HDLVariable().setName(memMapEntry.getKey()).addDimensions(sharedDepth));
 				ms.insertBefore(first, shared);
-				final int memDepth = deepest.intValue();
-				final int memWidth = thinnest.intValue();
+				final int memDepth = knownRelation ? deepest.get().intValue() : -1;
+				final int memWidth = knownRelation ? thinnest.get().intValue() : -1;
 				for (final HDLVariableDeclaration hvd : mem_hvds) {
-					final BigInteger other_width = ConstantEvaluate.valueOfForced(hvd.getPrimitive().getWidth(), null, "Insulin");
-					final int ratio = other_width.divide(thinnest).intValue();
+					int ratio = 1;
+					if (knownRelation) {
+						final BigInteger other_width = ConstantEvaluate.valueOfForced(hvd.getPrimitive().getWidth(), null, "Insulin");
+						ratio = other_width.divide(thinnest.get()).intValue();
+					}
 					// Only one variable per declaration
 					// Writes have to be registers
 					final HDLVariable variable = hvd.getVariables().get(0);
 					for (final HDLVariableRef ref : HDLQuery.getVarRefs(hdlUnit, variable)) {
 						final HDLAssignment assignment = ref.getContainer(HDLAssignment.class);
 						if (assignment.getLeft() == ref) {
-							// Other writes don't need fixing because they are
+							// Other writes don't need fixing because they
+							// are
 							// registers
 							if (ratio != 1) {
-								fixMemWrites(ms, memDepth, memWidth, ratio, ref, assignment);
+								fixMemWrites(ms, sharedDepth, memDepth, memWidth, ratio, ref, assignment);
 							}
 						} else {
-							fixMemReads(ms, memDepth, memWidth, ratio, ref, assignment, hvd);
+							fixMemReads(ms, sharedDepth, memDepth, sharedWidth, memWidth, ratio, ref, assignment, hvd);
 						}
 					}
 				}
@@ -239,8 +256,8 @@ public class Insulin {
 		return fixedMems;
 	}
 
-	private static void fixMemReads(final ModificationSet ms, int memDepth, final int memWidth, final int ratio, final HDLVariableRef ref, final HDLAssignment assignment,
-			final HDLVariableDeclaration hvd) {
+	private static void fixMemReads(final ModificationSet ms, HDLExpression memDepth, int memDepthValue, final HDLExpression memWidth, int memWidthValue, final int ratio,
+			final HDLVariableRef ref, final HDLAssignment assignment, final HDLVariableDeclaration hvd) {
 		// Introduce a temporary read variable to generate
 		// the register to read from
 		final HDLVariable tempReadVar = new HDLVariable().setName(getTempName(null, "readMem"));
@@ -253,7 +270,7 @@ public class Insulin {
 			ms.insertAfter(assignment, origAss);
 			return;
 		}
-		final HDLExpression addr = unwrapUintAddrCast(ref, memDepth, ratio);
+		final HDLExpression addr = unwrapUintAddrCast(ref, memDepth, memDepthValue, ratio);
 		final int bits = log2(ratio);
 		HDLVariableRef memRef;
 		if (assignment.getRight() == ref) {
@@ -264,21 +281,29 @@ public class Insulin {
 		final HDLVariableRef emptyRef = ref.setArray(Collections.<HDLExpression>emptyList());
 		final List<HDLAssignment> newAssignments = Lists.newArrayList();
 		final HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(bits)));
-		for (int i = 0; i < ratio; i++) {
-			final HDLConcat concatedAddr = new HDLConcat().addCats(addr).addCats(cast.setTarget(HDLLiteral.get(ratio - 1 - i)));
-			final HDLExpression newAddress = new HDLManip().setCastTo(HDLPrimitive.getNatural()).setType(HDLManipType.CAST).setTarget(concatedAddr);
-			final HDLRange bitRange = new HDLRange().setFrom(HDLLiteral.get(((i + 1) * memWidth) - 1)).setTo(HDLLiteral.get(i * memWidth));
-			final HDLReference left = memRef.addBits(bitRange);
-			newAssignments.add(new HDLAssignment().setRight(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setLeft(left));
+		if (ratio == 1) {
+			newAssignments.add(new HDLAssignment().setRight(emptyRef.addArray(addr)).setType(HDLAssignmentType.ASSGN).setLeft(memRef));
+		} else {
+			for (int i = 0; i < ratio; i++) {
+				final HDLConcat concatedAddr = new HDLConcat().addCats(addr).addCats(cast.setTarget(HDLLiteral.get(ratio - 1 - i)));
+				final HDLExpression newAddress = new HDLManip().setCastTo(HDLPrimitive.getNatural()).setType(HDLManipType.CAST).setTarget(concatedAddr);
+				final HDLRange bitRange = new HDLRange().setFrom(HDLLiteral.get(((i + 1) * memWidthValue) - 1)).setTo(HDLLiteral.get(i * memWidthValue));
+				final HDLReference left = memRef.addBits(bitRange);
+				newAssignments.add(new HDLAssignment().setRight(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setLeft(left));
+			}
 		}
 		ms.insertAfter(assignment, newAssignments.toArray(new HDLAssignment[newAssignments.size()]));
 	}
 
-	public static HDLExpression unwrapUintAddrCast(final HDLVariableRef ref, int memDepth, int ratio) {
+	public static HDLExpression unwrapUintAddrCast(final HDLVariableRef ref, HDLExpression memDepth, int memDepthValue, int ratio) {
 		HDLExpression addr = ref.getArray().get(0);
 		// Unwrap the target casts added earlier in Insulin
 		// Unwrap the fortified uint32 cast
-		final HDLPrimitive addrWidth = HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(log2(memDepth / ratio)));
+		HDLPrimitive addrWidth = HDLPrimitive.getBitvector();
+		if (ratio != 1)
+			addrWidth = addrWidth.setWidth(HDLLiteral.get(log2(memDepthValue / ratio)));
+		else
+			addrWidth = addrWidth.setWidth(HDLBuiltInFunctions.LOG2CEIL_UINT.getCall(memDepth));
 		if (addr instanceof HDLManip) {
 			final HDLManip cast = (HDLManip) addr;
 			addr = cast.setCastTo(addrWidth);
@@ -297,11 +322,12 @@ public class Insulin {
 		return tmpVar;
 	}
 
-	private static void fixMemWrites(final ModificationSet ms, final int memDepth, final int memWidth, final int ratio, final HDLVariableRef ref, final HDLAssignment assignment) {
+	private static void fixMemWrites(final ModificationSet ms, HDLExpression memDepthExp, final int memDepth, final int memWidth, final int ratio, final HDLVariableRef ref,
+			final HDLAssignment assignment) {
 		// Ratio needs to be power of 2
 		// Assignment needs to reference
 		final int bits = log2(ratio);
-		final HDLExpression addr = unwrapUintAddrCast(ref, memDepth, ratio);
+		final HDLExpression addr = unwrapUintAddrCast(ref, memDepthExp, memDepth, ratio);
 
 		// Create bit signal assignment if not reference
 		HDLVariableRef reference;
