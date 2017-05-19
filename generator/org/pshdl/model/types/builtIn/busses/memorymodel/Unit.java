@@ -66,4 +66,8 @@ public class Unit {
 			return Optional.absent();
 		return Optional.of(decl);
 	}
+
+	public int getCheckSum() {
+		return toCompactString().hashCode();
+	}
 }

@@ -24,7 +24,7 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from MemoryModel.g4 by ANTLR 4.5.3
+// Generated from MemoryModel.g4 by ANTLR 4.7
 package org.pshdl.model.types.builtIn.busses.memorymodel.v4;
 
 import org.antlr.v4.runtime.ParserRuleContext;

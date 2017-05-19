@@ -38,21 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.antlr.v4.runtime.ANTLRErrorListener;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.antlr.v4.runtime.InputMismatchException;
-import org.antlr.v4.runtime.LexerNoViableAltException;
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.pshdl.model.HDLExpression;
 import org.pshdl.model.HDLPackage;
-import org.pshdl.model.parser.PSHDLLangParser.PsExpressionContext;
-import org.pshdl.model.parser.PSHDLLangParser.PsModelContext;
+import org.pshdl.model.parser.PSHDLLang.PsExpressionContext;
+import org.pshdl.model.parser.PSHDLLang.PsModelContext;
 import org.pshdl.model.utils.HDLLibrary;
 import org.pshdl.model.utils.services.IHDLValidator.IErrorCode;
 import org.pshdl.model.validation.Problem;
@@ -78,7 +68,7 @@ public class PSHDLParser {
 
 	public static HDLPackage parse(File file, String libURI, Set<Problem> syntaxProblems) throws IOException, FileNotFoundException {
 		try (final FileInputStream fis = new FileInputStream(file)) {
-			final HDLPackage hdl = parseStream(new ANTLRInputStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
+			final HDLPackage hdl = parseStream(CharStreams.fromStream(fis), libURI, syntaxProblems, file.getAbsolutePath());
 			return hdl;
 		}
 	}
@@ -103,23 +93,23 @@ public class PSHDLParser {
 			int length = -1;
 			int totalOffset = -1;
 			SyntaxErrors error = SyntaxErrors.OtherException;
-			if ((e == null) && PSHDLLangParser.MISSING_SEMI.equals(msg)) {
+			if ((e == null) && PSHDLLang.MISSING_SEMI.equals(msg)) {
 				error = SyntaxErrors.MissingSemicolon;
 				msg = "Missing ';'";
 			}
-			if ((e == null) && PSHDLLangParser.WRONG_ORDER.equals(msg)) {
+			if ((e == null) && PSHDLLang.WRONG_ORDER.equals(msg)) {
 				error = SyntaxErrors.WrongOrder;
 				msg = "The order for variable declarations is «direction?» «register?» «type» «name»";
 			}
-			if ((e == null) && PSHDLLangParser.MISSING_WIDTH.equals(msg)) {
+			if ((e == null) && PSHDLLang.MISSING_WIDTH.equals(msg)) {
 				error = SyntaxErrors.MissingWidth;
 				msg = "The empty width <> is only allowed in function declarations";
 			}
-			if ((e == null) && PSHDLLangParser.MISSING_TYPE.equals(msg)) {
+			if ((e == null) && PSHDLLang.MISSING_TYPE.equals(msg)) {
 				error = SyntaxErrors.MissingType;
 				msg = "The variable declaration is missing its type";
 			}
-			if ((e == null) && PSHDLLangParser.MISSING_IFPAREN.equals(msg)) {
+			if ((e == null) && PSHDLLang.MISSING_IFPAREN.equals(msg)) {
 				error = SyntaxErrors.MissingIfParen;
 				msg = "The syntax for if-statements is 'if («expression») { «thenStatements*» } else { «elseStatements*» }";
 			}
@@ -189,13 +179,13 @@ public class PSHDLParser {
 	 * @return a {@link HDLPackage} if successful, <code>null</code>l otherwise
 	 */
 	public static HDLPackage parseString(String input, String libURI, final Set<Problem> syntaxProblems, String src) {
-		return parseStream(new ANTLRInputStream(input), libURI, syntaxProblems, src);
+		return parseStream(CharStreams.fromString(input), libURI, syntaxProblems, src);
 	}
 
-	private static HDLPackage parseStream(ANTLRInputStream input, String libURI, final Set<Problem> syntaxProblems, String src) {
+	private static HDLPackage parseStream(CharStream input, String libURI, final Set<Problem> syntaxProblems, String src) {
 		final PSHDLLangLexer lexer = new PSHDLLangLexer(input);
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
-		final PSHDLLangParser parser = new PSHDLLangParser(tokens);
+		final PSHDLLang parser = new PSHDLLang(tokens);
 		final ANTLRErrorListener listener = new SyntaxErrorCollector(tokens, syntaxProblems);
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(listener);
@@ -220,14 +210,14 @@ public class PSHDLParser {
 	 * @return a {@link HDLPackage} if successful, <code>null</code>l otherwise
 	 */
 	public static HDLExpression parseExpressionString(String input, final Set<Problem> syntaxProblems) {
-		return parseExpressionStream(new ANTLRInputStream(input), syntaxProblems);
+		return parseExpressionStream(CharStreams.fromString(input), syntaxProblems);
 	}
 
-	private static HDLExpression parseExpressionStream(ANTLRInputStream input, final Set<Problem> syntaxProblems) {
+	private static HDLExpression parseExpressionStream(CharStream input, final Set<Problem> syntaxProblems) {
 		final PSHDLLangLexer lexer = new PSHDLLangLexer(input);
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
 		final ANTLRErrorListener parserListener = new SyntaxErrorCollector(tokens, syntaxProblems);
-		final PSHDLLangParser parser = new PSHDLLangParser(tokens);
+		final PSHDLLang parser = new PSHDLLang(tokens);
 		parser.removeErrorListeners();
 		parser.addErrorListener(parserListener);
 		lexer.removeErrorListeners();

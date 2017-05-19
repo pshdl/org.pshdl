@@ -42,10 +42,7 @@ import org.pshdl.model.HDLManip.HDLManipType;
 import org.pshdl.model.HDLRegisterConfig.*;
 import org.pshdl.model.HDLVariableDeclaration.HDLDirection;
 import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.*;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
-import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
 import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelAST;
@@ -149,18 +146,7 @@ public class ABP3BusCodeGen extends CommonBusCode {
 	private static HDLSwitchCaseStatement createWriteCase(Row row, int pos, Map<String, Integer> intPos, Map<String, Boolean> isArray) {
 		HDLSwitchCaseStatement label = new HDLSwitchCaseStatement().setLabel(HDLLiteral.get(pos * 4l));
 		final HDLVariableRef busData = new HDLVariableRef().setVar(HDLQualifiedName.create("PWDATA"));
-		int bitPos = 31;
-		for (final NamedElement ne : row.definitions) {
-			final Definition def = (Definition) ne;
-			final int size = MemoryModel.getSize(def);
-			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
-				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.getName(row)));
-				target = createRef(intPos, isArray, def, target, row);
-				final HDLRange range = getRange(bitPos, size);
-				label = label.addDos(new HDLAssignment().setLeft(target).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(range)));
-			}
-			bitPos -= size;
-		}
+		label = createWriteSwitch(row, intPos, isArray, label, busData);
 		return label;
 	}
 

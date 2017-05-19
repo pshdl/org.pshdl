@@ -32,7 +32,7 @@ import java.util.List;
 import org.antlr.v4.runtime.Token;
 
 public class Memory implements NamedElement {
-	public List<Reference> references = new LinkedList<Reference>();
+	private List<Object> references = new LinkedList<Object>();
 
 	public Memory() {
 	}
@@ -44,11 +44,23 @@ public class Memory implements NamedElement {
 		}
 	}
 
+	public List<Object> getReferences() {
+		return references;
+	}
+
+	public void addReference(Reference ref) {
+		references.add(ref);
+	}
+
+	public void addConstant(Constant c) {
+		references.add(c);
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("memory {\n");
-		for (final Reference ref : references) {
+		for (final Object ref : references) {
 			sb.append('\t').append(ref).append('\n');
 		}
 		sb.append('}');

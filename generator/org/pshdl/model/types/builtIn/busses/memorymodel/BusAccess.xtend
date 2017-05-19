@@ -26,9 +26,10 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel
 
+import java.util.LinkedHashSet
 import java.util.LinkedList
 import java.util.List
-import java.util.LinkedHashSet
+import org.pshdl.model.types.builtIn.busses.memorymodel.Constant.ConstantType
 
 class BusAccess {
 
@@ -67,7 +68,7 @@ typedef enum {
 /**
  * A function pointer for providing a custom waring handler 
  */
-typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row, char *msg);
+typedef void (*warnFunc_p)(warningType_t t, uint32_t value, char *def, char *row, char *msg);
 
 
 #endif	
@@ -79,22 +80,24 @@ typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row
  */
 
 #include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include "«prefix»BusAccess.h"
 #include "«prefix»BusPrint.h"
 
-void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg) {
+void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint32_t value, char *def, char *row, char *msg) {
     switch (t) {
         case error:
-            printf("ERROR for value 0x%llx of definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
+            printf("ERROR for value 0x%"PRIx32" of definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
             break;
         case limit:
-            printf("Limited value 0x%llx for definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
+            printf("Limited value 0x%"PRIx32" for definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
             break;
         case mask:
-            printf("Masked value 0x%llx for definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
+            printf("Masked value 0x%"PRIx32" for definition %s of row %s %s"PSHDL_NL, value, def, row, msg);
             break;
         case invalidIndex:
-            printf("The index 0x%llx is not valid for the column %s %s"PSHDL_NL, value, row, msg);
+            printf("The index 0x%"PRIx32" is not valid for the column %s %s"PSHDL_NL, value, row, msg);
     }
     
 }
@@ -118,7 +121,7 @@ void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *d
 /**
  * An implementation of the warn handler that prints the warning to stdout
  */
-void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg);
+void «prefix.prefix»defaultPrintfWarn(warningType_t t, uint32_t value, char *def, char *row, char *msg);
 
 «generatePrintDef(rows, prefix)»
 #endif
@@ -151,7 +154,7 @@ void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name
 			if (!checkedRows.contains(row.name)) {
 				res = res + '''void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name»_t *data){
     printf("«row.name.toFirstUpper» «FOR Definition d : row.allDefs» «d.name»: 0x%0«Math.ceil(
-					MemoryModel.getSize(d) / 4f).intValue»x«ENDFOR»"PSHDL_NL«FOR Definition d : row.allDefs», data->«row.
+					MemoryModel.getSize(d) / 4f).intValue»"PRIx32"«ENDFOR»"PSHDL_NL«FOR Definition d : row.allDefs», data->«row.
 					getVarNameIndex(d)»«ENDFOR»);
 }
 '''
@@ -174,6 +177,7 @@ void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name
 #define «prefix»BusDefinitions_h
 
 #include "BusStdDefinitions.h"
+#include <stdbool.h>
 
 /**
  * This methods allows the user to set a custom warning handler. Usually this is used
@@ -189,11 +193,27 @@ void «prefix.prefix»print«row.name.toFirstUpper»(«prefix.prefix»«row.name
  */
 void «prefix.prefix»setWarn(warnFunc_p warnFunction);
 
+#define «prefix.prefix»checkSumValue 0x«unit.checkSum.hex32»
+
 /**
  * The variable holding the current warning handler
  */
 extern warnFunc_p «prefix.prefix»warn;
 
+«IF rows.map[it.definitions.head].findFirst[it instanceof Constant && (it as Constant).constType === ConstantType.checksum] !== null»
+/**
+ * Retrievs the checkSumField and validates it against the known value «prefix.prefix»checkSumValue 0x«unit.checkSum.hex32».
+ * A mismatch between the memory mapped value and the known value may indicate that the drivers
+ * do not match the firmware that is on the FPGA!
+ *
+ * @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.
+ * 
+ * @retval true the memory mapped value matches the known value
+ * @retval false the memory mapped differs from the known value
+ *
+ */
+bool «prefix.prefix»validateCheckSumMatch(uint32_t *base);
+«ENDIF»
 «generateDeclarations(unit, prefix, rows)»
 
 #endif
@@ -246,7 +266,7 @@ extern warnFunc_p «prefix.prefix»warn;
 						typedef struct «prefix.prefix»«col.name» {
 							«FOR NamedElement neRow : col.rows»
 								///Struct for row «neRow.name»
-								«neRow.simpleName»_t «neRow.simpleName»;
+								«prefix.prefix»«neRow.simpleName»_t «neRow.simpleName»;
 							«ENDFOR»
 						} «prefix.prefix»«col.name»_t;
 					'''
@@ -256,7 +276,7 @@ extern warnFunc_p «prefix.prefix»warn;
 		return res
 	}
 
-	def generateAccessC(List<Row> rows, String prefix, boolean withDate) '''/**
+	def generateAccessC(Unit unit, String prefix, List<Row> rows, boolean withDate) '''/**
  * @brief Provides access to the memory mapped registers
  * 
  * For each type of row there are methods for setting/getting the values
@@ -265,6 +285,7 @@ extern warnFunc_p «prefix.prefix»warn;
  */
  
 #include <stdint.h>
+#include <stdbool.h>
 #include "«prefix»BusAccess.h"
 #include "BusStdDefinitions.h"
 
@@ -273,7 +294,7 @@ extern warnFunc_p «prefix.prefix»warn;
  * can use it to provide your own error handling, or you can use the implementation
  * provided in «prefix»BusPrint.h
  */
-static void «prefix.prefix»defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){
+static void «prefix.prefix»defaultWarn(warningType_t t, uint32_t value, char *def, char *row, char *msg){
 }
 
 warnFunc_p «prefix.prefix»warn=«prefix.prefix»defaultWarn;
@@ -294,12 +315,46 @@ void «prefix.prefix»setWarn(warnFunc_p warnFunction){
     «prefix.prefix»warn=warnFunction;
 }
 
+«IF rows.map[it.definitions.head].findFirst[it instanceof Constant && (it as Constant).constType === ConstantType.checksum] !== null»
+/**
+ * Retrievs the checkSumField and validates it against the known value «prefix.prefix»checkSumValue 0x«unit.checkSum.hex32».
+ * A mismatch between the memory mapped value and the known value may indicate that the drivers
+ * do not match the firmware that is on the FPGA!
+ *
+ * @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.
+ * 
+ * @retval true the memory mapped value matches the known value
+ * @retval false the memory mapped differs from the known value
+ *
+ */
+bool «prefix.prefix»validateCheckSumMatch(uint32_t *base){
+	return base[«rows.findCheckSumIdx»] == 0x«unit.checkSum.hex32»;
+}
+«ENDIF»
+
 //Setter functions
 «generateSetterFunctions(rows, prefix)»
 
 //Getter functions
 «generateGetterFunctions(rows, prefix)»
 '''
+	
+	def hex32(int value){
+		String.format("%08x",value)
+	}
+	
+	def int findCheckSumIdx(List<Row> rows){
+		var int pos=0
+		for(Row row:rows){
+			val head = row.definitions.head
+			if (head instanceof Constant){
+				if (head.constType === ConstantType.checksum)
+					return pos
+			}
+			pos+=1
+		}
+		throw new IllegalArgumentException("Did not find a checkSum")
+	}
 	
 	def getPrefix(String string) {
 		if (string=="")
@@ -460,8 +515,8 @@ int «prefix.prefix»set«row.name.toFirstUpper»(uint32_t *base, uint32_t index
 			}
 			case mask: {
 				sb.append(
-					'''When this value exceeds its valid range [«humanRange(d)»], the value is masked with 0x«(1l <<
-						d.width) - 1» and the warn function called.''')
+					'''When this value exceeds its valid range [«humanRange(d)»], the value is masked with 0x«(((1l <<
+						d.width) - 1) as int).hex32» and the warn function called.''')
 			}
 			case silentError: {
 				sb.append('''When this value exceeds its valid range [«humanRange(d)»], an error is returned.''')
@@ -472,8 +527,8 @@ int «prefix.prefix»set«row.name.toFirstUpper»(uint32_t *base, uint32_t index
 			}
 			case silentMask: {
 				sb.append(
-					'''When this value exceeds its valid range [«humanRange(d)»], the value is masked with 0x«(1l <<
-						d.width) - 1».''')
+					'''When this value exceeds its valid range [«humanRange(d)»], the value is masked with 0x«(((1l <<
+						d.width) - 1) as int).hex32».''')
 			}
 		}
 		return sb
@@ -619,7 +674,12 @@ int «prefix.prefix»set«row.name.toFirstUpper»(uint32_t *base, uint32_t index
 	}
 
 	def boolean hasWrite(NamedElement ne) {
-		(ne as Definition).rw !== Definition$RWType.r && (ne as Definition).type !== Definition$Type.UNUSED
+		if (ne instanceof Constant)
+			return false
+		val d = ne as Definition
+		if (d.modFlag)
+			return true
+		d.rw !== Definition$RWType.r && d.type !== Definition$Type.UNUSED
 	}
 
 	def getMaxValueHex(Definition d) {

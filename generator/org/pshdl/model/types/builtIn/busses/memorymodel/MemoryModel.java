@@ -62,7 +62,7 @@ public class MemoryModel {
 		final byte[] builtHTML = MemoryModelSideFiles.builtHTML(unit, rows, true);
 		if (builtHTML == null)
 			throw new IllegalArgumentException("buildHTML returned null");
-		System.out.println(new BusAccess().generateAccessC(rows, "test", true));
+		System.out.println(new BusAccess().generateAccessC(unit, "test", rows, true));
 		System.out.println(new BusAccess().generateAccessH(unit, "test", rows, true));
 		// // SideFile[] cFiles = MemoryModelSideFiles.getCFiles(unit, rows);
 		// for (SideFile sideFile : cFiles) {
@@ -79,6 +79,9 @@ public class MemoryModel {
 		final Map<String, Integer> defDimension = Maps.newLinkedHashMap();
 		for (final Row row : rows) {
 			for (final NamedElement ne : row.definitions) {
+				if (ne instanceof Constant) {
+					continue;
+				}
 				final Definition def = (Definition) ne;
 				final String name = def.getName(row);
 				final Definition stockDef = definitions.get(name);
@@ -127,7 +130,8 @@ public class MemoryModel {
 			if (type == null)
 				throw new IllegalArgumentException("Should not happen");
 			HDLVariableDeclaration hdv = new HDLVariableDeclaration().setType(type);
-			hdv = hdv.setRegister(def.register ? HDLRegisterConfig.defaultConfig() : null);
+			HDLRegisterConfig register = def.register ? HDLRegisterConfig.defaultConfig() : null;
+			hdv = hdv.setRegister(register);
 			switch (def.rw) {
 			case r:
 				hdv = hdv.setDirection(HDLDirection.IN);
@@ -138,6 +142,8 @@ public class MemoryModel {
 			case w:
 				hdv = hdv.setDirection(HDLDirection.OUT);
 				break;
+			case constant:
+				throw new IllegalArgumentException("Constants don't have a variable");
 			}
 			HDLVariable var = new HDLVariable().setName(name);
 			final Integer dim = defDimension.get(name);
@@ -146,38 +152,58 @@ public class MemoryModel {
 			}
 			hdv = hdv.addVariables(var);
 			hdi = hdi.addPorts(hdv);
+			if (def.modFlag) {
+				HDLVariableDeclaration hvd = new HDLVariableDeclaration().setType(HDLPrimitive.getBool()).setRegister(register).setDirection(HDLDirection.OUT);
+				hvd = hvd.addVariables(new HDLVariable().setName(name + "$written").setDefaultValue(HDLLiteral.getFalse()));
+				hdi = hdi.addPorts(hvd);
+			}
 		}
 		return hdi;
 	}
 
 	public static List<Row> buildRows(Unit unit) {
 		final List<Row> rows = new LinkedList<Row>();
-		for (final Reference ref : unit.memory.references) {
-			final Optional<NamedElement> optRes = unit.resolve(ref);
-			if (!optRes.isPresent()) {
-				continue;
-			}
-			final NamedElement declaration = optRes.get();
-			if (ref.dimensions.size() != 0) {
-				for (final Integer num : ref.dimensions) {
-					for (int i = 0; i < num; i++) {
-						addDeclarations(unit, rows, declaration, null, i);
+		for (final Object obj : unit.memory.getReferences()) {
+			if (obj instanceof Reference) {
+				Reference ref = (Reference) obj;
+				final Optional<NamedElement> optRes = unit.resolve(ref);
+				if (!optRes.isPresent()) {
+					continue;
+				}
+				final NamedElement declaration = optRes.get();
+				if (ref.dimensions.size() != 0) {
+					for (final Integer num : ref.dimensions) {
+						for (int i = 0; i < num; i++) {
+							addDeclarations(unit, rows, declaration, null, i);
+						}
 					}
+				} else {
+					addDeclarations(unit, rows, declaration, null, 0);
 				}
 			} else {
-				addDeclarations(unit, rows, declaration, null, 0);
+				addDeclarations(unit, rows, wrapConstant((Constant) obj), null, 0);
 			}
 		}
+		int hashCode = unit.getCheckSum();
 		for (final Row row : rows) {
-			row.updateInfo();
+			row.updateInfo(hashCode);
 		}
 		return rows;
+	}
+
+	private static Row wrapConstant(final Constant obj) {
+		Row row = new Row(obj.getName());
+		row.definitions.add(obj);
+		return row;
 	}
 
 	private static void addDeclarations(Unit unit, List<Row> rows, NamedElement declaration, Column parent, int colIndex) {
 		if (declaration instanceof Column) {
 			final Column col = (Column) declaration;
-			for (final NamedElement row : col.rows) {
+			for (NamedElement row : col.rows) {
+				if (row instanceof Constant) {
+					row = wrapConstant((Constant) row);
+				}
 				addDeclarations(unit, rows, row, col, colIndex);
 			}
 			return;

@@ -328,7 +328,7 @@ public class BusGenerator implements IHDLGenerator, IHDLAnnotationProvider {
 	}
 
 	public static Unit createDefaultUnit(int regCount) {
-		final Definition def = new Definition("regs", true, RWType.rw, Type.BIT, 32);
+		final Definition def = new Definition("regs", true, false, RWType.rw, Type.BIT, 32);
 		final Row row = new Row("reg", null, def);
 		final Memory mem = new Memory(new Reference("reg", regCount));
 		final Unit unit = new Unit();

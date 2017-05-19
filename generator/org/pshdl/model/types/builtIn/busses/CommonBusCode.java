@@ -36,16 +36,35 @@ import org.pshdl.model.HDLRange;
 import org.pshdl.model.HDLSwitchCaseStatement;
 import org.pshdl.model.HDLVariable;
 import org.pshdl.model.HDLVariableRef;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
+import org.pshdl.model.types.builtIn.busses.memorymodel.*;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
-import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
-import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
 import org.pshdl.model.utils.HDLQualifiedName;
 
 import com.google.common.collect.Maps;
 
 public class CommonBusCode {
+	public static HDLSwitchCaseStatement createWriteSwitch(Row row, Map<String, Integer> intPos, Map<String, Boolean> isArray, HDLSwitchCaseStatement label,
+			final HDLVariableRef busData) {
+		int bitPos = 31;
+		for (final NamedElement ne : row.definitions) {
+			final Definition def = (Definition) ne;
+			final int size = MemoryModel.getSize(def);
+			if (def.modFlag) {
+				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.getName(row) + "$written"));
+				target = createRef(intPos, isArray, def, target, row);
+				label = label.addDos(new HDLAssignment().setLeft(target).setType(HDLAssignmentType.ASSGN).setRight(HDLLiteral.getTrue()));
+			}
+			if ((def.rw == RWType.rw) || (def.rw == RWType.w)) {
+				HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(def.getName(row)));
+				target = createRef(intPos, isArray, def, target, row);
+				final HDLRange range = getRange(bitPos, size);
+				label = label.addDos(new HDLAssignment().setLeft(target).setType(HDLAssignmentType.ASSGN).setRight(busData.addBits(range)));
+			}
+			bitPos -= size;
+		}
+		return label;
+	}
+
 	public static HDLSwitchCaseStatement createReadCase(Row row, int reg, Map<String, Integer> intPos, Map<String, Boolean> isArray, String dataPort, HDLLiteral labelValue) {
 		HDLSwitchCaseStatement label = new HDLSwitchCaseStatement().setLabel(labelValue);
 		final HDLVariableRef target = new HDLVariableRef().setVar(HDLQualifiedName.create(dataPort));
@@ -58,6 +77,11 @@ public class CommonBusCode {
 				source = createRef(intPos, isArray, def, source, row);
 				final HDLRange range = getRange(bitPos, size);
 				label = label.addDos(new HDLAssignment().setLeft(target.addBits(range)).setType(HDLAssignmentType.ASSGN).setRight(source));
+			}
+			if (def.rw == RWType.constant) {
+				final HDLRange range = getRange(bitPos, size);
+				Constant c = (Constant) def;
+				label = label.addDos(new HDLAssignment().setLeft(target.addBits(range)).setType(HDLAssignmentType.ASSGN).setRight(HDLLiteral.get(c.value)));
 			}
 			bitPos -= size;
 		}

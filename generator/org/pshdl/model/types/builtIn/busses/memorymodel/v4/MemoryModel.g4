@@ -32,8 +32,7 @@ declaration
 	:	(
 			(row) | 
 			(column) | 
-			(alias)  |
-			(constant)
+			(alias)
 		) ;
 	
 row
@@ -42,7 +41,8 @@ row
 		(
 			(filling)    |
 			(definition) | 
-			(reference)
+			(reference)  |
+			(constant)
 		)* '}';
 
 rowID:
@@ -50,7 +50,7 @@ rowID:
 
 constant
 	:
-		'const' ID? value=(NUMBER | '$date' | '$time' | '$checkSum') ';';
+		'const' ('<' width '>')? ID? value=(NUMBER | '$date' | '$time' | '$checkSum') ';';
 
 filling
 	:
@@ -58,7 +58,10 @@ filling
 
 column 
 	:	
-		'column' ID '{' (reference)* '}';
+		'column' ID '{' (
+			(reference) | 
+			(constant)
+		)* '}';
 alias
 	:	
 		'alias' ID '{' 
@@ -68,7 +71,10 @@ alias
 		)* '}';
 memory
 	:
-		'memory' '{' (reference)* '}';
+		'memory' '{' (
+			(reference) | 
+			(constant)
+		)* '}';
 definition
 	:
 		rwStatus
@@ -78,6 +84,7 @@ definition
 		ID 
 		('[' NUMBER ']')* 
 		(warnType)?
+		(modFlag='writtenFlag')?
 		';';
 warnType
 	:	(silent='silent')? 

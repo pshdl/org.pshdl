@@ -25,12 +25,9 @@
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
 
-grammar PSHDLLang;
+parser grammar PSHDLLang;
 
-@lexer::members {
-public static final int WHITESPACE = 1; 
-public static final int COMMENTS = 2;
-}
+options { tokenVocab = PSHDLLangLexer; }
 
 @parser::members {
 public static final String MISSING_SEMI="MISSING_SEMI";
@@ -352,102 +349,5 @@ psPortDeclaration :
 ;
 
 psQualifiedName :
-	RULE_ID ('.' RULE_ID)*
-;
-
-
-AND:'&';
-OR:'|';
-XOR:'^';
-LOGI_AND:'&&';
-LOGI_OR:'||';
-MUL:'*';
-DIV:'/';
-//MINUS:'-';
-PLUS:'+';
-MOD:'%';
-POW:'**';
-SLL:'<<';
-SRA:'>>';
-SRL:'>>>';
-EQ:'==';
-NOT_EQ:'!=';
-LESS:'<';
-LESS_EQ:'<=';
-GREATER:'>';
-GREATER_EQ:'>=';
-ASSGN:'=';
-ADD_ASSGN:'+=';
-SUB_ASSGN:'-=';
-MUL_ASSGN:'*=';
-DIV_ASSGN:'/=';
-MOD_ASSGN:'%=';
-AND_ASSGN:'&=';
-XOR_ASSGN:'^=';
-OR_ASSGN:'|=';
-SLL_ASSGN:'<<=';
-SRL_ASSGN:'>>>=';
-SRA_ASSGN:'>>=';
-ARITH_NEG:'-';
-BIT_NEG:'~';
-LOGIC_NEG:'!';
-ANY_INT:'int<>';
-ANY_UINT:'uint<>';
-ANY_BIT:'bit<>';
-ANY_IF:'interface<>';
-ANY_ENUM:'enum<>';
-BIT:'bit';
-INT:'int';
-UINT:'uint';
-INT32:'int32';
-UINT32:'uint32';
-STRING:'string';
-BOOL:'bool';
-ENUM:'enum';
-INTERFACE:'interface';
-FUNCTION:'function';
-
-MODULE:'module';
-TESTBENCH:'testbench';
-
-RULE_PS_LITERAL_TERMINAL :
-	'0b' ( '0' | '1' | '_')+ |
-	'0x' ( 'a' .. 'f' | 'A' .. 'F' | '0' .. '9' | '_')+ |
-	'1' .. '9' ( '0' .. '9' | '_' )+ |
-	'0' .. '9' |
-	'true' |
-	'false'
-;
-
-fragment
-    IDCHARFIRST : '$' | 'a' .. 'z' | 'A' .. 'Z';
-fragment
-    IDCHAR : IDCHARFIRST | '_' | '0' .. '9';
-	
-RULE_ID :
-	IDCHARFIRST IDCHAR*
-;
-
-fragment
-ESC : 	'\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\');
-
-RULE_STRING :
-	'"'  (ESC | ~ ('\\' | '"'))* '"' |
-	'\'' (ESC | ~ ('\\' |'\''))* '\''
-;
-
-RULE_ML_COMMENT :
-	('/*' .*? '*/') -> channel(COMMENTS)
-;
-
-RULE_GENERATOR_CONTENT :
-	'<[' .*? ']>'
-;
-
-RULE_SL_COMMENT :
-	('//' ~ ('\n' | '\r' )* ('\r'? '\n')? )-> channel(COMMENTS)
-;
-
-RULE_WS :
-	(' ' | '\t' | '\r' | '\n')+ -> channel(WHITESPACE)
+	RULE_ID (DOT RULE_ID)*
 ;

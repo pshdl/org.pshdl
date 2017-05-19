@@ -24,1392 +24,1374 @@
  * Contributors:
  *     Karsten Becker - initial API and implementation
  ******************************************************************************/
-// Generated from PSHDLLang.g4 by ANTLR 4.5.3
+// Generated from PSHDLLang.g4 by ANTLR 4.7
 package org.pshdl.model.parser;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
  * This interface defines a complete listener for a parse tree produced by
- * {@link PSHDLLangParser}.
+ * {@link PSHDLLang}.
  */
 public interface PSHDLLangListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psModel}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psModel}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsModel(PSHDLLangParser.PsModelContext ctx);
+	void enterPsModel(PSHDLLang.PsModelContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psModel}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psModel}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsModel(PSHDLLangParser.PsModelContext ctx);
+	void exitPsModel(PSHDLLang.PsModelContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psUnit}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psUnit}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsUnit(PSHDLLangParser.PsUnitContext ctx);
+	void enterPsUnit(PSHDLLang.PsUnitContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psUnit}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psUnit}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsUnit(PSHDLLangParser.PsUnitContext ctx);
+	void exitPsUnit(PSHDLLang.PsUnitContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psExtends}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psExtends}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsExtends(PSHDLLangParser.PsExtendsContext ctx);
+	void enterPsExtends(PSHDLLang.PsExtendsContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psExtends}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psExtends}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsExtends(PSHDLLangParser.PsExtendsContext ctx);
+	void exitPsExtends(PSHDLLang.PsExtendsContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psImports}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psImports}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsImports(PSHDLLangParser.PsImportsContext ctx);
+	void enterPsImports(PSHDLLang.PsImportsContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psImports}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psImports}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsImports(PSHDLLangParser.PsImportsContext ctx);
+	void exitPsImports(PSHDLLang.PsImportsContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link PSHDLLang#psQualifiedNameImport}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void enterPsQualifiedNameImport(PSHDLLang.PsQualifiedNameImportContext ctx);
+
+	/**
+	 * Exit a parse tree produced by {@link PSHDLLang#psQualifiedNameImport}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void exitPsQualifiedNameImport(PSHDLLang.PsQualifiedNameImportContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link PSHDLLang#psBlock}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void enterPsBlock(PSHDLLang.PsBlockContext ctx);
+
+	/**
+	 * Exit a parse tree produced by {@link PSHDLLang#psBlock}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void exitPsBlock(PSHDLLang.PsBlockContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link PSHDLLang#psProcess}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void enterPsProcess(PSHDLLang.PsProcessContext ctx);
+
+	/**
+	 * Exit a parse tree produced by {@link PSHDLLang#psProcess}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void exitPsProcess(PSHDLLang.PsProcessContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link PSHDLLang#psInstantiation}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void enterPsInstantiation(PSHDLLang.PsInstantiationContext ctx);
+
+	/**
+	 * Exit a parse tree produced by {@link PSHDLLang#psInstantiation}.
+	 * 
+	 * @param ctx
+	 *            the parse tree
+	 */
+	void exitPsInstantiation(PSHDLLang.PsInstantiationContext ctx);
 
 	/**
 	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psQualifiedNameImport}.
+	 * {@link PSHDLLang#psInterfaceInstantiation}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsQualifiedNameImport(PSHDLLangParser.PsQualifiedNameImportContext ctx);
+	void enterPsInterfaceInstantiation(PSHDLLang.PsInterfaceInstantiationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psQualifiedNameImport}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psInterfaceInstantiation}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsQualifiedNameImport(PSHDLLangParser.PsQualifiedNameImportContext ctx);
+	void exitPsInterfaceInstantiation(PSHDLLang.PsInterfaceInstantiationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psBlock}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psDirectGeneration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBlock(PSHDLLangParser.PsBlockContext ctx);
+	void enterPsDirectGeneration(PSHDLLang.PsDirectGenerationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psBlock}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psDirectGeneration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBlock(PSHDLLangParser.PsBlockContext ctx);
+	void exitPsDirectGeneration(PSHDLLang.PsDirectGenerationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psProcess}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psPassedArguments}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsProcess(PSHDLLangParser.PsProcessContext ctx);
+	void enterPsPassedArguments(PSHDLLang.PsPassedArgumentsContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psProcess}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psPassedArguments}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsProcess(PSHDLLangParser.PsProcessContext ctx);
+	void exitPsPassedArguments(PSHDLLang.PsPassedArgumentsContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psInstantiation}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psArgument}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInstantiation(PSHDLLangParser.PsInstantiationContext ctx);
+	void enterPsArgument(PSHDLLang.PsArgumentContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psInstantiation}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psArgument}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInstantiation(PSHDLLangParser.PsInstantiationContext ctx);
+	void exitPsArgument(PSHDLLang.PsArgumentContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psInterfaceInstantiation}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psCast}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInterfaceInstantiation(PSHDLLangParser.PsInterfaceInstantiationContext ctx);
+	void enterPsCast(PSHDLLang.PsCastContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psInterfaceInstantiation}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psCast}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInterfaceInstantiation(PSHDLLangParser.PsInterfaceInstantiationContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psDirectGeneration}
-	 * .
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void enterPsDirectGeneration(PSHDLLangParser.PsDirectGenerationContext ctx);
-
-	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psDirectGeneration}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void exitPsDirectGeneration(PSHDLLangParser.PsDirectGenerationContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psPassedArguments}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void enterPsPassedArguments(PSHDLLangParser.PsPassedArgumentsContext ctx);
-
-	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psPassedArguments}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void exitPsPassedArguments(PSHDLLangParser.PsPassedArgumentsContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psArgument}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void enterPsArgument(PSHDLLangParser.PsArgumentContext ctx);
-
-	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psArgument}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void exitPsArgument(PSHDLLangParser.PsArgumentContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psCast}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void enterPsCast(PSHDLLangParser.PsCastContext ctx);
-
-	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psCast}.
-	 * 
-	 * @param ctx
-	 *            the parse tree
-	 */
-	void exitPsCast(PSHDLLangParser.PsCastContext ctx);
+	void exitPsCast(PSHDLLang.PsCastContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psBitAnd} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBitAnd(PSHDLLangParser.PsBitAndContext ctx);
+	void enterPsBitAnd(PSHDLLang.PsBitAndContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psBitAnd} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBitAnd(PSHDLLangParser.PsBitAndContext ctx);
+	void exitPsBitAnd(PSHDLLang.PsBitAndContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psAdd} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsAdd(PSHDLLangParser.PsAddContext ctx);
+	void enterPsAdd(PSHDLLang.PsAddContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psAdd} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsAdd(PSHDLLangParser.PsAddContext ctx);
+	void exitPsAdd(PSHDLLang.PsAddContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psConcat} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsConcat(PSHDLLangParser.PsConcatContext ctx);
+	void enterPsConcat(PSHDLLang.PsConcatContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psConcat} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsConcat(PSHDLLangParser.PsConcatContext ctx);
+	void exitPsConcat(PSHDLLang.PsConcatContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psValueExp} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsValueExp(PSHDLLangParser.PsValueExpContext ctx);
+	void enterPsValueExp(PSHDLLang.PsValueExpContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psValueExp} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsValueExp(PSHDLLangParser.PsValueExpContext ctx);
+	void exitPsValueExp(PSHDLLang.PsValueExpContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psShift} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsShift(PSHDLLangParser.PsShiftContext ctx);
+	void enterPsShift(PSHDLLang.PsShiftContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psShift} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsShift(PSHDLLangParser.PsShiftContext ctx);
+	void exitPsShift(PSHDLLang.PsShiftContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psBitLogAnd} labeled
-	 * alternative in {@link PSHDLLangParser#psExpression}.
+	 * alternative in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBitLogAnd(PSHDLLangParser.PsBitLogAndContext ctx);
+	void enterPsBitLogAnd(PSHDLLang.PsBitLogAndContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psBitLogAnd} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBitLogAnd(PSHDLLangParser.PsBitLogAndContext ctx);
+	void exitPsBitLogAnd(PSHDLLang.PsBitLogAndContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psBitOr} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBitOr(PSHDLLangParser.PsBitOrContext ctx);
+	void enterPsBitOr(PSHDLLang.PsBitOrContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psBitOr} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBitOr(PSHDLLangParser.PsBitOrContext ctx);
+	void exitPsBitOr(PSHDLLang.PsBitOrContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psParens} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsParens(PSHDLLangParser.PsParensContext ctx);
+	void enterPsParens(PSHDLLang.PsParensContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psParens} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsParens(PSHDLLangParser.PsParensContext ctx);
+	void exitPsParens(PSHDLLang.PsParensContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psEqualityComp} labeled
-	 * alternative in {@link PSHDLLangParser#psExpression}.
+	 * alternative in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsEqualityComp(PSHDLLangParser.PsEqualityCompContext ctx);
+	void enterPsEqualityComp(PSHDLLang.PsEqualityCompContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psEqualityComp} labeled
-	 * alternative in {@link PSHDLLangParser#psExpression}.
+	 * alternative in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsEqualityComp(PSHDLLangParser.PsEqualityCompContext ctx);
+	void exitPsEqualityComp(PSHDLLang.PsEqualityCompContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psBitLogOr} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBitLogOr(PSHDLLangParser.PsBitLogOrContext ctx);
+	void enterPsBitLogOr(PSHDLLang.PsBitLogOrContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psBitLogOr} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBitLogOr(PSHDLLangParser.PsBitLogOrContext ctx);
+	void exitPsBitLogOr(PSHDLLang.PsBitLogOrContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psTernary} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsTernary(PSHDLLangParser.PsTernaryContext ctx);
+	void enterPsTernary(PSHDLLang.PsTernaryContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psTernary} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsTernary(PSHDLLangParser.PsTernaryContext ctx);
+	void exitPsTernary(PSHDLLang.PsTernaryContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psArrayInitExp} labeled
-	 * alternative in {@link PSHDLLangParser#psExpression}.
+	 * alternative in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsArrayInitExp(PSHDLLangParser.PsArrayInitExpContext ctx);
+	void enterPsArrayInitExp(PSHDLLang.PsArrayInitExpContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psArrayInitExp} labeled
-	 * alternative in {@link PSHDLLangParser#psExpression}.
+	 * alternative in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsArrayInitExp(PSHDLLangParser.PsArrayInitExpContext ctx);
+	void exitPsArrayInitExp(PSHDLLang.PsArrayInitExpContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psManip} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsManip(PSHDLLangParser.PsManipContext ctx);
+	void enterPsManip(PSHDLLang.PsManipContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psManip} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsManip(PSHDLLangParser.PsManipContext ctx);
+	void exitPsManip(PSHDLLang.PsManipContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psEquality} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsEquality(PSHDLLangParser.PsEqualityContext ctx);
+	void enterPsEquality(PSHDLLang.PsEqualityContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psEquality} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsEquality(PSHDLLangParser.PsEqualityContext ctx);
+	void exitPsEquality(PSHDLLang.PsEqualityContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psBitXor} labeled alternative
-	 * in {@link PSHDLLangParser#psExpression}.
+	 * in {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBitXor(PSHDLLangParser.PsBitXorContext ctx);
+	void enterPsBitXor(PSHDLLang.PsBitXorContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psBitXor} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBitXor(PSHDLLangParser.PsBitXorContext ctx);
+	void exitPsBitXor(PSHDLLang.PsBitXorContext ctx);
 
 	/**
 	 * Enter a parse tree produced by the {@code psMul} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsMul(PSHDLLangParser.PsMulContext ctx);
+	void enterPsMul(PSHDLLang.PsMulContext ctx);
 
 	/**
 	 * Exit a parse tree produced by the {@code psMul} labeled alternative in
-	 * {@link PSHDLLangParser#psExpression}.
+	 * {@link PSHDLLang#psExpression}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsMul(PSHDLLangParser.PsMulContext ctx);
+	void exitPsMul(PSHDLLang.PsMulContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psValue}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psValue}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsValue(PSHDLLangParser.PsValueContext ctx);
+	void enterPsValue(PSHDLLang.PsValueContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psValue}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psValue}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsValue(PSHDLLangParser.PsValueContext ctx);
+	void exitPsValue(PSHDLLang.PsValueContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psBitAccess}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psBitAccess}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsBitAccess(PSHDLLangParser.PsBitAccessContext ctx);
+	void enterPsBitAccess(PSHDLLang.PsBitAccessContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psBitAccess}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psBitAccess}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsBitAccess(PSHDLLangParser.PsBitAccessContext ctx);
+	void exitPsBitAccess(PSHDLLang.PsBitAccessContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psAccessRange}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psAccessRange}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsAccessRange(PSHDLLangParser.PsAccessRangeContext ctx);
+	void enterPsAccessRange(PSHDLLang.PsAccessRangeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psAccessRange}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psAccessRange}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsAccessRange(PSHDLLangParser.PsAccessRangeContext ctx);
+	void exitPsAccessRange(PSHDLLang.PsAccessRangeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psVariableRef}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psVariableRef}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsVariableRef(PSHDLLangParser.PsVariableRefContext ctx);
+	void enterPsVariableRef(PSHDLLang.PsVariableRefContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psVariableRef}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psVariableRef}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsVariableRef(PSHDLLangParser.PsVariableRefContext ctx);
+	void exitPsVariableRef(PSHDLLang.PsVariableRefContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psRefPart}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psRefPart}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsRefPart(PSHDLLangParser.PsRefPartContext ctx);
+	void enterPsRefPart(PSHDLLang.PsRefPartContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psRefPart}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psRefPart}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsRefPart(PSHDLLangParser.PsRefPartContext ctx);
+	void exitPsRefPart(PSHDLLang.PsRefPartContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psVariable}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psVariable}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsVariable(PSHDLLangParser.PsVariableContext ctx);
+	void enterPsVariable(PSHDLLang.PsVariableContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psVariable}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psVariable}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsVariable(PSHDLLangParser.PsVariableContext ctx);
+	void exitPsVariable(PSHDLLang.PsVariableContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psVariableMatch}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psVariableMatch}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsVariableMatch(PSHDLLangParser.PsVariableMatchContext ctx);
+	void enterPsVariableMatch(PSHDLLang.PsVariableMatchContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psVariableMatch}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psVariableMatch}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsVariableMatch(PSHDLLangParser.PsVariableMatchContext ctx);
+	void exitPsVariableMatch(PSHDLLang.PsVariableMatchContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psStatement}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsStatement(PSHDLLangParser.PsStatementContext ctx);
+	void enterPsStatement(PSHDLLang.PsStatementContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psStatement}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsStatement(PSHDLLangParser.PsStatementContext ctx);
+	void exitPsStatement(PSHDLLang.PsStatementContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psGroupMatch}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psGroupMatch}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsGroupMatch(PSHDLLangParser.PsGroupMatchContext ctx);
+	void enterPsGroupMatch(PSHDLLang.PsGroupMatchContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psGroupMatch}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psGroupMatch}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsGroupMatch(PSHDLLangParser.PsGroupMatchContext ctx);
+	void exitPsGroupMatch(PSHDLLang.PsGroupMatchContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psExport}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psExport}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsExport(PSHDLLangParser.PsExportContext ctx);
+	void enterPsExport(PSHDLLang.PsExportContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psExport}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psExport}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsExport(PSHDLLangParser.PsExportContext ctx);
+	void exitPsExport(PSHDLLang.PsExportContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psFunctionDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFunctionDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFunctionDeclaration(PSHDLLangParser.PsFunctionDeclarationContext ctx);
+	void enterPsFunctionDeclaration(PSHDLLang.PsFunctionDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psFunctionDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFunctionDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFunctionDeclaration(PSHDLLangParser.PsFunctionDeclarationContext ctx);
+	void exitPsFunctionDeclaration(PSHDLLang.PsFunctionDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psInlineFunction}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psInlineFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInlineFunction(PSHDLLangParser.PsInlineFunctionContext ctx);
+	void enterPsInlineFunction(PSHDLLang.PsInlineFunctionContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psInlineFunction}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psInlineFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInlineFunction(PSHDLLangParser.PsInlineFunctionContext ctx);
+	void exitPsInlineFunction(PSHDLLang.PsInlineFunctionContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psSubstituteFunction}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psSubstituteFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsSubstituteFunction(PSHDLLangParser.PsSubstituteFunctionContext ctx);
+	void enterPsSubstituteFunction(PSHDLLang.PsSubstituteFunctionContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psSubstituteFunction}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psSubstituteFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsSubstituteFunction(PSHDLLangParser.PsSubstituteFunctionContext ctx);
+	void exitPsSubstituteFunction(PSHDLLang.PsSubstituteFunctionContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psNativeFunction}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psNativeFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsNativeFunction(PSHDLLangParser.PsNativeFunctionContext ctx);
+	void enterPsNativeFunction(PSHDLLang.PsNativeFunctionContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psNativeFunction}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psNativeFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsNativeFunction(PSHDLLangParser.PsNativeFunctionContext ctx);
+	void exitPsNativeFunction(PSHDLLang.PsNativeFunctionContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncRecturnType}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncRecturnType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncRecturnType(PSHDLLangParser.PsFuncRecturnTypeContext ctx);
+	void enterPsFuncRecturnType(PSHDLLang.PsFuncRecturnTypeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncRecturnType}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncRecturnType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncRecturnType(PSHDLLangParser.PsFuncRecturnTypeContext ctx);
+	void exitPsFuncRecturnType(PSHDLLang.PsFuncRecturnTypeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParam}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncParam}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncParam(PSHDLLangParser.PsFuncParamContext ctx);
+	void enterPsFuncParam(PSHDLLang.PsFuncParamContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParam}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncParam}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncParam(PSHDLLangParser.PsFuncParamContext ctx);
+	void exitPsFuncParam(PSHDLLang.PsFuncParamContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncSpec}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncSpec}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncSpec(PSHDLLangParser.PsFuncSpecContext ctx);
+	void enterPsFuncSpec(PSHDLLang.PsFuncSpecContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncSpec}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncSpec}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncSpec(PSHDLLangParser.PsFuncSpecContext ctx);
+	void exitPsFuncSpec(PSHDLLang.PsFuncSpecContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParamWithRW}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncParamWithRW}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncParamWithRW(PSHDLLangParser.PsFuncParamWithRWContext ctx);
+	void enterPsFuncParamWithRW(PSHDLLang.PsFuncParamWithRWContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParamWithRW}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncParamWithRW}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncParamWithRW(PSHDLLangParser.PsFuncParamWithRWContext ctx);
+	void exitPsFuncParamWithRW(PSHDLLang.PsFuncParamWithRWContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncOptArray}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncOptArray}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncOptArray(PSHDLLangParser.PsFuncOptArrayContext ctx);
+	void enterPsFuncOptArray(PSHDLLang.PsFuncOptArrayContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncOptArray}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncOptArray}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncOptArray(PSHDLLangParser.PsFuncOptArrayContext ctx);
+	void exitPsFuncOptArray(PSHDLLang.PsFuncOptArrayContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParamRWType}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncParamRWType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncParamRWType(PSHDLLangParser.PsFuncParamRWTypeContext ctx);
+	void enterPsFuncParamRWType(PSHDLLang.PsFuncParamRWTypeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParamRWType}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncParamRWType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncParamRWType(PSHDLLangParser.PsFuncParamRWTypeContext ctx);
+	void exitPsFuncParamRWType(PSHDLLang.PsFuncParamRWTypeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncParamType}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncParamType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncParamType(PSHDLLangParser.PsFuncParamTypeContext ctx);
+	void enterPsFuncParamType(PSHDLLang.PsFuncParamTypeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncParamType}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncParamType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncParamType(PSHDLLangParser.PsFuncParamTypeContext ctx);
+	void exitPsFuncParamType(PSHDLLang.PsFuncParamTypeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFunction}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFunction(PSHDLLangParser.PsFunctionContext ctx);
+	void enterPsFunction(PSHDLLang.PsFunctionContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFunction}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFunction}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFunction(PSHDLLangParser.PsFunctionContext ctx);
+	void exitPsFunction(PSHDLLang.PsFunctionContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psFuncArgs}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psFuncArgs}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsFuncArgs(PSHDLLangParser.PsFuncArgsContext ctx);
+	void enterPsFuncArgs(PSHDLLang.PsFuncArgsContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psFuncArgs}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psFuncArgs}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsFuncArgs(PSHDLLangParser.PsFuncArgsContext ctx);
+	void exitPsFuncArgs(PSHDLLang.PsFuncArgsContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psAssignmentOrFunc}
-	 * .
+	 * Enter a parse tree produced by {@link PSHDLLang#psAssignmentOrFunc}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsAssignmentOrFunc(PSHDLLangParser.PsAssignmentOrFuncContext ctx);
+	void enterPsAssignmentOrFunc(PSHDLLang.PsAssignmentOrFuncContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psAssignmentOrFunc}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psAssignmentOrFunc}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsAssignmentOrFunc(PSHDLLangParser.PsAssignmentOrFuncContext ctx);
+	void exitPsAssignmentOrFunc(PSHDLLang.PsAssignmentOrFuncContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psAssignmentOp}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psAssignmentOp}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsAssignmentOp(PSHDLLangParser.PsAssignmentOpContext ctx);
+	void enterPsAssignmentOp(PSHDLLang.PsAssignmentOpContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psAssignmentOp}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psAssignmentOp}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsAssignmentOp(PSHDLLangParser.PsAssignmentOpContext ctx);
+	void exitPsAssignmentOp(PSHDLLang.PsAssignmentOpContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psCompoundStatement}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psCompoundStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsCompoundStatement(PSHDLLangParser.PsCompoundStatementContext ctx);
+	void enterPsCompoundStatement(PSHDLLang.PsCompoundStatementContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psCompoundStatement}
-	 * .
+	 * Exit a parse tree produced by {@link PSHDLLang#psCompoundStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsCompoundStatement(PSHDLLangParser.PsCompoundStatementContext ctx);
+	void exitPsCompoundStatement(PSHDLLang.PsCompoundStatementContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psIfStatement}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psIfStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsIfStatement(PSHDLLangParser.PsIfStatementContext ctx);
+	void enterPsIfStatement(PSHDLLang.PsIfStatementContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psIfStatement}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psIfStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsIfStatement(PSHDLLangParser.PsIfStatementContext ctx);
+	void exitPsIfStatement(PSHDLLang.PsIfStatementContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psSimpleBlock}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psSimpleBlock}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsSimpleBlock(PSHDLLangParser.PsSimpleBlockContext ctx);
+	void enterPsSimpleBlock(PSHDLLang.PsSimpleBlockContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psSimpleBlock}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psSimpleBlock}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsSimpleBlock(PSHDLLangParser.PsSimpleBlockContext ctx);
+	void exitPsSimpleBlock(PSHDLLang.PsSimpleBlockContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psForStatement}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psForStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsForStatement(PSHDLLangParser.PsForStatementContext ctx);
+	void enterPsForStatement(PSHDLLang.PsForStatementContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psForStatement}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psForStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsForStatement(PSHDLLangParser.PsForStatementContext ctx);
+	void exitPsForStatement(PSHDLLang.PsForStatementContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psSwitchStatement}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psSwitchStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsSwitchStatement(PSHDLLangParser.PsSwitchStatementContext ctx);
+	void enterPsSwitchStatement(PSHDLLang.PsSwitchStatementContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psSwitchStatement}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psSwitchStatement}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsSwitchStatement(PSHDLLangParser.PsSwitchStatementContext ctx);
+	void exitPsSwitchStatement(PSHDLLang.PsSwitchStatementContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psCaseStatements}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psCaseStatements}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsCaseStatements(PSHDLLangParser.PsCaseStatementsContext ctx);
+	void enterPsCaseStatements(PSHDLLang.PsCaseStatementsContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psCaseStatements}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psCaseStatements}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsCaseStatements(PSHDLLangParser.PsCaseStatementsContext ctx);
+	void exitPsCaseStatements(PSHDLLang.PsCaseStatementsContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsDeclaration(PSHDLLangParser.PsDeclarationContext ctx);
+	void enterPsDeclaration(PSHDLLang.PsDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsDeclaration(PSHDLLangParser.PsDeclarationContext ctx);
+	void exitPsDeclaration(PSHDLLang.PsDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psDeclarationType}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psDeclarationType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsDeclarationType(PSHDLLangParser.PsDeclarationTypeContext ctx);
+	void enterPsDeclarationType(PSHDLLang.PsDeclarationTypeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psDeclarationType}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psDeclarationType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsDeclarationType(PSHDLLangParser.PsDeclarationTypeContext ctx);
+	void exitPsDeclarationType(PSHDLLang.PsDeclarationTypeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psTypeDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psTypeDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsTypeDeclaration(PSHDLLangParser.PsTypeDeclarationContext ctx);
+	void enterPsTypeDeclaration(PSHDLLang.PsTypeDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psTypeDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psTypeDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsTypeDeclaration(PSHDLLangParser.PsTypeDeclarationContext ctx);
+	void exitPsTypeDeclaration(PSHDLLang.PsTypeDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psEnumDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psEnumDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsEnumDeclaration(PSHDLLangParser.PsEnumDeclarationContext ctx);
+	void enterPsEnumDeclaration(PSHDLLang.PsEnumDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psEnumDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psEnumDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsEnumDeclaration(PSHDLLangParser.PsEnumDeclarationContext ctx);
+	void exitPsEnumDeclaration(PSHDLLang.PsEnumDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psEnum}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psEnum}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsEnum(PSHDLLangParser.PsEnumContext ctx);
+	void enterPsEnum(PSHDLLang.PsEnumContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psEnum}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psEnum}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsEnum(PSHDLLangParser.PsEnumContext ctx);
+	void exitPsEnum(PSHDLLang.PsEnumContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psVariableDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psVariableDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsVariableDeclaration(PSHDLLangParser.PsVariableDeclarationContext ctx);
+	void enterPsVariableDeclaration(PSHDLLang.PsVariableDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psVariableDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psVariableDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsVariableDeclaration(PSHDLLangParser.PsVariableDeclarationContext ctx);
+	void exitPsVariableDeclaration(PSHDLLang.PsVariableDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psDeclAssignment}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psDeclAssignment}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsDeclAssignment(PSHDLLangParser.PsDeclAssignmentContext ctx);
+	void enterPsDeclAssignment(PSHDLLang.PsDeclAssignmentContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psDeclAssignment}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psDeclAssignment}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsDeclAssignment(PSHDLLangParser.PsDeclAssignmentContext ctx);
+	void exitPsDeclAssignment(PSHDLLang.PsDeclAssignmentContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psArrayInit}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psArrayInit}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsArrayInit(PSHDLLangParser.PsArrayInitContext ctx);
+	void enterPsArrayInit(PSHDLLang.PsArrayInitContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psArrayInit}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psArrayInit}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsArrayInit(PSHDLLangParser.PsArrayInitContext ctx);
+	void exitPsArrayInit(PSHDLLang.PsArrayInitContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psArrayInitSubParens}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psArrayInitSubParens}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsArrayInitSubParens(PSHDLLangParser.PsArrayInitSubParensContext ctx);
+	void enterPsArrayInitSubParens(PSHDLLang.PsArrayInitSubParensContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psArrayInitSubParens}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psArrayInitSubParens}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsArrayInitSubParens(PSHDLLangParser.PsArrayInitSubParensContext ctx);
+	void exitPsArrayInitSubParens(PSHDLLang.PsArrayInitSubParensContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psArrayInitSub}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psArrayInitSub}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsArrayInitSub(PSHDLLangParser.PsArrayInitSubContext ctx);
+	void enterPsArrayInitSub(PSHDLLang.PsArrayInitSubContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psArrayInitSub}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psArrayInitSub}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsArrayInitSub(PSHDLLangParser.PsArrayInitSubContext ctx);
+	void exitPsArrayInitSub(PSHDLLang.PsArrayInitSubContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psArray}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psArray}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsArray(PSHDLLangParser.PsArrayContext ctx);
+	void enterPsArray(PSHDLLang.PsArrayContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psArray}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psArray}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsArray(PSHDLLangParser.PsArrayContext ctx);
+	void exitPsArray(PSHDLLang.PsArrayContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psDirection}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psDirection}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsDirection(PSHDLLangParser.PsDirectionContext ctx);
+	void enterPsDirection(PSHDLLang.PsDirectionContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psDirection}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psDirection}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsDirection(PSHDLLangParser.PsDirectionContext ctx);
+	void exitPsDirection(PSHDLLang.PsDirectionContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psAnnotation}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psAnnotation}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsAnnotation(PSHDLLangParser.PsAnnotationContext ctx);
+	void enterPsAnnotation(PSHDLLang.PsAnnotationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psAnnotation}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psAnnotation}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsAnnotation(PSHDLLangParser.PsAnnotationContext ctx);
+	void exitPsAnnotation(PSHDLLang.PsAnnotationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psAnnotationType}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psAnnotationType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsAnnotationType(PSHDLLangParser.PsAnnotationTypeContext ctx);
+	void enterPsAnnotationType(PSHDLLang.PsAnnotationTypeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psAnnotationType}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psAnnotationType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsAnnotationType(PSHDLLangParser.PsAnnotationTypeContext ctx);
+	void exitPsAnnotationType(PSHDLLang.PsAnnotationTypeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psPrimitive}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psPrimitive}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsPrimitive(PSHDLLangParser.PsPrimitiveContext ctx);
+	void enterPsPrimitive(PSHDLLang.PsPrimitiveContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psPrimitive}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psPrimitive}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsPrimitive(PSHDLLangParser.PsPrimitiveContext ctx);
+	void exitPsPrimitive(PSHDLLang.PsPrimitiveContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psPrimitiveType}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psPrimitiveType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsPrimitiveType(PSHDLLangParser.PsPrimitiveTypeContext ctx);
+	void enterPsPrimitiveType(PSHDLLang.PsPrimitiveTypeContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psPrimitiveType}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psPrimitiveType}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsPrimitiveType(PSHDLLangParser.PsPrimitiveTypeContext ctx);
+	void exitPsPrimitiveType(PSHDLLang.PsPrimitiveTypeContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psWidth}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psWidth}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsWidth(PSHDLLangParser.PsWidthContext ctx);
+	void enterPsWidth(PSHDLLang.PsWidthContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psWidth}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psWidth}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsWidth(PSHDLLangParser.PsWidthContext ctx);
+	void exitPsWidth(PSHDLLang.PsWidthContext ctx);
 
 	/**
-	 * Enter a parse tree produced by
-	 * {@link PSHDLLangParser#psInterfaceDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psInterfaceDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInterfaceDeclaration(PSHDLLangParser.PsInterfaceDeclarationContext ctx);
+	void enterPsInterfaceDeclaration(PSHDLLang.PsInterfaceDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by
-	 * {@link PSHDLLangParser#psInterfaceDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psInterfaceDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInterfaceDeclaration(PSHDLLangParser.PsInterfaceDeclarationContext ctx);
+	void exitPsInterfaceDeclaration(PSHDLLang.PsInterfaceDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psInterface}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psInterface}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInterface(PSHDLLangParser.PsInterfaceContext ctx);
+	void enterPsInterface(PSHDLLang.PsInterfaceContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psInterface}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psInterface}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInterface(PSHDLLangParser.PsInterfaceContext ctx);
+	void exitPsInterface(PSHDLLang.PsInterfaceContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psInterfaceExtends}
-	 * .
+	 * Enter a parse tree produced by {@link PSHDLLang#psInterfaceExtends}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInterfaceExtends(PSHDLLangParser.PsInterfaceExtendsContext ctx);
+	void enterPsInterfaceExtends(PSHDLLang.PsInterfaceExtendsContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psInterfaceExtends}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psInterfaceExtends}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInterfaceExtends(PSHDLLangParser.PsInterfaceExtendsContext ctx);
+	void exitPsInterfaceExtends(PSHDLLang.PsInterfaceExtendsContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psInterfaceDecl}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psInterfaceDecl}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsInterfaceDecl(PSHDLLangParser.PsInterfaceDeclContext ctx);
+	void enterPsInterfaceDecl(PSHDLLang.PsInterfaceDeclContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psInterfaceDecl}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psInterfaceDecl}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsInterfaceDecl(PSHDLLangParser.PsInterfaceDeclContext ctx);
+	void exitPsInterfaceDecl(PSHDLLang.PsInterfaceDeclContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psPortDeclaration}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psPortDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsPortDeclaration(PSHDLLangParser.PsPortDeclarationContext ctx);
+	void enterPsPortDeclaration(PSHDLLang.PsPortDeclarationContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psPortDeclaration}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psPortDeclaration}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsPortDeclaration(PSHDLLangParser.PsPortDeclarationContext ctx);
+	void exitPsPortDeclaration(PSHDLLang.PsPortDeclarationContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link PSHDLLangParser#psQualifiedName}.
+	 * Enter a parse tree produced by {@link PSHDLLang#psQualifiedName}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void enterPsQualifiedName(PSHDLLangParser.PsQualifiedNameContext ctx);
+	void enterPsQualifiedName(PSHDLLang.PsQualifiedNameContext ctx);
 
 	/**
-	 * Exit a parse tree produced by {@link PSHDLLangParser#psQualifiedName}.
+	 * Exit a parse tree produced by {@link PSHDLLang#psQualifiedName}.
 	 * 
 	 * @param ctx
 	 *            the parse tree
 	 */
-	void exitPsQualifiedName(PSHDLLangParser.PsQualifiedNameContext ctx);
+	void exitPsQualifiedName(PSHDLLang.PsQualifiedNameContext ctx);
 }

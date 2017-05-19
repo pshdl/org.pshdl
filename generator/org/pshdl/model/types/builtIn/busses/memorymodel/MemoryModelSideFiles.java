@@ -56,7 +56,8 @@ public class MemoryModelSideFiles {
 		final String rootDir = "drivers/";
 		final BusAccess ba = new BusAccess();
 		res.add(new AuxiliaryContent(rootDir + dirName + "/" + unitName + "Map.xhtml", builtHTML(memUnit, rows, withDate), true));
-		res.add(new AuxiliaryContent(rootDir + dirName + "/" + prefix + "BusAccess.c", ba.generateAccessC(rows, prefix, withDate).toString().getBytes(Charsets.UTF_8), true));
+		res.add(new AuxiliaryContent(rootDir + dirName + "/" + prefix + "BusAccess.c", ba.generateAccessC(memUnit, prefix, rows, withDate).toString().getBytes(Charsets.UTF_8),
+				true));
 		res.add(new AuxiliaryContent(rootDir + dirName + "/" + prefix + "BusAccess.h", ba.generateAccessH(memUnit, prefix, rows, withDate).toString().getBytes(Charsets.UTF_8),
 				true));
 		res.add(new AuxiliaryContent(rootDir + dirName + "/" + prefix + "BusPrint.c", ba.generatePrintC(memUnit, prefix, rows, withDate).toString().getBytes(Charsets.UTF_8),
@@ -117,25 +118,29 @@ public class MemoryModelSideFiles {
 				formatter.format("<tr>");
 				formatter.format("<td class='offset'>%d [0x%02x]</td>", pos * mul, pos * mul);
 				for (final NamedElement dec : row.definitions) {
-					final Definition def = (Definition) dec;
-					final Integer integer = getAndInc(defIndex, def.name);
-					final int size = MemoryModel.getSize(def);
-					if (def.type != Type.UNUSED) {
-						final String toolTip;
-						if (size == 32) {
-							toolTip = String.format("Width:%d Shift:%d Mask:%08X &#10;read: base[%4$d];&#10;write: base[%4$d]=newVal", size, (def.bitPos - size) + 1,
-									(1l << size) - 1, (pos * mul) / 4);
-						} else {
-							toolTip = String.format(
-									"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
-									(def.bitPos - size) + 1, (1l << size) - 1, (pos * mul) / 4);
-						}
-						formatter.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "", def.name,
-								integer);
+					if (dec instanceof Constant) {
+						Constant c = (Constant) dec;
+						formatter.format("<td colspan='%d' class='field %s %s'>%s</td>", c.width, "constStyle", "", String.format("0x%X", c.value));
 					} else {
-						formatter.format("<td colspan='%d' class='field %s %s'>%s</td>", size, def.rw + "Style", "", def.name);
+						final Definition def = (Definition) dec;
+						final Integer integer = getAndInc(defIndex, def.name);
+						final int size = MemoryModel.getSize(def);
+						if (def.type != Type.UNUSED) {
+							final String toolTip;
+							if (size == 32) {
+								toolTip = String.format("Width:%d Shift:%d Mask:%08X &#10;read: base[%4$d];&#10;write: base[%4$d]=newVal", size, (def.bitPos - size) + 1,
+										(1l << size) - 1, (pos * mul) / 4);
+							} else {
+								toolTip = String.format(
+										"Width:%d Shift:%d Mask:%08X &#10;read: (base[%4$d]&gt;&gt;%2$d)&amp;0x%3$X&#10;write: base[%4$d]=(newVal&amp;0x%3$X)&lt;&lt;%2$d", size,
+										(def.bitPos - size) + 1, (1l << size) - 1, (pos * mul) / 4);
+							}
+							formatter.format("<td colspan='%d' title='%s' class='field %s %s'>%s [%d]</td>", size, toolTip, def.rw + "Style", def.register ? "register" : "",
+									def.name, integer);
+						} else {
+							formatter.format("<td colspan='%d' class='field %s %s'>%s</td>", size, def.rw + "Style", "", def.name);
+						}
 					}
-
 				}
 				final Integer integer = getAndInc(rowIndex, row.getName());
 				formatter.format("<td class='rowInfo'>%s [%d]</td></tr>%n", row.getName(), integer);

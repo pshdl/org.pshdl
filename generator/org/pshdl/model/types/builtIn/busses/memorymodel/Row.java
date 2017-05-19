@@ -26,9 +26,7 @@
  ******************************************************************************/
 package org.pshdl.model.types.builtIn.busses.memorymodel;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.antlr.v4.runtime.Token;
 
@@ -56,20 +54,70 @@ public class Row implements NamedElement {
 
 	public final Map<String, Integer> defCount = Maps.newLinkedHashMap();
 
-	public void updateInfo() {
+	public void updateInfo(int checkSum) {
 		int bitPos = 31;
 		for (final NamedElement ne : definitions) {
-			final Definition def = (Definition) ne;
-			def.bitPos = bitPos;
-			bitPos -= MemoryModel.getSize(def);
-			final String rowName = def.getName(this);
+			String rowName = ne.getName();
+			if (ne instanceof Constant) {
+				Constant c = (Constant) ne;
+				c.bitPos = bitPos;
+				bitPos -= c.width;
+				switch (c.constType) {
+				case checksum:
+					c.value = checkSum;
+					break;
+				case date: {
+					Calendar cal = Calendar.getInstance();
+					c.value = toHex(cal.get(Calendar.DAY_OF_MONTH));
+					c.value |= toHex(cal.get(Calendar.MONTH + 1)) << 8;
+					c.value |= toHex(cal.get(Calendar.YEAR)) << 16;
+					break;
+				}
+				case time: {
+					Calendar cal = Calendar.getInstance();
+					c.value = toHex(cal.get(Calendar.SECOND));
+					c.value |= toHex(cal.get(Calendar.MINUTE)) << 8;
+					c.value |= toHex(cal.get(Calendar.HOUR_OF_DAY)) << 16;
+					break;
+				}
+				case number:
+					break;
+				}
+			} else {
+				final Definition def = (Definition) ne;
+				def.bitPos = bitPos;
+				bitPos -= MemoryModel.getSize(def);
+				rowName = def.getName(this);
+			}
 			Integer integer = defCount.get(rowName);
 			if (integer == null) {
 				integer = 0;
 			}
-			def.arrayIndex = integer;
+			if (ne instanceof Constant) {
+				Constant c = (Constant) ne;
+				c.arrayIndex = integer;
+			} else {
+				final Definition def = (Definition) ne;
+				def.arrayIndex = integer;
+			}
 			defCount.put(rowName, ++integer);
 		}
+	}
+
+	private static int toHex(int i) {
+		int res = 0;
+		int shift = 0;
+		while (i != 0) {
+			int digit = i % 10;
+			i /= 10;
+			res |= digit << shift;
+			shift += 4;
+		}
+		return res;
+	}
+
+	public static void main(String[] args) {
+		System.out.printf("%08x", (toHex(1011) << 0) | (toHex(1981) << 16));
 	}
 
 	public String getOrigName() {

@@ -61,7 +61,7 @@ public class Definition implements NamedElement {
 	}
 
 	public enum RWType {
-		r, rw, w;
+		r, rw, w, constant;
 	}
 
 	public List<Integer> dimensions = new LinkedList<Integer>();
@@ -69,6 +69,8 @@ public class Definition implements NamedElement {
 	public String name = "fill";
 
 	public boolean register;
+
+	public boolean modFlag;
 
 	public RWType rw = null;
 
@@ -84,13 +86,14 @@ public class Definition implements NamedElement {
 	public Definition() {
 	}
 
-	public Definition(String name, boolean register, RWType rw, Type type, int width, int... dimensions) {
+	public Definition(String name, boolean register, boolean modFlag, RWType rw, Type type, int width, int... dimensions) {
 		super();
 		for (final int dim : dimensions) {
 			this.dimensions.add(dim);
 		}
 		this.name = name;
 		this.register = register;
+		this.modFlag = modFlag;
 		this.rw = rw;
 		this.type = type;
 		this.width = width;
@@ -159,7 +162,10 @@ public class Definition implements NamedElement {
 		final String rwString = rw != null ? rw + " " : "";
 		if (type == Type.UNUSED)
 			return name + w + ";";
-		return rwString + reg + lowerCase + w + " " + name + sb + " " + warn + ";";
+		String mod = "";
+		if (modFlag)
+			mod = " writtenFlag";
+		return rwString + reg + lowerCase + w + " " + name + sb + " " + warn + mod + ";";
 	}
 
 	public Definition withoutDim() {
@@ -170,6 +176,7 @@ public class Definition implements NamedElement {
 		res.rw = rw;
 		res.register = register;
 		res.warn = warn;
+		res.modFlag = modFlag;
 		return res;
 	}
 

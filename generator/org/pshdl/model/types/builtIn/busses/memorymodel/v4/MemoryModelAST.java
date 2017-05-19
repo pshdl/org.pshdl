@@ -31,34 +31,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.pshdl.model.*;
 import org.pshdl.model.parser.PSHDLParser;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Alias;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Column;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
+import org.pshdl.model.types.builtIn.busses.memorymodel.*;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Constant.*;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.RWType;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.Type;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition.WarnType;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Memory;
-import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Reference;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Row;
-import org.pshdl.model.types.builtIn.busses.memorymodel.Unit;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.AliasContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ColumnContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DeclarationContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.DefinitionContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.FillingContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.MemoryContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.ReferenceContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.RowContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.UnitContext;
-import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.WarnTypeContext;
+import org.pshdl.model.types.builtIn.busses.memorymodel.v4.MemoryModelParser.*;
 import org.pshdl.model.validation.Problem;
 
 import com.google.common.base.Charsets;
@@ -77,12 +60,6 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		decl = new Alias(id);
 		obj = decl;
 	}
-
-	// @Override
-	// public void enterConstant(ConstantContext ctx) {
-	// // TODO Auto-generated method stub
-	// super.enterConstant(ctx);
-	// }
 
 	@Override
 	public void enterFilling(FillingContext ctx) {
@@ -114,6 +91,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		def.name = ctx.ID().getText();
 		def.rw = RWType.valueOf(ctx.rwStatus().getText());
 		def.register = ctx.hasRegister != null;
+		def.modFlag = ctx.modFlag != null;
 		def.type = Type.valueOf(ctx.type().getText().toUpperCase());
 		if (ctx.width() != null) {
 			def.width = Integer.parseInt(ctx.width().getText());
@@ -139,6 +117,34 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		addNamedElement(def);
 	}
 
+	@Override
+	public void enterConstant(ConstantContext ctx) {
+		String value = ctx.value.getText();
+		String name = ctx.ID() != null ? ctx.ID().getText() : null;
+		Constant c;
+		int width = 32;
+		if (ctx.width() != null) {
+			String swidth = ctx.width().getText();
+			width = HDLLiteral.parseString(swidth).intValue();
+		}
+		switch (value) {
+		case "$date":
+			c = new Constant("$date", ConstantType.date);
+			break;
+		case "$time":
+			c = new Constant("$time", ConstantType.time);
+			break;
+		case "$checkSum":
+			c = new Constant("$checkSum", ConstantType.checksum);
+			break;
+		default:
+			int intValue = HDLLiteral.parseString(value).intValue();
+			c = new Constant(name, intValue, width);
+		}
+		obj = c;
+		addNamedElement(c);
+	}
+
 	private void addNamedElement(NamedElement def) {
 		if (decl instanceof Alias) {
 			final Alias al = (Alias) decl;
@@ -154,7 +160,12 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 		}
 		if (decl instanceof Memory) {
 			final Memory memory = (Memory) decl;
-			memory.references.add((Reference) def);
+			if (def instanceof Reference) {
+				Reference ref = (Reference) def;
+				memory.addReference(ref);
+			} else {
+				memory.addConstant((Constant) def);
+			}
 		}
 	}
 
@@ -190,7 +201,7 @@ public class MemoryModelAST extends MemoryModelBaseListener {
 	}
 
 	public static Unit parseUnit(String string, Set<Problem> problems, int lineOffset) throws IOException {
-		final ANTLRInputStream input = new ANTLRInputStream(string);
+		final CharStream input = CharStreams.fromString(string);
 		final MemoryModelLexer lexer = new MemoryModelLexer(input);
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
 		final MemoryModelParser parser = new MemoryModelParser(tokens);

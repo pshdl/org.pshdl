@@ -36,8 +36,10 @@ import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IntegerRange;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.ListExtensions;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Column;
+import org.pshdl.model.types.builtIn.busses.memorymodel.Constant;
 import org.pshdl.model.types.builtIn.busses.memorymodel.Definition;
 import org.pshdl.model.types.builtIn.busses.memorymodel.MemoryModel;
 import org.pshdl.model.types.builtIn.busses.memorymodel.NamedElement;
@@ -137,7 +139,7 @@ public class BusAccess {
     _builder.append(" ");
     _builder.append("*/");
     _builder.newLine();
-    _builder.append("typedef void (*warnFunc_p)(warningType_t t, uint64_t value, char *def, char *row, char *msg);");
+    _builder.append("typedef void (*warnFunc_p)(warningType_t t, uint32_t value, char *def, char *row, char *msg);");
     _builder.newLine();
     _builder.newLine();
     _builder.newLine();
@@ -162,6 +164,10 @@ public class BusAccess {
     _builder.newLine();
     _builder.append("#include <stdio.h>");
     _builder.newLine();
+    _builder.append("#include <stdint.h>");
+    _builder.newLine();
+    _builder.append("#include <inttypes.h>");
+    _builder.newLine();
     _builder.append("#include \"");
     _builder.append(prefix);
     _builder.append("BusAccess.h\"");
@@ -174,7 +180,7 @@ public class BusAccess {
     _builder.append("void ");
     String _prefix = this.getPrefix(prefix);
     _builder.append(_prefix);
-    _builder.append("defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg) {");
+    _builder.append("defaultPrintfWarn(warningType_t t, uint32_t value, char *def, char *row, char *msg) {");
     _builder.newLineIfNotEmpty();
     _builder.append("    ");
     _builder.append("switch (t) {");
@@ -183,7 +189,7 @@ public class BusAccess {
     _builder.append("case error:");
     _builder.newLine();
     _builder.append("            ");
-    _builder.append("printf(\"ERROR for value 0x%llx of definition %s of row %s %s\"PSHDL_NL, value, def, row, msg);");
+    _builder.append("printf(\"ERROR for value 0x%\"PRIx32\" of definition %s of row %s %s\"PSHDL_NL, value, def, row, msg);");
     _builder.newLine();
     _builder.append("            ");
     _builder.append("break;");
@@ -192,7 +198,7 @@ public class BusAccess {
     _builder.append("case limit:");
     _builder.newLine();
     _builder.append("            ");
-    _builder.append("printf(\"Limited value 0x%llx for definition %s of row %s %s\"PSHDL_NL, value, def, row, msg);");
+    _builder.append("printf(\"Limited value 0x%\"PRIx32\" for definition %s of row %s %s\"PSHDL_NL, value, def, row, msg);");
     _builder.newLine();
     _builder.append("            ");
     _builder.append("break;");
@@ -201,7 +207,7 @@ public class BusAccess {
     _builder.append("case mask:");
     _builder.newLine();
     _builder.append("            ");
-    _builder.append("printf(\"Masked value 0x%llx for definition %s of row %s %s\"PSHDL_NL, value, def, row, msg);");
+    _builder.append("printf(\"Masked value 0x%\"PRIx32\" for definition %s of row %s %s\"PSHDL_NL, value, def, row, msg);");
     _builder.newLine();
     _builder.append("            ");
     _builder.append("break;");
@@ -210,7 +216,7 @@ public class BusAccess {
     _builder.append("case invalidIndex:");
     _builder.newLine();
     _builder.append("            ");
-    _builder.append("printf(\"The index 0x%llx is not valid for the column %s %s\"PSHDL_NL, value, row, msg);");
+    _builder.append("printf(\"The index 0x%\"PRIx32\" is not valid for the column %s %s\"PSHDL_NL, value, row, msg);");
     _builder.newLine();
     _builder.append("    ");
     _builder.append("}");
@@ -271,7 +277,7 @@ public class BusAccess {
     _builder.append("void ");
     String _prefix = this.getPrefix(prefix);
     _builder.append(_prefix);
-    _builder.append("defaultPrintfWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg);");
+    _builder.append("defaultPrintfWarn(warningType_t t, uint32_t value, char *def, char *row, char *msg);");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
     String _generatePrintDef = this.generatePrintDef(rows, prefix);
@@ -367,7 +373,7 @@ public class BusAccess {
               float _divide = (_size / 4f);
               int _intValue = Double.valueOf(Math.ceil(_divide)).intValue();
               _builder_1.append(_intValue, "    ");
-              _builder_1.append("x");
+              _builder_1.append("\"PRIx32\"");
             }
           }
           _builder_1.append("\"PSHDL_NL");
@@ -431,6 +437,8 @@ public class BusAccess {
     _builder.newLine();
     _builder.append("#include \"BusStdDefinitions.h\"");
     _builder.newLine();
+    _builder.append("#include <stdbool.h>");
+    _builder.newLine();
     _builder.newLine();
     _builder.append("/**");
     _builder.newLine();
@@ -478,6 +486,14 @@ public class BusAccess {
     _builder.append("setWarn(warnFunc_p warnFunction);");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
+    _builder.append("#define ");
+    String _prefix_2 = this.getPrefix(prefix);
+    _builder.append(_prefix_2);
+    _builder.append("checkSumValue 0x");
+    String _hex32 = this.hex32(unit.getCheckSum());
+    _builder.append(_hex32);
+    _builder.newLineIfNotEmpty();
+    _builder.newLine();
     _builder.append("/**");
     _builder.newLine();
     _builder.append(" ");
@@ -487,11 +503,66 @@ public class BusAccess {
     _builder.append("*/");
     _builder.newLine();
     _builder.append("extern warnFunc_p ");
-    String _prefix_2 = this.getPrefix(prefix);
-    _builder.append(_prefix_2);
+    String _prefix_3 = this.getPrefix(prefix);
+    _builder.append(_prefix_3);
     _builder.append("warn;");
     _builder.newLineIfNotEmpty();
     _builder.newLine();
+    {
+      final Function1<Row, NamedElement> _function = (Row it) -> {
+        return IterableExtensions.<NamedElement>head(it.definitions);
+      };
+      final Function1<NamedElement, Boolean> _function_1 = (NamedElement it) -> {
+        return Boolean.valueOf(((it instanceof Constant) && (((Constant) it).constType == Constant.ConstantType.checksum)));
+      };
+      NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(ListExtensions.<Row, NamedElement>map(rows, _function), _function_1);
+      boolean _tripleNotEquals = (_findFirst != null);
+      if (_tripleNotEquals) {
+        _builder.append("/**");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* Retrievs the checkSumField and validates it against the known value ");
+        String _prefix_4 = this.getPrefix(prefix);
+        _builder.append(_prefix_4, " ");
+        _builder.append("checkSumValue 0x");
+        String _hex32_1 = this.hex32(unit.getCheckSum());
+        _builder.append(_hex32_1, " ");
+        _builder.append(".");
+        _builder.newLineIfNotEmpty();
+        _builder.append(" ");
+        _builder.append("* A mismatch between the memory mapped value and the known value may indicate that the drivers");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* do not match the firmware that is on the FPGA!");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("*");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* ");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* @retval true the memory mapped value matches the known value");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* @retval false the memory mapped differs from the known value");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("*");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("*/");
+        _builder.newLine();
+        _builder.append("bool ");
+        String _prefix_5 = this.getPrefix(prefix);
+        _builder.append(_prefix_5);
+        _builder.append("validateCheckSumMatch(uint32_t *base);");
+        _builder.newLineIfNotEmpty();
+      }
+    }
     String _generateDeclarations = this.generateDeclarations(unit, prefix, rows);
     _builder.append(_generateDeclarations);
     _builder.newLineIfNotEmpty();
@@ -683,6 +754,8 @@ public class BusAccess {
               _builder_1.append(_name, "\t");
               _builder_1.newLineIfNotEmpty();
               _builder_1.append("\t");
+              String _prefix_1 = this.getPrefix(prefix);
+              _builder_1.append(_prefix_1, "\t");
               String _simpleName = neRow.getSimpleName();
               _builder_1.append(_simpleName, "\t");
               _builder_1.append("_t ");
@@ -693,8 +766,8 @@ public class BusAccess {
             }
           }
           _builder_1.append("} ");
-          String _prefix_1 = this.getPrefix(prefix);
-          _builder_1.append(_prefix_1);
+          String _prefix_2 = this.getPrefix(prefix);
+          _builder_1.append(_prefix_2);
           _builder_1.append(col.name);
           _builder_1.append("_t;");
           _builder_1.newLineIfNotEmpty();
@@ -706,7 +779,7 @@ public class BusAccess {
     return res;
   }
   
-  public CharSequence generateAccessC(final List<Row> rows, final String prefix, final boolean withDate) {
+  public CharSequence generateAccessC(final Unit unit, final String prefix, final List<Row> rows, final boolean withDate) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("/**");
     _builder.newLine();
@@ -731,6 +804,8 @@ public class BusAccess {
     _builder.append(" ");
     _builder.newLine();
     _builder.append("#include <stdint.h>");
+    _builder.newLine();
+    _builder.append("#include <stdbool.h>");
     _builder.newLine();
     _builder.append("#include \"");
     _builder.append(prefix);
@@ -758,7 +833,7 @@ public class BusAccess {
     _builder.append("static void ");
     String _prefix = this.getPrefix(prefix);
     _builder.append(_prefix);
-    _builder.append("defaultWarn(warningType_t t, uint64_t value, char *def, char *row, char *msg){");
+    _builder.append("defaultWarn(warningType_t t, uint32_t value, char *def, char *row, char *msg){");
     _builder.newLineIfNotEmpty();
     _builder.append("}");
     _builder.newLine();
@@ -829,6 +904,73 @@ public class BusAccess {
     _builder.append("}");
     _builder.newLine();
     _builder.newLine();
+    {
+      final Function1<Row, NamedElement> _function = (Row it) -> {
+        return IterableExtensions.<NamedElement>head(it.definitions);
+      };
+      final Function1<NamedElement, Boolean> _function_1 = (NamedElement it) -> {
+        return Boolean.valueOf(((it instanceof Constant) && (((Constant) it).constType == Constant.ConstantType.checksum)));
+      };
+      NamedElement _findFirst = IterableExtensions.<NamedElement>findFirst(ListExtensions.<Row, NamedElement>map(rows, _function), _function_1);
+      boolean _tripleNotEquals = (_findFirst != null);
+      if (_tripleNotEquals) {
+        _builder.append("/**");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* Retrievs the checkSumField and validates it against the known value ");
+        String _prefix_6 = this.getPrefix(prefix);
+        _builder.append(_prefix_6, " ");
+        _builder.append("checkSumValue 0x");
+        String _hex32 = this.hex32(unit.getCheckSum());
+        _builder.append(_hex32, " ");
+        _builder.append(".");
+        _builder.newLineIfNotEmpty();
+        _builder.append(" ");
+        _builder.append("* A mismatch between the memory mapped value and the known value may indicate that the drivers");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* do not match the firmware that is on the FPGA!");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("*");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* @param base a (volatile) pointer to the memory offset at which the IP core can be found in memory.");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* ");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* @retval true the memory mapped value matches the known value");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("* @retval false the memory mapped differs from the known value");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("*");
+        _builder.newLine();
+        _builder.append(" ");
+        _builder.append("*/");
+        _builder.newLine();
+        _builder.append("bool ");
+        String _prefix_7 = this.getPrefix(prefix);
+        _builder.append(_prefix_7);
+        _builder.append("validateCheckSumMatch(uint32_t *base){");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        _builder.append("return base[");
+        int _findCheckSumIdx = this.findCheckSumIdx(rows);
+        _builder.append(_findCheckSumIdx, "\t");
+        _builder.append("] == 0x");
+        String _hex32_1 = this.hex32(unit.getCheckSum());
+        _builder.append(_hex32_1, "\t");
+        _builder.append(";");
+        _builder.newLineIfNotEmpty();
+        _builder.append("}");
+        _builder.newLine();
+      }
+    }
+    _builder.newLine();
     _builder.append("//Setter functions");
     _builder.newLine();
     String _generateSetterFunctions = this.generateSetterFunctions(rows, prefix);
@@ -841,6 +983,27 @@ public class BusAccess {
     _builder.append(_generateGetterFunctions);
     _builder.newLineIfNotEmpty();
     return _builder;
+  }
+  
+  public String hex32(final int value) {
+    return String.format("%08x", Integer.valueOf(value));
+  }
+  
+  public int findCheckSumIdx(final List<Row> rows) {
+    int pos = 0;
+    for (final Row row : rows) {
+      {
+        final NamedElement head = IterableExtensions.<NamedElement>head(row.definitions);
+        if ((head instanceof Constant)) {
+          if ((((Constant)head).constType == Constant.ConstantType.checksum)) {
+            return pos;
+          }
+        }
+        int _pos = pos;
+        pos = (_pos + 1);
+      }
+    }
+    throw new IllegalArgumentException("Did not find a checkSum");
   }
   
   public String getPrefix(final String string) {
@@ -1369,8 +1532,9 @@ public class BusAccess {
           CharSequence _humanRange_2 = this.humanRange(d);
           _builder_2.append(_humanRange_2);
           _builder_2.append("], the value is masked with 0x");
-          _builder_2.append(((1l << 
-            d.width) - 1));
+          String _hex32 = this.hex32(((int) ((1l << 
+            d.width) - 1)));
+          _builder_2.append(_hex32);
           _builder_2.append(" and the warn function called.");
           sb.append(_builder_2);
           break;
@@ -1396,8 +1560,9 @@ public class BusAccess {
           CharSequence _humanRange_5 = this.humanRange(d);
           _builder_5.append(_humanRange_5);
           _builder_5.append("], the value is masked with 0x");
-          _builder_5.append(((1l << 
-            d.width) - 1));
+          String _hex32_1 = this.hex32(((int) ((1l << 
+            d.width) - 1)));
+          _builder_5.append(_hex32_1);
           _builder_5.append(".");
           sb.append(_builder_5);
           break;
@@ -1902,7 +2067,18 @@ public class BusAccess {
   }
   
   public boolean hasWrite(final NamedElement ne) {
-    return ((((Definition) ne).rw != Definition.RWType.r) && (((Definition) ne).type != Definition.Type.UNUSED));
+    boolean _xblockexpression = false;
+    {
+      if ((ne instanceof Constant)) {
+        return false;
+      }
+      final Definition d = ((Definition) ne);
+      if (d.modFlag) {
+        return true;
+      }
+      _xblockexpression = ((d.rw != Definition.RWType.r) && (d.type != Definition.Type.UNUSED));
+    }
+    return _xblockexpression;
   }
   
   public String getMaxValueHex(final Definition d) {
