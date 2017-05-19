@@ -141,7 +141,13 @@ public class HDLLiteral extends AbstractHDLLiteral {
 			return null;
 		if (FALSE.equals(string))
 			return null;
+		bigIntegerVal = parseString(string);
+		return bigIntegerVal;
+	}
+
+	public static BigInteger parseString(final String string) {
 		final char zeroChar = string.charAt(0);
+		BigInteger bigIntegerVal = BigInteger.ZERO;
 		if (zeroChar == '0') {
 			if (string.length() > 1) {
 				final String str = string.substring(2).replaceAll("_", "");
