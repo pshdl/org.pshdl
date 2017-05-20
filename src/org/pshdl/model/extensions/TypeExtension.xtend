@@ -68,6 +68,8 @@ import org.pshdl.model.utils.HDLProblemException
 import org.pshdl.model.utils.Insulin
 import org.pshdl.model.validation.Problem
 import org.pshdl.model.validation.builtin.ErrorCode
+import org.pshdl.model.types.builtIn.HDLBuiltInAnnotationProvider.HDLBuiltInAnnotations
+import org.pshdl.model.HDLPrimitive.HDLPrimitiveType
 
 class TypeExtension {
 	private static TypeExtension INST = new TypeExtension
@@ -307,7 +309,7 @@ class TypeExtension {
 			if (res.present) {
 				val opType = res.get.cachedType
 				if (opType.present) {
-					val type = opType.get
+					var type = opType.get
 					val dim = type.dim
 					if (arr.length > dim.length)
 						return opType

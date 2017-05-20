@@ -404,7 +404,7 @@ public class TypeExtension {
         final Optional<? extends HDLType> opType = TypeExtension.cachedType(res.get());
         boolean _isPresent_1 = opType.isPresent();
         if (_isPresent_1) {
-          final HDLType type = opType.get();
+          HDLType type = opType.get();
           final ArrayList<HDLExpression> dim = type.getDim();
           int _length = ((Object[])Conversions.unwrapArray(arr, Object.class)).length;
           int _length_1 = ((Object[])Conversions.unwrapArray(dim, Object.class)).length;

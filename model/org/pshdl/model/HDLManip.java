@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.pshdl.model.impl.AbstractHDLManip;
+import org.pshdl.model.utils.*;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
 
 /**
@@ -145,6 +146,8 @@ public class HDLManip extends AbstractHDLManip {
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
+
+	public static final MetaAccess<HDLType> WRONG_TYPE = new GenericMeta<>("WRONG_TYPE", true);
 	// $CONTENT-END$
 
 }

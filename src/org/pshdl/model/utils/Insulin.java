@@ -233,17 +233,23 @@ public class Insulin {
 						final BigInteger other_width = ConstantEvaluate.valueOfForced(hvd.getPrimitive().getWidth(), null, "Insulin");
 						ratio = other_width.divide(thinnest.get()).intValue();
 					}
-					// Only one variable per declaration
-					// Writes have to be registers
+					// VALIDATE: Only one variable per declaration
+					// VALIDATE: Writes have to be registers
+					// VALIDATE: Type is primitive
+					// VALIDATE: Ratio is ignored for parameterized width
+					// VALIDATE: Type has to be Bitvector
 					final HDLVariable variable = hvd.getVariables().get(0);
 					for (final HDLVariableRef ref : HDLQuery.getVarRefs(hdlUnit, variable)) {
 						final HDLAssignment assignment = ref.getContainer(HDLAssignment.class);
 						if (assignment.getLeft() == ref) {
-							// Other writes don't need fixing because they
-							// are
+							// Other writes don't need fixing because they are
 							// registers
 							if (ratio != 1) {
 								fixMemWrites(ms, sharedDepth, memDepth, memWidth, ratio, ref, assignment);
+							} else {
+								HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(HDLPrimitive.getBitvector().setWidth(sharedWidth))
+										.setTarget(assignment.getRight());
+								ms.replace(assignment, assignment.setRight(cast));
 							}
 						} else {
 							fixMemReads(ms, sharedDepth, memDepth, sharedWidth, memWidth, ratio, ref, assignment, hvd);
@@ -264,9 +270,16 @@ public class Insulin {
 		final HDLVariableDeclaration tempDecl = hvd.setVariables(Collections.singletonList(tempReadVar))
 				.setAnnotations(Collections.singletonList(HDLBuiltInAnnotations.VHDLNoExplicitReset.create(null)));
 		ms.insertAfter(hvd, tempDecl);
-		ms.replace(assignment, assignment.setRight(tempReadVar.asHDLRef()));
+		HDLManip primCast = new HDLManip().setType(HDLManipType.CAST).setCastTo(hvd.getPrimitive());
+		if (assignment.getRight() instanceof HDLManip) {
+			HDLManip manip = (HDLManip) assignment.getRight();
+			ms.replace(manip, manip.setTarget(tempReadVar.asHDLRef()));
+		} else
+			ms.replace(assignment, assignment.setRight(primCast.setTarget(tempReadVar.asHDLRef())));
 		if (ratio == 1) {
-			final HDLAssignment origAss = new HDLAssignment().setType(HDLAssignmentType.ASSGN).setLeft(tempReadVar.asHDLRef()).setRight(ref);
+			HDLManip cast = primCast.setTarget(ref);
+			cast.addMeta(HDLManip.WRONG_TYPE, HDLPrimitive.getBitvector().setWidth(memWidth));
+			final HDLAssignment origAss = new HDLAssignment().setType(HDLAssignmentType.ASSGN).setLeft(tempReadVar.asHDLRef()).setRight(cast);
 			ms.insertAfter(assignment, origAss);
 			return;
 		}
@@ -282,7 +295,7 @@ public class Insulin {
 		final List<HDLAssignment> newAssignments = Lists.newArrayList();
 		final HDLManip cast = new HDLManip().setType(HDLManipType.CAST).setCastTo(HDLPrimitive.getBitvector().setWidth(HDLLiteral.get(bits)));
 		if (ratio == 1) {
-			newAssignments.add(new HDLAssignment().setRight(emptyRef.addArray(addr)).setType(HDLAssignmentType.ASSGN).setLeft(memRef));
+			newAssignments.add(new HDLAssignment().setLeft(memRef).setType(HDLAssignmentType.ASSGN).setRight(emptyRef.addArray(addr)));
 		} else {
 			for (int i = 0; i < ratio; i++) {
 				final HDLConcat concatedAddr = new HDLConcat().addCats(addr).addCats(cast.setTarget(HDLLiteral.get(ratio - 1 - i)));
@@ -344,7 +357,7 @@ public class Insulin {
 			final HDLExpression newAddress = new HDLManip().setCastTo(HDLPrimitive.getNatural()).setType(HDLManipType.CAST).setTarget(concatedAddr);
 			final HDLRange bitRange = new HDLRange().setFrom(HDLLiteral.get(((i + 1) * memWidth) - 1)).setTo(HDLLiteral.get(i * memWidth));
 			final HDLExpression right = reference.addBits(bitRange);
-			newAssignments.add(new HDLAssignment().setLeft(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setRight(right));
+			newAssignments.add(new HDLAssignment().setLeft(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setRight(cast.setTarget(right)));
 		}
 		ms.replace(assignment, newAssignments.toArray(new HDLAssignment[newAssignments.size()]));
 	}
