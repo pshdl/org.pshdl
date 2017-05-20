@@ -191,6 +191,7 @@ public class Insulin {
 				final Collection<HDLVariableDeclaration> mem_hvds = memMapEntry.getValue();
 				final Iterator<HDLVariableDeclaration> iterator = mem_hvds.iterator();
 				iterator.hasNext();
+
 				final HDLVariableDeclaration first = iterator.next();
 				HDLExpression sharedWidth = first.getPrimitive().getWidth();
 				HDLExpression sharedDepth = first.getVariables().get(0).getDimensions().get(0);
@@ -220,13 +221,10 @@ public class Insulin {
 					sharedWidth = HDLLiteral.get(thinnestVal);
 					sharedDepth = HDLLiteral.get(deepestVal);
 				}
-				// Create the shared variable memory
-				HDLVariableDeclaration shared = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(sharedWidth))
-						.addAnnotations(HDLBuiltInAnnotations.sharedVar.create(null));
-				shared = shared.addVariables(new HDLVariable().setName(memMapEntry.getKey()).addDimensions(sharedDepth));
-				ms.insertBefore(first, shared);
+
 				final int memDepth = knownRelation ? deepest.get().intValue() : -1;
 				final int memWidth = knownRelation ? thinnest.get().intValue() : -1;
+				HDLExpression resetValue = null;
 				for (final HDLVariableDeclaration hvd : mem_hvds) {
 					int ratio = 1;
 					if (knownRelation) {
@@ -238,7 +236,16 @@ public class Insulin {
 					// VALIDATE: Type is primitive
 					// VALIDATE: Ratio is ignored for parameterized width
 					// VALIDATE: Type has to be Bitvector
+					// VALIDATE: Only allow one reset value
+					// VALIDATE: Reset value is HDLArrayInit and constant
+					// VALIDATE: Reset value has to be on thinnest
+					// VALIDATE: Disallow default value
 					final HDLVariable variable = hvd.getVariables().get(0);
+					HDLRegisterConfig registerConfig = variable.getRegisterConfig();
+					if ((registerConfig != null) && (registerConfig.getResetValue() instanceof HDLArrayInit)) {
+						resetValue = registerConfig.getResetValue();
+						ms.replace(registerConfig, registerConfig.setResetValue(HDLManip.getCast(hvd.getPrimitive(), HDLLiteral.get(0))));
+					}
 					for (final HDLVariableRef ref : HDLQuery.getVarRefs(hdlUnit, variable)) {
 						final HDLAssignment assignment = ref.getContainer(HDLAssignment.class);
 						if (assignment.getLeft() == ref) {
@@ -256,6 +263,11 @@ public class Insulin {
 						}
 					}
 				}
+				// Create the shared variable memory
+				HDLVariableDeclaration shared = new HDLVariableDeclaration().setType(HDLPrimitive.getBitvector().setWidth(sharedWidth))
+						.addAnnotations(HDLBuiltInAnnotations.sharedVar.create(null));
+				shared = shared.addVariables(new HDLVariable().setName(memMapEntry.getKey()).addDimensions(sharedDepth).setDefaultValue(resetValue));
+				ms.insertBefore(first, shared);
 			}
 		}
 		final T fixedMems = ms.apply(apply);
@@ -357,7 +369,7 @@ public class Insulin {
 			final HDLExpression newAddress = new HDLManip().setCastTo(HDLPrimitive.getNatural()).setType(HDLManipType.CAST).setTarget(concatedAddr);
 			final HDLRange bitRange = new HDLRange().setFrom(HDLLiteral.get(((i + 1) * memWidth) - 1)).setTo(HDLLiteral.get(i * memWidth));
 			final HDLExpression right = reference.addBits(bitRange);
-			newAssignments.add(new HDLAssignment().setLeft(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setRight(cast.setTarget(right)));
+			newAssignments.add(new HDLAssignment().setLeft(emptyRef.addArray(newAddress)).setType(HDLAssignmentType.ASSGN).setRight(right));
 		}
 		ms.replace(assignment, newAssignments.toArray(new HDLAssignment[newAssignments.size()]));
 	}

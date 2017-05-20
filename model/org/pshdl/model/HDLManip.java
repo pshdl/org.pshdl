@@ -148,6 +148,10 @@ public class HDLManip extends AbstractHDLManip {
 	// $CONTENT-BEGIN$
 
 	public static final MetaAccess<HDLType> WRONG_TYPE = new GenericMeta<>("WRONG_TYPE", true);
+
+	public static HDLManip getCast(HDLType primitive, HDLExpression target) {
+		return new HDLManip().setType(HDLManipType.CAST).setCastTo(primitive).setTarget(target);
+	}
 	// $CONTENT-END$
 
 }
