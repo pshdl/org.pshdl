@@ -90,6 +90,20 @@ public class ScopingExtension {
     return this.resolveVariableDefault(obj, hVar);
   }
   
+  public Optional<HDLFunction> resolveFunctionByName(final AbstractHDLFunctionCall obj, final HDLQualifiedName hVar) {
+    IHDLObject _container = obj.getContainer();
+    boolean _tripleEquals = (_container == null);
+    if (_tripleEquals) {
+      return Optional.<HDLFunction>absent();
+    }
+    final HDLFunctionCall call = ((HDLFunctionCall) obj);
+    final Optional<? extends Iterable<HDLFunction>> candidates = this.resolveFunctionCall(obj.getContainer(), call, hVar);
+    if (((!candidates.isPresent()) || IterableExtensions.isEmpty(candidates.get()))) {
+      return Optional.<HDLFunction>absent();
+    }
+    return Optional.<HDLFunction>of(IterableExtensions.<HDLFunction>head(candidates.get()));
+  }
+  
   public Optional<HDLFunction> resolveFunction(final AbstractHDLFunctionCall obj, final HDLQualifiedName hVar) {
     IHDLObject _container = obj.getContainer();
     boolean _tripleEquals = (_container == null);
@@ -250,6 +264,7 @@ public class ScopingExtension {
     for (final HDLFunctionParameter v : _args) {
       res.add(v.getName());
     }
+    res.addAll(HDLResolver.getallVariableDeclarations(obj.getStmnts()));
     return res;
   }
   

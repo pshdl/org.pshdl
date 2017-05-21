@@ -549,7 +549,7 @@ class ParserToModelExtension {
 	def dispatch HDLSubstituteFunction toHDL(PsSubstituteFunctionContext context, boolean isStatement) {
 		var func = new HDLSubstituteFunction
 		func = func.setName(context.psFunction.toName)
-		func = func.setStmnts(context.psStatement.map[toHDL(true) as HDLStatement])
+		func = func.setStmnts(context.psBlock.map[toHDL(true) as HDLStatement])
 		func = func.setArgs(context.psFuncParam.psFuncSpec.map[toHDL(false) as HDLFunctionParameter])
 		if (context.psFuncRecturnType !== null)
 			func = func.setReturnType(context.psFuncRecturnType.toHDL(false) as HDLFunctionParameter)

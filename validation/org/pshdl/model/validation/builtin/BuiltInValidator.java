@@ -227,9 +227,9 @@ public class BuiltInValidator implements IHDLValidator {
 			checkArrayBoundaries(pkg, problems, hContext);
 			checkConstantEquals(pkg, problems, hContext);
 			checkBitAccess(pkg, problems, hContext);
-			// TODO Validate value ranges, check for 0 divide
+			// VALIDATE Validate value ranges, check for 0 divide
 			checkRanges(pkg, problems, hContext);
-			// TODO Check for POW only power of 2
+			// VALIDATE Check for POW only power of 2
 			checkCombinedAssignment(pkg, problems, hContext);
 			checkAnnotations(pkg, problems, hContext);
 			checkType(pkg, problems, hContext);
@@ -238,25 +238,26 @@ public class BuiltInValidator implements IHDLValidator {
 			checkConstantPackageDeclarations(pkg, problems, hContext);
 			checkLiteralConcat(pkg, problems);
 			checkDuplicateType(pkg, problems);
-			// TODO Validate bitWidth mismatch
+			// VALIDATE Validate bitWidth mismatch
 			checkBitWidthMismatch(pkg, problems, hContext);
 			checkAssignments(pkg, problems, hContext);
 			checkDirectionSubScopes(pkg, problems, hContext);
-			// TODO Multi-bit Write only for Constants
-			// TODO check for signals named clk or rst and warn about the
+			// VALIDATE Multi-bit Write only for Constants
+			// VALIDATE check for signals named clk or rst and warn about the
 			// collision
-			// TODO check for valid parameter
+			// VALIDATE check for valid parameter
 			checkSwitchStatements(pkg, problems, hContext);
-			// TODO Type checking!
-			// TODO Check for combinatorial loop.
-			// TODO Check for multiple assignment in same Scope
-			// TODO No processes in Module
-			// TODO no I/O variables in block
-			// TODO warn for name collision in generators
-			// TODO Out port array size need to be constant
-			// TODO Check for bit access on left assignment side when right is
+			// VALIDATE Type checking!
+			// VALIDATE Check for combinatorial loop.
+			// VALIDATE Check for multiple assignment in same Scope
+			// VALIDATE No processes in Module
+			// VALIDATE no I/O variables in block
+			// VALIDATE warn for name collision in generators
+			// VALIDATE Out port array size need to be constant
+			// VALIDATE Check for bit access on left assignment side when right is
 			// matching
-			// TODO no Registers in Testbench/Global gen
+			// VALIDATE no Registers in Testbench/Global gen
+			// VALIDATE: Don't allow boolean assignments to non-boolean variable
 			checkRegisters(pkg, problems, hContext);
 
 		} catch (final Exception e) {

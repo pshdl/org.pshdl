@@ -86,6 +86,17 @@ class ScopingExtension {
 		return obj.resolveVariableDefault(hVar)
 	}
 
+
+	def Optional<HDLFunction> resolveFunctionByName(AbstractHDLFunctionCall obj, HDLQualifiedName hVar) {
+		if (obj.container === null)
+			return Optional.absent
+		val call=obj as HDLFunctionCall
+		val candidates=obj.container.resolveFunctionCall(call, hVar)
+		if (!candidates.present || candidates.get.empty)
+			return Optional.absent		
+		return Optional.of(candidates.get.head)
+	}
+	
 	def Optional<HDLFunction> resolveFunction(AbstractHDLFunctionCall obj, HDLQualifiedName hVar) {
 		if (obj.container === null)
 			return Optional.absent
@@ -220,6 +231,7 @@ class ScopingExtension {
 		val List<HDLVariable> res = new LinkedList<HDLVariable>
 		for (v : obj.args)
 			res.add(v.name)
+		res.addAll(HDLResolver.getallVariableDeclarations(obj.stmnts));
 		return res
 	}
 

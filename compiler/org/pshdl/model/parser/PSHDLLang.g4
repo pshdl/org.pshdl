@@ -172,7 +172,7 @@ psInlineFunction :
 ;
 
 psSubstituteFunction :
-	'substitute' 'function' psFuncRecturnType? psFunction psFuncParam '{' psStatement* '}'
+	'substitute' 'function' psFuncRecturnType? psFunction psFuncParam '{' psBlock* '}'
 ;
 
 psNativeFunction :

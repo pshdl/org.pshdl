@@ -196,10 +196,10 @@ class FullNameExtension {
 		val cached=call.getMeta(FULLNAME)
 		if (cached !== null)
 			return cached
-		val callRef = call.resolveFunction
+		val callRef = call.resolveFunctionName
 		if (!callRef.present)
 			return null
-		return callRef.get.fullName
+		return callRef.get
 	}
 	
 	def dispatch HDLQualifiedName getFullName(HDLVariable unit) {

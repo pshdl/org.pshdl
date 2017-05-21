@@ -708,11 +708,11 @@ public class ParserToModelExtension {
   protected HDLSubstituteFunction _toHDL(final PSHDLLang.PsSubstituteFunctionContext context, final boolean isStatement) {
     HDLSubstituteFunction func = new HDLSubstituteFunction();
     func = func.setName(this.toName(context.psFunction()));
-    final Function1<PSHDLLang.PsStatementContext, HDLStatement> _function = (PSHDLLang.PsStatementContext it) -> {
+    final Function1<PSHDLLang.PsBlockContext, HDLStatement> _function = (PSHDLLang.PsBlockContext it) -> {
       IHDLObject _hDL = this.toHDL(it, true);
       return ((HDLStatement) _hDL);
     };
-    func = func.setStmnts(ListExtensions.<PSHDLLang.PsStatementContext, HDLStatement>map(context.psStatement(), _function));
+    func = func.setStmnts(ListExtensions.<PSHDLLang.PsBlockContext, HDLStatement>map(context.psBlock(), _function));
     final Function1<PSHDLLang.PsFuncSpecContext, HDLFunctionParameter> _function_1 = (PSHDLLang.PsFuncSpecContext it) -> {
       IHDLObject _hDL = this.toHDL(it, false);
       return ((HDLFunctionParameter) _hDL);

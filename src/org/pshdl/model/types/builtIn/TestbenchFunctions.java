@@ -27,14 +27,19 @@
 package org.pshdl.model.types.builtIn;
 
 import org.pshdl.model.HDLFunction;
+import org.pshdl.model.HDLFunctionCall;
 import org.pshdl.model.HDLFunctionParameter;
 import org.pshdl.model.HDLFunctionParameter.RWType;
 import org.pshdl.model.HDLFunctionParameter.Type;
 import org.pshdl.model.HDLNativeFunction;
+import org.pshdl.model.HDLType;
 import org.pshdl.model.HDLVariable;
+import org.pshdl.model.evaluation.HDLEvaluationContext;
 import org.pshdl.model.types.builtIn.HDLFunctionImplementation.HDLDefaultFunctionImpl;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.services.INativeFunctionProvider;
+
+import com.google.common.base.Optional;
 
 public class TestbenchFunctions extends HDLDefaultFunctionImpl implements INativeFunctionProvider {
 
@@ -88,13 +93,17 @@ public class TestbenchFunctions extends HDLDefaultFunctionImpl implements INativ
 
 	@Override
 	public String getDocumentation(HDLFunction function) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public HDLFunction[] signatures() {
 		return new HDLFunction[] { PULSE, WAIT, WAITFOR, WAITUNTIL };
+	}
+
+	@Override
+	public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+		return Optional.absent();
 	}
 
 }

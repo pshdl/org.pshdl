@@ -31,9 +31,13 @@ import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.pshdl.model.extensions.FullNameExtension;
+import org.pshdl.model.extensions.ScopingExtension;
 import org.pshdl.model.impl.AbstractHDLFunctionCall;
 import org.pshdl.model.utils.HDLQualifiedName;
 import org.pshdl.model.utils.HDLQuery.HDLFieldAccess;
+
+import com.google.common.base.Optional;
 
 /**
  * The class HDLFunctionCall contains the following fields
@@ -128,6 +132,17 @@ public class HDLFunctionCall extends AbstractHDLFunctionCall implements HDLState
 		return super.getContainingFeature(obj);
 	}
 	// $CONTENT-BEGIN$
+
+	public Optional<HDLQualifiedName> resolveFunctionName() {
+		if (!frozen) {
+			throw new IllegalArgumentException("Object not frozen");
+		}
+		final Optional<HDLFunction> resolveFunctionByName = ScopingExtension.INST.resolveFunctionByName(this, function);
+		if (!resolveFunctionByName.isPresent()) {
+			return Optional.absent();
+		}
+		return Optional.fromNullable(FullNameExtension.fullNameOf(resolveFunctionByName.get()));
+	}
 
 	// $CONTENT-END$
 

@@ -71,9 +71,9 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
   
   private final static int epsWidth = 16;
   
-  public static String TESTRUNNER_DIR = "/Users/karstenbecker/GDrive/DartTestRunner/";
+  public static String TESTRUNNER_DIR = "/Users/karstenbecker/Dropbox/PSHDL/DartTestRunner/";
   
-  public static String DART_EXEC = "/Applications/dart/dart-sdk/bin/dart";
+  public static String DART_EXEC = "/usr/local/bin/dart";
   
   public DartCodeGenerator() {
   }
@@ -107,10 +107,10 @@ public class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptu
         String _name_1 = yaml.getName();
         File _file_2 = new File(tempDir, _name_1);
         Files.copy(yaml, _file_2);
-        java.nio.file.Files.createSymbolicLink(new File(binDir, "packages").toPath(), 
-          new File(testRunnerDir, "packages").toPath());
-        java.nio.file.Files.createSymbolicLink(new File(tempDir, "packages").toPath(), 
-          new File(testRunnerDir, "packages").toPath());
+        java.nio.file.Files.createSymbolicLink(new File(tempDir, ".pub").toPath(), 
+          new File(testRunnerDir, ".pub").toPath());
+        java.nio.file.Files.createSymbolicLink(new File(tempDir, ".packages").toPath(), 
+          new File(testRunnerDir, ".packages").toPath());
         _xblockexpression = new IHDLInterpreterFactory<NativeRunner>() {
           @Override
           public NativeRunner newInstance() {

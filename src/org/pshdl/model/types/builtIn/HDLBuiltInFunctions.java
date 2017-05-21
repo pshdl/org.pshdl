@@ -145,6 +145,100 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 			return new HDLFunction[] { ASSERT };
 		}
 
+		@Override
+		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+			return Optional.absent();
+		}
+
+	}
+
+	public static class WidthFunctions extends HDLDefaultFunctionImpl {
+
+		public WidthFunctions() {
+			super(true, false);
+		}
+
+		@Override
+		public Optional<BigInteger> getConstantValue(HDLFunctionCall call, HDLEvaluationContext context) {
+			final HDLExpression a = call.getParams().get(0);
+			final Optional<BigInteger> valueOf = ConstantEvaluate.valueOf(TypeExtension.getWidth(a), context);
+			switch (call.getFunctionRefName().getLastSegment()) {
+			case "widthOf":
+				return valueOf;
+			case "msbOf":
+				if (valueOf.isPresent()) {
+					return Optional.of(valueOf.get().subtract(BigInteger.ONE));
+				}
+				return valueOf;
+			default:
+				throw new IllegalArgumentException("I know nothing about this function");
+			}
+		}
+
+		@Override
+		public Optional<Range<BigInteger>> getRange(HDLFunctionCall call, HDLEvaluationContext context) {
+			final HDLExpression a = call.getParams().get(0);
+			final Optional<Range<BigInteger>> rangeOf = RangeExtension.rangeOf(TypeExtension.getWidth(a), context);
+			switch (call.getFunctionRefName().getLastSegment()) {
+			case "widthOf":
+				return rangeOf;
+			case "msbOf":
+				if (rangeOf.isPresent()) {
+					final Range<BigInteger> range = rangeOf.get();
+					final BigInteger lower = range.lowerEndpoint();
+					final BigInteger upper = range.upperEndpoint().subtract(BigInteger.ONE);
+					if (range.lowerEndpoint().equals(range.upperEndpoint())) {
+						return Optional.of(Range.singleton(upper));
+					}
+					return Optional.of(Range.closed(lower, upper));
+				}
+				return rangeOf;
+			default:
+				throw new IllegalArgumentException("I know nothing about this function");
+			}
+		}
+
+		@Override
+		public Map<String, String> getArgumentDocumentation(HDLFunction function) {
+			final LinkedHashMap<String, String> res = Maps.newLinkedHashMap();
+			res.put("a", "any expression");
+			return res;
+		}
+
+		@Override
+		public String getReturnDocumentation(HDLFunction function) {
+			switch (function.getName()) {
+			case "widthOf":
+				return "The width of the expression";
+			case "msbOf":
+				return "The higest possible bit index of the expression";
+			default:
+				throw new IllegalArgumentException("I know nothing about this function");
+			}
+		}
+
+		@Override
+		public String getDocumentation(HDLFunction function) {
+			switch (function.getName()) {
+			case "widthOf":
+				return "Returns the width of the expression";
+			case "msbOf":
+				return "Returns the higest possible bit index of the expression";
+			default:
+				throw new IllegalArgumentException("I know nothing about this function");
+			}
+		}
+
+		@Override
+		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+			return Optional.of(HDLPrimitive.getNatural());
+		}
+
+		@Override
+		public HDLFunction[] signatures() {
+			return new HDLFunction[] { WIDTH_OF, MSB_OF };
+		}
+
 	}
 
 	public static class AbsFunction extends HDLDefaultFunctionImpl {
@@ -463,6 +557,11 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 			return new HDLFunction[] { ORDINAL };
 		}
 
+		@Override
+		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+			return null;
+		}
+
 	}
 
 	public static class Log2class extends HDLDefaultFunctionImpl {
@@ -549,6 +648,11 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 			throw new IllegalArgumentException("I know nothing about this function:" + call);
 		}
 
+		@Override
+		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+			return Optional.of(HDLPrimitive.getNatural());
+		}
+
 	}
 
 	public static final HDLFunction ORDINAL = (HDLFunction) createOrdinal().freeze(null);
@@ -614,8 +718,20 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 		return new HDLNativeFunction().setSimOnly(false).setName(name.qfn().toString());
 	}
 
+	public static final HDLFunction WIDTH_OF = (HDLFunction) createWidthOf().freeze(null);
+
+	public static HDLNativeFunction createWidthOf() {
+		return basicFunc(BuiltInFunctions.widthOf).addArgs(param(Type.PARAM_ANY_BIT, "a")).setReturnType(returnType(Type.PARAM_UINT));
+	}
+
+	public static final HDLFunction MSB_OF = (HDLFunction) createMSBOf().freeze(null);
+
+	public static HDLNativeFunction createMSBOf() {
+		return basicFunc(BuiltInFunctions.msbOf).addArgs(param(Type.PARAM_ANY_BIT, "a")).setReturnType(returnType(Type.PARAM_UINT));
+	}
+
 	public static enum BuiltInFunctions {
-		highZ, min, max, abs, log2ceil, log2floor, assertThat, ordinal, printf;
+		highZ, min, max, abs, log2ceil, log2floor, assertThat, ordinal, printf, widthOf, msbOf;
 
 		public HDLQualifiedName qfn() {
 			return HDLQualifiedName.create("pshdl", name());
@@ -645,7 +761,8 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 	@Override
 	public HDLFunctionImplementation[] getStaticFunctions() {
-		return new HDLFunctionImplementation[] { new AbsFunction(), new AssertThat(), new HighZFunction(), new Log2class(), new MinMaxFunction(), new OrdinalFunction() };
+		return new HDLFunctionImplementation[] { new AbsFunction(), new AssertThat(), new HighZFunction(), new Log2class(), new MinMaxFunction(), new OrdinalFunction(),
+				new WidthFunctions() };
 	}
 
 	@Override
@@ -659,12 +776,10 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 
 	public class PrintFunction extends HDLDefaultFunctionImpl {
 
-		private final Iterable<HDLExpression> args;
 		private HDLFunction signature;
 
 		public PrintFunction(Iterable<HDLExpression> arguments) {
 			super(true, true);
-			this.args = arguments;
 			HDLFunction sig = basicFunc(BuiltInFunctions.printf);
 			int pos = 0;
 			for (final HDLExpression hdlExpression : arguments) {
@@ -736,6 +851,11 @@ public class HDLBuiltInFunctions implements INativeFunctionProvider, IDynamicFun
 				return new HDLFunction[0];// This should actually never happen
 			}
 			return new HDLFunction[] { signature };
+		}
+
+		@Override
+		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
+			return Optional.absent();
 		}
 
 	}

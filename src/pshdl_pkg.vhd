@@ -590,6 +590,12 @@ package Types is
     function "or" (L: INTEGER; R: INTEGER) return INTEGER;
     function "xor" (L: INTEGER; R: INTEGER) return INTEGER;
     function "and" (L: INTEGER; R: INTEGER) return INTEGER;
+    function widthOf(a: std_logic_vector) return INTEGER;
+    function widthOf(a: unsigned) return INTEGER;
+    function widthOf(a: signed) return INTEGER;
+    function msbOf(a: std_logic_vector) return INTEGER;
+    function msbOf(a: unsigned) return INTEGER;
+    function msbOf(a: signed) return INTEGER;
 end;
 
 package body Types is
@@ -694,5 +700,35 @@ package body Types is
     begin
         return intToInteger(resizeInteger(L,32) and resizeInteger(R,32));
     end "and";
+
+    function widthOf(a: std_logic_vector) return INTEGER is
+    begin
+        return a'LENGTH;
+    end widthOf;
+
+    function widthOf(a: unsigned) return INTEGER is
+    begin
+        return a'LENGTH;
+    end widthOf;
+
+    function widthOf(a: signed) return INTEGER is
+    begin
+        return a'LENGTH;
+    end widthOf;
+
+    function msbOf(a: std_logic_vector) return INTEGER is
+    begin
+        return a'HIGH;
+    end msbOf;
+
+    function msbOf(a: unsigned) return INTEGER is
+    begin
+        return a'HIGH;
+    end msbOf;
+
+    function msbOf(a: signed) return INTEGER is
+    begin
+        return a'HIGH;
+    end msbOf;
 
 end;

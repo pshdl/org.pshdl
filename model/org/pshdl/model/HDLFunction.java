@@ -29,7 +29,9 @@ package org.pshdl.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -174,6 +176,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 		@SuppressWarnings("unchecked")
 		final T orig = (T) stmnt.copyDeepFrozen(origin.getContainer());
 		final Iterator<HDLExpression> argIter = arguments.iterator();
+		final Set<String> argRefs = new HashSet<>();
 		for (final HDLFunctionParameter param : args) {
 			if (!argIter.hasNext()) {
 				continue;
@@ -191,6 +194,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 				final Collection<HDLVariableRef> allArgRefs = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef())
 						.getAll();
 				for (final HDLVariableRef argRef : allArgRefs) {
+					argRefs.add(argRef.getVarRefName().toString());
 					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 					if ((argRef.getBits().size() != 0) || (argRef.getArray().size() != 0)) {
 						if (exp instanceof HDLVariableRef) {
@@ -215,6 +219,7 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 			case PARAM_ANY_ENUM:
 				final Collection<HDLVariableRef> allEnum = HDLQuery.select(HDLVariableRef.class).from(orig).where(HDLResolvedRef.fVar).isEqualTo(param.getName().asRef()).getAll();
 				for (final HDLVariableRef argRef : allEnum) {
+					argRefs.add(argRef.getVarRefName().toString());
 					final HDLExpression exp = arg.copyFiltered(CopyFilter.DEEP_META);
 					msExp.replace(argRef, exp);
 				}
@@ -230,6 +235,14 @@ public abstract class HDLFunction extends AbstractHDLFunction {
 				break;
 			case PARAM_FUNCTION:
 				break;
+			}
+		}
+		final HDLVariableRef[] allRefs = orig.getAllObjectsOf(HDLVariableRef.class, true);
+		for (final HDLVariableRef varRef : allRefs) {
+			final HDLQualifiedName qfn = varRef.getVarRefName();
+			if (!argRefs.contains(qfn.toString())) {
+				final HDLQualifiedName localPart = qfn.getLocalPart();
+				msExp.replace(varRef, varRef.setVar(localPart));
 			}
 		}
 		final T newExp = msExp.apply(orig);

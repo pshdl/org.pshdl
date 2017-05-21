@@ -234,8 +234,17 @@ public class HDLResolver {
 			return Optional.of(checkCache);
 		}
 		if (var.length > 1) {
+			final HDLQualifiedName typePart = resolveName.getTypePart();
+			if (var.getSegment(0).charAt(0) == HDLQualifiedName.LOCAL_TYPE_SEP) {
+				var = new HDLQualifiedName(typePart + "." + var);
+				final HDLVariable checkCacheAgain = checkCache(var, variableCache);
+				if (checkCacheAgain != null) {
+					return Optional.of(checkCacheAgain);
+				}
+			}
 			// Using lastSgement if $for0.I or ThisObject.I
-			if (var.getSegment(0).startsWith("$") || var.getTypePart().equals(resolveName.getTypePart())) {
+			// After some insulin stage, the @block.x have been renamed to $block_x
+			if ((var.getLocalPart().getSegment(0).charAt(0) == '$') || var.getTypePart().equals(typePart)) {
 				final String string = var.getLastSegment();
 				for (final Entry<HDLQualifiedName, HDLVariable> entry : variableCache.entrySet()) {
 					if (entry.getKey().getLastSegment().equals(string)) {
@@ -243,6 +252,7 @@ public class HDLResolver {
 					}
 				}
 			}
+
 		}
 		if (HDLRegisterConfig.DEF_CLK.equals(var.getLastSegment())) {
 			return Optional.of(HDLRegisterConfig.defaultClk(true));

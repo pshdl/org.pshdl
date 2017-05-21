@@ -258,13 +258,13 @@ public class FullNameExtension {
     if ((cached != null)) {
       return cached;
     }
-    final Optional<HDLFunction> callRef = call.resolveFunction();
+    final Optional<HDLQualifiedName> callRef = call.resolveFunctionName();
     boolean _isPresent = callRef.isPresent();
     boolean _not = (!_isPresent);
     if (_not) {
       return null;
     }
-    return this.getFullName(callRef.get());
+    return callRef.get();
   }
   
   protected HDLQualifiedName _getFullName(final HDLVariable unit) {

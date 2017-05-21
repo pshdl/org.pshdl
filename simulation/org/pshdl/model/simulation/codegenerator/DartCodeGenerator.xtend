@@ -93,8 +93,8 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 	String library
 	boolean usePackageImport
 	static final int epsWidth = 16;
-	public static String TESTRUNNER_DIR = "/Users/karstenbecker/GDrive/DartTestRunner/"
-	public static String DART_EXEC = "/Applications/dart/dart-sdk/bin/dart"
+	public static String TESTRUNNER_DIR = "/Users/karstenbecker/Dropbox/PSHDL/DartTestRunner/"
+	public static String DART_EXEC = "/usr/local/bin/dart"
 
 	new() {
 	}
@@ -117,10 +117,10 @@ class DartCodeGenerator extends CommonCodeGenerator implements ITypeOuptutProvid
 		Files.copy(testRunner, new File(binDir, testRunner.getName()))
 		val yaml = new File(testRunnerDir, "pubspec.yaml")
 		Files.copy(yaml, new File(tempDir, yaml.getName()))
-		java.nio.file.Files.createSymbolicLink(new File(binDir, "packages").toPath(),
-			new File(testRunnerDir, "packages").toPath())
-		java.nio.file.Files.createSymbolicLink(new File(tempDir, "packages").toPath(),
-			new File(testRunnerDir, "packages").toPath())
+		java.nio.file.Files.createSymbolicLink(new File(tempDir, ".pub").toPath(),
+			new File(testRunnerDir, ".pub").toPath())
+		java.nio.file.Files.createSymbolicLink(new File(tempDir, ".packages").toPath(),
+			new File(testRunnerDir, ".packages").toPath())
 		new IHDLInterpreterFactory<NativeRunner>() {
 
 			override newInstance() {

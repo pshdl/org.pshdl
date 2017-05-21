@@ -73,11 +73,6 @@ public interface HDLFunctionImplementation {
 			return Optional.absent();
 		}
 
-		@Override
-		public Optional<? extends HDLType> specifyReturnType(HDLFunction function, HDLFunctionCall call, HDLEvaluationContext context) {
-			throw new UnsupportedOperationException("Need to be implemented for:" + this);
-		}
-
 	}
 
 	public String getDocumentation(HDLFunction function);
